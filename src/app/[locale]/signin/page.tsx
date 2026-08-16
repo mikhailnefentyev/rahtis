@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Card, CardBody } from '@/components/ui';
 import { redirectIfSignedIn } from '@/lib/auth/actions';
@@ -21,7 +22,7 @@ export default async function SignInPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ next?: string }>;
+  searchParams: Promise<{ next?: string; reason?: string }>;
 }) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
@@ -30,7 +31,7 @@ export default async function SignInPage({
   await redirectIfSignedIn(locale);
 
   const { t } = await getI18n(locale);
-  const { next } = await searchParams;
+  const { next, reason } = await searchParams;
 
   return (
     <main className="flex flex-1 items-center justify-center px-5 py-12">
@@ -49,9 +50,26 @@ export default async function SignInPage({
               {t.auth.signInSubtitle}
             </p>
 
+            {/* Пришли по просроченной или уже использованной ссылке из письма. */}
+            {reason === 'link' && (
+              <p
+                role="alert"
+                className="mb-4 rounded-control border border-warn/35 bg-warn/10 px-3 py-2 text-[13px] text-warn"
+              >
+                {t.invite.linkExpired}
+              </p>
+            )}
+
             <SignInForm next={next ?? null} />
           </CardBody>
         </Card>
+
+        <p className="mt-5 text-center text-[13px] text-ink-muted">
+          {t.auth.noApplicationYet}{' '}
+          <Link href={`/${locale}/apply`} className="text-accent hover:underline">
+            {t.auth.applyLink}
+          </Link>
+        </p>
       </div>
     </main>
   );

@@ -168,7 +168,34 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      moderate_company: {
+        Args: {
+          p_company_id: string
+          p_decision: Database["public"]["Enums"]["company_status"]
+          p_note?: string
+        }
+        Returns: {
+          activated_at: string | null
+          approved_at: string | null
+          business_id: string
+          contact_email: string
+          country: string
+          created_at: string
+          id: string
+          kind: Database["public"]["Enums"]["party_role"]
+          name: string
+          rejected_at: string | null
+          rejection_reason: string | null
+          status: Database["public"]["Enums"]["company_status"]
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "companies"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
     }
     Enums: {
       company_status: "PENDING" | "APPROVED" | "ACTIVE" | "REJECTED"

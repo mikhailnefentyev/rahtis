@@ -211,6 +211,45 @@ export const ru = {
     queue: 'Очередь модерации',
     applications: 'Заявки на регистрацию',
     vehicles: 'Машины на допуск',
+    approveAndInvite: 'Одобрить · выслать приглашение',
+    rejectWithReason: 'Отклонить',
+    reasonLabel: 'Причина отказа',
+    reasonPlaceholder: 'Y-tunnus не найден в реестре PRH',
+    reasonRequired: 'Укажите причину — компания её увидит',
+    inviteSent: 'Приглашение отправлено',
+    inviteFailed: 'Компания одобрена, но письмо не ушло',
+    resendInvite: 'Отправить приглашение повторно',
+    accessGranted: 'Доступ выдан',
+    noUsersYet: 'Приглашение не отправлено',
+    recent: 'Рассмотренные заявки',
+    decidedAt: 'Решение',
+  },
+
+  apply: {
+    title: 'Заявка на регистрацию',
+    subtitle:
+      'Открытой регистрации нет. Aivomaa проверяет каждую компанию по реестру и высылает доступ на указанную почту.',
+    iAmCarrier: 'Я перевозчик',
+    iAmShipper: 'Я заказчик',
+    submit: 'Отправить заявку в Aivomaa',
+    submitting: 'Отправляем…',
+    carrierNote:
+      'После одобрения: вход в кабинет → лицензия и страховка → карточки авто. Допуск выдаётся по каждой машине отдельно.',
+    shipperNote: 'После одобрения: вход в кабинет → реквизиты → публикация заказов.',
+    sentTitle: 'Заявка отправлена',
+    duplicate: 'Заявка от компании с таким Y-tunnus уже подана или одобрена.',
+    failed: 'Не удалось отправить заявку. Попробуйте ещё раз.',
+  },
+
+  invite: {
+    title: 'Задайте пароль',
+    subtitle: 'Приглашение принято. Придумайте пароль для входа в кабинет.',
+    password: 'Новый пароль',
+    repeat: 'Повторите пароль',
+    submit: 'Сохранить и войти',
+    tooShort: 'Пароль должен быть не короче 8 символов',
+    mismatch: 'Пароли не совпадают',
+    linkExpired: 'Ссылка недействительна или устарела. Запросите новое приглашение у Aivomaa.',
   },
 
   report: {
@@ -337,7 +376,11 @@ export const ru = {
     'report.weekTotal': 'Итого за неделю: {amount}',
 
     'signup.submitted':
-      'Aivomaa проверит {company} (Y-tunnus {businessId}) по реестру и вышлет коды доступа на {email}.',
+      'Aivomaa проверит {company} (Y-tunnus {businessId}) по реестру и вышлет доступ на {email}.',
+    'moderation.pendingCount':
+      '{count, plural, =0 {Новых заявок нет} one {# заявка ждёт решения} few {# заявки ждут решения} many {# заявок ждут решения} other {# заявки ждут решения}}',
+    'moderation.invitedTo': 'Приглашение отправлено на {email}',
+    'moderation.decidedBy': 'Решение принято {date}',
 
     'trip.stepReported': 'Заказ {ref}: водитель отметил «{step}».',
     'trip.amended': 'Изменение маршрута по заказу {ref}: {change}',
