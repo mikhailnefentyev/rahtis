@@ -1,11 +1,12 @@
 import 'server-only';
 
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
-import { supabaseServiceRoleKey, supabaseUrl } from '@/lib/env';
+import { supabaseUrl } from '@/lib/env';
+import { supabaseSecretKey } from '@/lib/env.server';
 import type { Database } from '@/types/database';
 
 /**
- * Клиент под service_role: обходит RLS полностью.
+ * Клиент под secret-ключом: обходит RLS полностью.
  *
  * Импорт 'server-only' в первой строке — не украшение: он превращает любую
  * попытку затащить этот модуль в клиентский бандл в ошибку сборки, а не в
@@ -21,7 +22,7 @@ import type { Database } from '@/types/database';
  * и проверку прав нужно писать руками.
  */
 export function createAdminClient() {
-  return createSupabaseClient<Database>(supabaseUrl(), supabaseServiceRoleKey(), {
+  return createSupabaseClient<Database>(supabaseUrl(), supabaseSecretKey(), {
     auth: {
       persistSession: false,
       autoRefreshToken: false,

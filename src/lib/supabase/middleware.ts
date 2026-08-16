@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
-import { isSupabaseConfigured, supabaseAnonKey, supabaseUrl } from '@/lib/env';
+import { isSupabaseConfigured, supabasePublishableKey, supabaseUrl } from '@/lib/env';
 
 /**
  * Продлевает сессию Supabase на каждом запросе.
@@ -14,7 +14,7 @@ import { isSupabaseConfigured, supabaseAnonKey, supabaseUrl } from '@/lib/env';
 export async function updateSession(request: NextRequest, response: NextResponse) {
   if (!isSupabaseConfigured()) return response;
 
-  const supabase = createServerClient(supabaseUrl(), supabaseAnonKey(), {
+  const supabase = createServerClient(supabaseUrl(), supabasePublishableKey(), {
     cookies: {
       getAll() {
         return request.cookies.getAll();

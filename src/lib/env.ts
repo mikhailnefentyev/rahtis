@@ -1,11 +1,18 @@
 /**
- * Доступ к переменным окружения с понятной ошибкой вместо `undefined`,
- * который всплывёт где-нибудь в глубине Supabase SDK.
+ * Публичные переменные окружения Supabase.
  *
- * NEXT_PUBLIC_* обращения обязаны быть буквальными: Next подставляет их
- * на этапе сборки, поэтому `process.env[name]` с вычисляемым ключом
- * молча вернёт undefined в браузере.
+ * Секретный ключ здесь намеренно отсутствует — он живёт в env.server.ts,
+ * который защищён импортом 'server-only'. Держать оба ключа в одном модуле
+ * значит рано или поздно затащить секрет в клиентский бандл.
+ *
+ * Обращения к NEXT_PUBLIC_* обязаны быть буквальными: Next подставляет их
+ * на этапе сборки, поэтому `process.env[name]` с вычисляемым ключом молча
+ * вернёт undefined в браузере.
  */
+
+/** Префиксы ключей нового формата Supabase — это не JWT. */
+const PUBLISHABLE_PREFIX = 'sb_publishable_';
+const SECRET_PREFIX = 'sb_secret_';
 
 export function supabaseUrl(): string {
   const value = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -13,24 +20,40 @@ export function supabaseUrl(): string {
   return value;
 }
 
-export function supabaseAnonKey(): string {
-  const value = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!value) throw new Error(missing('NEXT_PUBLIC_SUPABASE_ANON_KEY'));
+/**
+ * Publishable-ключ (`sb_publishable_…`, ранее назывался anon).
+ *
+ * Попадает в браузерный бандл — так и задумано. Доступ ограничивают
+ * политики RLS, а не секретность ключа.
+ */
+export function supabasePublishableKey(): string {
+  const value = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+  if (!value) throw new Error(missing('NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY'));
+
+  // Самая дорогая ошибка в этом файле: секретный ключ, вписанный в
+  // переменную с префиксом NEXT_PUBLIC_, уедет в браузер к каждому
+  // посетителю и откроет всю базу в обход RLS. Стоит одной проверки.
+  if (value.startsWith(SECRET_PREFIX)) {
+    throw new Error(
+      'В NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY лежит секретный ключ (sb_secret_…). ' +
+        'Всё с префиксом NEXT_PUBLIC_ попадает в браузер. Впишите сюда publishable-ключ ' +
+        '(sb_publishable_…), а секретный — в SUPABASE_SECRET_KEY, и обязательно ' +
+        'отзовите засвеченный ключ в панели Supabase.',
+    );
+  }
+
   return value;
 }
 
-/** Ключ service_role: только серверный код, никогда не в браузер. */
-export function supabaseServiceRoleKey(): string {
-  const value = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!value) throw new Error(missing('SUPABASE_SERVICE_ROLE_KEY'));
-  return value;
-}
-
-/** Настроен ли Supabase. Позволяет коду мягко деградировать до подключения проекта. */
+/** Настроен ли Supabase. Позволяет коду работать до подключения проекта. */
 export function isSupabaseConfigured(): boolean {
-  return Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+  return Boolean(
+    process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+  );
 }
 
-function missing(name: string): string {
-  return `Не задана переменная окружения ${name}. Скопируйте .env.example в .env.local и заполните значения из панели Supabase (Settings → API).`;
+export { PUBLISHABLE_PREFIX, SECRET_PREFIX };
+
+export function missing(name: string): string {
+  return `Не задана переменная окружения ${name}. Скопируйте .env.example в .env.local и заполните значения из панели Supabase (Project Settings → API Keys).`;
 }
