@@ -43,47 +43,95 @@ export type Database = {
         Row: {
           activated_at: string | null
           approved_at: string | null
+          bic: string | null
+          billing_city: string | null
+          billing_country: string | null
+          billing_email: string | null
+          billing_postal_code: string | null
+          billing_reference: string | null
+          billing_street: string | null
           business_id: string
           contact_email: string
           country: string
           created_at: string
+          einvoice_operator: string | null
+          einvoice_ovt: string | null
+          iban: string | null
           id: string
           kind: Database["public"]["Enums"]["party_role"]
+          legal_city: string | null
+          legal_country: string | null
+          legal_name: string | null
+          legal_postal_code: string | null
+          legal_street: string | null
           name: string
           rejected_at: string | null
           rejection_reason: string | null
           status: Database["public"]["Enums"]["company_status"]
           updated_at: string
+          vat_number: string | null
         }
         Insert: {
           activated_at?: string | null
           approved_at?: string | null
+          bic?: string | null
+          billing_city?: string | null
+          billing_country?: string | null
+          billing_email?: string | null
+          billing_postal_code?: string | null
+          billing_reference?: string | null
+          billing_street?: string | null
           business_id: string
           contact_email: string
           country?: string
           created_at?: string
+          einvoice_operator?: string | null
+          einvoice_ovt?: string | null
+          iban?: string | null
           id?: string
           kind: Database["public"]["Enums"]["party_role"]
+          legal_city?: string | null
+          legal_country?: string | null
+          legal_name?: string | null
+          legal_postal_code?: string | null
+          legal_street?: string | null
           name: string
           rejected_at?: string | null
           rejection_reason?: string | null
           status?: Database["public"]["Enums"]["company_status"]
           updated_at?: string
+          vat_number?: string | null
         }
         Update: {
           activated_at?: string | null
           approved_at?: string | null
+          bic?: string | null
+          billing_city?: string | null
+          billing_country?: string | null
+          billing_email?: string | null
+          billing_postal_code?: string | null
+          billing_reference?: string | null
+          billing_street?: string | null
           business_id?: string
           contact_email?: string
           country?: string
           created_at?: string
+          einvoice_operator?: string | null
+          einvoice_ovt?: string | null
+          iban?: string | null
           id?: string
           kind?: Database["public"]["Enums"]["party_role"]
+          legal_city?: string | null
+          legal_country?: string | null
+          legal_name?: string | null
+          legal_postal_code?: string | null
+          legal_street?: string | null
           name?: string
           rejected_at?: string | null
           rejection_reason?: string | null
           status?: Database["public"]["Enums"]["company_status"]
           updated_at?: string
+          vat_number?: string | null
         }
         Relationships: []
       }
@@ -168,6 +216,46 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      activate_company: {
+        Args: { p_company_id: string }
+        Returns: {
+          activated_at: string | null
+          approved_at: string | null
+          bic: string | null
+          billing_city: string | null
+          billing_country: string | null
+          billing_email: string | null
+          billing_postal_code: string | null
+          billing_reference: string | null
+          billing_street: string | null
+          business_id: string
+          contact_email: string
+          country: string
+          created_at: string
+          einvoice_operator: string | null
+          einvoice_ovt: string | null
+          iban: string | null
+          id: string
+          kind: Database["public"]["Enums"]["party_role"]
+          legal_city: string | null
+          legal_country: string | null
+          legal_name: string | null
+          legal_postal_code: string | null
+          legal_street: string | null
+          name: string
+          rejected_at: string | null
+          rejection_reason: string | null
+          status: Database["public"]["Enums"]["company_status"]
+          updated_at: string
+          vat_number: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "companies"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       moderate_company: {
         Args: {
           p_company_id: string
@@ -177,17 +265,33 @@ export type Database = {
         Returns: {
           activated_at: string | null
           approved_at: string | null
+          bic: string | null
+          billing_city: string | null
+          billing_country: string | null
+          billing_email: string | null
+          billing_postal_code: string | null
+          billing_reference: string | null
+          billing_street: string | null
           business_id: string
           contact_email: string
           country: string
           created_at: string
+          einvoice_operator: string | null
+          einvoice_ovt: string | null
+          iban: string | null
           id: string
           kind: Database["public"]["Enums"]["party_role"]
+          legal_city: string | null
+          legal_country: string | null
+          legal_name: string | null
+          legal_postal_code: string | null
+          legal_street: string | null
           name: string
           rejected_at: string | null
           rejection_reason: string | null
           status: Database["public"]["Enums"]["company_status"]
           updated_at: string
+          vat_number: string | null
         }
         SetofOptions: {
           from: "*"

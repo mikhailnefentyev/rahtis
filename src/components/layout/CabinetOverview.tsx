@@ -1,4 +1,5 @@
-import { Badge, Card, CardBody, Kv, Mono } from '@/components/ui';
+import Link from 'next/link';
+import { Badge, buttonClass, Card, CardBody, Kv, Mono } from '@/components/ui';
 import { companyStatusTone } from '@/components/ui/tone';
 import { getI18n, type Locale } from '@/lib/i18n';
 import type { Company, PartyRole } from '@/types/db';
@@ -20,6 +21,9 @@ export async function CabinetOverview({
   company: Company | null;
 }) {
   const { t, f } = await getI18n(locale);
+
+  /* Одобрена, но ещё не активна — значит реквизиты не заполнены. */
+  const needsRequisites = company?.status === 'APPROVED';
 
   const hint =
     company?.status === 'APPROVED'
@@ -63,9 +67,22 @@ export async function CabinetOverview({
           </CardBody>
         </Card>
 
-        <Card stripe={hint ? 'warn' : 'neutral'}>
+        <Card stripe={needsRequisites ? 'warn' : 'neutral'}>
           <CardBody className="flex flex-col gap-3">
-            {hint && <p className="text-[13px] leading-relaxed text-ink">{hint}</p>}
+            {needsRequisites && (
+              <>
+                <p className="text-[13px] leading-relaxed text-ink">
+                  {t.requisites.fillToActivate}
+                </p>
+                <Link
+                  href={`/${locale}/requisites`}
+                  className={buttonClass({ variant: 'primary', size: 'md', className: 'self-start' })}
+                >
+                  {t.requisites.openForm}
+                </Link>
+              </>
+            )}
+            {hint && <p className="text-[13px] leading-relaxed text-ink-muted">{hint}</p>}
             <p className="text-[13px] leading-relaxed text-ink-muted">{t.cabinet.stageNotice}</p>
           </CardBody>
         </Card>
