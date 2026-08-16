@@ -1,5 +1,5 @@
 export { Badge, Dot } from './Badge';
-export { Button } from './Button';
+export { Button, buttonClass } from './Button';
 export { Card, CardBody, CardHeader, CardTitle, CardDivider } from './Card';
 export { Countdown } from './Countdown';
 export { DocChip } from './DocChip';

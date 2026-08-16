@@ -1,0 +1,58 @@
+import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import { Card, CardBody } from '@/components/ui';
+import { redirectIfSignedIn } from '@/lib/auth/actions';
+import { getI18n, isLocale } from '@/lib/i18n';
+import { SignInForm } from './form';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  if (!isLocale(locale)) return {};
+  const { t } = await getI18n(locale);
+  return { title: t.auth.signInTitle };
+}
+
+export default async function SignInPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<{ next?: string }>;
+}) {
+  const { locale } = await params;
+  if (!isLocale(locale)) notFound();
+
+  /* Вошедшему на странице входа делать нечего. */
+  await redirectIfSignedIn(locale);
+
+  const { t } = await getI18n(locale);
+  const { next } = await searchParams;
+
+  return (
+    <main className="flex flex-1 items-center justify-center px-5 py-12">
+      <div className="w-full max-w-sm">
+        <div className="mb-6 text-center">
+          <p className="font-mono text-xl font-extrabold tracking-tight text-accent">
+            {t.brand.name}
+          </p>
+          <p className="label-micro mt-2">{t.brand.tagline}</p>
+        </div>
+
+        <Card>
+          <CardBody className="p-6">
+            <h1 className="text-[15px] font-semibold tracking-tight">{t.auth.signInTitle}</h1>
+            <p className="mt-1.5 mb-5 text-[13px] leading-relaxed text-ink-muted">
+              {t.auth.signInSubtitle}
+            </p>
+
+            <SignInForm next={next ?? null} />
+          </CardBody>
+        </Card>
+      </div>
+    </main>
+  );
+}

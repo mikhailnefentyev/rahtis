@@ -1,25 +1,34 @@
 import { NextResponse, type NextRequest } from 'next/server';
+import { PROTECTED_SEGMENTS, signInPath } from '@/lib/auth/paths';
 import { LOCALE_COOKIE, defaultLocale, isLocale, matchLocale } from '@/lib/i18n/config';
 import { updateSession } from '@/lib/supabase/middleware';
 
 /**
  * Проходит перед каждым запросом (в Next 16 это бывшее middleware).
  *
- * Решает две задачи за один проход:
+ * Три задачи за один проход:
  *
- *   1. Локаль. Каждый маршрут живёт под префиксом языка (/ru/carrier/desk).
+ *   1. Локаль. Каждый маршрут живёт под префиксом языка (/ru/carrier).
  *      Запрос без префикса получает редирект на подходящий язык — сначала
  *      из куки, затем из Accept-Language, затем дефолт.
  *
- *   2. Сессия Supabase. Токен продлевается на каждом запросе, иначе
- *      пользователь разлогинится через час работы.
+ *   2. Сессия. Токен продлевается на каждом запросе, иначе пользователь
+ *      разлогинится через час работы.
  *
- * Защита маршрутов по ролям появится на Этапе 1 — она встанет между этими
- * двумя шагами, когда сессия уже разобрана, но ответ ещё не отдан.
+ *   3. Отсечение неавторизованных от кабинетов.
+ *
+ * Роль здесь намеренно не проверяется. Для этого нужен запрос к базе, а
+ * middleware выполняется на каждый запрос, включая переходы внутри одного
+ * кабинета. Роль проверяет layout — один раз на навигацию, с кешированием
+ * в пределах запроса.
+ *
+ * И главное: этот слой не защищает данные. У Next.js была не одна
+ * уязвимость с обходом middleware, поэтому доступ к строкам защищает RLS,
+ * а здесь решается только навигация.
  */
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const first = pathname.split('/')[1];
+  const [, first, second] = pathname.split('/');
 
   if (!isLocale(first)) {
     const url = request.nextUrl.clone();
@@ -27,8 +36,17 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  const response = NextResponse.next({ request });
-  return updateSession(request, response);
+  const { response, userId } = await updateSession(request, NextResponse.next({ request }));
+
+  if (!userId && PROTECTED_SEGMENTS.includes(second ?? '')) {
+    const url = request.nextUrl.clone();
+    url.pathname = signInPath(first);
+    /* Куда вернуть после входа — вместе со строкой запроса. */
+    url.search = `?next=${encodeURIComponent(pathname + request.nextUrl.search)}`;
+    return NextResponse.redirect(url);
+  }
+
+  return response;
 }
 
 function resolveLocale(request: NextRequest): string {

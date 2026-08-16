@@ -22,6 +22,28 @@ const sizeClass: Record<Size, string> = {
   lg: 'h-10 gap-2 rounded-control px-5 text-sm',
 };
 
+/**
+ * Классы кнопки отдельно от самой кнопки.
+ *
+ * Нужны там, где по смыслу ссылка, а по виду кнопка: переход в кабинет,
+ * возврат на вход. Подменять <a> внутри <button> нельзя — получится
+ * неверная разметка и сломанная навигация с клавиатуры.
+ */
+export function buttonClass({
+  variant = 'default',
+  size = 'md',
+  className,
+}: { variant?: Variant; size?: Size; className?: string } = {}): string {
+  return cn(
+    'inline-flex cursor-pointer items-center justify-center border font-semibold',
+    'transition-colors duration-150',
+    'disabled:pointer-events-none disabled:opacity-35',
+    sizeClass[size],
+    variantClass[variant],
+    className,
+  );
+}
+
 export function Button({
   variant = 'default',
   size = 'md',
@@ -32,18 +54,5 @@ export function Button({
   variant?: Variant;
   size?: Size;
 }) {
-  return (
-    <button
-      type={type}
-      className={cn(
-        'inline-flex cursor-pointer items-center justify-center border font-semibold',
-        'transition-colors duration-150',
-        'disabled:pointer-events-none disabled:opacity-35',
-        sizeClass[size],
-        variantClass[variant],
-        className,
-      )}
-      {...props}
-    />
-  );
+  return <button type={type} className={buttonClass({ variant, size, className })} {...props} />;
 }

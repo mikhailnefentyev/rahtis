@@ -2,17 +2,26 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { isSupabaseConfigured, supabasePublishableKey, supabaseUrl } from '@/lib/env';
 
+export type SessionCheck = {
+  response: NextResponse;
+  /** null — пользователь не вошёл либо Supabase ещё не подключён. */
+  userId: string | null;
+};
+
 /**
- * Продлевает сессию Supabase на каждом запросе.
+ * Продлевает сессию Supabase и сообщает, кто пришёл.
  *
  * Access-токен живёт около часа. Без этого шага пользователь, открывший
  * вкладку с утра, к обеду обнаружит себя разлогиненным посреди рейса.
  *
- * Пока проект Supabase не подключён, функция просто пропускает запрос
- * дальше: каркас должен собираться и запускаться без ключей.
+ * Пока проект Supabase не подключён, запрос пропускается дальше без
+ * пользователя: каркас должен запускаться без ключей.
  */
-export async function updateSession(request: NextRequest, response: NextResponse) {
-  if (!isSupabaseConfigured()) return response;
+export async function updateSession(
+  request: NextRequest,
+  response: NextResponse,
+): Promise<SessionCheck> {
+  if (!isSupabaseConfigured()) return { response, userId: null };
 
   const supabase = createServerClient(supabaseUrl(), supabasePublishableKey(), {
     cookies: {
@@ -30,7 +39,9 @@ export async function updateSession(request: NextRequest, response: NextResponse
 
   // Именно getUser, а не getSession: он проверяет токен на сервере Supabase.
   // getSession читает куку на доверии, и подделанную сессию не заметит.
-  await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  return response;
+  return { response, userId: user?.id ?? null };
 }
