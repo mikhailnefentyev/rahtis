@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { cn } from '@/lib/cn';
 import { formatCountdown } from '@/lib/format';
+import { useI18n } from '@/lib/i18n/provider';
 import { useNow } from '@/lib/useNow';
 
 /**
@@ -15,19 +16,21 @@ import { useNow } from '@/lib/useNow';
  *
  * До гидратации время неизвестно (серверные часы тут не годятся), поэтому
  * первый кадр показывает прочерк той же ширины — без скачка вёрстки.
+ *
+ * Формулировка берётся из словаря целиком, а не склеивается из времени и
+ * подписи: во многих языках время стоит не первым.
  */
 export function Countdown({
   deadline,
-  label = 'до отката',
   onExpire,
   className,
 }: {
   deadline: string | number | Date;
-  label?: string;
   /** Вызывается один раз в момент истечения — например, чтобы обновить список. */
   onExpire?: () => void;
   className?: string;
 }) {
+  const { t, m } = useI18n();
   const now = useNow();
   const target = new Date(deadline).getTime();
   const left = now == null ? null : target - now;
@@ -53,7 +56,11 @@ export function Countdown({
       )}
     >
       <ClockIcon />
-      {left == null ? '—:—' : expired ? 'время вышло' : `${formatCountdown(left)} ${label}`}
+      {left == null
+        ? t.countdown.unknown
+        : expired
+          ? t.countdown.expired
+          : m('countdown.left', { time: formatCountdown(left) })}
     </span>
   );
 }

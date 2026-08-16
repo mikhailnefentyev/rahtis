@@ -72,6 +72,33 @@ export function createFormat(intlLocale: string) {
       return nf.format(value);
     },
 
+    /**
+     * Дробное число с фиксированным числом знаков: рейтинг 4.7 → «4,7»
+     * в русском и финском, «4.7» в английском. Разделитель дробной части
+     * решает локаль, а не toFixed.
+     */
+    decimal(value: number, digits = 1): string {
+      const nf = cached(`dec:${intlLocale}:${digits}`, () =>
+        new Intl.NumberFormat(intlLocale, {
+          minimumFractionDigits: digits,
+          maximumFractionDigits: digits,
+        }),
+      );
+      return nf.format(value);
+    },
+
+    /** Доля как проценты: 0.03 → «3 %». Знак и отступ ставит локаль. */
+    percent(fraction: number, digits = 0): string {
+      const nf = cached(`pct:${intlLocale}:${digits}`, () =>
+        new Intl.NumberFormat(intlLocale, {
+          style: 'percent',
+          minimumFractionDigits: digits,
+          maximumFractionDigits: digits,
+        }),
+      );
+      return nf.format(fraction);
+    },
+
     /** Дата: «12.11.2026». */
     date(value: Date | string | number): string {
       const df = cached(`date:${intlLocale}`, () =>

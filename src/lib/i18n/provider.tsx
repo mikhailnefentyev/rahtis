@@ -1,25 +1,25 @@
 'use client';
 
-import { createContext, useContext } from 'react';
+import { createContext, useContext, useMemo } from 'react';
+import { createI18n, type I18n } from './bundle';
 import type { Locale } from './config';
 import type { Dictionary } from './dictionaries';
 
-type I18nValue = {
-  locale: Locale;
-  t: Dictionary;
-};
-
-const I18nContext = createContext<I18nValue | null>(null);
+const I18nContext = createContext<I18n | null>(null);
 
 /**
- * Отдаёт словарь клиентским компонентам.
+ * Отдаёт язык клиентским компонентам.
  *
- * Серверные компоненты словарь не запрашивают через контекст — они получают
- * его напрямую из `getDictionary(locale)`, без обращения к React-контексту.
+ * Серверные компоненты через контекст ничего не запрашивают — они берут
+ * тот же набор напрямую из `getI18n(locale)`.
  *
- * Словарь сериализуется в разметку целиком. Пока он размером в несколько
- * килобайт, это дешевле, чем дробить его по неймспейсам; когда вырастет —
- * провайдер начнёт принимать срез, а не весь объект.
+ * Через границу сервер → клиент проходит только словарь: это обычный
+ * объект, он сериализуется. Функции `m` и `f` собираются здесь заново,
+ * потому что функцию в разметку не положишь.
+ *
+ * Словарь передаётся целиком. Пока он размером в несколько килобайт, это
+ * дешевле, чем дробить его по неймспейсам; когда вырастет — провайдер
+ * начнёт принимать срез, а не весь объект.
  */
 export function I18nProvider({
   locale,
@@ -30,20 +30,16 @@ export function I18nProvider({
   dictionary: Dictionary;
   children: React.ReactNode;
 }) {
-  return (
-    <I18nContext.Provider value={{ locale, t: dictionary }}>{children}</I18nContext.Provider>
-  );
+  const value = useMemo(() => createI18n(locale, dictionary), [locale, dictionary]);
+
+  return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 }
 
-export function useI18n(): I18nValue {
+/** Язык в клиентском компоненте: `const { t, m, f } = useI18n()`. */
+export function useI18n(): I18n {
   const value = useContext(I18nContext);
   if (!value) {
     throw new Error('useI18n вызван вне I18nProvider — оберните дерево в провайдер локали.');
   }
   return value;
-}
-
-/** Короткий доступ к словарю: `const t = useT()`. */
-export function useT(): Dictionary {
-  return useI18n().t;
 }

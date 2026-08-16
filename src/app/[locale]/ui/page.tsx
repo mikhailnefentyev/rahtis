@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { MATCHING } from '@/lib/config';
 import { UiKitShowcase } from './showcase';
 
-export const metadata: Metadata = { title: 'UI-кит' };
+export const metadata: Metadata = { title: 'UI Kit' };
 
 /**
  * Витрина всегда свежая: демонстрационные дедлайны считаются от момента

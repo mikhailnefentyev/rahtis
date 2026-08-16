@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { cn } from '@/lib/cn';
+import { useI18n } from '@/lib/i18n/provider';
 
 /**
  * Модальное окно на нативном <dialog>.
@@ -28,6 +29,7 @@ export function Modal({
   children: React.ReactNode;
   className?: string;
 }) {
+  const { t } = useI18n();
   const ref = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -60,7 +62,7 @@ export function Modal({
         <button
           type="button"
           onClick={onClose}
-          aria-label="Закрыть"
+          aria-label={t.a11y.close}
           className="-mt-1 -mr-1 cursor-pointer rounded-control p-1.5 text-ink-faint transition-colors duration-150 hover:bg-raised hover:text-ink"
         >
           <svg viewBox="0 0 16 16" className="size-4" fill="none" aria-hidden>

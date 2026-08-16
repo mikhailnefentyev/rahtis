@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { cn } from '@/lib/cn';
+import { useI18n } from '@/lib/i18n/provider';
 
 function Star({ filled, className }: { filled: boolean; className?: string }) {
   return (
@@ -22,24 +23,31 @@ function Star({ filled, className }: { filled: boolean; className?: string }) {
  * Рядом со звёздами всегда стоит число: пять нарисованных звёзд не дают
  * отличить 4.5 от 4.9, а заказчик выбирает машину именно по этой разнице.
  * Иконки — SVG, не символ «★»: он рисуется разными шрифтами по-разному.
+ *
+ * Само значение форматируется по локали (4,7 в русском и финском, 4.7 в
+ * английском), а число оценок склоняется через plural.
  */
 export function Stars({
   value,
   count,
-  emptyLabel = 'нет оценок',
   className,
 }: {
   value: number | null;
   count?: number;
-  emptyLabel?: string;
   className?: string;
 }) {
+  const { t, m, f } = useI18n();
+
   if (value == null) {
-    return <span className={cn('text-xs text-ink-dim', className)}>{emptyLabel}</span>;
+    return <span className={cn('text-xs text-ink-dim', className)}>{t.rating.none}</span>;
   }
 
   const rounded = Math.round(value);
-  const label = count != null ? `${value.toFixed(1)} из 5, оценок: ${count}` : `${value.toFixed(1)} из 5`;
+  const shown = f.decimal(value, 1);
+  const label =
+    count == null
+      ? m('rating.summary', { value: shown })
+      : m('rating.summaryWithCount', { value: shown, count });
 
   return (
     <span className={cn('inline-flex items-center gap-1.5', className)} title={label}>
@@ -48,8 +56,8 @@ export function Stars({
           <Star key={n} filled={n <= rounded} />
         ))}
       </span>
-      <span className="font-mono text-xs font-bold text-warn">{value.toFixed(1)}</span>
-      {count != null && <span className="font-mono text-xs text-ink-dim">({count})</span>}
+      <span className="font-mono text-xs font-bold text-warn">{shown}</span>
+      {count != null && <span className="font-mono text-xs text-ink-dim">({f.number(count)})</span>}
     </span>
   );
 }
@@ -64,6 +72,7 @@ export function RateStars({
   disabled?: boolean;
   className?: string;
 }) {
+  const { m } = useI18n();
   const [hover, setHover] = useState(0);
 
   return (
@@ -73,7 +82,7 @@ export function RateStars({
           key={n}
           type="button"
           disabled={disabled}
-          aria-label={`Оценка ${n} из 5`}
+          aria-label={m('rating.setValue', { stars: n })}
           onMouseEnter={() => setHover(n)}
           onFocus={() => setHover(n)}
           onClick={() => onRate(n)}

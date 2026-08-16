@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import {
   Badge,
   Button,
@@ -39,16 +39,9 @@ import {
   vehicleAccessTone,
 } from '@/components/ui';
 import { COMMISSION_BPS, commissionCents, payoutCents } from '@/lib/config';
-import { createFormat } from '@/lib/format';
-import { useT } from '@/lib/i18n/provider';
+import { useI18n } from '@/lib/i18n/provider';
 
-export type DemoDeadlines = {
-  normal: string;
-  urgent: string;
-  expired: string;
-};
-
-/**
+/*
  * Витрина UI-кита.
  *
  * Каждый компонент показан во всех состояниях, какие у него бывают.
@@ -56,28 +49,41 @@ export type DemoDeadlines = {
  * увидеть, как выглядит компонент до того, как встроить его в экран,
  * и чтобы заметить, что новое состояние сломало старое.
  *
- * Демонстрационные дедлайны приходят пропсами с сервера — ровно так же,
- * как в бою они приедут из колонки deadline_at.
+ * Про строки на этой странице. Продуктовые формулировки — кнопки, статусы,
+ * подписи полей — берутся из словаря, как и везде. Собственные заголовки
+ * витрины («Палитра», «Типографика») и демо-данные оставлены в коде:
+ * страница живёт только в разработке и не переводится, а тащить её служебные
+ * подписи в словарь значит отдать переводчику полсотни строк, которых никто
+ * никогда не увидит. Правило «ноль текста вне словарей» действует для всего
+ * остального кода и держится линтером — исключение прописано в eslint.config.mjs.
  */
+
+export type DemoDeadlines = {
+  normal: string;
+  urgent: string;
+  expired: string;
+};
+
 export function UiKitShowcase({ deadlines }: { deadlines: DemoDeadlines }) {
-  const t = useT();
-  const f = useMemo(() => createFormat(t.meta.intl), [t.meta.intl]);
+  const { t, m, f } = useI18n();
 
   const [tab, setTab] = useState<'desk' | 'fleet' | 'report'>('desk');
   const [modalOpen, setModalOpen] = useState(false);
   const [rating, setRating] = useState<number | null>(null);
 
+  const commissionRate = COMMISSION_BPS / 10_000;
+
   const payouts = [
-    { carrier: 'Nieminen Kuljetus Oy', trips: 7, gross: 324_000 },
-    { carrier: 'Koskinen Transport', trips: 4, gross: 198_000 },
-    { carrier: 'Virtanen Logistics', trips: 2, gross: 76_000 },
+    { carrier: 'Nieminen Kuljetus Oy', trips: 7, gross: 324_000, rating: 4.7 },
+    { carrier: 'Koskinen Transport', trips: 4, gross: 198_000, rating: 4.3 },
+    { carrier: 'Virtanen Logistics', trips: 2, gross: 76_000, rating: 4.0 },
   ];
 
   return (
     <main className="mx-auto w-full max-w-5xl px-5 py-10">
       <header className="mb-10">
-        <p className="label-micro">{t.brand.name} · Этап 0 · направление A «Priima»</p>
-        <h1 className="mt-3 text-2xl font-semibold tracking-tight">UI-кит</h1>
+        <p className="label-micro">{t.brand.name} · Priima</p>
+        <h1 className="mt-3 text-2xl font-semibold tracking-tight">UI Kit</h1>
         <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-ink-muted">
           Компоненты во всех состояниях. Бирюза принадлежит только интерактиву,
           семантические цвета — только состоянию. Данные всегда моноширинным.
@@ -107,13 +113,61 @@ export function UiKitShowcase({ deadlines }: { deadlines: DemoDeadlines }) {
             <CardBody className="flex flex-col gap-3">
               <p className="text-2xl font-semibold tracking-tight">Заголовок раздела · 24px</p>
               <p className="text-[15px] font-semibold tracking-tight">Заголовок карточки · 15px</p>
-              <p className="text-[13px] text-ink">Основной текст · 13px — плотно, но читаемо</p>
+              <p className="text-[13px] text-ink">Основной текст · 13px</p>
               <p className="text-[13px] text-ink-muted">Второстепенный текст · ink-muted</p>
               <p className="text-xs text-ink-faint">Подпись · ink-faint</p>
               <p className="label-micro">Надпись над данными · 10px капсом</p>
               <p className="font-mono text-[13px] tracking-tight">
-                Данные моно: HKO-441 · 12.11.2026 08:00 · 130 км · {f.eur(48_000)}
+                HKO-441 · {f.dateTime('2026-11-12T06:00:00Z')} · {m('order.distance', { km: 130 })}{' '}
+                · {f.eur(48_000)}
               </p>
+            </CardBody>
+          </Card>
+        </Section>
+
+        <Section title="Локаль: числа, даты, множественное число">
+          <Card>
+            <CardBody className="flex flex-col gap-5">
+              <Labelled label="Intl-форматтеры">
+                <div className="flex flex-col gap-1">
+                  <Kv k="Сумма" v={f.eur(324_000)} mono />
+                  <Kv k="С копейками" v={f.eur(192_050)} mono />
+                  <Kv k="Дата" v={f.date('2026-11-12T06:00:00Z')} mono />
+                  <Kv k="Время" v={f.time('2026-11-12T06:00:00Z')} mono />
+                  <Kv k="Дробное" v={f.decimal(4.7)} mono />
+                  <Kv k="Проценты" v={f.percent(commissionRate)} mono />
+                </div>
+              </Labelled>
+
+              <Labelled label="Plural · рейсы">
+                <div className="flex flex-wrap gap-2">
+                  {[0, 1, 2, 5, 11, 21, 22, 105].map((n) => (
+                    <Mono key={n} className="rounded-control bg-sunken px-2 py-1 text-xs">
+                      {m('order.tripsCount', { count: n })}
+                    </Mono>
+                  ))}
+                </div>
+              </Labelled>
+
+              <Labelled label="Plural · оси">
+                <div className="flex flex-wrap gap-2">
+                  {[1, 2, 3, 5].map((n) => (
+                    <Mono key={n} className="rounded-control bg-sunken px-2 py-1 text-xs">
+                      {m('vehicle.axlesCount', { count: n })}
+                    </Mono>
+                  ))}
+                </div>
+              </Labelled>
+
+              <Labelled label="Именованные подстановки">
+                <p className="max-w-2xl text-[13px] text-ink-muted">
+                  {m('signup.submitted', {
+                    company: 'Nieminen Kuljetus Oy',
+                    businessId: '1234567-8',
+                    email: 'ops@nieminen.fi',
+                  })}
+                </p>
+              </Labelled>
             </CardBody>
           </Card>
         </Section>
@@ -121,27 +175,27 @@ export function UiKitShowcase({ deadlines }: { deadlines: DemoDeadlines }) {
         <Section title="Кнопки">
           <div className="flex flex-col gap-4">
             <Row>
-              <Button variant="primary">Беру</Button>
-              <Button>Подробнее</Button>
-              <Button variant="ghost">Свернуть</Button>
-              <Button variant="danger">Отказаться</Button>
+              <Button variant="primary">{t.action.take}</Button>
+              <Button>{t.action.details}</Button>
+              <Button variant="ghost">{t.action.collapse}</Button>
+              <Button variant="danger">{t.action.decline}</Button>
             </Row>
             <Row>
               <Button variant="primary" size="sm">
-                Выбрать
+                {t.action.choose}
               </Button>
               <Button variant="primary" size="md">
-                Опубликовать
+                {t.action.publish}
               </Button>
               <Button variant="primary" size="lg">
-                Отправить заявку
+                {t.action.submitApplication}
               </Button>
             </Row>
             <Row>
               <Button variant="primary" disabled>
-                Мест нет 3/3
+                {m('order.offersFull', { count: 3, max: 3 })}
               </Button>
-              <Button disabled>Недоступно</Button>
+              <Button disabled>{t.action.add}</Button>
             </Row>
           </div>
         </Section>
@@ -181,11 +235,11 @@ export function UiKitShowcase({ deadlines }: { deadlines: DemoDeadlines }) {
 
         <Section title="Метрики">
           <StatRow>
-            <Stat label="Очередь модерации" value="3" tone="warn" />
+            <Stat label={t.moderation.queue} value={f.number(3)} tone="warn" />
             <Stat label={t.money.revenue} value={f.eur(211_000)} tone="info" />
             <Stat label={t.money.payout} value={f.eur(204_670)} tone="live" />
             <Stat
-              label={`${t.money.margin} · ${COMMISSION_BPS / 100}%`}
+              label={m('money.marginRate', { rate: commissionRate })}
               value={f.eur(6_330)}
               tone="ok"
             />
@@ -195,9 +249,9 @@ export function UiKitShowcase({ deadlines }: { deadlines: DemoDeadlines }) {
         <Section title="Обратный отсчёт">
           <Card>
             <CardBody className="flex flex-wrap gap-6">
-              <Countdown deadline={deadlines.normal} label={t.order.timeLeft} />
-              <Countdown deadline={deadlines.urgent} label={t.order.timeLeft} />
-              <Countdown deadline={deadlines.expired} label={t.order.timeLeft} />
+              <Countdown deadline={deadlines.normal} />
+              <Countdown deadline={deadlines.urgent} />
+              <Countdown deadline={deadlines.expired} />
             </CardBody>
           </Card>
         </Section>
@@ -212,7 +266,7 @@ export function UiKitShowcase({ deadlines }: { deadlines: DemoDeadlines }) {
             active={tab}
             onChange={setTab}
           />
-          <p className="mt-3 text-[13px] text-ink-muted">Активна вкладка: {tab}</p>
+          <p className="mt-3 font-mono text-xs text-ink-dim">active: {tab}</p>
         </Section>
 
         <Section title="Карточка заказа">
@@ -231,18 +285,18 @@ export function UiKitShowcase({ deadlines }: { deadlines: DemoDeadlines }) {
                     Hanko → Helsinki
                   </p>
                   <p className="mt-1.5 text-[13px] text-ink-muted">
-                    Тент 13.6, 3 оси · <Mono>130</Mono> {t.unit.km} ·{' '}
+                    Тент 13.6 · {m('vehicle.axlesCount', { count: 3 })} ·{' '}
+                    <Mono>{m('order.distance', { km: 130 })}</Mono> ·{' '}
                     <Mono className="font-bold text-ink">{f.eur(48_000)}</Mono>{' '}
-                    <span className="text-ink-dim">
-                      · <Mono>{f.eurPerKm(48_000, 130)}</Mono>
-                      {t.unit.perKm}
-                    </span>
+                    <Mono className="text-ink-dim">
+                      · {m('order.ratePerKm', { rate: f.eurPerKm(48_000, 130) ?? '' })}
+                    </Mono>
                   </p>
                   <p className="mt-1 text-xs text-ink-dim">Baltic Freight Oy</p>
                 </div>
                 <div className="flex flex-col items-end gap-2">
-                  <Button variant="primary">Закрыть рейс</Button>
-                  <Countdown deadline={deadlines.normal} label={t.order.timeLeft} />
+                  <Button variant="primary">{t.action.closeTrip}</Button>
+                  <Countdown deadline={deadlines.normal} />
                 </div>
               </div>
 
@@ -254,33 +308,33 @@ export function UiKitShowcase({ deadlines }: { deadlines: DemoDeadlines }) {
                   title={`${t.stopKind.PICKUP} · ${t.placeKind.PORT}`}
                   primary="Hanko Port, Terminal 2"
                   secondary="Satamakatu 1, 10900 Hanko"
-                  meta="12.11.2026 08:00"
+                  meta={f.dateTime('2026-11-12T06:00:00Z')}
                 />
                 <Waypoint
                   kind="EXTRA_LOAD"
                   title={t.stopKind.EXTRA_LOAD}
                   primary="Kotka Cargo Oy"
                   secondary="Satamatie 8, 48100 Kotka"
-                  meta="12.11.2026 10:30"
+                  meta={f.dateTime('2026-11-12T08:30:00Z')}
                 />
                 <Waypoint
                   kind="DELIVERY"
                   title={t.stopKind.DELIVERY}
                   primary="Helsinki Logistics Center"
                   secondary="Tavaratie 5, 00700 Helsinki · Mika Virtanen · +358 40 700 1122"
-                  meta="12.11.2026 14:00"
+                  meta={f.dateTime('2026-11-12T12:00:00Z')}
                 />
                 <Waypoint
                   kind="TRAILER_RETURN"
                   title={t.stopKind.TRAILER_RETURN}
-                  primary="Hanko Port, Terminal 2 — без груза"
+                  primary="Hanko Port, Terminal 2"
                 />
               </WaypointList>
 
               <CardDivider className="my-4" />
 
               <div className="label-micro mb-2.5">
-                {t.order.offers} · 2 / 3 — выберите машину
+                {m('order.offersCounter', { count: 2, max: 3 })}
               </div>
               <div className="flex items-center justify-between gap-4 rounded-control border border-line bg-sunken px-3 py-2.5">
                 <div className="min-w-0">
@@ -289,7 +343,7 @@ export function UiKitShowcase({ deadlines }: { deadlines: DemoDeadlines }) {
                     <Stars value={4.7} count={9} />
                   </div>
                   <p className="mt-1 text-xs text-ink-muted">
-                    3 {t.unit.axles} · Antti Nieminen · Nieminen Kuljetus Oy
+                    {m('vehicle.axlesCount', { count: 3 })} · Antti Nieminen · Nieminen Kuljetus Oy
                   </p>
                 </div>
                 <Button variant="primary" size="sm">
@@ -302,30 +356,28 @@ export function UiKitShowcase({ deadlines }: { deadlines: DemoDeadlines }) {
 
         <Section title="Таблица-документ">
           <TableFrame
-            caption="Еженедельные выплаты перевозчикам"
-            actions={<Button size="sm">↓ {t.action.export}</Button>}
+            caption={t.report.weeklyPayouts}
+            actions={<Button size="sm">{t.action.export}</Button>}
           >
             <Table>
               <thead>
                 <tr>
-                  <Th>Перевозчик</Th>
+                  <Th>{t.role.carrier}</Th>
                   <Th>{t.vehicle.rating}</Th>
-                  <Th numeric>{t.unit.trips}</Th>
+                  <Th numeric>{t.order.trips}</Th>
                   <Th numeric>{t.money.gross}</Th>
-                  <Th numeric>
-                    {t.money.commission} {COMMISSION_BPS / 100}%
-                  </Th>
+                  <Th numeric>{m('money.commissionRate', { rate: commissionRate })}</Th>
                   <Th numeric>{t.money.payout}</Th>
                 </tr>
               </thead>
               <tbody>
-                {payouts.map((row, i) => (
+                {payouts.map((row) => (
                   <Tr key={row.carrier} interactive>
                     <Td>{row.carrier}</Td>
                     <Td>
-                      <Stars value={[4.7, 4.3, 4.0][i] ?? null} />
+                      <Stars value={row.rating} />
                     </Td>
-                    <Td numeric>{row.trips}</Td>
+                    <Td numeric>{f.number(row.trips)}</Td>
                     <Td numeric className="text-ink-muted">
                       {f.eur(row.gross)}
                     </Td>
@@ -348,14 +400,10 @@ export function UiKitShowcase({ deadlines }: { deadlines: DemoDeadlines }) {
               <Field label={t.company.name} required>
                 {(p) => <Input {...p} placeholder="Nieminen Kuljetus Oy" />}
               </Field>
-              <Field
-                label={t.company.businessId}
-                required
-                error={t.validation.businessId}
-              >
+              <Field label={t.company.businessId} required error={t.validation.businessId}>
                 {(p) => <InputMono {...p} defaultValue="12345" />}
               </Field>
-              <Field label={t.company.email} hint="Сюда придут коды доступа">
+              <Field label={t.company.email} hint={t.company.emailHint}>
                 {(p) => <Input {...p} type="email" placeholder="ops@company.fi" />}
               </Field>
               <Field label={t.vehicle.euro}>
@@ -367,16 +415,12 @@ export function UiKitShowcase({ deadlines }: { deadlines: DemoDeadlines }) {
                   </Select>
                 )}
               </Field>
-              <Field label={t.vehicle.plate} className="sm:col-span-1">
+              <Field label={t.vehicle.plate}>
                 {(p) => <InputMono {...p} placeholder="HKO-441" />}
               </Field>
-              <Field label="Недоступное поле">
-                {(p) => <Input {...p} disabled defaultValue="Заполняется оператором" />}
-              </Field>
+              <Field label={t.vehicle.base}>{(p) => <Input {...p} disabled defaultValue="Hanko" />}</Field>
               <Field label={t.order.comment} className="sm:col-span-2">
-                {(p) => (
-                  <Textarea {...p} rows={3} placeholder="Пропуск в порт, пломба, температурный режим…" />
-                )}
+                {(p) => <Textarea {...p} rows={3} placeholder={t.order.commentPlaceholder} />}
               </Field>
             </CardBody>
           </Card>
@@ -385,10 +429,10 @@ export function UiKitShowcase({ deadlines }: { deadlines: DemoDeadlines }) {
         <Section title="Секция формы">
           <Card>
             <CardBody>
-              <SectionTitle>Груз и оплата</SectionTitle>
+              <SectionTitle>{t.order.cargoAndPayment}</SectionTitle>
               <div className="flex flex-col gap-1.5">
-                <Kv k={t.order.trailer} v="Тент 13.6, 3 оси" />
-                <Kv k={t.order.distance} v="130 км" mono />
+                <Kv k={t.order.trailer} v="Тент 13.6" />
+                <Kv k={t.order.distance} v={m('order.distance', { km: 130 })} mono />
                 <Kv k={t.order.rate} v={f.eur(48_000)} mono />
                 <Kv k={t.vehicle.driver} v="Antti Nieminen · +358 40 111 2233" />
               </div>
@@ -401,14 +445,14 @@ export function UiKitShowcase({ deadlines }: { deadlines: DemoDeadlines }) {
             <CardBody className="flex flex-col gap-5">
               <Labelled label="Оценка">
                 <Stars value={4.7} count={9} />
-                <Stars value={3.0} />
-                <Stars value={null} emptyLabel={t.rating.none} />
+                <Stars value={3.0} count={1} />
+                <Stars value={null} />
               </Labelled>
               <Labelled label={t.rating.rate}>
                 <RateStars onRate={setRating} />
-                <span className="text-[13px] text-ink-muted">
-                  {rating ? `Выставлено: ${rating}` : 'Не оценено'}
-                </span>
+                <Mono className="text-[13px] text-ink-muted">
+                  {rating == null ? '—' : f.decimal(rating, 0)}
+                </Mono>
               </Labelled>
               <Labelled label={t.order.documents}>
                 <DocChip label={t.company.license} uploaded />
@@ -420,11 +464,11 @@ export function UiKitShowcase({ deadlines }: { deadlines: DemoDeadlines }) {
 
         <Section title="Пустые состояния">
           <div className="grid gap-3 sm:grid-cols-2">
-            <EmptyState title={t.empty.noOrders} description="Смените регион в фильтре или подождите новых публикаций." />
+            <EmptyState title={t.empty.noOrders} description={t.empty.noOrdersHint} />
             <EmptyState
-              title="Нет допуска к заказам"
-              description="Чтобы видеть стол и откликаться, нужна хотя бы одна допущенная машина."
-              action={<Button variant="primary">Добавить машину</Button>}
+              title={t.empty.noAccessTitle}
+              description={t.empty.noAccessText}
+              action={<Button variant="primary">{t.action.addVehicle}</Button>}
             />
           </div>
         </Section>
@@ -432,20 +476,20 @@ export function UiKitShowcase({ deadlines }: { deadlines: DemoDeadlines }) {
         <Section title="Шапка карточки и модалка">
           <Card>
             <CardHeader>
-              <CardTitle>Заявки на регистрацию</CardTitle>
+              <CardTitle>{t.moderation.applications}</CardTitle>
               <Badge tone="warn" className="ml-auto">
-                3 в очереди
+                {m('moderation.queued', { count: 3 })}
               </Badge>
             </CardHeader>
             <CardBody>
-              <Button onClick={() => setModalOpen(true)}>Открыть модалку</Button>
+              <Button onClick={() => setModalOpen(true)}>{t.order.closeTitle}</Button>
             </CardBody>
           </Card>
 
           <Modal
             open={modalOpen}
             onClose={() => setModalOpen(false)}
-            title="Закрытие рейса"
+            title={t.order.closeTitle}
             subtitle={
               <>
                 {t.orderType.TRAILER_SWAP} · <Mono>BF-2026-0912</Mono> · Hanko → Helsinki
@@ -462,11 +506,11 @@ export function UiKitShowcase({ deadlines }: { deadlines: DemoDeadlines }) {
           >
             <div className="flex flex-col gap-4">
               <p className="text-[13px] text-ink-muted">
-                Esc и клик по подложке закрывают окно, фокус не выходит наружу —
-                за это отвечает нативный &lt;dialog&gt;.
+                Esc и клик по подложке закрывают окно, фокус не выходит наружу — за это отвечает
+                нативный &lt;dialog&gt;.
               </p>
               <Field label={t.order.damage}>
-                {(p) => <Textarea {...p} rows={2} placeholder="Скол на левом борту прицепа" />}
+                {(p) => <Textarea {...p} rows={2} placeholder={t.order.damagePlaceholder} />}
               </Field>
             </div>
           </Modal>
@@ -495,8 +539,8 @@ function Row({ children }: { children: React.ReactNode }) {
 
 function Labelled({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex flex-wrap items-center gap-2.5">
-      <span className="label-micro w-32 shrink-0">{label}</span>
+    <div className="flex flex-wrap items-start gap-2.5">
+      <span className="label-micro w-32 shrink-0 pt-1">{label}</span>
       {children}
     </div>
   );

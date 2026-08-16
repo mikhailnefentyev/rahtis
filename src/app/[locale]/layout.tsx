@@ -47,7 +47,7 @@ export async function generateMetadata({
       default: t.brand.name,
       template: `%s · ${t.brand.name}`,
     },
-    description: 'Цифровая биржа грузоперевозок. Оператор — Aivomaa Oy, Финляндия.',
+    description: t.brand.description,
     applicationName: APP.name,
   };
 }
