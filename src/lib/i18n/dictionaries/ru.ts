@@ -44,10 +44,11 @@ export const ru = {
     description: 'Цифровая биржа грузоперевозок. Оператор — Aivomaa Oy, Финляндия.',
   },
 
+  /* Ключи совпадают со значениями enum party_role в Postgres. */
   role: {
-    carrier: 'Перевозчик',
-    shipper: 'Заказчик',
-    admin: 'Админ · Aivomaa',
+    CARRIER: 'Перевозчик',
+    SHIPPER: 'Заказчик',
+    ADMIN: 'Админ · Aivomaa',
   },
 
   nav: {

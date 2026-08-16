@@ -362,7 +362,7 @@ export function UiKitShowcase({ deadlines }: { deadlines: DemoDeadlines }) {
             <Table>
               <thead>
                 <tr>
-                  <Th>{t.role.carrier}</Th>
+                  <Th>{t.role.CARRIER}</Th>
                   <Th>{t.vehicle.rating}</Th>
                   <Th numeric>{t.order.trips}</Th>
                   <Th numeric>{t.money.gross}</Th>
