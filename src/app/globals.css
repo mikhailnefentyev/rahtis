@@ -1,0 +1,135 @@
+@import 'tailwindcss';
+
+/* ═══════════════════════════════════════════════════════════════════
+   RAHTIS · направление A «Priima»
+
+   Тёмная диспетчерская: почти чёрный фон с холодным подтоном, волосяные
+   границы вместо теней, минимум цвета. Бирюза принадлежит только тому,
+   на что можно нажать. Статус несёт семантический цвет — и они намеренно
+   разные, чтобы «выполнен» не выглядел кнопкой.
+
+   Тема одна. Светлого варианта не будет: интерфейс работает в кабине,
+   в порту и ночью, и светлый экран там мешает.
+   ═══════════════════════════════════════════════════════════════════ */
+
+@theme {
+  /* ── Поверхности ────────────────────────────────────────────────
+     Четыре уровня глубины. Больше не нужно: как только уровней
+     становится пять, разница между соседними перестаёт читаться. */
+  --color-ground: #090d0f; /* фон страницы */
+  --color-surface: #0f1518; /* карточки, панели */
+  --color-raised: #161f23; /* кнопки, вкладки, всё нажимаемое */
+  --color-sunken: #0b1113; /* поля ввода — утоплены, а не подняты */
+
+  /* ── Границы ────────────────────────────────────────────────────
+     line — обычная волосяная. grid — заметнее, только для таблиц и
+     блока маршрута, где интерфейс притворяется документом. */
+  --color-line: #1d272b;
+  --color-line-grid: #263438;
+  --color-line-strong: #33454a;
+
+  /* ── Текст ──────────────────────────────────────────────────────
+     Четыре ступени, все проверены на контраст к --color-surface:
+     ink 15:1 · muted 8.3:1 · faint 5.4:1 · dim 3.1:1.
+     dim — только для нетекстовой информации (иконки, разделители). */
+  --color-ink: #e6edee;
+  --color-ink-muted: #9db0b5;
+  --color-ink-faint: #7a8d93;
+  --color-ink-dim: #55666b;
+
+  /* ── Акцент: только интерактив ──────────────────────────────────
+     В прототипе этой же бирюзой красили и кнопки, и статус «на столе» —
+     заказ визуально сливался с кнопкой «Беру». Здесь акцент означает
+     ровно одно: сюда можно нажать. */
+  --color-accent: #54d6c6;
+  --color-accent-hover: #6fe0d2;
+  --color-accent-ink: #06201e; /* текст на заливке акцентом, 9.6:1 */
+  --color-accent-line: #24544f;
+  --color-accent-wash: #101f21;
+
+  /* ── Семантика: только состояние ────────────────────────────────
+     Никогда не используются для кнопок и ссылок. */
+  --color-ok: #5bc98f; /* выполнено, допущено, без повреждений */
+  --color-warn: #e0a83e; /* ждёт решения, идёт отсчёт, есть замечания */
+  --color-danger: #e5695f; /* отклонено, откат, повреждение */
+  --color-live: #8e93ff; /* рейс в работе */
+
+  /* ── Типографика ────────────────────────────────────────────────
+     Данные — только моноширинным: номера машин, суммы, время, километры
+     должны выстраиваться в колонку. */
+  --font-sans:
+    var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, 'Cascadia Mono', Consolas, monospace;
+
+  --text-micro: 0.625rem; /* 10px — надписи капсом над данными */
+  --text-micro--line-height: 1.2;
+  --text-micro--letter-spacing: 0.13em;
+
+  /* ── Форма ──────────────────────────────────────────────────────
+     Плоско и тесно: радиусы маленькие, тени отсутствуют. Глубину даёт
+     поверхность и граница, а не размытие. */
+  --radius-control: 6px;
+  --radius-card: 10px;
+  --radius-pill: 999px;
+}
+
+@layer base {
+  html {
+    background-color: var(--color-ground);
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--color-ground);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 0.875rem; /* 14px база: плотная сетка, но ещё читаемо */
+    line-height: 1.55;
+  }
+
+  /* Цифры в таблицах должны стоять колонка в колонку. */
+  .font-mono,
+  table {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Фокус видно всегда — по интерфейсу ходят с клавиатуры. */
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background-color: var(--color-accent);
+    color: var(--color-accent-ink);
+  }
+
+  /* Скроллбары в тон панелям, иначе светлая полоса режет тёмный экран. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-line-strong) transparent;
+  }
+}
+
+@layer utilities {
+  /* Надпись над данными: «ОЧЕРЕДЬ МОДЕРАЦИИ», «ЗАБОР · ПОРТ». */
+  .label-micro {
+    font-size: var(--text-micro);
+    line-height: var(--text-micro--line-height);
+    letter-spacing: var(--text-micro--letter-spacing);
+    text-transform: uppercase;
+    color: var(--color-ink-faint);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
