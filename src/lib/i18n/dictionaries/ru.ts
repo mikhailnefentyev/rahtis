@@ -215,6 +215,7 @@ export const ru = {
     rejectWithReason: 'Отклонить',
     reasonLabel: 'Причина отказа',
     reasonPlaceholder: 'Y-tunnus не найден в реестре PRH',
+    vehicleReasonPlaceholder: 'Страховка не покрывает международные перевозки',
     reasonRequired: 'Укажите причину — компания её увидит',
     inviteSent: 'Приглашение отправлено',
     inviteFailed: 'Компания одобрена, но письмо не ушло',
@@ -320,6 +321,51 @@ export const ru = {
     euro: 'Эко-класс',
     base: 'База (город)',
     rating: 'Рейтинг',
+  },
+
+  fleet: {
+    title: 'Мой автопарк',
+    subtitle:
+      'Стол заказов открывается, когда у компании есть хотя бы одна допущенная машина и действующие документы.',
+    addVehicle: 'Добавить машину',
+    newVehicle: 'Новая карточка',
+    editVehicle: 'Карточка машины',
+    submitForApproval: 'Отправить на допуск',
+    deleteDraft: 'Удалить черновик',
+    noVehicles: 'Машин пока нет',
+    noVehiclesHint: 'Добавьте карточку авто — Aivomaa проверит её и выдаст допуск.',
+    onReview: 'Aivomaa проверяет документы и карточку',
+    rejectedHint: 'Не допущена — исправьте замечание и отправьте снова',
+    canTakeOrders: 'Компания может брать заказы',
+    cannotTakeOrders: 'Стол заказов закрыт',
+    whyClosedNoDocs: 'Загрузите действующие лицензию и страховку компании.',
+    whyClosedNoVehicle: 'Нужна хотя бы одна допущенная машина.',
+    whyClosedExpired: 'Документы компании просрочены — допуск машин не действует.',
+    languagesHint: 'На каких языках водитель говорит с диспетчером',
+  },
+
+  documents: {
+    title: 'Документы компании',
+    subtitle: 'Лицензия и страховка проверяются оператором вместе с карточками авто.',
+    CARRIER_LICENSE: 'Лицензия перевозчика',
+    INSURANCE: 'Страховка (CMR/ответственность)',
+    upload: 'Загрузить',
+    replace: 'Заменить',
+    uploading: 'Загружаем…',
+    view: 'Открыть',
+    file: 'Файл',
+    validUntil: 'Действует до',
+    validUntilRequired: 'Для страховки срок обязателен',
+    perpetual: 'бессрочно',
+    expired: 'просрочен',
+    notUploaded: 'не загружен',
+    tooLarge: 'Файл больше 10 МБ',
+    wrongType: 'Допустимы PDF, JPG, PNG и WEBP',
+    uploadFailed: 'Не удалось загрузить файл. Попробуйте ещё раз.',
+    replacedNotice: 'Прежняя версия сохраняется как основание выданных допусков.',
+    attention: 'Требуют внимания',
+    attentionHint:
+      'У этих компаний есть допущенные машины, а документы просрочены или скоро истекут.',
   },
 
   company: {
@@ -433,6 +479,19 @@ export const ru = {
       '{count, plural, =0 {Новых заявок нет} one {# заявка ждёт решения} few {# заявки ждут решения} many {# заявок ждут решения} other {# заявки ждут решения}}',
     'moderation.invitedTo': 'Приглашение отправлено на {email}',
     'moderation.decidedBy': 'Решение принято {date}',
+
+    'fleet.vehiclesCount':
+      '{count, plural, =0 {Машин нет} one {# машина} few {# машины} many {# машин} other {# машины}}',
+    'fleet.approvedCount':
+      '{count, plural, =0 {нет допущенных} one {# допущена} few {# допущены} many {# допущено} other {# допущено}}',
+    'fleet.pendingCount':
+      '{count, plural, =0 {Машин на проверке нет} one {# машина на проверке} few {# машины на проверке} many {# машин на проверке} other {# машины на проверке}}',
+
+    'documents.expiresIn':
+      'Истекает через {count, plural, one {# день} few {# дня} many {# дней} other {# дня}}',
+    'documents.expiredAgo':
+      'Просрочен {count, plural, one {# день} few {# дня} many {# дней} other {# дня}} назад',
+    'documents.validUntilDate': 'Действует до {date}',
 
     'trip.stepReported': 'Заказ {ref}: водитель отметил «{step}».',
     'trip.amended': 'Изменение маршрута по заказу {ref}: {change}',

@@ -83,6 +83,20 @@ export async function CabinetOverview({
               </>
             )}
             {hint && <p className="text-[13px] leading-relaxed text-ink-muted">{hint}</p>}
+
+            {role === 'CARRIER' && (
+              <Link
+                href={`/${locale}/carrier/fleet`}
+                className={buttonClass({
+                  variant: needsRequisites ? 'default' : 'primary',
+                  size: 'md',
+                  className: 'self-start',
+                })}
+              >
+                {t.fleet.title}
+              </Link>
+            )}
+
             <p className="text-[13px] leading-relaxed text-ink-muted">{t.cabinet.stageNotice}</p>
           </CardBody>
         </Card>

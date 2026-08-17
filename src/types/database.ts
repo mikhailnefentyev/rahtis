@@ -135,6 +135,56 @@ export type Database = {
         }
         Relationships: []
       }
+      company_documents: {
+        Row: {
+          company_id: string
+          file_name: string
+          id: string
+          is_current: boolean
+          kind: Database["public"]["Enums"]["document_kind"]
+          mime_type: string
+          size_bytes: number
+          storage_path: string
+          uploaded_at: string
+          uploaded_by: string | null
+          valid_until: string | null
+        }
+        Insert: {
+          company_id: string
+          file_name: string
+          id?: string
+          is_current?: boolean
+          kind: Database["public"]["Enums"]["document_kind"]
+          mime_type: string
+          size_bytes: number
+          storage_path: string
+          uploaded_at?: string
+          uploaded_by?: string | null
+          valid_until?: string | null
+        }
+        Update: {
+          company_id?: string
+          file_name?: string
+          id?: string
+          is_current?: boolean
+          kind?: Database["public"]["Enums"]["document_kind"]
+          mime_type?: string
+          size_bytes?: number
+          storage_path?: string
+          uploaded_at?: string
+          uploaded_by?: string | null
+          valid_until?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_documents_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       company_events: {
         Row: {
           actor_id: string | null
@@ -211,6 +261,115 @@ export type Database = {
           },
         ]
       }
+      vehicle_events: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          from_access: Database["public"]["Enums"]["vehicle_access"] | null
+          id: number
+          note: string | null
+          to_access: Database["public"]["Enums"]["vehicle_access"]
+          vehicle_id: string
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          from_access?: Database["public"]["Enums"]["vehicle_access"] | null
+          id?: never
+          note?: string | null
+          to_access: Database["public"]["Enums"]["vehicle_access"]
+          vehicle_id: string
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          from_access?: Database["public"]["Enums"]["vehicle_access"] | null
+          id?: never
+          note?: string | null
+          to_access?: Database["public"]["Enums"]["vehicle_access"]
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_events_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vehicles: {
+        Row: {
+          access: Database["public"]["Enums"]["vehicle_access"]
+          approved_at: string | null
+          axles: number
+          base_city: string
+          company_id: string
+          company_kind: Database["public"]["Enums"]["party_role"]
+          created_at: string
+          driver_name: string
+          euro_class: Database["public"]["Enums"]["euro_class"]
+          id: string
+          languages: string[]
+          make: string
+          plate: string
+          rejected_at: string | null
+          rejection_reason: string | null
+          submitted_at: string | null
+          updated_at: string
+          whatsapp: string
+        }
+        Insert: {
+          access?: Database["public"]["Enums"]["vehicle_access"]
+          approved_at?: string | null
+          axles: number
+          base_city: string
+          company_id: string
+          company_kind?: Database["public"]["Enums"]["party_role"]
+          created_at?: string
+          driver_name: string
+          euro_class: Database["public"]["Enums"]["euro_class"]
+          id?: string
+          languages?: string[]
+          make: string
+          plate: string
+          rejected_at?: string | null
+          rejection_reason?: string | null
+          submitted_at?: string | null
+          updated_at?: string
+          whatsapp: string
+        }
+        Update: {
+          access?: Database["public"]["Enums"]["vehicle_access"]
+          approved_at?: string | null
+          axles?: number
+          base_city?: string
+          company_id?: string
+          company_kind?: Database["public"]["Enums"]["party_role"]
+          created_at?: string
+          driver_name?: string
+          euro_class?: Database["public"]["Enums"]["euro_class"]
+          id?: string
+          languages?: string[]
+          make?: string
+          plate?: string
+          rejected_at?: string | null
+          rejection_reason?: string | null
+          submitted_at?: string | null
+          updated_at?: string
+          whatsapp?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicles_company_fk"
+            columns: ["company_id", "company_kind"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id", "kind"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -256,6 +415,62 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      company_readiness: {
+        Args: { p_company_id: string }
+        Returns: {
+          approved_vehicles: number
+          can_take_orders: boolean
+          documents_ok: boolean
+          has_insurance: boolean
+          has_license: boolean
+          insurance_valid_until: string
+          license_valid_until: string
+        }[]
+      }
+      decide_vehicle: {
+        Args: {
+          p_decision: Database["public"]["Enums"]["vehicle_access"]
+          p_note?: string
+          p_vehicle_id: string
+        }
+        Returns: {
+          access: Database["public"]["Enums"]["vehicle_access"]
+          approved_at: string | null
+          axles: number
+          base_city: string
+          company_id: string
+          company_kind: Database["public"]["Enums"]["party_role"]
+          created_at: string
+          driver_name: string
+          euro_class: Database["public"]["Enums"]["euro_class"]
+          id: string
+          languages: string[]
+          make: string
+          plate: string
+          rejected_at: string | null
+          rejection_reason: string | null
+          submitted_at: string | null
+          updated_at: string
+          whatsapp: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "vehicles"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      documents_needing_attention: {
+        Args: { p_within_days?: number }
+        Returns: {
+          approved_vehicles: number
+          company_id: string
+          company_name: string
+          days_left: number
+          kind: Database["public"]["Enums"]["document_kind"]
+          valid_until: string
+        }[]
+      }
       moderate_company: {
         Args: {
           p_company_id: string
@@ -300,10 +515,42 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      submit_vehicle: {
+        Args: { p_vehicle_id: string }
+        Returns: {
+          access: Database["public"]["Enums"]["vehicle_access"]
+          approved_at: string | null
+          axles: number
+          base_city: string
+          company_id: string
+          company_kind: Database["public"]["Enums"]["party_role"]
+          created_at: string
+          driver_name: string
+          euro_class: Database["public"]["Enums"]["euro_class"]
+          id: string
+          languages: string[]
+          make: string
+          plate: string
+          rejected_at: string | null
+          rejection_reason: string | null
+          submitted_at: string | null
+          updated_at: string
+          whatsapp: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "vehicles"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
     }
     Enums: {
       company_status: "PENDING" | "APPROVED" | "ACTIVE" | "REJECTED"
+      document_kind: "CARRIER_LICENSE" | "INSURANCE"
+      euro_class: "EURO_4" | "EURO_5" | "EURO_6"
       party_role: "CARRIER" | "SHIPPER" | "ADMIN"
+      vehicle_access: "DRAFT" | "PENDING" | "APPROVED" | "REJECTED"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -435,7 +682,10 @@ export const Constants = {
   public: {
     Enums: {
       company_status: ["PENDING", "APPROVED", "ACTIVE", "REJECTED"],
+      document_kind: ["CARRIER_LICENSE", "INSURANCE"],
+      euro_class: ["EURO_4", "EURO_5", "EURO_6"],
       party_role: ["CARRIER", "SHIPPER", "ADMIN"],
+      vehicle_access: ["DRAFT", "PENDING", "APPROVED", "REJECTED"],
     },
   },
 } as const

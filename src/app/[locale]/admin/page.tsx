@@ -17,9 +17,11 @@ import {
 import { companyStatusTone } from '@/components/ui/tone';
 import { requireRole } from '@/lib/auth/guard';
 import { resendInviteAction } from '@/lib/companies/actions';
+import { daysUntil } from '@/lib/dates';
 import { getI18n, isLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import { ApplicationCard } from './ApplicationCard';
+import { VehicleCard } from './VehicleCard';
 
 /**
  * Пульт оператора: очередь заявок и последние решения.
@@ -36,7 +38,13 @@ export default async function AdminPage({ params }: { params: Promise<{ locale: 
 
   const [{ t, m, f }, supabase] = await Promise.all([getI18n(locale), createClient()]);
 
-  const [{ data: pending }, { data: decided }, { data: profiles }] = await Promise.all([
+  const [
+    { data: pending },
+    { data: decided },
+    { data: profiles },
+    { data: pendingVehicles },
+    { data: attention },
+  ] = await Promise.all([
     supabase
       .from('companies')
       .select('*')
@@ -49,7 +57,27 @@ export default async function AdminPage({ params }: { params: Promise<{ locale: 
       .order('updated_at', { ascending: false })
       .limit(20),
     supabase.from('profiles').select('company_id').not('company_id', 'is', null),
+    /*
+     * Связь с компанией составная, поэтому имя внешнего ключа указано
+     * явно: без подсказки PostgREST выбирает связь сам.
+     */
+    supabase
+      .from('vehicles')
+      .select('*, company:companies!vehicles_company_fk(name)')
+      .eq('access', 'PENDING')
+      .order('submitted_at', { ascending: true }),
+    supabase.rpc('documents_needing_attention', { p_within_days: 30 }),
   ]);
+
+  /* Документы компаний, чьи машины сейчас на допуске: решение принимается вместе. */
+  const vehicleCompanyIds = [...new Set((pendingVehicles ?? []).map((v) => v.company_id))];
+  const { data: vehicleDocs } = vehicleCompanyIds.length
+    ? await supabase
+        .from('company_documents')
+        .select('*')
+        .in('company_id', vehicleCompanyIds)
+        .eq('is_current', true)
+    : { data: [] };
 
   /* У какой компании уже есть пользователь — значит приглашение дошло. */
   const withUsers = new Set((profiles ?? []).map((p) => p.company_id));
@@ -101,6 +129,70 @@ export default async function AdminPage({ params }: { params: Promise<{ locale: 
           </div>
         )}
       </section>
+
+      <section className="mt-10">
+        <h2 className="mb-4 border-b border-line pb-2 text-[13px] font-semibold tracking-tight text-ink-faint">
+          {m('fleet.pendingCount', { count: (pendingVehicles ?? []).length })}
+        </h2>
+
+        {(pendingVehicles ?? []).length === 0 ? (
+          <EmptyState title={t.empty.noVehicles} />
+        ) : (
+          <div className="flex flex-col gap-3">
+            {(pendingVehicles ?? []).map((vehicle) => (
+              <VehicleCard
+                key={vehicle.id}
+                vehicle={vehicle}
+                companyName={vehicle.company?.name ?? '—'}
+                documents={(vehicleDocs ?? [])
+                  .filter((d) => d.company_id === vehicle.company_id)
+                  .map((document) => ({
+                    document,
+                    daysLeft: document.valid_until ? daysUntil(document.valid_until) : null,
+                  }))}
+              />
+            ))}
+          </div>
+        )}
+      </section>
+
+      {(attention ?? []).length > 0 && (
+        <section className="mt-10">
+          <h2 className="mb-2 border-b border-line pb-2 text-[13px] font-semibold tracking-tight text-danger">
+            {t.documents.attention}
+          </h2>
+          <p className="mb-4 text-[13px] text-ink-muted">{t.documents.attentionHint}</p>
+
+          <TableFrame>
+            <Table>
+              <thead>
+                <tr>
+                  <Th>{t.role.CARRIER}</Th>
+                  <Th>{t.order.documents}</Th>
+                  <Th>{t.documents.validUntil}</Th>
+                  <Th numeric>{t.moderation.vehicles}</Th>
+                </tr>
+              </thead>
+              <tbody>
+                {(attention ?? []).map((row) => (
+                  <Tr key={`${row.company_id}-${row.kind}`}>
+                    <Td>{row.company_name}</Td>
+                    <Td>{t.documents[row.kind]}</Td>
+                    <Td>
+                      <span className={row.days_left < 0 ? 'text-danger' : 'text-warn'}>
+                        {row.days_left < 0
+                          ? m('documents.expiredAgo', { count: Math.abs(row.days_left) })
+                          : m('documents.expiresIn', { count: row.days_left })}
+                      </span>
+                    </Td>
+                    <Td numeric>{f.number(row.approved_vehicles)}</Td>
+                  </Tr>
+                ))}
+              </tbody>
+            </Table>
+          </TableFrame>
+        </section>
+      )}
 
       {history.length > 0 && (
         <section className="mt-10">
