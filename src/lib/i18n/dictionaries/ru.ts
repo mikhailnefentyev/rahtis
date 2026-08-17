@@ -262,6 +262,34 @@ export const ru = {
     shipperRefShort: 'Ваш номер',
   },
 
+  matching: {
+    take: 'Беру',
+    taking: 'Отправляем…',
+    taken: 'Ваш отклик принят',
+    noSlots: 'Мест нет',
+    slots: 'Мест занято',
+    chooseVehicle: 'Какой машиной берёте',
+    waitingChoice: 'Ждём выбор заказчика',
+    offers: 'Отклики',
+    chooseCarrier: 'Выберите машину',
+    choose: 'Выбрать',
+    awaitDriver: 'Ждём подтверждения водителя',
+    confirm: 'Подтвердить работу',
+    decline: 'Отказаться',
+    cancel: 'Отменить',
+    assignments: 'Мои рейсы',
+    noAssignments: 'Закреплённых рейсов нет',
+    noAssignmentsHint: 'Возьмите заказ на столе — он появится здесь.',
+    chosenYou: 'Заказчик выбрал вас',
+    chosenYouHint: 'Подтвердите работу в течение 15 минут, иначе заказ вернётся на стол.',
+    inProgress: 'Рейс в работе',
+    contactsNow: 'Контакты получателя открыты — заказ закреплён за вами.',
+    failed: 'Не удалось выполнить действие. Обновите страницу и попробуйте ещё раз.',
+    tooLate: 'Срок вышел, заказ вернулся на стол.',
+    noSlotsLeft: 'Мест уже нет — на заказ откликнулись три машины.',
+    alreadyTaken: 'Вы уже откликнулись на этот заказ.',
+  },
+
   desk: {
     title: 'Стол заказов',
     subtitle: 'Открытые заказы из регионов, где стоят ваши машины.',
@@ -570,6 +598,9 @@ export const ru = {
     'order.stopsCount':
       '{count, plural, one {# точка} few {# точки} many {# точек} other {# точки}} в маршруте',
     'order.publishedAt': 'Опубликован {date}',
+    'matching.slotsTaken': '{count} из {max}',
+    'matching.offersCount':
+      '{count, plural, =0 {Откликов нет} one {# отклик} few {# отклика} many {# откликов} other {# отклика}} из {max}',
 
     'trip.stepReported': 'Заказ {ref}: водитель отметил «{step}».',
     'trip.amended': 'Изменение маршрута по заказу {ref}: {change}',

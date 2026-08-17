@@ -7,6 +7,7 @@ import { cabinetPath } from '@/lib/auth/paths';
 import { getI18n, isLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import type { OrderStop } from '@/types/db';
+import type { OfferRow } from './OffersPanel';
 import { OrdersView } from './OrdersView';
 
 export async function generateMetadata({
@@ -46,6 +47,46 @@ export default async function OrdersPage({ params }: { params: Promise<{ locale:
     (stopsByOrder[stop.order_id] ??= []).push(stop);
   }
 
+  /*
+   * Отклики вместе с машиной и компанией: заказчик выбирает по рейтингу
+   * и по машине, а не по идентификаторам.
+   */
+  const waitingIds = (orders ?? [])
+    .filter((o) => o.status === 'REQUESTED' || o.status === 'AWAIT_DRIVER')
+    .map((o) => o.id);
+
+  const offersByOrder: Record<string, OfferRow[]> = {};
+
+  if (waitingIds.length > 0) {
+    /*
+     * Строка select — одним литералом, без пробелов и без склейки: разбор
+     * связей в supabase-js работает на уровне типов, а конкатенация
+     * превращает литерал в обычный string и типизация теряется.
+     */
+    const { data: offers } = await supabase
+      .from('order_offers')
+      .select(
+        'id,order_id,carrier_company_id,vehicle_id,carrier:companies!order_offers_carrier_company_id_fkey(name),vehicle:vehicles!order_offers_vehicle_id_fkey(plate,driver_name,axles,languages)',
+      )
+      .in('order_id', waitingIds)
+      .order('created_at');
+
+    for (const offer of offers ?? []) {
+      (offersByOrder[offer.order_id] ??= []).push({
+        id: offer.id,
+        carrier_company_id: offer.carrier_company_id,
+        vehicle_id: offer.vehicle_id,
+        carrier_name: offer.carrier?.name ?? '—',
+        plate: offer.vehicle?.plate ?? '—',
+        driver_name: offer.vehicle?.driver_name ?? '—',
+        axles: offer.vehicle?.axles ?? 0,
+        languages: offer.vehicle?.languages ?? [],
+        /* Рейтинг компании появится на Этапе 7 — до тех пор оценок нет. */
+        rating: null,
+      });
+    }
+  }
+
   return (
     <main className="mx-auto w-full max-w-4xl px-5 py-8">
       <nav className="mb-6">
@@ -76,7 +117,11 @@ export default async function OrdersPage({ params }: { params: Promise<{ locale:
           </CardBody>
         </Card>
       ) : (
-        <OrdersView orders={orders ?? []} stopsByOrder={stopsByOrder} />
+        <OrdersView
+          orders={orders ?? []}
+          stopsByOrder={stopsByOrder}
+          offersByOrder={offersByOrder}
+        />
       )}
     </main>
   );

@@ -1,10 +1,58 @@
 'use client';
 
-import { useState } from 'react';
+import { useActionState, useState } from 'react';
 import { RouteStops } from '@/components/domain/RouteStops';
-import { Button, Card, CardBody, CardDivider, EmptyState, Mono } from '@/components/ui';
+import { Badge, Button, Card, CardBody, CardDivider, EmptyState, Mono, Select } from '@/components/ui';
+import { MATCHING } from '@/lib/config';
+import { takeOrderAction, type MatchingState } from '@/lib/orders/matching';
 import { useI18n } from '@/lib/i18n/provider';
-import type { DeskOrder, DeskStop } from '@/types/db';
+import type { DeskOrder, DeskStop, Vehicle } from '@/types/db';
+
+const initialTake: MatchingState = { error: null };
+
+/**
+ * Кнопка «Беру».
+ *
+ * Машину выбирает перевозчик: у компании их может быть несколько, а
+ * отклик подаётся конкретной. С одной машиной выбирать нечего — селект
+ * не показывается.
+ */
+function TakeButton({ orderId, vehicles }: { orderId: string; vehicles: Vehicle[] }) {
+  const { t, locale } = useI18n();
+  const [state, formAction, pending] = useActionState(takeOrderAction, initialTake);
+
+  return (
+    <form action={formAction} className="flex flex-col items-end gap-2">
+      <input type="hidden" name="locale" value={locale} />
+      <input type="hidden" name="order_id" value={orderId} />
+
+      {vehicles.length === 1 ? (
+        <input type="hidden" name="vehicle_id" value={vehicles[0]!.id} />
+      ) : (
+        <label className="flex flex-col items-end gap-1">
+          <span className="label-micro">{t.matching.chooseVehicle}</span>
+          <Select name="vehicle_id" required className="w-44">
+            {vehicles.map((vehicle) => (
+              <option key={vehicle.id} value={vehicle.id}>
+                {vehicle.plate}
+              </option>
+            ))}
+          </Select>
+        </label>
+      )}
+
+      <Button type="submit" variant="primary" size="sm" disabled={pending}>
+        {pending ? t.matching.taking : t.matching.take}
+      </Button>
+
+      {state.error && (
+        <p role="alert" className="max-w-52 text-right text-xs text-danger">
+          {state.error}
+        </p>
+      )}
+    </form>
+  );
+}
 
 /**
  * Стол заказов.
@@ -13,7 +61,7 @@ import type { DeskOrder, DeskStop } from '@/types/db';
  * desk_orders. Об этом сказано прямо в карточке: иначе перевозчик решит,
  * что заказчик не заполнил контакт.
  */
-export function DeskList({ orders }: { orders: DeskOrder[] }) {
+export function DeskList({ orders, vehicles }: { orders: DeskOrder[]; vehicles: Vehicle[] }) {
   const { t, m, f } = useI18n();
   const [expanded, setExpanded] = useState<string | null>(null);
 
@@ -66,9 +114,38 @@ export function DeskList({ orders }: { orders: DeskOrder[] }) {
                   )}
                 </div>
 
-                <Button size="sm" onClick={() => setExpanded(open ? null : order.id)}>
-                  {t.desk.details}
-                </Button>
+                <div className="flex flex-col items-end gap-2">
+                  {order.taken_by_me ? (
+                    <>
+                      <Badge tone="warn">{t.matching.taken}</Badge>
+                      <span className="text-xs text-ink-faint">{t.matching.waitingChoice}</span>
+                    </>
+                  ) : order.offers_count >= MATCHING.maxOffersPerOrder ? (
+                    <Badge tone="neutral">
+                      {t.matching.noSlots}{' '}
+                      {m('matching.slotsTaken', {
+                        count: order.offers_count,
+                        max: MATCHING.maxOffersPerOrder,
+                      })}
+                    </Badge>
+                  ) : (
+                    <TakeButton orderId={order.id} vehicles={vehicles} />
+                  )}
+
+                  {order.offers_count > 0 && !order.taken_by_me && (
+                    <span className="font-mono text-xs text-ink-dim">
+                      {t.matching.slots}{' '}
+                      {m('matching.slotsTaken', {
+                        count: order.offers_count,
+                        max: MATCHING.maxOffersPerOrder,
+                      })}
+                    </span>
+                  )}
+
+                  <Button size="sm" onClick={() => setExpanded(open ? null : order.id)}>
+                    {t.desk.details}
+                  </Button>
+                </div>
               </div>
 
               {open && (

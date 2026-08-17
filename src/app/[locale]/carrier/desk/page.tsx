@@ -6,6 +6,7 @@ import { requireRole } from '@/lib/auth/guard';
 import { cabinetPath } from '@/lib/auth/paths';
 import { getI18n, isLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
+import { Assignments } from './Assignments';
 import { DeskList } from './DeskList';
 
 export async function generateMetadata({
@@ -43,11 +44,20 @@ export default async function DeskPage({
    * то же правило действует внутри desk_orders, и держать его в двух
    * местах значит рано или поздно получить расхождение.
    */
-  const [{ data: readiness }, { data: orders }, { data: regions }] = await Promise.all([
-    supabase.rpc('company_readiness', { p_company_id: company.id }),
-    supabase.rpc('desk_orders', { p_region: region ?? undefined }),
-    supabase.rpc('desk_regions'),
-  ]);
+  const [{ data: readiness }, { data: orders }, { data: regions }, { data: assignments }, { data: vehicles }] =
+    await Promise.all([
+      supabase.rpc('company_readiness', { p_company_id: company.id }),
+      supabase.rpc('desk_orders', { p_region: region ?? undefined }),
+      supabase.rpc('desk_regions'),
+      supabase.rpc('my_assignments'),
+      /* Отклик подаётся конкретной машиной — нужен список допущенных. */
+      supabase
+        .from('vehicles')
+        .select('*')
+        .eq('company_id', company.id)
+        .eq('access', 'APPROVED')
+        .order('plate'),
+    ]);
 
   const state = readiness?.[0];
   const canTakeOrders = state?.can_take_orders ?? false;
@@ -67,6 +77,9 @@ export default async function DeskPage({
       <p className="mt-2 mb-6 max-w-xl text-[13px] leading-relaxed text-ink-muted">
         {t.desk.subtitle}
       </p>
+
+      {/* Закреплённые рейсы важнее стола: они требуют действия и горят по срокам. */}
+      <Assignments assignments={assignments ?? []} />
 
       {!canTakeOrders ? (
         /*
@@ -119,7 +132,7 @@ export default async function DeskPage({
             {m('desk.ordersCount', { count: (orders ?? []).length })}
           </p>
 
-          <DeskList orders={orders ?? []} />
+          <DeskList orders={orders ?? []} vehicles={vehicles ?? []} />
         </>
       )}
     </main>

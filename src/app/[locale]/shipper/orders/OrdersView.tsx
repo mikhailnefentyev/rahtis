@@ -6,13 +6,16 @@ import { Badge, Button, Card, CardBody, CardDivider, EmptyState, Mono } from '@/
 import { orderStatusTone } from '@/components/ui/tone';
 import { useI18n } from '@/lib/i18n/provider';
 import type { Order, OrderStop } from '@/types/db';
+import { OffersPanel, type OfferRow } from './OffersPanel';
 
 export function OrdersView({
   orders,
   stopsByOrder,
+  offersByOrder,
 }: {
   orders: Order[];
   stopsByOrder: Record<string, OrderStop[]>;
+  offersByOrder: Record<string, OfferRow[]>;
 }) {
   const { t, m, f } = useI18n();
   const [composing, setComposing] = useState(false);
@@ -106,6 +109,11 @@ export function OrdersView({
                       )}
                     </div>
                   </div>
+
+                  {/* Отклики требуют решения по таймеру — они выше маршрута. */}
+                  {(order.status === 'REQUESTED' || order.status === 'AWAIT_DRIVER') && (
+                    <OffersPanel order={order} offers={offersByOrder[order.id] ?? []} />
+                  )}
 
                   {stops.length > 0 && (
                     <>

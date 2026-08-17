@@ -261,6 +261,55 @@ export type Database = {
           },
         ]
       }
+      order_offers: {
+        Row: {
+          carrier_company_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          order_id: string
+          vehicle_id: string
+        }
+        Insert: {
+          carrier_company_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          order_id: string
+          vehicle_id: string
+        }
+        Update: {
+          carrier_company_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          order_id?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_offers_carrier_company_id_fkey"
+            columns: ["carrier_company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_offers_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_offers_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       order_stops: {
         Row: {
           address: string
@@ -334,9 +383,13 @@ export type Database = {
       }
       orders: {
         Row: {
+          assigned_company_id: string | null
+          assigned_vehicle_id: string | null
+          chosen_offer_id: string | null
           comment: string | null
           created_at: string
           created_by: string | null
+          deadline_at: string | null
           distance_km: number | null
           id: string
           order_type: Database["public"]["Enums"]["order_type"]
@@ -351,9 +404,13 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          assigned_company_id?: string | null
+          assigned_vehicle_id?: string | null
+          chosen_offer_id?: string | null
           comment?: string | null
           created_at?: string
           created_by?: string | null
+          deadline_at?: string | null
           distance_km?: number | null
           id?: string
           order_type: Database["public"]["Enums"]["order_type"]
@@ -368,9 +425,13 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          assigned_company_id?: string | null
+          assigned_vehicle_id?: string | null
+          chosen_offer_id?: string | null
           comment?: string | null
           created_at?: string
           created_by?: string | null
+          deadline_at?: string | null
           distance_km?: number | null
           id?: string
           order_type?: Database["public"]["Enums"]["order_type"]
@@ -385,6 +446,27 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "orders_assigned_company_id_fkey"
+            columns: ["assigned_company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_assigned_vehicle_id_fkey"
+            columns: ["assigned_vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_chosen_offer_id_fkey"
+            columns: ["chosen_offer_id"]
+            isOneToOne: false
+            referencedRelation: "order_offers"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "orders_company_fk"
             columns: ["shipper_company_id", "shipper_company_kind"]
@@ -586,6 +668,66 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      cancel_order: {
+        Args: { p_order_id: string }
+        Returns: {
+          assigned_company_id: string | null
+          assigned_vehicle_id: string | null
+          chosen_offer_id: string | null
+          comment: string | null
+          created_at: string
+          created_by: string | null
+          deadline_at: string | null
+          distance_km: number | null
+          id: string
+          order_type: Database["public"]["Enums"]["order_type"]
+          published_at: string | null
+          rate_cents: number | null
+          ref: string
+          shipper_company_id: string
+          shipper_company_kind: Database["public"]["Enums"]["party_role"]
+          shipper_ref: string | null
+          status: Database["public"]["Enums"]["order_status"]
+          trailer: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      choose_offer: {
+        Args: { p_offer_id: string }
+        Returns: {
+          assigned_company_id: string | null
+          assigned_vehicle_id: string | null
+          chosen_offer_id: string | null
+          comment: string | null
+          created_at: string
+          created_by: string | null
+          deadline_at: string | null
+          distance_km: number | null
+          id: string
+          order_type: Database["public"]["Enums"]["order_type"]
+          published_at: string | null
+          rate_cents: number | null
+          ref: string
+          shipper_company_id: string
+          shipper_company_kind: Database["public"]["Enums"]["party_role"]
+          shipper_ref: string | null
+          status: Database["public"]["Enums"]["order_status"]
+          trailer: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       company_readiness: {
         Args: { p_company_id: string }
         Returns: {
@@ -598,12 +740,46 @@ export type Database = {
           license_valid_until: string
         }[]
       }
-      create_order: {
-        Args: { p_order: Json; p_publish?: boolean; p_stops: Json }
+      confirm_order: {
+        Args: { p_order_id: string }
         Returns: {
+          assigned_company_id: string | null
+          assigned_vehicle_id: string | null
+          chosen_offer_id: string | null
           comment: string | null
           created_at: string
           created_by: string | null
+          deadline_at: string | null
+          distance_km: number | null
+          id: string
+          order_type: Database["public"]["Enums"]["order_type"]
+          published_at: string | null
+          rate_cents: number | null
+          ref: string
+          shipper_company_id: string
+          shipper_company_kind: Database["public"]["Enums"]["party_role"]
+          shipper_ref: string | null
+          status: Database["public"]["Enums"]["order_status"]
+          trailer: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      create_order: {
+        Args: { p_order: Json; p_publish?: boolean; p_stops: Json }
+        Returns: {
+          assigned_company_id: string | null
+          assigned_vehicle_id: string | null
+          chosen_offer_id: string | null
+          comment: string | null
+          created_at: string
+          created_by: string | null
+          deadline_at: string | null
           distance_km: number | null
           id: string
           order_type: Database["public"]["Enums"]["order_type"]
@@ -664,6 +840,7 @@ export type Database = {
           delivery_city: string
           distance_km: number
           id: string
+          offers_count: number
           order_type: Database["public"]["Enums"]["order_type"]
           pickup_city: string
           pickup_date: string
@@ -673,6 +850,7 @@ export type Database = {
           ref: string
           shipper_name: string
           stops: Json
+          taken_by_me: boolean
           trailer: string
         }[]
       }
@@ -694,6 +872,7 @@ export type Database = {
           valid_until: string
         }[]
       }
+      expire_order_deadlines: { Args: never; Returns: number }
       moderate_company: {
         Args: {
           p_company_id: string
@@ -738,6 +917,23 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      my_assignments: {
+        Args: never
+        Returns: {
+          comment: string
+          deadline_at: string
+          distance_km: number
+          id: string
+          order_type: Database["public"]["Enums"]["order_type"]
+          rate_cents: number
+          ref: string
+          shipper_name: string
+          status: Database["public"]["Enums"]["order_status"]
+          stops: Json
+          trailer: string
+          vehicle_plate: string
+        }[]
+      }
       submit_vehicle: {
         Args: { p_vehicle_id: string }
         Returns: {
@@ -763,6 +959,36 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "vehicles"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      take_order: {
+        Args: { p_order_id: string; p_vehicle_id: string }
+        Returns: {
+          assigned_company_id: string | null
+          assigned_vehicle_id: string | null
+          chosen_offer_id: string | null
+          comment: string | null
+          created_at: string
+          created_by: string | null
+          deadline_at: string | null
+          distance_km: number | null
+          id: string
+          order_type: Database["public"]["Enums"]["order_type"]
+          published_at: string | null
+          rate_cents: number | null
+          ref: string
+          shipper_company_id: string
+          shipper_company_kind: Database["public"]["Enums"]["party_role"]
+          shipper_ref: string | null
+          status: Database["public"]["Enums"]["order_status"]
+          trailer: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "orders"
           isOneToOne: true
           isSetofReturn: false
         }
