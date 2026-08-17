@@ -85,15 +85,32 @@ export async function CabinetOverview({
             {hint && <p className="text-[13px] leading-relaxed text-ink-muted">{hint}</p>}
 
             {role === 'CARRIER' && (
+              <div className="flex flex-wrap gap-2">
+                <Link
+                  href={`/${locale}/carrier/desk`}
+                  className={buttonClass({ variant: 'primary', size: 'md' })}
+                >
+                  {t.desk.title}
+                </Link>
+                <Link
+                  href={`/${locale}/carrier/fleet`}
+                  className={buttonClass({ variant: 'default', size: 'md' })}
+                >
+                  {t.fleet.title}
+                </Link>
+              </div>
+            )}
+
+            {role === 'SHIPPER' && (
               <Link
-                href={`/${locale}/carrier/fleet`}
+                href={`/${locale}/shipper/orders`}
                 className={buttonClass({
                   variant: needsRequisites ? 'default' : 'primary',
                   size: 'md',
                   className: 'self-start',
                 })}
               >
-                {t.fleet.title}
+                {t.orders.title}
               </Link>
             )}
 

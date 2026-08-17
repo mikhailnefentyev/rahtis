@@ -128,6 +128,7 @@ export const ru = {
 
   /** Статусы заказа (ТЗ §6). Значения совпадают с enum order_status. */
   orderStatus: {
+    DRAFT: 'Черновик',
     OPEN: 'На столе',
     REQUESTED: 'Есть отклики',
     AWAIT_DRIVER: 'Ждём водителя',
@@ -205,6 +206,76 @@ export const ru = {
     trips: 'Рейсов',
     cargoAndPayment: 'Груз и оплата',
     closeTitle: 'Закрытие рейса',
+  },
+
+  orderForm: {
+    title: 'Новый заказ',
+    subtitle: 'Заполните маршрут целиком и опубликуйте — заказ появится на столе перевозчиков.',
+    type: 'Тип рейса',
+    shipperRef: 'Ваш номер заказа',
+    shipperRefHint: 'Необязательно. Номер платформы присваивается автоматически',
+
+    pickupSection: 'Откуда забираем',
+    deliverySection: 'Где выгрузка',
+    cargoSection: 'Груз и оплата',
+
+    placeKind: 'Тип места',
+    placeName: 'Название места',
+    address: 'Адрес',
+    city: 'Город',
+    date: 'Дата',
+    time: 'Время',
+    company: 'Компания',
+    contact: 'Контакт',
+    phone: 'Телефон',
+
+    addExtraLoad: '+ Доп. загрузка',
+    addExtraUnload: '+ Доп. выгрузка',
+    addContinuation: '+ Продолжение рейса',
+    addTrailerReturn: '+ Возврат прицепа',
+    remove: 'Убрать',
+
+    continuationRef: 'Номер заказа продолжения',
+    returnWhere: 'Куда возвращать',
+    returnLoaded: 'С грузом',
+    returnEmpty: 'Без груза',
+
+    trailer: 'Прицеп',
+    trailerPlaceholder: 'Тент 13.6, 3 оси',
+    distance: 'Пробег, км',
+    rate: 'Ставка, €',
+
+    publish: 'Опубликовать · рассылка машинам региона',
+    publishing: 'Публикуем…',
+    published: 'Заказ опубликован',
+    needActive: 'Заполните реквизиты компании — без них заказ не опубликовать.',
+    failed: 'Не удалось опубликовать заказ. Проверьте поля и попробуйте ещё раз.',
+  },
+
+  orders: {
+    title: 'Мои заказы',
+    subtitle: 'Опубликованные заказы и их состояние.',
+    newOrder: 'Новый заказ',
+    none: 'Заказов пока нет',
+    noneHint: 'Опубликуйте первый заказ — он появится на столе перевозчиков.',
+    route: 'Маршрут',
+    shipperRefShort: 'Ваш номер',
+  },
+
+  desk: {
+    title: 'Стол заказов',
+    subtitle: 'Открытые заказы из регионов, где стоят ваши машины.',
+    allRegions: 'Все регионы',
+    empty: 'Нет заказов в этом регионе',
+    emptyHint: 'Смените регион в фильтре или подождите новых публикаций.',
+    closedTitle: 'Стол закрыт',
+    closedNoVehicle:
+      'Чтобы видеть стол и откликаться, нужна хотя бы одна допущенная машина. Добавьте карточку авто — Aivomaa проверит её и выдаст допуск.',
+    closedExpired:
+      'Документы компании просрочены — допуск машин не действует. Загрузите продлённую лицензию или страховку.',
+    openFleet: 'Мой автопарк',
+    contactsHidden: 'Контакты получателя откроются после того, как заказ закрепят за вами.',
+    details: 'Маршрут и детали',
   },
 
   moderation: {
@@ -492,6 +563,13 @@ export const ru = {
     'documents.expiredAgo':
       'Просрочен {count, plural, one {# день} few {# дня} many {# дней} other {# дня}} назад',
     'documents.validUntilDate': 'Действует до {date}',
+
+    'desk.ordersCount':
+      '{count, plural, =0 {Заказов нет} one {# заказ} few {# заказа} many {# заказов} other {# заказа}}',
+    'desk.regionCount': '{city} · {count}',
+    'order.stopsCount':
+      '{count, plural, one {# точка} few {# точки} many {# точек} other {# точки}} в маршруте',
+    'order.publishedAt': 'Опубликован {date}',
 
     'trip.stepReported': 'Заказ {ref}: водитель отметил «{step}».',
     'trip.amended': 'Изменение маршрута по заказу {ref}: {change}',

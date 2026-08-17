@@ -223,6 +223,177 @@ export type Database = {
           },
         ]
       }
+      order_events: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          from_status: Database["public"]["Enums"]["order_status"] | null
+          id: number
+          note: string | null
+          order_id: string
+          to_status: Database["public"]["Enums"]["order_status"]
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          from_status?: Database["public"]["Enums"]["order_status"] | null
+          id?: never
+          note?: string | null
+          order_id: string
+          to_status: Database["public"]["Enums"]["order_status"]
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          from_status?: Database["public"]["Enums"]["order_status"] | null
+          id?: never
+          note?: string | null
+          order_id?: string
+          to_status?: Database["public"]["Enums"]["order_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_stops: {
+        Row: {
+          address: string
+          city: string
+          company_name: string | null
+          contact_name: string | null
+          contact_phone: string | null
+          created_at: string
+          external_ref: string | null
+          id: string
+          note: string | null
+          order_id: string
+          place_kind: Database["public"]["Enums"]["place_kind"] | null
+          place_name: string | null
+          returns_loaded: boolean | null
+          role: Database["public"]["Enums"]["stop_role"]
+          scheduled_date: string | null
+          scheduled_time: string | null
+          sequence: number
+          updated_at: string
+        }
+        Insert: {
+          address: string
+          city: string
+          company_name?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          external_ref?: string | null
+          id?: string
+          note?: string | null
+          order_id: string
+          place_kind?: Database["public"]["Enums"]["place_kind"] | null
+          place_name?: string | null
+          returns_loaded?: boolean | null
+          role: Database["public"]["Enums"]["stop_role"]
+          scheduled_date?: string | null
+          scheduled_time?: string | null
+          sequence: number
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          city?: string
+          company_name?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          external_ref?: string | null
+          id?: string
+          note?: string | null
+          order_id?: string
+          place_kind?: Database["public"]["Enums"]["place_kind"] | null
+          place_name?: string | null
+          returns_loaded?: boolean | null
+          role?: Database["public"]["Enums"]["stop_role"]
+          scheduled_date?: string | null
+          scheduled_time?: string | null
+          sequence?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_stops_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          comment: string | null
+          created_at: string
+          created_by: string | null
+          distance_km: number | null
+          id: string
+          order_type: Database["public"]["Enums"]["order_type"]
+          published_at: string | null
+          rate_cents: number | null
+          ref: string
+          shipper_company_id: string
+          shipper_company_kind: Database["public"]["Enums"]["party_role"]
+          shipper_ref: string | null
+          status: Database["public"]["Enums"]["order_status"]
+          trailer: string | null
+          updated_at: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          created_by?: string | null
+          distance_km?: number | null
+          id?: string
+          order_type: Database["public"]["Enums"]["order_type"]
+          published_at?: string | null
+          rate_cents?: number | null
+          ref?: string
+          shipper_company_id: string
+          shipper_company_kind?: Database["public"]["Enums"]["party_role"]
+          shipper_ref?: string | null
+          status?: Database["public"]["Enums"]["order_status"]
+          trailer?: string | null
+          updated_at?: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          created_by?: string | null
+          distance_km?: number | null
+          id?: string
+          order_type?: Database["public"]["Enums"]["order_type"]
+          published_at?: string | null
+          rate_cents?: number | null
+          ref?: string
+          shipper_company_id?: string
+          shipper_company_kind?: Database["public"]["Enums"]["party_role"]
+          shipper_ref?: string | null
+          status?: Database["public"]["Enums"]["order_status"]
+          trailer?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_company_fk"
+            columns: ["shipper_company_id", "shipper_company_kind"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id", "kind"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           company_id: string | null
@@ -427,6 +598,32 @@ export type Database = {
           license_valid_until: string
         }[]
       }
+      create_order: {
+        Args: { p_order: Json; p_publish?: boolean; p_stops: Json }
+        Returns: {
+          comment: string | null
+          created_at: string
+          created_by: string | null
+          distance_km: number | null
+          id: string
+          order_type: Database["public"]["Enums"]["order_type"]
+          published_at: string | null
+          rate_cents: number | null
+          ref: string
+          shipper_company_id: string
+          shipper_company_kind: Database["public"]["Enums"]["party_role"]
+          shipper_ref: string | null
+          status: Database["public"]["Enums"]["order_status"]
+          trailer: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       decide_vehicle: {
         Args: {
           p_decision: Database["public"]["Enums"]["vehicle_access"]
@@ -459,6 +656,32 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      desk_orders: {
+        Args: { p_limit?: number; p_region?: string }
+        Returns: {
+          comment: string
+          delivery_city: string
+          distance_km: number
+          id: string
+          order_type: Database["public"]["Enums"]["order_type"]
+          pickup_city: string
+          pickup_date: string
+          pickup_time: string
+          published_at: string
+          rate_cents: number
+          ref: string
+          shipper_name: string
+          stops: Json
+          trailer: string
+        }[]
+      }
+      desk_regions: {
+        Args: never
+        Returns: {
+          city: string
+          open_orders: number
+        }[]
       }
       documents_needing_attention: {
         Args: { p_within_days?: number }
@@ -549,7 +772,24 @@ export type Database = {
       company_status: "PENDING" | "APPROVED" | "ACTIVE" | "REJECTED"
       document_kind: "CARRIER_LICENSE" | "INSURANCE"
       euro_class: "EURO_4" | "EURO_5" | "EURO_6"
+      order_status:
+        | "DRAFT"
+        | "OPEN"
+        | "REQUESTED"
+        | "AWAIT_DRIVER"
+        | "IN_PROGRESS"
+        | "DONE"
+        | "CANCELLED"
+      order_type: "TRAILER_SWAP" | "ROUND_TRIP" | "ONE_WAY"
       party_role: "CARRIER" | "SHIPPER" | "ADMIN"
+      place_kind: "PORT" | "TERMINAL" | "PARKING" | "ADDRESS"
+      stop_role:
+        | "PICKUP"
+        | "DELIVERY"
+        | "EXTRA_LOAD"
+        | "EXTRA_UNLOAD"
+        | "CONTINUATION"
+        | "TRAILER_RETURN"
       vehicle_access: "DRAFT" | "PENDING" | "APPROVED" | "REJECTED"
     }
     CompositeTypes: {
@@ -684,7 +924,26 @@ export const Constants = {
       company_status: ["PENDING", "APPROVED", "ACTIVE", "REJECTED"],
       document_kind: ["CARRIER_LICENSE", "INSURANCE"],
       euro_class: ["EURO_4", "EURO_5", "EURO_6"],
+      order_status: [
+        "DRAFT",
+        "OPEN",
+        "REQUESTED",
+        "AWAIT_DRIVER",
+        "IN_PROGRESS",
+        "DONE",
+        "CANCELLED",
+      ],
+      order_type: ["TRAILER_SWAP", "ROUND_TRIP", "ONE_WAY"],
       party_role: ["CARRIER", "SHIPPER", "ADMIN"],
+      place_kind: ["PORT", "TERMINAL", "PARKING", "ADDRESS"],
+      stop_role: [
+        "PICKUP",
+        "DELIVERY",
+        "EXTRA_LOAD",
+        "EXTRA_UNLOAD",
+        "CONTINUATION",
+        "TRAILER_RETURN",
+      ],
       vehicle_access: ["DRAFT", "PENDING", "APPROVED", "REJECTED"],
     },
   },
