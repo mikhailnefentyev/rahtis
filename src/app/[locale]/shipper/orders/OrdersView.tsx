@@ -99,14 +99,14 @@ export function OrdersView({
 
                       <p className="mt-1.5 text-[13px] text-ink-muted">
                         {order.trailer ? `${order.trailer} · ` : ''}
-                        <Mono>{m('order.distance', { km: order.distance_km ?? 0 })}</Mono> ·{' '}
-                        <Mono className="font-bold text-ink">{f.eur(order.rate_cents ?? 0)}</Mono>{' '}
+                        {m('order.distance', { km: order.distance_km ?? 0 })} ·{' '}
+                        <span className="font-semibold text-ink">{f.eur(order.rate_cents ?? 0)}</span>{' '}
                         {order.distance_km && order.rate_cents ? (
-                          <Mono className="text-ink-dim">
+                          <span className="text-ink-dim">
                             · {m('order.ratePerKm', {
                               rate: f.eurPerKm(order.rate_cents, order.distance_km) ?? '',
                             })}
-                          </Mono>
+                          </span>
                         ) : null}
                       </p>
 

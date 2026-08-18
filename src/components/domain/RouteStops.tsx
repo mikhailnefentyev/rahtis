@@ -1,6 +1,6 @@
 'use client';
 
-import { Badge, Mono, Waypoint, WaypointList } from '@/components/ui';
+import { Badge, Waypoint, WaypointList } from '@/components/ui';
 import { useI18n } from '@/lib/i18n/provider';
 import type { DeskStop, OrderStop, PlaceKind, StopRole } from '@/types/db';
 
@@ -67,7 +67,7 @@ export function RouteStops({ stops }: { stops: AnyStop[] }) {
     if (stop.cargo_weight_kg) {
       chips.push(
         <Badge key="weight" tone="neutral">
-          <Mono>{m('stop.weight', { tonnes: stop.cargo_weight_kg / 1000 })}</Mono>
+          {m('stop.weight', { tonnes: stop.cargo_weight_kg / 1000 })}
         </Badge>,
       );
     }

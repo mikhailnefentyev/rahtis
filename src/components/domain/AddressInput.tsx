@@ -188,7 +188,15 @@ export function AddressInput({
         onFocus={() => setOpen(true)}
       />
 
-      {/* Координаты уезжают на сервер скрытыми полями рядом с адресом. */}
+      {/*
+        * Координаты и город уезжают на сервер скрытыми полями рядом с
+        * адресом. Города отдельным полем в форме больше нет: заказчик
+        * пишет адрес целиком — улица, дом, индекс, город, — а название
+        * города берётся из того же ответа геокодера, что и координаты.
+        * Так город всегда совпадает с точкой на карте, а не с тем, что
+        * человек выбрал в списке из шести штук.
+        */}
+      <input type="hidden" name={`${name}_city`} value={chosen?.city ?? ''} />
       <input type="hidden" name={`${name}_lat`} value={chosen?.position?.lat ?? ''} />
       <input type="hidden" name={`${name}_lon`} value={chosen?.position?.lon ?? ''} />
       <input type="hidden" name={`${name}_score`} value={chosen?.score ?? ''} />

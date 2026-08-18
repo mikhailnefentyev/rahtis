@@ -3,8 +3,6 @@
 import { useState } from 'react';
 import { AddressInput, type ChosenAddress } from '@/components/domain/AddressInput';
 import { Field, Input, InputMono, Select, Textarea } from '@/components/ui';
-import { REGIONS } from '@/lib/config';
-import { CITY_CENTRES } from '@/lib/routing/cities';
 import {
   hasBookingRef,
   hasCargo,
@@ -35,9 +33,7 @@ export function StopFields({
   role,
   prefix,
   repeated = false,
-  cityFromRegions = false,
   defaultPlaceKind = 'ADDRESS',
-  defaultCity,
   requireCompany = false,
   showContact = false,
   showPlaceName = false,
@@ -51,9 +47,7 @@ export function StopFields({
   /** Имена полей: `${prefix}_address` и так далее. */
   prefix: string;
   repeated?: boolean;
-  cityFromRegions?: boolean;
   defaultPlaceKind?: PlaceKind;
-  defaultCity?: string;
   requireCompany?: boolean;
   showContact?: boolean;
   showPlaceName?: boolean;
@@ -71,12 +65,6 @@ export function StopFields({
    * Это единственное поле точки, влияющее на состав остальных.
    */
   const [placeKind, setPlaceKind] = useState<PlaceKind>(defaultPlaceKind);
-
-  /*
-   * Город смещает выдачу подсказки. Без смещения «Satamak» отдаёт Вааса
-   * раньше Ханко — проверено замером.
-   */
-  const [city, setCity] = useState(defaultCity ?? (cityFromRegions ? REGIONS[0] : ''));
 
   const name = (field: string) => `${prefix}_${field}`;
 
@@ -137,38 +125,9 @@ export function StopFields({
             name={name('address')}
             required
             placeholder={addressPlaceholder}
-            near={CITY_CENTRES[city]}
             onChosen={onChosen}
           />
         )}
-      </Field>
-
-      <Field label={t.orderForm.city} required>
-        {(p) =>
-          cityFromRegions ? (
-            <Select
-              {...p}
-              name={name('city')}
-              required
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-            >
-              {REGIONS.map((region) => (
-                <option key={region} value={region}>
-                  {region}
-                </option>
-              ))}
-            </Select>
-          ) : (
-            <Input
-              {...p}
-              name={name('city')}
-              required
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-            />
-          )
-        }
       </Field>
 
       <div className="grid grid-cols-2 gap-3">

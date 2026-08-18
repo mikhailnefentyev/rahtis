@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useCallback, useMemo, useState } from 'react';
+import { useActionState, useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Badge,
   Button,
@@ -15,7 +15,6 @@ import {
   Textarea,
 } from '@/components/ui';
 import type { ChosenAddress } from '@/components/domain/AddressInput';
-import { REGIONS } from '@/lib/config';
 import { publishOrderAction, type PublishState } from '@/lib/orders/actions';
 import { computeRouteAction, type RouteState } from '@/lib/routing/actions';
 import { useI18n } from '@/lib/i18n/provider';
@@ -94,23 +93,47 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
 
   const canRoute = routePoints.length >= 2;
 
-  async function calculate() {
-    setRouting(true);
-    setRouteError(null);
+  /*
+   * Отпечаток набора точек. По нему решается, нужен ли пересчёт: массив
+   * пересобирается при каждом изменении координат, а маршрут зависит
+   * только от самих значений и их порядка.
+   */
+  const pointsKey = routePoints.map((p) => `${p.lat},${p.lon}`).join(';');
 
-    const result = await computeRouteAction(routePoints, 'FI', locale);
-    setRouting(false);
+  /*
+   * Пробег считается сам, как только известны две точки. Кнопки нет
+   * намеренно: заказчик заполняет адреса и вводит ставку, а километраж —
+   * это следствие маршрута, а не отдельное решение. Лишнее нажатие здесь
+   * означало бы, что можно опубликовать заказ с непосчитанным пробегом.
+   *
+   * Задержка нужна на случай, когда адреса правят подряд: маршрут стоит
+   * денег за вызов, и считать промежуточные состояния незачем.
+   */
+  useEffect(() => {
+    if (!canRoute) return;
 
-    if (!result.ok) {
-      setRouteError(result.error);
-      setRoute(null);
-      return;
-    }
+    const timer = setTimeout(async () => {
+      setRouting(true);
+      setRouteError(null);
 
-    setRoute(result);
-    setDistance(String(result.km));
-    setSource('AUTO');
-  }
+      const result = await computeRouteAction(routePoints, 'FI', locale);
+
+      setRouting(false);
+      if (!result.ok) {
+        setRouteError(result.error);
+        setRoute(null);
+        return;
+      }
+
+      setRoute(result);
+      setDistance(String(result.km));
+      setSource('AUTO');
+    }, 500);
+
+    return () => clearTimeout(timer);
+    /* routePoints выводится из pointsKey — сравнивать нужно значения. */
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pointsKey, canRoute, locale]);
 
   /* Ставка за километр — подсказка при вводе, в базе не хранится. */
   const km = Number.parseInt(distance.replace(/\D/g, ''), 10);
@@ -184,7 +207,6 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
             role="PICKUP"
             prefix="pickup"
             defaultPlaceKind="PORT"
-            cityFromRegions
             showPlaceName
             requireDate
             addressPlaceholder="Satamakatu 1, 10900 Hanko"
@@ -195,7 +217,7 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
       </Card>
 
       {/* ── Доп. точки ── */}
-      {extras.map((extra, index) => (
+      {extras.map((extra) => (
         <Card key={extra.key} stripe="warn">
           <CardBody>
             <div className="mb-3 flex items-center justify-between">
@@ -217,7 +239,6 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
               prefix="extra"
               repeated
               requireCompany
-              defaultCity={REGIONS[index % REGIONS.length]}
               onChosen={onChosen(`extra-${extra.key}`)}
             />
           </CardBody>
@@ -231,12 +252,10 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
           <StopFields
             role="DELIVERY"
             prefix="delivery"
-            cityFromRegions
-            defaultCity={REGIONS[1]}
             requireCompany
             showContact
             requireDate
-            addressPlaceholder="Satamakaari 20, 00980 Helsinki"
+            addressPlaceholder="Merituulentie 424, 48310 Kotka"
             onChosen={onChosen('delivery')}
           />
         </CardBody>
@@ -259,7 +278,6 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
               role="CONTINUATION"
               prefix="cont"
               requireCompany
-              defaultCity={REGIONS[3]}
               onChosen={onChosen('cont')}
             />
           </CardBody>
@@ -285,7 +303,6 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
               defaultPlaceKind="PORT"
               showPlaceName
               showReturnLoaded
-              defaultCity={REGIONS[0]}
               placeNamePlaceholder="Hanko Port, Terminal 2"
               onChosen={onChosen('ret')}
             />
@@ -342,33 +359,22 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
                 />
               )}
             </Field>
-            {/*
-              * Расчёт стоит рядом с полем пробега, а не отдельной кнопкой
-              * наверху: он предлагает значение именно этому полю, и связь
-              * должна быть видна без объяснений.
-              */}
+            {/* Состояние расчёта — рядом с полем пробега, которое он заполняет. */}
             <div className="sm:col-span-2 flex flex-wrap items-center gap-3">
-              <Button
-                type="button"
-                size="sm"
-                onClick={calculate}
-                disabled={!canRoute || routing}
-              >
-                {routing ? t.routing.calculating : t.routing.calculate}
-              </Button>
-
-              {!canRoute && (
+              {routing ? (
+                <span className="text-xs text-ink-muted">{t.routing.calculating}</span>
+              ) : !canRoute ? (
                 <span className="text-xs text-ink-dim">{t.routing.noCoordinates}</span>
-              )}
-
-              {route && (
-                <span className="font-mono text-xs text-ink-muted">
-                  {m('routing.result', {
-                    km: route.km,
-                    hours: Math.floor(route.durationS / 3600),
-                    minutes: Math.round((route.durationS % 3600) / 60),
-                  })}
-                </span>
+              ) : (
+                route && (
+                  <span className="text-xs text-ink-muted">
+                    {m('routing.result', {
+                      km: route.km,
+                      hours: Math.floor(route.durationS / 3600),
+                      minutes: Math.round((route.durationS % 3600) / 60),
+                    })}
+                  </span>
+                )
               )}
 
               <Badge tone={source === 'AUTO' ? 'ok' : 'neutral'}>

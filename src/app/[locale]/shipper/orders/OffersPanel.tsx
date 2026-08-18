@@ -1,6 +1,6 @@
 'use client';
 
-import { Badge, Button, Countdown, Kv, Mono, Plate, Stars } from '@/components/ui';
+import { Badge, Button, Countdown, Kv, Plate, Stars } from '@/components/ui';
 import { APP, MATCHING } from '@/lib/config';
 import { EURO_LABEL } from '@/lib/fleet/labels';
 import { cancelOrderAction, chooseOfferAction } from '@/lib/orders/matching';
@@ -33,18 +33,13 @@ function VehicleLine({ offer, badge }: { offer: ShipperOffer; badge?: React.Reac
       </div>
 
       <p className="mt-1 text-xs text-ink-muted">
-        {offer.make} · <Mono>{m('vehicle.axlesCount', { count: offer.axles })}</Mono> ·{' '}
-        <Mono>{EURO_LABEL[offer.euro_class]}</Mono>
+        {offer.make} · {m('vehicle.axlesCount', { count: offer.axles })} ·{' '}
+        {EURO_LABEL[offer.euro_class]}
       </p>
 
       <p className="text-xs text-ink-dim">
         {m('matching.basedIn', { city: offer.base_city })}
-        {offer.languages.length > 0 && (
-          <>
-            {' · '}
-            <Mono>{offer.languages.join('/')}</Mono>
-          </>
-        )}
+        {offer.languages.length > 0 && <>{' · '}{offer.languages.join('/')}</>}
       </p>
     </div>
   );
@@ -129,7 +124,7 @@ export function OffersPanel({ order, offers }: { order: ShipperOrder; offers: Sh
  * работать без этих данных заказчик не сможет.
  */
 export function AssignedCarrier({ offer }: { offer: ShipperOffer }) {
-  const { t } = useI18n();
+  const { t, m } = useI18n();
 
   return (
     <div className="mt-4 border-t border-line pt-4">
@@ -144,6 +139,12 @@ export function AssignedCarrier({ offer }: { offer: ShipperOffer }) {
         <div className="flex flex-col gap-1">
           {offer.driver_name && <Kv k={t.vehicle.driver} v={offer.driver_name} />}
           <Kv k={t.vehicle.make} v={offer.make} />
+          {/*
+            * Число осей заказчику нужно по делу: от него зависит
+            * допустимая нагрузка и пройдёт ли сцепка по его площадке.
+            */}
+          <Kv k={t.vehicle.axles} v={m('vehicle.axlesCount', { count: offer.axles })} />
+          <Kv k={t.vehicle.euro} v={EURO_LABEL[offer.euro_class]} />
           <Kv k={t.vehicle.base} v={offer.base_city} />
         </div>
       </div>
