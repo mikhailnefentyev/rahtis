@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "check": "npm run lint && npm run typecheck"
+    "check": "npm run lint && npm run typecheck",
+    "predev": "node scripts/sync-map-worker.mjs",
+    "prebuild": "node scripts/sync-map-worker.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.4",

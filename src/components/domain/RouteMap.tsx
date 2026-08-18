@@ -117,6 +117,23 @@ export function RouteMap({
         const maplibre = await import('maplibre-gl');
         if (cancelled || !container.current) return;
 
+        /*
+         * Воркер берётся из public/maplibre/, а не из того места, куда его
+         * положил сборщик.
+         *
+         * Next копирует maplibre-gl-worker.mjs в /_next/static/media/
+         * побайтово, вместе с относительным импортом общего модуля внутри.
+         * Общий модуль туда тоже попадает, но под именем с другим хешем —
+         * импорт упирается в 404, модульный воркер не инстанцируется и
+         * умирает молча. Внешне это выглядит как исправная карта с пустым
+         * холстом: контроллы и атрибуция на месте, тайлы не запрашиваются
+         * ни разу, события load и idle не наступают, в консоли пусто.
+         *
+         * scripts/sync-map-worker.mjs кладёт оба файла рядом, и
+         * относительный импорт снова разрешается.
+         */
+        maplibre.setWorkerUrl('/maplibre/maplibre-gl-worker.mjs');
+
         const line = geometry ? decodePolyline(geometry) : [];
 
         /*

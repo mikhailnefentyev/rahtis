@@ -45,6 +45,8 @@ const eslintConfig = defineConfig([
     'next-env.d.ts',
     // Визуальный прототип — референс, а не код проекта. В сборку не входит.
     'rahti.jsx',
+    // Копия воркера maplibre: чужой собранный код, кладётся скриптом.
+    'public/maplibre/**',
   ]),
 
   {

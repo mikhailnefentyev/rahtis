@@ -44,3 +44,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Копия воркера maplibre, создаётся scripts/sync-map-worker.mjs
+/public/maplibre
