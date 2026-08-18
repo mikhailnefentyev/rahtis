@@ -4,15 +4,10 @@ import { useCallback, useState } from 'react';
 import { Badge, Button, Card, CardBody, EmptyState, Mono, Plate } from '@/components/ui';
 import { vehicleAccessTone } from '@/components/ui/tone';
 import { deleteDraftVehicleAction, submitVehicleAction } from '@/lib/fleet/actions';
+import { EURO_LABEL } from '@/lib/fleet/labels';
 import { useI18n } from '@/lib/i18n/provider';
 import type { Vehicle } from '@/types/db';
 import { VehicleForm } from './VehicleForm';
-
-const EURO_LABEL: Record<string, string> = {
-  EURO_4: 'Euro 4',
-  EURO_5: 'Euro 5',
-  EURO_6: 'Euro 6',
-};
 
 export function FleetView({
   vehicles,

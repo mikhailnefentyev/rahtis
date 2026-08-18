@@ -34,6 +34,20 @@ export type CompanyReadiness = Database['public']['Functions']['company_readines
 export type DeskOrder = Database['public']['Functions']['desk_orders']['Returns'][number];
 
 /**
+ * Отклик глазами заказчика: машина, компания и рейтинг, без телефона
+ * водителя (ТЗ §14).
+ *
+ * Поле rating переопределено на nullable. Генератор типов выводит его из
+ * сигнатуры функции как numeric и о null не знает, а оценок в системе
+ * пока нет вовсе — они появятся на Этапе 7. Без переопределения код
+ * считал бы, что рейтинг есть всегда.
+ */
+export type ShipperOffer = Omit<
+  Database['public']['Functions']['offers_for_shipper']['Returns'][number],
+  'rating'
+> & { rating: number | null };
+
+/**
  * Точка маршрута в том виде, в каком её отдаёт стол.
  *
  * Это не OrderStop: contact_name и contact_phone функция desk_orders не
@@ -54,6 +68,14 @@ export type DeskStop = {
   external_ref: string | null;
   returns_loaded: boolean | null;
   note: string | null;
+  /*
+   * Бронь, вес и пломба нужны перевозчику до взятия заказа: по ним он
+   * решает, пройдёт ли машина по массе и успеет ли к окну на терминале.
+   * Получателя (consignee) здесь нет — третье лицо, как и контакты.
+   */
+  booking_ref: string | null;
+  cargo_weight_kg: number | null;
+  seal_required: boolean | null;
 };
 
 /** Языки водителя. Набор совпадает с ограничением vehicles_languages_known. */

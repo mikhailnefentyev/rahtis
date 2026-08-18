@@ -206,6 +206,11 @@ export const ru = {
     trips: 'Рейсов',
     cargoAndPayment: 'Груз и оплата',
     closeTitle: 'Закрытие рейса',
+
+    /* Подписи полей точки при показе маршрута. */
+    bookingRef: 'Бронь',
+    consignee: 'Получатель',
+    sealRequired: 'Пломба',
   },
 
   orderForm: {
@@ -239,6 +244,22 @@ export const ru = {
     returnWhere: 'Куда возвращать',
     returnLoaded: 'С грузом',
     returnEmpty: 'Без груза',
+
+    /* Поля точки маршрута под грузовую специфику. */
+    bookingRef: 'Номер брони REF',
+    bookingRefHint: 'По нему в порту выдают и принимают прицеп',
+    cargoWeight: 'Вес груза, т',
+    cargoWeightHint: 'До 76 тонн — предел для сцепок HCT',
+    consignee: 'Получатель груза',
+    consigneeHint: 'Кому груз едет с этой точки',
+    loadingRef: 'Номер заказа на загрузку',
+    loadingRefHint: 'Внутренний номер отправителя, если он есть',
+    seal: 'Пломба',
+    sealUnknown: 'Не указано',
+    sealYes: 'Нужна',
+    sealNo: 'Не нужна',
+    stopNote: 'Инструкции по точке',
+    stopNotePlaceholder: 'Звонить за час, въезд с задней стороны, пропуск на проходной…',
 
     trailer: 'Прицеп',
     trailerPlaceholder: 'Тент 13.6, 3 оси',
@@ -283,6 +304,7 @@ export const ru = {
     chosenYou: 'Заказчик выбрал вас',
     chosenYouHint: 'Подтвердите работу в течение 15 минут, иначе заказ вернётся на стол.',
     inProgress: 'Рейс в работе',
+    assignedCarrier: 'Исполнитель',
     contactsNow: 'Контакты получателя открыты — заказ закреплён за вами.',
     failed: 'Не удалось выполнить действие. Обновите страницу и попробуйте ещё раз.',
     tooLate: 'Срок вышел, заказ вернулся на стол.',
@@ -595,6 +617,16 @@ export const ru = {
     'desk.ordersCount':
       '{count, plural, =0 {Заказов нет} one {# заказ} few {# заказа} many {# заказов} other {# заказа}}',
     'desk.regionCount': '{city} · {count}',
+    /*
+     * Вес — числовым скелетом ICU, а не готовой строкой: разделитель
+     * дробной части у русского и финского запятая, у английского точка.
+     * ::.0# означает «минимум ноль знаков после запятой, максимум один» —
+     * 24 т остаётся «24 т», а 24,5 т не округляется до 25.
+     */
+    'stop.weight': '{tonnes, number, ::.0#} т',
+    'stop.bookingRef': '{label}: {ref}',
+    'stop.consignee': '{label}: {name}',
+
     'order.stopsCount':
       '{count, plural, one {# точка} few {# точки} many {# точек} other {# точки}} в маршруте',
     'order.publishedAt': 'Опубликован {date}',

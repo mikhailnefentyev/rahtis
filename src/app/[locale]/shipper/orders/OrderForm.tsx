@@ -17,6 +17,7 @@ import {
 import { REGIONS } from '@/lib/config';
 import { publishOrderAction, type PublishState } from '@/lib/orders/actions';
 import { useI18n } from '@/lib/i18n/provider';
+import { StopFields } from './StopFields';
 
 const initial: PublishState = { error: null, ref: null };
 
@@ -27,6 +28,10 @@ type Extra = { key: number; role: 'EXTRA_LOAD' | 'EXTRA_UNLOAD' };
  *
  * По ТЗ §5 это одна форма, а не пошаговый мастер: заказчик видит весь
  * маршрут целиком и добавляет необязательные части кнопками.
+ *
+ * Поля самих точек живут в StopFields — одна разметка на все шесть ролей.
+ * Здесь остаётся только то, что относится к заказу целиком, и порядок,
+ * в котором точки идут по маршруту.
  */
 export function OrderForm({ onPublished }: { onPublished: () => void }) {
   const { t, locale } = useI18n();
@@ -82,49 +87,20 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
         </CardBody>
       </Card>
 
-      {/* ── Забор ── */}
+      {/* ── Забор прицепа ── */}
       <Card stripe="info">
         <CardBody>
           <SectionTitle>{t.orderForm.pickupSection}</SectionTitle>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field label={t.orderForm.placeKind} required>
-              {(p) => (
-                <Select {...p} name="pickup_place_kind" required defaultValue="PORT">
-                  <option value="PORT">{t.placeKind.PORT}</option>
-                  <option value="TERMINAL">{t.placeKind.TERMINAL}</option>
-                  <option value="PARKING">{t.placeKind.PARKING}</option>
-                  <option value="ADDRESS">{t.placeKind.ADDRESS}</option>
-                </Select>
-              )}
-            </Field>
-            <Field label={t.orderForm.placeName}>
-              {(p) => <Input {...p} name="pickup_place_name" placeholder="Hanko Port, Terminal 2" />}
-            </Field>
-            <Field label={t.orderForm.address} required className="sm:col-span-2">
-              {(p) => (
-                <Input {...p} name="pickup_address" required placeholder="Satamakatu 1, 10900 Hanko" />
-              )}
-            </Field>
-            <Field label={t.orderForm.city} required>
-              {(p) => (
-                <Select {...p} name="pickup_city" required defaultValue={REGIONS[0]}>
-                  {REGIONS.map((city) => (
-                    <option key={city} value={city}>
-                      {city}
-                    </option>
-                  ))}
-                </Select>
-              )}
-            </Field>
-            <div className="grid grid-cols-2 gap-3">
-              <Field label={t.orderForm.date} required>
-                {(p) => <Input {...p} type="date" name="pickup_date" required />}
-              </Field>
-              <Field label={t.orderForm.time}>
-                {(p) => <Input {...p} type="time" name="pickup_time" />}
-              </Field>
-            </div>
-          </div>
+          <StopFields
+            role="PICKUP"
+            prefix="pickup"
+            defaultPlaceKind="PORT"
+            cityFromRegions
+            showPlaceName
+            requireDate
+            addressPlaceholder="Satamakatu 1, 10900 Hanko"
+            placeNamePlaceholder="Hanko Port, Terminal 2"
+          />
         </CardBody>
       </Card>
 
@@ -146,23 +122,13 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
 
             <input type="hidden" name="extra_role" value={extra.role} />
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Field label={t.orderForm.company} required>
-                {(p) => <Input {...p} name="extra_company" required />}
-              </Field>
-              <Field label={t.orderForm.city} required>
-                {(p) => <Input {...p} name="extra_city" required defaultValue={REGIONS[index % REGIONS.length]} />}
-              </Field>
-              <Field label={t.orderForm.address} required className="sm:col-span-2">
-                {(p) => <Input {...p} name="extra_address" required />}
-              </Field>
-              <Field label={t.orderForm.date}>
-                {(p) => <Input {...p} type="date" name="extra_date" />}
-              </Field>
-              <Field label={t.orderForm.time}>
-                {(p) => <Input {...p} type="time" name="extra_time" />}
-              </Field>
-            </div>
+            <StopFields
+              role={extra.role}
+              prefix="extra"
+              repeated
+              requireCompany
+              defaultCity={REGIONS[index % REGIONS.length]}
+            />
           </CardBody>
         </Card>
       ))}
@@ -171,41 +137,16 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
       <Card stripe="live">
         <CardBody>
           <SectionTitle>{t.orderForm.deliverySection}</SectionTitle>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field label={t.orderForm.company} required>
-              {(p) => (
-                <Input {...p} name="delivery_company" required placeholder="Helsinki Logistics Center" />
-              )}
-            </Field>
-            <Field label={t.orderForm.city} required>
-              {(p) => (
-                <Select {...p} name="delivery_city" required defaultValue={REGIONS[1]}>
-                  {REGIONS.map((city) => (
-                    <option key={city} value={city}>
-                      {city}
-                    </option>
-                  ))}
-                </Select>
-              )}
-            </Field>
-            <Field label={t.orderForm.address} required className="sm:col-span-2">
-              {(p) => (
-                <Input {...p} name="delivery_address" required placeholder="Tavaratie 5, 00700 Helsinki" />
-              )}
-            </Field>
-            <Field label={t.orderForm.contact}>
-              {(p) => <Input {...p} name="delivery_contact" placeholder="Mika Virtanen" />}
-            </Field>
-            <Field label={t.orderForm.phone}>
-              {(p) => <InputMono {...p} name="delivery_phone" placeholder="+358407001122" />}
-            </Field>
-            <Field label={t.orderForm.date} required>
-              {(p) => <Input {...p} type="date" name="delivery_date" required />}
-            </Field>
-            <Field label={t.orderForm.time}>
-              {(p) => <Input {...p} type="time" name="delivery_time" />}
-            </Field>
-          </div>
+          <StopFields
+            role="DELIVERY"
+            prefix="delivery"
+            cityFromRegions
+            defaultCity={REGIONS[1]}
+            requireCompany
+            showContact
+            requireDate
+            addressPlaceholder="Tavaratie 5, 00700 Helsinki"
+          />
         </CardBody>
       </Card>
 
@@ -222,28 +163,12 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
 
             <input type="hidden" name="has_continuation" value="on" />
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Field label={t.orderForm.company} required>
-                {(p) => <Input {...p} name="cont_company" required />}
-              </Field>
-              <Field label={t.orderForm.continuationRef}>
-                {(p) => <InputMono {...p} name="cont_ref" placeholder="NC-2026-0414" />}
-              </Field>
-              <Field label={t.orderForm.address} required className="sm:col-span-2">
-                {(p) => <Input {...p} name="cont_address" required />}
-              </Field>
-              <Field label={t.orderForm.city} required>
-                {(p) => <Input {...p} name="cont_city" required defaultValue={REGIONS[3]} />}
-              </Field>
-              <div className="grid grid-cols-2 gap-3">
-                <Field label={t.orderForm.date}>
-                  {(p) => <Input {...p} type="date" name="cont_date" />}
-                </Field>
-                <Field label={t.orderForm.time}>
-                  {(p) => <Input {...p} type="time" name="cont_time" />}
-                </Field>
-              </div>
-            </div>
+            <StopFields
+              role="CONTINUATION"
+              prefix="cont"
+              requireCompany
+              defaultCity={REGIONS[3]}
+            />
           </CardBody>
         </Card>
       )}
@@ -261,21 +186,15 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
 
             <input type="hidden" name="has_return" value="on" />
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Field label={t.orderForm.returnWhere} required>
-                {(p) => <Input {...p} name="ret_place" required placeholder="Hanko Port, Terminal 2" />}
-              </Field>
-              <Field label={t.orderForm.city} required>
-                {(p) => <Input {...p} name="ret_city" required defaultValue={REGIONS[0]} />}
-              </Field>
-              <Field label={t.orderForm.address} required className="sm:col-span-2">
-                {(p) => <Input {...p} name="ret_address" required />}
-              </Field>
-              <label className="flex cursor-pointer items-center gap-2.5 sm:col-span-2">
-                <input type="checkbox" name="ret_loaded" className="size-4 accent-accent" />
-                <span className="text-[13px] text-ink">{t.orderForm.returnLoaded}</span>
-              </label>
-            </div>
+            <StopFields
+              role="TRAILER_RETURN"
+              prefix="ret"
+              defaultPlaceKind="PORT"
+              showPlaceName
+              showReturnLoaded
+              defaultCity={REGIONS[0]}
+              placeNamePlaceholder="Hanko Port, Terminal 2"
+            />
           </CardBody>
         </Card>
       )}

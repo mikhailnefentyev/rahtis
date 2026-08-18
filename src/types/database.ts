@@ -1,4 +1,4 @@
-﻿export type Json =
+export type Json =
   | string
   | number
   | boolean
@@ -313,8 +313,11 @@ export type Database = {
       order_stops: {
         Row: {
           address: string
+          booking_ref: string | null
+          cargo_weight_kg: number | null
           city: string
           company_name: string | null
+          consignee: string | null
           contact_name: string | null
           contact_phone: string | null
           created_at: string
@@ -328,13 +331,17 @@ export type Database = {
           role: Database["public"]["Enums"]["stop_role"]
           scheduled_date: string | null
           scheduled_time: string | null
+          seal_required: boolean | null
           sequence: number
           updated_at: string
         }
         Insert: {
           address: string
+          booking_ref?: string | null
+          cargo_weight_kg?: number | null
           city: string
           company_name?: string | null
+          consignee?: string | null
           contact_name?: string | null
           contact_phone?: string | null
           created_at?: string
@@ -348,13 +355,17 @@ export type Database = {
           role: Database["public"]["Enums"]["stop_role"]
           scheduled_date?: string | null
           scheduled_time?: string | null
+          seal_required?: boolean | null
           sequence: number
           updated_at?: string
         }
         Update: {
           address?: string
+          booking_ref?: string | null
+          cargo_weight_kg?: number | null
           city?: string
           company_name?: string | null
+          consignee?: string | null
           contact_name?: string | null
           contact_phone?: string | null
           created_at?: string
@@ -368,6 +379,7 @@ export type Database = {
           role?: Database["public"]["Enums"]["stop_role"]
           scheduled_date?: string | null
           scheduled_time?: string | null
+          seal_required?: boolean | null
           sequence?: number
           updated_at?: string
         }
@@ -932,6 +944,27 @@ export type Database = {
           stops: Json
           trailer: string
           vehicle_plate: string
+        }[]
+      }
+      offers_for_shipper: {
+        Args: { p_order_ids: string[] }
+        Returns: {
+          axles: number
+          base_city: string
+          carrier_company_id: string
+          carrier_name: string
+          created_at: string
+          driver_name: string
+          euro_class: Database["public"]["Enums"]["euro_class"]
+          is_assigned: boolean
+          is_chosen: boolean
+          languages: string[]
+          make: string
+          offer_id: string
+          order_id: string
+          plate: string
+          rating: number
+          vehicle_id: string
         }[]
       }
       submit_vehicle: {

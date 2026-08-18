@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { getViewer } from '@/lib/auth/viewer';
 import { getDictionary, isLocale, type Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
+import { tonnesToKg } from '@/lib/orders/stopFields';
 import type { StopRole } from '@/types/db';
 
 export type PublishState = { error: string | null; ref: string | null };
@@ -37,76 +38,99 @@ type StopInput = {
   external_ref?: string;
   returns_loaded?: boolean;
   note?: string;
+  booking_ref?: string;
+  cargo_weight_kg?: string;
+  consignee?: string;
+  seal_required?: boolean;
 };
+
+/** Читает одно поле точки. Для доп.точек — по позиции в массиве. */
+type FieldReader = (field: string) => string;
+
+/**
+ * Пломба приходит списком из трёх значений, а не флажком: у повторяемых
+ * точек снятый флажок не отправляется вовсе и сбил бы позиции в массиве.
+ * Пустая строка означает «про пломбу не сказали» — это не «не нужна».
+ */
+function toSeal(value: string): boolean | undefined {
+  if (value === 'true') return true;
+  if (value === 'false') return false;
+  return undefined;
+}
+
+/**
+ * Одна точка маршрута из полей формы.
+ *
+ * Поля собираются все подряд, без оглядки на роль: что из них вообще
+ * применимо, решают ограничения базы (миграция stop_details) — здесь
+ * повторять ту же матрицу значило бы завести второй источник правды.
+ * Форма неприменимые поля просто не показывает и присылает пустыми.
+ */
+function readStop(read: FieldReader, role: StopRole): StopInput {
+  return {
+    role,
+    place_kind: read('place_kind'),
+    place_name: read('place_name'),
+    company_name: read('company'),
+    address: read('address'),
+    city: read('city'),
+    contact_name: read('contact'),
+    contact_phone: read('phone').replace(/[\s-]/g, ''),
+    scheduled_date: read('date'),
+    scheduled_time: read('time'),
+    external_ref: read('ref'),
+    note: read('note'),
+    booking_ref: read('booking_ref'),
+    /* Тонны формы в килограммы базы: вес хранится целым, как и деньги. */
+    cargo_weight_kg: tonnesToKg(read('weight'))?.toString(),
+    consignee: read('consignee'),
+    seal_required: toSeal(read('seal')),
+  };
+}
 
 /**
  * Собирает точки маршрута из полей формы.
  *
  * Доп.точек может быть сколько угодно, поэтому их поля приходят массивами
  * с одинаковыми именами — форма добавляет и убирает блоки, а порядок
- * сохраняется порядком элементов в FormData.
+ * сохраняется порядком элементов в FormData. Форма обязана присылать
+ * каждое поле для каждой доп.точки, в том числе пустым: пропуск сдвинул
+ * бы все последующие точки на одну позицию.
  */
 function collectStops(formData: FormData): StopInput[] {
   const stops: StopInput[] = [];
 
-  stops.push({
-    role: 'PICKUP',
-    place_kind: str(formData, 'pickup_place_kind'),
-    place_name: str(formData, 'pickup_place_name'),
-    address: str(formData, 'pickup_address'),
-    city: str(formData, 'pickup_city'),
-    scheduled_date: str(formData, 'pickup_date'),
-    scheduled_time: str(formData, 'pickup_time'),
-  });
+  const single =
+    (prefix: string): FieldReader =>
+    (field) =>
+      str(formData, `${prefix}_${field}`);
+
+  stops.push(readStop(single('pickup'), 'PICKUP'));
 
   /* Доп.точки идут между забором и выгрузкой — так их и читают в кабине. */
   const extraRoles = formData.getAll('extra_role').map(String);
-  const extraCompanies = formData.getAll('extra_company').map(String);
-  const extraAddresses = formData.getAll('extra_address').map(String);
-  const extraCities = formData.getAll('extra_city').map(String);
-  const extraDates = formData.getAll('extra_date').map(String);
-  const extraTimes = formData.getAll('extra_time').map(String);
+  const columns = new Map<string, string[]>();
+  const atIndex =
+    (index: number): FieldReader =>
+    (field) => {
+      const key = `extra_${field}`;
+      if (!columns.has(key)) columns.set(key, formData.getAll(key).map(String));
+      return columns.get(key)![index]?.trim() ?? '';
+    };
 
   extraRoles.forEach((role, index) => {
-    stops.push({
-      role: role === 'EXTRA_UNLOAD' ? 'EXTRA_UNLOAD' : 'EXTRA_LOAD',
-      company_name: extraCompanies[index]?.trim(),
-      address: extraAddresses[index]?.trim() ?? '',
-      city: extraCities[index]?.trim() ?? '',
-      scheduled_date: extraDates[index]?.trim(),
-      scheduled_time: extraTimes[index]?.trim(),
-    });
+    stops.push(readStop(atIndex(index), role === 'EXTRA_UNLOAD' ? 'EXTRA_UNLOAD' : 'EXTRA_LOAD'));
   });
 
-  stops.push({
-    role: 'DELIVERY',
-    company_name: str(formData, 'delivery_company'),
-    address: str(formData, 'delivery_address'),
-    city: str(formData, 'delivery_city'),
-    contact_name: str(formData, 'delivery_contact'),
-    contact_phone: str(formData, 'delivery_phone').replace(/[\s-]/g, ''),
-    scheduled_date: str(formData, 'delivery_date'),
-    scheduled_time: str(formData, 'delivery_time'),
-  });
+  stops.push(readStop(single('delivery'), 'DELIVERY'));
 
   if (formData.get('has_continuation') === 'on') {
-    stops.push({
-      role: 'CONTINUATION',
-      company_name: str(formData, 'cont_company'),
-      address: str(formData, 'cont_address'),
-      city: str(formData, 'cont_city'),
-      external_ref: str(formData, 'cont_ref'),
-      scheduled_date: str(formData, 'cont_date'),
-      scheduled_time: str(formData, 'cont_time'),
-    });
+    stops.push(readStop(single('cont'), 'CONTINUATION'));
   }
 
   if (formData.get('has_return') === 'on') {
     stops.push({
-      role: 'TRAILER_RETURN',
-      place_name: str(formData, 'ret_place'),
-      address: str(formData, 'ret_address'),
-      city: str(formData, 'ret_city'),
+      ...readStop(single('ret'), 'TRAILER_RETURN'),
       returns_loaded: formData.get('ret_loaded') === 'on',
     });
   }

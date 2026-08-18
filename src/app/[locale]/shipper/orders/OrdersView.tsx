@@ -5,8 +5,8 @@ import { RouteStops } from '@/components/domain/RouteStops';
 import { Badge, Button, Card, CardBody, CardDivider, EmptyState, Mono } from '@/components/ui';
 import { orderStatusTone } from '@/components/ui/tone';
 import { useI18n } from '@/lib/i18n/provider';
-import type { Order, OrderStop } from '@/types/db';
-import { OffersPanel, type OfferRow } from './OffersPanel';
+import type { Order, OrderStop, ShipperOffer } from '@/types/db';
+import { AssignedCarrier, OffersPanel } from './OffersPanel';
 
 export function OrdersView({
   orders,
@@ -15,7 +15,7 @@ export function OrdersView({
 }: {
   orders: Order[];
   stopsByOrder: Record<string, OrderStop[]>;
-  offersByOrder: Record<string, OfferRow[]>;
+  offersByOrder: Record<string, ShipperOffer[]>;
 }) {
   const { t, m, f } = useI18n();
   const [composing, setComposing] = useState(false);
@@ -62,6 +62,8 @@ export function OrdersView({
             const stops = stopsByOrder[order.id] ?? [];
             const pickup = stops.find((s) => s.role === 'PICKUP');
             const delivery = stops.find((s) => s.role === 'DELIVERY');
+            const offers = offersByOrder[order.id] ?? [];
+            const assigned = offers.find((o) => o.is_assigned);
 
             return (
               <Card key={order.id} stripe={orderStatusTone[order.status]}>
@@ -112,7 +114,12 @@ export function OrdersView({
 
                   {/* Отклики требуют решения по таймеру — они выше маршрута. */}
                   {(order.status === 'REQUESTED' || order.status === 'AWAIT_DRIVER') && (
-                    <OffersPanel order={order} offers={offersByOrder[order.id] ?? []} />
+                    <OffersPanel order={order} offers={offers} />
+                  )}
+
+                  {/* Рейс идёт — выбирать не из чего, важно кто везёт. */}
+                  {order.status === 'IN_PROGRESS' && assigned && (
+                    <AssignedCarrier offer={assigned} />
                   )}
 
                   {stops.length > 0 && (

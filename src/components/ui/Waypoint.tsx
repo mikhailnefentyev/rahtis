@@ -34,6 +34,9 @@ export function Waypoint({
   primary,
   secondary,
   meta,
+  tags,
+  code,
+  note,
   className,
 }: {
   kind: WaypointKind;
@@ -45,6 +48,19 @@ export function Waypoint({
   secondary?: string;
   /** Дата и время — моноширинным, чтобы вставало в колонку. */
   meta?: string;
+  /** Пилюли свойств груза: вес, пломба. */
+  tags?: React.ReactNode;
+  /**
+   * Номер брони. Отдельной строкой и крупнее прочего: его диктуют по
+   * телефону на воротах порта, и I от 1, а O от 0 должны различаться на
+   * глаз — в общей строке через точку он для этого слишком мелкий.
+   */
+  code?: React.ReactNode;
+  /**
+   * Инструкции по точке. Не обрезаются: «въезд с задней стороны» теряет
+   * смысл ровно там, где обрывается многоточием.
+   */
+  note?: string;
   className?: string;
 }) {
   const style = kindStyle[kind];
@@ -60,11 +76,23 @@ export function Waypoint({
       >
         {style.glyph}
       </span>
-      <div className="min-w-0">
+      <div className="min-w-0 flex-1">
         <div className="label-micro">{title}</div>
         <div className="mt-0.5 truncate text-[13px] text-ink">{primary}</div>
         {secondary && <div className="truncate text-xs text-ink-muted">{secondary}</div>}
         {meta && <div className="mt-0.5 font-mono text-xs tracking-tight text-ink-faint">{meta}</div>}
+
+        {tags && <div className="mt-1.5 flex flex-wrap items-center gap-1.5">{tags}</div>}
+
+        {code && (
+          <div className="mt-1.5 font-mono text-[13px] tracking-tight text-ink">{code}</div>
+        )}
+
+        {note && (
+          <p className="mt-1.5 rounded-control border border-line bg-sunken px-2.5 py-1.5 text-xs leading-relaxed text-ink-muted">
+            {note}
+          </p>
+        )}
       </div>
     </div>
   );

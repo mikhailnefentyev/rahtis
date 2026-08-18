@@ -1,24 +1,25 @@
 'use client';
 
-import { Waypoint, WaypointList } from '@/components/ui';
+import { Badge, Mono, Waypoint, WaypointList } from '@/components/ui';
 import { useI18n } from '@/lib/i18n/provider';
 import type { DeskStop, OrderStop, PlaceKind, StopRole } from '@/types/db';
 
 /**
  * Маршрут заказа.
  *
- * Принимает и точку из таблицы, и точку со стола: у второй контактных
- * полей нет вовсе, и компонент их просто не запрашивает. Тип с
- * необязательными контактами сделал бы отсутствие данных неотличимым от
- * незаполненного поля.
+ * Принимает и точку из таблицы, и точку со стола: у второй нет ни
+ * контактов, ни получателя груза, и компонент их просто не запрашивает.
+ * Тип с необязательными полями сделал бы отсутствие данных неотличимым
+ * от незаполненного поля.
  */
 type AnyStop = (OrderStop | DeskStop) & {
   contact_name?: string | null;
   contact_phone?: string | null;
+  consignee?: string | null;
 };
 
 export function RouteStops({ stops }: { stops: AnyStop[] }) {
-  const { t, f } = useI18n();
+  const { t, m, f } = useI18n();
 
   const title = (stop: AnyStop) =>
     stop.role === 'PICKUP' && stop.place_kind
@@ -40,6 +41,9 @@ export function RouteStops({ stops }: { stops: AnyStop[] }) {
     if (stop.contact_name) {
       parts.push(stop.contact_phone ? `${stop.contact_name} · ${stop.contact_phone}` : stop.contact_name);
     }
+    if (stop.consignee) {
+      parts.push(m('stop.consignee', { label: t.order.consignee, name: stop.consignee }));
+    }
     return parts.join(' · ');
   };
 
@@ -53,6 +57,31 @@ export function RouteStops({ stops }: { stops: AnyStop[] }) {
     return stop.scheduled_time ? `${date} ${stop.scheduled_time.slice(0, 5)}` : date;
   };
 
+  /*
+   * Вес и пломба — то, по чему решают, берётся ли машина за рейс вообще.
+   * Пилюлями, а не строкой: их ищут глазами, а не читают.
+   */
+  const tags = (stop: AnyStop) => {
+    const chips: React.ReactNode[] = [];
+
+    if (stop.cargo_weight_kg) {
+      chips.push(
+        <Badge key="weight" tone="neutral">
+          <Mono>{m('stop.weight', { tonnes: stop.cargo_weight_kg / 1000 })}</Mono>
+        </Badge>,
+      );
+    }
+    if (stop.seal_required) {
+      chips.push(
+        <Badge key="seal" tone="warn">
+          {t.order.sealRequired}
+        </Badge>,
+      );
+    }
+
+    return chips.length > 0 ? chips : undefined;
+  };
+
   return (
     <WaypointList>
       {stops.map((stop) => (
@@ -63,6 +92,13 @@ export function RouteStops({ stops }: { stops: AnyStop[] }) {
           primary={primary(stop)}
           secondary={secondary(stop)}
           meta={meta(stop)}
+          tags={tags(stop)}
+          code={
+            stop.booking_ref
+              ? m('stop.bookingRef', { label: t.order.bookingRef, ref: stop.booking_ref })
+              : undefined
+          }
+          note={stop.note ?? undefined}
         />
       ))}
     </WaypointList>
