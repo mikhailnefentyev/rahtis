@@ -41,17 +41,24 @@ export type MapStop = {
   passed?: boolean;
 };
 
-/** Цвета совпадают с глифами точек в списке — одна легенда на два представления. */
+/*
+ * Цвета совпадают с глифами точек в списке — одна легенда на два
+ * представления. Значения продублированы hex'ами, а не токенами темы:
+ * maplibre рисует на канве WebGL и переменные CSS не читает.
+ */
 const ROLE_COLOR: Record<StopRole, string> = {
-  PICKUP: '#54d6c6',
-  DELIVERY: '#8e93ff',
-  EXTRA_LOAD: '#e0a83e',
-  EXTRA_UNLOAD: '#e0a83e',
-  CONTINUATION: '#54d6c6',
-  TRAILER_RETURN: '#7a8d93',
+  PICKUP: '#0b6f67',
+  DELIVERY: '#4448cf',
+  EXTRA_LOAD: '#8f5e0c',
+  EXTRA_UNLOAD: '#8f5e0c',
+  CONTINUATION: '#0b6f67',
+  TRAILER_RETURN: '#61737a',
 };
 
-const PASSED_COLOR = '#5bc98f';
+const PASSED_COLOR = '#1a7a48';
+
+/* Текст номера на маркере — белый: все цвета ролей тёмные. */
+const MARKER_INK = '#ffffff';
 
 /** Маркер собирается разметкой, а не картинкой: номер должен быть текстом. */
 function markerElement(index: number, color: string, passed: boolean): HTMLElement {
@@ -64,10 +71,10 @@ function markerElement(index: number, color: string, passed: boolean): HTMLEleme
     'height:22px',
     'border-radius:6px',
     'font:600 11px/1 ui-monospace,monospace',
-    'color:#06201e',
+    `color:${MARKER_INK}`,
     `background:${passed ? PASSED_COLOR : color}`,
     `border:1.5px solid ${passed ? PASSED_COLOR : color}`,
-    'box-shadow:0 1px 6px rgba(0,0,0,.6)',
+    'box-shadow:0 1px 4px rgba(14,22,25,.35)',
     passed ? 'opacity:.85' : '',
   ].join(';');
   el.textContent = String(index + 1);
@@ -155,8 +162,8 @@ export function RouteMap({
 
         const instance = new maplibre.Map({
           container: container.current,
-          /* Тёмный фон: интерфейс работает в кабине и ночью. */
-          style: `https://api.maptiler.com/maps/dataviz-dark/style.json?key=${maptilerKey()}`,
+          /* Светлый фон в тон интерфейсу: карта не должна быть тёмным окном. */
+          style: `https://api.maptiler.com/maps/dataviz/style.json?key=${maptilerKey()}`,
           bounds: box,
           fitBoundsOptions: { padding: 36, maxZoom: 13 },
           /* Карта показывает маршрут, а не изучает местность. */
@@ -181,13 +188,13 @@ export function RouteMap({
               },
             });
 
-            /* Подложка под линией: тонкая бирюза на тёмной карте теряется. */
+            /* Белая подложка: тонкая линия теряется среди дорог карты. */
             instance.addLayer({
               id: 'route-casing',
               type: 'line',
               source: 'route',
               layout: { 'line-cap': 'round', 'line-join': 'round' },
-              paint: { 'line-color': '#06201e', 'line-width': 7, 'line-opacity': 0.9 },
+              paint: { 'line-color': '#ffffff', 'line-width': 7, 'line-opacity': 0.95 },
             });
 
             instance.addLayer({
@@ -195,7 +202,7 @@ export function RouteMap({
               type: 'line',
               source: 'route',
               layout: { 'line-cap': 'round', 'line-join': 'round' },
-              paint: { 'line-color': '#54d6c6', 'line-width': 3 },
+              paint: { 'line-color': '#0b6f67', 'line-width': 3.5 },
             });
           }
 

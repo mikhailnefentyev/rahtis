@@ -50,7 +50,7 @@ export function Modal({
       }}
       className={cn(
         'm-auto w-[min(30rem,calc(100vw-2rem))] rounded-card border border-line bg-surface p-0 text-ink',
-        'backdrop:bg-black/70 backdrop:backdrop-blur-[2px]',
+        'backdrop:bg-ink/35 backdrop:backdrop-blur-[2px]',
         className,
       )}
     >
