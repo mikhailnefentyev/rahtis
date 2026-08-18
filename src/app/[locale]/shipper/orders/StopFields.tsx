@@ -1,8 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import { AddressInput, type ChosenAddress } from '@/components/domain/AddressInput';
 import { Field, Input, InputMono, Select, Textarea } from '@/components/ui';
 import { REGIONS } from '@/lib/config';
+import { CITY_CENTRES } from '@/lib/routing/cities';
 import {
   hasBookingRef,
   hasCargo,
@@ -43,6 +45,7 @@ export function StopFields({
   requireDate = false,
   addressPlaceholder,
   placeNamePlaceholder,
+  onChosen,
 }: {
   role: StopRole;
   /** Имена полей: `${prefix}_address` и так далее. */
@@ -58,6 +61,8 @@ export function StopFields({
   requireDate?: boolean;
   addressPlaceholder?: string;
   placeNamePlaceholder?: string;
+  /** Координаты выбранного адреса — форме, чтобы посчитать маршрут. */
+  onChosen?: (chosen: ChosenAddress | null) => void;
 }) {
   const { t } = useI18n();
 
@@ -66,6 +71,12 @@ export function StopFields({
    * Это единственное поле точки, влияющее на состав остальных.
    */
   const [placeKind, setPlaceKind] = useState<PlaceKind>(defaultPlaceKind);
+
+  /*
+   * Город смещает выдачу подсказки. Без смещения «Satamak» отдаёт Вааса
+   * раньше Ханко — проверено замером.
+   */
+  const [city, setCity] = useState(defaultCity ?? (cityFromRegions ? REGIONS[0] : ''));
 
   const name = (field: string) => `${prefix}_${field}`;
 
@@ -114,24 +125,48 @@ export function StopFields({
         filler('company')
       )}
 
-      <Field label={t.orderForm.address} required className="sm:col-span-2">
+      <Field
+        label={t.orderForm.address}
+        hint={t.orderForm.addressHint}
+        required
+        className="sm:col-span-2"
+      >
         {(p) => (
-          <Input {...p} name={name('address')} required placeholder={addressPlaceholder} />
+          <AddressInput
+            {...p}
+            name={name('address')}
+            required
+            placeholder={addressPlaceholder}
+            near={CITY_CENTRES[city]}
+            onChosen={onChosen}
+          />
         )}
       </Field>
 
       <Field label={t.orderForm.city} required>
         {(p) =>
           cityFromRegions ? (
-            <Select {...p} name={name('city')} required defaultValue={defaultCity ?? REGIONS[0]}>
-              {REGIONS.map((city) => (
-                <option key={city} value={city}>
-                  {city}
+            <Select
+              {...p}
+              name={name('city')}
+              required
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+            >
+              {REGIONS.map((region) => (
+                <option key={region} value={region}>
+                  {region}
                 </option>
               ))}
             </Select>
           ) : (
-            <Input {...p} name={name('city')} required defaultValue={defaultCity} />
+            <Input
+              {...p}
+              name={name('city')}
+              required
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+            />
           )
         }
       </Field>

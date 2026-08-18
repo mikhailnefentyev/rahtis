@@ -42,6 +42,11 @@ type StopInput = {
   cargo_weight_kg?: string;
   consignee?: string;
   seal_required?: boolean;
+  lat?: string;
+  lon?: string;
+  geocode_score?: string;
+  leg_distance_m?: string;
+  leg_duration_s?: string;
 };
 
 /** Читает одно поле точки. Для доп.точек — по позиции в массиве. */
@@ -85,6 +90,15 @@ function readStop(read: FieldReader, role: StopRole): StopInput {
     cargo_weight_kg: tonnesToKg(read('weight'))?.toString(),
     consignee: read('consignee'),
     seal_required: toSeal(read('seal')),
+    /*
+     * Координаты приходят скрытыми полями рядом с адресом: их проставляет
+     * поле подсказки в момент выбора. Набранный руками адрес координат не
+     * имеет — и это правильно, потому что геокодер несуществующий адрес не
+     * отвергает, а подбирает похожий в другом городе.
+     */
+    lat: read('address_lat'),
+    lon: read('address_lon'),
+    geocode_score: read('address_score'),
   };
 }
 
@@ -135,7 +149,57 @@ function collectStops(formData: FormData): StopInput[] {
     });
   }
 
+  /*
+   * Плечи маршрута раскладываются по точкам: плечо N — это путь ДО точки
+   * N от предыдущей, поэтому у первой точки его нет. Роутер возвращает их
+   * ровно столько, сколько промежутков между точками.
+   */
+  const legs = parseLegs(formData.get('route_legs'));
+  if (legs.length === stops.length - 1) {
+    legs.forEach((leg, index) => {
+      const stop = stops[index + 1];
+      stop.leg_distance_m = String(leg.distanceM);
+      stop.leg_duration_s = String(leg.durationS);
+    });
+  }
+
   return stops;
+}
+
+type Leg = { distanceM: number; durationS: number };
+
+/** Плечи приходят строкой JSON из скрытого поля формы. */
+function parseLegs(value: FormDataEntryValue | null): Leg[] {
+  if (typeof value !== 'string' || value.length === 0) return [];
+
+  try {
+    const parsed: unknown = JSON.parse(value);
+    if (!Array.isArray(parsed)) return [];
+
+    return parsed.filter(
+      (leg): leg is Leg =>
+        typeof leg === 'object' &&
+        leg !== null &&
+        typeof (leg as Leg).distanceM === 'number' &&
+        typeof (leg as Leg).durationS === 'number',
+    );
+  } catch {
+    return [];
+  }
+}
+
+/** Границы маршрута приходят строкой JSON: [minLon, minLat, maxLon, maxLat]. */
+function parseBounds(value: FormDataEntryValue | null): number[] | undefined {
+  if (typeof value !== 'string' || value.length === 0) return undefined;
+
+  try {
+    const parsed: unknown = JSON.parse(value);
+    return Array.isArray(parsed) && parsed.length === 4 && parsed.every((n) => typeof n === 'number')
+      ? parsed
+      : undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 /**
@@ -177,6 +241,16 @@ export async function publishOrderAction(
       distance_km: String(distance),
       rate_cents: String(rateCents),
       comment: str(formData, 'comment'),
+      /*
+       * Источник пробега и кэш маршрута. distance_km остаётся тем, что
+       * в поле: расчёт его предлагает, а не присваивает, и заказчик,
+       * поправивший километраж руками, остаётся источником правды.
+       */
+      distance_source: str(formData, 'distance_source') === 'AUTO' ? 'AUTO' : 'MANUAL',
+      distance_auto_km: str(formData, 'distance_auto_km'),
+      route_geometry: str(formData, 'route_geometry'),
+      route_bounds: parseBounds(formData.get('route_bounds')),
+      route_fingerprint: str(formData, 'route_fingerprint'),
     },
     p_stops: collectStops(formData),
     p_publish: true,

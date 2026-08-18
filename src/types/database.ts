@@ -322,7 +322,12 @@ export type Database = {
           contact_phone: string | null
           created_at: string
           external_ref: string | null
+          geocode_score: number | null
           id: string
+          lat: number | null
+          leg_distance_m: number | null
+          leg_duration_s: number | null
+          lon: number | null
           note: string | null
           order_id: string
           place_kind: Database["public"]["Enums"]["place_kind"] | null
@@ -346,7 +351,12 @@ export type Database = {
           contact_phone?: string | null
           created_at?: string
           external_ref?: string | null
+          geocode_score?: number | null
           id?: string
+          lat?: number | null
+          leg_distance_m?: number | null
+          leg_duration_s?: number | null
+          lon?: number | null
           note?: string | null
           order_id: string
           place_kind?: Database["public"]["Enums"]["place_kind"] | null
@@ -370,7 +380,12 @@ export type Database = {
           contact_phone?: string | null
           created_at?: string
           external_ref?: string | null
+          geocode_score?: number | null
           id?: string
+          lat?: number | null
+          leg_distance_m?: number | null
+          leg_duration_s?: number | null
+          lon?: number | null
           note?: string | null
           order_id?: string
           place_kind?: Database["public"]["Enums"]["place_kind"] | null
@@ -402,12 +417,18 @@ export type Database = {
           created_at: string
           created_by: string | null
           deadline_at: string | null
+          distance_auto_km: number | null
           distance_km: number | null
+          distance_source: Database["public"]["Enums"]["distance_source"]
           id: string
           order_type: Database["public"]["Enums"]["order_type"]
           published_at: string | null
           rate_cents: number | null
           ref: string
+          route_bounds: Json | null
+          route_computed_at: string | null
+          route_fingerprint: string | null
+          route_geometry: string | null
           shipper_company_id: string
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
           shipper_ref: string | null
@@ -423,12 +444,18 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           deadline_at?: string | null
+          distance_auto_km?: number | null
           distance_km?: number | null
+          distance_source?: Database["public"]["Enums"]["distance_source"]
           id?: string
           order_type: Database["public"]["Enums"]["order_type"]
           published_at?: string | null
           rate_cents?: number | null
           ref?: string
+          route_bounds?: Json | null
+          route_computed_at?: string | null
+          route_fingerprint?: string | null
+          route_geometry?: string | null
           shipper_company_id: string
           shipper_company_kind?: Database["public"]["Enums"]["party_role"]
           shipper_ref?: string | null
@@ -444,12 +471,18 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           deadline_at?: string | null
+          distance_auto_km?: number | null
           distance_km?: number | null
+          distance_source?: Database["public"]["Enums"]["distance_source"]
           id?: string
           order_type?: Database["public"]["Enums"]["order_type"]
           published_at?: string | null
           rate_cents?: number | null
           ref?: string
+          route_bounds?: Json | null
+          route_computed_at?: string | null
+          route_fingerprint?: string | null
+          route_geometry?: string | null
           shipper_company_id?: string
           shipper_company_kind?: Database["public"]["Enums"]["party_role"]
           shipper_ref?: string | null
@@ -690,12 +723,18 @@ export type Database = {
           created_at: string
           created_by: string | null
           deadline_at: string | null
+          distance_auto_km: number | null
           distance_km: number | null
+          distance_source: Database["public"]["Enums"]["distance_source"]
           id: string
           order_type: Database["public"]["Enums"]["order_type"]
           published_at: string | null
           rate_cents: number | null
           ref: string
+          route_bounds: Json | null
+          route_computed_at: string | null
+          route_fingerprint: string | null
+          route_geometry: string | null
           shipper_company_id: string
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
           shipper_ref: string | null
@@ -720,12 +759,18 @@ export type Database = {
           created_at: string
           created_by: string | null
           deadline_at: string | null
+          distance_auto_km: number | null
           distance_km: number | null
+          distance_source: Database["public"]["Enums"]["distance_source"]
           id: string
           order_type: Database["public"]["Enums"]["order_type"]
           published_at: string | null
           rate_cents: number | null
           ref: string
+          route_bounds: Json | null
+          route_computed_at: string | null
+          route_fingerprint: string | null
+          route_geometry: string | null
           shipper_company_id: string
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
           shipper_ref: string | null
@@ -762,12 +807,18 @@ export type Database = {
           created_at: string
           created_by: string | null
           deadline_at: string | null
+          distance_auto_km: number | null
           distance_km: number | null
+          distance_source: Database["public"]["Enums"]["distance_source"]
           id: string
           order_type: Database["public"]["Enums"]["order_type"]
           published_at: string | null
           rate_cents: number | null
           ref: string
+          route_bounds: Json | null
+          route_computed_at: string | null
+          route_fingerprint: string | null
+          route_geometry: string | null
           shipper_company_id: string
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
           shipper_ref: string | null
@@ -792,12 +843,18 @@ export type Database = {
           created_at: string
           created_by: string | null
           deadline_at: string | null
+          distance_auto_km: number | null
           distance_km: number | null
+          distance_source: Database["public"]["Enums"]["distance_source"]
           id: string
           order_type: Database["public"]["Enums"]["order_type"]
           published_at: string | null
           rate_cents: number | null
           ref: string
+          route_bounds: Json | null
+          route_computed_at: string | null
+          route_fingerprint: string | null
+          route_geometry: string | null
           shipper_company_id: string
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
           shipper_ref: string | null
@@ -860,6 +917,8 @@ export type Database = {
           published_at: string
           rate_cents: number
           ref: string
+          route_bounds: Json
+          route_geometry: string
           shipper_name: string
           stops: Json
           taken_by_me: boolean
@@ -939,6 +998,8 @@ export type Database = {
           order_type: Database["public"]["Enums"]["order_type"]
           rate_cents: number
           ref: string
+          route_bounds: Json
+          route_geometry: string
           shipper_name: string
           status: Database["public"]["Enums"]["order_status"]
           stops: Json
@@ -1006,12 +1067,18 @@ export type Database = {
           created_at: string
           created_by: string | null
           deadline_at: string | null
+          distance_auto_km: number | null
           distance_km: number | null
+          distance_source: Database["public"]["Enums"]["distance_source"]
           id: string
           order_type: Database["public"]["Enums"]["order_type"]
           published_at: string | null
           rate_cents: number | null
           ref: string
+          route_bounds: Json | null
+          route_computed_at: string | null
+          route_fingerprint: string | null
+          route_geometry: string | null
           shipper_company_id: string
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
           shipper_ref: string | null
@@ -1029,6 +1096,7 @@ export type Database = {
     }
     Enums: {
       company_status: "PENDING" | "APPROVED" | "ACTIVE" | "REJECTED"
+      distance_source: "MANUAL" | "AUTO"
       document_kind: "CARRIER_LICENSE" | "INSURANCE"
       euro_class: "EURO_4" | "EURO_5" | "EURO_6"
       order_status:
@@ -1181,6 +1249,7 @@ export const Constants = {
   public: {
     Enums: {
       company_status: ["PENDING", "APPROVED", "ACTIVE", "REJECTED"],
+      distance_source: ["MANUAL", "AUTO"],
       document_kind: ["CARRIER_LICENSE", "INSURANCE"],
       euro_class: ["EURO_4", "EURO_5", "EURO_6"],
       order_status: [

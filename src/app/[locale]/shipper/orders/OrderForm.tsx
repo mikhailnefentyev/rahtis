@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useState } from 'react';
+import { useActionState, useCallback, useMemo, useState } from 'react';
 import {
   Badge,
   Button,
@@ -14,8 +14,10 @@ import {
   Select,
   Textarea,
 } from '@/components/ui';
+import type { ChosenAddress } from '@/components/domain/AddressInput';
 import { REGIONS } from '@/lib/config';
 import { publishOrderAction, type PublishState } from '@/lib/orders/actions';
+import { computeRouteAction, type RouteState } from '@/lib/routing/actions';
 import { useI18n } from '@/lib/i18n/provider';
 import { StopFields } from './StopFields';
 
@@ -34,7 +36,7 @@ type Extra = { key: number; role: 'EXTRA_LOAD' | 'EXTRA_UNLOAD' };
  * в котором точки идут по маршруту.
  */
 export function OrderForm({ onPublished }: { onPublished: () => void }) {
-  const { t, locale } = useI18n();
+  const { t, m, locale } = useI18n();
   const [state, formAction, pending] = useActionState(publishOrderAction, initial);
 
   const [extras, setExtras] = useState<Extra[]>([]);
@@ -42,6 +44,73 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
   const [hasReturn, setHasReturn] = useState(false);
   const [distance, setDistance] = useState('');
   const [rate, setRate] = useState('');
+
+  /*
+   * Координаты выбранных адресов, по слотам маршрута. Ключ слота живёт
+   * столько же, сколько блок формы: у доп.точек это их собственный key,
+   * поэтому удаление второй точки не сдвигает координаты третьей.
+   */
+  const [coords, setCoords] = useState<Record<string, ChosenAddress | null>>({});
+  const [route, setRoute] = useState<Extract<RouteState, { ok: true }> | null>(null);
+  const [routeError, setRouteError] = useState<string | null>(null);
+  const [routing, setRouting] = useState(false);
+
+  /*
+   * Расчёт предлагает километраж, но не владеет им. Как только заказчик
+   * правит поле руками, источником становится он: ставка считается от
+   * distance_km, и молча вернуть туда своё число значило бы изменить цену
+   * уже принятого решения.
+   */
+  const [source, setSource] = useState<'MANUAL' | 'AUTO'>('MANUAL');
+
+  const onChosen = useCallback(
+    (slot: string) => (chosen: ChosenAddress | null) => {
+      setCoords((prev) => ({ ...prev, [slot]: chosen }));
+      /* Маршрут посчитан по прежним точкам — он устарел. */
+      setRoute(null);
+    },
+    [],
+  );
+
+  /*
+   * Точки в порядке маршрута — том же, в каком их читают в кабине и в
+   * каком они уходят в create_order. Расчёт возможен, когда координаты
+   * есть хотя бы у двух точек: адрес, набранный руками и не выбранный из
+   * подсказки, координат не имеет и в маршрут не попадает.
+   */
+  const routePoints = useMemo(() => {
+    const slots = [
+      'pickup',
+      ...extras.map((e) => `extra-${e.key}`),
+      'delivery',
+      ...(hasContinuation ? ['cont'] : []),
+      ...(hasReturn ? ['ret'] : []),
+    ];
+
+    return slots
+      .map((slot) => coords[slot]?.position)
+      .filter((p): p is { lat: number; lon: number } => Boolean(p));
+  }, [coords, extras, hasContinuation, hasReturn]);
+
+  const canRoute = routePoints.length >= 2;
+
+  async function calculate() {
+    setRouting(true);
+    setRouteError(null);
+
+    const result = await computeRouteAction(routePoints, 'FI', locale);
+    setRouting(false);
+
+    if (!result.ok) {
+      setRouteError(result.error);
+      setRoute(null);
+      return;
+    }
+
+    setRoute(result);
+    setDistance(String(result.km));
+    setSource('AUTO');
+  }
 
   /* Ставка за километр — подсказка при вводе, в базе не хранится. */
   const km = Number.parseInt(distance.replace(/\D/g, ''), 10);
@@ -68,6 +137,26 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
   return (
     <form action={formAction} className="flex flex-col gap-4">
       <input type="hidden" name="locale" value={locale} />
+
+      {/*
+       * Кэш маршрута уезжает вместе с заказом: пересчитывать его при
+       * каждом показе карточки значило бы платить за один и тот же
+       * маршрут снова и снова.
+       */}
+      <input type="hidden" name="distance_source" value={source} />
+      <input type="hidden" name="distance_auto_km" value={route?.km ?? ''} />
+      <input type="hidden" name="route_geometry" value={route?.geometry ?? ''} />
+      <input
+        type="hidden"
+        name="route_bounds"
+        value={route ? JSON.stringify(route.bounds) : ''}
+      />
+      <input type="hidden" name="route_fingerprint" value={route?.fingerprint ?? ''} />
+      <input
+        type="hidden"
+        name="route_legs"
+        value={route ? JSON.stringify(route.legs) : ''}
+      />
 
       <Card>
         <CardBody className="grid gap-4 sm:grid-cols-2">
@@ -100,6 +189,7 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
             requireDate
             addressPlaceholder="Satamakatu 1, 10900 Hanko"
             placeNamePlaceholder="Hanko Port, Terminal 2"
+            onChosen={onChosen('pickup')}
           />
         </CardBody>
       </Card>
@@ -128,6 +218,7 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
               repeated
               requireCompany
               defaultCity={REGIONS[index % REGIONS.length]}
+              onChosen={onChosen(`extra-${extra.key}`)}
             />
           </CardBody>
         </Card>
@@ -145,7 +236,8 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
             requireCompany
             showContact
             requireDate
-            addressPlaceholder="Tavaratie 5, 00700 Helsinki"
+            addressPlaceholder="Satamakaari 20, 00980 Helsinki"
+            onChosen={onChosen('delivery')}
           />
         </CardBody>
       </Card>
@@ -168,6 +260,7 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
               prefix="cont"
               requireCompany
               defaultCity={REGIONS[3]}
+              onChosen={onChosen('cont')}
             />
           </CardBody>
         </Card>
@@ -194,6 +287,7 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
               showReturnLoaded
               defaultCity={REGIONS[0]}
               placeNamePlaceholder="Hanko Port, Terminal 2"
+              onChosen={onChosen('ret')}
             />
           </CardBody>
         </Card>
@@ -240,11 +334,54 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
                   required
                   inputMode="numeric"
                   value={distance}
-                  onChange={(e) => setDistance(e.target.value)}
+                  onChange={(e) => {
+                    setDistance(e.target.value);
+                    setSource('MANUAL');
+                  }}
                   placeholder="130"
                 />
               )}
             </Field>
+            {/*
+              * Расчёт стоит рядом с полем пробега, а не отдельной кнопкой
+              * наверху: он предлагает значение именно этому полю, и связь
+              * должна быть видна без объяснений.
+              */}
+            <div className="sm:col-span-2 flex flex-wrap items-center gap-3">
+              <Button
+                type="button"
+                size="sm"
+                onClick={calculate}
+                disabled={!canRoute || routing}
+              >
+                {routing ? t.routing.calculating : t.routing.calculate}
+              </Button>
+
+              {!canRoute && (
+                <span className="text-xs text-ink-dim">{t.routing.noCoordinates}</span>
+              )}
+
+              {route && (
+                <span className="font-mono text-xs text-ink-muted">
+                  {m('routing.result', {
+                    km: route.km,
+                    hours: Math.floor(route.durationS / 3600),
+                    minutes: Math.round((route.durationS % 3600) / 60),
+                  })}
+                </span>
+              )}
+
+              <Badge tone={source === 'AUTO' ? 'ok' : 'neutral'}>
+                {source === 'AUTO' ? t.routing.auto : t.routing.manual}
+              </Badge>
+            </div>
+
+            {routeError && (
+              <p className="sm:col-span-4 text-xs text-warn" role="status">
+                {routeError}
+              </p>
+            )}
+
             <Field label={`${t.orderForm.rate} ${perKm}`} required>
               {(p) => (
                 <InputMono
