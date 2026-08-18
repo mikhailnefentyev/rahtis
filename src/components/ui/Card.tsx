@@ -16,17 +16,27 @@ const stripeClass: Record<StatusTone, string> = {
  * Теней нет: глубину даёт поверхность и волосяная граница. Опциональная
  * полоса слева окрашена в тон состояния — она позволяет считать статус
  * ленты карточек периферийным зрением, не читая ни одного бейджа.
+ *
+ * attention включает дышащий контур. Это не украшение и не «важность»:
+ * оно означает, что по этой карточке открыто окно решения и время идёт.
+ * Ставить его на всё подряд нельзя — движение работает ровно до тех пор,
+ * пока движется что-то одно.
  */
 export function Card({
   stripe,
+  attention,
   className,
   ...props
-}: React.HTMLAttributes<HTMLDivElement> & { stripe?: StatusTone }) {
+}: React.HTMLAttributes<HTMLDivElement> & {
+  stripe?: StatusTone;
+  attention?: boolean;
+}) {
   return (
     <div
       className={cn(
         'rounded-card border border-line bg-surface',
         stripe && cn('border-l-2', stripeClass[stripe]),
+        attention && 'attention-ring',
         className,
       )}
       {...props}

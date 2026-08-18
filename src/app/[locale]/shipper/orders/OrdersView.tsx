@@ -67,7 +67,12 @@ export function OrdersView({
             const assigned = offers.find((o) => o.is_assigned);
 
             return (
-              <Card key={order.id} stripe={orderStatusTone[order.status]}>
+              <Card
+                key={order.id}
+                stripe={orderStatusTone[order.status]}
+                /* Дышит только то, где идёт отсчёт и решение за заказчиком. */
+                attention={Boolean(order.deadline_at)}
+              >
                 <CardBody>
                   <div className="flex flex-wrap items-start justify-between gap-4">
                     <div className="min-w-0">

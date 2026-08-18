@@ -44,7 +44,16 @@ export function Assignments({ assignments }: { assignments: Assignment[] }) {
           const waiting = order.status === 'AWAIT_DRIVER';
 
           return (
-            <Card key={order.id} stripe={orderStatusTone[order.status]}>
+            <Card
+              key={order.id}
+              stripe={orderStatusTone[order.status]}
+              /*
+               * У перевозчика отсчёт идёт только в AWAIT_DRIVER: заказчик
+               * его выбрал и ждёт подтверждения. Идущий рейс не дышит —
+               * решать там нечего.
+               */
+              attention={order.status === 'AWAIT_DRIVER' && Boolean(order.deadline_at)}
+            >
               <CardBody>
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div className="min-w-0">

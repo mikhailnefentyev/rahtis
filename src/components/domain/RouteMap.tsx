@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import { cn } from '@/lib/cn';
 import { isMapConfigured, maptilerKey } from '@/lib/env';
 import { decodePolyline } from '@/lib/routing';
 import { useI18n } from '@/lib/i18n/provider';
@@ -99,6 +100,13 @@ export function RouteMap({
   const [failed, setFailed] = useState(false);
 
   /*
+   * Пока тайлы не пришли, на месте карты пустой прямоугольник. Мерцание
+   * говорит «грузится», а не «сломалось» — по грузовому маршруту это
+   * секунда-две даже на быстрой сети.
+   */
+  const [ready, setReady] = useState(false);
+
+  /*
    * Список пересобирается только при смене точек. Без этого он был бы
    * новым объектом на каждый рендер, эффект перезапускался бы следом, и
    * карта пересоздавалась бы бесконечно.
@@ -177,6 +185,7 @@ export function RouteMap({
 
         instance.on('load', () => {
           if (cancelled) return;
+          setReady(true);
 
           if (line.length > 1) {
             instance.addSource('route', {
@@ -222,6 +231,7 @@ export function RouteMap({
 
     return () => {
       cancelled = true;
+      setReady(false);
       map?.remove();
     };
   }, [geometry, bounds, drawable, points]);
@@ -229,13 +239,21 @@ export function RouteMap({
   if (!drawable || failed) return null;
 
   return (
-    <div className={className}>
+    <div className={cn('relative', className)}>
       <div
         ref={container}
         role="img"
         aria-label={t.routing.mapLabel}
         className="h-64 w-full overflow-hidden rounded-control border border-line bg-sunken"
       />
+
+      {/* Заглушка поверх, а не вместо: контейнер нужен карте с самого начала. */}
+      {!ready && (
+        <div
+          aria-hidden
+          className="shimmer pointer-events-none absolute inset-0 rounded-control bg-sunken"
+        />
+      )}
     </div>
   );
 }

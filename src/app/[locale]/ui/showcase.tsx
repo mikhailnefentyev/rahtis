@@ -102,6 +102,7 @@ export function UiKitShowcase({ deadlines }: { deadlines: DemoDeadlines }) {
             <Swatch name="warn" className="bg-warn" note="ждёт решения" />
             <Swatch name="danger" className="bg-danger" note="откат" />
             <Swatch name="live" className="bg-live" note="в работе" />
+            <Swatch name="attention" className="bg-attention" note="идёт отсчёт" />
             <Swatch name="line" className="bg-line" note="границы" />
             <Swatch name="line-grid" className="bg-line-grid" note="сетка таблиц" />
             <Swatch name="ink" className="bg-ink" note="текст" />
@@ -254,6 +255,40 @@ export function UiKitShowcase({ deadlines }: { deadlines: DemoDeadlines }) {
               <Countdown deadline={deadlines.expired} />
             </CardBody>
           </Card>
+        </Section>
+
+        <Section title="Движение">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Card stripe="warn" attention>
+              <CardBody>
+                <p className="label-micro mb-2">Ждёт решения</p>
+                <p className="text-[13px] text-ink-muted">
+                  Дышащий контур означает ровно одно: открыто окно решения и время
+                  идёт. Период 2,8 секунды — медленнее пульса; быстрое мерцание в
+                  окне, открытом весь день, читается как неисправность.
+                </p>
+                <div className="mt-3">
+                  <Countdown deadline={deadlines.normal} />
+                </div>
+              </CardBody>
+            </Card>
+
+            <Card>
+              <CardBody>
+                <p className="label-micro mb-2">Загрузка</p>
+                <p className="mb-3 text-[13px] text-ink-muted">
+                  Мерцание на месте ещё не пришедшего блока: ожидание, а не событие.
+                </p>
+                <div className="shimmer h-20 w-full rounded-control bg-sunken" />
+              </CardBody>
+            </Card>
+          </div>
+
+          <p className="mt-3 text-xs text-ink-faint">
+            Движение есть только у этих двух. Всё остальное в интерфейсе статично:
+            анимация работает ровно до тех пор, пока движется что-то одно. При
+            prefers-reduced-motion оба замирают — сигнал остаётся, мельтешение уходит.
+          </p>
         </Section>
 
         <Section title="Вкладки">

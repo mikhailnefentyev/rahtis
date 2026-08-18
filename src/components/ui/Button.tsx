@@ -36,8 +36,14 @@ export function buttonClass({
 }: { variant?: Variant; size?: Size; className?: string } = {}): string {
   return cn(
     'inline-flex cursor-pointer items-center justify-center border font-semibold',
-    'transition-colors duration-150',
-    'disabled:pointer-events-none disabled:opacity-35',
+    /*
+     * Отклик на нажатие — полпикселя вниз. Ровно столько, чтобы палец и
+     * глаз получили подтверждение; заметное движение в кнопке, которую
+     * жмут сотню раз за смену, начинает раздражать на второй день.
+     */
+    'transition-[color,background-color,border-color,transform] duration-150',
+    'active:translate-y-[0.5px]',
+    'disabled:pointer-events-none disabled:opacity-35 disabled:active:translate-y-0',
     sizeClass[size],
     variantClass[variant],
     className,
