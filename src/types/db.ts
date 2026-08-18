@@ -25,6 +25,19 @@ export type StopRole = Database['public']['Enums']['stop_role'];
 export type PlaceKind = Database['public']['Enums']['place_kind'];
 
 export type Order = Tables<'orders'>;
+
+/**
+ * Заказ глазами заказчика.
+ *
+ * Колонки назначения (assigned_company_id, assigned_vehicle_id,
+ * chosen_offer_id) сюда не входят: грант их заказчику не отдаёт, потому
+ * что его контрагент — Aivomaa, а не перевозчик (ТЗ §1). Тип это
+ * отражает, чтобы попытка прочитать исполнителя из заказа не собралась.
+ */
+export type ShipperOrder = Omit<
+  Order,
+  'assigned_company_id' | 'assigned_vehicle_id' | 'chosen_offer_id' | 'shipper_company_id' | 'shipper_company_kind' | 'updated_at' | 'created_by' | 'route_computed_at' | 'route_fingerprint'
+>;
 export type OrderStop = Tables<'order_stops'>;
 
 /** Что возвращает public.company_readiness — гейт стола заказов. */
@@ -44,8 +57,13 @@ export type DeskOrder = Database['public']['Functions']['desk_orders']['Returns'
  */
 export type ShipperOffer = Omit<
   Database['public']['Functions']['offers_for_shipper']['Returns'][number],
-  'rating'
-> & { rating: number | null };
+  'rating' | 'plate' | 'driver_name'
+> & {
+  rating: number | null;
+  /* Появляются только у назначенной машины — до выбора это опознавательный признак. */
+  plate: string | null;
+  driver_name: string | null;
+};
 
 /**
  * Точка маршрута в том виде, в каком её отдаёт стол.

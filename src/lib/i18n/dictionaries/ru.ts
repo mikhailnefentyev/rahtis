@@ -311,7 +311,7 @@ export const ru = {
     chooseVehicle: 'Какой машиной берёте',
     waitingChoice: 'Ждём выбор заказчика',
     offers: 'Отклики',
-    chooseCarrier: 'Выберите машину',
+    chooseCarrier: 'Выберите вариант',
     choose: 'Выбрать',
     awaitDriver: 'Ждём подтверждения водителя',
     confirm: 'Подтвердить работу',
@@ -323,7 +323,7 @@ export const ru = {
     chosenYou: 'Заказчик выбрал вас',
     chosenYouHint: 'Подтвердите работу в течение 15 минут, иначе заказ вернётся на стол.',
     inProgress: 'Рейс в работе',
-    assignedCarrier: 'Исполнитель',
+    assignedCarrier: 'Исполнитель рейса',
     contactsNow: 'Контакты получателя открыты — заказ закреплён за вами.',
     failed: 'Не удалось выполнить действие. Обновите страницу и попробуйте ещё раз.',
     tooLate: 'Срок вышел, заказ вернулся на стол.',
@@ -653,6 +653,8 @@ export const ru = {
       '{count, plural, one {# точка} few {# точки} many {# точек} other {# точки}} в маршруте',
     'order.publishedAt': 'Опубликован {date}',
     'matching.slotsTaken': '{count} из {max}',
+    'matching.variant': 'Вариант {no}',
+    'matching.basedIn': 'База {city}',
     'matching.offersCount':
       '{count, plural, =0 {Откликов нет} one {# отклик} few {# отклика} many {# откликов} other {# отклика}} из {max}',
 

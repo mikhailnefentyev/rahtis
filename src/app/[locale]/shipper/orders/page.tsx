@@ -29,9 +29,16 @@ export default async function OrdersPage({ params }: { params: Promise<{ locale:
 
   const [{ t }, supabase] = await Promise.all([getI18n(locale), createClient()]);
 
+  /*
+   * Колонки поимённо, а не select('*'): колонки назначения заказчику не
+   * выдаются грантом (см. миграцию carrier_anonymity), и звёздочка
+   * упёрлась бы в отказ доступа целиком.
+   */
   const { data: orders } = await supabase
     .from('orders')
-    .select('*')
+    .select(
+      'id,ref,shipper_ref,order_type,trailer,distance_km,rate_cents,comment,status,published_at,deadline_at,created_at,distance_source,distance_auto_km,route_geometry,route_bounds',
+    )
     .eq('shipper_company_id', company.id)
     .order('created_at', { ascending: false });
 
@@ -47,16 +54,16 @@ export default async function OrdersPage({ params }: { params: Promise<{ locale:
   }
 
   /*
-   * Отклики вместе с машиной и компанией.
+   * Отклики через RPC, а не вложенным select по order_offers.
    *
-   * Через RPC, а не вложенным select по order_offers: у заказчика нет и
-   * не должно быть политики чтения vehicles, поэтому вложенные связи
-   * приходили пустыми, а заглушки превращали отказ доступа в прочерки.
-   * Что именно заказчик видит о перевозчике, определено одним списком
-   * колонок внутри offers_for_shipper.
+   * Две причины сразу. У заказчика нет и не должно быть политики чтения
+   * vehicles — вложенные связи приходили пустыми. И состав того, что
+   * заказчик вправе знать об исполнителе, должен быть записан в одном
+   * месте явным списком колонок: компании-перевозчика там нет.
    *
    * IN_PROGRESS в списке наравне с ожиданием решения: после подтверждения
-   * водителем заказчик должен видеть, кто везёт его груз.
+   * водителем заказчик должен видеть машину и водителя — без них не
+   * выписать пропуск в порт.
    */
   const withCarrierIds = (orders ?? [])
     .filter(

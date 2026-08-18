@@ -1012,8 +1012,6 @@ export type Database = {
         Returns: {
           axles: number
           base_city: string
-          carrier_company_id: string
-          carrier_name: string
           created_at: string
           driver_name: string
           euro_class: Database["public"]["Enums"]["euro_class"]
@@ -1025,7 +1023,7 @@ export type Database = {
           order_id: string
           plate: string
           rating: number
-          vehicle_id: string
+          variant_no: number
         }[]
       }
       submit_vehicle: {

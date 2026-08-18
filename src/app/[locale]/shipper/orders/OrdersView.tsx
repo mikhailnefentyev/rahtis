@@ -6,7 +6,7 @@ import { RouteStops } from '@/components/domain/RouteStops';
 import { Badge, Button, Card, CardBody, CardDivider, EmptyState, Mono } from '@/components/ui';
 import { orderStatusTone } from '@/components/ui/tone';
 import { useI18n } from '@/lib/i18n/provider';
-import type { Order, OrderStop, ShipperOffer } from '@/types/db';
+import type { OrderStop, ShipperOffer, ShipperOrder } from '@/types/db';
 import { AssignedCarrier, OffersPanel } from './OffersPanel';
 
 export function OrdersView({
@@ -14,7 +14,7 @@ export function OrdersView({
   stopsByOrder,
   offersByOrder,
 }: {
-  orders: Order[];
+  orders: ShipperOrder[];
   stopsByOrder: Record<string, OrderStop[]>;
   offersByOrder: Record<string, ShipperOffer[]>;
 }) {

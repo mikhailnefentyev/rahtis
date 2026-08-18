@@ -1,38 +1,44 @@
 'use client';
 
-import { Badge, Button, Countdown, Mono, Plate, Stars } from '@/components/ui';
-import { MATCHING } from '@/lib/config';
+import { Badge, Button, Countdown, Kv, Mono, Plate, Stars } from '@/components/ui';
+import { APP, MATCHING } from '@/lib/config';
 import { EURO_LABEL } from '@/lib/fleet/labels';
 import { cancelOrderAction, chooseOfferAction } from '@/lib/orders/matching';
 import { useI18n } from '@/lib/i18n/provider';
-import type { Order, ShipperOffer } from '@/types/db';
+import type { ShipperOffer, ShipperOrder } from '@/types/db';
 
 /**
- * Машина и перевозчик одной карточкой.
+ * Машина в отклике — без опознавательных признаков перевозчика.
  *
- * Заказчик выбирает по рейтингу компании и по машине: сколько осей
- * (пройдёт ли по массе), какая марка, кто за рулём и на каких языках
- * говорит. Телефона водителя здесь нет и быть не может — до старта рейса
- * заказчику он не нужен, и функция offers_for_shipper его не отдаёт.
+ * Aivomaa работает принципалом-посредником (ТЗ §1): заказчик платит
+ * оператору, оператор платит перевозчику. Контрагент заказчика —
+ * Aivomaa, и в его кабинете исполнителем значится Aivomaa. Кто именно
+ * из подрядчиков поехал — дело оператора.
+ *
+ * Что заказчик всё же видит и почему: рейтинг — по нему он выбирает
+ * (ТЗ §6); марка, оси, эко-класс и база — по ним он понимает, пройдёт ли
+ * сцепка по его площадке и успеет ли машина к окну погрузки.
  */
-function CarrierLine({ offer, badge }: { offer: ShipperOffer; badge?: React.ReactNode }) {
+function VehicleLine({ offer, badge }: { offer: ShipperOffer; badge?: React.ReactNode }) {
   const { m } = useI18n();
 
   return (
     <div className="min-w-0">
       <div className="flex flex-wrap items-center gap-2.5">
-        <Plate>{offer.plate}</Plate>
+        <span className="text-[13px] font-semibold tracking-tight text-ink">
+          {m('matching.variant', { no: offer.variant_no })}
+        </span>
         <Stars value={offer.rating} />
         {badge}
       </div>
 
       <p className="mt-1 text-xs text-ink-muted">
-        <Mono>{m('vehicle.axlesCount', { count: offer.axles })}</Mono> · {offer.make} ·{' '}
-        {offer.driver_name}
+        {offer.make} · <Mono>{m('vehicle.axlesCount', { count: offer.axles })}</Mono> ·{' '}
+        <Mono>{EURO_LABEL[offer.euro_class]}</Mono>
       </p>
 
       <p className="text-xs text-ink-dim">
-        {offer.carrier_name} · {offer.base_city} · <Mono>{EURO_LABEL[offer.euro_class]}</Mono>
+        {m('matching.basedIn', { city: offer.base_city })}
         {offer.languages.length > 0 && (
           <>
             {' · '}
@@ -45,14 +51,13 @@ function CarrierLine({ offer, badge }: { offer: ShipperOffer; badge?: React.Reac
 }
 
 /**
- * Отклики на заказ и выбор перевозчика.
+ * Отклики на заказ и выбор исполнителя.
  *
- * Отклики отсортированы по рейтингу компании (ТЗ §6): заказчик решает
- * быстро, и лучший кандидат должен стоять первым, а не первым нажавшим.
- * Пока оценок нет (они появятся на Этапе 7), порядок остаётся тем, в
- * каком отклики пришли.
+ * Отсортированы по рейтингу (ТЗ §6): заказчик решает быстро, и лучший
+ * кандидат должен стоять первым, а не первым нажавшим. Пока оценок нет
+ * (Этап 7), порядок остаётся тем, в каком отклики пришли.
  */
-export function OffersPanel({ order, offers }: { order: Order; offers: ShipperOffer[] }) {
+export function OffersPanel({ order, offers }: { order: ShipperOrder; offers: ShipperOffer[] }) {
   const { t, m, locale } = useI18n();
 
   const awaiting = order.status === 'AWAIT_DRIVER';
@@ -91,7 +96,7 @@ export function OffersPanel({ order, offers }: { order: Order; offers: ShipperOf
             key={offer.offer_id}
             className="flex flex-wrap items-center justify-between gap-3 rounded-control border border-line bg-sunken px-3 py-2.5"
           >
-            <CarrierLine
+            <VehicleLine
               offer={offer}
               badge={offer.is_chosen && <Badge tone="live">{t.matching.awaitDriver}</Badge>}
             />
@@ -113,12 +118,15 @@ export function OffersPanel({ order, offers }: { order: Order; offers: ShipperOf
 }
 
 /**
- * Кто везёт груз — после того как водитель подтвердил работу.
+ * Кто везёт груз после подтверждения водителем.
  *
- * Отдельный блок, а не карточка отклика: выбирать больше не из чего, и
- * кнопки выбора здесь были бы ложным обещанием. Раньше этого блока не
- * было вовсе, и с переходом заказа в IN_PROGRESS заказчик переставал
- * видеть, кому отдал груз.
+ * Исполнитель здесь — Aivomaa, и это не формальность: именно она отвечает
+ * перед заказчиком по договору и выставляет ему счёт.
+ *
+ * Госномер и водитель показываются, потому что без них не выписать
+ * пропуск в порт и не предупредить терминал, кого ждать. Опознавательный
+ * признак это слабый: по номеру перевозчика можно найти в реестре, но
+ * работать без этих данных заказчик не сможет.
  */
 export function AssignedCarrier({ offer }: { offer: ShipperOffer }) {
   const { t } = useI18n();
@@ -126,8 +134,18 @@ export function AssignedCarrier({ offer }: { offer: ShipperOffer }) {
   return (
     <div className="mt-4 border-t border-line pt-4">
       <p className="label-micro mb-3">{t.matching.assignedCarrier}</p>
+
       <div className="rounded-control border border-line bg-sunken px-3 py-2.5">
-        <CarrierLine offer={offer} />
+        <div className="mb-2.5 flex flex-wrap items-center gap-2.5">
+          {offer.plate && <Plate>{offer.plate}</Plate>}
+          <Badge tone="ok">{APP.operator.legalName}</Badge>
+        </div>
+
+        <div className="flex flex-col gap-1">
+          {offer.driver_name && <Kv k={t.vehicle.driver} v={offer.driver_name} />}
+          <Kv k={t.vehicle.make} v={offer.make} />
+          <Kv k={t.vehicle.base} v={offer.base_city} />
+        </div>
       </div>
     </div>
   );
