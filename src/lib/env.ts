@@ -45,6 +45,34 @@ export function supabasePublishableKey(): string {
   return value;
 }
 
+/**
+ * Ключ MapTiler — фон карты маршрута.
+ *
+ * Публичный по устройству, и иначе быть не может: тайлы грузит браузер,
+ * то есть ключ обязан быть в бандле. Это принципиально другая история,
+ * чем ключ TomTom, который считает маршруты и живёт только на сервере.
+ *
+ * Защита здесь не в секретности, а в ограничении по источнику: в панели
+ * MapTiler ключу задаются разрешённые домены, и с чужого сайта он не
+ * работает. Без этого ограничения чужой сайт израсходует наш лимит.
+ */
+export function maptilerKey(): string {
+  const value = process.env.NEXT_PUBLIC_MAPTILER_KEY;
+  if (!value) throw new Error(missing('NEXT_PUBLIC_MAPTILER_KEY'));
+  return value;
+}
+
+/**
+ * Есть ли фон карты.
+ *
+ * Карта — дополнение к списку точек, а не замена ему: маршрут читается и
+ * без неё. Поэтому отсутствие ключа не ломает страницу, а просто убирает
+ * карту.
+ */
+export function isMapConfigured(): boolean {
+  return Boolean(process.env.NEXT_PUBLIC_MAPTILER_KEY);
+}
+
 /** Настроен ли Supabase. Позволяет коду работать до подключения проекта. */
 export function isSupabaseConfigured(): boolean {
   return Boolean(

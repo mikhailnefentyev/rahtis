@@ -1,6 +1,7 @@
 'use client';
 
 import { useActionState, useState } from 'react';
+import { OrderRouteMap } from '@/components/domain/RouteMap';
 import { RouteStops } from '@/components/domain/RouteStops';
 import { Badge, Button, Card, CardBody, CardDivider, EmptyState, Mono, Select } from '@/components/ui';
 import { MATCHING } from '@/lib/config';
@@ -155,6 +156,18 @@ export function DeskList({ orders, vehicles }: { orders: DeskOrder[]; vehicles: 
                     {m('order.stopsCount', { count: stops.length })}
                   </p>
                   <RouteStops stops={stops} />
+
+                  {/*
+                    * Карта на столе — до того, как заказ взят: по ней видно,
+                    * куда на самом деле ехать. Контактов и получателя она не
+                    * раскрывает, линия маршрута их не содержит.
+                    */}
+                  <OrderRouteMap
+                    geometry={order.route_geometry}
+                    bounds={order.route_bounds}
+                    stops={stops}
+                    className="mt-4"
+                  />
 
                   {order.comment && (
                     <p className="mt-4 rounded-control border border-line bg-sunken px-3 py-2 text-xs text-ink-muted">

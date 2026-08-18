@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { OrderRouteMap } from '@/components/domain/RouteMap';
 import { RouteStops } from '@/components/domain/RouteStops';
 import { Badge, Button, Card, CardBody, CardDivider, EmptyState, Mono } from '@/components/ui';
 import { orderStatusTone } from '@/components/ui/tone';
@@ -129,6 +130,14 @@ export function OrdersView({
                         {m('order.stopsCount', { count: stops.length })}
                       </p>
                       <RouteStops stops={stops} />
+
+                      {/* Карта под списком: список — источник, карта — проверка. */}
+                      <OrderRouteMap
+                        geometry={order.route_geometry}
+                        bounds={order.route_bounds}
+                        stops={stops}
+                        className="mt-4"
+                      />
                     </>
                   )}
 

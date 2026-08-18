@@ -299,6 +299,7 @@ export const ru = {
     manual: 'введено вручную',
     recalculate: 'Пересчитать',
     noCoordinates: 'Выберите адреса из подсказки — тогда пробег посчитается сам.',
+    mapLabel: 'Карта маршрута',
   },
 
   matching: {

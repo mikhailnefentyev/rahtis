@@ -76,6 +76,10 @@ export type DeskStop = {
   booking_ref: string | null;
   cargo_weight_kg: number | null;
   seal_required: boolean | null;
+  /* Координаты нужны, чтобы поставить точку на карту. */
+  lat: number | null;
+  lon: number | null;
+  leg_distance_m: number | null;
 };
 
 /** Языки водителя. Набор совпадает с ограничением vehicles_languages_known. */

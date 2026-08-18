@@ -1,5 +1,6 @@
 'use client';
 
+import { OrderRouteMap } from '@/components/domain/RouteMap';
 import { RouteStops } from '@/components/domain/RouteStops';
 import {
   Badge,
@@ -100,6 +101,13 @@ export function Assignments({ assignments }: { assignments: Assignment[] }) {
                   <>
                     <CardDivider className="my-4" />
                     <RouteStops stops={stops} />
+
+                    <OrderRouteMap
+                      geometry={order.route_geometry}
+                      bounds={order.route_bounds}
+                      stops={stops}
+                      className="mt-4"
+                    />
                     <p className="mt-3 text-xs text-ink-dim">{t.matching.contactsNow}</p>
                   </>
                 )}
