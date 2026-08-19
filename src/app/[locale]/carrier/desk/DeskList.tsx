@@ -3,7 +3,7 @@
 import { useActionState, useState } from 'react';
 import { OrderRouteMap } from '@/components/domain/RouteMap';
 import { RouteStops } from '@/components/domain/RouteStops';
-import { Badge, Button, Card, CardBody, CardDivider, EmptyState, Mono, Select } from '@/components/ui';
+import { Badge, Button, Card, CardBody, CardDivider, EmptyState, Mono, Plate, Select } from '@/components/ui';
 import { MATCHING } from '@/lib/config';
 import { takeOrderAction, type MatchingState } from '@/lib/orders/matching';
 import { useI18n } from '@/lib/i18n/provider';
@@ -86,6 +86,8 @@ export function DeskList({ orders, vehicles }: { orders: DeskOrder[]; vehicles: 
                       {t.orderType[order.order_type]}
                     </h3>
                     <Mono className="text-xs text-ink-dim">{order.ref}</Mono>
+                    {/* Номер прицепа — по нему водитель находит железо на площадке. */}
+                    {order.trailer_plate && <Plate>{order.trailer_plate}</Plate>}
                   </div>
 
                   <p className="mt-2 font-mono text-sm tracking-tight text-accent">

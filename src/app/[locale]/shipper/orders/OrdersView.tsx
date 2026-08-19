@@ -5,7 +5,7 @@ import { OrderRouteMap } from '@/components/domain/RouteMap';
 import { DocumentList } from '@/components/domain/TripDocuments';
 import { TripStage } from '@/components/domain/TripProgress';
 import { RouteStops } from '@/components/domain/RouteStops';
-import { Badge, Button, Card, CardBody, CardDivider, EmptyState, Mono } from '@/components/ui';
+import { Badge, Button, Card, CardBody, CardDivider, EmptyState, Mono, Plate } from '@/components/ui';
 import { orderStatusTone } from '@/components/ui/tone';
 import { useI18n } from '@/lib/i18n/provider';
 import type { OrderStop, ShipperOffer, ShipperOrder, TripDocument } from '@/types/db';
@@ -88,6 +88,8 @@ export function OrdersView({
                           {t.orderStatus[order.status]}
                         </Badge>
                         <Mono className="text-xs text-ink-dim">{order.ref}</Mono>
+                        {/* Номер прицепа — по нему водитель находит железо на площадке. */}
+                        {order.trailer_plate && <Plate>{order.trailer_plate}</Plate>}
                         {order.shipper_ref && (
                           <Mono className="text-xs text-ink-dim">
                             {t.orders.shipperRefShort}: {order.shipper_ref}

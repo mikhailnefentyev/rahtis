@@ -95,7 +95,6 @@ export type DeskStop = {
    * решает, пройдёт ли машина по массе и успеет ли к окну на терминале.
    * Получателя (consignee) здесь нет — третье лицо, как и контакты.
    */
-  booking_ref: string | null;
   cargo_weight_kg: number | null;
   seal_required: boolean | null;
   /* Координаты нужны, чтобы поставить точку на карту. */

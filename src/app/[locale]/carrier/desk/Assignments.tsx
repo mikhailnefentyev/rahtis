@@ -74,6 +74,8 @@ export function Assignments({
                         {t.orderStatus[order.status]}
                       </Badge>
                       <Mono className="text-xs text-ink-dim">{order.ref}</Mono>
+                      {/* Номер прицепа — по нему водитель находит железо на площадке. */}
+                      {order.trailer_plate && <Plate>{order.trailer_plate}</Plate>}
                       {order.vehicle_plate && <Plate>{order.vehicle_plate}</Plate>}
                     </div>
 

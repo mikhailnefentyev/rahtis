@@ -116,24 +116,6 @@ export function StopFields({
         </>
       )}
 
-      {/*
-       * Бронь. Моноширинным и отдельной строкой: её диктуют по телефону
-       * на воротах порта, и I/1 или O/0 должны различаться на глаз.
-       */}
-      {/*
-        * Бронь спрашивается везде, а не только у портов и терминалов.
-        * Где её требуют на воротах, знает заказчик, а не форма: список
-        * «порт или терминал» всё равно не покрывал бы склады с пропускной
-        * системой и частные площадки.
-        */}
-      <Field
-        label={t.orderForm.bookingRef}
-        hint={t.orderForm.bookingRefHint}
-        className="sm:col-span-2"
-      >
-        {(p) => <InputMono {...p} name={name('booking_ref')} placeholder="BK-4471902" />}
-      </Field>
-
       {cargo ? (
         <>
           <Field label={t.orderForm.cargoWeight} hint={t.orderForm.cargoWeightHint}>
@@ -196,7 +178,12 @@ export function StopFields({
        */}
       <Field label={t.orderForm.stopNote} className="sm:col-span-2">
         {(p) => (
-          <Textarea {...p} name={name('note')} rows={2} placeholder={t.orderForm.stopNotePlaceholder} />
+          <Textarea
+          {...p}
+          name={name('note')}
+          rows={2}
+          placeholder={t.orderForm.stopNotePlaceholder}
+        />
         )}
       </Field>
     </div>

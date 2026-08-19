@@ -316,6 +316,28 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
         <CardBody>
           <SectionTitle>{t.orderForm.cargoSection}</SectionTitle>
           <div className="grid gap-4 sm:grid-cols-4">
+            {/*
+              * Номер прицепа стоит первым в блоке и обязателен: прицепы
+              * ищут по номерам, и заказ без него означает водителя,
+              * который приехал на площадку и не знает, что цеплять.
+              */}
+            <Field
+              label={t.orderForm.trailerPlate}
+              hint={t.orderForm.trailerPlateHint}
+              required
+              className="sm:col-span-2"
+            >
+              {(p) => (
+                <InputMono
+                  {...p}
+                  name="trailer_plate"
+                  required
+                  placeholder="ABC-123"
+                  style={{ textTransform: 'uppercase' }}
+                />
+              )}
+            </Field>
+
             <Field label={t.orderForm.trailer} className="sm:col-span-2">
               {(p) => <Input {...p} name="trailer" placeholder={t.orderForm.trailerPlaceholder} />}
             </Field>

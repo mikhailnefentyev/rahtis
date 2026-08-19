@@ -259,7 +259,6 @@ export const ru = {
     closeTitle: 'Закрытие рейса',
 
     /* Подписи полей точки при показе маршрута. */
-    bookingRef: 'Бронь',
     consignee: 'Получатель',
     sealRequired: 'Пломба',
   },
@@ -298,7 +297,6 @@ export const ru = {
 
     /* Поля точки маршрута под грузовую специфику. */
     bookingRef: 'Номер брони REF',
-    bookingRefHint: 'По нему в порту выдают и принимают прицеп',
     cargoWeight: 'Вес груза, т',
     cargoWeightHint: 'До 76 тонн — предел для сцепок HCT',
     consignee: 'Получатель груза',
@@ -310,10 +308,12 @@ export const ru = {
     sealYes: 'Нужна',
     sealNo: 'Не нужна',
     stopNote: 'Инструкции по точке',
-    stopNotePlaceholder: 'Звонить за час, въезд с задней стороны, пропуск на проходной…',
+    stopNotePlaceholder: 'Номер брони, пропуск на проходной, звонить за час…',
 
-    trailer: 'Прицеп',
+    trailer: 'Тип прицепа',
     trailerPlaceholder: 'Тент 13.6, 3 оси',
+    trailerPlate: 'Номер прицепа',
+    trailerPlateHint: 'По нему водитель находит прицеп на площадке — обязательно',
     distance: 'Пробег, км',
     rate: 'Ставка, €',
 
@@ -696,7 +696,6 @@ export const ru = {
     'routing.legDistance': 'плечо {km, number} км',
 
     'stop.weight': '{tonnes, number, ::.0#} т',
-    'stop.bookingRef': '{label}: {ref}',
     'stop.consignee': '{label}: {name}',
 
     'order.stopsCount':

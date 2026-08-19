@@ -39,7 +39,6 @@ type StopInput = {
   /** Прицеп с грузом или пустой — только на заборе и на отцепке. */
   trailer_loaded?: boolean;
   note?: string;
-  booking_ref?: string;
   cargo_weight_kg?: string;
   consignee?: string;
   seal_required?: boolean;
@@ -113,7 +112,6 @@ function readStop(read: FieldReader, role: StopRole): StopInput {
     scheduled_time: read('time'),
     external_ref: read('ref'),
     note: read('note'),
-    booking_ref: read('booking_ref'),
     /* Тонны формы в килограммы базы: вес хранится целым, как и деньги. */
     cargo_weight_kg: tonnesToKg(read('weight'))?.toString(),
     consignee: read('consignee'),
@@ -267,6 +265,7 @@ export async function publishOrderAction(
       order_type: str(formData, 'order_type'),
       shipper_ref: str(formData, 'shipper_ref'),
       trailer: str(formData, 'trailer'),
+      trailer_plate: str(formData, 'trailer_plate').toUpperCase(),
       distance_km: String(distance),
       rate_cents: String(rateCents),
       comment: str(formData, 'comment'),

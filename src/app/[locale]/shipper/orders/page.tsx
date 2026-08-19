@@ -37,7 +37,7 @@ export default async function OrdersPage({ params }: { params: Promise<{ locale:
   const { data: orders } = await supabase
     .from('orders')
     .select(
-      'id,ref,shipper_ref,order_type,trailer,distance_km,rate_cents,comment,status,published_at,deadline_at,created_at,distance_source,distance_auto_km,route_geometry,route_bounds',
+      'id,ref,shipper_ref,order_type,trailer,trailer_plate,distance_km,rate_cents,comment,status,published_at,deadline_at,created_at,distance_source,distance_auto_km,route_geometry,route_bounds',
     )
     .eq('shipper_company_id', company.id)
     .order('created_at', { ascending: false });

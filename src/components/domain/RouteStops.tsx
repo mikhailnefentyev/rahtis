@@ -96,11 +96,6 @@ export function RouteStops({ stops }: { stops: AnyStop[] }) {
           secondary={secondary(stop)}
           meta={meta(stop)}
           tags={tags(stop)}
-          code={
-            stop.booking_ref
-              ? m('stop.bookingRef', { label: t.order.bookingRef, ref: stop.booking_ref })
-              : undefined
-          }
           note={stop.note ?? undefined}
         />
       ))}

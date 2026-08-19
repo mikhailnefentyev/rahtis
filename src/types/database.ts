@@ -367,7 +367,6 @@ export type Database = {
       order_stops: {
         Row: {
           address: string
-          booking_ref: string | null
           cargo_weight_kg: number | null
           city: string
           company_name: string | null
@@ -398,7 +397,6 @@ export type Database = {
         }
         Insert: {
           address: string
-          booking_ref?: string | null
           cargo_weight_kg?: number | null
           city: string
           company_name?: string | null
@@ -429,7 +427,6 @@ export type Database = {
         }
         Update: {
           address?: string
-          booking_ref?: string | null
           cargo_weight_kg?: number | null
           city?: string
           company_name?: string | null
@@ -494,6 +491,7 @@ export type Database = {
           shipper_ref: string | null
           status: Database["public"]["Enums"]["order_status"]
           trailer: string | null
+          trailer_plate: string | null
           updated_at: string
         }
         Insert: {
@@ -521,6 +519,7 @@ export type Database = {
           shipper_ref?: string | null
           status?: Database["public"]["Enums"]["order_status"]
           trailer?: string | null
+          trailer_plate?: string | null
           updated_at?: string
         }
         Update: {
@@ -548,6 +547,7 @@ export type Database = {
           shipper_ref?: string | null
           status?: Database["public"]["Enums"]["order_status"]
           trailer?: string | null
+          trailer_plate?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -800,6 +800,7 @@ export type Database = {
           shipper_ref: string | null
           status: Database["public"]["Enums"]["order_status"]
           trailer: string | null
+          trailer_plate: string | null
           updated_at: string
         }
         SetofOptions: {
@@ -836,6 +837,7 @@ export type Database = {
           shipper_ref: string | null
           status: Database["public"]["Enums"]["order_status"]
           trailer: string | null
+          trailer_plate: string | null
           updated_at: string
         }
         SetofOptions: {
@@ -872,6 +874,7 @@ export type Database = {
           shipper_ref: string | null
           status: Database["public"]["Enums"]["order_status"]
           trailer: string | null
+          trailer_plate: string | null
           updated_at: string
         }
         SetofOptions: {
@@ -897,7 +900,6 @@ export type Database = {
         Args: { p_damage_note?: string; p_stop_id: string }
         Returns: {
           address: string
-          booking_ref: string | null
           cargo_weight_kg: number | null
           city: string
           company_name: string | null
@@ -960,6 +962,7 @@ export type Database = {
           shipper_ref: string | null
           status: Database["public"]["Enums"]["order_status"]
           trailer: string | null
+          trailer_plate: string | null
           updated_at: string
         }
         SetofOptions: {
@@ -996,6 +999,7 @@ export type Database = {
           shipper_ref: string | null
           status: Database["public"]["Enums"]["order_status"]
           trailer: string | null
+          trailer_plate: string | null
           updated_at: string
         }
         SetofOptions: {
@@ -1059,6 +1063,7 @@ export type Database = {
           stops: Json
           taken_by_me: boolean
           trailer: string
+          trailer_plate: string
         }[]
       }
       desk_regions: {
@@ -1140,6 +1145,7 @@ export type Database = {
           status: Database["public"]["Enums"]["order_status"]
           stops: Json
           trailer: string
+          trailer_plate: string
           vehicle_plate: string
         }[]
       }
@@ -1218,6 +1224,7 @@ export type Database = {
           shipper_ref: string | null
           status: Database["public"]["Enums"]["order_status"]
           trailer: string | null
+          trailer_plate: string | null
           updated_at: string
         }
         SetofOptions: {
@@ -1231,7 +1238,6 @@ export type Database = {
         Args: { p_stop_id: string }
         Returns: {
           address: string
-          booking_ref: string | null
           cargo_weight_kg: number | null
           city: string
           company_name: string | null
