@@ -2,22 +2,25 @@
 
 import { useState } from 'react';
 import { OrderRouteMap } from '@/components/domain/RouteMap';
+import { DocumentList } from '@/components/domain/TripDocuments';
 import { TripStage } from '@/components/domain/TripProgress';
 import { RouteStops } from '@/components/domain/RouteStops';
 import { Badge, Button, Card, CardBody, CardDivider, EmptyState, Mono } from '@/components/ui';
 import { orderStatusTone } from '@/components/ui/tone';
 import { useI18n } from '@/lib/i18n/provider';
-import type { OrderStop, ShipperOffer, ShipperOrder } from '@/types/db';
+import type { OrderStop, ShipperOffer, ShipperOrder, TripDocument } from '@/types/db';
 import { AssignedCarrier, OffersPanel } from './OffersPanel';
 
 export function OrdersView({
   orders,
   stopsByOrder,
   offersByOrder,
+  documentsByOrder,
 }: {
   orders: ShipperOrder[];
   stopsByOrder: Record<string, OrderStop[]>;
   offersByOrder: Record<string, ShipperOffer[]>;
+  documentsByOrder: Record<string, TripDocument[]>;
 }) {
   const { t, m, f } = useI18n();
   const [composing, setComposing] = useState(false);
@@ -153,6 +156,17 @@ export function OrdersView({
                         className="mt-4"
                       />
                     </>
+                  )}
+
+                  {/*
+                    * Документы выполненного рейса (ТЗ §9): заказчик
+                    * получает их готовыми, вместе с отметкой «выполнен».
+                    */}
+                  {order.status === 'DONE' && (documentsByOrder[order.id] ?? []).length > 0 && (
+                    <div className="mt-4 border-t border-line pt-4">
+                      <p className="label-micro mb-2.5">{t.trip.documents}</p>
+                      <DocumentList documents={documentsByOrder[order.id] ?? []} />
+                    </div>
                   )}
 
                   {order.comment && (

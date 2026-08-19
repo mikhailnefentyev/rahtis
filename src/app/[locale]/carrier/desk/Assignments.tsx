@@ -16,9 +16,10 @@ import {
 import { orderStatusTone } from '@/components/ui/tone';
 import { cancelOrderAction, confirmOrderAction } from '@/lib/orders/matching';
 import { useI18n } from '@/lib/i18n/provider';
+import { ClosingPanel } from './ClosingPanel';
 import { TripPanel } from './TripPanel';
 import type { Database } from '@/types/database';
-import type { OrderStop } from '@/types/db';
+import type { OrderStop, TripDocument } from '@/types/db';
 
 type Assignment = Database['public']['Functions']['my_assignments']['Returns'][number];
 
@@ -29,7 +30,13 @@ type Assignment = Database['public']['Functions']['my_assignments']['Returns'][n
  * закреплён, и они нужны для работы. До закрепления их не отдавала
  * функция стола.
  */
-export function Assignments({ assignments }: { assignments: Assignment[] }) {
+export function Assignments({
+  assignments,
+  documentsByOrder,
+}: {
+  assignments: Assignment[];
+  documentsByOrder: Record<string, TripDocument[]>;
+}) {
   const { t, m, f, locale } = useI18n();
 
   if (assignments.length === 0) return null;
@@ -125,6 +132,20 @@ export function Assignments({ assignments }: { assignments: Assignment[] }) {
                       className="mt-4"
                     />
                     {order.status === 'IN_PROGRESS' && <TripPanel stops={stops} />}
+
+                    {/*
+                      * Закрытие появляется, когда пройдены все точки, и
+                      * остаётся у выполненного рейса: документы нужны до
+                      * выплаты, а не только в момент закрытия.
+                      */}
+                    {(order.status === 'IN_PROGRESS' || order.status === 'DONE') && (
+                      <ClosingPanel
+                        orderId={order.id}
+                        stops={stops}
+                        documents={documentsByOrder[order.id] ?? []}
+                        closed={order.status === 'DONE'}
+                      />
+                    )}
 
                     <p className="mt-3 text-xs text-ink-dim">{t.matching.contactsNow}</p>
                   </>

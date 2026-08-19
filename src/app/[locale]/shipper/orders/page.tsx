@@ -6,7 +6,7 @@ import { requireRole } from '@/lib/auth/guard';
 import { cabinetPath } from '@/lib/auth/paths';
 import { getI18n, isLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
-import type { OrderStop, ShipperOffer } from '@/types/db';
+import type { OrderStop, ShipperOffer, TripDocument } from '@/types/db';
 import { OrdersView } from './OrdersView';
 
 export async function generateMetadata({
@@ -84,6 +84,24 @@ export default async function OrdersPage({ params }: { params: Promise<{ locale:
     }
   }
 
+  /*
+   * Документы рейса. Заказчику они приходят готовыми — по ТЗ §9 после
+   * закрытия рейса «документы приложены». RLS отдаёт только документы
+   * его заказов: политика проверяет, что он сторона этого рейса.
+   */
+  const { data: tripDocs } = orderIds.length
+    ? await supabase
+        .from('order_documents')
+        .select('*')
+        .in('order_id', orderIds)
+        .order('created_at')
+    : { data: [] as TripDocument[] };
+
+  const documentsByOrder: Record<string, TripDocument[]> = {};
+  for (const doc of tripDocs ?? []) {
+    (documentsByOrder[doc.order_id] ??= []).push(doc);
+  }
+
   return (
     <main className="mx-auto w-full max-w-4xl px-5 py-8">
       <nav className="mb-6">
@@ -118,6 +136,7 @@ export default async function OrdersPage({ params }: { params: Promise<{ locale:
           orders={orders ?? []}
           stopsByOrder={stopsByOrder}
           offersByOrder={offersByOrder}
+          documentsByOrder={documentsByOrder}
         />
       )}
     </main>

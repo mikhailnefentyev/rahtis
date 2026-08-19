@@ -26,6 +26,10 @@ export type PlaceKind = Database['public']['Enums']['place_kind'];
 
 export type Order = Tables<'orders'>;
 
+/** Документ рейса: CMR, фото загрузки, выгрузки, повреждения (ТЗ §9). */
+export type TripDocument = Tables<'order_documents'>;
+export type TripDocumentKind = Database['public']['Enums']['trip_document_kind'];
+
 /**
  * Заказ глазами заказчика.
  *

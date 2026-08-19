@@ -81,3 +81,120 @@ export async function uncompleteStopAction(formData: FormData): Promise<void> {
 
   revalidatePath(`/${locale}/carrier`, 'layout');
 }
+
+/* ── Документы рейса (ТЗ §9) ───────────────────────────────────── */
+
+const BUCKET = 'trip-docs';
+const MAX_BYTES = 10 * 1024 * 1024;
+const ALLOWED_TYPES = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
+
+const DOCUMENT_KINDS = ['CMR', 'LOADING_PHOTO', 'UNLOADING_PHOTO', 'DAMAGE_PHOTO'] as const;
+type DocumentKind = (typeof DOCUMENT_KINDS)[number];
+
+/**
+ * Загрузка документа рейса.
+ *
+ * Файл идёт через сервер, а не напрямую в Storage — по той же причине,
+ * что у документов компании: при прямой загрузке обрыв между записью
+ * файла и записью строки оставил бы объект, о котором база не знает.
+ * Здесь неудачная вставка убирает загруженный файл.
+ *
+ * Оба шага выполняются клиентом пользователя, поэтому политики Storage и
+ * RLS проверяются по-настоящему — секретный ключ тут не участвует.
+ */
+export async function uploadTripDocumentAction(
+  _previous: TripState,
+  formData: FormData,
+): Promise<TripState> {
+  const locale = toLocale(formData.get('locale'));
+  const t = await getDictionary(locale);
+
+  const forbidden = await guard(locale);
+  if (forbidden) return { error: forbidden };
+
+  const viewer = await getViewer();
+  const orderId = String(formData.get('order_id') ?? '');
+  const kind = String(formData.get('kind') ?? '') as DocumentKind;
+
+  if (!DOCUMENT_KINDS.includes(kind)) return { error: t.documents.uploadFailed };
+
+  const file = formData.get('file');
+  if (!(file instanceof File) || file.size === 0) return { error: t.validation.required };
+  if (file.size > MAX_BYTES) return { error: t.documents.tooLarge };
+  if (!ALLOWED_TYPES.includes(file.type)) return { error: t.documents.wrongType };
+
+  /*
+   * Первый сегмент пути — идентификатор заказа: по нему политики Storage
+   * решают, сторона ли вызывающий этому рейсу. Имя обезличивается
+   * префиксом, чтобы две загрузки с одинаковым именем не столкнулись.
+   */
+  const safeName = file.name.replace(/[^\w.\-]+/g, '_').slice(-80);
+  const path = `${orderId}/${kind}/${crypto.randomUUID()}-${safeName}`;
+
+  const supabase = await createClient();
+
+  const { error: uploadError } = await supabase.storage
+    .from(BUCKET)
+    .upload(path, file, { contentType: file.type, upsert: false });
+
+  if (uploadError) return { error: t.documents.uploadFailed };
+
+  const stopId = String(formData.get('stop_id') ?? '');
+
+  const { error: insertError } = await supabase.from('order_documents').insert({
+    order_id: orderId,
+    stop_id: stopId || null,
+    kind,
+    storage_path: path,
+    file_name: file.name.slice(-120),
+    mime_type: file.type,
+    size_bytes: file.size,
+    uploaded_by: viewer.status === 'ready' ? viewer.userId : null,
+  });
+
+  if (insertError) {
+    /* Запись не удалась — файл без неё бесполезен, убираем. */
+    await supabase.storage.from(BUCKET).remove([path]);
+    return { error: t.documents.uploadFailed };
+  }
+
+  revalidatePath(`/${locale}`, 'layout');
+  return { error: null };
+}
+
+/**
+ * Ссылка на документ рейса — на пять минут.
+ *
+ * Выписывает клиент пользователя, а не секретный ключ: политики Storage
+ * проверяются ещё раз в момент выдачи, и заказчик чужого рейса ссылку не
+ * получит, даже зная путь.
+ */
+export async function tripDocumentUrlAction(storagePath: string): Promise<string | null> {
+  const viewer = await getViewer();
+  if (viewer.status !== 'ready') return null;
+
+  const supabase = await createClient();
+  const { data } = await supabase.storage.from(BUCKET).createSignedUrl(storagePath, 300);
+
+  return data?.signedUrl ?? null;
+}
+
+/** Закрытие рейса: все точки пройдены и приложен CMR. */
+export async function closeOrderAction(
+  _previous: TripState,
+  formData: FormData,
+): Promise<TripState> {
+  const locale = toLocale(formData.get('locale'));
+
+  const forbidden = await guard(locale);
+  if (forbidden) return { error: forbidden };
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc('close_order', {
+    p_order_id: String(formData.get('order_id') ?? ''),
+  });
+
+  revalidatePath(`/${locale}`, 'layout');
+
+  return { error: error ? await explain(locale, error.code, error.message) : null };
+}

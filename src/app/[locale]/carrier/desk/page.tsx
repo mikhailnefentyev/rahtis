@@ -6,6 +6,7 @@ import { requireRole } from '@/lib/auth/guard';
 import { cabinetPath } from '@/lib/auth/paths';
 import { getI18n, isLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
+import type { TripDocument } from '@/types/db';
 import { Assignments } from './Assignments';
 import { DeskList } from './DeskList';
 
@@ -59,6 +60,24 @@ export default async function DeskPage({
         .order('plate'),
     ]);
 
+  /*
+   * Документы рейсов одним запросом на все закреплённые заказы, а не по
+   * одному на карточку. RLS отдаёт только те, где компания — сторона.
+   */
+  const assignedIds = (assignments ?? []).map((o) => o.id);
+  const { data: tripDocs } = assignedIds.length
+    ? await supabase
+        .from('order_documents')
+        .select('*')
+        .in('order_id', assignedIds)
+        .order('created_at')
+    : { data: [] as TripDocument[] };
+
+  const documentsByOrder: Record<string, TripDocument[]> = {};
+  for (const doc of tripDocs ?? []) {
+    (documentsByOrder[doc.order_id] ??= []).push(doc);
+  }
+
   const state = readiness?.[0];
   const canTakeOrders = state?.can_take_orders ?? false;
 
@@ -79,7 +98,7 @@ export default async function DeskPage({
       </p>
 
       {/* Закреплённые рейсы важнее стола: они требуют действия и горят по срокам. */}
-      <Assignments assignments={assignments ?? []} />
+      <Assignments assignments={assignments ?? []} documentsByOrder={documentsByOrder} />
 
       {!canTakeOrders ? (
         /*

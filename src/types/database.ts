@@ -223,6 +223,60 @@ export type Database = {
           },
         ]
       }
+      order_documents: {
+        Row: {
+          created_at: string
+          file_name: string
+          id: string
+          kind: Database["public"]["Enums"]["trip_document_kind"]
+          mime_type: string
+          order_id: string
+          size_bytes: number
+          stop_id: string | null
+          storage_path: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          file_name: string
+          id?: string
+          kind: Database["public"]["Enums"]["trip_document_kind"]
+          mime_type: string
+          order_id: string
+          size_bytes: number
+          stop_id?: string | null
+          storage_path: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          file_name?: string
+          id?: string
+          kind?: Database["public"]["Enums"]["trip_document_kind"]
+          mime_type?: string
+          order_id?: string
+          size_bytes?: number
+          stop_id?: string | null
+          storage_path?: string
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_documents_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_documents_stop_id_fkey"
+            columns: ["stop_id"]
+            isOneToOne: false
+            referencedRelation: "order_stops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       order_events: {
         Row: {
           actor_id: string | null
@@ -791,6 +845,42 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      close_order: {
+        Args: { p_order_id: string }
+        Returns: {
+          assigned_company_id: string | null
+          assigned_vehicle_id: string | null
+          chosen_offer_id: string | null
+          comment: string | null
+          created_at: string
+          created_by: string | null
+          deadline_at: string | null
+          distance_auto_km: number | null
+          distance_km: number | null
+          distance_source: Database["public"]["Enums"]["distance_source"]
+          id: string
+          order_type: Database["public"]["Enums"]["order_type"]
+          published_at: string | null
+          rate_cents: number | null
+          ref: string
+          route_bounds: Json | null
+          route_computed_at: string | null
+          route_fingerprint: string | null
+          route_geometry: string | null
+          shipper_company_id: string
+          shipper_company_kind: Database["public"]["Enums"]["party_role"]
+          shipper_ref: string | null
+          status: Database["public"]["Enums"]["order_status"]
+          trailer: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       company_readiness: {
         Args: { p_company_id: string }
         Returns: {
@@ -1201,6 +1291,11 @@ export type Database = {
         | "EXTRA_UNLOAD"
         | "CONTINUATION"
         | "TRAILER_RETURN"
+      trip_document_kind:
+        | "CMR"
+        | "LOADING_PHOTO"
+        | "UNLOADING_PHOTO"
+        | "DAMAGE_PHOTO"
       vehicle_access: "DRAFT" | "PENDING" | "APPROVED" | "REJECTED"
     }
     CompositeTypes: {
@@ -1355,6 +1450,12 @@ export const Constants = {
         "EXTRA_UNLOAD",
         "CONTINUATION",
         "TRAILER_RETURN",
+      ],
+      trip_document_kind: [
+        "CMR",
+        "LOADING_PHOTO",
+        "UNLOADING_PHOTO",
+        "DAMAGE_PHOTO",
       ],
       vehicle_access: ["DRAFT", "PENDING", "APPROVED", "REJECTED"],
     },
