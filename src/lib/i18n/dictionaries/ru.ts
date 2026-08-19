@@ -221,7 +221,10 @@ export const ru = {
     shipperRefHint: 'Необязательно. Номер платформы присваивается автоматически',
 
     pickupSection: 'Откуда забираем',
+    trailerPickupSection: 'Где забираем прицеп',
     deliverySection: 'Где выгрузка',
+    workSection: 'Что делаем с грузом',
+    dropSection: 'Где отцепляем прицеп',
     cargoSection: 'Груз и оплата',
 
     placeKind: 'Тип места',

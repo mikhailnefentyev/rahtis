@@ -15,6 +15,7 @@ import {
   Textarea,
 } from '@/components/ui';
 import type { ChosenAddress } from '@/components/domain/AddressInput';
+import type { OrderType } from '@/types/db';
 import { publishOrderAction, type PublishState } from '@/lib/orders/actions';
 import { computeRouteAction, type RouteState } from '@/lib/routing/actions';
 import { useI18n } from '@/lib/i18n/provider';
@@ -38,9 +39,27 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
   const { t, m, locale } = useI18n();
   const [state, formAction, pending] = useActionState(publishOrderAction, initial);
 
+  /*
+   * Тип рейса определяет форму маршрута, а не только подпись.
+   *
+   * Перецеп устроен так: забрали прицеп где-то, съездили на выгрузку или
+   * загрузку, отвезли в порт, на парковку или терминал и отцепили. Значит
+   * у него три обязательные части, а не две, и середина — это выгрузка
+   * ИЛИ загрузка. У кругорейса и груза в один конец прицеп свой, отцеплять
+   * его негде, и возврат остаётся необязательным довеском.
+   */
+  const [orderType, setOrderType] = useState<OrderType>('TRAILER_SWAP');
+  const isSwap = orderType === 'TRAILER_SWAP';
+
+  /* Работа посередине: выгружаемся или загружаемся. */
+  const [workRole, setWorkRole] = useState<'DELIVERY' | 'EXTRA_LOAD'>('DELIVERY');
+
   const [extras, setExtras] = useState<Extra[]>([]);
   const [hasContinuation, setHasContinuation] = useState(false);
   const [hasReturn, setHasReturn] = useState(false);
+
+  /* У перецепа отцепка не добавляется кнопкой — она есть всегда. */
+  const showReturn = isSwap || hasReturn;
   const [distance, setDistance] = useState('');
   const [rate, setRate] = useState('');
 
@@ -83,13 +102,13 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
       ...extras.map((e) => `extra-${e.key}`),
       'delivery',
       ...(hasContinuation ? ['cont'] : []),
-      ...(hasReturn ? ['ret'] : []),
+      ...(showReturn ? ['ret'] : []),
     ];
 
     return slots
       .map((slot) => coords[slot]?.position)
       .filter((p): p is { lat: number; lon: number } => Boolean(p));
-  }, [coords, extras, hasContinuation, hasReturn]);
+  }, [coords, extras, hasContinuation, showReturn]);
 
   const canRoute = routePoints.length >= 2;
 
@@ -185,7 +204,13 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
         <CardBody className="grid gap-4 sm:grid-cols-2">
           <Field label={t.orderForm.type} required>
             {(p) => (
-              <Select {...p} name="order_type" required defaultValue="TRAILER_SWAP">
+              <Select
+                {...p}
+                name="order_type"
+                required
+                value={orderType}
+                onChange={(e) => setOrderType(e.target.value as OrderType)}
+              >
                 <option value="TRAILER_SWAP">{t.orderType.TRAILER_SWAP}</option>
                 <option value="ROUND_TRIP">{t.orderType.ROUND_TRIP}</option>
                 <option value="ONE_WAY">{t.orderType.ONE_WAY}</option>
@@ -202,7 +227,9 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
       {/* ── Забор прицепа ── */}
       <Card stripe="info">
         <CardBody>
-          <SectionTitle>{t.orderForm.pickupSection}</SectionTitle>
+          <SectionTitle>
+            {isSwap ? t.orderForm.trailerPickupSection : t.orderForm.pickupSection}
+          </SectionTitle>
           <StopFields
             role="PICKUP"
             prefix="pickup"
@@ -245,12 +272,41 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
         </Card>
       ))}
 
-      {/* ── Выгрузка ── */}
+      {/* ── Работа: выгрузка или загрузка ── */}
       <Card stripe="live">
         <CardBody>
-          <SectionTitle>{t.orderForm.deliverySection}</SectionTitle>
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+            <SectionTitle className="mb-0 border-0 pb-0">
+              {t.orderForm.workSection}
+            </SectionTitle>
+
+            {/*
+              * Переключатель роли, а не два разных блока: место, время и
+              * контакт у выгрузки и загрузки одни и те же, отличается
+              * только то, что происходит с грузом.
+              */}
+            <div className="flex gap-1.5">
+              <Button
+                size="sm"
+                variant={workRole === 'DELIVERY' ? 'primary' : 'default'}
+                onClick={() => setWorkRole('DELIVERY')}
+              >
+                {t.stopKind.DELIVERY}
+              </Button>
+              <Button
+                size="sm"
+                variant={workRole === 'EXTRA_LOAD' ? 'primary' : 'default'}
+                onClick={() => setWorkRole('EXTRA_LOAD')}
+              >
+                {t.stopKind.EXTRA_LOAD}
+              </Button>
+            </div>
+          </div>
+
+          <input type="hidden" name="work_role" value={workRole} />
+
           <StopFields
-            role="DELIVERY"
+            role={workRole}
             prefix="delivery"
             requireCompany
             showContact
@@ -285,14 +341,19 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
       )}
 
       {/* ── Возврат прицепа ── */}
-      {hasReturn && (
-        <Card>
+      {showReturn && (
+        <Card stripe="info">
           <CardBody>
             <div className="mb-3 flex items-center justify-between">
-              <SectionTitle className="mb-0 border-0 pb-0">{t.stopKind.TRAILER_RETURN}</SectionTitle>
-              <Button size="sm" onClick={() => setHasReturn(false)}>
-                {t.orderForm.remove}
-              </Button>
+              <SectionTitle className="mb-0 border-0 pb-0">
+                {isSwap ? t.orderForm.dropSection : t.stopKind.TRAILER_RETURN}
+              </SectionTitle>
+              {/* У перецепа отцепка — окончание рейса, убрать её нельзя. */}
+              {!isSwap && (
+                <Button size="sm" onClick={() => setHasReturn(false)}>
+                  {t.orderForm.remove}
+                </Button>
+              )}
             </div>
 
             <input type="hidden" name="has_return" value="on" />
@@ -328,7 +389,7 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
             {t.orderForm.addContinuation}
           </Button>
         )}
-        {!hasReturn && (
+        {!showReturn && (
           <Button size="sm" onClick={() => setHasReturn(true)}>
             {t.orderForm.addTrailerReturn}
           </Button>

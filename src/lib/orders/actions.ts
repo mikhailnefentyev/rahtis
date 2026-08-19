@@ -163,7 +163,14 @@ function collectStops(formData: FormData): StopInput[] {
     stops.push(readStop(atIndex(index), role === 'EXTRA_UNLOAD' ? 'EXTRA_UNLOAD' : 'EXTRA_LOAD'));
   });
 
-  stops.push(readStop(single('delivery'), 'DELIVERY'));
+  /*
+   * Середина рейса — выгрузка или загрузка. Форма присылает, что именно:
+   * у перецепа «забрали пустой прицеп → загрузились → отвезли в порт»
+   * выгрузки нет вовсе, и требовать её значило бы запретить половину
+   * реальных рейсов.
+   */
+  const workRole = str(formData, 'work_role') === 'EXTRA_LOAD' ? 'EXTRA_LOAD' : 'DELIVERY';
+  stops.push(readStop(single('delivery'), workRole));
 
   if (formData.get('has_continuation') === 'on') {
     stops.push(readStop(single('cont'), 'CONTINUATION'));
