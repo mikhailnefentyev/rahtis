@@ -11,11 +11,9 @@ import {
   InputMono,
   Mono,
   SectionTitle,
-  Select,
   Textarea,
 } from '@/components/ui';
 import type { ChosenAddress } from '@/components/domain/AddressInput';
-import type { OrderType } from '@/types/db';
 import { publishOrderAction, type PublishState } from '@/lib/orders/actions';
 import { computeRouteAction, type RouteState } from '@/lib/routing/actions';
 import { useI18n } from '@/lib/i18n/provider';
@@ -40,26 +38,16 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
   const [state, formAction, pending] = useActionState(publishOrderAction, initial);
 
   /*
-   * Тип рейса определяет форму маршрута, а не только подпись.
+   * Пока делаем только перецеп (irtoperä).
    *
-   * Перецеп устроен так: забрали прицеп где-то, съездили на выгрузку или
-   * загрузку, отвезли в порт, на парковку или терминал и отцепили. Значит
-   * у него три обязательные части, а не две, и середина — это выгрузка
-   * ИЛИ загрузка. У кругорейса и груза в один конец прицеп свой, отцеплять
-   * его негде, и возврат остаётся необязательным довеском.
+   * Его форма: забрали прицеп где-то → сколько угодно загрузок и выгрузок
+   * в любом порядке → отцепили. Кругорейс по форме тот же самый — забрать
+   * прицеп на терминале, загрузиться, выгрузиться, отцепить, — поэтому
+   * отдельного типа для него не нужно: разница выражается набором
+   * действий, а не пунктом в списке. Груз в один конец придёт позже, и
+   * тогда селектор типа вернётся.
    */
-  const [orderType, setOrderType] = useState<OrderType>('TRAILER_SWAP');
-  const isSwap = orderType === 'TRAILER_SWAP';
-
-  /* Работа посередине: выгружаемся или загружаемся. */
-  const [workRole, setWorkRole] = useState<'DELIVERY' | 'EXTRA_LOAD'>('DELIVERY');
-
   const [extras, setExtras] = useState<Extra[]>([]);
-  const [hasContinuation, setHasContinuation] = useState(false);
-  const [hasReturn, setHasReturn] = useState(false);
-
-  /* У перецепа отцепка не добавляется кнопкой — она есть всегда. */
-  const showReturn = isSwap || hasReturn;
   const [distance, setDistance] = useState('');
   const [rate, setRate] = useState('');
 
@@ -97,18 +85,12 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
    * подсказки, координат не имеет и в маршрут не попадает.
    */
   const routePoints = useMemo(() => {
-    const slots = [
-      'pickup',
-      ...extras.map((e) => `extra-${e.key}`),
-      'delivery',
-      ...(hasContinuation ? ['cont'] : []),
-      ...(showReturn ? ['ret'] : []),
-    ];
+    const slots = ['pickup', ...extras.map((e) => `extra-${e.key}`), 'ret'];
 
     return slots
       .map((slot) => coords[slot]?.position)
       .filter((p): p is { lat: number; lon: number } => Boolean(p));
-  }, [coords, extras, hasContinuation, showReturn]);
+  }, [coords, extras]);
 
   const canRoute = routePoints.length >= 2;
 
@@ -202,21 +184,18 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
 
       <Card>
         <CardBody className="grid gap-4 sm:grid-cols-2">
-          <Field label={t.orderForm.type} required>
-            {(p) => (
-              <Select
-                {...p}
-                name="order_type"
-                required
-                value={orderType}
-                onChange={(e) => setOrderType(e.target.value as OrderType)}
-              >
-                <option value="TRAILER_SWAP">{t.orderType.TRAILER_SWAP}</option>
-                <option value="ROUND_TRIP">{t.orderType.ROUND_TRIP}</option>
-                <option value="ONE_WAY">{t.orderType.ONE_WAY}</option>
-              </Select>
-            )}
-          </Field>
+          {/*
+            * Тип рейса пока один. Кругорейс по форме — тот же перецеп
+            * (забрать прицеп, загрузиться, выгрузиться, отцепить), и
+            * разница выражается набором действий, а не пунктом списка.
+            */}
+          <input type="hidden" name="order_type" value="TRAILER_SWAP" />
+          <div>
+            <p className="label-micro">{t.orderForm.type}</p>
+            <p className="mt-1.5 text-[13px] font-semibold text-ink">
+              {t.orderType.TRAILER_SWAP}
+            </p>
+          </div>
 
           <Field label={t.orderForm.shipperRef} hint={t.orderForm.shipperRefHint}>
             {(p) => <InputMono {...p} name="shipper_ref" placeholder="BF-2026-0912" />}
@@ -228,13 +207,13 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
       <Card stripe="info">
         <CardBody>
           <SectionTitle>
-            {isSwap ? t.orderForm.trailerPickupSection : t.orderForm.pickupSection}
+            {t.orderForm.trailerPickupSection}
           </SectionTitle>
           <StopFields
             role="PICKUP"
             prefix="pickup"
-            defaultPlaceKind="PORT"
             showPlaceName
+            showTrailerState
             requireDate
             addressPlaceholder="Satamakatu 1, 10900 Hanko"
             placeNamePlaceholder="Hanko Port, Terminal 2"
@@ -243,158 +222,94 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
         </CardBody>
       </Card>
 
-      {/* ── Доп. точки ── */}
-      {extras.map((extra) => (
-        <Card key={extra.key} stripe="warn">
-          <CardBody>
-            <div className="mb-3 flex items-center justify-between">
-              <SectionTitle className="mb-0 border-0 pb-0">
-                {extra.role === 'EXTRA_LOAD' ? t.stopKind.EXTRA_LOAD : t.stopKind.EXTRA_UNLOAD}
-              </SectionTitle>
-              <Button
-                size="sm"
-                onClick={() => setExtras((list) => list.filter((e) => e.key !== extra.key))}
-              >
-                {t.orderForm.remove}
-              </Button>
-            </div>
-
-            <input type="hidden" name="extra_role" value={extra.role} />
-
-            <StopFields
-              role={extra.role}
-              prefix="extra"
-              repeated
-              requireCompany
-              onChosen={onChosen(`extra-${extra.key}`)}
-            />
-          </CardBody>
-        </Card>
-      ))}
-
-      {/* ── Работа: выгрузка или загрузка ── */}
+      {/* ── Действия рейса: выгрузки и загрузки, сколько нужно ── */}
       <Card stripe="live">
         <CardBody>
-          <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-            <SectionTitle className="mb-0 border-0 pb-0">
-              {t.orderForm.workSection}
-            </SectionTitle>
+          <SectionTitle>{t.orderForm.actionsSection}</SectionTitle>
+          <p className="-mt-1 mb-3 text-xs text-ink-faint">{t.orderForm.actionsHint}</p>
 
-            {/*
-              * Переключатель роли, а не два разных блока: место, время и
-              * контакт у выгрузки и загрузки одни и те же, отличается
-              * только то, что происходит с грузом.
-              */}
-            <div className="flex gap-1.5">
-              <Button
-                size="sm"
-                variant={workRole === 'DELIVERY' ? 'primary' : 'default'}
-                onClick={() => setWorkRole('DELIVERY')}
-              >
-                {t.stopKind.DELIVERY}
-              </Button>
-              <Button
-                size="sm"
-                variant={workRole === 'EXTRA_LOAD' ? 'primary' : 'default'}
-                onClick={() => setWorkRole('EXTRA_LOAD')}
-              >
-                {t.stopKind.EXTRA_LOAD}
-              </Button>
-            </div>
+          {extras.length === 0 && (
+            <p className="mb-3 rounded-control border border-warn/35 bg-warn/10 px-3 py-2 text-[13px] text-warn">
+              {t.orderForm.noActions}
+            </p>
+          )}
+
+          <div className="flex flex-col gap-4">
+            {extras.map((extra, index) => (
+              <div key={extra.key} className="rounded-control border border-line bg-sunken p-3">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <span className="label-micro">
+                    {index + 1} ·{' '}
+                    {extra.role === 'EXTRA_LOAD' ? t.stopKind.EXTRA_LOAD : t.stopKind.EXTRA_UNLOAD}
+                  </span>
+                  <Button
+                    size="sm"
+                    onClick={() => setExtras((list) => list.filter((e) => e.key !== extra.key))}
+                  >
+                    {t.orderForm.remove}
+                  </Button>
+                </div>
+
+                {/*
+                  * Роль каждого действия уезжает своим скрытым полем: точки
+                  * приходят на сервер массивами, и порядок в них — это и есть
+                  * порядок рейса.
+                  */}
+                <input type="hidden" name="extra_role" value={extra.role} />
+
+                <StopFields
+                  role={extra.role}
+                  prefix="extra"
+                  repeated
+                  requireCompany
+                  showContact
+                  onChosen={onChosen(`extra-${extra.key}`)}
+                />
+              </div>
+            ))}
           </div>
 
-          <input type="hidden" name="work_role" value={workRole} />
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Button
+              size="sm"
+              onClick={() =>
+                setExtras((list) => [...list, { key: Date.now(), role: 'EXTRA_UNLOAD' }])
+              }
+            >
+              {t.orderForm.addUnload}
+            </Button>
+            <Button
+              size="sm"
+              onClick={() =>
+                setExtras((list) => [...list, { key: Date.now(), role: 'EXTRA_LOAD' }])
+              }
+            >
+              {t.orderForm.addLoad}
+            </Button>
+          </div>
+        </CardBody>
+      </Card>
+
+      {/* ── Отцепка прицепа: окончание перецепа, убрать нельзя ── */}
+      <Card stripe="info">
+        <CardBody>
+          <SectionTitle>{t.orderForm.dropSection}</SectionTitle>
+
+          <input type="hidden" name="has_return" value="on" />
 
           <StopFields
-            role={workRole}
-            prefix="delivery"
-            requireCompany
-            showContact
-            requireDate
-            addressPlaceholder="Merituulentie 424, 48310 Kotka"
-            onChosen={onChosen('delivery')}
+            role="TRAILER_RETURN"
+            prefix="ret"
+            showPlaceName
+            showTrailerState
+            addressPlaceholder="Satamakatu 1, 10900 Hanko"
+            placeNamePlaceholder="Hanko Port, Terminal 2"
+            onChosen={onChosen('ret')}
           />
         </CardBody>
       </Card>
 
-      {/* ── Продолжение рейса ── */}
-      {hasContinuation && (
-        <Card stripe="info">
-          <CardBody>
-            <div className="mb-3 flex items-center justify-between">
-              <SectionTitle className="mb-0 border-0 pb-0">{t.stopKind.CONTINUATION}</SectionTitle>
-              <Button size="sm" onClick={() => setHasContinuation(false)}>
-                {t.orderForm.remove}
-              </Button>
-            </div>
 
-            <input type="hidden" name="has_continuation" value="on" />
-
-            <StopFields
-              role="CONTINUATION"
-              prefix="cont"
-              requireCompany
-              onChosen={onChosen('cont')}
-            />
-          </CardBody>
-        </Card>
-      )}
-
-      {/* ── Возврат прицепа ── */}
-      {showReturn && (
-        <Card stripe="info">
-          <CardBody>
-            <div className="mb-3 flex items-center justify-between">
-              <SectionTitle className="mb-0 border-0 pb-0">
-                {isSwap ? t.orderForm.dropSection : t.stopKind.TRAILER_RETURN}
-              </SectionTitle>
-              {/* У перецепа отцепка — окончание рейса, убрать её нельзя. */}
-              {!isSwap && (
-                <Button size="sm" onClick={() => setHasReturn(false)}>
-                  {t.orderForm.remove}
-                </Button>
-              )}
-            </div>
-
-            <input type="hidden" name="has_return" value="on" />
-
-            <StopFields
-              role="TRAILER_RETURN"
-              prefix="ret"
-              defaultPlaceKind="PORT"
-              showPlaceName
-              showReturnLoaded
-              placeNamePlaceholder="Hanko Port, Terminal 2"
-              onChosen={onChosen('ret')}
-            />
-          </CardBody>
-        </Card>
-      )}
-
-      <div className="flex flex-wrap gap-2">
-        <Button
-          size="sm"
-          onClick={() => setExtras((list) => [...list, { key: Date.now(), role: 'EXTRA_LOAD' }])}
-        >
-          {t.orderForm.addExtraLoad}
-        </Button>
-        <Button
-          size="sm"
-          onClick={() => setExtras((list) => [...list, { key: Date.now(), role: 'EXTRA_UNLOAD' }])}
-        >
-          {t.orderForm.addExtraUnload}
-        </Button>
-        {!hasContinuation && (
-          <Button size="sm" onClick={() => setHasContinuation(true)}>
-            {t.orderForm.addContinuation}
-          </Button>
-        )}
-        {!showReturn && (
-          <Button size="sm" onClick={() => setHasReturn(true)}>
-            {t.orderForm.addTrailerReturn}
-          </Button>
-        )}
-      </div>
 
       {/* ── Груз и оплата ── */}
       <Card>

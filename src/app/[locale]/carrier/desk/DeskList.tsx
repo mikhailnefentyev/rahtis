@@ -89,7 +89,7 @@ export function DeskList({ orders, vehicles }: { orders: DeskOrder[]; vehicles: 
                   </div>
 
                   <p className="mt-2 font-mono text-sm tracking-tight text-accent">
-                    {order.pickup_city} → {order.delivery_city ?? '—'}
+                    {order.pickup_city} → {order.finish_city ?? '—'}
                   </p>
 
                   <p className="mt-1.5 text-[13px] text-ink-muted">

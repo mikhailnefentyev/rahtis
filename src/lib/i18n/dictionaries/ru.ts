@@ -248,6 +248,14 @@ export const ru = {
     returnWhere: 'Куда возвращать',
     returnLoaded: 'С грузом',
     returnEmpty: 'Без груза',
+    trailerState: 'Прицеп',
+    trailerLoaded: 'С грузом',
+    trailerEmpty: 'Пустой',
+    addUnload: '+ Выгрузка',
+    addLoad: '+ Загрузка',
+    actionsSection: 'Что делаем в рейсе',
+    actionsHint: 'Выгрузок и загрузок может быть сколько угодно, в любом порядке',
+    noActions: 'Добавьте хотя бы одно действие — выгрузку или загрузку',
 
     /* Поля точки маршрута под грузовую специфику. */
     bookingRef: 'Номер брони REF',

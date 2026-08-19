@@ -1,19 +1,10 @@
 'use client';
 
-import { useState } from 'react';
 import { AddressInput, type ChosenAddress } from '@/components/domain/AddressInput';
 import { Field, Input, InputMono, Select, Textarea } from '@/components/ui';
-import {
-  hasBookingRef,
-  hasCargo,
-  hasConsignee,
-  hasExternalRef,
-  needsPlaceKind,
-} from '@/lib/orders/stopFields';
+import { hasCargo, hasConsignee, hasExternalRef } from '@/lib/orders/stopFields';
 import { useI18n } from '@/lib/i18n/provider';
-import type { PlaceKind, StopRole } from '@/types/db';
-
-const PLACE_KINDS: PlaceKind[] = ['PORT', 'TERMINAL', 'PARKING', 'ADDRESS'];
+import type { StopRole } from '@/types/db';
 
 /**
  * Поля одной точки маршрута.
@@ -33,11 +24,10 @@ export function StopFields({
   role,
   prefix,
   repeated = false,
-  defaultPlaceKind = 'ADDRESS',
   requireCompany = false,
   showContact = false,
   showPlaceName = false,
-  showReturnLoaded = false,
+  showTrailerState = false,
   requireDate = false,
   addressPlaceholder,
   placeNamePlaceholder,
@@ -47,11 +37,11 @@ export function StopFields({
   /** Имена полей: `${prefix}_address` и так далее. */
   prefix: string;
   repeated?: boolean;
-  defaultPlaceKind?: PlaceKind;
   requireCompany?: boolean;
   showContact?: boolean;
   showPlaceName?: boolean;
-  showReturnLoaded?: boolean;
+  /** Прицеп с грузом или пустой — спрашивается на заборе и на отцепке. */
+  showTrailerState?: boolean;
   requireDate?: boolean;
   addressPlaceholder?: string;
   placeNamePlaceholder?: string;
@@ -60,11 +50,6 @@ export function StopFields({
 }) {
   const { t } = useI18n();
 
-  /*
-   * Тип места держится в состоянии: от него зависит, спрашивать ли бронь.
-   * Это единственное поле точки, влияющее на состав остальных.
-   */
-  const [placeKind, setPlaceKind] = useState<PlaceKind>(defaultPlaceKind);
 
   const name = (field: string) => `${prefix}_${field}`;
 
@@ -75,28 +60,9 @@ export function StopFields({
   const cargo = hasCargo(role);
   const consignee = hasConsignee(role);
   const externalRef = hasExternalRef(role);
-  const booking = hasBookingRef(placeKind);
 
   return (
     <div className="grid gap-4 sm:grid-cols-2">
-      <Field label={t.orderForm.placeKind} required={needsPlaceKind(role)}>
-        {(p) => (
-          <Select
-            {...p}
-            name={name('place_kind')}
-            required={needsPlaceKind(role)}
-            value={placeKind}
-            onChange={(e) => setPlaceKind(e.target.value as PlaceKind)}
-          >
-            {PLACE_KINDS.map((kind) => (
-              <option key={kind} value={kind}>
-                {t.placeKind[kind]}
-              </option>
-            ))}
-          </Select>
-        )}
-      </Field>
-
       {showPlaceName ? (
         <Field label={t.orderForm.placeName}>
           {(p) => <Input {...p} name={name('place_name')} placeholder={placeNamePlaceholder} />}
@@ -154,17 +120,19 @@ export function StopFields({
        * Бронь. Моноширинным и отдельной строкой: её диктуют по телефону
        * на воротах порта, и I/1 или O/0 должны различаться на глаз.
        */}
-      {booking ? (
-        <Field
-          label={t.orderForm.bookingRef}
-          hint={t.orderForm.bookingRefHint}
-          className="sm:col-span-2"
-        >
-          {(p) => <InputMono {...p} name={name('booking_ref')} placeholder="BK-4471902" />}
-        </Field>
-      ) : (
-        filler('booking_ref')
-      )}
+      {/*
+        * Бронь спрашивается везде, а не только у портов и терминалов.
+        * Где её требуют на воротах, знает заказчик, а не форма: список
+        * «порт или терминал» всё равно не покрывал бы склады с пропускной
+        * системой и частные площадки.
+        */}
+      <Field
+        label={t.orderForm.bookingRef}
+        hint={t.orderForm.bookingRefHint}
+        className="sm:col-span-2"
+      >
+        {(p) => <InputMono {...p} name={name('booking_ref')} placeholder="BK-4471902" />}
+      </Field>
 
       {cargo ? (
         <>
@@ -210,11 +178,15 @@ export function StopFields({
         filler('ref')
       )}
 
-      {showReturnLoaded && (
-        <label className="flex cursor-pointer items-center gap-2.5 sm:col-span-2">
-          <input type="checkbox" name={name('loaded')} className="size-4 accent-accent" />
-          <span className="text-[13px] text-ink">{t.orderForm.returnLoaded}</span>
-        </label>
+      {showTrailerState && (
+        <Field label={t.orderForm.trailerState} required>
+          {(p) => (
+            <Select {...p} name={name('trailer_loaded')} required defaultValue="false">
+              <option value="false">{t.orderForm.trailerEmpty}</option>
+              <option value="true">{t.orderForm.trailerLoaded}</option>
+            </Select>
+          )}
+        </Field>
       )}
 
       {/*

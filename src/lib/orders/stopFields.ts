@@ -1,4 +1,4 @@
-import type { PlaceKind, StopRole } from '@/types/db';
+import type { StopRole } from '@/types/db';
 
 /**
  * Какое поле точки применимо к какой роли.
@@ -10,14 +10,16 @@ import type { PlaceKind, StopRole } from '@/types/db';
  *
  *   поле             PICKUP  EXTRA_LOAD  EXTRA_UNLOAD  DELIVERY  CONT  RETURN
  *   note                ○         ○           ○           ○       ○      ○
- *   booking_ref         ○*        ○*          ○*          ○*      ○*     ○*
+ *   booking_ref         ○         ○           ○           ○       ○      ○
  *   cargo_weight_kg     ○         ○           —           —       ○      —
  *   consignee           —         ○           —           —       ○      —
  *   seal_required       ○         ○           —           —       ○      —
  *   external_ref        —         ○           —           —       ○      —
- *   place_kind          ●         ○           ○           ○       ○      ●
+ *   trailer_loaded      ●         —           —           —       —      ●
  *
- *   * только когда place_kind = PORT или TERMINAL
+ * Тип места из формы убран: подсказка адреса и так возвращает и порты, и
+ * терминалы, и обычные склады. Бронь спрашивается везде — где её требуют
+ * на воротах, знает заказчик, а не схема.
  */
 
 /** Роли, на которых груз берут на борт. */
@@ -43,19 +45,11 @@ export const hasExternalRef = (role: StopRole): boolean =>
   role === 'EXTRA_LOAD' || role === 'CONTINUATION';
 
 /**
- * Бронь привязана к типу места, а не к роли и не к списку портов:
- * иначе Vuosaari и Turku пришлось бы дописывать в код вслед за Kotka,
- * Rauma и Hanko. Ворота и оператор терминала есть у порта и терминала —
- * там бронь и спрашивают.
+ * Состояние прицепа — с грузом или пустой — осмысленно только на концах
+ * рейса: там, где его цепляют и где оставляют. Между ними прицеп уже
+ * прицеплен, и вопрос не стоит.
  */
-export const hasBookingRef = (placeKind: PlaceKind | null | undefined): boolean =>
-  placeKind === 'PORT' || placeKind === 'TERMINAL';
-
-/**
- * Тип места обязателен там, где от него зависит порядок действий
- * водителя: на заборе прицепа и на его возврате.
- */
-export const needsPlaceKind = (role: StopRole): boolean =>
+export const hasTrailerState = (role: StopRole): boolean =>
   role === 'PICKUP' || role === 'TRAILER_RETURN';
 
 /** Верхняя граница — финская: 76 тонн для сцепок HCT, по ЕС предел 40. */

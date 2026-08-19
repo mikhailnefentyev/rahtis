@@ -332,12 +332,12 @@ export type Database = {
           order_id: string
           place_kind: Database["public"]["Enums"]["place_kind"] | null
           place_name: string | null
-          returns_loaded: boolean | null
           role: Database["public"]["Enums"]["stop_role"]
           scheduled_date: string | null
           scheduled_time: string | null
           seal_required: boolean | null
           sequence: number
+          trailer_loaded: boolean | null
           updated_at: string
         }
         Insert: {
@@ -361,12 +361,12 @@ export type Database = {
           order_id: string
           place_kind?: Database["public"]["Enums"]["place_kind"] | null
           place_name?: string | null
-          returns_loaded?: boolean | null
           role: Database["public"]["Enums"]["stop_role"]
           scheduled_date?: string | null
           scheduled_time?: string | null
           seal_required?: boolean | null
           sequence: number
+          trailer_loaded?: boolean | null
           updated_at?: string
         }
         Update: {
@@ -390,12 +390,12 @@ export type Database = {
           order_id?: string
           place_kind?: Database["public"]["Enums"]["place_kind"] | null
           place_name?: string | null
-          returns_loaded?: boolean | null
           role?: Database["public"]["Enums"]["stop_role"]
           scheduled_date?: string | null
           scheduled_time?: string | null
           seal_required?: boolean | null
           sequence?: number
+          trailer_loaded?: boolean | null
           updated_at?: string
         }
         Relationships: [
@@ -906,8 +906,8 @@ export type Database = {
         Args: { p_limit?: number; p_region?: string }
         Returns: {
           comment: string
-          delivery_city: string
           distance_km: number
+          finish_city: string
           id: string
           offers_count: number
           order_type: Database["public"]["Enums"]["order_type"]

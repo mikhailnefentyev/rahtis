@@ -36,7 +36,8 @@ type StopInput = {
   scheduled_date?: string;
   scheduled_time?: string;
   external_ref?: string;
-  returns_loaded?: boolean;
+  /** Прицеп с грузом или пустой — только на заборе и на отцепке. */
+  trailer_loaded?: boolean;
   note?: string;
   booking_ref?: string;
   cargo_weight_kg?: string;
@@ -146,9 +147,16 @@ function collectStops(formData: FormData): StopInput[] {
     (field) =>
       str(formData, `${prefix}_${field}`);
 
-  stops.push(readStop(single('pickup'), 'PICKUP'));
+  stops.push({
+    ...readStop(single('pickup'), 'PICKUP'),
+    trailer_loaded: str(formData, 'pickup_trailer_loaded') === 'true',
+  });
 
-  /* Доп.точки идут между забором и выгрузкой — так их и читают в кабине. */
+  /*
+   * Действия рейса — выгрузки и загрузки, сколько угодно и в любом
+   * порядке. Порядок в массиве и есть порядок рейса: перецеп это
+   * «забрали прицеп → сколько-то действий → отцепили».
+   */
   const extraRoles = formData.getAll('extra_role').map(String);
   const columns = new Map<string, string[]>();
   const atIndex =
@@ -163,23 +171,10 @@ function collectStops(formData: FormData): StopInput[] {
     stops.push(readStop(atIndex(index), role === 'EXTRA_UNLOAD' ? 'EXTRA_UNLOAD' : 'EXTRA_LOAD'));
   });
 
-  /*
-   * Середина рейса — выгрузка или загрузка. Форма присылает, что именно:
-   * у перецепа «забрали пустой прицеп → загрузились → отвезли в порт»
-   * выгрузки нет вовсе, и требовать её значило бы запретить половину
-   * реальных рейсов.
-   */
-  const workRole = str(formData, 'work_role') === 'EXTRA_LOAD' ? 'EXTRA_LOAD' : 'DELIVERY';
-  stops.push(readStop(single('delivery'), workRole));
-
-  if (formData.get('has_continuation') === 'on') {
-    stops.push(readStop(single('cont'), 'CONTINUATION'));
-  }
-
   if (formData.get('has_return') === 'on') {
     stops.push({
       ...readStop(single('ret'), 'TRAILER_RETURN'),
-      returns_loaded: formData.get('ret_loaded') === 'on',
+      trailer_loaded: str(formData, 'ret_trailer_loaded') === 'true',
     });
   }
 

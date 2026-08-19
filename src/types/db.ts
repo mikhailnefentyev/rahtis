@@ -84,7 +84,7 @@ export type DeskStop = {
   scheduled_date: string | null;
   scheduled_time: string | null;
   external_ref: string | null;
-  returns_loaded: boolean | null;
+  trailer_loaded: boolean | null;
   note: string | null;
   /*
    * Бронь, вес и пломба нужны перевозчику до взятия заказа: по ним он

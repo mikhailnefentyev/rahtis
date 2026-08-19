@@ -28,12 +28,15 @@ export function RouteStops({ stops }: { stops: AnyStop[] }) {
         ? `${t.stopKind.CONTINUATION} · ${stop.external_ref}`
         : t.stopKind[stop.role as StopRole];
 
+  /*
+   * На концах рейса к месту добавляется состояние прицепа: его цепляют и
+   * оставляют как с грузом, так и пустым, и водителю это надо знать до
+   * приезда — от этого зависит, что он делает на площадке.
+   */
   const primary = (stop: AnyStop) => {
     const base = stop.place_name ?? stop.company_name ?? stop.address;
-    if (stop.role === 'TRAILER_RETURN') {
-      return `${base} — ${stop.returns_loaded ? t.orderForm.returnLoaded : t.orderForm.returnEmpty}`;
-    }
-    return base;
+    if (stop.trailer_loaded === null || stop.trailer_loaded === undefined) return base;
+    return `${base} — ${stop.trailer_loaded ? t.orderForm.trailerLoaded : t.orderForm.trailerEmpty}`;
   };
 
   const secondary = (stop: AnyStop) => {
