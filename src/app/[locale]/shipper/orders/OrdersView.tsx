@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { OrderRouteMap } from '@/components/domain/RouteMap';
+import { TripStage } from '@/components/domain/TripProgress';
 import { RouteStops } from '@/components/domain/RouteStops';
 import { Badge, Button, Card, CardBody, CardDivider, EmptyState, Mono } from '@/components/ui';
 import { orderStatusTone } from '@/components/ui/tone';
@@ -121,6 +122,14 @@ export function OrdersView({
                   {/* Отклики требуют решения по таймеру — они выше маршрута. */}
                   {(order.status === 'REQUESTED' || order.status === 'AWAIT_DRIVER') && (
                     <OffersPanel order={order} offers={offers} />
+                  )}
+
+                  {/*
+                    * Пока рейс идёт, заказчик читает тот же этап по тем же
+                    * точкам, что и перевозчик (ТЗ §7, единый статус).
+                    */}
+                  {order.status === 'IN_PROGRESS' && stops.length > 0 && (
+                    <TripStage stops={stops} className="mt-3" />
                   )}
 
                   {/* Рейс идёт — выбирать не из чего, важно кто везёт. */}

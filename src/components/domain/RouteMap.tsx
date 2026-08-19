@@ -28,12 +28,12 @@ export type MapStop = {
   lon: number | null;
   label: string;
   /**
-   * Точка пройдена. Заполнится на Этапе 6, когда водитель начнёт
-   * отмечать этапы рейса; сейчас всегда false.
+   * Точка пройдена — красится зелёным.
    *
-   * Это отметка по данным этапов, а не по координатам машины: живого GPS
-   * здесь нет и не предполагается. Когда он появится, он станет ещё одним
-   * слоем поверх той же карты, а не заменой этому.
+   * Это отметка по данным этапов (order_stops.completed_at), а не по
+   * координатам машины: живого GPS здесь нет и не предполагается. Когда
+   * он появится, он станет ещё одним слоем поверх той же карты, а не
+   * заменой этому.
    */
   passed?: boolean;
 };
@@ -298,6 +298,8 @@ export function OrderRouteMap({
     address: string;
     place_name?: string | null;
     company_name?: string | null;
+    /* Пройденные точки красятся иначе — отметка по данным этапов. */
+    completed_at?: string | null;
   }[];
   className?: string;
 }) {
@@ -313,6 +315,7 @@ export function OrderRouteMap({
         role: s.role,
         lat: s.lat,
         lon: s.lon,
+        passed: Boolean(s.completed_at),
         /* В подсказке маркера — роль и место: номер на маркере без этого нем. */
         label: `${t.stopKind[s.role]}: ${s.place_name ?? s.company_name ?? s.address}`,
       })),

@@ -317,10 +317,12 @@ export type Database = {
           cargo_weight_kg: number | null
           city: string
           company_name: string | null
+          completed_at: string | null
           consignee: string | null
           contact_name: string | null
           contact_phone: string | null
           created_at: string
+          damage_note: string | null
           external_ref: string | null
           geocode_score: number | null
           id: string
@@ -346,10 +348,12 @@ export type Database = {
           cargo_weight_kg?: number | null
           city: string
           company_name?: string | null
+          completed_at?: string | null
           consignee?: string | null
           contact_name?: string | null
           contact_phone?: string | null
           created_at?: string
+          damage_note?: string | null
           external_ref?: string | null
           geocode_score?: number | null
           id?: string
@@ -375,10 +379,12 @@ export type Database = {
           cargo_weight_kg?: number | null
           city?: string
           company_name?: string | null
+          completed_at?: string | null
           consignee?: string | null
           contact_name?: string | null
           contact_phone?: string | null
           created_at?: string
+          damage_note?: string | null
           external_ref?: string | null
           geocode_score?: number | null
           id?: string
@@ -797,6 +803,46 @@ export type Database = {
           license_valid_until: string
         }[]
       }
+      complete_stop: {
+        Args: { p_damage_note?: string; p_stop_id: string }
+        Returns: {
+          address: string
+          booking_ref: string | null
+          cargo_weight_kg: number | null
+          city: string
+          company_name: string | null
+          completed_at: string | null
+          consignee: string | null
+          contact_name: string | null
+          contact_phone: string | null
+          created_at: string
+          damage_note: string | null
+          external_ref: string | null
+          geocode_score: number | null
+          id: string
+          lat: number | null
+          leg_distance_m: number | null
+          leg_duration_s: number | null
+          lon: number | null
+          note: string | null
+          order_id: string
+          place_kind: Database["public"]["Enums"]["place_kind"] | null
+          place_name: string | null
+          role: Database["public"]["Enums"]["stop_role"]
+          scheduled_date: string | null
+          scheduled_time: string | null
+          seal_required: boolean | null
+          sequence: number
+          trailer_loaded: boolean | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "order_stops"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       confirm_order: {
         Args: { p_order_id: string }
         Returns: {
@@ -1087,6 +1133,46 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      uncomplete_stop: {
+        Args: { p_stop_id: string }
+        Returns: {
+          address: string
+          booking_ref: string | null
+          cargo_weight_kg: number | null
+          city: string
+          company_name: string | null
+          completed_at: string | null
+          consignee: string | null
+          contact_name: string | null
+          contact_phone: string | null
+          created_at: string
+          damage_note: string | null
+          external_ref: string | null
+          geocode_score: number | null
+          id: string
+          lat: number | null
+          leg_distance_m: number | null
+          leg_duration_s: number | null
+          lon: number | null
+          note: string | null
+          order_id: string
+          place_kind: Database["public"]["Enums"]["place_kind"] | null
+          place_name: string | null
+          role: Database["public"]["Enums"]["stop_role"]
+          scheduled_date: string | null
+          scheduled_time: string | null
+          seal_required: boolean | null
+          sequence: number
+          trailer_loaded: boolean | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "order_stops"
           isOneToOne: true
           isSetofReturn: false
         }

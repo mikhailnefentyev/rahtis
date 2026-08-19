@@ -1,6 +1,7 @@
 'use client';
 
 import { OrderRouteMap } from '@/components/domain/RouteMap';
+import { TripStage } from '@/components/domain/TripProgress';
 import { RouteStops } from '@/components/domain/RouteStops';
 import {
   Badge,
@@ -15,6 +16,7 @@ import {
 import { orderStatusTone } from '@/components/ui/tone';
 import { cancelOrderAction, confirmOrderAction } from '@/lib/orders/matching';
 import { useI18n } from '@/lib/i18n/provider';
+import { TripPanel } from './TripPanel';
 import type { Database } from '@/types/database';
 import type { OrderStop } from '@/types/db';
 
@@ -106,6 +108,11 @@ export function Assignments({ assignments }: { assignments: Assignment[] }) {
                   </div>
                 </div>
 
+                {/* Этап рейса — сразу под шапкой: это главное, что здесь ищут. */}
+                {order.status === 'IN_PROGRESS' && stops.length > 0 && (
+                  <TripStage stops={stops} className="mt-3" />
+                )}
+
                 {stops.length > 0 && (
                   <>
                     <CardDivider className="my-4" />
@@ -117,6 +124,8 @@ export function Assignments({ assignments }: { assignments: Assignment[] }) {
                       stops={stops}
                       className="mt-4"
                     />
+                    {order.status === 'IN_PROGRESS' && <TripPanel stops={stops} />}
+
                     <p className="mt-3 text-xs text-ink-dim">{t.matching.contactsNow}</p>
                   </>
                 )}

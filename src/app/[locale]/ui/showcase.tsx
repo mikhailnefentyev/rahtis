@@ -211,7 +211,7 @@ export function UiKitShowcase({ deadlines }: { deadlines: DemoDeadlines }) {
               ))}
             </Labelled>
             <Labelled label="Этап рейса">
-              {Object.values(t.tripStep).map((label) => (
+              {Object.values(t.tripStage).map((label) => (
                 <Badge key={label} tone="live">
                   {label}
                 </Badge>
@@ -313,7 +313,7 @@ export function UiKitShowcase({ deadlines }: { deadlines: DemoDeadlines }) {
                     <h3 className="text-[15px] font-semibold tracking-tight">
                       {t.orderType.TRAILER_SWAP}
                     </h3>
-                    <Badge tone="live">{t.tripStep.LOADED}</Badge>
+                    <Badge tone="live">{t.tripStage.loaded}</Badge>
                     <Mono className="text-xs text-ink-dim">BF-2026-0912</Mono>
                   </div>
                   <p className="mt-2 font-mono text-sm tracking-tight text-accent">
