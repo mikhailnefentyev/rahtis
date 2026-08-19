@@ -3,7 +3,6 @@
 import { useActionState, useEffect, useState } from 'react';
 import { Button, Card, CardBody, Field, Input, InputMono, Select } from '@/components/ui';
 import { saveVehicleAction, type VehicleState } from '@/lib/fleet/actions';
-import { REGIONS } from '@/lib/config';
 import { useI18n } from '@/lib/i18n/provider';
 import { DRIVER_LANGUAGES, type Vehicle } from '@/types/db';
 
@@ -117,15 +116,23 @@ export function VehicleForm({
             )}
           </Field>
 
+          {/*
+            * База — обычное поле, а не список.
+            *
+            * Список из шести городов запуска не давал перевозчику из Раумы
+            * или Оулу указать свою базу вовсе, хотя стол он видит по всей
+            * стране. Регионы стола и так считаются по фактическим заказам
+            * (desk_regions), а не по этому списку.
+            */}
           <Field label={t.vehicle.base} required>
             {(p) => (
-              <Select {...p} name="base_city" required defaultValue={vehicle?.base_city ?? REGIONS[0]}>
-                {REGIONS.map((city) => (
-                  <option key={city} value={city}>
-                    {city}
-                  </option>
-                ))}
-              </Select>
+              <Input
+                {...p}
+                name="base_city"
+                required
+                defaultValue={vehicle?.base_city ?? ''}
+                placeholder="Helsinki"
+              />
             )}
           </Field>
 

@@ -220,14 +220,10 @@ export const ru = {
     shipperRef: 'Ваш номер заказа',
     shipperRefHint: 'Необязательно. Номер платформы присваивается автоматически',
 
-    pickupSection: 'Откуда забираем',
     trailerPickupSection: 'Где забираем прицеп',
-    deliverySection: 'Где выгрузка',
-    workSection: 'Что делаем с грузом',
     dropSection: 'Где отцепляем прицеп',
     cargoSection: 'Груз и оплата',
 
-    placeKind: 'Тип места',
     placeName: 'Название места',
     address: 'Адрес',
     addressHint: 'Улица, дом, индекс, город. Выберите из подсказки — город и пробег заполнятся сами',
@@ -238,16 +234,8 @@ export const ru = {
     contact: 'Контакт',
     phone: 'Телефон',
 
-    addExtraLoad: '+ Доп. загрузка',
-    addExtraUnload: '+ Доп. выгрузка',
-    addContinuation: '+ Продолжение рейса',
-    addTrailerReturn: '+ Возврат прицепа',
     remove: 'Убрать',
 
-    continuationRef: 'Номер заказа продолжения',
-    returnWhere: 'Куда возвращать',
-    returnLoaded: 'С грузом',
-    returnEmpty: 'Без груза',
     trailerState: 'Прицеп',
     trailerLoaded: 'С грузом',
     trailerEmpty: 'Пустой',

@@ -20,12 +20,24 @@ export type WaypointKind =
  * (ТЗ §8), и структура данных должна это позволять без переделки.
  */
 const kindStyle: Record<WaypointKind, { glyph: string; className: string }> = {
+  /*
+   * Концы рейса — где прицеп взяли и где оставили — одного цвета.
+   * Перецеп это «забрали прицеп → поработали с грузом → отцепили», и
+   * форма рейса должна читаться по левому краю списка: две бирюзовые
+   * метки обрамляют янтарные действия с грузом. Раньше отцепка была
+   * серой и терялась, хотя это ключевой момент рейса: без неё водитель
+   * не знает, где расстаётся с железом.
+   */
   PICKUP: { glyph: '▲', className: 'text-accent border-accent/40 bg-accent/10' },
-  DELIVERY: { glyph: '▼', className: 'text-live border-live/40 bg-live/10' },
+  TRAILER_RETURN: { glyph: '↩', className: 'text-accent border-accent/40 bg-accent/10' },
+
+  /* Действия с грузом: пришёл или ушёл. */
   EXTRA_LOAD: { glyph: '+', className: 'text-warn border-warn/40 bg-warn/10' },
   EXTRA_UNLOAD: { glyph: '−', className: 'text-warn border-warn/40 bg-warn/10' },
+
+  /* Роли прежней модели: живут в заказах, созданных до списка действий. */
+  DELIVERY: { glyph: '▼', className: 'text-live border-live/40 bg-live/10' },
   CONTINUATION: { glyph: '»', className: 'text-accent border-accent/40 bg-accent/10' },
-  TRAILER_RETURN: { glyph: '↩', className: 'text-ink-faint border-line-strong bg-raised' },
 };
 
 export function Waypoint({
