@@ -64,7 +64,9 @@ export async function CompletedCabinet({
         )}
       </div>
 
-      <p className="mt-2 mb-6 max-w-xl text-[13px] leading-relaxed text-ink-muted">{subtitle}</p>
+      <p className="mt-2 mb-6 max-w-xl text-[13px] leading-relaxed text-ink-muted">
+        {subtitle} {t.money.calcNote}
+      </p>
 
       <CompletedList orders={orders ?? []} totals={totals ?? []} />
     </main>

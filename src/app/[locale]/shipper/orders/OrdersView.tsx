@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { OrderAmendments } from '@/components/domain/OrderAmendments';
 import { OrderRouteMap } from '@/components/domain/RouteMap';
-import { DocumentList } from '@/components/domain/TripDocuments';
 import { TripStage } from '@/components/domain/TripProgress';
 import { RouteStops } from '@/components/domain/RouteStops';
 import { Badge, Button, Card, CardBody, CardDivider, EmptyState, Mono, Plate } from '@/components/ui';
@@ -14,7 +13,6 @@ import type {
   OrderStop,
   ShipperOffer,
   ShipperOrder,
-  TripDocument,
 } from '@/types/db';
 import { AmendPanel } from './AmendPanel';
 import { AssignedCarrier, OffersPanel } from './OffersPanel';
@@ -23,13 +21,11 @@ export function OrdersView({
   orders,
   stopsByOrder,
   offersByOrder,
-  documentsByOrder,
   amendmentsByOrder,
 }: {
   orders: ShipperOrder[];
   stopsByOrder: Record<string, OrderStop[]>;
   offersByOrder: Record<string, ShipperOffer[]>;
-  documentsByOrder: Record<string, TripDocument[]>;
   amendmentsByOrder: Record<string, OrderAmendment[]>;
 }) {
   const { t, m, f } = useI18n();
@@ -117,6 +113,7 @@ export function OrdersView({
                         {order.trailer ? `${order.trailer} · ` : ''}
                         {m('order.distance', { km: order.distance_km ?? 0 })} ·{' '}
                         <span className="font-semibold text-ink">{f.eur(order.rate_cents ?? 0)}</span>{' '}
+                        <span className="text-ink-dim">{t.money.addVat}</span>{' '}
                         {order.distance_km && order.rate_cents ? (
                           <span className="text-ink-dim">
                             · {m('order.ratePerKm', {
@@ -183,17 +180,6 @@ export function OrdersView({
                         className="mt-4"
                       />
                     </>
-                  )}
-
-                  {/*
-                    * Документы выполненного рейса (ТЗ §9): заказчик
-                    * получает их готовыми, вместе с отметкой «выполнен».
-                    */}
-                  {order.status === 'DONE' && (documentsByOrder[order.id] ?? []).length > 0 && (
-                    <div className="mt-4 border-t border-line pt-4">
-                      <p className="label-micro mb-2.5">{t.trip.documents}</p>
-                      <DocumentList documents={documentsByOrder[order.id] ?? []} />
-                    </div>
                   )}
 
                   {order.comment && (

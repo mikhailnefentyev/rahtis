@@ -104,6 +104,9 @@ export function CompletedList({
                     </span>
                   </span>
                 )}
+
+                {/* Все числа выше нетто — налог добавляется в счёте. */}
+                <span className="text-ink-dim">{t.money.addVat}</span>
               </div>
             </div>
 

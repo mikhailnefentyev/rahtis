@@ -98,6 +98,7 @@ export function DeskList({ orders, vehicles }: { orders: DeskOrder[]; vehicles: 
                     {order.trailer ? `${order.trailer} · ` : ''}
                     {m('order.distance', { km: order.distance_km ?? 0 })} ·{' '}
                     <span className="font-semibold text-ink">{f.eur(order.rate_cents ?? 0)}</span>{' '}
+                    <span className="text-ink-dim">{t.money.addVat}</span>{' '}
                     {order.distance_km && order.rate_cents ? (
                       <span className="text-ink-dim">
                         · {m('order.ratePerKm', {

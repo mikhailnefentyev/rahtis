@@ -6,7 +6,7 @@ import { requireRole } from '@/lib/auth/guard';
 import { cabinetPath } from '@/lib/auth/paths';
 import { getI18n, isLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
-import type { OrderAmendment, OrderStop, ShipperOffer, TripDocument } from '@/types/db';
+import type { OrderAmendment, OrderStop, ShipperOffer } from '@/types/db';
 import { OrdersView } from './OrdersView';
 
 export async function generateMetadata({
@@ -40,6 +40,13 @@ export default async function OrdersPage({ params }: { params: Promise<{ locale:
       'id,ref,shipper_ref,order_type,trailer,trailer_plate,distance_km,rate_cents,comment,status,published_at,deadline_at,created_at,distance_source,distance_auto_km,route_geometry,route_bounds',
     )
     .eq('shipper_company_id', company.id)
+    /*
+     * Выполненные сюда не попадают: у них своя вкладка, где лежат
+     * документы, суммы и оценка. Список заказов — это то, что ещё в
+     * работе, и держать в нём готовое значит удлинять его ровно на
+     * величину оборота компании.
+     */
+    .neq('status', 'DONE')
     .order('created_at', { ascending: false });
 
   /* Точки читаются одним запросом на все заказы, а не по одному на карточку. */
@@ -82,24 +89,6 @@ export default async function OrdersPage({ params }: { params: Promise<{ locale:
     for (const offer of (offers ?? []) as ShipperOffer[]) {
       (offersByOrder[offer.order_id] ??= []).push(offer);
     }
-  }
-
-  /*
-   * Документы рейса. Заказчику они приходят готовыми — по ТЗ §9 после
-   * закрытия рейса «документы приложены». RLS отдаёт только документы
-   * его заказов: политика проверяет, что он сторона этого рейса.
-   */
-  const { data: tripDocs } = orderIds.length
-    ? await supabase
-        .from('order_documents')
-        .select('*')
-        .in('order_id', orderIds)
-        .order('created_at')
-    : { data: [] as TripDocument[] };
-
-  const documentsByOrder: Record<string, TripDocument[]> = {};
-  for (const doc of tripDocs ?? []) {
-    (documentsByOrder[doc.order_id] ??= []).push(doc);
   }
 
   /*
@@ -155,7 +144,6 @@ export default async function OrdersPage({ params }: { params: Promise<{ locale:
           orders={orders ?? []}
           stopsByOrder={stopsByOrder}
           offersByOrder={offersByOrder}
-          documentsByOrder={documentsByOrder}
           amendmentsByOrder={amendmentsByOrder}
         />
       )}

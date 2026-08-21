@@ -416,7 +416,7 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
               </p>
             )}
 
-            <Field label={`${t.orderForm.rate} ${perKm}`} required>
+            <Field label={`${t.orderForm.rate} ${perKm}`} hint={t.money.addVat} required>
               {(p) => (
                 <InputMono
                   {...p}

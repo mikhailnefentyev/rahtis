@@ -86,7 +86,8 @@ export function Assignments({
                     <p className="mt-1.5 text-[13px] text-ink-muted">
                       {order.trailer ? `${order.trailer} · ` : ''}
                       {m('order.distance', { km: order.distance_km ?? 0 })} ·{' '}
-                      <span className="font-semibold text-ink">{f.eur(order.rate_cents ?? 0)}</span>
+                      <span className="font-semibold text-ink">{f.eur(order.rate_cents ?? 0)}</span>{' '}
+                      <span className="text-ink-dim">{t.money.addVat}</span>
                     </p>
                     <p className="mt-1 text-xs text-ink-dim">{order.shipper_name}</p>
 
@@ -153,16 +154,16 @@ export function Assignments({
                     {order.status === 'IN_PROGRESS' && <TripPanel stops={stops} />}
 
                     {/*
-                      * Закрытие появляется, когда пройдены все точки, и
-                      * остаётся у выполненного рейса: документы нужны до
-                      * выплаты, а не только в момент закрытия.
+                      * Закрытие появляется, когда пройдены все точки.
+                      * Выполненного рейса здесь уже нет — он уходит во
+                      * вкладку выполненных вместе с документами.
                       */}
-                    {(order.status === 'IN_PROGRESS' || order.status === 'DONE') && (
+                    {order.status === 'IN_PROGRESS' && (
                       <ClosingPanel
                         orderId={order.id}
                         stops={stops}
                         documents={documentsByOrder[order.id] ?? []}
-                        closed={order.status === 'DONE'}
+                        closed={false}
                       />
                     )}
 

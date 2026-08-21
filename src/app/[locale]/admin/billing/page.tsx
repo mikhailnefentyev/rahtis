@@ -16,6 +16,7 @@ import {
   Tr,
 } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
+import { withVat } from '@/lib/config';
 import { cabinetPath } from '@/lib/auth/paths';
 import { getI18n, isLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
@@ -67,6 +68,15 @@ export default async function BillingPage({
   const revenue = clients.reduce((sum, r) => sum + Number(r.rate_cents), 0);
   const commission = clients.reduce((sum, r) => sum + Number(r.commission_cents), 0);
   const payout = clients.reduce((sum, r) => sum + Number(r.payout_cents), 0);
+
+  /*
+   * Здесь налог появляется числом, а не подписью: оператор приходит
+   * выставлять счета и платить, а обе операции идут с ALV. Нетто
+   * остаётся значением плитки, брутто — подсказкой под ним, чтобы одно
+   * не подменяло другое.
+   */
+  const invoiceTotal = withVat(revenue);
+  const payoutTotal = withVat(payout);
 
   /*
    * Оценка стоит в одной таблице с выплатой: решение «кому давать больше
@@ -132,12 +142,21 @@ export default async function BillingPage({
 
       <h1 className="text-xl font-semibold tracking-tight">{t.done.titleAdmin}</h1>
       <p className="mt-2 mb-6 max-w-xl text-[13px] leading-relaxed text-ink-muted">
-        {t.done.subtitleAdmin}
+        {t.done.subtitleAdmin} {t.money.calcNote}
       </p>
 
       <StatRow>
-        <Stat label={t.money.revenue} value={f.eur(revenue)} />
-        <Stat label={t.done.payout} value={f.eur(payout)} />
+        <Stat
+          label={t.money.revenue}
+          value={f.eur(revenue)}
+          hint={m('money.withVat', { amount: f.eur(invoiceTotal) })}
+        />
+        <Stat
+          label={t.done.payout}
+          value={f.eur(payout)}
+          hint={m('money.withVat', { amount: f.eur(payoutTotal) })}
+        />
+        {/* Маржа без налога и без подсказки: ALV здесь транзитный. */}
         <Stat label={t.done.margin} value={f.eur(commission)} tone="ok" />
       </StatRow>
 

@@ -653,6 +653,15 @@ export const ru = {
   },
 
   money: {
+    /*
+     * Расчёты платформы нетто, а деньги ходят с налогом: и счёт
+     * заказчику, и выплата перевозчику. Формулировка финская — её же
+     * читает бухгалтер в счёте.
+     */
+    addVat: '+ ALV 25,5%',
+    calcNote:
+      'Расчёты без налога. Счета и выплаты — с ALV 25,5% (lisätään ALV 25,5%), для финских компаний.',
+
     gross: 'Валовая ставка',
     commission: 'Комиссия',
     payout: 'К выплате',
@@ -751,6 +760,7 @@ export const ru = {
 
     'countdown.left': '{time} до отката',
 
+    'money.withVat': 'с ALV {amount}',
     'money.commissionRate': 'Комиссия {rate, number, ::percent}',
     'money.marginRate': 'Маржа · {rate, number, ::percent}',
 
