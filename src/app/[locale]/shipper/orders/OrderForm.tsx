@@ -78,21 +78,39 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
     [],
   );
 
+  /* Слоты маршрута в порядке рейса: забор, действия, отцепка. */
+  const slots = useMemo(
+    () => ['pickup', ...extras.map((e) => `extra-${e.key}`), 'ret'],
+    [extras],
+  );
+
   /*
    * Точки в порядке маршрута — том же, в каком их читают в кабине и в
-   * каком они уходят в create_order. Расчёт возможен, когда координаты
-   * есть хотя бы у двух точек: адрес, набранный руками и не выбранный из
-   * подсказки, координат не имеет и в маршрут не попадает.
+   * каком они уходят в create_order.
    */
-  const routePoints = useMemo(() => {
-    const slots = ['pickup', ...extras.map((e) => `extra-${e.key}`), 'ret'];
+  const routePoints = useMemo(
+    () =>
+      slots
+        .map((slot) => coords[slot]?.position)
+        .filter((p): p is { lat: number; lon: number } => Boolean(p)),
+    [coords, slots],
+  );
 
-    return slots
-      .map((slot) => coords[slot]?.position)
-      .filter((p): p is { lat: number; lon: number } => Boolean(p));
-  }, [coords, extras]);
-
-  const canRoute = routePoints.length >= 2;
+  /*
+   * Считать можно только когда координаты есть у ВСЕХ точек.
+   *
+   * Раньше здесь стояло «хотя бы у двух», и точка без координат просто
+   * выпадала из расчёта. Маршрут получался короче настоящего, а бейдж
+   * говорил «рассчитано для грузовика» — то есть заказ уезжал с
+   * километражом, посчитанным в обход одной из выгрузок, и ставка за
+   * километр считалась не от того рейса, который поедет.
+   *
+   * Набранный руками адрес координат не имеет, и это не повод посчитать
+   * без него: маршрут по неполному набору точек не короче настоящего, а
+   * просто другой. Форма в таком случае говорит, что пробег нужно указать
+   * самому.
+   */
+  const canRoute = slots.length >= 2 && routePoints.length === slots.length;
 
   /*
    * Отпечаток набора точек. По нему решается, нужен ли пересчёт: массив
@@ -136,6 +154,18 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pointsKey, canRoute, locale]);
 
+  /*
+   * Маршрут действителен, только пока набор точек полон.
+   *
+   * Стоит добавить блок с ещё не выбранным адресом, и посчитанное раньше
+   * перестаёт быть про этот рейс. Стирать его из состояния не нужно —
+   * достаточно перестать им пользоваться: вернётся полный набор, вернётся
+   * и линия. Число в поле пробега при этом остаётся, но перестаёт
+   * называться расчётом: с этой минуты за него отвечает человек.
+   */
+  const liveRoute = canRoute ? route : null;
+  const liveSource = canRoute ? source : 'MANUAL';
+
   /* Ставка за километр — подсказка при вводе, в базе не хранится. */
   const km = Number.parseInt(distance.replace(/\D/g, ''), 10);
   const euros = Number.parseFloat(rate.replace(/\s/g, '').replace(',', '.'));
@@ -167,19 +197,19 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
        * каждом показе карточки значило бы платить за один и тот же
        * маршрут снова и снова.
        */}
-      <input type="hidden" name="distance_source" value={source} />
-      <input type="hidden" name="distance_auto_km" value={route?.km ?? ''} />
-      <input type="hidden" name="route_geometry" value={route?.geometry ?? ''} />
+      <input type="hidden" name="distance_source" value={liveSource} />
+      <input type="hidden" name="distance_auto_km" value={liveRoute?.km ?? ''} />
+      <input type="hidden" name="route_geometry" value={liveRoute?.geometry ?? ''} />
       <input
         type="hidden"
         name="route_bounds"
-        value={route ? JSON.stringify(route.bounds) : ''}
+        value={liveRoute ? JSON.stringify(liveRoute.bounds) : ''}
       />
-      <input type="hidden" name="route_fingerprint" value={route?.fingerprint ?? ''} />
+      <input type="hidden" name="route_fingerprint" value={liveRoute?.fingerprint ?? ''} />
       <input
         type="hidden"
         name="route_legs"
-        value={route ? JSON.stringify(route.legs) : ''}
+        value={liveRoute ? JSON.stringify(liveRoute.legs) : ''}
       />
 
       <Card>
@@ -364,19 +394,19 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
               ) : !canRoute ? (
                 <span className="text-xs text-ink-dim">{t.routing.noCoordinates}</span>
               ) : (
-                route && (
+                liveRoute && (
                   <span className="text-xs text-ink-muted">
                     {m('routing.result', {
-                      km: route.km,
-                      hours: Math.floor(route.durationS / 3600),
-                      minutes: Math.round((route.durationS % 3600) / 60),
+                      km: liveRoute.km,
+                      hours: Math.floor(liveRoute.durationS / 3600),
+                      minutes: Math.round((liveRoute.durationS % 3600) / 60),
                     })}
                   </span>
                 )
               )}
 
-              <Badge tone={source === 'AUTO' ? 'ok' : 'neutral'}>
-                {source === 'AUTO' ? t.routing.auto : t.routing.manual}
+              <Badge tone={liveSource === 'AUTO' ? 'ok' : 'neutral'}>
+                {liveSource === 'AUTO' ? t.routing.auto : t.routing.manual}
               </Badge>
             </div>
 
