@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { getViewer } from '@/lib/auth/viewer';
 import { getDictionary, isLocale, type Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
-import { tonnesToKg } from '@/lib/orders/stopFields';
+import { cityOf, tonnesToKg, type FieldReader } from '@/lib/orders/stopFields';
 import type { StopRole } from '@/types/db';
 
 export type PublishState = { error: string | null; ref: string | null };
@@ -48,36 +48,6 @@ type StopInput = {
   leg_distance_m?: string;
   leg_duration_s?: string;
 };
-
-/** Читает одно поле точки. Для доп.точек — по позиции в массиве. */
-type FieldReader = (field: string) => string;
-
-/**
- * Город точки.
- *
- * Отдельного поля в форме больше нет: заказчик пишет адрес целиком —
- * улица, дом, индекс, город, — а название города приходит из ответа
- * геокодера вместе с координатами. Так город всегда совпадает с точкой
- * на карте, а не с тем, что человек выбрал в списке из шести штук.
- *
- * Запасной разбор нужен, когда адрес набран руками и подсказка не
- * выбрана: город в базе NOT NULL, по нему работает фильтр стола, и
- * ронять публикацию из-за этого нельзя. Финский формат предсказуем —
- * «Satamakatu 1, 10900 Hanko», — поэтому берётся то, что стоит после
- * почтового индекса.
- */
-function cityOf(read: FieldReader): string {
-  const fromSuggestion = read('address_city');
-  if (fromSuggestion) return fromSuggestion;
-
-  const address = read('address');
-  const afterPostcode = /\d{5}\s+([^,]+)$/.exec(address);
-  if (afterPostcode) return afterPostcode[1].trim();
-
-  /* Ни индекса, ни подсказки — берём последнюю часть после запятой. */
-  const parts = address.split(',').map((x) => x.trim()).filter(Boolean);
-  return parts.length > 1 ? parts[parts.length - 1] : '';
-}
 
 /**
  * Пломба приходит списком из трёх значений, а не флажком: у повторяемых

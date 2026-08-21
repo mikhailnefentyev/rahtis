@@ -223,6 +223,63 @@ export type Database = {
           },
         ]
       }
+      order_amendments: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          actor_id: string | null
+          changes: Json
+          created_at: string
+          id: number
+          kind: Database["public"]["Enums"]["amendment_kind"]
+          order_id: string
+          stop_id: string | null
+          stop_label: string
+          stop_role: Database["public"]["Enums"]["stop_role"]
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          actor_id?: string | null
+          changes: Json
+          created_at?: string
+          id?: never
+          kind: Database["public"]["Enums"]["amendment_kind"]
+          order_id: string
+          stop_id?: string | null
+          stop_label: string
+          stop_role: Database["public"]["Enums"]["stop_role"]
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          actor_id?: string | null
+          changes?: Json
+          created_at?: string
+          id?: never
+          kind?: Database["public"]["Enums"]["amendment_kind"]
+          order_id?: string
+          stop_id?: string | null
+          stop_label?: string
+          stop_role?: Database["public"]["Enums"]["stop_role"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_amendments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_amendments_stop_id_fkey"
+            columns: ["stop_id"]
+            isOneToOne: false
+            referencedRelation: "order_stops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       order_documents: {
         Row: {
           created_at: string
@@ -470,7 +527,9 @@ export type Database = {
           assigned_company_id: string | null
           assigned_vehicle_id: string | null
           chosen_offer_id: string | null
+          closed_at: string | null
           comment: string | null
+          commission_bps: number | null
           created_at: string
           created_by: string | null
           deadline_at: string | null
@@ -498,7 +557,9 @@ export type Database = {
           assigned_company_id?: string | null
           assigned_vehicle_id?: string | null
           chosen_offer_id?: string | null
+          closed_at?: string | null
           comment?: string | null
+          commission_bps?: number | null
           created_at?: string
           created_by?: string | null
           deadline_at?: string | null
@@ -526,7 +587,9 @@ export type Database = {
           assigned_company_id?: string | null
           assigned_vehicle_id?: string | null
           chosen_offer_id?: string | null
+          closed_at?: string | null
           comment?: string | null
+          commission_bps?: number | null
           created_at?: string
           created_by?: string | null
           deadline_at?: string | null
@@ -733,6 +796,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      acknowledge_amendments: { Args: { p_order_id: string }; Returns: number }
       activate_company: {
         Args: { p_company_id: string }
         Returns: {
@@ -773,13 +837,59 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      add_stop: {
+        Args: { p_before_stop_id: string; p_stop: Json }
+        Returns: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          actor_id: string | null
+          changes: Json
+          created_at: string
+          id: number
+          kind: Database["public"]["Enums"]["amendment_kind"]
+          order_id: string
+          stop_id: string | null
+          stop_label: string
+          stop_role: Database["public"]["Enums"]["stop_role"]
+        }
+        SetofOptions: {
+          from: "*"
+          to: "order_amendments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      amend_stop: {
+        Args: { p_patch: Json; p_stop_id: string }
+        Returns: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          actor_id: string | null
+          changes: Json
+          created_at: string
+          id: number
+          kind: Database["public"]["Enums"]["amendment_kind"]
+          order_id: string
+          stop_id: string | null
+          stop_label: string
+          stop_role: Database["public"]["Enums"]["stop_role"]
+        }
+        SetofOptions: {
+          from: "*"
+          to: "order_amendments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       cancel_order: {
         Args: { p_order_id: string }
         Returns: {
           assigned_company_id: string | null
           assigned_vehicle_id: string | null
           chosen_offer_id: string | null
+          closed_at: string | null
           comment: string | null
+          commission_bps: number | null
           created_at: string
           created_by: string | null
           deadline_at: string | null
@@ -816,7 +926,9 @@ export type Database = {
           assigned_company_id: string | null
           assigned_vehicle_id: string | null
           chosen_offer_id: string | null
+          closed_at: string | null
           comment: string | null
+          commission_bps: number | null
           created_at: string
           created_by: string | null
           deadline_at: string | null
@@ -853,7 +965,9 @@ export type Database = {
           assigned_company_id: string | null
           assigned_vehicle_id: string | null
           chosen_offer_id: string | null
+          closed_at: string | null
           comment: string | null
+          commission_bps: number | null
           created_at: string
           created_by: string | null
           deadline_at: string | null
@@ -941,7 +1055,9 @@ export type Database = {
           assigned_company_id: string | null
           assigned_vehicle_id: string | null
           chosen_offer_id: string | null
+          closed_at: string | null
           comment: string | null
+          commission_bps: number | null
           created_at: string
           created_by: string | null
           deadline_at: string | null
@@ -978,7 +1094,9 @@ export type Database = {
           assigned_company_id: string | null
           assigned_vehicle_id: string | null
           chosen_offer_id: string | null
+          closed_at: string | null
           comment: string | null
+          commission_bps: number | null
           created_at: string
           created_by: string | null
           deadline_at: string | null
@@ -1168,6 +1286,67 @@ export type Database = {
           variant_no: number
         }[]
       }
+      remove_stop: {
+        Args: { p_stop_id: string }
+        Returns: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          actor_id: string | null
+          changes: Json
+          created_at: string
+          id: number
+          kind: Database["public"]["Enums"]["amendment_kind"]
+          order_id: string
+          stop_id: string | null
+          stop_label: string
+          stop_role: Database["public"]["Enums"]["stop_role"]
+        }
+        SetofOptions: {
+          from: "*"
+          to: "order_amendments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      store_route: {
+        Args: { p_order_id: string; p_route: Json }
+        Returns: {
+          assigned_company_id: string | null
+          assigned_vehicle_id: string | null
+          chosen_offer_id: string | null
+          closed_at: string | null
+          comment: string | null
+          commission_bps: number | null
+          created_at: string
+          created_by: string | null
+          deadline_at: string | null
+          distance_auto_km: number | null
+          distance_km: number | null
+          distance_source: Database["public"]["Enums"]["distance_source"]
+          id: string
+          order_type: Database["public"]["Enums"]["order_type"]
+          published_at: string | null
+          rate_cents: number | null
+          ref: string
+          route_bounds: Json | null
+          route_computed_at: string | null
+          route_fingerprint: string | null
+          route_geometry: string | null
+          shipper_company_id: string
+          shipper_company_kind: Database["public"]["Enums"]["party_role"]
+          shipper_ref: string | null
+          status: Database["public"]["Enums"]["order_status"]
+          trailer: string | null
+          trailer_plate: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       submit_vehicle: {
         Args: { p_vehicle_id: string }
         Returns: {
@@ -1203,7 +1382,9 @@ export type Database = {
           assigned_company_id: string | null
           assigned_vehicle_id: string | null
           chosen_offer_id: string | null
+          closed_at: string | null
           comment: string | null
+          commission_bps: number | null
           created_at: string
           created_by: string | null
           deadline_at: string | null
@@ -1275,6 +1456,7 @@ export type Database = {
       }
     }
     Enums: {
+      amendment_kind: "STOP_ADDED" | "STOP_CHANGED" | "STOP_REMOVED"
       company_status: "PENDING" | "APPROVED" | "ACTIVE" | "REJECTED"
       distance_source: "MANUAL" | "AUTO"
       document_kind: "CARRIER_LICENSE" | "INSURANCE"
@@ -1433,6 +1615,7 @@ export const Constants = {
   },
   public: {
     Enums: {
+      amendment_kind: ["STOP_ADDED", "STOP_CHANGED", "STOP_REMOVED"],
       company_status: ["PENDING", "APPROVED", "ACTIVE", "REJECTED"],
       distance_source: ["MANUAL", "AUTO"],
       document_kind: ["CARRIER_LICENSE", "INSURANCE"],

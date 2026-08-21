@@ -6,7 +6,7 @@ import { requireRole } from '@/lib/auth/guard';
 import { cabinetPath } from '@/lib/auth/paths';
 import { getI18n, isLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
-import type { TripDocument } from '@/types/db';
+import type { OrderAmendment, TripDocument } from '@/types/db';
 import { Assignments } from './Assignments';
 import { DeskList } from './DeskList';
 
@@ -78,6 +78,26 @@ export default async function DeskPage({
     (documentsByOrder[doc.order_id] ??= []).push(doc);
   }
 
+  /*
+   * Правки маршрута от заказчика (ТЗ §8). Читаются вместе с документами:
+   * неподтверждённая правка — это то, ради чего перевозчик открывает
+   * карточку идущего рейса, и запрашивать её отдельным заходом на
+   * карточку значило бы показать маршрут раньше, чем предупреждение о
+   * том, что он изменился.
+   */
+  const { data: amendmentRows } = assignedIds.length
+    ? await supabase
+        .from('order_amendments')
+        .select('*')
+        .in('order_id', assignedIds)
+        .order('created_at')
+    : { data: [] as OrderAmendment[] };
+
+  const amendmentsByOrder: Record<string, OrderAmendment[]> = {};
+  for (const row of amendmentRows ?? []) {
+    (amendmentsByOrder[row.order_id] ??= []).push(row);
+  }
+
   const state = readiness?.[0];
   const canTakeOrders = state?.can_take_orders ?? false;
 
@@ -98,7 +118,11 @@ export default async function DeskPage({
       </p>
 
       {/* Закреплённые рейсы важнее стола: они требуют действия и горят по срокам. */}
-      <Assignments assignments={assignments ?? []} documentsByOrder={documentsByOrder} />
+      <Assignments
+        assignments={assignments ?? []}
+        documentsByOrder={documentsByOrder}
+        amendmentsByOrder={amendmentsByOrder}
+      />
 
       {!canTakeOrders ? (
         /*

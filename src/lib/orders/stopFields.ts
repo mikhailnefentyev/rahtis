@@ -64,3 +64,71 @@ export function tonnesToKg(value: string): number | null {
   const kg = Math.round(tonnes * 1000);
   return kg >= 1 && kg <= MAX_CARGO_KG ? kg : null;
 }
+
+/** Читает одно поле точки. Для доп.точек — по позиции в массиве. */
+export type FieldReader = (field: string) => string;
+
+/**
+ * Город точки.
+ *
+ * Отдельного поля в форме нет: заказчик пишет адрес целиком — улица,
+ * дом, индекс, город, — а название города приходит из ответа геокодера
+ * вместе с координатами. Так город всегда совпадает с точкой на карте, а
+ * не с тем, что человек выбрал в списке из шести штук.
+ *
+ * Запасной разбор нужен, когда адрес набран руками и подсказка не
+ * выбрана: город в базе NOT NULL, по нему работает фильтр стола, и
+ * ронять из-за этого публикацию нельзя. Финский формат предсказуем —
+ * «Satamakatu 1, 10900 Hanko», — поэтому берётся то, что стоит после
+ * почтового индекса.
+ */
+export function cityOf(read: FieldReader): string {
+  const fromSuggestion = read('address_city');
+  if (fromSuggestion) return fromSuggestion;
+
+  const address = read('address');
+  const afterPostcode = /\d{5}\s+([^,]+)$/.exec(address);
+  if (afterPostcode) return afterPostcode[1].trim();
+
+  /* Ни индекса, ни подсказки — берём последнюю часть после запятой. */
+  const parts = address.split(',').map((x) => x.trim()).filter(Boolean);
+  return parts.length > 1 ? parts[parts.length - 1] : '';
+}
+
+/**
+ * Все поля точки по роли, одним ответом.
+ *
+ * Форме публикации это не нужно: там три секции с известными ролями, и
+ * флаги стоят прямо в разметке, где их видно рядом с полями. А правка
+ * маршрута (ТЗ §8) открывается для любой точки идущего рейса, и роль
+ * становится известна только в момент нажатия — вычислять по ней набор
+ * полей приходится и разметке, и сборке патча на сервере.
+ *
+ * Отдельные предикаты выше остаются: их вызывает сам StopFields.
+ */
+export type StopFieldFlags = {
+  placeName: boolean;
+  company: boolean;
+  contact: boolean;
+  cargo: boolean;
+  consignee: boolean;
+  externalRef: boolean;
+  trailerState: boolean;
+};
+
+export function stopFieldFlags(role: StopRole): StopFieldFlags {
+  /* Название площадки спрашивается там же, где состояние прицепа: на
+   * концах рейса. «Hanko Port, Terminal 2» — это про ворота, в которые
+   * заезжают за железом, а не про склад получателя. */
+  const ends = hasTrailerState(role);
+
+  return {
+    placeName: ends,
+    company: !ends,
+    contact: !ends,
+    cargo: hasCargo(role),
+    consignee: hasConsignee(role),
+    externalRef: hasExternalRef(role),
+    trailerState: ends,
+  };
+}

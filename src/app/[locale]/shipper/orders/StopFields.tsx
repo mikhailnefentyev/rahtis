@@ -7,6 +7,33 @@ import { useI18n } from '@/lib/i18n/provider';
 import type { StopRole } from '@/types/db';
 
 /**
+ * Значения, с которыми поля открываются.
+ *
+ * Ключи — суффиксы имён полей, те же, что уезжают в FormData. Нужны
+ * правке маршрута (ТЗ §8): она открывает ту же форму на существующей
+ * точке, и человек должен увидеть, что там сейчас написано, а не пустые
+ * поля, в которые надо заново переписать всё, чтобы поменять время.
+ */
+export type StopDefaults = Partial<
+  Record<
+    | 'place_name'
+    | 'company'
+    | 'address'
+    | 'date'
+    | 'time'
+    | 'contact'
+    | 'phone'
+    | 'weight'
+    | 'seal'
+    | 'consignee'
+    | 'ref'
+    | 'note'
+    | 'trailer_loaded',
+    string
+  >
+>;
+
+/**
  * Поля одной точки маршрута.
  *
  * Одна разметка на все шесть ролей вместо шести похожих блоков. Что
@@ -31,6 +58,7 @@ export function StopFields({
   requireDate = false,
   addressPlaceholder,
   placeNamePlaceholder,
+  defaults,
   onChosen,
 }: {
   role: StopRole;
@@ -45,6 +73,8 @@ export function StopFields({
   requireDate?: boolean;
   addressPlaceholder?: string;
   placeNamePlaceholder?: string;
+  /** С чем поля открываются. Пусто — новая точка. */
+  defaults?: StopDefaults;
   /** Координаты выбранного адреса — форме, чтобы посчитать маршрут. */
   onChosen?: (chosen: ChosenAddress | null) => void;
 }) {
@@ -52,6 +82,8 @@ export function StopFields({
 
 
   const name = (field: string) => `${prefix}_${field}`;
+
+  const was = (field: keyof StopDefaults) => defaults?.[field] ?? '';
 
   /** Пустое скрытое поле вместо неприменимого — чтобы не сбить позиции. */
   const filler = (field: string) =>
@@ -65,7 +97,14 @@ export function StopFields({
     <div className="grid gap-4 sm:grid-cols-2">
       {showPlaceName ? (
         <Field label={t.orderForm.placeName}>
-          {(p) => <Input {...p} name={name('place_name')} placeholder={placeNamePlaceholder} />}
+          {(p) => (
+            <Input
+              {...p}
+              name={name('place_name')}
+              defaultValue={was('place_name')}
+              placeholder={placeNamePlaceholder}
+            />
+          )}
         </Field>
       ) : (
         filler('place_name')
@@ -73,7 +112,7 @@ export function StopFields({
 
       {requireCompany ? (
         <Field label={t.orderForm.company} required>
-          {(p) => <Input {...p} name={name('company')} required />}
+          {(p) => <Input {...p} name={name('company')} defaultValue={was('company')} required />}
         </Field>
       ) : (
         filler('company')
@@ -89,6 +128,7 @@ export function StopFields({
           <AddressInput
             {...p}
             name={name('address')}
+            defaultValue={was('address')}
             required
             placeholder={addressPlaceholder}
             onChosen={onChosen}
@@ -98,20 +138,42 @@ export function StopFields({
 
       <div className="grid grid-cols-2 gap-3">
         <Field label={t.orderForm.date} required={requireDate}>
-          {(p) => <Input {...p} type="date" name={name('date')} required={requireDate} />}
+          {(p) => (
+              <Input
+                {...p}
+                type="date"
+                name={name('date')}
+                defaultValue={was('date')}
+                required={requireDate}
+              />
+            )}
         </Field>
         <Field label={t.orderForm.time}>
-          {(p) => <Input {...p} type="time" name={name('time')} />}
+          {(p) => <Input {...p} type="time" name={name('time')} defaultValue={was('time')} />}
         </Field>
       </div>
 
       {showContact && (
         <>
           <Field label={t.orderForm.contact}>
-            {(p) => <Input {...p} name={name('contact')} placeholder="Mika Virtanen" />}
+            {(p) => (
+              <Input
+                {...p}
+                name={name('contact')}
+                defaultValue={was('contact')}
+                placeholder="Mika Virtanen"
+              />
+            )}
           </Field>
           <Field label={t.orderForm.phone}>
-            {(p) => <InputMono {...p} name={name('phone')} placeholder="+358407001122" />}
+            {(p) => (
+              <InputMono
+                {...p}
+                name={name('phone')}
+                defaultValue={was('phone')}
+                placeholder="+358407001122"
+              />
+            )}
           </Field>
         </>
       )}
@@ -120,7 +182,13 @@ export function StopFields({
         <>
           <Field label={t.orderForm.cargoWeight} hint={t.orderForm.cargoWeightHint}>
             {(p) => (
-              <InputMono {...p} name={name('weight')} inputMode="decimal" placeholder="24,5" />
+              <InputMono
+                {...p}
+                name={name('weight')}
+                defaultValue={was('weight')}
+                inputMode="decimal"
+                placeholder="24,5"
+              />
             )}
           </Field>
 
@@ -132,7 +200,7 @@ export function StopFields({
            */}
           <Field label={t.orderForm.seal}>
             {(p) => (
-              <Select {...p} name={name('seal')} defaultValue="">
+              <Select {...p} name={name('seal')} defaultValue={was('seal')}>
                 <option value="">{t.orderForm.sealUnknown}</option>
                 <option value="true">{t.orderForm.sealYes}</option>
                 <option value="false">{t.orderForm.sealNo}</option>
@@ -146,7 +214,7 @@ export function StopFields({
 
       {consignee ? (
         <Field label={t.orderForm.consignee} hint={t.orderForm.consigneeHint}>
-          {(p) => <Input {...p} name={name('consignee')} />}
+          {(p) => <Input {...p} name={name('consignee')} defaultValue={was('consignee')} />}
         </Field>
       ) : (
         filler('consignee')
@@ -154,7 +222,14 @@ export function StopFields({
 
       {externalRef ? (
         <Field label={t.orderForm.loadingRef} hint={t.orderForm.loadingRefHint}>
-          {(p) => <InputMono {...p} name={name('ref')} placeholder="NC-2026-0414" />}
+          {(p) => (
+            <InputMono
+              {...p}
+              name={name('ref')}
+              defaultValue={was('ref')}
+              placeholder="NC-2026-0414"
+            />
+          )}
         </Field>
       ) : (
         filler('ref')
@@ -163,7 +238,12 @@ export function StopFields({
       {showTrailerState && (
         <Field label={t.orderForm.trailerState} required>
           {(p) => (
-            <Select {...p} name={name('trailer_loaded')} required defaultValue="false">
+            <Select
+              {...p}
+              name={name('trailer_loaded')}
+              required
+              defaultValue={defaults?.trailer_loaded ?? 'false'}
+            >
               <option value="false">{t.orderForm.trailerEmpty}</option>
               <option value="true">{t.orderForm.trailerLoaded}</option>
             </Select>
@@ -181,6 +261,7 @@ export function StopFields({
           <Textarea
           {...p}
           name={name('note')}
+          defaultValue={was('note')}
           rows={2}
           placeholder={t.orderForm.stopNotePlaceholder}
         />

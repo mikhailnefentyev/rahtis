@@ -6,7 +6,7 @@ import { requireRole } from '@/lib/auth/guard';
 import { cabinetPath } from '@/lib/auth/paths';
 import { getI18n, isLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
-import type { OrderStop, ShipperOffer, TripDocument } from '@/types/db';
+import type { OrderAmendment, OrderStop, ShipperOffer, TripDocument } from '@/types/db';
 import { OrdersView } from './OrdersView';
 
 export async function generateMetadata({
@@ -102,6 +102,25 @@ export default async function OrdersPage({ params }: { params: Promise<{ locale:
     (documentsByOrder[doc.order_id] ??= []).push(doc);
   }
 
+  /*
+   * Журнал правок маршрута (ТЗ §8). Читается тем же порядком, что и
+   * документы: одним запросом на все заказы, а не по одному на карточку.
+   * Заказчику он показывает, что он сам поменял после старта, — карточка
+   * идущего рейса иначе не отличается от той, которую взял перевозчик.
+   */
+  const { data: amendmentRows } = orderIds.length
+    ? await supabase
+        .from('order_amendments')
+        .select('*')
+        .in('order_id', orderIds)
+        .order('created_at')
+    : { data: [] as OrderAmendment[] };
+
+  const amendmentsByOrder: Record<string, OrderAmendment[]> = {};
+  for (const row of amendmentRows ?? []) {
+    (amendmentsByOrder[row.order_id] ??= []).push(row);
+  }
+
   return (
     <main className="mx-auto w-full max-w-4xl px-5 py-8">
       <nav className="mb-6">
@@ -137,6 +156,7 @@ export default async function OrdersPage({ params }: { params: Promise<{ locale:
           stopsByOrder={stopsByOrder}
           offersByOrder={offersByOrder}
           documentsByOrder={documentsByOrder}
+          amendmentsByOrder={amendmentsByOrder}
         />
       )}
     </main>

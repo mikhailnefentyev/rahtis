@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { OrderAmendments } from '@/components/domain/OrderAmendments';
 import { OrderRouteMap } from '@/components/domain/RouteMap';
 import { DocumentList } from '@/components/domain/TripDocuments';
 import { TripStage } from '@/components/domain/TripProgress';
@@ -8,7 +9,14 @@ import { RouteStops } from '@/components/domain/RouteStops';
 import { Badge, Button, Card, CardBody, CardDivider, EmptyState, Mono, Plate } from '@/components/ui';
 import { orderStatusTone } from '@/components/ui/tone';
 import { useI18n } from '@/lib/i18n/provider';
-import type { OrderStop, ShipperOffer, ShipperOrder, TripDocument } from '@/types/db';
+import type {
+  OrderAmendment,
+  OrderStop,
+  ShipperOffer,
+  ShipperOrder,
+  TripDocument,
+} from '@/types/db';
+import { AmendPanel } from './AmendPanel';
 import { AssignedCarrier, OffersPanel } from './OffersPanel';
 
 export function OrdersView({
@@ -16,11 +24,13 @@ export function OrdersView({
   stopsByOrder,
   offersByOrder,
   documentsByOrder,
+  amendmentsByOrder,
 }: {
   orders: ShipperOrder[];
   stopsByOrder: Record<string, OrderStop[]>;
   offersByOrder: Record<string, ShipperOffer[]>;
   documentsByOrder: Record<string, TripDocument[]>;
+  amendmentsByOrder: Record<string, OrderAmendment[]>;
 }) {
   const { t, m, f } = useI18n();
   const [composing, setComposing] = useState(false);
@@ -155,6 +165,21 @@ export function OrdersView({
                         geometry={order.route_geometry}
                         bounds={order.route_bounds}
                         stops={stops}
+                        className="mt-4"
+                      />
+
+                      {/*
+                        * Живая корректировка (ТЗ §8) — под маршрутом, а не
+                        * над ним: сначала человек смотрит, что едет сейчас,
+                        * и только потом решает, что менять.
+                        */}
+                      {order.status === 'IN_PROGRESS' && (
+                        <AmendPanel orderId={order.id} stops={stops} className="mt-4" />
+                      )}
+
+                      <OrderAmendments
+                        amendments={amendmentsByOrder[order.id] ?? []}
+                        orderId={order.id}
                         className="mt-4"
                       />
                     </>

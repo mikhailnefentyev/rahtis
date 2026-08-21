@@ -1,5 +1,6 @@
 'use client';
 
+import { OrderAmendments } from '@/components/domain/OrderAmendments';
 import { OrderRouteMap } from '@/components/domain/RouteMap';
 import { TripStage } from '@/components/domain/TripProgress';
 import { RouteStops } from '@/components/domain/RouteStops';
@@ -19,7 +20,7 @@ import { useI18n } from '@/lib/i18n/provider';
 import { ClosingPanel } from './ClosingPanel';
 import { TripPanel } from './TripPanel';
 import type { Database } from '@/types/database';
-import type { OrderStop, TripDocument } from '@/types/db';
+import type { OrderAmendment, OrderStop, TripDocument } from '@/types/db';
 
 type Assignment = Database['public']['Functions']['my_assignments']['Returns'][number];
 
@@ -33,9 +34,11 @@ type Assignment = Database['public']['Functions']['my_assignments']['Returns'][n
 export function Assignments({
   assignments,
   documentsByOrder,
+  amendmentsByOrder,
 }: {
   assignments: Assignment[];
   documentsByOrder: Record<string, TripDocument[]>;
+  amendmentsByOrder: Record<string, OrderAmendment[]>;
 }) {
   const { t, m, f, locale } = useI18n();
 
@@ -51,6 +54,7 @@ export function Assignments({
         {assignments.map((order) => {
           const stops = (order.stops ?? []) as unknown as OrderStop[];
           const waiting = order.status === 'AWAIT_DRIVER';
+          const amendments = amendmentsByOrder[order.id] ?? [];
 
           return (
             <Card
@@ -121,6 +125,19 @@ export function Assignments({
                 {order.status === 'IN_PROGRESS' && stops.length > 0 && (
                   <TripStage stops={stops} className="mt-3" />
                 )}
+
+                {/*
+                  * Правки заказчика идут выше маршрута, а не в конце
+                  * карточки: маршрут ниже — уже изменённый, и прочитать
+                  * его, не зная об этом, значит поехать по старому плану,
+                  * запомненному утром.
+                  */}
+                <OrderAmendments
+                  amendments={amendments}
+                  orderId={order.id}
+                  canAcknowledge={order.status === 'IN_PROGRESS'}
+                  className="mt-3"
+                />
 
                 {stops.length > 0 && (
                   <>

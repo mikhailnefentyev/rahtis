@@ -30,6 +30,19 @@ export type Order = Tables<'orders'>;
 export type TripDocument = Tables<'order_documents'>;
 export type TripDocumentKind = Database['public']['Enums']['trip_document_kind'];
 
+/** Правка маршрута в идущем рейсе (ТЗ §8). */
+export type OrderAmendment = Tables<'order_amendments'>;
+export type AmendmentKind = Database['public']['Enums']['amendment_kind'];
+
+/**
+ * Пара «было → стало» из журнала правок.
+ *
+ * Значения разнотипны — строка адреса, дата, вес в килограммах, признак
+ * пломбы, — потому что это поля точки, а не однородный список. Разбирает
+ * их тот, кто знает поле по имени: компонент журнала.
+ */
+export type AmendmentChange = { from: unknown; to: unknown };
+
 /**
  * Заказ глазами заказчика.
  *
@@ -37,10 +50,15 @@ export type TripDocumentKind = Database['public']['Enums']['trip_document_kind']
  * chosen_offer_id) сюда не входят: грант их заказчику не отдаёт, потому
  * что его контрагент — Aivomaa, а не перевозчик (ТЗ §1). Тип это
  * отражает, чтобы попытка прочитать исполнителя из заказа не собралась.
+ *
+ * commission_bps и closed_at не входят по той же причине: комиссия — это
+ * доля оператора в расчётах с перевозчиком, и заказчику она не видна ни
+ * грантом, ни типом. Отчёты Этапа 7 читают их функциями с security
+ * definer, где состав колонок записан явно.
  */
 export type ShipperOrder = Omit<
   Order,
-  'assigned_company_id' | 'assigned_vehicle_id' | 'chosen_offer_id' | 'shipper_company_id' | 'shipper_company_kind' | 'updated_at' | 'created_by' | 'route_computed_at' | 'route_fingerprint'
+  'assigned_company_id' | 'assigned_vehicle_id' | 'chosen_offer_id' | 'shipper_company_id' | 'shipper_company_kind' | 'updated_at' | 'created_by' | 'route_computed_at' | 'route_fingerprint' | 'commission_bps' | 'closed_at'
 >;
 export type OrderStop = Tables<'order_stops'>;
 
