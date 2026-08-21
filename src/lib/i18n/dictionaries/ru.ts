@@ -208,6 +208,31 @@ export const ru = {
     notYours: 'Править маршрут может только заказчик этого рейса.',
   },
 
+  /** Выполненные рейсы и деньги по ним (ТЗ §11). */
+  done: {
+    titleCarrier: 'Выполненные рейсы',
+    titleShipper: 'Выполненные заказы',
+    titleAdmin: 'Счета и выплаты',
+    subtitleCarrier: 'Закрытые рейсы по неделям и суммы к выплате.',
+    subtitleShipper: 'Выполненные заказы по неделям и суммы к оплате.',
+    subtitleAdmin: 'Кому выставлять счёт и кому платить.',
+    open: 'Открыть',
+    collapse: 'Свернуть',
+    none: 'Выполненных рейсов пока нет',
+    noneHint: 'Закрытый рейс попадает сюда вместе с документами и суммой.',
+    rate: 'Ставка',
+    commission: 'Комиссия',
+    payout: 'К выплате',
+    margin: 'Маржа',
+    clients: 'Заказчикам — счета',
+    carriers: 'Перевозчикам — выплаты',
+    company: 'Компания',
+    trips: 'Рейсов',
+    distance: 'Пробег',
+    noPartners: 'За этот период рейсов не закрывалось',
+    allTime: 'За всё время',
+  },
+
   /** Что случилось с точкой. Значения совпадают с enum amendment_kind. */
   amendKind: {
     STOP_ADDED: 'Точка добавлена',
@@ -763,5 +788,9 @@ export const ru = {
     'amend.pendingCount':
       '{count, plural, one {# изменение} few {# изменения} many {# изменений} other {# изменения}}',
     'amend.madeAt': 'Изменено {date}',
+
+    'done.weekOf': 'Неделя с {date}',
+    'done.closedAt': 'Закрыт {date}',
+    'done.bps': '{rate, number, ::percent}',
   },
 } as const;

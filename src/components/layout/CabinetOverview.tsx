@@ -98,20 +98,33 @@ export async function CabinetOverview({
                 >
                   {t.fleet.title}
                 </Link>
+                <Link
+                  href={`/${locale}/carrier/done`}
+                  className={buttonClass({ variant: 'default', size: 'md' })}
+                >
+                  {t.done.titleCarrier}
+                </Link>
               </div>
             )}
 
             {role === 'SHIPPER' && (
-              <Link
-                href={`/${locale}/shipper/orders`}
-                className={buttonClass({
-                  variant: needsRequisites ? 'default' : 'primary',
-                  size: 'md',
-                  className: 'self-start',
-                })}
-              >
-                {t.orders.title}
-              </Link>
+              <div className="flex flex-wrap gap-2">
+                <Link
+                  href={`/${locale}/shipper/orders`}
+                  className={buttonClass({
+                    variant: needsRequisites ? 'default' : 'primary',
+                    size: 'md',
+                  })}
+                >
+                  {t.orders.title}
+                </Link>
+                <Link
+                  href={`/${locale}/shipper/done`}
+                  className={buttonClass({ variant: 'default', size: 'md' })}
+                >
+                  {t.done.titleShipper}
+                </Link>
+              </div>
             )}
 
             <p className="text-[13px] leading-relaxed text-ink-muted">{t.cabinet.stageNotice}</p>

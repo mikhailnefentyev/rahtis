@@ -54,6 +54,8 @@ type TomTomResult = {
   score: number;
   address: TomTomAddress;
   position: { lat: number; lon: number };
+  /* Есть только у названных мест: порт, терминал, склад. */
+  poi?: { name?: string };
 };
 
 async function get<T>(url: string): Promise<T> {
@@ -74,13 +76,26 @@ async function get<T>(url: string): Promise<T> {
  * считать можно, но она не там, где ворота склада.
  */
 function isPrecise(result: TomTomResult): boolean {
-  return result.type === 'Point Address' || result.type === 'Address Range';
+  return (
+    result.type === 'Point Address' ||
+    result.type === 'Address Range' ||
+    /* У названного места координата — сама точка, а не середина округа. */
+    result.type === 'POI'
+  );
 }
 
 function toSuggestion(result: TomTomResult): AddressSuggestion {
+  /*
+   * У названного места в строке стоит имя, а не только адрес: «Hietanen
+   * Port — Merituulentie 424» отвечает на вопрос «то ли это место»,
+   * тогда как один адрес заставляет вспоминать, что там находится.
+   */
+  const address = result.address.freeformAddress ?? '';
+  const name = result.poi?.name;
+
   return {
     id: result.id,
-    label: result.address.freeformAddress ?? '',
+    label: name ? `${name} — ${address}` : address,
     city: result.address.municipality ?? null,
     postalCode: result.address.postalCode ?? null,
     position: result.position ? { lat: result.position.lat, lon: result.position.lon } : null,
@@ -98,8 +113,19 @@ export const tomtom: RoutingProvider = {
       typeahead: 'true',
       countrySet: COUNTRIES,
       limit: String(options.limit ?? 6),
-      /* Адреса и улицы, без заправок и кафе: маршрут строится по адресам. */
-      idxSet: 'PAD,Str,Geo',
+      /*
+       * Адреса, улицы, местности — и названные места.
+       *
+       * POI добавлен затем, что груз едет не на улицу, а в порт или на
+       * терминал, и диспетчер знает их по имени. Замер по Финляндии:
+       * «Kotka port» находит настоящие «Hietanen Port» и «New Port
+       * Kotka», «Turku satama» — терминалы в Пансио. Покрытие при этом
+       * неровное: у Ханко и Раумы портовых точек у поставщика нет, и
+       * запрос отдаёт водонапорную башню и макаронную фабрику. Поэтому
+       * POI стоит после адресов и ничего не вытесняет — он добавляет
+       * попадания там, где они есть.
+       */
+      idxSet: 'PAD,Str,Geo,POI',
     });
 
     /*

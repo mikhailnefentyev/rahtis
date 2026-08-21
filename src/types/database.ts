@@ -1049,6 +1049,31 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      completed_orders: {
+        Args: { p_from?: string; p_to?: string }
+        Returns: {
+          carrier_name: string
+          closed_at: string
+          commission_bps: number
+          commission_cents: number
+          distance_km: number
+          documents: Json
+          id: string
+          order_type: Database["public"]["Enums"]["order_type"]
+          payout_cents: number
+          rate_cents: number
+          ref: string
+          route_bounds: Json
+          route_geometry: string
+          shipper_name: string
+          shipper_ref: string
+          stops: Json
+          trailer: string
+          trailer_plate: string
+          vehicle_plate: string
+          week: string
+        }[]
+      }
       confirm_order: {
         Args: { p_order_id: string }
         Returns: {
@@ -1286,6 +1311,20 @@ export type Database = {
           variant_no: number
         }[]
       }
+      partner_totals: {
+        Args: { p_from?: string; p_to?: string }
+        Returns: {
+          business_id: string
+          commission_cents: number
+          company_id: string
+          company_name: string
+          distance_km: number
+          orders_count: number
+          party: Database["public"]["Enums"]["party_role"]
+          payout_cents: number
+          rate_cents: number
+        }[]
+      }
       remove_stop: {
         Args: { p_stop_id: string }
         Returns: {
@@ -1453,6 +1492,17 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      weekly_totals: {
+        Args: { p_weeks?: number }
+        Returns: {
+          commission_cents: number
+          distance_km: number
+          orders_count: number
+          payout_cents: number
+          rate_cents: number
+          week: string
+        }[]
       }
     }
     Enums: {

@@ -5,6 +5,8 @@ import { getDictionary, isLocale, type Locale } from '@/lib/i18n';
 import { truckProfile } from './profiles';
 import { tomtom } from './tomtom';
 import { metresToKm, routeFingerprint, routingConfigured } from './index';
+import { findPlaces, toSuggestion as placeSuggestion } from './places';
+import { normalizeQuery } from './query';
 import type { AddressSuggestion, LatLon } from './types';
 
 /**
@@ -54,14 +56,51 @@ export async function suggestAddressAction(
   const trimmed = query.trim();
   if (trimmed.length < 3) return { ok: true, suggestions: [] };
 
+  /*
+   * Свои площадки — первыми и без обращения к поставщику.
+   *
+   * Они не догадка геокодера, а точки, названные оператором: у порта в
+   * Ханко геокодер не знает даже номера дома, а «порт Раума» ищет как
+   * улицу Porttitie. Заодно это самый дешёвый ответ из возможных —
+   * подсказка вызывается на нажатие клавиши и стоит денег.
+   */
+  const own = findPlaces(trimmed).map(placeSuggestion);
+
   if (!routingConfigured()) {
-    return { ok: false, error: (await getDictionary(l)).routing.unavailable };
+    /* Без ключа справочник всё равно отвечает — это уже лучше пустоты. */
+    return own.length > 0
+      ? { ok: true, suggestions: own }
+      : { ok: false, error: (await getDictionary(l)).routing.unavailable };
   }
 
   try {
-    return { ok: true, suggestions: await provider.suggest(trimmed, { near }) };
+    /*
+     * Запрос переводится на язык данных: интерфейс русский, а места
+     * финские, и «Порт Ханко» поставщик не найдёт никогда. Перевод стоит
+     * здесь, а не в реализации: он про язык человека, а не про то, какой
+     * поставщик отвечает.
+     */
+    const found = await provider.suggest(normalizeQuery(trimmed), { near });
+
+    /*
+     * Свои площадки не дублируются тем, что нашёл поставщик по тому же
+     * адресу. Сравниваются именно адреса: в подписи названного места
+     * впереди стоит имя, и целиком строки не совпали бы никогда —
+     * «Ts Rauma Satama — Hakunintie 28» и «Порт Раума — Hakunintie 28»
+     * это одна точка, названная по-разному.
+     */
+    const address = (label: string) =>
+      label.includes(' — ') ? label.slice(label.indexOf(' — ') + 3) : label;
+    const mine = new Set(own.map((s) => address(s.label)));
+
+    return {
+      ok: true,
+      suggestions: [...own, ...found.filter((s) => !mine.has(address(s.label)))],
+    };
   } catch {
-    return { ok: false, error: (await getDictionary(l)).routing.suggestFailed };
+    return own.length > 0
+      ? { ok: true, suggestions: own }
+      : { ok: false, error: (await getDictionary(l)).routing.suggestFailed };
   }
 }
 

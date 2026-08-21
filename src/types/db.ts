@@ -30,6 +30,22 @@ export type Order = Tables<'orders'>;
 export type TripDocument = Tables<'order_documents'>;
 export type TripDocumentKind = Database['public']['Enums']['trip_document_kind'];
 
+/**
+ * Выполненный рейс глазами спрашивающего (ТЗ §11).
+ *
+ * Комиссия и выплата приходят пустыми заказчику, имя перевозчика — всем,
+ * кроме оператора. Решает это функция completed_orders одним местом, а
+ * тип лишь отражает, что колонка может не прийти.
+ */
+export type CompletedOrder =
+  Database['public']['Functions']['completed_orders']['Returns'][number];
+
+/** Итого за неделю: счёт заказчику, выплата перевозчику, маржа оператора. */
+export type WeeklyTotal = Database['public']['Functions']['weekly_totals']['Returns'][number];
+
+/** Сводка оператора: кому выставлять счёт и кому платить. */
+export type PartnerTotal = Database['public']['Functions']['partner_totals']['Returns'][number];
+
 /** Правка маршрута в идущем рейсе (ТЗ §8). */
 export type OrderAmendment = Tables<'order_amendments'>;
 export type AmendmentKind = Database['public']['Enums']['amendment_kind'];
