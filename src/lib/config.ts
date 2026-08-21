@@ -28,7 +28,12 @@ export const APP = {
  * Отчёты и счета считают по зафиксированной ставке, а не по текущей — иначе
  * изменение комиссии перепишет задним числом уже выставленные счета.
  */
-export const COMMISSION_BPS = 300;
+/*
+ * ВРЕМЕННО 0 на время проверки — вместе с app.current_commission_bps() в
+ * базе, которая и есть действующий источник. По ТЗ §1 ставка 3%, вернуть
+ * оба значения нужно до первых настоящих расчётов.
+ */
+export const COMMISSION_BPS = 0;
 
 /** Комиссия оператора с суммы в центах. */
 export function commissionCents(rateCents: number, bps: number = COMMISSION_BPS): number {
