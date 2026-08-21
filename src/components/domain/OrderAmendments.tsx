@@ -88,8 +88,16 @@ export function OrderAmendments({
     <div className={className}>
       <div className="mb-2.5 flex flex-wrap items-center justify-between gap-2">
         <div className="flex flex-wrap items-center gap-2">
+          {/*
+           * «Изменения от заказчика» — подпись для того, кому правка
+           * адресована, и только пока она не доведена. Заказчику в его
+           * собственном кабинете она сообщала бы, что кто-то другой
+           * поменял ему маршрут.
+           */}
           <p className="label-micro">
-            {pending.length > 0 ? t.order.changelogFromShipper : t.order.changelog}
+            {canAcknowledge && pending.length > 0
+              ? t.order.changelogFromShipper
+              : t.order.changelog}
           </p>
           {pending.length > 0 && (
             <Badge tone="warn">{m('amend.pendingCount', { count: pending.length })}</Badge>
