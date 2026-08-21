@@ -43,6 +43,12 @@ export type CompletedOrder =
 /** Итого за неделю: счёт заказчику, выплата перевозчику, маржа оператора. */
 export type WeeklyTotal = Database['public']['Functions']['weekly_totals']['Returns'][number];
 
+/** Оценка перевозчика за рейс, 1–5 (ТЗ §10). */
+export type OrderRating = Tables<'order_ratings'>;
+
+/** Средняя оценка компании и число оценок. */
+export type CarrierRating = Database['public']['Functions']['carrier_rating']['Returns'][number];
+
 /** Сводка оператора: кому выставлять счёт и кому платить. */
 export type PartnerTotal = Database['public']['Functions']['partner_totals']['Returns'][number];
 

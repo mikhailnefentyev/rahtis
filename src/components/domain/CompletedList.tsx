@@ -3,8 +3,19 @@
 import { useMemo, useState } from 'react';
 import { OrderRouteMap } from '@/components/domain/RouteMap';
 import { RouteStops } from '@/components/domain/RouteStops';
+import { RateTrip } from '@/components/domain/RateTrip';
 import { DocumentList } from '@/components/domain/TripDocuments';
-import { Badge, Button, Card, CardBody, EmptyState, Kv, Mono, Plate } from '@/components/ui';
+import {
+  Badge,
+  Button,
+  Card,
+  CardBody,
+  EmptyState,
+  Kv,
+  Mono,
+  Plate,
+  Stars,
+} from '@/components/ui';
 import { useI18n } from '@/lib/i18n/provider';
 import type { CompletedOrder, OrderStop, TripDocument, WeeklyTotal } from '@/types/db';
 
@@ -152,6 +163,13 @@ export function CompletedList({
                             </span>
                           )}
 
+                          {/*
+                           * Оценка видна и в свёрнутой строке: заказчик
+                           * ищет глазами неоценённые рейсы, а перевозчик —
+                           * те, где ему что-то поставили.
+                           */}
+                          {order.rating_score != null && <Stars value={order.rating_score} />}
+
                           <Button size="sm" onClick={() => setOpened(open ? null : order.id)}>
                             {open ? t.done.collapse : t.done.open}
                           </Button>
@@ -214,6 +232,33 @@ export function CompletedList({
                             <p className="label-micro mb-2.5">{t.trip.documents}</p>
                             <DocumentList documents={documents} />
                           </div>
+
+                          {/*
+                           * Право оценить решает база: у заказчика рейса с
+                           * назначенным перевозчиком can_rate истинно, у
+                           * остальных нет. Условие «если заказчик» здесь
+                           * завело бы второе место, где это решается.
+                           */}
+                          {order.can_rate ? (
+                            <RateTrip
+                              orderId={order.id}
+                              score={order.rating_score}
+                              comment={order.rating_comment}
+                              className="mt-4 border-t border-line pt-4"
+                            />
+                          ) : (
+                            order.rating_score != null && (
+                              <div className="mt-4 border-t border-line pt-4">
+                                <p className="label-micro mb-2">{t.rating.received}</p>
+                                <Stars value={order.rating_score} />
+                                {order.rating_comment && (
+                                  <p className="mt-2 rounded-control border border-line bg-sunken px-3 py-2 text-xs text-ink-muted">
+                                    {order.rating_comment}
+                                  </p>
+                                )}
+                              </div>
+                            )
+                          )}
                         </div>
                       )}
                     </CardBody>

@@ -6,6 +6,7 @@ import {
   Card,
   CardBody,
   Mono,
+  Stars,
   Stat,
   StatRow,
   Table,
@@ -67,7 +68,17 @@ export default async function BillingPage({
   const commission = clients.reduce((sum, r) => sum + Number(r.commission_cents), 0);
   const payout = clients.reduce((sum, r) => sum + Number(r.payout_cents), 0);
 
-  const table = (list: PartnerTotal[], moneyLabel: string, money: (r: PartnerTotal) => number) => (
+  /*
+   * Оценка стоит в одной таблице с выплатой: решение «кому давать больше
+   * заказов» принимается по обоим числам сразу, а не по двум экранам.
+   * У заказчиков колонки нет — обратная оценка это отдельный разговор.
+   */
+  const table = (
+    list: PartnerTotal[],
+    moneyLabel: string,
+    money: (r: PartnerTotal) => number,
+    withRating = false,
+  ) => (
     <TableFrame>
       <Table>
         <thead>
@@ -76,6 +87,7 @@ export default async function BillingPage({
             <Th>{t.done.trips}</Th>
             <Th>{t.done.distance}</Th>
             <Th>{moneyLabel}</Th>
+            {withRating && <Th>{t.rating.title}</Th>}
           </Tr>
         </thead>
         <tbody>
@@ -95,6 +107,11 @@ export default async function BillingPage({
               <Td>
                 <span className="font-semibold text-ink">{f.eur(money(r))}</span>
               </Td>
+              {withRating && (
+                <Td>
+                  <Stars value={r.rating === null ? null : Number(r.rating)} count={r.ratings_count ?? undefined} />
+                </Td>
+              )}
             </Tr>
           ))}
         </tbody>
@@ -143,7 +160,8 @@ export default async function BillingPage({
         <h2 className="mb-3 border-b border-line pb-2 text-[13px] font-semibold tracking-tight text-ink-faint">
           {t.done.carriers}
         </h2>
-        {carriers.length > 0 && table(carriers, t.done.payout, (r) => Number(r.payout_cents))}
+        {carriers.length > 0 &&
+          table(carriers, t.done.payout, (r) => Number(r.payout_cents), true)}
       </section>
 
       <section className="mt-10">

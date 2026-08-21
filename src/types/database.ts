@@ -421,6 +421,61 @@ export type Database = {
           },
         ]
       }
+      order_ratings: {
+        Row: {
+          carrier_company_id: string
+          comment: string | null
+          created_at: string
+          order_id: string
+          rated_by: string | null
+          score: number
+          shipper_company_id: string
+          updated_at: string
+        }
+        Insert: {
+          carrier_company_id: string
+          comment?: string | null
+          created_at?: string
+          order_id: string
+          rated_by?: string | null
+          score: number
+          shipper_company_id: string
+          updated_at?: string
+        }
+        Update: {
+          carrier_company_id?: string
+          comment?: string | null
+          created_at?: string
+          order_id?: string
+          rated_by?: string | null
+          score?: number
+          shipper_company_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_ratings_carrier_company_id_fkey"
+            columns: ["carrier_company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_ratings_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: true
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_ratings_shipper_company_id_fkey"
+            columns: ["shipper_company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       order_stops: {
         Row: {
           address: string
@@ -920,6 +975,13 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      carrier_rating: {
+        Args: { p_company_id?: string }
+        Returns: {
+          ratings_count: number
+          score: number
+        }[]
+      }
       choose_offer: {
         Args: { p_offer_id: string }
         Returns: {
@@ -1052,6 +1114,7 @@ export type Database = {
       completed_orders: {
         Args: { p_from?: string; p_to?: string }
         Returns: {
+          can_rate: boolean
           carrier_name: string
           closed_at: string
           commission_bps: number
@@ -1062,6 +1125,8 @@ export type Database = {
           order_type: Database["public"]["Enums"]["order_type"]
           payout_cents: number
           rate_cents: number
+          rating_comment: string
+          rating_score: number
           ref: string
           route_bounds: Json
           route_geometry: string
@@ -1323,7 +1388,28 @@ export type Database = {
           party: Database["public"]["Enums"]["party_role"]
           payout_cents: number
           rate_cents: number
+          rating: number
+          ratings_count: number
         }[]
+      }
+      rate_order: {
+        Args: { p_comment?: string; p_order_id: string; p_score: number }
+        Returns: {
+          carrier_company_id: string
+          comment: string | null
+          created_at: string
+          order_id: string
+          rated_by: string | null
+          score: number
+          shipper_company_id: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "order_ratings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       remove_stop: {
         Args: { p_stop_id: string }
