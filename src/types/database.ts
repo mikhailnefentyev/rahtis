@@ -1293,6 +1293,13 @@ export type Database = {
         }[]
       }
       expire_order_deadlines: { Args: never; Returns: number }
+      fleet_size: {
+        Args: never
+        Returns: {
+          regions: number
+          vehicles: number
+        }[]
+      }
       moderate_company: {
         Args: {
           p_company_id: string
