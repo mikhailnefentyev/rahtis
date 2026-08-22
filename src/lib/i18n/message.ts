@@ -8,7 +8,12 @@ import type { Dictionary } from './dictionaries';
  * который понимают Crowdin, Lokalise, POEditor и переводчики-люди. Строки
  * можно выгрузить, отдать на перевод и загрузить обратно без конвертации,
  * а множественное число посчитает Intl.PluralRules по правилам CLDR — те же,
- * что у операционных систем.
+ * что у операционных систем. *
+ * Сообщения об ошибках здесь по-английски, в отличие от остального
+ * src/lib. Правило «в src/lib можно по-русски» держится на том, что этих
+ * строк не видит никто, кроме разработчика; для модулей, уезжающих в
+ * браузер, оно неверно — код попадает в бандл вместе со строками, и
+ * русский текст оказывается на финском и английском сайте.
  */
 
 export type MessageKey = keyof Dictionary['msg'];
@@ -49,11 +54,11 @@ export function createMessages(intlLocale: string, dictionary: Dictionary): Mess
       // доедет до продакшена. В продакшене падать нельзя — экран важнее
       // одной строки, поэтому отдаём исходный шаблон.
       if (process.env.NODE_ENV !== 'production') {
-        throw new Error(`Не удалось отформатировать сообщение «${key}» для локали ${intlLocale}`, {
+        throw new Error(`i18n: cannot format message "${key}" for locale ${intlLocale}`, {
           cause,
         });
       }
-      console.error(`i18n: сообщение «${key}» не отформатировано`, cause);
+      console.error(`i18n: message "${key}" was not formatted`, cause);
       return pattern;
     }
   };
