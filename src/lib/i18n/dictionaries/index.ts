@@ -4,10 +4,16 @@ import { ru } from './ru';
 /**
  * Форма словаря выводится из русского — он эталон.
  *
- * DeepReadonly здесь не нужен: словари объявлены через `as const`,
- * поэтому уже неизменяемы на уровне типов.
+ * Строки при этом расширяются до `string`. Без расширения `as const`
+ * сделал бы каждое значение литеральным типом, и финское «Suomi» не
+ * подошло бы к типу «Русский» — второй язык стал бы невозможен.
+ *
+ * Структура сохраняется: пропущенный или лишний ключ по-прежнему ошибка
+ * компиляции, а это и есть главный предохранитель перевода.
  */
-export type Dictionary = typeof ru;
+type Widen<T> = T extends string ? string : { [K in keyof T]: Widen<T[K]> };
+
+export type Dictionary = Widen<typeof ru>;
 
 /**
  * Реестр словарей.
@@ -21,7 +27,7 @@ export type Dictionary = typeof ru;
  */
 const loaders: Record<Locale, () => Promise<Dictionary>> = {
   ru: async () => ru,
-  // fi: () => import('./fi').then((m) => m.fi),
+  fi: () => import('./fi').then((m) => m.fi),
 };
 
 export async function getDictionary(locale: Locale): Promise<Dictionary> {
