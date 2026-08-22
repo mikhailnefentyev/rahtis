@@ -15,16 +15,20 @@ import '../globals.css';
  * префикса перенаправляет middleware.
  */
 
-// Кириллица обязательна: интерфейс русский, дальше — финский и остальные.
+/*
+ * Только латиница. Кириллический поднабор грузился, пока интерфейс был
+ * русским; сейчас это два лишних файла шрифта на каждой странице ради
+ * букв, которых на ней нет.
+ */
 const sans = Geist({
   variable: '--font-geist-sans',
-  subsets: ['latin', 'cyrillic'],
+  subsets: ['latin'],
   display: 'swap',
 });
 
 const mono = Geist_Mono({
   variable: '--font-geist-mono',
-  subsets: ['latin', 'cyrillic'],
+  subsets: ['latin'],
   display: 'swap',
 });
 

@@ -23,7 +23,7 @@ import type { AddressSuggestion } from './types';
 
 export type CuratedPlace = {
   id: string;
-  /** Как называется — на языке интерфейса. */
+  /** Как называется — по-фински, как написано на воротах. */
   name: string;
   address: string;
   city: string;
@@ -38,7 +38,7 @@ export type CuratedPlace = {
 export const PLACES: CuratedPlace[] = [
   {
     id: 'hanko-port',
-    name: 'Порт Ханко',
+    name: 'Hangon satama',
     address: 'Korsmaninkatu 6, 10900 Hanko',
     city: 'Hanko',
     position: { lat: 59.824178, lon: 22.96404 },
@@ -46,7 +46,7 @@ export const PLACES: CuratedPlace[] = [
   },
   {
     id: 'rauma-port',
-    name: 'Порт Раума',
+    name: 'Rauman satama',
     address: 'Hakunintie 28, 26100 Rauma',
     city: 'Rauma',
     position: { lat: 61.129872, lon: 21.466139 },
@@ -54,7 +54,7 @@ export const PLACES: CuratedPlace[] = [
   },
   {
     id: 'kotka-hietanen',
-    name: 'Котка Хиетанен',
+    name: 'Kotka · Hietanen',
     address: 'Murtajantie 2, 48100 Kotka',
     city: 'Kotka',
     position: { lat: 60.479838, lon: 26.942221 },
@@ -64,7 +64,7 @@ export const PLACES: CuratedPlace[] = [
   },
   {
     id: 'naantali-port',
-    name: 'Порт Наантали',
+    name: 'Naantalin satama',
     address: 'Satamatie 13, 21100 Naantali',
     city: 'Naantali',
     position: { lat: 60.457947, lon: 22.043417 },
@@ -72,7 +72,7 @@ export const PLACES: CuratedPlace[] = [
   },
   {
     id: 'turku-viking',
-    name: 'Турку · Viking Line',
+    name: 'Turku · Viking Line',
     address: 'Kuninkaantie, 20100 Turku',
     city: 'Turku',
     position: { lat: 60.433165, lon: 22.222195 },
@@ -80,7 +80,7 @@ export const PLACES: CuratedPlace[] = [
   },
   {
     id: 'turku-silja',
-    name: 'Турку · Silja Line',
+    name: 'Turku · Silja Line',
     address: 'Linnankatu 91, 20100 Turku',
     city: 'Turku',
     position: { lat: 60.435567, lon: 22.217776 },

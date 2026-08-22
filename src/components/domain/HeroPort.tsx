@@ -141,15 +141,17 @@ async function TripPreview({ locale }: { locale: Locale }) {
         at: '22:10',
       },
       { kind: t.stopKind.EXTRA_UNLOAD, place: 'UPM Kotka', sub: 'UPM Kotka · Mika', at: '07:00' },
+      { kind: t.stopKind.EXTRA_LOAD, place: 'LaserPoint Oy', sub: 'Kouvola', at: '09:30' },
       {
         kind: t.stopKind.TRAILER_RETURN,
-        place: 'DFDS Turku',
-        sub: t.orderForm.trailerEmpty,
-        at: '12:30',
+        place: 'Viking Line Turku',
+        /* Прицеп уходит на паром гружёным: в Коуволе его загрузили снова. */
+        sub: t.orderForm.trailerLoaded,
+        at: '14:30',
       },
     ],
-    distance: m('order.distance', { km: 580 }),
-    stopsCount: m('order.stopsCount', { count: 3 }),
+    distance: m('order.distance', { km: 620 }),
+    stopsCount: m('order.stopsCount', { count: 4 }),
     lane: 'Hanko → Turku',
   };
 
@@ -157,7 +159,7 @@ async function TripPreview({ locale }: { locale: Locale }) {
     { status: l.cycle1, note: l.cycle1Note, tone: 'idle', done: 0, waiting: false },
     { status: l.cycle2, note: l.cycle2Note, tone: 'warn', done: 0, waiting: true },
     { status: l.cycle3, note: l.cycle3Note, tone: 'live', done: 1, waiting: false },
-    { status: l.cycle4, note: l.cycle4Note, tone: 'ok', done: 3, waiting: false },
+    { status: l.cycle4, note: l.cycle4Note, tone: 'ok', done: 4, waiting: false },
   ];
 
   return (
