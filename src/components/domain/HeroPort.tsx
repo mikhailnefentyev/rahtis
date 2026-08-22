@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { LocaleSwitch } from '@/components/layout/LocaleSwitch';
 import {
   TripCycle,
   type CycleStage,
@@ -93,8 +94,12 @@ export async function HeroPort({ locale }: { locale: Locale }) {
               <Mono className="hero-port__count">{fleet.vehicles}</Mono> {t.landing.fleetLabel}
               <span className="hero-port__sep" aria-hidden="true" />
               <Mono className="hero-port__count">{fleet.regions}</Mono> {t.landing.regionsLabel}
-              <span className="hero-port__sep" aria-hidden="true" />
-              {t.landing.fleetLive}
+              {/*
+                * Пояснение отдельной строкой, а не третьим членом ряда:
+                * на узком экране оно переносится, и разделитель остаётся
+                * висеть в конце предыдущей строки.
+                */}
+              <span className="hero-port__fleetNote">{t.landing.fleetLive}</span>
             </p>
           )}
 
@@ -111,9 +116,12 @@ export async function HeroPort({ locale }: { locale: Locale }) {
         </div>
       </div>
 
-      <Link href={signInPath(locale)} className="hero-port__signin">
-        {t.landing.signIn}
-      </Link>
+      <div className="hero-port__corner">
+        <LocaleSwitch current={locale} />
+        <Link href={signInPath(locale)} className="hero-port__signin">
+          {t.landing.signIn}
+        </Link>
+      </div>
     </section>
   );
 }

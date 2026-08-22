@@ -27,6 +27,7 @@ export type Dictionary = Widen<typeof fi>;
  */
 const loaders: Record<Locale, () => Promise<Dictionary>> = {
   fi: async () => fi,
+  en: () => import('./en').then((m) => m.en),
 };
 
 export async function getDictionary(locale: Locale): Promise<Dictionary> {

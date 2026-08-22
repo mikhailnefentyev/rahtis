@@ -2,7 +2,7 @@ import { getDictionary } from './dictionaries';
 import { createI18n, type I18n } from './bundle';
 import type { Locale } from './config';
 
-export { locales, defaultLocale, isLocale, matchLocale, LOCALE_COOKIE } from './config';
+export { locales, defaultLocale, isLocale, matchLocale, LOCALE_COOKIE, LOCALE_NAMES } from './config';
 export type { Locale } from './config';
 export { getDictionary } from './dictionaries';
 export type { Dictionary } from './dictionaries';

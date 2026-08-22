@@ -382,23 +382,86 @@
   100% { transform: scale(3.2); opacity: 0; }
 }
 
+.hero-port__fleetNote {
+  display: block;
+  width: 100%;
+  margin-top: 4px;
+  color: rgba(255, 255, 255, 0.52);
+}
+
 .hero-port__note {
   margin: 22px 0 0;
   font-size: 12px;
   color: rgba(255, 255, 255, 0.58);
 }
 
-.hero-port__signin {
+/* Правый верхний угол первого экрана: язык и вход. */
+.hero-port__corner {
   position: absolute;
   z-index: 3;
-  top: 22px;
+  top: 18px;
   right: 24px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.hero-port__signin {
   font-size: 13px;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.86);
   text-decoration: none;
 }
 .hero-port__signin:hover { color: #ffffff; text-decoration: underline; }
+
+/*
+ * Переключатель языка.
+ *
+ * Двухбуквенные коды моноширинным: FI и EN одинаковой ширины, и ряд не
+ * дёргается при переключении. Цвета берутся из переменных, поэтому один
+ * и тот же блок работает и в светлой шапке кабинета.
+ */
+.locale-switch {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-pill);
+  background: var(--color-sunken);
+}
+.locale-switch a {
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--color-ink-faint);
+  text-decoration: none;
+  transition:
+    color 160ms ease,
+    background-color 160ms ease;
+}
+.locale-switch a:hover { color: var(--color-ink-muted); }
+.locale-switch a[data-on] {
+  background: var(--color-surface);
+  color: var(--color-ink);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+/* Поверх съёмки та же разметка, но на стекле: рамка кабинета там не видна. */
+.hero-port__corner .locale-switch {
+  border-color: rgba(255, 255, 255, 0.28);
+  background: rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(6px);
+}
+.hero-port__corner .locale-switch a { color: rgba(255, 255, 255, 0.62); }
+.hero-port__corner .locale-switch a:hover { color: rgba(255, 255, 255, 0.9); }
+.hero-port__corner .locale-switch a[data-on] {
+  background: rgba(255, 255, 255, 0.92);
+  color: #10201d;
+  box-shadow: none;
+}
 
 /* ── Карточка рейса поверх видео ──────────────────────────────── */
 .trip-preview {

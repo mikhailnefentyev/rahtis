@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { LocaleSwitch } from '@/components/layout/LocaleSwitch';
 import { Badge, Button } from '@/components/ui';
 import { companyStatusTone } from '@/components/ui/tone';
 import { signOutAction } from '@/lib/auth/actions';
@@ -43,6 +44,8 @@ export async function CabinetHeader({
               </Badge>
             </span>
           )}
+
+          <LocaleSwitch current={locale} />
 
           <form action={signOutAction}>
             <input type="hidden" name="locale" value={locale} />

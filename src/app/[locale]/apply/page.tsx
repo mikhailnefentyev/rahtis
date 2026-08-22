@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { signInPath } from '@/lib/auth/paths';
+import { LocaleSwitch } from '@/components/layout/LocaleSwitch';
 import { getI18n, isLocale } from '@/lib/i18n';
 import { ApplyForm } from './form';
 
@@ -23,7 +24,11 @@ export default async function ApplyPage({ params }: { params: Promise<{ locale: 
   const { t } = await getI18n(locale);
 
   return (
-    <main className="flex flex-1 items-center justify-center px-5 py-12">
+    <main className="relative flex flex-1 items-center justify-center px-5 py-12">
+      <div className="absolute top-5 right-5">
+        <LocaleSwitch current={locale} />
+      </div>
+
       <div className="w-full max-w-md">
         <div className="mb-6 text-center">
           <Link

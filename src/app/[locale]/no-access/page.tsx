@@ -3,6 +3,7 @@ import { Button, Card, CardBody } from '@/components/ui';
 import { signOutAction } from '@/lib/auth/actions';
 import { cabinetPath, signInPath } from '@/lib/auth/paths';
 import { getViewer } from '@/lib/auth/viewer';
+import { LocaleSwitch } from '@/components/layout/LocaleSwitch';
 import { getI18n, isLocale } from '@/lib/i18n';
 
 /**
@@ -31,7 +32,11 @@ export default async function NoAccessPage({ params }: { params: Promise<{ local
   const rejected = viewer.status === 'ready';
 
   return (
-    <main className="flex flex-1 items-center justify-center px-5 py-12">
+    <main className="relative flex flex-1 items-center justify-center px-5 py-12">
+      <div className="absolute top-5 right-5">
+        <LocaleSwitch current={locale} />
+      </div>
+
       <Card className="w-full max-w-md" stripe={rejected ? 'danger' : 'warn'}>
         <CardBody className="p-6">
           <h1 className="text-[15px] font-semibold tracking-tight">{t.auth.noAccessTitle}</h1>

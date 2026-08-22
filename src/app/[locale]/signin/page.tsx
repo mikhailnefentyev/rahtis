@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Card, CardBody } from '@/components/ui';
 import { redirectIfSignedIn } from '@/lib/auth/actions';
+import { LocaleSwitch } from '@/components/layout/LocaleSwitch';
 import { getI18n, isLocale } from '@/lib/i18n';
 import { SignInForm } from './form';
 
@@ -34,7 +35,11 @@ export default async function SignInPage({
   const { next, reason } = await searchParams;
 
   return (
-    <main className="flex flex-1 items-center justify-center px-5 py-12">
+    <main className="relative flex flex-1 items-center justify-center px-5 py-12">
+      <div className="absolute top-5 right-5">
+        <LocaleSwitch current={locale} />
+      </div>
+
       <div className="w-full max-w-sm">
         <div className="mb-6 text-center">
           <p className="font-mono text-xl font-extrabold tracking-tight text-accent">
