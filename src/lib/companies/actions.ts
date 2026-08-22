@@ -5,12 +5,12 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { getViewer } from '@/lib/auth/viewer';
 import { isValidBusinessId } from '@/lib/format';
-import { getDictionary, isLocale, type Locale } from '@/lib/i18n';
+import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
 import type { CompanyRole } from '@/types/db';
 
 function toLocale(value: FormDataEntryValue | null): Locale {
   const raw = String(value ?? '');
-  return isLocale(raw) ? raw : 'ru';
+  return isLocale(raw) ? raw : defaultLocale;
 }
 
 /* ── Публичная форма заявки ─────────────────────────────────────── */

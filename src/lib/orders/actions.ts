@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { getViewer } from '@/lib/auth/viewer';
-import { getDictionary, isLocale, type Locale } from '@/lib/i18n';
+import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import { cityOf, tonnesToKg, type FieldReader } from '@/lib/orders/stopFields';
 import type { StopRole } from '@/types/db';
@@ -11,7 +11,7 @@ export type PublishState = { error: string | null; ref: string | null };
 
 function toLocale(value: FormDataEntryValue | null): Locale {
   const raw = String(value ?? '');
-  return isLocale(raw) ? raw : 'ru';
+  return isLocale(raw) ? raw : defaultLocale;
 }
 
 const str = (form: FormData, key: string): string =>

@@ -26,13 +26,26 @@ import { updateSession } from '@/lib/supabase/middleware';
  * уязвимость с обходом middleware, поэтому доступ к строкам защищает RLS,
  * а здесь решается только навигация.
  */
+/** Языки, которые были и ушли. Ссылки на них не должны упираться в 404. */
+const RETIRED_LOCALES = ['ru'];
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const [, first, second] = pathname.split('/');
 
   if (!isLocale(first)) {
     const url = request.nextUrl.clone();
-    url.pathname = `/${resolveLocale(request)}${pathname === '/' ? '' : pathname}`;
+    /*
+     * Снятая локаль не должна оставлять битых ссылок: /ru/carrier/desk
+     * из закладки ведёт на /fi/carrier/desk, а не на /fi/ru/carrier/desk,
+     * которого нет.
+     */
+    const rest = RETIRED_LOCALES.includes(first ?? '')
+      ? pathname.slice(first!.length + 1)
+      : pathname === '/'
+        ? ''
+        : pathname;
+    url.pathname = `/${resolveLocale(request)}${rest}`;
     return NextResponse.redirect(url);
   }
 

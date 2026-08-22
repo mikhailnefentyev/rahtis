@@ -2,7 +2,7 @@
 
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { getDictionary, isLocale, type Locale } from '@/lib/i18n';
+import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
 import { cabinetPath, noAccessPath, safeRedirect, signInPath } from './paths';
 import { getViewer } from './viewer';
 
@@ -20,7 +20,7 @@ export async function signInAction(
   formData: FormData,
 ): Promise<SignInState> {
   const rawLocale = String(formData.get('locale') ?? '');
-  const locale: Locale = isLocale(rawLocale) ? rawLocale : 'ru';
+  const locale: Locale = isLocale(rawLocale) ? rawLocale : defaultLocale;
   const t = await getDictionary(locale);
 
   const email = String(formData.get('email') ?? '')
@@ -65,7 +65,7 @@ export async function setPasswordAction(
   formData: FormData,
 ): Promise<SetPasswordState> {
   const rawLocale = String(formData.get('locale') ?? '');
-  const locale: Locale = isLocale(rawLocale) ? rawLocale : 'ru';
+  const locale: Locale = isLocale(rawLocale) ? rawLocale : defaultLocale;
   const t = await getDictionary(locale);
 
   const password = String(formData.get('password') ?? '');
@@ -87,7 +87,7 @@ export async function setPasswordAction(
 
 export async function signOutAction(formData: FormData): Promise<void> {
   const rawLocale = String(formData.get('locale') ?? '');
-  const locale: Locale = isLocale(rawLocale) ? rawLocale : 'ru';
+  const locale: Locale = isLocale(rawLocale) ? rawLocale : defaultLocale;
 
   const supabase = await createClient();
   await supabase.auth.signOut();

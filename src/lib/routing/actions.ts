@@ -1,7 +1,7 @@
 'use server';
 
 import { getViewer } from '@/lib/auth/viewer';
-import { getDictionary, isLocale, type Locale } from '@/lib/i18n';
+import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
 import { truckProfile } from './profiles';
 import { tomtom } from './tomtom';
 import { metresToKm, routeFingerprint, routingConfigured } from './index';
@@ -29,7 +29,7 @@ async function forbidden(locale: Locale) {
 }
 
 function toLocale(value: string | undefined): Locale {
-  return value && isLocale(value) ? value : 'ru';
+  return value && isLocale(value) ? value : defaultLocale;
 }
 
 export type SuggestState =

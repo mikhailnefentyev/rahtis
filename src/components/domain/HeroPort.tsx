@@ -1,4 +1,9 @@
 import Link from 'next/link';
+import {
+  TripCycle,
+  type CycleStage,
+  type CycleTrip,
+} from '@/components/domain/TripCycle';
 import { buttonClass, Mono } from '@/components/ui';
 import { signInPath } from '@/lib/auth/paths';
 import { getI18n, type Locale } from '@/lib/i18n';
@@ -113,43 +118,55 @@ export async function HeroPort({ locale }: { locale: Locale }) {
   );
 }
 
-/** Карточка рейса — тот же вид, что в кабинете, только без данных из базы. */
+/**
+ * Карточка рейса — тот же вид, что в кабинете, только без данных из базы.
+ *
+ * Собирается на сервере целиком: клиентской части достаются готовые
+ * строки, а не словарь. Стадий четыре, и это те же четыре состояния, что
+ * заказ проходит по-настоящему — от публикации до приложенной накладной.
+ */
 async function TripPreview({ locale }: { locale: Locale }) {
-  const { t } = await getI18n(locale);
+  const { t, m } = await getI18n(locale);
+  const l = t.landing;
 
-  const stops = [
-    { kind: t.stopKind.PICKUP, place: 'Steveco Hanko', sub: 'Korsmaninkatu 6, 10900 Hanko', at: '22:10' },
-    { kind: t.stopKind.EXTRA_UNLOAD, place: 'UPM Kotka', sub: 'UPM Kotka · Mika', at: '07:00' },
-    { kind: t.stopKind.TRAILER_RETURN, place: 'DFDS Turku', sub: t.orderForm.trailerEmpty, at: '12:30' },
+  const trip: CycleTrip = {
+    title: t.orderType.TRAILER_SWAP,
+    ref: 'RS-2026-0041',
+    plate: 'ABC-123',
+    stops: [
+      {
+        kind: t.stopKind.PICKUP,
+        place: 'Steveco Hanko',
+        sub: 'Korsmaninkatu 6, 10900 Hanko',
+        at: '22:10',
+      },
+      { kind: t.stopKind.EXTRA_UNLOAD, place: 'UPM Kotka', sub: 'UPM Kotka · Mika', at: '07:00' },
+      {
+        kind: t.stopKind.TRAILER_RETURN,
+        place: 'DFDS Turku',
+        sub: t.orderForm.trailerEmpty,
+        at: '12:30',
+      },
+    ],
+    distance: m('order.distance', { km: 580 }),
+    stopsCount: m('order.stopsCount', { count: 3 }),
+    lane: 'Hanko → Turku',
+  };
+
+  const stages: CycleStage[] = [
+    { status: l.cycle1, note: l.cycle1Note, tone: 'idle', done: 0, waiting: false },
+    { status: l.cycle2, note: l.cycle2Note, tone: 'warn', done: 0, waiting: true },
+    { status: l.cycle3, note: l.cycle3Note, tone: 'live', done: 1, waiting: false },
+    { status: l.cycle4, note: l.cycle4Note, tone: 'ok', done: 3, waiting: false },
   ];
 
   return (
-    <div className="trip-preview">
-      <div className="trip-preview__top">
-        <span className="trip-preview__title">{t.orderType.TRAILER_SWAP}</span>
-        <span className="trip-preview__badge">{t.orderStatus.IN_PROGRESS}</span>
-        <Mono className="trip-preview__ref">RS-2026-0041</Mono>
-      </div>
-
-      <ul className="trip-preview__route">
-        {stops.map((stop) => (
-          <li key={stop.place}>
-            <span className="trip-preview__pin" aria-hidden="true" />
-            <span>
-              <span className="trip-preview__stop">
-                {stop.kind} · {stop.place}
-              </span>
-              <span className="trip-preview__sub">{stop.sub}</span>
-            </span>
-            <Mono className="trip-preview__time">{stop.at}</Mono>
-          </li>
-        ))}
-      </ul>
-
-      <div className="trip-preview__foot">
-        <Mono>580 {t.unit.km}</Mono>
-        <Mono>Hanko → Turku</Mono>
-      </div>
-    </div>
+    <TripCycle
+      trip={trip}
+      stages={stages}
+      stageLabel={stages.map((_, n) =>
+        m('landing.cycleStage', { no: n + 1, total: stages.length }),
+      )}
+    />
   );
 }

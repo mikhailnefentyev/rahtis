@@ -10,7 +10,7 @@ import {
   isValidVatNumber,
   normalizeIban,
 } from '@/lib/banking';
-import { getDictionary, isLocale, type Locale } from '@/lib/i18n';
+import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 
 export type RequisitesState = { error: string | null; done: boolean };
@@ -37,7 +37,7 @@ export async function saveRequisitesAction(
   formData: FormData,
 ): Promise<RequisitesState> {
   const rawLocale = String(formData.get('locale') ?? '');
-  const locale: Locale = isLocale(rawLocale) ? rawLocale : 'ru';
+  const locale: Locale = isLocale(rawLocale) ? rawLocale : defaultLocale;
   const t = await getDictionary(locale);
 
   const viewer = await getViewer();

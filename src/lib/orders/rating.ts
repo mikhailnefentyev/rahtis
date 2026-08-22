@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { getViewer } from '@/lib/auth/viewer';
-import { getDictionary, isLocale, type Locale } from '@/lib/i18n';
+import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 
 /**
@@ -17,7 +17,7 @@ export type RatingState = { error: string | null; score: number | null };
 
 function toLocale(value: FormDataEntryValue | null): Locale {
   const raw = String(value ?? '');
-  return isLocale(raw) ? raw : 'ru';
+  return isLocale(raw) ? raw : defaultLocale;
 }
 
 export async function rateOrderAction(

@@ -1,5 +1,3 @@
-import type { Dictionary } from './index';
-
 /**
  * Suomenkielinen sanasto.
  *
@@ -194,6 +192,20 @@ export const fi = {
     regionsLabel: 'toiminta-aluetta',
     fleetLive: 'Luvut päivittyvät uusien hyväksyntöjen myötä.',
     regions: 'Toiminta-alueet',
+
+    /*
+     * Neljä vaihetta, jotka tilaus oikeasti käy läpi. Tekstit ovat samat
+     * kuin palvelussa, jotta kortti vastaa sitä, mitä käyttäjä myöhemmin
+     * näkee omilla sivuillaan.
+     */
+    cycle1: 'Tarjolla',
+    cycle1Note: 'Julkaistu ja välitetty alueen kuljetusliikkeille',
+    cycle2: 'Tarjouksia 2 / 3',
+    cycle2Note: 'Rahdinantaja valitsee hinnan ja arvostelujen perusteella',
+    cycle3: 'Ajossa · perävaunu noudettu',
+    cycle3Note: 'Kuljettaja merkitsee pisteet järjestyksessä',
+    cycle4: 'Valmis · rahtikirja liitetty',
+    cycle4Note: 'Asiakirjat rahdinantajalla, tilitys viikkoraportissa',
     cabinet: 'Omat sivut',
 
     helpEyebrow: 'Mitä RAHTIS tekee',
@@ -894,8 +906,15 @@ export const fi = {
     'amend.madeAt': 'Muutettu {date}',
 
 
+    'landing.cycleStage': 'Vaihe {no} / {total}',
+
     'done.weekOf': 'Viikko {date}',
     'done.closedAt': 'Päättyi {date}',
     'done.bps': '{rate, number, ::percent}',
   },
-} as const satisfies Dictionary;
+/*
+ * Без `satisfies Dictionary`: тип Dictionary выводится отсюда же, и
+ * проверка эталона собственным типом была бы кольцом. Форму этого
+ * словаря проверяют остальные словари, а не он сам.
+ */
+} as const;

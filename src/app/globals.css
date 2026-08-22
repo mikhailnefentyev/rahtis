@@ -281,8 +281,8 @@
   margin-inline: auto;
   padding: 96px 20px 72px;
   display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-  gap: 56px;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: 48px;
   align-items: center;
 }
 
@@ -298,8 +298,8 @@
 
 .hero-port__title {
   margin: 14px 0 0;
-  font-size: clamp(38px, 5.4vw, 62px);
-  line-height: 1.02;
+  font-size: clamp(32px, 4.4vw, 52px);
+  line-height: 1.06;
   letter-spacing: -0.035em;
   font-weight: 600;
   color: #ffffff;
@@ -408,7 +408,13 @@
   padding: 18px;
   box-shadow: 0 18px 48px rgba(0, 0, 0, 0.34);
 }
-.trip-preview__top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.trip-preview__top { display: flex; align-items: center; gap: 10px; }
+.trip-preview__title { flex: 1 1 auto; min-width: 0; }
+.trip-preview__ids {
+  display: flex;
+  gap: 12px;
+  margin-top: 6px;
+}
 .trip-preview__title { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
 .trip-preview__badge {
   height: 22px;
@@ -464,6 +470,81 @@
   color: var(--color-ink-faint);
 }
 
+/*
+ * Цвет стадии. Тот же язык статусов, что в кабинете: серый — лежит на
+ * столе, янтарный — ждём чужого решения, синий — едет, зелёный — сделан.
+ * Одна переменная красит и полосу слева, и бейдж, поэтому карточка
+ * меняется целиком, а не пятнами.
+ */
+.trip-preview {
+  --stage: var(--color-line-strong);
+  border-left: 3px solid var(--stage);
+  transition: border-color 260ms ease;
+}
+.trip-preview[data-tone='warn'] { --stage: var(--color-warn); }
+.trip-preview[data-tone='live'] { --stage: var(--color-live); }
+.trip-preview[data-tone='ok'] { --stage: var(--color-ok); }
+
+.trip-preview__badge {
+  border-color: color-mix(in srgb, var(--stage) 38%, transparent);
+  background: color-mix(in srgb, var(--stage) 12%, var(--color-surface));
+  color: var(--stage);
+  transition:
+    color 260ms ease,
+    background-color 260ms ease,
+    border-color 260ms ease;
+}
+.trip-preview[data-tone='idle'] .trip-preview__badge { color: var(--color-ink-muted); }
+
+.trip-preview__plate {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--color-ink-faint);
+}
+
+/* Пройденная точка заливается цветом стадии — как отметка в рейсе. */
+.trip-preview__route li[data-done] .trip-preview__pin {
+  background: color-mix(in srgb, var(--stage) 22%, var(--color-surface));
+  border-color: color-mix(in srgb, var(--stage) 55%, transparent);
+}
+.trip-preview__pin {
+  transition:
+    background-color 260ms ease,
+    border-color 260ms ease;
+}
+
+/* Ждём чужого решения — карточка дышит, но еле заметно. */
+.trip-preview[data-waiting] { animation: trip-wait 2s ease-in-out infinite; }
+@keyframes trip-wait {
+  0%, 100% { box-shadow: 0 18px 48px rgba(0, 0, 0, 0.34); }
+  50% { box-shadow: 0 18px 48px rgba(0, 0, 0, 0.34), 0 0 0 4px color-mix(in srgb, var(--stage) 16%, transparent); }
+}
+
+.trip-cycle__note {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 0 0;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.62);
+}
+.trip-cycle__ticks { display: inline-flex; gap: 5px; flex: none; }
+.trip-cycle__tick {
+  width: 16px;
+  height: 4px;
+  padding: 0;
+  border: 0;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.26);
+  cursor: pointer;
+  transition:
+    background-color 260ms ease,
+    width 260ms ease;
+}
+.trip-cycle__tick[data-on] { width: 26px; background: rgba(255, 255, 255, 0.86); }
+.trip-cycle__tick:hover { background: rgba(255, 255, 255, 0.6); }
+.trip-cycle__label { line-height: 1.35; }
+
 @media (max-width: 1000px) {
   .hero-port__inner { grid-template-columns: 1fr; gap: 40px; padding-top: 84px; }
 }
@@ -481,4 +562,5 @@
     background-position: center;
   }
   .hero-port__pulse::after { animation: none; }
+  .trip-preview[data-waiting] { animation: none; }
 }
