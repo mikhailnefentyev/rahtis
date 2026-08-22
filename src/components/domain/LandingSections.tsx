@@ -24,11 +24,15 @@ export async function LandingSections({ locale }: { locale: Locale }) {
         * Здесь напрашивались логотипы клиентов, но выдуманные логотипы
         * были бы враньём, а пустая полоса читалась бы как «клиентов нет».
         * Города — то же социальное доказательство, только проверяемое.
+        *
+        * Список ровно тот же, что в справочнике площадок: обещать на
+        * витрине город, куда заказ нельзя оформить, значит обещать
+        * впустую.
         */}
       <div className="border-y border-line bg-surface py-6">
         <p className="label-micro text-center">{l.regions}</p>
         <p className="mt-3 text-center font-mono text-[15px] tracking-[0.14em] text-ink-dim">
-          HANKO · RAUMA · KOTKA · NAANTALI · TURKU
+          HANKO · HELSINKI · RAUMA · KOTKA · NAANTALI · TURKU
         </p>
       </div>
 
