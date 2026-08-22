@@ -17,6 +17,16 @@ import type { AddressSuggestion } from './types';
  * территории это сотни метров и на километраж не влияет, а водитель едет
  * по адресу, который написан точно.
  *
+ * Хельсинки стоит четырьмя строками, а не одной: водитель едет не в
+ * город, а в конкретную гавань, а между Вуосаари и Катаянокка
+ * пятнадцать километров и полтора часа в пятницу вечером. Гавани названы
+ * районами, а не операторами: Tallink стоит в двух из четырёх, а
+ * Länsisatama делят Tallink и Eckerö. Оператор находится по слову.
+ *
+ * Länsiterminaali — единственная координата, взятая точкой интереса, а не
+ * адресной: адресная точка Tyynenmerenkatu 8 приходится на середину
+ * улицы в шестистах метрах от здания терминала.
+ *
  * Список короткий и таким задуман: сюда попадает то, куда действительно
  * ездят. Всё остальное ищется у поставщика, как и раньше.
  */
@@ -43,6 +53,53 @@ export const PLACES: CuratedPlace[] = [
     city: 'Hanko',
     position: { lat: 59.824178, lon: 22.96404 },
     terms: ['порт', 'ханко', 'hanko', 'hangon', 'satama', 'port', 'korsmaninkatu'],
+  },
+  {
+    id: 'helsinki-vuosaari',
+    name: 'Helsinki · Vuosaari',
+    address: 'Satamakaari 24, 00980 Helsinki',
+    city: 'Helsinki',
+    position: { lat: 60.213578, lon: 25.172049 },
+    terms: [
+      'хельсинки', 'вуосаари', 'helsinki', 'vuosaari', 'nordsjö', 'nordsjo',
+      'satama', 'port', 'порт', 'satamakaari', 'rahti',
+    ],
+  },
+  {
+    id: 'helsinki-lansisatama',
+    name: 'Helsinki · Länsisatama',
+    address: 'Tyynenmerenkatu 8, 00220 Helsinki',
+    city: 'Helsinki',
+    position: { lat: 60.149625, lon: 24.916633 },
+    terms: [
+      'хельсинки', 'лянсисатама', 'западный', 'helsinki', 'länsisatama', 'lansisatama',
+      'länsiterminaali', 'lansiterminaali', 'jätkäsaari', 'jatkasaari', 'tyynenmerenkatu',
+      'tallink', 'silja', 'таллинк', 'eckerö', 'eckero', 'ekerö', 'ekero', 'экерё', 'экере',
+      'satama', 'port', 'порт',
+    ],
+  },
+  {
+    id: 'helsinki-etelasatama',
+    name: 'Helsinki · Eteläsatama',
+    address: 'Olympiaranta 1, 00140 Helsinki',
+    city: 'Helsinki',
+    position: { lat: 60.160774, lon: 24.957726 },
+    terms: [
+      'хельсинки', 'этеля', 'этелясатама', 'южный', 'helsinki', 'eteläsatama', 'etelasatama',
+      'olympiaterminaali', 'olympiaranta', 'olympia', 'олимпия',
+      'tallink', 'silja', 'таллинк', 'силья', 'satama', 'port', 'порт',
+    ],
+  },
+  {
+    id: 'helsinki-katajanokka',
+    name: 'Helsinki · Katajanokka',
+    address: 'Katajanokanlaituri 8, 00160 Helsinki',
+    city: 'Helsinki',
+    position: { lat: 60.163838, lon: 24.96835 },
+    terms: [
+      'хельсинки', 'катаянокка', 'helsinki', 'katajanokka', 'katajanokan',
+      'katajanokanlaituri', 'viking', 'line', 'викинг', 'satama', 'port', 'порт',
+    ],
   },
   {
     id: 'rauma-port',
