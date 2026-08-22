@@ -27,28 +27,29 @@ export function LocaleSwitch({ current }: { current: Locale }) {
    * же ряд без строки запроса — вид не прыгает.
    */
   return (
-    <Suspense fallback={<Switch current={current} search="" />}>
+    <Suspense fallback={<Switch current={current} search={null} />}>
       <WithSearch current={current} />
     </Suspense>
   );
 }
 
 function WithSearch({ current }: { current: Locale }) {
-  return <Switch current={current} search={useSearchParams().toString()} />;
+  return <Switch current={current} search={useSearchParams()} />;
 }
 
-function Switch({ current, search }: { current: Locale; search: string }) {
+function Switch({ current, search }: { current: Locale; search: URLSearchParams | null }) {
   const pathname = usePathname();
 
   return (
     <nav className="locale-switch" aria-label={LOCALE_NAMES[current]}>
       {locales.map((locale) => {
         const active = locale === current;
+        const query = translateQuery(search, locale);
 
         return (
           <Link
             key={locale}
-            href={swapLocale(pathname, locale) + (search ? `?${search}` : '')}
+            href={swapLocale(pathname, locale) + (query ? `?${query}` : '')}
             hrefLang={locale}
             data-on={active ? '' : undefined}
             aria-current={active ? 'true' : undefined}
@@ -77,6 +78,33 @@ function swapLocale(pathname: string, locale: Locale): string {
     return parts.join('/');
   }
   return `/${locale}${pathname === '/' ? '' : pathname}`;
+}
+
+/**
+ * Строка запроса для другого языка.
+ *
+ * Всё переносится как есть, кроме `next` со страницы входа: без правки
+ * человек переключает язык на форме входа, входит — и попадает в кабинет
+ * на прежнем языке.
+ *
+ * Правится только адрес, который уже начинается с известного языка. Это
+ * тот же порог, что у `safeRedirect`: параметр приходит из строки
+ * запроса, то есть от кого угодно, и трогать его можно, лишь убедившись,
+ * что это наш внутренний путь, а не чужой сайт.
+ */
+function translateQuery(search: URLSearchParams | null, locale: Locale): string {
+  if (!search) return '';
+
+  const next = search.get('next');
+  if (!next || !next.startsWith('/') || next.startsWith('//')) return search.toString();
+
+  const parts = next.split('/');
+  if (!(locales as readonly string[]).includes(parts[1] ?? '')) return search.toString();
+
+  parts[1] = locale;
+  const translated = new URLSearchParams(search);
+  translated.set('next', parts.join('/'));
+  return translated.toString();
 }
 
 /** Год — столько же, сколько живёт привычка читать интерфейс на своём языке. */

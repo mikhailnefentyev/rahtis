@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { MATCHING } from '@/lib/config';
 import { UiKitShowcase } from './showcase';
 
@@ -12,6 +13,21 @@ export const metadata: Metadata = { title: 'UI Kit' };
 export const dynamic = 'force-dynamic';
 
 export default function UiKitPage() {
+  /*
+   * В бою витрины нет.
+   *
+   * Это инструмент разработки: подписи разделов написаны по-русски, как и
+   * комментарии в коде, и переводить их незачем — их читает тот, кто
+   * платформу строит. Но на живом сайте, где интерфейс финский и
+   * английский, чужой язык во внутреннем разделе выглядит недоделкой, а
+   * сам раздел открыт кому угодно по прямому адресу.
+   *
+   * Проверка в теле страницы, а не в конфиге сборки: маршрут остаётся
+   * одним и тем же файлом, и в разработке витрина открывается без
+   * оговорок.
+   */
+  if (process.env.NODE_ENV === 'production') notFound();
+
   return <UiKitShowcase deadlines={demoDeadlines()} />;
 }
 
