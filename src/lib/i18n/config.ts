@@ -16,8 +16,14 @@ export const locales = ['fi', 'ru'] as const;
 
 export type Locale = (typeof locales)[number];
 
-/** Язык по умолчанию: на него уходят запросы без явной локали. */
-export const defaultLocale: Locale = 'ru';
+/**
+ * Язык по умолчанию: на него уходят запросы без явной локали.
+ *
+ * Финский, а не русский: рынок финский, и посетитель без внятного
+ * Accept-Language должен попадать на финскую страницу, а не на ту, на
+ * которой платформу пишут.
+ */
+export const defaultLocale: Locale = 'fi';
 
 /** Кука, в которой запоминается выбор пользователя. */
 export const LOCALE_COOKIE = 'rahti_locale';

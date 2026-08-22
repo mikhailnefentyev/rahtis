@@ -16,10 +16,11 @@ import { createClient } from '@/lib/supabase/server';
  * только если под ней настоящая темнота, а не полупрозрачная плёнка.
  */
 export async function HeroPort({ locale }: { locale: Locale }) {
-  const [{ t, m }, supabase] = await Promise.all([getI18n(locale), createClient()]);
+  const [{ t }, supabase] = await Promise.all([getI18n(locale), createClient()]);
 
   /*
-   * Живое число: столько машин имеют допуск прямо сейчас.
+   * Живые числа: столько машин имеет допуск прямо сейчас и в скольких
+   * городах они стоят.
    *
    * Через функцию, а не запросом к vehicles: главную открывает аноним, а
    * RLS закрывает таблицу от него целиком — счётчик молча не рисовался
@@ -61,9 +62,12 @@ export async function HeroPort({ locale }: { locale: Locale }) {
             {t.landing.titleA}
             <br />
             {t.landing.titleB}
+            <br />
+            {t.landing.titleC}
           </h1>
 
           <p className="hero-port__lede">{t.landing.lede}</p>
+          <p className="hero-port__lede hero-port__lede--second">{t.landing.lede2}</p>
 
           <div className="hero-port__doors">
             <Link
@@ -83,7 +87,7 @@ export async function HeroPort({ locale }: { locale: Locale }) {
               <span className="hero-port__pulse" aria-hidden="true" />
               <Mono className="hero-port__count">{fleet.vehicles}</Mono> {t.landing.fleetLabel}
               <span className="hero-port__sep" aria-hidden="true" />
-              <Mono>{m('landing.regions', { count: fleet.regions })}</Mono>
+              <Mono className="hero-port__count">{fleet.regions}</Mono> {t.landing.regionsLabel}
               <span className="hero-port__sep" aria-hidden="true" />
               {t.landing.fleetLive}
             </p>
@@ -114,9 +118,9 @@ async function TripPreview({ locale }: { locale: Locale }) {
   const { t } = await getI18n(locale);
 
   const stops = [
-    { kind: t.stopKind.PICKUP, place: 'Hanko Steveco', sub: 'Korsmaninkatu 6, 10900 Hanko', at: '22:10' },
-    { kind: t.stopKind.EXTRA_UNLOAD, place: 'UPM Kotka', sub: 'Kotka UPM · Mika', at: '07:00' },
-    { kind: t.stopKind.TRAILER_RETURN, place: 'Turku DFDS', sub: t.orderForm.trailerEmpty, at: '12:30' },
+    { kind: t.stopKind.PICKUP, place: 'Steveco Hanko', sub: 'Korsmaninkatu 6, 10900 Hanko', at: '22:10' },
+    { kind: t.stopKind.EXTRA_UNLOAD, place: 'UPM Kotka', sub: 'UPM Kotka · Mika', at: '07:00' },
+    { kind: t.stopKind.TRAILER_RETURN, place: 'DFDS Turku', sub: t.orderForm.trailerEmpty, at: '12:30' },
   ];
 
   return (
