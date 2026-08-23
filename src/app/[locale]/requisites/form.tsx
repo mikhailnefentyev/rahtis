@@ -274,48 +274,53 @@ export function RequisitesForm({ company }: { company: Company }) {
         </>
       )}
 
-      {/* ── Перевозчик: выплаты ── */}
-      {isCarrier && (
-        <Card>
-          <CardBody>
-            <SectionTitle>{t.requisites.payoutSection}</SectionTitle>
+      {/*
+        * Счёт нужен обеим сторонам, но за разным. Перевозчику на него
+        * приходят выплаты за рейсы. Заказчику — возвраты и хвосты по
+        * кредит-нотам: электронные счета настроены не у всех, и без
+        * счёта такой возврат некуда отправить.
+        */}
+      <Card>
+        <CardBody>
+          <SectionTitle>
+            {isCarrier ? t.requisites.payoutSection : t.requisites.bankSection}
+          </SectionTitle>
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Field
-                label={t.requisites.iban}
-                hint={t.requisites.ibanHint}
-                required
-                error={ibanError}
-                className="sm:col-span-2"
-              >
-                {(p) => (
-                  <InputMono
-                    {...p}
-                    name="iban"
-                    required
-                    value={iban}
-                    onChange={(e) => setIban(e.target.value)}
-                    onBlur={() => setIban(formatIban(iban))}
-                    placeholder="FI21 1234 5600 0007 85"
-                  />
-                )}
-              </Field>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field
+              label={t.requisites.iban}
+              hint={isCarrier ? t.requisites.ibanHint : t.requisites.ibanHintShipper}
+              required={isCarrier}
+              error={ibanError}
+              className="sm:col-span-2"
+            >
+              {(p) => (
+                <InputMono
+                  {...p}
+                  name="iban"
+                  required={isCarrier}
+                  value={iban}
+                  onChange={(e) => setIban(e.target.value)}
+                  onBlur={() => setIban(formatIban(iban))}
+                  placeholder="FI21 1234 5600 0007 85"
+                />
+              )}
+            </Field>
 
-              <Field label={t.requisites.bic} hint={t.requisites.bicHint} error={bicError}>
-                {(p) => (
-                  <InputMono
-                    {...p}
-                    name="bic"
-                    value={bic}
-                    onChange={(e) => setBic(e.target.value)}
-                    placeholder="NDEAFIHH"
-                  />
-                )}
-              </Field>
-            </div>
-          </CardBody>
-        </Card>
-      )}
+            <Field label={t.requisites.bic} hint={t.requisites.bicHint} error={bicError}>
+              {(p) => (
+                <InputMono
+                  {...p}
+                  name="bic"
+                  value={bic}
+                  onChange={(e) => setBic(e.target.value)}
+                  placeholder="NDEAFIHH"
+                />
+              )}
+            </Field>
+          </div>
+        </CardBody>
+      </Card>
 
       {state.error && (
         <p

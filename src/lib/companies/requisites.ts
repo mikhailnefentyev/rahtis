@@ -87,8 +87,13 @@ export async function saveRequisitesAction(
     einvoice_ovt: isCarrier ? null : ovt,
     einvoice_operator: isCarrier ? null : operator,
 
-    iban: isCarrier ? (iban ? normalizeIban(iban) : null) : null,
-    bic: isCarrier ? bic : null,
+    /*
+     * Счёт сохраняется обеим сторонам. Раньше у заказчика он затирался в
+     * null: считалось, что платить ему не за что. Возвраты и кредит-ноты
+     * это опровергают, а электронные счета настроены не у всех.
+     */
+    iban: iban ? normalizeIban(iban) : null,
+    bic,
   };
 
   const supabase = await createClient();

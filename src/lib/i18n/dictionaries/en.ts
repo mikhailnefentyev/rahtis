@@ -661,8 +661,10 @@ export const en = {
     operatorInvalid: '4–20 characters',
 
     payoutSection: 'Payouts',
+    bankSection: 'Bank details',
     iban: 'IBAN',
     ibanHint: 'The account we pay the jobs into',
+    ibanHintShipper: 'The account we pay any refunds into',
     ibanInvalid: 'That IBAN does not pass the check. Check the digits.',
     bic: 'BIC / SWIFT',
     bicHint: 'Not needed for Finnish accounts',

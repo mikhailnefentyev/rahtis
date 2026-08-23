@@ -670,8 +670,10 @@ export const fi = {
     operatorInvalid: '4–20 merkkiä',
 
     payoutSection: 'Tilitykset',
+    bankSection: 'Pankkiyhteys',
     iban: 'IBAN',
     ibanHint: 'Tili, jolle maksamme kuljetukset',
+    ibanHintShipper: 'Tili, jolle mahdolliset hyvitykset maksetaan',
     ibanInvalid: 'IBAN ei mene tarkistuksesta läpi. Tarkista numerot.',
     bic: 'BIC / SWIFT',
     bicHint: 'Suomalaisille tileille ei tarvita',
