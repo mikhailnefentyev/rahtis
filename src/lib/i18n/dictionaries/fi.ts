@@ -941,7 +941,8 @@ export const fi = {
 
     'pulse.week': 'vko {no}',
     'pulse.weekAmount': 'Viikko {no} · {amount}',
-    'pulse.total': '{weeks} vko yhteensä {amount}',
+    'pulse.totalOne': 'vko {no} yhteensä {amount}',
+    'pulse.totalRange': 'vko {from}–{to} yhteensä {amount}',
 
     'done.weekOf': 'Viikko {date}',
     'done.closedAt': 'Päättyi {date}',

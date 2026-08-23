@@ -257,7 +257,10 @@ export function UiKitShowcase({ deadlines }: { deadlines: DemoDeadlines }) {
                 { note: 'первая неделя', values: [0, 0, 0, 0, 0, 0, 0, 4800] },
               ].map((row) => (
                 <div key={row.note}>
-                  <p className="label-micro mb-2">{row.note}</p>
+                  <div className="mb-2 flex flex-wrap items-baseline justify-between gap-x-4">
+                    <p className="label-micro">{row.note}</p>
+                    <Mono className="text-[13px] font-semibold">{weekTotal(row.values, m, f)}</Mono>
+                  </div>
                   <Bars
                     points={row.values.map((value, n) => ({
                       value,
@@ -626,4 +629,27 @@ function Swatch({ name, className, note }: { name: string; className: string; no
       </div>
     </div>
   );
+}
+
+/**
+ * Подпись «vko 34 yhteensä …» для витрины.
+ *
+ * Повторяет правило кабинета: называются недели, в которых была работа,
+ * а не длина окна. Здесь она нужна, чтобы увидеть все три случая рядом —
+ * одна неделя, разрыв, полный ряд.
+ */
+function weekTotal(
+  values: number[],
+  m: ReturnType<typeof useI18n>['m'],
+  f: ReturnType<typeof useI18n>['f'],
+): string {
+  const worked = values.map((value, n) => ({ value, no: 27 + n })).filter((row) => row.value > 0);
+  const total = values.reduce((sum, value) => sum + value, 0);
+  const first = worked[0];
+  const last = worked[worked.length - 1];
+  if (!first || !last) return '';
+
+  return first === last
+    ? m('pulse.totalOne', { no: first.no, amount: f.eur(total) })
+    : m('pulse.totalRange', { from: first.no, to: last.no, amount: f.eur(total) });
 }

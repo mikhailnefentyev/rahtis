@@ -921,7 +921,8 @@ export const en = {
 
     'pulse.week': 'wk {no}',
     'pulse.weekAmount': 'Week {no} · {amount}',
-    'pulse.total': '{weeks} wks total {amount}',
+    'pulse.totalOne': 'wk {no} total {amount}',
+    'pulse.totalRange': 'wks {from}–{to} total {amount}',
 
     'done.weekOf': 'Week of {date}',
     'done.closedAt': 'Completed {date}',

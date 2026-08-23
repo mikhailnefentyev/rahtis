@@ -57,7 +57,16 @@ export async function CabinetPulse({ locale, role }: { locale: Locale; role: Par
   );
 
   const total = series.reduce((sum, point) => sum + point.cents, 0);
-  const hasHistory = series.some((point) => point.cents > 0);
+
+  /*
+   * Подпись называет недели, в которых действительно были перевозки, а
+   * не длину окна. «8 vko yhteensä» у компании с одной рабочей неделей
+   * читается как средняя за два месяца, хотя сумма верная: остальные
+   * семь недель просто нули.
+   */
+  const worked = series.filter((point) => point.cents > 0);
+  const first = worked[0];
+  const last = worked[worked.length - 1];
 
   return (
     <div className="mt-4 grid gap-4 lg:grid-cols-2">
@@ -88,14 +97,20 @@ export async function CabinetPulse({ locale, role }: { locale: Locale; role: Par
               {' · '}
               {t.pulse.vatFree}
             </p>
-            {hasHistory && (
+            {first && last && (
               <Mono className="text-[13px] font-semibold">
-                {m('pulse.total', { weeks: WEEKS, amount: f.eur(total) })}
+                {first === last
+                  ? m('pulse.totalOne', { no: isoWeek(first.week), amount: f.eur(total) })
+                  : m('pulse.totalRange', {
+                      from: isoWeek(first.week),
+                      to: isoWeek(last.week),
+                      amount: f.eur(total),
+                    })}
               </Mono>
             )}
           </div>
 
-          {hasHistory ? (
+          {first ? (
             <Bars
               points={series.map((point) => ({
                 value: point.cents,
