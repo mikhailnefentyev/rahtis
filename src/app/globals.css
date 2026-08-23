@@ -463,6 +463,71 @@
   box-shadow: none;
 }
 
+/* ── Нижняя часть кабинета: состояние и недели ────────────────── */
+
+/*
+ * Подпись впереди, число после: «Avoimia 3». Обратный порядок заставил
+ * бы финский согласовывать слово с числом, а «3 Odottaa kuljettajaa»
+ * согласовать нельзя — это не существительное, а глагольная фраза.
+ */
+.pulse-chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 7px;
+  padding: 5px 11px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-pill);
+  background: var(--color-sunken);
+  font-size: 13px;
+  color: var(--color-ink-muted);
+}
+.pulse-chip__count {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.pulse-bars {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 6px;
+  align-items: end;
+  margin-top: 2px;
+}
+.pulse-bars__col { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+
+/*
+ * Дорожка фиксированной высоты, столбик внутри в процентах. Так пустая
+ * неделя занимает то же место, что и полная, и восемь недель всегда
+ * стоят ровной сеткой.
+ */
+.pulse-bars__track {
+  height: 84px;
+  display: flex;
+  align-items: flex-end;
+  border-bottom: 1px solid var(--color-line);
+}
+.pulse-bars__bar {
+  width: 100%;
+  border-radius: 3px 3px 0 0;
+  background: var(--color-accent);
+  min-height: 1px;
+}
+/* Ноль — не пропуск, а тонкая линия: месяц простоя должен быть виден. */
+.pulse-bars__bar[data-zero] { background: var(--color-line-strong); border-radius: 0; }
+
+.pulse-bars__label {
+  text-align: center;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.02em;
+  color: var(--color-ink-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* ── Карточка рейса поверх видео ──────────────────────────────── */
 .trip-preview {
   background: var(--color-surface);

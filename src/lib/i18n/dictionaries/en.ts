@@ -773,6 +773,20 @@ export const en = {
     total: 'Total',
   },
 
+  pulse: {
+    now: 'Right now',
+    nowEmpty: 'No transports in progress',
+
+    countOpen: 'Available',
+    countOffers: 'Offers in',
+    countAwaitDriver: 'Awaiting driver',
+    countInProgress: 'On the road',
+    earnings: 'Earnings by week',
+    spend: 'Costs by week',
+    vatFree: 'VAT 0%',
+    empty: 'The chart appears once the first job is completed.',
+  },
+
   unit: {
     km: 'km',
   },
@@ -904,6 +918,10 @@ export const en = {
     'amend.madeAt': 'Changed {date}',
 
     'landing.cycleStage': 'Stage {no} / {total}',
+
+    'pulse.week': 'wk {no}',
+    'pulse.weekAmount': 'Week {no} · {amount}',
+    'pulse.total': '{weeks} wks total {amount}',
 
     'done.weekOf': 'Week of {date}',
     'done.closedAt': 'Completed {date}',

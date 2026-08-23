@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import {
+  Bars,
   Badge,
   Button,
   Card,
@@ -245,6 +246,40 @@ export function UiKitShowcase({ deadlines }: { deadlines: DemoDeadlines }) {
               tone="ok"
             />
           </StatRow>
+        </Section>
+
+        <Section title="Столбики по неделям">
+          <Card>
+            <CardBody className="flex flex-col gap-5">
+              {[
+                { note: 'обычная неделя', values: [4800, 7200, 5100, 9600, 3200, 8400, 6000, 11200] },
+                { note: 'простой в середине', values: [6400, 0, 0, 0, 5200, 7800, 0, 9100] },
+                { note: 'первая неделя', values: [0, 0, 0, 0, 0, 0, 0, 4800] },
+              ].map((row) => (
+                <div key={row.note}>
+                  <p className="label-micro mb-2">{row.note}</p>
+                  <Bars
+                    points={row.values.map((value, n) => ({
+                      value,
+                      label: m('pulse.week', { no: 27 + n }),
+                      title: m('pulse.weekAmount', { no: 27 + n, amount: f.eur(value) }),
+                    }))}
+                  />
+                </div>
+              ))}
+
+              <div className="flex flex-wrap gap-2">
+                {(['countOpen', 'countOffers', 'countAwaitDriver', 'countInProgress'] as const).map(
+                  (key, n) => (
+                    <span key={key} className="pulse-chip">
+                      {t.pulse[key]}
+                      <Mono className="pulse-chip__count">{n + 1}</Mono>
+                    </span>
+                  ),
+                )}
+              </div>
+            </CardBody>
+          </Card>
         </Section>
 
         <Section title="Обратный отсчёт">

@@ -782,6 +782,28 @@ export const fi = {
     total: 'Yhteensä',
   },
 
+  pulse: {
+    now: 'Juuri nyt',
+    nowEmpty: 'Ei käynnissä olevia kuljetuksia',
+
+    /*
+     * Omat nimet laskurille, vaikka orderStatus sanoo saman.
+     *
+     * Tilamerkintä kertoo yhdestä kuljetuksesta, laskuri monesta, ja
+     * suomessa se on eri sana: yksi kuljetus on «Avoin», mutta kolme on
+     * «Avoimia 3». Luku tulee sanan jälkeen samasta syystä — «3 Odottaa
+     * kuljettajaa» ei ole suomea.
+     */
+    countOpen: 'Avoimia',
+    countOffers: 'Tarjouksia',
+    countAwaitDriver: 'Odottaa kuljettajaa',
+    countInProgress: 'Ajossa',
+    earnings: 'Ansiot viikoittain',
+    spend: 'Kustannukset viikoittain',
+    vatFree: 'alv 0 %',
+    empty: 'Kaavio piirtyy, kun ensimmäinen kuljetus on valmis.',
+  },
+
   unit: {
     km: 'km',
   },
@@ -916,6 +938,10 @@ export const fi = {
 
 
     'landing.cycleStage': 'Vaihe {no} / {total}',
+
+    'pulse.week': 'vko {no}',
+    'pulse.weekAmount': 'Viikko {no} · {amount}',
+    'pulse.total': '{weeks} vko yhteensä {amount}',
 
     'done.weekOf': 'Viikko {date}',
     'done.closedAt': 'Päättyi {date}',
