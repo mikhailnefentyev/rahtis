@@ -28,14 +28,14 @@ export const fi = {
 
   role: {
     CARRIER: 'Kuljetusliike',
-    SHIPPER: 'Rahdinantaja',
+    SHIPPER: 'Tilaaja',
     ADMIN: 'Ylläpito · Aivomaa',
   },
 
   nav: {
-    desk: 'Kuormatarjonta',
+    desk: 'Avoimet kuljetukset',
     fleet: 'Kalusto',
-    orders: 'Omat tilaukset',
+    orders: 'Omat kuljetukset',
     report: 'Viikkoraportti',
     moderation: 'Tarkastus',
     dispatch: 'Ajojärjestely · WhatsApp',
@@ -64,7 +64,7 @@ export const fi = {
     retry: 'Yritä uudelleen',
     closeTrip: 'Päätä kuljetus',
     submitApplication: 'Lähetä hakemus',
-    addVehicle: 'Lisää auto',
+    addVehicle: 'Lisää ajoneuvo',
   },
 
   a11y: {
@@ -99,13 +99,14 @@ export const fi = {
     yourRole: 'Roolisi',
     stageNotice: 'Osio avautuu myöhemmin. Nyt käytössä ovat kirjautuminen, roolit ja käyttöoikeudet.',
     approvedCarrierHint:
-      'Yritys on hyväksytty. Lataa liikennelupa ja vakuutus sekä lisää autot, niin kuormatarjonta avautuu. Hyväksymme jokaisen auton erikseen.',
-    approvedShipperHint: 'Yritys on hyväksytty. Täydennä yritystiedot, niin voit julkaista tilauksia.',
+      'Yritys on hyväksytty. Lataa liikennelupa ja vakuutus sekä lisää ajoneuvot, niin avoimet kuljetukset tulevat näkyviin. Hyväksymme jokaisen ajoneuvon erikseen.',
+    approvedShipperHint:
+      'Yritys on hyväksytty. Täydennä yritystiedot, niin voit julkaista kuljetuksia.',
   },
 
   orderStatus: {
     DRAFT: 'Luonnos',
-    OPEN: 'Tarjolla',
+    OPEN: 'Avoin',
     REQUESTED: 'Tarjouksia',
     AWAIT_DRIVER: 'Odottaa kuljettajaa',
     IN_PROGRESS: 'Ajossa',
@@ -136,10 +137,10 @@ export const fi = {
     allDone: 'Kaikki pisteet tehty',
     failed: 'Merkintä ei onnistunut. Päivitä sivu ja yritä uudelleen.',
     outOfOrder: 'Pisteet merkitään järjestyksessä. Merkitse ensin edelliset pisteet.',
-    notYours: 'Vain kuljetuksen hoitava liike voi merkitä pisteitä.',
+    notYours: 'Vain kuljetusta ajava kuljetusliike voi merkitä pisteitä.',
 
     closing: 'Kuljetuksen päättäminen',
-    closingHint: 'Liitä rahtikirja ja kuvat. Ne välittyvät rahdinantajalle heti.',
+    closingHint: 'Liitä rahtikirja ja kuvat. Ne välittyvät tilaajalle heti.',
     close: 'Päätä kuljetus',
     closing_: 'Päätetään…',
     closed: 'Kuljetus on valmis',
@@ -171,7 +172,7 @@ export const fi = {
     acknowledge: 'Kuittaa nähdyksi',
     acknowledged: 'Kuitattu',
     failed: 'Muutos ei onnistunut. Päivitä sivu ja yritä uudelleen.',
-    notYours: 'Vain tilauksen rahdinantaja voi muuttaa reittiä.',
+    notYours: 'Vain kuljetuksen tilaaja voi muuttaa reittiä.',
   },
 
   landing: {
@@ -194,18 +195,18 @@ export const fi = {
     regions: 'Toiminta-alueet',
 
     /*
-     * Neljä vaihetta, jotka tilaus oikeasti käy läpi. Tekstit ovat samat
+     * Neljä vaihetta, jotka kuljetus oikeasti käy läpi. Tekstit ovat samat
      * kuin palvelussa, jotta kortti vastaa sitä, mitä käyttäjä myöhemmin
      * näkee omilla sivuillaan.
      */
     cycle1: 'Tarjolla',
     cycle1Note: 'Julkaistu ja välitetty alueen kuljetusliikkeille',
     cycle2: 'Tarjouksia 2 / 3',
-    cycle2Note: 'Rahdinantaja valitsee hinnan ja arvostelujen perusteella',
+    cycle2Note: 'Tilaaja valitsee hinnan ja arvostelujen perusteella',
     cycle3: 'Ajossa · perävaunu noudettu',
     cycle3Note: 'Kuljettaja merkitsee pisteet järjestyksessä',
     cycle4: 'Valmis · rahtikirja liitetty',
-    cycle4Note: 'Asiakirjat rahdinantajalla, tilitys viikkoraportissa',
+    cycle4Note: 'Asiakirjat tilaajalla, tilitys viikkoraportissa',
     cabinet: 'Omat sivut',
 
     helpEyebrow: 'Mitä RAHTIS tekee',
@@ -356,32 +357,39 @@ export const fi = {
     finalLede2:
       'Tarkistamme yrityksen tiedot rekistereistä ja avaamme hyväksynnän jälkeen tunnukset palveluun.',
     finalLede3: 'Kuljetusliikkeiltä tarvitsemme lisäksi tiedot liikenneluvasta ja vakuutuksesta.',
-    applyShipper: 'Rahdinantajan hakemus',
+    applyShipper: 'Tilaajan hakemus',
     applyCarrier: 'Kuljetusliikkeen hakemus',
     footerCountry: 'Suomi',
   },
 
   done: {
     titleCarrier: 'Ajetut kuljetukset',
-    titleShipper: 'Valmiit tilaukset',
+    titleShipper: 'Valmiit kuljetukset',
     titleAdmin: 'Laskutus ja tilitykset',
-    subtitleCarrier: 'Päättyneet kuljetukset viikoittain ja tilityssummat.',
-    subtitleShipper: 'Valmiit tilaukset viikoittain ja maksettavat summat.',
-    subtitleAdmin: 'Kenelle lasku, kenelle tilitys.',
+    subtitleCarrier: 'Viikon aikana ajetut kuljetukset ja niistä tilitettävät summat.',
+    subtitleShipper: 'Viikon aikana valmistuneet kuljetukset ja niiden laskutettavat summat.',
+    subtitleAdmin: 'Tilaajien laskut ja kuljetusliikkeiden tilitykset.',
+    /*
+     * Примечание про НДС различается по роли: заказчику выставляют счёт,
+     * перевозчику платят. Одна общая фраза заставляла бы каждого читать
+     * половину про чужие деньги.
+     */
+    vatNoteShipper: 'Summat alv 0 %. Laskuihin lisätään alv 25,5 %.',
+    vatNoteCarrier: 'Summat alv 0 %. Tilityksiin lisätään alv 25,5 %.',
     open: 'Avaa',
     collapse: 'Pienennä',
     none: 'Ei vielä ajettuja kuljetuksia',
     noneHint: 'Päättynyt kuljetus siirtyy tänne asiakirjoineen ja summineen.',
     rate: 'Hinta',
-    commission: 'Provisio',
+    commission: 'Palvelumaksu',
     payout: 'Tilitys',
     margin: 'Kate',
-    clients: 'Rahdinantajat · laskutus',
+    clients: 'Tilaajat · laskutus',
     carriers: 'Kuljetusliikkeet · tilitykset',
     company: 'Yritys',
     trips: 'Kuljetuksia',
     distance: 'Matka',
-    noPartners: 'Tällä jaksolla ei päättynyt kuljetuksia',
+    noPartners: 'Tällä jaksolla ei valmistunut kuljetuksia',
     allTime: 'Koko ajalta',
   },
 
@@ -435,22 +443,22 @@ export const fi = {
   },
 
   order: {
-    ref: 'Tilausnumero',
+    ref: 'Kuljetusnumero',
     trailer: 'Perävaunu',
     distance: 'Matka',
     rate: 'Hinta',
     ratePerKm: 'Kilometrihinta',
-    comment: 'Lisätiedot tilaukseen',
+    comment: 'Lisätiedot kuljetukseen',
     commentPlaceholder: 'Satamalupa, sinetti, lämpötila…',
     changelog: 'Muutokset lähdön jälkeen',
-    changelogFromShipper: 'Muutos rahdinantajalta',
-    offers: 'Tarjoukset',
+    changelogFromShipper: 'Muutos tilaajalta',
+    offers: 'Kuljetustarjoukset',
     noDamage: 'Ei vaurioita',
     damage: 'Vauriot',
     damagePlaceholder: 'Kolhu perävaunun vasemmassa laidassa',
     documents: 'Asiakirjat',
     trips: 'Kuljetuksia',
-    cargoAndPayment: 'Rahti ja hinta',
+    cargoAndPayment: 'Kuorma ja hinta',
     closeTitle: 'Kuljetuksen päättäminen',
 
     consignee: 'Vastaanottaja',
@@ -458,15 +466,15 @@ export const fi = {
   },
 
   orderForm: {
-    title: 'Uusi tilaus',
-    subtitle: 'Täytä reitti kokonaan ja julkaise. Tilaus näkyy kuljetusliikkeille heti.',
+    title: 'Uusi kuljetus',
+    subtitle: 'Täytä reitti kokonaan ja julkaise. Kuljetus näkyy kuljetusliikkeille heti.',
     type: 'Kuljetuksen tyyppi',
-    shipperRef: 'Oma tilausnumerosi',
-    shipperRefHint: 'Vapaaehtoinen. Alusta antaa oman numeron automaattisesti',
+    shipperRef: 'Oma viitteesi',
+    shipperRefHint: 'Vapaaehtoinen. RAHTIS antaa kuljetukselle oman numeron automaattisesti',
 
     trailerPickupSection: 'Mistä perävaunu noudetaan',
     dropSection: 'Mihin perävaunu jätetään',
-    cargoSection: 'Rahti ja hinta',
+    cargoSection: 'Kuorma ja hinta',
 
     placeName: 'Paikan nimi',
     address: 'Osoite',
@@ -493,8 +501,8 @@ export const fi = {
     bookingRef: 'Varausnumero',
     cargoWeight: 'Paino, t',
     cargoWeightHint: 'Enintään 76 tonnia eli HCT-yhdistelmän suurin sallittu massa',
-    consignee: 'Rahdin vastaanottaja',
-    consigneeHint: 'Kenelle rahti menee tältä pisteeltä',
+    consignee: 'Kuorman vastaanottaja',
+    consigneeHint: 'Kenelle kuorma menee tältä pisteeltä',
     loadingRef: 'Lastauksen viite',
     loadingRefHint: 'Lähettäjän oma numero, jos sellainen on',
     seal: 'Sinetti',
@@ -511,21 +519,21 @@ export const fi = {
     distance: 'Matka, km',
     rate: 'Hinta, €',
 
-    publish: 'Julkaise · näkyy alueen autoille',
+    publish: 'Julkaise · näkyy alueen kuljetusliikkeille',
     publishing: 'Julkaistaan…',
-    published: 'Tilaus julkaistu',
-    needActive: 'Täydennä yritystiedot. Ilman niitä tilausta ei voi julkaista.',
+    published: 'Kuljetus julkaistu',
+    needActive: 'Täydennä yritystiedot. Ilman niitä kuljetusta ei voi julkaista.',
     failed: 'Julkaisu ei onnistunut. Tarkista kentät ja yritä uudelleen.',
   },
 
   orders: {
-    title: 'Omat tilaukset',
-    subtitle: 'Julkaistut tilaukset ja niiden tilanne.',
-    newOrder: 'Uusi tilaus',
-    none: 'Ei vielä tilauksia',
-    noneHint: 'Julkaise ensimmäinen tilaus, niin se näkyy kuljetusliikkeille.',
+    title: 'Omat kuljetukset',
+    subtitle: 'Julkaistut kuljetukset ja niiden tilanne.',
+    newOrder: 'Uusi kuljetus',
+    none: 'Ei vielä kuljetuksia',
+    noneHint: 'Julkaise ensimmäinen kuljetus, niin se näkyy kuljetusliikkeille.',
     route: 'Reitti',
-    shipperRefShort: 'Oma numero',
+    shipperRefShort: 'Oma viite',
   },
 
   routing: {
@@ -552,8 +560,8 @@ export const fi = {
     noSlots: 'Paikat täynnä',
     slots: 'Paikkoja varattu',
     chooseVehicle: 'Millä autolla ajat',
-    waitingChoice: 'Odotetaan rahdinantajan valintaa',
-    offers: 'Tarjoukset',
+    waitingChoice: 'Odotetaan tilaajan valintaa',
+    offers: 'Kuljetustarjoukset',
     chooseCarrier: 'Valitse',
     choose: 'Valitse',
     awaitDriver: 'Odotetaan kuljettajan vahvistusta',
@@ -562,38 +570,38 @@ export const fi = {
     cancel: 'Peruuta',
     assignments: 'Omat kuljetukset',
     noAssignments: 'Ei kuljetuksia',
-    noAssignmentsHint: 'Ota tilaus kuormatarjonnasta, niin se siirtyy tänne.',
-    chosenYou: 'Rahdinantaja valitsi sinut',
-    chosenYouHint: 'Vahvista 15 minuutin kuluessa, muuten tilaus palaa tarjolle.',
+    noAssignmentsHint: 'Ota kuljetus, niin se siirtyy tänne.',
+    chosenYou: 'Tilaaja valitsi sinut',
+    chosenYouHint: 'Vahvista 15 minuutin kuluessa, muuten kuljetus vapautuu takaisin avoimeksi.',
     inProgress: 'Kuljetus ajossa',
     assignedCarrier: 'Kuljetuksen ajaa',
     contactsNow: 'Vastaanottajan yhteystiedot ovat nyt näkyvissä.',
     failed: 'Toiminto ei onnistunut. Päivitä sivu ja yritä uudelleen.',
-    tooLate: 'Aika loppui, tilaus palasi tarjolle.',
-    noSlotsLeft: 'Paikat ovat täynnä, tilaukseen tarjosi jo kolme autoa.',
-    alreadyTaken: 'Olet jo tehnyt tarjouksen tähän tilaukseen.',
+    tooLate: 'Aika loppui, kuljetus vapautui takaisin avoimeksi.',
+    noSlotsLeft: 'Paikat ovat täynnä: kuljetukseen on jo kolme tarjousta.',
+    alreadyTaken: 'Olet jo tehnyt tarjouksen tähän kuljetukseen.',
   },
 
   desk: {
-    title: 'Kuormatarjonta',
-    subtitle: 'Avoimet tilaukset alueilta, joilla autosi ovat.',
+    title: 'Avoimet kuljetukset',
+    subtitle: 'Avoimet kuljetukset alueilta, joilla ajoneuvosi ovat.',
     allRegions: 'Kaikki alueet',
-    empty: 'Tällä alueella ei ole tilauksia',
-    emptyHint: 'Vaihda aluetta tai odota uusia julkaisuja.',
-    closedTitle: 'Kuormatarjonta on suljettu',
+    empty: 'Tällä alueella ei ole avoimia kuljetuksia',
+    emptyHint: 'Vaihda aluetta tai odota uusia kuljetuksia.',
+    closedTitle: 'Avoimet kuljetukset eivät ole näkyvissä',
     closedNoVehicle:
-      'Tarvitset vähintään yhden hyväksytyn auton. Lisää auto, niin tarkastamme sen ja annamme hyväksynnän.',
+      'Avoimet kuljetukset näkyvät, kun yritykselläsi on vähintään yksi hyväksytty ajoneuvo ja vaaditut asiakirjat ovat voimassa. Lisää ajoneuvo, niin tarkastamme sen.',
     closedExpired:
-      'Yrityksen asiakirjat ovat vanhentuneet, joten hyväksyntä ei ole voimassa. Lataa uusittu lupa tai vakuutus.',
+      'Avoimet kuljetukset näkyvät, kun yritykselläsi on vähintään yksi hyväksytty ajoneuvo ja vaaditut asiakirjat ovat voimassa. Lataa uusittu liikennelupa tai vakuutus.',
     openFleet: 'Kalusto',
-    contactsHidden: 'Vastaanottajan yhteystiedot näkyvät, kun otat tilauksen.',
-    details: 'Reitti ja tiedot',
+    contactsHidden: 'Vastaanottajan yhteystiedot näkyvät, kun otat kuljetuksen.',
+    details: 'Kuljetuksen tiedot',
   },
 
   moderation: {
     queue: 'Tarkastusjono',
     applications: 'Hakemukset',
-    vehicles: 'Autot hyväksyntään',
+    vehicles: 'Ajoneuvot hyväksyntään',
     approveAndInvite: 'Hyväksy ja lähetä kutsu',
     rejectWithReason: 'Hylkää',
     reasonLabel: 'Hylkäyksen syy',
@@ -618,8 +626,8 @@ export const fi = {
     submit: 'Lähetä hakemus',
     submitting: 'Lähetetään…',
     carrierNote:
-      'Hyväksynnän jälkeen: kirjautuminen, lupa ja vakuutus, autojen tiedot. Hyväksymme jokaisen auton erikseen.',
-    shipperNote: 'Hyväksynnän jälkeen: kirjautuminen, yritystiedot, tilausten julkaisu.',
+      'Hyväksynnän jälkeen: kirjautuminen, liikennelupa ja vakuutus, ajoneuvojen tiedot. Hyväksymme jokaisen ajoneuvon erikseen.',
+    shipperNote: 'Hyväksynnän jälkeen: kirjautuminen, yritystiedot, kuljetusten julkaisu.',
     sentTitle: 'Hakemus lähetetty',
     duplicate: 'Tällä Y-tunnuksella on jo hakemus vireillä tai hyväksytty.',
     failed: 'Lähetys ei onnistunut. Yritä uudelleen.',
@@ -646,7 +654,7 @@ export const fi = {
     billingEmail: 'Laskutuksen sähköposti',
     billingEmailHint: 'Tänne lähetämme laskut',
     billingReference: 'Viite laskulle',
-    billingReferenceHint: 'Tilausnumero tai kustannuspaikka, jonka haluat laskulle',
+    billingReferenceHint: 'Viitteesi tai kustannuspaikka, jonka haluat laskulle',
 
     einvoiceSection: 'Verkkolasku',
     einvoiceOptional: 'Vapaaehtoinen. Täytä, jos vastaanotat verkkolaskuja.',
@@ -688,8 +696,8 @@ export const fi = {
 
   report: {
     weeklyPayouts: 'Viikkotilitykset kuljetusliikkeille',
-    dailyInvoices: 'Päivittäinen yhteenveto rahdinantajittain',
-    byMachine: 'Erittely autoittain',
+    dailyInvoices: 'Päivittäinen yhteenveto tilaajittain',
+    byMachine: 'Erittely ajoneuvoittain',
   },
 
   vehicle: {
@@ -707,27 +715,27 @@ export const fi = {
   fleet: {
     title: 'Kalusto',
     subtitle:
-      'Kuormatarjonta avautuu, kun yrityksellä on vähintään yksi hyväksytty auto ja voimassa olevat asiakirjat.',
-    addVehicle: 'Lisää auto',
-    newVehicle: 'Uusi auto',
-    editVehicle: 'Auton tiedot',
+      'Avoimet kuljetukset näkyvät, kun yritykselläsi on vähintään yksi hyväksytty ajoneuvo ja vaaditut asiakirjat ovat voimassa.',
+    addVehicle: 'Lisää ajoneuvo',
+    newVehicle: 'Uusi ajoneuvo',
+    editVehicle: 'Ajoneuvon tiedot',
     submitForApproval: 'Lähetä hyväksyttäväksi',
     deleteDraft: 'Poista luonnos',
-    noVehicles: 'Ei vielä autoja',
-    noVehiclesHint: 'Lisää auto, niin tarkastamme sen ja annamme hyväksynnän.',
-    onReview: 'Tarkastamme asiakirjat ja auton tiedot',
+    noVehicles: 'Ei vielä ajoneuvoja',
+    noVehiclesHint: 'Lisää ajoneuvo, niin tarkastamme sen ja annamme hyväksynnän.',
+    onReview: 'Tarkastamme asiakirjat ja ajoneuvon tiedot',
     rejectedHint: 'Ei hyväksytty. Korjaa huomautus ja lähetä uudelleen.',
     canTakeOrders: 'Voit ottaa kuljetuksia',
-    cannotTakeOrders: 'Kuormatarjonta on suljettu',
-    whyClosedNoDocs: 'Lataa voimassa olevat lupa ja vakuutus.',
-    whyClosedNoVehicle: 'Tarvitaan vähintään yksi hyväksytty auto.',
+    cannotTakeOrders: 'Avoimet kuljetukset eivät ole näkyvissä',
+    whyClosedNoDocs: 'Lataa voimassa olevat liikennelupa ja vakuutus.',
+    whyClosedNoVehicle: 'Tarvitaan vähintään yksi hyväksytty ajoneuvo.',
     whyClosedExpired: 'Asiakirjat ovat vanhentuneet, hyväksyntä ei ole voimassa.',
     languagesHint: 'Millä kielillä kuljettaja pystyy asioimaan',
   },
 
   documents: {
     title: 'Yrityksen asiakirjat',
-    subtitle: 'Tarkastamme luvan ja vakuutuksen yhdessä autojen kanssa.',
+    subtitle: 'Tarkastamme liikenneluvan ja vakuutuksen yhdessä ajoneuvojen kanssa.',
     CARRIER_LICENSE: 'Liikennelupa',
     INSURANCE: 'Vakuutus (CMR / vastuu)',
     upload: 'Lataa',
@@ -745,7 +753,8 @@ export const fi = {
     uploadFailed: 'Lataus ei onnistunut. Yritä uudelleen.',
     replacedNotice: 'Vanha versio säilyy, koska aiemmat hyväksynnät perustuvat siihen.',
     attention: 'Huomiota vaativat',
-    attentionHint: 'Näillä yrityksillä on hyväksyttyjä autoja, mutta asiakirjat ovat vanhentumassa tai jo vanhentuneet.',
+    attentionHint:
+      'Näillä yrityksillä on hyväksyttyjä ajoneuvoja, mutta asiakirjat ovat vanhentumassa tai jo vanhentuneet.',
   },
 
   company: {
@@ -763,11 +772,11 @@ export const fi = {
   },
 
   money: {
-    addVat: '+ ALV 25,5 %',
-    calcNote: 'Hinnat ovat verottomia. Laskuihin ja tilityksiin lisätään ALV 25,5 %.',
+    addVat: '+ alv 25,5 %',
+    calcNote: 'Summat alv 0 %. Laskuihin ja tilityksiin lisätään alv 25,5 %.',
 
     gross: 'Bruttohinta',
-    commission: 'Provisio',
+    commission: 'Palvelumaksu',
     payout: 'Tilitys',
     revenue: 'Laskutus',
     margin: 'Kate',
@@ -779,20 +788,20 @@ export const fi = {
   },
 
   rating: {
-    title: 'Arvio',
+    title: 'Arvosana',
     none: 'ei arvioita',
     rate: 'Arvioi kuljetusliike',
     yours: 'Antamasi arvio',
-    received: 'Rahdinantajan arvio',
+    received: 'Tilaajan arvio',
     addComment: 'Lisää kommentti',
     editComment: 'Muuta kommenttia',
     commentPlaceholder: 'Myöhästyi purusta, paperit kunnossa…',
-    commentTitle: 'Rahdinantajan kommentti',
+    commentTitle: 'Tilaajan kommentti',
     save: 'Tallenna',
     saving: 'Tallennetaan…',
     starFirst: 'Anna ensin tähdet',
     failed: 'Arvion tallennus ei onnistunut. Päivitä sivu ja yritä uudelleen.',
-    company: 'Yrityksen arvio',
+    company: 'Yrityksen arvosana',
   },
 
   countdown: {
@@ -801,14 +810,14 @@ export const fi = {
   },
 
   empty: {
-    noOrders: 'Tällä alueella ei ole tilauksia.',
-    noOrdersHint: 'Vaihda aluetta tai odota uusia julkaisuja.',
+    noOrders: 'Tällä alueella ei ole avoimia kuljetuksia.',
+    noOrdersHint: 'Vaihda aluetta tai odota uusia kuljetuksia.',
     noApplications: 'Ei uusia hakemuksia.',
-    noVehicles: 'Ei autoja tarkastuksessa.',
+    noVehicles: 'Ei ajoneuvoja tarkastuksessa.',
     noTrips: 'Tällä viikolla ei ole kuljetuksia.',
     noMessages: 'Kuljettajalta ei ole viestejä.',
-    noAccessTitle: 'Ei pääsyä tilauksiin',
-    noAccessText: 'Tarvitset vähintään yhden hyväksytyn auton.',
+    noAccessTitle: 'Ei pääsyä kuljetuksiin',
+    noAccessText: 'Tarvitset vähintään yhden hyväksytyn ajoneuvon.',
   },
 
   validation: {
@@ -832,26 +841,27 @@ export const fi = {
    */
   msg: {
     'order.offersCounter':
-      '{count, plural, one {# tarjous} other {# tarjousta}} / {max} — valitse auto',
+      '{count, plural, one {# tarjous} other {# tarjousta}} / {max} — valitse kuljetusliike',
     'order.offersFull': 'Paikat täynnä {count} / {max}',
     'order.distance': '{km, number} km',
     'order.ratePerKm': '{rate}/km',
     'order.tripsCount': '{count, plural, one {# kuljetus} other {# kuljetusta}}',
 
     'vehicle.axlesCount': '{count, plural, one {# akseli} other {# akselia}}',
-    'vehicle.accessGranted': 'Auto {plate} on hyväksytty.',
+    'vehicle.accessGranted': 'Ajoneuvo {plate} on hyväksytty.',
 
     'moderation.queued': 'Jonossa {count, plural, one {# hakemus} other {# hakemusta}}',
 
-    'rating.summary': 'Arvio {value} / 5',
+    'rating.summary': 'Arvosana {value}',
     'rating.summaryWithCount':
-      'Arvio {value} / 5 · {count, plural, one {# arvio} other {# arviota}}',
+      'Arvosana {value} · {count, plural, one {# arvio} other {# arviota}}',
+    'rating.ratingsCount': '{count, plural, one {# arvio} other {# arviota}}',
     'rating.setValue': 'Anna arvio {stars} / 5',
 
     'countdown.left': 'Aikaa jäljellä {time}',
 
     'money.withVat': 'Sis. ALV {amount}',
-    'money.commissionRate': 'Provisio {rate, number, ::percent}',
+    'money.commissionRate': 'Palvelumaksu {rate, number, ::percent}',
     'money.marginRate': 'Kate · {rate, number, ::percent}',
 
     'report.weekTotal': 'Viikko yhteensä {amount}',
@@ -863,17 +873,17 @@ export const fi = {
     'moderation.invitedTo': 'Kutsu lähetetty osoitteeseen {email}',
     'moderation.decidedBy': 'Päätetty {date}',
 
-    'fleet.vehiclesCount': '{count, plural, =0 {Ei autoja} one {# auto} other {# autoa}}',
+    'fleet.vehiclesCount': '{count, plural, =0 {Ei ajoneuvoja} one {# ajoneuvo} other {# ajoneuvoa}}',
     'fleet.approvedCount':
       '{count, plural, =0 {ei hyväksyttyjä} one {# hyväksytty} other {# hyväksyttyä}}',
     'fleet.pendingCount':
-      '{count, plural, =0 {Ei autoja tarkastuksessa} one {# auto tarkastuksessa} other {# autoa tarkastuksessa}}',
+      '{count, plural, =0 {Ei ajoneuvoja tarkastuksessa} one {# ajoneuvo tarkastuksessa} other {# ajoneuvoa tarkastuksessa}}',
 
     'documents.expiresIn': 'Vanhenee {count, plural, one {# päivän} other {# päivän}} kuluttua',
     'documents.expiredAgo': 'Vanhentui {count, plural, one {# päivä} other {# päivää}} sitten',
     'documents.validUntilDate': 'Voimassa {date} asti',
 
-    'desk.ordersCount': '{count, plural, =0 {Ei tilauksia} one {# tilaus} other {# tilausta}}',
+    'desk.ordersCount': '{count, plural, =0 {Ei kuljetuksia} one {# kuljetus} other {# kuljetusta}}',
     'desk.regionCount': '{city} · {count}',
 
     'routing.result': '{km, number} km · noin {hours} h {minutes} min',
@@ -896,8 +906,8 @@ export const fi = {
     'trip.completedAt': 'Tehty klo {time}',
     'trip.damageAt': 'Vaurio · {place}',
 
-    'trip.stepReported': 'Tilaus {ref}: kuljettaja merkitsi ”{step}”.',
-    'trip.amended': 'Reitti muuttui tilauksessa {ref}: {change}',
+    'trip.stepReported': 'Kuljetus {ref}: kuljettaja merkitsi ”{step}”.',
+    'trip.amended': 'Reitti muuttui kuljetuksessa {ref}: {change}',
 
     'amend.stopAt': '{kind} · {place}',
     'amend.fieldChange': '{label}: {from} → {to}',

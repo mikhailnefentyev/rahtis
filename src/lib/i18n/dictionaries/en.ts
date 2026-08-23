@@ -361,9 +361,11 @@ export const en = {
     titleCarrier: 'Jobs driven',
     titleShipper: 'Completed orders',
     titleAdmin: 'Invoicing and payouts',
-    subtitleCarrier: 'Completed jobs by week, with payout amounts.',
-    subtitleShipper: 'Completed orders by week, with amounts due.',
-    subtitleAdmin: 'Who gets an invoice, who gets a payout.',
+    subtitleCarrier: 'Jobs driven during the week and the payouts due on them.',
+    subtitleShipper: 'Jobs completed during the week and the amounts to be invoiced.',
+    subtitleAdmin: 'Invoices to shippers, payouts to carriers.',
+    vatNoteShipper: 'Amounts exclude VAT. Invoices add VAT at 25.5%.',
+    vatNoteCarrier: 'Amounts exclude VAT. Payouts add VAT at 25.5%.',
     open: 'Open',
     collapse: 'Collapse',
     none: 'No jobs driven yet',
@@ -577,14 +579,14 @@ export const en = {
     allRegions: 'All areas',
     empty: 'No orders in this area',
     emptyHint: 'Change the area or wait for new orders.',
-    closedTitle: 'The load board is closed',
+    closedTitle: 'The load board is not visible',
     closedNoVehicle:
-      'You need at least one approved vehicle. Add a vehicle and we will check it and grant approval.',
+      'Open jobs appear once your company has at least one approved vehicle and valid documents. Add a vehicle and we will check it.',
     closedExpired:
-      'Your company documents have expired, so the approval is not valid. Upload a renewed licence or insurance.',
+      'Open jobs appear once your company has at least one approved vehicle and valid documents. Upload a renewed operating licence or insurance.',
     openFleet: 'Fleet',
     contactsHidden: 'The consignee’s contact details appear once you take the order.',
-    details: 'Route and details',
+    details: 'Job details',
   },
 
   moderation: {
@@ -704,7 +706,7 @@ export const en = {
   fleet: {
     title: 'Fleet',
     subtitle:
-      'The load board opens once the company has at least one approved vehicle and valid documents.',
+      'Open jobs appear once your company has at least one approved vehicle and valid documents.',
     addVehicle: 'Add vehicle',
     newVehicle: 'New vehicle',
     editVehicle: 'Vehicle details',
@@ -715,7 +717,7 @@ export const en = {
     onReview: 'We are checking the documents and the vehicle details',
     rejectedHint: 'Not approved. Fix what is noted and send it again.',
     canTakeOrders: 'You can take jobs',
-    cannotTakeOrders: 'The load board is closed',
+    cannotTakeOrders: 'The load board is not visible',
     whyClosedNoDocs: 'Upload a valid licence and insurance.',
     whyClosedNoVehicle: 'At least one approved vehicle is needed.',
     whyClosedExpired: 'The documents have expired, so the approval is not valid.',
@@ -762,7 +764,7 @@ export const en = {
 
   money: {
     addVat: '+ VAT 25.5%',
-    calcNote: 'Prices exclude VAT. Invoices and payouts add VAT at 25.5%.',
+    calcNote: 'Amounts exclude VAT. Invoices and payouts add VAT at 25.5%.',
 
     gross: 'Gross price',
     commission: 'Service fee',
@@ -828,7 +830,7 @@ export const en = {
    * directly.
    */
   msg: {
-    'order.offersCounter': '{count, plural, one {# offer} other {# offers}} / {max} — pick a truck',
+    'order.offersCounter': '{count, plural, one {# offer} other {# offers}} / {max} — pick a carrier',
     'order.offersFull': 'Slots full {count} / {max}',
     'order.distance': '{km, number} km',
     'order.ratePerKm': '{rate}/km',
@@ -839,9 +841,10 @@ export const en = {
 
     'moderation.queued': '{count, plural, one {# application} other {# applications}} queued',
 
-    'rating.summary': 'Rating {value} / 5',
+    'rating.summary': 'Rating {value}',
     'rating.summaryWithCount':
-      'Rating {value} / 5 · {count, plural, one {# rating} other {# ratings}}',
+      'Rating {value} · {count, plural, one {# rating} other {# ratings}}',
+    'rating.ratingsCount': '{count, plural, one {# rating} other {# ratings}}',
     'rating.setValue': 'Give {stars} out of 5',
 
     'countdown.left': '{time} left',

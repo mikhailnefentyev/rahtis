@@ -57,7 +57,10 @@ export function Stars({
         ))}
       </span>
       <span className="font-mono text-xs font-bold text-warn">{shown}</span>
-      {count != null && <span className="font-mono text-xs text-ink-dim">({f.number(count)})</span>}
+      {count != null && (
+        /* «· 3 arviota», а не «(3)»: скобка не говорит, что за число внутри. */
+        <span className="text-xs text-ink-dim">· {m('rating.ratingsCount', { count })}</span>
+      )}
     </span>
   );
 }

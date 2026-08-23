@@ -41,6 +41,8 @@ export async function CompletedCabinet({
 
   const title = role === 'CARRIER' ? t.done.titleCarrier : t.done.titleShipper;
   const subtitle = role === 'CARRIER' ? t.done.subtitleCarrier : t.done.subtitleShipper;
+  /* Заказчику выставляют счёт, перевозчику платят — примечание разное. */
+  const vatNote = role === 'CARRIER' ? t.done.vatNoteCarrier : t.done.vatNoteShipper;
 
   return (
     <main className="mx-auto w-full max-w-4xl px-5 py-8">
@@ -65,7 +67,7 @@ export async function CompletedCabinet({
       </div>
 
       <p className="mt-2 mb-6 max-w-xl text-[13px] leading-relaxed text-ink-muted">
-        {subtitle} {t.money.calcNote}
+        {subtitle} {vatNote}
       </p>
 
       <CompletedList orders={orders ?? []} totals={totals ?? []} />
