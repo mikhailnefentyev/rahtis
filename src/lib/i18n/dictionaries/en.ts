@@ -673,6 +673,20 @@ export const en = {
     openForm: 'Complete the details',
   },
 
+  account: {
+    title: 'My account',
+    passwordTitle: 'Change password',
+    passwordHint: 'The new password takes effect immediately. Remember it — we cannot see it or recover it.',
+    current: 'Current password',
+    newPassword: 'New password',
+    repeat: 'Repeat the new password',
+    submit: 'Change password',
+    saving: 'Changing…',
+    saved: 'Password changed',
+    wrongCurrent: 'The current password does not match',
+    sameAsOld: 'The new password is the same as the current one',
+  },
+
   invite: {
     title: 'Set a password',
     subtitle: 'Your invite is accepted. Choose a password for signing in.',

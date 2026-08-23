@@ -682,6 +682,20 @@ export const fi = {
     openForm: 'Täydennä tiedot',
   },
 
+  account: {
+    title: 'Oma tili',
+    passwordTitle: 'Salasanan vaihto',
+    passwordHint: 'Uusi salasana tulee voimaan heti. Muista se — emme näe emmekä voi palauttaa sitä.',
+    current: 'Nykyinen salasana',
+    newPassword: 'Uusi salasana',
+    repeat: 'Toista uusi salasana',
+    submit: 'Vaihda salasana',
+    saving: 'Vaihdetaan…',
+    saved: 'Salasana vaihdettu',
+    wrongCurrent: 'Nykyinen salasana ei täsmää',
+    sameAsOld: 'Uusi salasana on sama kuin nykyinen',
+  },
+
   invite: {
     title: 'Aseta salasana',
     subtitle: 'Kutsu on hyväksytty. Valitse salasana kirjautumista varten.',

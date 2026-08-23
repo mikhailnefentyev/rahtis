@@ -3,7 +3,7 @@ import { LocaleSwitch } from '@/components/layout/LocaleSwitch';
 import { Badge, Button } from '@/components/ui';
 import { companyStatusTone } from '@/components/ui/tone';
 import { signOutAction } from '@/lib/auth/actions';
-import { cabinetPath } from '@/lib/auth/paths';
+import { accountPath, cabinetPath } from '@/lib/auth/paths';
 import { getI18n, type Locale } from '@/lib/i18n';
 import type { Company, PartyRole } from '@/types/db';
 
@@ -44,6 +44,13 @@ export async function CabinetHeader({
               </Badge>
             </span>
           )}
+
+          <Link
+            href={accountPath(locale)}
+            className="text-[13px] text-ink-muted hover:text-ink"
+          >
+            {t.account.title}
+          </Link>
 
           <LocaleSwitch current={locale} />
 

@@ -85,6 +85,55 @@ export async function setPasswordAction(
   );
 }
 
+export type ChangePasswordState = { error: string | null; done: boolean };
+
+/**
+ * Смена пароля вошедшим пользователем.
+ *
+ * Текущий пароль спрашивается не для проформы. Сессия живёт в куке и
+ * переживает закрытие вкладки: без этой проверки любой, кто добрался до
+ * незапертого компьютера диспетчера, сменил бы пароль и забрал доступ к
+ * заказам компании. Проверка стоит один вход по паролю — Supabase другого
+ * способа подтвердить владельца сессии паролем не даёт.
+ *
+ * Успешный вход заодно обновляет куки сессии. Это не побочный эффект, а
+ * то, что нужно: дальше пароль меняется у того же пользователя.
+ */
+export async function changePasswordAction(
+  _previous: ChangePasswordState,
+  formData: FormData,
+): Promise<ChangePasswordState> {
+  const rawLocale = String(formData.get('locale') ?? '');
+  const locale: Locale = isLocale(rawLocale) ? rawLocale : defaultLocale;
+  const t = await getDictionary(locale);
+
+  const current = String(formData.get('current') ?? '');
+  const password = String(formData.get('password') ?? '');
+  const repeat = String(formData.get('repeat') ?? '');
+
+  if (password.length < 8) return { error: t.invite.tooShort, done: false };
+  if (password !== repeat) return { error: t.invite.mismatch, done: false };
+  if (password === current) return { error: t.account.sameAsOld, done: false };
+
+  const viewer = await getViewer();
+  if (viewer.status === 'guest' || !viewer.email) {
+    return { error: t.error.forbidden, done: false };
+  }
+
+  const supabase = await createClient();
+
+  const { error: wrong } = await supabase.auth.signInWithPassword({
+    email: viewer.email,
+    password: current,
+  });
+  if (wrong) return { error: t.account.wrongCurrent, done: false };
+
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) return { error: error.message, done: false };
+
+  return { error: null, done: true };
+}
+
 export async function signOutAction(formData: FormData): Promise<void> {
   const rawLocale = String(formData.get('locale') ?? '');
   const locale: Locale = isLocale(rawLocale) ? rawLocale : defaultLocale;

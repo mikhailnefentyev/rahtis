@@ -14,8 +14,15 @@ const cabinetSegment: Record<PartyRole, string> = {
   ADMIN: 'admin',
 };
 
+/** Личные настройки: пароль и почта. Общие для всех ролей. */
+export const ACCOUNT_SEGMENT = 'account';
+
 /** Разделы, доступные только вошедшим. Проверяется в proxy.ts. */
-export const PROTECTED_SEGMENTS = Object.values(cabinetSegment);
+export const PROTECTED_SEGMENTS = [...Object.values(cabinetSegment), ACCOUNT_SEGMENT];
+
+export function accountPath(locale: Locale): string {
+  return `/${locale}/${ACCOUNT_SEGMENT}`;
+}
 
 export function cabinetPath(locale: Locale, role: PartyRole): string {
   return `/${locale}/${cabinetSegment[role]}`;
