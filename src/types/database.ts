@@ -39,6 +39,75 @@ export type Database = {
   }
   public: {
     Tables: {
+      email_outbox: {
+        Row: {
+          id: number
+          created_at: string
+          template: string
+          locale: string
+          from_email: string
+          reply_to: string | null
+          to_email: string
+          to_name: string | null
+          subject: string
+          body_text: string
+          body_html: string | null
+          attachments: Json
+          company_id: string | null
+          provider: string
+          status: Database["public"]["Enums"]["email_status"]
+          attempts: number
+          provider_message_id: string | null
+          error: string | null
+          sent_at: string | null
+        }
+        Insert: {
+          template: string
+          locale?: string
+          from_email: string
+          reply_to?: string | null
+          to_email: string
+          to_name?: string | null
+          subject: string
+          body_text: string
+          body_html?: string | null
+          attachments?: Json
+          company_id?: string | null
+          provider: string
+          status?: Database["public"]["Enums"]["email_status"]
+        }
+        Update: {
+          status?: Database["public"]["Enums"]["email_status"]
+          attempts?: number
+          provider_message_id?: string | null
+          error?: string | null
+          sent_at?: string | null
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          id: number
+          created_at: string
+          company_id: string
+          user_id: string | null
+          kind: Database["public"]["Enums"]["notification_kind"]
+          title: string
+          body: string | null
+          link: string | null
+          read_at: string | null
+        }
+        Insert: {
+          company_id: string
+          user_id?: string | null
+          kind: Database["public"]["Enums"]["notification_kind"]
+          title: string
+          body?: string | null
+          link?: string | null
+        }
+        Update: { read_at?: string | null }
+        Relationships: []
+      }
       companies: {
         Row: {
           activated_at: string | null
@@ -1371,6 +1440,17 @@ export type Database = {
           vehicle_plate: string
         }[]
       }
+      notify_company: {
+        Args: {
+          p_company_id: string
+          p_kind: Database["public"]["Enums"]["notification_kind"]
+          p_title: string
+          p_body?: string
+          p_link?: string
+        }
+        Returns: number
+      }
+      unread_notifications: { Args: never; Returns: number }
       offers_for_shipper: {
         Args: { p_order_ids: string[] }
         Returns: {
@@ -1610,6 +1690,13 @@ export type Database = {
       company_status: "PENDING" | "APPROVED" | "ACTIVE" | "REJECTED"
       distance_source: "MANUAL" | "AUTO"
       document_kind: "CARRIER_LICENSE" | "INSURANCE"
+      email_status: "PENDING" | "SENT" | "FAILED" | "SKIPPED"
+      notification_kind:
+        | "ORDER"
+        | "BILLING"
+        | "MODERATION"
+        | "REPORT"
+        | "ADMIN_MESSAGE"
       euro_class: "EURO_4" | "EURO_5" | "EURO_6"
       order_status:
         | "DRAFT"

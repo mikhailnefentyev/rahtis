@@ -1,6 +1,8 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { operatorInbox, sendEmail } from '@/lib/email';
+import { inviteEmail } from '@/lib/email/templates/invite';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { getViewer } from '@/lib/auth/viewer';
@@ -115,7 +117,7 @@ export async function approveCompanyAction(formData: FormData): Promise<void> {
   }
 
   if (isCompanyRole(company.kind)) {
-    await sendInvite(companyId, company.contact_email, company.kind);
+    await sendInvite(companyId, company.name, company.contact_email, company.kind);
   }
   revalidatePath(`/${locale}/admin`);
 }
@@ -154,12 +156,12 @@ export async function resendInviteAction(formData: FormData): Promise<void> {
 
   const { data: company } = await supabase
     .from('companies')
-    .select('contact_email, kind')
+    .select('name, contact_email, kind')
     .eq('id', companyId)
     .single();
 
   if (company && isCompanyRole(company.kind)) {
-    await sendInvite(companyId, company.contact_email, company.kind);
+    await sendInvite(companyId, company.name, company.contact_email, company.kind);
   }
 
   revalidatePath(`/${locale}/admin`);
@@ -219,28 +221,51 @@ export async function deleteCompanyAction(formData: FormData): Promise<void> {
  * которое пользователю доступно на запись. Поэтому метаданные ставятся
  * отдельным вызовом сразу после приглашения.
  */
-async function sendInvite(companyId: string, email: string, role: CompanyRole): Promise<boolean> {
+async function sendInvite(
+  companyId: string,
+  companyName: string,
+  email: string,
+  role: CompanyRole,
+): Promise<boolean> {
   const admin = createAdminClient();
   const site = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
-
-  /*
-   * Язык берётся из настроек, а не прошит строкой. Здесь стояло «/ru» —
-   * локали, которой в проекте больше нет: ссылка из письма вела на
-   * несуществующий адрес и держалась только на правиле перенаправления
-   * снятых языков.
-   */
   const l = defaultLocale;
 
-  const { data, error } = await admin.auth.admin.inviteUserByEmail(email, {
-    redirectTo: `${site}/${l}/auth/confirm?next=${encodeURIComponent(`/${l}/set-password`)}`,
+  /*
+   * generateLink вместо inviteUserByEmail.
+   *
+   * inviteUserByEmail отправляет письмо сам — почтой Supabase, у которой
+   * на проекте по умолчанию лимит в считанные письма в час, общий адрес
+   * отправителя и репутация, из-за которой письма падают в спам. Именно
+   * поэтому приглашения не доходили.
+   *
+   * generateLink делает ту же работу без отправки: заводит пользователя,
+   * если его нет, и возвращает ссылку. Письмо дальше собираем и шлём мы
+   * сами — на своём бланке и через свой провайдер. Почта Supabase из
+   * цепочки уходит совсем.
+   */
+  const { data, error } = await admin.auth.admin.generateLink({
+    type: 'invite',
+    email,
+    options: {
+      redirectTo: `${site}/${l}/auth/confirm?next=${encodeURIComponent(`/${l}/set-password`)}`,
+    },
   });
 
-  if (error || !data?.user) {
-    console.error('Приглашение не отправлено:', error?.message);
+  const user = data?.user;
+  const link = data?.properties?.action_link;
+
+  if (error || !user || !link) {
+    console.error('Ссылка приглашения не создана:', error?.message);
     return false;
   }
 
-  const { error: metaError } = await admin.auth.admin.updateUserById(data.user.id, {
+  /*
+   * Роль и компания кладутся в app_metadata: это единственное место, где
+   * их можно записать так, чтобы пользователь не мог подменить их сам.
+   * Триггер в базе увидит появление роли и создаст профиль.
+   */
+  const { error: metaError } = await admin.auth.admin.updateUserById(user.id, {
     app_metadata: { role, company_id: companyId },
   });
 
@@ -249,5 +274,20 @@ async function sendInvite(companyId: string, email: string, role: CompanyRole): 
     return false;
   }
 
-  return true;
+  const result = await sendEmail(
+    inviteEmail({
+      to: email,
+      companyName,
+      companyId,
+      link,
+      operatorEmail: operatorInbox(),
+    }),
+  );
+
+  /*
+   * Письмо в журнале есть в любом случае, даже когда провайдер —
+   * заглушка. Оператор откроет журнал и скопирует ссылку вручную, пока
+   * реальная отправка не подключена.
+   */
+  return result.outboxId !== null;
 }
