@@ -101,7 +101,6 @@ export const en = {
     status: 'Status',
     businessId: 'Y-tunnus',
     yourRole: 'Your role',
-    stageNotice: 'This section opens later. Sign-in, roles and permissions are live now.',
     approvedCarrierHint:
       'Your company is approved. Upload your operating licence and insurance and add your vehicles, and the load board opens. Every vehicle is approved separately.',
     approvedShipperHint:

@@ -97,7 +97,6 @@ export const fi = {
     status: 'Tila',
     businessId: 'Y-tunnus',
     yourRole: 'Roolisi',
-    stageNotice: 'Osio avautuu myöhemmin. Nyt käytössä ovat kirjautuminen, roolit ja käyttöoikeudet.',
     approvedCarrierHint:
       'Yritys on hyväksytty. Lataa liikennelupa ja vakuutus sekä lisää ajoneuvot, niin avoimet kuljetukset tulevat näkyviin. Hyväksymme jokaisen ajoneuvon erikseen.',
     approvedShipperHint:
