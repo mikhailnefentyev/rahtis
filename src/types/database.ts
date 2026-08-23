@@ -778,6 +778,7 @@ export type Database = {
       vehicles: {
         Row: {
           access: Database["public"]["Enums"]["vehicle_access"]
+          adr: boolean
           approved_at: string | null
           axles: number
           base_city: string
@@ -798,6 +799,7 @@ export type Database = {
         }
         Insert: {
           access?: Database["public"]["Enums"]["vehicle_access"]
+          adr?: boolean
           approved_at?: string | null
           axles: number
           base_city: string
@@ -818,6 +820,7 @@ export type Database = {
         }
         Update: {
           access?: Database["public"]["Enums"]["vehicle_access"]
+          adr?: boolean
           approved_at?: string | null
           axles?: number
           base_city?: string
@@ -1249,6 +1252,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      delete_company: {
+        Args: { p_company_id: string }
+        Returns: string[]
       }
       desk_orders: {
         Args: { p_limit?: number; p_region?: string }

@@ -46,6 +46,11 @@ export function VehicleCard({
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2.5">
               <Plate className="text-[15px]">{vehicle.plate}</Plate>
+              {vehicle.adr && (
+                /* Допуск к опасным грузам виден сразу: без него машину
+                   нет смысла ставить на такой заказ. */
+                <Badge tone="warn">{t.vehicle.adr}</Badge>
+              )}
               <Badge tone="warn">{t.vehicleAccess.PENDING}</Badge>
               <span className="font-mono text-xs text-ink-dim">
                 {EURO_LABEL[vehicle.euro_class]}

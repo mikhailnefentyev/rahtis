@@ -15,6 +15,18 @@ const initial: VehicleState = { error: null, done: false };
  * это делает триггер в базе, а форма предупреждает об этом заранее, чтобы
  * пропавший допуск не выглядел поломкой.
  */
+/**
+ * Подписи для выбора осей.
+ *
+ * Числа те же, что в app.axle_capacity_kg: двухосный берёт 25 тонн,
+ * трёхосный 32. Для четырёх и пяти отдельного правила нет, поэтому там
+ * остаётся голое число.
+ */
+const AXLE_LABEL: Record<number, string> = {
+  2: '2 · 25 t',
+  3: '3 · 32 t',
+};
+
 export function VehicleForm({
   vehicle,
   onClose,
@@ -94,15 +106,36 @@ export function VehicleForm({
             )}
           </Field>
 
-          <Field label={t.vehicle.axles} required>
+          {/*
+            * Оси названы вместе с грузоподъёмностью: перевозчик выбирает
+            * не число, а то, какие заказы машина сможет брать. Пределы те
+            * же, что проверяет база в take_order.
+            */}
+          <Field label={t.vehicle.axles} hint={t.vehicle.capacityHint} required>
             {(p) => (
               <Select {...p} name="axles" required defaultValue={String(vehicle?.axles ?? 3)}>
                 {[2, 3, 4, 5].map((n) => (
                   <option key={n} value={n}>
-                    {n}
+                    {AXLE_LABEL[n] ?? String(n)}
                   </option>
                 ))}
               </Select>
+            )}
+          </Field>
+
+          <Field label={t.vehicle.adr} hint={t.vehicle.adrHint}>
+            {(p) => (
+              <label className="flex items-center gap-2.5 text-[13px]">
+                <input
+                  id={p.id}
+                  type="checkbox"
+                  name="adr"
+                  value="1"
+                  defaultChecked={vehicle?.adr ?? false}
+                  className="size-4 accent-[var(--color-accent)]"
+                />
+                {t.vehicle.adrHas}
+              </label>
             )}
           </Field>
 

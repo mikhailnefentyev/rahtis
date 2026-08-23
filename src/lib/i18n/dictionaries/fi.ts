@@ -614,6 +614,11 @@ export const fi = {
     noUsersYet: 'Kutsua ei ole lähetetty',
     recent: 'Käsitellyt hakemukset',
     decidedAt: 'Päätös',
+    remove: 'Poista yritys',
+    removeConfirm: 'Poistetaanko yritys pysyvästi? Tätä ei voi perua.',
+    removeBlocked: 'Yritystä ei voi poistaa: sillä on kuljetuksia. Kuljetushistoriaa ei poisteta.',
+    removed: 'Yritys poistettu',
+    inviteNotSent: 'Kutsua ei saatu lähetettyä. Tarkista sähköpostiasetukset ja lähetä uudelleen.',
   },
 
   apply: {
@@ -680,6 +685,7 @@ export const fi = {
     alreadyActive: 'Yritys on jo käytössä. Tietoja voi muuttaa milloin tahansa.',
     fillToActivate: 'Täydennä yritystiedot, niin yritys otetaan käyttöön',
     openForm: 'Täydennä tiedot',
+    open: 'Yritystiedot',
   },
 
   account: {
@@ -723,6 +729,12 @@ export const fi = {
     euro: 'Päästöluokka',
     base: 'Kotipaikka',
     rating: 'Arvio',
+    adr: 'ADR',
+    adrHas: 'ADR-lupa',
+    adrHint: 'Onko ajoneuvolla ja kuljettajalla lupa vaarallisiin aineisiin',
+    adrNo: 'Ei ADR-lupaa',
+    capacity: 'Kantavuus',
+    capacityHint: 'Kaksiakselinen vetoauto ottaa 25 t, kolmiakselinen 32 t.',
   },
 
   fleet: {
@@ -744,6 +756,7 @@ export const fi = {
     whyClosedNoVehicle: 'Tarvitaan vähintään yksi hyväksytty ajoneuvo.',
     whyClosedExpired: 'Asiakirjat ovat vanhentuneet, hyväksyntä ei ole voimassa.',
     languagesHint: 'Millä kielillä kuljettaja pystyy asioimaan',
+    tooHeavy: 'Kuljetus on liian raskas tälle ajoneuvolle. Valitse kolmiakselinen vetoauto.',
   },
 
   documents: {

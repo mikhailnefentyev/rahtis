@@ -141,6 +141,7 @@ function readVehicleForm(formData: FormData) {
     languages: formData.getAll('languages').map(String),
     whatsapp: String(formData.get('whatsapp') ?? '').replace(/[\s-]/g, ''),
     axles: Number(formData.get('axles') ?? 0),
+    adr: formData.get('adr') === '1',
     make: String(formData.get('make') ?? '').trim(),
     euro_class: String(formData.get('euro_class') ?? '') as EuroClass,
     base_city: String(formData.get('base_city') ?? '').trim(),

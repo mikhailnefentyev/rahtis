@@ -45,6 +45,20 @@ export async function CabinetHeader({
             </span>
           )}
 
+          {/*
+            * Реквизиты нужны и после активации: банковский счёт меняется,
+            * адрес для счетов тоже. Раньше ссылка на них показывалась
+            * только пока компания не активна, и поменять IBAN было негде.
+            */}
+          {role !== 'ADMIN' && (
+            <Link
+              href={`/${locale}/requisites`}
+              className="text-[13px] text-ink-muted hover:text-ink"
+            >
+              {t.requisites.open}
+            </Link>
+          )}
+
           <Link
             href={accountPath(locale)}
             className="text-[13px] text-ink-muted hover:text-ink"

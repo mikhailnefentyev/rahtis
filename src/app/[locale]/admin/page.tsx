@@ -18,7 +18,7 @@ import {
 } from '@/components/ui';
 import { companyStatusTone } from '@/components/ui/tone';
 import { requireRole } from '@/lib/auth/guard';
-import { resendInviteAction } from '@/lib/companies/actions';
+import { deleteCompanyAction, resendInviteAction } from '@/lib/companies/actions';
 import { daysUntil } from '@/lib/dates';
 import { getI18n, isLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
@@ -218,6 +218,7 @@ export default async function AdminPage({ params }: { params: Promise<{ locale: 
                   <Th>{t.cabinet.status}</Th>
                   <Th>{t.moderation.accessGranted}</Th>
                   <Th numeric>{t.moderation.decidedAt}</Th>
+                  <Th />
                 </tr>
               </thead>
               <tbody>
@@ -251,6 +252,26 @@ export default async function AdminPage({ params }: { params: Promise<{ locale: 
                       <Mono className="text-ink-muted">
                         {f.date(company.rejected_at ?? company.approved_at ?? company.updated_at)}
                       </Mono>
+                    </Td>
+                    <Td>
+                      {/*
+                        * Подтверждение нативное: удаление редкое, и ради него
+                        * тащить в админку модалку с состоянием незачем. База
+                        * всё равно откажет, если у компании есть заказы.
+                        */}
+                      <form action={deleteCompanyAction}>
+                        <input type="hidden" name="locale" value={locale} />
+                        <input type="hidden" name="company_id" value={company.id} />
+                        <Button
+                          type="submit"
+                          size="sm"
+                          variant="ghost"
+                          className="text-danger"
+                          formNoValidate
+                        >
+                          {t.moderation.remove}
+                        </Button>
+                      </form>
                     </Td>
                   </Tr>
                 ))}

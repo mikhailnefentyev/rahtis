@@ -23,6 +23,13 @@ async function explain(locale: Locale, code: string | undefined, message: string
   const t = await getDictionary(locale);
 
   if (code === '23505') return t.matching.alreadyTaken;
+  /*
+   * 55001 — своя ошибка take_order: груза больше, чем берёт тягач с
+   * таким числом осей. Отдельный код, а не разбор текста: сообщение из
+   * базы содержит килограммы и по-русски, а перевозчику нужно сказать,
+   * какая машина подойдёт.
+   */
+  if (code === '55001') return t.fleet.tooHeavy;
   if (code === '55000' && message?.includes('Мест нет')) return t.matching.noSlotsLeft;
   if (code === '55000') return t.matching.tooLate;
 

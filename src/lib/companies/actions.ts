@@ -166,6 +166,49 @@ export async function resendInviteAction(formData: FormData): Promise<void> {
 }
 
 /**
+ * Удаление компании из разобранных заявок.
+ *
+ * Функция базы отказывается удалять компанию с заказами: внешние ключи
+ * стоят с каскадом, и удаление заказчика унесло бы вместе с ним все его
+ * рейсы, накладные и суммы, по которым выставлены счета.
+ *
+ * Учётные записи снимаются здесь, а не в SQL: auth.users каскадом не
+ * удаляется и доступна только админскому ключу. Порядок обратный
+ * очевидному — сначала база отдаёт список пользователей и удаляет свои
+ * строки, потом снимаются аккаунты. Если второй шаг не дойдёт, останется
+ * учётка без профиля: она не войдёт никуда, потому что роль лежит в
+ * app_metadata и проверяется по компании, которой уже нет.
+ */
+export async function deleteCompanyAction(formData: FormData): Promise<void> {
+  const locale = toLocale(formData.get('locale'));
+  await requireAdmin();
+
+  const companyId = String(formData.get('company_id') ?? '');
+  const supabase = await createClient();
+
+  const { data: userIds, error } = await supabase.rpc('delete_company', {
+    p_company_id: companyId,
+  });
+
+  if (error) {
+    console.error('Компания не удалена:', error.message);
+    revalidatePath(`/${locale}/admin`);
+    return;
+  }
+
+  const admin = createAdminClient();
+  for (const userId of userIds ?? []) {
+    const { error: authError } = await admin.auth.admin.deleteUser(userId);
+    if (authError) {
+      console.error('Учётная запись не снята:', authError.message);
+    }
+  }
+
+  revalidatePath(`/${locale}/admin`);
+}
+
+
+/**
  * Приглашение пользователя компании.
  *
  * Роль и компания кладутся в app_metadata: это единственное место, где
@@ -176,17 +219,25 @@ export async function resendInviteAction(formData: FormData): Promise<void> {
  * которое пользователю доступно на запись. Поэтому метаданные ставятся
  * отдельным вызовом сразу после приглашения.
  */
-async function sendInvite(companyId: string, email: string, role: CompanyRole): Promise<void> {
+async function sendInvite(companyId: string, email: string, role: CompanyRole): Promise<boolean> {
   const admin = createAdminClient();
   const site = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
 
+  /*
+   * Язык берётся из настроек, а не прошит строкой. Здесь стояло «/ru» —
+   * локали, которой в проекте больше нет: ссылка из письма вела на
+   * несуществующий адрес и держалась только на правиле перенаправления
+   * снятых языков.
+   */
+  const l = defaultLocale;
+
   const { data, error } = await admin.auth.admin.inviteUserByEmail(email, {
-    redirectTo: `${site}/ru/auth/confirm?next=${encodeURIComponent('/ru/set-password')}`,
+    redirectTo: `${site}/${l}/auth/confirm?next=${encodeURIComponent(`/${l}/set-password`)}`,
   });
 
   if (error || !data?.user) {
     console.error('Приглашение не отправлено:', error?.message);
-    return;
+    return false;
   }
 
   const { error: metaError } = await admin.auth.admin.updateUserById(data.user.id, {
@@ -195,5 +246,8 @@ async function sendInvite(companyId: string, email: string, role: CompanyRole): 
 
   if (metaError) {
     console.error('Не удалось записать app_metadata:', metaError.message);
+    return false;
   }
+
+  return true;
 }

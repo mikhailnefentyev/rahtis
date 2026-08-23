@@ -605,6 +605,11 @@ export const en = {
     noUsersYet: 'No invite sent',
     recent: 'Processed applications',
     decidedAt: 'Decision',
+    remove: 'Delete company',
+    removeConfirm: 'Delete this company permanently? This cannot be undone.',
+    removeBlocked: 'This company cannot be deleted: it has transports. Transport history is never deleted.',
+    removed: 'Company deleted',
+    inviteNotSent: 'The invite could not be sent. Check the email settings and send it again.',
   },
 
   apply: {
@@ -671,6 +676,7 @@ export const en = {
     alreadyActive: 'The company is already live. You can change these details at any time.',
     fillToActivate: 'Complete the company details and the company goes live',
     openForm: 'Complete the details',
+    open: 'Company details',
   },
 
   account: {
@@ -714,6 +720,12 @@ export const en = {
     euro: 'Emission class',
     base: 'Home base',
     rating: 'Rating',
+    adr: 'ADR',
+    adrHas: 'ADR permit',
+    adrHint: 'Whether the vehicle and driver are cleared for dangerous goods',
+    adrNo: 'No ADR permit',
+    capacity: 'Payload',
+    capacityHint: 'A two-axle tractor takes 25 t, a three-axle one 32 t.',
   },
 
   fleet: {
@@ -735,6 +747,7 @@ export const en = {
     whyClosedNoVehicle: 'At least one approved vehicle is needed.',
     whyClosedExpired: 'The documents have expired, so the approval is not valid.',
     languagesHint: 'Which languages the driver can work in',
+    tooHeavy: 'This job is too heavy for the vehicle. Pick a three-axle tractor.',
   },
 
   documents: {
