@@ -678,6 +678,11 @@ export type Database = {
       orders: {
         Row: {
           assigned_company_id: string | null
+          billing: Database["public"]["Enums"]["billing_status"]
+          invoice_ref: string | null
+          invoiced_at: string | null
+          paid_at: string | null
+          settled_at: string | null
           assigned_vehicle_id: string | null
           chosen_offer_id: string | null
           closed_at: string | null
@@ -708,6 +713,11 @@ export type Database = {
         }
         Insert: {
           assigned_company_id?: string | null
+          billing?: Database["public"]["Enums"]["billing_status"]
+          invoice_ref?: string | null
+          invoiced_at?: string | null
+          paid_at?: string | null
+          settled_at?: string | null
           assigned_vehicle_id?: string | null
           chosen_offer_id?: string | null
           closed_at?: string | null
@@ -738,6 +748,11 @@ export type Database = {
         }
         Update: {
           assigned_company_id?: string | null
+          billing?: Database["public"]["Enums"]["billing_status"]
+          invoice_ref?: string | null
+          invoiced_at?: string | null
+          paid_at?: string | null
+          settled_at?: string | null
           assigned_vehicle_id?: string | null
           chosen_offer_id?: string | null
           closed_at?: string | null
@@ -872,6 +887,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      support_messages: {
+        Row: {
+          id: number
+          created_at: string
+          company_id: string
+          user_id: string | null
+          role: Database["public"]["Enums"]["party_role"]
+          from_email: string
+          subject: string
+          body: string
+          handled_at: string | null
+          handled_by: string | null
+        }
+        Insert: {
+          company_id: string
+          user_id?: string | null
+          role: Database["public"]["Enums"]["party_role"]
+          from_email: string
+          subject: string
+          body: string
+        }
+        Update: { handled_at?: string | null; handled_by?: string | null }
+        Relationships: []
       }
       vehicles: {
         Row: {
@@ -1473,6 +1512,19 @@ export type Database = {
         Args: { p_company_id: string; p_reason?: string }
         Returns: Database["public"]["Tables"]["companies"]["Row"]
       }
+      set_billing: {
+        Args: {
+          p_order_id: string
+          p_next: Database["public"]["Enums"]["billing_status"]
+          p_invoice_ref?: string
+        }
+        Returns: Database["public"]["Tables"]["orders"]["Row"]
+      }
+      submit_support_message: {
+        Args: { p_subject: string; p_body: string }
+        Returns: number
+      }
+      handle_support_message: { Args: { p_id: number }; Returns: undefined }
       unfreeze_company: {
         Args: { p_company_id: string }
         Returns: Database["public"]["Tables"]["companies"]["Row"]
@@ -1724,6 +1776,7 @@ export type Database = {
     }
     Enums: {
       amendment_kind: "STOP_ADDED" | "STOP_CHANGED" | "STOP_REMOVED"
+      billing_status: "PENDING" | "INVOICED" | "PAID" | "SETTLED"
       company_status: "PENDING" | "APPROVED" | "ACTIVE" | "REJECTED"
       distance_source: "MANUAL" | "AUTO"
       document_kind: "CARRIER_LICENSE" | "INSURANCE"

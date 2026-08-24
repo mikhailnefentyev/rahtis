@@ -3,8 +3,11 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { CompletedList } from '@/components/domain/CompletedList';
 import {
+  Badge,
+  Button,
   Card,
   CardBody,
+  Input,
   Mono,
   Stars,
   Stat,
@@ -15,11 +18,14 @@ import {
   Th,
   Tr,
 } from '@/components/ui';
+import type { StatusTone } from '@/components/ui/tone';
 import { requireRole } from '@/lib/auth/guard';
+import { setBillingAction } from '@/lib/billing/actions';
 import { withVat } from '@/lib/config';
 import { cabinetPath } from '@/lib/auth/paths';
 import { getI18n, isLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
+import type { Database } from '@/types/database';
 import type { PartnerTotal } from '@/types/db';
 
 export async function generateMetadata({
@@ -42,6 +48,14 @@ export async function generateMetadata({
  * ответить на второй должен уметь тот же экран, иначе разбор спорной
  * суммы уходит в другое место и в другой запрос.
  */
+/** Цвет состояния расчётов: тот же язык, что у статусов рейса. */
+const billingTone: Record<Database['public']['Enums']['billing_status'], StatusTone> = {
+  PENDING: 'neutral',
+  INVOICED: 'warn',
+  PAID: 'live',
+  SETTLED: 'ok',
+};
+
 export default async function BillingPage({
   params,
 }: {
@@ -54,10 +68,22 @@ export default async function BillingPage({
 
   const [{ t, m, f }, supabase] = await Promise.all([getI18n(locale), createClient()]);
 
-  const [{ data: partners }, { data: orders }, { data: totals }] = await Promise.all([
+  const [{ data: partners }, { data: orders }, { data: totals }, { data: billing }] =
+    await Promise.all([
     supabase.rpc('partner_totals', {}),
     supabase.rpc('completed_orders', {}),
     supabase.rpc('weekly_totals', { p_weeks: 12 }),
+    /*
+     * Состояние расчётов отдельным запросом, а не из completed_orders:
+     * та функция описывает рейс, и добавлять в неё колонки бухгалтерии
+     * значит показывать их всем, кто её зовёт, включая обе стороны.
+     */
+    supabase
+      .from('orders')
+      .select('id, ref, rate_cents, commission_bps, billing, invoice_ref, closed_at')
+      .eq('status', 'DONE')
+      .order('closed_at', { ascending: false })
+      .limit(50),
   ]);
 
   const rows = (partners ?? []) as PartnerTotal[];
@@ -181,6 +207,86 @@ export default async function BillingPage({
         </h2>
         {carriers.length > 0 &&
           table(carriers, t.done.payout, (r) => Number(r.payout_cents), true)}
+      </section>
+
+      <section className="mt-10">
+        <h2 className="mb-3 border-b border-line pb-2 text-[13px] font-semibold tracking-tight text-ink-faint">
+          {t.billing.title}
+        </h2>
+
+        {(billing ?? []).length === 0 ? (
+          <Card>
+            <CardBody>
+              <p className="text-[13px] text-ink-muted">{t.done.none}</p>
+            </CardBody>
+          </Card>
+        ) : (
+          <TableFrame caption={t.billing.title}>
+            <Table>
+              <thead>
+                <tr>
+                  <Th>{t.order.ref}</Th>
+                  <Th numeric>{t.done.rate}</Th>
+                  <Th>{t.billing.invoiceRef}</Th>
+                  <Th>{t.billing.title}</Th>
+                  <Th />
+                </tr>
+              </thead>
+              <tbody>
+                {(billing ?? []).map((order) => {
+                  /*
+                   * Следующий шаг один, поэтому и кнопка одна. Выпадающий
+                   * список из четырёх состояний позволил бы отметить рейс
+                   * оплаченным до выставления счёта — база это отклонит, но
+                   * узнает об этом оператор уже после нажатия.
+                   */
+                  const next =
+                    order.billing === 'PENDING'
+                      ? ('INVOICED' as const)
+                      : order.billing === 'INVOICED'
+                        ? ('PAID' as const)
+                        : order.billing === 'PAID'
+                          ? ('SETTLED' as const)
+                          : null;
+
+                  return (
+                    <Tr key={order.id}>
+                      <Td mono>{order.ref}</Td>
+                      <Td numeric>{f.eur(order.rate_cents ?? 0)}</Td>
+                      <Td mono>{order.invoice_ref ?? '—'}</Td>
+                      <Td>
+                        <Badge tone={billingTone[order.billing]}>{t.billing[order.billing]}</Badge>
+                      </Td>
+                      <Td>
+                        {next && (
+                          <form action={setBillingAction} className="flex items-center gap-2">
+                            <input type="hidden" name="locale" value={locale} />
+                            <input type="hidden" name="order_id" value={order.id} />
+                            <input type="hidden" name="next" value={next} />
+                            {next === 'INVOICED' && (
+                              <Input
+                                name="invoice_ref"
+                                placeholder={t.billing.invoiceRefPlaceholder}
+                                className="h-8 w-28 text-[12px]"
+                              />
+                            )}
+                            <Button type="submit" size="sm" formNoValidate>
+                              {next === 'INVOICED'
+                                ? t.billing.toInvoiced
+                                : next === 'PAID'
+                                  ? t.billing.toPaid
+                                  : t.billing.toSettled}
+                            </Button>
+                          </form>
+                        )}
+                      </Td>
+                    </Tr>
+                  );
+                })}
+              </tbody>
+            </Table>
+          </TableFrame>
+        )}
       </section>
 
       <section className="mt-10">

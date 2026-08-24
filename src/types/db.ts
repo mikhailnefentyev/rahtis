@@ -77,10 +77,14 @@ export type AmendmentChange = { from: unknown; to: unknown };
  * доля оператора в расчётах с перевозчиком, и заказчику она не видна ни
  * грантом, ни типом. Отчёты Этапа 7 читают их функциями с security
  * definer, где состав колонок записан явно.
+ *
+ * Состояние расчётов тоже не входит. Заказчик узнаёт о выставленном
+ * счёте уведомлением, а суммы смотрит в «Valmiit kuljetukset» — список
+ * своих заказов для этого не место, там про рейсы, а не про деньги.
  */
 export type ShipperOrder = Omit<
   Order,
-  'assigned_company_id' | 'assigned_vehicle_id' | 'chosen_offer_id' | 'shipper_company_id' | 'shipper_company_kind' | 'updated_at' | 'created_by' | 'route_computed_at' | 'route_fingerprint' | 'commission_bps' | 'closed_at'
+  'assigned_company_id' | 'assigned_vehicle_id' | 'chosen_offer_id' | 'shipper_company_id' | 'shipper_company_kind' | 'updated_at' | 'created_by' | 'route_computed_at' | 'route_fingerprint' | 'commission_bps' | 'closed_at' | 'billing' | 'invoice_ref' | 'invoiced_at' | 'paid_at' | 'settled_at'
 >;
 export type OrderStop = Tables<'order_stops'>;
 

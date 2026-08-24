@@ -28,7 +28,9 @@ import {
 import { daysUntil } from '@/lib/dates';
 import { getI18n, isLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
+import { handleSupportAction } from '@/lib/support/actions';
 import { ApplicationCard } from './ApplicationCard';
+import { NoticeForm } from './NoticeForm';
 import { VehicleCard } from './VehicleCard';
 
 /**
@@ -50,6 +52,7 @@ export default async function AdminPage({ params }: { params: Promise<{ locale: 
     { data: pending },
     { data: decided },
     { data: profiles },
+    { data: questions },
     { data: pendingVehicles },
     { data: attention },
   ] = await Promise.all([
@@ -65,6 +68,12 @@ export default async function AdminPage({ params }: { params: Promise<{ locale: 
       .order('updated_at', { ascending: false })
       .limit(20),
     supabase.from('profiles').select('company_id').not('company_id', 'is', null),
+    supabase
+      .from('support_messages')
+      .select('id, created_at, company_id, role, from_email, subject, body, handled_at')
+      .is('handled_at', null)
+      .order('created_at', { ascending: false })
+      .limit(30),
     /*
      * Связь с компанией составная, поэтому имя внешнего ключа указано
      * явно: без подсказки PostgREST выбирает связь сам.
@@ -221,6 +230,55 @@ export default async function AdminPage({ params }: { params: Promise<{ locale: 
           </TableFrame>
         </section>
       )}
+
+      {(questions ?? []).length > 0 && (
+        <section className="mt-10">
+          <TableFrame caption={t.support.queue}>
+            <Table>
+              <thead>
+                <tr>
+                  <Th>{t.outbox.created}</Th>
+                  <Th>{t.support.from}</Th>
+                  <Th>{t.support.subject}</Th>
+                  <Th>{t.support.body}</Th>
+                  <Th />
+                </tr>
+              </thead>
+              <tbody>
+                {(questions ?? []).map((question) => (
+                  <Tr key={question.id}>
+                    <Td mono>{f.dateTime(question.created_at)}</Td>
+                    <Td>
+                      {question.from_email}
+                      <span className="block text-xs text-ink-dim">{t.role[question.role]}</span>
+                    </Td>
+                    <Td>{question.subject}</Td>
+                    <Td>
+                      <span className="block max-w-md whitespace-pre-wrap">{question.body}</span>
+                    </Td>
+                    <Td>
+                      <form action={handleSupportAction}>
+                        <input type="hidden" name="locale" value={locale} />
+                        <input type="hidden" name="id" value={question.id} />
+                        <Button type="submit" size="sm" formNoValidate>
+                          {t.support.markHandled}
+                        </Button>
+                      </form>
+                    </Td>
+                  </Tr>
+                ))}
+              </tbody>
+            </Table>
+          </TableFrame>
+        </section>
+      )}
+
+      <NoticeForm
+        locale={locale}
+        companies={(decided ?? [])
+          .filter((c) => c.status === 'ACTIVE' && !c.frozen_at)
+          .map((c) => ({ id: c.id, name: c.name, kind: c.kind }))}
+      />
 
       {history.length > 0 && (
         <section className="mt-10">
