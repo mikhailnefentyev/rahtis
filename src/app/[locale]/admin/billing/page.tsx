@@ -21,6 +21,7 @@ import {
 import type { StatusTone } from '@/components/ui/tone';
 import { requireRole } from '@/lib/auth/guard';
 import { setBillingAction } from '@/lib/billing/actions';
+import { ReportsButton } from '../ReportsButton';
 import { withVat } from '@/lib/config';
 import { cabinetPath } from '@/lib/auth/paths';
 import { getI18n, isLocale } from '@/lib/i18n';
@@ -295,6 +296,8 @@ export default async function BillingPage({
         </h2>
         <CompletedList orders={orders ?? []} totals={totals ?? []} />
       </section>
+
+      <ReportsButton locale={locale} />
     </main>
   );
 }

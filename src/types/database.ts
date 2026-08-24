@@ -912,6 +912,41 @@ export type Database = {
         Update: { handled_at?: string | null; handled_by?: string | null }
         Relationships: []
       }
+      weekly_reports: {
+        Row: {
+          id: string
+          week: string
+          company_id: string | null
+          role: Database["public"]["Enums"]["party_role"]
+          file_path: string
+          bytes: number | null
+          orders_count: number
+          gross_cents: number
+          commission_cents: number | null
+          payout_cents: number | null
+          commission_bps: number | null
+          vat_bps: number
+          generated_at: string
+          emailed_at: string | null
+        }
+        Insert: {
+          week: string
+          company_id?: string | null
+          role: Database["public"]["Enums"]["party_role"]
+          file_path: string
+          bytes?: number | null
+          orders_count?: number
+          gross_cents?: number
+          commission_cents?: number | null
+          payout_cents?: number | null
+          commission_bps?: number | null
+          vat_bps: number
+          generated_at?: string
+          emailed_at?: string | null
+        }
+        Update: { emailed_at?: string | null }
+        Relationships: []
+      }
       vehicles: {
         Row: {
           access: Database["public"]["Enums"]["vehicle_access"]

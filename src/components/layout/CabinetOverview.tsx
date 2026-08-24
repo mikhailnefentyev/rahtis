@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { CabinetPulse } from '@/components/domain/CabinetPulse';
+import { ReportArchive } from '@/components/domain/ReportArchive';
 import { SupportForm } from '@/components/domain/SupportForm';
 import { Badge, buttonClass, Card, CardBody, Kv, Mono } from '@/components/ui';
 import { companyStatusTone } from '@/components/ui/tone';
@@ -134,6 +135,8 @@ export async function CabinetOverview({
       </div>
 
       <CabinetPulse locale={locale} role={role} />
+
+      <ReportArchive locale={locale} role={role} />
 
       <SupportForm locale={locale} />
     </main>
