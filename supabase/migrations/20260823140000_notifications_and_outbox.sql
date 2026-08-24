@@ -200,6 +200,23 @@ $$;
 comment on function app.notify(uuid, public.notification_kind, text, text, text, uuid) is
   'Кладёт уведомление в кабинет компании. Для вызова изнутри функций базы.';
 
+/*
+ * Отзыв прав обязателен, и это не формальность.
+ *
+ * Функция security definer и никаких прав внутри не проверяет — она и не
+ * должна, её зовут из функций, где проверка уже сделана. Но новая
+ * функция по умолчанию исполняема для PUBLIC, а схема app открыта
+ * вошедшим (grant usage on schema app). Без отзыва любой вошедший
+ * пользователь мог бы положить уведомление в кабинет ЛЮБОЙ компании —
+ * например «Aivomaa: выплаты теперь на другой счёт» перевозчику.
+ *
+ * Полагаться на то, что PostgREST не публикует схему app, нельзя: это
+ * настройка проекта, а не право в базе, и меняется она одним полем в
+ * панели.
+ */
+revoke all on function app.notify(uuid, public.notification_kind, text, text, text, uuid)
+  from public, anon, authenticated;
+
 
 /* Произвольное уведомление от оператора — единственный путь снаружи. */
 create or replace function public.notify_company(
