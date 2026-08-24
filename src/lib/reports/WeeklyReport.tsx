@@ -3,10 +3,15 @@ import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
 /**
  * Недельный отчёт.
  *
- * Шрифт не регистрируется намеренно. Встроенная Helvetica выводится с
- * WinAnsiEncoding, а это Windows-1252: ä, ö, å, € и · в ней есть все.
- * Тащить в репозиторий файл шрифта ради букв, которые и так рисуются,
- * значит добавить мегабайт и обязанность его обновлять.
+ * Шрифт не регистрируется. Встроенная Helvetica выводится с
+ * WinAnsiEncoding, а это Windows-1252: ä, ö, å, €, ·, — в ней есть.
+ * Финского и шведского хватает, файл шрифта в репозиторий не нужен.
+ *
+ * Плата за это — всё, чего в Windows-1252 нет, рисуется неверно и молча.
+ * Стрелка U+2192 в первом выпущенном отчёте стала апострофом; свои
+ * разделители мы после этого держим внутри кодировки. Но имя польского
+ * или литовского перевозчика с ł или ė так же тихо поедет, и починит это
+ * только встроенный шрифт с полным Юникодом.
  *
  * Вёрстка своя, а не наша веб-разметка: react-pdf понимает подмножество
  * flexbox и ничего не знает о Tailwind. Числа выровнены по правому краю
@@ -38,12 +43,12 @@ const s = StyleSheet.create({
     borderBottomWidth: 0.5,
     borderBottomColor: '#d7dde2',
   },
-  th: { fontSize: 8, fontFamily: 'Helvetica-Bold', color: '#5b6670' },
-  cell: { fontSize: 9 },
+  th: { fontSize: 8, fontFamily: 'Helvetica-Bold', color: '#5b6670', paddingRight: 6 },
+  cell: { fontSize: 9, paddingRight: 6 },
   right: { textAlign: 'right' },
 
   totals: { flexDirection: 'row', marginTop: 10, paddingTop: 6, borderTopWidth: 1, borderTopColor: '#101418' },
-  totalLabel: { fontSize: 9, fontFamily: 'Helvetica-Bold' },
+  totalLabel: { fontSize: 9, fontFamily: 'Helvetica-Bold', paddingRight: 6 },
 
   empty: { marginTop: 18, fontSize: 9, color: '#5b6670' },
 
@@ -108,7 +113,8 @@ export function WeeklyReport({
   withCommission: boolean;
 }) {
   const cols = withCommission
-    ? { ref: 62, date: 52, route: 150, vehicle: 54, km: 40, gross: 52, commission: 52, net: 52 }
+    ? /* Заголовок «Palvelumaksu» длиннее числа под ним — ширину задаёт он. */
+      { ref: 74, date: 58, route: 110, vehicle: 52, km: 32, gross: 50, commission: 64, net: 58 }
     : { ref: 68, date: 58, route: 210, vehicle: 62, km: 46, gross: 0, commission: 0, net: 70 };
 
   return (

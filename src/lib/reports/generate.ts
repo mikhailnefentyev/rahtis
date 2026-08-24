@@ -22,6 +22,9 @@ import { WeeklyReport, type ReportRow, type ReportTexts } from './WeeklyReport';
 
 const BUCKET = 'reports';
 
+/** Разделитель точек маршрута. Только символы Windows-1252: см. ниже. */
+const LEG = ' - ';
+
 /** Понедельник недели, содержащей дату, по Хельсинки. */
 export function mondayOf(date: Date): string {
   const local = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Helsinki' }).format(date);
@@ -107,11 +110,19 @@ export async function generateWeeklyReports(week?: string): Promise<GenerateResu
         .in('order_id', ids)
     : { data: [] };
 
+  /*
+   * Разделитель маршрута обычным дефисом, а не стрелкой.
+   *
+   * Встроенная Helvetica выводится с WinAnsiEncoding, и стрелки U+2192 в
+   * этой кодировке нет: в первом же выпущенном отчёте она отрисовалась
+   * апострофом. Всё, что мы составляем сами, должно жить внутри
+   * Windows-1252 — пока в PDF не встроен шрифт с полным Юникодом.
+   */
   const route = new Map<string, string>();
   for (const stop of stops ?? []) {
     const label = stop.place_name || stop.city || '';
     const current = route.get(stop.order_id);
-    route.set(stop.order_id, current ? `${current.split(' → ')[0]} → ${label}` : label);
+    route.set(stop.order_id, current ? `${current.split(LEG)[0]}${LEG}${label}` : label);
   }
 
   const plate = new Map<string, string>();
@@ -141,6 +152,11 @@ export async function generateWeeklyReports(week?: string): Promise<GenerateResu
   }
 
   return { week: target, reports, emails, errors };
+}
+
+function uniformBps(orders: OrderRow[]): number | null {
+  const rates = new Set(orders.map((o) => o.commission_bps ?? COMMISSION_BPS));
+  return rates.size === 1 ? [...rates][0]! : null;
 }
 
 function push(
@@ -265,7 +281,12 @@ async function issue(
       gross_cents: gross,
       commission_cents: carrier ? fee : null,
       payout_cents: carrier ? net : null,
-      commission_bps: orders[0]?.commission_bps ?? COMMISSION_BPS,
+      /*
+       * Ставка пишется, только если она одна на все рейсы недели. Взяв
+       * ставку первого, мы бы подписали отчёт числом, к остальным строкам
+       * не относящимся: у закрытых в разное время рейсов она разная.
+       */
+      commission_bps: uniformBps(orders),
       vat_bps: VAT_BPS,
       generated_at: new Date().toISOString(),
     },
