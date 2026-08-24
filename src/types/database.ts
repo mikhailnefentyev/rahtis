@@ -108,9 +108,32 @@ export type Database = {
         Update: { read_at?: string | null }
         Relationships: []
       }
+      audit_log: {
+        Row: {
+          id: number
+          at: string
+          actor_id: string | null
+          actor_email: string | null
+          action: string
+          subject: string
+          detail: Json
+        }
+        Insert: {
+          actor_id?: string | null
+          actor_email?: string | null
+          action: string
+          subject: string
+          detail?: Json
+        }
+        Update: never
+        Relationships: []
+      }
       companies: {
         Row: {
           activated_at: string | null
+          frozen_at: string | null
+          frozen_by: string | null
+          freeze_reason: string | null
           approved_at: string | null
           bic: string | null
           billing_city: string | null
@@ -142,6 +165,9 @@ export type Database = {
         }
         Insert: {
           activated_at?: string | null
+          frozen_at?: string | null
+          frozen_by?: string | null
+          freeze_reason?: string | null
           approved_at?: string | null
           bic?: string | null
           billing_city?: string | null
@@ -173,6 +199,9 @@ export type Database = {
         }
         Update: {
           activated_at?: string | null
+          frozen_at?: string | null
+          frozen_by?: string | null
+          freeze_reason?: string | null
           approved_at?: string | null
           bic?: string | null
           billing_city?: string | null
@@ -1439,6 +1468,14 @@ export type Database = {
           trailer_plate: string
           vehicle_plate: string
         }[]
+      }
+      freeze_company: {
+        Args: { p_company_id: string; p_reason?: string }
+        Returns: Database["public"]["Tables"]["companies"]["Row"]
+      }
+      unfreeze_company: {
+        Args: { p_company_id: string }
+        Returns: Database["public"]["Tables"]["companies"]["Row"]
       }
       notify_company: {
         Args: {

@@ -88,6 +88,9 @@ export const fi = {
     noAccessTitle: 'Omat sivut eivät ole käytettävissä',
     noProfileText:
       'Tunnus on olemassa, mutta sitä ei ole liitetty yritykseen. Ota yhteyttä Aivomaahan, niin avaamme pääsyn.',
+    frozenTitle: 'Tunnukset on jäädytetty',
+    frozenText:
+      'Yrityksen tunnukset on jäädytetty. Tiedot ja kuljetushistoria säilyvät. Ota yhteyttä Aivomaahan, niin selvitämme asian.',
     rejectedText:
       'Yrityksesi hakemus on hylätty. Ota yhteyttä Aivomaahan, niin kerromme syyn ja voit hakea uudelleen.',
   },
@@ -641,6 +644,13 @@ export const fi = {
     noUsersYet: 'Kutsua ei ole lähetetty',
     recent: 'Käsitellyt hakemukset',
     decidedAt: 'Päätös',
+    freeze: 'Jäädytä',
+    unfreeze: 'Palauta käyttöön',
+    frozen: 'Jäädytetty',
+    freezeReason: 'Jäädytyksen syy',
+    freezeReasonPlaceholder: 'Sopimus päättynyt',
+    freezeBlocked: 'Yrityksellä on keskeneräisiä kuljetuksia. Päätä tai peru ne ensin.',
+    freezeHint: 'Jäädytetty yritys ei kirjaudu eikä ota kuljetuksia. Tiedot ja historia säilyvät.',
     remove: 'Poista yritys',
     removeConfirm: 'Poistetaanko yritys pysyvästi? Tätä ei voi perua.',
     removeBlocked: 'Yritystä ei voi poistaa: sillä on kuljetuksia. Kuljetushistoriaa ei poisteta.',

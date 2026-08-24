@@ -168,6 +168,52 @@ export async function resendInviteAction(formData: FormData): Promise<void> {
 }
 
 /**
+ * Заморозка и возврат.
+ *
+ * Основной способ убрать компанию из работы. Данные, заказы и история
+ * остаются: это доказательная база и бухгалтерия, а держать её нужно
+ * шесть лет по kirjanpitolaki.
+ *
+ * База откажет, если у компании есть незакрытые заказы. Проверка стоит
+ * там, а не здесь: замороженный не может войти, а значит не отметит
+ * точку и не закроет рейс — груз остался бы посреди маршрута без
+ * человека, способного довести его до конца.
+ */
+export async function freezeCompanyAction(formData: FormData): Promise<void> {
+  const locale = toLocale(formData.get('locale'));
+  await requireAdmin();
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc('freeze_company', {
+    p_company_id: String(formData.get('company_id') ?? ''),
+    p_reason: String(formData.get('reason') ?? '').trim() || undefined,
+  });
+
+  if (error) {
+    console.error('Компания не заморожена:', error.message);
+  }
+
+  revalidatePath(`/${locale}/admin`);
+}
+
+export async function unfreezeCompanyAction(formData: FormData): Promise<void> {
+  const locale = toLocale(formData.get('locale'));
+  await requireAdmin();
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc('unfreeze_company', {
+    p_company_id: String(formData.get('company_id') ?? ''),
+  });
+
+  if (error) {
+    console.error('Компания не разморожена:', error.message);
+  }
+
+  revalidatePath(`/${locale}/admin`);
+}
+
+
+/**
  * Удаление компании из разобранных заявок.
  *
  * Функция базы отказывается удалять компанию с заказами: внешние ключи

@@ -7,6 +7,7 @@ import {
   Card,
   CardBody,
   EmptyState,
+  Input,
   Mono,
   Stat,
   StatRow,
@@ -18,7 +19,12 @@ import {
 } from '@/components/ui';
 import { companyStatusTone } from '@/components/ui/tone';
 import { requireRole } from '@/lib/auth/guard';
-import { deleteCompanyAction, resendInviteAction } from '@/lib/companies/actions';
+import {
+  deleteCompanyAction,
+  freezeCompanyAction,
+  resendInviteAction,
+  unfreezeCompanyAction,
+} from '@/lib/companies/actions';
 import { daysUntil } from '@/lib/dates';
 import { getI18n, isLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
@@ -265,23 +271,50 @@ export default async function AdminPage({ params }: { params: Promise<{ locale: 
                     </Td>
                     <Td>
                       {/*
-                        * Подтверждение нативное: удаление редкое, и ради него
-                        * тащить в админку модалку с состоянием незачем. База
-                        * всё равно откажет, если у компании есть заказы.
+                        * Заморозка — основное действие, удаление осталось для
+                        * мусора: база разрешает его только компании без единого
+                        * заказа. Обе кнопки без модалки: они редкие, а отказ
+                        * всё равно придёт из базы, а не из диалога.
                         */}
-                      <form action={deleteCompanyAction}>
-                        <input type="hidden" name="locale" value={locale} />
-                        <input type="hidden" name="company_id" value={company.id} />
-                        <Button
-                          type="submit"
-                          size="sm"
-                          variant="ghost"
-                          className="text-danger"
-                          formNoValidate
-                        >
-                          {t.moderation.remove}
-                        </Button>
-                      </form>
+                      <div className="flex flex-wrap items-center gap-2">
+                        {company.frozen_at ? (
+                          <form action={unfreezeCompanyAction} className="flex items-center gap-2">
+                            <input type="hidden" name="locale" value={locale} />
+                            <input type="hidden" name="company_id" value={company.id} />
+                            <Badge tone="warn">{t.moderation.frozen}</Badge>
+                            <Button type="submit" size="sm" formNoValidate>
+                              {t.moderation.unfreeze}
+                            </Button>
+                          </form>
+                        ) : (
+                          <form action={freezeCompanyAction} className="flex items-center gap-2">
+                            <input type="hidden" name="locale" value={locale} />
+                            <input type="hidden" name="company_id" value={company.id} />
+                            <Input
+                              name="reason"
+                              placeholder={t.moderation.freezeReasonPlaceholder}
+                              className="h-8 w-40 text-[12px]"
+                            />
+                            <Button type="submit" size="sm" formNoValidate>
+                              {t.moderation.freeze}
+                            </Button>
+                          </form>
+                        )}
+
+                        <form action={deleteCompanyAction}>
+                          <input type="hidden" name="locale" value={locale} />
+                          <input type="hidden" name="company_id" value={company.id} />
+                          <Button
+                            type="submit"
+                            size="sm"
+                            variant="ghost"
+                            className="text-danger"
+                            formNoValidate
+                          >
+                            {t.moderation.remove}
+                          </Button>
+                        </form>
+                      </div>
                     </Td>
                   </Tr>
                 ))}

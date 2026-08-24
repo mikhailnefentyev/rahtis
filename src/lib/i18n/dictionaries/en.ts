@@ -92,6 +92,9 @@ export const en = {
     noAccessTitle: 'Your account is not available',
     noProfileText:
       'The account exists but is not linked to a company. Contact Aivomaa and we will open access.',
+    frozenTitle: 'Access is frozen',
+    frozenText:
+      'This company’s access has been frozen. Its data and transport history are kept. Contact Aivomaa and we will sort it out.',
     rejectedText:
       'Your company’s application was rejected. Contact Aivomaa — we will tell you why, and you can apply again.',
   },
@@ -632,6 +635,13 @@ export const en = {
     noUsersYet: 'No invite sent',
     recent: 'Processed applications',
     decidedAt: 'Decision',
+    freeze: 'Freeze',
+    unfreeze: 'Restore access',
+    frozen: 'Frozen',
+    freezeReason: 'Reason for freezing',
+    freezeReasonPlaceholder: 'Contract ended',
+    freezeBlocked: 'This company has unfinished transports. Complete or cancel them first.',
+    freezeHint: 'A frozen company cannot sign in or take work. Its data and history are kept.',
     remove: 'Delete company',
     removeConfirm: 'Delete this company permanently? This cannot be undone.',
     removeBlocked: 'This company cannot be deleted: it has transports. Transport history is never deleted.',

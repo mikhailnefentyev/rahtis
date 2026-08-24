@@ -23,13 +23,15 @@ export default async function NoAccessPage({ params }: { params: Promise<{ local
   const viewer = await getViewer();
   if (viewer.status === 'guest') redirect(signInPath(locale));
 
-  /* Профиль появился, компания не отклонена — здесь делать нечего. */
-  if (viewer.status === 'ready' && viewer.company?.status !== 'REJECTED') {
+  const frozen = viewer.status === 'ready' && Boolean(viewer.company?.frozen_at);
+  const rejected = viewer.status === 'ready' && viewer.company?.status === 'REJECTED';
+
+  /* Профиль есть, компания жива и не отклонена — здесь делать нечего. */
+  if (viewer.status === 'ready' && !rejected && !frozen) {
     redirect(cabinetPath(locale, viewer.role));
   }
 
   const { t } = await getI18n(locale);
-  const rejected = viewer.status === 'ready';
 
   return (
     <main className="relative flex flex-1 items-center justify-center px-5 py-12">
@@ -39,9 +41,19 @@ export default async function NoAccessPage({ params }: { params: Promise<{ local
 
       <Card className="w-full max-w-md" stripe={rejected ? 'danger' : 'warn'}>
         <CardBody className="p-6">
-          <h1 className="text-[15px] font-semibold tracking-tight">{t.auth.noAccessTitle}</h1>
+          <h1 className="text-[15px] font-semibold tracking-tight">
+            {frozen ? t.auth.frozenTitle : t.auth.noAccessTitle}
+          </h1>
+          {/*
+            * Три разные причины — три разных текста. «Нет доступа» без
+            * объяснения превращает человека в звонок оператору.
+            */}
           <p className="mt-2 text-[13px] leading-relaxed text-ink-muted">
-            {rejected ? t.auth.rejectedText : t.auth.noProfileText}
+            {frozen
+              ? t.auth.frozenText
+              : rejected
+                ? t.auth.rejectedText
+                : t.auth.noProfileText}
           </p>
 
           <p className="mt-4 font-mono text-xs text-ink-dim">{viewer.email}</p>

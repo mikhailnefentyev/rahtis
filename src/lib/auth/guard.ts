@@ -34,6 +34,15 @@ export async function requireRole(locale: Locale, role: PartyRole): Promise<Read
     redirect(noAccessPath(locale));
   }
 
+  /*
+   * Заморожена — тоже закрыт, но по другой причине и с другим текстом.
+   * Отклонённая компания не начинала работать, замороженная работала и
+   * может вернуться, поэтому «обратитесь к нам» здесь не отписка.
+   */
+  if (viewer.company?.frozen_at) {
+    redirect(noAccessPath(locale));
+  }
+
   /* Чужой кабинет — не ошибка, а промах: уводим в свой. */
   if (viewer.role !== role) {
     redirect(cabinetPath(locale, viewer.role));
