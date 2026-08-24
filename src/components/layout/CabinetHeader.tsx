@@ -5,6 +5,7 @@ import { companyStatusTone } from '@/components/ui/tone';
 import { signOutAction } from '@/lib/auth/actions';
 import { accountPath, cabinetPath } from '@/lib/auth/paths';
 import { getI18n, type Locale } from '@/lib/i18n';
+import { createClient } from '@/lib/supabase/server';
 import type { Company, PartyRole } from '@/types/db';
 
 /**
@@ -22,7 +23,13 @@ export async function CabinetHeader({
   role: PartyRole;
   company: Company | null;
 }) {
-  const { t } = await getI18n(locale);
+  const [{ t }, supabase] = await Promise.all([getI18n(locale), createClient()]);
+
+  /*
+   * Счётчик считает функция, а не выборка списка: в шапке нужно одно
+   * число, а уведомлений у работающей компании со временем станут сотни.
+   */
+  const { data: unread } = await supabase.rpc('unread_notifications');
 
   return (
     <header className="sticky top-0 z-10 border-b border-line bg-ground/95 backdrop-blur">
@@ -44,6 +51,17 @@ export async function CabinetHeader({
               </Badge>
             </span>
           )}
+
+          <Link
+            href={`/${locale}/notifications`}
+            className="relative text-[13px] text-ink-muted hover:text-ink"
+          >
+            {t.notify.title}
+            {/* Число рядом, а не точка: «сколько ждёт» важнее, чем «что-то есть». */}
+            {typeof unread === 'number' && unread > 0 && (
+              <span className="unread-badge">{unread > 99 ? '99+' : unread}</span>
+            )}
+          </Link>
 
           {/*
             * Реквизиты нужны и после активации: банковский счёт меняется,

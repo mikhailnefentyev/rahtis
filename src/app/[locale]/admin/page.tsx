@@ -93,13 +93,23 @@ export default async function AdminPage({ params }: { params: Promise<{ locale: 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-xl font-semibold tracking-tight">{t.moderation.applications}</h1>
 
-        {/* Счета и выплаты — соседний пульт: там деньги, здесь допуски. */}
-        <Link
-          href={`/${locale}/admin/billing`}
-          className={buttonClass({ variant: 'primary', size: 'md' })}
-        >
-          {t.done.titleAdmin}
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          {/* Журнал писем рядом с допусками: приглашение уходит отсюда же. */}
+          <Link
+            href={`/${locale}/admin/outbox`}
+            className={buttonClass({ variant: 'default', size: 'md' })}
+          >
+            {t.outbox.title}
+          </Link>
+
+          {/* Счета и выплаты — соседний пульт: там деньги, здесь допуски. */}
+          <Link
+            href={`/${locale}/admin/billing`}
+            className={buttonClass({ variant: 'primary', size: 'md' })}
+          >
+            {t.done.titleAdmin}
+          </Link>
+        </div>
       </div>
 
       <StatRow className="mt-6">

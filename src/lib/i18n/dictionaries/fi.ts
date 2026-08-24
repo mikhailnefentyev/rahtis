@@ -597,6 +597,33 @@ export const fi = {
     details: 'Kuljetuksen tiedot',
   },
 
+  notify: {
+    title: 'Ilmoitukset',
+    empty: 'Ei ilmoituksia',
+    emptyHint: 'Tänne tulevat tiedot kuljetuksista, laskutuksesta ja ylläpidosta.',
+    markAllRead: 'Merkitse kaikki luetuiksi',
+    unread: 'Lukematta',
+    open: 'Avaa',
+  },
+
+  outbox: {
+    title: 'Lähtevät viestit',
+    subtitle: 'Kaikki palvelun sähköpostit. Lokiin kirjataan myös lähettämättä jääneet.',
+    empty: 'Ei viestejä',
+    to: 'Vastaanottaja',
+    subject: 'Aihe',
+    template: 'Malli',
+    provider: 'Lähettäjä',
+    status: 'Tila',
+    created: 'Luotu',
+    body: 'Viestin sisältö',
+    stubNotice: 'Lähetys ei ole käytössä. Viestit kirjataan lokiin, mutta niitä ei lähetetä.',
+    PENDING: 'Jonossa',
+    SENT: 'Lähetetty',
+    FAILED: 'Ei lähtenyt',
+    SKIPPED: 'Ei lähetetty',
+  },
+
   moderation: {
     queue: 'Tarkastusjono',
     applications: 'Hakemukset',

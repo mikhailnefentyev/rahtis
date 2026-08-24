@@ -588,6 +588,33 @@ export const en = {
     details: 'Job details',
   },
 
+  notify: {
+    title: 'Notifications',
+    empty: 'No notifications',
+    emptyHint: 'Updates on transports, invoicing and admin arrive here.',
+    markAllRead: 'Mark all as read',
+    unread: 'Unread',
+    open: 'Open',
+  },
+
+  outbox: {
+    title: 'Outgoing messages',
+    subtitle: 'Every email the platform produces. Messages that never went out are logged too.',
+    empty: 'No messages',
+    to: 'Recipient',
+    subject: 'Subject',
+    template: 'Template',
+    provider: 'Sender',
+    status: 'Status',
+    created: 'Created',
+    body: 'Message body',
+    stubNotice: 'Sending is off. Messages are logged but not delivered.',
+    PENDING: 'Queued',
+    SENT: 'Sent',
+    FAILED: 'Failed',
+    SKIPPED: 'Not sent',
+  },
+
   moderation: {
     queue: 'Review queue',
     applications: 'Applications',
