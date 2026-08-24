@@ -1086,6 +1086,14 @@ export const fi = {
     'pulse.totalOne': 'vko {no} yhteensä {amount}',
     'pulse.totalRange': 'vko {from}–{to} yhteensä {amount}',
 
+    'event.offer.received': 'Uusi tarjous kuljetukseen {ref}',
+    'event.offer.chosen': 'Sinut valittiin kuljetukseen {ref} — vahvista {minutes} minuutissa',
+    'event.order.released': 'Kuljetus {ref} vapautui takaisin avoimeksi',
+    'event.order.amended': 'Kuljetuksen {ref} reitti muuttui',
+    'event.order.closed': 'Kuljetus {ref} on valmis, asiakirjat ovat saatavilla',
+    'event.vehicle.approved': 'Ajoneuvo {plate} on hyväksytty',
+    'event.vehicle.rejected': 'Ajoneuvoa {plate} ei hyväksytty',
+
     'done.weekOf': 'Viikko {date}',
     'done.closedAt': 'Päättyi {date}',
     'done.bps': '{rate, number, ::percent}',

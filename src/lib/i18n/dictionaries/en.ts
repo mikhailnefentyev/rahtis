@@ -1066,6 +1066,14 @@ export const en = {
     'pulse.totalOne': 'wk {no} total {amount}',
     'pulse.totalRange': 'wks {from}–{to} total {amount}',
 
+    'event.offer.received': 'New offer on transport {ref}',
+    'event.offer.chosen': 'You were picked for transport {ref} — confirm within {minutes} minutes',
+    'event.order.released': 'Transport {ref} is back on the board',
+    'event.order.amended': 'The route on transport {ref} changed',
+    'event.order.closed': 'Transport {ref} is complete, the documents are available',
+    'event.vehicle.approved': 'Vehicle {plate} is approved',
+    'event.vehicle.rejected': 'Vehicle {plate} was not approved',
+
     'done.weekOf': 'Week of {date}',
     'done.closedAt': 'Completed {date}',
     'done.bps': '{rate, number, ::percent}',

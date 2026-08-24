@@ -1,6 +1,8 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
+import { explainAdmin, withAdminError } from '@/lib/admin/errors';
 import { COMMISSION_BPS, payoutCents } from '@/lib/config';
 import { operatorInbox } from '@/lib/email';
 import { invoicedEmail, settledEmail } from '@/lib/email/templates/billing';
@@ -56,7 +58,7 @@ export async function setBillingAction(formData: FormData): Promise<void> {
   if (error || !order) {
     console.error('Состояние расчётов не изменилось:', error?.message);
     revalidatePath(`/${locale}/admin/billing`);
-    return;
+    redirect(withAdminError(`/${locale}/admin/billing`, explainAdmin(error)));
   }
 
   await announce(order, next, locale);

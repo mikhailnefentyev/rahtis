@@ -92,7 +92,9 @@ export type Database = {
           company_id: string
           user_id: string | null
           kind: Database["public"]["Enums"]["notification_kind"]
-          title: string
+          code: string | null
+          params: Json
+          title: string | null
           body: string | null
           link: string | null
           read_at: string | null
@@ -101,7 +103,9 @@ export type Database = {
           company_id: string
           user_id?: string | null
           kind: Database["public"]["Enums"]["notification_kind"]
-          title: string
+          code?: string | null
+          params?: Json
+          title?: string | null
           body?: string | null
           link?: string | null
         }

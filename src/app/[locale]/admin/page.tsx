@@ -17,6 +17,7 @@ import {
   Th,
   Tr,
 } from '@/components/ui';
+import { AdminError } from '@/components/layout/AdminError';
 import { companyStatusTone } from '@/components/ui/tone';
 import { requireRole } from '@/lib/auth/guard';
 import {
@@ -40,11 +41,19 @@ import { VehicleCard } from './VehicleCard';
  * секретный ключ здесь не нужен — он вступает в дело только там, где нужен
  * Admin API авторизации, то есть при отправке приглашения.
  */
-export default async function AdminPage({ params }: { params: Promise<{ locale: string }> }) {
+export default async function AdminPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<{ error?: string }>;
+}) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
 
   await requireRole(locale, 'ADMIN');
+
+  const { error: failure } = await searchParams;
 
   const [{ t, m, f }, supabase] = await Promise.all([getI18n(locale), createClient()]);
 
@@ -105,6 +114,8 @@ export default async function AdminPage({ params }: { params: Promise<{ locale: 
 
   return (
     <main className="mx-auto w-full max-w-6xl px-5 py-8">
+      <AdminError locale={locale} code={failure} />
+
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-xl font-semibold tracking-tight">{t.moderation.applications}</h1>
 

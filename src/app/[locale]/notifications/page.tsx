@@ -38,17 +38,38 @@ export default async function NotificationsPage({
   const viewer = await getViewer();
   if (viewer.status === 'guest') redirect(signInPath(locale, `/${locale}/notifications`));
 
-  const [{ t, f }, supabase] = await Promise.all([getI18n(locale), createClient()]);
+  const [{ t, m, f }, supabase] = await Promise.all([getI18n(locale), createClient()]);
 
   const { data: rows } = await supabase
     .from('notifications')
-    .select('id, created_at, kind, title, body, link, read_at')
+    .select('id, created_at, kind, code, params, title, body, link, read_at')
     .order('created_at', { ascending: false })
     .limit(100);
 
   const list = rows ?? [];
   const unread = list.filter((row) => row.read_at === null).length;
   const back = viewer.status === 'ready' ? cabinetPath(locale, viewer.role) : noAccessPath(locale);
+
+  /*
+   * Текст события собирается здесь, а не хранится в базе.
+   *
+   * В строке лежит код и подстановки — слово подбирает язык читающего.
+   * Свободные сообщения оператора кода не имеют и показываются как есть:
+   * их писал человек, и переводить их некому.
+   */
+  const headline = (row: { code: string | null; params: unknown; title: string | null }) => {
+    if (!row.code) return row.title ?? '';
+
+    const key = `event.${row.code}` as Parameters<typeof m>[0];
+    const params = (row.params ?? {}) as Record<string, string | number>;
+
+    try {
+      return m(key, params);
+    } catch {
+      /* Неизвестный код — не повод показать пустую строку. */
+      return row.title ?? row.code;
+    }
+  };
 
   return (
     <main className="mx-auto w-full max-w-3xl px-5 py-8">
@@ -82,7 +103,7 @@ export default async function NotificationsPage({
               <Card stripe={row.read_at === null ? 'info' : 'neutral'}>
                 <CardBody className="flex flex-col gap-1.5">
                   <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                    <span className="text-[14px] font-semibold">{row.title}</span>
+                    <span className="text-[14px] font-semibold">{headline(row)}</span>
                     <Mono className="text-xs text-ink-faint">{f.dateTime(row.created_at)}</Mono>
                   </div>
 

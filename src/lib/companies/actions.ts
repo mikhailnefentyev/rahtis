@@ -1,6 +1,8 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
+import { explainAdmin, withAdminError } from '@/lib/admin/errors';
 import { operatorInbox, sendEmail } from '@/lib/email';
 import { inviteEmail } from '@/lib/email/templates/invite';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -117,7 +119,16 @@ export async function approveCompanyAction(formData: FormData): Promise<void> {
   }
 
   if (isCompanyRole(company.kind)) {
-    await sendInvite(companyId, company.name, company.contact_email, company.kind);
+    const sent = await sendInvite(companyId, company.name, company.contact_email, company.kind);
+    revalidatePath(`/${locale}/admin`);
+
+    /*
+     * Компанию одобрили в любом случае — это решение уже записано в базе.
+     * Но оператор должен знать, что письмо не собралось: иначе он будет
+     * ждать, пока человек войдёт по приглашению, которого нет.
+     */
+    if (!sent) redirect(withAdminError(`/${locale}/admin`, 'inviteNotSent'));
+    return;
   }
   revalidatePath(`/${locale}/admin`);
 }
@@ -161,7 +172,10 @@ export async function resendInviteAction(formData: FormData): Promise<void> {
     .single();
 
   if (company && isCompanyRole(company.kind)) {
-    await sendInvite(companyId, company.name, company.contact_email, company.kind);
+    const sent = await sendInvite(companyId, company.name, company.contact_email, company.kind);
+    revalidatePath(`/${locale}/admin`);
+    if (!sent) redirect(withAdminError(`/${locale}/admin`, 'inviteNotSent'));
+    return;
   }
 
   revalidatePath(`/${locale}/admin`);
@@ -189,11 +203,12 @@ export async function freezeCompanyAction(formData: FormData): Promise<void> {
     p_reason: String(formData.get('reason') ?? '').trim() || undefined,
   });
 
+  revalidatePath(`/${locale}/admin`);
+
   if (error) {
     console.error('Компания не заморожена:', error.message);
+    redirect(withAdminError(`/${locale}/admin`, explainAdmin(error)));
   }
-
-  revalidatePath(`/${locale}/admin`);
 }
 
 export async function unfreezeCompanyAction(formData: FormData): Promise<void> {
@@ -205,11 +220,12 @@ export async function unfreezeCompanyAction(formData: FormData): Promise<void> {
     p_company_id: String(formData.get('company_id') ?? ''),
   });
 
+  revalidatePath(`/${locale}/admin`);
+
   if (error) {
     console.error('Компания не разморожена:', error.message);
+    redirect(withAdminError(`/${locale}/admin`, explainAdmin(error)));
   }
-
-  revalidatePath(`/${locale}/admin`);
 }
 
 
@@ -241,7 +257,7 @@ export async function deleteCompanyAction(formData: FormData): Promise<void> {
   if (error) {
     console.error('Компания не удалена:', error.message);
     revalidatePath(`/${locale}/admin`);
-    return;
+    redirect(withAdminError(`/${locale}/admin`, explainAdmin(error)));
   }
 
   const admin = createAdminClient();

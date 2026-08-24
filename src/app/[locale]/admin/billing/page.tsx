@@ -18,6 +18,7 @@ import {
   Th,
   Tr,
 } from '@/components/ui';
+import { AdminError } from '@/components/layout/AdminError';
 import type { StatusTone } from '@/components/ui/tone';
 import { requireRole } from '@/lib/auth/guard';
 import { setBillingAction } from '@/lib/billing/actions';
@@ -59,13 +60,17 @@ const billingTone: Record<Database['public']['Enums']['billing_status'], StatusT
 
 export default async function BillingPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ error?: string }>;
 }) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
 
   await requireRole(locale, 'ADMIN');
+
+  const { error: failure } = await searchParams;
 
   const [{ t, m, f }, supabase] = await Promise.all([getI18n(locale), createClient()]);
 
@@ -158,6 +163,8 @@ export default async function BillingPage({
 
   return (
     <main className="mx-auto w-full max-w-6xl px-5 py-8">
+      <AdminError locale={locale} code={failure} />
+
       <nav className="mb-6">
         <Link
           href={cabinetPath(locale, 'ADMIN')}
