@@ -664,6 +664,31 @@ export const en = {
     SKIPPED: 'Not sent',
   },
 
+  legal: {
+    TERMS: 'Terms of service',
+    PRIVACY: 'Privacy notice',
+    CARRIER_AGREEMENT: 'Carrier agreement',
+    SHIPPER_AGREEMENT: 'Shipper agreement',
+
+    missing: 'This document has not been published yet.',
+    clauseLink: 'Copy a link to this clause',
+
+    accept: 'I accept the terms of service and the privacy notice',
+    acceptRequired: 'The terms must be accepted before going live.',
+
+    manage: 'Documents and versions',
+    newVersion: 'New version',
+    activate: 'Publish',
+    DRAFT: 'Draft',
+    ACTIVE: 'In force',
+    ARCHIVED: 'Archived',
+    clauses: 'Clauses',
+    noClauses: 'This version has no clauses and cannot be published.',
+    acceptances: 'Acceptances',
+    acceptedBy: 'Accepted by',
+    noAcceptances: 'No acceptances',
+  },
+
   moderation: {
     queue: 'Review queue',
     applications: 'Applications',
@@ -1073,6 +1098,10 @@ export const en = {
     'event.order.closed': 'Transport {ref} is complete, the documents are available',
     'event.vehicle.approved': 'Vehicle {plate} is approved',
     'event.vehicle.rejected': 'Vehicle {plate} was not approved',
+
+    'legal.version': 'Version {n}',
+    'legal.effective': 'In force from {date}',
+    'legal.accepted': 'Accepted {date} · version {n}',
 
     'done.weekOf': 'Week of {date}',
     'done.closedAt': 'Completed {date}',

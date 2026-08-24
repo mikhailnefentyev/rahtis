@@ -122,6 +122,13 @@ export default async function AdminPage({
         <div className="flex flex-wrap gap-2">
           {/* Журнал писем рядом с допусками: приглашение уходит отсюда же. */}
           <Link
+            href={`/${locale}/admin/legal`}
+            className={buttonClass({ variant: 'default', size: 'md' })}
+          >
+            {t.legal.manage}
+          </Link>
+
+          <Link
             href={`/${locale}/admin/outbox`}
             className={buttonClass({ variant: 'default', size: 'md' })}
           >

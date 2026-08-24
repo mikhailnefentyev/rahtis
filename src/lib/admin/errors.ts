@@ -23,6 +23,7 @@ export type AdminErrorCode =
   | 'onlyForward'
   | 'notDone'
   | 'inviteNotSent'
+  | 'noClauses'
   | 'generic';
 
 const BY_SQLSTATE: Record<string, AdminErrorCode> = {
@@ -34,6 +35,8 @@ const BY_SQLSTATE: Record<string, AdminErrorCode> = {
   '55004': 'notDone',
   /* set_billing: расчёты идут только вперёд. */
   '55005': 'onlyForward',
+  /* activate_legal_version: в редакции нет ни одного пункта. */
+  '55006': 'noClauses',
 };
 
 export function explainAdmin(error: PostgrestError | null | undefined): AdminErrorCode | null {

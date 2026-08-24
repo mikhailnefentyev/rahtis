@@ -673,6 +673,32 @@ export const fi = {
     SKIPPED: 'Ei lähetetty',
   },
 
+  legal: {
+    TERMS: 'Käyttöehdot',
+    PRIVACY: 'Tietosuojaseloste',
+    CARRIER_AGREEMENT: 'Kuljetusliikkeen sopimus',
+    SHIPPER_AGREEMENT: 'Tilaajan sopimus',
+
+    missing: 'Asiakirjaa ei ole vielä julkaistu.',
+    clauseLink: 'Kopioi linkki kohtaan',
+
+    accept: 'Hyväksyn käyttöehdot ja tietosuojaselosteen',
+    acceptRequired: 'Ehdot on hyväksyttävä ennen käyttöönottoa.',
+
+    /* Ylläpito */
+    manage: 'Asiakirjat ja versiot',
+    newVersion: 'Uusi versio',
+    activate: 'Ota käyttöön',
+    DRAFT: 'Luonnos',
+    ACTIVE: 'Voimassa',
+    ARCHIVED: 'Arkistoitu',
+    clauses: 'Kohtia',
+    noClauses: 'Versiossa ei ole yhtään kohtaa, sitä ei voi ottaa käyttöön.',
+    acceptances: 'Hyväksynnät',
+    acceptedBy: 'Hyväksyjä',
+    noAcceptances: 'Ei hyväksyntöjä',
+  },
+
   moderation: {
     queue: 'Tarkastusjono',
     applications: 'Hakemukset',
@@ -1093,6 +1119,10 @@ export const fi = {
     'event.order.closed': 'Kuljetus {ref} on valmis, asiakirjat ovat saatavilla',
     'event.vehicle.approved': 'Ajoneuvo {plate} on hyväksytty',
     'event.vehicle.rejected': 'Ajoneuvoa {plate} ei hyväksytty',
+
+    'legal.version': 'Versio {n}',
+    'legal.effective': 'Voimassa {date} alkaen',
+    'legal.accepted': 'Hyväksytty {date} · versio {n}',
 
     'done.weekOf': 'Viikko {date}',
     'done.closedAt': 'Päättyi {date}',

@@ -24,6 +24,7 @@ export async function AdminError({
     freezeBlocked: t.moderation.freezeBlocked,
     removeBlocked: t.moderation.removeBlocked,
     inviteNotSent: t.moderation.inviteNotSent,
+    noClauses: t.legal.noClauses,
     onlyForward: t.billing.onlyForward,
     notDone: t.billing.notDone,
     generic: t.error.generic,

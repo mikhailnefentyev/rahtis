@@ -331,6 +331,41 @@ export function RequisitesForm({ company }: { company: Company }) {
         </p>
       )}
 
+      {/*
+        * Галочка обязательна и не проставлена заранее: предзаполненное
+        * согласие не считается согласием по GDPR. Ссылки открываются в
+        * новой вкладке — заполненную форму нельзя терять ради того,
+        * чтобы прочитать условия.
+        */}
+      <label className="flex items-start gap-2.5 text-[13px] leading-relaxed">
+        <input
+          type="checkbox"
+          name="accept_legal"
+          required
+          className="mt-0.5 size-4 shrink-0 accent-[var(--color-accent)]"
+        />
+        <span>
+          {t.legal.accept}{' '}
+          <a
+            href={`/${locale}/${locale === 'fi' ? 'kayttoehdot' : 'terms'}`}
+            target="_blank"
+            rel="noopener"
+            className="font-semibold text-accent hover:underline"
+          >
+            {t.legal.TERMS}
+          </a>
+          {' · '}
+          <a
+            href={`/${locale}/${locale === 'fi' ? 'tietosuoja' : 'privacy'}`}
+            target="_blank"
+            rel="noopener"
+            className="font-semibold text-accent hover:underline"
+          >
+            {t.legal.PRIVACY}
+          </a>
+        </span>
+      </label>
+
       <Button
         type="submit"
         variant="primary"

@@ -356,6 +356,22 @@ export async function LandingSections({ locale }: { locale: Locale }) {
           <a href="mailto:info@aipoweredsolutions.fi" className="hover:text-ink-muted">
             info@aipoweredsolutions.fi
           </a>
+
+          {/* Условия читают до согласия, поэтому ссылка на них — на витрине. */}
+          <span className="flex gap-4">
+            <Link
+              href={`/${locale}/${locale === 'fi' ? 'kayttoehdot' : 'terms'}`}
+              className="hover:text-ink-muted"
+            >
+              {t.legal.TERMS}
+            </Link>
+            <Link
+              href={`/${locale}/${locale === 'fi' ? 'tietosuoja' : 'privacy'}`}
+              className="hover:text-ink-muted"
+            >
+              {t.legal.PRIVACY}
+            </Link>
+          </span>
         </div>
       </footer>
     </>

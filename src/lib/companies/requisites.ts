@@ -107,14 +107,37 @@ export async function saveRequisitesAction(
     return { error: t.requisites.failed, done: false };
   }
 
+  /*
+   * Согласие записывается до активации, а не после.
+   *
+   * Активация без принятых условий запрещена в базе, и порядок здесь не
+   * косметика: приняв обратный, мы бы получили активированную компанию,
+   * у которой согласия нет — то есть ровно то состояние, которого закон
+   * не допускает.
+   *
+   * Галочка обязательна, но проверять её здесь не нужно: без записи
+   * согласия activate_company откажет сама.
+   */
+  if (formData.get('accept_legal') === 'on') {
+    const { error: acceptError } = await supabase.rpc('accept_legal', {
+      p_source: 'ACTIVATION',
+    });
+    if (acceptError) console.error('Согласие не записано:', acceptError.message);
+  }
+
   const { error: activateError } = await supabase.rpc('activate_company', {
     p_company_id: company.id,
   });
 
   if (activateError) {
-    /* 23514 — функция сообщила о неполных реквизитах. */
+    /* 23514 — неполные реквизиты, 55008 — не приняты условия. */
     return {
-      error: activateError.code === '23514' ? t.requisites.incomplete : t.requisites.failed,
+      error:
+        activateError.code === '23514'
+          ? t.requisites.incomplete
+          : activateError.code === '55008'
+            ? t.legal.acceptRequired
+            : t.requisites.failed,
       done: false,
     };
   }

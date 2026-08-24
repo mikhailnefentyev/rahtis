@@ -84,7 +84,7 @@ export type AmendmentChange = { from: unknown; to: unknown };
  */
 export type ShipperOrder = Omit<
   Order,
-  'assigned_company_id' | 'assigned_vehicle_id' | 'chosen_offer_id' | 'shipper_company_id' | 'shipper_company_kind' | 'updated_at' | 'created_by' | 'route_computed_at' | 'route_fingerprint' | 'commission_bps' | 'closed_at' | 'billing' | 'invoice_ref' | 'invoiced_at' | 'paid_at' | 'settled_at'
+  'assigned_company_id' | 'assigned_vehicle_id' | 'chosen_offer_id' | 'shipper_company_id' | 'shipper_company_kind' | 'updated_at' | 'created_by' | 'route_computed_at' | 'route_fingerprint' | 'commission_bps' | 'closed_at' | 'billing' | 'invoice_ref' | 'invoiced_at' | 'paid_at' | 'settled_at' | 'terms_document_id'
 >;
 export type OrderStop = Tables<'order_stops'>;
 

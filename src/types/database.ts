@@ -85,6 +85,66 @@ export type Database = {
         }
         Relationships: []
       }
+      legal_documents: {
+        Row: {
+          id: string
+          kind: Database["public"]["Enums"]["legal_kind"]
+          version: number
+          effective_from: string
+          status: Database["public"]["Enums"]["legal_status"]
+          created_at: string
+          activated_at: string | null
+        }
+        Insert: {
+          kind: Database["public"]["Enums"]["legal_kind"]
+          version: number
+          effective_from?: string
+          status?: Database["public"]["Enums"]["legal_status"]
+        }
+        Update: {
+          effective_from?: string
+          status?: Database["public"]["Enums"]["legal_status"]
+        }
+        Relationships: []
+      }
+      legal_clauses: {
+        Row: {
+          id: string
+          document_id: string
+          locale: string
+          path: number[]
+          number: string
+          title: string | null
+          body: string | null
+        }
+        Insert: {
+          document_id: string
+          locale: string
+          path: number[]
+          title?: string | null
+          body?: string | null
+        }
+        Update: { title?: string | null; body?: string | null; path?: number[] }
+        Relationships: []
+      }
+      legal_acceptances: {
+        Row: {
+          id: number
+          company_id: string
+          document_id: string
+          accepted_by: string | null
+          accepted_at: string
+          source: string
+        }
+        Insert: {
+          company_id: string
+          document_id: string
+          accepted_by?: string | null
+          source?: string
+        }
+        Update: never
+        Relationships: []
+      }
       notifications: {
         Row: {
           id: number
@@ -683,6 +743,7 @@ export type Database = {
         Row: {
           assigned_company_id: string | null
           billing: Database["public"]["Enums"]["billing_status"]
+          terms_document_id: string | null
           invoice_ref: string | null
           invoiced_at: string | null
           paid_at: string | null
@@ -718,6 +779,7 @@ export type Database = {
         Insert: {
           assigned_company_id?: string | null
           billing?: Database["public"]["Enums"]["billing_status"]
+          terms_document_id?: string | null
           invoice_ref?: string | null
           invoiced_at?: string | null
           paid_at?: string | null
@@ -753,6 +815,7 @@ export type Database = {
         Update: {
           assigned_company_id?: string | null
           billing?: Database["public"]["Enums"]["billing_status"]
+          terms_document_id?: string | null
           invoice_ref?: string | null
           invoiced_at?: string | null
           paid_at?: string | null
@@ -1568,6 +1631,33 @@ export type Database = {
         Args: { p_company_id: string }
         Returns: Database["public"]["Tables"]["companies"]["Row"]
       }
+      active_legal_document: {
+        Args: { p_kind: Database["public"]["Enums"]["legal_kind"] }
+        Returns: string
+      }
+      legal_clause: {
+        Args: {
+          p_kind: Database["public"]["Enums"]["legal_kind"]
+          p_locale: string
+          p_number: string
+        }
+        Returns: {
+          number: string
+          title: string | null
+          body: string | null
+          section_title: string | null
+          version: number
+        }[]
+      }
+      new_legal_version: {
+        Args: { p_kind: Database["public"]["Enums"]["legal_kind"] }
+        Returns: Database["public"]["Tables"]["legal_documents"]["Row"]
+      }
+      activate_legal_version: {
+        Args: { p_document_id: string }
+        Returns: Database["public"]["Tables"]["legal_documents"]["Row"]
+      }
+      accept_legal: { Args: { p_source?: string }; Returns: number }
       notify_company: {
         Args: {
           p_company_id: string
@@ -1820,6 +1910,12 @@ export type Database = {
       distance_source: "MANUAL" | "AUTO"
       document_kind: "CARRIER_LICENSE" | "INSURANCE"
       email_status: "PENDING" | "SENT" | "FAILED" | "SKIPPED"
+      legal_kind:
+        | "TERMS"
+        | "PRIVACY"
+        | "CARRIER_AGREEMENT"
+        | "SHIPPER_AGREEMENT"
+      legal_status: "DRAFT" | "ACTIVE" | "ARCHIVED"
       notification_kind:
         | "ORDER"
         | "BILLING"
