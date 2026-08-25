@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { AgentChat } from '@/components/domain/AgentChat';
 import { CabinetPulse } from '@/components/domain/CabinetPulse';
 import { ReportArchive } from '@/components/domain/ReportArchive';
 import { SupportForm } from '@/components/domain/SupportForm';
@@ -135,6 +136,8 @@ export async function CabinetOverview({
       </div>
 
       <CabinetPulse locale={locale} role={role} />
+
+      <AgentChat locale={locale} role={role} />
 
       <ReportArchive locale={locale} role={role} />
 

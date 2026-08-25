@@ -664,6 +664,22 @@ export const en = {
     SKIPPED: 'Not sent',
   },
 
+  chat: {
+    title: 'Ask the assistant',
+    hint: 'The assistant knows your transports, documents and contract terms.',
+    placeholder: 'Type a question…',
+    send: 'Send',
+    sending: 'Sending…',
+    thinking: 'The assistant is looking it up…',
+    empty: 'No messages yet',
+    emptyHint: 'Ask about a transport status or a clause of the contract.',
+    failed: 'The message did not go through. Try again.',
+    you: 'You',
+    agent: 'Assistant',
+    operator: 'Admin',
+    offline: 'The assistant is not connected yet. Your message goes to the operator.',
+  },
+
   legal: {
     TERMS: 'Terms of service',
     PRIVACY: 'Privacy notice',

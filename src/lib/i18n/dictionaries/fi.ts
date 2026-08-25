@@ -673,6 +673,22 @@ export const fi = {
     SKIPPED: 'Ei lähetetty',
   },
 
+  chat: {
+    title: 'Kysy avustajalta',
+    hint: 'Avustaja tuntee kuljetuksesi, asiakirjat ja sopimusehdot.',
+    placeholder: 'Kirjoita kysymys…',
+    send: 'Lähetä',
+    sending: 'Lähetetään…',
+    thinking: 'Avustaja etsii vastausta…',
+    empty: 'Ei viestejä vielä',
+    emptyHint: 'Kysy esimerkiksi kuljetuksen tilaa tai sopimuksen kohtaa.',
+    failed: 'Viesti ei lähtenyt. Yritä uudelleen.',
+    you: 'Sinä',
+    agent: 'Avustaja',
+    operator: 'Ylläpito',
+    offline: 'Avustaja ei ole vielä käytössä. Viesti jää ylläpidolle.',
+  },
+
   legal: {
     TERMS: 'Käyttöehdot',
     PRIVACY: 'Tietosuojaseloste',

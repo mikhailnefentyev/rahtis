@@ -39,6 +39,80 @@ export type Database = {
   }
   public: {
     Tables: {
+      conversations: {
+        Row: {
+          id: string
+          company_id: string
+          audience: Database["public"]["Enums"]["chat_audience"]
+          channel: Database["public"]["Enums"]["chat_channel"]
+          external_ref: string | null
+          subject: string | null
+          status: string
+          created_by: string | null
+          created_at: string
+          last_message_at: string
+          dispatch_token: string | null
+          pending_since: string | null
+        }
+        Insert: {
+          company_id: string
+          audience: Database["public"]["Enums"]["chat_audience"]
+          channel?: Database["public"]["Enums"]["chat_channel"]
+          external_ref?: string | null
+          subject?: string | null
+          created_by?: string | null
+          dispatch_token?: string | null
+          pending_since?: string | null
+        }
+        Update: {
+          status?: string
+          subject?: string | null
+          last_message_at?: string
+          dispatch_token?: string | null
+          pending_since?: string | null
+        }
+        Relationships: []
+      }
+      messages: {
+        Row: {
+          id: string
+          conversation_id: string
+          sender: Database["public"]["Enums"]["chat_sender"]
+          sender_user_id: string | null
+          body: string
+          attachments: Json
+          created_at: string
+        }
+        Insert: {
+          conversation_id: string
+          sender: Database["public"]["Enums"]["chat_sender"]
+          sender_user_id?: string | null
+          body: string
+          attachments?: Json
+        }
+        Update: never
+        Relationships: []
+      }
+      place_guides: {
+        Row: {
+          id: string
+          place_key: string
+          locale: string
+          company_id: string | null
+          title: string
+          body: string
+          updated_at: string
+        }
+        Insert: {
+          place_key: string
+          locale?: string
+          company_id?: string | null
+          title: string
+          body: string
+        }
+        Update: { title?: string; body?: string }
+        Relationships: []
+      }
       email_outbox: {
         Row: {
           id: number
@@ -1635,6 +1709,13 @@ export type Database = {
         Args: { p_kind: Database["public"]["Enums"]["legal_kind"] }
         Returns: string
       }
+      agent_order_by_ref: { Args: Record<string, unknown>; Returns: Json[] }
+      agent_trip_status: { Args: Record<string, unknown>; Returns: Json[] }
+      agent_trip_documents: { Args: Record<string, unknown>; Returns: Json[] }
+      agent_company_money: { Args: Record<string, unknown>; Returns: Json[] }
+      agent_legal_clause: { Args: Record<string, unknown>; Returns: Json[] }
+      agent_place_guide: { Args: Record<string, unknown>; Returns: Json[] }
+      agent_privileges: { Args: never; Returns: { object: string; privilege: string }[] }
       legal_clause: {
         Args: {
           p_kind: Database["public"]["Enums"]["legal_kind"]
@@ -1910,6 +1991,9 @@ export type Database = {
       distance_source: "MANUAL" | "AUTO"
       document_kind: "CARRIER_LICENSE" | "INSURANCE"
       email_status: "PENDING" | "SENT" | "FAILED" | "SKIPPED"
+      chat_audience: "DRIVER" | "CARRIER" | "SHIPPER" | "ADMIN"
+      chat_channel: "WEB" | "WHATSAPP"
+      chat_sender: "USER" | "AGENT" | "OPERATOR"
       legal_kind:
         | "TERMS"
         | "PRIVACY"

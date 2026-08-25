@@ -463,6 +463,22 @@
   box-shadow: none;
 }
 
+/* Пульс «агент думает»: движение мягче точек, которые скачут. */
+.agent-pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  animation: agent-breathe 1.4s ease-in-out infinite;
+}
+@keyframes agent-breathe {
+  0%, 100% { opacity: 0.35; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .agent-pulse { animation: none; opacity: 0.8; }
+}
+
 /* Счётчик непрочитанного рядом с надписью, не поверх неё. */
 .unread-badge {
   display: inline-flex;
