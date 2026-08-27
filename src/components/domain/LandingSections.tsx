@@ -230,6 +230,10 @@ export async function LandingSections({ locale }: { locale: Locale }) {
                 * значит заставить слушать вслух картинку.
                 */}
               <div className="phone" aria-hidden="true">
+                <span className="phone__btn phone__btn--silence" />
+                <span className="phone__btn phone__btn--up" />
+                <span className="phone__btn phone__btn--down" />
+                <span className="phone__btn phone__btn--power" />
                 <div className="phone__island" />
                 <div className="phone__screen">
                   <div className="phone__glare" />
