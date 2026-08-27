@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { LocaleSwitch } from '@/components/layout/LocaleSwitch';
 import { Badge, Button } from '@/components/ui';
@@ -34,11 +35,23 @@ export async function CabinetHeader({
   return (
     <header className="sticky top-0 z-10 border-b border-line bg-ground/95 backdrop-blur">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-2 px-5 py-3">
-        <Link
-          href={cabinetPath(locale, role)}
-          className="font-mono text-lg font-extrabold tracking-tight text-accent"
-        >
-          {t.brand.name}
+        {/*
+          * Логотип, а не надпись. Размеры заданы явно и высота
+          * фиксирована: без них next/image не зарезервирует место, и
+          * шапка дёрнется, когда картинка догрузится.
+          *
+          * priority: логотип виден сразу и не должен въезжать после
+          * содержимого страницы.
+          */}
+        <Link href={cabinetPath(locale, role)} className="flex shrink-0 items-center">
+          <Image
+            src="/logo-header.png"
+            alt={t.brand.name}
+            width={954}
+            height={240}
+            priority
+            className="h-5 w-auto sm:h-6"
+          />
         </Link>
         <span className="label-micro hidden sm:inline">{t.role[role]}</span>
 
