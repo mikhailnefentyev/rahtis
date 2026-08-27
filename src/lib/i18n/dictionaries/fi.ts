@@ -317,6 +317,8 @@ export const fi = {
     aiLede2:
       'Kyse ei ole valikkobotista tai automaattivastaajasta. Avustaja käyttää keikan tietoja ja auttaa käytännön tilanteissa matkan aikana.',
     aiOnline: 'WhatsApp · paikalla',
+    aiToday: 'Tänään',
+    aiPlaceholder: 'Viesti',
     aiDriver: 'Kuljettaja',
     aiBot: 'RAHTIS',
     aiQ1: 'Milloin Kotkan portti on auki?',

@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { buttonClass, Card, CardBody, Mono } from '@/components/ui';
 import { getI18n, type Locale } from '@/lib/i18n';
@@ -204,70 +205,106 @@ export async function LandingSections({ locale }: { locale: Locale }) {
       </section>
 
       {/* ── Помощник водителя ──────────────────────────────────── */}
-      <section id="assistant" className="border-y border-line bg-surface">
+      <section id="assistant" className="assistant">
         <div className="mx-auto w-full max-w-6xl px-5 py-20">
-          <p className="label-micro">
+          <p className="label-micro !text-[#8fa3bd]">
             {l.aiEyebrow}
-            <span className="ml-2 rounded-pill border border-line-strong bg-sunken px-2 py-0.5 text-[9px] tracking-[0.1em] text-ink-faint">
-              {l.aiSoon}
-            </span>
+            <span className="assistant__soon">{l.aiSoon}</span>
           </p>
           <h2 className="mt-2.5 text-[clamp(26px,3vw,34px)] leading-tight font-semibold tracking-tight text-balance">
             {l.aiTitle}
           </h2>
-          <p className="mt-3 max-w-[62ch] text-[15px] text-ink-muted">{l.aiLede}</p>
-          <p className="mt-2.5 max-w-[62ch] text-[15px] text-ink-muted">{l.aiLede2}</p>
+          <p className="mt-3 max-w-[62ch] text-[15px] text-[#9fb0c6]">{l.aiLede}</p>
+          <p className="mt-2.5 max-w-[62ch] text-[15px] text-[#9fb0c6]">{l.aiLede2}</p>
 
-          <div className="mt-8 grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-            <Card>
-              <CardBody className="p-[18px]">
-                <div className="flex items-center gap-3 border-b border-line pb-3.5">
-                  <span className="grid size-[42px] place-items-center rounded-lg border border-accent-line bg-accent-wash">
-                    <Mono className="text-[13px] font-bold text-accent">AI</Mono>
-                  </span>
-                  <span>
-                    <span className="block text-[15px] font-semibold">{t.brand.name}</span>
-                    <span className="block text-xs text-ink-faint">{l.aiOnline}</span>
-                  </span>
-                </div>
+          <div className="mt-10 grid items-center gap-10 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
+            <div className="assistant__stage">
+              {/*
+                * Телефон собран разметкой, а не снят скриншотом: переписка
+                * переводится, и картинку пришлось бы переснимать на каждый
+                * язык и на каждую правку текста.
+                *
+                * aria-hidden целиком — это иллюстрация. Всё, что она
+                * говорит, сказано словами в соседней колонке, а озвучивать
+                * подряд время на часах, значки связи и реплики примера
+                * значит заставить слушать вслух картинку.
+                */}
+              <div className="phone" aria-hidden="true">
+                <div className="phone__island" />
+                <div className="phone__screen">
+                  <div className="phone__glare" />
 
-                {/* Вопрос водителя слева, ответ помощника справа и акцентом. */}
-                <div className="mt-3.5 flex flex-col gap-2">
-                  {[
-                    { text: l.aiQ1, out: false },
-                    { text: l.aiA1, out: true },
-                    { text: l.aiQ2, out: false },
-                    { text: l.aiA2, out: true },
-                    { text: l.aiQ3, out: false },
-                    { text: l.aiA3, out: true },
-                  ].map((bubble) => (
-                    <span
-                      key={bubble.text}
-                      className={
-                        bubble.out
-                          ? 'flex max-w-[86%] flex-col items-end self-end'
-                          : 'flex max-w-[86%] flex-col items-start self-start'
-                      }
-                    >
-                      <span className="label-micro mb-1 text-ink-faint">
-                        {bubble.out ? l.aiBot : l.aiDriver}
-                      </span>
-                      <span
-                        className={
-                          bubble.out
-                            ? 'rounded-xl rounded-br-[4px] border border-accent-line bg-accent-wash px-3 py-2.5 text-[13px] leading-snug'
-                            : 'rounded-xl rounded-bl-[4px] border border-line bg-sunken px-3 py-2.5 text-[13px] leading-snug'
-                        }
-                      >
-                        {bubble.text}
-                      </span>
+                  <div className="wa-status">
+                    <span>7.02</span>
+                    <span className="wa-status__icons">
+                      <Signal />
+                      <Wifi />
+                      <Battery />
                     </span>
-                  ))}
-                </div>
-              </CardBody>
-            </Card>
+                  </div>
 
-            <div className="grid gap-px overflow-hidden rounded-card border border-line bg-line sm:grid-cols-2">
+                  <div className="wa-bar">
+                    <ArrowBack />
+                    <span className="wa-bar__avatar">
+                      {/* Марка вместо аватара: у помощника лицо платформы. */}
+                      <Image src="/mark.png" alt="" width={40} height={40} />
+                    </span>
+                    <span className="wa-bar__who">
+                      <span className="wa-bar__name">{l.aiBot}</span>
+                      <span className="wa-bar__state">{l.aiOnline}</span>
+                    </span>
+                    <span className="wa-bar__icons">
+                      <Video />
+                      <Phone />
+                      <Dots />
+                    </span>
+                  </div>
+
+                  <div className="wa-chat">
+                    <span className="wa-day">{l.aiToday}</span>
+
+                    {[
+                      { text: l.aiQ1, out: true, at: '6.58' },
+                      { text: l.aiA1, out: false, at: '6.58' },
+                      { text: l.aiQ2, out: true, at: '7.00' },
+                      { text: l.aiA2, out: false, at: '7.00' },
+                      { text: l.aiQ3, out: true, at: '7.02' },
+                    ].map((msg) => (
+                      <span
+                        key={msg.text}
+                        className={msg.out ? 'wa-msg wa-msg--out' : 'wa-msg wa-msg--in'}
+                      >
+                        {msg.text}
+                        <span className="wa-msg__meta">
+                          {msg.at}
+                          {msg.out && <Ticks />}
+                        </span>
+                      </span>
+                    ))}
+
+                    {/* Ответ на последний вопрос ещё печатается — переписка живая. */}
+                    <span className="wa-typing">
+                      <i />
+                      <i />
+                      <i />
+                    </span>
+                  </div>
+
+                  <div className="wa-input">
+                    <span className="wa-input__field">
+                      <Smile />
+                      <span>{l.aiPlaceholder}</span>
+                      <Clip />
+                    </span>
+                    <span className="wa-input__send">
+                      <Mic />
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="assistant__grid">
               {[
                 { title: l.ai1, text: l.ai1Text },
                 { title: l.ai2, text: l.ai2Text },
@@ -276,12 +313,12 @@ export async function LandingSections({ locale }: { locale: Locale }) {
                 { title: l.ai5, text: l.ai5Text },
                 { title: l.ai6, text: null },
               ].map((item) => (
-                <div key={item.title} className="bg-surface p-5">
-                  <h3 className="text-[14px] font-semibold">{item.title}</h3>
+                <div key={item.title} className="assistant__cell">
+                  <h3>{item.title}</h3>
                   {item.text ? (
-                    <p className="mt-1.5 text-[13px] text-ink-muted">{item.text}</p>
+                    <p>{item.text}</p>
                   ) : (
-                    <Mono className="mt-1.5 block text-[13px] tracking-[0.04em] text-ink-faint">
+                    <Mono className="mt-1.5 block text-[13px] tracking-[0.04em] text-[#8fa3bd]">
                       FI · SV · EN · ET · RU · PL · LT · LV
                     </Mono>
                   )}
@@ -375,5 +412,134 @@ export async function LandingSections({ locale }: { locale: Locale }) {
         </div>
       </footer>
     </>
+  );
+}
+
+/*
+ * Значки телефона.
+ *
+ * Рисуются здесь, а не берутся набором: их девять, они размером с ноготь
+ * и нужны ровно в одном месте страницы. Библиотека иконок ради девяти
+ * путей на одной иллюстрации — лишняя зависимость в бандле.
+ *
+ * Ни один из них не повторяет знак мессенджера: узнавание держится на
+ * цвете и раскладке окна, а не на чужой марке.
+ */
+const stroke = {
+  fill: 'none',
+  stroke: 'currentColor',
+  strokeWidth: 1.8,
+  strokeLinecap: 'round' as const,
+  strokeLinejoin: 'round' as const,
+};
+
+function Signal() {
+  return (
+    <svg width="12" height="10" viewBox="0 0 12 10" fill="currentColor">
+      <rect x="0" y="7" width="2" height="3" rx="0.5" />
+      <rect x="3.2" y="5" width="2" height="5" rx="0.5" />
+      <rect x="6.4" y="2.6" width="2" height="7.4" rx="0.5" />
+      <rect x="9.6" y="0" width="2" height="10" rx="0.5" />
+    </svg>
+  );
+}
+
+function Wifi() {
+  return (
+    <svg width="12" height="10" viewBox="0 0 12 10" {...stroke} strokeWidth={1.3}>
+      <path d="M1 3.4a7.5 7.5 0 0 1 10 0" />
+      <path d="M3 5.6a4.5 4.5 0 0 1 6 0" />
+      <circle cx="6" cy="8.2" r="0.7" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+function Battery() {
+  return (
+    <svg width="16" height="9" viewBox="0 0 16 9" fill="none">
+      <rect x="0.5" y="0.5" width="13" height="8" rx="2" stroke="currentColor" opacity="0.6" />
+      <rect x="2" y="2" width="9" height="5" rx="1" fill="currentColor" />
+      <path d="M15 3.2v2.6" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" opacity="0.6" />
+    </svg>
+  );
+}
+
+function ArrowBack() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" {...stroke} style={{ flex: 'none' }}>
+      <path d="M10 3 5 8l5 5" />
+    </svg>
+  );
+}
+
+function Video() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 16 16" {...stroke}>
+      <rect x="1.5" y="4" width="9" height="8" rx="2" />
+      <path d="M10.5 8.2l4-2.2v4.4l-4-2.2z" />
+    </svg>
+  );
+}
+
+function Phone() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 16 16" {...stroke}>
+      <path d="M3 2.5h2.2l1 2.6-1.4 1a7.5 7.5 0 0 0 3.6 3.6l1-1.4 2.6 1V11a2 2 0 0 1-2.2 2A10.5 10.5 0 0 1 2.6 4.7 2 2 0 0 1 3 2.5z" />
+    </svg>
+  );
+}
+
+function Dots() {
+  return (
+    <svg width="4" height="15" viewBox="0 0 4 16" fill="currentColor">
+      <circle cx="2" cy="3" r="1.4" />
+      <circle cx="2" cy="8" r="1.4" />
+      <circle cx="2" cy="13" r="1.4" />
+    </svg>
+  );
+}
+
+/* Две галочки: сообщение доставлено и прочитано. */
+function Ticks() {
+  return (
+    <svg
+      className="wa-msg__tick"
+      width="13"
+      height="8"
+      viewBox="0 0 14 8"
+      {...stroke}
+      strokeWidth={1.5}
+    >
+      <path d="M1 4.4 3.2 6.6 7.6 1.4" />
+      <path d="M6 4.4 8.2 6.6 12.6 1.4" />
+    </svg>
+  );
+}
+
+function Smile() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 16 16" {...stroke} strokeWidth={1.4} style={{ flex: 'none' }}>
+      <circle cx="8" cy="8" r="6.2" />
+      <path d="M5.6 9.4a3 3 0 0 0 4.8 0" />
+      <circle cx="6" cy="6.4" r="0.5" fill="currentColor" stroke="none" />
+      <circle cx="10" cy="6.4" r="0.5" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+function Clip() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 16 16" {...stroke} strokeWidth={1.4} style={{ flex: 'none' }}>
+      <path d="M11 4.5 5.9 9.6a1.8 1.8 0 0 0 2.5 2.5l5.1-5.1a3.4 3.4 0 0 0-4.8-4.8L3.4 7.5" />
+    </svg>
+  );
+}
+
+function Mic() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 16 16" {...stroke}>
+      <rect x="6" y="1.8" width="4" height="7" rx="2" />
+      <path d="M3.6 7.6a4.4 4.4 0 0 0 8.8 0M8 12v2.2" />
+    </svg>
   );
 }

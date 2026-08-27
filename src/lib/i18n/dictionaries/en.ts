@@ -312,6 +312,8 @@ export const en = {
     aiLede2:
       'It is not a menu bot or an autoresponder. The assistant uses the job’s own data and helps with the practical things that come up on the road.',
     aiOnline: 'WhatsApp · online',
+    aiToday: 'Today',
+    aiPlaceholder: 'Message',
     aiDriver: 'Driver',
     aiBot: 'RAHTIS',
     aiQ1: 'When is the Kotka gate open?',
