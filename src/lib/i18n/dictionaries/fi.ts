@@ -310,7 +310,6 @@ export const fi = {
       'Peruutettu keikka palautuu automaattisesti tarjolle ja siitä lähtee tieto sopiville kuljetusliikkeille.',
 
     aiEyebrow: 'Kuljettajan avustaja',
-    aiSoon: 'Tulossa',
     aiTitle: 'Kuljettajalla on apu mukana koko keikan ajan',
     aiLede:
       'WhatsAppissa toimiva RAHTIS-avustaja tuntee kyseisen keikan tiedot ja pystyy vastaamaan kuljettajan kysymyksiin hänen omalla kielellään.',

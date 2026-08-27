@@ -305,7 +305,6 @@ export const en = {
       'A cancelled job returns to the board automatically and suitable carriers are notified.',
 
     aiEyebrow: 'Driver’s assistant',
-    aiSoon: 'Coming',
     aiTitle: 'The driver always has someone to ask',
     aiLede:
       'The RAHTIS assistant works in WhatsApp, knows the details of that particular job, and answers the driver in the driver’s own language.',

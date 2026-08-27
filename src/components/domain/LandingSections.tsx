@@ -209,7 +209,6 @@ export async function LandingSections({ locale }: { locale: Locale }) {
         <div className="mx-auto w-full max-w-6xl px-5 py-20">
           <p className="label-micro !text-[#8fa3bd]">
             {l.aiEyebrow}
-            <span className="assistant__soon">{l.aiSoon}</span>
           </p>
           <h2 className="mt-2.5 text-[clamp(26px,3vw,34px)] leading-tight font-semibold tracking-tight text-balance">
             {l.aiTitle}
@@ -233,7 +232,6 @@ export async function LandingSections({ locale }: { locale: Locale }) {
                 <span className="phone__btn phone__btn--silence" />
                 <span className="phone__btn phone__btn--up" />
                 <span className="phone__btn phone__btn--down" />
-                <span className="phone__btn phone__btn--power" />
                 <div className="phone__island" />
                 <div className="phone__screen">
                   <div className="phone__glare" />
@@ -323,7 +321,7 @@ export async function LandingSections({ locale }: { locale: Locale }) {
                     <p>{item.text}</p>
                   ) : (
                     <Mono className="mt-1.5 block text-[13px] tracking-[0.04em] text-[#8fa3bd]">
-                      FI · SV · EN · ET · RU · PL · LT · LV
+                      FI · SV · EN · ET · RU · PL · LT · LV · BG · RO · DE
                     </Mono>
                   )}
                 </div>
