@@ -66,9 +66,24 @@
   --color-accent-line: #9cc9d9;
   --color-accent-wash: #e8f3f7;
 
-  /* Чистый голубой логотипа. Только там, где цвет не несёт текста:
-     подчёркивание активной вкладки, кольцо фокуса поверх тёмного. */
+  /* Чистый голубой логотипа. Только там, где цвет не несёт текста: на
+     белом он даёт 2,3:1 и как надпись исчезает. Сейчас это пульс
+     «машины на линии» и свечение под телефоном помощника. */
   --color-accent-bright: #00a8d8;
+
+  /* ── Тёмная полоса ──────────────────────────────────────────────
+     Раздел помощника — единственное место, кроме первого экрана, где
+     фон тёмный, и ему нужен свой набор: чернила на нём не читаются, а
+     ink-muted с белого фона на синеве даёт грязь.
+
+     Ступени те же четыре, контраст к --color-night:
+     ink 15.7:1 · muted 8.3:1 · faint 7.1:1. */
+  --color-night: #0b1524;
+  --color-night-raised: #101c2e;
+  --color-night-line: #1b2a42;
+  --color-night-ink: #eef3f9;
+  --color-night-muted: #9fb0c6;
+  --color-night-faint: #8fa3bd;
 
   /* ── Семантика: только состояние ────────────────────────────────
      Никогда не используются для кнопок и ссылок. Все затемнены под
@@ -114,6 +129,22 @@
   --radius-control: 6px;
   --radius-card: 10px;
   --radius-pill: 999px;
+
+  /* ── Время ──────────────────────────────────────────────────────
+     Три ступени на три разные работы, и больше никаких.
+
+     150 мс — цвет под курсором: подтверждение, что элемент живой, оно
+     должно успеть до того, как человек об этом подумает.
+     260 мс — смена состояния: карточка сменила стадию, шапка легла на
+     фон. Здесь есть что проследить глазом.
+     420 мс — движение предмета: телефон в разделе помощника. Вещь
+     тяжелее цвета и едет дольше.
+
+     Раньше на первую работу приходились 150, 160 и 180 мс — три числа
+     за одно и то же, просто написанные в разные недели. */
+  --duration-quick: 150ms;
+  --duration-state: 260ms;
+  --duration-object: 420ms;
 }
 
 @layer base {
@@ -147,6 +178,21 @@
     outline: 2px solid var(--color-accent);
     outline-offset: 2px;
     border-radius: 2px;
+  }
+
+  /*
+   * На тёмных поверхностях кольцо берёт чистый голубой.
+   *
+   * Тёмный акцент рассчитан на белую карточку, где даёт 6,7:1. На
+   * первом экране и в разделе помощника он падает до 2,7:1 — ниже 3:1,
+   * которые требуются нетекстовым элементам, и человек, идущий по
+   * странице с клавиатуры, просто теряет каретку. Голубой на тех же
+   * фонах даёт 6,6:1.
+   */
+  .hero-port :focus-visible,
+  .assistant :focus-visible,
+  .site-head:not([data-solid]) :focus-visible {
+    outline-color: var(--color-accent-bright);
   }
 
   ::selection {
@@ -265,8 +311,8 @@
   z-index: 50;
   border-bottom: 1px solid transparent;
   transition:
-    background-color 220ms ease,
-    border-color 220ms ease;
+    background-color 260ms ease,
+    border-color 260ms ease;
 }
 .site-head[data-solid] {
   background: var(--color-ground);
@@ -314,7 +360,7 @@
   font-weight: 500;
   text-decoration: none;
   color: rgba(255, 255, 255, 0.76);
-  transition: color 180ms ease;
+  transition: color 150ms ease;
 }
 .site-head__menu a:hover { color: #ffffff; }
 .site-head[data-solid] .site-head__menu a { color: var(--color-ink-muted); }
@@ -332,7 +378,7 @@
   font-weight: 600;
   text-decoration: none;
   color: rgba(255, 255, 255, 0.9);
-  transition: color 180ms ease;
+  transition: color 150ms ease;
 }
 .site-head__signin:hover { color: #ffffff; text-decoration: underline; }
 .site-head[data-solid] .site-head__signin { color: var(--color-accent); }
@@ -388,10 +434,17 @@
    и раскладке, а чужой знак на своей витрине — уже другой разговор.
    ═══════════════════════════════════════════════════════════════ */
 .assistant {
-  background: #0b1524;
-  color: #e8eef6;
-  border-block: 1px solid #16233a;
+  background: var(--color-night);
+  color: var(--color-night-ink);
+  border-block: 1px solid var(--color-night-line);
 }
+
+/*
+ * Надпись над заголовком берёт цвет отсюда, а не из разметки. Иначе
+ * её пришлось бы перебивать «!important» поверх .label-micro — правило
+ * общее и красит в чернильный, которого на тёмном не видно.
+ */
+.assistant .label-micro { color: var(--color-night-faint); }
 
 /* Свечение под телефоном: источник света в сцене, а не декоративное пятно. */
 .assistant__stage {
@@ -729,15 +782,15 @@
   gap: 1px;
   overflow: hidden;
   border-radius: var(--radius-card);
-  background: #1b2a42;
-  border: 1px solid #1b2a42;
+  background: var(--color-night-line);
+  border: 1px solid var(--color-night-line);
 }
 @media (min-width: 640px) {
   .assistant__grid { grid-template-columns: 1fr 1fr; }
 }
-.assistant__cell { background: #101c2e; padding: 20px; }
-.assistant__cell h3 { font-size: 14px; font-weight: 600; color: #eef3f9; }
-.assistant__cell p { margin-top: 6px; font-size: 13px; color: #9fb0c6; }
+.assistant__cell { background: var(--color-night-raised); padding: 20px; }
+.assistant__cell h3 { font-size: 14px; font-weight: 600; color: var(--color-night-ink); }
+.assistant__cell p { margin-top: 6px; font-size: 13px; color: var(--color-night-muted); }
 
 /*
  * Узкий экран: наклон снимается. Развёрнутый телефон на телефоне же
@@ -861,7 +914,7 @@
   font-size: 14px;
   font-weight: 600;
   text-decoration: none;
-  transition: background 160ms ease, border-color 160ms ease;
+  transition: background 150ms ease, border-color 150ms ease;
 }
 .hero-port__ghost:hover {
   background: rgba(255, 255, 255, 0.12);
@@ -943,8 +996,8 @@
   color: var(--color-ink-faint);
   text-decoration: none;
   transition:
-    color 160ms ease,
-    background-color 160ms ease;
+    color 150ms ease,
+    background-color 150ms ease;
 }
 .locale-switch a:hover { color: var(--color-ink-muted); }
 .locale-switch a[data-on] {

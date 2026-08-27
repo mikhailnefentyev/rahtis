@@ -86,8 +86,9 @@ export function UiKitShowcase({ deadlines }: { deadlines: DemoDeadlines }) {
         <p className="label-micro">{t.brand.name} · Priima</p>
         <h1 className="mt-3 text-2xl font-semibold tracking-tight">UI Kit</h1>
         <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-ink-muted">
-          Компоненты во всех состояниях. Бирюза принадлежит только интерактиву,
-          семантические цвета — только состоянию. Данные всегда моноширинным.
+          Компоненты во всех состояниях. Голубой логотипа принадлежит только
+          интерактиву, семантические цвета — только состоянию. Данные всегда
+          моноширинным.
         </p>
       </header>
 

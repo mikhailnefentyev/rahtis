@@ -207,14 +207,14 @@ export async function LandingSections({ locale }: { locale: Locale }) {
       {/* ── Помощник водителя ──────────────────────────────────── */}
       <section id="assistant" className="assistant">
         <div className="mx-auto w-full max-w-6xl px-5 py-20">
-          <p className="label-micro !text-[#8fa3bd]">
+          <p className="label-micro">
             {l.aiEyebrow}
           </p>
           <h2 className="mt-2.5 text-[clamp(26px,3vw,34px)] leading-tight font-semibold tracking-tight text-balance">
             {l.aiTitle}
           </h2>
-          <p className="mt-3 max-w-[62ch] text-[15px] text-[#9fb0c6]">{l.aiLede}</p>
-          <p className="mt-2.5 max-w-[62ch] text-[15px] text-[#9fb0c6]">{l.aiLede2}</p>
+          <p className="mt-3 max-w-[62ch] text-[15px] text-night-muted">{l.aiLede}</p>
+          <p className="mt-2.5 max-w-[62ch] text-[15px] text-night-muted">{l.aiLede2}</p>
 
           <div className="mt-10 grid items-center gap-10 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
             <div className="assistant__stage">
@@ -320,7 +320,7 @@ export async function LandingSections({ locale }: { locale: Locale }) {
                   {item.text ? (
                     <p>{item.text}</p>
                   ) : (
-                    <Mono className="mt-1.5 block text-[13px] tracking-[0.04em] text-[#8fa3bd]">
+                    <Mono className="mt-1.5 block text-[13px] tracking-[0.04em] text-night-faint">
                       FI · SV · EN · ET · RU · PL · LT · LV · BG · RO · DE
                     </Mono>
                   )}

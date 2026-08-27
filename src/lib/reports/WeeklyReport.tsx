@@ -18,41 +18,48 @@ import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
  * руками — таблиц в этом движке нет.
  */
 
+/*
+ * Цвета продублированы числами: react-pdf не читает переменные CSS.
+ * Значения те же, что в globals.css — чернила, приглушённый текст,
+ * волосяная линия и нетекстовый серый. При смене палитры править надо
+ * оба места; расхождение видно сразу, потому что отчёт кладут рядом со
+ * страницей кабинета.
+ */
 const s = StyleSheet.create({
-  page: { paddingTop: 40, paddingBottom: 52, paddingHorizontal: 40, fontSize: 9, color: '#101418' },
+  page: { paddingTop: 40, paddingBottom: 52, paddingHorizontal: 40, fontSize: 9, color: '#0c1626' },
 
   brand: { fontSize: 14, fontFamily: 'Helvetica-Bold', letterSpacing: 1 },
-  operator: { fontSize: 8, color: '#5b6670', marginTop: 2 },
+  operator: { fontSize: 8, color: '#44546b', marginTop: 2 },
 
   title: { fontSize: 13, fontFamily: 'Helvetica-Bold', marginTop: 18 },
-  period: { fontSize: 9, color: '#5b6670', marginTop: 3 },
+  period: { fontSize: 9, color: '#44546b', marginTop: 3 },
 
   /* Пометка про налог обязана быть на каждой странице, а не только на первой. */
-  vat: { fontSize: 8, color: '#5b6670', marginTop: 10 },
+  vat: { fontSize: 8, color: '#44546b', marginTop: 10 },
 
   head: {
     flexDirection: 'row',
     marginTop: 18,
     paddingBottom: 4,
     borderBottomWidth: 1,
-    borderBottomColor: '#101418',
+    borderBottomColor: '#0c1626',
   },
   row: {
     flexDirection: 'row',
     paddingVertical: 4,
     borderBottomWidth: 0.5,
-    borderBottomColor: '#d7dde2',
+    borderBottomColor: '#dae0ea',
   },
-  th: { fontSize: 8, fontFamily: 'Helvetica-Bold', color: '#5b6670', paddingRight: 6 },
+  th: { fontSize: 8, fontFamily: 'Helvetica-Bold', color: '#44546b', paddingRight: 6 },
   cell: { fontSize: 9, paddingRight: 6 },
   right: { textAlign: 'right' },
 
-  totals: { flexDirection: 'row', marginTop: 10, paddingTop: 6, borderTopWidth: 1, borderTopColor: '#101418' },
+  totals: { flexDirection: 'row', marginTop: 10, paddingTop: 6, borderTopWidth: 1, borderTopColor: '#0c1626' },
   totalLabel: { fontSize: 9, fontFamily: 'Helvetica-Bold', paddingRight: 6 },
 
-  empty: { marginTop: 18, fontSize: 9, color: '#5b6670' },
+  empty: { marginTop: 18, fontSize: 9, color: '#44546b' },
 
-  note: { marginTop: 22, fontSize: 8, color: '#5b6670', lineHeight: 1.5 },
+  note: { marginTop: 22, fontSize: 8, color: '#44546b', lineHeight: 1.5 },
 
   footer: {
     position: 'absolute',
@@ -60,7 +67,7 @@ const s = StyleSheet.create({
     left: 40,
     right: 40,
     fontSize: 7,
-    color: '#8a949c',
+    color: '#8894a6',
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
