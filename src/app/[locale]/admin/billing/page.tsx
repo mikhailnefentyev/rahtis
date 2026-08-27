@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { CompletedList } from '@/components/domain/CompletedList';
 import {
@@ -24,7 +23,6 @@ import { requireRole } from '@/lib/auth/guard';
 import { setBillingAction } from '@/lib/billing/actions';
 import { ReportsButton } from '../ReportsButton';
 import { withVat } from '@/lib/config';
-import { cabinetPath } from '@/lib/auth/paths';
 import { getI18n, isLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import type { Database } from '@/types/database';
@@ -165,14 +163,6 @@ export default async function BillingPage({
     <main className="mx-auto w-full max-w-6xl px-5 py-8">
       <AdminError locale={locale} code={failure} />
 
-      <nav className="mb-6">
-        <Link
-          href={cabinetPath(locale, 'ADMIN')}
-          className="text-[13px] text-ink-muted hover:text-ink"
-        >
-          ← {t.role.ADMIN}
-        </Link>
-      </nav>
 
       <h1 className="text-xl font-semibold tracking-tight">{t.done.titleAdmin}</h1>
       <p className="mt-2 mb-6 max-w-xl text-[13px] leading-relaxed text-ink-muted">

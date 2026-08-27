@@ -48,12 +48,12 @@ export type MapStop = {
  * по списку.
  */
 const ROLE_COLOR: Record<StopRole, string> = {
-  PICKUP: '#0b6f67',
-  TRAILER_RETURN: '#0b6f67',
+  PICKUP: '#0d647f',
+  TRAILER_RETURN: '#0d647f',
   EXTRA_LOAD: '#8f5e0c',
   EXTRA_UNLOAD: '#8f5e0c',
   DELIVERY: '#4448cf',
-  CONTINUATION: '#0b6f67',
+  CONTINUATION: '#0d647f',
 };
 
 const PASSED_COLOR = '#1a7a48';
@@ -227,7 +227,7 @@ export function RouteMap({
               type: 'line',
               source: 'route',
               layout: { 'line-cap': 'round', 'line-join': 'round' },
-              paint: { 'line-color': '#0b6f67', 'line-width': 3.5 },
+              paint: { 'line-color': '#0d647f', 'line-width': 3.5 },
             });
           }
 

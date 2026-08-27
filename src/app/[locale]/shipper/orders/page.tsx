@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Card, CardBody, buttonClass } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
-import { cabinetPath } from '@/lib/auth/paths';
+import { accountPath } from '@/lib/auth/paths';
 import { getI18n, isLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import type { OrderAmendment, OrderStop, ShipperOffer } from '@/types/db';
@@ -112,15 +112,6 @@ export default async function OrdersPage({ params }: { params: Promise<{ locale:
 
   return (
     <main className="mx-auto w-full max-w-4xl px-5 py-8">
-      <nav className="mb-6">
-        <Link
-          href={cabinetPath(locale, 'SHIPPER')}
-          className="text-[13px] text-ink-muted hover:text-ink"
-        >
-          ← {t.role.SHIPPER}
-        </Link>
-      </nav>
-
       <h1 className="text-xl font-semibold tracking-tight">{t.orders.title}</h1>
       <p className="mt-2 mb-6 max-w-xl text-[13px] leading-relaxed text-ink-muted">
         {t.orders.subtitle}
@@ -132,7 +123,7 @@ export default async function OrdersPage({ params }: { params: Promise<{ locale:
           <CardBody className="flex flex-col items-start gap-3">
             <p className="text-[13px] text-ink">{t.orderForm.needActive}</p>
             <Link
-              href={`/${locale}/requisites`}
+              href={accountPath(locale)}
               className={buttonClass({ variant: 'primary', size: 'md' })}
             >
               {t.requisites.openForm}

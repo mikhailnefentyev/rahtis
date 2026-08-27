@@ -2,19 +2,26 @@ import Link from 'next/link';
 import { AgentChat } from '@/components/domain/AgentChat';
 import { CabinetPulse } from '@/components/domain/CabinetPulse';
 import { ReportArchive } from '@/components/domain/ReportArchive';
-import { SupportForm } from '@/components/domain/SupportForm';
 import { Badge, buttonClass, Card, CardBody, Kv, Mono } from '@/components/ui';
 import { companyStatusTone } from '@/components/ui/tone';
+import { accountPath } from '@/lib/auth/paths';
 import { getI18n, type Locale } from '@/lib/i18n';
 import type { Company, PartyRole } from '@/types/db';
 
 /**
  * Первый экран кабинета: кто вы и куда отсюда идти.
  *
- * Слева компания и её состояние, справа то, что можно сделать. Разделов
- * ровно столько, сколько работает: пока работал один вход, здесь стояла
- * оговорка «раздел откроется позже» — она пережила семь этапов и висела
- * под работающими кнопками, обещая, что кабинета ещё нет.
+ * Слева компания и её состояние, справа — то, что требует действия
+ * прямо сейчас.
+ *
+ * Кнопок разделов здесь больше нет: они переехали во вкладки шапки и
+ * висят там всегда, а не только на первом экране. Оставленные заодно,
+ * они дублировали строку вкладок ровно под ней, и вторая карточка
+ * состояла из одной этой строки.
+ *
+ * Поэтому карточка условная. Ей нечего сказать активной компании без
+ * незакрытых дел — и тогда её нет вовсе, а не стоит пустой белый
+ * прямоугольник в половину экрана.
  */
 export async function CabinetOverview({
   locale,
@@ -39,11 +46,13 @@ export async function CabinetOverview({
           : null
       : null;
 
+  const aside = needsRequisites || hint !== null;
+
   return (
     <main className="mx-auto w-full max-w-6xl px-5 py-8">
       <h1 className="text-xl font-semibold tracking-tight">{t.role[role]}</h1>
 
-      <div className="mt-6 grid gap-4 lg:grid-cols-2">
+      <div className={`mt-6 grid gap-4 ${aside ? 'lg:grid-cols-2' : ''}`}>
         <Card>
           <CardBody className="flex flex-col gap-2.5">
             {company ? (
@@ -72,67 +81,30 @@ export async function CabinetOverview({
           </CardBody>
         </Card>
 
-        <Card stripe={needsRequisites ? 'warn' : 'neutral'}>
-          <CardBody className="flex flex-col gap-3">
-            {needsRequisites && (
-              <>
-                <p className="text-[13px] leading-relaxed text-ink">
-                  {t.requisites.fillToActivate}
-                </p>
-                <Link
-                  href={`/${locale}/requisites`}
-                  className={buttonClass({ variant: 'primary', size: 'md', className: 'self-start' })}
-                >
-                  {t.requisites.openForm}
-                </Link>
-              </>
-            )}
-            {hint && <p className="text-[13px] leading-relaxed text-ink-muted">{hint}</p>}
-
-            {role === 'CARRIER' && (
-              <div className="flex flex-wrap gap-2">
-                <Link
-                  href={`/${locale}/carrier/desk`}
-                  className={buttonClass({ variant: 'primary', size: 'md' })}
-                >
-                  {t.desk.title}
-                </Link>
-                <Link
-                  href={`/${locale}/carrier/fleet`}
-                  className={buttonClass({ variant: 'default', size: 'md' })}
-                >
-                  {t.fleet.title}
-                </Link>
-                <Link
-                  href={`/${locale}/carrier/done`}
-                  className={buttonClass({ variant: 'default', size: 'md' })}
-                >
-                  {t.done.titleCarrier}
-                </Link>
-              </div>
-            )}
-
-            {role === 'SHIPPER' && (
-              <div className="flex flex-wrap gap-2">
-                <Link
-                  href={`/${locale}/shipper/orders`}
-                  className={buttonClass({
-                    variant: needsRequisites ? 'default' : 'primary',
-                    size: 'md',
-                  })}
-                >
-                  {t.orders.title}
-                </Link>
-                <Link
-                  href={`/${locale}/shipper/done`}
-                  className={buttonClass({ variant: 'default', size: 'md' })}
-                >
-                  {t.done.titleShipper}
-                </Link>
-              </div>
-            )}
-          </CardBody>
-        </Card>
+        {aside && (
+          <Card stripe={needsRequisites ? 'warn' : 'neutral'}>
+            <CardBody className="flex flex-col gap-3">
+              {needsRequisites && (
+                <>
+                  <p className="text-[13px] leading-relaxed text-ink">
+                    {t.requisites.fillToActivate}
+                  </p>
+                  <Link
+                    href={accountPath(locale)}
+                    className={buttonClass({
+                      variant: 'primary',
+                      size: 'md',
+                      className: 'self-start',
+                    })}
+                  >
+                    {t.requisites.openForm}
+                  </Link>
+                </>
+              )}
+              {hint && <p className="text-[13px] leading-relaxed text-ink-muted">{hint}</p>}
+            </CardBody>
+          </Card>
+        )}
       </div>
 
       <CabinetPulse locale={locale} role={role} />
@@ -140,8 +112,6 @@ export async function CabinetOverview({
       <AgentChat locale={locale} role={role} />
 
       <ReportArchive locale={locale} role={role} />
-
-      <SupportForm locale={locale} />
     </main>
   );
 }

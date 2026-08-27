@@ -1,9 +1,7 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Badge, Card, CardBody, EmptyState, Mono, Table, TableFrame, Td, Th, Tr } from '@/components/ui';
 import type { StatusTone } from '@/components/ui/tone';
-import { cabinetPath } from '@/lib/auth/paths';
 import { requireRole } from '@/lib/auth/guard';
 import { getI18n, isLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
@@ -57,12 +55,6 @@ export default async function OutboxPage({ params }: { params: Promise<{ locale:
 
   return (
     <main className="mx-auto w-full max-w-6xl px-5 py-8">
-      <nav className="mb-6">
-        <Link href={cabinetPath(locale, 'ADMIN')} className="text-[13px] text-ink-muted hover:text-ink">
-          ← {t.role.ADMIN}
-        </Link>
-      </nav>
-
       <h1 className="text-xl font-semibold tracking-tight">{t.outbox.title}</h1>
       <p className="mt-2 max-w-xl text-[13px] leading-relaxed text-ink-muted">
         {t.outbox.subtitle}

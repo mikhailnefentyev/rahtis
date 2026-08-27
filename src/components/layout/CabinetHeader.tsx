@@ -1,19 +1,29 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { CabinetTabs, type CabinetTab } from '@/components/layout/CabinetTabs';
 import { LocaleSwitch } from '@/components/layout/LocaleSwitch';
 import { Badge, Button } from '@/components/ui';
 import { companyStatusTone } from '@/components/ui/tone';
 import { signOutAction } from '@/lib/auth/actions';
 import { accountPath, cabinetPath } from '@/lib/auth/paths';
-import { getI18n, type Locale } from '@/lib/i18n';
+import { getI18n, type Dictionary, type Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import type { Company, PartyRole } from '@/types/db';
 
 /**
- * Шапка кабинета: марка, роль, компания и выход.
+ * Шапка кабинета: марка, разделы, компания и выход.
  *
  * Серверный компонент: выход — обычная форма с серверным действием,
  * поэтому кнопка работает и до загрузки клиентского кода.
+ *
+ * Два ряда, а не один. Верхний отвечает на «кто я», нижний — на «куда
+ * идти». Раньше разделы лежали кнопками на первом экране кабинета, и
+ * попасть из списка рейсов в календарь можно было только через возврат
+ * наверх.
+ *
+ * Фон непрозрачный. Полупрозрачный с backdrop-blur выглядел легче, но
+ * сквозь него просвечивал текст уезжающей страницы, и закреплённая шапка
+ * читалась как сломанная.
  */
 export async function CabinetHeader({
   locale,
@@ -32,9 +42,11 @@ export async function CabinetHeader({
    */
   const { data: unread } = await supabase.rpc('unread_notifications');
 
+  const home = cabinetPath(locale, role);
+
   return (
-    <header className="sticky top-0 z-10 border-b border-line bg-ground/95 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-2 px-5 py-3">
+    <header className="sticky top-0 z-40 border-b border-line bg-ground">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-2 px-5 pt-3 pb-2">
         {/*
           * Логотип, а не надпись. Размеры заданы явно и высота
           * фиксирована: без них next/image не зарезервирует место, и
@@ -43,7 +55,7 @@ export async function CabinetHeader({
           * priority: логотип виден сразу и не должен въезжать после
           * содержимого страницы.
           */}
-        <Link href={cabinetPath(locale, role)} className="flex shrink-0 items-center">
+        <Link href={home} className="flex shrink-0 items-center">
           <Image
             src="/logo-header.png"
             alt={t.brand.name}
@@ -77,23 +89,13 @@ export async function CabinetHeader({
           </Link>
 
           {/*
-            * Реквизиты нужны и после активации: банковский счёт меняется,
-            * адрес для счетов тоже. Раньше ссылка на них показывалась
-            * только пока компания не активна, и поменять IBAN было негде.
+            * Одна ссылка на личное и на реквизиты компании. Раньше их было
+            * две, и вели они на две почти одинаковые страницы: пароль на
+            * одной, IBAN на другой — при том, что открывает их один и тот
+            * же человек и по одному и тому же поводу «поправить свои
+            * данные».
             */}
-          {role !== 'ADMIN' && (
-            <Link
-              href={`/${locale}/requisites`}
-              className="text-[13px] text-ink-muted hover:text-ink"
-            >
-              {t.requisites.open}
-            </Link>
-          )}
-
-          <Link
-            href={accountPath(locale)}
-            className="text-[13px] text-ink-muted hover:text-ink"
-          >
+          <Link href={accountPath(locale)} className="text-[13px] text-ink-muted hover:text-ink">
             {t.account.title}
           </Link>
 
@@ -107,6 +109,37 @@ export async function CabinetHeader({
           </form>
         </div>
       </div>
+
+      <CabinetTabs tabs={cabinetTabs(locale, role, home, t)} />
     </header>
   );
+}
+
+/** Разделы роли. Первым всегда корень кабинета — по нему сравнение точное. */
+function cabinetTabs(locale: Locale, role: PartyRole, home: string, t: Dictionary): CabinetTab[] {
+  const overview: CabinetTab = { href: home, label: t.nav.overview };
+
+  if (role === 'CARRIER') {
+    return [
+      overview,
+      { href: `/${locale}/carrier/desk`, label: t.desk.title },
+      { href: `/${locale}/carrier/fleet`, label: t.fleet.title },
+      { href: `/${locale}/carrier/done`, label: t.done.titleCarrier },
+    ];
+  }
+
+  if (role === 'SHIPPER') {
+    return [
+      overview,
+      { href: `/${locale}/shipper/orders`, label: t.orders.title },
+      { href: `/${locale}/shipper/done`, label: t.done.titleShipper },
+    ];
+  }
+
+  return [
+    overview,
+    { href: `/${locale}/admin/billing`, label: t.done.titleAdmin },
+    { href: `/${locale}/admin/legal`, label: t.legal.manage },
+    { href: `/${locale}/admin/outbox`, label: t.outbox.title },
+  ];
 }

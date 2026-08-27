@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { AdminError } from '@/components/layout/AdminError';
 import {
@@ -17,7 +16,6 @@ import {
 } from '@/components/ui';
 import type { StatusTone } from '@/components/ui/tone';
 import { requireRole } from '@/lib/auth/guard';
-import { cabinetPath } from '@/lib/auth/paths';
 import { getI18n, isLocale } from '@/lib/i18n';
 import { activateLegalVersionAction, newLegalVersionAction } from '@/lib/legal/actions';
 import { createClient } from '@/lib/supabase/server';
@@ -101,14 +99,6 @@ export default async function LegalAdminPage({
     <main className="mx-auto w-full max-w-6xl px-5 py-8">
       <AdminError locale={locale} code={failure} />
 
-      <nav className="mb-6">
-        <Link
-          href={cabinetPath(locale, 'ADMIN')}
-          className="text-[13px] text-ink-muted hover:text-ink"
-        >
-          ← {t.role.ADMIN}
-        </Link>
-      </nav>
 
       <h1 className="text-xl font-semibold tracking-tight">{t.legal.manage}</h1>
 

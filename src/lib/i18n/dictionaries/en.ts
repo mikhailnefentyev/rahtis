@@ -37,6 +37,7 @@ export const en = {
   },
 
   nav: {
+    overview: 'Overview',
     desk: 'Load board',
     fleet: 'Fleet',
     orders: 'My orders',
@@ -740,8 +741,8 @@ export const en = {
     title: 'Application',
     subtitle:
       'There is no open sign-up. We check every company against the register and send the credentials to the address you give.',
-    iAmCarrier: 'I run transport',
-    iAmShipper: 'I need transport',
+    iAmCarrier: 'Carrier',
+    iAmShipper: 'Shipper',
     submit: 'Send application',
     submitting: 'Sending…',
     carrierNote:
@@ -806,7 +807,7 @@ export const en = {
   },
 
   account: {
-    title: 'My account',
+    title: 'Your details',
     passwordTitle: 'Change password',
     passwordHint: 'The new password takes effect immediately. Remember it — we cannot see it or recover it.',
     current: 'Current password',

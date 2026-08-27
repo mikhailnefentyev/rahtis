@@ -33,6 +33,7 @@ export const fi = {
   },
 
   nav: {
+    overview: 'Yleiskuva',
     desk: 'Avoimet kuljetukset',
     fleet: 'Kalusto',
     orders: 'Omat kuljetukset',
@@ -750,8 +751,8 @@ export const fi = {
     title: 'Hakemus',
     subtitle:
       'Avointa rekisteröitymistä ei ole. Tarkistamme jokaisen yrityksen tiedot rekisteristä ja lähetämme tunnukset antamaasi osoitteeseen.',
-    iAmCarrier: 'Ajan kuljetuksia',
-    iAmShipper: 'Tarvitsen kuljetuksia',
+    iAmCarrier: 'Kuljetusliike',
+    iAmShipper: 'Tilaaja',
     submit: 'Lähetä hakemus',
     submitting: 'Lähetetään…',
     carrierNote:
@@ -816,7 +817,7 @@ export const fi = {
   },
 
   account: {
-    title: 'Oma tili',
+    title: 'Omat tiedot',
     passwordTitle: 'Salasanan vaihto',
     passwordHint: 'Uusi salasana tulee voimaan heti. Muista se — emme näe emmekä voi palauttaa sitä.',
     current: 'Nykyinen salasana',
