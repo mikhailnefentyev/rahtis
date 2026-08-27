@@ -18,10 +18,16 @@ const HEAD_HEIGHT = 68;
  * которой экран и сделан во весь рост; марка там светлая. Ниже начинается
  * обычный светлый сайт, и шапка становится полосой с тёмной маркой.
  *
- * Переключает не позиция скролла, а наблюдатель за меткой в конце первого
- * экрана: высота экрана меняется от поворота телефона и от адресной
- * строки, и любое число в пикселях пришлось бы пересчитывать на каждый
- * resize.
+ * Переключается по метке в конце первого экрана, а не по числу пикселей:
+ * высота экрана задана в svh и меняется от поворота телефона и от
+ * свёрнутой адресной строки, а метка едет вместе с ней.
+ *
+ * Положение метки читается на прокрутке, хотя напрашивается
+ * IntersectionObserver. Он здесь не работает: наблюдатель сообщает о
+ * смене пересечения, а при переходе по якорю метка уходит из «ниже
+ * экрана» сразу в «выше шапки» — оба раза «не пересекает». Перехода нет,
+ * обработчик молчит, и шапка остаётся прозрачной поверх светлой
+ * страницы, где её белые буквы не видны.
  *
  * Логотипа два файла, а не один с фильтром: буквы тёмно-синие, и
  * `invert` вместе с ними перекрасил бы голубой акцент у S — то
@@ -41,21 +47,30 @@ export function SiteHeader() {
     if (!sentinel) return;
 
     /*
-     * rootMargin поднимает границу до нижней кромки полосы: переключение
-     * происходит ровно тогда, когда метка уходит под шапку, а не когда
-     * она покидает экран целиком.
-     *
-     * Решение принимается по координате, а не по isIntersecting: метка
-     * не пересекает окно и когда она выше шапки, и когда она ещё ниже
-     * экрана, а состояния это разные.
+     * Замер раз в кадр. Событий прокрутки за секунду приходят десятки, а
+     * getBoundingClientRect заставляет браузер пересчитать раскладку —
+     * без ограничения это делалось бы на каждое из них.
      */
-    const io = new IntersectionObserver(
-      ([entry]) => setSolid(entry.boundingClientRect.top <= HEAD_HEIGHT),
-      { rootMargin: `-${HEAD_HEIGHT}px 0px 0px 0px`, threshold: 0 },
-    );
+    let frame = 0;
 
-    io.observe(sentinel);
-    return () => io.disconnect();
+    const measure = () => {
+      frame = 0;
+      setSolid(sentinel.getBoundingClientRect().top <= HEAD_HEIGHT);
+    };
+
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(measure);
+    };
+
+    measure();
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule, { passive: true });
+
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+      window.removeEventListener('scroll', schedule);
+      window.removeEventListener('resize', schedule);
+    };
   }, []);
 
   const menu = [
@@ -65,10 +80,37 @@ export function SiteHeader() {
     { href: '#assistant', label: t.landing.menuAssistant },
   ];
 
+  const home = `/${locale}`;
+
+  /**
+   * Марка возвращает к началу главной.
+   *
+   * Обычной ссылки для этого мало: шапка живёт только на главной, адрес
+   * уже её, и браузер на переход по тому же адресу не отвечает ничем —
+   * а если в адресе остался якорь раздела, то и вовсе вернёт к нему.
+   *
+   * href при этом остаётся настоящим: по нему работают «открыть в новой
+   * вкладке» и копирование адреса. Перехват отменяется, если нажатие с
+   * модификатором — иначе средняя кнопка и Ctrl открывали бы вкладку и
+   * тут же прокручивали текущую.
+   */
+  function backToTop(event: React.MouseEvent<HTMLAnchorElement>) {
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+    event.preventDefault();
+    history.replaceState(null, '', home);
+    window.scrollTo({
+      top: 0,
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        ? 'auto'
+        : 'smooth',
+    });
+  }
+
   return (
     <header className="site-head" data-solid={solid || undefined}>
       <div className="site-head__inner">
-        <Link href={`/${locale}`} className="site-head__mark">
+        <Link href={home} className="site-head__mark" onClick={backToTop}>
           {/*
             * Обе версии в разметке, видимость решает CSS. Подмена src по
             * состоянию давала бы моргание на переключении: браузер
