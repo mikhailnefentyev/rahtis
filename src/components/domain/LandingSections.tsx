@@ -37,7 +37,7 @@ export async function LandingSections({ locale }: { locale: Locale }) {
       </div>
 
       {/* ── Что мы делаем ──────────────────────────────────────── */}
-      <section className="mx-auto w-full max-w-6xl px-5 py-20">
+      <section id="service" className="mx-auto w-full max-w-6xl px-5 py-20">
         <p className="label-micro">{l.helpEyebrow}</p>
         <h2 className="mt-2.5 max-w-[22ch] text-[clamp(26px,3vw,34px)] leading-tight font-semibold tracking-tight text-balance">
           {l.helpTitle}
@@ -146,7 +146,7 @@ export async function LandingSections({ locale }: { locale: Locale }) {
       </section>
 
       {/* ── Путь рейса ─────────────────────────────────────────── */}
-      <section className="border-y border-line bg-surface">
+      <section id="steps" className="border-y border-line bg-surface">
         <div className="mx-auto w-full max-w-6xl px-5 py-20">
           <p className="label-micro">{l.stepsEyebrow}</p>
           <h2 className="mt-2.5 text-[clamp(26px,3vw,34px)] leading-tight font-semibold tracking-tight text-balance">
@@ -204,7 +204,7 @@ export async function LandingSections({ locale }: { locale: Locale }) {
       </section>
 
       {/* ── Помощник водителя ──────────────────────────────────── */}
-      <section className="border-y border-line bg-surface">
+      <section id="assistant" className="border-y border-line bg-surface">
         <div className="mx-auto w-full max-w-6xl px-5 py-20">
           <p className="label-micro">
             {l.aiEyebrow}

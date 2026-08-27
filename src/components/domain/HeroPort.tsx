@@ -1,12 +1,10 @@
 import Link from 'next/link';
-import { LocaleSwitch } from '@/components/layout/LocaleSwitch';
 import {
   TripCycle,
   type CycleStage,
   type CycleTrip,
 } from '@/components/domain/TripCycle';
 import { buttonClass, Mono } from '@/components/ui';
-import { signInPath } from '@/lib/auth/paths';
 import { getI18n, type Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 
@@ -114,13 +112,6 @@ export async function HeroPort({ locale }: { locale: Locale }) {
         <div className="hero-port__card">
           <TripPreview locale={locale} />
         </div>
-      </div>
-
-      <div className="hero-port__corner">
-        <LocaleSwitch current={locale} />
-        <Link href={signInPath(locale)} className="hero-port__signin">
-          {t.landing.signIn}
-        </Link>
       </div>
     </section>
   );

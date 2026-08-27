@@ -183,6 +183,11 @@ export const en = {
   },
 
   landing: {
+    menuService: 'Service',
+    menuRoles: 'Who it is for',
+    menuSteps: 'How it works',
+    menuAssistant: 'Assistant',
+    menuSignIn: 'Sign in',
     eyebrow: 'Freight platform in Finland',
     titleA: 'Trucks keep rolling.',
     titleB: 'Freight leaves on time.',

@@ -248,6 +248,128 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════
+   Шапка витрины
+
+   Закреплена наверху и в двух состояниях, потому что фон под ней
+   разный. Над первым экраном подложки нет: светлая полоса срезала бы
+   верх съёмки, ради которой экран сделан во весь рост. Ниже начинается
+   обычный светлый сайт, и шапка становится полосой.
+
+   position: fixed, а не sticky. Sticky занимает место в потоке и сдвинул
+   бы первый экран вниз ровно на свою высоту — 100svh перестал бы быть
+   первым экраном.
+   ═══════════════════════════════════════════════════════════════ */
+.site-head {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 50;
+  border-bottom: 1px solid transparent;
+  transition:
+    background-color 220ms ease,
+    border-color 220ms ease;
+}
+.site-head[data-solid] {
+  background: var(--color-ground);
+  border-bottom-color: var(--color-line);
+}
+
+.site-head__inner {
+  max-width: 1180px;
+  margin-inline: auto;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.site-head__mark {
+  display: inline-flex;
+  flex: none;
+}
+.site-head__logo {
+  display: block;
+  height: 22px;
+  width: auto;
+}
+/* Тёмная марка ждёт в разметке: подмена src моргала бы на переключении. */
+.site-head__logo--dark { display: none; }
+.site-head[data-solid] .site-head__logo--light { display: none; }
+.site-head[data-solid] .site-head__logo--dark { display: block; }
+
+/*
+ * Разделы прячутся на узком экране. Бургер здесь был бы лишним: под
+ * пунктами лежат части одной страницы, и с телефона до них доезжают
+ * прокруткой, а не меню.
+ */
+.site-head__menu {
+  display: none;
+  gap: 22px;
+  margin-right: auto;
+}
+@media (min-width: 900px) {
+  .site-head__menu { display: flex; }
+}
+.site-head__menu a {
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.76);
+  transition: color 180ms ease;
+}
+.site-head__menu a:hover { color: #ffffff; }
+.site-head[data-solid] .site-head__menu a { color: var(--color-ink-muted); }
+.site-head[data-solid] .site-head__menu a:hover { color: var(--color-ink); }
+
+.site-head__side {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-left: auto;
+}
+
+.site-head__signin {
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.9);
+  transition: color 180ms ease;
+}
+.site-head__signin:hover { color: #ffffff; text-decoration: underline; }
+.site-head[data-solid] .site-head__signin { color: var(--color-accent); }
+
+/* Поверх съёмки рамка переключателя не видна — та же подложка, что была
+   в углу первого экрана. */
+.site-head:not([data-solid]) .locale-switch {
+  border-color: rgba(255, 255, 255, 0.28);
+  background: rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(6px);
+}
+.site-head:not([data-solid]) .locale-switch a { color: rgba(255, 255, 255, 0.62); }
+.site-head:not([data-solid]) .locale-switch a:hover { color: rgba(255, 255, 255, 0.9); }
+.site-head:not([data-solid]) .locale-switch a[data-on] {
+  background: rgba(255, 255, 255, 0.92);
+  color: #0c1626;
+  box-shadow: none;
+}
+
+/*
+ * Метке нужна высота: цель нулевой площади браузер не считает
+ * пересекающей окно, наблюдатель по ней не срабатывает ни разу, и шапка
+ * навсегда остаётся прозрачной.
+ */
+#hero-end {
+  height: 1px;
+}
+
+/* Заголовок раздела не должен уезжать под закреплённую полосу. */
+#service,
+#roles,
+#steps,
+#assistant {
+  scroll-margin-top: 68px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
    Первый экран главной страницы
 
    Единственное место в продукте с тёмным фоном и светлым текстом.
@@ -411,25 +533,6 @@
   color: rgba(255, 255, 255, 0.58);
 }
 
-/* Правый верхний угол первого экрана: язык и вход. */
-.hero-port__corner {
-  position: absolute;
-  z-index: 3;
-  top: 18px;
-  right: 24px;
-  display: flex;
-  align-items: center;
-  gap: 18px;
-}
-
-.hero-port__signin {
-  font-size: 13px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.86);
-  text-decoration: none;
-}
-.hero-port__signin:hover { color: #ffffff; text-decoration: underline; }
-
 /*
  * Переключатель языка.
  *
@@ -463,20 +566,6 @@
   background: var(--color-surface);
   color: var(--color-ink);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
-}
-
-/* Поверх съёмки та же разметка, но на стекле: рамка кабинета там не видна. */
-.hero-port__corner .locale-switch {
-  border-color: rgba(255, 255, 255, 0.28);
-  background: rgba(0, 0, 0, 0.28);
-  backdrop-filter: blur(6px);
-}
-.hero-port__corner .locale-switch a { color: rgba(255, 255, 255, 0.62); }
-.hero-port__corner .locale-switch a:hover { color: rgba(255, 255, 255, 0.9); }
-.hero-port__corner .locale-switch a[data-on] {
-  background: rgba(255, 255, 255, 0.92);
-  color: #0c1626;
-  box-shadow: none;
 }
 
 /* Пульс «агент думает»: движение мягче точек, которые скачут. */

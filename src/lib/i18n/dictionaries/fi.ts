@@ -179,6 +179,11 @@ export const fi = {
   },
 
   landing: {
+    menuService: 'Palvelu',
+    menuRoles: 'Kenelle',
+    menuSteps: 'Näin se toimii',
+    menuAssistant: 'Avustaja',
+    menuSignIn: 'Kirjaudu',
     eyebrow: 'Logistiikka-alusta Suomessa',
     titleA: 'Auto pysyy liikkeessä.',
     titleB: 'Rahti lähtee ajallaan.',
