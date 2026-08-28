@@ -1,0 +1,115 @@
+# ═══════════════════════════════════════════════════════════════════
+# RAHTIS · проверки перед выкатом
+#
+# Три работы, и разделены они не ради красоты, а потому что требуют
+# разного. Первая не требует ничего и потому идёт всегда. Вторая и
+# третья просят доступ к боевому проекту Supabase и молча пропускаются
+# там, где его нет: сборка, красная из-за незаполненного секрета,
+# приучает смотреть мимо красного.
+#
+# Секреты подставляются на уровне работы, а не шага. Условие шага читает
+# контекст env, и переменная, объявленная тут же в шаге, для его
+# собственного `if` ещё не существует.
+# ═══════════════════════════════════════════════════════════════════
+
+name: Проверки
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Новый коммит отменяет проверку предыдущего: добивать сборку кода,
+# который уже переписали, незачем.
+concurrency:
+  group: check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ── Разбор и типы ────────────────────────────────────────────────
+  code:
+    name: Линтер и типы
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # ci, а не install: ставит ровно то, что записано в lock-файле, и
+      # падает при расхождении вместо того, чтобы молча его поправить.
+      - run: npm ci
+
+      - run: npm run lint
+      - run: npm run typecheck
+
+  # ── Сборка ───────────────────────────────────────────────────────
+  #
+  # Ловит то, чего не видят ни линтер, ни tsc: утёкший на клиент
+  # серверный модуль, страницу, которая не собирается, отсутствующий
+  # ассет. Переменные нужны настоящие — сборка вычисляет NEXT_PUBLIC_* и
+  # вшивает их в бандл.
+  build:
+    name: Сборка
+    runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+      NEXT_PUBLIC_MAPTILER_KEY: ${{ secrets.NEXT_PUBLIC_MAPTILER_KEY }}
+      NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: next build
+        if: env.NEXT_PUBLIC_SUPABASE_URL != ''
+        run: npm run build
+
+      - name: Секреты не настроены — сборка пропущена
+        if: env.NEXT_PUBLIC_SUPABASE_URL == ''
+        run: echo "::notice::Добавьте секреты репозитория, чтобы включить сборку в проверках."
+
+  # ── Типы против настоящей базы ───────────────────────────────────
+  #
+  # Самая ценная из трёх, и появилась она не из любви к порядку.
+  # Закоммиченный database.ts однажды разошёлся с базой на тысячу строк,
+  # и всё это время прятал две настоящие ошибки: обращение к полю,
+  # которое может быть пустым, и вызов с аргументами, которых функция не
+  # объявляла. Файл генерируется — значит, устаревает молча, и заметить
+  # это может только машина.
+  types:
+    name: Типы совпадают с базой
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Перегенерировать и сравнить
+        if: env.SUPABASE_ACCESS_TOKEN != ''
+        run: |
+          npx supabase gen types typescript --project-id "$PROJECT_REF" > src/types/database.ts
+          if ! git diff --exit-code -- src/types/database.ts; then
+            echo "::error::database.ts отстал от базы. Выполните: npx supabase gen types typescript --linked > src/types/database.ts"
+            exit 1
+          fi
+
+      - name: Токен не настроен — сверка пропущена
+        if: env.SUPABASE_ACCESS_TOKEN == ''
+        run: echo "::notice::Добавьте SUPABASE_ACCESS_TOKEN и SUPABASE_PROJECT_REF, чтобы включить сверку типов."
