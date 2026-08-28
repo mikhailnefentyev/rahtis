@@ -56,7 +56,15 @@ export async function LegalDocument({ locale, kind }: { locale: Locale; kind: Ki
         {list.map((clause) => {
           /* Глубина адреса решает всё: {5} — раздел, {5,2} и глубже — пункт. */
           const section = clause.path.length === 1;
-          const anchor = `p-${clause.number.replaceAll('.', '-')}`;
+
+          /*
+           * Номер — вычисляемая колонка, и типы честно зовут её
+           * необязательной. Собрать его из адреса можно тем же способом,
+           * каким это делает база, поэтому запасной путь не заглушка, а
+           * тот же ответ: «5.2» — это path, склеенный точками.
+           */
+          const number = clause.number ?? clause.path.join('.');
+          const anchor = `p-${number.replaceAll('.', '-')}`;
 
           return (
             <section

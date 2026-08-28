@@ -69,7 +69,15 @@ export async function POST(request: Request) {
   }
 
   const admin = createAdminClient();
-  const { data, error } = await admin.rpc(spec.fn, params);
+
+  /*
+   * Приведение здесь, потому что имя функции — переменная, а типы
+   * PostgREST описывают набор аргументов для каждой функции отдельно.
+   * Доказательства типам не хватает, гарантия при этом есть: params
+   * собран строго по spec.args, то есть шире объявленного набора он быть
+   * не может, а лишнее из запроса отброшено циклом выше.
+   */
+  const { data, error } = await admin.rpc(spec.fn, params as never);
 
   if (error) {
     /* 42501 — пропуск недействителен: воркфлоу не должен видеть подробностей. */
