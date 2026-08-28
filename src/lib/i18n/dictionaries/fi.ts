@@ -1043,6 +1043,12 @@ export const fi = {
     generic: 'Jokin meni pieleen. Yritä uudelleen.',
     notFound: 'Sivua ei löydy',
     forbidden: 'Ei pääsyä tähän osioon',
+    title: 'Sivu ei latautunut',
+    body: 'Sivun lataus keskeytyi. Tiedot ovat tallessa — mitään ei kadonnut kesken toiminnon.',
+    retry: 'Yritä uudelleen',
+    home: 'Etusivulle',
+    reference: 'Virheen tunnus',
+    referenceHint: 'Kerro tämä tunnus, jos otat yhteyttä ylläpitoon.',
   },
 
   /**

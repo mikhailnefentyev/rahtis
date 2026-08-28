@@ -1750,6 +1750,22 @@ export type Database = {
         Returns: number
       }
       unread_notifications: { Args: never; Returns: number }
+      record_incident: {
+        Args: {
+          p_fingerprint: string
+          p_severity: Database["public"]["Enums"]["incident_severity"]
+          p_source: string
+          p_kind: string
+          p_message: string
+          p_path?: string | null
+          p_sqlstate?: string | null
+        }
+        Returns: number
+      }
+      platform_pulse: {
+        Args: never
+        Returns: { metric: string; value: number; threshold: number | null }[]
+      }
       offers_for_shipper: {
         Args: { p_order_ids: string[] }
         Returns: {
@@ -1991,6 +2007,8 @@ export type Database = {
       distance_source: "MANUAL" | "AUTO"
       document_kind: "CARRIER_LICENSE" | "INSURANCE"
       email_status: "PENDING" | "SENT" | "FAILED" | "SKIPPED"
+      incident_severity: "WARN" | "ERROR" | "FATAL"
+      incident_status: "OPEN" | "ACKED" | "RESOLVED"
       chat_audience: "DRIVER" | "CARRIER" | "SHIPPER" | "ADMIN"
       chat_channel: "WEB" | "WHATSAPP"
       chat_sender: "USER" | "AGENT" | "OPERATOR"

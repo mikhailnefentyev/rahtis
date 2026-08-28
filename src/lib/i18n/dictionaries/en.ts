@@ -1025,6 +1025,12 @@ export const en = {
     generic: 'Something went wrong. Try again.',
     notFound: 'Page not found',
     forbidden: 'No access to this section',
+    title: 'The page did not load',
+    body: 'The page failed to load. Your data is safe — nothing was lost mid-action.',
+    retry: 'Try again',
+    home: 'Go to front page',
+    reference: 'Error reference',
+    referenceHint: 'Quote this reference if you contact support.',
   },
 
   /**
