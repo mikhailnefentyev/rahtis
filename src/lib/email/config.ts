@@ -19,16 +19,18 @@ export function emailProviderName(): 'stub' | 'resend' {
 /**
  * Отправитель. Формат «Имя <адрес>» или голый адрес.
  *
- * Плейсхолдер намеренно на нашем домене: подставив сюда чужой, письма
- * попадут в спам ещё до того, как мы это заметим.
+ * Умолчание — подтверждённый в Resend домен rahtis.eu. Это не удобство:
+ * письмо с адреса на неподтверждённом домене провайдер отклонит, а если
+ * и пропустит, оно уйдёт в спам и испортит репутацию домена, которую
+ * потом восстанавливать неделями.
  */
 export function emailFrom(): string {
-  return process.env.EMAIL_FROM ?? 'RAHTIS <noreply@aipoweredsolutions.fi>';
+  return process.env.EMAIL_FROM ?? 'RAHTIS <noreply@rahtis.eu>';
 }
 
 /** Куда писать оператору. Он же адрес ответа в письмах платформы. */
 export function emailReplyTo(): string {
-  return process.env.EMAIL_REPLY_TO ?? 'info@aipoweredsolutions.fi';
+  return process.env.EMAIL_REPLY_TO ?? 'admin@rahtis.eu';
 }
 
 /** Ящик оператора: сюда идут вопросы из кабинетов. */

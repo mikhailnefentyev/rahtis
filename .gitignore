@@ -47,3 +47,6 @@ next-env.d.ts
 
 # Копия воркера maplibre, создаётся scripts/sync-map-worker.mjs
 /public/maplibre
+
+# Предпросмотр письма, собирается npm run email:test -- --preview
+/email-preview.html

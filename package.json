@@ -9,6 +9,7 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "check": "npm run lint && npm run typecheck",
+    "email:test": "node scripts/send-test-email.mjs",
     "types": "npx --yes supabase gen types typescript --linked > src/types/database.ts",
     "predev": "node scripts/sync-maplibre.mjs",
     "prebuild": "node scripts/sync-maplibre.mjs"

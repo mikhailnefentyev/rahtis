@@ -1,3 +1,4 @@
+import { renderEmail, renderText, type EmailBlock } from '../layout';
 import type { EmailMessage } from '../types';
 
 /**
@@ -10,7 +11,44 @@ import type { EmailMessage } from '../types';
  * Суммы уже отформатированы вызывающим: форматирование денег живёт в
  * одном месте на весь проект, и повторять его здесь значит завести
  * второй источник правды о том, как выглядит евро.
+ *
+ * Числа собраны в таблицу, а не размазаны по фразам. Бухгалтер ищет в
+ * письме сумму и номер, а не читает его — колонка находится взглядом,
+ * предложение приходится вычитывать.
  */
+
+function build(input: {
+  template: string;
+  to: string;
+  companyId: string;
+  subject: string;
+  heading: string;
+  preheader: string;
+  lead: string;
+  rows: Array<[string, string]>;
+  operatorEmail: string;
+}): EmailMessage {
+  const blocks: EmailBlock[] = [
+    { kind: 'text', value: 'Hei,' },
+    { kind: 'text', value: input.lead },
+    { kind: 'facts', rows: input.rows },
+    { kind: 'note', value: `Kysymykset: ${input.operatorEmail}` },
+  ];
+
+  return {
+    template: input.template,
+    to: input.to,
+    subject: input.subject,
+    text: renderText({ heading: input.heading, blocks, operatorEmail: input.operatorEmail }),
+    html: renderEmail({
+      heading: input.heading,
+      preheader: input.preheader,
+      blocks,
+      operatorEmail: input.operatorEmail,
+    }),
+    companyId: input.companyId,
+  };
+}
 
 export function invoicedEmail(input: {
   to: string;
@@ -21,26 +59,23 @@ export function invoicedEmail(input: {
   invoiceRef: string | null;
   operatorEmail: string;
 }): EmailMessage {
-  return {
+  const rows: Array<[string, string]> = [
+    ['Kuljetus', input.orderRef],
+    ['Summa (alv 0 %)', input.amount],
+  ];
+  if (input.invoiceRef) rows.push(['Laskun numero', input.invoiceRef]);
+
+  return build({
     template: 'billing.invoiced',
     to: input.to,
-    subject: `RAHTIS · lasku kuljetuksesta ${input.orderRef}`,
-    text: [
-      'Hei,',
-      '',
-      `Kuljetuksesta ${input.orderRef} on lähetetty lasku.`,
-      '',
-      `Summa: ${input.amount} (alv 0 %). Laskuun lisätään alv 25,5 %.`,
-      input.invoiceRef ? `Laskun numero: ${input.invoiceRef}` : null,
-      '',
-      `Kysymykset: ${input.operatorEmail}`,
-      '',
-      'Aivomaa Oy · Y-tunnus 3592993-6',
-    ]
-      .filter((line) => line !== null)
-      .join('\n'),
     companyId: input.companyId,
-  };
+    subject: `RAHTIS · lasku kuljetuksesta ${input.orderRef}`,
+    heading: `Lasku kuljetuksesta ${input.orderRef}`,
+    preheader: `Summa ${input.amount} (alv 0 %).`,
+    lead: 'Kuljetuksesta on lähetetty lasku. Laskuun lisätään alv 25,5 %.',
+    rows,
+    operatorEmail: input.operatorEmail,
+  });
 }
 
 export function settledEmail(input: {
@@ -51,21 +86,18 @@ export function settledEmail(input: {
   amount: string;
   operatorEmail: string;
 }): EmailMessage {
-  return {
+  return build({
     template: 'billing.settled',
     to: input.to,
-    subject: `RAHTIS · tilitys kuljetuksesta ${input.orderRef}`,
-    text: [
-      'Hei,',
-      '',
-      `Kuljetuksesta ${input.orderRef} on maksettu tilitys.`,
-      '',
-      `Summa: ${input.amount} (alv 0 %). Tilitykseen lisätään alv 25,5 %.`,
-      '',
-      `Kysymykset: ${input.operatorEmail}`,
-      '',
-      'Aivomaa Oy · Y-tunnus 3592993-6',
-    ].join('\n'),
     companyId: input.companyId,
-  };
+    subject: `RAHTIS · tilitys kuljetuksesta ${input.orderRef}`,
+    heading: `Tilitys kuljetuksesta ${input.orderRef}`,
+    preheader: `Summa ${input.amount} (alv 0 %).`,
+    lead: 'Kuljetuksesta on maksettu tilitys. Tilitykseen lisätään alv 25,5 %.',
+    rows: [
+      ['Kuljetus', input.orderRef],
+      ['Summa (alv 0 %)', input.amount],
+    ],
+    operatorEmail: input.operatorEmail,
+  });
 }
