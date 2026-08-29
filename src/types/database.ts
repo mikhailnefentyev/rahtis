@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.17"
+    PostgrestVersion: "14.5"
   }
   graphql_public: {
     Tables: {
@@ -2059,6 +2059,19 @@ export type Database = {
           kind: Database["public"]["Enums"]["document_kind"]
           valid_until: string
         }[]
+      }
+      driver_active_trips: { Args: { p_phone: string }; Returns: Json }
+      driver_complete_next_stop: {
+        Args: {
+          p_damage_note?: string
+          p_expect?: Database["public"]["Enums"]["stop_role"]
+          p_phone: string
+        }
+        Returns: Json
+      }
+      driver_escalate: {
+        Args: { p_phone: string; p_question: string }
+        Returns: Json
       }
       expire_order_deadlines: { Args: never; Returns: number }
       fleet_size: {

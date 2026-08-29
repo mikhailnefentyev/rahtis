@@ -1145,6 +1145,7 @@ export const fi = {
     'event.offer.chosen': 'Sinut valittiin kuljetukseen {ref} — vahvista {minutes} minuutissa',
     'event.order.released': 'Kuljetus {ref} vapautui takaisin avoimeksi',
     'event.order.amended': 'Kuljetuksen {ref} reitti muuttui',
+    'event.trip.stop.done': 'Kuljetus {ref}: {place} merkitty tehdyksi ({done}/{total})',
     'event.order.closed': 'Kuljetus {ref} on valmis, asiakirjat ovat saatavilla',
     'event.vehicle.approved': 'Ajoneuvo {plate} on hyväksytty',
     'event.vehicle.rejected': 'Ajoneuvoa {plate} ei hyväksytty',

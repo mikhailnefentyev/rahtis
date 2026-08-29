@@ -1124,6 +1124,7 @@ export const en = {
     'event.offer.chosen': 'You were picked for transport {ref} — confirm within {minutes} minutes',
     'event.order.released': 'Transport {ref} is back on the board',
     'event.order.amended': 'The route on transport {ref} changed',
+    'event.trip.stop.done': 'Transport {ref}: {place} marked done ({done}/{total})',
     'event.order.closed': 'Transport {ref} is complete, the documents are available',
     'event.vehicle.approved': 'Vehicle {plate} is approved',
     'event.vehicle.rejected': 'Vehicle {plate} was not approved',
