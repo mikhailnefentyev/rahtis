@@ -5,6 +5,7 @@ import { headers } from 'next/headers';
 import { sendEmail, operatorInbox } from '@/lib/email';
 import { recoveryEmail } from '@/lib/email/templates/recovery';
 import { getDictionary, isLocale, defaultLocale, type Locale } from '@/lib/i18n';
+import { siteUrl } from '@/lib/config';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { supabaseSecretKey } from '@/lib/env.server';
 
@@ -109,7 +110,7 @@ export async function requestPasswordReset(
   if (!(await allowed(`email:${email}`, PER_EMAIL))) return wait();
   if (!(await allowed(`ip:${ip}`, PER_IP))) return wait();
 
-  const site = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+  const site = siteUrl();
   const admin = createAdminClient();
 
   const { data, error } = await admin.auth.admin.generateLink({

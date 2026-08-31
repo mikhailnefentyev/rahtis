@@ -27,6 +27,42 @@ export const APP = {
 } as const;
 
 /**
+ * Адрес сайта для ссылок в письмах.
+ *
+ * Ссылка из письма живёт дольше письма: человек открывает её через час,
+ * через день, с другого устройства. Она обязана вести на работающий
+ * сайт, а не на машину, с которой письмо отправили.
+ *
+ * Порядок источников выстроен так, чтобы боевое письмо со ссылкой на
+ * localhost стало невозможным. Именно это и случилось: письмо ушло с
+ * ноутбука, где NEXT_PUBLIC_SITE_URL указывает на localhost, и кнопка в
+ * ящике повела в никуда.
+ *
+ * VERCEL_PROJECT_PRODUCTION_URL подставляет сама площадка, и она права
+ * по определению — это адрес, по которому приложение сейчас доступно.
+ * Поэтому в бою он важнее переменной, которую человек мог не заполнить
+ * или заполнить доменом, ещё не привязанным к проекту.
+ */
+export function siteUrl(): string {
+  const configured = process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/$/, '');
+  const local = configured?.startsWith('http://localhost');
+
+  /* На площадке localhost не годится ни при каких настройках. */
+  const onVercel = Boolean(process.env.VERCEL);
+
+  if (configured && !(local && onVercel)) return configured;
+
+  const production = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+  if (production) return `https://${production}`;
+
+  /* Превью-развёртывание: свой адрес у каждого. */
+  const deployment = process.env.VERCEL_URL;
+  if (deployment) return `https://${deployment}`;
+
+  return 'http://localhost:3000';
+}
+
+/**
  * Комиссия оператора в базисных пунктах: 300 bps = 3%.
  *
  * Хранится в bps, а не в долях, чтобы не тащить float в расчёты денег.

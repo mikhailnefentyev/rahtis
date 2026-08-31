@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { explainAdmin, withAdminError } from '@/lib/admin/errors';
+import { siteUrl } from '@/lib/config';
 import { operatorInbox, sendEmail } from '@/lib/email';
 import { inviteEmail } from '@/lib/email/templates/invite';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -290,7 +291,7 @@ async function sendInvite(
   role: CompanyRole,
 ): Promise<boolean> {
   const admin = createAdminClient();
-  const site = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+  const site = siteUrl();
   const l = defaultLocale;
 
   /*
