@@ -84,6 +84,7 @@ export const fi = {
     submitting: 'Kirjaudutaan…',
     signOut: 'Kirjaudu ulos',
     fillBoth: 'Anna sähköposti ja salasana',
+    serviceDown: 'Palvelu ei juuri nyt vastaa. Yritä hetken kuluttua uudelleen — salasanasi on kunnossa.',
     invalidCredentials: 'Sähköposti tai salasana ei täsmää',
     noApplicationYet: 'Etkö ole vielä hakenut mukaan?',
     applyLink: 'Lähetä hakemus',

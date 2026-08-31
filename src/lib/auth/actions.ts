@@ -2,6 +2,7 @@
 
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { recordIncident } from '@/lib/incidents/record';
 import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
 import { cabinetPath, noAccessPath, safeRedirect, signInPath } from './paths';
 import { getViewer } from './viewer';
@@ -36,6 +37,26 @@ export async function signInAction(
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
+    /*
+     * Отказ в доступе и отказ службы — разные вещи, и путать их дорого.
+     *
+     * Раньше здесь на любую ошибку отвечали «неверный пароль». Однажды
+     * на боевом сайте оказался неверный адрес Supabase: запросы уходили
+     * в никуда, и сайт всем подряд сообщал, что у них неправильный
+     * пароль. Люди меняли пароли, пароли не помогали, а причина была не
+     * в них. Полдня ушло на то, что видно из одной строки лога.
+     *
+     * Различаем по коду: 400 и 422 — это ответ Supabase «не сходится
+     * логин или пароль», всё остальное означает, что мы до него не
+     * доехали.
+     */
+    const refused = error.status === 400 || error.status === 422;
+
+    if (!refused) {
+      void recordIncident({ source: 'action', path: '/signin', error });
+      return { error: t.auth.serviceDown };
+    }
+
     /*
      * Ответ намеренно одинаковый для «нет такого пользователя» и «неверный
      * пароль». Разные формулировки позволили бы перебором выяснить, какие

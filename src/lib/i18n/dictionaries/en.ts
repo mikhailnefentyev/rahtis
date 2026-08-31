@@ -88,6 +88,7 @@ export const en = {
     submitting: 'Signing in…',
     signOut: 'Sign out',
     fillBoth: 'Enter your email and password',
+    serviceDown: 'The service is not responding right now. Try again shortly — your password is fine.',
     invalidCredentials: 'That email and password do not match',
     noApplicationYet: 'Not applied yet?',
     applyLink: 'Send an application',
