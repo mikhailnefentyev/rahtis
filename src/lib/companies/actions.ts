@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { explainAdmin, withAdminError } from '@/lib/admin/errors';
+import { confirmLink } from '@/lib/auth/links';
 import { siteUrl } from '@/lib/config';
 import { operatorInbox, sendEmail } from '@/lib/email';
 import { inviteEmail } from '@/lib/email/templates/invite';
@@ -310,13 +311,15 @@ async function sendInvite(
   const { data, error } = await admin.auth.admin.generateLink({
     type: 'invite',
     email,
-    options: {
-      redirectTo: `${site}/${l}/auth/confirm?next=${encodeURIComponent(`/${l}/set-password`)}`,
-    },
+    /* Ссылку строим сами: почему — в lib/auth/links.ts. */
   });
 
   const user = data?.user;
-  const link = data?.properties?.action_link;
+  const hashedToken = data?.properties?.hashed_token;
+
+  const link = hashedToken
+    ? confirmLink({ site, locale: l, hashedToken, type: 'invite', next: '/set-password' })
+    : null;
 
   if (error || !user || !link) {
     console.error('Ссылка приглашения не создана:', error?.message);

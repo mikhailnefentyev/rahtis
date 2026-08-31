@@ -5,6 +5,7 @@ import { headers } from 'next/headers';
 import { sendEmail, operatorInbox } from '@/lib/email';
 import { recoveryEmail } from '@/lib/email/templates/recovery';
 import { getDictionary, isLocale, defaultLocale, type Locale } from '@/lib/i18n';
+import { confirmLink } from '@/lib/auth/links';
 import { siteUrl } from '@/lib/config';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { supabaseSecretKey } from '@/lib/env.server';
@@ -116,15 +117,24 @@ export async function requestPasswordReset(
   const { data, error } = await admin.auth.admin.generateLink({
     type: 'recovery',
     email,
-    options: {
-      redirectTo: `${site}/${locale}/auth/confirm?next=${encodeURIComponent(`/${locale}/set-password`)}`,
-    },
+    /*
+     * redirectTo здесь не задаётся: ссылку мы строим сами, и путь через
+     * редирект Supabase не используется вовсе. См. lib/auth/links.ts.
+     */
   });
 
-  const link = data?.properties?.action_link;
+  const hashedToken = data?.properties?.hashed_token;
 
   /* Адреса нет в системе — молчим и отвечаем то же самое. */
-  if (error || !link) return wait();
+  if (error || !hashedToken) return wait();
+
+  const link = confirmLink({
+    site,
+    locale,
+    hashedToken,
+    type: 'recovery',
+    next: '/set-password',
+  });
 
   await sendEmail(recoveryEmail({ to: email, link, operatorEmail: operatorInbox() }));
 
