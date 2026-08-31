@@ -72,6 +72,17 @@ export default async function SignInPage({
             )}
 
             <SignInForm next={next ?? null} />
+
+            {/*
+              * Ссылка под формой, а не над ней: сначала попытка войти,
+              * потом путь для тех, у кого не вышло. Наверху она отвлекала
+              * бы всех ради меньшинства.
+              */}
+            <p className="mt-4 text-[13px]">
+              <Link href={`/${locale}/forgot`} className="text-ink-muted hover:text-ink">
+                {t.recovery.link}
+              </Link>
+            </p>
           </CardBody>
         </Card>
 

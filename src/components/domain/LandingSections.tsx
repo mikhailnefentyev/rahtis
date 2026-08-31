@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { buttonClass, Card, CardBody, Mono } from '@/components/ui';
+import { APP } from '@/lib/config';
 import { getI18n, type Locale } from '@/lib/i18n';
 
 /**
@@ -388,12 +389,17 @@ export async function LandingSections({ locale }: { locale: Locale }) {
       {/* ── Подвал ─────────────────────────────────────────────── */}
       <footer className="mx-auto w-full max-w-6xl px-5 py-12">
         <div className="flex flex-wrap items-baseline gap-x-8 gap-y-4 text-xs text-ink-dim">
+          {/*
+            * Здесь юрлицо, а не марка: рядом стоит Y-tunnus, а он
+            * принадлежит Aivomaa Oy. Подвал витрины — то место, где по
+            * закону должно быть видно, с кем человек имеет дело.
+            */}
           <span>
-            <span className="font-semibold text-ink-muted">{t.brand.operator}</span> ·{' '}
-            <Mono>3592993-6</Mono> · {l.footerCountry}
+            <span className="font-semibold text-ink-muted">{t.brand.legalEntity}</span> ·{' '}
+            <Mono>{APP.operator.businessId}</Mono> · {l.footerCountry}
           </span>
-          <a href="mailto:info@aipoweredsolutions.fi" className="hover:text-ink-muted">
-            info@aipoweredsolutions.fi
+          <a href={`mailto:${APP.operator.email}`} className="hover:text-ink-muted">
+            {APP.operator.email}
           </a>
 
           {/* Условия читают до согласия, поэтому ссылка на них — на витрине. */}

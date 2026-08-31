@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { LocaleSwitch } from '@/components/layout/LocaleSwitch';
 import { LegalDocument } from '@/components/domain/LegalDocument';
+import { APP } from '@/lib/config';
 import { getI18n, isLocale } from '@/lib/i18n';
 import type { Database } from '@/types/database';
 
@@ -38,7 +39,7 @@ export async function LegalPage({ locale: raw, kind }: { locale: string; kind: K
       <LegalDocument locale={locale} kind={kind} />
 
       <p className="mt-10 border-t border-line pt-4 text-xs text-ink-dim">
-        {t.brand.operator} · 3592993-6 · {t.landing.footerCountry}
+        {t.brand.legalEntity} · {APP.operator.businessId} · {t.landing.footerCountry}
       </p>
     </main>
   );

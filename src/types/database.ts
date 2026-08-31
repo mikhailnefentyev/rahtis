@@ -1672,6 +1672,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      auth_throttle_hit: {
+        Args: { p_key_hash: string; p_limit: number; p_window_seconds: number }
+        Returns: boolean
+      }
       cancel_order: {
         Args: { p_order_id: string }
         Returns: {
@@ -2277,6 +2281,7 @@ export type Database = {
           value: number
         }[]
       }
+      prune_auth_throttle: { Args: never; Returns: number }
       prune_incidents: { Args: { p_keep_days?: number }; Returns: number }
       rate_order: {
         Args: { p_comment?: string; p_order_id: string; p_score: number }

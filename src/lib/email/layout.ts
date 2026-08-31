@@ -29,6 +29,24 @@ const ACCENT_BRIGHT = '#00a8d8';
 const FONT =
   "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
 
+/*
+ * В подвале письма — юридическое лицо, а не марка. Здесь Y-tunnus, и
+ * получатель должен видеть, с кем он имеет дело по договору. В теле
+ * письма при этом подписывается RAHTIS: человек переписывается с
+ * платформой, а счёт ему выставляет Aivomaa Oy.
+ *
+ * Значение написано здесь, а не взято из lib/config, и это вынужденно:
+ * модуль читает не только приложение, но и scripts/send-test-email.mjs
+ * голым Node, который не знает ни про алиас «@/», ни про импорт без
+ * расширения. Проверять письмо не тем шаблоном, который уйдёт людям,
+ * хуже, чем продублировать одну строку. При смене реквизитов править
+ * оба места — в lib/config.ts стоит встречная пометка.
+ */
+const LEGAL = 'Aivomaa Oy · Y-tunnus 3592993-6';
+
+/** Подпись в теле. Не ставится там, где письмо пришло НАМ, а не от нас. */
+const SIGNATURE = 'Rahtis Team';
+
 export type EmailBlock =
   | { kind: 'text'; value: string }
   | { kind: 'note'; value: string }
@@ -94,6 +112,8 @@ export function renderEmail(input: {
   preheader: string;
   blocks: EmailBlock[];
   operatorEmail: string;
+  /** Письмо пришло НАМ, а не от нас — тогда подписи быть не должно. */
+  incoming?: boolean;
 }): string {
   return `<!doctype html>
 <html lang="fi">
@@ -124,7 +144,7 @@ export function renderEmail(input: {
 
     <tr><td style="padding:18px 28px 22px;border-top:1px solid ${LINE};background:#f6f8fb;">
       <p style="margin:0;font:400 12px/1.6 ${FONT};color:${INK_FAINT};">
-        Aivomaa Oy · Y-tunnus 3592993-6<br>
+        ${LEGAL}<br>
         <a href="mailto:${escape(input.operatorEmail)}" style="color:${ACCENT};text-decoration:none;">${escape(input.operatorEmail)}</a>
       </p>
       <p style="margin:10px 0 0;font:400 11px/1.5 ${FONT};color:#8894a6;">
@@ -151,6 +171,7 @@ export function renderText(input: {
   heading: string;
   blocks: EmailBlock[];
   operatorEmail: string;
+  incoming?: boolean;
 }): string {
   const body = input.blocks
     .map((item) => {
@@ -170,10 +191,11 @@ export function renderText(input: {
     input.heading,
     '',
     body,
+    ...(input.incoming ? [] : ['', SIGNATURE]),
     '',
     'Emme koskaan kysy salasanaasi sähköpostitse emmekä puhelimessa.',
     '',
-    'Aivomaa Oy · Y-tunnus 3592993-6',
+    LEGAL,
     input.operatorEmail,
   ].join('\n');
 }

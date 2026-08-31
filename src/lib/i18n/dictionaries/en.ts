@@ -26,14 +26,16 @@ export const en = {
   brand: {
     name: 'RAHTIS',
     tagline: 'Freight platform · Finland',
-    operator: 'Aivomaa Oy',
-    description: 'Digital freight platform. Operated by Aivomaa Oy.',
+    operator: 'RAHTIS',
+    /* Юрлицо. Только там, где его требует закон: договоры, счета, отчёты. */
+    legalEntity: 'Aivomaa Oy',
+    description: 'Digital freight platform in Finland.',
   },
 
   role: {
     CARRIER: 'Carrier',
     SHIPPER: 'Shipper',
-    ADMIN: 'Admin · Aivomaa',
+    ADMIN: 'Admin · RAHTIS',
   },
 
   nav: {
@@ -79,7 +81,7 @@ export const en = {
 
   auth: {
     signInTitle: 'Sign in',
-    signInSubtitle: 'There is no open sign-up. Aivomaa issues credentials after a check.',
+    signInSubtitle: 'There is no open sign-up. RAHTIS issues credentials after a check.',
     email: 'Email',
     password: 'Password',
     submit: 'Sign in',
@@ -92,12 +94,12 @@ export const en = {
 
     noAccessTitle: 'Your account is not available',
     noProfileText:
-      'The account exists but is not linked to a company. Contact Aivomaa and we will open access.',
+      'The account exists but is not linked to a company. Contact RAHTIS support and we will open access.',
     frozenTitle: 'Access is frozen',
     frozenText:
-      'This company’s access has been frozen. Its data and transport history are kept. Contact Aivomaa and we will sort it out.',
+      'This company’s access has been frozen. Its data and transport history are kept. Contact RAHTIS support and we will sort it out.',
     rejectedText:
-      'Your company’s application was rejected. Contact Aivomaa — we will tell you why, and you can apply again.',
+      'Your company’s application was rejected. Contact RAHTIS support — we will tell you why, and you can apply again.',
   },
 
   cabinet: {
@@ -194,7 +196,7 @@ export const en = {
     titleC: 'The phone stops ringing.',
     lede:
       'Once an order is published, it goes automatically to approved carriers in the area. Offers can arrive within minutes. The job’s progress is visible step by step, and at the end every document sits in one place.',
-    lede2: 'Aivomaa Oy makes sure the process runs from start to finish.',
+    lede2: 'RAHTIS makes sure the process runs from start to finish.',
     asShipper: 'I need freight moved',
     asCarrier: 'I run a fleet',
     signIn: 'Sign in',
@@ -338,7 +340,7 @@ export const en = {
       'The driver can simply write “unloaded” in WhatsApp, and the job status updates for the shipper and the carrier.',
     ai5: 'Hands over to a person when it should',
     ai5Text:
-      'If the assistant cannot be sure of an answer, the question goes to Aivomaa’s dispatch.',
+      'If the assistant cannot be sure of an answer, the question goes to RAHTIS dispatch.',
     ai6: 'Speaks the driver’s language',
 
     servicesEyebrow: 'The service grows in stages',
@@ -812,6 +814,18 @@ export const en = {
     open: 'Company details',
   },
 
+  recovery: {
+    link: 'Forgot your password?',
+    title: 'Password reset',
+    subtitle: 'Enter your email address. We will send a link for setting a new password.',
+    submit: 'Send link',
+    sending: 'Sending…',
+    sent:
+      'If the address is registered, the link is on its way. Check your spam folder too — the link is valid for an hour.',
+    badEmail: 'Check the email address',
+    backToSignIn: 'Back to sign in',
+  },
+
   account: {
     title: 'Your details',
     passwordTitle: 'Change password',
@@ -834,7 +848,7 @@ export const en = {
     submit: 'Save and sign in',
     tooShort: 'The password needs at least 8 characters',
     mismatch: 'The passwords do not match',
-    linkExpired: 'This link is invalid or has expired. Ask Aivomaa for a new invite.',
+    linkExpired: 'This link is invalid or has expired. Ask RAHTIS support for a new invite.',
   },
 
   report: {

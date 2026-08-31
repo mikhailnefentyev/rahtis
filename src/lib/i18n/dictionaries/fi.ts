@@ -22,14 +22,16 @@ export const fi = {
   brand: {
     name: 'RAHTIS',
     tagline: 'Kuljetusalusta · Suomi',
-    operator: 'Aivomaa Oy',
-    description: 'Digitaalinen kuljetusalusta. Operaattorina Aivomaa Oy.',
+    operator: 'RAHTIS',
+    /* Юрлицо. Только там, где его требует закон: договоры, счета, отчёты. */
+    legalEntity: 'Aivomaa Oy',
+    description: 'Digitaalinen kuljetusalusta Suomessa.',
   },
 
   role: {
     CARRIER: 'Kuljetusliike',
     SHIPPER: 'Tilaaja',
-    ADMIN: 'Ylläpito · Aivomaa',
+    ADMIN: 'Ylläpito · RAHTIS',
   },
 
   nav: {
@@ -75,7 +77,7 @@ export const fi = {
 
   auth: {
     signInTitle: 'Kirjaudu sisään',
-    signInSubtitle: 'Avointa rekisteröitymistä ei ole. Aivomaa avaa tunnukset tarkastuksen jälkeen.',
+    signInSubtitle: 'Avointa rekisteröitymistä ei ole. RAHTIS avaa tunnukset tarkastuksen jälkeen.',
     email: 'Sähköposti',
     password: 'Salasana',
     submit: 'Kirjaudu',
@@ -88,12 +90,12 @@ export const fi = {
 
     noAccessTitle: 'Omat sivut eivät ole käytettävissä',
     noProfileText:
-      'Tunnus on olemassa, mutta sitä ei ole liitetty yritykseen. Ota yhteyttä Aivomaahan, niin avaamme pääsyn.',
+      'Tunnus on olemassa, mutta sitä ei ole liitetty yritykseen. Ota yhteyttä RAHTIS-tukeen, niin avaamme pääsyn.',
     frozenTitle: 'Tunnukset on jäädytetty',
     frozenText:
-      'Yrityksen tunnukset on jäädytetty. Tiedot ja kuljetushistoria säilyvät. Ota yhteyttä Aivomaahan, niin selvitämme asian.',
+      'Yrityksen tunnukset on jäädytetty. Tiedot ja kuljetushistoria säilyvät. Ota yhteyttä RAHTIS-tukeen, niin selvitämme asian.',
     rejectedText:
-      'Yrityksesi hakemus on hylätty. Ota yhteyttä Aivomaahan, niin kerromme syyn ja voit hakea uudelleen.',
+      'Yrityksesi hakemus on hylätty. Ota yhteyttä RAHTIS-tukeen, niin kerromme syyn ja voit hakea uudelleen.',
   },
 
   cabinet: {
@@ -190,7 +192,7 @@ export const fi = {
     titleC: 'Turhat puhelut jäävät pois.',
     lede:
       'Kun tilaus julkaistaan, se välittyy automaattisesti alueen hyväksytyille kuljetusliikkeille. Tarjoukset voivat tulla jo minuuteissa. Keikan eteneminen näkyy vaihe vaiheelta, ja lopuksi kaikki asiakirjat löytyvät samasta paikasta.',
-    lede2: 'Aivomaa Oy huolehtii siitä, että prosessi etenee alusta loppuun.',
+    lede2: 'RAHTIS huolehtii siitä, että prosessi etenee alusta loppuun.',
     asShipper: 'Olen kuljetuksen tilaaja',
     asCarrier: 'Olen kuljetusliike',
     signIn: 'Kirjaudu palveluun',
@@ -343,7 +345,7 @@ export const fi = {
       'Kuljettaja voi esimerkiksi kirjoittaa WhatsAppiin ”purettu”, jolloin keikan tila päivittyy tilaajalle ja kuljetusliikkeelle.',
     ai5: 'Siirtää asian ihmiselle tarvittaessa',
     ai5Text:
-      'Jos avustaja ei pysty varmistamaan vastausta, asia siirtyy Aivomaan ajojärjestelyyn.',
+      'Jos avustaja ei pysty varmistamaan vastausta, asia siirtyy RAHTIS-ajojärjestelyyn.',
     ai6: 'Palvelee kuljettajan kielellä',
 
     servicesEyebrow: 'Palvelu laajenee vaiheittain',
@@ -822,6 +824,19 @@ export const fi = {
     open: 'Yritystiedot',
   },
 
+  recovery: {
+    link: 'Unohditko salasanan?',
+    title: 'Salasanan palautus',
+    subtitle:
+      'Anna sähköpostiosoitteesi. Lähetämme linkin, jolla asetat uuden salasanan.',
+    submit: 'Lähetä linkki',
+    sending: 'Lähetetään…',
+    sent:
+      'Jos osoite on rekisteröity, linkki on matkalla. Tarkista myös roskapostikansio — linkki on voimassa tunnin.',
+    badEmail: 'Tarkista sähköpostiosoite',
+    backToSignIn: 'Takaisin kirjautumiseen',
+  },
+
   account: {
     title: 'Omat tiedot',
     passwordTitle: 'Salasanan vaihto',
@@ -844,7 +859,7 @@ export const fi = {
     submit: 'Tallenna ja kirjaudu',
     tooShort: 'Salasanassa pitää olla vähintään 8 merkkiä',
     mismatch: 'Salasanat eivät täsmää',
-    linkExpired: 'Linkki ei kelpaa tai on vanhentunut. Pyydä uusi kutsu Aivomaalta.',
+    linkExpired: 'Linkki ei kelpaa tai on vanhentunut. Pyydä uusi kutsu RAHTIS-tuesta.',
   },
 
   report: {

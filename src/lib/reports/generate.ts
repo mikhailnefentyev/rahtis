@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { renderToBuffer } from '@react-pdf/renderer';
-import { COMMISSION_BPS, VAT_BPS, commissionCents, payoutCents } from '@/lib/config';
+import { APP, COMMISSION_BPS, VAT_BPS, commissionCents, payoutCents } from '@/lib/config';
 import { operatorInbox } from '@/lib/email';
 import { createFormat } from '@/lib/format';
 import { getDictionary, defaultLocale } from '@/lib/i18n';
@@ -244,7 +244,7 @@ async function issue(
     total: t.report_.total,
     empty: t.report_.empty,
     closingNote: t.report_.closingNote,
-    operator: `${t.brand.operator} · Y-tunnus 3592993-6`,
+    operator: `${t.brand.legalEntity} · Y-tunnus ${APP.operator.businessId}`,
     page: t.report_.page,
   };
 

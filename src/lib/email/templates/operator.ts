@@ -73,12 +73,18 @@ export function supportEmail(input: {
     to: input.operatorInbox,
     replyTo: input.fromEmail,
     subject: `RAHTIS · kysymys: ${input.subject}`,
-    text: renderText({ heading: input.subject, blocks, operatorEmail: input.operatorInbox }),
+    text: renderText({
+      heading: input.subject,
+      blocks,
+      operatorEmail: input.operatorInbox,
+      incoming: true,
+    }),
     html: renderEmail({
       heading: input.subject,
       preheader: `${input.companyName} · ${input.fromEmail}`,
       blocks,
       operatorEmail: input.operatorInbox,
+      incoming: true,
     }),
     companyId: input.companyId,
   };
