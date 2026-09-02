@@ -6,7 +6,7 @@ import { stubProvider } from './stub';
 import type { EmailMessage, EmailProvider, EmailResult } from './types';
 
 export type { EmailAttachment, EmailMessage, EmailProvider, EmailResult } from './types';
-export { emailFrom, emailReplyTo, operatorInbox } from './config';
+export { EMAIL_LOCALE, emailFrom, emailReplyTo, operatorInbox } from './config';
 
 /** Кто отправляет сейчас. Решает одна переменная окружения. */
 export function getEmailProvider(): EmailProvider {

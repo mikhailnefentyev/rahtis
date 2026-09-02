@@ -5,7 +5,11 @@ import { redirect } from 'next/navigation';
 import { explainAdmin, withAdminError } from '@/lib/admin/errors';
 import { confirmLink } from '@/lib/auth/links';
 import { siteUrl } from '@/lib/config';
-import { operatorInbox, sendEmail } from '@/lib/email';
+import { EMAIL_LOCALE, emailReplyTo, operatorInbox, sendEmail } from '@/lib/email';
+import {
+  applicationFiledEmail,
+  applicationReceivedEmail,
+} from '@/lib/email/templates/application';
 import { inviteEmail } from '@/lib/email/templates/invite';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
@@ -53,22 +57,89 @@ export async function submitApplicationAction(
   if (!/^\S+@\S+\.\S+$/.test(email)) return { error: t.validation.email, done: false };
 
   const admin = createAdminClient();
-  const { error } = await admin.from('companies').insert({
-    kind,
-    name,
-    business_id: businessId,
-    contact_email: email,
-  });
+  const { data: company, error } = await admin
+    .from('companies')
+    .insert({
+      kind,
+      name,
+      business_id: businessId,
+      contact_email: email,
+    })
+    .select('id')
+    .single();
 
-  if (error) {
+  if (error || !company) {
     /* 23505 — сработал частичный уникальный индекс по (country, business_id). */
     return {
-      error: error.code === '23505' ? t.apply.duplicate : t.apply.failed,
+      error: error?.code === '23505' ? t.apply.duplicate : t.apply.failed,
       done: false,
     };
   }
 
+  await announceApplication({
+    companyId: company.id,
+    companyName: name,
+    businessId,
+    email,
+    kind,
+  });
+
   return { error: null, done: true };
+}
+
+/**
+ * Письма о новой заявке: оператору и заявителю.
+ *
+ * Стоит после вставки, а не внутри неё, и результат не проверяется —
+ * это осознанный порядок. Заявка принята в тот момент, когда строка
+ * легла в базу; почта — дубль этого события. Упавший провайдер не
+ * должен превращать принятую заявку в «попробуйте ещё раз», иначе
+ * человек отправит форму второй раз и получит отказ по дублю Y-tunnus.
+ *
+ * Исход отправки не теряется: строка появляется в email_outbox до
+ * попытки, а неотправленные письма видны оператору в журнале и в пульсе
+ * платформы (метрика email_stuck).
+ *
+ * Оператору — первым. Если что-то из двух не уйдёт, важнее сохранить то
+ * письмо, без которого заявка останется незамеченной.
+ *
+ * Спам-вектора здесь не прибавилось: до этой точки доходит только
+ * заявка, прошедшая уникальный индекс по (country, business_id), и
+ * повторная отправка той же формы писем уже не порождает.
+ */
+async function announceApplication(input: {
+  companyId: string;
+  companyName: string;
+  businessId: string;
+  email: string;
+  kind: CompanyRole;
+}): Promise<void> {
+  /* Письма платформы по-фински, независимо от языка формы. */
+  const t = await getDictionary(EMAIL_LOCALE);
+  const role = t.role[input.kind];
+
+  await sendEmail(
+    applicationFiledEmail({
+      operatorInbox: operatorInbox(),
+      applicantEmail: input.email,
+      companyName: input.companyName,
+      companyId: input.companyId,
+      businessId: input.businessId,
+      role,
+      queueLink: `${siteUrl()}/${EMAIL_LOCALE}/admin`,
+    }),
+  );
+
+  await sendEmail(
+    applicationReceivedEmail({
+      to: input.email,
+      companyName: input.companyName,
+      companyId: input.companyId,
+      businessId: input.businessId,
+      role,
+      operatorEmail: emailReplyTo(),
+    }),
+  );
 }
 
 /* ── Решения оператора ──────────────────────────────────────────── */
