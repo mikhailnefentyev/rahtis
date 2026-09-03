@@ -5,6 +5,7 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import { cn } from '@/lib/cn';
 import { isMapConfigured, maptilerKey } from '@/lib/env';
 import { decodePolyline } from '@/lib/routing';
+import { stopTitle, type HaulKind } from '@/lib/orders/haul';
 import { useI18n } from '@/lib/i18n/provider';
 import type { StopRole } from '@/types/db';
 
@@ -285,10 +286,13 @@ export function OrderRouteMap({
   geometry,
   bounds,
   stops,
+  haulKind = 'TRAILER',
   className,
 }: {
   geometry: string | null;
   bounds: unknown;
+  /* Подпись метки называет единицу: у контейнера прицепа в рейсе нет. */
+  haulKind?: HaulKind;
   stops: {
     id: string;
     sequence: number;
@@ -317,9 +321,9 @@ export function OrderRouteMap({
         lon: s.lon,
         passed: Boolean(s.completed_at),
         /* В подсказке маркера — роль и место: номер на маркере без этого нем. */
-        label: `${t.stopKind[s.role]}: ${s.place_name ?? s.company_name ?? s.address}`,
+        label: `${stopTitle(t, s.role as StopRole, haulKind)}: ${s.place_name ?? s.company_name ?? s.address}`,
       })),
-    [stops, t],
+    [stops, t, haulKind],
   );
 
   return <RouteMap geometry={geometry} bounds={box} stops={mapStops} className={className} />;

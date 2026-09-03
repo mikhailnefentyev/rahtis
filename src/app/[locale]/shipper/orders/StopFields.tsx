@@ -3,6 +3,7 @@
 import { AddressInput, type ChosenAddress } from '@/components/domain/AddressInput';
 import { Field, Input, InputMono, Select, Textarea } from '@/components/ui';
 import { hasCargo, hasConsignee, hasExternalRef } from '@/lib/orders/stopFields';
+import type { HaulKind } from '@/lib/orders/haul';
 import { useI18n } from '@/lib/i18n/provider';
 import type { StopRole } from '@/types/db';
 
@@ -55,6 +56,7 @@ export function StopFields({
   showContact = false,
   showPlaceName = false,
   showTrailerState = false,
+  haulKind = 'TRAILER',
   requireDate = false,
   addressPlaceholder,
   placeNamePlaceholder,
@@ -70,6 +72,8 @@ export function StopFields({
   showPlaceName?: boolean;
   /** Прицеп с грузом или пустой — спрашивается на заборе и на отцепке. */
   showTrailerState?: boolean;
+  /* «Прицеп кузов гружён» или «контейнер гружён» — слово от единицы. */
+  haulKind?: HaulKind;
   requireDate?: boolean;
   addressPlaceholder?: string;
   placeNamePlaceholder?: string;
@@ -250,7 +254,7 @@ export function StopFields({
       )}
 
       {showTrailerState && (
-        <Field label={t.orderForm.trailerState} required>
+        <Field label={t.haul[haulKind].unitState} required>
           {(p) => (
             <Select
               {...p}

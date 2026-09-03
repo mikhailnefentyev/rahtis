@@ -180,13 +180,14 @@ export function OrdersView({
                       <p className="label-micro mb-3">
                         {m('order.stopsCount', { count: stops.length })}
                       </p>
-                      <RouteStops stops={stops} />
+                      <RouteStops stops={stops} haulKind={order.haul_kind} />
 
                       {/* Карта под списком: список — источник, карта — проверка. */}
                       <OrderRouteMap
                         geometry={order.route_geometry}
                         bounds={order.route_bounds}
                         stops={stops}
+                        haulKind={order.haul_kind}
                         className="mt-4"
                       />
 
@@ -196,12 +197,18 @@ export function OrdersView({
                         * и только потом решает, что менять.
                         */}
                       {order.status === 'IN_PROGRESS' && (
-                        <AmendPanel orderId={order.id} stops={stops} className="mt-4" />
+                        <AmendPanel
+                          orderId={order.id}
+                          stops={stops}
+                          haulKind={order.haul_kind}
+                          className="mt-4"
+                        />
                       )}
 
                       <OrderAmendments
                         amendments={amendmentsByOrder[order.id] ?? []}
                         orderId={order.id}
+                        haulKind={order.haul_kind}
                         className="mt-4"
                       />
                     </>

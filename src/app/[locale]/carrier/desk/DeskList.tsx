@@ -166,7 +166,7 @@ export function DeskList({ orders, vehicles }: { orders: DeskOrder[]; vehicles: 
                   <p className="label-micro mb-3">
                     {m('order.stopsCount', { count: stops.length })}
                   </p>
-                  <RouteStops stops={stops} />
+                  <RouteStops stops={stops} haulKind={order.haul_kind} />
 
                   {/*
                     * Карта на столе — до того, как заказ взят: по ней видно,
@@ -177,6 +177,7 @@ export function DeskList({ orders, vehicles }: { orders: DeskOrder[]; vehicles: 
                     geometry={order.route_geometry}
                     bounds={order.route_bounds}
                     stops={stops}
+                    haulKind={order.haul_kind}
                     className="mt-4"
                   />
 

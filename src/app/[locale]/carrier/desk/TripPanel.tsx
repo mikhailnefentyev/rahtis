@@ -3,6 +3,7 @@
 import { useActionState, useState } from 'react';
 import { Button, Textarea } from '@/components/ui';
 import { stopPlace, tripProgress, type TripStop } from '@/lib/orders/progress';
+import { stopTitle, type HaulKind } from '@/lib/orders/haul';
 import { completeStopAction, uncompleteStopAction, type TripState } from '@/lib/orders/trip';
 import { useI18n } from '@/lib/i18n/provider';
 
@@ -20,7 +21,14 @@ const initial: TripState = { error: null };
  * повреждении» означала бы, что о нём вспомнят позже — то есть не
  * вспомнят.
  */
-export function TripPanel({ stops }: { stops: TripStop[] }) {
+export function TripPanel({
+  stops,
+  haulKind = 'TRAILER',
+}: {
+  stops: TripStop[];
+  /* Забор и возврат называются по единице: у контейнера прицепа нет. */
+  haulKind?: HaulKind;
+}) {
   const { t, m, f, locale } = useI18n();
   const [state, formAction, pending] = useActionState(completeStopAction, initial);
   const [damageOpen, setDamageOpen] = useState(false);
@@ -42,7 +50,7 @@ export function TripPanel({ stops }: { stops: TripStop[] }) {
             <div className="min-w-0">
               <p className="label-micro">{t.trip.nextStop}</p>
               <p className="mt-0.5 text-[13px] text-ink">
-                {next.sequence + 1} · {t.stopKind[next.role]} — {stopPlace(next)}
+                {next.sequence + 1} · {stopTitle(t, next.role, haulKind)} — {stopPlace(next)}
               </p>
             </div>
 

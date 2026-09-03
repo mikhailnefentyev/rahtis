@@ -395,6 +395,36 @@ export const en = {
     allTime: 'All time',
   },
 
+  /*
+   * The words that change with what is being hauled.
+   *
+   * Only five places in the whole interface name the trailer: the
+   * pickup and return headings on the form and in the route list,
+   * and whether the unit is loaded. A container needs different
+   * ones — 'trailer return' on a container job promises the driver
+   * a trailer that is not in the route.
+   *
+   * Parallel vocabularies under one haulKind rather than scattered
+   * keys: when a third unit type arrives it gets one block, not
+   * five keys in five places.
+   */
+  haul: {
+    TRAILER: {
+      stopPickup: 'Trailer pickup',
+      stopReturn: 'Trailer return',
+      pickupSection: 'Where the trailer is picked up',
+      dropSection: 'Where the trailer is left',
+      unitState: 'Trailer',
+    },
+    CONTAINER: {
+      stopPickup: 'Container pickup',
+      stopReturn: 'Container return',
+      pickupSection: 'Where the container is picked up',
+      dropSection: 'Where the container is left',
+      unitState: 'Container',
+    },
+  },
+
   haulKind: {
     TRAILER: 'Semi-trailer',
     CONTAINER: 'Container',
@@ -533,8 +563,6 @@ export const en = {
     shipperRef: 'Your own order number',
     shipperRefHint: 'Optional. The platform assigns its own number automatically',
 
-    trailerPickupSection: 'Where the trailer is collected',
-    dropSection: 'Where the trailer is left',
     cargoSection: 'Cargo and price',
 
     placeName: 'Place name',
@@ -1239,6 +1267,7 @@ export const en = {
     'event.offer.received': 'New offer on transport {ref}',
     'event.offer.chosen': 'You were picked for transport {ref} — confirm within {minutes} minutes',
     'event.order.released': 'Transport {ref} is back on the board',
+    'event.order.cancelled': 'Transport {ref} has been cancelled — see the change log',
     'event.order.amended': 'The route on transport {ref} changed',
     'event.trip.stop.done': 'Transport {ref}: {place} marked done ({done}/{total})',
     'event.order.closed': 'Transport {ref} is complete, the documents are available',

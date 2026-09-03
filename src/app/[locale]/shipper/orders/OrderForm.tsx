@@ -16,6 +16,7 @@ import {
 } from '@/components/ui';
 import type { ChosenAddress } from '@/components/domain/AddressInput';
 import { publishOrderAction, type PublishState } from '@/lib/orders/actions';
+import { stopTitle } from '@/lib/orders/haul';
 import { computeRouteAction, type RouteState } from '@/lib/routing/actions';
 import { useI18n } from '@/lib/i18n/provider';
 import { StopFields } from './StopFields';
@@ -138,12 +139,12 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
       slots
         .filter((slot) => !coords[slot]?.position)
         .map((slot) => {
-          if (slot === 'pickup') return t.stopKind.PICKUP;
-          if (slot === 'ret') return t.stopKind.TRAILER_RETURN;
+          if (slot === 'pickup') return stopTitle(t, 'PICKUP', haulKind);
+          if (slot === 'ret') return stopTitle(t, 'TRAILER_RETURN', haulKind);
           const extra = extras.find((e) => `extra-${e.key}` === slot);
           return extra ? t.stopKind[extra.role] : slot;
         }),
-    [slots, coords, extras, t],
+    [slots, coords, extras, t, haulKind],
   );
 
   /*
@@ -290,13 +291,14 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
       <Card stripe="info">
         <CardBody>
           <SectionTitle>
-            {t.orderForm.trailerPickupSection}
+            {t.haul[haulKind].pickupSection}
           </SectionTitle>
           <StopFields
             role="PICKUP"
             prefix="pickup"
             showPlaceName
             showTrailerState
+            haulKind={haulKind}
             requireDate
             addressPlaceholder="Satamakatu 1, 10900 Hanko"
             placeNamePlaceholder="Hanko Port, Terminal 2"
@@ -376,7 +378,7 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
       {/* ── Отцепка прицепа: окончание перецепа, убрать нельзя ── */}
       <Card stripe="info">
         <CardBody>
-          <SectionTitle>{t.orderForm.dropSection}</SectionTitle>
+          <SectionTitle>{t.haul[haulKind].dropSection}</SectionTitle>
 
           <input type="hidden" name="has_return" value="on" />
 
@@ -385,6 +387,7 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
             prefix="ret"
             showPlaceName
             showTrailerState
+            haulKind={haulKind}
             addressPlaceholder="Satamakatu 1, 10900 Hanko"
             placeNamePlaceholder="Hanko Port, Terminal 2"
             onChosen={onChosen('ret')}

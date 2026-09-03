@@ -2,6 +2,7 @@
 
 import { Badge, Button, Mono } from '@/components/ui';
 import { acknowledgeAmendmentsAction } from '@/lib/orders/amend';
+import { stopTitle, type HaulKind } from '@/lib/orders/haul';
 import { useI18n } from '@/lib/i18n/provider';
 import type { AmendmentChange, OrderAmendment, StopRole } from '@/types/db';
 
@@ -57,11 +58,15 @@ function useFieldLabels(): Record<string, string> {
 export function OrderAmendments({
   amendments,
   orderId,
+  haulKind = 'TRAILER',
   canAcknowledge = false,
   className,
 }: {
   amendments: OrderAmendment[];
   orderId: string;
+  /* Забор и возврат называются по единице: у контейнера прицепа нет. */
+  haulKind?: HaulKind;
+
   /** Кнопка «принял к сведению» — только у перевозчика этого рейса. */
   canAcknowledge?: boolean;
   className?: string;
@@ -179,7 +184,7 @@ export function OrderAmendments({
                 {amendment.stop_role !== null && (
                   <span className="text-[13px] text-ink">
                     {m('amend.stopAt', {
-                      kind: t.stopKind[amendment.stop_role as StopRole],
+                      kind: stopTitle(t, amendment.stop_role as StopRole, haulKind),
                       place: amendment.stop_label ?? '',
                     })}
                   </span>

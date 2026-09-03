@@ -405,6 +405,36 @@ export const fi = {
     allTime: 'Koko ajalta',
   },
 
+  /*
+   * Sanat, jotka vaihtuvat vedettävän mukaan.
+   *
+   * Vain viisi kohtaa koko käyttöliittymästä puhuu perävaunusta
+   * nimeltä: noutopisteen ja palautuspisteen otsikot lomakkeella ja
+   * reittilistassa sekä tieto siitä, onko yksikkö kuormattu.
+   * Kontilla ne ovat toiset — 'perävaunun palautus' konttikeikalla
+   * lupaa kuljettajalle perävaunun, jota reitillä ei ole.
+   *
+   * Rinnakkaiset sanastot yhden haulKindin alla eivätkä erilliset
+   * avaimet siellä täällä: kun kolmas yksikkötyyppi tulee, sille
+   * lisätään yksi lohko eikä viittä avainta viiteen paikkaan.
+   */
+  haul: {
+    TRAILER: {
+      stopPickup: 'Perävaunun nouto',
+      stopReturn: 'Perävaunun palautus',
+      pickupSection: 'Mistä perävaunu noudetaan',
+      dropSection: 'Mihin perävaunu jätetään',
+      unitState: 'Perävaunu',
+    },
+    CONTAINER: {
+      stopPickup: 'Kontin nouto',
+      stopReturn: 'Kontin palautus',
+      pickupSection: 'Mistä kontti noudetaan',
+      dropSection: 'Mihin kontti jätetään',
+      unitState: 'Kontti',
+    },
+  },
+
   haulKind: {
     TRAILER: 'Perävaunu',
     CONTAINER: 'Kontti',
@@ -543,8 +573,6 @@ export const fi = {
     shipperRef: 'Oma viitteesi',
     shipperRefHint: 'Vapaaehtoinen. RAHTIS antaa kuljetukselle oman numeron automaattisesti',
 
-    trailerPickupSection: 'Mistä perävaunu noudetaan',
-    dropSection: 'Mihin perävaunu jätetään',
     cargoSection: 'Kuorma ja hinta',
 
     placeName: 'Paikan nimi',
@@ -1260,6 +1288,7 @@ export const fi = {
     'event.offer.received': 'Uusi tarjous kuljetukseen {ref}',
     'event.offer.chosen': 'Sinut valittiin kuljetukseen {ref} — vahvista {minutes} minuutissa',
     'event.order.released': 'Kuljetus {ref} vapautui takaisin avoimeksi',
+    'event.order.cancelled': 'Kuljetus {ref} on peruutettu — katso muutosloki',
     'event.order.amended': 'Kuljetuksen {ref} reitti muuttui',
     'event.trip.stop.done': 'Kuljetus {ref}: {place} merkitty tehdyksi ({done}/{total})',
     'event.order.closed': 'Kuljetus {ref} on valmis, asiakirjat ovat saatavilla',

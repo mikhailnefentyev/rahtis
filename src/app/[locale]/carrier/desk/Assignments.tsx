@@ -139,6 +139,7 @@ export function Assignments({
                 <OrderAmendments
                   amendments={amendments}
                   orderId={order.id}
+                  haulKind={order.haul_kind}
                   canAcknowledge={order.status === 'IN_PROGRESS'}
                   className="mt-3"
                 />
@@ -146,15 +147,18 @@ export function Assignments({
                 {stops.length > 0 && (
                   <>
                     <CardDivider className="my-4" />
-                    <RouteStops stops={stops} />
+                    <RouteStops stops={stops} haulKind={order.haul_kind} />
 
                     <OrderRouteMap
                       geometry={order.route_geometry}
                       bounds={order.route_bounds}
                       stops={stops}
+                      haulKind={order.haul_kind}
                       className="mt-4"
                     />
-                    {order.status === 'IN_PROGRESS' && <TripPanel stops={stops} />}
+                    {order.status === 'IN_PROGRESS' && (
+                      <TripPanel stops={stops} haulKind={order.haul_kind} />
+                    )}
 
                     {/*
                       * Закрытие появляется, когда пройдены все точки.

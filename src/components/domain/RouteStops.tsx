@@ -1,6 +1,7 @@
 'use client';
 
 import { Badge, Waypoint, WaypointList } from '@/components/ui';
+import { stopTitle, type HaulKind } from '@/lib/orders/haul';
 import { useI18n } from '@/lib/i18n/provider';
 import type { DeskStop, OrderStop, PlaceKind, StopRole } from '@/types/db';
 
@@ -18,15 +19,22 @@ type AnyStop = (OrderStop | DeskStop) & {
   consignee?: string | null;
 };
 
-export function RouteStops({ stops }: { stops: AnyStop[] }) {
+export function RouteStops({
+  stops,
+  haulKind = 'TRAILER',
+}: {
+  stops: AnyStop[];
+  /* Забор и возврат называются по единице: у контейнера нет перевозчика прицепа. */
+  haulKind?: HaulKind;
+}) {
   const { t, m, f } = useI18n();
 
   const title = (stop: AnyStop) =>
     stop.role === 'PICKUP' && stop.place_kind
-      ? `${t.stopKind.PICKUP} · ${t.placeKind[stop.place_kind as PlaceKind]}`
+      ? `${stopTitle(t, 'PICKUP', haulKind)} · ${t.placeKind[stop.place_kind as PlaceKind]}`
       : stop.role === 'CONTINUATION' && stop.external_ref
         ? `${t.stopKind.CONTINUATION} · ${stop.external_ref}`
-        : t.stopKind[stop.role as StopRole];
+        : stopTitle(t, stop.role as StopRole, haulKind);
 
   /*
    * На концах рейса к месту добавляется состояние прицепа: его цепляют и

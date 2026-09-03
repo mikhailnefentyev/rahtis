@@ -9,6 +9,7 @@ import {
   type AmendState,
 } from '@/lib/orders/amend';
 import { stopFieldFlags } from '@/lib/orders/stopFields';
+import { stopTitle, type HaulKind } from '@/lib/orders/haul';
 import { useI18n } from '@/lib/i18n/provider';
 import type { OrderStop, StopRole } from '@/types/db';
 import { StopFields, type StopDefaults } from './StopFields';
@@ -56,10 +57,13 @@ type Editing =
 export function AmendPanel({
   orderId,
   stops,
+  haulKind = 'TRAILER',
   className,
 }: {
   orderId: string;
   stops: OrderStop[];
+  /* Забор и возврат называются по единице: у контейнера прицепа нет. */
+  haulKind?: HaulKind;
   className?: string;
 }) {
   const { t } = useI18n();
@@ -86,7 +90,7 @@ export function AmendPanel({
             <div key={stop.id} className="rounded-control border border-line bg-sunken p-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span className="text-[13px] text-ink">
-                  {stop.sequence + 1} · {t.stopKind[stop.role]} —{' '}
+                  {stop.sequence + 1} · {stopTitle(t, stop.role, haulKind)} —{' '}
                   {stop.place_name ?? stop.company_name ?? stop.city}
                 </span>
 
@@ -133,6 +137,7 @@ export function AmendPanel({
                   key={`${open.kind}-${open.stop.id}-${open.kind === 'add' ? open.role : ''}`}
                   orderId={orderId}
                   editing={open}
+                  haulKind={haulKind}
                   onDone={() => setEditing(null)}
                 />
               )}
@@ -154,10 +159,12 @@ export function AmendPanel({
 function StopEditor({
   orderId,
   editing,
+  haulKind,
   onDone,
 }: {
   orderId: string;
   editing: Editing;
+  haulKind: HaulKind;
   onDone: () => void;
 }) {
   const { t, locale } = useI18n();
@@ -196,7 +203,7 @@ function StopEditor({
         </>
       )}
 
-      <SectionTitle>{adding ? t.stopKind[role] : t.amend.edit}</SectionTitle>
+      <SectionTitle>{adding ? stopTitle(t, role, haulKind) : t.amend.edit}</SectionTitle>
 
       <StopFields
         role={role}
@@ -205,6 +212,7 @@ function StopEditor({
         showContact={flags.contact}
         showPlaceName={flags.placeName}
         showTrailerState={flags.trailerState}
+        haulKind={haulKind}
         defaults={adding ? undefined : defaultsOf(editing.stop)}
       />
 
