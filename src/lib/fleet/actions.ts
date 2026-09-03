@@ -142,6 +142,16 @@ function readVehicleForm(formData: FormData) {
     whatsapp: String(formData.get('whatsapp') ?? '').replace(/[\s-]/g, ''),
     axles: Number(formData.get('axles') ?? 0),
     adr: formData.get('adr') === '1',
+    /*
+     * Длины контейнеров приходят набором флажков с одним именем.
+     * Массив, а не «максимальная длина»: раздвижное шасси берёт двадцатку
+     * и сороковку, но не тридцатку, а платформа под 45 футов не всегда
+     * имеет замки под 20 — одно число здесь врёт в обе стороны.
+     */
+    container_feet: formData
+      .getAll('container_feet')
+      .map((v) => Number(v))
+      .filter((n) => Number.isFinite(n) && n > 0),
     make: String(formData.get('make') ?? '').trim(),
     euro_class: String(formData.get('euro_class') ?? '') as EuroClass,
     base_city: String(formData.get('base_city') ?? '').trim(),

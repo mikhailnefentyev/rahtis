@@ -22,7 +22,7 @@ import type { StatusTone } from '@/components/ui/tone';
 import { requireRole } from '@/lib/auth/guard';
 import { setBillingAction } from '@/lib/billing/actions';
 import { ReportsButton } from '../ReportsButton';
-import { withVat } from '@/lib/config';
+import { VAT_BPS, withVat } from '@/lib/config';
 import { getI18n, isLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import type { Database } from '@/types/database';
@@ -109,6 +109,14 @@ export default async function BillingPage({
   const payoutTotal = withVat(payout);
 
   /*
+   * При нулевой ставке брутто равно нетто, и подсказка «в том числе ALV»
+   * повторяла бы значение плитки тем же числом. Повтор читается как
+   * ошибка вёрстки, а не как «налога нет», поэтому подсказка исчезает
+   * вместе со ставкой — и вернётся сама, если ставка вернётся.
+   */
+  const showVat = VAT_BPS > 0;
+
+  /*
    * Оценка стоит в одной таблице с выплатой: решение «кому давать больше
    * заказов» принимается по обоим числам сразу, а не по двум экранам.
    * У заказчиков колонки нет — обратная оценка это отдельный разговор.
@@ -173,12 +181,12 @@ export default async function BillingPage({
         <Stat
           label={t.money.revenue}
           value={f.eur(revenue)}
-          hint={m('money.withVat', { amount: f.eur(invoiceTotal) })}
+          hint={showVat ? m('money.withVat', { amount: f.eur(invoiceTotal) }) : t.money.addVat}
         />
         <Stat
           label={t.done.payout}
           value={f.eur(payout)}
-          hint={m('money.withVat', { amount: f.eur(payoutTotal) })}
+          hint={showVat ? m('money.withVat', { amount: f.eur(payoutTotal) }) : t.money.addVat}
         />
         {/* Маржа без налога и без подсказки: ALV здесь транзитный. */}
         <Stat label={t.done.margin} value={f.eur(commission)} tone="ok" />

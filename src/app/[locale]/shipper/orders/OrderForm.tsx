@@ -10,6 +10,7 @@ import {
   Input,
   InputMono,
   Mono,
+  Select,
   SectionTitle,
   Textarea,
 } from '@/components/ui';
@@ -38,14 +39,26 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
   const [state, formAction, pending] = useActionState(publishOrderAction, initial);
 
   /*
+   * Что тянут — вторая ось рядом с типом рейса.
+   *
+   * Форма рейса у контейнера та же, что у перецепа: забрали единицу,
+   * отработали точки, оставили. Меняются только подписи и то, чем
+   * единица описывается: у полуприцепа тип и регистрационный номер, у
+   * контейнера длина в футах и номер по ISO 6346.
+   */
+  const [haulKind, setHaulKind] = useState<'TRAILER' | 'CONTAINER'>('TRAILER');
+  const container = haulKind === 'CONTAINER';
+  const [feet, setFeet] = useState('40');
+
+  /*
    * Пока делаем только перецеп (irtoperä).
    *
    * Его форма: забрали прицеп где-то → сколько угодно загрузок и выгрузок
    * в любом порядке → отцепили. Кругорейс по форме тот же самый — забрать
    * прицеп на терминале, загрузиться, выгрузиться, отцепить, — поэтому
    * отдельного типа для него не нужно: разница выражается набором
-   * действий, а не пунктом в списке. Груз в один конец придёт позже, и
-   * тогда селектор типа вернётся.
+   * действий, а не пунктом в списке. Контейнер идёт по той же форме, и
+   * это ещё одна причина не заводить под него тип рейса.
    */
   const [extras, setExtras] = useState<Extra[]>([]);
   const [distance, setDistance] = useState('');
@@ -234,7 +247,7 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
       />
 
       <Card>
-        <CardBody className="grid gap-4 sm:grid-cols-2">
+        <CardBody className="grid gap-4 sm:grid-cols-3">
           {/*
             * Тип рейса пока один. Кругорейс по форме — тот же перецеп
             * (забрать прицеп, загрузиться, выгрузиться, отцепить), и
@@ -247,6 +260,25 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
               {t.orderType.TRAILER_SWAP}
             </p>
           </div>
+
+          {/*
+            * Единица выбирается здесь, рядом с типом рейса, а не в блоке
+            * груза: от неё зависит, как называются поля ниже, и человек
+            * должен решить это до того, как начнёт их заполнять.
+            */}
+          <Field label={t.orderForm.haulKind}>
+            {(p) => (
+              <Select
+                {...p}
+                name="haul_kind"
+                value={haulKind}
+                onChange={(e) => setHaulKind(e.target.value === 'CONTAINER' ? 'CONTAINER' : 'TRAILER')}
+              >
+                <option value="TRAILER">{t.haulKind.TRAILER}</option>
+                <option value="CONTAINER">{t.haulKind.CONTAINER}</option>
+              </Select>
+            )}
+          </Field>
 
           <Field label={t.orderForm.shipperRef} hint={t.orderForm.shipperRefHint}>
             {(p) => <InputMono {...p} name="shipper_ref" placeholder="BF-2026-0912" />}
@@ -373,8 +405,8 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
               * который приехал на площадку и не знает, что цеплять.
               */}
             <Field
-              label={t.orderForm.trailerPlate}
-              hint={t.orderForm.trailerPlateHint}
+              label={container ? t.orderForm.containerNumber : t.orderForm.trailerPlate}
+              hint={container ? t.orderForm.containerNumberHint : t.orderForm.trailerPlateHint}
               required
               className="sm:col-span-2"
             >
@@ -383,14 +415,57 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
                   {...p}
                   name="trailer_plate"
                   required
-                  placeholder="ABC-123"
+                  placeholder={container ? 'MSCU1234567' : 'ABC-123'}
                   style={{ textTransform: 'uppercase' }}
                 />
               )}
             </Field>
 
-            <Field label={t.orderForm.trailer} className="sm:col-span-2">
-              {(p) => <Input {...p} name="trailer" placeholder={t.orderForm.trailerPlaceholder} />}
+            {/*
+              * Длина — не украшение карточки, а условие подбора машины:
+              * сороковка не встанет на двадцатифутовое шасси. Поэтому
+              * поле обязательное и стоит рядом с номером, а не среди
+              * необязательных описаний.
+              *
+              * Ходовые размеры списком, редкие — числом: 10-футовые и
+              * североамериканские 48 и 53 существуют, и запирать их в
+              * перечисление значило бы звать миграцию ради одного заказа.
+              */}
+            {container && (
+              <Field label={t.orderForm.containerFeet} hint={t.orderForm.containerFeetHint} required>
+                {(p) => (
+                  <Select
+                    {...p}
+                    name="container_feet"
+                    required
+                    value={feet}
+                    onChange={(e) => setFeet(e.target.value)}
+                  >
+                    {[20, 30, 40, 45].map((size) => (
+                      <option key={size} value={size}>
+                        {m('order.containerSize', { feet: size })}
+                      </option>
+                    ))}
+                  </Select>
+                )}
+              </Field>
+            )}
+
+            <Field
+              label={container ? t.orderForm.containerType : t.orderForm.trailer}
+              className={container ? '' : 'sm:col-span-2'}
+            >
+              {(p) => (
+                <Input
+                  {...p}
+                  name="trailer"
+                  placeholder={
+                    container
+                      ? t.orderForm.containerTypePlaceholder
+                      : t.orderForm.trailerPlaceholder
+                  }
+                />
+              )}
             </Field>
             <Field label={t.orderForm.distance} required>
               {(p) => (

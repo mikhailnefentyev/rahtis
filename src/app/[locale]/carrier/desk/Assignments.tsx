@@ -1,5 +1,6 @@
 'use client';
 
+import { HaulBadge } from '@/components/domain/HaulBadge';
 import { OrderAmendments } from '@/components/domain/OrderAmendments';
 import { OrderRouteMap } from '@/components/domain/RouteMap';
 import { TripStage } from '@/components/domain/TripProgress';
@@ -78,6 +79,7 @@ export function Assignments({
                       <Badge tone={orderStatusTone[order.status]}>
                         {t.orderStatus[order.status]}
                       </Badge>
+                      <HaulBadge haulKind={order.haul_kind} containerFeet={order.container_feet} />
                       <Mono className="text-xs text-ink-dim">{order.ref}</Mono>
                       {/* Номер прицепа — по нему водитель находит железо на площадке. */}
                       {order.trailer_plate && <Plate>{order.trailer_plate}</Plate>}

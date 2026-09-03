@@ -30,6 +30,12 @@ async function explain(locale: Locale, code: string | undefined, message: string
    * какая машина подойдёт.
    */
   if (code === '55001') return t.fleet.tooHeavy;
+  /*
+   * 55002 — контейнер не встал на шасси. Свой код, а не общий 55000, по
+   * той же причине, что и вес: перевозчику нужно понять, что дело в
+   * машине, а не в занятом заказе, и выбрать другую.
+   */
+  if (code === '55002') return t.matching.noChassis;
   if (code === '55000' && message?.includes('Мест нет')) return t.matching.noSlotsLeft;
   if (code === '55000') return t.matching.tooLate;
 

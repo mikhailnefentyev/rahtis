@@ -405,6 +405,11 @@ export const fi = {
     allTime: 'Koko ajalta',
   },
 
+  haulKind: {
+    TRAILER: 'Perävaunu',
+    CONTAINER: 'Kontti',
+  },
+
   amendKind: {
     STOP_ADDED: 'Piste lisätty',
     STOP_CHANGED: 'Piste muuttui',
@@ -570,10 +575,22 @@ export const fi = {
     stopNote: 'Ohjeet pisteelle',
     stopNotePlaceholder: 'Varausnumero, porttilupa, soita tuntia ennen…',
 
+    haulKind: 'Mitä vedetään',
     trailer: 'Perävaunun tyyppi',
     trailerPlaceholder: 'Kapelli 13,6, 3 akselia',
     trailerPlate: 'Perävaunun rekisterinumero',
     trailerPlateHint: 'Kuljettaja löytää sen avulla oikean vaunun kentältä. Pakollinen tieto.',
+    /*
+     * Kontilla on oma sanasto: rekisterinumeron tilalla ISO 6346
+     * -tunnus, tyypin tilalla pituus jalkoina. Samat kentät, eri
+     * otsikot — kuljettaja etsii kentältä eri esinettä.
+     */
+    containerNumber: 'Kontin numero',
+    containerNumberHint: 'ISO 6346, esimerkiksi MSCU1234567. Kuljettaja löytää kontin sillä terminaalista.',
+    containerFeet: 'Kontin pituus',
+    containerFeetHint: 'Jaloissa. Määrää, mikä alusta kontin ottaa.',
+    containerType: 'Kontin tyyppi',
+    containerTypePlaceholder: 'Kuivakontti, high cube, reefer…',
     distance: 'Matka, km',
     rate: 'Hinta, €',
 
@@ -648,6 +665,7 @@ export const fi = {
     contactsNow: 'Vastaanottajan yhteystiedot ovat nyt näkyvissä.',
     failed: 'Toiminto ei onnistunut. Päivitä sivu ja yritä uudelleen.',
     tooLate: 'Aika loppui, kuljetus vapautui takaisin avoimeksi.',
+    noChassis: 'Tällä ajoneuvolla ei ole alustaa tämän kokoiselle kontille.',
     noSlotsLeft: 'Paikat ovat täynnä: kuljetukseen on jo kolme tarjousta.',
     alreadyTaken: 'Olet jo tehnyt tarjouksen tähän kuljetukseen.',
   },
@@ -973,6 +991,10 @@ export const fi = {
     adrNo: 'Ei ADR-lupaa',
     capacity: 'Kantavuus',
     capacityHint: 'Kaksiakselinen vetoauto ottaa 25 t, kolmiakselinen 32 t.',
+    containerFeet: 'Konttialusta',
+    containerFeetHint:
+      'Mitkä konttipituudet tämä yhdistelmä ottaa. Tyhjä tarkoittaa, ettei ajoneuvo vedä kontteja.',
+    containerNone: 'Ei konttialustaa',
   },
 
   fleet: {
@@ -1036,8 +1058,15 @@ export const fi = {
   },
 
   money: {
-    addVat: '+ alv 25,5 %',
-    calcNote: 'Summat alv 0 %. Laskuihin ja tilityksiin lisätään alv 25,5 %.',
+    /*
+     * Nolla ei ole tilapäinen: asiakkaat ovat ulkomaisia yrityksiä, ja
+     * kuljetuspalvelu EU-maiden alv-velvollisten välillä menee
+     * käännetyllä verovelvollisuudella. Myyjä laskuttaa 0 %, ostaja
+     * tilittää veron omassa maassaan. Ks. VAT_BPS lib/config.ts.
+     */
+    addVat: 'alv 0 %',
+    calcNote:
+      'Summat alv 0 %. Käännetty verovelvollisuus: ostaja tilittää veron omassa maassaan.',
 
     gross: 'Bruttohinta',
     commission: 'Palvelumaksu',
@@ -1135,6 +1164,7 @@ export const fi = {
     'order.offersCounter':
       '{count, plural, one {# tarjous} other {# tarjousta}} / {max} — valitse kuljetusliike',
     'order.offersFull': 'Paikat täynnä {count} / {max}',
+    'order.containerSize': '{feet, number} jalkaa',
     'order.distance': '{km, number} km',
     'order.ratePerKm': '{rate}/km',
     'order.tripsCount': '{count, plural, one {# kuljetus} other {# kuljetusta}}',

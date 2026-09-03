@@ -255,6 +255,13 @@ export async function publishOrderAction(
   const { data, error } = await supabase.rpc('create_order', {
     p_order: {
       order_type: str(formData, 'order_type'),
+      /*
+       * Что тянут — вторая ось рядом с типом рейса. База сама обнулит
+       * длину у полуприцепа, поэтому переключение типа в форме не может
+       * оставить в заказе размер от прошлого выбора.
+       */
+      haul_kind: str(formData, 'haul_kind') === 'CONTAINER' ? 'CONTAINER' : 'TRAILER',
+      container_feet: str(formData, 'container_feet'),
       shipper_ref: str(formData, 'shipper_ref'),
       trailer: str(formData, 'trailer'),
       trailer_plate: str(formData, 'trailer_plate').toUpperCase(),

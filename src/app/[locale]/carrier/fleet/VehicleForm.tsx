@@ -34,7 +34,7 @@ export function VehicleForm({
   vehicle: Vehicle | null;
   onClose: () => void;
 }) {
-  const { t, locale } = useI18n();
+  const { t, m, locale } = useI18n();
   const [state, formAction, pending] = useActionState(saveVehicleAction, initial);
   const [languages, setLanguages] = useState<string[]>(vehicle?.languages ?? ['FI']);
 
@@ -120,6 +120,36 @@ export function VehicleForm({
                   </option>
                 ))}
               </Select>
+            )}
+          </Field>
+
+          {/*
+            * Шасси под контейнеры — рядом с осями, а не среди примет
+            * машины: и то и другое отвечает на вопрос «какие заказы эта
+            * машина сможет взять», и проверяет их одна и та же функция в
+            * take_order.
+            *
+            * Флажки, а не выпадающий список: длины не исключают друг
+            * друга, и «двадцатка и сороковка» — обычный случай, а не
+            * редкость. Пусто означает, что машина контейнеры не возит, и
+            * это умолчание для всего существующего парка.
+            */}
+          <Field label={t.vehicle.containerFeet} hint={t.vehicle.containerFeetHint}>
+            {() => (
+              <div className="flex flex-wrap gap-3">
+                {[20, 30, 40, 45].map((size) => (
+                  <label key={size} className="flex items-center gap-2 text-[13px]">
+                    <input
+                      type="checkbox"
+                      name="container_feet"
+                      value={size}
+                      defaultChecked={vehicle?.container_feet?.includes(size) ?? false}
+                      className="size-4 accent-[var(--color-accent)]"
+                    />
+                    {m('order.containerSize', { feet: size })}
+                  </label>
+                ))}
+              </div>
             )}
           </Field>
 

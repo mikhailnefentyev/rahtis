@@ -1001,12 +1001,14 @@ export type Database = {
           closed_at: string | null
           comment: string | null
           commission_bps: number | null
+          container_feet: number | null
           created_at: string
           created_by: string | null
           deadline_at: string | null
           distance_auto_km: number | null
           distance_km: number | null
           distance_source: Database["public"]["Enums"]["distance_source"]
+          haul_kind: Database["public"]["Enums"]["haul_kind"]
           id: string
           invoice_ref: string | null
           invoiced_at: string | null
@@ -1037,12 +1039,14 @@ export type Database = {
           closed_at?: string | null
           comment?: string | null
           commission_bps?: number | null
+          container_feet?: number | null
           created_at?: string
           created_by?: string | null
           deadline_at?: string | null
           distance_auto_km?: number | null
           distance_km?: number | null
           distance_source?: Database["public"]["Enums"]["distance_source"]
+          haul_kind?: Database["public"]["Enums"]["haul_kind"]
           id?: string
           invoice_ref?: string | null
           invoiced_at?: string | null
@@ -1073,12 +1077,14 @@ export type Database = {
           closed_at?: string | null
           comment?: string | null
           commission_bps?: number | null
+          container_feet?: number | null
           created_at?: string
           created_by?: string | null
           deadline_at?: string | null
           distance_auto_km?: number | null
           distance_km?: number | null
           distance_source?: Database["public"]["Enums"]["distance_source"]
+          haul_kind?: Database["public"]["Enums"]["haul_kind"]
           id?: string
           invoice_ref?: string | null
           invoiced_at?: string | null
@@ -1309,6 +1315,7 @@ export type Database = {
           base_city: string
           company_id: string
           company_kind: Database["public"]["Enums"]["party_role"]
+          container_feet: number[]
           created_at: string
           driver_name: string
           euro_class: Database["public"]["Enums"]["euro_class"]
@@ -1330,6 +1337,7 @@ export type Database = {
           base_city: string
           company_id: string
           company_kind?: Database["public"]["Enums"]["party_role"]
+          container_feet?: number[]
           created_at?: string
           driver_name: string
           euro_class: Database["public"]["Enums"]["euro_class"]
@@ -1351,6 +1359,7 @@ export type Database = {
           base_city?: string
           company_id?: string
           company_kind?: Database["public"]["Enums"]["party_role"]
+          container_feet?: number[]
           created_at?: string
           driver_name?: string
           euro_class?: Database["public"]["Enums"]["euro_class"]
@@ -1492,12 +1501,14 @@ export type Database = {
           closed_at: string | null
           comment: string | null
           commission_bps: number | null
+          container_feet: number | null
           created_at: string
           created_by: string | null
           deadline_at: string | null
           distance_auto_km: number | null
           distance_km: number | null
           distance_source: Database["public"]["Enums"]["distance_source"]
+          haul_kind: Database["public"]["Enums"]["haul_kind"]
           id: string
           invoice_ref: string | null
           invoiced_at: string | null
@@ -1731,12 +1742,14 @@ export type Database = {
           closed_at: string | null
           comment: string | null
           commission_bps: number | null
+          container_feet: number | null
           created_at: string
           created_by: string | null
           deadline_at: string | null
           distance_auto_km: number | null
           distance_km: number | null
           distance_source: Database["public"]["Enums"]["distance_source"]
+          haul_kind: Database["public"]["Enums"]["haul_kind"]
           id: string
           invoice_ref: string | null
           invoiced_at: string | null
@@ -1783,12 +1796,14 @@ export type Database = {
           closed_at: string | null
           comment: string | null
           commission_bps: number | null
+          container_feet: number | null
           created_at: string
           created_by: string | null
           deadline_at: string | null
           distance_auto_km: number | null
           distance_km: number | null
           distance_source: Database["public"]["Enums"]["distance_source"]
+          haul_kind: Database["public"]["Enums"]["haul_kind"]
           id: string
           invoice_ref: string | null
           invoiced_at: string | null
@@ -1828,12 +1843,14 @@ export type Database = {
           closed_at: string | null
           comment: string | null
           commission_bps: number | null
+          container_feet: number | null
           created_at: string
           created_by: string | null
           deadline_at: string | null
           distance_auto_km: number | null
           distance_km: number | null
           distance_source: Database["public"]["Enums"]["distance_source"]
+          haul_kind: Database["public"]["Enums"]["haul_kind"]
           id: string
           invoice_ref: string | null
           invoiced_at: string | null
@@ -1952,12 +1969,14 @@ export type Database = {
           closed_at: string | null
           comment: string | null
           commission_bps: number | null
+          container_feet: number | null
           created_at: string
           created_by: string | null
           deadline_at: string | null
           distance_auto_km: number | null
           distance_km: number | null
           distance_source: Database["public"]["Enums"]["distance_source"]
+          haul_kind: Database["public"]["Enums"]["haul_kind"]
           id: string
           invoice_ref: string | null
           invoiced_at: string | null
@@ -1997,12 +2016,14 @@ export type Database = {
           closed_at: string | null
           comment: string | null
           commission_bps: number | null
+          container_feet: number | null
           created_at: string
           created_by: string | null
           deadline_at: string | null
           distance_auto_km: number | null
           distance_km: number | null
           distance_source: Database["public"]["Enums"]["distance_source"]
+          haul_kind: Database["public"]["Enums"]["haul_kind"]
           id: string
           invoice_ref: string | null
           invoiced_at: string | null
@@ -2046,6 +2067,7 @@ export type Database = {
           base_city: string
           company_id: string
           company_kind: Database["public"]["Enums"]["party_role"]
+          container_feet: number[]
           created_at: string
           driver_name: string
           euro_class: Database["public"]["Enums"]["euro_class"]
@@ -2072,8 +2094,10 @@ export type Database = {
         Args: { p_limit?: number; p_region?: string }
         Returns: {
           comment: string
+          container_feet: number
           distance_km: number
           finish_city: string
+          haul_kind: Database["public"]["Enums"]["haul_kind"]
           id: string
           offers_count: number
           order_type: Database["public"]["Enums"]["order_type"]
@@ -2240,8 +2264,10 @@ export type Database = {
         Args: never
         Returns: {
           comment: string
+          container_feet: number
           deadline_at: string
           distance_km: number
+          haul_kind: Database["public"]["Enums"]["haul_kind"]
           id: string
           order_type: Database["public"]["Enums"]["order_type"]
           rate_cents: number
@@ -2396,12 +2422,14 @@ export type Database = {
           closed_at: string | null
           comment: string | null
           commission_bps: number | null
+          container_feet: number | null
           created_at: string
           created_by: string | null
           deadline_at: string | null
           distance_auto_km: number | null
           distance_km: number | null
           distance_source: Database["public"]["Enums"]["distance_source"]
+          haul_kind: Database["public"]["Enums"]["haul_kind"]
           id: string
           invoice_ref: string | null
           invoiced_at: string | null
@@ -2452,12 +2480,14 @@ export type Database = {
           closed_at: string | null
           comment: string | null
           commission_bps: number | null
+          container_feet: number | null
           created_at: string
           created_by: string | null
           deadline_at: string | null
           distance_auto_km: number | null
           distance_km: number | null
           distance_source: Database["public"]["Enums"]["distance_source"]
+          haul_kind: Database["public"]["Enums"]["haul_kind"]
           id: string
           invoice_ref: string | null
           invoiced_at: string | null
@@ -2497,12 +2527,14 @@ export type Database = {
           closed_at: string | null
           comment: string | null
           commission_bps: number | null
+          container_feet: number | null
           created_at: string
           created_by: string | null
           deadline_at: string | null
           distance_auto_km: number | null
           distance_km: number | null
           distance_source: Database["public"]["Enums"]["distance_source"]
+          haul_kind: Database["public"]["Enums"]["haul_kind"]
           id: string
           invoice_ref: string | null
           invoiced_at: string | null
@@ -2546,6 +2578,7 @@ export type Database = {
           base_city: string
           company_id: string
           company_kind: Database["public"]["Enums"]["party_role"]
+          container_feet: number[]
           created_at: string
           driver_name: string
           euro_class: Database["public"]["Enums"]["euro_class"]
@@ -2576,12 +2609,14 @@ export type Database = {
           closed_at: string | null
           comment: string | null
           commission_bps: number | null
+          container_feet: number | null
           created_at: string
           created_by: string | null
           deadline_at: string | null
           distance_auto_km: number | null
           distance_km: number | null
           distance_source: Database["public"]["Enums"]["distance_source"]
+          haul_kind: Database["public"]["Enums"]["haul_kind"]
           id: string
           invoice_ref: string | null
           invoiced_at: string | null
@@ -2715,12 +2750,14 @@ export type Database = {
           closed_at: string | null
           comment: string | null
           commission_bps: number | null
+          container_feet: number | null
           created_at: string
           created_by: string | null
           deadline_at: string | null
           distance_auto_km: number | null
           distance_km: number | null
           distance_source: Database["public"]["Enums"]["distance_source"]
+          haul_kind: Database["public"]["Enums"]["haul_kind"]
           id: string
           invoice_ref: string | null
           invoiced_at: string | null
@@ -2768,6 +2805,7 @@ export type Database = {
       document_kind: "CARRIER_LICENSE" | "INSURANCE"
       email_status: "PENDING" | "SENT" | "FAILED" | "SKIPPED"
       euro_class: "EURO_4" | "EURO_5" | "EURO_6"
+      haul_kind: "TRAILER" | "CONTAINER"
       incident_severity: "WARN" | "ERROR" | "FATAL"
       incident_status: "OPEN" | "ACKED" | "RESOLVED"
       legal_kind:
@@ -2953,6 +2991,7 @@ export const Constants = {
       document_kind: ["CARRIER_LICENSE", "INSURANCE"],
       email_status: ["PENDING", "SENT", "FAILED", "SKIPPED"],
       euro_class: ["EURO_4", "EURO_5", "EURO_6"],
+      haul_kind: ["TRAILER", "CONTAINER"],
       incident_severity: ["WARN", "ERROR", "FATAL"],
       incident_status: ["OPEN", "ACKED", "RESOLVED"],
       legal_kind: [

@@ -3,6 +3,7 @@
 import { useActionState, useState } from 'react';
 import { OrderRouteMap } from '@/components/domain/RouteMap';
 import { RouteStops } from '@/components/domain/RouteStops';
+import { HaulBadge } from '@/components/domain/HaulBadge';
 import { Badge, Button, Card, CardBody, CardDivider, EmptyState, Mono, Plate, Select } from '@/components/ui';
 import { MATCHING } from '@/lib/config';
 import { takeOrderAction, type MatchingState } from '@/lib/orders/matching';
@@ -85,6 +86,13 @@ export function DeskList({ orders, vehicles }: { orders: DeskOrder[]; vehicles: 
                     <h3 className="text-[15px] font-semibold tracking-tight">
                       {t.orderType[order.order_type]}
                     </h3>
+                    {/*
+                      * Единица — сразу после типа рейса и до номера.
+                      * Перевозчик листает стол и решает по ней, есть ли у
+                      * него подходящее шасси: заказ, который не на чем
+                      * везти, дальше читать незачем.
+                      */}
+                    <HaulBadge haulKind={order.haul_kind} containerFeet={order.container_feet} />
                     <Mono className="text-xs text-ink-dim">{order.ref}</Mono>
                     {/* Номер прицепа — по нему водитель находит железо на площадке. */}
                     {order.trailer_plate && <Plate>{order.trailer_plate}</Plate>}

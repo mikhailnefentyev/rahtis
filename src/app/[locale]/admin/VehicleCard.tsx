@@ -65,6 +65,26 @@ export function VehicleCard({
               <Kv k={t.vehicle.driver} v={`${vehicle.driver_name} · ${vehicle.languages.join('/')}`} />
               <Kv k={t.vehicle.whatsapp} v={<Mono>{vehicle.whatsapp}</Mono>} />
               <Kv k={t.vehicle.base} v={vehicle.base_city} />
+              {/*
+                * Шасси показывается строкой всегда, даже пустое, и в этом
+                * отличие от кабинета перевозчика: оператор здесь не
+                * читает карточку, а проверяет её перед допуском, и
+                * «контейнеры не возит» — такой же ответ, как список
+                * длин. Отсутствие строки он прочитал бы как «не
+                * заполнено».
+                */}
+              <Kv
+                k={t.vehicle.containerFeet}
+                v={
+                  vehicle.container_feet.length > 0
+                    ? vehicle.container_feet
+                        .slice()
+                        .sort((a, b) => a - b)
+                        .map((n) => m('order.containerSize', { feet: n }))
+                        .join(', ')
+                    : t.vehicle.containerNone
+                }
+              />
             </div>
           </div>
 

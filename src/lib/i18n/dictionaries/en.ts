@@ -395,6 +395,11 @@ export const en = {
     allTime: 'All time',
   },
 
+  haulKind: {
+    TRAILER: 'Semi-trailer',
+    CONTAINER: 'Container',
+  },
+
   amendKind: {
     STOP_ADDED: 'Stop added',
     STOP_CHANGED: 'Stop changed',
@@ -560,10 +565,22 @@ export const en = {
     stopNote: 'Instructions for this stop',
     stopNotePlaceholder: 'Booking number, gate pass, call an hour ahead…',
 
+    haulKind: 'What is being hauled',
     trailer: 'Trailer type',
     trailerPlaceholder: 'Curtainsider 13.6, 3 axles',
     trailerPlate: 'Trailer registration',
     trailerPlateHint: 'This is how the driver finds the right trailer on the yard. Required.',
+    /*
+     * A container has its own vocabulary: an ISO 6346 number instead of
+     * a registration, a length in feet instead of a type. Same fields,
+     * different labels — the driver is looking for a different object.
+     */
+    containerNumber: 'Container number',
+    containerNumberHint: 'ISO 6346, for example MSCU1234567. This is how the driver finds it at the terminal.',
+    containerFeet: 'Container length',
+    containerFeetHint: 'In feet. It decides which chassis can take it.',
+    containerType: 'Container type',
+    containerTypePlaceholder: 'Dry van, high cube, reefer…',
     distance: 'Distance, km',
     rate: 'Price, €',
 
@@ -639,6 +656,7 @@ export const en = {
     contactsNow: 'The consignee’s contact details are now visible.',
     failed: 'That did not go through. Refresh the page and try again.',
     tooLate: 'Time ran out and the order went back on the board.',
+    noChassis: 'This vehicle has no chassis for a container of that size.',
     noSlotsLeft: 'Slots are full — three trucks have already offered on this order.',
     alreadyTaken: 'You have already made an offer on this order.',
   },
@@ -962,6 +980,10 @@ export const en = {
     adrNo: 'No ADR permit',
     capacity: 'Payload',
     capacityHint: 'A two-axle tractor takes 25 t, a three-axle one 32 t.',
+    containerFeet: 'Container chassis',
+    containerFeetHint:
+      'Which container lengths this rig can take. Empty means it does not carry containers.',
+    containerNone: 'No container chassis',
   },
 
   fleet: {
@@ -1025,8 +1047,16 @@ export const en = {
   },
 
   money: {
-    addVat: '+ VAT 25.5%',
-    calcNote: 'Amounts exclude VAT. Invoices and payouts add VAT at 25.5%.',
+    /*
+     * Zero is not a placeholder: the customers are foreign companies,
+     * and freight between VAT-registered businesses in different EU
+     * states falls under reverse charge. The seller invoices at 0%
+     * and the buyer accounts for the tax at home. See VAT_BPS in
+     * lib/config.ts.
+     */
+    addVat: 'VAT 0%',
+    calcNote:
+      'Amounts at VAT 0%. Reverse charge: the buyer accounts for the tax in their own country.',
 
     gross: 'Gross price',
     commission: 'Service fee',
@@ -1114,6 +1144,7 @@ export const en = {
   msg: {
     'order.offersCounter': '{count, plural, one {# offer} other {# offers}} / {max} — pick a carrier',
     'order.offersFull': 'Slots full {count} / {max}',
+    'order.containerSize': '{feet, number} ft',
     'order.distance': '{km, number} km',
     'order.ratePerKm': '{rate}/km',
     'order.tripsCount': '{count, plural, one {# job} other {# jobs}}',

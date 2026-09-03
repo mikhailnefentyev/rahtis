@@ -63,8 +63,22 @@ export function FleetView({
                     </span>
                   </div>
 
+                  {/*
+                    * Оси и шасси — одной строкой: обе отвечают на вопрос
+                    * «какие заказы эта машина возьмёт», и проверяет их
+                    * одна функция в take_order. Машина без контейнерного
+                    * шасси не пишет об этом ничего: отсутствие строки и
+                    * есть ответ, а «не возит контейнеры» у большинства
+                    * парка было бы шумом в каждой карточке.
+                    */}
                   <p className="mt-2 text-[13px] text-ink">
                     {vehicle.make} · {m('vehicle.axlesCount', { count: vehicle.axles })}
+                    {vehicle.container_feet.length > 0 &&
+                      ` · ${t.vehicle.containerFeet}: ${vehicle.container_feet
+                        .slice()
+                        .sort((a, b) => a - b)
+                        .map((n) => m('order.containerSize', { feet: n }))
+                        .join(', ')}`}
                   </p>
                   <p className="mt-1 text-[13px] text-ink-muted">
                     {vehicle.driver_name} · {vehicle.languages.join('/')} ·{' '}
