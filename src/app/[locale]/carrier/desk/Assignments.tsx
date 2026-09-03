@@ -46,6 +46,20 @@ export function Assignments({
 
   if (assignments.length === 0) return null;
 
+  /*
+   * Снятые рейсы отделены от работы.
+   *
+   * Их нельзя было оставить в общем списке: карточка рейса построена
+   * вокруг действий — подтвердить, отметить точку, закрыть, — а у снятого
+   * действий нет ни одного. Показанная тем же способом, она предлагала бы
+   * нажать то, что уже ничего не изменит, и носила бы бейдж «в работе».
+   *
+   * Поэтому ниже отдельный блок и другая, короткая карточка: она
+   * сообщает, а не просит.
+   */
+  const active = assignments.filter((o) => o.status !== 'CANCELLED');
+  const cancelled = assignments.filter((o) => o.status === 'CANCELLED');
+
   return (
     <section className="mb-8">
       <h2 className="mb-4 border-b border-line pb-2 text-[13px] font-semibold tracking-tight text-ink-faint">
@@ -53,7 +67,7 @@ export function Assignments({
       </h2>
 
       <div className="flex flex-col gap-3">
-        {assignments.map((order) => {
+        {active.map((order) => {
           const stops = (order.stops ?? []) as unknown as OrderStop[];
           const waiting = order.status === 'AWAIT_DRIVER';
           const amendments = amendmentsByOrder[order.id] ?? [];
@@ -194,6 +208,81 @@ export function Assignments({
           );
         })}
       </div>
+
+      {cancelled.length > 0 && (
+        <div className="mt-6">
+          <p className="label-micro mb-2">{t.matching.cancelledTrips}</p>
+          <div className="flex flex-col gap-2">
+            {cancelled.map((order) => (
+              <CancelledTrip
+                key={order.id}
+                order={order}
+                amendments={amendmentsByOrder[order.id] ?? []}
+              />
+            ))}
+          </div>
+        </div>
+      )}
     </section>
+  );
+}
+
+/**
+ * Снятый рейс одной строкой.
+ *
+ * Показывает ровно то, ради чего он здесь остался: номер, маршрут и
+ * причину. Причина берётся из журнала заказа, а не из отдельного поля —
+ * там она лежит вместе с автором и временем, и второй экземпляр той же
+ * строки однажды разошёлся бы с первым.
+ *
+ * Причины может не быть: поле необязательное, и пустое честнее
+ * выдуманного. Тогда строка просто говорит, что рейс снят.
+ */
+function CancelledTrip({
+  order,
+  amendments,
+}: {
+  order: Assignment;
+  amendments: OrderAmendment[];
+}) {
+  const { t, m, f } = useI18n();
+
+  const stops = (order.stops ?? []) as unknown as OrderStop[];
+  const from = stops.find((s) => s.role === 'PICKUP')?.city;
+  const to = stops[stops.length - 1]?.city;
+
+  const event = amendments.find((a) => a.kind === 'ORDER_CANCELLED');
+  const changes = (event?.changes ?? {}) as Record<string, { to?: unknown }>;
+  const reason = String(changes.reason?.to ?? '').trim();
+
+  return (
+    <Card stripe="danger">
+      <CardBody className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge tone="danger">{t.orderStatus.CANCELLED}</Badge>
+            <HaulBadge haulKind={order.haul_kind} containerFeet={order.container_feet} />
+            <Mono className="text-xs text-ink-dim">{order.ref}</Mono>
+            {order.trailer_plate && <Plate>{order.trailer_plate}</Plate>}
+          </div>
+
+          {from && to && (
+            <p className="mt-1.5 font-mono text-[13px] text-ink-muted">
+              {from} → {to}
+            </p>
+          )}
+
+          <p className="mt-1 text-xs text-ink-muted">
+            {reason ? `${t.lifecycle.fieldReason}: ${reason}` : t.lifecycle.cancelled}
+          </p>
+        </div>
+
+        {event && (
+          <Mono className="text-[11px] text-ink-dim">
+            {m('amend.madeAt', { date: f.dateTime(event.created_at) })}
+          </Mono>
+        )}
+      </CardBody>
+    </Card>
   );
 }

@@ -692,6 +692,7 @@ export const en = {
     contactsNow: 'The consignee’s contact details are now visible.',
     failed: 'That did not go through. Refresh the page and try again.',
     tooLate: 'Time ran out and the order went back on the board.',
+    cancelledTrips: 'Cancelled jobs',
     noChassis: 'This vehicle has no chassis for a container of that size.',
     noSlotsLeft: 'Slots are full — three trucks have already offered on this order.',
     alreadyTaken: 'You have already made an offer on this order.',

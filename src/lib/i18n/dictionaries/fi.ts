@@ -701,6 +701,7 @@ export const fi = {
     contactsNow: 'Vastaanottajan yhteystiedot ovat nyt näkyvissä.',
     failed: 'Toiminto ei onnistunut. Päivitä sivu ja yritä uudelleen.',
     tooLate: 'Aika loppui, kuljetus vapautui takaisin avoimeksi.',
+    cancelledTrips: 'Peruutetut kuljetukset',
     noChassis: 'Tällä ajoneuvolla ei ole alustaa tämän kokoiselle kontille.',
     noSlotsLeft: 'Paikat ovat täynnä: kuljetukseen on jo kolme tarjousta.',
     alreadyTaken: 'Olet jo tehnyt tarjouksen tähän kuljetukseen.',
