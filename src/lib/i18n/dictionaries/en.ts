@@ -473,8 +473,16 @@ export const en = {
     REJECTED: 'Not approved',
   },
 
+  /*
+   * The heading no longer names what is being hauled.
+   *
+   * 'Semi-trailer transport' was right while there was nothing else.
+   * On a container order it lied: there is no trailer. What is hauled
+   * is now said by the haulKind badge beside it, and the heading is
+   * left to say what shape the job is.
+   */
   orderType: {
-    TRAILER_SWAP: 'Semi-trailer transport',
+    TRAILER_SWAP: 'Transport order',
     ROUND_TRIP: 'Round trip',
     ONE_WAY: 'One-way transport',
   },

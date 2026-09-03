@@ -483,8 +483,16 @@ export const fi = {
     REJECTED: 'Ei hyväksytty',
   },
 
+  /*
+   * Otsikko ei enää nimeä vedettävää.
+   *
+   * 'Puoliperävaunun kuljetus' oli oikein niin kauan kuin muuta ei
+   * ollutkaan. Konttitilauksen otsikkona se valehteli: perävaunua ei
+   * ole. Mitä vedetään, kertoo nyt vieressä oleva haulKind-merkki, ja
+   * otsikon tehtäväksi jää sanoa, minkä muotoinen keikka on.
+   */
   orderType: {
-    TRAILER_SWAP: 'Puoliperävaunun kuljetus',
+    TRAILER_SWAP: 'Kuljetustilaus',
     ROUND_TRIP: 'Rengasajo',
     ONE_WAY: 'Yhdensuuntainen kuljetus',
   },
