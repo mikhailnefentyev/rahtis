@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { getViewer } from '@/lib/auth/viewer';
 import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
-import { cityOf, tonnesToKg, type FieldReader } from '@/lib/orders/stopFields';
+import { cityOf, hasCoordinates, tonnesToKg, type FieldReader } from '@/lib/orders/stopFields';
 import type { StopRole } from '@/types/db';
 
 export type PublishState = { error: string | null; ref: string | null };
@@ -228,6 +228,28 @@ export async function publishOrderAction(
     return { error: t.validation.positiveNumber, ref: null };
   }
 
+  const stops = collectStops(formData);
+
+  /*
+   * Заказ без координат не публикуется.
+   *
+   * Раньше набранный руками адрес просто не давал посчитать маршрут:
+   * километраж заказчик вписывал сам, и заказ уезжал с числом, взятым
+   * из головы. Починить это потом нельзя — distance_km после публикации
+   * неизменен намеренно, потому что от него посчитана ставка, о которой
+   * договорились с перевозчиком. Правка адреса на идущем рейсе меняет
+   * линию на карте, но не деньги: об этом прямо написано в панели правок
+   * (amend.rateUnchanged).
+   *
+   * Значит единственное место, где эту ошибку ещё можно не сделать, —
+   * здесь. Проверка стоит на сервере, а не только в форме: форма гасит
+   * кнопку, но действие вызывается по сети, и запрет обязан жить там,
+   * где пишутся данные.
+   */
+  if (stops.some((stop) => !hasCoordinates(stop))) {
+    return { error: t.routing.addressRequired, ref: null };
+  }
+
   const supabase = await createClient();
 
   const { data, error } = await supabase.rpc('create_order', {
@@ -250,7 +272,7 @@ export async function publishOrderAction(
       route_bounds: parseBounds(formData.get('route_bounds')),
       route_fingerprint: str(formData, 'route_fingerprint'),
     },
-    p_stops: collectStops(formData),
+    p_stops: stops,
     p_publish: true,
   });
 

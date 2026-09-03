@@ -553,6 +553,13 @@ export const en = {
     recalculate: 'Recalculate',
     noCoordinates:
       'Pick the addresses from the suggestions and the kilometres are calculated automatically.',
+    /*
+     * The same rule stated twice: the form names the stops that are
+     * missing, the server only refuses. The server text cannot list the
+     * stops, because it should never be reached in the first place.
+     */
+    addressRequired:
+      'Every address must be picked from the suggestions. Kilometres and price are calculated from the coordinates, and neither can be corrected once the order is published.',
     mapLabel: 'Route map',
   },
 
@@ -1100,6 +1107,8 @@ export const en = {
     'desk.regionCount': '{city} · {count}',
 
     'routing.result': '{km, number} km · about {hours} h {minutes} min',
+    'routing.pickFromList': 'Pick the address from the suggestions: {stops}',
+    'order.routeRecomputed': 'Route changed — {km, number} km calculated',
     'routing.legDistance': 'leg {km, number} km',
 
     'stop.weight': '{tonnes, number, ::.0#} t',

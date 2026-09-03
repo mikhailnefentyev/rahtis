@@ -562,6 +562,13 @@ export const fi = {
     manual: 'annettu käsin',
     recalculate: 'Laske uudelleen',
     noCoordinates: 'Valitse osoitteet ehdotuksista, niin kilometrit lasketaan automaattisesti.',
+    /*
+     * Sama sääntö kahdella tapaa sanottuna: lomake kertoo, mitkä pisteet
+     * puuttuvat, palvelin vain torjuu. Palvelimen teksti ei voi luetella
+     * pisteitä, koska sinne asti ei pitäisi koskaan päästä.
+     */
+    addressRequired:
+      'Jokainen osoite on valittava ehdotuksista. Kilometrit ja hinta lasketaan koordinaateista, eikä niitä voi enää korjata julkaisun jälkeen.',
     mapLabel: 'Reittikartta',
   },
 
@@ -1121,6 +1128,8 @@ export const fi = {
     'desk.regionCount': '{city} · {count}',
 
     'routing.result': '{km, number} km · noin {hours} h {minutes} min',
+    'routing.pickFromList': 'Valitse osoite ehdotuksista: {stops}',
+    'order.routeRecomputed': 'Reitti muuttui — laskettu {km, number} km',
     'routing.legDistance': 'osuus {km, number} km',
 
     'stop.weight': '{tonnes, number, ::.0#} t',

@@ -123,6 +123,25 @@ export function OrdersView({
                         ) : null}
                       </p>
 
+                      {/*
+                        * Правка маршрута меняет линию, но не цену.
+                        *
+                        * Так и задумано: ставка согласована с перевозчиком,
+                        * и менять её задним числом нельзя. Но пока
+                        * пересчитанный пробег лежал только в базе, заказчик
+                        * видел прежние километры и прежние €/км и считал,
+                        * что правка обошлась даром. Расхождение — это
+                        * предмет отдельного разговора с перевозчиком, и
+                        * начинается он с того, что его видно.
+                        */}
+                      {order.distance_auto_km !== null &&
+                        order.distance_km !== null &&
+                        order.distance_auto_km !== order.distance_km && (
+                          <p className="mt-1 text-xs text-warn">
+                            {m('order.routeRecomputed', { km: order.distance_auto_km })}
+                          </p>
+                        )}
+
                       {order.published_at && (
                         <p className="mt-1 text-xs text-ink-dim">
                           {m('order.publishedAt', { date: f.dateTime(order.published_at) })}

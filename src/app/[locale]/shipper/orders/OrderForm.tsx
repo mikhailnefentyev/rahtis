@@ -113,6 +113,27 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
   const canRoute = slots.length >= 2 && routePoints.length === slots.length;
 
   /*
+   * Какие точки мешают посчитать — по именам, а не «где-то не хватает».
+   *
+   * При четырёх-шести адресах подсказка «выберите адреса из списка» не
+   * говорит, какие именно: заказчик видит заполненную форму и не знает,
+   * куда смотреть. Список ролей отвечает на этот вопрос сразу, а порядок
+   * в нём тот же, что на экране.
+   */
+  const unresolved = useMemo(
+    () =>
+      slots
+        .filter((slot) => !coords[slot]?.position)
+        .map((slot) => {
+          if (slot === 'pickup') return t.stopKind.PICKUP;
+          if (slot === 'ret') return t.stopKind.TRAILER_RETURN;
+          const extra = extras.find((e) => `extra-${e.key}` === slot);
+          return extra ? t.stopKind[extra.role] : slot;
+        }),
+    [slots, coords, extras, t],
+  );
+
+  /*
    * Отпечаток набора точек. По нему решается, нужен ли пересчёт: массив
    * пересобирается при каждом изменении координат, а маршрут зависит
    * только от самих значений и их порядка.
@@ -392,7 +413,19 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
               {routing ? (
                 <span className="text-xs text-ink-muted">{t.routing.calculating}</span>
               ) : !canRoute ? (
-                <span className="text-xs text-ink-dim">{t.routing.noCoordinates}</span>
+                /*
+                 * Тоном предупреждения, а не подписью под полем.
+                 *
+                 * Пока это была самая тусклая строка на экране, её
+                 * прочитывали как пояснение и шли дальше — вписывали
+                 * километраж руками и публиковали заказ с числом из
+                 * головы. Теперь публикация в этом состоянии запрещена,
+                 * и строка обязана выглядеть тем, чем стала: условием, а
+                 * не советом.
+                 */
+                <span className="text-xs text-warn" role="status">
+                  {m('routing.pickFromList', { stops: unresolved.join(' · ') })}
+                </span>
               ) : (
                 liveRoute && (
                   <span className="text-xs text-ink-muted">
@@ -449,7 +482,21 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
         <Button type="button" onClick={onPublished} className="flex-1">
           {t.action.cancel}
         </Button>
-        <Button type="submit" variant="primary" size="lg" disabled={pending} className="flex-[3]">
+        {/*
+          * Кнопка гаснет, пока хоть один адрес без координат.
+          *
+          * Это не дублирование серверной проверки, а её единственный
+          * человеческий вид: отказ после нажатия заставил бы разбираться,
+          * что не так, с уже заполненной формой. Запрет при этом живёт на
+          * сервере — здесь только то, что видно глазами.
+          */}
+        <Button
+          type="submit"
+          variant="primary"
+          size="lg"
+          disabled={pending || !canRoute}
+          className="flex-[3]"
+        >
           {pending ? t.orderForm.publishing : t.orderForm.publish}
         </Button>
       </div>

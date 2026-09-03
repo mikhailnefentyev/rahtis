@@ -4,7 +4,13 @@ import { revalidatePath } from 'next/cache';
 import { getViewer } from '@/lib/auth/viewer';
 import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
 import { computeRouteAction } from '@/lib/routing/actions';
-import { cityOf, stopFieldFlags, tonnesToKg, type FieldReader } from '@/lib/orders/stopFields';
+import {
+  cityOf,
+  hasCoordinates,
+  stopFieldFlags,
+  tonnesToKg,
+  type FieldReader,
+} from '@/lib/orders/stopFields';
 import { createClient } from '@/lib/supabase/server';
 import type { StopRole } from '@/types/db';
 
@@ -103,25 +109,37 @@ function readFields(read: FieldReader, role: StopRole): Record<string, string> {
 /**
  * Адрес и всё, что приезжает вместе с ним.
  *
- * Ключи адреса попадают в патч, только если строка изменилась. Иначе
- * пустые скрытые поля координат — а они пусты всегда, пока человек не
- * выбрал новую подсказку, — обнулили бы координаты точки, которую никто
- * не двигал, и маршрут потерял бы её без всякой причины.
+ * Три исхода, и различать их обязательно:
  *
- * Если же адрес переписан руками и подсказка не выбрана, координаты
- * стираются намеренно: считать маршрут до места, которого в поле уже не
- * написано, хуже, чем не считать вовсе. Это то же правило, по которому
- * живёт поле адреса при публикации.
+ *   'untouched' — строка та же, что была. Ключей адреса в патче нет.
+ *     Иначе пустые скрытые поля координат — а они пусты всегда, пока
+ *     человек не выбрал новую подсказку, — обнулили бы координаты точки,
+ *     которую никто не двигал, и маршрут потерял бы её ни за что.
+ *
+ *   'nowhere' — адрес переписан, но координат нет: подсказку не выбрали.
+ *     Раньше координаты в этом случае стирались, точка выпадала из
+ *     расчёта, и правка проходила. Выглядело это так, будто изменился
+ *     только адрес, а на деле рейс терял точку: маршрут пересчитать
+ *     нечем, линия остаётся от прежних точек, метки нет. Теперь это
+ *     отказ — то же правило, что и при публикации.
+ *
+ *   иначе — новый адрес с координатами, patch как раньше.
  */
-function readAddress(read: FieldReader, before: string): Record<string, string> {
+type AddressPatch = 'untouched' | 'nowhere' | Record<string, string>;
+
+function readAddress(read: FieldReader, before: string): AddressPatch {
   const address = read('address');
-  if (!address || address === before) return {};
+  if (!address || address === before) return 'untouched';
+
+  const lat = read('address_lat');
+  const lon = read('address_lon');
+  if (!hasCoordinates({ lat, lon })) return 'nowhere';
 
   return {
     address,
     city: cityOf(read),
-    lat: read('address_lat'),
-    lon: read('address_lon'),
+    lat,
+    lon,
     geocode_score: read('address_score'),
   };
 }
@@ -138,13 +156,19 @@ type Client = Awaited<ReturnType<typeof createClient>>;
 /**
  * Считает маршрут заново и кладёт на место стёртого правкой.
  *
- * Молчит, когда считать нечего: у точки, чей адрес набран руками,
- * координат нет, а маршрут по неполному набору точек был бы не короче
- * настоящего, а просто другим. Пустая карта в этом случае честнее.
- *
- * Неудача расчёта тоже проходит молча. Правка уже записана и уже уехала
+ * Неудача расчёта проходит молча. Правка уже записана и уже уехала
  * перевозчику; ронять её из-за того, что не ответил чужой сервис, значит
  * поставить карту выше маршрута.
+ *
+ * А вот посчитать нечем — не молчание, а стирание. Прежняя линия была
+ * проложена по точкам, одной из которых в рейсе больше нет, и оставить
+ * её значит показывать заказчику и водителю маршрут, который никуда не
+ * ведёт. Пустая карта честнее нарисованной неправды.
+ *
+ * Дойти до стирания стало трудно: адрес без координат больше не
+ * принимается ни при публикации, ни при правке. Остаются заказы,
+ * созданные до этого правила, — у них координат нет и не будет, пока
+ * заказчик не переберёт точки руками.
  */
 async function refreshRoute(supabase: Client, orderId: string, locale: Locale): Promise<void> {
   const { data: stops } = await supabase
@@ -153,8 +177,13 @@ async function refreshRoute(supabase: Client, orderId: string, locale: Locale): 
     .eq('order_id', orderId)
     .order('sequence');
 
-  if (!stops || stops.length < 2) return;
-  if (stops.some((s) => s.lat === null || s.lon === null)) return;
+  const complete =
+    stops !== null && stops.length >= 2 && stops.every((s) => s.lat !== null && s.lon !== null);
+
+  if (!complete) {
+    await clearRoute(supabase, orderId);
+    return;
+  }
 
   const points = stops.map((s) => ({ lat: s.lat as number, lon: s.lon as number }));
 
@@ -172,6 +201,22 @@ async function refreshRoute(supabase: Client, orderId: string, locale: Locale): 
       legs: route.legs,
     },
   });
+}
+
+/**
+ * Убирает линию, переставшую соответствовать точкам.
+ *
+ * Отдельной функции в базе для этого нет и не нужно: store_route берёт
+ * каждое поле через nullif, поэтому пустой объект обнуляет геометрию,
+ * границы, отпечаток и посчитанный пробег одним вызовом. Права при этом
+ * проверяет та же функция и тем же способом, что при записи маршрута, —
+ * второй путь к тем же колонкам не заводится.
+ *
+ * distance_km store_route не трогает никогда, и здесь это ровно то, что
+ * нужно: ставка согласована, линия — нет.
+ */
+async function clearRoute(supabase: Client, orderId: string): Promise<void> {
+  await supabase.rpc('store_route', { p_order_id: orderId, p_route: {} });
 }
 
 /* ── Действия ───────────────────────────────────────────────────── */
@@ -196,9 +241,14 @@ export async function amendStopAction(
   const role = str(formData, 'role') as StopRole;
   const read = reader(formData, 'stop');
 
+  const address = readAddress(read, str(formData, 'address_before'));
+  if (address === 'nowhere') {
+    return { error: (await getDictionary(locale)).routing.addressRequired, saved: false };
+  }
+
   const patch = {
     ...readFields(read, role),
-    ...readAddress(read, str(formData, 'address_before')),
+    ...(address === 'untouched' ? {} : address),
   };
 
   const supabase = await createClient();
@@ -238,6 +288,12 @@ export async function addStopAction(
   const role = str(formData, 'role') as StopRole;
   const read = reader(formData, 'stop');
 
+  /* У новой точки адрес новый по определению — сравнивать не с чем. */
+  const address = readAddress(read, '');
+  if (address === 'nowhere' || address === 'untouched') {
+    return { error: (await getDictionary(locale)).routing.addressRequired, saved: false };
+  }
+
   const supabase = await createClient();
   const orderId = str(formData, 'order_id');
 
@@ -246,8 +302,7 @@ export async function addStopAction(
     p_stop: {
       role,
       ...readFields(read, role),
-      /* У новой точки адрес новый по определению — сравнивать не с чем. */
-      ...readAddress(read, ''),
+      ...address,
     },
   });
 
