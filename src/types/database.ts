@@ -1939,8 +1939,10 @@ export type Database = {
           closed_at: string
           commission_bps: number
           commission_cents: number
+          container_feet: number
           distance_km: number
           documents: Json
+          haul_kind: Database["public"]["Enums"]["haul_kind"]
           id: string
           order_type: Database["public"]["Enums"]["order_type"]
           payout_cents: number

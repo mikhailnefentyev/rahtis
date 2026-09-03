@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { OrderRouteMap } from '@/components/domain/RouteMap';
+import { HaulBadge } from '@/components/domain/HaulBadge';
 import { RouteStops } from '@/components/domain/RouteStops';
 import { RateTrip } from '@/components/domain/RateTrip';
 import { DocumentList } from '@/components/domain/TripDocuments';
@@ -125,6 +126,11 @@ export function CompletedList({
                         <div className="min-w-0">
                           <div className="flex flex-wrap items-center gap-2.5">
                             <Badge tone="ok">{t.orderStatus.DONE}</Badge>
+                            {/* Что везли — и в закрытом рейсе: по нему разбирают спор. */}
+                            <HaulBadge
+                              haulKind={order.haul_kind}
+                              containerFeet={order.container_feet}
+                            />
                             <Mono className="text-xs text-ink-dim">{order.ref}</Mono>
                             {order.shipper_ref && (
                               <Mono className="text-xs text-ink-dim">{order.shipper_ref}</Mono>
@@ -221,11 +227,12 @@ export function CompletedList({
                               <p className="label-micro mb-2.5">
                                 {m('order.stopsCount', { count: stops.length })}
                               </p>
-                              <RouteStops stops={stops} />
+                              <RouteStops stops={stops} haulKind={order.haul_kind} />
                               <OrderRouteMap
                                 geometry={order.route_geometry}
                                 bounds={order.route_bounds as number[] | null}
                                 stops={stops}
+                                haulKind={order.haul_kind}
                                 className="mt-4"
                               />
                             </>
