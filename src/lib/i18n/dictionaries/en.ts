@@ -413,8 +413,13 @@ export const en = {
     withdraw: 'Cancel order',
     withdrawing: 'Cancelling…',
     withdrawHint: 'The order leaves the working lists for good. Its data and history stay.',
-    abandon: 'Step back from this job',
-    abandoning: 'Stepping back…',
+    /*
+     * First person, matching 'I take this job', which this undoes.
+     * The old wording read as giving up; the point is that the truck
+     * cannot run, not that the carrier lost heart.
+     */
+    abandon: 'I cannot run this job',
+    abandoning: 'Reporting…',
     abandonHint:
       'If no stop has been reached yet, the order goes back on the board for someone else. If the run has started, it is cancelled and dispatch will be in touch.',
     reprice: 'Update distance and price',

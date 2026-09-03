@@ -423,8 +423,13 @@ export const fi = {
     withdraw: 'Peruuta kuljetus',
     withdrawing: 'Peruutetaan…',
     withdrawHint: 'Kuljetus poistuu työlistoilta lopullisesti. Tiedot ja historia jäävät.',
-    abandon: 'Luovu kuljetuksesta',
-    abandoning: 'Luovutaan…',
+    /*
+     * Ensimmäisessä persoonassa, kuten 'Otan kuljetuksen', jonka
+     * vastapari tämä on. 'Luovu kuljetuksesta' kuulosti luovuttamiselta
+     * ja syytti kuljettajaa; kyse on siitä, ettei auto kulje.
+     */
+    abandon: 'En pysty ajamaan',
+    abandoning: 'Ilmoitetaan…',
     abandonHint:
       'Jos yhtäkään pistettä ei ole vielä käyty, kuljetus palaa tarjolle muille. Jos matka on jo alkanut, se peruuntuu ja ajojärjestely ottaa yhteyttä.',
     reprice: 'Päivitä matka ja hinta',
