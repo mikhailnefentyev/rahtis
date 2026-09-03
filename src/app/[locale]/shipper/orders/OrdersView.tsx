@@ -16,6 +16,7 @@ import type {
 } from '@/types/db';
 import { AmendPanel } from './AmendPanel';
 import { AssignedCarrier, OffersPanel } from './OffersPanel';
+import { OrderTrouble } from './OrderTrouble';
 
 export function OrdersView({
   orders,
@@ -199,6 +200,28 @@ export function OrdersView({
                         className="mt-4"
                       />
                     </>
+                  )}
+
+                  {/*
+                    * Снятие и пересчёт — в самом низу карточки и за
+                    * раскрытием.
+                    *
+                    * Это выходы из положения, а не рабочий ход: заказчик
+                    * попадает сюда, когда что-то разошлось. Держать их
+                    * рядом с откликами значило бы предлагать снять заказ
+                    * каждому, кто зашёл посмотреть, кто откликнулся.
+                    *
+                    * Выполненного и снятого здесь нет: по первому уже
+                    * посчитаны деньги, второго не существует.
+                    */}
+                  {order.status !== 'DONE' && order.status !== 'CANCELLED' && (
+                    <OrderTrouble
+                      orderId={order.id}
+                      distanceKm={order.distance_km}
+                      rateCents={order.rate_cents}
+                      autoKm={order.distance_auto_km}
+                      className="mt-4 border-t border-line pt-4"
+                    />
                   )}
 
                   {order.comment && (

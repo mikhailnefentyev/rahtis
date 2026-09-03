@@ -17,6 +17,7 @@ import {
 import { orderStatusTone } from '@/components/ui/tone';
 import { cancelOrderAction, confirmOrderAction } from '@/lib/orders/matching';
 import { useI18n } from '@/lib/i18n/provider';
+import { AbandonPanel } from './AbandonPanel';
 import { ClosingPanel } from './ClosingPanel';
 import { TripPanel } from './TripPanel';
 import type { Database } from '@/types/database';
@@ -169,6 +170,18 @@ export function Assignments({
 
                     <p className="mt-3 text-xs text-ink-dim">{t.matching.contactsNow}</p>
                   </>
+                )}
+
+                {/*
+                  * Отказ — в самом низу, ниже закрытия рейса.
+                  *
+                  * Порядок здесь означает вероятность: девяносто девять
+                  * рейсов из ста заканчиваются кнопкой «сдал», и она
+                  * обязана попадаться раньше. Отказ ищут те, у кого уже
+                  * что-то случилось, и лишняя прокрутка им не помеха.
+                  */}
+                {order.status === 'IN_PROGRESS' && (
+                  <AbandonPanel orderId={order.id} className="mt-4 border-t border-line pt-4" />
                 )}
               </CardBody>
             </Card>

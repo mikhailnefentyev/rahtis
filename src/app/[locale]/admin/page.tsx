@@ -18,7 +18,7 @@ import {
   Tr,
 } from '@/components/ui';
 import { AdminError } from '@/components/layout/AdminError';
-import { companyStatusTone } from '@/components/ui/tone';
+import { companyStatusTone, orderStatusTone } from '@/components/ui/tone';
 import { requireRole } from '@/lib/auth/guard';
 import {
   deleteCompanyAction,
@@ -31,6 +31,7 @@ import { getI18n, isLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import { handleSupportAction } from '@/lib/support/actions';
 import { ApplicationCard } from './ApplicationCard';
+import { DeleteOrderButton } from './DeleteOrderButton';
 import { NoticeForm } from './NoticeForm';
 import { VehicleCard } from './VehicleCard';
 
@@ -94,6 +95,24 @@ export default async function AdminPage({
       .order('submitted_at', { ascending: true }),
     supabase.rpc('documents_needing_attention', { p_within_days: 30 }),
   ]);
+
+  /*
+   * Заказы, которые база вообще разрешает стереть: черновики, висящие на
+   * столе и снятые, ни разу не попавшие в счёт. Выполненные и идущие сюда
+   * не попадают по определению — их не удаляет никто и ничем.
+   *
+   * Наличие документов здесь не проверяется: у заказа этих статусов их не
+   * бывает, а если вдруг окажутся, откажет сама delete_order и скажет
+   * почему. Дублировать её условие значило бы завести второй список
+   * правил, который однажды разойдётся с первым.
+   */
+  const { data: disposable } = await supabase
+    .from('orders')
+    .select('id, ref, status, created_at, distance_km, rate_cents, shipper:companies!orders_company_fk(name)')
+    .in('status', ['DRAFT', 'OPEN', 'CANCELLED'])
+    .is('invoiced_at', null)
+    .order('created_at', { ascending: false })
+    .limit(30);
 
   /* Документы компаний, чьи машины сейчас на допуске: решение принимается вместе. */
   const vehicleCompanyIds = [...new Set((pendingVehicles ?? []).map((v) => v.company_id))];
@@ -414,6 +433,55 @@ export default async function AdminPage({
           )}
         </section>
       )}
+
+      {/*
+        * Уборка заказов — последним разделом.
+        *
+        * Оператор заходит сюда не каждый день: пробные и ошибочные заказы
+        * копятся медленно. Держать этот список выше очереди заявок
+        * значило бы каждое утро предлагать что-нибудь удалить.
+        */}
+      <section className="mt-10">
+        <h2 className="mb-1 text-[13px] font-semibold tracking-tight text-ink-faint">
+          {t.lifecycle.cleanupTitle}
+        </h2>
+        <p className="mb-3 text-xs text-ink-muted">{t.lifecycle.cleanupHint}</p>
+
+        {(disposable ?? []).length === 0 ? (
+          <EmptyState title={t.lifecycle.cleanupEmpty} />
+        ) : (
+          <TableFrame>
+            <Table>
+              <thead>
+                <Tr>
+                  <Th>{t.order.ref}</Th>
+                  <Th>{t.cabinet.company}</Th>
+                  <Th>{t.cabinet.status}</Th>
+                  <Th>{t.order.distance}</Th>
+                  <Th />
+                </Tr>
+              </thead>
+              <tbody>
+                {(disposable ?? []).map((order) => (
+                  <Tr key={order.id}>
+                    <Td mono>{order.ref}</Td>
+                    <Td>{order.shipper?.name ?? '—'}</Td>
+                    <Td>
+                      <Badge tone={orderStatusTone[order.status]}>
+                        {t.orderStatus[order.status]}
+                      </Badge>
+                    </Td>
+                    <Td mono>{m('order.distance', { km: order.distance_km ?? 0 })}</Td>
+                    <Td>
+                      <DeleteOrderButton orderId={order.id} />
+                    </Td>
+                  </Tr>
+                ))}
+              </tbody>
+            </Table>
+          </TableFrame>
+        )}
+      </section>
     </main>
   );
 }

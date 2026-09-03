@@ -409,6 +409,47 @@ export const fi = {
     STOP_ADDED: 'Piste lisätty',
     STOP_CHANGED: 'Piste muuttui',
     STOP_REMOVED: 'Piste poistettu',
+    ORDER_REPRICED: 'Matka ja hinta päivitetty',
+    ORDER_CANCELLED: 'Kuljetus peruutettu',
+    ORDER_RELEASED: 'Kuljetusliike luopui',
+  },
+
+  /*
+   * Häiriötilanteet: peruutus, luopuminen, uudelleenhinnoittelu, poisto.
+   * Omana ryhmänään eikä matchingin alla, koska nämä eivät liity
+   * tarjouksiin vaan siihen, mitä kuljetukselle tapahtuu sen jälkeen.
+   */
+  lifecycle: {
+    withdraw: 'Peruuta kuljetus',
+    withdrawing: 'Peruutetaan…',
+    withdrawHint: 'Kuljetus poistuu työlistoilta lopullisesti. Tiedot ja historia jäävät.',
+    abandon: 'Luovu kuljetuksesta',
+    abandoning: 'Luovutaan…',
+    abandonHint:
+      'Jos yhtäkään pistettä ei ole vielä käyty, kuljetus palaa tarjolle muille. Jos matka on jo alkanut, se peruuntuu ja ajojärjestely ottaa yhteyttä.',
+    reprice: 'Päivitä matka ja hinta',
+    repricing: 'Tallennetaan…',
+    repriceHint:
+      'Hinta seuraa kilometrejä samalla €/km-hinnalla, josta sovittiin. Voit myös kirjoittaa summan itse.',
+    repriceOpen: 'Korjaa matka ja hinta',
+    remove: 'Poista kuljetus',
+    removing: 'Poistetaan…',
+    removeHint:
+      'Poistaa kuljetuksen tietokannasta lopullisesti. Vain koe- ja virhekuljetuksille: laskutettua tai dokumentoitua ei voi poistaa.',
+    reason: 'Syy',
+    reasonPlaceholder: 'Auto rikki, kuorma peruuntui…',
+    confirm: 'Vahvista',
+    cancelled: 'Kuljetus on peruutettu',
+    notAllowed: 'Sinulla ei ole oikeutta tähän toimenpiteeseen.',
+    notFound: 'Kuljetusta ei löytynyt.',
+    failed: 'Toimenpide ei mennyt läpi. Päivitä sivu ja yritä uudelleen.',
+    fieldStatus: 'Tila',
+    fieldBy: 'Tekijä',
+    fieldReason: 'Syy',
+    cleanupTitle: 'Kuljetusten siivous',
+    cleanupHint:
+      'Luonnokset, tarjolla olevat ja peruutetut kuljetukset, joita ei ole laskutettu. Poisto on lopullinen: laskutettua tai dokumentoitua ei voi poistaa.',
+    cleanupEmpty: 'Ei poistettavia kuljetuksia',
   },
 
   tripDocument: {
@@ -586,7 +627,12 @@ export const fi = {
     awaitDriver: 'Odotetaan kuljettajan vahvistusta',
     confirm: 'Vahvista',
     decline: 'Kieltäydy',
-    cancel: 'Peruuta',
+    /*
+     * Ei 'Peruuta': tämä painike palauttaa kuljetuksen tarjolle, ei
+     * poista sitä. Vieressä on lifecycle.withdraw, joka nimenomaan
+     * peruu — kahta samannäköistä nappia ei voi erottaa toisistaan.
+     */
+    cancel: 'Palauta tarjolle',
     assignments: 'Omat kuljetukset',
     noAssignments: 'Ei kuljetuksia',
     noAssignmentsHint: 'Ota kuljetus, niin se siirtyy tänne.',
@@ -1130,6 +1176,8 @@ export const fi = {
     'routing.result': '{km, number} km · noin {hours} h {minutes} min',
     'routing.pickFromList': 'Valitse osoite ehdotuksista: {stops}',
     'order.routeRecomputed': 'Reitti muuttui — laskettu {km, number} km',
+    'lifecycle.wasNow': 'Ennen {before}, nyt {after}',
+    'lifecycle.kmAndMoney': '{km, number} km · {amount}',
     'routing.legDistance': 'osuus {km, number} km',
 
     'stop.weight': '{tonnes, number, ::.0#} t',

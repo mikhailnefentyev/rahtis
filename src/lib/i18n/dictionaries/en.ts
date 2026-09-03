@@ -399,6 +399,47 @@ export const en = {
     STOP_ADDED: 'Stop added',
     STOP_CHANGED: 'Stop changed',
     STOP_REMOVED: 'Stop removed',
+    ORDER_REPRICED: 'Distance and price updated',
+    ORDER_CANCELLED: 'Order cancelled',
+    ORDER_RELEASED: 'Carrier stepped back',
+  },
+
+  /*
+   * When things go wrong: cancelling, stepping back, repricing, deleting.
+   * A group of its own rather than part of matching, because none of it is
+   * about offers — it is about what happens to an order afterwards.
+   */
+  lifecycle: {
+    withdraw: 'Cancel order',
+    withdrawing: 'Cancelling…',
+    withdrawHint: 'The order leaves the working lists for good. Its data and history stay.',
+    abandon: 'Step back from this job',
+    abandoning: 'Stepping back…',
+    abandonHint:
+      'If no stop has been reached yet, the order goes back on the board for someone else. If the run has started, it is cancelled and dispatch will be in touch.',
+    reprice: 'Update distance and price',
+    repricing: 'Saving…',
+    repriceHint:
+      'The price follows the kilometres at the €/km you agreed. You can also type the amount yourself.',
+    repriceOpen: 'Correct distance and price',
+    remove: 'Delete order',
+    removing: 'Deleting…',
+    removeHint:
+      'Removes the order from the database for good. Test and mistaken orders only: anything invoiced or documented cannot be deleted.',
+    reason: 'Reason',
+    reasonPlaceholder: 'Truck broke down, load called off…',
+    confirm: 'Confirm',
+    cancelled: 'This order has been cancelled',
+    notAllowed: 'You are not allowed to do this.',
+    notFound: 'Order not found.',
+    failed: 'That did not go through. Refresh the page and try again.',
+    fieldStatus: 'Status',
+    fieldBy: 'By',
+    fieldReason: 'Reason',
+    cleanupTitle: 'Order cleanup',
+    cleanupHint:
+      'Drafts, orders on the board and cancelled orders that were never invoiced. Deletion is final: anything invoiced or documented cannot be removed.',
+    cleanupEmpty: 'Nothing to delete',
   },
 
   tripDocument: {
@@ -577,7 +618,12 @@ export const en = {
     awaitDriver: 'Waiting for the driver to confirm',
     confirm: 'Confirm',
     decline: 'Decline',
-    cancel: 'Cancel',
+    /*
+     * Not 'Cancel': this button puts the order back on the board, it
+     * does not call it off. lifecycle.withdraw sits next to it and does
+     * exactly that — two look-alike buttons cannot be told apart.
+     */
+    cancel: 'Put back on the board',
     assignments: 'My jobs',
     noAssignments: 'No jobs',
     noAssignmentsHint: 'Take an order from the load board and it moves here.',
@@ -1109,6 +1155,8 @@ export const en = {
     'routing.result': '{km, number} km · about {hours} h {minutes} min',
     'routing.pickFromList': 'Pick the address from the suggestions: {stops}',
     'order.routeRecomputed': 'Route changed — {km, number} km calculated',
+    'lifecycle.wasNow': 'Was {before}, now {after}',
+    'lifecycle.kmAndMoney': '{km, number} km · {amount}',
     'routing.legDistance': 'leg {km, number} km',
 
     'stop.weight': '{tonnes, number, ::.0#} t',

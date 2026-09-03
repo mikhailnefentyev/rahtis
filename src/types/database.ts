@@ -649,8 +649,8 @@ export type Database = {
           kind: Database["public"]["Enums"]["amendment_kind"]
           order_id: string
           stop_id: string | null
-          stop_label: string
-          stop_role: Database["public"]["Enums"]["stop_role"]
+          stop_label: string | null
+          stop_role: Database["public"]["Enums"]["stop_role"] | null
         }
         Insert: {
           acknowledged_at?: string | null
@@ -662,8 +662,8 @@ export type Database = {
           kind: Database["public"]["Enums"]["amendment_kind"]
           order_id: string
           stop_id?: string | null
-          stop_label: string
-          stop_role: Database["public"]["Enums"]["stop_role"]
+          stop_label?: string | null
+          stop_role?: Database["public"]["Enums"]["stop_role"] | null
         }
         Update: {
           acknowledged_at?: string | null
@@ -675,8 +675,8 @@ export type Database = {
           kind?: Database["public"]["Enums"]["amendment_kind"]
           order_id?: string
           stop_id?: string | null
-          stop_label?: string
-          stop_role?: Database["public"]["Enums"]["stop_role"]
+          stop_label?: string | null
+          stop_role?: Database["public"]["Enums"]["stop_role"] | null
         }
         Relationships: [
           {
@@ -1482,6 +1482,51 @@ export type Database = {
       }
     }
     Functions: {
+      abandon_order: {
+        Args: { p_order_id: string; p_reason?: string }
+        Returns: {
+          assigned_company_id: string | null
+          assigned_vehicle_id: string | null
+          billing: Database["public"]["Enums"]["billing_status"]
+          chosen_offer_id: string | null
+          closed_at: string | null
+          comment: string | null
+          commission_bps: number | null
+          created_at: string
+          created_by: string | null
+          deadline_at: string | null
+          distance_auto_km: number | null
+          distance_km: number | null
+          distance_source: Database["public"]["Enums"]["distance_source"]
+          id: string
+          invoice_ref: string | null
+          invoiced_at: string | null
+          order_type: Database["public"]["Enums"]["order_type"]
+          paid_at: string | null
+          published_at: string | null
+          rate_cents: number | null
+          ref: string
+          route_bounds: Json | null
+          route_computed_at: string | null
+          route_fingerprint: string | null
+          route_geometry: string | null
+          settled_at: string | null
+          shipper_company_id: string
+          shipper_company_kind: Database["public"]["Enums"]["party_role"]
+          shipper_ref: string | null
+          status: Database["public"]["Enums"]["order_status"]
+          terms_document_id: string | null
+          trailer: string | null
+          trailer_plate: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       accept_legal: { Args: { p_source?: string }; Returns: number }
       acknowledge_amendments: { Args: { p_order_id: string }; Returns: number }
       activate_company: {
@@ -1561,8 +1606,8 @@ export type Database = {
           kind: Database["public"]["Enums"]["amendment_kind"]
           order_id: string
           stop_id: string | null
-          stop_label: string
-          stop_role: Database["public"]["Enums"]["stop_role"]
+          stop_label: string | null
+          stop_role: Database["public"]["Enums"]["stop_role"] | null
         }
         SetofOptions: {
           from: "*"
@@ -1662,8 +1707,8 @@ export type Database = {
           kind: Database["public"]["Enums"]["amendment_kind"]
           order_id: string
           stop_id: string | null
-          stop_label: string
-          stop_role: Database["public"]["Enums"]["stop_role"]
+          stop_label: string | null
+          stop_role: Database["public"]["Enums"]["stop_role"] | null
         }
         SetofOptions: {
           from: "*"
@@ -2022,6 +2067,7 @@ export type Database = {
         }
       }
       delete_company: { Args: { p_company_id: string }; Returns: string[] }
+      delete_order: { Args: { p_order_id: string }; Returns: string }
       desk_orders: {
         Args: { p_limit?: number; p_region?: string }
         Returns: {
@@ -2326,12 +2372,61 @@ export type Database = {
           kind: Database["public"]["Enums"]["amendment_kind"]
           order_id: string
           stop_id: string | null
-          stop_label: string
-          stop_role: Database["public"]["Enums"]["stop_role"]
+          stop_label: string | null
+          stop_role: Database["public"]["Enums"]["stop_role"] | null
         }
         SetofOptions: {
           from: "*"
           to: "order_amendments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      reprice_order: {
+        Args: {
+          p_distance_km: number
+          p_order_id: string
+          p_rate_cents: number
+        }
+        Returns: {
+          assigned_company_id: string | null
+          assigned_vehicle_id: string | null
+          billing: Database["public"]["Enums"]["billing_status"]
+          chosen_offer_id: string | null
+          closed_at: string | null
+          comment: string | null
+          commission_bps: number | null
+          created_at: string
+          created_by: string | null
+          deadline_at: string | null
+          distance_auto_km: number | null
+          distance_km: number | null
+          distance_source: Database["public"]["Enums"]["distance_source"]
+          id: string
+          invoice_ref: string | null
+          invoiced_at: string | null
+          order_type: Database["public"]["Enums"]["order_type"]
+          paid_at: string | null
+          published_at: string | null
+          rate_cents: number | null
+          ref: string
+          route_bounds: Json | null
+          route_computed_at: string | null
+          route_fingerprint: string | null
+          route_geometry: string | null
+          settled_at: string | null
+          shipper_company_id: string
+          shipper_company_kind: Database["public"]["Enums"]["party_role"]
+          shipper_ref: string | null
+          status: Database["public"]["Enums"]["order_status"]
+          terms_document_id: string | null
+          trailer: string | null
+          trailer_plate: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "orders"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -2610,9 +2705,60 @@ export type Database = {
           week: string
         }[]
       }
+      withdraw_order: {
+        Args: { p_order_id: string; p_reason?: string }
+        Returns: {
+          assigned_company_id: string | null
+          assigned_vehicle_id: string | null
+          billing: Database["public"]["Enums"]["billing_status"]
+          chosen_offer_id: string | null
+          closed_at: string | null
+          comment: string | null
+          commission_bps: number | null
+          created_at: string
+          created_by: string | null
+          deadline_at: string | null
+          distance_auto_km: number | null
+          distance_km: number | null
+          distance_source: Database["public"]["Enums"]["distance_source"]
+          id: string
+          invoice_ref: string | null
+          invoiced_at: string | null
+          order_type: Database["public"]["Enums"]["order_type"]
+          paid_at: string | null
+          published_at: string | null
+          rate_cents: number | null
+          ref: string
+          route_bounds: Json | null
+          route_computed_at: string | null
+          route_fingerprint: string | null
+          route_geometry: string | null
+          settled_at: string | null
+          shipper_company_id: string
+          shipper_company_kind: Database["public"]["Enums"]["party_role"]
+          shipper_ref: string | null
+          status: Database["public"]["Enums"]["order_status"]
+          terms_document_id: string | null
+          trailer: string | null
+          trailer_plate: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
     }
     Enums: {
-      amendment_kind: "STOP_ADDED" | "STOP_CHANGED" | "STOP_REMOVED"
+      amendment_kind:
+        | "STOP_ADDED"
+        | "STOP_CHANGED"
+        | "STOP_REMOVED"
+        | "ORDER_REPRICED"
+        | "ORDER_CANCELLED"
+        | "ORDER_RELEASED"
       billing_status: "PENDING" | "INVOICED" | "PAID" | "SETTLED"
       chat_audience: "DRIVER" | "CARRIER" | "SHIPPER" | "ADMIN"
       chat_channel: "WEB" | "WHATSAPP"
@@ -2675,12 +2821,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -2704,11 +2850,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -2729,11 +2875,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -2754,11 +2900,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -2771,11 +2917,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -2790,7 +2936,14 @@ export const Constants = {
   },
   public: {
     Enums: {
-      amendment_kind: ["STOP_ADDED", "STOP_CHANGED", "STOP_REMOVED"],
+      amendment_kind: [
+        "STOP_ADDED",
+        "STOP_CHANGED",
+        "STOP_REMOVED",
+        "ORDER_REPRICED",
+        "ORDER_CANCELLED",
+        "ORDER_RELEASED",
+      ],
       billing_status: ["PENDING", "INVOICED", "PAID", "SETTLED"],
       chat_audience: ["DRIVER", "CARRIER", "SHIPPER", "ADMIN"],
       chat_channel: ["WEB", "WHATSAPP"],

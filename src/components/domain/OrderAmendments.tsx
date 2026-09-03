@@ -18,7 +18,16 @@ import type { AmendmentChange, OrderAmendment, StopRole } from '@/types/db';
  * Готовый текст, сложенный на сервере, был бы написан по-русски навсегда.
  */
 
-/** Поля точки, у которых есть подпись. Остальные журнал не показывает. */
+/**
+ * Поля, у которых есть подпись. Остальные журнал не показывает.
+ *
+ * Первая часть — поля точки, вторая — самого заказа: снятие, отказ
+ * перевозчика и пересчёт пишутся в тот же журнал, потому что читаются
+ * они вперемешку. «Выгрузку перенесли на 14:00, потом маршрут стал
+ * длиннее, потом перевозчик отказался» — это одна история рейса, и
+ * разносить её по трём лентам значит заставить читателя сшивать её
+ * самому по времени.
+ */
 function useFieldLabels(): Record<string, string> {
   const { t } = useI18n();
 
@@ -36,6 +45,12 @@ function useFieldLabels(): Record<string, string> {
     consignee: t.orderForm.consignee,
     seal_required: t.orderForm.seal,
     trailer_loaded: t.orderForm.trailerState,
+
+    status: t.lifecycle.fieldStatus,
+    by: t.lifecycle.fieldBy,
+    reason: t.lifecycle.fieldReason,
+    distance_km: t.order.distance,
+    rate_cents: t.orderForm.rate,
   };
 }
 
@@ -80,6 +95,25 @@ export function OrderAmendments({
     /* Дата и время местные настенные — момента времени здесь нет. */
     if (field === 'scheduled_date') return f.date(`${String(value)}T12:00:00Z`);
     if (field === 'scheduled_time') return String(value).slice(0, 5);
+
+    /*
+     * Поля событий заказа. Статус и сторона приезжают из базы кодами —
+     * OPEN, CANCELLED, SHIPPER, — и переводятся теми же словарями, что
+     * бейджи в списках. Показать код значило бы завести второе название
+     * у того же состояния.
+     */
+    if (field === 'status') {
+      const code = String(value) as keyof typeof t.orderStatus;
+      return t.orderStatus[code] ?? String(value);
+    }
+    if (field === 'by') {
+      const code = String(value) as keyof typeof t.role;
+      return t.role[code] ?? String(value);
+    }
+    if (field === 'rate_cents' && typeof value === 'number') return f.eur(value);
+    if (field === 'distance_km' && typeof value === 'number') {
+      return m('order.distance', { km: value });
+    }
 
     return String(value);
   };
@@ -133,14 +167,23 @@ export function OrderAmendments({
                   : 'rounded-control border border-line bg-sunken px-3 py-2'
               }
             >
+              {/*
+                * У события заказа точки нет, и подписи о ней тоже.
+                * Раньше роль и название были обязательны, потому что
+                * других записей в журнале не бывало; теперь бейджа
+                * «Заказ снят» достаточно, а приписка «точка: ничего»
+                * была бы шумом.
+                */}
               <div className="flex flex-wrap items-center gap-2">
                 <Badge tone={fresh ? 'warn' : 'neutral'}>{t.amendKind[amendment.kind]}</Badge>
-                <span className="text-[13px] text-ink">
-                  {m('amend.stopAt', {
-                    kind: t.stopKind[amendment.stop_role as StopRole],
-                    place: amendment.stop_label,
-                  })}
-                </span>
+                {amendment.stop_role !== null && (
+                  <span className="text-[13px] text-ink">
+                    {m('amend.stopAt', {
+                      kind: t.stopKind[amendment.stop_role as StopRole],
+                      place: amendment.stop_label ?? '',
+                    })}
+                  </span>
+                )}
               </div>
 
               <ul className="mt-1.5 flex flex-col gap-0.5">
