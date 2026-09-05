@@ -207,3 +207,28 @@ export function toSuggestion(place: CuratedPlace): AddressSuggestion {
     precise: true,
   };
 }
+
+/**
+ * Города справочника — для полосы направлений на витрине.
+ *
+ * Полоса перечисляла города строкой в разметке, а комментарий рядом
+ * утверждал, что список «ровно тот же, что в справочнике». Два источника
+ * одной правды: добавленный сюда порт на витрине не появлялся, убранный
+ * — оставался обещанием, за которым уже ничего нет.
+ *
+ * Порядок — по стране, потом по имени: полоса читается как карта, а не
+ * как случайный набор. Внутри страны алфавит, потому что другого
+ * осмысленного порядка у портов нет.
+ */
+export function placeCities(): string[] {
+  const seen = new Map<string, string>();
+
+  for (const place of PLACES) {
+    const key = `${place.country}|${place.city}`;
+    if (!seen.has(key)) seen.set(key, place.city);
+  }
+
+  return [...seen.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([, city]) => city);
+}

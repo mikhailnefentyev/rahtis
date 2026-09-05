@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { buttonClass, Card, CardBody, Mono } from '@/components/ui';
 import { APP } from '@/lib/config';
 import { getI18n, type Locale } from '@/lib/i18n';
+import { placeCities } from '@/lib/routing/places';
 
 /**
  * Всё, что лежит на главной ниже первого экрана.
@@ -33,8 +34,16 @@ export async function LandingSections({ locale }: { locale: Locale }) {
         */}
       <div className="border-y border-line bg-surface py-6">
         <p className="label-micro text-center">{l.regions}</p>
+        {/*
+          * Города берутся из справочника, а не переписываются сюда.
+          *
+          * Раньше строка стояла в разметке, а комментарий выше обещал,
+          * что список тот же. Два источника одной правды расходятся на
+          * первом же порту: добавленный в справочник здесь не появлялся,
+          * убранный — оставался обещанием, за которым ничего нет.
+          */}
         <p className="mt-3 text-center font-mono text-[15px] tracking-[0.14em] text-ink-dim">
-          HANKO · HELSINKI · RAUMA · KOTKA · NAANTALI · TURKU
+          {placeCities().join(' · ').toUpperCase()}
         </p>
       </div>
 
