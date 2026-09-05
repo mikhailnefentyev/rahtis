@@ -72,7 +72,16 @@ export function invoicedEmail(input: {
     subject: `RAHTIS · lasku kuljetuksesta ${input.orderRef}`,
     heading: `Lasku kuljetuksesta ${input.orderRef}`,
     preheader: `Summa ${input.amount} (alv 0 %).`,
-    lead: 'Kuljetuksesta on lähetetty lasku. Laskuun lisätään alv 25,5 %.',
+    /*
+     * Alv 0 %, ei 25,5 %.
+     *
+     * Asiakkaat ovat ulkomaisia yrityksiä, ja kuljetuspalvelu EU-maiden
+     * alv-velvollisten välillä menee käännetyllä verovelvollisuudella.
+     * Vanha teksti lupasi laskuun veron, jota siinä ei ole — ks.
+     * VAT_BPS lib/config.ts.
+     */
+    lead:
+      'Kuljetuksesta on lähetetty lasku. Käännetty verovelvollisuus: ostaja tilittää veron omassa maassaan.',
     rows,
     operatorEmail: input.operatorEmail,
   });
@@ -93,7 +102,8 @@ export function settledEmail(input: {
     subject: `RAHTIS · tilitys kuljetuksesta ${input.orderRef}`,
     heading: `Tilitys kuljetuksesta ${input.orderRef}`,
     preheader: `Summa ${input.amount} (alv 0 %).`,
-    lead: 'Kuljetuksesta on maksettu tilitys. Tilitykseen lisätään alv 25,5 %.',
+    lead:
+      'Kuljetuksesta on maksettu tilitys. Summa on alv 0 %: käännetty verovelvollisuus.',
     rows: [
       ['Kuljetus', input.orderRef],
       ['Summa (alv 0 %)', input.amount],
