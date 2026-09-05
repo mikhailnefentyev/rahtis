@@ -47,6 +47,8 @@ function cacheKey(query: string, near?: LatLon): string {
 export type ChosenAddress = {
   address: string;
   city: string | null;
+  /* Страна от геокодера: по ней выбирается профиль грузовика. */
+  country: string | null;
   position: LatLon | null;
   score: number;
   precise: boolean;
@@ -138,6 +140,7 @@ export function AddressInput({
     const picked: ChosenAddress = {
       address: item.label,
       city: item.city,
+      country: item.country,
       position: item.position,
       score: item.score,
       precise: item.precise,
@@ -197,6 +200,7 @@ export function AddressInput({
         * человек выбрал в списке из шести штук.
         */}
       <input type="hidden" name={`${name}_city`} value={chosen?.city ?? ''} />
+      <input type="hidden" name={`${name}_country`} value={chosen?.country ?? ''} />
       <input type="hidden" name={`${name}_lat`} value={chosen?.position?.lat ?? ''} />
       <input type="hidden" name={`${name}_lon`} value={chosen?.position?.lon ?? ''} />
       <input type="hidden" name={`${name}_score`} value={chosen?.score ?? ''} />

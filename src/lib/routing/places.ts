@@ -37,6 +37,12 @@ export type CuratedPlace = {
   name: string;
   address: string;
   city: string;
+  /*
+   * Страна двумя буквами. Весь нынешний справочник финский, но поле
+   * обязательное: норвежский терминал, добавленный без него, тихо
+   * поехал бы по финскому профилю грузовика.
+   */
+  country: string;
   position: { lat: number; lon: number };
   /**
    * По каким словам ищется. Русские и финские вперемешку: диспетчер
@@ -51,6 +57,7 @@ export const PLACES: CuratedPlace[] = [
     name: 'Hangon satama',
     address: 'Korsmaninkatu 6, 10900 Hanko',
     city: 'Hanko',
+    country: 'FI',
     position: { lat: 59.824178, lon: 22.96404 },
     terms: ['порт', 'ханко', 'hanko', 'hangon', 'satama', 'port', 'korsmaninkatu'],
   },
@@ -59,6 +66,7 @@ export const PLACES: CuratedPlace[] = [
     name: 'Helsinki · Vuosaari',
     address: 'Satamakaari 24, 00980 Helsinki',
     city: 'Helsinki',
+    country: 'FI',
     position: { lat: 60.213578, lon: 25.172049 },
     terms: [
       'хельсинки', 'вуосаари', 'helsinki', 'vuosaari', 'nordsjö', 'nordsjo',
@@ -70,6 +78,7 @@ export const PLACES: CuratedPlace[] = [
     name: 'Helsinki · Länsisatama',
     address: 'Tyynenmerenkatu 8, 00220 Helsinki',
     city: 'Helsinki',
+    country: 'FI',
     position: { lat: 60.149625, lon: 24.916633 },
     terms: [
       'хельсинки', 'лянсисатама', 'западный', 'helsinki', 'länsisatama', 'lansisatama',
@@ -83,6 +92,7 @@ export const PLACES: CuratedPlace[] = [
     name: 'Helsinki · Eteläsatama',
     address: 'Olympiaranta 1, 00140 Helsinki',
     city: 'Helsinki',
+    country: 'FI',
     position: { lat: 60.160774, lon: 24.957726 },
     terms: [
       'хельсинки', 'этеля', 'этелясатама', 'южный', 'helsinki', 'eteläsatama', 'etelasatama',
@@ -95,6 +105,7 @@ export const PLACES: CuratedPlace[] = [
     name: 'Helsinki · Katajanokka',
     address: 'Katajanokanlaituri 8, 00160 Helsinki',
     city: 'Helsinki',
+    country: 'FI',
     position: { lat: 60.163838, lon: 24.96835 },
     terms: [
       'хельсинки', 'катаянокка', 'helsinki', 'katajanokka', 'katajanokan',
@@ -106,6 +117,7 @@ export const PLACES: CuratedPlace[] = [
     name: 'Rauman satama',
     address: 'Hakunintie 28, 26100 Rauma',
     city: 'Rauma',
+    country: 'FI',
     position: { lat: 61.129872, lon: 21.466139 },
     terms: ['порт', 'раума', 'rauma', 'rauman', 'satama', 'port', 'hakunintie'],
   },
@@ -114,6 +126,7 @@ export const PLACES: CuratedPlace[] = [
     name: 'Kotka · Hietanen',
     address: 'Murtajantie 2, 48100 Kotka',
     city: 'Kotka',
+    country: 'FI',
     position: { lat: 60.479838, lon: 26.942221 },
     terms: [
       'порт', 'котка', 'хиетанен', 'kotka', 'hietanen', 'satama', 'port', 'murtajantie',
@@ -124,6 +137,7 @@ export const PLACES: CuratedPlace[] = [
     name: 'Naantalin satama',
     address: 'Satamatie 13, 21100 Naantali',
     city: 'Naantali',
+    country: 'FI',
     position: { lat: 60.457947, lon: 22.043417 },
     terms: ['порт', 'наантали', 'naantali', 'satama', 'port', 'satamatie'],
   },
@@ -132,6 +146,7 @@ export const PLACES: CuratedPlace[] = [
     name: 'Turku · Viking Line',
     address: 'Kuninkaantie, 20100 Turku',
     city: 'Turku',
+    country: 'FI',
     position: { lat: 60.433165, lon: 22.222195 },
     terms: ['турку', 'викинг', 'turku', 'viking', 'line', 'satama', 'порт', 'port'],
   },
@@ -140,6 +155,7 @@ export const PLACES: CuratedPlace[] = [
     name: 'Turku · Silja Line',
     address: 'Linnankatu 91, 20100 Turku',
     city: 'Turku',
+    country: 'FI',
     position: { lat: 60.435567, lon: 22.217776 },
     terms: [
       'турку', 'силья', 'сильялайн', 'turku', 'silja', 'tallink', 'line', 'satama', 'порт', 'port',
@@ -184,6 +200,7 @@ export function toSuggestion(place: CuratedPlace): AddressSuggestion {
     id: `place:${place.id}`,
     label: `${place.name} — ${place.address}`,
     city: place.city,
+    country: place.country,
     postalCode: null,
     position: place.position,
     score: 100,

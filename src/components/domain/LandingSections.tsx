@@ -353,14 +353,26 @@ export async function LandingSections({ locale }: { locale: Locale }) {
             </CardBody>
           </Card>
 
-          <div className="rounded-card border border-dashed border-line bg-sunken p-6">
-            <span className="inline-block rounded-pill border border-line-strong bg-surface px-2.5 py-1 text-[11px] font-semibold text-ink-faint">
-              {l.serviceSoon}
-            </span>
-            <h3 className="mt-3 text-[19px] font-semibold tracking-tight">{l.service2}</h3>
-            <p className="mt-3 text-[14px] text-ink-muted">{l.service2Text}</p>
-            <p className="mt-2.5 text-[14px] text-ink-muted">{l.service2Text2}</p>
-          </div>
+          {/*
+            * Контейнеры перестали быть «следующим»: они работают.
+            *
+            * Карточка была пунктирной и с меткой «Seuraavaksi», пока
+            * второй услугой числилась перевозка чужим кузовом. Держать
+            * пунктир вокруг того, что уже возят, значит говорить
+            * перевозчику «нам это ещё нельзя доверить».
+            */}
+          <Card>
+            <CardBody className="flex flex-col gap-3 p-6">
+              <span className="self-start rounded-pill border border-accent-line bg-accent-wash px-2.5 py-1 text-[11px] font-semibold text-accent">
+                {l.serviceLive}
+              </span>
+              <h3 className="text-[19px] font-semibold tracking-tight">
+                {l.service2} <Mono className="text-[0.72em] text-ink-dim">20 · 40 · 45</Mono>
+              </h3>
+              <p className="text-[14px] text-ink-muted">{l.service2Text}</p>
+              <p className="text-[14px] text-ink-muted">{l.service2Text2}</p>
+            </CardBody>
+          </Card>
         </div>
       </section>
 

@@ -155,6 +155,16 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
   const pointsKey = routePoints.map((p) => `${p.lat},${p.lon}`).join(';');
 
   /*
+   * Профиль грузовика — по стране забора.
+   *
+   * Раньше здесь стояла жёсткая 'FI', и пока платформа работала по
+   * Финляндии, это было верно. Норвежский рейс так посчитался бы по
+   * финской сцепке: из всех параметров поставщик учитывает высоту, и
+   * машину провело бы под мостами по чужим нормам.
+   */
+  const pickupCountry = coords.pickup?.country ?? null;
+
+  /*
    * Пробег считается сам, как только известны две точки. Кнопки нет
    * намеренно: заказчик заполняет адреса и вводит ставку, а километраж —
    * это следствие маршрута, а не отдельное решение. Лишнее нажатие здесь
@@ -170,7 +180,7 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
       setRouting(true);
       setRouteError(null);
 
-      const result = await computeRouteAction(routePoints, 'FI', locale);
+      const result = await computeRouteAction(routePoints, pickupCountry ?? 'FI', locale);
 
       setRouting(false);
       if (!result.ok) {
@@ -187,7 +197,7 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
     return () => clearTimeout(timer);
     /* routePoints выводится из pointsKey — сравнивать нужно значения. */
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pointsKey, canRoute, locale]);
+  }, [pointsKey, canRoute, locale, pickupCountry]);
 
   /*
    * Маршрут действителен, только пока набор точек полон.

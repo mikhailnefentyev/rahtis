@@ -31,6 +31,7 @@ type StopInput = {
   company_name?: string;
   address: string;
   city: string;
+  country?: string;
   contact_name?: string;
   contact_phone?: string;
   scheduled_date?: string;
@@ -76,6 +77,7 @@ function readStop(read: FieldReader, role: StopRole): StopInput {
     company_name: read('company'),
     address: read('address'),
     city: cityOf(read),
+    country: read('address_country'),
     contact_name: read('contact'),
     contact_phone: read('phone').replace(/[\s-]/g, ''),
     scheduled_date: read('date'),

@@ -28,8 +28,15 @@ import type {
 const SEARCH = 'https://api.tomtom.com/search/2';
 const ROUTING = 'https://api.tomtom.com/routing/1';
 
-/** Выдача ограничена странами запуска: подсказка не должна звать в Испанию. */
-const COUNTRIES = 'FI,SE';
+/**
+ * Выдача ограничена странами работы: подсказка не должна звать в Испанию.
+ *
+ * Норвегия и Дания добавлены вместе с выходом на порты Скандинавии. Без
+ * них норвежский терминал не находился вовсе — не «плохо находился», а
+ * отсутствовал в выдаче, и адрес пришлось бы набирать руками, то есть
+ * без координат, то есть без километража.
+ */
+const COUNTRIES = 'FI,SE,NO,DK';
 
 function key(): string {
   const value = process.env.TOMTOM_KEY;
@@ -44,6 +51,8 @@ function key(): string {
 type TomTomAddress = {
   freeformAddress?: string;
   municipality?: string;
+  /* Двухбуквенный код: по нему выбирается профиль грузовика. */
+  countryCode?: string;
   postalCode?: string;
   streetNumber?: string;
 };
@@ -97,6 +106,7 @@ function toSuggestion(result: TomTomResult): AddressSuggestion {
     id: result.id,
     label: name ? `${name} — ${address}` : address,
     city: result.address.municipality ?? null,
+    country: result.address.countryCode ?? null,
     postalCode: result.address.postalCode ?? null,
     position: result.position ? { lat: result.position.lat, lon: result.position.lon } : null,
     score: result.score,

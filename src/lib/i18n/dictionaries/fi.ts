@@ -21,11 +21,11 @@ export const fi = {
 
   brand: {
     name: 'RAHTIS',
-    tagline: 'Kuljetusalusta · Suomi',
+    tagline: 'Irtoperät ja kontit · Skandinavia',
     operator: 'RAHTIS',
     /* Юрлицо. Только там, где его требует закон: договоры, счета, отчёты. */
     legalEntity: 'Aivomaa Oy',
-    description: 'Digitaalinen kuljetusalusta Suomessa.',
+    description: 'Irtoperien ja konttien kuljetusalusta Skandinavian satamissa.',
   },
 
   role: {
@@ -187,14 +187,23 @@ export const fi = {
     menuSteps: 'Näin se toimii',
     menuAssistant: 'Avustaja',
     menuSignIn: 'Kirjaudu',
-    eyebrow: 'Logistiikka-alusta Suomessa',
-    titleA: 'Auto pysyy liikkeessä.',
-    titleB: 'Rahti lähtee ajallaan.',
+    /*
+     * Kärki nimeää sen, mitä oikeasti liikutetaan.
+     *
+     * 'Logistiikka-alusta Suomessa' lupasi kaiken rahdin koko maassa.
+     * Alusta tekee kahta asiaa — irtoperiä ja kontteja — ja tekee ne
+     * Skandinavian satamissa. Kapea lupaus, joka pitää, tuo enemmän
+     * kuin laaja, jonka takana ei ole mitään.
+     */
+    eyebrow: 'Irtoperät ja kontit · Skandinavian satamat',
+    titleA: 'Perävaunu vaihtuu ajallaan.',
+    titleB: 'Kontti lähtee satamasta.',
     titleC: 'Turhat puhelut jäävät pois.',
     lede:
-      'Kun tilaus julkaistaan, se välittyy automaattisesti alueen hyväksytyille kuljetusliikkeille. Tarjoukset voivat tulla jo minuuteissa. Keikan eteneminen näkyy vaihe vaiheelta, ja lopuksi kaikki asiakirjat löytyvät samasta paikasta.',
-    lede2: 'RAHTIS huolehtii siitä, että prosessi etenee alusta loppuun.',
-    asShipper: 'Olen kuljetuksen tilaaja',
+      'RAHTIS tekee kahta asiaa: irtoperien vaihtoa ja konttikuljetuksia Skandinavian satamien välillä. Kun tilaus julkaistaan, se välittyy automaattisesti hyväksytyille kuljetusliikkeille. Tarjoukset voivat tulla jo minuuteissa, keikan eteneminen näkyy vaihe vaiheelta, ja asiakirjat löytyvät lopuksi samasta paikasta.',
+    lede2:
+      'Kutsumme mukaan huolitsijat, operaattorit ja kuljetusliikkeet: sähköinen asiakirjaliikenne kuuluu palveluun, ja liitäntä omiin järjestelmiinne katsotaan yhdessä.',
+    asShipper: 'Olen huolitsija tai operaattori',
     asCarrier: 'Olen kuljetusliike',
     signIn: 'Kirjaudu palveluun',
     apply: 'Lähetä hakemus',
@@ -214,7 +223,7 @@ export const fi = {
     cycle1Note: 'Julkaistu ja välitetty alueen kuljetusliikkeille',
     cycle2: 'Tarjouksia 2 / 3',
     cycle2Note: 'Tilaaja valitsee hinnan ja arvostelujen perusteella',
-    cycle3: 'Ajossa · perävaunu noudettu',
+    cycle3: 'Ajossa · yksikkö noudettu',
     cycle3Note: 'Kuljettaja merkitsee pisteet järjestyksessä',
     cycle4: 'Valmis · rahtikirja liitetty',
     cycle4Note: 'Asiakirjat tilaajalla, tilitys viikkoraportissa',
@@ -224,7 +233,7 @@ export const fi = {
     helpTitle: 'Pidämme rahdin liikkeessä ja autot ajossa',
     helpLede:
       'RAHTIS ei korvaa huolitsijaa, ajojärjestelyä tai kuljetusliikettä. Se poistaa työstä turhan etsimisen, soittelun, saman asian selvittämisen moneen kertaan ja hajallaan olevat asiakirjat.',
-    helpCargo: 'Kuljetuksen tilaajalle',
+    helpCargo: 'Huolitsijalle ja operaattorille',
     helpCargoTitle: 'Tilaus liikkeelle nopeasti',
     helpCargoText:
       'Julkaise kuljetus kerran. Tieto välittyy heti alueen hyväksytyille kuljetusliikkeille, ja tarjoukset tulevat samaan näkymään.',
@@ -261,8 +270,8 @@ export const fi = {
     timeNew6: 'Ajetut keikat ja tilitykset näkyvät viikkoraportissa.',
 
     rolesEyebrow: 'Kenelle RAHTIS on tarkoitettu',
-    rolesTitle: 'Yksi alusta kuljetuksen molemmille osapuolille',
-    shipperEyebrow: 'Kuljetuksen tilaajalle',
+    rolesTitle: 'Yksi alusta irtoperille ja konteille — molemmille osapuolille',
+    shipperEyebrow: 'Huolitsijalle ja operaattorille',
     shipperTitle: 'Kuljetusliikettä ei tarvitse etsiä yksi kerrallaan.',
     shipper1: 'Julkaiset tilauksen kerran, ja se välittyy alueen hyväksytyille kuljetusliikkeille.',
     shipper2: 'Saat enintään kolme tarjousta samaan näkymään.',
@@ -352,16 +361,23 @@ export const fi = {
     servicesEyebrow: 'Palvelu laajenee vaiheittain',
     servicesTitle: 'Aloitamme irtoperäliikenteestä ja laajennamme muihin kuljetuksiin',
     serviceLive: 'Toiminnassa',
-    serviceSoon: 'Seuraavaksi',
     service1: 'Irtoperävaunujen kuljetukset',
     service1Text:
       'Veturi noutaa perävaunun satamasta tai terminaalista, hoitaa sovitut lastaukset ja purut ja toimittaa perävaunun seuraavaan sovittuun paikkaan.',
-    service1Text2: 'Aloitamme Suomessa ja laajennamme myöhemmin Skandinaviaan.',
-    service2: 'Kuljetukset kuljetusliikkeen omalla kalustolla',
+    service1Text2: 'Toimimme Skandinavian satamissa: Suomi, Ruotsi, Norja ja Tanska.',
+    /*
+     * Toinen palvelu on kontit, ei yleinen rahti.
+     *
+     * Tässä luki aiemmin 'kuljetukset kuljetusliikkeen omalla
+     * kalustolla' — kapelli, kylmä, kippi, lavetti. Sitä ei luvata nyt:
+     * alusta tekee irtoperiä ja kontteja, ja lupaus, jonka takana ei
+     * ole toimintaa, maksaa enemmän kuin puuttuva rivi.
+     */
+    service2: 'Konttikuljetukset',
     service2Text:
-      'Kuljetusliike hoitaa kuljetuksen omalla kalustollaan: esimerkiksi kapelliperävaunulla, kylmäkalustolla, kippikalustolla tai lavetilla.',
+      'Veturi noutaa kontin satamasta tai terminaalista — tyhjänä tai kuormattuna — ja toimittaa sen sovittuun paikkaan. Paluumatkalla kontti palautetaan satamaan.',
     service2Text2:
-      'Tilaaja ilmoittaa kuorman tiedot, painon, mitat ja muut vaatimukset. RAHTIS etsii tehtävään sopivan kuljetusliikkeen.',
+      'Koko ilmoitetaan jaloissa: 20, 30, 40 tai 45. Keikan näkevät vain ne ajoneuvot, joiden alusta ottaa juuri sen kokoisen kontin.',
 
     finalEyebrow: 'Näin pääset alkuun',
     finalTitle: 'Kerro yrityksestäsi – me hoidamme loput',
@@ -369,7 +385,7 @@ export const fi = {
     finalLede2:
       'Tarkistamme yrityksen tiedot rekistereistä ja avaamme hyväksynnän jälkeen tunnukset palveluun.',
     finalLede3: 'Kuljetusliikkeiltä tarvitsemme lisäksi tiedot liikenneluvasta ja vakuutuksesta.',
-    applyShipper: 'Tilaajan hakemus',
+    applyShipper: 'Huolitsijan hakemus',
     applyCarrier: 'Kuljetusliikkeen hakemus',
     footerCountry: 'Suomi',
   },

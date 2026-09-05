@@ -134,7 +134,7 @@ export function renderEmail(input: {
 
     <tr><td bgcolor="${INK}" style="padding:20px 28px;">
       <span style="font:700 20px/1 ${FONT};letter-spacing:0.14em;color:#ffffff;">RAHTI<span style="color:${ACCENT_BRIGHT};">S</span></span>
-      <span style="display:block;margin-top:7px;font:600 10px/1.2 ${FONT};letter-spacing:0.13em;text-transform:uppercase;color:#8fa3bd;">Kuljetusalusta · Suomi</span>
+      <span style="display:block;margin-top:7px;font:600 10px/1.2 ${FONT};letter-spacing:0.13em;text-transform:uppercase;color:#8fa3bd;">Irtoperät ja kontit · Skandinavia</span>
     </td></tr>
 
     <tr><td style="padding:28px;">

@@ -25,11 +25,11 @@ export const en = {
 
   brand: {
     name: 'RAHTIS',
-    tagline: 'Freight platform · Finland',
+    tagline: 'Trailers and containers · Scandinavia',
     operator: 'RAHTIS',
     /* Юрлицо. Только там, где его требует закон: договоры, счета, отчёты. */
     legalEntity: 'Aivomaa Oy',
-    description: 'Digital freight platform in Finland.',
+    description: 'Trailer swap and container haulage platform across Scandinavian ports.',
   },
 
   role: {
@@ -191,14 +191,23 @@ export const en = {
     menuSteps: 'How it works',
     menuAssistant: 'Assistant',
     menuSignIn: 'Sign in',
-    eyebrow: 'Freight platform in Finland',
-    titleA: 'Trucks keep rolling.',
-    titleB: 'Freight leaves on time.',
+    /*
+     * The strapline names what actually moves.
+     *
+     * 'Freight platform in Finland' promised all cargo across one
+     * country. The platform does two things — trailer swaps and
+     * containers — and does them across Scandinavian ports. A narrow
+     * promise that holds beats a wide one with nothing behind it.
+     */
+    eyebrow: 'Trailer swaps and containers · Scandinavian ports',
+    titleA: 'The trailer swaps on time.',
+    titleB: 'The container leaves the port.',
     titleC: 'The phone stops ringing.',
     lede:
-      'Once an order is published, it goes automatically to approved carriers in the area. Offers can arrive within minutes. The job’s progress is visible step by step, and at the end every document sits in one place.',
-    lede2: 'RAHTIS makes sure the process runs from start to finish.',
-    asShipper: 'I need freight moved',
+      'RAHTIS does two things: trailer swaps and container haulage between Scandinavian ports. Once an order is published it goes automatically to approved carriers. Offers can arrive within minutes, the job’s progress is visible step by step, and every document sits in one place at the end.',
+    lede2:
+      'We invite forwarders, operators and carriers to work with us: electronic document flow is part of the service, and a link to your own systems is something we work out together.',
+    asShipper: 'I am a forwarder or operator',
     asCarrier: 'I run a fleet',
     signIn: 'Sign in',
     apply: 'Send an application',
@@ -214,7 +223,7 @@ export const en = {
     cycle1Note: 'Published and sent to carriers in the area',
     cycle2: 'Offers 2 / 3',
     cycle2Note: 'The shipper chooses on price and ratings',
-    cycle3: 'On the road · trailer picked up',
+    cycle3: 'On the road · unit collected',
     cycle3Note: 'The driver marks the stops in order',
     cycle4: 'Completed · CMR note attached',
     cycle4Note: 'Documents with the shipper, payout in the weekly report',
@@ -223,7 +232,7 @@ export const en = {
     helpTitle: 'We keep freight moving and trucks working',
     helpLede:
       'RAHTIS does not replace your forwarder, your dispatcher or your carrier. It takes out the searching, the phone calls, explaining the same job over and over, and documents scattered across inboxes.',
-    helpCargo: 'For the shipper',
+    helpCargo: 'For forwarders and operators',
     helpCargoTitle: 'Orders move quickly',
     helpCargoText:
       'Publish the job once. It goes straight to approved carriers in the area, and the offers come back to the same screen.',
@@ -256,8 +265,8 @@ export const en = {
     timeNew6: 'Completed jobs and payouts appear in the weekly report.',
 
     rolesEyebrow: 'Who RAHTIS is for',
-    rolesTitle: 'One platform for both sides of a job',
-    shipperEyebrow: 'For the shipper',
+    rolesTitle: 'One platform for trailer swaps and containers — for both sides',
+    shipperEyebrow: 'For forwarders and operators',
     shipperTitle: 'You do not have to find a carrier one call at a time.',
     shipper1: 'Publish the order once and it goes to approved carriers in the area.',
     shipper2: 'You get up to three offers in the same view.',
@@ -347,16 +356,24 @@ export const en = {
     servicesEyebrow: 'The service grows in stages',
     servicesTitle: 'We start with trailer swaps and expand to other transport',
     serviceLive: 'Live',
-    serviceSoon: 'Next',
     service1: 'Semi-trailer swaps',
     service1Text:
       'A tractor unit collects the trailer from a port or terminal, handles the agreed loading and unloading, and delivers the trailer to the next agreed place.',
-    service1Text2: 'We start in Finland and expand into Scandinavia later.',
-    service2: 'Transport on the carrier’s own equipment',
+    service1Text2: 'We operate across Scandinavian ports: Finland, Sweden, Norway and Denmark.',
+    /*
+     * The second service is containers, not general cargo.
+     *
+     * This used to read 'transport on the carrier's own equipment' —
+     * curtainsider, reefer, tipper, low-loader. That is not promised
+     * now: the platform does trailer swaps and containers, and a
+     * promise with no operation behind it costs more than a missing
+     * line.
+     */
+    service2: 'Container haulage',
     service2Text:
-      'The carrier runs the job with its own equipment: curtainsider, reefer, tipper or low-loader.',
+      'The tractor collects the container from a port or terminal — empty or loaded — and delivers it where agreed. On the way back the container returns to the port.',
     service2Text2:
-      'The shipper states the cargo, weight, dimensions and any other requirements. RAHTIS finds a carrier that fits.',
+      'The size is stated in feet: 20, 30, 40 or 45. Only vehicles whose chassis takes that length see the job.',
 
     finalEyebrow: 'Getting started',
     finalTitle: 'Tell us about your company — we handle the rest',
@@ -364,7 +381,7 @@ export const en = {
     finalLede2:
       'We check the company against the registers and issue credentials once it is approved.',
     finalLede3: 'From carriers we also need the operating licence and insurance details.',
-    applyShipper: 'Shipper application',
+    applyShipper: 'Forwarder application',
     applyCarrier: 'Carrier application',
     footerCountry: 'Finland',
   },

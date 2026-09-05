@@ -901,6 +901,7 @@ export type Database = {
           consignee: string | null
           contact_name: string | null
           contact_phone: string | null
+          country: string | null
           created_at: string
           damage_note: string | null
           external_ref: string | null
@@ -931,6 +932,7 @@ export type Database = {
           consignee?: string | null
           contact_name?: string | null
           contact_phone?: string | null
+          country?: string | null
           created_at?: string
           damage_note?: string | null
           external_ref?: string | null
@@ -961,6 +963,7 @@ export type Database = {
           consignee?: string | null
           contact_name?: string | null
           contact_phone?: string | null
+          country?: string | null
           created_at?: string
           damage_note?: string | null
           external_ref?: string | null
@@ -1903,6 +1906,7 @@ export type Database = {
           consignee: string | null
           contact_name: string | null
           contact_phone: string | null
+          country: string | null
           created_at: string
           damage_note: string | null
           external_ref: string | null
@@ -2659,6 +2663,7 @@ export type Database = {
           consignee: string | null
           contact_name: string | null
           contact_phone: string | null
+          country: string | null
           created_at: string
           damage_note: string | null
           external_ref: string | null

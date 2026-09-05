@@ -138,6 +138,7 @@ function readAddress(read: FieldReader, before: string): AddressPatch {
   return {
     address,
     city: cityOf(read),
+    country: read('address_country'),
     lat,
     lon,
     geocode_score: read('address_score'),
@@ -173,7 +174,7 @@ type Client = Awaited<ReturnType<typeof createClient>>;
 async function refreshRoute(supabase: Client, orderId: string, locale: Locale): Promise<void> {
   const { data: stops } = await supabase
     .from('order_stops')
-    .select('lat,lon')
+    .select('lat,lon,country,role')
     .eq('order_id', orderId)
     .order('sequence');
 
@@ -187,8 +188,13 @@ async function refreshRoute(supabase: Client, orderId: string, locale: Locale): 
 
   const points = stops.map((s) => ({ lat: s.lat as number, lon: s.lon as number }));
 
-  /* Профиль грузовика финский — тот же, что при публикации заказа. */
-  const route = await computeRouteAction(points, 'FI', locale);
+  /*
+   * Профиль грузовика — по стране забора, как и при публикации. Пустая
+   * страна у точек, созданных до появления колонки, даёт умолчание: то
+   * же поведение, что было до этой правки.
+   */
+  const country = stops.find((s) => s.role === 'PICKUP')?.country ?? 'FI';
+  const route = await computeRouteAction(points, country, locale);
   if (!route.ok) return;
 
   await supabase.rpc('store_route', {

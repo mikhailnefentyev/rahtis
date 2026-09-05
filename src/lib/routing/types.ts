@@ -23,6 +23,11 @@ export type AddressSuggestion = {
   label: string;
   /** Город отдельно: он же регион стола заказов. */
   city: string | null;
+  /**
+   * Страна двумя буквами. По стране точки забора выбирается профиль
+   * грузовика: финская сцепка и европейская едут по разным дорогам.
+   */
+  country: string | null;
   postalCode: string | null;
   position: LatLon | null;
   /**
