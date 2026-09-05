@@ -41,10 +41,21 @@ export async function LandingSections({ locale }: { locale: Locale }) {
           * что список тот же. Два источника одной правды расходятся на
           * первом же порту: добавленный в справочник здесь не появлялся,
           * убранный — оставался обещанием, за которым ничего нет.
+          *
+          * По странам, а не одной строкой: городов стало под тридцать, и
+          * сплошная лента перестала читаться как география — по ней уже
+          * не видно, что покрыта вся Скандинавия, а не один берег.
           */}
-        <p className="mt-3 text-center font-mono text-[15px] tracking-[0.14em] text-ink-dim">
-          {placeCities().join(' · ').toUpperCase()}
-        </p>
+        <div className="mt-3 flex flex-col gap-1.5">
+          {placeCities().map((group) => (
+            <p key={group.country} className="text-center font-mono text-[13px] text-ink-dim">
+              <span className="mr-2 text-accent">{group.country}</span>
+              <span className="tracking-[0.12em]">
+                {group.cities.join(' · ').toUpperCase()}
+              </span>
+            </p>
+          ))}
+        </div>
       </div>
 
       {/* ── Что мы делаем ──────────────────────────────────────── */}

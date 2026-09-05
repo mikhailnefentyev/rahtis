@@ -161,12 +161,366 @@ export const PLACES: CuratedPlace[] = [
       'турку', 'силья', 'сильялайн', 'turku', 'silja', 'tallink', 'line', 'satama', 'порт', 'port',
     ],
   },
+
+  /* ── Suomi · pohjoinen ja itä ──────────────────────────────────── */
+
+  {
+    id: 'hamina-port',
+    name: 'HaminaKotka · Hamina',
+    address: 'Hiirenkarintie, 49460 Hamina',
+    city: 'Hamina',
+    country: 'FI',
+    position: { lat: 60.539762, lon: 27.161054 },
+    terms: ['хамина', 'hamina', 'haminakotka', 'satama', 'порт', 'port', 'hiirenkarintie'],
+  },
+  {
+    id: 'pori-mantyluoto',
+    name: 'Pori · Mäntyluoto',
+    address: 'Merisatamantie 4, 28880 Pori',
+    city: 'Pori',
+    country: 'FI',
+    position: { lat: 61.592165, lon: 21.493232 },
+    terms: [
+      'пори', 'мянтылуото', 'pori', 'mantyluoto', 'mäntyluoto', 'satama', 'порт', 'port',
+      'merisatamantie',
+    ],
+  },
+  {
+    id: 'vaasa-wasaline',
+    name: 'Vaasa · Wasaline',
+    address: 'Laivanvarustajankatu 6, 65170 Vaasa',
+    city: 'Vaasa',
+    country: 'FI',
+    position: { lat: 63.087635, lon: 21.557295 },
+    terms: [
+      'вааса', 'васа', 'васалайн', 'vaasa', 'vasa', 'wasaline', 'vaskiluoto', 'vasklot',
+      'kvarken', 'merenkurkku', 'satama', 'порт', 'port',
+    ],
+  },
+  {
+    id: 'kokkola-port',
+    name: 'Kokkolan satama',
+    address: 'Satamatie 330, 67900 Kokkola',
+    city: 'Kokkola',
+    country: 'FI',
+    position: { lat: 63.843609, lon: 23.058471 },
+    terms: ['коккола', 'kokkola', 'karleby', 'satama', 'порт', 'port', 'satamatie'],
+  },
+  {
+    id: 'oulu-oritkari',
+    name: 'Oulu · Oritkari',
+    address: 'Poikkimaantie 16, 90400 Oulu',
+    city: 'Oulu',
+    country: 'FI',
+    position: { lat: 64.991073, lon: 25.426792 },
+    terms: [
+      'оулу', 'оритькари', 'oulu', 'uleaborg', 'oritkari', 'satama', 'порт', 'port',
+      'poikkimaantie',
+    ],
+  },
+  {
+    id: 'kemi-ajos',
+    name: 'Kemi · Ajos',
+    address: 'Ajoksentie 708, 94900 Kemi',
+    city: 'Kemi',
+    country: 'FI',
+    position: { lat: 65.668129, lon: 24.529924 },
+    terms: ['кеми', 'айос', 'kemi', 'ajos', 'satama', 'порт', 'port', 'ajoksentie'],
+  },
+
+  /* ── Ruotsi ────────────────────────────────────────────────────── */
+
+  {
+    id: 'umea-holmsund',
+    name: 'Umeå · Holmsund',
+    address: 'Blå vägen 4, 913 32 Holmsund',
+    city: 'Holmsund',
+    country: 'SE',
+    position: { lat: 63.681067, lon: 20.339712 },
+    terms: [
+      'умео', 'умеа', 'холмсунд', 'umea', 'holmsund', 'wasaline', 'kvarken',
+      'hamn', 'satama', 'порт', 'port',
+    ],
+  },
+  {
+    id: 'stockholm-varta',
+    name: 'Stockholm · Värtahamnen',
+    address: 'Hamnpirsvägen 10, 115 41 Stockholm',
+    city: 'Stockholm',
+    country: 'SE',
+    position: { lat: 59.351467, lon: 18.112716 },
+    terms: [
+      'стокгольм', 'вярта', 'вяртахамнен', 'stockholm', 'varta', 'vartahamnen',
+      'tallink', 'silja', 'hamn', 'порт', 'port',
+    ],
+  },
+  {
+    id: 'stockholm-tegelvik',
+    name: 'Stockholm · Tegelvikshamn',
+    address: 'Stadsgården, Tegelvikshamn, 116 30 Stockholm',
+    city: 'Stockholm',
+    country: 'SE',
+    position: { lat: 59.316, lon: 18.0958 },
+    terms: [
+      'стокгольм', 'стадсгорден', 'тегельвик', 'викинг', 'stockholm', 'stadsgarden',
+      'tegelvik', 'tegelvikshamn', 'viking', 'line', 'hamn', 'порт', 'port',
+    ],
+  },
+  {
+    id: 'kapellskar',
+    name: 'Kapellskär',
+    address: 'Västra Kapellskär 8, 760 15 Gräddö',
+    city: 'Kapellskär',
+    country: 'SE',
+    position: { lat: 59.722722, lon: 19.061172 },
+    terms: [
+      'капельскар', 'капельшер', 'kapellskar', 'graddo', 'finnlines',
+      'hamn', 'порт', 'port',
+    ],
+  },
+  {
+    id: 'stockholm-norvik',
+    name: 'Stockholm Norvik · Nynäshamn',
+    address: 'Norvikvägen 18, 149 45 Nynäshamn',
+    city: 'Nynäshamn',
+    country: 'SE',
+    position: { lat: 58.937555, lon: 17.9745 },
+    terms: [
+      'норвик', 'нюнесхамн', 'norvik', 'nynashamn', 'hutchison', 'hamn',
+      'порт', 'port', 'container', 'kontti',
+    ],
+  },
+  {
+    id: 'goteborg-portentry',
+    name: 'Göteborg · Port Entry',
+    address: 'Ytterhamnsvägen 1, 418 78 Göteborg',
+    city: 'Göteborg',
+    country: 'SE',
+    position: { lat: 57.701867, lon: 11.858883 },
+    terms: [
+      'гётеборг', 'гетеборг', 'goteborg', 'gothenburg', 'entry', 'apm',
+      'skandiahamnen', 'hamn', 'порт', 'port', 'container', 'kontti',
+    ],
+  },
+  {
+    id: 'goteborg-stena-dk',
+    name: 'Göteborg · Stena Danmarksterminalen',
+    address: 'Emigrantvägen 20, 413 27 Göteborg',
+    city: 'Göteborg',
+    country: 'SE',
+    position: { lat: 57.701187, lon: 11.946307 },
+    terms: [
+      'гётеборг', 'гетеборг', 'стена', 'goteborg', 'gothenburg', 'stena',
+      'danmarksterminalen', 'emigrantvagen', 'hamn', 'порт', 'port',
+    ],
+  },
+  {
+    id: 'helsingborg-gate',
+    name: 'Helsingborg · Central Gate',
+    address: 'Massgodsleden 4, 252 28 Helsingborg',
+    city: 'Helsingborg',
+    country: 'SE',
+    position: { lat: 56.028709, lon: 12.700896 },
+    terms: [
+      'хельсингборг', 'helsingborg', 'gate', 'hamn', 'порт', 'port', 'container', 'kontti',
+      'massgodsleden',
+    ],
+  },
+  {
+    id: 'malmo-finnlines',
+    name: 'Malmö · Finnlines',
+    address: 'Lappögatan 3B, 211 24 Malmö',
+    city: 'Malmö',
+    country: 'SE',
+    position: { lat: 55.629423, lon: 13.008892 },
+    terms: [
+      'мальмё', 'мальме', 'malmo', 'finnlines', 'norra', 'hamnen', 'hamn',
+      'порт', 'port', 'lappogatan',
+    ],
+  },
+  {
+    id: 'trelleborg-port',
+    name: 'Trelleborgs hamn',
+    address: 'Norra Nyhamnsgatan 1A, 231 61 Trelleborg',
+    city: 'Trelleborg',
+    country: 'SE',
+    position: { lat: 55.373539, lon: 13.142069 },
+    terms: [
+      'треллеборг', 'trelleborg', 'hamn', 'порт', 'port', 'rostock', 'travemunde',
+      'nyhamnsgatan',
+    ],
+  },
+  {
+    id: 'stromstad-colorline',
+    name: 'Strömstad · Color Line',
+    address: 'Torskholmen, 452 31 Strömstad',
+    city: 'Strömstad',
+    country: 'SE',
+    position: { lat: 58.935797, lon: 11.170935 },
+    terms: [
+      'стрёмстад', 'стремстад', 'stromstad', 'color', 'line', 'torskholmen',
+      'hamn', 'порт', 'port',
+    ],
+  },
+
+  /* ── Norja ─────────────────────────────────────────────────────── */
+
+  {
+    id: 'oslo-yilport',
+    name: 'Oslo · Yilport, Sjursøya',
+    address: 'Sjursøya 9, 0193 Oslo',
+    city: 'Oslo',
+    country: 'NO',
+    position: { lat: 59.888232, lon: 10.755263 },
+    terms: [
+      'осло', 'шурсёйа', 'сюрсойа', 'oslo', 'yilport', 'sjursoya', 'havn',
+      'порт', 'port', 'container', 'kontti',
+    ],
+  },
+  {
+    id: 'oslo-colorline',
+    name: 'Oslo · Color Line, Hjortnes',
+    address: 'Filipstadveien 16, 0250 Oslo',
+    city: 'Oslo',
+    country: 'NO',
+    position: { lat: 59.909079, lon: 10.713785 },
+    terms: [
+      'осло', 'колорлайн', 'хьортнес', 'oslo', 'color', 'line', 'hjortnes', 'filipstad',
+      'filipstadveien', 'kiel', 'havn', 'порт', 'port',
+    ],
+  },
+  {
+    id: 'oslo-vippetangen',
+    name: 'Oslo · Vippetangen',
+    address: 'Akershusstranda 31, 0150 Oslo',
+    city: 'Oslo',
+    country: 'NO',
+    position: { lat: 59.90293, lon: 10.74314 },
+    terms: [
+      'осло', 'виппетанген', 'oslo', 'vippetangen', 'dfds', 'stena', 'akershusstranda',
+      'havn', 'порт', 'port',
+    ],
+  },
+  {
+    id: 'larvik-colorline',
+    name: 'Larvik · Color Line',
+    address: 'Revet 8, 3263 Larvik',
+    city: 'Larvik',
+    country: 'NO',
+    position: { lat: 59.040573, lon: 10.047404 },
+    terms: [
+      'ларвик', 'larvik', 'color', 'line', 'revet', 'hirtshals', 'havn', 'порт', 'port',
+    ],
+  },
+  {
+    id: 'kristiansand-colorline',
+    name: 'Kristiansand · Color Line',
+    address: 'Vestre Strandgate 31, 4611 Kristiansand',
+    city: 'Kristiansand',
+    country: 'NO',
+    position: { lat: 58.144565, lon: 7.991197 },
+    terms: [
+      'кристиансанн', 'kristiansand', 'color', 'line', 'havn', 'порт', 'port',
+    ],
+  },
+  {
+    id: 'sandefjord-colorline',
+    name: 'Sandefjord · Color Line',
+    address: 'Strandpromenaden 20, 3210 Sandefjord',
+    city: 'Sandefjord',
+    country: 'NO',
+    position: { lat: 59.126944, lon: 10.228017 },
+    terms: [
+      'сандефьорд', 'sandefjord', 'color', 'line', 'stromstad', 'havn',
+      'порт', 'port',
+    ],
+  },
+
+  /* ── Tanska ────────────────────────────────────────────────────── */
+
+  {
+    id: 'frederikshavn-dfds',
+    name: 'Frederikshavn · DFDS',
+    address: 'Færgehavnsvej 31, 9900 Frederikshavn',
+    city: 'Frederikshavn',
+    country: 'DK',
+    position: { lat: 57.43459, lon: 10.537014 },
+    terms: [
+      'фредериксхавн', 'frederikshavn', 'dfds', 'faergehavnsvej', 'havn', 'порт', 'port',
+    ],
+  },
+  {
+    id: 'frederikshavn-stena',
+    name: 'Frederikshavn · Stena Line',
+    address: 'Færgehavnsvej 10, 9900 Frederikshavn',
+    city: 'Frederikshavn',
+    country: 'DK',
+    position: { lat: 57.434581, lon: 10.54364 },
+    terms: [
+      'фредериксхавн', 'стена', 'frederikshavn', 'stena', 'line', 'havn', 'порт', 'port',
+    ],
+  },
+  {
+    id: 'hirtshals-colorline',
+    name: 'Hirtshals · Color Line',
+    address: 'Dalsagervej 5, 9850 Hirtshals',
+    city: 'Hirtshals',
+    country: 'DK',
+    position: { lat: 57.576132, lon: 9.986374 },
+    terms: [
+      'хиртсхальс', 'hirtshals', 'color', 'line', 'dalsagervej', 'havn', 'порт', 'port',
+    ],
+  },
+  {
+    id: 'kobenhavn-dfds',
+    name: 'København · DFDS',
+    address: 'Dampfærgevej 30, 2100 København Ø',
+    city: 'København',
+    country: 'DK',
+    position: { lat: 55.70116, lon: 12.595405 },
+    terms: [
+      'копенгаген', 'kobenhavn', 'copenhagen', 'dfds', 'dampfaergevej',
+      'havn', 'порт', 'port',
+    ],
+  },
+  {
+    id: 'esbjerg-dfds',
+    name: 'Esbjerg · DFDS',
+    address: 'Zodiakvej 5, 6700 Esbjerg',
+    city: 'Esbjerg',
+    country: 'DK',
+    position: { lat: 55.453823, lon: 8.488956 },
+    terms: [
+      'эсбьерг', 'esbjerg', 'dfds', 'zodiakvej', 'immingham', 'havn', 'порт', 'port',
+    ],
+  },
 ];
 
-/** Слова запроса без пунктуации и регистра. */
-function tokens(query: string): string[] {
-  return query
+/**
+ * Скандинавские буквы к латинским.
+ *
+ * Диспетчер пишет «Göteborg» и «Mäntyluoto» правильно, а в списке слов
+ * они записаны без диакритики — и поиск не находил ничего. Держать в
+ * terms оба написания каждого слова значит удваивать список и всё равно
+ * забыть половину: у одного порта их пять.
+ *
+ * Складываются обе стороны, поэтому неважно, кто как написал. Норвежские
+ * ø и æ и датское å нормализацией не раскладываются — их приходится
+ * называть поимённо.
+ */
+function fold(value: string): string {
+  return value
     .toLowerCase()
+    .replace(/ø/g, 'o')
+    .replace(/æ/g, 'ae')
+    .replace(/ß/g, 'ss')
+    .normalize('NFD')
+    .replace(/\p{M}/gu, '');
+}
+
+/** Слова запроса без пунктуации, регистра и диакритики. */
+function tokens(query: string): string[] {
+  return fold(query)
     .split(/[^\p{L}\p{N}]+/u)
     .filter((word) => word.length > 0);
 }
@@ -183,7 +537,7 @@ export function findPlaces(query: string): CuratedPlace[] {
   if (words.length === 0) return [];
 
   return PLACES.filter((place) =>
-    words.every((word) => place.terms.some((term) => term.startsWith(word))),
+    words.every((word) => place.terms.some((term) => fold(term).startsWith(word))),
   );
 }
 
@@ -220,15 +574,27 @@ export function toSuggestion(place: CuratedPlace): AddressSuggestion {
  * как случайный набор. Внутри страны алфавит, потому что другого
  * осмысленного порядка у портов нет.
  */
-export function placeCities(): string[] {
-  const seen = new Map<string, string>();
+export function placeCities(): { country: string; cities: string[] }[] {
+  const byCountry = new Map<string, Set<string>>();
 
   for (const place of PLACES) {
-    const key = `${place.country}|${place.city}`;
-    if (!seen.has(key)) seen.set(key, place.city);
+    const cities = byCountry.get(place.country) ?? new Set<string>();
+    cities.add(place.city);
+    byCountry.set(place.country, cities);
   }
 
-  return [...seen.entries()]
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([, city]) => city);
+  /*
+   * Порядок стран задан списком, а не алфавитом: Финляндия первой,
+   * потому что оператор финский и оттуда идёт большинство рейсов, дальше
+   * соседи по часовой стрелке вокруг Ботнического залива. Алфавит
+   * поставил бы Данию во главе полосы, где ей нечего делать.
+   */
+  const order = ['FI', 'SE', 'NO', 'DK'];
+
+  return order
+    .filter((code) => byCountry.has(code))
+    .map((code) => ({
+      country: code,
+      cities: [...byCountry.get(code)!].sort((a, b) => a.localeCompare(b, 'sv')),
+    }));
 }
