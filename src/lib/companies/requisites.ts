@@ -72,6 +72,14 @@ export async function saveRequisitesAction(
     legal_postal_code: text(formData, 'legal_postal_code'),
     legal_city: text(formData, 'legal_city'),
     legal_country: (text(formData, 'legal_country') ?? 'FI').toUpperCase(),
+
+    /*
+     * Язык переписки. Значение из формы принимается только известное:
+     * колонка ограничена check-ограничением, и присланное браузером
+     * «de» отвергла бы база отказом на весь патч — а вместе с ним и
+     * реквизиты, которые человек как раз заполнял.
+     */
+    language: text(formData, 'language') === 'en' ? 'en' : 'fi',
     vat_number: vat,
 
     billing_street: isCarrier || sameAddress ? null : text(formData, 'billing_street'),

@@ -9,6 +9,7 @@ import {
   Field,
   Input,
   InputMono,
+  Select,
   SectionTitle,
 } from '@/components/ui';
 import {
@@ -147,6 +148,28 @@ export function RequisitesForm({ company }: { company: Company }) {
                   onChange={(e) => setVat(e.target.value)}
                   placeholder="FI12345678"
                 />
+              )}
+            </Field>
+
+            {/*
+              * Язык переписки, а не интерфейса.
+              *
+              * Интерфейс каждый переключает себе сам, и переключатель
+              * стоит в шапке. Здесь решается, на каком языке компании
+              * будут приходить письма — приглашение, счёт, отчёт, — и это
+              * решение общее: их читают разные люди, в том числе те, у
+              * кого доступа в кабинет нет вовсе.
+              *
+              * Поле стоит в юридическом блоке рядом со страной: там же,
+              * где остальное, что относится к компании как к стороне
+              * договора, а не к человеку за экраном.
+              */}
+            <Field label={t.requisites.language} hint={t.requisites.languageHint} required>
+              {(p) => (
+                <Select {...p} name="language" required defaultValue={company.language ?? 'fi'}>
+                  <option value="fi">Suomi</option>
+                  <option value="en">English</option>
+                </Select>
               )}
             </Field>
           </div>

@@ -905,6 +905,9 @@ export const en = {
     city: 'Town',
     country: 'Country',
     vat: 'VAT number',
+    language: 'Language of correspondence',
+    languageHint:
+      'The language we send invitations, invoices and reports in. Everyone picks the interface language for themselves in the top bar.',
     vatHint: 'Derived from the Y-tunnus. Correct it if you use a VAT group number',
     vatInvalid: 'Format: country code plus 2–12 characters, for example FI12345678',
 

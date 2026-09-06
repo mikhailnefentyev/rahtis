@@ -914,6 +914,9 @@ export const fi = {
     city: 'Kaupunki',
     country: 'Maa',
     vat: 'ALV-numero',
+    language: 'Viestinnän kieli',
+    languageHint:
+      'Millä kielellä lähetämme kutsut, laskut ja raportit. Käyttöliittymän kielen jokainen valitsee itse yläpalkista.',
     vatHint: 'Muodostettu Y-tunnuksesta. Korjaa, jos käytät ALV-ryhmän tunnusta',
     vatInvalid: 'Muoto: maatunnus ja 2–12 merkkiä, esimerkiksi FI12345678',
 
