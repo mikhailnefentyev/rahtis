@@ -44,8 +44,21 @@ const FONT =
  */
 const LEGAL = 'Aivomaa Oy · Y-tunnus 3592993-6';
 
-/** Подпись в теле. Не ставится там, где письмо пришло НАМ, а не от нас. */
+/**
+ * Финские умолчания для подписи, шапки и оговорки про пароль.
+ *
+ * Строки живут здесь, а не приходят из lib/email/text.ts, по той же
+ * причине, что и LEGAL: модуль читает не только приложение, но и
+ * scripts/send-test-email.mjs голым Node, который не знает ни алиаса «@/»,
+ * ни импорта без расширения. Один импорт сюда — и проверка письма
+ * перестанет запускаться.
+ *
+ * Поэтому язык приезжает параметрами, а умолчание остаётся финским:
+ * скрипт вызывает рендер без них и получает то же письмо, что и раньше.
+ */
 const SIGNATURE = 'Rahtis Team';
+const TAGLINE = 'Irtoperät ja kontit · Skandinavia';
+const NEVER_ASK = 'Emme koskaan kysy salasanaasi sähköpostitse emmekä puhelimessa.';
 
 export type EmailBlock =
   | { kind: 'text'; value: string }
@@ -114,6 +127,9 @@ export function renderEmail(input: {
   operatorEmail: string;
   /** Письмо пришло НАМ, а не от нас — тогда подписи быть не должно. */
   incoming?: boolean;
+  /** Язык шапки и оговорки. Без них — по-фински, как было. */
+  tagline?: string;
+  neverAsk?: string;
 }): string {
   return `<!doctype html>
 <html lang="fi">
@@ -134,7 +150,7 @@ export function renderEmail(input: {
 
     <tr><td bgcolor="${INK}" style="padding:20px 28px;">
       <span style="font:700 20px/1 ${FONT};letter-spacing:0.14em;color:#ffffff;">RAHTI<span style="color:${ACCENT_BRIGHT};">S</span></span>
-      <span style="display:block;margin-top:7px;font:600 10px/1.2 ${FONT};letter-spacing:0.13em;text-transform:uppercase;color:#8fa3bd;">Irtoperät ja kontit · Skandinavia</span>
+      <span style="display:block;margin-top:7px;font:600 10px/1.2 ${FONT};letter-spacing:0.13em;text-transform:uppercase;color:#8fa3bd;">${escape(input.tagline ?? TAGLINE)}</span>
     </td></tr>
 
     <tr><td style="padding:28px;">
@@ -148,7 +164,7 @@ export function renderEmail(input: {
         <a href="mailto:${escape(input.operatorEmail)}" style="color:${ACCENT};text-decoration:none;">${escape(input.operatorEmail)}</a>
       </p>
       <p style="margin:10px 0 0;font:400 11px/1.5 ${FONT};color:#8894a6;">
-        Emme koskaan kysy salasanaasi sähköpostitse emmekä puhelimessa.
+        ${escape(input.neverAsk ?? NEVER_ASK)}
       </p>
     </td></tr>
 
@@ -172,6 +188,8 @@ export function renderText(input: {
   blocks: EmailBlock[];
   operatorEmail: string;
   incoming?: boolean;
+  signature?: string;
+  neverAsk?: string;
 }): string {
   const body = input.blocks
     .map((item) => {
@@ -191,9 +209,9 @@ export function renderText(input: {
     input.heading,
     '',
     body,
-    ...(input.incoming ? [] : ['', SIGNATURE]),
+    ...(input.incoming ? [] : ['', input.signature ?? SIGNATURE]),
     '',
-    'Emme koskaan kysy salasanaasi sähköpostitse emmekä puhelimessa.',
+    input.neverAsk ?? NEVER_ASK,
     '',
     LEGAL,
     input.operatorEmail,

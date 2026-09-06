@@ -3,6 +3,7 @@
 import { createHmac } from 'node:crypto';
 import { headers } from 'next/headers';
 import { sendEmail, operatorInbox } from '@/lib/email';
+import { emailLocaleOf } from '@/lib/email/text';
 import { recoveryEmail } from '@/lib/email/templates/recovery';
 import { getDictionary, isLocale, defaultLocale, type Locale } from '@/lib/i18n';
 import { confirmLink } from '@/lib/auth/links';
@@ -136,7 +137,32 @@ export async function requestPasswordReset(
     next: '/set-password',
   });
 
-  await sendEmail(recoveryEmail({ to: email, link, operatorEmail: operatorInbox() }));
+  /*
+   * Язык ищется по адресу почты, а не берётся из формы.
+   *
+   * Форма открыта на том языке, который выбрал браузер или предыдущая
+   * страница, а письмо должно прийти на языке переписки с компанией — том
+   * же, на котором пришло приглашение. Человек, восстанавливающий пароль,
+   * узнаёт письмо по виду, и смена языка посреди переписки читается как
+   * подделка.
+   *
+   * Компания может не найтись: адрес чужой или заведён не как контактный.
+   * Тогда финский по умолчанию — как и у всего остального.
+   */
+  const { data: company } = await admin
+    .from('companies')
+    .select('language')
+    .eq('contact_email', email)
+    .maybeSingle();
+
+  await sendEmail(
+    recoveryEmail({
+      to: email,
+      link,
+      operatorEmail: operatorInbox(),
+      locale: emailLocaleOf(company?.language),
+    }),
+  );
 
   return wait();
 }

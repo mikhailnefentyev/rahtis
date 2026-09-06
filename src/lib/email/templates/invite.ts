@@ -1,11 +1,14 @@
 import { renderEmail, renderText, type EmailBlock } from '../layout';
+import { emailText, type EmailLocale } from '../text';
 import type { EmailMessage } from '../types';
 
 /**
  * Приглашение в платформу.
  *
- * По-фински и без вариантов языка: рынок финский, а английский кабинет
- * существует для тех, кто читает интерфейс, а не для переписки.
+ * Язык — тот, что записан у компании: она указала его, подавая заявку.
+ * Раньше письмо было финским всегда, и это было верно, пока рынок был
+ * финским; датский экспедитор получил бы коды доступа на языке, которого
+ * не знает, и без переключателя, какой есть у кабинета.
  *
  * Ссылка одноразовая и живёт сутки — это условие Supabase, а не наше.
  * Про это сказано прямо: человек, открывший письмо через неделю, должен
@@ -20,36 +23,36 @@ export function inviteEmail(input: {
   companyId: string;
   link: string;
   operatorEmail: string;
+  locale: EmailLocale;
 }): EmailMessage {
-  const heading = `${input.companyName} on hyväksytty RAHTIS-palveluun`;
+  const t = emailText(input.locale);
+  const heading = t.invite.heading(input.companyName);
 
   const blocks: EmailBlock[] = [
-    { kind: 'text', value: 'Hei,' },
-    {
-      kind: 'text',
-      value:
-        'Yrityksenne tiedot on tarkistettu ja pääsy palveluun on avattu. ' +
-        'Aseta salasana alla olevasta linkistä, niin pääset kirjautumaan sisään.',
-    },
-    { kind: 'button', label: 'Aseta salasana', href: input.link },
-    {
-      kind: 'note',
-      value:
-        'Linkki on kertakäyttöinen ja voimassa vuorokauden. ' +
-        `Jos se ehtii vanhentua, pyydä uusi osoitteesta ${input.operatorEmail}.`,
-    },
+    { kind: 'text', value: t.greeting },
+    { kind: 'text', value: t.invite.body },
+    { kind: 'button', label: t.invite.button, href: input.link },
+    { kind: 'note', value: t.invite.note(input.operatorEmail) },
   ];
 
   return {
     template: 'invite',
     to: input.to,
-    subject: `RAHTIS · tunnukset yritykselle ${input.companyName}`,
-    text: renderText({ heading, blocks, operatorEmail: input.operatorEmail }),
-    html: renderEmail({
+    subject: t.invite.subject(input.companyName),
+    text: renderText({
       heading,
-      preheader: 'Aseta salasana ja kirjaudu sisään.',
       blocks,
       operatorEmail: input.operatorEmail,
+      signature: t.signature,
+      neverAsk: t.neverAsk,
+    }),
+    html: renderEmail({
+      heading,
+      preheader: t.invite.preheader,
+      blocks,
+      operatorEmail: input.operatorEmail,
+      tagline: t.brandTagline,
+      neverAsk: t.neverAsk,
     }),
     companyId: input.companyId,
   };

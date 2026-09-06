@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { explainAdmin, withAdminError } from '@/lib/admin/errors';
 import { COMMISSION_BPS, payoutCents } from '@/lib/config';
 import { operatorInbox } from '@/lib/email';
+import { emailLocaleOf } from '@/lib/email/text';
 import { invoicedEmail, settledEmail } from '@/lib/email/templates/billing';
 import { getViewer } from '@/lib/auth/viewer';
 import { createFormat } from '@/lib/format';
@@ -80,7 +81,7 @@ async function announce(order: Order, next: BillingStatus, locale: Locale): Prom
 
   const { data: company } = await supabase
     .from('companies')
-    .select('name, contact_email, billing_email')
+    .select('name, contact_email, billing_email, language')
     .eq('id', companyId)
     .single();
 
@@ -122,6 +123,7 @@ async function announce(order: Order, next: BillingStatus, locale: Locale): Prom
             amount,
             invoiceRef: order.invoice_ref,
             operatorEmail: operatorInbox(),
+            locale: emailLocaleOf(company.language),
           })
         : settledEmail({
             to,
@@ -130,6 +132,7 @@ async function announce(order: Order, next: BillingStatus, locale: Locale): Prom
             orderRef: order.ref,
             amount,
             operatorEmail: operatorInbox(),
+            locale: emailLocaleOf(company.language),
           })),
     },
   });

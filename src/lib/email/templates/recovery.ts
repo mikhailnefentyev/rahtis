@@ -1,4 +1,5 @@
 import { renderEmail, renderText, type EmailBlock } from '../layout';
+import { emailText, type EmailLocale } from '../text';
 import type { EmailMessage } from '../types';
 
 /**
@@ -13,41 +14,46 @@ import type { EmailMessage } from '../types';
  * Человек, получивший такое письмо ни с того ни с сего, должен понимать,
  * что его учётная запись цела: ссылку никто, кроме него, не откроет, и
  * пароль сам по себе не меняется.
+ *
+ * Язык здесь единственное место, где он может не найтись: пароль
+ * восстанавливают по адресу почты, а компания к этому моменту ещё не
+ * известна. Тогда письмо уходит по-фински — тем же умолчанием, что у
+ * компании без выбранного языка.
  */
 export function recoveryEmail(input: {
   to: string;
   link: string;
   operatorEmail: string;
+  locale: EmailLocale;
 }): EmailMessage {
-  const heading = 'Salasanan palautus';
+  const t = emailText(input.locale);
+  const heading = t.recovery.heading;
 
   const blocks: EmailBlock[] = [
-    { kind: 'text', value: 'Hei,' },
-    {
-      kind: 'text',
-      value:
-        'Pyysit uutta salasanaa RAHTIS-tunnuksellesi. Aseta se alla olevasta linkistä.',
-    },
-    { kind: 'button', label: 'Aseta uusi salasana', href: input.link },
-    {
-      kind: 'note',
-      value:
-        'Linkki on kertakäyttöinen ja voimassa tunnin. ' +
-        'Jos et pyytänyt uutta salasanaa, voit jättää viestin huomiotta — ' +
-        'salasanasi ei muutu ennen kuin linkkiä käytetään.',
-    },
+    { kind: 'text', value: t.greeting },
+    { kind: 'text', value: t.recovery.body },
+    { kind: 'button', label: t.recovery.button, href: input.link },
+    { kind: 'note', value: t.recovery.note },
   ];
 
   return {
     template: 'recovery',
     to: input.to,
-    subject: 'RAHTIS · salasanan palautus',
-    text: renderText({ heading, blocks, operatorEmail: input.operatorEmail }),
-    html: renderEmail({
+    subject: t.recovery.subject,
+    text: renderText({
       heading,
-      preheader: 'Aseta uusi salasana tunnin sisällä.',
       blocks,
       operatorEmail: input.operatorEmail,
+      signature: t.signature,
+      neverAsk: t.neverAsk,
+    }),
+    html: renderEmail({
+      heading,
+      preheader: t.recovery.preheader,
+      blocks,
+      operatorEmail: input.operatorEmail,
+      tagline: t.brandTagline,
+      neverAsk: t.neverAsk,
     }),
   };
 }

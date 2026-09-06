@@ -1,4 +1,5 @@
 import { renderEmail, renderText, type EmailBlock } from '../layout';
+import { emailText, type EmailLocale } from '../text';
 import type { EmailMessage } from '../types';
 
 /**
@@ -29,6 +30,10 @@ import type { EmailMessage } from '../types';
  * должен увидеть, с каким Y-tunnus заявка ушла на самом деле. Опечатка
  * в номере — самая частая причина отказа, и заметить её лучше сейчас,
  * а не после проверки.
+ *
+ * Язык — тот, на котором была открыта форма заявки: человек уже выбрал,
+ * на каком языке ему читать, и спрашивать второй раз незачем. Это же
+ * значение записывается компании и дальше служит языком всей переписки.
  */
 export function applicationReceivedEmail(input: {
   to: string;
@@ -37,39 +42,25 @@ export function applicationReceivedEmail(input: {
   businessId: string;
   role: string;
   operatorEmail: string;
+  locale: EmailLocale;
 }): EmailMessage {
-  const heading = 'Hakemuksenne on vastaanotettu';
+  const t = emailText(input.locale);
+  const heading = t.application.heading;
 
   const blocks: EmailBlock[] = [
-    { kind: 'text', value: 'Hei,' },
-    {
-      kind: 'text',
-      value:
-        'Kiitos hakemuksesta. Se on kirjattu ja siirtynyt tarkastukseen: ' +
-        'käymme yrityksenne tiedot läpi PRH:n ja YTJ:n rekistereistä.',
-    },
+    { kind: 'text', value: t.greeting },
+    { kind: 'text', value: t.application.thanks },
     {
       kind: 'facts',
       rows: [
-        ['Yritys', input.companyName],
-        ['Y-tunnus', input.businessId],
-        ['Rooli', input.role],
-        ['Sähköposti', input.to],
+        [t.application.fieldCompany, input.companyName],
+        [t.application.fieldBusinessId, input.businessId],
+        [t.application.fieldRole, input.role],
+        [t.application.fieldEmail, input.to],
       ],
     },
-    {
-      kind: 'text',
-      value:
-        'Kun hakemus on hyväksytty, lähetämme tähän samaan osoitteeseen linkin, ' +
-        'jolla asetat salasanan ja pääset kirjautumaan sisään. Sitä ennen ' +
-        'palveluun ei pääse kirjautumaan.',
-    },
-    {
-      kind: 'note',
-      value:
-        'Tarkastuksen tekee ihminen, joten vastaus tulee arkipäivien aikana. ' +
-        `Jos jokin tiedoista on väärin tai haluat kysyä hakemuksesta, vastaa tähän viestiin tai kirjoita osoitteeseen ${input.operatorEmail}.`,
-    },
+    { kind: 'text', value: t.application.next },
+    { kind: 'note', value: t.application.note(input.operatorEmail) },
   ];
 
   return {
@@ -77,13 +68,21 @@ export function applicationReceivedEmail(input: {
     to: input.to,
     toName: input.companyName,
     replyTo: input.operatorEmail,
-    subject: `RAHTIS · hakemus vastaanotettu — ${input.companyName}`,
-    text: renderText({ heading, blocks, operatorEmail: input.operatorEmail }),
-    html: renderEmail({
+    subject: t.application.subject(input.companyName),
+    text: renderText({
       heading,
-      preheader: 'Hakemus on kirjattu ja siirtynyt tarkastukseen.',
       blocks,
       operatorEmail: input.operatorEmail,
+      signature: t.signature,
+      neverAsk: t.neverAsk,
+    }),
+    html: renderEmail({
+      heading,
+      preheader: t.application.preheader,
+      blocks,
+      operatorEmail: input.operatorEmail,
+      tagline: t.brandTagline,
+      neverAsk: t.neverAsk,
     }),
     companyId: input.companyId,
   };

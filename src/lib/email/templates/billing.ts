@@ -1,4 +1,5 @@
 import { renderEmail, renderText, type EmailBlock } from '../layout';
+import { emailText, type EmailLocale } from '../text';
 import type { EmailMessage } from '../types';
 
 /**
@@ -27,24 +28,35 @@ function build(input: {
   lead: string;
   rows: Array<[string, string]>;
   operatorEmail: string;
+  locale: EmailLocale;
 }): EmailMessage {
+  const t = emailText(input.locale);
+
   const blocks: EmailBlock[] = [
-    { kind: 'text', value: 'Hei,' },
+    { kind: 'text', value: t.greeting },
     { kind: 'text', value: input.lead },
     { kind: 'facts', rows: input.rows },
-    { kind: 'note', value: `Kysymykset: ${input.operatorEmail}` },
+    { kind: 'note', value: t.billing.questions(input.operatorEmail) },
   ];
 
   return {
     template: input.template,
     to: input.to,
     subject: input.subject,
-    text: renderText({ heading: input.heading, blocks, operatorEmail: input.operatorEmail }),
+    text: renderText({
+      heading: input.heading,
+      blocks,
+      operatorEmail: input.operatorEmail,
+      signature: t.signature,
+      neverAsk: t.neverAsk,
+    }),
     html: renderEmail({
       heading: input.heading,
       preheader: input.preheader,
       blocks,
       operatorEmail: input.operatorEmail,
+      tagline: t.brandTagline,
+      neverAsk: t.neverAsk,
     }),
     companyId: input.companyId,
   };
@@ -58,32 +70,35 @@ export function invoicedEmail(input: {
   amount: string;
   invoiceRef: string | null;
   operatorEmail: string;
+  locale: EmailLocale;
 }): EmailMessage {
+  const t = emailText(input.locale);
+
   const rows: Array<[string, string]> = [
-    ['Kuljetus', input.orderRef],
-    ['Summa (alv 0 %)', input.amount],
+    [t.billing.fieldOrder, input.orderRef],
+    [t.billing.fieldAmount, input.amount],
   ];
-  if (input.invoiceRef) rows.push(['Laskun numero', input.invoiceRef]);
+  if (input.invoiceRef) rows.push([t.billing.fieldInvoice, input.invoiceRef]);
 
   return build({
     template: 'billing.invoiced',
     to: input.to,
     companyId: input.companyId,
-    subject: `RAHTIS · lasku kuljetuksesta ${input.orderRef}`,
-    heading: `Lasku kuljetuksesta ${input.orderRef}`,
-    preheader: `Summa ${input.amount} (alv 0 %).`,
+    subject: t.billing.invoicedSubject(input.orderRef),
+    heading: t.billing.invoicedHeading(input.orderRef),
+    preheader: t.billing.preheader(input.amount),
     /*
-     * Alv 0 %, ei 25,5 %.
+     * Ставка ноль, а не 25,5 %.
      *
-     * Asiakkaat ovat ulkomaisia yrityksiä, ja kuljetuspalvelu EU-maiden
-     * alv-velvollisten välillä menee käännetyllä verovelvollisuudella.
-     * Vanha teksti lupasi laskuun veron, jota siinä ei ole — ks.
-     * VAT_BPS lib/config.ts.
+     * Заказчики — иностранные компании, и перевозка между плательщиками
+     * ALV разных стран ЕС идёт по обратному начислению. Прежний текст
+     * обещал к счёту налог, которого в нём нет, — см. VAT_BPS в
+     * lib/config.ts.
      */
-    lead:
-      'Kuljetuksesta on lähetetty lasku. Käännetty verovelvollisuus: ostaja tilittää veron omassa maassaan.',
+    lead: t.billing.invoicedLead,
     rows,
     operatorEmail: input.operatorEmail,
+    locale: input.locale,
   });
 }
 
@@ -94,20 +109,23 @@ export function settledEmail(input: {
   orderRef: string;
   amount: string;
   operatorEmail: string;
+  locale: EmailLocale;
 }): EmailMessage {
+  const t = emailText(input.locale);
+
   return build({
     template: 'billing.settled',
     to: input.to,
     companyId: input.companyId,
-    subject: `RAHTIS · tilitys kuljetuksesta ${input.orderRef}`,
-    heading: `Tilitys kuljetuksesta ${input.orderRef}`,
-    preheader: `Summa ${input.amount} (alv 0 %).`,
-    lead:
-      'Kuljetuksesta on maksettu tilitys. Summa on alv 0 %: käännetty verovelvollisuus.',
+    subject: t.billing.settledSubject(input.orderRef),
+    heading: t.billing.settledHeading(input.orderRef),
+    preheader: t.billing.preheader(input.amount),
+    lead: t.billing.settledLead,
     rows: [
-      ['Kuljetus', input.orderRef],
-      ['Summa (alv 0 %)', input.amount],
+      [t.billing.fieldOrder, input.orderRef],
+      [t.billing.fieldAmount, input.amount],
     ],
     operatorEmail: input.operatorEmail,
+    locale: input.locale,
   });
 }

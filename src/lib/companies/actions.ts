@@ -6,6 +6,7 @@ import { explainAdmin, withAdminError } from '@/lib/admin/errors';
 import { confirmLink } from '@/lib/auth/links';
 import { siteUrl } from '@/lib/config';
 import { EMAIL_LOCALE, emailReplyTo, operatorInbox, sendEmail } from '@/lib/email';
+import { emailLocaleOf, type EmailLocale } from '@/lib/email/text';
 import {
   applicationFiledEmail,
   applicationReceivedEmail,
@@ -64,6 +65,13 @@ export async function submitApplicationAction(
       name,
       business_id: businessId,
       contact_email: email,
+      /*
+       * Язык переписки — тот, на котором открыта форма. Человек уже
+       * выбрал, на каком языке ему читать; спрашивать второй раз о том,
+       * на что он ответил действием, значит не доверять собственному
+       * переключателю.
+       */
+      language: emailLocaleOf(locale),
     })
     .select('id')
     .single();
@@ -82,6 +90,7 @@ export async function submitApplicationAction(
     businessId,
     email,
     kind,
+    locale: emailLocaleOf(locale),
   });
 
   return { error: null, done: true };
@@ -113,10 +122,17 @@ async function announceApplication(input: {
   businessId: string;
   email: string;
   kind: CompanyRole;
+  locale: EmailLocale;
 }): Promise<void> {
-  /* Письма платформы по-фински, независимо от языка формы. */
-  const t = await getDictionary(EMAIL_LOCALE);
-  const role = t.role[input.kind];
+  /*
+   * Роль называется дважды и по-разному.
+   *
+   * Оператору — по-фински: письмо о новой заявке читает Aivomaa, и
+   * переводить его не для кого. Заявителю — на его языке: он выбрал его,
+   * подавая заявку, и по-фински «Kuljetusliike» ему ничего не скажет.
+   */
+  const forOperator = await getDictionary(EMAIL_LOCALE);
+  const forApplicant = await getDictionary(input.locale);
 
   await sendEmail(
     applicationFiledEmail({
@@ -125,7 +141,7 @@ async function announceApplication(input: {
       companyName: input.companyName,
       companyId: input.companyId,
       businessId: input.businessId,
-      role,
+      role: forOperator.role[input.kind],
       queueLink: `${siteUrl()}/${EMAIL_LOCALE}/admin`,
     }),
   );
@@ -136,8 +152,9 @@ async function announceApplication(input: {
       companyName: input.companyName,
       companyId: input.companyId,
       businessId: input.businessId,
-      role,
+      role: forApplicant.role[input.kind],
       operatorEmail: emailReplyTo(),
+      locale: input.locale,
     }),
   );
 }
@@ -192,7 +209,13 @@ export async function approveCompanyAction(formData: FormData): Promise<void> {
   }
 
   if (isCompanyRole(company.kind)) {
-    const sent = await sendInvite(companyId, company.name, company.contact_email, company.kind);
+    const sent = await sendInvite(
+      companyId,
+      company.name,
+      company.contact_email,
+      company.kind,
+      company.language,
+    );
     revalidatePath(`/${locale}/admin`);
 
     /*
@@ -240,12 +263,18 @@ export async function resendInviteAction(formData: FormData): Promise<void> {
 
   const { data: company } = await supabase
     .from('companies')
-    .select('name, contact_email, kind')
+    .select('name, contact_email, kind, language')
     .eq('id', companyId)
     .single();
 
   if (company && isCompanyRole(company.kind)) {
-    const sent = await sendInvite(companyId, company.name, company.contact_email, company.kind);
+    const sent = await sendInvite(
+      companyId,
+      company.name,
+      company.contact_email,
+      company.kind,
+      company.language,
+    );
     revalidatePath(`/${locale}/admin`);
     if (!sent) redirect(withAdminError(`/${locale}/admin`, 'inviteNotSent'));
     return;
@@ -361,6 +390,7 @@ async function sendInvite(
   companyName: string,
   email: string,
   role: CompanyRole,
+  language: string | null,
 ): Promise<boolean> {
   const admin = createAdminClient();
   const site = siteUrl();
@@ -418,6 +448,7 @@ async function sendInvite(
       companyId,
       link,
       operatorEmail: operatorInbox(),
+      locale: emailLocaleOf(language),
     }),
   );
 

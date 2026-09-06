@@ -92,6 +92,7 @@ export type Database = {
           iban: string | null
           id: string
           kind: Database["public"]["Enums"]["party_role"]
+          language: string
           legal_city: string | null
           legal_country: string | null
           legal_name: string | null
@@ -126,6 +127,7 @@ export type Database = {
           iban?: string | null
           id?: string
           kind: Database["public"]["Enums"]["party_role"]
+          language?: string
           legal_city?: string | null
           legal_country?: string | null
           legal_name?: string | null
@@ -160,6 +162,7 @@ export type Database = {
           iban?: string | null
           id?: string
           kind?: Database["public"]["Enums"]["party_role"]
+          language?: string
           legal_city?: string | null
           legal_country?: string | null
           legal_name?: string | null
@@ -1567,6 +1570,7 @@ export type Database = {
           iban: string | null
           id: string
           kind: Database["public"]["Enums"]["party_role"]
+          language: string
           legal_city: string | null
           legal_country: string | null
           legal_name: string | null
@@ -2185,6 +2189,7 @@ export type Database = {
           iban: string | null
           id: string
           kind: Database["public"]["Enums"]["party_role"]
+          language: string
           legal_city: string | null
           legal_country: string | null
           legal_name: string | null
@@ -2247,6 +2252,7 @@ export type Database = {
           iban: string | null
           id: string
           kind: Database["public"]["Enums"]["party_role"]
+          language: string
           legal_city: string | null
           legal_country: string | null
           legal_name: string | null
@@ -2716,6 +2722,7 @@ export type Database = {
           iban: string | null
           id: string
           kind: Database["public"]["Enums"]["party_role"]
+          language: string
           legal_city: string | null
           legal_country: string | null
           legal_name: string | null
