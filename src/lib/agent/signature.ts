@@ -40,7 +40,7 @@ export function signOutgoing(secret: string, body: string) {
   };
 }
 
-export type VerifyResult = { ok: true } | { ok: false; reason: string };
+export type VerifyResult = { ok: true } | { ok: false; reason: string; got?: string };
 
 /**
  * Проверка входящего запроса от n8n.
@@ -67,7 +67,18 @@ export function verifyIncoming(request: Request, body: string): VerifyResult {
   const given = Buffer.from(signature);
 
   if (expected.length !== given.length || !timingSafeEqual(expected, given)) {
-    return { ok: false, reason: 'signature mismatch' };
+    /*
+     * К отказу прикладывается то, что мы посчитали своим: длина тела и
+     * метка времени. Секрета это не выдаёт — вызывающий и так знает, что
+     * прислал, — зато отличает «разошлись секреты» от «тело изменилось в
+     * пути». Без этого расхождение видно только как слово mismatch, и
+     * искать его приходится наугад.
+     */
+    return {
+      ok: false,
+      reason: 'signature mismatch',
+      got: `${Buffer.byteLength(body)} bytes, ts ${timestamp}`,
+    };
   }
 
   return { ok: true };

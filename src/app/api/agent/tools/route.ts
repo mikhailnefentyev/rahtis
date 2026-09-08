@@ -28,7 +28,7 @@ export async function POST(request: Request) {
 
   const check = verifyIncoming(request, body);
   if (!check.ok) {
-    return Response.json({ error: check.reason }, { status: 401 });
+    return Response.json({ error: check.reason, got: check.got ?? null }, { status: 401 });
   }
 
   let payload: {

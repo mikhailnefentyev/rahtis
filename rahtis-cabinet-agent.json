@@ -289,7 +289,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Итог прогона. Платформа получает не только «да/нет», но и шаг, на\n// котором всё встало: без этого отладка сводится к угадыванию.\nconst signed = $('Подпись: ответ').all();\nconst last = signed[signed.length - 1].json;\nconst parsed = $('Разобрать ответ').all();\nconst modelError = parsed.length ? parsed[parsed.length - 1].json.model_error : null;\nconst replyError = $json.error ? String($json.error.message || $json.error).slice(0, 300) : null;\nreturn [{ json: {\n  ok: !replyError && !modelError,\n  stage: replyError ? 'reply' : (modelError ? 'model' : null),\n  detail: replyError || modelError || null,\n  reply: last.reply,\n} }];"
+        "jsCode": "// Итог прогона. Платформа получает не только «да/нет», но и шаг, на\n// котором всё встало: без этого отладка сводится к угадыванию.\nconst signed = $('Подпись: ответ').all();\nconst last = signed[signed.length - 1].json;\nconst parsed = $('Разобрать ответ').all();\nconst modelError = parsed.length ? parsed[parsed.length - 1].json.model_error : null;\n// Что именно подписали и что на это сказал сервер. Обе стороны считают\n// подпись от одной строки; расхождение видно только если сравнить их\n// длины и метки времени, а по одному слову «mismatch» не разобрать.\nconst replyError = $json.error\n  ? ('подписал ' + last.body.length + ' Б, метка ' + last.timestamp + '; сервер: ' + JSON.stringify($json).slice(0, 300))\n  : null;\nreturn [{ json: {\n  ok: !replyError && !modelError,\n  stage: replyError ? 'reply' : (modelError ? 'model' : null),\n  detail: replyError || modelError || null,\n  reply: last.reply,\n} }];"
       },
       "id": "done",
       "name": "Готово",
