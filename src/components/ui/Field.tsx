@@ -74,7 +74,12 @@ export function InputMono({ className, ...props }: React.InputHTMLAttributes<HTM
   return <Input className={cn('font-mono tracking-tight', className)} {...props} />;
 }
 
-export function Textarea({ className, ...props }: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
+/*
+ * ComponentProps, а не TextareaHTMLAttributes: в React 19 ref — обычное
+ * свойство, и с ним оно доезжает до самого поля. С прежним типом ref
+ * терялся молча, и обращаться к полю приходилось через форму.
+ */
+export function Textarea({ className, ...props }: React.ComponentProps<'textarea'>) {
   return <textarea className={cn(controlClass, 'resize-y py-2 leading-relaxed', className)} {...props} />;
 }
 

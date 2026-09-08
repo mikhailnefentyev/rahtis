@@ -96,7 +96,12 @@ export async function deliverDispatch({ url, secret, body, conversationId }: Del
       method: 'POST',
       headers: signOutgoing(secret, body),
       body,
-      signal: AbortSignal.timeout(10_000),
+      /*
+       * Двадцать секунд, а не десять: ответа теперь ждёт человек, и
+       * круг с вызовом инструментов в десять не укладывался. Если не
+       * успеет и это — лента дождётся ответа опросом.
+       */
+      signal: AbortSignal.timeout(20_000),
     });
 
     /*

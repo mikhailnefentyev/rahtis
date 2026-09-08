@@ -1,9 +1,7 @@
-import { Card, CardBody, Mono } from '@/components/ui';
+import { Card, CardBody } from '@/components/ui';
 import { getI18n, type Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
-import { AgentChatForm } from './AgentChatForm';
-import { AgentChatLog } from './AgentChatLog';
-import { AgentChatPoll } from './AgentChatPoll';
+import { AgentChatLive, type ChatMessage } from './AgentChatLive';
 
 /**
  * Окно чата с агентом в кабинете.
@@ -12,16 +10,23 @@ import { AgentChatPoll } from './AgentChatPoll';
  * переписка, и делить её на обращения значило бы каждый раз объяснять
  * заново, о какой компании речь.
  *
- * Серверная часть отдельно от формы: лента и история читаются на
- * сервере, в браузер уезжает только поле ввода. Переписка может быть
- * длинной, и тащить её через клиентский компонент незачем.
+ * Сервер отдаёт историю и уходит. Дальше лента живёт в браузере: вопрос
+ * появляется мгновенно, ответ дорисовывается на место, страница не
+ * перерисовывается. Раньше каждое сообщение стоило полной перерисовки
+ * кабинета — она и подбрасывала страницу, теряя прокрутку.
  */
-export async function AgentChat({ locale, role }: { locale: Locale; role: 'CARRIER' | 'SHIPPER' | 'ADMIN' }) {
-  const [{ t, f }, supabase] = await Promise.all([getI18n(locale), createClient()]);
+export async function AgentChat({
+  locale,
+  role,
+}: {
+  locale: Locale;
+  role: 'CARRIER' | 'SHIPPER' | 'ADMIN';
+}) {
+  const [{ t }, supabase] = await Promise.all([getI18n(locale), createClient()]);
 
   const { data: conversation } = await supabase
     .from('conversations')
-    .select('id, pending_since')
+    .select('id')
     .eq('audience', role)
     .order('last_message_at', { ascending: false })
     .limit(1)
@@ -36,14 +41,6 @@ export async function AgentChat({ locale, role }: { locale: Locale; role: 'CARRI
         .limit(100)
     : { data: [] };
 
-  const list = messages ?? [];
-
-  const who = {
-    USER: t.chat.you,
-    AGENT: t.chat.agent,
-    OPERATOR: t.chat.operator,
-  } as const;
-
   return (
     <Card className="mt-4">
       <CardBody className="flex flex-col gap-3">
@@ -52,58 +49,10 @@ export async function AgentChat({ locale, role }: { locale: Locale; role: 'CARRI
           <p className="mt-1 text-[13px] text-ink-muted">{t.chat.hint}</p>
         </div>
 
-        {list.length === 0 ? (
-          <p className="text-[13px] text-ink-muted">{t.chat.emptyHint}</p>
-        ) : (
-          <AgentChatLog count={list.length}>
-            {list.map((message) => {
-              const own = message.sender === 'USER';
-
-              return (
-                <li
-                  key={message.id}
-                  className={own ? 'flex flex-col items-end' : 'flex flex-col items-start'}
-                >
-                  <span className="label-micro mb-1 text-ink-faint">
-                    {who[message.sender]} · <Mono>{f.time(message.created_at)}</Mono>
-                  </span>
-                  <span
-                    className={
-                      own
-                        ? 'max-w-[85%] rounded-xl rounded-br-[4px] border border-accent-line bg-accent-wash px-3 py-2 text-[13px] leading-snug whitespace-pre-wrap'
-                        : 'max-w-[85%] rounded-xl rounded-bl-[4px] border border-line bg-sunken px-3 py-2 text-[13px] leading-snug whitespace-pre-wrap'
-                    }
-                  >
-                    {message.body}
-                  </span>
-                </li>
-              );
-            })}
-          </AgentChatLog>
-        )}
-
-        {/*
-          * «Агент думает» рисуется по времени отправки, а не по флагу:
-          * зависший запрос видно по возрасту, а флаг о возрасте молчит.
-          *
-          * Строка занимает место и когда молчит: появляясь и исчезая, она
-          * толкала форму под собой, и поле ввода уезжало из-под курсора.
-          */}
-        <p
-          aria-live="polite"
-          className="flex min-h-[18px] items-center gap-2 text-[13px] text-ink-muted"
-        >
-          {conversation?.pending_since && (
-            <>
-              <span className="agent-pulse" aria-hidden="true" />
-              {t.chat.thinking}
-            </>
-          )}
-        </p>
-
-        <AgentChatPoll pending={Boolean(conversation?.pending_since)} />
-
-        <AgentChatForm locale={locale} conversationId={conversation?.id ?? null} />
+        <AgentChatLive
+          initial={(messages ?? []) as ChatMessage[]}
+          conversationId={conversation?.id ?? null}
+        />
       </CardBody>
     </Card>
   );
