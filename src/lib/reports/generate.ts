@@ -270,7 +270,7 @@ async function issue(
 
   if (upload) throw new Error(`загрузка: ${upload.message}`);
 
-  await admin.from('weekly_reports').upsert(
+  const { data: saved } = await admin.from('weekly_reports').upsert(
     {
       week,
       company_id: companyId,
@@ -291,7 +291,9 @@ async function issue(
       generated_at: new Date().toISOString(),
     },
     { onConflict: 'week,company_id,role' },
-  );
+  )
+    .select('id')
+    .single();
 
   /*
    * Замороженной компании отчёт выпускается, но не рассылается: данные
@@ -307,7 +309,13 @@ async function issue(
     kind: 'REPORT',
     title: `${texts.title} · ${t.report_.period.replace('{week}', String(isoWeekNumber(week))).split(' · ')[0]}`,
     body: `${orders.length} · ${f.eur(net)}`,
-    link: carrier ? '/carrier/done' : '/shipper/done',
+    /*
+     * Ссылка ведёт на сам отчёт, а не в раздел выполненных рейсов:
+     * человек приходил туда, где отчёта нет, и искал его среди
+     * карточек. Если строка почему-то не вернулась, остаётся прежний
+     * адрес — уведомление без ссылки хуже, чем с неточной.
+     */
+    link: saved?.id ? `/reports/${saved.id}` : carrier ? '/carrier/done' : '/shipper/done',
     email: to
       ? {
           to,
