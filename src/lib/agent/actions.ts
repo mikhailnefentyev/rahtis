@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { after } from 'next/server';
+import { cabinetPath } from '@/lib/auth/paths';
 import { getViewer } from '@/lib/auth/viewer';
 import { defaultLocale, getDictionary, isLocale, type Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
@@ -79,6 +80,14 @@ export async function sendAgentMessageAction(
   const delivery = await prepareDispatch(conversationId, message.id);
   if (delivery) after(() => deliverDispatch(delivery));
 
-  revalidatePath(`/${locale}`, 'layout');
+  /*
+   * Обновляется страница кабинета, а не всё под локалью.
+   *
+   * Раньше стояло revalidatePath(locale, 'layout'): переписка тянула за
+   * собой шапку, вкладки и весь остальной кабинет, страницу при отправке
+   * подбрасывало, и приходилось прокручивать её обратно. Чат живёт на
+   * одной странице, ею и ограничимся.
+   */
+  revalidatePath(cabinetPath(locale, viewer.role));
   return { error: null };
 }

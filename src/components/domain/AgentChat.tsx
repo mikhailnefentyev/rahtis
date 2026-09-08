@@ -2,6 +2,7 @@ import { Card, CardBody, Mono } from '@/components/ui';
 import { getI18n, type Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import { AgentChatForm } from './AgentChatForm';
+import { AgentChatLog } from './AgentChatLog';
 import { AgentChatPoll } from './AgentChatPoll';
 
 /**
@@ -54,7 +55,7 @@ export async function AgentChat({ locale, role }: { locale: Locale; role: 'CARRI
         {list.length === 0 ? (
           <p className="text-[13px] text-ink-muted">{t.chat.emptyHint}</p>
         ) : (
-          <ul className="flex max-h-96 flex-col gap-2 overflow-y-auto">
+          <AgentChatLog count={list.length}>
             {list.map((message) => {
               const own = message.sender === 'USER';
 
@@ -78,19 +79,27 @@ export async function AgentChat({ locale, role }: { locale: Locale; role: 'CARRI
                 </li>
               );
             })}
-          </ul>
+          </AgentChatLog>
         )}
 
         {/*
           * «Агент думает» рисуется по времени отправки, а не по флагу:
           * зависший запрос видно по возрасту, а флаг о возрасте молчит.
+          *
+          * Строка занимает место и когда молчит: появляясь и исчезая, она
+          * толкала форму под собой, и поле ввода уезжало из-под курсора.
           */}
-        {conversation?.pending_since && (
-          <p className="flex items-center gap-2 text-[13px] text-ink-muted">
-            <span className="agent-pulse" aria-hidden="true" />
-            {t.chat.thinking}
-          </p>
-        )}
+        <p
+          aria-live="polite"
+          className="flex min-h-[18px] items-center gap-2 text-[13px] text-ink-muted"
+        >
+          {conversation?.pending_since && (
+            <>
+              <span className="agent-pulse" aria-hidden="true" />
+              {t.chat.thinking}
+            </>
+          )}
+        </p>
 
         <AgentChatPoll pending={Boolean(conversation?.pending_since)} />
 
