@@ -95,9 +95,9 @@
           ]
         },
         "sendBody": true,
-        "contentType": "raw",
-        "rawContentType": "application/json",
-        "body": "={{ $json.payload }}",
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.parse($json.payload) }}",
         "options": {
           "response": {
             "response": {
@@ -164,7 +164,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Подпись вызова инструмента.\n//\n// conversation_id и dispatch_token — из треда, который открыла платформа.\n// Пропуск живёт до ответа: скомпрометированный n8n получит инструменты\n// только по треду, который сейчас в работе, а не по любому, чей\n// идентификатор он когда-то видел.\n\nconst crypto = require('crypto');\n\n// Секрет для подписи.\n//\n// $env в узлах Code на n8n Cloud закрыт наглухо: с версии 2.0\n// N8N_BLOCK_ENV_ACCESS_IN_NODE по умолчанию true, и на облаке этот\n// переключатель недоступен. Поэтому секрет берётся из переменных n8n\n// ($vars — планы Pro и Enterprise Cloud).\n//\n// Если у вас Starter, где переменных нет, впишите значение в SECRET\n// ниже. Оно останется видимым каждому, у кого есть доступ в n8n, —\n// это плата за отсутствие хранилища секретов на этом тарифе.\nlet SECRET = '';\ntry { if (typeof $vars !== 'undefined' && $vars.AGENT_WEBHOOK_SECRET) SECRET = $vars.AGENT_WEBHOOK_SECRET; } catch (e) {}\nif (!SECRET) throw new Error('AGENT_WEBHOOK_SECRET не задан: создайте переменную в n8n или впишите значение в SECRET.');\nconst secret = SECRET;\nconst st = $json.__state;\n\n// Тело уходит строкой, ровно той, от которой считается подпись.\n//\n// Сырое тело включается парой contentType: raw и rawContentType. Без\n// contentType узел считает тело обычным JSON из полей-пар, полей нет —\n// и он отправляет пустой запрос: платформа видела 0 байт при\n// подписанных 533. Ошибки при этом не возникает, узел молчит.\nconst payload = JSON.stringify({\n  conversation_id: st.conversation_id,\n  dispatch_token: st.dispatch_token,\n  tool: $json.tool,\n  args: $json.args,\n});\n\nconst timestamp = Math.floor(Date.now() / 1000).toString();\nconst signature = 'sha256=' + crypto.createHmac('sha256', secret).update(timestamp + '.' + payload).digest('hex');\n\nreturn [{ json: { payload, timestamp, signature, __state: st, tool_use_id: $json.tool_use_id } }];"
+        "jsCode": "// Подпись вызова инструмента.\n//\n// conversation_id и dispatch_token — из треда, который открыла платформа.\n// Пропуск живёт до ответа: скомпрометированный n8n получит инструменты\n// только по треду, который сейчас в работе, а не по любому, чей\n// идентификатор он когда-то видел.\n\nconst crypto = require('crypto');\n\n// Секрет для подписи.\n//\n// $env в узлах Code на n8n Cloud закрыт наглухо: с версии 2.0\n// N8N_BLOCK_ENV_ACCESS_IN_NODE по умолчанию true, и на облаке этот\n// переключатель недоступен. Поэтому секрет берётся из переменных n8n\n// ($vars — планы Pro и Enterprise Cloud).\n//\n// Если у вас Starter, где переменных нет, впишите значение в SECRET\n// ниже. Оно останется видимым каждому, у кого есть доступ в n8n, —\n// это плата за отсутствие хранилища секретов на этом тарифе.\nlet SECRET = '';\ntry { if (typeof $vars !== 'undefined' && $vars.AGENT_WEBHOOK_SECRET) SECRET = $vars.AGENT_WEBHOOK_SECRET; } catch (e) {}\nif (!SECRET) throw new Error('AGENT_WEBHOOK_SECRET не задан: создайте переменную в n8n или впишите значение в SECRET.');\nconst secret = SECRET;\nconst st = $json.__state;\n// Тело для узла HTTP.\n//\n// Узел отправляет его в режиме JSON: сырой режим в этой установке\n// n8n тела не передавал вовсе — платформа видела 0 байт при\n// подписанных 544, и ошибки при этом не возникало. Режим JSON\n// проверен на запросе к модели, поэтому он же и здесь.\n//\n// Узел разбирает строку обратно в объект и собирает JSON заново, так\n// что байты на проводе уже не те, от которых считалась подпись.\n// Платформа поэтому сверяет подпись и с приведённым видом тела.\nconst payload = JSON.stringify({\n  conversation_id: st.conversation_id,\n  dispatch_token: st.dispatch_token,\n  tool: $json.tool,\n  args: $json.args,\n});\n\nconst timestamp = Math.floor(Date.now() / 1000).toString();\nconst signature = 'sha256=' + crypto.createHmac('sha256', secret).update(timestamp + '.' + payload).digest('hex');\n\n// Под обоими именами: выражение в узле уже дважды разъезжалось с полем.\nreturn [{ json: { payload, body: payload, timestamp, signature, __state: st, tool_use_id: $json.tool_use_id } }];"
       },
       "id": "sign-tool",
       "name": "Подпись: инструмент",
@@ -197,9 +197,9 @@
           ]
         },
         "sendBody": true,
-        "contentType": "raw",
-        "rawContentType": "application/json",
-        "body": "={{ $json.payload }}",
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.parse($json.payload) }}",
         "options": {
           "response": {
             "response": {
@@ -233,7 +233,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Подпись ответа в тред.\n//\n// Токен гасится на стороне платформы: повторить тот же ответ вторым\n// запросом нельзя.\n\nconst crypto = require('crypto');\n\n// Секрет для подписи.\n//\n// $env в узлах Code на n8n Cloud закрыт наглухо: с версии 2.0\n// N8N_BLOCK_ENV_ACCESS_IN_NODE по умолчанию true, и на облаке этот\n// переключатель недоступен. Поэтому секрет берётся из переменных n8n\n// ($vars — планы Pro и Enterprise Cloud).\n//\n// Если у вас Starter, где переменных нет, впишите значение в SECRET\n// ниже. Оно останется видимым каждому, у кого есть доступ в n8n, —\n// это плата за отсутствие хранилища секретов на этом тарифе.\nlet SECRET = '';\ntry { if (typeof $vars !== 'undefined' && $vars.AGENT_WEBHOOK_SECRET) SECRET = $vars.AGENT_WEBHOOK_SECRET; } catch (e) {}\nif (!SECRET) throw new Error('AGENT_WEBHOOK_SECRET не задан: создайте переменную в n8n или впишите значение в SECRET.');\nconst secret = SECRET;\nconst st = $json.__state;\n\n// Тело уходит строкой, ровно той, от которой считается подпись.\n//\n// Сырое тело включается парой contentType: raw и rawContentType. Без\n// contentType узел считает тело обычным JSON из полей-пар, полей нет —\n// и он отправляет пустой запрос: платформа видела 0 байт при\n// подписанных 533. Ошибки при этом не возникает, узел молчит.\nconst payload = JSON.stringify({\n  conversation_id: st.conversation_id,\n  dispatch_token: st.dispatch_token,\n  text: String($json.reply).slice(0, 8000),\n});\n\nconst timestamp = Math.floor(Date.now() / 1000).toString();\nconst signature = 'sha256=' + crypto.createHmac('sha256', secret).update(timestamp + '.' + payload).digest('hex');\n\nreturn [{ json: { payload, timestamp, signature, reply: $json.reply } }];"
+        "jsCode": "// Подпись ответа в тред.\n//\n// Токен гасится на стороне платформы: повторить тот же ответ вторым\n// запросом нельзя.\n\nconst crypto = require('crypto');\n\n// Секрет для подписи.\n//\n// $env в узлах Code на n8n Cloud закрыт наглухо: с версии 2.0\n// N8N_BLOCK_ENV_ACCESS_IN_NODE по умолчанию true, и на облаке этот\n// переключатель недоступен. Поэтому секрет берётся из переменных n8n\n// ($vars — планы Pro и Enterprise Cloud).\n//\n// Если у вас Starter, где переменных нет, впишите значение в SECRET\n// ниже. Оно останется видимым каждому, у кого есть доступ в n8n, —\n// это плата за отсутствие хранилища секретов на этом тарифе.\nlet SECRET = '';\ntry { if (typeof $vars !== 'undefined' && $vars.AGENT_WEBHOOK_SECRET) SECRET = $vars.AGENT_WEBHOOK_SECRET; } catch (e) {}\nif (!SECRET) throw new Error('AGENT_WEBHOOK_SECRET не задан: создайте переменную в n8n или впишите значение в SECRET.');\nconst secret = SECRET;\nconst st = $json.__state;\n// Тело для узла HTTP.\n//\n// Узел отправляет его в режиме JSON: сырой режим в этой установке\n// n8n тела не передавал вовсе — платформа видела 0 байт при\n// подписанных 544, и ошибки при этом не возникало. Режим JSON\n// проверен на запросе к модели, поэтому он же и здесь.\n//\n// Узел разбирает строку обратно в объект и собирает JSON заново, так\n// что байты на проводе уже не те, от которых считалась подпись.\n// Платформа поэтому сверяет подпись и с приведённым видом тела.\nconst payload = JSON.stringify({\n  conversation_id: st.conversation_id,\n  dispatch_token: st.dispatch_token,\n  text: String($json.reply).slice(0, 8000),\n});\n\nconst timestamp = Math.floor(Date.now() / 1000).toString();\nconst signature = 'sha256=' + crypto.createHmac('sha256', secret).update(timestamp + '.' + payload).digest('hex');\n\n// Под обоими именами: выражение в узле уже дважды разъезжалось с полем.\nreturn [{ json: { payload, body: payload, timestamp, signature, reply: $json.reply } }];"
       },
       "id": "sign-reply",
       "name": "Подпись: ответ",
@@ -266,9 +266,9 @@
           ]
         },
         "sendBody": true,
-        "contentType": "raw",
-        "rawContentType": "application/json",
-        "body": "={{ $json.payload }}",
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.parse($json.payload) }}",
         "options": {
           "response": {
             "response": {
