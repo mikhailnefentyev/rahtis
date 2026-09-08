@@ -1692,7 +1692,12 @@ export type Database = {
         }[]
       }
       agent_place_guide: {
-        Args: { p_conversation_id: string; p_query: string; p_token: string }
+        Args: {
+          p_conversation_id: string
+          p_locale?: string
+          p_query: string
+          p_token: string
+        }
         Returns: {
           body: string
           place_key: string
