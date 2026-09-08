@@ -1669,12 +1669,26 @@ export type Database = {
           distance_km: number
           haul_kind: Database["public"]["Enums"]["haul_kind"]
           order_type: Database["public"]["Enums"]["order_type"]
+          payout_due: string
+          payout_period_start: string
           published_at: string
           rate_cents: number
           ref: string
           status: Database["public"]["Enums"]["order_status"]
           trailer: string
           trailer_plate: string
+        }[]
+      }
+      agent_payout_schedule: {
+        Args: { p_conversation_id: string; p_periods?: number; p_token: string }
+        Returns: {
+          days_left: number
+          due_date: string
+          gross_cents: number
+          orders_count: number
+          payout_cents: number
+          period_end: string
+          period_start: string
         }[]
       }
       agent_place_guide: {
