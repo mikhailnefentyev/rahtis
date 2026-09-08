@@ -1,0 +1,719 @@
+{
+  "name": "RAHTIS — Агент водителя (WhatsApp)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "rahtis-driver",
+        "responseMode": "responseNode",
+        "options": {
+          "rawBody": true
+        }
+      },
+      "id": "wh-driver",
+      "name": "Входящее WhatsApp",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1120,
+        300
+      ],
+      "webhookId": "rahtis-driver"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Проверка подписи входящего вебхука и разбор сообщения.\n//\n// Без этой проверки вебхук открыт: кто узнал адрес, тот может прислать\n// {phone, text} от имени любого водителя — и отметить этап чужого рейса.\n// Платформа доверяет нашей подписи; мы обязаны доверять только провайдеру.\n//\n// Meta (WhatsApp Cloud API) подписывает тело так же, как RAHTIS:\n// HMAC-SHA256 на App Secret, заголовок X-Hub-Signature-256 вида sha256=<hex>.\n// Если провайдер другой — замените проверку на его схему, но не убирайте.\n\nconst crypto = require('crypto');\n\n// Секрет для подписи.\n//\n// $env в узлах Code на n8n Cloud закрыт наглухо: с версии 2.0\n// N8N_BLOCK_ENV_ACCESS_IN_NODE по умолчанию true, и на облаке этот\n// переключатель недоступен. Поэтому секрет берётся из переменных n8n\n// ($vars — планы Pro и Enterprise Cloud).\n//\n// Если у вас Starter, где переменных нет, впишите значение в SECRET\n// ниже. Оно останется видимым каждому, у кого есть доступ в n8n, —\n// это плата за отсутствие хранилища секретов на этом тарифе.\nlet SECRET = '';\ntry { if (typeof $vars !== 'undefined' && $vars.WHATSAPP_APP_SECRET) SECRET = $vars.WHATSAPP_APP_SECRET; } catch (e) {}\nif (!SECRET) throw new Error('WHATSAPP_APP_SECRET ne zadan: sozdaite peremennuyu v n8n ili vpishite znachenie v SECRET.');\nconst secret = SECRET;\n\n// rawBody включён в узле Webhook: подпись обязана считаться от тех же\n// байтов, которые прислал провайдер. Пересобранный JSON даст другую строку.\nconst raw = $json.body === undefined ? '' : (typeof $json.body === 'string' ? $json.body : JSON.stringify($json.body));\nconst given = $json.headers['x-hub-signature-256'] || '';\n\nconst expected = 'sha256=' + crypto.createHmac('sha256', secret).update(raw).digest('hex');\n\n// Сравнение постоянного времени: обычное === выходит на первом несовпавшем\n// байте, и подпись подбирается побайтово по времени ответа.\nconst a = Buffer.from(expected);\nconst b = Buffer.from(given);\nconst ok = a.length === b.length && crypto.timingSafeEqual(a, b);\n\nlet payload = {};\ntry { payload = typeof raw === 'string' && raw ? JSON.parse(raw) : ($json.body || {}); } catch (e) { payload = {}; }\n\n// Разбор формата WhatsApp Cloud API. Запасные пути — для ручной проверки\n// из curl и для провайдеров с плоским телом.\nconst msg = payload?.entry?.[0]?.changes?.[0]?.value?.messages?.[0];\nconst phoneRaw = msg?.from || payload.phone || payload.from || '';\nconst text = msg?.text?.body || payload.text || payload.message || '';\n\n// Только цифры — ровно так же нормализует база (app.phone_digits).\nconst phone = String(phoneRaw).replace(/\\D/g, '');\n\nreturn [{ json: { ok, phone, text } }];"
+      },
+      "id": "verify-in",
+      "name": "Проверить подпись провайдера",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -900,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.ok && $json.phone }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-signed",
+      "name": "Подпись верна?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -680,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Подпись запроса к RAHTIS.\n//\n// Проверено на боевом эндпоинте: HMAC-SHA256 на DRIVER_WEBHOOK_SECRET от\n// строки `${timestamp}.${body}`, заголовок x-rahtis-signature вида\n// sha256=<hex>, окно 300 секунд.\n//\n// Тело уходит как raw: если дать узлу HTTP пересобрать JSON, подпись\n// начнёт зависеть от порядка ключей и разойдётся с нашей.\n\nconst crypto = require('crypto');\n\n// Секрет для подписи.\n//\n// $env в узлах Code на n8n Cloud закрыт наглухо: с версии 2.0\n// N8N_BLOCK_ENV_ACCESS_IN_NODE по умолчанию true, и на облаке этот\n// переключатель недоступен. Поэтому секрет берётся из переменных n8n\n// ($vars — планы Pro и Enterprise Cloud).\n//\n// Если у вас Starter, где переменных нет, впишите значение в SECRET\n// ниже. Оно останется видимым каждому, у кого есть доступ в n8n, —\n// это плата за отсутствие хранилища секретов на этом тарифе.\nlet SECRET = '';\ntry { if (typeof $vars !== 'undefined' && $vars.DRIVER_WEBHOOK_SECRET) SECRET = $vars.DRIVER_WEBHOOK_SECRET; } catch (e) {}\nif (!SECRET) throw new Error('DRIVER_WEBHOOK_SECRET ne zadan: sozdaite peremennuyu v n8n ili vpishite znachenie v SECRET.');\nconst secret = SECRET;\n\nconst body = JSON.stringify({ phone: $json.phone });\nconst timestamp = Math.floor(Date.now() / 1000).toString();\nconst signature = 'sha256=' + crypto.createHmac('sha256', secret).update(timestamp + '.' + body).digest('hex');\n\nreturn [{ json: { body, timestamp, signature, phone: $json.phone, text: $json.text } }];"
+      },
+      "id": "sign-context",
+      "name": "Подпись: контекст",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -460,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.rahtis.eu/api/driver/context",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            },
+            {
+              "name": "x-rahtis-timestamp",
+              "value": "={{ $json.timestamp }}"
+            },
+            {
+              "name": "x-rahtis-signature",
+              "value": "={{ $json.signature }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ $json.body }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "http-context",
+      "name": "Контекст рейса",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -240,
+        200
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.trips ? $json.trips.length : 0 }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-trip",
+      "name": "Есть активный рейс?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -20,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Запрос к Claude: понять водителя и решить, что делать.\n//\n// Модель отвечает одним из трёх: METKA:STEP:<роль> — водитель сообщил об\n// этапе; METKA:ESCALATE — вопрос не по данным рейса; иначе — готовый\n// ответ фактом из карточки.\n//\n// Роль в METKA:STEP нужна платформе: она сверит её со следующей\n// непройденной точкой и откажет, если агент неверно понял фразу. Отметка\n// — единственная запись во всём наборе, и цена ошибки здесь высокая.\n//\n// Модель: claude-opus-5. Для водителя за рулём важна скорость, поэтому\n// effort low — задача простая, глубокое рассуждение ей не нужно.\n// Если нужно дешевле — замените model на claude-haiku-4-5.\n\nconst trips = $json.trips;\nconst text = $('Подпись: контекст').item.json.text;\n\nconst system = [\n  'Ты — диспетчер-помощник платформы RAHTIS для водителя грузовика.',\n  'Водитель за рулём: отвечай КОРОТКО, одним-двумя предложениями.',\n  '',\n  'Отвечай ТОЛЬКО по данным рейсов ниже. Не выдумывай адреса, телефоны и время.',\n  '',\n  'Определи, что сделал водитель:',\n  '1. СООБЩИЛ ОБ ЭТАПЕ (забрал, загрузился, выгрузился, сдал) — верни строго METKA:STEP:<роль>,',\n  '   где роль одна из: PICKUP, DELIVERY, EXTRA_LOAD, EXTRA_UNLOAD, CONTINUATION, TRAILER_RETURN.',\n  '   Роль бери из поля progress.next.role — водитель отмечает именно следующую точку.',\n  '2. СПРОСИЛ по рейсу (где выгрузка, чей телефон, во сколько, нужна ли пломба) — ответь фактом.',\n  '3. Вопрос вне данных рейса, спорный или про деньги и повреждения — верни строго METKA:ESCALATE.',\n  '',\n  'ВАЖНО про единицу: haul_kind = CONTAINER означает КОНТЕЙНЕР, а не прицеп.',\n  'Тогда trailer_plate — это номер контейнера по ISO 6346, а container_feet — его длина в футах.',\n  'Называй вещи своими именами: «контейнер 20 футов MSCU1234561», не «прицеп».',\n  'При haul_kind = TRAILER это полуприцеп и его регистрационный номер.',\n  '',\n  'Язык ответа — тот же, на котором написал водитель.',\n  '',\n  'ДАННЫЕ РЕЙСОВ:',\n  JSON.stringify(trips),\n].join('\\n');\n\nconst payload = {\n  model: 'claude-opus-5',\n  max_tokens: 1024,\n  output_config: { effort: 'low' },\n  system,\n  messages: [{ role: 'user', content: text }],\n};\n\nreturn [{ json: { payload: JSON.stringify(payload) } }];"
+      },
+      "id": "build-prompt",
+      "name": "Собрать запрос к Claude",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        200,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            },
+            {
+              "name": "anthropic-version",
+              "value": "2023-06-01"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ $json.payload }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        },
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
+      },
+      "id": "http-claude",
+      "name": "Claude: понять и ответить",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        420,
+        120
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Достаём текст из ответа Claude.\n//\n// content — массив блоков разных типов. Берём только text: при\n// включённом рассуждении там же приходят блоки thinking, и склеивать их\n// в ответ водителю нельзя.\n\nconst blocks = Array.isArray($json.content) ? $json.content : [];\nconst reply = blocks.filter((b) => b.type === 'text').map((b) => b.text).join('').trim();\n\n// Ошибка API приходит с полем error и без content.\nif (!reply && $json.error) {\n  return [{ json: { decision: 'ERROR', reply: 'Palvelu ei vastaa. / Служба не отвечает.', detail: $json.error?.message } }];\n}\n\nlet decision = 'ANSWER';\nlet role = '';\n\nif (reply.startsWith('METKA:STEP:')) {\n  decision = 'STEP';\n  role = reply.slice('METKA:STEP:'.length).trim().split(/\\s/)[0];\n} else if (reply.includes('METKA:ESCALATE')) {\n  decision = 'ESCALATE';\n}\n\nreturn [{ json: { decision, role, reply } }];"
+      },
+      "id": "parse-claude",
+      "name": "Разобрать решение",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        640,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.decision }}",
+                    "rightValue": "STEP",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "outputKey": "Отметка этапа"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.decision }}",
+                    "rightValue": "ESCALATE",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "outputKey": "Эскалация"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "Готовый ответ"
+        }
+      },
+      "id": "switch-decision",
+      "name": "Этап / Эскалация / Ответ",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        860,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Подпись отметки этапа.\n//\n// expect — роль точки со слов водителя. Платформа сверит её со следующей\n// непройденной точкой и откажет, если не совпало: агент, неверно понявший\n// фразу, не должен продвигать рейс.\n\nconst crypto = require('crypto');\n\n// Секрет для подписи.\n//\n// $env в узлах Code на n8n Cloud закрыт наглухо: с версии 2.0\n// N8N_BLOCK_ENV_ACCESS_IN_NODE по умолчанию true, и на облаке этот\n// переключатель недоступен. Поэтому секрет берётся из переменных n8n\n// ($vars — планы Pro и Enterprise Cloud).\n//\n// Если у вас Starter, где переменных нет, впишите значение в SECRET\n// ниже. Оно останется видимым каждому, у кого есть доступ в n8n, —\n// это плата за отсутствие хранилища секретов на этом тарифе.\nlet SECRET = '';\ntry { if (typeof $vars !== 'undefined' && $vars.DRIVER_WEBHOOK_SECRET) SECRET = $vars.DRIVER_WEBHOOK_SECRET; } catch (e) {}\nif (!SECRET) throw new Error('DRIVER_WEBHOOK_SECRET ne zadan: sozdaite peremennuyu v n8n ili vpishite znachenie v SECRET.');\nconst secret = SECRET;\nconst phone = $('Подпись: контекст').item.json.phone;\n\nconst body = JSON.stringify({ phone, expect: $json.role });\nconst timestamp = Math.floor(Date.now() / 1000).toString();\nconst signature = 'sha256=' + crypto.createHmac('sha256', secret).update(timestamp + '.' + body).digest('hex');\n\nreturn [{ json: { body, timestamp, signature } }];"
+      },
+      "id": "sign-step",
+      "name": "Подпись: отметка",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1080,
+        -20
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.rahtis.eu/api/driver/step",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            },
+            {
+              "name": "x-rahtis-timestamp",
+              "value": "={{ $json.timestamp }}"
+            },
+            {
+              "name": "x-rahtis-signature",
+              "value": "={{ $json.signature }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ $json.body }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "http-step",
+      "name": "Отметить этап",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1300,
+        -20
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Подпись эскалации.\n//\n// Вопрос уходит в ту же очередь, которую оператор читает в админке.\n// Работает независимо от того, есть ли у водителя активный рейс.\n\nconst crypto = require('crypto');\n\n// Секрет для подписи.\n//\n// $env в узлах Code на n8n Cloud закрыт наглухо: с версии 2.0\n// N8N_BLOCK_ENV_ACCESS_IN_NODE по умолчанию true, и на облаке этот\n// переключатель недоступен. Поэтому секрет берётся из переменных n8n\n// ($vars — планы Pro и Enterprise Cloud).\n//\n// Если у вас Starter, где переменных нет, впишите значение в SECRET\n// ниже. Оно останется видимым каждому, у кого есть доступ в n8n, —\n// это плата за отсутствие хранилища секретов на этом тарифе.\nlet SECRET = '';\ntry { if (typeof $vars !== 'undefined' && $vars.DRIVER_WEBHOOK_SECRET) SECRET = $vars.DRIVER_WEBHOOK_SECRET; } catch (e) {}\nif (!SECRET) throw new Error('DRIVER_WEBHOOK_SECRET ne zadan: sozdaite peremennuyu v n8n ili vpishite znachenie v SECRET.');\nconst secret = SECRET;\nconst src = $('Проверить подпись провайдера').item.json;\n\nconst body = JSON.stringify({ phone: src.phone, question: src.text });\nconst timestamp = Math.floor(Date.now() / 1000).toString();\nconst signature = 'sha256=' + crypto.createHmac('sha256', secret).update(timestamp + '.' + body).digest('hex');\n\nreturn [{ json: { body, timestamp, signature } }];"
+      },
+      "id": "sign-escalate",
+      "name": "Подпись: эскалация",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1080,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.rahtis.eu/api/driver/escalate",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            },
+            {
+              "name": "x-rahtis-timestamp",
+              "value": "={{ $json.timestamp }}"
+            },
+            {
+              "name": "x-rahtis-signature",
+              "value": "={{ $json.signature }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ $json.body }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "http-escalate",
+      "name": "Эскалация оператору",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1300,
+        200
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Что сказать водителю.\n//\n// Отказ платформы — штатный путь, а не исключение: «точка уже пройдена»,\n// «роль не совпала», «рейс уже не идёт». Все три приходят кодом 55000 с\n// понятным текстом в detail, и водителю надо показать именно его, а не\n// общее «не получилось».\n\nconst src = $json;\nlet reply;\n\nif (src.ok === true) {\n  reply = 'Kuittaus vastaanotettu ✅ / Отметка принята ✅';\n} else if (src.error) {\n  // detail пишет та же функция базы, которая отказала: она знает почему.\n  reply = src.detail || 'Ei onnistunut. / Не получилось.';\n} else if (src.decision === 'ANSWER' || src.reply) {\n  reply = src.reply;\n} else {\n  reply = 'Selvä. / Принято.';\n}\n\nreturn [{ json: { reply } }];"
+      },
+      "id": "reply-step",
+      "name": "Ответ: этап",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1520,
+        -20
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const src = $json;\nconst reply = src.ok === true\n  ? 'Välitin kysymyksen ajojärjestelijälle. / Передал вопрос диспетчеру.'\n  : (src.detail || 'Kysymystä ei saatu välitettyä. / Вопрос передать не удалось.');\nreturn [{ json: { reply } }];"
+      },
+      "id": "reply-escalate",
+      "name": "Ответ: эскалация",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1520,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { reply: $json.reply } }];"
+      },
+      "id": "reply-answer",
+      "name": "Ответ: факт из рейса",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1300,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Рейса нет — но вопрос всё равно доходит до диспетчера.\n//\n// В прежней версии эта ветка была тупиком: водитель без активного рейса\n// получал «рейс не найден» и не мог спросить ничего. А /escalate работает\n// независимо от рейса.\n\nconst crypto = require('crypto');\n\n// Секрет для подписи.\n//\n// $env в узлах Code на n8n Cloud закрыт наглухо: с версии 2.0\n// N8N_BLOCK_ENV_ACCESS_IN_NODE по умолчанию true, и на облаке этот\n// переключатель недоступен. Поэтому секрет берётся из переменных n8n\n// ($vars — планы Pro и Enterprise Cloud).\n//\n// Если у вас Starter, где переменных нет, впишите значение в SECRET\n// ниже. Оно останется видимым каждому, у кого есть доступ в n8n, —\n// это плата за отсутствие хранилища секретов на этом тарифе.\nlet SECRET = '';\ntry { if (typeof $vars !== 'undefined' && $vars.DRIVER_WEBHOOK_SECRET) SECRET = $vars.DRIVER_WEBHOOK_SECRET; } catch (e) {}\nif (!SECRET) throw new Error('DRIVER_WEBHOOK_SECRET ne zadan: sozdaite peremennuyu v n8n ili vpishite znachenie v SECRET.');\nconst secret = SECRET;\nconst src = $('Проверить подпись провайдера').item.json;\n\nconst body = JSON.stringify({ phone: src.phone, question: src.text });\nconst timestamp = Math.floor(Date.now() / 1000).toString();\nconst signature = 'sha256=' + crypto.createHmac('sha256', secret).update(timestamp + '.' + body).digest('hex');\n\nreturn [{ json: { body, timestamp, signature } }];"
+      },
+      "id": "sign-noTrip",
+      "name": "Нет рейса: в эскалацию",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        200,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { reply: 'Kiitos, ei pääsyä palveluun tällä numerolla. Ole yhteydessä yritykseesi. / Доступа по этому номеру нет. Обратитесь в свою компанию.' } }];"
+      },
+      "id": "reply-denied",
+      "name": "Отказано",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -460,
+        440
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"reply\": $json.reply } }}",
+        "options": {}
+      },
+      "id": "respond",
+      "name": "Ответ водителю",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1740,
+        200
+      ]
+    }
+  ],
+  "connections": {
+    "Входящее WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "Проверить подпись провайдера",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Проверить подпись провайдера": {
+      "main": [
+        [
+          {
+            "node": "Подпись верна?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Подпись верна?": {
+      "main": [
+        [
+          {
+            "node": "Подпись: контекст",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Отказано",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Подпись: контекст": {
+      "main": [
+        [
+          {
+            "node": "Контекст рейса",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Контекст рейса": {
+      "main": [
+        [
+          {
+            "node": "Есть активный рейс?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Есть активный рейс?": {
+      "main": [
+        [
+          {
+            "node": "Собрать запрос к Claude",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Нет рейса: в эскалацию",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Собрать запрос к Claude": {
+      "main": [
+        [
+          {
+            "node": "Claude: понять и ответить",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claude: понять и ответить": {
+      "main": [
+        [
+          {
+            "node": "Разобрать решение",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Разобрать решение": {
+      "main": [
+        [
+          {
+            "node": "Этап / Эскалация / Ответ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Этап / Эскалация / Ответ": {
+      "main": [
+        [
+          {
+            "node": "Подпись: отметка",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Подпись: эскалация",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ответ: факт из рейса",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Подпись: отметка": {
+      "main": [
+        [
+          {
+            "node": "Отметить этап",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Отметить этап": {
+      "main": [
+        [
+          {
+            "node": "Ответ: этап",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Подпись: эскалация": {
+      "main": [
+        [
+          {
+            "node": "Эскалация оператору",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Нет рейса: в эскалацию": {
+      "main": [
+        [
+          {
+            "node": "Эскалация оператору",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Эскалация оператору": {
+      "main": [
+        [
+          {
+            "node": "Ответ: эскалация",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ответ: этап": {
+      "main": [
+        [
+          {
+            "node": "Ответ водителю",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ответ: эскалация": {
+      "main": [
+        [
+          {
+            "node": "Ответ водителю",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ответ: факт из рейса": {
+      "main": [
+        [
+          {
+            "node": "Ответ водителю",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Отказано": {
+      "main": [
+        [
+          {
+            "node": "Ответ водителю",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "rahtis"
+  }
+}

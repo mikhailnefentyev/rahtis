@@ -2,6 +2,7 @@ import 'server-only';
 
 import { createAdminClient } from '@/lib/supabase/admin';
 import { n8nWebhookUrl, agentSecret, signOutgoing } from './signature';
+import { emailLocaleOf } from '@/lib/email/text';
 
 /**
  * Отправка вопроса во внешний воркфлоу.
@@ -42,7 +43,11 @@ export async function dispatchToAgent(conversationId: string, messageId: string)
   }
 
   const [{ data: company }, { data: message }] = await Promise.all([
-    admin.from('companies').select('name, kind').eq('id', conversation.company_id).single(),
+    admin
+      .from('companies')
+      .select('name, kind, language')
+      .eq('id', conversation.company_id)
+      .single(),
     admin.from('messages').select('body, sender_user_id').eq('id', messageId).single(),
   ]);
 
@@ -56,7 +61,16 @@ export async function dispatchToAgent(conversationId: string, messageId: string)
     party_role: company?.kind ?? null,
     message_id: messageId,
     text: message?.body ?? '',
-    locale: 'fi',
+    /*
+     * Язык переписки компании, а не константа.
+     *
+     * Здесь стояло жёсткое 'fi' — с тех пор, когда весь рынок был
+     * финским и другого языка у писем не было. Агент отвечает на языке
+     * собеседника, и в большинстве случаев этого хватает; но по «RS-2026-0043?»
+     * язык не определить, и тогда нужен запасной. Финский по умолчанию
+     * отвечал бы датчанину по-фински на его же вопрос без слов.
+     */
+    locale: emailLocaleOf(company?.language),
   });
 
   try {
@@ -67,8 +81,28 @@ export async function dispatchToAgent(conversationId: string, messageId: string)
       signal: AbortSignal.timeout(10_000),
     });
 
+    /*
+     * Воркфлоу отвечает 200 и на своих провалах: код ответа относится к
+     * вебхуку, а не к тому, что внутри. Пока разбирали только код, отказ
+     * подписи и молчание модели выглядели снаружи одинаково — успехом.
+     * Поэтому читаем тело: ok, а при неудаче — шаг и причина.
+     */
     if (!response.ok) {
       console.error('agent: воркфлоу ответил', response.status);
+      return;
+    }
+
+    const outcome = (await response.json().catch(() => null)) as
+      | { ok?: boolean; stage?: string | null; detail?: string | null }
+      | null;
+
+    if (!outcome?.ok) {
+      console.error(
+        'agent: воркфлоу не ответил в тред',
+        conversation.id,
+        outcome?.stage ?? 'без шага',
+        outcome?.detail ?? 'без причины',
+      );
     }
   } catch (cause) {
     /*
