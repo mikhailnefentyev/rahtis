@@ -1664,8 +1664,10 @@ export type Database = {
         Args: { p_conversation_id: string; p_ref: string; p_token: string }
         Returns: {
           closed_at: string
+          container_feet: number
           counterparty: string
           distance_km: number
+          haul_kind: Database["public"]["Enums"]["haul_kind"]
           order_type: Database["public"]["Enums"]["order_type"]
           published_at: string
           rate_cents: number
