@@ -99,9 +99,9 @@
           ]
         },
         "sendBody": true,
-        "specifyBody": "raw",
-        "rawContentType": "application/json",
-        "body": "={{ $json.body }}",
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.parse($json.body) }}",
         "options": {
           "response": {
             "response": {
@@ -181,9 +181,9 @@
           ]
         },
         "sendBody": true,
-        "specifyBody": "raw",
-        "rawContentType": "application/json",
-        "body": "={{ $json.payload }}",
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.parse($json.payload) }}",
         "options": {
           "response": {
             "response": {
@@ -312,9 +312,9 @@
           ]
         },
         "sendBody": true,
-        "specifyBody": "raw",
-        "rawContentType": "application/json",
-        "body": "={{ $json.body }}",
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.parse($json.body) }}",
         "options": {
           "response": {
             "response": {
@@ -368,9 +368,9 @@
           ]
         },
         "sendBody": true,
-        "specifyBody": "raw",
-        "rawContentType": "application/json",
-        "body": "={{ $json.body }}",
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.parse($json.body) }}",
         "options": {
           "response": {
             "response": {
