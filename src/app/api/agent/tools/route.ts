@@ -17,6 +17,7 @@ const TOOLS = {
   trip_status: { fn: 'agent_trip_status', args: ['ref'] },
   trip_documents: { fn: 'agent_trip_documents', args: ['ref'] },
   company_money: { fn: 'agent_company_money', args: ['weeks'] },
+  payout_schedule: { fn: 'agent_payout_schedule', args: ['periods'] },
   legal_clause: { fn: 'agent_legal_clause', args: ['number', 'kind', 'locale'] },
   place_guide: { fn: 'agent_place_guide', args: ['query'] },
 } as const;

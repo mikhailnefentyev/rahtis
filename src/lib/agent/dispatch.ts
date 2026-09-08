@@ -17,7 +17,20 @@ import { emailLocaleOf } from '@/lib/email/text';
  * остаётся в чате и ждёт оператора. Молчание агента лучше, чем сломанная
  * отправка сообщения.
  */
-export async function dispatchToAgent(conversationId: string, messageId: string): Promise<void> {
+type Delivery = { url: string; secret: string; body: string; conversationId: string };
+
+/**
+ * Пометка ожидания и сбор запроса — без обращения к воркфлоу.
+ *
+ * Отделено от доставки намеренно. Раньше отправка сообщения ждала
+ * ответа n8n целиком, и человек по восемь секунд смотрел на форму,
+ * которая будто не нажалась. Пометка ставится здесь и сразу, а стучаться
+ * наружу можно уже после того, как страница отрисована.
+ */
+export async function prepareDispatch(
+  conversationId: string,
+  messageId: string,
+): Promise<Delivery | null> {
   const admin = createAdminClient();
 
   const token = crypto.randomUUID();
@@ -31,7 +44,7 @@ export async function dispatchToAgent(conversationId: string, messageId: string)
 
   if (error || !conversation) {
     console.error('Тред не помечен ожидающим:', error?.message);
-    return;
+    return null;
   }
 
   const url = n8nWebhookUrl();
@@ -39,7 +52,7 @@ export async function dispatchToAgent(conversationId: string, messageId: string)
 
   if (!url || !secret) {
     console.info('agent: воркфлоу не настроен, вопрос ждёт в чате');
-    return;
+    return null;
   }
 
   const [{ data: company }, { data: message }] = await Promise.all([
@@ -73,6 +86,11 @@ export async function dispatchToAgent(conversationId: string, messageId: string)
     locale: emailLocaleOf(company?.language),
   });
 
+  return { url, secret, body, conversationId: conversation.id };
+}
+
+/** Собственно обращение к воркфлоу: долгое, и делать его надо не на глазах у человека. */
+export async function deliverDispatch({ url, secret, body, conversationId }: Delivery): Promise<void> {
   try {
     const response = await fetch(url, {
       method: 'POST',
@@ -99,7 +117,7 @@ export async function dispatchToAgent(conversationId: string, messageId: string)
     if (!outcome?.ok) {
       console.error(
         'agent: воркфлоу не ответил в тред',
-        conversation.id,
+        conversationId,
         outcome?.stage ?? 'без шага',
         outcome?.detail ?? 'без причины',
       );
@@ -111,7 +129,7 @@ export async function dispatchToAgent(conversationId: string, messageId: string)
      * выглядит как «агент не знает», а на деле сломан один запрос.
      */
     if (outcome?.tools?.length) {
-      console.error('agent: инструменты отказали', conversation.id, outcome.tools.join(' | '));
+      console.error('agent: инструменты отказали', conversationId, outcome.tools.join(' | '));
     }
   } catch (cause) {
     /*

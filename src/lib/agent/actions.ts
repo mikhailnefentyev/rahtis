@@ -1,10 +1,11 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { after } from 'next/server';
 import { getViewer } from '@/lib/auth/viewer';
 import { defaultLocale, getDictionary, isLocale, type Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
-import { dispatchToAgent } from './dispatch';
+import { deliverDispatch, prepareDispatch } from './dispatch';
 
 export type ChatState = { error: string | null };
 
@@ -68,7 +69,15 @@ export async function sendAgentMessageAction(
     return { error: t.chat.failed };
   }
 
-  await dispatchToAgent(conversationId, message.id);
+  /*
+   * Тред помечается ожидающим сразу, а стучимся в воркфлоу уже после
+   * ответа страницы. Раньше отправка ждала весь круг — вопрос, модель,
+   * ответ в тред, — и человек по восемь секунд смотрел на форму, будто
+   * кнопка не нажалась. Пометка нужна до отрисовки: по ней лента и
+   * понимает, что надо ждать ответа.
+   */
+  const delivery = await prepareDispatch(conversationId, message.id);
+  if (delivery) after(() => deliverDispatch(delivery));
 
   revalidatePath(`/${locale}`, 'layout');
   return { error: null };
