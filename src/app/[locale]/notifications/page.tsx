@@ -4,7 +4,7 @@ import { notFound, redirect } from 'next/navigation';
 import { LocaleSwitch } from '@/components/layout/LocaleSwitch';
 import { Button, Card, CardBody, EmptyState, Mono } from '@/components/ui';
 import { markAllReadAction } from '@/lib/notifications/actions';
-import { cabinetPath, noAccessPath, signInPath } from '@/lib/auth/paths';
+import { cabinetPath, noAccessPath, REPORTS_SEGMENT, signInPath } from '@/lib/auth/paths';
 import { getViewer } from '@/lib/auth/viewer';
 import { getI18n, isLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
@@ -111,9 +111,17 @@ export default async function NotificationsPage({
                     <p className="text-[13px] leading-relaxed text-ink-muted">{row.body}</p>
                   )}
 
+                  {/*
+                    * Отчёт открывается соседней вкладкой: это файл, и уводить
+                    * ради него с сайта незачем — человек читает уведомления
+                    * дальше, а не возвращается кнопкой «назад». Остальные
+                    * ссылки ведут внутрь кабинета и вкладку не плодят.
+                    */}
                   {row.link && (
                     <Link
                       href={`/${locale}${row.link}`}
+                      target={row.link.startsWith(`/${REPORTS_SEGMENT}/`) ? '_blank' : undefined}
+                      rel={row.link.startsWith(`/${REPORTS_SEGMENT}/`) ? 'noopener' : undefined}
                       className="self-start text-[13px] font-semibold text-accent hover:underline"
                     >
                       {t.notify.open} →
