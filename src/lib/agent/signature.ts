@@ -63,10 +63,34 @@ export function verifyIncoming(request: Request, body: string): VerifyResult {
     return { ok: false, reason: 'timestamp outside the allowed window' };
   }
 
-  const expected = Buffer.from(`sha256=${digest(secret, timestamp, body)}`);
-  const given = Buffer.from(signature);
+  /*
+   * Подписанное тело и отправленное — не всегда одни и те же байты.
+   *
+   * n8n подписывает строку в узле Code, а отправляет её узлом HTTP,
+   * который сначала разбирает JSON и собирает заново. Смысл сохраняется,
+   * байты — нет: меняются отступы и запись букв вне ASCII. Подпись от
+   * этого рассыпается, и снаружи это выглядит как разошедшиеся секреты,
+   * хотя секрет один.
+   *
+   * Поэтому сверяем и с приведённым видом — тем же JSON, пересобранным
+   * заново. Ослаблением это не является: разобранная полезная нагрузка у
+   * обоих видов одна и та же, а подпись по-прежнему требует секрета.
+   */
+  const forms = [body];
+  try {
+    const canonical = JSON.stringify(JSON.parse(body));
+    if (canonical !== body) forms.push(canonical);
+  } catch {
+    /* Не JSON — сверяем только присланные байты. */
+  }
 
-  if (expected.length !== given.length || !timingSafeEqual(expected, given)) {
+  const given = Buffer.from(signature);
+  const matches = forms.some((form) => {
+    const expected = Buffer.from(`sha256=${digest(secret, timestamp, form)}`);
+    return expected.length === given.length && timingSafeEqual(expected, given);
+  });
+
+  if (!matches) {
     /*
      * К отказу прикладывается то, что мы посчитали своим: длина тела и
      * метка времени. Секрета это не выдаёт — вызывающий и так знает, что
