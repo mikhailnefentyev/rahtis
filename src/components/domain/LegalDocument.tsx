@@ -1,6 +1,6 @@
 import { Card, CardBody, Mono } from '@/components/ui';
 import { getI18n, type Locale } from '@/lib/i18n';
-import { createClient } from '@/lib/supabase/server';
+import { activeLegalDocument } from '@/lib/legal/read';
 import type { Database } from '@/types/database';
 
 type Kind = Database['public']['Enums']['legal_kind'];
@@ -17,14 +17,16 @@ type Kind = Database['public']['Enums']['legal_kind'];
  * точка внутри идентификатора читается как начало класса.
  */
 export async function LegalDocument({ locale, kind }: { locale: Locale; kind: Kind }) {
-  const [{ t, m, f }, supabase] = await Promise.all([getI18n(locale), createClient()]);
-
-  const { data: document } = await supabase
-    .from('legal_documents')
-    .select('id, version, effective_from')
-    .eq('kind', kind)
-    .eq('status', 'ACTIVE')
-    .maybeSingle();
+  /*
+   * Документ читается из кэша и одним запросом: он публичный, у всех
+   * одинаковый и меняется в тот единственный момент, когда оператор
+   * активирует редакцию. Прежде каждый заход стоил двух последовательных
+   * обращений к базе за текстом, не менявшимся неделями.
+   */
+  const [{ t, m, f }, document] = await Promise.all([
+    getI18n(locale),
+    activeLegalDocument(kind, locale),
+  ]);
 
   if (!document) {
     return (
@@ -36,14 +38,7 @@ export async function LegalDocument({ locale, kind }: { locale: Locale; kind: Ki
     );
   }
 
-  const { data: clauses } = await supabase
-    .from('legal_clauses')
-    .select('id, path, number, title, body')
-    .eq('document_id', document.id)
-    .eq('locale', locale)
-    .order('path');
-
-  const list = clauses ?? [];
+  const list = document.clauses;
 
   return (
     <>

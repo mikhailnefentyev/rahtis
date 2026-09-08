@@ -1,10 +1,11 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, updateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { explainAdmin, withAdminError } from '@/lib/admin/errors';
 import { getViewer } from '@/lib/auth/viewer';
 import { defaultLocale, isLocale, type Locale } from '@/lib/i18n';
+import { LEGAL_TAG } from './read';
 import { createClient } from '@/lib/supabase/server';
 import type { Database } from '@/types/database';
 
@@ -55,6 +56,15 @@ export async function activateLegalVersionAction(formData: FormData): Promise<vo
   });
 
   revalidatePath(`/${locale}/admin/legal`);
+  /*
+   * Публичные страницы условий и политики держат текст в кэше: он
+   * меняется только здесь. Без сброса метки посетитель читал бы прежнюю
+   * редакцию, согласившись при этом с новой.
+   *
+   * updateTag, а не revalidateTag: первый гасит кэш немедленно, второй
+   * лишь помечает его устаревшим и успевает отдать старый текст ещё раз.
+   */
+  updateTag(LEGAL_TAG);
 
   if (error) {
     console.error('Редакция не активирована:', error.message);
