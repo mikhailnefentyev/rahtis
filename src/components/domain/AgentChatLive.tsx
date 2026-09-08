@@ -68,7 +68,13 @@ export function AgentChatLive({
    * пометка ожидания снята — или когда ждать уже незачем.
    */
   useEffect(() => {
-    if (!pending || !thread) return;
+    /*
+     * Пока запрос в пути, опрашивать нечего: ответ придёт им же. Без
+     * этого опрос успевал сходить в базу и притащить оттуда копию
+     * только что отправленного вопроса — он двоился в ленте до самого
+     * ответа, а потом лишний исчезал.
+     */
+    if (!pending || !thread || sending) return;
 
     const startedAt = Date.now();
     const timer = setInterval(async () => {
@@ -77,7 +83,12 @@ export function AgentChatLive({
         return;
       }
 
-      const last = messages[messages.length - 1];
+      /*
+       * Отсчёт от последнего записанного сообщения, а не от временного:
+       * у временного метка с часов браузера, и она вполне может
+       * отставать от серверной.
+       */
+      const last = [...messages].reverse().find((m) => !m.id.startsWith('local-'));
       if (!last) return;
 
       try {
@@ -95,7 +106,7 @@ export function AgentChatLive({
     }, POLL_MS);
 
     return () => clearInterval(timer);
-  }, [pending, thread, messages, merge]);
+  }, [pending, thread, sending, messages, merge]);
 
   async function send(text: string) {
     /*
