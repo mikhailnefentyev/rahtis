@@ -93,7 +93,7 @@ export async function dispatchToAgent(conversationId: string, messageId: string)
     }
 
     const outcome = (await response.json().catch(() => null)) as
-      | { ok?: boolean; stage?: string | null; detail?: string | null }
+      | { ok?: boolean; stage?: string | null; detail?: string | null; tools?: string[] }
       | null;
 
     if (!outcome?.ok) {
@@ -103,6 +103,15 @@ export async function dispatchToAgent(conversationId: string, messageId: string)
         outcome?.stage ?? 'без шага',
         outcome?.detail ?? 'без причины',
       );
+    }
+
+    /*
+     * Отказ инструмента ответ не срывает: агент честно говорит, что
+     * данных не нашёл. Но молчать о нём нельзя — для человека это
+     * выглядит как «агент не знает», а на деле сломан один запрос.
+     */
+    if (outcome?.tools?.length) {
+      console.error('agent: инструменты отказали', conversation.id, outcome.tools.join(' | '));
     }
   } catch (cause) {
     /*

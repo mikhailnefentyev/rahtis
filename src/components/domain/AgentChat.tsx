@@ -2,6 +2,7 @@ import { Card, CardBody, Mono } from '@/components/ui';
 import { getI18n, type Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import { AgentChatForm } from './AgentChatForm';
+import { AgentChatPoll } from './AgentChatPoll';
 
 /**
  * Окно чата с агентом в кабинете.
@@ -90,6 +91,8 @@ export async function AgentChat({ locale, role }: { locale: Locale; role: 'CARRI
             {t.chat.thinking}
           </p>
         )}
+
+        <AgentChatPoll pending={Boolean(conversation?.pending_since)} />
 
         <AgentChatForm locale={locale} conversationId={conversation?.id ?? null} />
       </CardBody>

@@ -289,7 +289,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Итог прогона. Платформа получает не только «да/нет», но и шаг, на\n// котором всё встало: без этого отладка сводится к угадыванию.\nconst signed = $('Подпись: ответ').all();\nconst last = signed[signed.length - 1].json;\nconst parsed = $('Разобрать ответ').all();\nconst modelError = parsed.length ? parsed[parsed.length - 1].json.model_error : null;\n// Что именно подписали и что на это сказал сервер. Обе стороны считают\n// подпись от одной строки; расхождение видно только если сравнить их\n// длины и метки времени, а по одному слову «mismatch» не разобрать.\nconst replyError = $json.error\n  ? ('подписал ' + last.payload.length + ' Б, метка ' + last.timestamp + '; сервер: ' + JSON.stringify($json).slice(0, 300))\n  : null;\nreturn [{ json: {\n  ok: !replyError && !modelError,\n  stage: replyError ? 'reply' : (modelError ? 'model' : null),\n  detail: replyError || modelError || null,\n  reply: last.reply,\n} }];"
+        "jsCode": "// Итог прогона. Платформа получает не только «да/нет», но и шаг, на\n// котором всё встало: без этого отладка сводится к угадыванию.\nconst signed = $('Подпись: ответ').all();\nconst last = signed[signed.length - 1].json;\nconst parsed = $('Разобрать ответ').all();\nconst modelError = parsed.length ? parsed[parsed.length - 1].json.model_error : null;\n// Что именно подписали и что на это сказал сервер. Обе стороны считают\n// подпись от одной строки; расхождение видно только если сравнить их\n// длины и метки времени, а по одному слову «mismatch» не разобрать.\nconst replyError = $json.error\n  ? ('подписал ' + last.payload.length + ' Б, метка ' + last.timestamp + '; сервер: ' + JSON.stringify($json).slice(0, 300))\n  : null;\n/*\n * Отказы инструментов уезжают наружу вместе с итогом. Модель\n * пересказывает их своими словами — «сервис данных отвечает ошибкой», —\n * и по такому пересказу не понять ни кода, ни причины.\n */\nconst calls = (() => { try { return $('Вызвать инструмент').all(); } catch (e) { return []; } })();\nconst toolErrors = calls\n  .map((c) => (c.json && c.json.error ? JSON.stringify(c.json).slice(0, 200) : null))\n  .filter(Boolean);\n\nreturn [{ json: {\n  ok: !replyError && !modelError,\n  stage: replyError ? 'reply' : (modelError ? 'model' : null),\n  detail: replyError || modelError || null,\n  reply: last.reply,\n  tools: toolErrors,\n} }];"
       },
       "id": "done",
       "name": "Готово",
@@ -302,7 +302,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Отказ на входе. Причину возвращаем платформе: 'signature' — секреты\n// разошлись, 'stale' — часы n8n убежали дальше окна в 300 секунд.\nreturn [{ json: { ok: false, stage: 'signature', detail: $json.why || 'signature' } }];"
+        "jsCode": "// Отказ на входе. Причину возвращаем платформе: 'signature' — секреты\n// разошлись, 'stale' — часы n8n убежали дальше окна в 300 секунд.\nreturn [{ json: { ok: false, stage: 'signature', detail: $json.why || 'signature', tools: [] } }];"
       },
       "id": "denied",
       "name": "Отказано",
@@ -316,7 +316,7 @@
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "={{ { \"ok\": $json.ok === true, \"stage\": $json.stage || null, \"detail\": $json.detail || null } }}",
+        "responseBody": "={{ { \"ok\": $json.ok === true, \"stage\": $json.stage || null, \"detail\": $json.detail || null, \"tools\": $json.tools || [] } }}",
         "options": {}
       },
       "id": "respond",
