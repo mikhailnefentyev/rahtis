@@ -1,7 +1,14 @@
 import 'server-only';
 
 import { renderToBuffer } from '@react-pdf/renderer';
-import { APP, COMMISSION_BPS, VAT_BPS, commissionCents, payoutCents } from '@/lib/config';
+import {
+  APP,
+  COMMISSION_BPS,
+  INVOICE_TERM_DAYS,
+  VAT_BPS,
+  commissionCents,
+  payoutCents,
+} from '@/lib/config';
 import { operatorInbox } from '@/lib/email';
 import { createFormat } from '@/lib/format';
 import { getDictionary, defaultLocale } from '@/lib/i18n';
@@ -55,6 +62,31 @@ export type GenerateResult = {
   errors: string[];
 };
 
+/*
+ * Отрезок, за который выпускается документ.
+ *
+ * Недельный отчёт и документы расчётного периода отличаются тремя
+ * вещами: границами, заголовком и наличием срока оплаты. Всё остальное —
+ * выборка рейсов, подсчёт, вёрстка, хранилище, письмо — у них общее, и
+ * разводить это на два похожих файла значило бы чинить их потом
+ * по очереди.
+ */
+export type Span = {
+  kind: 'WEEK' | 'PERIOD';
+  /** Понедельник недели либо первое число периода. */
+  start: string;
+  /** Последний день отрезка включительно. */
+  end: string;
+  /** Заказчику — срок оплаты, перевозчику — день выплаты. */
+  due: { shipper: string; carrier: string } | null;
+};
+
+/** Отрезок недели: конец считается от начала, как было. */
+function weekSpan(start: string): Span {
+  const end = new Date(new Date(`${start}T00:00:00Z`).getTime() + 6 * 24 * 3600 * 1000);
+  return { kind: 'WEEK', start, end: end.toISOString().slice(0, 10), due: null };
+}
+
 type OrderRow = {
   id: string;
   ref: string;
@@ -68,12 +100,56 @@ type OrderRow = {
 };
 
 export async function generateWeeklyReports(week?: string): Promise<GenerateResult> {
+  return run(weekSpan(week ?? lastWeek()));
+}
+
+/**
+ * Документы расчётного периода.
+ *
+ * Границы и день выплаты перевозчику берутся из базы, а не считаются
+ * здесь: правило периодов — включая короткий февраль — записано в
+ * payout_schedule, и второй его экземпляр на TypeScript разошёлся бы с
+ * первым ровно в феврале.
+ *
+ * Срок оплаты заказчику, наоборот, живёт в config.ts: это коммерческое
+ * условие, а не свойство календаря.
+ */
+export async function generatePeriodSettlement(moment?: string): Promise<GenerateResult> {
   const admin = createAdminClient();
-  const target = week ?? lastWeek();
+
+  const { data, error } = await admin.rpc('settlement_period', {
+    p_moment: moment ?? new Date(Date.now() - 24 * 3600 * 1000).toISOString(),
+  });
+
+  const period = Array.isArray(data) ? data[0] : data;
+
+  if (error || !period) {
+    return {
+      week: moment ?? '',
+      reports: 0,
+      emails: 0,
+      errors: [error?.message ?? 'период не определён'],
+    };
+  }
+
+  const issued = new Date();
+  const shipperDue = new Date(issued.getTime() + INVOICE_TERM_DAYS * 24 * 3600 * 1000);
+
+  return run({
+    kind: 'PERIOD',
+    start: period.period_start,
+    end: period.period_end,
+    due: { shipper: shipperDue.toISOString().slice(0, 10), carrier: period.payout_due },
+  });
+}
+
+async function run(span: Span): Promise<GenerateResult> {
+  const admin = createAdminClient();
+  const target = span.start;
   const errors: string[] = [];
 
   const from = `${target}T00:00:00+02:00`;
-  const to = new Date(new Date(`${target}T00:00:00Z`).getTime() + 7 * 24 * 3600 * 1000)
+  const to = new Date(new Date(`${span.end}T00:00:00Z`).getTime() + 24 * 3600 * 1000)
     .toISOString()
     .slice(0, 10);
 
@@ -143,7 +219,7 @@ export async function generateWeeklyReports(week?: string): Promise<GenerateResu
 
   for (const [companyId, entry] of byCompany) {
     try {
-      const sent = await issue(admin, target, companyId, entry.role, entry.orders, route, plate);
+      const sent = await issue(admin, span, companyId, entry.role, entry.orders, route, plate);
       reports += 1;
       if (sent) emails += 1;
     } catch (cause) {
@@ -173,7 +249,7 @@ function push(
 
 async function issue(
   admin: ReturnType<typeof createAdminClient>,
-  week: string,
+  span: Span,
   key: string,
   role: 'CARRIER' | 'SHIPPER',
   orders: OrderRow[],
@@ -181,6 +257,7 @@ async function issue(
   plate: Map<string, string>,
 ): Promise<boolean> {
   const companyId = key.split(':')[0]!;
+  const week = span.start;
   const t = await getDictionary(defaultLocale);
   const f = createFormat(t.meta.intl);
 
@@ -223,14 +300,37 @@ async function issue(
     };
   });
 
-  const end = new Date(new Date(`${week}T00:00:00Z`).getTime() + 6 * 24 * 3600 * 1000);
+  const period = span.kind === 'WEEK'
+    ? t.report_.period
+        .replace('{week}', String(isoWeekNumber(week)))
+        .replace('{from}', f.date(week))
+        .replace('{to}', f.date(span.end))
+    : t.report_.periodRange.replace('{from}', f.date(week)).replace('{to}', f.date(span.end));
+
+  const title =
+    span.kind === 'WEEK'
+      ? carrier
+        ? t.report_.carrierTitle
+        : t.report_.shipperTitle
+      : carrier
+        ? t.report_.settlementCarrierTitle
+        : t.report_.settlementShipperTitle;
+
+  /*
+   * Срок стоит в шапке, а не в письме: письмо теряется, документ
+   * остаётся. Заказчику это «оплатить до», перевозчику «выплатим» —
+   * одна дата разного смысла, и называть их одним словом нельзя.
+   */
+  const due = span.due
+    ? carrier
+      ? t.report_.dueCarrier.replace('{date}', f.date(span.due.carrier))
+      : t.report_.dueShipper.replace('{date}', f.date(span.due.shipper))
+    : null;
 
   const texts: ReportTexts = {
-    title: carrier ? t.report_.carrierTitle : t.report_.shipperTitle,
-    period: `${t.report_.period
-      .replace('{week}', String(isoWeekNumber(week)))
-      .replace('{from}', f.date(week))
-      .replace('{to}', f.date(end.toISOString()))} · ${company.name}`,
+    title,
+    period: `${period} · ${company.name}`,
+    due,
     vatNote: carrier ? t.done.vatNoteCarrier : t.done.vatNoteShipper,
     colRef: t.report_.colRef,
     colDate: t.report_.colDate,
@@ -262,7 +362,7 @@ async function issue(
     }),
   );
 
-  const path = `${companyId}/${week}-${role}.pdf`;
+  const path = `${companyId}/${week}-${role}${span.kind === 'PERIOD' ? '-settlement' : ''}.pdf`;
 
   const { error: upload } = await admin.storage
     .from(BUCKET)
@@ -288,9 +388,11 @@ async function issue(
        */
       commission_bps: uniformBps(orders),
       vat_bps: VAT_BPS,
+      kind: span.kind,
+      due_date: span.due ? (carrier ? span.due.carrier : span.due.shipper) : null,
       generated_at: new Date().toISOString(),
     },
-    { onConflict: 'week,company_id,role' },
+    { onConflict: 'week,company_id,role,kind' },
   )
     .select('id')
     .single();
@@ -307,7 +409,7 @@ async function issue(
   const result = await notify({
     companyId,
     kind: 'REPORT',
-    title: `${texts.title} · ${t.report_.period.replace('{week}', String(isoWeekNumber(week))).split(' · ')[0]}`,
+    title: `${texts.title} · ${period}`,
     body: `${orders.length} · ${f.eur(net)}`,
     /*
      * Ссылка ведёт на сам отчёт, а не в раздел выполненных рейсов:
@@ -320,7 +422,12 @@ async function issue(
       ? {
           to,
           template: 'weekly_report',
-          subject: t.report_.emailSubject.replace('{week}', String(isoWeekNumber(week))),
+          subject:
+            span.kind === 'WEEK'
+              ? t.report_.emailSubject.replace('{week}', String(isoWeekNumber(week)))
+              : t.report_.settlementEmailSubject
+                  .replace('{from}', f.date(week))
+                  .replace('{to}', f.date(span.end)),
           text: [
             'Hei,',
             '',
@@ -328,6 +435,7 @@ async function issue(
             '',
             `Kuljetuksia: ${orders.length}`,
             `Yhteensä: ${f.eur(net)}`,
+            ...(due ? ['', due] : []),
             '',
             texts.vatNote,
             '',
@@ -347,7 +455,8 @@ async function issue(
       .update({ emailed_at: new Date().toISOString() })
       .eq('week', week)
       .eq('company_id', companyId)
-      .eq('role', role);
+      .eq('role', role)
+      .eq('kind', span.kind);
   }
 
   return result.emailSent;

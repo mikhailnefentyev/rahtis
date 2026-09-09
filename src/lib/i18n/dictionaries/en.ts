@@ -1025,6 +1025,21 @@ export const en = {
     shipperTitle: 'Weekly report · completed transports',
     adminTitle: 'Weekly report · invoicing and payouts',
     period: 'Week {week} · {from}–{to}',
+    /*
+     * Period documents. A separate title because they say something
+     * different from the weekly report: the week shows work done, the
+     * period shows money.
+     *
+     * 'Payment summary' for the shipper, not 'invoice': the invoice
+     * number is issued in accounting, and calling a summary an invoice
+     * would promise bookkeeping rigour where there is none.
+     */
+    settlementShipperTitle: 'Payment summary · transports in the period',
+    settlementCarrierTitle: 'Period statement · transports driven',
+    periodRange: 'Period {from}–{to}',
+    dueShipper: 'Due by {date}',
+    dueCarrier: 'Payout on {date}',
+    settlementEmailSubject: 'RAHTIS · period summary {from}–{to}',
     colRef: 'Number',
     colDate: 'Completed',
     colRoute: 'Route',

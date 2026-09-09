@@ -1401,11 +1401,13 @@ export type Database = {
           commission_bps: number | null
           commission_cents: number | null
           company_id: string | null
+          due_date: string | null
           emailed_at: string | null
           file_path: string
           generated_at: string
           gross_cents: number
           id: string
+          kind: Database["public"]["Enums"]["report_kind"]
           orders_count: number
           payout_cents: number | null
           role: Database["public"]["Enums"]["party_role"]
@@ -1417,11 +1419,13 @@ export type Database = {
           commission_bps?: number | null
           commission_cents?: number | null
           company_id?: string | null
+          due_date?: string | null
           emailed_at?: string | null
           file_path: string
           generated_at?: string
           gross_cents?: number
           id?: string
+          kind?: Database["public"]["Enums"]["report_kind"]
           orders_count?: number
           payout_cents?: number | null
           role: Database["public"]["Enums"]["party_role"]
@@ -1433,11 +1437,13 @@ export type Database = {
           commission_bps?: number | null
           commission_cents?: number | null
           company_id?: string | null
+          due_date?: string | null
           emailed_at?: string | null
           file_path?: string
           generated_at?: string
           gross_cents?: number
           id?: string
+          kind?: Database["public"]["Enums"]["report_kind"]
           orders_count?: number
           payout_cents?: number | null
           role?: Database["public"]["Enums"]["party_role"]
@@ -2566,6 +2572,14 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      settlement_period: {
+        Args: { p_moment?: string }
+        Returns: {
+          payout_due: string
+          period_end: string
+          period_start: string
+        }[]
+      }
       store_route: {
         Args: { p_order_id: string; p_route: Json }
         Returns: {
@@ -2882,6 +2896,7 @@ export type Database = {
       order_type: "TRAILER_SWAP" | "ROUND_TRIP" | "ONE_WAY"
       party_role: "CARRIER" | "SHIPPER" | "ADMIN"
       place_kind: "PORT" | "TERMINAL" | "PARKING" | "ADDRESS"
+      report_kind: "WEEK" | "PERIOD"
       stop_role:
         | "PICKUP"
         | "DELIVERY"
@@ -3071,6 +3086,7 @@ export const Constants = {
       order_type: ["TRAILER_SWAP", "ROUND_TRIP", "ONE_WAY"],
       party_role: ["CARRIER", "SHIPPER", "ADMIN"],
       place_kind: ["PORT", "TERMINAL", "PARKING", "ADDRESS"],
+      report_kind: ["WEEK", "PERIOD"],
       stop_role: [
         "PICKUP",
         "DELIVERY",

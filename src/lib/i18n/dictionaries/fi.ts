@@ -1027,6 +1027,20 @@ export const fi = {
     shipperTitle: 'Viikkoraportti · valmiit kuljetukset',
     adminTitle: 'Viikkoraportti · laskutus ja tilitykset',
     period: 'Viikko {week} · {from}–{to}',
+    /*
+     * Kauden asiakirjat. Erillinen otsikko, koska ne kertovat eri asian
+     * kuin viikkoraportti: viikko näyttää tehdyn työn, kausi rahan.
+     *
+     * Tilaajalle 'maksuerittely', ei 'lasku': laskun numero syntyy
+     * kirjanpidossa, ja erittelyn kutsuminen laskuksi lupaisi
+     * kirjanpidon tarkkuutta siellä, missä sitä ei ole.
+     */
+    settlementShipperTitle: 'Maksuerittely · kauden kuljetukset',
+    settlementCarrierTitle: 'Kauden koontiraportti · ajetut kuljetukset',
+    periodRange: 'Kausi {from}–{to}',
+    dueShipper: 'Maksettava {date} mennessä',
+    dueCarrier: 'Tilitys maksetaan {date}',
+    settlementEmailSubject: 'RAHTIS · kauden erittely {from}–{to}',
     colRef: 'Numero',
     colDate: 'Valmistui',
     colRoute: 'Reitti',

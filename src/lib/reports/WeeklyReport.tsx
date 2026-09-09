@@ -33,6 +33,8 @@ const s = StyleSheet.create({
 
   title: { fontSize: 13, fontFamily: 'Helvetica-Bold', marginTop: 18 },
   period: { fontSize: 9, color: '#44546b', marginTop: 3 },
+  /* Срок оплаты — единственная строка шапки, набранная жирным: её ищут. */
+  due: { fontSize: 10, fontFamily: 'Helvetica-Bold', marginTop: 5 },
 
   /* Пометка про налог обязана быть на каждой странице, а не только на первой. */
   vat: { fontSize: 8, color: '#44546b', marginTop: 10 },
@@ -89,6 +91,11 @@ export type ReportRow = {
 export type ReportTexts = {
   title: string;
   period: string;
+  /*
+   * Срок оплаты. Есть только у документов расчётного периода: у
+   * недельного отчёта платить нечего, он про выработку.
+   */
+  due?: string | null;
   vatNote: string;
   colRef: string;
   colDate: string;
@@ -134,6 +141,7 @@ export function WeeklyReport({
 
         <Text style={s.title}>{texts.title}</Text>
         <Text style={s.period}>{texts.period}</Text>
+        {texts.due ? <Text style={s.due}>{texts.due}</Text> : null}
         <Text style={s.vat}>{texts.vatNote}</Text>
 
         {rows.length === 0 ? (
