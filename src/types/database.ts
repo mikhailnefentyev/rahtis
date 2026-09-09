@@ -1156,7 +1156,9 @@ export type Database = {
           body: string
           company_id: string | null
           id: string
+          lat: number | null
           locale: string
+          lon: number | null
           place_key: string
           title: string
           updated_at: string
@@ -1165,7 +1167,9 @@ export type Database = {
           body: string
           company_id?: string | null
           id?: string
+          lat?: number | null
           locale?: string
+          lon?: number | null
           place_key: string
           title: string
           updated_at?: string
@@ -1174,7 +1178,9 @@ export type Database = {
           body?: string
           company_id?: string | null
           id?: string
+          lat?: number | null
           locale?: string
+          lon?: number | null
           place_key?: string
           title?: string
           updated_at?: string
