@@ -196,23 +196,32 @@ export const fi = {
      * kuin laaja, jonka takana ei ole mitään.
      */
     eyebrow: 'Irtoperät ja kontit · Skandinavian satamat',
-    titleA: 'Perävaunu vaihtuu ajallaan.',
+    /* Irtoperä, ei perävaunu: sama sana kuin kärjessä ja palvelussa. */
+    titleA: 'Irtoperä vaihtuu ajallaan.',
     titleB: 'Kontti lähtee satamasta.',
     titleC: 'Turhat puhelut jäävät pois.',
     lede:
-      'RAHTIS tekee kahta asiaa: irtoperien vaihtoa ja konttikuljetuksia Skandinavian satamien välillä. Kun tilaus julkaistaan, se välittyy automaattisesti hyväksytyille kuljetusliikkeille. Tarjoukset voivat tulla jo minuuteissa, keikan eteneminen näkyy vaihe vaiheelta, ja asiakirjat löytyvät lopuksi samasta paikasta.',
+      'RAHTIS välittää irtoperien vaihdot ja konttikuljetukset hyväksytyille kuljetusliikkeille. Kun tilaus julkaistaan, se tavoittaa sopivat kuljetusliikkeet automaattisesti. Vastaukset voivat tulla jo minuuteissa, kuljetuksen eteneminen näkyy vaihe vaiheelta, ja kuvat sekä asiakirjat löytyvät lopuksi samasta paikasta.',
+    /*
+     * Toinen kappale puhuu hyödystä ja jakaa sen puolittain: toiselle
+     * vähemmän käsityötä, toiselle keikkoja ilman soittelua. Ensimmäinen
+     * kappale kuvaa palvelun, tämä vastaa kysymykseen «mitä minä hyödyn».
+     */
     lede2:
-      'Kutsumme mukaan huolitsijat, operaattorit ja kuljetusliikkeet: sähköinen asiakirjaliikenne kuuluu palveluun, ja liitäntä omiin järjestelmiinne katsotaan yhdessä.',
-    asShipper: 'Olen huolitsija tai operaattori',
-    asCarrier: 'Olen kuljetusliike',
+      'Huolitsijoille ja operaattoreille RAHTIS vähentää manuaalista välitystyötä ja kokoaa kuljetuksen seurannan sekä sähköisen asiakirjaliikenteen yhteen. Kuljetusliikkeille se tarjoaa uusia keikkoja ilman jatkuvaa soittelua. Integraatio omiin järjestelmiin suunnitellaan yhdessä.',
+    /* Kolme asiaa, joiden takia palveluun tullaan. */
+    highlight1: 'Automaattinen välitys',
+    highlight2: 'Vaihekohtainen seuranta',
+    highlight3: 'Asiakirjat yhdessä paikassa',
+    asShipper: 'Huolitsijalle tai operaattorille',
+    asCarrier: 'Kuljetusliikkeelle',
     signIn: 'Kirjaudu palveluun',
     apply: 'Lähetä hakemus',
-    moderationNote:
-      'Palveluun ei voi rekisteröityä suoraan. Tarkistamme jokaisen yrityksen tiedot ennen hyväksyntää PRH:n ja YTJ:n rekistereistä.',
     fleetLabel: 'hyväksyttyä autoa',
     regionsLabel: 'toiminta-aluetta',
-    fleetLive: 'Luvut päivittyvät uusien hyväksyntöjen myötä.',
     regions: 'Toiminta-alueet',
+    /* Maat nimillä, ei tunnuksilla: nauha luetaan, ei tulkita. */
+    country: { FI: 'Suomi', SE: 'Ruotsi', NO: 'Norja', DK: 'Tanska' },
 
     /*
      * Neljä vaihetta, jotka kuljetus oikeasti käy läpi. Tekstit ovat samat
@@ -382,8 +391,15 @@ export const fi = {
     finalEyebrow: 'Näin pääset alkuun',
     finalTitle: 'Kerro yrityksestäsi – me hoidamme loput',
     finalLede: 'Tarvitsemme yrityksen nimen, Y-tunnuksen ja sähköpostiosoitteen.',
+    /*
+     * Sama asia seisoi aiemmin kahdesti: tässä ja ensimmäisen ruudun
+     * alahuomautuksena. Huomautus kertoi lisäksi kaksi asiaa, joita tämä
+     * rivi ei kertonut — ettei palveluun voi rekisteröityä suoraan ja
+     * mitkä rekisterit tarkistetaan. Ne ovat nyt tässä, ja huomautus on
+     * poissa.
+     */
     finalLede2:
-      'Tarkistamme yrityksen tiedot rekistereistä ja avaamme hyväksynnän jälkeen tunnukset palveluun.',
+      'Palveluun ei voi rekisteröityä suoraan: tarkistamme yrityksen tiedot PRH:n ja YTJ:n rekistereistä ja avaamme tunnukset hyväksynnän jälkeen.',
     finalLede3: 'Kuljetusliikkeiltä tarvitsemme lisäksi tiedot liikenneluvasta ja vakuutuksesta.',
     applyShipper: 'Huolitsijan hakemus',
     applyCarrier: 'Kuljetusliikkeen hakemus',

@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { buttonClass, Card, CardBody, Mono } from '@/components/ui';
 import { APP } from '@/lib/config';
 import { getI18n, type Locale } from '@/lib/i18n';
-import { placeCities } from '@/lib/routing/places';
+import { placeCountries } from '@/lib/routing/places';
 
 /**
  * Всё, что лежит на главной ниже первого экрана.
@@ -32,30 +32,31 @@ export async function LandingSections({ locale }: { locale: Locale }) {
         * витрине город, куда заказ нельзя оформить, значит обещать
         * впустую.
         */}
-      <div className="border-y border-line bg-surface py-6">
+      <div className="border-y border-line bg-surface py-7">
         <p className="label-micro text-center">{l.regions}</p>
         {/*
-          * Города берутся из справочника, а не переписываются сюда.
+          * Страны берутся из справочника, а не переписываются сюда:
+          * убранная оттуда страна не должна остаться на витрине
+          * обещанием, за которым уже нет ни одного порта.
           *
-          * Раньше строка стояла в разметке, а комментарий выше обещал,
-          * что список тот же. Два источника одной правды расходятся на
-          * первом же порту: добавленный в справочник здесь не появлялся,
-          * убранный — оставался обещанием, за которым ничего нет.
+          * Одной строкой и словами, а не кодами. Двадцать девять городов
+          * стояли здесь четырьмя строками разной длины и читались как
+          * перенос по ширине; страна — то же обещание, сказанное с
+          * одного взгляда.
           *
-          * По странам, а не одной строкой: городов стало под тридцать, и
-          * сплошная лента перестала читаться как география — по ней уже
-          * не видно, что покрыта вся Скандинавия, а не один берег.
+          * Разделитель — отдельный элемент между пунктами, и на телефоне
+          * он не рисуется: четыре слова с разрядкой в 400 точек не
+          * помещаются, ряд переносится, и точка встала бы в начало
+          * второй строки. Расстояния там хватает и без неё.
           */}
-        <div className="mt-3 flex flex-col gap-1.5">
-          {placeCities().map((group) => (
-            <p key={group.country} className="text-center font-mono text-[13px] text-ink-dim">
-              <span className="mr-2 text-accent">{group.country}</span>
-              <span className="tracking-[0.12em]">
-                {group.cities.join(' · ').toUpperCase()}
-              </span>
-            </p>
+        <p className="mt-3.5 flex flex-wrap justify-center gap-x-4 gap-y-1.5 text-center font-mono text-[13px] tracking-[0.16em] text-ink-dim sm:gap-x-0">
+          {placeCountries().map((code, i) => (
+            <span key={code}>
+              {i > 0 && <span className="mx-4 hidden text-line-strong sm:inline">·</span>}
+              {l.country[code as keyof typeof l.country].toUpperCase()}
+            </span>
           ))}
-        </div>
+        </p>
       </div>
 
       {/* ── Что мы делаем ──────────────────────────────────────── */}

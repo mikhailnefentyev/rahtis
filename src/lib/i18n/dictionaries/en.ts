@@ -201,22 +201,36 @@ export const en = {
      */
     eyebrow: 'Trailer swaps and containers · Scandinavian ports',
     titleA: 'The trailer swaps on time.',
-    titleB: 'The container leaves the port.',
+    /*
+     * 'Leaves port', not 'leaves the port': with the article the line
+     * overflows the copy column and drops a lone 'port.' onto a line of
+     * its own. Leaving port is the idiom anyway.
+     */
+    titleB: 'The container leaves port.',
     titleC: 'The phone stops ringing.',
     lede:
-      'RAHTIS does two things: trailer swaps and container haulage between Scandinavian ports. Once an order is published it goes automatically to approved carriers. Offers can arrive within minutes, the job’s progress is visible step by step, and every document sits in one place at the end.',
+      'RAHTIS passes trailer swaps and container haulage to approved carriers. Once an order is published it reaches suitable carriers automatically. Replies can arrive within minutes, the job’s progress is visible step by step, and photos and documents sit in one place at the end.',
+    /*
+     * The second paragraph speaks in benefits and splits them by side:
+     * less manual work for one, jobs without phone calls for the other.
+     * The first paragraph describes the service, this one answers
+     * “what is in it for me”.
+     */
     lede2:
-      'We invite forwarders, operators and carriers to work with us: electronic document flow is part of the service, and a link to your own systems is something we work out together.',
-    asShipper: 'I am a forwarder or operator',
-    asCarrier: 'I run a fleet',
+      'For forwarders and operators, RAHTIS cuts manual dispatch work and brings tracking and electronic document flow together. For carriers, it offers new jobs without constant phone calls. Integration with your own systems is planned together.',
+    /* The three things people come here for. */
+    highlight1: 'Automatic dispatch',
+    highlight2: 'Stage-by-stage tracking',
+    highlight3: 'Documents in one place',
+    asShipper: 'For forwarders and operators',
+    asCarrier: 'For carriers',
     signIn: 'Sign in',
     apply: 'Send an application',
-    moderationNote:
-      'You cannot sign up directly. We check every company against the PRH and YTJ registers before approval.',
     fleetLabel: 'approved vehicles',
     regionsLabel: 'operating areas',
-    fleetLive: 'The figures update as new approvals come through.',
     regions: 'Operating areas',
+    /* Countries by name, not by code: the strip is read, not decoded. */
+    country: { FI: 'Finland', SE: 'Sweden', NO: 'Norway', DK: 'Denmark' },
     cabinet: 'My account',
 
     cycle1: 'Available',
@@ -378,8 +392,14 @@ export const en = {
     finalEyebrow: 'Getting started',
     finalTitle: 'Tell us about your company — we handle the rest',
     finalLede: 'We need the company name, the Y-tunnus and an email address.',
+    /*
+     * The same fact used to stand twice: here and as a footnote on the
+     * first screen. The footnote also carried two things this line did
+     * not — that you cannot sign up directly, and which registers we
+     * check. They live here now, and the footnote is gone.
+     */
     finalLede2:
-      'We check the company against the registers and issue credentials once it is approved.',
+      'You cannot sign up directly: we check the company against the PRH and YTJ registers and issue credentials once it is approved.',
     finalLede3: 'From carriers we also need the operating licence and insurance details.',
     applyShipper: 'Forwarder application',
     applyCarrier: 'Carrier application',

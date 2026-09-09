@@ -71,6 +71,11 @@ export async function HeroPort({ locale }: { locale: Locale }) {
           </h1>
 
           <p className="hero-port__lede">{t.landing.lede}</p>
+          {/*
+            * Второй абзац говорит выгодой и разделён по сторонам: одному
+            * меньше ручной работы, другому — рейсы без обзвона. Первый
+            * абзац описывает услугу, этот отвечает на «а мне зачем».
+            */}
           <p className="hero-port__lede hero-port__lede--second">{t.landing.lede2}</p>
 
           <div className="hero-port__doors">
@@ -85,23 +90,38 @@ export async function HeroPort({ locale }: { locale: Locale }) {
             </Link>
           </div>
 
-          {/* Пустой парк не показывается: ноль машин отговаривает вернее пустоты. */}
+          {/*
+            * Три вещи, за которые сюда приходят, — под кнопками, где на
+            * них смотрят уже решившись. Разделитель рисуется вёрсткой, а
+            * не вписан в текст: на узком экране пункты становятся
+            * столбиком, и точка посреди строки повисла бы.
+            */}
+          <p className="hero-port__marks">
+            {[t.landing.highlight1, t.landing.highlight2, t.landing.highlight3].map((mark) => (
+              <span key={mark} className="hero-port__mark">
+                {mark}
+              </span>
+            ))}
+          </p>
+
+          {/*
+            * Пустой парк не показывается: ноль машин отговаривает вернее
+            * пустоты.
+            *
+            * Под счётчиком стояли две строки: пояснение, что числа живые,
+            * и примечание про ручную модерацию. Первое объясняло то, что
+            * и так видно по пульсирующей точке; второе слово в слово
+            * повторяло абзац у формы заявки внизу страницы. Обе ушли, и
+            * первый экран кончается тем, ради чего он есть, — кнопками.
+            */}
           {fleet && fleet.vehicles > 0 && (
             <p className="hero-port__fleet">
               <span className="hero-port__pulse" aria-hidden="true" />
               <Mono className="hero-port__count">{fleet.vehicles}</Mono> {t.landing.fleetLabel}
               <span className="hero-port__sep" aria-hidden="true" />
               <Mono className="hero-port__count">{fleet.regions}</Mono> {t.landing.regionsLabel}
-              {/*
-                * Пояснение отдельной строкой, а не третьим членом ряда:
-                * на узком экране оно переносится, и разделитель остаётся
-                * висеть в конце предыдущей строки.
-                */}
-              <span className="hero-port__fleetNote">{t.landing.fleetLive}</span>
             </p>
           )}
-
-          <p className="hero-port__note">{t.landing.moderationNote}</p>
         </div>
 
         {/*
