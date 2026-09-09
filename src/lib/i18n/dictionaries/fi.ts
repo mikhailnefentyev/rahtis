@@ -259,40 +259,45 @@ export const fi = {
     timeTitle: 'Logistiikassa aika maksaa',
     timeLede:
       'Kun kuljetuksen tilaaja etsii vapaata autoa puhelimitse, rahti odottaa. Kun kuljetusliike etsii seuraavaa kuormaa, auto seisoo. Molemmissa tapauksissa menetetään samaa asiaa: aikaa.',
+    /*
+     * Rivit ovat pareja: vasen ja oikea sanovat saman asian, ennen ja
+     * jälkeen. Aiemmin tässä oli kaksi erillistä kuuden virkkeen listaa,
+     * ja lukijan piti itse arvata mikä kuului mihinkin. Nyt pari on
+     * yhdellä rivillä, joten vertailun tekee taitto eikä lukija — ja
+     * silloin virke saa lyhentyä ilmaukseksi.
+     */
     timeOld: 'Näin se usein toimii nyt',
-    timeOld1:
-      'Tilaaja soittaa useille kuljetusliikkeille ja kertoo saman kuljetuksen tiedot joka kerta uudelleen.',
-    timeOld2: 'Kuljetusliike etsii seuraavaa keikkaa puhelimitse, jotta auto ei lähtisi tyhjänä.',
-    timeOld3: 'Sovitut asiat jäävät puheluiden ja viestien varaan.',
-    timeOld4:
-      'Kuljettaja joutuu kysymään erikseen osoitteita, yhteystietoja ja terminaalien ohjeita.',
-    timeOld5: 'Rahtikirjat ja muut asiakirjat saattavat tulla vasta päiviä kuljetuksen jälkeen.',
-    timeOld6: 'Laskutusta ja tilityksiä selvitetään jälkikäteen eri kanavissa.',
     timeNew: 'Näin RAHTIS toimii',
-    timeNew1:
-      'Tilaus julkaistaan kerran ja välitetään automaattisesti oikean alueen kuljetusliikkeille.',
-    timeNew2: 'Hyväksytyt kuljetusliikkeet näkevät avoimet keikat samassa näkymässä.',
-    timeNew3: 'Hinta, aikataulu, reitti ja kalustovaatimukset ovat selvillä ennen keikan hyväksymistä.',
-    timeNew4:
-      'Kuljettaja saa osoitteet, yhteystiedot, varaukset ja kohdekohtaiset ohjeet suoraan keikalle.',
-    timeNew5: 'Asiakirjat liitetään keikkaan heti sen valmistuttua.',
-    timeNew6: 'Ajetut keikat ja tilitykset näkyvät viikkoraportissa.',
+    timeOld1: 'Soitot yhdelle kerrallaan',
+    timeNew1: 'Yksi julkaisu, koko alue',
+    timeOld2: 'Auto etsii kuormaa puhelimitse',
+    timeNew2: 'Avoimet keikat yhdessä näkymässä',
+    timeOld3: 'Sovittu jää puheluiden varaan',
+    timeNew3: 'Hinta, aikataulu ja reitti kirjattuna',
+    timeOld4: 'Kuljettaja kyselee osoitteita',
+    timeNew4: 'Osoitteet ja ohjeet keikan mukana',
+    timeOld5: 'Rahtikirja tulee päivien päästä',
+    timeNew5: 'Asiakirjat heti valmistuttua',
+    timeOld6: 'Laskutus selviää jälkikäteen',
+    timeNew6: 'Keikat ja tilitykset viikkoraportissa',
 
     rolesEyebrow: 'Kenelle RAHTIS on tarkoitettu',
     rolesTitle: 'Yksi alusta irtoperille ja konteille — molemmille osapuolille',
     shipperEyebrow: 'Huolitsijalle ja operaattorille',
     shipperTitle: 'Kuljetusliikettä ei tarvitse etsiä yksi kerrallaan.',
-    shipper1: 'Julkaiset tilauksen kerran, ja se välittyy alueen hyväksytyille kuljetusliikkeille.',
+    /*
+     * Neljä kohtaa kuuden sijaan. Julkaisu kerran, asiakirjat heti ja
+     * viikkoraportti sanottiin jo edellisessä osiossa; toistettuina ne
+     * eivät vahvista lupausta vaan pidentävät listan. Jäljellä on se,
+     * mitä vain tästä näkökulmasta voi sanoa.
+     */
     shipper2: 'Saat enintään kolme tarjousta samaan näkymään.',
     shipper3: 'Valitset sopivan kuljetusliikkeen hinnan, kaluston ja arvostelujen perusteella.',
     shipper4:
       'Jos reitti, aikataulu tai muu tieto muuttuu kesken keikan, päivitys menee suoraan kuljetusliikkeelle ja kuljettajalle.',
-    shipper5: 'Asiakirjat ovat saatavilla heti keikan valmistuttua.',
     shipper6: 'Viikkoraportista näet keikat, summat, asiakirjat ja palautteet.',
     carrierEyebrow: 'Kuljetusliikkeelle',
     carrierTitle: 'Pidä auto ajossa myös keikkojen välillä.',
-    carrier1: 'Näet alueesi avoimet keikat yhdestä paikasta.',
-    carrier2: 'Seuraavaa kuljetusta ei tarvitse etsiä soittamalla.',
     carrier3: 'Voit löytää paluukeikan alueelta, jossa edellinen kuljetus päättyy.',
     carrier4: 'Jokainen auto hyväksytään palveluun erikseen.',
     carrier5: 'Hinta, palvelumaksu ja sinulle jäävä osuus näkyvät ennen keikan hyväksymistä.',

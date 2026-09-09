@@ -263,36 +263,45 @@ export const en = {
     timeTitle: 'In logistics, time is what you pay for',
     timeLede:
       'While a shipper rings round for a free truck, the freight waits. While a carrier rings round for the next load, the truck stands. Both are losing the same thing: time.',
+    /*
+     * The rows are pairs: left and right say the same thing, before and
+     * after. This used to be two separate lists of six sentences, and the
+     * reader had to work out which line answered which. Now the pair sits
+     * on one row, so the layout does the comparing — and once it does,
+     * the sentence can shrink to a phrase.
+     */
     timeOld: 'How it usually works now',
-    timeOld1: 'The shipper calls several carriers and explains the same job to each one.',
-    timeOld2: 'The carrier calls round for the next job so the truck does not run empty.',
-    timeOld3: 'What was agreed lives in phone calls and messages.',
-    timeOld4: 'The driver has to ask separately for addresses, contacts and terminal rules.',
-    timeOld5: 'CMR notes and other paperwork arrive days after the job.',
-    timeOld6: 'Invoicing and payouts get sorted out afterwards across different channels.',
     timeNew: 'How RAHTIS works',
-    timeNew1: 'The order is published once and goes automatically to carriers in the right area.',
-    timeNew2: 'Approved carriers see the open jobs in the same view.',
-    timeNew3: 'Price, schedule, route and equipment are known before the job is accepted.',
-    timeNew4: 'The driver gets addresses, contacts, bookings and site instructions with the job.',
-    timeNew5: 'Documents are attached to the job the moment it is completed.',
-    timeNew6: 'Completed jobs and payouts appear in the weekly report.',
+    timeOld1: 'Calls, one carrier at a time',
+    timeNew1: 'Published once, to the whole area',
+    timeOld2: 'Ringing round for the next load',
+    timeNew2: 'Open jobs in one view',
+    timeOld3: 'Agreements live in calls and texts',
+    timeNew3: 'Price, schedule and route on record',
+    timeOld4: 'The driver asks for addresses',
+    timeNew4: 'Addresses and instructions with the job',
+    timeOld5: 'CMR notes arrive days later',
+    timeNew5: 'Documents attached on completion',
+    timeOld6: 'Invoicing sorted out afterwards',
+    timeNew6: 'Jobs and payouts in the weekly report',
 
     rolesEyebrow: 'Who RAHTIS is for',
     rolesTitle: 'One platform for trailer swaps and containers — for both sides',
     shipperEyebrow: 'For forwarders and operators',
     shipperTitle: 'You do not have to find a carrier one call at a time.',
-    shipper1: 'Publish the order once and it goes to approved carriers in the area.',
+    /*
+     * Four points, not six. Published once, documents on completion and
+     * the weekly report were already said in the section above; repeated
+     * here they do not strengthen the promise, only lengthen the list.
+     * What is left is what only this side can say.
+     */
     shipper2: 'You get up to three offers in the same view.',
     shipper3: 'You pick the carrier on price, equipment and ratings.',
     shipper4:
       'If the route, the schedule or anything else changes mid-job, the update goes straight to the carrier and the driver.',
-    shipper5: 'Documents are available the moment the job is completed.',
     shipper6: 'The weekly report shows jobs, amounts, documents and feedback.',
     carrierEyebrow: 'For the carrier',
     carrierTitle: 'Keep the truck working between jobs too.',
-    carrier1: 'The open jobs in your area are all in one place.',
-    carrier2: 'You do not have to ring round for the next job.',
     carrier3: 'You can find a return load in the area where the last job ends.',
     carrier4: 'Every vehicle is approved onto the platform separately.',
     carrier5: 'Price, service fee and your share are visible before you accept.',

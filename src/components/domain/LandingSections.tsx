@@ -93,33 +93,57 @@ export async function LandingSections({ locale }: { locale: Locale }) {
           </h2>
           <p className="mt-3 max-w-[62ch] text-[15px] text-ink-muted">{l.timeLede}</p>
 
-          <div className="mt-8 grid gap-4 md:grid-cols-2">
-            {/* Прошлое — пунктиром и утопленным: способ не отменён, он дороже. */}
-            <div className="rounded-card border border-dashed border-line bg-sunken p-6">
-              <p className="label-micro">{l.timeOld}</p>
-              <ul className="mt-3.5 grid gap-2.5">
-                {[l.timeOld1, l.timeOld2, l.timeOld3, l.timeOld4, l.timeOld5, l.timeOld6].map((line) => (
-                  <li key={line} className="grid grid-cols-[15px_1fr] gap-2.5 text-[14px] text-ink-faint">
-                    <span className="mt-[9px] h-px w-[9px] bg-line-strong" aria-hidden />
-                    <span>{line}</span>
-                  </li>
-                ))}
-              </ul>
+          {/*
+            * Пары, а не два списка.
+            *
+            * Раньше здесь стояли две колонки по шесть законченных
+            * предложений, и попарно они говорили об одном и том же —
+            * обзвон против одной публикации, поиск груза против общего
+            * стола. Но сопоставить их должен был читатель: удержать шесть
+            * пунктов и найти к ним шесть ответов. Он этого не делает, он
+            * видит двенадцать длинных строк и листает дальше.
+            *
+            * Теперь пара стоит на одной строке. Сравнение делает раскладка,
+            * и поэтому предложение может ужаться до выражения — а разные
+            * маркеры у колонок стали не нужны: противопоставление несёт
+            * сетка, а не форма точки.
+            *
+            * На телефоне колонки складываются, и «было» просто стоит над
+            * «стало». Порядок сохраняется, значок для этого не нужен.
+            */}
+          <div className="mt-8 overflow-hidden rounded-card border border-line">
+            <div className="hidden bg-sunken sm:grid sm:grid-cols-2">
+              {/*
+                * Оба заголовка одинаково тихие. Акцентом красить правый
+                * нечем: .label-micro задаёт цвет в том же слое, и утилита
+                * text-accent до него не достаёт. Подпирать важностью ради
+                * оттенка не стоит — сторону и так видно по колонке: слева
+                * бледное, справа чернильное.
+                */}
+              <p className="label-micro border-r border-line px-5 py-3">{l.timeOld}</p>
+              <p className="label-micro px-5 py-3">{l.timeNew}</p>
             </div>
 
-            <Card>
-              <CardBody className="p-6">
-                <p className="label-micro">{l.timeNew}</p>
-                <ul className="mt-3.5 grid gap-2.5">
-                  {[l.timeNew1, l.timeNew2, l.timeNew3, l.timeNew4, l.timeNew5, l.timeNew6].map((line) => (
-                    <li key={line} className="grid grid-cols-[15px_1fr] gap-2.5 text-[14px] text-ink-muted">
-                      <span className="mt-[7px] size-[7px] rounded-[2px] bg-accent" aria-hidden />
-                      <span>{line}</span>
-                    </li>
-                  ))}
-                </ul>
-              </CardBody>
-            </Card>
+            <ul>
+              {[
+                [l.timeOld1, l.timeNew1],
+                [l.timeOld2, l.timeNew2],
+                [l.timeOld3, l.timeNew3],
+                [l.timeOld4, l.timeNew4],
+                [l.timeOld5, l.timeNew5],
+                [l.timeOld6, l.timeNew6],
+              ].map(([was, now]) => (
+                <li
+                  key={now}
+                  className="grid gap-y-1 border-t border-line first:border-t-0 sm:grid-cols-2 sm:first:border-t"
+                >
+                  <span className="px-5 pt-4 text-[14px] text-ink-faint sm:border-r sm:border-line sm:py-4">
+                    {was}
+                  </span>
+                  <span className="px-5 pb-4 text-[14px] font-medium text-ink sm:py-4">{now}</span>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </section>
@@ -136,22 +160,27 @@ export async function LandingSections({ locale }: { locale: Locale }) {
             {
               eyebrow: l.shipperEyebrow,
               title: l.shipperTitle,
-              lines: [l.shipper1, l.shipper2, l.shipper3, l.shipper4, l.shipper5, l.shipper6],
+              lines: [l.shipper2, l.shipper3, l.shipper4, l.shipper6],
             },
             {
               eyebrow: l.carrierEyebrow,
               title: l.carrierTitle,
-              lines: [l.carrier1, l.carrier2, l.carrier3, l.carrier4, l.carrier5, l.carrier6],
+              lines: [l.carrier3, l.carrier4, l.carrier5, l.carrier6],
             },
           ].map((role) => (
             <Card key={role.title}>
               <CardBody className="flex flex-col gap-3.5 p-6">
                 <p className="label-micro">{role.eyebrow}</p>
                 <h3 className="text-[20px] font-semibold tracking-tight">{role.title}</h3>
+                {/*
+                  * Маркер тот же, что во всех списках страницы: квадратик
+                  * 7×7 акцентом. Здесь он был бледнее остальных, и списки
+                  * читались как разные по важности, хотя они равные.
+                  */}
                 <ul className="grid gap-2.5">
                   {role.lines.map((line) => (
                     <li key={line} className="grid grid-cols-[16px_1fr] gap-2.5 text-[14px] text-ink-muted">
-                      <span className="mt-[7px] size-[7px] rounded-[2px] bg-accent-line" aria-hidden />
+                      <span className="mt-[7px] size-[7px] rounded-[2px] bg-accent" aria-hidden />
                       <span>{line}</span>
                     </li>
                   ))}
@@ -215,10 +244,17 @@ export async function LandingSections({ locale }: { locale: Locale }) {
               <CardBody className="grid grid-cols-[3px_1fr] items-start gap-3.5">
                 <span className={`h-full rounded-[2px] ${fault.tone}`} aria-hidden />
                 <span>
-                  <span className="block max-w-[24ch] text-[13px] font-semibold text-ink">
+                  {/*
+                    * Четырнадцать, как во всех двухколоночных секциях.
+                    * Здесь стояло тринадцать — размер секции с четырьмя
+                    * колонками, где он оправдан узостью карточки. Рядом с
+                    * «Двумя дверями» той же ширины это читалось как
+                    * второсортность, хотя секция равная.
+                    */}
+                  <span className="block max-w-[26ch] text-[14px] font-semibold text-ink">
                     {fault.when}
                   </span>
-                  <span className="mt-1 block text-[13px] text-ink-muted">{fault.then}</span>
+                  <span className="mt-1 block text-[14px] text-ink-muted">{fault.then}</span>
                 </span>
               </CardBody>
             </Card>
