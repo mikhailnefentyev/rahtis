@@ -423,8 +423,17 @@ export const fi = {
      * перевозчику платят. Одна общая фраза заставляла бы каждого читать
      * половину про чужие деньги.
      */
-    vatNoteShipper: 'Summat alv 0 %. Laskuihin lisätään alv 25,5 %.',
-    vatNoteCarrier: 'Summat alv 0 %. Tilityksiin lisätään alv 25,5 %.',
+    /*
+     * Käännetty verovelvollisuus, ei lisättävää veroa.
+     *
+     * Tässä luki aiemmin, että summiin lisätään alv 25,5 %. Se on väärin
+     * ja väärin nimenomaan rahasta: alusta laskuttaa alv 0 % ja ostaja
+     * tilittää veron omassa maassaan — niin sanovat sekä VAT_BPS että
+     * käyttöehtojen kohta 6.1. Maksuasiakirjassa väärä verolause ei ole
+     * kirjoitusvirhe vaan lupaus summasta, jota ei tule.
+     */
+    vatNoteShipper: 'Summat alv 0 %: käännetty verovelvollisuus, ostaja tilittää veron omassa maassaan.',
+    vatNoteCarrier: 'Summat alv 0 %: käännetty verovelvollisuus, ostaja tilittää veron omassa maassaan.',
     open: 'Avaa',
     collapse: 'Pienennä',
     none: 'Ei vielä ajettuja kuljetuksia',
@@ -1055,6 +1064,8 @@ export const fi = {
     empty: 'Tällä viikolla ei valmistunut kuljetuksia.',
     closingNote:
       'Kuljetus kuuluu sille viikolle, jona se päättyi. Perjantaina aloitettu ja maanantaina purettu kuljetus näkyy seuraavan viikon raportissa.',
+    periodClosingNote:
+      'Kuljetus kuuluu sille kaudelle, jona se päättyi. Kuukauden lopussa aloitettu ja seuraavan kuun puolella purettu kuljetus näkyy seuraavan kauden asiakirjoissa.',
     page: 'Sivu',
     archive: 'Viikkoraportit',
     archiveEmpty: 'Ei vielä raportteja',

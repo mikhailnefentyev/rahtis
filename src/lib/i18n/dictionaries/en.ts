@@ -422,8 +422,18 @@ export const en = {
     subtitleCarrier: 'Jobs driven during the week and the payouts due on them.',
     subtitleShipper: 'Jobs completed during the week and the amounts to be invoiced.',
     subtitleAdmin: 'Invoices to shippers, payouts to carriers.',
-    vatNoteShipper: 'Amounts exclude VAT. Invoices add VAT at 25.5%.',
-    vatNoteCarrier: 'Amounts exclude VAT. Payouts add VAT at 25.5%.',
+    /*
+     * Reverse charge, nothing to add.
+     *
+     * This used to say VAT at 25.5% is added to the amounts. That is
+     * wrong, and wrong precisely about money: the platform invoices at
+     * 0% and the buyer accounts for the tax in its own country — which
+     * is what both VAT_BPS and clause 6.1 of the terms say. On a payment
+     * document a wrong tax line is not a typo but a promise about a sum
+     * that will not arrive.
+     */
+    vatNoteShipper: 'Amounts at VAT 0%: reverse charge, the buyer accounts for the tax in its own country.',
+    vatNoteCarrier: 'Amounts at VAT 0%: reverse charge, the buyer accounts for the tax in its own country.',
     open: 'Open',
     collapse: 'Collapse',
     none: 'No jobs driven yet',
@@ -1054,6 +1064,8 @@ export const en = {
     empty: 'No transports were completed this week.',
     closingNote:
       'A transport belongs to the week it finished in. One started on Friday and unloaded on Monday appears in the following week’s report.',
+    periodClosingNote:
+      'A transport belongs to the period in which it was completed. One started at the end of a period and unloaded after it appears in the next period documents.',
     page: 'Page',
     archive: 'Weekly reports',
     archiveEmpty: 'No reports yet',

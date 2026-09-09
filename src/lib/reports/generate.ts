@@ -343,7 +343,7 @@ async function issue(
     colDocuments: t.report_.colDocuments,
     total: t.report_.total,
     empty: t.report_.empty,
-    closingNote: t.report_.closingNote,
+    closingNote: span.kind === 'WEEK' ? t.report_.closingNote : t.report_.periodClosingNote,
     operator: `${t.brand.legalEntity} · Y-tunnus ${APP.operator.businessId}`,
     page: t.report_.page,
   };
@@ -421,7 +421,13 @@ async function issue(
     email: to
       ? {
           to,
-          template: 'weekly_report',
+          /*
+           * Журнал писем должен различать документы: недельный отчёт и
+           * документы периода уходят по-разному и на разные вопросы
+           * отвечают. Одно имя на оба означало бы, что на вопрос «за
+           * что письмо» журнал ответить не может.
+           */
+          template: span.kind === 'WEEK' ? 'weekly_report' : 'period_settlement',
           subject:
             span.kind === 'WEEK'
               ? t.report_.emailSubject.replace('{week}', String(isoWeekNumber(week)))
