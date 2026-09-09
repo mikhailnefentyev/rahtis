@@ -424,16 +424,21 @@ export const fi = {
      * половину про чужие деньги.
      */
     /*
-     * Käännetty verovelvollisuus, ei lisättävää veroa.
+     * Kaksi verolausetta, ei yhtä.
      *
-     * Tässä luki aiemmin, että summiin lisätään alv 25,5 %. Se on väärin
-     * ja väärin nimenomaan rahasta: alusta laskuttaa alv 0 % ja ostaja
-     * tilittää veron omassa maassaan — niin sanovat sekä VAT_BPS että
-     * käyttöehtojen kohta 6.1. Maksuasiakirjassa väärä verolause ei ole
-     * kirjoitusvirhe vaan lupaus summasta, jota ei tule.
+     * Kanta riippuu vastapuolen maasta: suomalaiselle yritykselle
+     * tavallinen kotimaan myynti 25,5 %, ulkomaiselle käännetty
+     * verovelvollisuus 0 %. Aiemmin tässä oli ensin yksi lause kaikille
+     * ('lisätään 25,5 %'), sitten toinen yksi kaikille ('alv 0 %') —
+     * kumpikin oli väärin puolelle asiakkaista.
+     *
+     * Nolla ei tarkoita, ettei veroa ole: käännetyssä
+     * verovelvollisuudessa veron tilittää ostaja, ja asiakirjan on
+     * sanottava se sanoin eikä tyhjällä rivillä.
      */
-    vatNoteShipper: 'Summat alv 0 %: käännetty verovelvollisuus, ostaja tilittää veron omassa maassaan.',
-    vatNoteCarrier: 'Summat alv 0 %: käännetty verovelvollisuus, ostaja tilittää veron omassa maassaan.',
+    vatNoteDomestic: 'Summat ilman arvonlisäveroa. Alv 25,5 % lisätään laskulle.',
+    vatNoteReverse:
+      'Summat alv 0 %: käännetty verovelvollisuus, ostaja tilittää veron omassa maassaan.',
     open: 'Avaa',
     collapse: 'Pienennä',
     none: 'Ei vielä ajettuja kuljetuksia',
@@ -1061,6 +1066,13 @@ export const fi = {
     colNetShipper: 'Laskutetaan',
     colDocuments: 'Asiakirjat',
     total: 'Yhteensä',
+    /*
+     * Verokannat asiakirjoissa. Kanta riippuu vastapuolen maasta:
+     * suomalaiselle yritykselle 25,5 %, ulkomaiselle käännetty
+     * verovelvollisuus.
+     */
+    vatLine: 'ALV {rate}',
+    totalWithVat: 'Yhteensä sis. ALV',
     empty: 'Tällä viikolla ei valmistunut kuljetuksia.',
     closingNote:
       'Kuljetus kuuluu sille viikolle, jona se päättyi. Perjantaina aloitettu ja maanantaina purettu kuljetus näkyy seuraavan viikon raportissa.',
@@ -1167,6 +1179,7 @@ export const fi = {
      * tilittää veron omassa maassaan. Ks. VAT_BPS lib/config.ts.
      */
     addVat: 'alv 0 %',
+    vatByCountry: 'Summat ilman alv:ta. Kanta määräytyy vastapuolen maan mukaan.',
     calcNote:
       'Summat alv 0 %. Käännetty verovelvollisuus: ostaja tilittää veron omassa maassaan.',
 

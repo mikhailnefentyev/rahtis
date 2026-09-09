@@ -423,17 +423,21 @@ export const en = {
     subtitleShipper: 'Jobs completed during the week and the amounts to be invoiced.',
     subtitleAdmin: 'Invoices to shippers, payouts to carriers.',
     /*
-     * Reverse charge, nothing to add.
+     * Two tax lines, not one.
      *
-     * This used to say VAT at 25.5% is added to the amounts. That is
-     * wrong, and wrong precisely about money: the platform invoices at
-     * 0% and the buyer accounts for the tax in its own country — which
-     * is what both VAT_BPS and clause 6.1 of the terms say. On a payment
-     * document a wrong tax line is not a typo but a promise about a sum
-     * that will not arrive.
+     * The rate follows the counterparty's country: a normal domestic
+     * sale at 25.5% for a Finnish company, reverse charge at 0% for a
+     * foreign one. This first held one sentence for everyone ('25.5% is
+     * added'), then another one for everyone ('VAT 0%') — each was wrong
+     * for half the customers.
+     *
+     * Zero does not mean there is no tax: under the reverse charge the
+     * buyer accounts for it, and the document must say so in words
+     * rather than with a blank line.
      */
-    vatNoteShipper: 'Amounts at VAT 0%: reverse charge, the buyer accounts for the tax in its own country.',
-    vatNoteCarrier: 'Amounts at VAT 0%: reverse charge, the buyer accounts for the tax in its own country.',
+    vatNoteDomestic: 'Amounts exclude VAT. VAT at 25.5% is added on the invoice.',
+    vatNoteReverse:
+      'Amounts at VAT 0%: reverse charge, the buyer accounts for the tax in its own country.',
     open: 'Open',
     collapse: 'Collapse',
     none: 'No jobs driven yet',
@@ -1061,6 +1065,13 @@ export const en = {
     colNetShipper: 'To invoice',
     colDocuments: 'Documents',
     total: 'Total',
+    /*
+     * Tax lines in the documents. The rate follows the counterparty's
+     * country: 25.5% for a Finnish company, reverse charge for a
+     * foreign one.
+     */
+    vatLine: 'VAT {rate}',
+    totalWithVat: 'Total incl. VAT',
     empty: 'No transports were completed this week.',
     closingNote:
       'A transport belongs to the week it finished in. One started on Friday and unloaded on Monday appears in the following week’s report.',
@@ -1168,6 +1179,7 @@ export const en = {
      * lib/config.ts.
      */
     addVat: 'VAT 0%',
+    vatByCountry: 'Amounts exclude VAT. The rate follows the counterparty country.',
     calcNote:
       'Amounts at VAT 0%. Reverse charge: the buyer accounts for the tax in their own country.',
 

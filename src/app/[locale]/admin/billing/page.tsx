@@ -22,7 +22,7 @@ import type { StatusTone } from '@/components/ui/tone';
 import { requireRole } from '@/lib/auth/guard';
 import { setBillingAction } from '@/lib/billing/actions';
 import { ReportsButton } from '../ReportsButton';
-import { VAT_BPS, withVat } from '@/lib/config';
+
 import { getI18n, isLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import type { Database } from '@/types/database';
@@ -105,16 +105,15 @@ export default async function BillingPage({
    * остаётся значением плитки, брутто — подсказкой под ним, чтобы одно
    * не подменяло другое.
    */
-  const invoiceTotal = withVat(revenue);
-  const payoutTotal = withVat(payout);
-
   /*
-   * При нулевой ставке брутто равно нетто, и подсказка «в том числе ALV»
-   * повторяла бы значение плитки тем же числом. Повтор читается как
-   * ошибка вёрстки, а не как «налога нет», поэтому подсказка исчезает
-   * вместе со ставкой — и вернётся сама, если ставка вернётся.
+   * Брутто у сводных плиток больше не считается.
+   *
+   * Ставка зависит от страны контрагента: финская компания платит
+   * 25,5 %, иностранная идёт по обратному начислению. В плитке сложены
+   * все, и одно число «в том числе ALV» на такую сумму было бы неверно
+   * для половины строк. Налог виден там, где виден контрагент, — в
+   * документах периода и в детализации.
    */
-  const showVat = VAT_BPS > 0;
 
   /*
    * Оценка стоит в одной таблице с выплатой: решение «кому давать больше
@@ -181,12 +180,12 @@ export default async function BillingPage({
         <Stat
           label={t.money.revenue}
           value={f.eur(revenue)}
-          hint={showVat ? m('money.withVat', { amount: f.eur(invoiceTotal) }) : t.money.addVat}
+          hint={t.money.vatByCountry}
         />
         <Stat
           label={t.done.payout}
           value={f.eur(payout)}
-          hint={showVat ? m('money.withVat', { amount: f.eur(payoutTotal) }) : t.money.addVat}
+          hint={t.money.vatByCountry}
         />
         {/* Маржа без налога и без подсказки: ALV здесь транзитный. */}
         <Stat label={t.done.margin} value={f.eur(commission)} tone="ok" />

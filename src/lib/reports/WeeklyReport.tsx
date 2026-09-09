@@ -57,6 +57,7 @@ const s = StyleSheet.create({
   right: { textAlign: 'right' },
 
   totals: { flexDirection: 'row', marginTop: 10, paddingTop: 6, borderTopWidth: 1, borderTopColor: '#0c1626' },
+  vatRow: { flexDirection: 'row', marginTop: 4 },
   totalLabel: { fontSize: 9, fontFamily: 'Helvetica-Bold', paddingRight: 6 },
 
   empty: { marginTop: 18, fontSize: 9, color: '#44546b' },
@@ -122,7 +123,14 @@ export function WeeklyReport({
 }: {
   texts: ReportTexts;
   rows: ReportRow[];
-  totals: { gross: string; commission: string | null; net: string; distance: string };
+  totals: {
+    gross: string;
+    commission: string | null;
+    net: string;
+    distance: string;
+    /** Есть только там, где налог прибавляется: у контрагента из Финляндии. */
+    vat?: { label: string; amount: string; grossLabel: string; gross: string } | null;
+  };
   /** У заказчика колонки комиссии нет: доля оператора — не его дело. */
   withCommission: boolean;
 }) {
@@ -203,6 +211,30 @@ export function WeeklyReport({
                 {totals.net}
               </Text>
             </View>
+
+            {/*
+              * Налог отдельными строками под итогом, а не приписанный к
+              * нему. Финская компания видит, из чего складывается сумма
+              * к оплате; иностранная этих строк не получает вовсе — у
+              * обратного начисления прибавлять нечего, и пустая строка
+              * «ALV 0 €» выглядела бы как забытое поле.
+              */}
+            {totals.vat ? (
+              <>
+                <View style={s.vatRow}>
+                  <Text style={[s.cell, { flex: 1 }]}>{totals.vat.label}</Text>
+                  <Text style={[s.cell, s.right, { width: withCommission ? cols.net : 70 }]}>
+                    {totals.vat.amount}
+                  </Text>
+                </View>
+                <View style={s.vatRow}>
+                  <Text style={[s.totalLabel, { flex: 1 }]}>{totals.vat.grossLabel}</Text>
+                  <Text style={[s.totalLabel, s.right, { width: withCommission ? cols.net : 70 }]}>
+                    {totals.vat.gross}
+                  </Text>
+                </View>
+              </>
+            ) : null}
           </>
         )}
 

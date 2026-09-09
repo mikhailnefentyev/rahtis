@@ -5,9 +5,10 @@ import {
   APP,
   COMMISSION_BPS,
   INVOICE_TERM_DAYS,
-  VAT_BPS,
   commissionCents,
   payoutCents,
+  vatBpsFor,
+  withVat,
 } from '@/lib/config';
 import { operatorInbox } from '@/lib/email';
 import { createFormat } from '@/lib/format';
@@ -263,7 +264,7 @@ async function issue(
 
   const { data: company } = await admin
     .from('companies')
-    .select('name, contact_email, billing_email, frozen_at')
+    .select('name, country, contact_email, billing_email, frozen_at')
     .eq('id', companyId)
     .single();
 
@@ -327,11 +328,21 @@ async function issue(
       : t.report_.dueShipper.replace('{date}', f.date(span.due.shipper))
     : null;
 
+  /*
+   * Ставка налога — от страны контрагента, а не одна на всех. Финская
+   * компания платит с налогом, иностранная — по обратному начислению.
+   * Считается здесь, а не в шаблоне: шаблон переводится на два языка, и
+   * правило, размноженное по локалям, разойдётся на первой же правке.
+   */
+  const vatBps = vatBpsFor(company.country);
+  const vatBase = carrier ? net : gross;
+  const vatAmount = withVat(vatBase, vatBps) - vatBase;
+
   const texts: ReportTexts = {
     title,
     period: `${period} · ${company.name}`,
     due,
-    vatNote: carrier ? t.done.vatNoteCarrier : t.done.vatNoteShipper,
+    vatNote: vatBps > 0 ? t.done.vatNoteDomestic : t.done.vatNoteReverse,
     colRef: t.report_.colRef,
     colDate: t.report_.colDate,
     colRoute: t.report_.colRoute,
@@ -357,6 +368,15 @@ async function issue(
         commission: carrier ? f.eur(fee) : null,
         net: f.eur(net),
         distance: String(km),
+        vat:
+          vatBps > 0
+            ? {
+                label: t.report_.vatLine.replace('{rate}', f.percent(vatBps / 10_000, 1)),
+                amount: f.eur(vatAmount),
+                grossLabel: t.report_.totalWithVat,
+                gross: f.eur(vatBase + vatAmount),
+              }
+            : null,
       },
       withCommission: carrier,
     }),
@@ -387,7 +407,7 @@ async function issue(
        * не относящимся: у закрытых в разное время рейсов она разная.
        */
       commission_bps: uniformBps(orders),
-      vat_bps: VAT_BPS,
+      vat_bps: vatBps,
       kind: span.kind,
       due_date: span.due ? (carrier ? span.due.carrier : span.due.shipper) : null,
       generated_at: new Date().toISOString(),

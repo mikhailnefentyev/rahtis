@@ -3,6 +3,7 @@ import { CompletedList } from '@/components/domain/CompletedList';
 import { Stars } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
 import { cabinetPath } from '@/lib/auth/paths';
+import { vatBpsFor } from '@/lib/config';
 import { getI18n, type Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 
@@ -21,7 +22,7 @@ export async function CompletedCabinet({
   locale: Locale;
   role: 'CARRIER' | 'SHIPPER';
 }) {
-  await requireRole(locale, role);
+  const viewer = await requireRole(locale, role);
 
   const [{ t }, supabase] = await Promise.all([getI18n(locale), createClient()]);
 
@@ -41,8 +42,15 @@ export async function CompletedCabinet({
 
   const title = role === 'CARRIER' ? t.done.titleCarrier : t.done.titleShipper;
   const subtitle = role === 'CARRIER' ? t.done.subtitleCarrier : t.done.subtitleShipper;
-  /* Заказчику выставляют счёт, перевозчику платят — примечание разное. */
-  const vatNote = role === 'CARRIER' ? t.done.vatNoteCarrier : t.done.vatNoteShipper;
+  /*
+   * Примечание про налог различается не по роли, а по стране компании:
+   * финская платит со ставкой 25,5 %, иностранная — по обратному
+   * начислению. По роли оно различалось, пока ставка была одна на всех,
+   * и тогда разница между «к счёту добавится» и «к выплате добавится»
+   * была единственной, какая есть.
+   */
+  const vatNote =
+    vatBpsFor(viewer.company?.country) > 0 ? t.done.vatNoteDomestic : t.done.vatNoteReverse;
 
   return (
     <main className="mx-auto w-full max-w-4xl px-5 py-8">
