@@ -5,7 +5,7 @@
       "parameters": {
         "httpMethod": "POST",
         "path": "rahtis-driver",
-        "responseMode": "responseNode",
+        "responseMode": "onReceived",
         "options": {
           "rawBody": true
         }
@@ -430,20 +430,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Рейса нет — но вопрос всё равно доходит до диспетчера.\n//\n// В прежней версии эта ветка была тупиком: водитель без активного рейса\n// получал «рейс не найден» и не мог спросить ничего. А /escalate работает\n// независимо от рейса.\n\nconst crypto = require('crypto');\n\n// Секрет для подписи.\n//\n// $env в узлах Code на n8n Cloud закрыт наглухо: с версии 2.0\n// N8N_BLOCK_ENV_ACCESS_IN_NODE по умолчанию true, и на облаке этот\n// переключатель недоступен. Поэтому секрет берётся из переменных n8n\n// ($vars — планы Pro и Enterprise Cloud).\n//\n// Если у вас Starter, где переменных нет, впишите значение в SECRET\n// ниже. Оно останется видимым каждому, у кого есть доступ в n8n, —\n// это плата за отсутствие хранилища секретов на этом тарифе.\nlet SECRET = '';\ntry { if (typeof $vars !== 'undefined' && $vars.DRIVER_WEBHOOK_SECRET) SECRET = $vars.DRIVER_WEBHOOK_SECRET; } catch (e) {}\nif (!SECRET) throw new Error('DRIVER_WEBHOOK_SECRET ne zadan: sozdaite peremennuyu v n8n ili vpishite znachenie v SECRET.');\nconst secret = SECRET;\nconst src = $('Проверить подпись провайдера').item.json;\n\nconst body = JSON.stringify({ phone: src.phone, question: src.text });\nconst timestamp = Math.floor(Date.now() / 1000).toString();\nconst signature = 'sha256=' + crypto.createHmac('sha256', secret).update(timestamp + '.' + body).digest('hex');\n\nreturn [{ json: { body, timestamp, signature } }];"
-      },
-      "id": "sign-noTrip",
-      "name": "Нет рейса: в эскалацию",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        200,
-        340
-      ]
-    },
-    {
-      "parameters": {
-        "jsCode": "return [{ json: { reply: 'Kiitos, ei pääsyä palveluun tällä numerolla. Ole yhteydessä yritykseesi. / Доступа по этому номеру нет. Обратитесь в свою компанию.' } }];"
+        "jsCode": "// Неверная подпись провайдера — тупик, и намеренно.\n//\n// Прежде эта ветка отвечала водителю текстом. С настоящей отправкой\n// такой ответ означал бы, что любой, кто узнал адрес вебхука, может\n// заставить наш номер написать произвольному человеку: подпись не\n// сошлась, а номер взят из того же неподписанного тела.\n//\n// Мете при этом уже возвращён код 200 — узел вебхука отвечает сразу,\n// не дожидаясь ветвления. Молчание здесь и есть правильный ответ.\n//\n// Причина видна в журнале выполнений n8n; наружу она не выходит, чтобы\n// не подсказывать подбирающему, что именно не сошлось.\nreturn [{ json: { refused: true } }];"
       },
       "id": "reply-denied",
       "name": "Отказано",
@@ -456,18 +443,147 @@
     },
     {
       "parameters": {
-        "respondWith": "json",
-        "responseBody": "={{ { \"reply\": $json.reply } }}",
+        "httpMethod": "GET",
+        "path": "rahtis-driver",
+        "responseMode": "responseNode",
         "options": {}
       },
-      "id": "respond",
-      "name": "Ответ водителю",
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.1,
+      "id": "verify-hook",
+      "name": "Проверка подписки (GET)",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
       "position": [
-        1740,
-        200
+        -460,
+        460
+      ],
+      "webhookId": "rahtis-driver-verify"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Подтверждение подписки на вебхук.\n//\n// Перед тем как слать события, Мета делает GET с hub.mode,\n// hub.verify_token и hub.challenge и ждёт обратно значение challenge\n// голым текстом. Без этого ответа подписку просто не создать — узел\n// на POST для этого не годится, он на GET не отвечает.\n//\n// Токен здесь свой, не тот, которым подписываются сообщения: он\n// нужен один раз при подключении и живёт отдельно, чтобы его можно\n// было показать тому, кто настраивает, не отдавая App Secret.\n\n// Значение берётся из переменных n8n ($vars — планы Pro и Enterprise\n// Cloud): $env в узлах Code на облаке закрыт наглухо с версии 2.0.\n//\n// Если у вас Starter, где переменных нет, впишите значение в VALUE\n// ниже. Оно останется видимым каждому, у кого есть доступ в n8n, —\n// это плата за отсутствие хранилища секретов на этом тарифе.\nlet VALUE = '';\ntry { if (typeof $vars !== 'undefined' && $vars.WHATSAPP_VERIFY_TOKEN) VALUE = $vars.WHATSAPP_VERIFY_TOKEN; } catch (e) {}\nif (!VALUE) throw new Error('WHATSAPP_VERIFY_TOKEN ne zadan: sozdaite peremennuyu v n8n ili vpishite znachenie v VALUE.');\n\nconst q = $json.query || {};\nconst ok = q['hub.mode'] === 'subscribe' && q['hub.verify_token'] === VALUE;\n\nreturn [{ json: { ok, challenge: q['hub.challenge'] || '' } }];"
+      },
+      "id": "verify-check",
+      "name": "Токен подписки верен?",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -240,
+        460
       ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.ok }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "verify-if",
+      "name": "Подписка: решение",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -20,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.challenge }}",
+        "options": {}
+      },
+      "id": "verify-ok",
+      "name": "Подписка: challenge",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        200,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "",
+        "options": {
+          "responseCode": 403
+        }
+      },
+      "id": "verify-no",
+      "name": "Подписка: отказ",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        200,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Сообщение водителю.\n//\n// Прежде ответ возвращался телом вебхука, и это не работало вовсе:\n// Мете тело ответа не нужно, ей нужен код 200. Сообщение доходит\n// только отдельным вызовом Graph API.\n//\n// Номер берётся из проверенного входящего, а не из тела запроса: на\n// ветке с неверной подписью мы сюда не приходим вовсе, и наш номер\n// нельзя заставить написать произвольному человеку.\n\n// Значение берётся из переменных n8n ($vars — планы Pro и Enterprise\n// Cloud): $env в узлах Code на облаке закрыт наглухо с версии 2.0.\n//\n// Если у вас Starter, где переменных нет, впишите значение в VALUE\n// ниже. Оно останется видимым каждому, у кого есть доступ в n8n, —\n// это плата за отсутствие хранилища секретов на этом тарифе.\nlet VALUE = '';\ntry { if (typeof $vars !== 'undefined' && $vars.WHATSAPP_PHONE_ID) VALUE = $vars.WHATSAPP_PHONE_ID; } catch (e) {}\nif (!VALUE) throw new Error('WHATSAPP_PHONE_ID ne zadan: sozdaite peremennuyu v n8n ili vpishite znachenie v VALUE.');\nconst phoneId = VALUE;\n\nconst to = $('Проверить подпись провайдера').item.json.phone;\nconst reply = $json.reply;\n\nreturn [{ json: { phoneId, to, reply } }];"
+      },
+      "id": "send-prepare",
+      "name": "Собрать сообщение",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1300,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v21.0/{{ $json.phoneId }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            },
+            {
+              "name": "authorization",
+              "value": "=Bearer {{ $vars.WHATSAPP_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ { messaging_product: \"whatsapp\", recipient_type: \"individual\", to: $json.to, type: \"text\", text: { preview_url: false, body: $json.reply } } }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "send-whatsapp",
+      "name": "Отправить водителю",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1520,
+        120
+      ],
+      "onError": "continueRegularOutput"
     }
   ],
   "connections": {
@@ -544,7 +660,7 @@
         ],
         [
           {
-            "node": "Нет рейса: в эскалацию",
+            "node": "Подпись: эскалация",
             "type": "main",
             "index": 0
           }
@@ -642,17 +758,6 @@
         ]
       ]
     },
-    "Нет рейса: в эскалацию": {
-      "main": [
-        [
-          {
-            "node": "Эскалация оператору",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Эскалация оператору": {
       "main": [
         [
@@ -668,7 +773,7 @@
       "main": [
         [
           {
-            "node": "Ответ водителю",
+            "node": "Собрать сообщение",
             "type": "main",
             "index": 0
           }
@@ -679,7 +784,7 @@
       "main": [
         [
           {
-            "node": "Ответ водителю",
+            "node": "Собрать сообщение",
             "type": "main",
             "index": 0
           }
@@ -690,18 +795,58 @@
       "main": [
         [
           {
-            "node": "Ответ водителю",
+            "node": "Собрать сообщение",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Отказано": {
+    "Проверка подписки (GET)": {
       "main": [
         [
           {
-            "node": "Ответ водителю",
+            "node": "Токен подписки верен?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Токен подписки верен?": {
+      "main": [
+        [
+          {
+            "node": "Подписка: решение",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Подписка: решение": {
+      "main": [
+        [
+          {
+            "node": "Подписка: challenge",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Подписка: отказ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Собрать сообщение": {
+      "main": [
+        [
+          {
+            "node": "Отправить водителю",
             "type": "main",
             "index": 0
           }
