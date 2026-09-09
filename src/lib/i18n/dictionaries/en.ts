@@ -1314,6 +1314,7 @@ export const en = {
     'pulse.totalOne': 'wk {no} total {amount}',
     'pulse.totalRange': 'wks {from}–{to} total {amount}',
 
+    'event.order.published': 'New transport {ref} · {from} → {to}',
     'event.offer.received': 'New offer on transport {ref}',
     'event.offer.chosen': 'You were picked for transport {ref} — confirm within {minutes} minutes',
     'event.order.released': 'Transport {ref} is back on the board',

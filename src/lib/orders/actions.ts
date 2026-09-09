@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { getViewer } from '@/lib/auth/viewer';
 import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
+import { dispatchPublishedOrder } from '@/lib/orders/dispatch';
 import { cityOf, hasCoordinates, tonnesToKg, type FieldReader } from '@/lib/orders/stopFields';
 import type { StopRole } from '@/types/db';
 
@@ -292,6 +293,15 @@ export async function publishOrderAction(
       ref: null,
     };
   }
+
+  /*
+   * Рассылка письмами. Уведомления в кабинеты перевозчиков уже написаны
+   * триггером в той же транзакции, что и публикация, — здесь только
+   * почтовый дубль, и он ждётся, а не бросается вдогонку: в серверном
+   * действии работа после ответа не гарантирована, а отправка занимает
+   * доли секунды. Своих ошибок функция наружу не выпускает.
+   */
+  await dispatchPublishedOrder(data.id);
 
   revalidatePath(`/${locale}/shipper`, 'layout');
   return { error: null, ref: data.ref };

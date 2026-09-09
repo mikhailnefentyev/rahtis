@@ -1326,6 +1326,7 @@ export const fi = {
     'pulse.totalOne': 'vko {no} yhteensä {amount}',
     'pulse.totalRange': 'vko {from}–{to} yhteensä {amount}',
 
+    'event.order.published': 'Uusi kuljetus {ref} · {from} → {to}',
     'event.offer.received': 'Uusi tarjous kuljetukseen {ref}',
     'event.offer.chosen': 'Sinut valittiin kuljetukseen {ref} — vahvista {minutes} minuutissa',
     'event.order.released': 'Kuljetus {ref} vapautui takaisin avoimeksi',

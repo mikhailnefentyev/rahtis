@@ -69,6 +69,27 @@ type Texts = {
     fieldEmail: string;
   };
 
+  /*
+   * Рассылка о новом заказе. Единственное письмо, которое уходит не
+   * адресату события, а всем, кому работа открыта, — поэтому оно короче
+   * остальных: перевозчик читает его на телефоне между рейсами и решает
+   * одно, ехать смотреть или нет.
+   */
+  dispatch: {
+    subject: (ref: string, from: string, to: string) => string;
+    heading: (from: string, to: string) => string;
+    preheader: (ref: string) => string;
+    lead: string;
+    button: string;
+    note: string;
+    fieldOrder: string;
+    fieldPickup: string;
+    fieldRoute: string;
+    fieldUnit: string;
+    fieldDistance: string;
+    fieldRate: string;
+  };
+
   billing: {
     invoicedSubject: (ref: string) => string;
     invoicedHeading: (ref: string) => string;
@@ -134,6 +155,21 @@ const fi: Texts = {
     fieldBusinessId: 'Y-tunnus',
     fieldRole: 'Rooli',
     fieldEmail: 'Sähköposti',
+  },
+
+  dispatch: {
+    subject: (ref, from, to) => `RAHTIS · uusi kuljetus ${ref} · ${from} → ${to}`,
+    heading: (from, to) => `Uusi kuljetus: ${from} → ${to}`,
+    preheader: (ref) => `Kuljetus ${ref} on avoimena tarjouspöydällä.`,
+    lead: 'Kuljetus on avoinna tarjouspöydällä. Ensimmäiset kolme tarjousta pääsevät mukaan.',
+    button: 'Avaa tarjouspöytä',
+    note: 'Saat tämän viestin, koska yritykselläsi on hyväksytty auto palvelussa.',
+    fieldOrder: 'Kuljetus',
+    fieldPickup: 'Nouto',
+    fieldRoute: 'Reitti',
+    fieldUnit: 'Yksikkö',
+    fieldDistance: 'Matka',
+    fieldRate: 'Hinta',
   },
 
   billing: {
@@ -202,6 +238,21 @@ const en: Texts = {
     fieldBusinessId: 'Y-tunnus',
     fieldRole: 'Role',
     fieldEmail: 'Email',
+  },
+
+  dispatch: {
+    subject: (ref, from, to) => `RAHTIS · new transport ${ref} · ${from} → ${to}`,
+    heading: (from, to) => `New transport: ${from} → ${to}`,
+    preheader: (ref) => `Transport ${ref} is open on the load board.`,
+    lead: 'This transport is open on the load board. The first three offers get in.',
+    button: 'Open the load board',
+    note: 'You are getting this because your company has an approved vehicle on the platform.',
+    fieldOrder: 'Transport',
+    fieldPickup: 'Pickup',
+    fieldRoute: 'Route',
+    fieldUnit: 'Unit',
+    fieldDistance: 'Distance',
+    fieldRate: 'Price',
   },
 
   billing: {

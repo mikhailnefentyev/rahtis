@@ -2368,6 +2368,16 @@ export type Database = {
           variant_no: number
         }[]
       }
+      order_dispatch_card: { Args: { p_order_id: string }; Returns: Json }
+      order_dispatch_recipients: {
+        Args: { p_order_id: string }
+        Returns: {
+          company_id: string
+          company_name: string
+          contact_email: string
+          language: string
+        }[]
+      }
       partner_totals: {
         Args: { p_from?: string; p_to?: string }
         Returns: {
