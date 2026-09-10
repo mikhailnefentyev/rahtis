@@ -19,7 +19,8 @@ import { publishOrderAction, type PublishState } from '@/lib/orders/actions';
 import { stopTitle } from '@/lib/orders/haul';
 import { computeRouteAction, type RouteState } from '@/lib/routing/actions';
 import { useI18n } from '@/lib/i18n/provider';
-import { StopFields } from './StopFields';
+import { StopFields, type StopDefaults } from './StopFields';
+import type { OrderStop, ShipperOrder, StopRole } from '@/types/db';
 
 const initial: PublishState = { error: null, ref: null };
 
@@ -35,7 +36,80 @@ type Extra = { key: number; role: 'EXTRA_LOAD' | 'EXTRA_UNLOAD' };
  * Здесь остаётся только то, что относится к заказу целиком, и порядок,
  * в котором точки идут по маршруту.
  */
-export function OrderForm({ onPublished }: { onPublished: () => void }) {
+
+/**
+ * Заказ, который повторяют.
+ *
+ * Повтор нужен там, где рейсы однотипные: тот же порт, тот же маршрут,
+ * другой прицеп. На тридцати единицах в день узкое место не поиск, а
+ * ввод, и заполнять двадцать полей заново ради смены номера — самая
+ * дорогая работа в кабинете.
+ */
+export type OrderTemplate = { order: ShipperOrder; stops: OrderStop[] };
+
+/**
+ * Что из точки переносится, а что нет.
+ *
+ * Даты не переносятся намеренно: повторяют рейс на другой день, и
+ * подставленное прошлое число — это приглашение опубликовать заказ на
+ * вчера. Пустое поле честнее: его видно и его нельзя не заметить.
+ *
+ * Всё остальное — адрес, площадка, получатель, контакт, вес, пломба,
+ * инструкции — переносится: это и есть то, ради чего повторяют.
+ */
+function stopDefaults(stop: OrderStop | undefined): StopDefaults {
+  if (!stop) return {};
+  return {
+    place_name: stop.place_name ?? '',
+    company: stop.company_name ?? '',
+    address: stop.address ?? '',
+    contact: stop.contact_name ?? '',
+    phone: stop.contact_phone ?? '',
+    consignee: stop.consignee ?? '',
+    weight: stop.cargo_weight_kg ? String(stop.cargo_weight_kg / 1000) : '',
+    seal: stop.seal_required === null ? '' : stop.seal_required ? 'yes' : 'no',
+    ref: stop.external_ref ?? '',
+    note: stop.note ?? '',
+    trailer_loaded: stop.trailer_loaded === null ? '' : stop.trailer_loaded ? 'yes' : 'no',
+  };
+}
+
+/** Координата точки в том виде, в каком её отдаёт подсказка адреса. */
+function stopChosen(stop: OrderStop | undefined): ChosenAddress | null {
+  if (!stop || stop.lat === null || stop.lon === null) return null;
+  return {
+    address: stop.address ?? '',
+    city: stop.city ?? null,
+    country: stop.country ?? null,
+    position: { lat: stop.lat, lon: stop.lon },
+    score: stop.geocode_score ?? 100,
+    precise: true,
+  };
+}
+
+/*
+ * Роль DELIVERY форма не создаёт: выгрузки добавляются кнопкой и
+ * приезжают как EXTRA_UNLOAD. Повторяя старый заказ с DELIVERY, мы
+ * переводим её в ту роль, которой форма умеет выражать то же самое.
+ */
+function repeatableRole(role: StopRole): 'EXTRA_LOAD' | 'EXTRA_UNLOAD' | null {
+  if (role === 'EXTRA_LOAD') return 'EXTRA_LOAD';
+  if (role === 'EXTRA_UNLOAD' || role === 'DELIVERY') return 'EXTRA_UNLOAD';
+  /*
+   * Продолжение рейса форма выразить не умеет: кнопок у неё две —
+   * выгрузка и загрузка. Молча выбросить такую точку нельзя, поэтому
+   * повтор о ней прямо предупреждает, а не делает вид, что перенёс.
+   */
+  return null;
+}
+
+export function OrderForm({
+  onPublished,
+  template,
+}: {
+  onPublished: () => void;
+  template?: OrderTemplate;
+}) {
   const { t, m, locale } = useI18n();
   const [state, formAction, pending] = useActionState(publishOrderAction, initial);
 
@@ -47,9 +121,18 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
    * единица описывается: у полуприцепа тип и регистрационный номер, у
    * контейнера длина в футах и номер по ISO 6346.
    */
-  const [haulKind, setHaulKind] = useState<'TRAILER' | 'CONTAINER'>('TRAILER');
+  const origin = template?.order;
+  const originStops = useMemo(
+    () => [...(template?.stops ?? [])].sort((a, b) => a.sequence - b.sequence),
+    [template],
+  );
+  const originPickup = originStops.find((s) => s.role === 'PICKUP');
+  const originReturn = originStops.find((s) => s.role === 'TRAILER_RETURN');
+  const originWork = originStops.filter((s) => repeatableRole(s.role) !== null);
+
+  const [haulKind, setHaulKind] = useState<'TRAILER' | 'CONTAINER'>(origin?.haul_kind ?? 'TRAILER');
   const container = haulKind === 'CONTAINER';
-  const [feet, setFeet] = useState('40');
+  const [feet, setFeet] = useState(origin?.container_feet ? String(origin.container_feet) : '40');
 
   /*
    * Пока делаем только перецеп (irtoperä).
@@ -61,16 +144,49 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
    * действий, а не пунктом в списке. Контейнер идёт по той же форме, и
    * это ещё одна причина не заводить под него тип рейса.
    */
-  const [extras, setExtras] = useState<Extra[]>([]);
-  const [distance, setDistance] = useState('');
-  const [rate, setRate] = useState('');
+  const [extras, setExtras] = useState<Extra[]>(() =>
+    originWork.map((stop, i) => ({ key: i + 1, role: repeatableRole(stop.role)! })),
+  );
+  /*
+   * Точки, которые повтор перенести не смог. Сейчас это только
+   * продолжение рейса: у формы для него нет поля. Считаем их, чтобы
+   * сказать об этом человеку, а не потерять молча.
+   */
+  const skipped = originStops.filter(
+    (stop) =>
+      stop.role !== 'PICKUP' && stop.role !== 'TRAILER_RETURN' && repeatableRole(stop.role) === null,
+  ).length;
+
+  const [distance, setDistance] = useState(origin?.distance_km ? String(origin.distance_km) : '');
+  const [rate, setRate] = useState(
+    origin?.rate_cents ? String(origin.rate_cents / 100).replace('.', ',') : '',
+  );
 
   /*
    * Координаты выбранных адресов, по слотам маршрута. Ключ слота живёт
    * столько же, сколько блок формы: у доп.точек это их собственный key,
    * поэтому удаление второй точки не сдвигает координаты третьей.
    */
-  const [coords, setCoords] = useState<Record<string, ChosenAddress | null>>({});
+  /*
+   * Координаты слотов маршрута.
+   *
+   * При повторе они заполняются сразу, а не ждут выбора из подсказки.
+   * Подставить их только в скрытые поля было недостаточно: форма считает
+   * километраж и решает, можно ли публиковать, по этому состоянию, а не
+   * по разметке. С заполненными полями и пустым состоянием повторённый
+   * заказ выглядел готовым и не публиковался — худший вид поломки.
+   */
+  const [coords, setCoords] = useState<Record<string, ChosenAddress | null>>(() => {
+    if (!template) return {};
+    const seed: Record<string, ChosenAddress | null> = {
+      pickup: stopChosen(originPickup),
+      ret: stopChosen(originReturn),
+    };
+    originWork.forEach((stop, i) => {
+      seed[`extra-${i + 1}`] = stopChosen(stop);
+    });
+    return seed;
+  });
   const [route, setRoute] = useState<Extract<RouteState, { ok: true }> | null>(null);
   const [routeError, setRouteError] = useState<string | null>(null);
   const [routing, setRouting] = useState(false);
@@ -235,6 +351,21 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
 
   return (
     <form action={formAction} className="flex flex-col gap-4">
+      {/*
+        * Повтор говорит, что он повтор, и что в нём осталось пустым.
+        *
+        * Без этой строки человек, открывший заполненную форму, не поймёт,
+        * почему даты пусты, а номер прицепа стёрт, — и решит, что форма
+        * потеряла данные. Пустые они намеренно: даты у нового рейса свои,
+        * а номер прицепа — это конкретное железо, и переносить его значит
+        * почти наверняка отправить водителя не за тем.
+        */}
+      {template && (
+        <p className="rounded-control border border-accent-line bg-accent-wash px-3 py-2 text-[13px] text-ink-muted">
+          {m('orderForm.repeatedFrom', { ref: template.order.ref })}
+          {skipped > 0 ? ` ${m('orderForm.repeatSkipped', { count: skipped })}` : ''}
+        </p>
+      )}
       <input type="hidden" name="locale" value={locale} />
 
       {/*
@@ -309,6 +440,8 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
             showPlaceName
             showTrailerState
             haulKind={haulKind}
+            defaults={stopDefaults(originPickup)}
+            defaultChosen={stopChosen(originPickup)}
             requireDate
             addressPlaceholder="Satamakatu 1, 10900 Hanko"
             placeNamePlaceholder="Hanko Port, Terminal 2"
@@ -358,6 +491,8 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
                   repeated
                   requireCompany
                   showContact
+                  defaults={stopDefaults(originWork[index])}
+                  defaultChosen={stopChosen(originWork[index])}
                   onChosen={onChosen(`extra-${extra.key}`)}
                 />
               </div>
@@ -398,6 +533,8 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
             showPlaceName
             showTrailerState
             haulKind={haulKind}
+            defaults={stopDefaults(originReturn)}
+            defaultChosen={stopChosen(originReturn)}
             addressPlaceholder="Satamakatu 1, 10900 Hanko"
             placeNamePlaceholder="Hanko Port, Terminal 2"
             onChosen={onChosen('ret')}
@@ -472,6 +609,7 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
                 <Input
                   {...p}
                   name="trailer"
+                  defaultValue={origin?.trailer ?? ''}
                   placeholder={
                     container
                       ? t.orderForm.containerTypePlaceholder
@@ -551,7 +689,15 @@ export function OrderForm({ onPublished }: { onPublished: () => void }) {
               )}
             </Field>
             <Field label={t.order.comment} className="sm:col-span-4">
-              {(p) => <Textarea {...p} name="comment" rows={2} placeholder={t.order.commentPlaceholder} />}
+              {(p) => (
+                <Textarea
+                  {...p}
+                  name="comment"
+                  rows={2}
+                  defaultValue={origin?.comment ?? ''}
+                  placeholder={t.order.commentPlaceholder}
+                />
+              )}
             </Field>
           </div>
         </CardBody>

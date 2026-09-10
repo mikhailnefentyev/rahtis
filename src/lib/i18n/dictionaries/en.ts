@@ -636,6 +636,7 @@ export const en = {
     contact: 'Contact person',
     phone: 'Phone',
 
+    repeat: 'Repeat this transport',
     remove: 'Remove',
 
     trailerState: 'Trailer',
@@ -1382,6 +1383,8 @@ export const en = {
     'legal.effective': 'In force from {date}',
     'legal.accepted': 'Accepted {date} · version {n}',
 
+    'orderForm.repeatedFrom': 'Repeating transport {ref}. Dates and the trailer number are left empty: the new job has its own.',
+    'orderForm.repeatSkipped': '{count, plural, one {One stop} other {# stops}} could not be repeated: the form has no field for a continuation.',
     'orders.shownOf': 'Showing {shown} of {total}',
     'done.windowNote': 'The list shows the last {weeks} weeks. Older transports are found by number in the period documents or by asking the assistant.',
     'done.weekOf': 'Week of {date}',

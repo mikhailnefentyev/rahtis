@@ -5,6 +5,7 @@ import { HaulBadge } from '@/components/domain/HaulBadge';
 import { Badge, Button, EmptyState, Input, Mono, Plate } from '@/components/ui';
 import { orderStatusTone } from '@/components/ui/tone';
 import { daysFromToday, todayInHelsinki } from '@/lib/dates';
+import { cityOfStop, routeEnds } from '@/lib/orders/route';
 import { useI18n } from '@/lib/i18n/provider';
 import type { OrderAmendment, OrderStop, ShipperOffer, ShipperOrder } from '@/types/db';
 import { OrderCard } from './OrderCard';
@@ -111,9 +112,12 @@ export function OrdersView({
 }) {
   const { t, m } = useI18n();
   const [composing, setComposing] = useState(false);
-  const [OrderForm, setOrderForm] = useState<React.ComponentType<{ onPublished: () => void }> | null>(
-    null,
-  );
+  const [OrderForm, setOrderForm] = useState<React.ComponentType<{
+    onPublished: () => void;
+    template?: { order: ShipperOrder; stops: OrderStop[] };
+  }> | null>(null);
+  /* Какой заказ повторяем. Пусто — форма открыта пустой. */
+  const [template, setTemplate] = useState<{ order: ShipperOrder; stops: OrderStop[] } | null>(null);
   /* Раскрыт один заказ за раз: иначе список снова превращается в ленту карточек. */
   const [opened, setOpened] = useState<string | null>(null);
   const [query, setQuery] = useState('');
@@ -138,12 +142,15 @@ export function OrdersView({
    * Форма публикации большая и нужна не при каждом заходе, поэтому её код
    * подгружается при первом нажатии, а не вместе со списком заказов.
    */
-  async function startComposing() {
+  async function startComposing(from?: { order: ShipperOrder; stops: OrderStop[] }) {
     if (!OrderForm) {
       const mod = await import('./OrderForm');
       setOrderForm(() => mod.OrderForm);
     }
+    setTemplate(from ?? null);
     setComposing(true);
+    /* Повтор открывает форму наверху — иначе она уедет под раскрытую карточку. */
+    if (from) window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   const bands = useMemo(() => {
@@ -210,6 +217,7 @@ export function OrdersView({
         stops={stopsByOrder[order.id] ?? []}
         offers={offersByOrder[order.id] ?? []}
         amendments={amendmentsByOrder[order.id] ?? []}
+        onRepeat={() => startComposing({ order, stops: stopsByOrder[order.id] ?? [] })}
       />
     );
   }
@@ -252,7 +260,7 @@ export function OrdersView({
           {m('desk.ordersCount', { count: orders.length })}
         </h2>
         {!composing && (
-          <Button variant="primary" size="sm" onClick={startComposing}>
+          <Button variant="primary" size="sm" onClick={() => startComposing()}>
             {t.orders.newOrder}
           </Button>
         )}
@@ -260,7 +268,13 @@ export function OrdersView({
 
       {composing && OrderForm && (
         <div className="mb-6">
-          <OrderForm onPublished={() => setComposing(false)} />
+          <OrderForm
+            template={template ?? undefined}
+            onPublished={() => {
+              setComposing(false);
+              setTemplate(null);
+            }}
+          />
         </div>
       )}
 
@@ -348,8 +362,8 @@ function Row({
 }) {
   const { t, f } = useI18n();
 
+  const { from, to } = routeEnds(stops);
   const pickup = stops.find((s) => s.role === 'PICKUP');
-  const delivery = stops.find((s) => s.role === 'DELIVERY');
 
   return (
     <div className="border-b border-line last:border-b-0">
@@ -367,10 +381,10 @@ function Row({
         <HaulBadge haulKind={order.haul_kind} containerFeet={order.container_feet} />
         {order.trailer_plate && <Plate>{order.trailer_plate}</Plate>}
 
-        {pickup && (
+        {from && (
           <span className="font-mono text-[13px] tracking-tight text-accent">
-            {pickup.city}
-            {delivery ? ` → ${delivery.city}` : ''}
+            {cityOfStop(from)}
+            {to ? ` → ${cityOfStop(to)}` : ''}
           </span>
         )}
 

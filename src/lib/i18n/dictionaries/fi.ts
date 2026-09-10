@@ -637,6 +637,7 @@ export const fi = {
     contact: 'Yhteyshenkilö',
     phone: 'Puhelin',
 
+    repeat: 'Toista tämä kuljetus',
     remove: 'Poista',
 
     trailerState: 'Perävaunu',
@@ -1393,6 +1394,8 @@ export const fi = {
     'legal.effective': 'Voimassa {date} alkaen',
     'legal.accepted': 'Hyväksytty {date} · versio {n}',
 
+    'orderForm.repeatedFrom': 'Toistetaan kuljetuksesta {ref}. Päivämäärät ja perävaunun numero on jätetty tyhjiksi: ne ovat uudella keikalla omat.',
+    'orderForm.repeatSkipped': '{count, plural, one {Yhtä pistettä} other {# pistettä}} ei voitu toistaa: jatkokeikalle ei ole lomakkeella kenttää.',
     'orders.shownOf': 'Näytetään {shown}/{total}',
     'done.windowNote': 'Listalla näkyvät viimeiset {weeks} viikkoa. Vanhemmat kuljetukset löytyvät numerolla kauden asiakirjoista tai kysymällä avustajalta.',
     'done.weekOf': 'Viikko {date}',

@@ -59,6 +59,7 @@ export function AddressInput({
   required,
   placeholder,
   defaultValue,
+  defaultChosen,
   near,
   onChosen,
   id,
@@ -68,6 +69,18 @@ export function AddressInput({
   required?: boolean;
   placeholder?: string;
   defaultValue?: string;
+  /**
+   * Уже выбранный адрес: адрес, город, страна и координата.
+   *
+   * Нужен повтору заказа. Без него скрытые поля координат оставались бы
+   * пустыми, и повторённый заказ не публиковался бы: публикация без
+   * координат запрещена намеренно — от них считается километраж, а от
+   * километража ставка.
+   *
+   * Подставлять их «как будто человек выбрал» здесь честно: они и были
+   * выбраны — в том заказе, который повторяют.
+   */
+  defaultChosen?: ChosenAddress | null;
   /** Смещение выдачи: обычно координаты города точки. */
   near?: LatLon;
   onChosen?: (chosen: ChosenAddress | null) => void;
@@ -77,7 +90,7 @@ export function AddressInput({
   const { t, locale } = useI18n();
 
   const [value, setValue] = useState(defaultValue ?? '');
-  const [chosen, setChosen] = useState<ChosenAddress | null>(null);
+  const [chosen, setChosen] = useState<ChosenAddress | null>(defaultChosen ?? null);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
 

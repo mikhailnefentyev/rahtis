@@ -5,6 +5,7 @@ import { HaulBadge } from '@/components/domain/HaulBadge';
 import { Badge, Card, CardBody, Mono, Plate } from '@/components/ui';
 import { orderStatusTone } from '@/components/ui/tone';
 import { useI18n } from '@/lib/i18n/provider';
+import { cityOfStop, routeEnds } from '@/lib/orders/route';
 import { AssignmentCard } from './AssignmentCard';
 import type { Database } from '@/types/database';
 import type { OrderAmendment, OrderStop, TripDocument } from '@/types/db';
@@ -150,8 +151,7 @@ function TripRow({
   const { t, f } = useI18n();
 
   const stops = stopsOf(order);
-  const pickup = stops.find((s) => s.role === 'PICKUP');
-  const delivery = stops.find((s) => s.role === 'DELIVERY');
+  const { from, to } = routeEnds(stops);
   const next = [...stops].sort((a, b) => a.sequence - b.sequence).find((s) => !s.completed_at);
   const done = stops.filter((s) => s.completed_at).length;
 
@@ -168,10 +168,10 @@ function TripRow({
         <HaulBadge haulKind={order.haul_kind} containerFeet={order.container_feet} />
         {order.trailer_plate && <Plate>{order.trailer_plate}</Plate>}
 
-        {pickup && (
+        {from && (
           <span className="font-mono text-[13px] tracking-tight text-accent">
-            {pickup.city}
-            {delivery ? ` → ${delivery.city}` : ''}
+            {cityOfStop(from)}
+            {to ? ` → ${cityOfStop(to)}` : ''}
           </span>
         )}
 

@@ -62,6 +62,7 @@ export function StopFields({
   placeNamePlaceholder,
   defaults,
   onChosen,
+  defaultChosen,
 }: {
   role: StopRole;
   /** Имена полей: `${prefix}_address` и так далее. */
@@ -81,6 +82,8 @@ export function StopFields({
   defaults?: StopDefaults;
   /** Координаты выбранного адреса — форме, чтобы посчитать маршрут. */
   onChosen?: (chosen: ChosenAddress | null) => void;
+  /** Уже выбранный адрес: при повторе заказа он приходит из прошлого рейса. */
+  defaultChosen?: ChosenAddress | null;
 }) {
   const { t } = useI18n();
 
@@ -133,6 +136,7 @@ export function StopFields({
             {...p}
             name={name('address')}
             defaultValue={was('address')}
+            defaultChosen={defaultChosen}
             required
             placeholder={addressPlaceholder}
             onChosen={onChosen}

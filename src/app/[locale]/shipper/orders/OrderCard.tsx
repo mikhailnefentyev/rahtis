@@ -5,9 +5,10 @@ import { OrderAmendments } from '@/components/domain/OrderAmendments';
 import { OrderRouteMap } from '@/components/domain/RouteMap';
 import { TripStage } from '@/components/domain/TripProgress';
 import { RouteStops } from '@/components/domain/RouteStops';
-import { Badge, Card, CardBody, CardDivider, Mono, Plate } from '@/components/ui';
+import { Badge, Button, Card, CardBody, CardDivider, Mono, Plate } from '@/components/ui';
 import { orderStatusTone } from '@/components/ui/tone';
 import { useI18n } from '@/lib/i18n/provider';
+import { routeEnds } from '@/lib/orders/route';
 import type { OrderAmendment, OrderStop, ShipperOffer, ShipperOrder } from '@/types/db';
 import { AmendPanel } from './AmendPanel';
 import { AssignedCarrier, OffersPanel } from './OffersPanel';
@@ -28,16 +29,18 @@ export function OrderCard({
   stops,
   offers,
   amendments,
+  onRepeat,
 }: {
   order: ShipperOrder;
   stops: OrderStop[];
   offers: ShipperOffer[];
   amendments: OrderAmendment[];
+  /** Повторить этот рейс: открыть форму, заполненную по нему. */
+  onRepeat?: () => void;
 }) {
   const { t, m, f } = useI18n();
 
-  const pickup = stops.find((s) => s.role === 'PICKUP');
-  const delivery = stops.find((s) => s.role === 'DELIVERY');
+  const { from: pickup, to: delivery } = routeEnds(stops);
   const assigned = offers.find((o) => o.is_assigned);
   const amendmentsByOrder = { [order.id]: amendments };
 
@@ -203,6 +206,19 @@ export function OrderCard({
                 <p className="mt-4 rounded-control border border-line bg-sunken px-3 py-2 text-xs text-ink-muted">
                   {order.comment}
                 </p>
+              )}
+              {/*
+                * Повтор — рабочий ход, а не выход из положения, поэтому
+                * он стоит отдельно от снятия и пересчёта. Доступен у
+                * любого заказа: чаще всего повторяют как раз выполненный
+                * или отменённый рейс, а не тот, что идёт сейчас.
+                */}
+              {onRepeat && (
+                <div className="mt-4 border-t border-line pt-4">
+                  <Button size="sm" onClick={onRepeat}>
+                    {t.orderForm.repeat}
+                  </Button>
+                </div>
               )}
             </CardBody>
           </Card>
