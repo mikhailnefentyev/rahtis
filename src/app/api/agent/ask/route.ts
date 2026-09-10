@@ -33,7 +33,13 @@ const HISTORY_LIMIT = 100;
 
 export async function POST(request: Request) {
   const viewer = await getViewer();
-  if (viewer.status !== 'ready' || !viewer.company) {
+  /*
+   * У оператора компании нет, и это не изъян профиля, а его роль: Aivomaa
+   * присутствует в системе посредником, а не стороной сделки. Прежняя
+   * проверка требовала компанию у всех и закрывала оператору вход в
+   * собственного помощника.
+   */
+  if (viewer.status !== 'ready' || (!viewer.company && viewer.role !== 'ADMIN')) {
     return Response.json({ error: 'forbidden' }, { status: 403 });
   }
 
@@ -55,7 +61,8 @@ export async function POST(request: Request) {
   if (!conversationId) {
     const { data, error } = await supabase
       .from('conversations')
-      .insert({ company_id: viewer.company.id, audience: viewer.role })
+      /* Тред оператора без компании: так же требует ограничение базы. */
+      .insert({ company_id: viewer.company?.id ?? null, audience: viewer.role })
       .select('id')
       .single();
 
@@ -121,7 +128,7 @@ export async function POST(request: Request) {
  */
 export async function GET(request: Request) {
   const viewer = await getViewer();
-  if (viewer.status !== 'ready' || !viewer.company) {
+  if (viewer.status !== 'ready' || (!viewer.company && viewer.role !== 'ADMIN')) {
     return Response.json({ error: 'forbidden' }, { status: 403 });
   }
 

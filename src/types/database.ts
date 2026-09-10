@@ -269,7 +269,7 @@ export type Database = {
         Row: {
           audience: Database["public"]["Enums"]["chat_audience"]
           channel: Database["public"]["Enums"]["chat_channel"]
-          company_id: string
+          company_id: string | null
           created_at: string
           created_by: string | null
           dispatch_token: string | null
@@ -283,7 +283,7 @@ export type Database = {
         Insert: {
           audience: Database["public"]["Enums"]["chat_audience"]
           channel?: Database["public"]["Enums"]["chat_channel"]
-          company_id: string
+          company_id?: string | null
           created_at?: string
           created_by?: string | null
           dispatch_token?: string | null
@@ -297,7 +297,7 @@ export type Database = {
         Update: {
           audience?: Database["public"]["Enums"]["chat_audience"]
           channel?: Database["public"]["Enums"]["chat_channel"]
-          company_id?: string
+          company_id?: string | null
           created_at?: string
           created_by?: string | null
           dispatch_token?: string | null

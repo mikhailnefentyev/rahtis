@@ -55,12 +55,20 @@ export async function prepareDispatch(
     return null;
   }
 
+  /*
+   * У треда оператора компании нет: он посредник, а не сторона сделки.
+   * Спрашивать её в этом случае незачем — и нельзя, запрос по пустому
+   * идентификатору вернул бы ошибку, из-за которой вопрос не ушёл бы в
+   * воркфлоу вовсе.
+   */
   const [{ data: company }, { data: message }] = await Promise.all([
-    admin
-      .from('companies')
-      .select('name, kind, language')
-      .eq('id', conversation.company_id)
-      .single(),
+    conversation.company_id
+      ? admin
+          .from('companies')
+          .select('name, kind, language')
+          .eq('id', conversation.company_id)
+          .single()
+      : Promise.resolve({ data: null }),
     admin.from('messages').select('body, sender_user_id').eq('id', messageId).single(),
   ]);
 

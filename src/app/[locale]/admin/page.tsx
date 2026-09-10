@@ -27,6 +27,7 @@ import {
   unfreezeCompanyAction,
 } from '@/lib/companies/actions';
 import { daysUntil } from '@/lib/dates';
+import { AgentChat } from '@/components/domain/AgentChat';
 import { getI18n, isLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import { handleSupportAction } from '@/lib/support/actions';
@@ -482,6 +483,20 @@ export default async function AdminPage({
           </TableFrame>
         )}
       </section>
+
+      {/*
+        * Помощник оператора.
+        *
+        * Инструменты аудиторию ADMIN знали с самого начала — оператору
+        * они открывают любой заказ и показывают контрагента, скрытого от
+        * сторон. Не было только места, откуда спросить: кабинет
+        * оператора собран отдельно от кабинетов сторон и общий обзор не
+        * использует.
+        *
+        * Внизу, а не вверху: сверху то, что требует решения — очередь
+        * заявок и допуски, — и помощник не должен их перекрывать.
+        */}
+      <AgentChat locale={locale} role="ADMIN" />
     </main>
   );
 }
