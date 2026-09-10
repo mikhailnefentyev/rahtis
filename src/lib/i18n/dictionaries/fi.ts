@@ -691,6 +691,14 @@ export const fi = {
   orders: {
     title: 'Omat kuljetukset',
     subtitle: 'Julkaistut kuljetukset ja niiden tilanne.',
+    /*
+     * Kolme kaistaa sen mukaan, kuka ketäkin odottaa. Nimet kertovat
+     * toiminnan, eivät tilaa: 'Odottaa päätöstäsi' sanoo mitä tehdä,
+     * 'REQUESTED' ei sano mitään.
+     */
+    bandDecide: 'Odottaa päätöstäsi',
+    bandRunning: 'Ajossa',
+    bandWaiting: 'Odottaa tarjouksia',
     newOrder: 'Uusi kuljetus',
     none: 'Ei vielä kuljetuksia',
     noneHint: 'Julkaise ensimmäinen kuljetus, niin se näkyy kuljetusliikkeille.',
@@ -1379,6 +1387,7 @@ export const fi = {
     'legal.effective': 'Voimassa {date} alkaen',
     'legal.accepted': 'Hyväksytty {date} · versio {n}',
 
+    'done.windowNote': 'Listalla näkyvät viimeiset {weeks} viikkoa. Vanhemmat kuljetukset löytyvät numerolla kauden asiakirjoista tai kysymällä avustajalta.',
     'done.weekOf': 'Viikko {date}',
     'done.closedAt': 'Päättyi {date}',
     'done.bps': '{rate, number, ::percent}',

@@ -1,23 +1,60 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { HaulBadge } from '@/components/domain/HaulBadge';
-import { OrderAmendments } from '@/components/domain/OrderAmendments';
-import { OrderRouteMap } from '@/components/domain/RouteMap';
-import { TripStage } from '@/components/domain/TripProgress';
-import { RouteStops } from '@/components/domain/RouteStops';
-import { Badge, Button, Card, CardBody, CardDivider, EmptyState, Mono, Plate } from '@/components/ui';
+import { Badge, Button, EmptyState, Mono, Plate } from '@/components/ui';
 import { orderStatusTone } from '@/components/ui/tone';
 import { useI18n } from '@/lib/i18n/provider';
-import type {
-  OrderAmendment,
-  OrderStop,
-  ShipperOffer,
-  ShipperOrder,
-} from '@/types/db';
-import { AmendPanel } from './AmendPanel';
-import { AssignedCarrier, OffersPanel } from './OffersPanel';
-import { OrderTrouble } from './OrderTrouble';
+import type { OrderAmendment, OrderStop, ShipperOffer, ShipperOrder } from '@/types/db';
+import { OrderCard } from './OrderCard';
+
+/**
+ * Список заказов заказчика.
+ *
+ * Раньше это был плоский список развёрнутых карточек, отсортированный по
+ * дате заведения. На пяти заказах так было удобно; на тридцати — а
+ * компания, отдающая по тридцать прицепов в день, к этому и идёт, —
+ * рассыпается сразу по трём причинам.
+ *
+ * Первая: порядок не тот. Диспетчер думает «что грузится сегодня», а не
+ * «что я завёл последним», и заказ, заведённый вчера на пятницу, стоял
+ * выше заказа, заведённого утром на сегодня.
+ *
+ * Вторая: в одном списке лежали четыре состояния с несравнимой
+ * срочностью. Ждущий откликов заказ, с которым делать нечего, занимал
+ * столько же места, сколько заказ с пятнадцатиминутным отсчётом.
+ *
+ * Третья: каждая карточка рисовала маршрут и карту. Тридцать заказов —
+ * тридцать карт на одной странице.
+ *
+ * Отсюда устройство: три полосы по тому, кто кого ждёт, внутри — по дате
+ * загрузки, и строка вместо карточки. Карточка раскрывается по одной.
+ *
+ * Резать активные по возрасту нельзя, и это стоит сказать прямо: заказ на
+ * загрузку через две недели заведён сегодня, а рейс, идущий третьи сутки,
+ * заведён позавчера. Возраст — ось выполненных, а не работающих.
+ */
+
+/** Момент загрузки строкой для сортировки: дата плюс время, пустое — в конец. */
+function pickupKey(stops: OrderStop[]): string {
+  const pickup = stops.find((s) => s.role === 'PICKUP');
+  if (!pickup?.scheduled_date) return '9999-99-99';
+  return `${pickup.scheduled_date} ${pickup.scheduled_time ?? '99:99'}`;
+}
+
+/**
+ * Ближайшая непройденная точка идущего рейса.
+ *
+ * У едущего заказа загрузка уже позади, и сортировать его по ней значит
+ * прижать к низу самый живой рейс. Важно то, что случится следующим.
+ */
+function nextStopKey(stops: OrderStop[]): string {
+  const next = [...stops]
+    .sort((a, b) => a.sequence - b.sequence)
+    .find((s) => !s.completed_at);
+  if (!next?.scheduled_date) return pickupKey(stops);
+  return `${next.scheduled_date} ${next.scheduled_time ?? '99:99'}`;
+}
 
 export function OrdersView({
   orders,
@@ -30,11 +67,13 @@ export function OrdersView({
   offersByOrder: Record<string, ShipperOffer[]>;
   amendmentsByOrder: Record<string, OrderAmendment[]>;
 }) {
-  const { t, m, f } = useI18n();
+  const { t, m } = useI18n();
   const [composing, setComposing] = useState(false);
   const [OrderForm, setOrderForm] = useState<React.ComponentType<{ onPublished: () => void }> | null>(
     null,
   );
+  /* Раскрыт один заказ за раз: иначе список снова превращается в ленту карточек. */
+  const [opened, setOpened] = useState<string | null>(null);
 
   /*
    * Форма публикации большая и нужна не при каждом заходе, поэтому её код
@@ -46,6 +85,74 @@ export function OrdersView({
       setOrderForm(() => mod.OrderForm);
     }
     setComposing(true);
+  }
+
+  const bands = useMemo(() => {
+    const decide: ShipperOrder[] = [];
+    const running: ShipperOrder[] = [];
+    const waiting: ShipperOrder[] = [];
+
+    for (const order of orders) {
+      /*
+       * Отсчёт решает, а не статус: пятнадцать минут идут и когда выбирают
+       * перевозчика, и когда подтверждает водитель. Пока они идут, заказ
+       * ждёт нас, а не мы его.
+       */
+      if (order.deadline_at) decide.push(order);
+      else if (order.status === 'IN_PROGRESS') running.push(order);
+      else waiting.push(order);
+    }
+
+    const by = (key: (stops: OrderStop[]) => string) => (a: ShipperOrder, b: ShipperOrder) =>
+      key(stopsByOrder[a.id] ?? []).localeCompare(key(stopsByOrder[b.id] ?? []));
+
+    decide.sort(by(pickupKey));
+    running.sort(by(nextStopKey));
+    waiting.sort(by(pickupKey));
+
+    return { decide, running, waiting };
+  }, [orders, stopsByOrder]);
+
+  function card(order: ShipperOrder) {
+    return (
+      <OrderCard
+        order={order}
+        stops={stopsByOrder[order.id] ?? []}
+        offers={offersByOrder[order.id] ?? []}
+        amendments={amendmentsByOrder[order.id] ?? []}
+      />
+    );
+  }
+
+  function band(title: string, list: ShipperOrder[], expanded: boolean) {
+    if (list.length === 0) return null;
+
+    return (
+      <section className="mt-6 first:mt-0">
+        <h3 className="label-micro mb-2.5 flex items-center gap-2">
+          {title}
+          <span className="text-ink-dim">{list.length}</span>
+        </h3>
+
+        {expanded ? (
+          <div className="flex flex-col gap-3">{list.map((order) => <div key={order.id}>{card(order)}</div>)}</div>
+        ) : (
+          <div className="overflow-hidden rounded-card border border-line">
+            {list.map((order) => (
+              <Row
+                key={order.id}
+                order={order}
+                stops={stopsByOrder[order.id] ?? []}
+                open={opened === order.id}
+                onToggle={() => setOpened(opened === order.id ? null : order.id)}
+              >
+                {card(order)}
+              </Row>
+            ))}
+          </div>
+        )}
+      </section>
+    );
   }
 
   return (
@@ -70,183 +177,81 @@ export function OrdersView({
       {orders.length === 0 && !composing ? (
         <EmptyState title={t.orders.none} description={t.orders.noneHint} />
       ) : (
-        <div className="flex flex-col gap-3">
-          {orders.map((order) => {
-            const stops = stopsByOrder[order.id] ?? [];
-            const pickup = stops.find((s) => s.role === 'PICKUP');
-            const delivery = stops.find((s) => s.role === 'DELIVERY');
-            const offers = offersByOrder[order.id] ?? [];
-            const assigned = offers.find((o) => o.is_assigned);
-
-            return (
-              <Card
-                key={order.id}
-                stripe={orderStatusTone[order.status]}
-                /* Дышит только то, где идёт отсчёт и решение за заказчиком. */
-                attention={Boolean(order.deadline_at)}
-              >
-                <CardBody>
-                  <div className="flex flex-wrap items-start justify-between gap-4">
-                    <div className="min-w-0">
-                      <div className="flex flex-wrap items-center gap-2.5">
-                        <h3 className="text-[15px] font-semibold tracking-tight">
-                          {t.orderType[order.order_type]}
-                        </h3>
-                        <Badge tone={orderStatusTone[order.status]}>
-                          {t.orderStatus[order.status]}
-                        </Badge>
-                        <HaulBadge
-                          haulKind={order.haul_kind}
-                          containerFeet={order.container_feet}
-                        />
-                        <Mono className="text-xs text-ink-dim">{order.ref}</Mono>
-                        {/* Номер прицепа — по нему водитель находит железо на площадке. */}
-                        {order.trailer_plate && <Plate>{order.trailer_plate}</Plate>}
-                        {order.shipper_ref && (
-                          <Mono className="text-xs text-ink-dim">
-                            {t.orders.shipperRefShort}: {order.shipper_ref}
-                          </Mono>
-                        )}
-                      </div>
-
-                      {pickup && delivery && (
-                        <p className="mt-2 font-mono text-sm tracking-tight text-accent">
-                          {pickup.city} → {delivery.city}
-                        </p>
-                      )}
-
-                      <p className="mt-1.5 text-[13px] text-ink-muted">
-                        {order.trailer ? `${order.trailer} · ` : ''}
-                        {m('order.distance', { km: order.distance_km ?? 0 })} ·{' '}
-                        <span className="font-semibold text-ink">{f.eur(order.rate_cents ?? 0)}</span>{' '}
-                        <span className="text-ink-dim">{t.money.addVat}</span>{' '}
-                        {order.distance_km && order.rate_cents ? (
-                          <span className="text-ink-dim">
-                            · {m('order.ratePerKm', {
-                              rate: f.eurPerKm(order.rate_cents, order.distance_km) ?? '',
-                            })}
-                          </span>
-                        ) : null}
-                      </p>
-
-                      {/*
-                        * Правка маршрута меняет линию, но не цену.
-                        *
-                        * Так и задумано: ставка согласована с перевозчиком,
-                        * и менять её задним числом нельзя. Но пока
-                        * пересчитанный пробег лежал только в базе, заказчик
-                        * видел прежние километры и прежние €/км и считал,
-                        * что правка обошлась даром. Расхождение — это
-                        * предмет отдельного разговора с перевозчиком, и
-                        * начинается он с того, что его видно.
-                        */}
-                      {order.distance_auto_km !== null &&
-                        order.distance_km !== null &&
-                        order.distance_auto_km !== order.distance_km && (
-                          <p className="mt-1 text-xs text-warn">
-                            {m('order.routeRecomputed', { km: order.distance_auto_km })}
-                          </p>
-                        )}
-
-                      {order.published_at && (
-                        <p className="mt-1 text-xs text-ink-dim">
-                          {m('order.publishedAt', { date: f.dateTime(order.published_at) })}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Отклики требуют решения по таймеру — они выше маршрута. */}
-                  {(order.status === 'REQUESTED' || order.status === 'AWAIT_DRIVER') && (
-                    <OffersPanel order={order} offers={offers} />
-                  )}
-
-                  {/*
-                    * Пока рейс идёт, заказчик читает тот же этап по тем же
-                    * точкам, что и перевозчик (ТЗ §7, единый статус).
-                    */}
-                  {order.status === 'IN_PROGRESS' && stops.length > 0 && (
-                    <TripStage stops={stops} className="mt-3" />
-                  )}
-
-                  {/* Рейс идёт — выбирать не из чего, важно кто везёт. */}
-                  {order.status === 'IN_PROGRESS' && assigned && (
-                    <AssignedCarrier offer={assigned} />
-                  )}
-
-                  {stops.length > 0 && (
-                    <>
-                      <CardDivider className="my-4" />
-                      <p className="label-micro mb-3">
-                        {m('order.stopsCount', { count: stops.length })}
-                      </p>
-                      <RouteStops stops={stops} haulKind={order.haul_kind} />
-
-                      {/* Карта под списком: список — источник, карта — проверка. */}
-                      <OrderRouteMap
-                        geometry={order.route_geometry}
-                        bounds={order.route_bounds}
-                        stops={stops}
-                        haulKind={order.haul_kind}
-                        className="mt-4"
-                      />
-
-                      {/*
-                        * Живая корректировка (ТЗ §8) — под маршрутом, а не
-                        * над ним: сначала человек смотрит, что едет сейчас,
-                        * и только потом решает, что менять.
-                        */}
-                      {order.status === 'IN_PROGRESS' && (
-                        <AmendPanel
-                          orderId={order.id}
-                          stops={stops}
-                          haulKind={order.haul_kind}
-                          className="mt-4"
-                        />
-                      )}
-
-                      <OrderAmendments
-                        amendments={amendmentsByOrder[order.id] ?? []}
-                        orderId={order.id}
-                        haulKind={order.haul_kind}
-                        className="mt-4"
-                      />
-                    </>
-                  )}
-
-                  {/*
-                    * Снятие и пересчёт — в самом низу карточки и за
-                    * раскрытием.
-                    *
-                    * Это выходы из положения, а не рабочий ход: заказчик
-                    * попадает сюда, когда что-то разошлось. Держать их
-                    * рядом с откликами значило бы предлагать снять заказ
-                    * каждому, кто зашёл посмотреть, кто откликнулся.
-                    *
-                    * Выполненного и снятого здесь нет: по первому уже
-                    * посчитаны деньги, второго не существует.
-                    */}
-                  {order.status !== 'DONE' && order.status !== 'CANCELLED' && (
-                    <OrderTrouble
-                      orderId={order.id}
-                      distanceKm={order.distance_km}
-                      rateCents={order.rate_cents}
-                      autoKm={order.distance_auto_km}
-                      className="mt-4 border-t border-line pt-4"
-                    />
-                  )}
-
-                  {order.comment && (
-                    <p className="mt-4 rounded-control border border-line bg-sunken px-3 py-2 text-xs text-ink-muted">
-                      {order.comment}
-                    </p>
-                  )}
-                </CardBody>
-              </Card>
-            );
-          })}
-        </div>
+        <>
+          {/* Отсчёт идёт — карточка раскрыта всегда: решать надо сейчас. */}
+          {band(t.orders.bandDecide, bands.decide, true)}
+          {band(t.orders.bandRunning, bands.running, false)}
+          {band(t.orders.bandWaiting, bands.waiting, false)}
+        </>
       )}
     </>
+  );
+}
+
+/**
+ * Строка списка.
+ *
+ * Всё, по чему заказ узнают с одного взгляда: состояние, номер, свой
+ * номер заказчика, единица, направление и час загрузки. Ставка справа —
+ * по ней сверяют, а не ищут.
+ */
+function Row({
+  order,
+  stops,
+  open,
+  onToggle,
+  children,
+}: {
+  order: ShipperOrder;
+  stops: OrderStop[];
+  open: boolean;
+  onToggle: () => void;
+  children: React.ReactNode;
+}) {
+  const { t, f } = useI18n();
+
+  const pickup = stops.find((s) => s.role === 'PICKUP');
+  const delivery = stops.find((s) => s.role === 'DELIVERY');
+
+  return (
+    <div className="border-b border-line last:border-b-0">
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={open}
+        className="flex w-full flex-wrap items-center gap-x-3 gap-y-1.5 px-4 py-3 text-left hover:bg-sunken"
+      >
+        <Badge tone={orderStatusTone[order.status]}>{t.orderStatus[order.status]}</Badge>
+        <Mono className="text-xs text-ink-dim">{order.ref}</Mono>
+        {order.shipper_ref && (
+          <Mono className="text-xs text-ink-dim">{order.shipper_ref}</Mono>
+        )}
+        <HaulBadge haulKind={order.haul_kind} containerFeet={order.container_feet} />
+        {order.trailer_plate && <Plate>{order.trailer_plate}</Plate>}
+
+        {pickup && (
+          <span className="font-mono text-[13px] tracking-tight text-accent">
+            {pickup.city}
+            {delivery ? ` → ${delivery.city}` : ''}
+          </span>
+        )}
+
+        {pickup?.scheduled_date && (
+          <Mono className="text-xs text-ink-muted">
+            {f.date(pickup.scheduled_date)}
+            {pickup.scheduled_time ? ` ${pickup.scheduled_time.slice(0, 5)}` : ''}
+          </Mono>
+        )}
+
+        <span className="ml-auto text-[13px] font-semibold text-ink">
+          {f.eur(order.rate_cents ?? 0)}
+        </span>
+        <span aria-hidden className="text-ink-dim">
+          {open ? '−' : '+'}
+        </span>
+      </button>
+
+      {open && <div className="px-4 pb-4">{children}</div>}
+    </div>
   );
 }

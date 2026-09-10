@@ -21,6 +21,8 @@ import { AdminError } from '@/components/layout/AdminError';
 import type { StatusTone } from '@/components/ui/tone';
 import { requireRole } from '@/lib/auth/guard';
 import { setBillingAction } from '@/lib/billing/actions';
+import { COMPLETED_WEEKS } from '@/lib/config';
+import { weeksAgoMonday } from '@/lib/dates';
 import { ReportsButton } from '../ReportsButton';
 
 import { getI18n, isLocale } from '@/lib/i18n';
@@ -75,7 +77,12 @@ export default async function BillingPage({
   const [{ data: partners }, { data: orders }, { data: totals }, { data: billing }] =
     await Promise.all([
     supabase.rpc('partner_totals', {}),
-    supabase.rpc('completed_orders', {}),
+    /*
+     * У оператора окно шире, но оно есть: он и правда работает с
+     * прошлыми периодами, когда разбирает спор о счёте, — но не со всеми
+     * сразу. Глубже уходят отчёты периода, где те же числа уже сведены.
+     */
+    supabase.rpc('completed_orders', { p_from: weeksAgoMonday(COMPLETED_WEEKS * 2) }),
     supabase.rpc('weekly_totals', { p_weeks: 12 }),
     /*
      * Состояние расчётов отдельным запросом, а не из completed_orders:

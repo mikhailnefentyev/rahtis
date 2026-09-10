@@ -690,6 +690,14 @@ export const en = {
   orders: {
     title: 'My orders',
     subtitle: 'Published orders and where they stand.',
+    /*
+     * Three bands by who is waiting for whom. The names say what to do,
+     * not what state a row is in: 'Waiting for your decision' tells you
+     * something, 'REQUESTED' does not.
+     */
+    bandDecide: 'Waiting for your decision',
+    bandRunning: 'On the road',
+    bandWaiting: 'Waiting for offers',
     newOrder: 'New order',
     none: 'No orders yet',
     noneHint: 'Publish your first order and carriers will see it.',
@@ -1368,6 +1376,7 @@ export const en = {
     'legal.effective': 'In force from {date}',
     'legal.accepted': 'Accepted {date} · version {n}',
 
+    'done.windowNote': 'The list shows the last {weeks} weeks. Older transports are found by number in the period documents or by asking the assistant.',
     'done.weekOf': 'Week of {date}',
     'done.closedAt': 'Completed {date}',
     'done.bps': '{rate, number, ::percent}',

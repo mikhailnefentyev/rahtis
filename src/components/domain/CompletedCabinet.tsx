@@ -3,7 +3,8 @@ import { CompletedList } from '@/components/domain/CompletedList';
 import { Stars } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
 import { cabinetPath } from '@/lib/auth/paths';
-import { vatBpsFor } from '@/lib/config';
+import { COMPLETED_WEEKS, vatBpsFor } from '@/lib/config';
+import { weeksAgoMonday } from '@/lib/dates';
 import { getI18n, type Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 
@@ -24,11 +25,22 @@ export async function CompletedCabinet({
 }) {
   const viewer = await requireRole(locale, role);
 
-  const [{ t }, supabase] = await Promise.all([getI18n(locale), createClient()]);
+  const [{ t, m }, supabase] = await Promise.all([getI18n(locale), createClient()]);
 
   /* Двенадцать недель: квартал закрытых рейсов покрывает любой спор о счёте. */
   const [{ data: orders }, { data: totals }, { data: rating }] = await Promise.all([
-    supabase.rpc('completed_orders', {}),
+    /*
+     * Окно, а не «всё за всё время».
+     *
+     * Прежде функция звалась без аргументов и отдавала каждый выполненный
+     * рейс компании вместе с точками и документами одним ответом. При
+     * тридцати рейсах в день это семь тысяч записей в год, и страница
+     * перестала бы открываться не постепенно, а в один день.
+     *
+     * Что глубже окна — ищут не глазами в списке, а по номеру: в
+     * документах расчётного периода или у агента.
+     */
+    supabase.rpc('completed_orders', { p_from: weeksAgoMonday(COMPLETED_WEEKS) }),
     supabase.rpc('weekly_totals', { p_weeks: 12 }),
     /*
      * Средняя оценка — только перевозчику и только своя: по ней его
@@ -79,6 +91,18 @@ export async function CompletedCabinet({
       </p>
 
       <CompletedList orders={orders ?? []} totals={totals ?? []} />
+
+      {/*
+        * Сказано прямо, где кончается список.
+        *
+        * Молчаливое окно хуже отсутствующего: человек, не нашедший рейс
+        * за март, решит, что платформа его потеряла, а не что список
+        * держит последние недели. Раз уж мы отрезали, надо объяснить,
+        * где искать остальное.
+        */}
+      <p className="mt-8 border-t border-line pt-4 text-[12px] text-ink-dim">
+        {m('done.windowNote', { weeks: COMPLETED_WEEKS })}
+      </p>
     </main>
   );
 }

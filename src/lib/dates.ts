@@ -30,3 +30,22 @@ function startOfDayInOperations(value: Date): number {
 
   return Date.parse(`${day}T00:00:00Z`);
 }
+
+/**
+ * Понедельник недели, отстоящей на столько-то недель назад, по Хельсинки.
+ *
+ * Нужен окну выполненных рейсов: кабинет держит последние недели, а всё,
+ * что раньше, достаётся отчётами периода и через агента. Без окна список
+ * растёт вместе с оборотом компании и однажды перестаёт открываться —
+ * тридцать рейсов в день это семь тысяч в год в одном ответе.
+ *
+ * Хельсинки, а не UTC: та же неделя, по которой считает app.report_week
+ * в базе. Сравниваются они между собой, и часовой пояс у них обязан
+ * совпадать.
+ */
+export function weeksAgoMonday(weeks: number, now: Date = new Date()): string {
+  const local = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Helsinki' }).format(now);
+  const d = new Date(`${local}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7) - weeks * 7);
+  return d.toISOString().slice(0, 10);
+}
