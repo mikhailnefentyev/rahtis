@@ -1,26 +1,11 @@
 'use client';
 
+import { useMemo, useState } from 'react';
 import { HaulBadge } from '@/components/domain/HaulBadge';
-import { OrderAmendments } from '@/components/domain/OrderAmendments';
-import { OrderRouteMap } from '@/components/domain/RouteMap';
-import { TripStage } from '@/components/domain/TripProgress';
-import { RouteStops } from '@/components/domain/RouteStops';
-import {
-  Badge,
-  Button,
-  Card,
-  CardBody,
-  CardDivider,
-  Countdown,
-  Mono,
-  Plate,
-} from '@/components/ui';
+import { Badge, Card, CardBody, Mono, Plate } from '@/components/ui';
 import { orderStatusTone } from '@/components/ui/tone';
-import { cancelOrderAction, confirmOrderAction } from '@/lib/orders/matching';
 import { useI18n } from '@/lib/i18n/provider';
-import { AbandonPanel } from './AbandonPanel';
-import { ClosingPanel } from './ClosingPanel';
-import { TripPanel } from './TripPanel';
+import { AssignmentCard } from './AssignmentCard';
 import type { Database } from '@/types/database';
 import type { OrderAmendment, OrderStop, TripDocument } from '@/types/db';
 
@@ -29,10 +14,30 @@ type Assignment = Database['public']['Functions']['my_assignments']['Returns'][n
 /**
  * Рейсы, закреплённые за перевозчиком.
  *
- * Здесь маршрут показывается целиком, с контактами получателя: заказ уже
- * закреплён, и они нужны для работы. До закрепления их не отдавала
- * функция стола.
+ * Устроены так же, как список у заказчика, и по той же причине: парк на
+ * двадцать машин закрепляет двадцать рейсов, а карточка каждого рисует
+ * маршрут с картой. На пяти это удобно, на двадцати — стена.
+ *
+ * Полосы по тому, чего ждут от перевозчика: подтвердить (идёт отсчёт,
+ * карточка раскрыта всегда), затем то, что уже едет. Снятые отделены и
+ * показаны короткой карточкой — она сообщает, а не просит.
+ *
+ * Внутри «в пути» — по ближайшей непройденной точке: у едущего рейса
+ * загрузка позади, и сортировать его по ней значит прижать к низу самый
+ * живой рейс.
  */
+
+/** Ближайшая непройденная точка: то, что случится с рейсом следующим. */
+function nextStopKey(stops: OrderStop[]): string {
+  const next = [...stops].sort((a, b) => a.sequence - b.sequence).find((s) => !s.completed_at);
+  if (!next?.scheduled_date) return '9999-99-99';
+  return `${next.scheduled_date} ${next.scheduled_time ?? '99:99'}`;
+}
+
+function stopsOf(order: Assignment): OrderStop[] {
+  return (order.stops ?? []) as unknown as OrderStop[];
+}
+
 export function Assignments({
   assignments,
   documentsByOrder,
@@ -42,23 +47,39 @@ export function Assignments({
   documentsByOrder: Record<string, TripDocument[]>;
   amendmentsByOrder: Record<string, OrderAmendment[]>;
 }) {
-  const { t, m, f, locale } = useI18n();
+  const { t } = useI18n();
+  /* Раскрыт один рейс за раз, как и у заказчика. */
+  const [opened, setOpened] = useState<string | null>(null);
+
+  const bands = useMemo(() => {
+    const confirm: Assignment[] = [];
+    const running: Assignment[] = [];
+    const cancelled: Assignment[] = [];
+
+    for (const order of assignments) {
+      if (order.status === 'CANCELLED') cancelled.push(order);
+      else if (order.status === 'AWAIT_DRIVER') confirm.push(order);
+      else running.push(order);
+    }
+
+    running.sort((a, b) => nextStopKey(stopsOf(a)).localeCompare(nextStopKey(stopsOf(b))));
+
+    return { confirm, running, cancelled };
+  }, [assignments]);
 
   if (assignments.length === 0) return null;
 
-  /*
-   * Снятые рейсы отделены от работы.
-   *
-   * Их нельзя было оставить в общем списке: карточка рейса построена
-   * вокруг действий — подтвердить, отметить точку, закрыть, — а у снятого
-   * действий нет ни одного. Показанная тем же способом, она предлагала бы
-   * нажать то, что уже ничего не изменит, и носила бы бейдж «в работе».
-   *
-   * Поэтому ниже отдельный блок и другая, короткая карточка: она
-   * сообщает, а не просит.
-   */
-  const active = assignments.filter((o) => o.status !== 'CANCELLED');
-  const cancelled = assignments.filter((o) => o.status === 'CANCELLED');
+  const { cancelled } = bands;
+
+  function card(order: Assignment) {
+    return (
+      <AssignmentCard
+        order={order}
+        documentsByOrder={documentsByOrder}
+        amendmentsByOrder={amendmentsByOrder}
+      />
+    );
+  }
 
   return (
     <section className="mb-8">
@@ -66,150 +87,31 @@ export function Assignments({
         {t.matching.assignments}
       </h2>
 
-      <div className="flex flex-col gap-3">
-        {active.map((order) => {
-          const stops = (order.stops ?? []) as unknown as OrderStop[];
-          const waiting = order.status === 'AWAIT_DRIVER';
-          const amendments = amendmentsByOrder[order.id] ?? [];
+      {/* Отсчёт идёт — карточка раскрыта: подтверждать надо сейчас. */}
+      {bands.confirm.length > 0 && (
+        <div className="mb-6 flex flex-col gap-3">
+          {bands.confirm.map((order) => (
+            <div key={order.id}>{card(order)}</div>
+          ))}
+        </div>
+      )}
 
-          return (
-            <Card
+      {bands.running.length > 0 && (
+        <div className="overflow-hidden rounded-card border border-line">
+          {bands.running.map((order) => (
+            <TripRow
               key={order.id}
-              stripe={orderStatusTone[order.status]}
-              /*
-               * У перевозчика отсчёт идёт только в AWAIT_DRIVER: заказчик
-               * его выбрал и ждёт подтверждения. Идущий рейс не дышит —
-               * решать там нечего.
-               */
-              attention={order.status === 'AWAIT_DRIVER' && Boolean(order.deadline_at)}
+              order={order}
+              open={opened === order.id}
+              onToggle={() => setOpened(opened === order.id ? null : order.id)}
             >
-              <CardBody>
-                <div className="flex flex-wrap items-start justify-between gap-4">
-                  <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-2.5">
-                      <h3 className="text-[15px] font-semibold tracking-tight">
-                        {t.orderType[order.order_type]}
-                      </h3>
-                      <Badge tone={orderStatusTone[order.status]}>
-                        {t.orderStatus[order.status]}
-                      </Badge>
-                      <HaulBadge haulKind={order.haul_kind} containerFeet={order.container_feet} />
-                      <Mono className="text-xs text-ink-dim">{order.ref}</Mono>
-                      {/* Номер прицепа — по нему водитель находит железо на площадке. */}
-                      {order.trailer_plate && <Plate>{order.trailer_plate}</Plate>}
-                      {order.vehicle_plate && <Plate>{order.vehicle_plate}</Plate>}
-                    </div>
+              {card(order)}
+            </TripRow>
+          ))}
+        </div>
+      )}
 
-                    <p className="mt-1.5 text-[13px] text-ink-muted">
-                      {order.trailer ? `${order.trailer} · ` : ''}
-                      {m('order.distance', { km: order.distance_km ?? 0 })} ·{' '}
-                      <span className="font-semibold text-ink">{f.eur(order.rate_cents ?? 0)}</span>{' '}
-                      <span className="text-ink-dim">{t.money.addVat}</span>
-                    </p>
-                    <p className="mt-1 text-xs text-ink-dim">{order.shipper_name}</p>
-
-                    {waiting && (
-                      <p className="mt-2 text-[13px] text-warn">{t.matching.chosenYouHint}</p>
-                    )}
-                  </div>
-
-                  <div className="flex flex-col items-end gap-2">
-                    {order.deadline_at && <Countdown deadline={order.deadline_at} />}
-
-                    {waiting ? (
-                      <>
-                        <form action={confirmOrderAction}>
-                          <input type="hidden" name="locale" value={locale} />
-                          <input type="hidden" name="order_id" value={order.id} />
-                          <Button type="submit" variant="primary" size="sm" className="w-full">
-                            {t.matching.confirm}
-                          </Button>
-                        </form>
-                        <form action={cancelOrderAction}>
-                          <input type="hidden" name="locale" value={locale} />
-                          <input type="hidden" name="order_id" value={order.id} />
-                          <Button type="submit" variant="danger" size="sm" className="w-full">
-                            {t.matching.decline}
-                          </Button>
-                        </form>
-                      </>
-                    ) : (
-                      <Badge tone="live">{t.matching.inProgress}</Badge>
-                    )}
-                  </div>
-                </div>
-
-                {/* Этап рейса — сразу под шапкой: это главное, что здесь ищут. */}
-                {order.status === 'IN_PROGRESS' && stops.length > 0 && (
-                  <TripStage stops={stops} className="mt-3" />
-                )}
-
-                {/*
-                  * Правки заказчика идут выше маршрута, а не в конце
-                  * карточки: маршрут ниже — уже изменённый, и прочитать
-                  * его, не зная об этом, значит поехать по старому плану,
-                  * запомненному утром.
-                  */}
-                <OrderAmendments
-                  amendments={amendments}
-                  orderId={order.id}
-                  haulKind={order.haul_kind}
-                  canAcknowledge={order.status === 'IN_PROGRESS'}
-                  className="mt-3"
-                />
-
-                {stops.length > 0 && (
-                  <>
-                    <CardDivider className="my-4" />
-                    <RouteStops stops={stops} haulKind={order.haul_kind} />
-
-                    <OrderRouteMap
-                      geometry={order.route_geometry}
-                      bounds={order.route_bounds}
-                      stops={stops}
-                      haulKind={order.haul_kind}
-                      className="mt-4"
-                    />
-                    {order.status === 'IN_PROGRESS' && (
-                      <TripPanel stops={stops} haulKind={order.haul_kind} />
-                    )}
-
-                    {/*
-                      * Закрытие появляется, когда пройдены все точки.
-                      * Выполненного рейса здесь уже нет — он уходит во
-                      * вкладку выполненных вместе с документами.
-                      */}
-                    {order.status === 'IN_PROGRESS' && (
-                      <ClosingPanel
-                        orderId={order.id}
-                        stops={stops}
-                        documents={documentsByOrder[order.id] ?? []}
-                        closed={false}
-                      />
-                    )}
-
-                    <p className="mt-3 text-xs text-ink-dim">{t.matching.contactsNow}</p>
-                  </>
-                )}
-
-                {/*
-                  * Отказ — в самом низу, ниже закрытия рейса.
-                  *
-                  * Порядок здесь означает вероятность: девяносто девять
-                  * рейсов из ста заканчиваются кнопкой «сдал», и она
-                  * обязана попадаться раньше. Отказ ищут те, у кого уже
-                  * что-то случилось, и лишняя прокрутка им не помеха.
-                  */}
-                {order.status === 'IN_PROGRESS' && (
-                  <AbandonPanel orderId={order.id} className="mt-4 border-t border-line pt-4" />
-                )}
-              </CardBody>
-            </Card>
-          );
-        })}
-      </div>
-
-      {cancelled.length > 0 && (
+            {cancelled.length > 0 && (
         <div className="mt-6">
           <p className="label-micro mb-2">{t.matching.cancelledTrips}</p>
           <div className="flex flex-col gap-2">
@@ -224,6 +126,83 @@ export function Assignments({
         </div>
       )}
     </section>
+  );
+}
+
+/**
+ * Строка идущего рейса.
+ *
+ * То, по чему рейс узнают с одного взгляда: состояние, номер, единица,
+ * направление и время ближайшей непройденной точки. Именно ближайшей, а
+ * не загрузки: у едущего рейса важно, что будет дальше.
+ */
+function TripRow({
+  order,
+  open,
+  onToggle,
+  children,
+}: {
+  order: Assignment;
+  open: boolean;
+  onToggle: () => void;
+  children: React.ReactNode;
+}) {
+  const { t, f } = useI18n();
+
+  const stops = stopsOf(order);
+  const pickup = stops.find((s) => s.role === 'PICKUP');
+  const delivery = stops.find((s) => s.role === 'DELIVERY');
+  const next = [...stops].sort((a, b) => a.sequence - b.sequence).find((s) => !s.completed_at);
+  const done = stops.filter((s) => s.completed_at).length;
+
+  return (
+    <div className="border-b border-line last:border-b-0">
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={open}
+        className="flex w-full flex-wrap items-center gap-x-3 gap-y-1.5 px-4 py-3 text-left hover:bg-sunken"
+      >
+        <Badge tone={orderStatusTone[order.status]}>{t.orderStatus[order.status]}</Badge>
+        <Mono className="text-xs text-ink-dim">{order.ref}</Mono>
+        <HaulBadge haulKind={order.haul_kind} containerFeet={order.container_feet} />
+        {order.trailer_plate && <Plate>{order.trailer_plate}</Plate>}
+
+        {pickup && (
+          <span className="font-mono text-[13px] tracking-tight text-accent">
+            {pickup.city}
+            {delivery ? ` → ${delivery.city}` : ''}
+          </span>
+        )}
+
+        {/* Сколько точек позади: этап рейса одним числом. */}
+        <Mono className="text-xs text-ink-muted">
+          {done}/{stops.length}
+        </Mono>
+
+        {next?.scheduled_date && (
+          <Mono className="text-xs text-ink-muted">
+            {f.date(next.scheduled_date)}
+            {next.scheduled_time ? ` ${next.scheduled_time.slice(0, 5)}` : ''}
+          </Mono>
+        )}
+
+        <span className="ml-auto text-[13px] font-semibold text-ink">
+          {/*
+            * Ставка заказчика, как и в карточке рядом: выплату за
+            * вычетом комиссии перевозчик видит в недельном отчёте, где
+            * рядом стоит сама комиссия. Показать здесь одно число без
+            * второго значило бы предложить гадать, какое это из двух.
+            */}
+          {f.eur(order.rate_cents ?? 0)}
+        </span>
+        <span aria-hidden className="text-ink-dim">
+          {open ? '−' : '+'}
+        </span>
+      </button>
+
+      {open && <div className="px-4 pb-4">{children}</div>}
+    </div>
   );
 }
 

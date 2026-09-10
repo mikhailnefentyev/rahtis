@@ -49,3 +49,22 @@ export function weeksAgoMonday(weeks: number, now: Date = new Date()): string {
   d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7) - weeks * 7);
   return d.toISOString().slice(0, 10);
 }
+
+/**
+ * Сегодняшняя дата по Хельсинки строкой `ГГГГ-ММ-ДД`.
+ *
+ * Операции ведутся в финском времени независимо от локали интерфейса, и
+ * «сегодня» у диспетчера в Таллине — то же самое, что у диспетчера в
+ * Хельсинки. Брать локальную дату браузера значило бы, что в полночь по
+ * Хельсинки список у двух человек разный.
+ */
+export function todayInHelsinki(now: Date = new Date()): string {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Helsinki' }).format(now);
+}
+
+/** Дата через столько-то дней от сегодняшней по Хельсинки. */
+export function daysFromToday(days: number, now: Date = new Date()): string {
+  const d = new Date(`${todayInHelsinki(now)}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + days);
+  return d.toISOString().slice(0, 10);
+}

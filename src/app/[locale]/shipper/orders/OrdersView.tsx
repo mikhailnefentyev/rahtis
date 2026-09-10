@@ -2,8 +2,9 @@
 
 import { useMemo, useState } from 'react';
 import { HaulBadge } from '@/components/domain/HaulBadge';
-import { Badge, Button, EmptyState, Mono, Plate } from '@/components/ui';
+import { Badge, Button, EmptyState, Input, Mono, Plate } from '@/components/ui';
 import { orderStatusTone } from '@/components/ui/tone';
+import { daysFromToday, todayInHelsinki } from '@/lib/dates';
 import { useI18n } from '@/lib/i18n/provider';
 import type { OrderAmendment, OrderStop, ShipperOffer, ShipperOrder } from '@/types/db';
 import { OrderCard } from './OrderCard';
@@ -27,8 +28,13 @@ import { OrderCard } from './OrderCard';
  * Третья: каждая карточка рисовала маршрут и карту. Тридцать заказов —
  * тридцать карт на одной странице.
  *
- * Отсюда устройство: три полосы по тому, кто кого ждёт, внутри — по дате
+ * Отсюда устройство: полосы по тому, кто кого ждёт, внутри — по дате
  * загрузки, и строка вместо карточки. Карточка раскрывается по одной.
+ *
+ * Полос пять, потому что состояний пять: решение за нами, в пути, ждём
+ * откликов, черновик, отменён. Свести редкие в общую «прочее» значит
+ * поселить отменённый заказ рядом с ждущим откликов — а это разные вещи
+ * настолько, что человек им не поверит.
  *
  * Резать активные по возрасту нельзя, и это стоит сказать прямо: заказ на
  * загрузку через две недели заведён сегодня, а рейс, идущий третьи сутки,
@@ -56,6 +62,42 @@ function nextStopKey(stops: OrderStop[]): string {
   return `${next.scheduled_date} ${next.scheduled_time ?? '99:99'}`;
 }
 
+/**
+ * Строка, по которой заказ ищут.
+ *
+ * Всё, что человек помнит о рейсе и может набрать: оба номера — наш и
+ * свой, номер прицепа или контейнера, города и названия площадок,
+ * получатель. Собирается один раз на заказ, а не на каждое нажатие
+ * клавиши.
+ */
+function haystack(order: ShipperOrder, stops: OrderStop[]): string {
+  const parts = [order.ref, order.shipper_ref, order.trailer, order.trailer_plate];
+  for (const stop of stops) {
+    parts.push(stop.city, stop.place_name, stop.company_name, stop.address);
+  }
+  return parts.filter(Boolean).join(' ').toLowerCase();
+}
+
+/** Окна дат загрузки. Границы включительные, как их и читает человек. */
+type When = 'all' | 'today' | 'tomorrow' | 'week';
+
+function inWindow(when: When, stops: OrderStop[]): boolean {
+  if (when === 'all') return true;
+
+  const pickup = stops.find((s) => s.role === 'PICKUP');
+  /*
+   * Заказ без даты загрузки не выпадает из выборки по времени: его дата
+   * неизвестна, а не «не сегодня». Спрятав его, мы потеряли бы именно
+   * то, чем стоит заняться в первую очередь.
+   */
+  if (!pickup?.scheduled_date) return true;
+
+  const day = pickup.scheduled_date;
+  if (when === 'today') return day === todayInHelsinki();
+  if (when === 'tomorrow') return day === daysFromToday(1);
+  return day >= todayInHelsinki() && day <= daysFromToday(6);
+}
+
 export function OrdersView({
   orders,
   stopsByOrder,
@@ -74,6 +116,23 @@ export function OrdersView({
   );
   /* Раскрыт один заказ за раз: иначе список снова превращается в ленту карточек. */
   const [opened, setOpened] = useState<string | null>(null);
+  const [query, setQuery] = useState('');
+  const [when, setWhen] = useState<When>('all');
+
+  /*
+   * Отбор идёт на клиенте, и пока это честно: в списке лежит только
+   * незакрытая работа, а её объём ограничен оборотом компании, не её
+   * возрастом. Когда счёт пойдёт на сотни, отбор переедет в запрос — там
+   * же, где уже лежат фильтры стола.
+   */
+  const visible = useMemo(() => {
+    const needle = query.trim().toLowerCase();
+    return orders.filter((order) => {
+      const stops = stopsByOrder[order.id] ?? [];
+      if (!inWindow(when, stops)) return false;
+      return needle === '' || haystack(order, stops).includes(needle);
+    });
+  }, [orders, stopsByOrder, query, when]);
 
   /*
    * Форма публикации большая и нужна не при каждом заходе, поэтому её код
@@ -91,16 +150,44 @@ export function OrdersView({
     const decide: ShipperOrder[] = [];
     const running: ShipperOrder[] = [];
     const waiting: ShipperOrder[] = [];
+    const draft: ShipperOrder[] = [];
+    const cancelled: ShipperOrder[] = [];
 
-    for (const order of orders) {
-      /*
-       * Отсчёт решает, а не статус: пятнадцать минут идут и когда выбирают
-       * перевозчика, и когда подтверждает водитель. Пока они идут, заказ
-       * ждёт нас, а не мы его.
-       */
-      if (order.deadline_at) decide.push(order);
-      else if (order.status === 'IN_PROGRESS') running.push(order);
-      else waiting.push(order);
+    /*
+     * Полоса выбирается статусом, и у каждого статуса свой дом.
+     *
+     * Сначала здесь стояло «есть отсчёт — значит решать, иначе если едет —
+     * в путь, иначе ждём откликов». Отменённый заказ попадал в «ждёт
+     * откликов», хотя он не ждёт ничего, и туда же провалился бы черновик.
+     * Ветка «иначе» в разборе состояний — это обещание, что новых
+     * состояний не будет.
+     *
+     * Отсчёт при этом не условие полосы, а лишь повод раскрыть карточку:
+     * заказ с откликами ждёт решения и тогда, когда срок уже вышел, а
+     * планировщик ещё не прошёлся.
+     */
+    for (const order of visible) {
+      switch (order.status) {
+        case 'REQUESTED':
+        case 'AWAIT_DRIVER':
+          decide.push(order);
+          break;
+        case 'IN_PROGRESS':
+          running.push(order);
+          break;
+        case 'OPEN':
+          waiting.push(order);
+          break;
+        case 'DRAFT':
+          draft.push(order);
+          break;
+        case 'CANCELLED':
+          cancelled.push(order);
+          break;
+        default:
+          /* DONE сюда не приходит: у него своя вкладка. */
+          break;
+      }
     }
 
     const by = (key: (stops: OrderStop[]) => string) => (a: ShipperOrder, b: ShipperOrder) =>
@@ -109,9 +196,12 @@ export function OrdersView({
     decide.sort(by(pickupKey));
     running.sort(by(nextStopKey));
     waiting.sort(by(pickupKey));
+    draft.sort(by(pickupKey));
+    /* Отменённые — по свежести: их смотрят, чтобы вспомнить, что было. */
+    cancelled.sort((a, b) => (b.created_at ?? '').localeCompare(a.created_at ?? ''));
 
-    return { decide, running, waiting };
-  }, [orders, stopsByOrder]);
+    return { decide, running, waiting, draft, cancelled };
+  }, [visible, stopsByOrder]);
 
   function card(order: ShipperOrder) {
     return (
@@ -174,14 +264,62 @@ export function OrdersView({
         </div>
       )}
 
+      {/*
+        * Поиск и окно дат.
+        *
+        * Оси взяты у бирж, а не придуманы: у trans.eu список фильтруется
+        * диапазоном дат загрузки и сортируется по ней же. Человек ищет
+        * либо «что грузится сегодня», либо конкретную единицу по номеру.
+        *
+        * Панель показывается, когда заказов больше горстки: на трёх
+        * строках она занимает больше места, чем экономит.
+        */}
+      {orders.length > 5 && !composing && (
+        <div className="mb-4 flex flex-wrap items-center gap-2">
+          <Input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={t.orders.searchPlaceholder}
+            className="w-full sm:w-72"
+            aria-label={t.orders.searchPlaceholder}
+          />
+
+          <div className="flex flex-wrap gap-1.5">
+            {(['all', 'today', 'tomorrow', 'week'] as When[]).map((key) => (
+              <Button
+                key={key}
+                size="sm"
+                variant={when === key ? 'primary' : 'default'}
+                onClick={() => setWhen(key)}
+                aria-pressed={when === key}
+              >
+                {t.orders.when[key]}
+              </Button>
+            ))}
+          </div>
+
+          {visible.length !== orders.length && (
+            <span className="text-xs text-ink-dim">
+              {m('orders.shownOf', { shown: visible.length, total: orders.length })}
+            </span>
+          )}
+        </div>
+      )}
+
       {orders.length === 0 && !composing ? (
         <EmptyState title={t.orders.none} description={t.orders.noneHint} />
+      ) : visible.length === 0 ? (
+        /* Пусто из-за отбора, а не потому, что заказов нет: так и сказано. */
+        <EmptyState title={t.orders.nothingFound} description={t.orders.nothingFoundHint} />
       ) : (
         <>
           {/* Отсчёт идёт — карточка раскрыта всегда: решать надо сейчас. */}
           {band(t.orders.bandDecide, bands.decide, true)}
           {band(t.orders.bandRunning, bands.running, false)}
           {band(t.orders.bandWaiting, bands.waiting, false)}
+          {band(t.orders.bandDraft, bands.draft, false)}
+          {band(t.orders.bandCancelled, bands.cancelled, false)}
         </>
       )}
     </>
