@@ -150,6 +150,13 @@ export async function saveRequisitesAction(
     };
   }
 
-  revalidatePath(`/${locale}`, 'layout');
+  /*
+   * Реквизиты доводят компанию до ACTIVE, а статус виден в шапке
+   * кабинета и в списке у оператора. Витрина и условия к этому
+   * отношения не имеют — сбрасывать их незачем.
+   */
+  revalidatePath(`/${locale}/shipper`, 'layout');
+  revalidatePath(`/${locale}/carrier`, 'layout');
+  revalidatePath(`/${locale}/admin`);
   return { error: null, done: true };
 }

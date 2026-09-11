@@ -1724,6 +1724,15 @@ export type Database = {
           privilege: string
         }[]
       }
+      agent_sql: {
+        Args: {
+          p_conversation_id: string
+          p_limit?: number
+          p_query: string
+          p_token: string
+        }
+        Returns: Json
+      }
       agent_trip_documents: {
         Args: { p_conversation_id: string; p_ref: string; p_token: string }
         Returns: {

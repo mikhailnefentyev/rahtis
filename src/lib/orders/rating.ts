@@ -56,6 +56,12 @@ export async function rateOrderAction(
     };
   }
 
-  revalidatePath(`/${locale}`, 'layout');
+  /*
+   * Оценка ложится на компанию: её видит перевозчик у себя, заказчик — в
+   * выполненных, оператор — в карточке компании.
+   */
+  revalidatePath(`/${locale}/shipper/done`);
+  revalidatePath(`/${locale}/carrier`, 'layout');
+  revalidatePath(`/${locale}/admin`);
   return { error: null, score };
 }

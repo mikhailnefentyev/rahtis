@@ -49,16 +49,7 @@ export default async function OrdersPage({ params }: { params: Promise<{ locale:
     .neq('status', 'DONE')
     .order('created_at', { ascending: false });
 
-  /* Точки читаются одним запросом на все заказы, а не по одному на карточку. */
   const orderIds = (orders ?? []).map((o) => o.id);
-  const { data: stops } = orderIds.length
-    ? await supabase.from('order_stops').select('*').in('order_id', orderIds).order('sequence')
-    : { data: [] as OrderStop[] };
-
-  const stopsByOrder: Record<string, OrderStop[]> = {};
-  for (const stop of stops ?? []) {
-    (stopsByOrder[stop.order_id] ??= []).push(stop);
-  }
 
   /*
    * Отклики через RPC, а не вложенным select по order_offers.
@@ -79,16 +70,35 @@ export default async function OrdersPage({ params }: { params: Promise<{ locale:
     )
     .map((o) => o.id);
 
+  /*
+   * Точки, отклики и правки зависят от списка заказов, но не друг от
+   * друга, — значит идут вместе, а не в очередь.
+   *
+   * Цена очереди здесь не теоретическая: до базы примерно девяносто
+   * миллисекунд в один конец независимо от того, что спрашиваешь, и три
+   * последовательных похода стоили почти треть секунды ожидания на ровном
+   * месте. Запросов столько же, ожидание одно.
+   */
+  const [{ data: stops }, { data: offers }, { data: amendmentRows }] = await Promise.all([
+    orderIds.length
+      ? supabase.from('order_stops').select('*').in('order_id', orderIds).order('sequence')
+      : Promise.resolve({ data: [] as OrderStop[] }),
+    withCarrierIds.length
+      ? supabase.rpc('offers_for_shipper', { p_order_ids: withCarrierIds })
+      : Promise.resolve({ data: [] as ShipperOffer[] }),
+    orderIds.length
+      ? supabase.from('order_amendments').select('*').in('order_id', orderIds).order('created_at')
+      : Promise.resolve({ data: [] as OrderAmendment[] }),
+  ]);
+
+  const stopsByOrder: Record<string, OrderStop[]> = {};
+  for (const stop of stops ?? []) {
+    (stopsByOrder[stop.order_id] ??= []).push(stop);
+  }
+
   const offersByOrder: Record<string, ShipperOffer[]> = {};
-
-  if (withCarrierIds.length > 0) {
-    const { data: offers } = await supabase.rpc('offers_for_shipper', {
-      p_order_ids: withCarrierIds,
-    });
-
-    for (const offer of (offers ?? []) as ShipperOffer[]) {
-      (offersByOrder[offer.order_id] ??= []).push(offer);
-    }
+  for (const offer of (offers ?? []) as ShipperOffer[]) {
+    (offersByOrder[offer.order_id] ??= []).push(offer);
   }
 
   /*
@@ -97,14 +107,6 @@ export default async function OrdersPage({ params }: { params: Promise<{ locale:
    * Заказчику он показывает, что он сам поменял после старта, — карточка
    * идущего рейса иначе не отличается от той, которую взял перевозчик.
    */
-  const { data: amendmentRows } = orderIds.length
-    ? await supabase
-        .from('order_amendments')
-        .select('*')
-        .in('order_id', orderIds)
-        .order('created_at')
-    : { data: [] as OrderAmendment[] };
-
   const amendmentsByOrder: Record<string, OrderAmendment[]> = {};
   for (const row of amendmentRows ?? []) {
     (amendmentsByOrder[row.order_id] ??= []).push(row);

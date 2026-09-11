@@ -1,6 +1,6 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
+import { revalidateOrder } from '@/lib/orders/revalidate';
 import { getViewer } from '@/lib/auth/viewer';
 import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
@@ -60,7 +60,7 @@ export async function takeOrderAction(
     p_vehicle_id: String(formData.get('vehicle_id') ?? ''),
   });
 
-  revalidatePath(`/${locale}/carrier`, 'layout');
+  revalidateOrder(locale);
 
   return { error: error ? await explain(locale, error.code, error.message) : null };
 }
@@ -72,7 +72,7 @@ export async function chooseOfferAction(formData: FormData): Promise<void> {
   const supabase = await createClient();
   await supabase.rpc('choose_offer', { p_offer_id: String(formData.get('offer_id') ?? '') });
 
-  revalidatePath(`/${locale}/shipper`, 'layout');
+  revalidateOrder(locale);
 }
 
 /** Подтверждение работы выбранным перевозчиком. */
@@ -82,7 +82,7 @@ export async function confirmOrderAction(formData: FormData): Promise<void> {
   const supabase = await createClient();
   await supabase.rpc('confirm_order', { p_order_id: String(formData.get('order_id') ?? '') });
 
-  revalidatePath(`/${locale}/carrier`, 'layout');
+  revalidateOrder(locale);
 }
 
 /** Откат до старта: доступен обеим сторонам (ТЗ §6). */
@@ -92,5 +92,5 @@ export async function cancelOrderAction(formData: FormData): Promise<void> {
   const supabase = await createClient();
   await supabase.rpc('cancel_order', { p_order_id: String(formData.get('order_id') ?? '') });
 
-  revalidatePath(`/${locale}`, 'layout');
+  revalidateOrder(locale);
 }

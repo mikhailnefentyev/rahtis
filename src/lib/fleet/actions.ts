@@ -106,7 +106,12 @@ export async function uploadDocumentAction(
     return { error: t.documents.uploadFailed };
   }
 
-  revalidatePath(`/${locale}`, 'layout');
+  /*
+   * Документ компании открывает стол заказов: меняется готовность, а её
+   * читают кабинет перевозчика и очередь допусков у оператора.
+   */
+  revalidatePath(`/${locale}/carrier`, 'layout');
+  revalidatePath(`/${locale}/admin`);
   return { error: null };
 }
 

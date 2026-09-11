@@ -64,7 +64,13 @@ export async function submitSupportAction(
     }),
   );
 
-  revalidatePath(`/${locale}`, 'layout');
+  /*
+   * Вопрос виден оператору в очереди и автору — в его кабинете. Сброс
+   * всего поддерева локали задевал заодно витрину и условия.
+   */
+  revalidatePath(`/${locale}/admin`);
+  revalidatePath(`/${locale}/shipper`);
+  revalidatePath(`/${locale}/carrier`);
   return { error: null, done: true };
 }
 

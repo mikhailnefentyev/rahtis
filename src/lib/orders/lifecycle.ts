@@ -1,6 +1,6 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
+import { revalidateOrder, revalidateOrderFinished } from '@/lib/orders/revalidate';
 import { getViewer } from '@/lib/auth/viewer';
 import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
@@ -95,7 +95,7 @@ export async function withdrawOrderAction(
 
   if (error) return { error: await explain(locale, error.code, error.message), done: false };
 
-  revalidatePath(`/${locale}`, 'layout');
+  revalidateOrderFinished(locale);
   return { ...idle, done: true };
 }
 
@@ -128,7 +128,7 @@ export async function abandonOrderAction(
 
   if (error) return { error: await explain(locale, error.code, error.message), done: false };
 
-  revalidatePath(`/${locale}`, 'layout');
+  revalidateOrderFinished(locale);
   return { ...idle, done: true };
 }
 
@@ -173,7 +173,7 @@ export async function repriceOrderAction(
 
   if (error) return { error: await explain(locale, error.code, error.message), done: false };
 
-  revalidatePath(`/${locale}`, 'layout');
+  revalidateOrder(locale);
   return { ...idle, done: true };
 }
 
@@ -205,6 +205,6 @@ export async function deleteOrderAction(
 
   if (error) return { error: await explain(locale, error.code, error.message), done: false };
 
-  revalidatePath(`/${locale}`, 'layout');
+  revalidateOrder(locale);
   return { ...idle, done: true };
 }

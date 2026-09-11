@@ -20,6 +20,12 @@ const TOOLS = {
   payout_schedule: { fn: 'agent_payout_schedule', args: ['periods'] },
   legal_clause: { fn: 'agent_legal_clause', args: ['number', 'kind', 'locale'] },
   place_guide: { fn: 'agent_place_guide', args: ['query', 'locale'] },
+  /*
+   * Свободный запрос на чтение. Доступен только оператору — проверку
+   * делает сама функция по аудитории треда, а не этот список: список
+   * говорит, какие инструменты есть, а кому они положены, решает база.
+   */
+  sql: { fn: 'agent_sql', args: ['query', 'limit'] },
 } as const;
 
 type ToolName = keyof typeof TOOLS;

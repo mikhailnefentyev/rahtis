@@ -1,6 +1,6 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
+import { revalidateOrder } from '@/lib/orders/revalidate';
 import { getViewer } from '@/lib/auth/viewer';
 import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
 import { computeRouteAction } from '@/lib/routing/actions';
@@ -277,7 +277,7 @@ export async function amendStopAction(
    */
   if (data?.changes && 'address' in patch) await refreshRoute(supabase, orderId, locale);
 
-  revalidatePath(`/${locale}`, 'layout');
+  revalidateOrder(locale);
   return { ...idle, saved: true };
 }
 
@@ -316,7 +316,7 @@ export async function addStopAction(
 
   await refreshRoute(supabase, orderId, locale);
 
-  revalidatePath(`/${locale}`, 'layout');
+  revalidateOrder(locale);
   return { ...idle, saved: true };
 }
 
@@ -341,7 +341,7 @@ export async function removeStopAction(
 
   await refreshRoute(supabase, orderId, locale);
 
-  revalidatePath(`/${locale}`, 'layout');
+  revalidateOrder(locale);
   return { ...idle, saved: true };
 }
 
@@ -363,5 +363,5 @@ export async function acknowledgeAmendmentsAction(formData: FormData): Promise<v
     p_order_id: str(formData, 'order_id'),
   });
 
-  revalidatePath(`/${locale}`, 'layout');
+  revalidateOrder(locale);
 }

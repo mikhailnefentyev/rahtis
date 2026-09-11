@@ -1,6 +1,6 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
+import { revalidateOrder, revalidateOrderFinished } from '@/lib/orders/revalidate';
 import { getViewer } from '@/lib/auth/viewer';
 import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
@@ -63,7 +63,7 @@ export async function completeStopAction(
     p_damage_note: String(formData.get('damage_note') ?? '').trim() || undefined,
   });
 
-  revalidatePath(`/${locale}/carrier`, 'layout');
+  revalidateOrder(locale);
 
   return { error: error ? await explain(locale, error.code, error.message) : null };
 }
@@ -79,7 +79,7 @@ export async function uncompleteStopAction(formData: FormData): Promise<void> {
     p_stop_id: String(formData.get('stop_id') ?? ''),
   });
 
-  revalidatePath(`/${locale}/carrier`, 'layout');
+  revalidateOrder(locale);
 }
 
 /* ── Документы рейса (ТЗ §9) ───────────────────────────────────── */
@@ -158,7 +158,7 @@ export async function uploadTripDocumentAction(
     return { error: t.documents.uploadFailed };
   }
 
-  revalidatePath(`/${locale}`, 'layout');
+  revalidateOrderFinished(locale);
   return { error: null };
 }
 
@@ -194,7 +194,7 @@ export async function closeOrderAction(
     p_order_id: String(formData.get('order_id') ?? ''),
   });
 
-  revalidatePath(`/${locale}`, 'layout');
+  revalidateOrderFinished(locale);
 
   return { error: error ? await explain(locale, error.code, error.message) : null };
 }
