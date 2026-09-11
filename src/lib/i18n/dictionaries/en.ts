@@ -906,6 +906,10 @@ export const en = {
     noAcceptances: 'No acceptances',
   },
 
+  admin: {
+    people: 'Users',
+  },
+
   moderation: {
     queue: 'Review queue',
     applications: 'Applications',
@@ -1388,6 +1392,7 @@ export const en = {
 
     'orderForm.repeatedFrom': 'Repeating transport {ref}. Dates and the trailer number are left empty: the new job has its own.',
     'orderForm.repeatSkipped': '{count, plural, one {One stop} other {# stops}} could not be repeated: the form has no field for a continuation.',
+    'admin.companyOrders': '{count, plural, =0 {No transports} one {# transport} other {# transports}}',
     'orders.shownOf': 'Showing {shown} of {total}',
     'done.windowNote': 'The list shows the last {weeks} weeks. Older transports are found by number in the period documents or by asking the assistant.',
     'done.weekOf': 'Week of {date}',

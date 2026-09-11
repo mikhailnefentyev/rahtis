@@ -336,7 +336,20 @@ export default async function AdminPage({
               <tbody>
                 {history.map((company) => (
                   <Tr key={company.id}>
-                    <Td>{company.name}</Td>
+                    <Td>
+                      {/*
+                        * Имя — ссылка на карточку. Решения принимаются
+                        * здесь же, кнопками справа; карточка отвечает на
+                        * другой вопрос — «а что это за компания»,
+                        * и открывается, когда он возник.
+                        */}
+                      <Link
+                        href={`/${locale}/admin/company/${company.id}`}
+                        className="font-medium text-ink hover:text-accent"
+                      >
+                        {company.name}
+                      </Link>
+                    </Td>
                     <Td mono>{company.business_id}</Td>
                     <Td>{t.role[company.kind]}</Td>
                     <Td>

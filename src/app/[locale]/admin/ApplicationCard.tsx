@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useState } from 'react';
 import { Badge, Button, Card, CardBody, Kv, Mono, Textarea } from '@/components/ui';
 import { approveCompanyAction, rejectCompanyAction } from '@/lib/companies/actions';
@@ -24,7 +25,14 @@ export function ApplicationCard({ company, ytjUrl }: { company: Company; ytjUrl:
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2.5">
-              <h3 className="text-[15px] font-semibold tracking-tight">{company.name}</h3>
+              <h3 className="text-[15px] font-semibold tracking-tight">
+                <Link
+                  href={`/${locale}/admin/company/${company.id}`}
+                  className="hover:text-accent"
+                >
+                  {company.name}
+                </Link>
+              </h3>
               <Badge tone={company.kind === 'CARRIER' ? 'live' : 'info'}>
                 {t.role[company.kind]}
               </Badge>
