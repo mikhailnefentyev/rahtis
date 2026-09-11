@@ -1695,10 +1695,11 @@ export type Database = {
         Args: { p_conversation_id: string; p_periods?: number; p_token: string }
         Returns: {
           days_left: number
-          due_date: string
           gross_cents: number
+          invoice_due: string
           orders_count: number
           payout_cents: number
+          payout_due: string
           period_end: string
           period_start: string
         }[]
@@ -2579,6 +2580,7 @@ export type Database = {
       settlement_period: {
         Args: { p_moment?: string }
         Returns: {
+          invoice_due: string
           payout_due: string
           period_end: string
           period_start: string

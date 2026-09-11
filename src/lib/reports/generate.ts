@@ -4,7 +4,6 @@ import { renderToBuffer } from '@react-pdf/renderer';
 import {
   APP,
   COMMISSION_BPS,
-  INVOICE_TERM_DAYS,
   commissionCents,
   payoutCents,
   vatBpsFor,
@@ -133,14 +132,20 @@ export async function generatePeriodSettlement(moment?: string): Promise<Generat
     };
   }
 
-  const issued = new Date();
-  const shipperDue = new Date(issued.getTime() + INVOICE_TERM_DAYS * 24 * 3600 * 1000);
-
+  /*
+   * Обе даты приходят из базы и обе считаются от конца периода.
+   *
+   * Прежде срок заказчика считался здесь как «сегодня плюс срок». Пока
+   * задание шло вовремя, это совпадало; запустись оно на день позже — и
+   * срок уехал бы вместе с ним. Хуже того, агент, у которого дня
+   * выставления нет вовсе, назвать такую дату не мог и честно писал, что
+   * не знает. От конца периода её знают оба.
+   */
   return run({
     kind: 'PERIOD',
     start: period.period_start,
     end: period.period_end,
-    due: { shipper: shipperDue.toISOString().slice(0, 10), carrier: period.payout_due },
+    due: { shipper: period.invoice_due, carrier: period.payout_due },
   });
 }
 
