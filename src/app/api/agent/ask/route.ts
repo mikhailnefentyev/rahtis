@@ -162,3 +162,37 @@ export async function GET(request: Request) {
     pending: Boolean(conversation?.pending_since),
   });
 }
+
+/**
+ * Стереть переписку целиком.
+ *
+ * Правило, кому можно, живёт в базе: функция сверяет компанию треда с
+ * компанией спрашивающего и отказывает, пока помощник отвечает. Здесь
+ * только проверка входа — повторять правило в двух местах значит
+ * однажды их развести.
+ */
+export async function DELETE(request: Request) {
+  const viewer = await getViewer();
+  if (viewer.status !== 'ready' || (!viewer.company && viewer.role !== 'ADMIN')) {
+    return Response.json({ error: 'forbidden' }, { status: 403 });
+  }
+
+  const url = new URL(request.url);
+  const conversationId = url.searchParams.get('conversation') ?? '';
+  if (!conversationId) {
+    return Response.json({ error: 'conversation is required' }, { status: 400 });
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc('delete_conversation', {
+    p_conversation_id: conversationId,
+  });
+
+  if (error) {
+    /* 55000 — помощник ещё отвечает: это не сбой, а «позже». */
+    const status = error.code === '55000' ? 409 : error.code === '42501' ? 403 : 400;
+    return Response.json({ error: error.code ?? 'failed', detail: error.message }, { status });
+  }
+
+  return Response.json({ ok: true });
+}

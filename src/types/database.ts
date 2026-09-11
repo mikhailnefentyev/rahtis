@@ -2132,6 +2132,10 @@ export type Database = {
         }
       }
       delete_company: { Args: { p_company_id: string }; Returns: string[] }
+      delete_conversation: {
+        Args: { p_conversation_id: string }
+        Returns: string
+      }
       delete_order: { Args: { p_order_id: string }; Returns: string }
       desk_orders: {
         Args: { p_limit?: number; p_region?: string }

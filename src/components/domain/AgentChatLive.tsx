@@ -42,6 +42,9 @@ export function AgentChatLive({
   const [pending, setPending] = useState(false);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [clearing, setClearing] = useState(false);
+  /* Второе нажатие подтверждает: переписка стирается целиком и насовсем. */
+  const [confirming, setConfirming] = useState(false);
 
   const box = useRef<HTMLUListElement>(null);
   const field = useRef<HTMLTextAreaElement>(null);
@@ -176,6 +179,40 @@ export function AgentChatLive({
     }
   }
 
+  /**
+   * Стереть переписку.
+   *
+   * Целиком, а не по сообщению: переписка, из которой выброшено одно
+   * сообщение, хуже отсутствующей — по ней делают выводы.
+   *
+   * Лента очищается только после ответа сервера. Очистив сразу, мы
+   * показали бы пустой чат там, где база отказала, — а отказывает она по
+   * делу: пока помощник отвечает, тред трогать нельзя.
+   */
+  async function clearThread() {
+    if (!thread || clearing) return;
+    setClearing(true);
+    setError(null);
+    try {
+      const response = await fetch(`/api/agent/ask?conversation=${encodeURIComponent(thread)}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        const data = (await response.json().catch(() => null)) as { detail?: string } | null;
+        setError(data?.detail ?? t.chat.failed);
+        return;
+      }
+      setMessages([]);
+      setThread(null);
+      setPending(false);
+      setConfirming(false);
+    } catch {
+      setError(t.chat.failed);
+    } finally {
+      setClearing(false);
+    }
+  }
+
   const who: Record<string, string> = {
     USER: t.chat.you,
     AGENT: t.chat.agent,
@@ -227,6 +264,30 @@ export function AgentChatLive({
             <span className="agent-pulse" aria-hidden="true" />
             {t.chat.thinking}
           </>
+        )}
+
+        {/*
+          * Кнопка появляется только когда есть что стирать, и молчит,
+          * пока помощник отвечает: база в этот момент откажет, и
+          * предлагать нажатие, которое не сработает, незачем.
+          */}
+        {thread && messages.length > 0 && !pending && (
+          <span className="ml-auto flex items-center gap-2">
+            {confirming && <span className="text-ink-dim">{t.chat.clearConfirm}</span>}
+            <Button
+              size="sm"
+              variant={confirming ? 'danger' : 'ghost'}
+              disabled={clearing}
+              onClick={() => (confirming ? void clearThread() : setConfirming(true))}
+            >
+              {confirming ? t.chat.clearYes : t.chat.clear}
+            </Button>
+            {confirming && (
+              <Button size="sm" variant="ghost" onClick={() => setConfirming(false)}>
+                {t.action.cancel}
+              </Button>
+            )}
+          </span>
         )}
       </p>
 
