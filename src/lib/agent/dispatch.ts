@@ -2,6 +2,7 @@ import 'server-only';
 
 import { createAdminClient } from '@/lib/supabase/admin';
 import { n8nWebhookUrl, agentSecret, signOutgoing } from './signature';
+import { agentSystemPrompt, agentTools } from '@/lib/agent/brief';
 import { emailLocaleOf } from '@/lib/email/text';
 
 /**
@@ -82,6 +83,21 @@ export async function prepareDispatch(
     party_role: company?.kind ?? null,
     message_id: messageId,
     text: message?.body ?? '',
+    /*
+     * Наставление и список инструментов собирает платформа, а не n8n.
+     *
+     * Так они едут вместе с кодом: правка роли попадает в работу
+     * выкладкой, а не переимпортом воркфлоу руками. Прежде правда жила в
+     * двух местах, и это выстрелило — аудиторию оператора завели в базе и
+     * в файле, а в работающем n8n осталась старая ветка, и помощник
+     * ответил оператору «платформа открывает мне только данные вашей
+     * компании».
+     */
+    system: agentSystemPrompt({
+      audience: conversation.audience,
+      companyName: company?.name ?? null,
+    }),
+    tools: agentTools(conversation.audience),
     /*
      * Язык переписки компании, а не константа.
      *
