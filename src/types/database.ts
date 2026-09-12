@@ -1646,6 +1646,15 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      agent_ask_operator: {
+        Args: {
+          p_conversation_id: string
+          p_question: string
+          p_subject?: string
+          p_token: string
+        }
+        Returns: Json
+      }
       agent_company_money: {
         Args: { p_conversation_id: string; p_token: string; p_weeks?: number }
         Returns: {
@@ -2204,6 +2213,7 @@ export type Database = {
         Args: { p_phone: string; p_question: string }
         Returns: Json
       }
+      driver_next_stop: { Args: { p_phone: string }; Returns: Json }
       expire_order_deadlines: { Args: never; Returns: number }
       fleet_size: {
         Args: never

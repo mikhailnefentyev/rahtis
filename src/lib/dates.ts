@@ -68,3 +68,42 @@ export function daysFromToday(days: number, now: Date = new Date()): string {
   d.setUTCDate(d.getUTCDate() + days);
   return d.toISOString().slice(0, 10);
 }
+
+/**
+ * Момент времени по расписанию точки: дата и час, записанные по Хельсинки.
+ *
+ * В базе дата и время лежат раздельно и без пояса — это стенные часы
+ * терминала, а не отметка на оси времени. Чтобы сравнить их с расчётным
+ * прибытием, которое считается от now(), нужен именно момент.
+ *
+ * Разбирать строку как UTC и на этом успокоиться нельзя: летом
+ * расхождение три часа, зимой два, и ответ «успеваешь» приходил бы
+ * ровно на те часы раньше, на которые водитель опаздывает. Поэтому
+ * поправка снимается у самого пояса на ту же дату, а не константой.
+ */
+export function operationsInstant(date: string, time: string): number | null {
+  const clock = time.length === 5 ? `${time}:00` : time;
+  const asIfUtc = Date.parse(`${date}T${clock}Z`);
+  if (!Number.isFinite(asIfUtc)) return null;
+
+  /* Как этот же момент выглядит на стенных часах Хельсинки. */
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: APP.timeZone,
+    hour12: false,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  }).formatToParts(new Date(asIfUtc));
+
+  const at = (type: string) => parts.find((p) => p.type === type)?.value ?? '00';
+  /* en-CA отдаёт час 24 вместо 00 — Date.parse такого не принимает. */
+  const hour = at('hour') === '24' ? '00' : at('hour');
+  const shown = Date.parse(
+    `${at('year')}-${at('month')}-${at('day')}T${hour}:${at('minute')}:${at('second')}Z`,
+  );
+
+  return Number.isFinite(shown) ? asIfUtc - (shown - asIfUtc) : null;
+}

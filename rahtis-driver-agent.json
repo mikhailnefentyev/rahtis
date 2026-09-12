@@ -152,7 +152,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Запрос к Claude: понять водителя и решить, что делать.\n//\n// Модель отвечает одним из трёх: METKA:STEP:<роль> — водитель сообщил об\n// этапе; METKA:ESCALATE — вопрос не по данным рейса; иначе — готовый\n// ответ фактом из карточки.\n//\n// Роль в METKA:STEP нужна платформе: она сверит её со следующей\n// непройденной точкой и откажет, если агент неверно понял фразу. Отметка\n// — единственная запись во всём наборе, и цена ошибки здесь высокая.\n//\n// Модель: claude-opus-5. Для водителя за рулём важна скорость, поэтому\n// effort low — задача простая, глубокое рассуждение ей не нужно.\n// Если нужно дешевле — замените model на claude-haiku-4-5.\n\nconst trips = $json.trips;\nconst text = $('Подпись: контекст').item.json.text;\n\nconst system = [\n  'Ты — диспетчер-помощник платформы RAHTIS для водителя грузовика.',\n  'Водитель за рулём: отвечай КОРОТКО, одним-двумя предложениями.',\n  '',\n  'Отвечай ТОЛЬКО по данным рейсов ниже. Не выдумывай адреса, телефоны и время.',\n  '',\n  'Определи, что сделал водитель:',\n  '1. СООБЩИЛ ОБ ЭТАПЕ (забрал, загрузился, выгрузился, сдал) — верни строго METKA:STEP:<роль>,',\n  '   где роль одна из: PICKUP, DELIVERY, EXTRA_LOAD, EXTRA_UNLOAD, CONTINUATION, TRAILER_RETURN.',\n  '   Роль бери из поля progress.next.role — водитель отмечает именно следующую точку.',\n  '2. СПРОСИЛ по рейсу (где выгрузка, чей телефон, во сколько, нужна ли пломба) — ответь фактом.',\n  '3. Вопрос вне данных рейса, спорный или про деньги и повреждения — верни строго METKA:ESCALATE.',\n  '',\n  'ВАЖНО про единицу: haul_kind = CONTAINER означает КОНТЕЙНЕР, а не прицеп.',\n  'Тогда trailer_plate — это номер контейнера по ISO 6346, а container_feet — его длина в футах.',\n  'Называй вещи своими именами: «контейнер 20 футов MSCU1234561», не «прицеп».',\n  'При haul_kind = TRAILER это полуприцеп и его регистрационный номер.',\n  '',\n  'ПЛОЩАДКИ: в guides лежат инструкции по портам и терминалам этого рейса.',\n  'Адрес ворот бери оттуда: он точнее адреса точки, если они разошлись.',\n  'Часов работы и порядка въезда там нет — спросят про них, верни METKA:ESCALATE.',\n  '',\n  'Язык ответа — тот же, на котором написал водитель.',\n  '',\n  'ДАННЫЕ РЕЙСОВ:',\n  JSON.stringify(trips),\n].join('\\n');\n\nconst payload = {\n  model: 'claude-opus-5',\n  max_tokens: 1024,\n  output_config: { effort: 'low' },\n  system,\n  messages: [{ role: 'user', content: text }],\n};\n\nreturn [{ json: { payload: JSON.stringify(payload) } }];"
+        "jsCode": "// Запрос к Claude: понять водителя и решить, что делать.\n//\n// Модель отвечает одним из трёх: METKA:STEP:<роль> — водитель сообщил об\n// этапе; METKA:ESCALATE — вопрос человеку; иначе — готовый ответ.\n//\n// Кроме этого у неё два инструмента, и они разной природы.\n//\n// eta считает платформа: тот же маршрутизатор с грузовым профилем, что\n// считал километраж заказа. Число приходит оттуда, а не из головы\n// модели, и разойтись с диспетчером поэтому не может.\n//\n// web_search работает на стороне Anthropic и нужен ровно для одного —\n// часов работы и порядка въезда, которых в платформе нет и не будет.\n// Список сайтов закрыт намеренно: без него на вопрос «во сколько\n// открывается Вуосаари» находится форум пятилетней давности, и время\n// оттуда звучит так же уверенно, как настоящее. Со списком модель либо\n// находит ответ у оператора порта, либо не находит вовсе — и тогда\n// честно отправляет вопрос человеку.\n//\n// Модель: claude-opus-5, effort low — водитель за рулём, нужна скорость.\n\nconst trips = $json.trips;\nconst src = $('Подпись: контекст').item.json;\nconst text = src.text;\n\n// Сайты, которым можно верить про часы работы: операторы портов и\n// паромные линии. Проверены поиском, а не взяты по памяти — домена,\n// которого нет, поиск молча не замечает, и в ответе это не видно.\nconst SITES = [\n  'portofhelsinki.fi',\n  'haminakotka.com',\n  'portofhanko.fi',\n  'portofrauma.com',\n  'portofnaantali.fi',\n  'portofturku.fi',\n  'portofpori.fi',\n  'portofkokkola.fi',\n  'ouluport.com',\n  'kvarkenports.com',\n  'euroports.fi',\n  'satamaoperaattorit.fi',\n  'finnlines.com',\n  'tallink.com',\n  'stenaline.com',\n  'transfennica.com',\n  'dfds.com',\n];\n\nconst system = [\n  'Ты — диспетчер-помощник платформы RAHTIS для водителя грузовика.',\n  'Водитель за рулём: отвечай КОРОТКО, одним-двумя предложениями.',\n  '',\n  'Факты о рейсе бери ТОЛЬКО из данных ниже. Не выдумывай адреса, телефоны и время.',\n  '',\n  'Определи, что сделал водитель:',\n  '1. СООБЩИЛ ОБ ЭТАПЕ (забрал, загрузился, выгрузился, сдал) — верни строго METKA:STEP:<роль>,',\n  '   где роль одна из: PICKUP, DELIVERY, EXTRA_LOAD, EXTRA_UNLOAD, CONTINUATION, TRAILER_RETURN.',\n  '   Роль бери из поля progress.next.role — водитель отмечает именно следующую точку.',\n  '2. СПРОСИЛ по рейсу (где выгрузка, чей телефон, во сколько, нужна ли пломба) — ответь фактом.',\n  '3. Вопрос спорный, про деньги или про повреждения — верни строго METKA:ESCALATE.',\n  '',\n  'ВАЖНО про единицу: haul_kind = CONTAINER означает КОНТЕЙНЕР, а не прицеп.',\n  'Тогда trailer_plate — это номер контейнера по ISO 6346, а container_feet — его длина в футах.',\n  'Называй вещи своими именами: «контейнер 20 футов MSCU1234561», не «прицеп».',\n  'При haul_kind = TRAILER это полуприцеп и его регистрационный номер.',\n  '',\n  'ПЛОЩАДКИ: в guides лежат инструкции по портам и терминалам этого рейса.',\n  'Адрес ворот бери оттуда: он точнее адреса точки, если они разошлись.',\n  '',\n  'ВРЕМЯ В ПУТИ («когда буду», «успею ли», «сколько ехать») — инструмент eta.',\n  'Ему нужно, где водитель сейчас. Не сказал — спроси одним коротким вопросом.',\n  'Своё число не придумывай и не складывай километры в уме: считает маршрутизатор,',\n  'тот же, что у диспетчера, с грузовым профилем и пробками.',\n  '',\n  'ЧАСЫ РАБОТЫ И ПОРЯДОК ВЪЕЗДА: в платформе их нет — ищи инструментом web_search.',\n  'Нашёл — назови время И сайт, откуда оно взято. Без источника время не называй вовсе.',\n  'Не нашёл, нашёл противоречие или сайт молчит — верни METKA:ESCALATE, а не догадку.',\n  'Водитель поедет по твоему ответу: опоздание к закрытым воротам стоит суток.',\n  '',\n  'РЕЖИМ ТРУДА И ОТДЫХА (ЕС 561/2006, AETR). Правила постоянные, вот они:',\n  '- 4,5 часа езды — перерыв 45 минут; его можно разбить на 15 и затем 30, в этом порядке.',\n  '- Езда за сутки 9 часов, дважды в неделю допускается 10.',\n  '- Езда за неделю 56 часов, за две недели подряд 90.',\n  '- Суточный отдых 11 часов; трижды между недельными отдыхами допускается 9.',\n  '- Недельный отдых 45 часов; через неделю допускается 24 с последующей компенсацией.',\n  'НО: сколько водитель уже отъездил сегодня, платформа НЕ знает — тахографа у неё нет.',\n  'Поэтому никогда не говори «у тебя осталось столько-то» и не подтверждай соблюдение режима.',\n  'Объясняй правило и отсылай к тахографу.',\n  '',\n  'Язык ответа — тот же, на котором написал водитель.',\n  '',\n  'ДАННЫЕ РЕЙСОВ:',\n  JSON.stringify(trips),\n].join('\\n');\n\nconst tools = [\n  {\n    name: 'eta',\n    description:\n      'Сколько ехать до следующей точки рейса и успевает ли водитель к назначенному времени. '\n      + 'Считает маршрутизатор платформы: грузовой профиль, пробки. Рейс берётся по номеру телефона.',\n    input_schema: {\n      type: 'object',\n      properties: {\n        origin: {\n          type: 'string',\n          description: 'Где водитель сейчас, его словами: город, порт, заправка, развязка',\n        },\n      },\n      required: ['origin'],\n    },\n  },\n  {\n    type: 'web_search_20260209',\n    name: 'web_search',\n    max_uses: 3,\n    allowed_domains: SITES,\n  },\n];\n\nconst state = {\n  phone: src.phone,\n  system,\n  tools,\n  iterations: 0,\n  messages: [{ role: 'user', content: text }],\n};\n\nconst payload = {\n  model: 'claude-opus-5',\n  max_tokens: 1024,\n  output_config: { effort: 'low' },\n  system,\n  tools,\n  // Один инструмент за круг: цикл ниже возвращает один результат, и два\n  // вызова разом оставили бы второй без ответа.\n  tool_choice: { type: 'auto', disable_parallel_tool_use: true },\n  messages: state.messages,\n};\n\nreturn [{ json: { __state: state, payload: JSON.stringify(payload) } }];"
       },
       "id": "build-prompt",
       "name": "Собрать запрос к Claude",
@@ -206,7 +206,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Достаём текст из ответа Claude.\n//\n// content — массив блоков разных типов. Берём только text: при\n// включённом рассуждении там же приходят блоки thinking, и склеивать их\n// в ответ водителю нельзя.\n\nconst blocks = Array.isArray($json.content) ? $json.content : [];\nconst reply = blocks.filter((b) => b.type === 'text').map((b) => b.text).join('').trim();\n\n// Ошибка API приходит с полем error и без content.\nif (!reply && $json.error) {\n  return [{ json: { decision: 'ERROR', reply: 'Palvelu ei vastaa. / Служба не отвечает.', detail: $json.error?.message } }];\n}\n\nlet decision = 'ANSWER';\nlet role = '';\n\nif (reply.startsWith('METKA:STEP:')) {\n  decision = 'STEP';\n  role = reply.slice('METKA:STEP:'.length).trim().split(/\\s/)[0];\n} else if (reply.includes('METKA:ESCALATE')) {\n  decision = 'ESCALATE';\n}\n\nreturn [{ json: { decision, role, reply } }];"
+        "jsCode": "// Что модель решила на этом круге.\n//\n// Состояние берётся у предыдущего узла, а не из ответа HTTP: узел HTTP\n// заменяет элемент целиком, и всё, что мы к нему прикрепили, сюда не\n// доезжает. На первом круге состояние даёт сборщик запроса, на\n// следующих — последний прогон «Добавить результат».\n//\n// Ответ ассистента кладётся в историю ЦЕЛИКОМ, вместе с блоками\n// tool_use и результатами поиска: следующий запрос обязан содержать тот\n// же tool_use, к которому мы вернём tool_result, иначе API не свяжет их.\n\nlet prev = null;\ntry {\n  const added = $('Добавить результат').all();\n  if (added.length) prev = added[added.length - 1].json.__state;\n} catch (e) {\n  prev = null;\n}\nif (!prev) prev = $('Собрать запрос к Claude').first().json.__state;\n\nconst res = $json;\n\nif (res.error || !Array.isArray(res.content)) {\n  const why = res.error ? (res.error.message || JSON.stringify(res.error)) : 'ответ модели не разобран';\n  return [{ json: { decision: 'ERROR', reply: 'Palvelu ei vastaa. / Служба не отвечает.', detail: String(why).slice(0, 300) } }];\n}\n\nconst messages = prev.messages.concat([{ role: 'assistant', content: res.content }]);\nconst next = Object.assign({}, prev, { messages });\n\n// Потолок на круги. Трёх хватает на «посчитай время» и «найди часы\n// работы»; без потолка модель, зациклившаяся на поиске, молотила бы,\n// пока водитель ждёт ответа.\nconst overLimit = next.iterations >= 3;\n\n// Инструмент платформы. Поиск сюда не попадает: он исполняется на\n// стороне Anthropic и приходит уже с результатом.\nconst toolUse = res.content.find((b) => b.type === 'tool_use');\n\n// Круги кончились, а модель всё ещё тянется к инструменту: ответа у\n// неё нет. Водителю уйдёт обрывок фразы вроде «сейчас посмотрю», если\n// просто взять текст этого круга, — поэтому вопрос идёт человеку.\nif (res.stop_reason === 'tool_use' && toolUse && overLimit) {\n  return [{ json: { __state: next, decision: 'ESCALATE', reply: 'METKA:ESCALATE' } }];\n}\n\nif (res.stop_reason === 'tool_use' && toolUse && !overLimit) {\n  return [{ json: {\n    __state: next,\n    decision: 'TOOL',\n    tool: toolUse.name,\n    tool_use_id: toolUse.id,\n    args: toolUse.input || {},\n  } }];\n}\n\n// Поиск не уложился в один ответ: продолжаем тот же разговор, ничего\n// не добавляя от себя. Без этой ветки незаконченный поиск выглядел бы\n// готовым ответом — и водителю уходило бы пустое сообщение.\nif (res.stop_reason === 'pause_turn' && !overLimit) {\n  return [{ json: { __state: next, decision: 'CONTINUE' } }];\n}\n\nconst reply = res.content.filter((b) => b.type === 'text').map((b) => b.text).join('').trim();\n\nlet decision = 'ANSWER';\nlet role = '';\n\nif (reply.startsWith('METKA:STEP:')) {\n  decision = 'STEP';\n  role = reply.slice('METKA:STEP:'.length).trim().split(/\\s/)[0];\n} else if (reply.includes('METKA:ESCALATE')) {\n  decision = 'ESCALATE';\n}\n\nreturn [{ json: { __state: next, decision, role, reply } }];"
       },
       "id": "parse-claude",
       "name": "Разобрать решение",
@@ -260,6 +260,46 @@
                 "combinator": "and"
               },
               "outputKey": "Эскалация"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.decision }}",
+                    "rightValue": "TOOL",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "outputKey": "Инструмент"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.decision }}",
+                    "rightValue": "CONTINUE",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "outputKey": "Продолжение"
             }
           ]
         },
@@ -404,7 +444,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const src = $json;\nconst reply = src.ok === true\n  ? 'Välitin kysymyksen ajojärjestelijälle. / Передал вопрос диспетчеру.'\n  : (src.detail || 'Kysymystä ei saatu välitettyä. / Вопрос передать не удалось.');\nreturn [{ json: { reply } }];"
+        "jsCode": "// Что сказать водителю, когда вопрос ушёл человеку.\n//\n// Прежде здесь стояло «передал диспетчеру» — и это был тупик: какому\n// диспетчеру, своему или чужому, и куда придёт ответ, водитель не знал.\n// Вопрос уходит оператору платформы, в очередь, которую он читает в\n// админке, и ответ вернётся в эту же переписку. Так и сказано.\n\nconst src = $json;\nconst reply = src.ok === true\n  ? 'Välitin kysymyksen RAHTIS-operaattorille (Aivomaa Oy). Vastaus tulee tähän samaan keskusteluun.'\n    + ' / Передал вопрос оператору платформы RAHTIS (Aivomaa Oy). Ответ придёт сюда же.'\n  : (src.detail || 'Kysymystä ei saatu välitettyä. / Вопрос передать не удалось.');\nreturn [{ json: { reply } }];"
       },
       "id": "reply-escalate",
       "name": "Ответ: эскалация",
@@ -584,6 +624,87 @@
         120
       ],
       "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Подпись расчёта времени в пути.\n//\n// Телефон берётся из проверенного входящего, а не из того, что назвала\n// модель: рейс на платформе выводится из номера, и номер обязан быть\n// тем же, чью подпись мы проверили.\n\nconst crypto = require('crypto');\n\nlet SECRET = '';\ntry { if (typeof $vars !== 'undefined' && $vars.DRIVER_WEBHOOK_SECRET) SECRET = $vars.DRIVER_WEBHOOK_SECRET; } catch (e) {}\nif (!SECRET) throw new Error('DRIVER_WEBHOOK_SECRET ne zadan: sozdaite peremennuyu v n8n ili vpishite znachenie v SECRET.');\nconst secret = SECRET;\n\nconst st = $json.__state;\nconst phone = $('Подпись: контекст').item.json.phone;\nconst origin = String(($json.args && $json.args.origin) || '').slice(0, 120);\n\nconst body = JSON.stringify({ phone, origin });\nconst timestamp = Math.floor(Date.now() / 1000).toString();\nconst signature = 'sha256=' + crypto.createHmac('sha256', secret).update(timestamp + '.' + body).digest('hex');\n\nreturn [{ json: { body, timestamp, signature, __state: st, tool_use_id: $json.tool_use_id } }];"
+      },
+      "id": "Подпись: время в пути",
+      "name": "Подпись: время в пути",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1080,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.rahtis.eu/api/driver/eta",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            },
+            {
+              "name": "x-rahtis-timestamp",
+              "value": "={{ $json.timestamp }}"
+            },
+            {
+              "name": "x-rahtis-signature",
+              "value": "={{ $json.signature }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.parse($json.body) }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "Посчитать время в пути",
+      "name": "Посчитать время в пути",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1300,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Результат инструмента обратно в разговор.\n//\n// Отказ тоже возвращается модели — блоком с is_error, а не молчанием.\n// «Не понял, где ты находишься» это ответ, который модель должна\n// пересказать водителю и переспросить, а не повод оборвать разговор.\n\nconst runs = $('Подпись: время в пути').all();\nconst signedRun = runs[runs.length - 1].json;\nconst st = signedRun.__state;\nconst res = $json;\n\nconst isError = Boolean(res.error);\nconst content = isError\n  ? String(res.error) + (res.detail ? ': ' + res.detail : '')\n  : JSON.stringify(res);\n\nconst messages = st.messages.concat([{\n  role: 'user',\n  content: [{\n    type: 'tool_result',\n    tool_use_id: signedRun.tool_use_id,\n    content,\n    is_error: isError,\n  }],\n}]);\n\nconst next = Object.assign({}, st, { messages, iterations: st.iterations + 1 });\n\nreturn [{ json: { __state: next, payload: JSON.stringify({\n  model: 'claude-opus-5',\n  max_tokens: 1024,\n  output_config: { effort: 'low' },\n  system: next.system,\n  tools: next.tools,\n  tool_choice: { type: 'auto', disable_parallel_tool_use: true },\n  messages: next.messages,\n}) } }];"
+      },
+      "id": "Добавить результат",
+      "name": "Добавить результат",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1520,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Поиск не уложился в один ответ.\n//\n// Модель возвращает stop_reason = pause_turn, когда серверный поиск ещё\n// идёт. Продолжение — это тот же разговор без единого нового слова от\n// нас: история уже содержит незаконченный ответ ассистента, и API\n// доводит его сам.\n\nconst st = $json.__state;\nconst next = Object.assign({}, st, { iterations: st.iterations + 1 });\n\nreturn [{ json: { __state: next, payload: JSON.stringify({\n  model: 'claude-opus-5',\n  max_tokens: 1024,\n  output_config: { effort: 'low' },\n  system: next.system,\n  tools: next.tools,\n  tool_choice: { type: 'auto', disable_parallel_tool_use: true },\n  messages: next.messages,\n}) } }];"
+      },
+      "id": "Продолжить поиск",
+      "name": "Продолжить поиск",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1080,
+        700
+      ]
     }
   ],
   "connections": {
@@ -712,6 +833,20 @@
         [
           {
             "node": "Подпись: эскалация",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Подпись: время в пути",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Продолжить поиск",
             "type": "main",
             "index": 0
           }
@@ -847,6 +982,50 @@
         [
           {
             "node": "Отправить водителю",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Подпись: время в пути": {
+      "main": [
+        [
+          {
+            "node": "Посчитать время в пути",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Посчитать время в пути": {
+      "main": [
+        [
+          {
+            "node": "Добавить результат",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Добавить результат": {
+      "main": [
+        [
+          {
+            "node": "Claude: понять и ответить",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Продолжить поиск": {
+      "main": [
+        [
+          {
+            "node": "Claude: понять и ответить",
             "type": "main",
             "index": 0
           }

@@ -4,6 +4,7 @@ import { boundsOf, encodePolyline } from './polyline';
 import type {
   AddressSuggestion,
   LatLon,
+  RouteOptions,
   RoutingProvider,
   RouteResult,
   SuggestOptions,
@@ -179,7 +180,11 @@ export const tomtom: RoutingProvider = {
     return result ? toSuggestion(result) : null;
   },
 
-  async route(points: LatLon[], profile: TruckProfile): Promise<RouteResult> {
+  async route(
+    points: LatLon[],
+    profile: TruckProfile,
+    options: RouteOptions = {},
+  ): Promise<RouteResult> {
     if (points.length < 2) {
       throw new Error('Для маршрута нужны хотя бы две точки с координатами.');
     }
@@ -191,8 +196,13 @@ export const tomtom: RoutingProvider = {
        * Без пробок: километраж не должен зависеть от того, в какую минуту
        * заказчик нажал кнопку. Время в пути от этого становится оценкой
        * без пробок — для планирования этого достаточно.
+       *
+       * Исключение — вопрос водителя «когда буду на месте». Там нужна
+       * ровно та минута, в которую спросили, и пробки включает вызывающий
+       * (RouteOptions.traffic). Отдельным значением по умолчанию это
+       * делать нельзя: километраж заказа обязан оставаться воспроизводимым.
        */
-      traffic: 'false',
+      traffic: options.traffic ? 'true' : 'false',
       travelMode: 'truck',
       vehicleCommercial: 'true',
       vehicleWeight: String(profile.grossWeightKg),

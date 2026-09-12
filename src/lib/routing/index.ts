@@ -6,6 +6,7 @@ export type {
   AddressSuggestion,
   LatLon,
   RouteLeg,
+  RouteOptions,
   RouteResult,
   RoutingProvider,
   SuggestOptions,

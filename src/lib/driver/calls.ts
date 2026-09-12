@@ -8,7 +8,7 @@ import type { Database } from '@/types/database';
 /**
  * Вызовы функций агента водителя.
  *
- * Тонкий слой поверх трёх функций базы: разобрать телефон, позвать,
+ * Тонкий слой поверх функций базы: разобрать телефон, позвать,
  * перевести отказ базы в понятный машине код. Никакой логики прав здесь
  * нет и быть не должно — она вся внутри функций, где её нельзя обойти,
  * забыв позвать проверку.
@@ -67,6 +67,9 @@ export function explain(error: PostgrestError): DriverFailure {
       return { status: 409, code: 'wrong_stage', message: error.message };
     case '55000':
       return { status: 409, code: 'not_possible', message: error.message };
+    /* Точка есть, а координат у неё нет: адрес набран руками. */
+    case '55002':
+      return { status: 409, code: 'no_coordinates', message: error.message };
     case '22023':
       return { status: 400, code: 'bad_request', message: error.message };
     default:
@@ -76,7 +79,13 @@ export function explain(error: PostgrestError): DriverFailure {
 
 type Rpc = Database['public']['Functions'];
 
-async function call<K extends 'driver_active_trips' | 'driver_complete_next_stop' | 'driver_escalate'>(
+async function call<
+  K extends
+    | 'driver_active_trips'
+    | 'driver_complete_next_stop'
+    | 'driver_escalate'
+    | 'driver_next_stop',
+>(
   fn: K,
   args: Rpc[K]['Args'],
   path: string,
@@ -91,7 +100,7 @@ async function call<K extends 'driver_active_trips' | 'driver_complete_next_stop
      * не понял фразу. Писать их как сбои значит утопить настоящие
      * поломки в шуме.
      */
-    if (!['P0002', '55000', '55001', '22023'].includes(error.code ?? '')) {
+    if (!['P0002', '55000', '55001', '55002', '22023'].includes(error.code ?? '')) {
       void recordIncident({ source: 'agent', path, error });
     }
     return { data: null, failure: explain(error) };
@@ -114,6 +123,10 @@ export async function completeNextStop(phone: string, expect: StopRole | null, d
     },
     '/api/driver/step',
   );
+}
+
+export async function nextStop(phone: string) {
+  return call('driver_next_stop', { p_phone: phone }, '/api/driver/eta');
 }
 
 export async function escalate(phone: string, question: string) {
