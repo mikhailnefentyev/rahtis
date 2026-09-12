@@ -227,12 +227,6 @@ export const en = {
     signIn: 'Sign in',
     apply: 'Send an application',
     fleetLabel: 'approved vehicles',
-    trust1Label: 'Checked',
-    trust1Text: 'Business ID, transport licence and insurance',
-    trust2Label: 'Settlement to the carrier',
-    trust2Text: 'Within 30 days of the period closing',
-    trust3Label: 'Pricing',
-    trust3Text: 'The carrier sets its own price',
         regionsLabel: 'operating areas',
     regions: 'Operating areas',
     /* Countries by name, not by code: the strip is read, not decoded. */

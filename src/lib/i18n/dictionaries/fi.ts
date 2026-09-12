@@ -218,21 +218,6 @@ export const fi = {
     signIn: 'Kirjaudu palveluun',
     apply: 'Lähetä hakemus',
     fleetLabel: 'hyväksyttyä autoa',
-    /*
-     * Neljä tarkistettavaa faktaa heti ensimmäisen ruudun alla.
-     *
-     * Suomalainen kuljetusyrittäjä ei osta lupauksia vaan tarkistaa:
-     * onko välittäjällä nimi ja Y-tunnus, tarkistetaanko liikennelupa,
-     * ja milloin raha tulee. Maksupäivä oli aiemmin sanottu vain
-     * sanana «tilitys» ilman yhtään lukua — juuri se luku ratkaisee,
-     * uskaltaako pieni liike kokeilla uutta välittäjää.
-     */
-    trust1Label: 'Tarkastettu',
-    trust1Text: 'Y-tunnus, liikennelupa ja vakuutus',
-    trust2Label: 'Tilitys kuljetusliikkeelle',
-    trust2Text: '30 päivän kuluessa jakson päätyttyä',
-    trust3Label: 'Hinnoittelu',
-    trust3Text: 'Kuljetusliike hinnoittelee itse',
         regionsLabel: 'toiminta-aluetta',
     regions: 'Toiminta-alueet',
     /* Maat nimillä, ei tunnuksilla: nauha luetaan, ei tulkita. */
