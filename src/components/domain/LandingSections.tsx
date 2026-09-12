@@ -22,6 +22,37 @@ export async function LandingSections({ locale }: { locale: Locale }) {
 
   return (
     <>
+      {/* ── Чем можно проверить ────────────────────────────────── */}
+      {/*
+        * Четыре факта, каждый из которых читатель может проверить сам.
+        *
+        * Полоса стоит первой после съёмки намеренно. Финский перевозчик
+        * решает не по обещанию, а по реквизитам: есть ли у посредника имя
+        * и Y-tunnus, проверяют ли лицензию и страховку, и — главное —
+        * когда придут деньги. Срок выплаты до этого на витрине не звучал
+        * вовсе: было слово «tilitys» и ни одного числа, хотя в расчётах
+        * платформы срок задан давно.
+        *
+        * Порядок обратный важности для нас и прямой для читателя: сперва
+        * допуск (можно ли вообще доверять соседу по бирже), потом деньги,
+        * потом цена, и последним — кто за всё отвечает.
+        */}
+      <div className="border-t border-line bg-surface">
+        <dl className="mx-auto grid w-full max-w-6xl gap-x-8 gap-y-6 px-5 py-8 sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            { label: l.trust1Label, text: l.trust1Text },
+            { label: l.trust2Label, text: l.trust2Text },
+            { label: l.trust3Label, text: l.trust3Text },
+            { label: l.trust4Label, text: l.trust4Text },
+          ].map((fact) => (
+            <div key={fact.label}>
+              <dt className="label-micro">{fact.label}</dt>
+              <dd className="mt-1.5 text-[16px] font-medium text-ink">{fact.text}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+
       {/* ── Направления работы ─────────────────────────────────── */}
       {/*
         * Здесь напрашивались логотипы клиентов, но выдуманные логотипы
@@ -49,7 +80,7 @@ export async function LandingSections({ locale }: { locale: Locale }) {
           * помещаются, ряд переносится, и точка встала бы в начало
           * второй строки. Расстояния там хватает и без неё.
           */}
-        <p className="mt-3.5 flex flex-wrap justify-center gap-x-4 gap-y-1.5 text-center font-mono text-[13px] tracking-[0.16em] text-ink-dim sm:gap-x-0">
+        <p className="mt-3.5 flex flex-wrap justify-center gap-x-4 gap-y-1.5 text-center font-mono text-[13px] tracking-[0.16em] text-ink-faint sm:gap-x-0">
           {placeCountries().map((code, i) => (
             <span key={code}>
               {i > 0 && <span className="mx-4 hidden text-line-strong sm:inline">·</span>}
@@ -65,7 +96,7 @@ export async function LandingSections({ locale }: { locale: Locale }) {
         <h2 className="mt-2.5 max-w-[22ch] text-[clamp(26px,3vw,34px)] leading-tight font-semibold tracking-tight text-balance">
           {l.helpTitle}
         </h2>
-        <p className="mt-3 max-w-[62ch] text-[15px] text-ink-muted">{l.helpLede}</p>
+        <p className="mt-3 max-w-[62ch] text-[16px] text-ink-muted">{l.helpLede}</p>
 
         <div className="mt-8 grid gap-4 md:grid-cols-3">
           {[
@@ -76,8 +107,8 @@ export async function LandingSections({ locale }: { locale: Locale }) {
             <Card key={card.title}>
               <CardBody>
                 <p className="label-micro">{card.eyebrow}</p>
-                <h3 className="mt-2 text-[19px] font-semibold tracking-tight">{card.title}</h3>
-                <p className="mt-2.5 text-[14px] text-ink-muted">{card.text}</p>
+                <h3 className="mt-2 text-[20px] font-semibold tracking-tight">{card.title}</h3>
+                <p className="mt-2.5 text-[16px] text-ink-muted">{card.text}</p>
               </CardBody>
             </Card>
           ))}
@@ -91,7 +122,7 @@ export async function LandingSections({ locale }: { locale: Locale }) {
           <h2 className="mt-2.5 max-w-[22ch] text-[clamp(26px,3vw,34px)] leading-tight font-semibold tracking-tight text-balance">
             {l.timeTitle}
           </h2>
-          <p className="mt-3 max-w-[62ch] text-[15px] text-ink-muted">{l.timeLede}</p>
+          <p className="mt-3 max-w-[62ch] text-[16px] text-ink-muted">{l.timeLede}</p>
 
           {/*
             * Пары, а не два списка.
@@ -137,10 +168,10 @@ export async function LandingSections({ locale }: { locale: Locale }) {
                   key={now}
                   className="grid gap-y-1 border-t border-line first:border-t-0 sm:grid-cols-2 sm:first:border-t"
                 >
-                  <span className="px-5 pt-4 text-[14px] text-ink-faint sm:border-r sm:border-line sm:py-4">
+                  <span className="px-5 pt-4 text-[16px] text-ink-faint sm:border-r sm:border-line sm:py-4">
                     {was}
                   </span>
-                  <span className="px-5 pb-4 text-[14px] font-medium text-ink sm:py-4">{now}</span>
+                  <span className="px-5 pb-4 text-[16px] font-medium text-ink sm:py-4">{now}</span>
                 </li>
               ))}
             </ul>
@@ -160,12 +191,12 @@ export async function LandingSections({ locale }: { locale: Locale }) {
             {
               eyebrow: l.shipperEyebrow,
               title: l.shipperTitle,
-              lines: [l.shipper2, l.shipper3, l.shipper4, l.shipper6],
+              lines: [l.shipper2, l.shipper3, l.shipper4, l.shipper5, l.shipper6],
             },
             {
               eyebrow: l.carrierEyebrow,
               title: l.carrierTitle,
-              lines: [l.carrier3, l.carrier4, l.carrier5, l.carrier6],
+              lines: [l.carrier2, l.carrier3, l.carrier4, l.carrier5, l.carrier6],
             },
           ].map((role) => (
             <Card key={role.title}>
@@ -179,7 +210,7 @@ export async function LandingSections({ locale }: { locale: Locale }) {
                   */}
                 <ul className="grid gap-2.5">
                   {role.lines.map((line) => (
-                    <li key={line} className="grid grid-cols-[16px_1fr] gap-2.5 text-[14px] text-ink-muted">
+                    <li key={line} className="grid grid-cols-[16px_1fr] gap-2.5 text-[16px] text-ink-muted">
                       <span className="mt-[7px] size-[7px] rounded-[2px] bg-accent" aria-hidden />
                       <span>{line}</span>
                     </li>
@@ -194,6 +225,44 @@ export async function LandingSections({ locale }: { locale: Locale }) {
               </CardBody>
             </Card>
           ))}
+        </div>
+      </section>
+
+      {/* ── Плата за услугу ────────────────────────────────────── */}
+      {/*
+        * Блок стоит вплотную к карточкам ролей, потому что вопрос «мне
+        * сколько это стоит» возникает ровно там, где человек прочитал,
+        * что ему обещают.
+        *
+        * Защита платы построена на перечислении работы, а не на числе.
+        * Ставка сейчас в переносе (config.COMMISSION_BPS), и называть
+        * процент на витрине значило бы пообещать то, что поменяется
+        * раньше страницы. Работа же не меняется: документы, счета,
+        * отчёты, поиск.
+        */}
+      <section className="border-y border-line bg-surface">
+        <div className="mx-auto w-full max-w-6xl px-5 py-20">
+          <p className="label-micro">{l.feeEyebrow}</p>
+          <h2 className="mt-2.5 max-w-[24ch] text-[clamp(26px,3vw,34px)] leading-tight font-semibold tracking-tight text-balance">
+            {l.feeTitle}
+          </h2>
+          <p className="mt-3 max-w-[62ch] text-[16px] text-ink-muted">{l.feeLede}</p>
+
+          <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {[
+              { title: l.fee1, text: l.fee1Text },
+              { title: l.fee2, text: l.fee2Text },
+              { title: l.fee3, text: l.fee3Text },
+              { title: l.fee4, text: l.fee4Text },
+            ].map((item) => (
+              <Card key={item.title}>
+                <CardBody>
+                  <h3 className="text-[18px] font-semibold tracking-tight">{item.title}</h3>
+                  <p className="mt-2.5 text-[16px] text-ink-muted">{item.text}</p>
+                </CardBody>
+              </Card>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -216,7 +285,7 @@ export async function LandingSections({ locale }: { locale: Locale }) {
               <Card key={step.n}>
                 <CardBody>
                   <Mono className="text-[11px] font-bold tracking-[0.08em] text-accent">{step.n}</Mono>
-                  <h3 className="mt-2 text-[15px] font-semibold">{step.title}</h3>
+                  <h3 className="mt-2 text-[18px] font-semibold">{step.title}</h3>
                   <p className="mt-1.5 text-[13px] text-ink-muted">{step.text}</p>
                 </CardBody>
               </Card>
@@ -231,7 +300,7 @@ export async function LandingSections({ locale }: { locale: Locale }) {
         <h2 className="mt-2.5 max-w-[24ch] text-[clamp(26px,3vw,34px)] leading-tight font-semibold tracking-tight text-balance">
           {l.faultsTitle}
         </h2>
-        <p className="mt-3 max-w-[62ch] text-[15px] text-ink-muted">{l.faultsLede}</p>
+        <p className="mt-3 max-w-[62ch] text-[16px] text-ink-muted">{l.faultsLede}</p>
 
         <div className="mt-8 grid gap-3.5 md:grid-cols-2">
           {[
@@ -251,10 +320,10 @@ export async function LandingSections({ locale }: { locale: Locale }) {
                     * «Двумя дверями» той же ширины это читалось как
                     * второсортность, хотя секция равная.
                     */}
-                  <span className="block max-w-[26ch] text-[14px] font-semibold text-ink">
+                  <span className="block max-w-[26ch] text-[16px] font-semibold text-ink">
                     {fault.when}
                   </span>
-                  <span className="mt-1 block text-[14px] text-ink-muted">{fault.then}</span>
+                  <span className="mt-1 block text-[16px] text-ink-muted">{fault.then}</span>
                 </span>
               </CardBody>
             </Card>
@@ -271,8 +340,8 @@ export async function LandingSections({ locale }: { locale: Locale }) {
           <h2 className="mt-2.5 text-[clamp(26px,3vw,34px)] leading-tight font-semibold tracking-tight text-balance">
             {l.aiTitle}
           </h2>
-          <p className="mt-3 max-w-[62ch] text-[15px] text-night-muted">{l.aiLede}</p>
-          <p className="mt-2.5 max-w-[62ch] text-[15px] text-night-muted">{l.aiLede2}</p>
+          <p className="mt-3 max-w-[62ch] text-[16px] text-night-muted">{l.aiLede}</p>
+          <p className="mt-2.5 max-w-[62ch] text-[16px] text-night-muted">{l.aiLede2}</p>
 
           <div className="mt-10 grid items-center gap-10 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
             <div className="assistant__stage">
@@ -396,17 +465,17 @@ export async function LandingSections({ locale }: { locale: Locale }) {
           {l.servicesTitle}
         </h2>
 
-        <div className="mt-8 grid gap-4 md:grid-cols-2">
+        <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           <Card>
             <CardBody className="flex flex-col gap-3 p-6">
               <span className="self-start rounded-pill border border-accent-line bg-accent-wash px-2.5 py-1 text-[11px] font-semibold text-accent">
                 {l.serviceLive}
               </span>
-              <h3 className="text-[19px] font-semibold tracking-tight">
-                {l.service1} <Mono className="text-[0.72em] text-ink-dim">irtoperä</Mono>
+              <h3 className="text-[20px] font-semibold tracking-tight">
+                {l.service1} <Mono className="text-[0.72em] text-ink-faint">irtoperä</Mono>
               </h3>
-              <p className="text-[14px] text-ink-muted">{l.service1Text}</p>
-              <p className="text-[14px] text-ink-muted">{l.service1Text2}</p>
+              <p className="text-[16px] text-ink-muted">{l.service1Text}</p>
+              <p className="text-[16px] text-ink-muted">{l.service1Text2}</p>
             </CardBody>
           </Card>
 
@@ -423,11 +492,28 @@ export async function LandingSections({ locale }: { locale: Locale }) {
               <span className="self-start rounded-pill border border-accent-line bg-accent-wash px-2.5 py-1 text-[11px] font-semibold text-accent">
                 {l.serviceLive}
               </span>
-              <h3 className="text-[19px] font-semibold tracking-tight">
-                {l.service2} <Mono className="text-[0.72em] text-ink-dim">20 · 40 · 45</Mono>
+              <h3 className="text-[20px] font-semibold tracking-tight">
+                {l.service2} <Mono className="text-[0.72em] text-ink-faint">20 · 40 · 45</Mono>
               </h3>
-              <p className="text-[14px] text-ink-muted">{l.service2Text}</p>
-              <p className="text-[14px] text-ink-muted">{l.service2Text2}</p>
+              <p className="text-[16px] text-ink-muted">{l.service2Text}</p>
+              <p className="text-[16px] text-ink-muted">{l.service2Text2}</p>
+            </CardBody>
+          </Card>
+
+          {/*
+            * Приложение водителя — единственное на странице, чего ещё
+            * нет. Метка «Kehitteillä» и пунктир сказаны честно: обещание
+            * без срока лучше молчания, но только пока видно, что это
+            * обещание, а не работающая услуга.
+            */}
+          <Card className="border-dashed">
+            <CardBody className="flex flex-col gap-3 p-6">
+              <span className="self-start rounded-pill border border-line-strong px-2.5 py-1 text-[11px] font-semibold text-ink-faint">
+                {l.serviceSoon}
+              </span>
+              <h3 className="text-[20px] font-semibold tracking-tight">{l.service3}</h3>
+              <p className="text-[16px] text-ink-muted">{l.service3Text}</p>
+              <p className="text-[16px] text-ink-muted">{l.service3Text2}</p>
             </CardBody>
           </Card>
         </div>
@@ -440,9 +526,9 @@ export async function LandingSections({ locale }: { locale: Locale }) {
           <h2 className="mt-3 text-[clamp(28px,3.6vw,40px)] font-semibold tracking-tight text-balance">
             {l.finalTitle}
           </h2>
-          <p className="mx-auto mt-3.5 max-w-[52ch] text-[15px] text-ink-muted">{l.finalLede}</p>
-          <p className="mx-auto mt-2.5 max-w-[52ch] text-[15px] text-ink-muted">{l.finalLede2}</p>
-          <p className="mx-auto mt-2.5 max-w-[52ch] text-[15px] text-ink-muted">{l.finalLede3}</p>
+          <p className="mx-auto mt-3.5 max-w-[52ch] text-[16px] text-ink-muted">{l.finalLede}</p>
+          <p className="mx-auto mt-2.5 max-w-[52ch] text-[16px] text-ink-muted">{l.finalLede2}</p>
+          <p className="mx-auto mt-2.5 max-w-[52ch] text-[16px] text-ink-muted">{l.finalLede3}</p>
 
           <div className="mt-7 flex flex-wrap justify-center gap-2.5">
             <Link href={`/${locale}/apply`} className={buttonClass({ variant: 'primary', size: 'lg' })}>
@@ -457,7 +543,7 @@ export async function LandingSections({ locale }: { locale: Locale }) {
 
       {/* ── Подвал ─────────────────────────────────────────────── */}
       <footer className="mx-auto w-full max-w-6xl px-5 py-12">
-        <div className="flex flex-wrap items-baseline gap-x-8 gap-y-4 text-xs text-ink-dim">
+        <div className="flex flex-wrap items-baseline gap-x-8 gap-y-4 text-xs text-ink-faint">
           {/*
             * Здесь юрлицо, а не марка: рядом стоит Y-tunnus, а он
             * принадлежит Aivomaa Oy. Подвал витрины — то место, где по

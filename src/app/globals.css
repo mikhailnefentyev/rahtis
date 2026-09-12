@@ -329,18 +329,37 @@
 }
 
 .site-head__mark {
-  display: inline-flex;
+  /*
+   * Сетка в одну клетку: обе марки лежат друг на друге и обе занимают
+   * место, поэтому ширина шапки не прыгает на переключении.
+   */
+  display: grid;
   flex: none;
 }
 .site-head__logo {
+  grid-area: 1 / 1;
   display: block;
   height: 22px;
   width: auto;
+  /*
+   * Перекрытие, а не подмена через display.
+   *
+   * Фон шапки перетекает 260 мс, и марка, переключавшаяся мгновенно,
+   * успевала оказаться тёмной на ещё тёмном фоне — на глаз она на
+   * четверть секунды пропадала. Замер: на 120-й миллисекунде подложка
+   * набирала лишь 0,87 непрозрачности, а тёмная марка стояла уже во
+   * весь цвет. Теперь обе идут тем же шагом, что и фон.
+   */
+  transition: opacity 260ms ease;
 }
 /* Тёмная марка ждёт в разметке: подмена src моргала бы на переключении. */
-.site-head__logo--dark { display: none; }
-.site-head[data-solid] .site-head__logo--light { display: none; }
-.site-head[data-solid] .site-head__logo--dark { display: block; }
+.site-head__logo--dark { opacity: 0; }
+.site-head[data-solid] .site-head__logo--light { opacity: 0; }
+.site-head[data-solid] .site-head__logo--dark { opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .site-head__logo { transition: none; }
+}
 
 /*
  * Разделы прячутся на узком экране. Бургер здесь был бы лишним: под

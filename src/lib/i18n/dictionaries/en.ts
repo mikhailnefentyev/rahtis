@@ -219,14 +219,22 @@ export const en = {
     lede2:
       'For forwarders and operators, RAHTIS cuts manual dispatch work and brings tracking and electronic document flow together. For carriers, it offers new jobs without constant phone calls. Integration with your own systems is planned together.',
     /* The three things people come here for. */
-    highlight1: 'Automatic dispatch',
-    highlight2: 'Stage-by-stage tracking',
-    highlight3: 'Documents in one place',
+    highlight1: 'A change does not stop the load',
+    highlight2: 'We do not auction the price down',
+    highlight3: 'Documents and settlements electronically',
     asShipper: 'For forwarders and operators',
     asCarrier: 'For carriers',
     signIn: 'Sign in',
     apply: 'Send an application',
     fleetLabel: 'approved vehicles',
+    trust1Label: 'Checked',
+    trust1Text: 'Business ID, transport licence and insurance',
+    trust2Label: 'Settlement to the carrier',
+    trust2Text: 'Within 30 days of the period closing',
+    trust3Label: 'Pricing',
+    trust3Text: 'The carrier sets its own price',
+    trust4Label: 'Operated by',
+    trust4Text: 'Aivomaa Oy · 3592993-6',
     regionsLabel: 'operating areas',
     regions: 'Operating areas',
     /* Countries by name, not by code: the strip is read, not decoded. */
@@ -300,12 +308,33 @@ export const en = {
     shipper4:
       'If the route, the schedule or anything else changes mid-job, the update goes straight to the carrier and the driver.',
     shipper6: 'The weekly report shows jobs, amounts, documents and feedback.',
+    shipper5:
+      'If a truck cancels or does not confirm, the job returns to the board on its own and reaches the next suitable trucks right away.',
+    carrier2:
+      'Less empty running means more paid kilometres with the same truck and the same driver.',
     carrierEyebrow: 'For the carrier',
     carrierTitle: 'Keep the truck working between jobs too.',
     carrier3: 'You can find a return load in the area where the last job ends.',
     carrier4: 'Every vehicle is approved onto the platform separately.',
     carrier5: 'Price, service fee and your share are visible before you accept.',
     carrier6: 'The weekly report shows jobs driven, earnings and payouts due.',
+
+    feeEyebrow: 'Service fee',
+    feeTitle: 'A small service fee, and it is visible before you take the job',
+    feeLede:
+      'We do not auction jobs down on price. The carrier prices its own work, and both the service fee and the remaining share are visible before the job is accepted. The fee covers the work that would otherwise be done by hand.',
+    fee1: 'Electronic documents',
+    fee1Text:
+      'The consignment note, loading photos and damage notes travel with the job and reach the shipper without being sent separately.',
+    fee2: 'Automated invoices and settlements',
+    fee2Text:
+      'The jobs of a period are assembled on their own into an invoice for the shipper and a settlement for the carrier. The payment date is known in advance.',
+    fee3: 'Reports',
+    fee3Text:
+      'The weekly report shows the jobs driven, the sums and the coming payment dates without separate bookkeeping.',
+    fee4: 'Finding the work and the hauler',
+    fee4Text:
+      'The shipper finds an available truck and the carrier finds the next job without a round of phone calls. That same work used to be done by telephone.',
 
     stepsEyebrow: 'How a job runs',
     stepsTitle: 'From application to completed job in four steps',
@@ -397,6 +426,13 @@ export const en = {
       'The tractor collects the container from a port or terminal — empty or loaded — and delivers it where agreed. On the way back the container returns to the port.',
     service2Text2:
       'The size is stated in feet: 20, 30, 40 or 45. Only vehicles whose chassis takes that length see the job.',
+
+    serviceSoon: 'In development',
+    service3: 'Driver app',
+    service3Text:
+      'Jobs, stops and documents in a dedicated app. The app is in development and will come alongside the WhatsApp assistant, not replace it.',
+    service3Text2:
+      'The driver sees the same job details as today, but photos and confirmations are handled without messaging.',
 
     finalEyebrow: 'Getting started',
     finalTitle: 'Tell us about your company — we handle the rest',

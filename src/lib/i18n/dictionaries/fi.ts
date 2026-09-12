@@ -210,14 +210,31 @@ export const fi = {
     lede2:
       'Huolitsijoille ja operaattoreille RAHTIS vähentää manuaalista välitystyötä ja kokoaa kuljetuksen seurannan sekä sähköisen asiakirjaliikenteen yhteen. Kuljetusliikkeille se tarjoaa uusia keikkoja ilman jatkuvaa soittelua. Integraatio omiin järjestelmiin suunnitellaan yhdessä.',
     /* Kolme asiaa, joiden takia palveluun tullaan. */
-    highlight1: 'Automaattinen välitys',
-    highlight2: 'Vaihekohtainen seuranta',
-    highlight3: 'Asiakirjat yhdessä paikassa',
+    highlight1: 'Muutos ei pysäytä kuljetusta',
+    highlight2: 'Emme kilpailuta hintaa alaspäin',
+    highlight3: 'Asiakirjat ja tilitykset sähköisesti',
     asShipper: 'Huolitsijalle tai operaattorille',
     asCarrier: 'Kuljetusliikkeelle',
     signIn: 'Kirjaudu palveluun',
     apply: 'Lähetä hakemus',
     fleetLabel: 'hyväksyttyä autoa',
+    /*
+     * Neljä tarkistettavaa faktaa heti ensimmäisen ruudun alla.
+     *
+     * Suomalainen kuljetusyrittäjä ei osta lupauksia vaan tarkistaa:
+     * onko välittäjällä nimi ja Y-tunnus, tarkistetaanko liikennelupa,
+     * ja milloin raha tulee. Maksupäivä oli aiemmin sanottu vain
+     * sanana «tilitys» ilman yhtään lukua — juuri se luku ratkaisee,
+     * uskaltaako pieni liike kokeilla uutta välittäjää.
+     */
+    trust1Label: 'Tarkastettu',
+    trust1Text: 'Y-tunnus, liikennelupa ja vakuutus',
+    trust2Label: 'Tilitys kuljetusliikkeelle',
+    trust2Text: '30 päivän kuluessa jakson päätyttyä',
+    trust3Label: 'Hinnoittelu',
+    trust3Text: 'Kuljetusliike hinnoittelee itse',
+    trust4Label: 'Palvelun tarjoaa',
+    trust4Text: 'Aivomaa Oy · 3592993-6',
     regionsLabel: 'toiminta-aluetta',
     regions: 'Toiminta-alueet',
     /* Maat nimillä, ei tunnuksilla: nauha luetaan, ei tulkita. */
@@ -296,12 +313,40 @@ export const fi = {
     shipper4:
       'Jos reitti, aikataulu tai muu tieto muuttuu kesken keikan, päivitys menee suoraan kuljetusliikkeelle ja kuljettajalle.',
     shipper6: 'Viikkoraportista näet keikat, summat, asiakirjat ja palautteet.',
+    shipper5:
+      'Jos auto peruu tai ei vahvista, keikka palaa tarjolle itsestään ja välittyy seuraaville sopiville autoille saman tien.',
+    carrier2:
+      'Vähemmän tyhjäajoa tarkoittaa enemmän ajettuja kilometrejä samalla autolla ja samalla kuljettajalla.',
     carrierEyebrow: 'Kuljetusliikkeelle',
     carrierTitle: 'Pidä auto ajossa myös keikkojen välillä.',
     carrier3: 'Voit löytää paluukeikan alueelta, jossa edellinen kuljetus päättyy.',
     carrier4: 'Jokainen auto hyväksytään palveluun erikseen.',
     carrier5: 'Hinta, palvelumaksu ja sinulle jäävä osuus näkyvät ennen keikan hyväksymistä.',
     carrier6: 'Viikkoraportista näet ajetut keikat, ansiot ja tulevat tilitykset.',
+
+    /*
+     * Palvelumaksu puolustetaan työllä, ei prosentilla.
+     *
+     * Välittäjän maksu herättää kuljetusyrittäjässä yhden kysymyksen:
+     * mistä minä maksan. Siihen vastataan luettelemalla se käsityö,
+     * joka jää tekemättä — ei adjektiiveilla.
+     */
+    feeEyebrow: 'Palvelumaksu',
+    feeTitle: 'Pieni palvelumaksu, ja sen näkee ennen keikan ottamista',
+    feeLede:
+      'Emme kilpailuta keikkaa hinnalla alaspäin. Kuljetusliike hinnoittelee työnsä itse, ja palvelumaksu sekä jäljelle jäävä osuus näkyvät ennen kuin keikan ottaa vastaan. Maksu kattaa sen työn, joka muuten tehdään käsin.',
+    fee1: 'Sähköinen asiakirjaliikenne',
+    fee1Text:
+      'Rahtikirja, kuormakuvat ja vauriomerkinnät kulkevat keikan mukana ja päätyvät tilaajalle ilman erillistä lähettämistä.',
+    fee2: 'Automaattiset laskut ja tilitykset',
+    fee2Text:
+      'Jakson keikat kootaan itsestään laskuksi tilaajalle ja tilitykseksi kuljetusliikkeelle. Maksupäivä on tiedossa etukäteen.',
+    fee3: 'Raportit',
+    fee3Text:
+      'Viikkoraportista näkee ajetut keikat, summat ja tulevat maksupäivät ilman omaa kirjanpitoa.',
+    fee4: 'Työn ja tekijän löytyminen',
+    fee4Text:
+      'Tilaaja löytää vapaan auton ja kuljetusliike seuraavan keikan ilman soittokierrosta. Sama työ tehtiin ennen puhelimella.',
 
     stepsEyebrow: 'Näin keikka etenee',
     stepsTitle: 'Hakemuksesta valmiiseen kuljetukseen neljässä vaiheessa',
@@ -392,6 +437,13 @@ export const fi = {
       'Veturi noutaa kontin satamasta tai terminaalista — tyhjänä tai kuormattuna — ja toimittaa sen sovittuun paikkaan. Paluumatkalla kontti palautetaan satamaan.',
     service2Text2:
       'Koko ilmoitetaan jaloissa: 20, 30, 40 tai 45. Keikan näkevät vain ne ajoneuvot, joiden alusta ottaa juuri sen kokoisen kontin.',
+
+    serviceSoon: 'Kehitteillä',
+    service3: 'Kuljettajan sovellus',
+    service3Text:
+      'Keikat, pisteet ja asiakirjat omassa sovelluksessa. Sovellus on kehitteillä ja tulee WhatsApp-avustajan rinnalle, ei sen tilalle.',
+    service3Text2:
+      'Kuljettaja näkee saman keikan tiedot kuin nyt, mutta kuvat ja kuittaukset hoituvat ilman viestittelyä.',
 
     finalEyebrow: 'Näin pääset alkuun',
     finalTitle: 'Kerro yrityksestäsi – me hoidamme loput',
