@@ -233,9 +233,7 @@ export const en = {
     trust2Text: 'Within 30 days of the period closing',
     trust3Label: 'Pricing',
     trust3Text: 'The carrier sets its own price',
-    trust4Label: 'Operated by',
-    trust4Text: 'Aivomaa Oy · 3592993-6',
-    regionsLabel: 'operating areas',
+        regionsLabel: 'operating areas',
     regions: 'Operating areas',
     /* Countries by name, not by code: the strip is read, not decoded. */
     country: { FI: 'Finland', SE: 'Sweden', NO: 'Norway', DK: 'Denmark' },

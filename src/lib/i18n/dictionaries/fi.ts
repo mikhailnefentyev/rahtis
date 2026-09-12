@@ -233,9 +233,7 @@ export const fi = {
     trust2Text: '30 päivän kuluessa jakson päätyttyä',
     trust3Label: 'Hinnoittelu',
     trust3Text: 'Kuljetusliike hinnoittelee itse',
-    trust4Label: 'Palvelun tarjoaa',
-    trust4Text: 'Aivomaa Oy · 3592993-6',
-    regionsLabel: 'toiminta-aluetta',
+        regionsLabel: 'toiminta-aluetta',
     regions: 'Toiminta-alueet',
     /* Maat nimillä, ei tunnuksilla: nauha luetaan, ei tulkita. */
     country: { FI: 'Suomi', SE: 'Ruotsi', NO: 'Norja', DK: 'Tanska' },

@@ -35,15 +35,19 @@ export async function LandingSections({ locale }: { locale: Locale }) {
         *
         * Порядок обратный важности для нас и прямой для читателя: сперва
         * допуск (можно ли вообще доверять соседу по бирже), потом деньги,
-        * потом цена, и последним — кто за всё отвечает.
+        * потом цена.
+        *
+        * Юрлица и Y-tunnus здесь нет намеренно: ни одна соседняя площадка
+        * не выносит реквизиты на витрину, и строка читалась бы не как
+        * открытость, а как оправдание. В подвале они остаются — там их
+        * требует закон.
         */}
       <div className="border-t border-line bg-surface">
-        <dl className="mx-auto grid w-full max-w-6xl gap-x-8 gap-y-6 px-5 py-8 sm:grid-cols-2 lg:grid-cols-4">
+        <dl className="mx-auto grid w-full max-w-6xl gap-x-8 gap-y-6 px-5 py-8 sm:grid-cols-3">
           {[
             { label: l.trust1Label, text: l.trust1Text },
             { label: l.trust2Label, text: l.trust2Text },
             { label: l.trust3Label, text: l.trust3Text },
-            { label: l.trust4Label, text: l.trust4Text },
           ].map((fact) => (
             <div key={fact.label}>
               <dt className="label-micro">{fact.label}</dt>
