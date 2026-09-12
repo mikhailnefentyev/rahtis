@@ -257,6 +257,17 @@
     text-transform: uppercase;
     color: var(--color-ink-faint);
   }
+
+  /*
+   * Акцентный вариант надзаголовка.
+   *
+   * Утилита text-accent сюда не достаёт: цвет задан в том же слое, и
+   * порядок правил решает не в её пользу. Признак на элементе решает
+   * это без !important и без второго класса с тем же набором свойств.
+   */
+  .label-micro[data-accent] {
+    color: var(--color-accent);
+  }
 }
 
 @keyframes attention-breathe {
@@ -893,10 +904,24 @@
 
 .hero-port__title {
   margin: 14px 0 0;
-  font-size: clamp(32px, 4.4vw, 52px);
+  /*
+   * Единственное место на сайте со своим шрифтом.
+   *
+   * Archivo плотнее и тяжелее Geist, поэтому размер поднят не сильно, а
+   * разрядка ужата: три утверждения должны стоять тремя плотными
+   * строками, как надпись на борту, а не растекаться по экрану.
+   */
+  font-family: var(--font-display), var(--font-geist-sans), system-ui, sans-serif;
+  /*
+   * Кегль меньше прежнего, хотя шрифт сменился на более крупный по
+   * рисунку: Archivo шире Geist на знак, и на прежних 52 пунктах третья
+   * строка переносилась — вместо трёх утверждений выходило четыре
+   * обрывка.
+   */
+  font-size: clamp(30px, 3.9vw, 48px);
   line-height: 1.06;
-  letter-spacing: -0.035em;
-  font-weight: 600;
+  letter-spacing: -0.026em;
+  font-weight: 700;
   color: #ffffff;
   text-wrap: balance;
 }

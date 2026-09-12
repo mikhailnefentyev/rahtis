@@ -108,9 +108,19 @@ export async function LandingSections({ locale }: { locale: Locale }) {
             { eyebrow: l.helpTruck, title: l.helpTruckTitle, text: l.helpTruckText },
             { eyebrow: l.helpDriver, title: l.helpDriverTitle, text: l.helpDriverText },
           ].map((card) => (
-            <Card key={card.title}>
+            /*
+              * Кромка сверху и акцентный надзаголовок.
+              *
+              * Три белые карточки на светлом фоне читались как один
+              * прямоугольник: отличить их друг от друга можно было
+              * только прочитав. Цвет здесь не украшение, а граница —
+              * он говорит, где начинается следующая карточка.
+              */
+            <Card key={card.title} className="border-t-2 border-t-accent">
               <CardBody>
-                <p className="label-micro">{card.eyebrow}</p>
+                <p className="label-micro" data-accent>
+                  {card.eyebrow}
+                </p>
                 <h3 className="mt-2 text-[20px] font-semibold tracking-tight">{card.title}</h3>
                 <p className="mt-2.5 text-[16px] text-ink-muted">{card.text}</p>
               </CardBody>
@@ -156,7 +166,9 @@ export async function LandingSections({ locale }: { locale: Locale }) {
                 * бледное, справа чернильное.
                 */}
               <p className="label-micro border-r border-line px-5 py-3">{l.timeOld}</p>
-              <p className="label-micro px-5 py-3">{l.timeNew}</p>
+              <p className="label-micro bg-accent-wash px-5 py-3" data-accent>
+                {l.timeNew}
+              </p>
             </div>
 
             <ul>
@@ -175,7 +187,18 @@ export async function LandingSections({ locale }: { locale: Locale }) {
                   <span className="px-5 pt-4 text-[16px] text-ink-faint sm:border-r sm:border-line sm:py-4">
                     {was}
                   </span>
-                  <span className="px-5 pb-4 text-[16px] font-medium text-ink sm:py-4">{now}</span>
+                  {/*
+                    * Правая половина подкрашена накрест всей таблицы.
+                    *
+                    * Раньше стороны различались только насыщенностью
+                    * букв — бледное слева, чернильное справа, — и на
+                    * беглом взгляде таблица читалась как один серый
+                    * блок. Заливка несёт тот же смысл, что и колонка:
+                    * это сторона RAHTIS.
+                    */}
+                  <span className="bg-accent-wash px-5 pb-4 text-[16px] font-medium text-ink sm:py-4">
+                    {now}
+                  </span>
                 </li>
               ))}
             </ul>
@@ -259,7 +282,7 @@ export async function LandingSections({ locale }: { locale: Locale }) {
               { title: l.fee3, text: l.fee3Text },
               { title: l.fee4, text: l.fee4Text },
             ].map((item) => (
-              <Card key={item.title}>
+              <Card key={item.title} className="border-t-2 border-t-accent">
                 <CardBody>
                   <h3 className="text-[18px] font-semibold tracking-tight">{item.title}</h3>
                   <p className="mt-2.5 text-[16px] text-ink-muted">{item.text}</p>
@@ -286,11 +309,19 @@ export async function LandingSections({ locale }: { locale: Locale }) {
               { n: '03', title: l.step3, text: l.step3Text },
               { n: '04', title: l.step4, text: l.step4Text },
             ].map((step) => (
-              <Card key={step.n}>
+              /*
+                * Номер был набран одиннадцатым кеглем и терялся среди
+                * подписей. Последовательность — главное, что говорит
+                * эта секция, поэтому номер стал размером с заголовок,
+                * а полоса слева повторяет его цветом.
+                */
+              <Card key={step.n} className="border-l-2 border-l-accent">
                 <CardBody>
-                  <Mono className="text-[11px] font-bold tracking-[0.08em] text-accent">{step.n}</Mono>
-                  <h3 className="mt-2 text-[18px] font-semibold">{step.title}</h3>
-                  <p className="mt-1.5 text-[13px] text-ink-muted">{step.text}</p>
+                  <Mono className="text-[26px] leading-none font-bold tracking-[0.02em] text-accent">
+                    {step.n}
+                  </Mono>
+                  <h3 className="mt-3 text-[18px] font-semibold">{step.title}</h3>
+                  <p className="mt-1.5 text-[16px] text-ink-muted">{step.text}</p>
                 </CardBody>
               </Card>
             ))}

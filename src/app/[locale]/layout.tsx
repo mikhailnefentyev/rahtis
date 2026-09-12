@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Archivo, Geist, Geist_Mono } from 'next/font/google';
 import { APP } from '@/lib/config';
 import { getDictionary, isLocale, locales } from '@/lib/i18n';
 import { I18nProvider } from '@/lib/i18n/provider';
@@ -29,6 +29,25 @@ const sans = Geist({
 const mono = Geist_Mono({
   variable: '--font-geist-mono',
   subsets: ['latin'],
+  display: 'swap',
+});
+
+/*
+ * Шрифт заголовка первого экрана — и только его.
+ *
+ * Geist хорош в тексте и ровно тем плох в заголовке: он нейтрален.
+ * Три коротких утверждения поверх съёмки порта должны звучать как
+ * надпись на борту, а не как подпись к абзацу.
+ *
+ * Archivo взят за плотность и закрытые апертуры: буквы стоят тесно и
+ * держат вес, но остаются тем же гротеском, что и текст, поэтому
+ * страница не распадается на два разных характера. Латиницы достаточно
+ * — ä и ö в ней есть, а других алфавитов на витрине нет.
+ */
+const display = Archivo({
+  variable: '--font-display',
+  subsets: ['latin'],
+  weight: ['700'],
   display: 'swap',
 });
 
@@ -71,7 +90,7 @@ export default async function LocaleLayout({
   return (
     <html
       lang={dictionary.meta.htmlLang}
-      className={`${sans.variable} ${mono.variable} h-full antialiased`}
+      className={`${sans.variable} ${mono.variable} ${display.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
         <I18nProvider locale={locale} dictionary={dictionary}>
