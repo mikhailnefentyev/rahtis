@@ -39,6 +39,11 @@ export default function robots(): MetadataRoute.Robots {
       ],
     },
     sitemap: `${SITE_URL}/sitemap.xml`,
-    host: SITE_URL,
+    /*
+     * Только имя узла, без схемы: директива ждёт хост, а не адрес, и с
+     * «https://» её просто не читают. Google её игнорирует в любом виде,
+     * держим ради Яндекса — там ходят перевозчики из Балтии.
+     */
+    host: new URL(SITE_URL).host,
   };
 }
