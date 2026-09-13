@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { LegalPage } from '@/components/domain/LegalPage';
 import { getI18n, isLocale } from '@/lib/i18n';
+import { pageMetadata } from '@/lib/seo';
 
 export async function generateMetadata({
   params,
@@ -10,7 +11,17 @@ export async function generateMetadata({
   const { locale } = await params;
   if (!isLocale(locale)) return {};
   const { t } = await getI18n(locale);
-  return { title: t.legal.TERMS };
+  /*
+   * Документ открывается по четырём адресам: финский и английский
+   * слаг работают в обеих локалях. Canonical сводит их к одному на
+   * язык, иначе поисковик видит восемь страниц вместо двух.
+   */
+  return pageMetadata({
+    locale,
+    paths: { fi: '/kayttoehdot', en: '/terms' },
+    title: t.legal.TERMS,
+    description: t.seo.termsDescription,
+  });
 }
 
 export default async function Page({ params }: { params: Promise<{ locale: string }> }) {

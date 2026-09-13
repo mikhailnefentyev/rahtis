@@ -6,6 +6,7 @@ import { Card, CardBody } from '@/components/ui';
 import { redirectIfSignedIn } from '@/lib/auth/actions';
 import { LocaleSwitch } from '@/components/layout/LocaleSwitch';
 import { getI18n, isLocale } from '@/lib/i18n';
+import { pageMetadata, samePath } from '@/lib/seo';
 import { SignInForm } from './form';
 
 export async function generateMetadata({
@@ -16,7 +17,13 @@ export async function generateMetadata({
   const { locale } = await params;
   if (!isLocale(locale)) return {};
   const { t } = await getI18n(locale);
-  return { title: t.auth.signInTitle };
+  return pageMetadata({
+    locale,
+    paths: samePath('/signin'),
+    title: t.auth.signInTitle,
+    description: t.seo.signinDescription,
+    noindex: true,
+  });
 }
 
 export default async function SignInPage({

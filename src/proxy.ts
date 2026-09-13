@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { PROTECTED_SEGMENTS, signInPath } from '@/lib/auth/paths';
-import { LOCALE_COOKIE, defaultLocale, isLocale, matchLocale } from '@/lib/i18n/config';
+import { LOCALE_COOKIE, isLocale, matchLocale } from '@/lib/i18n/config';
 import { updateSession } from '@/lib/supabase/middleware';
 
 /**
@@ -46,7 +46,16 @@ export async function proxy(request: NextRequest) {
         ? ''
         : pathname;
     url.pathname = `/${resolveLocale(request)}${rest}`;
-    return NextResponse.redirect(url);
+
+    const redirect = NextResponse.redirect(url);
+    /*
+     * Ответ зависит от языка браузера и от куки, и об этом надо сказать
+     * вслух: без Vary любой кэш по дороге вправе запомнить один редирект
+     * и отдавать его всем. Тогда финн попадает на английскую страницу
+     * или наоборот — в зависимости от того, кто зашёл первым.
+     */
+    redirect.headers.set('Vary', 'Accept-Language, Cookie');
+    return redirect;
   }
 
   const { response, userId } = await updateSession(request, NextResponse.next({ request }));
@@ -62,11 +71,25 @@ export async function proxy(request: NextRequest) {
   return response;
 }
 
+/**
+ * На каком языке встречать пришедшего без префикса.
+ *
+ * Сначала его собственный выбор из куки, потом язык браузера, и только
+ * потом запасной. Запасной — английский, а не финский, хотя рынок
+ * финский и defaultLocale остался финским.
+ *
+ * Причина в том, кто именно попадает в эту ветку. Финн и англичанин
+ * распознаются по Accept-Language и до неё не доходят. Доходят швед,
+ * норвежец, датчанин, эстонец, поляк — то есть ровно те страны, которые
+ * платформа обслуживает и в которых финского не знают. Показывать им
+ * финскую страницу значило бы встречать три четверти заявленной
+ * географии языком, которого они не читают.
+ */
 function resolveLocale(request: NextRequest): string {
   const fromCookie = request.cookies.get(LOCALE_COOKIE)?.value;
   if (isLocale(fromCookie)) return fromCookie;
 
-  return matchLocale(request.headers.get('accept-language')) ?? defaultLocale;
+  return matchLocale(request.headers.get('accept-language')) ?? 'en';
 }
 
 export const config = {

@@ -28,6 +28,39 @@ export const fi = {
     description: 'Irtoperien ja konttien kuljetusalusta Skandinavian satamissa.',
   },
 
+
+  /*
+   * Тексты для поисковика и для превью ссылки.
+   *
+   * Отдельным разделом, а не в brand: brand.description — одна фраза о
+   * компании, и она стояла описанием сразу пяти страниц. Поисковик
+   * считает такое дублем, а человек в выдаче не понимает, чем страницы
+   * различаются.
+   *
+   * Заголовок главной раньше был просто «RAHTIS»: самое дорогое поле на
+   * сайте занимало слово, которое никто не ищет.
+   */
+  seo: {
+    homeTitle: 'Irtoperien ja konttien kuljetusalusta Skandinaviassa',
+    homeDescription:
+      'RAHTIS välittää irtoperien vaihdot ja konttikuljetukset hyväksytyille kuljetusliikkeille Suomen, Ruotsin, Norjan ja Tanskan satamissa. Tilaus tavoittaa alueen autot heti, kuljetus näkyy vaihe vaiheelta ja asiakirjat syntyvät samaan paikkaan.',
+    termsDescription:
+      'RAHTIS-palvelun käyttöehdot: osapuolten vastuut, kuljetuksen kulku, maksut ja tilitykset sekä sopimuksen voimassaolo.',
+    privacyDescription:
+      'Miten RAHTIS käsittelee henkilötietoja: mitä tietoja kerätään, mihin niitä käytetään, kuinka kauna niitä säilytetään ja mitkä ovat rekisteröidyn oikeudet.',
+    signinDescription: 'Kirjaudu RAHTIS-palveluun tilaajana tai kuljetusliikkeenä.',
+    applyDescription:
+      'Hae RAHTIS-palveluun. Tarkistamme Y-tunnuksen ja yrityksen tiedot rekistereistä, kuljetusliikkeiltä lisäksi liikenneluvan ja vakuutuksen.',
+    forgotDescription: 'Palauta unohtunut salasana RAHTIS-palveluun.',
+  },
+
+  notFound: {
+    title: 'Sivua ei löytynyt',
+    lede: 'Osoite on voinut muuttua, tai sivua ei ole koskaan ollut. Etusivulta löytyvät palvelu, referenssit ja yhteydenotto.',
+    home: 'Etusivulle',
+    signIn: 'Kirjaudu palveluun',
+  },
+
   role: {
     CARRIER: 'Kuljetusliike',
     SHIPPER: 'Tilaaja',

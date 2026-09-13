@@ -32,6 +32,28 @@ export const en = {
     description: 'Trailer swap and container haulage platform across Scandinavian ports.',
   },
 
+
+  seo: {
+    homeTitle: 'Trailer swap and container platform in Scandinavia',
+    homeDescription:
+      'RAHTIS routes trailer swaps and container haulage to approved carriers across the ports of Finland, Sweden, Norway and Denmark. An order reaches the trucks in the area at once, the job is visible stop by stop, and the documents end up in one place.',
+    termsDescription:
+      'Terms of service for RAHTIS: responsibilities of the parties, how a job runs, payments and settlements, and the term of the agreement.',
+    privacyDescription:
+      'How RAHTIS handles personal data: what is collected, what it is used for, how long it is kept and what rights the data subject has.',
+    signinDescription: 'Sign in to RAHTIS as a shipper or as a carrier.',
+    applyDescription:
+      'Apply to RAHTIS. We check the business ID and company details against the registers, and for carriers the transport licence and insurance as well.',
+    forgotDescription: 'Reset a forgotten RAHTIS password.',
+  },
+
+  notFound: {
+    title: 'Page not found',
+    lede: 'The address may have changed, or the page may never have existed. The front page has the service, the references and the way to reach us.',
+    home: 'To the front page',
+    signIn: 'Sign in',
+  },
+
   role: {
     CARRIER: 'Carrier',
     SHIPPER: 'Shipper',

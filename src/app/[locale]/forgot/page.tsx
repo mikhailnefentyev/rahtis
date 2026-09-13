@@ -6,6 +6,7 @@ import { LocaleSwitch } from '@/components/layout/LocaleSwitch';
 import { Card, CardBody } from '@/components/ui';
 import { signInPath } from '@/lib/auth/paths';
 import { getI18n, isLocale } from '@/lib/i18n';
+import { pageMetadata, samePath } from '@/lib/seo';
 import { ForgotForm } from './form';
 
 export async function generateMetadata({
@@ -16,7 +17,13 @@ export async function generateMetadata({
   const { locale } = await params;
   if (!isLocale(locale)) return {};
   const { t } = await getI18n(locale);
-  return { title: t.recovery.title };
+  return pageMetadata({
+    locale,
+    paths: samePath('/forgot'),
+    title: t.recovery.title,
+    description: t.seo.forgotDescription,
+    noindex: true,
+  });
 }
 
 /**

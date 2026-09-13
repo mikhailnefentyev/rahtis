@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Archivo, Geist, Geist_Mono } from 'next/font/google';
 import { APP } from '@/lib/config';
+import { SITE_URL } from '@/lib/seo';
 import { getDictionary, isLocale, locales } from '@/lib/i18n';
 import { I18nProvider } from '@/lib/i18n/provider';
 import '../globals.css';
@@ -66,6 +67,12 @@ export async function generateMetadata({
   const t = await getDictionary(locale);
 
   return {
+    /*
+     * База для относительных адресов: без неё Next оставляет og:url и
+     * canonical относительными, а их читают машины, которым неоткуда
+     * узнать домен.
+     */
+    metadataBase: new URL(SITE_URL),
     title: {
       default: t.brand.name,
       template: `%s · ${t.brand.name}`,

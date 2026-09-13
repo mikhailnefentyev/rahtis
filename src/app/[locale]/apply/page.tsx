@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import { signInPath } from '@/lib/auth/paths';
 import { LocaleSwitch } from '@/components/layout/LocaleSwitch';
 import { getI18n, isLocale } from '@/lib/i18n';
+import { pageMetadata, samePath } from '@/lib/seo';
 import { ApplyForm } from './form';
 
 export async function generateMetadata({
@@ -15,7 +16,12 @@ export async function generateMetadata({
   const { locale } = await params;
   if (!isLocale(locale)) return {};
   const { t } = await getI18n(locale);
-  return { title: t.apply.title };
+  return pageMetadata({
+    locale,
+    paths: samePath('/apply'),
+    title: t.apply.title,
+    description: t.seo.applyDescription,
+  });
 }
 
 export default async function ApplyPage({ params }: { params: Promise<{ locale: string }> }) {
