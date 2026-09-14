@@ -1337,6 +1337,9 @@ export type Database = {
           approved_at: string | null
           axles: number
           base_city: string
+          base_country: string | null
+          base_lat: number | null
+          base_lon: number | null
           company_id: string
           company_kind: Database["public"]["Enums"]["party_role"]
           container_feet: number[]
@@ -1366,6 +1369,9 @@ export type Database = {
           approved_at?: string | null
           axles: number
           base_city: string
+          base_country?: string | null
+          base_lat?: number | null
+          base_lon?: number | null
           company_id: string
           company_kind?: Database["public"]["Enums"]["party_role"]
           container_feet?: number[]
@@ -1395,6 +1401,9 @@ export type Database = {
           approved_at?: string | null
           axles?: number
           base_city?: string
+          base_country?: string | null
+          base_lat?: number | null
+          base_lon?: number | null
           company_id?: string
           company_kind?: Database["public"]["Enums"]["party_role"]
           container_feet?: number[]
@@ -1873,6 +1882,17 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      carrier_presence: {
+        Args: never
+        Returns: {
+          city: string
+          country: string
+          express_vehicles: number
+          lat: number
+          lon: number
+          unit_vehicles: number
+        }[]
+      }
       carrier_rating: {
         Args: { p_company_id?: string }
         Returns: {
@@ -2175,6 +2195,9 @@ export type Database = {
           approved_at: string | null
           axles: number
           base_city: string
+          base_country: string | null
+          base_lat: number | null
+          base_lon: number | null
           company_id: string
           company_kind: Database["public"]["Enums"]["party_role"]
           container_feet: number[]
@@ -2734,6 +2757,9 @@ export type Database = {
           approved_at: string | null
           axles: number
           base_city: string
+          base_country: string | null
+          base_lat: number | null
+          base_lon: number | null
           company_id: string
           company_kind: Database["public"]["Enums"]["party_role"]
           container_feet: number[]
@@ -2977,6 +3003,7 @@ export type Database = {
       document_kind: "CARRIER_LICENSE" | "INSURANCE"
       email_status: "PENDING" | "SENT" | "FAILED" | "SKIPPED"
       euro_class: "EURO_4" | "EURO_5" | "EURO_6"
+      haul_branch: "UNIT" | "EXPRESS"
       haul_kind: "TRAILER" | "CONTAINER" | "VAN" | "TRUCK"
       incident_severity: "WARN" | "ERROR" | "FATAL"
       incident_status: "OPEN" | "ACKED" | "RESOLVED"
@@ -3165,6 +3192,7 @@ export const Constants = {
       document_kind: ["CARRIER_LICENSE", "INSURANCE"],
       email_status: ["PENDING", "SENT", "FAILED", "SKIPPED"],
       euro_class: ["EURO_4", "EURO_5", "EURO_6"],
+      haul_branch: ["UNIT", "EXPRESS"],
       haul_kind: ["TRAILER", "CONTAINER", "VAN", "TRUCK"],
       incident_severity: ["WARN", "ERROR", "FATAL"],
       incident_status: ["OPEN", "ACKED", "RESOLVED"],

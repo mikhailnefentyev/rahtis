@@ -1,6 +1,7 @@
 'use client';
 
 import { useActionState, useEffect, useState } from 'react';
+import { AddressInput } from '@/components/domain/AddressInput';
 import { Button, Card, CardBody, Field, Input, InputMono, Select } from '@/components/ui';
 import { saveVehicleAction, type VehicleState } from '@/lib/fleet/actions';
 import { useI18n } from '@/lib/i18n/provider';
@@ -323,20 +324,38 @@ export function VehicleForm({
           </Field>
 
           {/*
-            * База — обычное поле, а не список.
+            * База — подсказка адреса, а не свободный текст.
             *
-            * Список из шести городов запуска не давал перевозчику из Раумы
-            * или Оулу указать свою базу вовсе, хотя стол он видит по всей
-            * стране. Регионы стола и так считаются по фактическим заказам
-            * (desk_regions), а не по этому списку.
+            * Списка из шести городов здесь когда-то не стало по верной
+            * причине: он не давал перевозчику из Раумы или Оулу указать
+            * свою базу вовсе. Но свободный текст набирают руками, и в
+            * боевой базе лежит «Heslinki» — по такому полю нельзя ни
+            * сверить, ни нарисовать.
+            *
+            * Подсказка решает обе задачи разом: перевозчик указывает
+            * любой город Европы, а платформа получает координату и
+            * одинаковое написание. По ним заказчик видит в своём
+            * кабинете, есть ли рядом транспорт.
             */}
-          <Field label={t.vehicle.base} required>
+          <Field label={t.vehicle.base} hint={t.vehicle.baseHint} required className="sm:col-span-2">
             {(p) => (
-              <Input
+              <AddressInput
                 {...p}
                 name="base_city"
                 required
                 defaultValue={vehicle?.base_city ?? ''}
+                defaultChosen={
+                  vehicle?.base_lat != null && vehicle?.base_lon != null
+                    ? {
+                        address: vehicle.base_city,
+                        city: vehicle.base_city,
+                        country: vehicle.base_country,
+                        position: { lat: vehicle.base_lat, lon: vehicle.base_lon },
+                        score: 100,
+                        precise: true,
+                      }
+                    : null
+                }
                 placeholder="Helsinki"
               />
             )}

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { AgentChat } from '@/components/domain/AgentChat';
 import { CabinetPulse } from '@/components/domain/CabinetPulse';
+import { CarrierPresence } from '@/components/domain/CarrierPresence';
 import { ReportArchive } from '@/components/domain/ReportArchive';
 import { Badge, buttonClass, Card, CardBody, Kv, Mono } from '@/components/ui';
 import { companyStatusTone } from '@/components/ui/tone';
@@ -108,6 +109,16 @@ export async function CabinetOverview({
       </div>
 
       <CabinetPulse locale={locale} role={role} />
+
+      {/*
+        * Карта транспорта — только заказчику и оператору.
+        *
+        * Перевозчику она сказала бы, где стоят конкуренты, и не сказала
+        * бы ничего о его работе: заказы он ищет на столе, а не по чужим
+        * базам. Тот же круг зашит в carrier_presence, здесь только не
+        * делается лишний запрос.
+        */}
+      {role !== 'CARRIER' && <CarrierPresence locale={locale} />}
 
       <AgentChat locale={locale} role={role} />
 

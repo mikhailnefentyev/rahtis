@@ -192,6 +192,15 @@ function readVehicleForm(formData: FormData) {
     make: String(formData.get('make') ?? '').trim(),
     euro_class: String(formData.get('euro_class') ?? '') as EuroClass,
     base_city: String(formData.get('base_city') ?? '').trim(),
+    /*
+     * Координата базы приходит скрытыми полями подсказки — теми же, что
+     * у адреса точки маршрута. Набранный руками город координат не имеет,
+     * и это не ошибка: карточка сохранится, просто машина не попадёт на
+     * карту транспорта, пока базу не выберут из списка.
+     */
+    base_lat: num(formData, 'base_city_lat') ?? null,
+    base_lon: num(formData, 'base_city_lon') ?? null,
+    base_country: text(formData, 'base_city_country'),
   };
 }
 

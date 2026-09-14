@@ -582,6 +582,16 @@ export const fi = {
     },
   },
 
+  /*
+   * Kartta kalustosta tilaajan työpöydällä. Ei kerro, onko auto vapaana:
+   * vapaus vanhenee tunneissa ja vaatii ylläpitoa, kalusto ei.
+   */
+  presence: {
+    title: 'Missä kalustoa on',
+    hint: 'Hyväksytyt ajoneuvot kotipaikkansa mukaan. Ei kerro vapaana olosta eikä siitä, kenen autoja ne ovat.',
+    mapLabel: 'Kartta kaupungeista, joissa on kalustoa',
+  },
+
   haulKind: {
     TRAILER: 'Perävaunu',
     CONTAINER: 'Kontti',
@@ -1234,6 +1244,7 @@ export const fi = {
     make: 'Merkki ja malli',
     euro: 'Päästöluokka',
     base: 'Kotipaikka',
+    baseHint: 'Valitse kaupunki ehdotuksista, niin tilaajat näkevät kartalla, että alueella on kalustoa',
     rating: 'Arvio',
     adr: 'ADR',
     adrHas: 'ADR-lupa',
@@ -1494,6 +1505,10 @@ export const fi = {
     'trip.stageAt': '{stage} · {place}',
     'trip.progressCount': 'Tehty {done} / {total}',
     'trip.enRouteTo': 'Matkalla · {place}',
+    'presence.unitCount': '{count, plural, one {# vetoauto} other {# vetoautoa}}',
+    'presence.expressCount': '{count, plural, one {# paketti- tai kuorma-auto} other {# paketti- ja kuorma-autoa}}',
+    'presence.unitShort': '{count, number} vetoa',
+    'presence.expressShort': '{count, number} pika',
     'trip.completedAt': 'Tehty klo {time}',
     /*
      * Poikkeama, ei koordinaatit. Numeropari ei kerro riitatilanteessa

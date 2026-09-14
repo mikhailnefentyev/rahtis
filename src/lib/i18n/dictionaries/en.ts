@@ -552,6 +552,12 @@ export const en = {
     },
   },
 
+  presence: {
+    title: 'Where the vehicles are',
+    hint: 'Approved vehicles by home base. It does not show availability, nor whose vehicles these are.',
+    mapLabel: 'Map of cities with vehicles',
+  },
+
   haulKind: {
     TRAILER: 'Semi-trailer',
     CONTAINER: 'Container',
@@ -1199,6 +1205,7 @@ export const en = {
     make: 'Make and model',
     euro: 'Emission class',
     base: 'Home base',
+    baseHint: 'Pick the city from the suggestions so shippers can see on the map that there is capacity in the area',
     rating: 'Rating',
     adr: 'ADR',
     adrHas: 'ADR permit',
@@ -1450,6 +1457,10 @@ export const en = {
     'trip.stageAt': '{stage} · {place}',
     'trip.progressCount': 'Done {done} / {total}',
     'trip.enRouteTo': 'En route · {place}',
+    'presence.unitCount': '{count, plural, one {# tractor unit} other {# tractor units}}',
+    'presence.expressCount': '{count, plural, one {# van or truck} other {# vans and trucks}}',
+    'presence.unitShort': '{count, number} unit',
+    'presence.expressShort': '{count, number} express',
     'trip.completedAt': 'Done at {time}',
     'trip.markedNear': 'Marked {meters, number} m from the address',
     'trip.markedFar': 'Marked {km, number, ::.0#} km from the address',
