@@ -2453,6 +2453,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      reconcile_scheduler_calls: { Args: never; Returns: number }
       record_incident: {
         Args: {
           p_fingerprint: string
@@ -2545,6 +2546,8 @@ export type Database = {
           privilege: string
         }[]
       }
+      run_scheduled_job: { Args: { p_job: string }; Returns: Json }
+      scheduler_health: { Args: never; Returns: Json }
       set_billing: {
         Args: {
           p_invoice_ref?: string
@@ -2595,6 +2598,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      set_runtime_config: {
+        Args: { p_key: string; p_note?: string; p_value: string }
+        Returns: Json
       }
       settlement_period: {
         Args: { p_moment?: string }
