@@ -58,6 +58,7 @@ export function StopFields({
   showTrailerState = false,
   haulKind = 'TRAILER',
   requireDate = false,
+  requireWeight = false,
   addressPlaceholder,
   placeNamePlaceholder,
   defaults,
@@ -73,6 +74,15 @@ export function StopFields({
   showPlaceName?: boolean;
   /** Прицеп с грузом или пустой — спрашивается на заборе и на отцепке. */
   showTrailerState?: boolean;
+  /*
+   * Вес обязателен там, где по нему подбирают машину.
+   *
+   * У перецепа и контейнера он справочный: единицу тянет тягач, и
+   * грузоподъёмность решают оси. У экспресса вес — это и есть условие
+   * отклика: без него take_order сравнивает ноль с кузовом фургона и
+   * пропускает любой груз.
+   */
+  requireWeight?: boolean;
   /* «Прицеп кузов гружён» или «контейнер гружён» — слово от единицы. */
   haulKind?: HaulKind;
   requireDate?: boolean;
@@ -202,11 +212,12 @@ export function StopFields({
 
       {cargo ? (
         <>
-          <Field label={t.orderForm.cargoWeight} hint={t.orderForm.cargoWeightHint}>
+          <Field label={t.orderForm.cargoWeight} hint={t.orderForm.cargoWeightHint} required={requireWeight}>
             {(p) => (
               <InputMono
                 {...p}
                 name={name('weight')}
+                required={requireWeight}
                 defaultValue={was('weight')}
                 inputMode="decimal"
                 placeholder="24,5"

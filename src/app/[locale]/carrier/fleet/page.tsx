@@ -102,7 +102,16 @@ export default async function FleetPage({ params }: { params: Promise<{ locale: 
         </div>
       </section>
 
-      <FleetView vehicles={vehicles ?? []} documentsOk={state?.documents_ok ?? false} />
+      {/*
+        * Сегодняшняя дата считается здесь, как и остаток дней у
+        * документов: по ней карточка решает, просрочен ли техосмотр
+        * холодильника, а часы клиента могут расходиться с базой.
+        */}
+      <FleetView
+        vehicles={vehicles ?? []}
+        documentsOk={state?.documents_ok ?? false}
+        today={new Date().toISOString().slice(0, 10)}
+      />
     </main>
   );
 }

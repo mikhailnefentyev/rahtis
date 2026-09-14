@@ -64,6 +64,7 @@ export function OrderCard({
                     <HaulBadge
                       haulKind={order.haul_kind}
                       containerFeet={order.container_feet}
+                      ldm={order.ldm}
                     />
                     <Mono className="text-xs text-ink-dim">{order.ref}</Mono>
                     {/* Номер прицепа — по нему водитель находит железо на площадке. */}

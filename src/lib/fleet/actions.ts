@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { getViewer } from '@/lib/auth/viewer';
 import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
-import type { DocumentKind, EuroClass } from '@/types/db';
+import type { DocumentKind, EuroClass, VehicleClass } from '@/types/db';
 
 const BUCKET = 'company-docs';
 
@@ -136,7 +136,17 @@ export async function documentUrlAction(storagePath: string): Promise<string | n
 
 export type VehicleState = { error: string | null; done: boolean };
 
+/** Число из поля формы: пусто и мусор равны «не указано». */
+function num(formData: FormData, key: string): number | null {
+  const raw = String(formData.get(key) ?? '').replace(/\s/g, '').replace(',', '.');
+  const value = Number.parseFloat(raw);
+  return Number.isFinite(value) && value > 0 ? value : null;
+}
+
 function readVehicleForm(formData: FormData) {
+  const vehicleClass = String(formData.get('vehicle_class') ?? 'TRACTOR') as VehicleClass;
+  const express = vehicleClass !== 'TRACTOR';
+
   return {
     plate: String(formData.get('plate') ?? '')
       .trim()
@@ -145,18 +155,40 @@ function readVehicleForm(formData: FormData) {
     driver_name: String(formData.get('driver_name') ?? '').trim(),
     languages: formData.getAll('languages').map(String),
     whatsapp: String(formData.get('whatsapp') ?? '').replace(/[\s-]/g, ''),
-    axles: Number(formData.get('axles') ?? 0),
+    /*
+     * Оси у фургона и грузовика не спрашиваются: правило «две оси — 25
+     * тонн» написано про седельный тягач и к кузову неприменимо. Колонка
+     * при этом NOT NULL, поэтому туда идёт двойка — не как утверждение о
+     * машине, а как значение, которым никто не пользуется:
+     * app.vehicle_capacity_kg читает у неё payload_kg.
+     */
+    axles: express ? 2 : Number(formData.get('axles') ?? 0),
     adr: formData.get('adr') === '1',
+    vehicle_class: vehicleClass,
+    /*
+     * Лишнее обнуляется здесь, а не оставляется формой: ограничение
+     * vehicles_express_capacity не пропустит тягача с метрами кузова, и
+     * человек увидел бы отказ прав на карточке, заполненной правильно.
+     */
+    payload_kg: express ? num(formData, 'payload_kg') : null,
+    ldm: express ? num(formData, 'ldm') : null,
+    tail_lift: express && formData.get('tail_lift') === '1',
+    side_loading: express && formData.get('side_loading') === '1',
+    reefer: express && formData.get('reefer') === '1',
+    reefer_inspection_until:
+      express && formData.get('reefer') === '1' ? text(formData, 'reefer_inspection_until') : null,
     /*
      * Длины контейнеров приходят набором флажков с одним именем.
      * Массив, а не «максимальная длина»: раздвижное шасси берёт двадцатку
      * и сороковку, но не тридцатку, а платформа под 45 футов не всегда
      * имеет замки под 20 — одно число здесь врёт в обе стороны.
      */
-    container_feet: formData
-      .getAll('container_feet')
-      .map((v) => Number(v))
-      .filter((n) => Number.isFinite(n) && n > 0),
+    container_feet: express
+      ? []
+      : formData
+          .getAll('container_feet')
+          .map((v) => Number(v))
+          .filter((n) => Number.isFinite(n) && n > 0),
     make: String(formData.get('make') ?? '').trim(),
     euro_class: String(formData.get('euro_class') ?? '') as EuroClass,
     base_city: String(formData.get('base_city') ?? '').trim(),
@@ -175,6 +207,19 @@ export async function saveVehicleAction(
 
   const values = readVehicleForm(formData);
   if (values.languages.length === 0) {
+    return { error: t.validation.required, done: false };
+  }
+
+  /*
+   * Грузоподъёмность и метры — не украшение карточки: по ним подбирается
+   * машина под заказ. Без них ограничение базы откажет кодом, из которого
+   * человеку ничего не ясно, поэтому спрашиваем здесь.
+   */
+  if (values.vehicle_class !== 'TRACTOR' && (!values.payload_kg || !values.ldm)) {
+    return { error: t.validation.required, done: false };
+  }
+
+  if (values.reefer && !values.reefer_inspection_until) {
     return { error: t.validation.required, done: false };
   }
 

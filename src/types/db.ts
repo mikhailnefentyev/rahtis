@@ -11,6 +11,7 @@ export type PartyRole = Database['public']['Enums']['party_role'];
 export type CompanyStatus = Database['public']['Enums']['company_status'];
 export type VehicleAccess = Database['public']['Enums']['vehicle_access'];
 export type EuroClass = Database['public']['Enums']['euro_class'];
+export type VehicleClass = Database['public']['Enums']['vehicle_class'];
 export type DocumentKind = Database['public']['Enums']['document_kind'];
 
 export type Company = Tables<'companies'>;

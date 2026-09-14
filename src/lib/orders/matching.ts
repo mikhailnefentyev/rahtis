@@ -36,6 +36,12 @@ async function explain(locale: Locale, code: string | undefined, message: string
    * машине, а не в занятом заказе, и выбрать другую.
    */
   if (code === '55002') return t.matching.noChassis;
+  /*
+   * 55003 — машина не того класса или кузова не хватает по метрам. Свой
+   * код по той же причине: перевозчику нужно понять, что дело в машине,
+   * а не в занятом заказе, и выбрать другую.
+   */
+  if (code === '55003') return t.matching.wrongClass;
   if (code === '55000' && message?.includes('Мест нет')) return t.matching.noSlotsLeft;
   if (code === '55000') return t.matching.tooLate;
 

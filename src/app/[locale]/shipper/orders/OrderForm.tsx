@@ -16,7 +16,7 @@ import {
 } from '@/components/ui';
 import type { ChosenAddress } from '@/components/domain/AddressInput';
 import { publishOrderAction, type PublishState } from '@/lib/orders/actions';
-import { stopTitle } from '@/lib/orders/haul';
+import { stopTitle, type HaulKind } from '@/lib/orders/haul';
 import { computeRouteAction, type RouteState } from '@/lib/routing/actions';
 import { useI18n } from '@/lib/i18n/provider';
 import { StopFields, type StopDefaults } from './StopFields';
@@ -128,11 +128,27 @@ export function OrderForm({
   );
   const originPickup = originStops.find((s) => s.role === 'PICKUP');
   const originReturn = originStops.find((s) => s.role === 'TRAILER_RETURN');
+  const originDelivery = originStops.find((s) => s.role === 'DELIVERY');
   const originWork = originStops.filter((s) => repeatableRole(s.role) !== null);
 
-  const [haulKind, setHaulKind] = useState<'TRAILER' | 'CONTAINER'>(origin?.haul_kind ?? 'TRAILER');
+  const [haulKind, setHaulKind] = useState<HaulKind>(origin?.haul_kind ?? 'TRAILER');
   const container = haulKind === 'CONTAINER';
+
+  /*
+   * Экспресс — ветка, а не разновидность перецепа.
+   *
+   * У фургона и грузовика нет единицы, которую забирают и возвращают:
+   * груз едет внутри машины. Поэтому от этого одного признака зависит
+   * половина формы — какие секции показаны, какие поля обязательны и
+   * какая форма рейса уезжает в базу. Сама проверка живёт в базе
+   * (app.haul_carries_unit); здесь её зеркало, и оно должно называться
+   * так же ясно, иначе на следующей единице придётся искать по файлу
+   * семь разных условий.
+   */
+  const express = haulKind === 'VAN' || haulKind === 'TRUCK';
+
   const [feet, setFeet] = useState(origin?.container_feet ? String(origin.container_feet) : '40');
+  const [ldm, setLdm] = useState(origin?.ldm ? String(origin.ldm).replace('.', ',') : '');
 
   /*
    * Пока делаем только перецеп (irtoperä).
@@ -180,6 +196,7 @@ export function OrderForm({
     if (!template) return {};
     const seed: Record<string, ChosenAddress | null> = {
       pickup: stopChosen(originPickup),
+      delivery: stopChosen(originDelivery),
       ret: stopChosen(originReturn),
     };
     originWork.forEach((stop, i) => {
@@ -208,10 +225,17 @@ export function OrderForm({
     [],
   );
 
-  /* Слоты маршрута в порядке рейса: забор, действия, отцепка. */
+  /*
+   * Слоты маршрута в порядке рейса.
+   *
+   * У перецепа это забор, действия, отцепка. У экспресса — два адреса и
+   * всё: груз забрали здесь, привезли туда. Промежуточные точки ему не
+   * запрещены в принципе, но заводить их до первого такого заказа
+   * значило бы усложнить форму ради воображаемого случая.
+   */
   const slots = useMemo(
-    () => ['pickup', ...extras.map((e) => `extra-${e.key}`), 'ret'],
-    [extras],
+    () => (express ? ['pickup', 'delivery'] : ['pickup', ...extras.map((e) => `extra-${e.key}`), 'ret']),
+    [express, extras],
   );
 
   /*
@@ -256,6 +280,7 @@ export function OrderForm({
         .filter((slot) => !coords[slot]?.position)
         .map((slot) => {
           if (slot === 'pickup') return stopTitle(t, 'PICKUP', haulKind);
+          if (slot === 'delivery') return t.stopKind.DELIVERY;
           if (slot === 'ret') return stopTitle(t, 'TRAILER_RETURN', haulKind);
           const extra = extras.find((e) => `extra-${e.key}` === slot);
           return extra ? t.stopKind[extra.role] : slot;
@@ -391,22 +416,28 @@ export function OrderForm({
       <Card>
         <CardBody className="grid gap-4 sm:grid-cols-3">
           {/*
-            * Тип рейса пока один. Кругорейс по форме — тот же перецеп
-            * (забрать прицеп, загрузиться, выгрузиться, отцепить), и
-            * разница выражается набором действий, а не пунктом списка.
+            * Тип рейса не выбирают — он следует из единицы.
+            *
+            * У перецепа и контейнера форма одна: забрать железо,
+            * отработать точки, оставить. Кругорейс по форме тот же самый,
+            * и разница выражается набором действий, а не пунктом списка.
+            * У экспресса выбора нет тем более: забрать в одном месте и
+            * привезти в другое — это рейс в один конец по определению.
+            * Ту же подстановку делает и база: клиенту решать здесь нечего.
             */}
-          <input type="hidden" name="order_type" value="TRAILER_SWAP" />
+          <input type="hidden" name="order_type" value={express ? 'ONE_WAY' : 'TRAILER_SWAP'} />
           <div>
             <p className="label-micro">{t.orderForm.type}</p>
             <p className="mt-1.5 text-[13px] font-semibold text-ink">
-              {t.orderType.TRAILER_SWAP}
+              {express ? t.orderType.ONE_WAY : t.orderType.TRAILER_SWAP}
             </p>
           </div>
 
           {/*
             * Единица выбирается здесь, рядом с типом рейса, а не в блоке
-            * груза: от неё зависит, как называются поля ниже, и человек
-            * должен решить это до того, как начнёт их заполнять.
+            * груза: от неё зависит, как называются поля ниже и какие
+            * секции вообще есть, и человек должен решить это до того, как
+            * начнёт их заполнять.
             */}
           <Field label={t.orderForm.haulKind}>
             {(p) => (
@@ -414,10 +445,12 @@ export function OrderForm({
                 {...p}
                 name="haul_kind"
                 value={haulKind}
-                onChange={(e) => setHaulKind(e.target.value === 'CONTAINER' ? 'CONTAINER' : 'TRAILER')}
+                onChange={(e) => setHaulKind(e.target.value as HaulKind)}
               >
                 <option value="TRAILER">{t.haulKind.TRAILER}</option>
                 <option value="CONTAINER">{t.haulKind.CONTAINER}</option>
+                <option value="VAN">{t.vehicleClass.VAN}</option>
+                <option value="TRUCK">{t.vehicleClass.TRUCK}</option>
               </Select>
             )}
           </Field>
@@ -428,28 +461,71 @@ export function OrderForm({
         </CardBody>
       </Card>
 
-      {/* ── Забор прицепа ── */}
+      {/* ── Забор: прицеп с площадки или груз со склада ── */}
       <Card stripe="info">
         <CardBody>
           <SectionTitle>
             {t.haul[haulKind].pickupSection}
           </SectionTitle>
+          {/*
+            * Поля забора у экспресса другие, и это не косметика.
+            *
+            * За прицепом едут в ворота: там нужны название площадки и
+            * ответ «гружёный или пустой», а человека на месте нет —
+            * железо выдают по номеру. За грузом едут к отправителю: там
+            * есть компания, есть кому позвонить, и есть вес, по которому
+            * подбирается машина. Поэтому вес здесь обязателен: без него
+            * отклик сравнивает ноль с кузовом фургона и пропускает
+            * любой груз.
+            */}
           <StopFields
             role="PICKUP"
             prefix="pickup"
             showPlaceName
-            showTrailerState
+            showTrailerState={!express}
+            requireCompany={express}
+            showContact={express}
+            requireWeight={express}
             haulKind={haulKind}
             defaults={stopDefaults(originPickup)}
             defaultChosen={stopChosen(originPickup)}
             requireDate
-            addressPlaceholder="Satamakatu 1, 10900 Hanko"
-            placeNamePlaceholder="Hanko Port, Terminal 2"
+            addressPlaceholder={express ? 'Teollisuustie 4, 01500 Vantaa' : 'Satamakatu 1, 10900 Hanko'}
+            placeNamePlaceholder={express ? 'Varasto 3' : 'Hanko Port, Terminal 2'}
             onChosen={onChosen('pickup')}
           />
         </CardBody>
       </Card>
 
+      {/* ── Доставка: вторая и последняя точка экспресса ── */}
+      {express && (
+        <Card stripe="info">
+          <CardBody>
+            <SectionTitle>{t.haul[haulKind].dropSection}</SectionTitle>
+
+            <input type="hidden" name="has_delivery" value="on" />
+
+            <StopFields
+              role="DELIVERY"
+              prefix="delivery"
+              requireCompany
+              showContact
+              requireDate
+              defaults={stopDefaults(originDelivery)}
+              defaultChosen={stopChosen(originDelivery)}
+              addressPlaceholder="Hämeentie 12, 00530 Helsinki"
+              onChosen={onChosen('delivery')}
+            />
+          </CardBody>
+        </Card>
+      )}
+
+      {/*
+        * Действия и отцепка — про единицу, которую забрали и оставят.
+        * У экспресса её нет: маршрут закончился на доставке.
+        */}
+      {!express && (
+      <>
       {/* ── Действия рейса: выгрузки и загрузки, сколько нужно ── */}
       <Card stripe="live">
         <CardBody>
@@ -541,14 +617,48 @@ export function OrderForm({
           />
         </CardBody>
       </Card>
+      </>
+      )}
 
 
 
       {/* ── Груз и оплата ── */}
       <Card>
         <CardBody>
-          <SectionTitle>{t.orderForm.cargoSection}</SectionTitle>
+          <SectionTitle>{express ? t.orderForm.expressCargoSection : t.orderForm.cargoSection}</SectionTitle>
           <div className="grid gap-4 sm:grid-cols-4">
+            {/*
+              * У экспресса вместо номера единицы — погрузочные метры.
+              *
+              * Номера у груза нет: его выдают по адресу, и требовать его
+              * значило бы просить выдумать. А метры — это то же, чем для
+              * контейнера была длина: условие подбора машины, а не
+              * описание. Габариты остаются в лишних сведениях ниже:
+              * коробка 120×80×160 не сводится к одному числу, а три
+              * колонки под неё требовали бы точности, которой у
+              * заказчика в момент публикации нет.
+              */}
+            {express ? (
+              <Field
+                label={t.orderForm.ldm}
+                hint={t.orderForm.ldmHint}
+                required
+                className="sm:col-span-2"
+              >
+                {(p) => (
+                  <InputMono
+                    {...p}
+                    name="ldm"
+                    required
+                    inputMode="decimal"
+                    value={ldm}
+                    onChange={(e) => setLdm(e.target.value)}
+                    placeholder="1,2"
+                  />
+                )}
+              </Field>
+            ) : (
+            <>
             {/*
               * Номер прицепа стоит первым в блоке и обязателен: прицепы
               * ищут по номерам, и заказ без него означает водителя,
@@ -618,6 +728,8 @@ export function OrderForm({
                 />
               )}
             </Field>
+            </>
+            )}
             <Field label={t.orderForm.distance} required>
               {(p) => (
                 <InputMono
@@ -695,7 +807,9 @@ export function OrderForm({
                   name="comment"
                   rows={2}
                   defaultValue={origin?.comment ?? ''}
-                  placeholder={t.order.commentPlaceholder}
+                  placeholder={
+                    express ? t.orderForm.expressCommentPlaceholder : t.order.commentPlaceholder
+                  }
                 />
               )}
             </Field>

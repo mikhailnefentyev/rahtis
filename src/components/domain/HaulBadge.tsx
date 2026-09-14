@@ -1,13 +1,11 @@
 'use client';
 
 import { Badge } from '@/components/ui';
+import { carriesUnit, type HaulKind } from '@/lib/orders/haul';
 import { useI18n } from '@/lib/i18n/provider';
-import type { Database } from '@/types/database';
-
-type HaulKind = Database['public']['Enums']['haul_kind'];
 
 /**
- * Что тянут: полуприцеп или контейнер, и какой длины.
+ * Чем выполняется рейс и какого размера единица.
  *
  * Один компонент на три экрана — стол, кабинет перевозчика, кабинет
  * заказчика, — потому что это первое, на что смотрит перевозчик, решая,
@@ -27,21 +25,35 @@ type HaulKind = Database['public']['Enums']['haul_kind'];
 export function HaulBadge({
   haulKind,
   containerFeet,
+  ldm,
   className,
 }: {
   haulKind: HaulKind;
   containerFeet: number | null;
+  /** Погрузочные метры экспресса. У перецепа и контейнера их нет. */
+  ldm?: number | string | null;
   className?: string;
 }) {
   const { t, m } = useI18n();
 
   const container = haulKind === 'CONTAINER';
+  const express = !carriesUnit(haulKind);
+
+  /*
+   * Размер — в том же бейдже, а не полем ниже.
+   *
+   * «Kontti» без длины и «Pakettiauto» без метров не отвечают на вопрос,
+   * подойдёт ли машина, а именно этот вопрос здесь и задают.
+   */
+  const size = container
+    ? containerFeet && m('order.containerSize', { feet: containerFeet })
+    : express
+      ? ldm && `${String(ldm).replace('.', ',')} ldm`
+      : null;
 
   return (
-    <Badge tone={container ? 'info' : 'neutral'} className={className}>
-      {container && containerFeet
-        ? `${t.haulKind.CONTAINER} · ${m('order.containerSize', { feet: containerFeet })}`
-        : t.haulKind[haulKind]}
+    <Badge tone={container || express ? 'info' : 'neutral'} className={className}>
+      {size ? `${t.haulKind[haulKind]} · ${size}` : t.haulKind[haulKind]}
     </Badge>
   );
 }

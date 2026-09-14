@@ -75,6 +75,13 @@ export function DeskList({ orders, vehicles }: { orders: DeskOrder[]; vehicles: 
     <div className="flex flex-col gap-3">
       {orders.map((order) => {
         const stops = (order.stops ?? []) as unknown as DeskStop[];
+
+        /*
+         * Вес заказа — самый тяжёлый из пунктов, как и в базе
+         * (app.order_max_weight_kg): именно с ним take_order сравнивает
+         * грузоподъёмность машины.
+         */
+        const cargoKg = stops.reduce((max, stop) => Math.max(max, stop.cargo_weight_kg ?? 0), 0);
         const open = expanded === order.id;
 
         return (
@@ -92,7 +99,7 @@ export function DeskList({ orders, vehicles }: { orders: DeskOrder[]; vehicles: 
                       * него подходящее шасси: заказ, который не на чем
                       * везти, дальше читать незачем.
                       */}
-                    <HaulBadge haulKind={order.haul_kind} containerFeet={order.container_feet} />
+                    <HaulBadge haulKind={order.haul_kind} containerFeet={order.container_feet} ldm={order.ldm} />
                     <Mono className="text-xs text-ink-dim">{order.ref}</Mono>
                     {/* Номер прицепа — по нему водитель находит железо на площадке. */}
                     {order.trailer_plate && <Plate>{order.trailer_plate}</Plate>}
@@ -104,6 +111,15 @@ export function DeskList({ orders, vehicles }: { orders: DeskOrder[]; vehicles: 
 
                   <p className="mt-1.5 text-[13px] text-ink-muted">
                     {order.trailer ? `${order.trailer} · ` : ''}
+                    {/*
+                      * Вес груза — рядом с километрами, а не в развороте
+                      * маршрута. У экспресса это второе число после
+                      * метров, по которому решают, влезет ли: кузов
+                      * ограничен и тем и другим, и прятать половину
+                      * ответа под кнопку «показать точки» значит заставить
+                      * открывать каждый заказ подряд.
+                      */}
+                    {cargoKg ? `${cargoKg} kg · ` : ''}
                     {m('order.distance', { km: order.distance_km ?? 0 })} ·{' '}
                     <span className="font-semibold text-ink">{f.eur(order.rate_cents ?? 0)}</span>{' '}
                     <span className="text-ink-dim">{t.money.addVat}</span>{' '}

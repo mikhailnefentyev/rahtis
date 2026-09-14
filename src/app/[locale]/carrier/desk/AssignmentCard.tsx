@@ -70,7 +70,7 @@ export function AssignmentCard({
                   <Badge tone={orderStatusTone[order.status]}>
                     {t.orderStatus[order.status]}
                   </Badge>
-                  <HaulBadge haulKind={order.haul_kind} containerFeet={order.container_feet} />
+                  <HaulBadge haulKind={order.haul_kind} containerFeet={order.container_feet} ldm={order.ldm} />
                   <Mono className="text-xs text-ink-dim">{order.ref}</Mono>
                   {/* Номер прицепа — по нему водитель находит железо на площадке. */}
                   {order.trailer_plate && <Plate>{order.trailer_plate}</Plate>}

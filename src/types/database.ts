@@ -1018,6 +1018,7 @@ export type Database = {
           id: string
           invoice_ref: string | null
           invoiced_at: string | null
+          ldm: number | null
           order_type: Database["public"]["Enums"]["order_type"]
           paid_at: string | null
           published_at: string | null
@@ -1056,6 +1057,7 @@ export type Database = {
           id?: string
           invoice_ref?: string | null
           invoiced_at?: string | null
+          ldm?: number | null
           order_type: Database["public"]["Enums"]["order_type"]
           paid_at?: string | null
           published_at?: string | null
@@ -1094,6 +1096,7 @@ export type Database = {
           id?: string
           invoice_ref?: string | null
           invoiced_at?: string | null
+          ldm?: number | null
           order_type?: Database["public"]["Enums"]["order_type"]
           paid_at?: string | null
           published_at?: string | null
@@ -1333,12 +1336,19 @@ export type Database = {
           euro_class: Database["public"]["Enums"]["euro_class"]
           id: string
           languages: string[]
+          ldm: number | null
           make: string
+          payload_kg: number | null
           plate: string
+          reefer: boolean
+          reefer_inspection_until: string | null
           rejected_at: string | null
           rejection_reason: string | null
+          side_loading: boolean
           submitted_at: string | null
+          tail_lift: boolean
           updated_at: string
+          vehicle_class: Database["public"]["Enums"]["vehicle_class"]
           whatsapp: string
         }
         Insert: {
@@ -1355,12 +1365,19 @@ export type Database = {
           euro_class: Database["public"]["Enums"]["euro_class"]
           id?: string
           languages?: string[]
+          ldm?: number | null
           make: string
+          payload_kg?: number | null
           plate: string
+          reefer?: boolean
+          reefer_inspection_until?: string | null
           rejected_at?: string | null
           rejection_reason?: string | null
+          side_loading?: boolean
           submitted_at?: string | null
+          tail_lift?: boolean
           updated_at?: string
+          vehicle_class?: Database["public"]["Enums"]["vehicle_class"]
           whatsapp: string
         }
         Update: {
@@ -1377,12 +1394,19 @@ export type Database = {
           euro_class?: Database["public"]["Enums"]["euro_class"]
           id?: string
           languages?: string[]
+          ldm?: number | null
           make?: string
+          payload_kg?: number | null
           plate?: string
+          reefer?: boolean
+          reefer_inspection_until?: string | null
           rejected_at?: string | null
           rejection_reason?: string | null
+          side_loading?: boolean
           submitted_at?: string | null
+          tail_lift?: boolean
           updated_at?: string
+          vehicle_class?: Database["public"]["Enums"]["vehicle_class"]
           whatsapp?: string
         }
         Relationships: [
@@ -1530,6 +1554,7 @@ export type Database = {
           id: string
           invoice_ref: string | null
           invoiced_at: string | null
+          ldm: number | null
           order_type: Database["public"]["Enums"]["order_type"]
           paid_at: string | null
           published_at: string | null
@@ -1812,6 +1837,7 @@ export type Database = {
           id: string
           invoice_ref: string | null
           invoiced_at: string | null
+          ldm: number | null
           order_type: Database["public"]["Enums"]["order_type"]
           paid_at: string | null
           published_at: string | null
@@ -1866,6 +1892,7 @@ export type Database = {
           id: string
           invoice_ref: string | null
           invoiced_at: string | null
+          ldm: number | null
           order_type: Database["public"]["Enums"]["order_type"]
           paid_at: string | null
           published_at: string | null
@@ -1913,6 +1940,7 @@ export type Database = {
           id: string
           invoice_ref: string | null
           invoiced_at: string | null
+          ldm: number | null
           order_type: Database["public"]["Enums"]["order_type"]
           paid_at: string | null
           published_at: string | null
@@ -2042,6 +2070,7 @@ export type Database = {
           id: string
           invoice_ref: string | null
           invoiced_at: string | null
+          ldm: number | null
           order_type: Database["public"]["Enums"]["order_type"]
           paid_at: string | null
           published_at: string | null
@@ -2089,6 +2118,7 @@ export type Database = {
           id: string
           invoice_ref: string | null
           invoiced_at: string | null
+          ldm: number | null
           order_type: Database["public"]["Enums"]["order_type"]
           paid_at: string | null
           published_at: string | null
@@ -2135,12 +2165,19 @@ export type Database = {
           euro_class: Database["public"]["Enums"]["euro_class"]
           id: string
           languages: string[]
+          ldm: number | null
           make: string
+          payload_kg: number | null
           plate: string
+          reefer: boolean
+          reefer_inspection_until: string | null
           rejected_at: string | null
           rejection_reason: string | null
+          side_loading: boolean
           submitted_at: string | null
+          tail_lift: boolean
           updated_at: string
+          vehicle_class: Database["public"]["Enums"]["vehicle_class"]
           whatsapp: string
         }
         SetofOptions: {
@@ -2165,6 +2202,7 @@ export type Database = {
           finish_city: string
           haul_kind: Database["public"]["Enums"]["haul_kind"]
           id: string
+          ldm: number
           offers_count: number
           order_type: Database["public"]["Enums"]["order_type"]
           pickup_city: string
@@ -2338,6 +2376,7 @@ export type Database = {
           distance_km: number
           haul_kind: Database["public"]["Enums"]["haul_kind"]
           id: string
+          ldm: number
           order_type: Database["public"]["Enums"]["order_type"]
           rate_cents: number
           ref: string
@@ -2513,6 +2552,7 @@ export type Database = {
           id: string
           invoice_ref: string | null
           invoiced_at: string | null
+          ldm: number | null
           order_type: Database["public"]["Enums"]["order_type"]
           paid_at: string | null
           published_at: string | null
@@ -2573,6 +2613,7 @@ export type Database = {
           id: string
           invoice_ref: string | null
           invoiced_at: string | null
+          ldm: number | null
           order_type: Database["public"]["Enums"]["order_type"]
           paid_at: string | null
           published_at: string | null
@@ -2633,6 +2674,7 @@ export type Database = {
           id: string
           invoice_ref: string | null
           invoiced_at: string | null
+          ldm: number | null
           order_type: Database["public"]["Enums"]["order_type"]
           paid_at: string | null
           published_at: string | null
@@ -2679,12 +2721,19 @@ export type Database = {
           euro_class: Database["public"]["Enums"]["euro_class"]
           id: string
           languages: string[]
+          ldm: number | null
           make: string
+          payload_kg: number | null
           plate: string
+          reefer: boolean
+          reefer_inspection_until: string | null
           rejected_at: string | null
           rejection_reason: string | null
+          side_loading: boolean
           submitted_at: string | null
+          tail_lift: boolean
           updated_at: string
+          vehicle_class: Database["public"]["Enums"]["vehicle_class"]
           whatsapp: string
         }
         SetofOptions: {
@@ -2715,6 +2764,7 @@ export type Database = {
           id: string
           invoice_ref: string | null
           invoiced_at: string | null
+          ldm: number | null
           order_type: Database["public"]["Enums"]["order_type"]
           paid_at: string | null
           published_at: string | null
@@ -2858,6 +2908,7 @@ export type Database = {
           id: string
           invoice_ref: string | null
           invoiced_at: string | null
+          ldm: number | null
           order_type: Database["public"]["Enums"]["order_type"]
           paid_at: string | null
           published_at: string | null
@@ -2902,7 +2953,7 @@ export type Database = {
       document_kind: "CARRIER_LICENSE" | "INSURANCE"
       email_status: "PENDING" | "SENT" | "FAILED" | "SKIPPED"
       euro_class: "EURO_4" | "EURO_5" | "EURO_6"
-      haul_kind: "TRAILER" | "CONTAINER"
+      haul_kind: "TRAILER" | "CONTAINER" | "VAN" | "TRUCK"
       incident_severity: "WARN" | "ERROR" | "FATAL"
       incident_status: "OPEN" | "ACKED" | "RESOLVED"
       legal_kind:
@@ -2942,6 +2993,7 @@ export type Database = {
         | "UNLOADING_PHOTO"
         | "DAMAGE_PHOTO"
       vehicle_access: "DRAFT" | "PENDING" | "APPROVED" | "REJECTED"
+      vehicle_class: "TRACTOR" | "VAN" | "TRUCK"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -3089,7 +3141,7 @@ export const Constants = {
       document_kind: ["CARRIER_LICENSE", "INSURANCE"],
       email_status: ["PENDING", "SENT", "FAILED", "SKIPPED"],
       euro_class: ["EURO_4", "EURO_5", "EURO_6"],
-      haul_kind: ["TRAILER", "CONTAINER"],
+      haul_kind: ["TRAILER", "CONTAINER", "VAN", "TRUCK"],
       incident_severity: ["WARN", "ERROR", "FATAL"],
       incident_status: ["OPEN", "ACKED", "RESOLVED"],
       legal_kind: [
@@ -3134,6 +3186,7 @@ export const Constants = {
         "DAMAGE_PHOTO",
       ],
       vehicle_access: ["DRAFT", "PENDING", "APPROVED", "REJECTED"],
+      vehicle_class: ["TRACTOR", "VAN", "TRUCK"],
     },
   },
 } as const

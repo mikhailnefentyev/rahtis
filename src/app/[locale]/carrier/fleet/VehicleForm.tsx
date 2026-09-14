@@ -4,7 +4,7 @@ import { useActionState, useEffect, useState } from 'react';
 import { Button, Card, CardBody, Field, Input, InputMono, Select } from '@/components/ui';
 import { saveVehicleAction, type VehicleState } from '@/lib/fleet/actions';
 import { useI18n } from '@/lib/i18n/provider';
-import { DRIVER_LANGUAGES, type Vehicle } from '@/types/db';
+import { DRIVER_LANGUAGES, type Vehicle, type VehicleClass } from '@/types/db';
 
 const initial: VehicleState = { error: null, done: false };
 
@@ -38,6 +38,22 @@ export function VehicleForm({
   const [state, formAction, pending] = useActionState(saveVehicleAction, initial);
   const [languages, setLanguages] = useState<string[]>(vehicle?.languages ?? ['FI']);
 
+  /*
+   * Класс решает, какая половина карточки видна.
+   *
+   * У тягача спрашивают оси и контейнерное шасси — то, чем он берёт
+   * чужую единицу. У фургона и грузовика единицы нет: груз едет в
+   * кузове, и вместо осей нужны килограммы и погрузочные метры, по
+   * которым платформа подбирает машину под заказ.
+   */
+  const [vehicleClass, setVehicleClass] = useState<VehicleClass>(
+    vehicle?.vehicle_class ?? 'TRACTOR',
+  );
+  const express = vehicleClass !== 'TRACTOR';
+
+  /* Дату техосмотра спрашиваем только там, где заявлен холодильник. */
+  const [reefer, setReefer] = useState(vehicle?.reefer ?? false);
+
   /* Закрываем форму после успешного сохранения — в эффекте, а не в рендере. */
   useEffect(() => {
     if (state.done) onClose();
@@ -62,6 +78,21 @@ export function VehicleForm({
           {languages.map((code) => (
             <input key={code} type="hidden" name="languages" value={code} />
           ))}
+
+          <Field label={t.vehicle.class} hint={t.vehicle.classHint} className="sm:col-span-2">
+            {(p) => (
+              <Select
+                {...p}
+                name="vehicle_class"
+                value={vehicleClass}
+                onChange={(e) => setVehicleClass(e.target.value as VehicleClass)}
+              >
+                <option value="TRACTOR">{t.vehicleClass.TRACTOR}</option>
+                <option value="VAN">{t.vehicleClass.VAN}</option>
+                <option value="TRUCK">{t.vehicleClass.TRUCK}</option>
+              </Select>
+            )}
+          </Field>
 
           <Field label={t.vehicle.plate} required>
             {(p) => (
@@ -110,18 +141,128 @@ export function VehicleForm({
             * Оси названы вместе с грузоподъёмностью: перевозчик выбирает
             * не число, а то, какие заказы машина сможет брать. Пределы те
             * же, что проверяет база в take_order.
+            *
+            * У фургона и грузовика вопроса нет: правило «две оси — 25
+            * тонн» написано про седельный тягач и к кузову неприменимо.
             */}
-          <Field label={t.vehicle.axles} hint={t.vehicle.capacityHint} required>
-            {(p) => (
-              <Select {...p} name="axles" required defaultValue={String(vehicle?.axles ?? 3)}>
-                {[2, 3, 4, 5].map((n) => (
-                  <option key={n} value={n}>
-                    {AXLE_LABEL[n] ?? String(n)}
-                  </option>
-                ))}
-              </Select>
-            )}
-          </Field>
+          {!express && (
+            <Field label={t.vehicle.axles} hint={t.vehicle.capacityHint} required>
+              {(p) => (
+                <Select {...p} name="axles" required defaultValue={String(vehicle?.axles ?? 3)}>
+                  {[2, 3, 4, 5].map((n) => (
+                    <option key={n} value={n}>
+                      {AXLE_LABEL[n] ?? String(n)}
+                    </option>
+                  ))}
+                </Select>
+              )}
+            </Field>
+          )}
+
+          {/*
+            * Кузов: килограммы и метры. Оба обязательны и оба участвуют в
+            * подборе — take_order сверяет вес заказа с грузоподъёмностью,
+            * а погрузочные метры кузова с метрами груза. Незаполненная
+            * карточка означала бы машину, которой не достаётся ни один
+            * заказ, и понять почему было бы неоткуда.
+            */}
+          {express && (
+            <>
+              <Field label={t.vehicle.payload} hint={t.vehicle.payloadHint} required>
+                {(p) => (
+                  <InputMono
+                    {...p}
+                    name="payload_kg"
+                    required
+                    inputMode="numeric"
+                    defaultValue={vehicle?.payload_kg ?? ''}
+                    placeholder={vehicleClass === 'VAN' ? '1200' : '9500'}
+                  />
+                )}
+              </Field>
+
+              <Field label={t.vehicle.ldm} hint={t.vehicle.ldmHint} required>
+                {(p) => (
+                  <InputMono
+                    {...p}
+                    name="ldm"
+                    required
+                    inputMode="decimal"
+                    defaultValue={vehicle?.ldm ?? ''}
+                    placeholder={vehicleClass === 'VAN' ? '3,4' : '7,2'}
+                  />
+                )}
+              </Field>
+
+              {/*
+                * Оснащение — то, на что смотрит заказчик, выбирая отклик.
+                * Требованием заказа оно пока не сделано намеренно: пока
+                * таких машин в парке единицы, обязательное требование
+                * дало бы заказ, который некому взять.
+                */}
+              <Field label={t.vehicle.equipment} className="sm:col-span-2">
+                {() => (
+                  <div className="flex flex-wrap gap-4">
+                    <label className="flex items-center gap-2 text-[13px]">
+                      <input
+                        type="checkbox"
+                        name="tail_lift"
+                        value="1"
+                        defaultChecked={vehicle?.tail_lift ?? false}
+                        className="size-4 accent-[var(--color-accent)]"
+                      />
+                      {t.vehicle.tailLift}
+                    </label>
+                    <label className="flex items-center gap-2 text-[13px]">
+                      <input
+                        type="checkbox"
+                        name="side_loading"
+                        value="1"
+                        defaultChecked={vehicle?.side_loading ?? false}
+                        className="size-4 accent-[var(--color-accent)]"
+                      />
+                      {t.vehicle.sideLoading}
+                    </label>
+                    <label className="flex items-center gap-2 text-[13px]">
+                      <input
+                        type="checkbox"
+                        name="reefer"
+                        value="1"
+                        checked={reefer}
+                        onChange={(e) => setReefer(e.target.checked)}
+                        className="size-4 accent-[var(--color-accent)]"
+                      />
+                      {t.vehicle.reefer}
+                    </label>
+                  </div>
+                )}
+              </Field>
+
+              {/*
+                * Заявленный холодильник без даты техосмотра — обещание,
+                * которое нечем проверить. Того же требует ограничение в
+                * базе; здесь оно лишь показано человеку вовремя.
+                */}
+              {reefer && (
+                <Field
+                  label={t.vehicle.reeferUntil}
+                  hint={t.vehicle.reeferUntilHint}
+                  required
+                  className="sm:col-span-2"
+                >
+                  {(p) => (
+                    <Input
+                      {...p}
+                      type="date"
+                      name="reefer_inspection_until"
+                      required
+                      defaultValue={vehicle?.reefer_inspection_until ?? ''}
+                    />
+                  )}
+                </Field>
+              )}
+            </>
+          )}
 
           {/*
             * Шасси под контейнеры — рядом с осями, а не среди примет
@@ -134,6 +275,7 @@ export function VehicleForm({
             * редкость. Пусто означает, что машина контейнеры не возит, и
             * это умолчание для всего существующего парка.
             */}
+          {!express && (
           <Field label={t.vehicle.containerFeet} hint={t.vehicle.containerFeetHint}>
             {() => (
               <div className="flex flex-wrap gap-3">
@@ -152,6 +294,7 @@ export function VehicleForm({
               </div>
             )}
           </Field>
+          )}
 
           <Field label={t.vehicle.adr} hint={t.vehicle.adrHint}>
             {(p) => (

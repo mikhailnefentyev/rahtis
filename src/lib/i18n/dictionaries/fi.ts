@@ -552,11 +552,44 @@ export const fi = {
       dropSection: 'Mihin kontti jätetään',
       unitState: 'Kontti',
     },
+    /*
+     * Pikakuljetuksessa ei ole yksikköä, joka noudetaan ja palautetaan:
+     * kuorma matkustaa autossa. Siksi sanasto puhuu kuormasta eikä
+     * perävaunusta, ja se on pakettiautolla ja kuorma-autolla sama —
+     * ero on auton koossa, ei siinä mitä pisteellä tehdään.
+     */
+    VAN: {
+      stopPickup: 'Kuorman nouto',
+      stopReturn: 'Toimitus',
+      pickupSection: 'Mistä kuorma noudetaan',
+      dropSection: 'Mihin kuorma toimitetaan',
+      unitState: 'Kuorma',
+    },
+    TRUCK: {
+      stopPickup: 'Kuorman nouto',
+      stopReturn: 'Toimitus',
+      pickupSection: 'Mistä kuorma noudetaan',
+      dropSection: 'Mihin kuorma toimitetaan',
+      unitState: 'Kuorma',
+    },
   },
 
   haulKind: {
     TRAILER: 'Perävaunu',
     CONTAINER: 'Kontti',
+    VAN: 'Pakettiauto',
+    TRUCK: 'Kuorma-auto',
+  },
+
+  /*
+   * Ajoneuvoluokan nimessä on kokoraja mukana, kuten akselimäärässäkin
+   * on kantavuus: kuljetusliike ei valitse sanaa vaan sitä, minkä
+   * kokoisia kuljetuksia auto voi ottaa.
+   */
+  vehicleClass: {
+    TRACTOR: 'Vetoauto',
+    VAN: 'Pakettiauto · enintään 3,5 t',
+    TRUCK: 'Kuorma-auto · enintään 26 t',
   },
 
   amendKind: {
@@ -718,6 +751,10 @@ export const fi = {
     noActions: 'Lisää vähintään yksi purku tai lastaus',
 
     bookingRef: 'Varausnumero',
+    ldm: 'Lavametrit',
+    ldmHint: 'Paljonko lattiapituutta kuorma vie. Mitat ja pakkaustapa lisätietoihin.',
+    expressCargoSection: 'Mitä kuljetetaan',
+    expressCommentPlaceholder: 'Mitat, pakkaus, nostotapa, lämpötila…',
     cargoWeight: 'Paino, t',
     cargoWeightHint: 'Enintään 76 tonnia eli HCT-yhdistelmän suurin sallittu massa',
     consignee: 'Kuorman vastaanottaja',
@@ -837,6 +874,7 @@ export const fi = {
     tooLate: 'Aika loppui, kuljetus vapautui takaisin avoimeksi.',
     cancelledTrips: 'Peruutetut kuljetukset',
     noChassis: 'Tällä ajoneuvolla ei ole alustaa tämän kokoiselle kontille.',
+    wrongClass: 'Tähän kuljetukseen tarvitaan toisen luokan auto tai isompi kuormatila.',
     noSlotsLeft: 'Paikat ovat täynnä: kuljetukseen on jo kolme tarjousta.',
     alreadyTaken: 'Olet jo tehnyt tarjouksen tähän kuljetukseen.',
   },
@@ -1199,6 +1237,20 @@ export const fi = {
     containerFeetHint:
       'Mitkä konttipituudet tämä yhdistelmä ottaa. Tyhjä tarkoittaa, ettei ajoneuvo vedä kontteja.',
     containerNone: 'Ei konttialustaa',
+    class: 'Ajoneuvoluokka',
+    classHint: 'Vetoauto vetää perävaunuja ja kontteja, pakettiauto ja kuorma-auto ajavat pikakuljetuksia.',
+    payload: 'Kantavuus, kg',
+    payloadHint: 'Paljonko kuormatilaan voi lastata',
+    ldm: 'Lavametrit',
+    ldmHint: 'Kuormatilan lattiapituus metreinä',
+    equipment: 'Varustus',
+    tailLift: 'Perälautanostin',
+    sideLoading: 'Sivulastaus',
+    reefer: 'Kylmäkone',
+    reeferUntil: 'Kylmäkoneen tarkastus voimassa',
+    reeferUntilHint: 'Päivä, johon asti kylmälaitteen tarkastus on voimassa',
+    reeferExpired: 'Kylmäkoneen tarkastus on vanhentunut',
+    noEquipment: 'Ei erikoisvarustusta',
   },
 
   fleet: {
@@ -1220,7 +1272,7 @@ export const fi = {
     whyClosedNoVehicle: 'Tarvitaan vähintään yksi hyväksytty ajoneuvo.',
     whyClosedExpired: 'Asiakirjat ovat vanhentuneet, hyväksyntä ei ole voimassa.',
     languagesHint: 'Millä kielillä kuljettaja pystyy asioimaan',
-    tooHeavy: 'Kuljetus on liian raskas tälle ajoneuvolle. Valitse kolmiakselinen vetoauto.',
+    tooHeavy: 'Kuljetus on liian raskas tälle ajoneuvolle. Valitse auto, jonka kantavuus riittää.',
   },
 
   documents: {

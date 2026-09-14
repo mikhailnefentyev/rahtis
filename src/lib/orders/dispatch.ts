@@ -35,6 +35,8 @@ type Card = {
   ref: string;
   haul_kind: string | null;
   container_feet: number | null;
+  ldm: number | string | null;
+  cargo_weight_kg: number | null;
   trailer: string | null;
   distance_km: number | null;
   rate_cents: number | null;
@@ -46,17 +48,30 @@ type Card = {
 };
 
 /**
- * Единица рейса словами: «Kontti 40 ft» или номер полуприцепа.
+ * Единица рейса словами: «Kontti 40 ft», номер полуприцепа или
+ * «Pakettiauto 1,2 ldm · 800 kg».
  *
- * Контейнер и прицеп различаются здесь, а не в шаблоне письма: шаблон
- * переводится на два языка, и логика выбора, размноженная по локалям,
- * разойдётся на первой же правке.
+ * Различаются они здесь, а не в шаблоне письма: шаблон переводится на
+ * два языка, и логика выбора, размноженная по локалям, разойдётся на
+ * первой же правке.
+ *
+ * У экспресса в строке и метры, и вес. Это единственное, по чему
+ * перевозчик решает, его это заказ или нет: марки прицепа, которую можно
+ * узнать, здесь нет — есть груз, и вопрос только в том, влезет ли он.
  */
 function unitLabel(card: Card, t: Awaited<ReturnType<typeof getDictionary>>): string | null {
   if (card.haul_kind === 'CONTAINER') {
     const kind = t.haulKind.CONTAINER;
     return card.container_feet ? `${kind} ${card.container_feet} ft` : kind;
   }
+
+  if (card.haul_kind === 'VAN' || card.haul_kind === 'TRUCK') {
+    const parts = [t.haulKind[card.haul_kind]];
+    if (card.ldm) parts.push(`${String(card.ldm).replace('.', ',')} ldm`);
+    if (card.cargo_weight_kg) parts.push(`${card.cargo_weight_kg} kg`);
+    return parts.join(' · ');
+  }
+
   return card.trailer ?? t.haulKind.TRAILER;
 }
 

@@ -28,6 +28,10 @@ export function VehicleCard({
   documents: DocumentWithDays[];
 }) {
   const { t, m, f, locale } = useI18n();
+
+  /* У фургона и грузовика проверяют кузов и оснащение, а не оси и шасси. */
+  const express = vehicle.vehicle_class !== 'TRACTOR';
+
   const [rejecting, setRejecting] = useState(false);
   const [reason, setReason] = useState('');
   const [opening, startOpening] = useTransition();
@@ -58,10 +62,14 @@ export function VehicleCard({
             </div>
 
             <p className="mt-2 text-[13px] text-ink">
-              {vehicle.make} · {m('vehicle.axlesCount', { count: vehicle.axles })}
+              {vehicle.make} ·{' '}
+              {express
+                ? `${vehicle.payload_kg} kg · ${String(vehicle.ldm).replace('.', ',')} ldm`
+                : m('vehicle.axlesCount', { count: vehicle.axles })}
             </p>
             <div className="mt-2 flex flex-col gap-1">
               <Kv k={t.role.CARRIER} v={companyName} />
+              <Kv k={t.vehicle.class} v={t.vehicleClass[vehicle.vehicle_class]} />
               <Kv k={t.vehicle.driver} v={`${vehicle.driver_name} · ${vehicle.languages.join('/')}`} />
               <Kv k={t.vehicle.whatsapp} v={<Mono>{vehicle.whatsapp}</Mono>} />
               <Kv k={t.vehicle.base} v={vehicle.base_city} />
@@ -72,19 +80,39 @@ export function VehicleCard({
                 * «контейнеры не возит» — такой же ответ, как список
                 * длин. Отсутствие строки он прочитал бы как «не
                 * заполнено».
+                *
+                * У фургона и грузовика шасси не бывает вовсе, и вместо
+                * него проверяется оснащение — то, что перевозчик о машине
+                * заявил и за что оператор ручается допуском.
                 */}
-              <Kv
-                k={t.vehicle.containerFeet}
-                v={
-                  vehicle.container_feet.length > 0
-                    ? vehicle.container_feet
-                        .slice()
-                        .sort((a, b) => a - b)
-                        .map((n) => m('order.containerSize', { feet: n }))
-                        .join(', ')
-                    : t.vehicle.containerNone
-                }
-              />
+              {express ? (
+                <Kv
+                  k={t.vehicle.equipment}
+                  v={
+                    [
+                      vehicle.tail_lift && t.vehicle.tailLift,
+                      vehicle.side_loading && t.vehicle.sideLoading,
+                      vehicle.reefer &&
+                        `${t.vehicle.reefer} · ${vehicle.reefer_inspection_until}`,
+                    ]
+                      .filter(Boolean)
+                      .join(', ') || t.vehicle.noEquipment
+                  }
+                />
+              ) : (
+                <Kv
+                  k={t.vehicle.containerFeet}
+                  v={
+                    vehicle.container_feet.length > 0
+                      ? vehicle.container_feet
+                          .slice()
+                          .sort((a, b) => a - b)
+                          .map((n) => m('order.containerSize', { feet: n }))
+                          .join(', ')
+                      : t.vehicle.containerNone
+                  }
+                />
+              )}
             </div>
           </div>
 

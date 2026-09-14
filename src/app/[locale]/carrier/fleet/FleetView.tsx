@@ -12,9 +12,12 @@ import { VehicleForm } from './VehicleForm';
 export function FleetView({
   vehicles,
   documentsOk,
+  today,
 }: {
   vehicles: Vehicle[];
   documentsOk: boolean;
+  /** Считается на сервере: рендер обязан быть чистым, а часы клиента могут врать. */
+  today: string;
 }) {
   const { t, m, locale } = useI18n();
   const [editing, setEditing] = useState<Vehicle | null | 'new'>(null);
@@ -64,15 +67,23 @@ export function FleetView({
                   </div>
 
                   {/*
-                    * Оси и шасси — одной строкой: обе отвечают на вопрос
-                    * «какие заказы эта машина возьмёт», и проверяет их
-                    * одна функция в take_order. Машина без контейнерного
-                    * шасси не пишет об этом ничего: отсутствие строки и
-                    * есть ответ, а «не возит контейнеры» у большинства
-                    * парка было бы шумом в каждой карточке.
+                    * Строка вместимости — ответ на один вопрос: какие
+                    * заказы эта машина возьмёт. У тягача его дают оси и
+                    * контейнерное шасси, у фургона и грузовика —
+                    * килограммы и погрузочные метры. Проверяет и то и
+                    * другое одна функция в take_order, поэтому и показано
+                    * это одной строкой, а не двумя блоками.
+                    *
+                    * Чего у машины нет, о том не пишется ничего:
+                    * отсутствие строки и есть ответ, а «не возит
+                    * контейнеры» у большинства парка было бы шумом в
+                    * каждой карточке.
                     */}
                   <p className="mt-2 text-[13px] text-ink">
-                    {vehicle.make} · {m('vehicle.axlesCount', { count: vehicle.axles })}
+                    {vehicle.make} ·{' '}
+                    {vehicle.vehicle_class === 'TRACTOR'
+                      ? m('vehicle.axlesCount', { count: vehicle.axles })
+                      : `${vehicle.payload_kg} kg · ${String(vehicle.ldm).replace('.', ',')} ldm`}
                     {vehicle.container_feet.length > 0 &&
                       ` · ${t.vehicle.containerFeet}: ${vehicle.container_feet
                         .slice()
@@ -80,6 +91,35 @@ export function FleetView({
                         .map((n) => m('order.containerSize', { feet: n }))
                         .join(', ')}`}
                   </p>
+
+                  {/*
+                    * Оснащение экспресса. Холодильник с просроченным
+                    * техосмотром показывается предупреждением, а не
+                    * прячется: заказы он не закрывает — сухой груз такая
+                    * машина везёт как прежде, — но обещать холод с
+                    * недействительной бумагой нельзя.
+                    */}
+                  {vehicle.vehicle_class !== 'TRACTOR' &&
+                    (vehicle.tail_lift || vehicle.side_loading || vehicle.reefer) && (
+                      <p className="mt-1 flex flex-wrap items-center gap-2 text-xs">
+                        {vehicle.tail_lift && <Badge tone="neutral">{t.vehicle.tailLift}</Badge>}
+                        {vehicle.side_loading && (
+                          <Badge tone="neutral">{t.vehicle.sideLoading}</Badge>
+                        )}
+                        {vehicle.reefer && (
+                          <Badge
+                            tone={
+                              vehicle.reefer_inspection_until &&
+                              vehicle.reefer_inspection_until < today
+                                ? 'warn'
+                                : 'info'
+                            }
+                          >
+                            {t.vehicle.reefer} · {vehicle.reefer_inspection_until}
+                          </Badge>
+                        )}
+                      </p>
+                    )}
                   <p className="mt-1 text-[13px] text-ink-muted">
                     {vehicle.driver_name} · {vehicle.languages.join('/')} ·{' '}
                     <Mono>{vehicle.whatsapp}</Mono>

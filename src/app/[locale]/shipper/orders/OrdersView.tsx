@@ -378,7 +378,7 @@ function Row({
         {order.shipper_ref && (
           <Mono className="text-xs text-ink-dim">{order.shipper_ref}</Mono>
         )}
-        <HaulBadge haulKind={order.haul_kind} containerFeet={order.container_feet} />
+        <HaulBadge haulKind={order.haul_kind} containerFeet={order.container_feet} ldm={order.ldm} />
         {order.trailer_plate && <Plate>{order.trailer_plate}</Plate>}
 
         {from && (

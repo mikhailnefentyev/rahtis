@@ -533,11 +533,33 @@ export const en = {
       dropSection: 'Where the container is left',
       unitState: 'Container',
     },
+    VAN: {
+      stopPickup: 'Cargo pickup',
+      stopReturn: 'Delivery',
+      pickupSection: 'Where the cargo is picked up',
+      dropSection: 'Where the cargo is delivered',
+      unitState: 'Cargo',
+    },
+    TRUCK: {
+      stopPickup: 'Cargo pickup',
+      stopReturn: 'Delivery',
+      pickupSection: 'Where the cargo is picked up',
+      dropSection: 'Where the cargo is delivered',
+      unitState: 'Cargo',
+    },
   },
 
   haulKind: {
     TRAILER: 'Semi-trailer',
     CONTAINER: 'Container',
+    VAN: 'Van',
+    TRUCK: 'Truck',
+  },
+
+  vehicleClass: {
+    TRACTOR: 'Tractor unit',
+    VAN: 'Van · up to 3.5 t',
+    TRUCK: 'Truck · up to 26 t',
   },
 
   amendKind: {
@@ -699,6 +721,10 @@ export const en = {
     noActions: 'Add at least one loading or unloading',
 
     bookingRef: 'Booking number',
+    ldm: 'Loading metres',
+    ldmHint: 'How much floor length the cargo takes. Put dimensions and packaging in the notes.',
+    expressCargoSection: 'What is being shipped',
+    expressCommentPlaceholder: 'Dimensions, packaging, handling, temperature…',
     cargoWeight: 'Weight, t',
     cargoWeightHint: 'Up to 76 tonnes, the maximum for an HCT combination',
     consignee: 'Consignee',
@@ -819,6 +845,7 @@ export const en = {
     tooLate: 'Time ran out and the order went back on the board.',
     cancelledTrips: 'Cancelled jobs',
     noChassis: 'This vehicle has no chassis for a container of that size.',
+    wrongClass: 'This transport needs a different vehicle class or more loading metres.',
     noSlotsLeft: 'Slots are full — three trucks have already offered on this order.',
     alreadyTaken: 'You have already made an offer on this order.',
   },
@@ -1180,6 +1207,20 @@ export const en = {
     containerFeetHint:
       'Which container lengths this rig can take. Empty means it does not carry containers.',
     containerNone: 'No container chassis',
+    class: 'Vehicle class',
+    classHint: 'A tractor unit pulls trailers and containers; vans and trucks run express deliveries.',
+    payload: 'Payload, kg',
+    payloadHint: 'How much the cargo space can carry',
+    ldm: 'Loading metres',
+    ldmHint: 'Floor length of the cargo space, in metres',
+    equipment: 'Equipment',
+    tailLift: 'Tail lift',
+    sideLoading: 'Side loading',
+    reefer: 'Refrigeration unit',
+    reeferUntil: 'Refrigeration inspection valid until',
+    reeferUntilHint: 'The date the refrigeration unit inspection expires',
+    reeferExpired: 'Refrigeration inspection has expired',
+    noEquipment: 'No special equipment',
   },
 
   fleet: {
@@ -1201,7 +1242,7 @@ export const en = {
     whyClosedNoVehicle: 'At least one approved vehicle is needed.',
     whyClosedExpired: 'The documents have expired, so the approval is not valid.',
     languagesHint: 'Which languages the driver can work in',
-    tooHeavy: 'This job is too heavy for the vehicle. Pick a three-axle tractor.',
+    tooHeavy: 'This job is too heavy for the vehicle. Pick one with enough payload.',
   },
 
   documents: {

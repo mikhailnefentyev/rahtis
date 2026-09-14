@@ -165,7 +165,7 @@ function TripRow({
       >
         <Badge tone={orderStatusTone[order.status]}>{t.orderStatus[order.status]}</Badge>
         <Mono className="text-xs text-ink-dim">{order.ref}</Mono>
-        <HaulBadge haulKind={order.haul_kind} containerFeet={order.container_feet} />
+        <HaulBadge haulKind={order.haul_kind} containerFeet={order.container_feet} ldm={order.ldm} />
         {order.trailer_plate && <Plate>{order.trailer_plate}</Plate>}
 
         {from && (
@@ -240,7 +240,7 @@ function CancelledTrip({
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <Badge tone="danger">{t.orderStatus.CANCELLED}</Badge>
-            <HaulBadge haulKind={order.haul_kind} containerFeet={order.container_feet} />
+            <HaulBadge haulKind={order.haul_kind} containerFeet={order.container_feet} ldm={order.ldm} />
             <Mono className="text-xs text-ink-dim">{order.ref}</Mono>
             {order.trailer_plate && <Plate>{order.trailer_plate}</Plate>}
           </div>

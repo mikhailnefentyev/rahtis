@@ -5,6 +5,7 @@ import { getViewer } from '@/lib/auth/viewer';
 import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import { dispatchPublishedOrder } from '@/lib/orders/dispatch';
+import { HAUL_KINDS, type HaulKind } from '@/lib/orders/haul';
 import { cityOf, hasCoordinates, tonnesToKg, type FieldReader } from '@/lib/orders/stopFields';
 import type { StopRole } from '@/types/db';
 
@@ -118,10 +119,28 @@ function collectStops(formData: FormData): StopInput[] {
     (field) =>
       str(formData, `${prefix}_${field}`);
 
-  stops.push({
-    ...readStop(single('pickup'), 'PICKUP'),
-    trailer_loaded: str(formData, 'pickup_trailer_loaded') === 'true',
-  });
+  /*
+   * Состояние единицы спрашивается только там, где единица есть.
+   *
+   * У экспресса поля в форме нет, и FormData отдал бы пустую строку —
+   * то есть false, «груз пустой», чего никто не говорил. Ключ в таком
+   * случае не отправляется вовсе: create_order пишет trailer_loaded,
+   * только если он пришёл.
+   */
+  const unitState = formData.has('pickup_trailer_loaded')
+    ? { trailer_loaded: str(formData, 'pickup_trailer_loaded') === 'true' }
+    : {};
+
+  stops.push({ ...readStop(single('pickup'), 'PICKUP'), ...unitState });
+
+  /*
+   * Экспресс: вторая точка — доставка, и на этом маршрут кончается.
+   * Отдельным блоком, а не через список действий: у неё своя роль в базе
+   * (DELIVERY), и именно её требует публикация.
+   */
+  if (formData.get('has_delivery') === 'on') {
+    stops.push(readStop(single('delivery'), 'DELIVERY'));
+  }
 
   /*
    * Действия рейса — выгрузки и загрузки, сколько угодно и в любом
@@ -209,6 +228,17 @@ function parseBounds(value: FormDataEntryValue | null): number[] | undefined {
  * таблицах, а половина маршрута без второй половины — состояние, которого
  * быть не должно.
  */
+/**
+ * Единица рейса из формы.
+ *
+ * Сверка по списку, а не приведение типа: значение приходит от браузера,
+ * и незнакомая строка должна стать умолчанием здесь, а не ошибкой
+ * enum-каста в базе, из которой человеку ничего не понятно.
+ */
+function haulKind(value: string): HaulKind {
+  return (HAUL_KINDS as readonly string[]).includes(value) ? (value as HaulKind) : 'TRAILER';
+}
+
 export async function publishOrderAction(
   _previous: PublishState,
   formData: FormData,
@@ -259,12 +289,18 @@ export async function publishOrderAction(
     p_order: {
       order_type: str(formData, 'order_type'),
       /*
-       * Что тянут — вторая ось рядом с типом рейса. База сама обнулит
-       * длину у полуприцепа, поэтому переключение типа в форме не может
-       * оставить в заказе размер от прошлого выбора.
+       * Чем выполняется рейс — вторая ось рядом с типом рейса. Значение
+       * сверяется со списком, а не передаётся как есть: форма приходит по
+       * сети, и незнакомая строка упала бы приведением типа уже внутри
+       * базы, без внятного ответа человеку.
+       *
+       * Лишнее база обнуляет сама — футы у всего, кроме контейнера, метры
+       * у всего, кроме экспресса, — поэтому переключение единицы в форме
+       * не может оставить в заказе размер от прошлого выбора.
        */
-      haul_kind: str(formData, 'haul_kind') === 'CONTAINER' ? 'CONTAINER' : 'TRAILER',
+      haul_kind: haulKind(str(formData, 'haul_kind')),
       container_feet: str(formData, 'container_feet'),
+      ldm: str(formData, 'ldm').replace(',', '.'),
       shipper_ref: str(formData, 'shipper_ref'),
       trailer: str(formData, 'trailer'),
       trailer_plate: str(formData, 'trailer_plate').toUpperCase(),
