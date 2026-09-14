@@ -45,6 +45,39 @@ const ROLES: StopRole[] = [
   'TRAILER_RETURN',
 ];
 
+/**
+ * Координата от водителя.
+ *
+ * WhatsApp умеет присылать место вложением, и воркфлоу перекладывает его
+ * в lat/lon. Приходит оно не всегда — водитель может просто написать
+ * «отгрузился», — поэтому отсутствие здесь нормальный случай, а не
+ * ошибка: отметка и без координаты остаётся отметкой.
+ *
+ * Проверяется только то, что это вообще координата. Нуль-остров в
+ * Гвинейском заливе — обычный исход разбора мусора, и расстояние до него
+ * считается совершенно исправно; тот же запрет стоит в базе.
+ */
+export function readPosition(
+  body: unknown,
+): { lat: number; lon: number; accuracyM: number | null } | null {
+  if (!body || typeof body !== 'object') return null;
+
+  const source = body as Record<string, unknown>;
+  const lat = Number(source.lat);
+  const lon = Number(source.lon);
+
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
+  if (Math.abs(lat) > 90 || Math.abs(lon) > 180) return null;
+  if (lat === 0 && lon === 0) return null;
+
+  const accuracy = Number(source.accuracy_m);
+  return {
+    lat,
+    lon,
+    accuracyM: Number.isFinite(accuracy) && accuracy >= 1 ? Math.round(accuracy) : null,
+  };
+}
+
 export function readRole(body: unknown): StopRole | null {
   const raw = readText(body, 'expect', 20);
   return raw && (ROLES as string[]).includes(raw) ? (raw as StopRole) : null;
@@ -113,13 +146,21 @@ export async function activeTrips(phone: string) {
   return call('driver_active_trips', { p_phone: phone }, '/api/driver/context');
 }
 
-export async function completeNextStop(phone: string, expect: StopRole | null, damage: string | null) {
+export async function completeNextStop(
+  phone: string,
+  expect: StopRole | null,
+  damage: string | null,
+  position: { lat: number; lon: number; accuracyM: number | null } | null,
+) {
   return call(
     'driver_complete_next_stop',
     {
       p_phone: phone,
       p_expect: expect ?? undefined,
       p_damage_note: damage ?? undefined,
+      p_lat: position?.lat,
+      p_lon: position?.lon,
+      p_accuracy_m: position?.accuracyM ?? undefined,
     },
     '/api/driver/step',
   );

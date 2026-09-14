@@ -47,6 +47,22 @@ async function guard(locale: Locale) {
   return null;
 }
 
+/**
+ * Координата из формы.
+ *
+ * Мусор равен отсутствию: база всё равно проверит своими правилами, а
+ * здесь важно только не превратить пустую строку в ноль — нуль-остров в
+ * Гвинейском заливе выглядит как исправная координата.
+ */
+function readPosition(formData: FormData): { lat: number; lon: number; accuracyM: number | null } | null {
+  const lat = Number.parseFloat(String(formData.get('lat') ?? ''));
+  const lon = Number.parseFloat(String(formData.get('lon') ?? ''));
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
+
+  const accuracy = Number.parseInt(String(formData.get('accuracy_m') ?? ''), 10);
+  return { lat, lon, accuracyM: Number.isFinite(accuracy) ? accuracy : null };
+}
+
 /** «Пройдена» — с описанием повреждения, если оно есть. */
 export async function completeStopAction(
   _previous: TripState,
@@ -57,10 +73,21 @@ export async function completeStopAction(
   const forbidden = await guard(locale);
   if (forbidden) return { error: forbidden };
 
+  /*
+   * Координата нажатия приходит скрытыми полями: её спрашивает у
+   * браузера сама панель, перед отправкой формы. Сюда она попадает
+   * строкой, как всё из формы, и разбирается настолько мягко, насколько
+   * возможно — отметка не должна сорваться из-за неудачного замера.
+   */
+  const position = readPosition(formData);
+
   const supabase = await createClient();
   const { error } = await supabase.rpc('complete_stop', {
     p_stop_id: String(formData.get('stop_id') ?? ''),
     p_damage_note: String(formData.get('damage_note') ?? '').trim() || undefined,
+    p_lat: position?.lat,
+    p_lon: position?.lon,
+    p_accuracy_m: position?.accuracyM ?? undefined,
   });
 
   revalidateOrder(locale);

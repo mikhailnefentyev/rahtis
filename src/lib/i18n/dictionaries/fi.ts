@@ -166,6 +166,14 @@ export const fi = {
     progress: 'Kuljetuksen eteneminen',
     markDone: 'Merkitse tehdyksi',
     marking: 'Merkitään…',
+    locating: 'Haetaan sijaintia…',
+    /*
+     * Sijainti ei ole pakollinen, joten sen puuttuminen kerrotaan, ei
+     * estetä: kuljettaja kellarilastauslaiturilla saa pisteen tehdyksi,
+     * mutta kaikki kolme osapuolta näkevät, ettei merkintää syntynyt.
+     */
+    noPosition: 'Ilman sijaintia',
+    positionAway: 'Merkitty etäältä',
     undo: 'Peru merkintä',
     damageQuestion: 'Vauriot tällä pisteellä',
     damagePlaceholder: 'Kolhu perävaunun vasemmassa laidassa, kapelli revennyt…',
@@ -1487,6 +1495,13 @@ export const fi = {
     'trip.progressCount': 'Tehty {done} / {total}',
     'trip.enRouteTo': 'Matkalla · {place}',
     'trip.completedAt': 'Tehty klo {time}',
+    /*
+     * Poikkeama, ei koordinaatit. Numeropari ei kerro riitatilanteessa
+     * mitään; etäisyys osoitteesta kertoo kaiken.
+     */
+    'trip.markedNear': 'Merkitty {meters, number} m päässä osoitteesta',
+    'trip.markedFar': 'Merkitty {km, number, ::.0#} km päässä osoitteesta',
+    'trip.markedHere': 'Merkitty paikan päällä',
     'trip.damageAt': 'Vaurio · {place}',
 
     'trip.stepReported': 'Kuljetus {ref}: kuljettaja merkitsi ”{step}”.',

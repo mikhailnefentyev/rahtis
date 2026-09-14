@@ -1,4 +1,4 @@
-import { completeNextStop, readPhone, readRole, readText } from '@/lib/driver/calls';
+import { completeNextStop, readPhone, readPosition, readRole, readText } from '@/lib/driver/calls';
 import { gateResponse, openGate } from '@/lib/driver/gate';
 
 /**
@@ -11,6 +11,11 @@ import { gateResponse, openGate } from '@/lib/driver/gate';
  * expect — роль точки со слов водителя. Не совпала с той, что идёт
  * следующей, — отметки не будет: агент, неверно понявший фразу, не
  * должен продвигать рейс.
+ *
+ * lat/lon — место водителя, если он прислал его вложением. Необязательно:
+ * отметка без координаты остаётся отметкой, просто в карточке видно, что
+ * места у неё нет. Ответ говорит только, записалась ли она, — сама
+ * координата в переписку не возвращается.
  */
 export const dynamic = 'force-dynamic';
 
@@ -27,6 +32,7 @@ export async function POST(request: Request) {
     phone,
     readRole(gate.body),
     readText(gate.body, 'damage_note', 500),
+    readPosition(gate.body),
   );
 
   if (failure) {

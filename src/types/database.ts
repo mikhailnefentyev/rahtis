@@ -900,7 +900,10 @@ export type Database = {
           cargo_weight_kg: number | null
           city: string
           company_name: string | null
+          completed_accuracy_m: number | null
           completed_at: string | null
+          completed_lat: number | null
+          completed_lon: number | null
           consignee: string | null
           contact_name: string | null
           contact_phone: string | null
@@ -931,7 +934,10 @@ export type Database = {
           cargo_weight_kg?: number | null
           city: string
           company_name?: string | null
+          completed_accuracy_m?: number | null
           completed_at?: string | null
+          completed_lat?: number | null
+          completed_lon?: number | null
           consignee?: string | null
           contact_name?: string | null
           contact_phone?: string | null
@@ -962,7 +968,10 @@ export type Database = {
           cargo_weight_kg?: number | null
           city?: string
           company_name?: string | null
+          completed_accuracy_m?: number | null
           completed_at?: string | null
+          completed_lat?: number | null
+          completed_lon?: number | null
           consignee?: string | null
           contact_name?: string | null
           contact_phone?: string | null
@@ -1980,13 +1989,22 @@ export type Database = {
         }[]
       }
       complete_stop: {
-        Args: { p_damage_note?: string; p_stop_id: string }
+        Args: {
+          p_accuracy_m?: number
+          p_damage_note?: string
+          p_lat?: number
+          p_lon?: number
+          p_stop_id: string
+        }
         Returns: {
           address: string
           cargo_weight_kg: number | null
           city: string
           company_name: string | null
+          completed_accuracy_m: number | null
           completed_at: string | null
+          completed_lat: number | null
+          completed_lon: number | null
           consignee: string | null
           contact_name: string | null
           contact_phone: string | null
@@ -2241,8 +2259,11 @@ export type Database = {
       driver_active_trips: { Args: { p_phone: string }; Returns: Json }
       driver_complete_next_stop: {
         Args: {
+          p_accuracy_m?: number
           p_damage_note?: string
           p_expect?: Database["public"]["Enums"]["stop_role"]
+          p_lat?: number
+          p_lon?: number
           p_phone: string
         }
         Returns: Json
@@ -2798,7 +2819,10 @@ export type Database = {
           cargo_weight_kg: number | null
           city: string
           company_name: string | null
+          completed_accuracy_m: number | null
           completed_at: string | null
+          completed_lat: number | null
+          completed_lon: number | null
           consignee: string | null
           contact_name: string | null
           contact_phone: string | null

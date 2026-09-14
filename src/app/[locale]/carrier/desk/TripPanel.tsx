@@ -1,9 +1,10 @@
 'use client';
 
-import { useActionState, useState } from 'react';
+import { useActionState, useRef, useState } from 'react';
 import { Button, Textarea } from '@/components/ui';
 import { stopPlace, tripProgress, type TripStop } from '@/lib/orders/progress';
 import { stopTitle, type HaulKind } from '@/lib/orders/haul';
+import { askPosition } from '@/lib/orders/position';
 import { completeStopAction, uncompleteStopAction, type TripState } from '@/lib/orders/trip';
 import { useI18n } from '@/lib/i18n/provider';
 
@@ -20,6 +21,11 @@ const initial: TripState = { error: null };
  * на точке, видит их своими глазами. Отдельная форма «сообщить о
  * повреждении» означала бы, что о нём вспомнят позже — то есть не
  * вспомнят.
+ *
+ * По той же причине здесь же берётся координата — до отправки формы, а
+ * не отдельной кнопкой «отметить место». Нажатие и место обязаны быть
+ * одним событием: отметка, которую ставят вторым действием, ставится
+ * тогда, когда удобно, а не там, где стоял человек.
  */
 export function TripPanel({
   stops,
@@ -33,6 +39,51 @@ export function TripPanel({
   const [state, formAction, pending] = useActionState(completeStopAction, initial);
   const [damageOpen, setDamageOpen] = useState(false);
 
+  /*
+   * Координата спрашивается по нажатию, а не при показе панели.
+   *
+   * Запрос при открытии карточки означал бы окно разрешения у каждого,
+   * кто просто листает рейсы, — и отказ, данный один раз не глядя,
+   * закрыл бы геолокацию для всех последующих доставок.
+   *
+   * Отправка формы при этом откладывается на один круг: submit
+   * останавливается, замер делается, поля заполняются, форма
+   * отправляется заново. Дольше шести секунд это не длится — столько
+   * стоит таймаут в askPosition.
+   */
+  const form = useRef<HTMLFormElement>(null);
+  const located = useRef(false);
+  const [locating, setLocating] = useState(false);
+  const [position, setPosition] = useState<{ lat: string; lon: string; accuracy: string }>({
+    lat: '', lon: '', accuracy: '',
+  });
+
+  async function locateThenSubmit(event: React.FormEvent<HTMLFormElement>) {
+    if (located.current) return;
+
+    event.preventDefault();
+    setLocating(true);
+
+    const where = await askPosition();
+    if (where) {
+      setPosition({
+        lat: String(where.lat),
+        lon: String(where.lon),
+        accuracy: where.accuracyM === null ? '' : String(where.accuracyM),
+      });
+    }
+
+    /*
+     * Отказ браузера отметку не отменяет. Точка помечается пройденной
+     * без координаты, и это видно в карточке у всех трёх сторон —
+     * запрет здесь заставил бы курьера звонить оператору, а оператор
+     * закрыл бы точку руками, то есть доказательства не прибавилось бы.
+     */
+    located.current = true;
+    setLocating(false);
+    form.current?.requestSubmit();
+  }
+
   const progress = tripProgress(stops);
   const next = progress.next as (TripStop & { id: string }) | null;
   const last = progress.last as (TripStop & { id: string }) | null;
@@ -42,9 +93,17 @@ export function TripPanel({
   return (
     <div className="mt-4 rounded-control border border-line bg-sunken p-3">
       {next ? (
-        <form action={formAction} className="flex flex-col gap-3">
+        <form
+          ref={form}
+          action={formAction}
+          onSubmit={locateThenSubmit}
+          className="flex flex-col gap-3"
+        >
           <input type="hidden" name="locale" value={locale} />
           <input type="hidden" name="stop_id" value={next.id} />
+          <input type="hidden" name="lat" value={position.lat} />
+          <input type="hidden" name="lon" value={position.lon} />
+          <input type="hidden" name="accuracy_m" value={position.accuracy} />
 
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="min-w-0">
@@ -54,8 +113,8 @@ export function TripPanel({
               </p>
             </div>
 
-            <Button type="submit" variant="primary" size="sm" disabled={pending}>
-              {pending ? t.trip.marking : t.trip.markDone}
+            <Button type="submit" variant="primary" size="sm" disabled={pending || locating}>
+              {locating ? t.trip.locating : pending ? t.trip.marking : t.trip.markDone}
             </Button>
           </div>
 
@@ -101,6 +160,14 @@ export function TripPanel({
               {stopPlace(last)}
               {last.completed_at && (
                 <> · {m('trip.completedAt', { time: f.time(last.completed_at) })}</>
+              )}
+              {/*
+                * Отметилась ли координата — говорится сразу, пока отметку
+                * ещё можно снять и поставить заново. Узнать об этом из
+                * чужой карточки через неделю уже бесполезно.
+                */}
+              {last.completed_at && last.completed_lat == null && (
+                <> · <span className="text-warn">{t.trip.noPosition}</span></>
               )}
             </span>
             <Button type="submit" size="sm">

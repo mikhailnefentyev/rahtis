@@ -2,6 +2,7 @@
 
 import { Badge, Waypoint, WaypointList } from '@/components/ui';
 import { stopTitle, type HaulKind } from '@/lib/orders/haul';
+import { markOf } from '@/lib/orders/position';
 import { useI18n } from '@/lib/i18n/provider';
 import type { DeskStop, OrderStop, PlaceKind, StopRole } from '@/types/db';
 
@@ -17,6 +18,14 @@ type AnyStop = (OrderStop | DeskStop) & {
   contact_name?: string | null;
   contact_phone?: string | null;
   consignee?: string | null;
+  /*
+   * Координата отметки. У точки со стола её нет и быть не может: стол
+   * показывает ещё не взятые заказы, в которых никто никуда не ездил.
+   */
+  completed_at?: string | null;
+  completed_lat?: number | null;
+  completed_lon?: number | null;
+  completed_accuracy_m?: number | null;
 };
 
 export function RouteStops({
@@ -88,6 +97,41 @@ export function RouteStops({
           {t.order.sealRequired}
         </Badge>,
       );
+    }
+
+    /*
+     * Отметка на карте — пилюлей рядом с весом, а не строкой мелким
+     * шрифтом. Показывается только у пройденных точек: у непройденной её
+     * отсутствие означает «ещё не были», и путать это с «были, но не
+     * записались» нельзя — второе разбирают, первое нет.
+     *
+     * Показывается не координата, а расхождение с адресом. Пара чисел в
+     * споре не говорит ничего; «отмечено в 4 км от адреса» говорит всё.
+     */
+    if (stop.completed_at) {
+      const mark = markOf(stop);
+
+      if (mark.kind === 'none') {
+        chips.push(
+          <Badge key="mark" tone="warn">
+            {t.trip.noPosition}
+          </Badge>,
+        );
+      } else if (mark.kind === 'unknown') {
+        chips.push(
+          <Badge key="mark" tone="neutral">
+            {m('trip.markedHere')}
+          </Badge>,
+        );
+      } else {
+        chips.push(
+          <Badge key="mark" tone={mark.kind === 'far' ? 'warn' : 'ok'}>
+            {mark.kind === 'far'
+              ? m('trip.markedFar', { km: mark.meters / 1000 })
+              : m('trip.markedNear', { meters: mark.meters })}
+          </Badge>,
+        );
+      }
     }
 
     return chips.length > 0 ? chips : undefined;

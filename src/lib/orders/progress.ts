@@ -26,6 +26,9 @@ export type TripStop = {
   company_name?: string | null;
   completed_at?: string | null;
   damage_note?: string | null;
+  /* Где стоял отмечающий. Пусто у пройденной точки — отметки не вышло. */
+  completed_lat?: number | null;
+  completed_lon?: number | null;
 };
 
 export type TripProgress = {
