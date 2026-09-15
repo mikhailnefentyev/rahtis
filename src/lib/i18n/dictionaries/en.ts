@@ -277,7 +277,7 @@ export const en = {
      */
     branchTells: 'Shipper states',
     branchExtra: 'Also',
-    unitFleet: 'Tractor unit, 2–5 axles',
+    unitFleet: 'Tractor unit, 2–3 axles',
     unitTells: 'Unit number and collection point',
     unitExtra: 'Containers 20–45 ft · ADR',
     expressBranch: 'Van or truck',
@@ -413,7 +413,7 @@ export const en = {
     fault2: 'The port moved the slot or the warehouse closed',
     fault2Text:
       'The shipper updates the stop on the job itself. The change is recorded in the history and reaches the carrier and the driver immediately.',
-    fault3: 'Damage found on the trailer at pickup',
+    fault3: 'Damage found on the unit or the load at pickup',
     fault3Text:
       'The damage is recorded against that stop with a photo and a timestamp, so there is a clear record of what happened and when.',
     fault4: 'The job is cancelled before it starts',
@@ -458,7 +458,7 @@ export const en = {
     ai6: 'Speaks the driver’s language',
 
     servicesEyebrow: 'The service grows in stages',
-    servicesTitle: 'We start with trailer swaps and expand to other transport',
+    servicesTitle: 'We started with trailer swaps — containers and express are live too',
     serviceLive: 'Live',
     service1: 'Semi-trailer swaps',
     service1Text:
@@ -478,6 +478,12 @@ export const en = {
       'The tractor collects the container from a port or terminal — empty or loaded — and delivers it where agreed. On the way back the container returns to the port.',
     service2Text2:
       'The size is stated in feet: 20, 30, 40 or 45. Only vehicles whose chassis takes that length see the job.',
+
+    service4: 'Express deliveries',
+    service4Text:
+      'A van or a truck collects the load from an agreed address and takes it to the destination. The load travels in the vehicle; nothing is swapped along the way.',
+    service4Text2:
+      'The shipper states loading metres and weight; pickup and delivery are marked on the map. Only vehicles with enough space in the body see the job.',
 
     serviceSoon: 'In development',
     service3: 'Driver app',

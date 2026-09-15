@@ -271,7 +271,7 @@ export const fi = {
     signIn: 'Kirjaudu palveluun',
     apply: 'Lähetä hakemus',
     fleetLabel: 'hyväksyttyä autoa',
-        regionsLabel: 'toiminta-aluetta',
+    regionsLabel: 'toiminta-aluetta',
     regions: 'Toiminta-alueet',
 
     /*
@@ -314,7 +314,7 @@ export const fi = {
     branchFleet: 'Kalusto',
     branchTells: 'Tilaaja kertoo',
     branchExtra: 'Lisäksi',
-    unitFleet: 'Vetoauto, 2–5 akselia',
+    unitFleet: 'Vetoauto, 2–3 akselia',
     unitTells: 'Yksikön numero ja noutopaikka',
     unitExtra: 'Kontit 20–45 ft · ADR',
     expressBranch: 'Pakettiauto tai kuorma-auto',
@@ -462,7 +462,7 @@ export const fi = {
     fault2: 'Satama muutti aikaikkunaa tai varasto sulkeutui',
     fault2Text:
       'Tilaaja päivittää tiedon suoraan keikalle. Muutos tallentuu tapahtumahistoriaan ja näkyy heti kuljetusliikkeelle ja kuljettajalle.',
-    fault3: 'Perävaunussa havaittiin vaurio noudon yhteydessä',
+    fault3: 'Noudossa havaittiin vaurio yksikössä tai kuormassa',
     fault3Text:
       'Vaurio kirjataan kyseiselle noutopisteelle kuvan ja kellonajan kanssa. Näin tapahtumasta jää selkeä dokumentointi.',
     fault4: 'Kuljetus perutaan ennen aloitusta',
@@ -491,7 +491,7 @@ export const fi = {
       'Ilmoitettujen tietojen mukaan ajoaikaa on jäljellä 3 h 20 min ja matka kestää noin 2 h 40 min. Nykyisillä tiedoilla ehdit perille ajoajan puitteissa.',
     ai1: 'Tuntee keikan tiedot',
     ai1Text:
-      'Osoitteet, yhteyshenkilöt, varausnumerot, perävaunun tiedot ja muut keikan tiedot ovat avustajan käytettävissä.',
+      'Osoitteet, yhteyshenkilöt, varausnumerot, yksikön tai kuorman tiedot ja muut keikan tiedot ovat avustajan käytettävissä.',
     ai2: 'Etsii tarvittaessa lisätietoa',
     ai2Text:
       'Avustaja voi auttaa esimerkiksi terminaalien aukioloajoissa, yhteystiedoissa, tarvikkeiden hankinnassa ja sopivan taukopaikan löytämisessä.',
@@ -507,7 +507,16 @@ export const fi = {
     ai6: 'Palvelee kuljettajan kielellä',
 
     servicesEyebrow: 'Palvelu laajenee vaiheittain',
-    servicesTitle: 'Aloitamme irtoperäliikenteestä ja laajennamme muihin kuljetuksiin',
+    /*
+     * Otsikko kertoi lupauksen, joka on jo pidetty.
+     *
+     * 'Aloitamme irtoperäliikenteestä ja laajennamme' oli totta silloin,
+     * kun muuta ei ollut. Nyt kontit ja pikakuljetukset ovat
+     * toiminnassa, ja saman lauseen toistaminen kertoisi lukijalle, että
+     * mitään ei ole tapahtunut. Mennyt aikamuoto todistaa sen, mitä osio
+     * lupaa: laajeneminen on tapahtunut kerran, joten se tapahtuu taas.
+     */
+    servicesTitle: 'Aloitimme irtoperistä — nyt mukana kontit ja pikakuljetukset',
     serviceLive: 'Toiminnassa',
     service1: 'Irtoperävaunujen kuljetukset',
     service1Text:
@@ -526,6 +535,17 @@ export const fi = {
       'Veturi noutaa kontin satamasta tai terminaalista — tyhjänä tai kuormattuna — ja toimittaa sen sovittuun paikkaan. Paluumatkalla kontti palautetaan satamaan.',
     service2Text2:
       'Koko ilmoitetaan jaloissa: 20, 30, 40 tai 45. Keikan näkevät vain ne ajoneuvot, joiden alusta ottaa juuri sen kokoisen kontin.',
+
+    /*
+     * Pikakuljetukset seisovat samalla rivillä kahden muun kanssa, eivät
+     * katkoviivalla: ne toimivat. Katkoviiva jää sille, mitä ei vielä
+     * ole — kuljettajan sovellukselle.
+     */
+    service4: 'Pikakuljetukset',
+    service4Text:
+      'Pakettiauto tai kuorma-auto noutaa kuorman sovitusta osoitteesta ja vie sen perille. Kuorma kulkee auton kyydissä, eikä matkalla vaihdeta yksikköä.',
+    service4Text2:
+      'Tilaaja kertoo lavametrit ja painon; nouto ja toimitus kuitataan kartalle. Keikan näkevät ne autot, joiden kuormatila riittää.',
 
     serviceSoon: 'Kehitteillä',
     service3: 'Kuljettajan sovellus',

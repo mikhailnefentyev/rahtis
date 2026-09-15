@@ -555,7 +555,15 @@ export async function LandingSections({ locale }: { locale: Locale }) {
           {l.servicesTitle}
         </h2>
 
-        <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {/*
+          * Карточек стало четыре, и сетка сменилась с трёх колонок на
+          * две. В трёх колонках четвёртая карточка — приложение
+          * водителя — свисала бы одна во втором ряду и читалась как
+          * недоделка, тогда как это единственная честная пометка на
+          * странице. Два на два держат ряд ровным, и каждой карточке
+          * достаётся ширина на два абзаца.
+          */}
+        <div className="mt-8 grid gap-4 md:grid-cols-2">
           <Card>
             <CardBody className="flex flex-col gap-3 p-6">
               <span className="self-start rounded-pill border border-accent-line bg-accent-wash px-2.5 py-1 text-[11px] font-semibold text-accent">
@@ -587,6 +595,25 @@ export async function LandingSections({ locale }: { locale: Locale }) {
               </h3>
               <p className="text-[16px] text-ink-muted">{l.service2Text}</p>
               <p className="text-[16px] text-ink-muted">{l.service2Text2}</p>
+            </CardBody>
+          </Card>
+
+          {/*
+            * Экспресс стоит третьим и с той же меткой «Toiminnassa»:
+            * ветка работает, её видно на столе и по ней идут расчёты.
+            * Ставить её в «Kehitteillä» значило бы отговаривать от того,
+            * что уже можно заказать.
+            */}
+          <Card>
+            <CardBody className="flex flex-col gap-3 p-6">
+              <span className="self-start rounded-pill border border-accent-line bg-accent-wash px-2.5 py-1 text-[11px] font-semibold text-accent">
+                {l.serviceLive}
+              </span>
+              <h3 className="text-[20px] font-semibold tracking-tight">
+                {l.service4} <Mono className="text-[0.72em] text-ink-faint">3,5 t · 26 t</Mono>
+              </h3>
+              <p className="text-[16px] text-ink-muted">{l.service4Text}</p>
+              <p className="text-[16px] text-ink-muted">{l.service4Text2}</p>
             </CardBody>
           </Card>
 
