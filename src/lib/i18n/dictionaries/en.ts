@@ -262,19 +262,31 @@ export const en = {
     regions: 'Operating areas',
 
     branchesEyebrow: 'Two ways to move freight',
-    branchesTitle: 'The unit moves, or the load moves',
+    branchesTitle: 'The unit is towed, the load is driven',
     branchesLede:
-      'Both run through the platform the same way: publish, offers, the job step by step, documents and settlement. The only difference is what the vehicle is given.',
-    unitBranch: 'The unit moves',
-    unitBranchTitle: 'Trailer or container',
+      'Both run through the platform the same way: publish, offers, the job step by step, documents and settlement. The difference is what the vehicle is given and what the shipper states.',
+    unitBranch: 'Tractor unit',
+    unitBranchTitle: 'The unit is collected and left',
     unitBranchText:
-      'A tractor unit collects the unit from an agreed place, works the stops along the way and leaves it at the end. A container is described by its length in feet, a trailer by its plate — that is how the driver finds the right unit and the platform the right vehicle.',
-    unitBranchTags: 'Ports and terminals · Scandinavia',
-    expressBranch: 'The load moves',
-    expressBranchTitle: 'Van up to 3.5 t or truck up to 26 t',
+      'A tractor unit collects the trailer or container from an agreed place, works the stops along the way and leaves it at the end. The driver finds the right unit by its number, the platform the right vehicle by the unit’s size.',
+    branchFleet: 'Vehicle',
+    /*
+     * Ключ держится в одну строку: в колонке 7rem «The shipper states»
+     * переносился, ряд становился выше соседних и таблица переставала
+     * читаться поперёк — ради чего она и сделана.
+     */
+    branchTells: 'Shipper states',
+    branchExtra: 'Also',
+    unitFleet: 'Tractor unit, 2–5 axles',
+    unitTells: 'Unit number and collection point',
+    unitExtra: 'Containers 20–45 ft · ADR',
+    expressBranch: 'Van or truck',
+    expressBranchTitle: 'The load travels in the vehicle',
     expressBranchText:
-      'The load travels in the vehicle. The shipper gives a pickup and a delivery address, loading metres and weight; dimensions and packaging go in the notes. Pickup and delivery are marked on the map, and the waybill and any damage photos come with them.',
-    expressBranchTags: 'Tail lift · Side loading · Refrigeration',
+      'The shipper gives a pickup and a delivery address, loading metres and weight; dimensions and packaging go in the notes. Pickup and delivery are marked on the map, and the waybill and any damage photos come with them.',
+    expressFleet: 'Up to 3.5 t or 26 t',
+    expressTells: 'Loading metres, weight, two addresses',
+    expressExtra: 'Tail lift · Side loading · Refrigeration',
     /* Countries by name, not by code: the strip is read, not decoded. */
     country: { FI: 'Finland', SE: 'Sweden', NO: 'Norway', DK: 'Denmark' },
     cabinet: 'My account',

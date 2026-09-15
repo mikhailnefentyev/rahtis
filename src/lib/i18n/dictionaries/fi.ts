@@ -285,19 +285,45 @@ export const fi = {
      * riviäkään muuta.
      */
     branchesEyebrow: 'Kaksi tapaa liikuttaa rahtia',
-    branchesTitle: 'Yksikkö liikkuu vai kuorma liikkuu',
+    /*
+     * Otsikko erottaa haarat verbillä, ei substantiivilla.
+     *
+     * 'Yksikkö vai kuorma' kysyy lukijalta jotain, mitä hän ei vielä
+     * tiedä. 'Vedetään' ja 'ajetaan' kertovat eron itse, yhdellä
+     * silmäyksellä ja ilman kysymysmerkkiä — ja tekevät kahdesta
+     * puolikkaasta symmetriset.
+     */
+    branchesTitle: 'Yksikkö vedetään, kuorma ajetaan',
     branchesLede:
-      'Kumpikin kulkee alustalla samalla tavalla: julkaisu, tarjoukset, kuljetus vaihe vaiheelta, asiakirjat ja tilitys. Ero on vain siinä, mitä autolle annetaan.',
-    unitBranch: 'Yksikkö liikkuu',
-    unitBranchTitle: 'Irtoperä tai kontti',
+      'Kumpikin kulkee alustalla samalla tavalla: julkaisu, tarjoukset, kuljetus vaihe vaiheelta, asiakirjat ja tilitys. Ero on siinä, mitä autolle annetaan ja mitä tilaaja kertoo.',
+    /*
+     * Kortin yläotsikko nimeää kaluston, ei haaraa: haaran sanoo jo
+     * osion otsikko, ja sen toistaminen kortissa luki änkytyksenä.
+     */
+    unitBranch: 'Vetoauto',
+    unitBranchTitle: 'Yksikkö haetaan ja jätetään',
     unitBranchText:
-      'Vetoauto hakee yksikön sovitusta paikasta, hoitaa matkan pisteet ja jättää sen perille. Kontista kerrotaan pituus jalkoina, perävaunusta rekisterinumero — niiden mukaan kuljettaja löytää oikean yksikön ja alusta oikean auton.',
-    unitBranchTags: 'Satamat ja terminaalit · Skandinavia',
-    expressBranch: 'Kuorma liikkuu',
-    expressBranchTitle: 'Pakettiauto enintään 3,5 t tai kuorma-auto enintään 26 t',
+      'Vetoauto hakee irtoperän tai kontin sovitusta paikasta, hoitaa matkan pisteet ja jättää sen perille. Kuljettaja löytää oikean yksikön numerosta, alusta oikean auton yksikön mitoista.',
+    /*
+     * Kolme riviä avain–arvo, molemmissa korteissa samat avaimet.
+     *
+     * Keskimmäinen rivi on tärkein: se vastaa kysymykseen «mitä minun
+     * pitää tietää ennen kuin julkaisen». Leipäteksti vastaa siihen
+     * myös, mutta sen pitää lukea; taulukon lukee silmä.
+     */
+    branchFleet: 'Kalusto',
+    branchTells: 'Tilaaja kertoo',
+    branchExtra: 'Lisäksi',
+    unitFleet: 'Vetoauto, 2–5 akselia',
+    unitTells: 'Yksikön numero ja noutopaikka',
+    unitExtra: 'Kontit 20–45 ft · ADR',
+    expressBranch: 'Pakettiauto tai kuorma-auto',
+    expressBranchTitle: 'Kuorma kulkee auton kyydissä',
     expressBranchText:
-      'Kuorma kulkee auton kyydissä. Tilaaja kertoo nouto- ja toimitusosoitteen, lavametrit ja painon; mitat ja pakkaustapa lisätietoihin. Nouto ja toimitus kuitataan kartalle, ja rahtikirja sekä mahdolliset vauriokuvat tulevat mukana.',
-    expressBranchTags: 'Perälautanostin · Sivulastaus · Kylmäkone',
+      'Tilaaja kertoo nouto- ja toimitusosoitteen, lavametrit ja painon; mitat ja pakkaustapa lisätietoihin. Nouto ja toimitus kuitataan kartalle, ja rahtikirja sekä mahdolliset vauriokuvat tulevat mukana.',
+    expressFleet: 'Enintään 3,5 t tai 26 t',
+    expressTells: 'Lavametrit, paino, kaksi osoitetta',
+    expressExtra: 'Perälautanostin · Sivulastaus · Kylmäkone',
     /* Maat nimillä, ei tunnuksilla: nauha luetaan, ei tulkita. */
     country: { FI: 'Suomi', SE: 'Ruotsi', NO: 'Norja', DK: 'Tanska' },
 

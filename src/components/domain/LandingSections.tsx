@@ -87,13 +87,21 @@ export async function LandingSections({ locale }: { locale: Locale }) {
                 eyebrow: l.unitBranch,
                 title: l.unitBranchTitle,
                 text: l.unitBranchText,
-                tags: l.unitBranchTags,
+                spec: [
+                  [l.branchFleet, l.unitFleet],
+                  [l.branchTells, l.unitTells],
+                  [l.branchExtra, l.unitExtra],
+                ],
               },
               {
                 eyebrow: l.expressBranch,
                 title: l.expressBranchTitle,
                 text: l.expressBranchText,
-                tags: l.expressBranchTags,
+                spec: [
+                  [l.branchFleet, l.expressFleet],
+                  [l.branchTells, l.expressTells],
+                  [l.branchExtra, l.expressExtra],
+                ],
               },
             ].map((card) => (
               <Card key={card.title} className="border-t-2 border-t-accent">
@@ -105,15 +113,34 @@ export async function LandingSections({ locale }: { locale: Locale }) {
                     {card.title}
                   </h3>
                   <p className="mt-2.5 text-[16px] text-ink-muted">{card.text}</p>
+
                   {/*
-                    * Приметы ветки — внизу карточки и моноширинно: их не
-                    * читают, их ищут глазами. У единицы это места, куда
-                    * едут, у экспресса — чем оборудован кузов, и именно
-                    * по нему заказчик решает, годится ли машина.
+                    * Три строки «ключ — значение» вместо строки примет.
+                    *
+                    * Ключи у обеих карточек одни и те же, и в этом весь
+                    * смысл: половинки читаются не по очереди, а поперёк —
+                    * взгляд идёт по строке и видит, чем ветки отличаются
+                    * в одном и том же месте. Средняя строка отвечает на
+                    * вопрос, ради которого сюда и пришли: что от меня
+                    * потребуется, чтобы опубликовать.
+                    *
+                    * Значение моноширинно, ключ — нет: так строка
+                    * выравнивается по левому краю колонки значений сама
+                    * собой, без сетки в пикселях.
                     */}
-                  <p className="mt-auto pt-5 font-mono text-xs tracking-tight text-ink-dim">
-                    {card.tags}
-                  </p>
+                  <dl className="mt-auto pt-6">
+                    {card.spec.map(([key, value]) => (
+                      <div
+                        key={key}
+                        className="grid gap-x-3 border-t border-line py-2 first:border-t-0 first:pt-0 sm:grid-cols-[minmax(0,7rem)_1fr]"
+                      >
+                        <dt className="label-micro pt-0.5">{key}</dt>
+                        <dd className="font-mono text-[13px] leading-snug tracking-tight text-ink">
+                          {value}
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
                 </CardBody>
               </Card>
             ))}
