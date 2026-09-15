@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useRef, useState } from 'react';
+import { startTransition, useActionState, useState } from 'react';
 import { Button, Textarea } from '@/components/ui';
 import { stopPlace, tripProgress, type TripStop } from '@/lib/orders/progress';
 import { stopTitle, type HaulKind } from '@/lib/orders/haul';
@@ -46,32 +46,31 @@ export function TripPanel({
    * кто просто листает рейсы, — и отказ, данный один раз не глядя,
    * закрыл бы геолокацию для всех последующих доставок.
    *
-   * Отправка формы при этом откладывается на один круг: submit
-   * останавливается, замер делается, поля заполняются, форма
-   * отправляется заново. Дольше шести секунд это не длится — столько
-   * стоит таймаут в askPosition.
+   * ПОЧЕМУ ЗДЕСЬ НЕТ СКРЫТЫХ ПОЛЕЙ И ПОВТОРНОЙ ОТПРАВКИ. Сначала было
+   * так: submit останавливался, координата ложилась в состояние, поля
+   * заполнялись, форма отправлялась заново. Оно не работало ни разу.
+   * setState только назначает перерисовку, а requestSubmit вызывается в
+   * том же такте — до того, как React успеет положить новые значения в
+   * разметку. Форма уходила со старыми, то есть пустыми, и каждая
+   * отметка ложилась без координаты. Снаружи это неотличимо от отказа
+   * браузера: точка помечена пройденной, места у неё нет, жаловаться
+   * некому.
+   *
+   * Теперь состав отправки собирается руками и уезжает прямо в
+   * действие. Ни гонки, ни второго круга: значения кладутся в FormData,
+   * а не в разметку, и между «замерили» и «отправили» ничего не стоит.
    */
-  const form = useRef<HTMLFormElement>(null);
-  const located = useRef(false);
   const [locating, setLocating] = useState(false);
-  const [position, setPosition] = useState<{ lat: string; lon: string; accuracy: string }>({
-    lat: '', lon: '', accuracy: '',
-  });
 
   async function locateThenSubmit(event: React.FormEvent<HTMLFormElement>) {
-    if (located.current) return;
-
     event.preventDefault();
-    setLocating(true);
 
+    /* Состав снимается до ожидания: после await у события нет цели. */
+    const payload = new FormData(event.currentTarget);
+
+    setLocating(true);
     const where = await askPosition();
-    if (where) {
-      setPosition({
-        lat: String(where.lat),
-        lon: String(where.lon),
-        accuracy: where.accuracyM === null ? '' : String(where.accuracyM),
-      });
-    }
+    setLocating(false);
 
     /*
      * Отказ браузера отметку не отменяет. Точка помечается пройденной
@@ -79,9 +78,13 @@ export function TripPanel({
      * запрет здесь заставил бы курьера звонить оператору, а оператор
      * закрыл бы точку руками, то есть доказательства не прибавилось бы.
      */
-    located.current = true;
-    setLocating(false);
-    form.current?.requestSubmit();
+    if (where) {
+      payload.set('lat', String(where.lat));
+      payload.set('lon', String(where.lon));
+      if (where.accuracyM !== null) payload.set('accuracy_m', String(where.accuracyM));
+    }
+
+    startTransition(() => formAction(payload));
   }
 
   const progress = tripProgress(stops);
@@ -93,17 +96,9 @@ export function TripPanel({
   return (
     <div className="mt-4 rounded-control border border-line bg-sunken p-3">
       {next ? (
-        <form
-          ref={form}
-          action={formAction}
-          onSubmit={locateThenSubmit}
-          className="flex flex-col gap-3"
-        >
+        <form onSubmit={locateThenSubmit} className="flex flex-col gap-3">
           <input type="hidden" name="locale" value={locale} />
           <input type="hidden" name="stop_id" value={next.id} />
-          <input type="hidden" name="lat" value={position.lat} />
-          <input type="hidden" name="lon" value={position.lon} />
-          <input type="hidden" name="accuracy_m" value={position.accuracy} />
 
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="min-w-0">
