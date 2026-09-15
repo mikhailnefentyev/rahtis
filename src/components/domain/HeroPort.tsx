@@ -5,8 +5,8 @@ import {
   type CycleTrip,
 } from '@/components/domain/TripCycle';
 import { buttonClass, Mono } from '@/components/ui';
+import { fleetSize } from '@/lib/fleet/size';
 import { getI18n, type Locale } from '@/lib/i18n';
-import { createClient } from '@/lib/supabase/server';
 
 /**
  * Первый экран главной страницы.
@@ -20,8 +20,6 @@ import { createClient } from '@/lib/supabase/server';
  * только если под ней настоящая темнота, а не полупрозрачная плёнка.
  */
 export async function HeroPort({ locale }: { locale: Locale }) {
-  const [{ t }, supabase] = await Promise.all([getI18n(locale), createClient()]);
-
   /*
    * Живые числа: столько машин имеет допуск прямо сейчас и в скольких
    * городах они стоят.
@@ -29,9 +27,14 @@ export async function HeroPort({ locale }: { locale: Locale }) {
    * Через функцию, а не запросом к vehicles: главную открывает аноним, а
    * RLS закрывает таблицу от него целиком — счётчик молча не рисовался
    * бы на живом сайте. Наружу выходят только два агрегата.
+   *
+   * Читается из кэша служебным ключом, а не клиентом посетителя. Тот
+   * клиент читает куку сессии, и из-за одной куки Next отдавал всю
+   * витрину динамической: каждый заход анонима поднимал функцию и шёл в
+   * базу за числом, которое меняется допусками оператора. Подробности —
+   * в lib/fleet/size.ts.
    */
-  const { data: fleetRows } = await supabase.rpc('fleet_size');
-  const fleet = fleetRows?.[0];
+  const [{ t }, fleet] = await Promise.all([getI18n(locale), fleetSize()]);
 
   return (
     <section className="hero-port">
