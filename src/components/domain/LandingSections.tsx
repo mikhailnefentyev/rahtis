@@ -59,6 +59,68 @@ export async function LandingSections({ locale }: { locale: Locale }) {
         </p>
       </div>
 
+      {/* ── Две ветки ──────────────────────────────────────────── */}
+      {/*
+        * Первое, что должен узнать пришедший: возим ли мы его рахти.
+        *
+        * Раньше ответ был разбросан по странице — что-то в заголовке,
+        * что-то в описании услуги, — и человек с фургонным грузом уходил
+        * с первого экрана, потому что видел там только прицепы и
+        * контейнеры. Две карточки отвечают за две секунды.
+        *
+        * Деление ровно то же, каким платформа разделена внутри: тягач
+        * видит одну половину витрины, фургон и грузовик — другую.
+        * Придумывать сайту собственную классификацию значило бы обещать
+        * не то, что человек потом увидит в кабинете.
+        */}
+      <section className="border-b border-line bg-surface">
+        <div className="mx-auto w-full max-w-6xl px-5 py-20">
+          <p className="label-micro">{l.branchesEyebrow}</p>
+          <h2 className="mt-2.5 max-w-[22ch] text-[clamp(26px,3vw,34px)] leading-tight font-semibold tracking-tight text-balance">
+            {l.branchesTitle}
+          </h2>
+          <p className="mt-3 max-w-[62ch] text-[16px] text-ink-muted">{l.branchesLede}</p>
+
+          <div className="mt-8 grid gap-4 md:grid-cols-2">
+            {[
+              {
+                eyebrow: l.unitBranch,
+                title: l.unitBranchTitle,
+                text: l.unitBranchText,
+                tags: l.unitBranchTags,
+              },
+              {
+                eyebrow: l.expressBranch,
+                title: l.expressBranchTitle,
+                text: l.expressBranchText,
+                tags: l.expressBranchTags,
+              },
+            ].map((card) => (
+              <Card key={card.title} className="border-t-2 border-t-accent">
+                <CardBody className="flex h-full flex-col">
+                  <p className="label-micro" data-accent>
+                    {card.eyebrow}
+                  </p>
+                  <h3 className="mt-2 text-[20px] leading-snug font-semibold tracking-tight text-balance">
+                    {card.title}
+                  </h3>
+                  <p className="mt-2.5 text-[16px] text-ink-muted">{card.text}</p>
+                  {/*
+                    * Приметы ветки — внизу карточки и моноширинно: их не
+                    * читают, их ищут глазами. У единицы это места, куда
+                    * едут, у экспресса — чем оборудован кузов, и именно
+                    * по нему заказчик решает, годится ли машина.
+                    */}
+                  <p className="mt-auto pt-5 font-mono text-xs tracking-tight text-ink-dim">
+                    {card.tags}
+                  </p>
+                </CardBody>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── Что мы делаем ──────────────────────────────────────── */}
       <section id="service" className="mx-auto w-full max-w-6xl px-5 py-20">
         <p className="label-micro">{l.helpEyebrow}</p>
@@ -144,6 +206,7 @@ export async function LandingSections({ locale }: { locale: Locale }) {
                 [l.timeOld4, l.timeNew4],
                 [l.timeOld5, l.timeNew5],
                 [l.timeOld6, l.timeNew6],
+                [l.timeOld7, l.timeNew7],
               ].map(([was, now]) => (
                 <li
                   key={now}

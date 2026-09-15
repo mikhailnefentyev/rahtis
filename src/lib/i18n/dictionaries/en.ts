@@ -34,7 +34,7 @@ export const en = {
 
 
   seo: {
-    homeTitle: 'Trailer swap and container platform in Scandinavia',
+    homeTitle: 'Haulage platform: trailer swaps, containers, express',
     homeDescription:
       'RAHTIS routes trailer swaps and container haulage to approved carriers across the ports of Finland, Sweden, Norway and Denmark. An order reaches the trucks in the area at once, the job is visible stop by stop, and the documents end up in one place.',
     termsDescription:
@@ -224,17 +224,23 @@ export const en = {
      * containers — and does them across Scandinavian ports. A narrow
      * promise that holds beats a wide one with nothing behind it.
      */
-    eyebrow: 'Trailer swaps and containers · Scandinavian ports',
-    titleA: 'The trailer swaps on time.',
+    eyebrow: 'Trailer swaps, containers and express · Scandinavia',
     /*
-     * 'Leaves port', not 'leaves the port': with the article the line
-     * overflows the copy column and drops a lone 'port.' onto a line of
-     * its own. Leaving port is the idiom anyway.
+     * First line lists, second promises, third gives the benefit.
+     *
+     * With express there are three things to name and no room to give
+     * each a line of its own. The rhythm survives, and every line still
+     * fits: the longest is the third, the one the headline size was
+     * measured against.
+     *
+     * 'Load', not 'parcel': express here is up to 26 tonnes in the
+     * vehicle, not post. The cabinet uses the same word.
      */
-    titleB: 'The container leaves port.',
+    titleA: 'Trailer, container, load.',
+    titleB: 'Each one leaves on time.',
     titleC: 'The phone stops ringing.',
     lede:
-      'RAHTIS passes trailer swaps and container haulage to approved carriers. Once an order is published it reaches suitable carriers automatically. Replies can arrive within minutes, the job’s progress is visible step by step, and photos and documents sit in one place at the end.',
+      'RAHTIS passes trailer swaps, container haulage and express deliveries to approved carriers. Once an order is published it reaches suitable carriers automatically. Replies can arrive within minutes, the job’s progress is visible step by step, and photos and documents sit in one place at the end.',
     /*
      * The second paragraph speaks in benefits and splits them by side:
      * less manual work for one, jobs without phone calls for the other.
@@ -242,7 +248,7 @@ export const en = {
      * “what is in it for me”.
      */
     lede2:
-      'For forwarders and operators, RAHTIS cuts manual dispatch work and brings tracking and electronic document flow together. For carriers, it offers new jobs without constant phone calls. Integration with your own systems is planned together.',
+      'For forwarders and operators, RAHTIS cuts manual dispatch work and brings tracking and electronic document flow together. For carriers, it offers new jobs without constant phone calls. The same work used to be done on the phone: time saved on either side is money saved.',
     /* The three things people come here for. */
     highlight1: 'A change does not stop the load',
     highlight2: 'We do not auction the price down',
@@ -254,6 +260,21 @@ export const en = {
     fleetLabel: 'approved vehicles',
         regionsLabel: 'operating areas',
     regions: 'Operating areas',
+
+    branchesEyebrow: 'Two ways to move freight',
+    branchesTitle: 'The unit moves, or the load moves',
+    branchesLede:
+      'Both run through the platform the same way: publish, offers, the job step by step, documents and settlement. The only difference is what the vehicle is given.',
+    unitBranch: 'The unit moves',
+    unitBranchTitle: 'Trailer or container',
+    unitBranchText:
+      'A tractor unit collects the unit from an agreed place, works the stops along the way and leaves it at the end. A container is described by its length in feet, a trailer by its plate — that is how the driver finds the right unit and the platform the right vehicle.',
+    unitBranchTags: 'Ports and terminals · Scandinavia',
+    expressBranch: 'The load moves',
+    expressBranchTitle: 'Van up to 3.5 t or truck up to 26 t',
+    expressBranchText:
+      'The load travels in the vehicle. The shipper gives a pickup and a delivery address, loading metres and weight; dimensions and packaging go in the notes. Pickup and delivery are marked on the map, and the waybill and any damage photos come with them.',
+    expressBranchTags: 'Tail lift · Side loading · Refrigeration',
     /* Countries by name, not by code: the strip is read, not decoded. */
     country: { FI: 'Finland', SE: 'Sweden', NO: 'Norway', DK: 'Denmark' },
     cabinet: 'My account',
@@ -287,7 +308,7 @@ export const en = {
     timeEyebrow: 'Standing still costs both sides',
     timeTitle: 'In logistics, time is what you pay for',
     timeLede:
-      'While a shipper rings round for a free truck, the freight waits. While a carrier rings round for the next load, the truck stands. Both are losing the same thing: time.',
+      'While a shipper rings round for a free truck, the freight waits. While a carrier rings round for the next load, the truck stands. Both are losing the same thing: time. RAHTIS does not negotiate the price down — it removes the steps where the time goes.',
     /*
      * The rows are pairs: left and right say the same thing, before and
      * after. This used to be two separate lists of six sentences, and the
@@ -309,9 +330,11 @@ export const en = {
     timeNew5: 'Documents attached on completion',
     timeOld6: 'Invoicing sorted out afterwards',
     timeNew6: 'Jobs and payouts in the weekly report',
+    timeOld7: 'Where the courier is takes a phone call',
+    timeNew7: 'Pickup and delivery marked on the map',
 
     rolesEyebrow: 'Who RAHTIS is for',
-    rolesTitle: 'One platform for trailer swaps and containers — for both sides',
+    rolesTitle: 'One platform for three kinds of haulage — and for both sides',
     shipperEyebrow: 'For forwarders and operators',
     shipperTitle: 'You do not have to find a carrier one call at a time.',
     /*

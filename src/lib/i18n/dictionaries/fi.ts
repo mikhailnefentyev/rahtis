@@ -41,13 +41,13 @@ export const fi = {
    * сайте занимало слово, которое никто не ищет.
    */
   seo: {
-    homeTitle: 'Irtoperien ja konttien kuljetusalusta Skandinaviassa',
+    homeTitle: 'Kuljetusalusta: irtoperät, kontit ja pikakuljetukset',
     homeDescription:
-      'RAHTIS välittää irtoperien vaihdot ja konttikuljetukset hyväksytyille kuljetusliikkeille Suomen, Ruotsin, Norjan ja Tanskan satamissa. Tilaus tavoittaa alueen autot heti, kuljetus näkyy vaihe vaiheelta ja asiakirjat syntyvät samaan paikkaan.',
+      'RAHTIS välittää irtoperien vaihdot, konttikuljetukset ja pikakuljetukset pakettiautolla tai kuorma-autolla hyväksytyille kuljetusliikkeille Suomessa ja Skandinaviassa. Tilaus tavoittaa sopivat autot heti, kuljetus näkyy vaihe vaiheelta ja asiakirjat syntyvät samaan paikkaan.',
     termsDescription:
       'RAHTIS-palvelun käyttöehdot: osapuolten vastuut, kuljetuksen kulku, maksut ja tilitykset sekä sopimuksen voimassaolo.',
     privacyDescription:
-      'Miten RAHTIS käsittelee henkilötietoja: mitä tietoja kerätään, mihin niitä käytetään, kuinka kauna niitä säilytetään ja mitkä ovat rekisteröidyn oikeudet.',
+      'Miten RAHTIS käsittelee henkilötietoja: mitä tietoja kerätään, mihin niitä käytetään, kuinka kauan niitä säilytetään ja mitkä ovat rekisteröidyn oikeudet.',
     signinDescription: 'Kirjaudu RAHTIS-palveluun tilaajana tai kuljetusliikkeenä.',
     applyDescription:
       'Hae RAHTIS-palveluun. Tarkistamme Y-tunnuksen ja yrityksen tiedot rekistereistä, kuljetusliikkeiltä lisäksi liikenneluvan ja vakuutuksen.',
@@ -232,24 +232,36 @@ export const fi = {
      * Kärki nimeää sen, mitä oikeasti liikutetaan.
      *
      * 'Logistiikka-alusta Suomessa' lupasi kaiken rahdin koko maassa.
-     * Alusta tekee kahta asiaa — irtoperiä ja kontteja — ja tekee ne
-     * Skandinavian satamissa. Kapea lupaus, joka pitää, tuo enemmän
-     * kuin laaja, jonka takana ei ole mitään.
+     * Kapea lupaus, joka pitää, tuo enemmän kuin laaja, jonka takana ei
+     * ole mitään — mutta lupauksen on katettava se, mitä alusta tekee.
+     * Pikakuljetusten myötä niitä on kolme, ja kaksi ensimmäistä riviä
+     * eivät enää mahtuneet luettelemaan yksiköitä yksi per rivi.
+     *
+     * Siksi ensimmäinen rivi luettelee, toinen lupaa ja kolmas kertoo
+     * hyödyn. Rytmi on entinen ja jokainen rivi mahtuu: pisin on yhä
+     * kolmas, jolle otsikon koko aikoinaan mitattiin.
+     *
+     * 'Kuorma' eikä 'paketti': pikakuljetus ei ole postipaketti vaan
+     * enintään 26 tonnia auton kyydissä. Sama sana on kabinetissakin.
      */
-    eyebrow: 'Irtoperät ja kontit · Skandinavian satamat',
+    eyebrow: 'Irtoperät, kontit ja pikakuljetukset · Skandinavia',
     /* Irtoperä, ei perävaunu: sama sana kuin kärjessä ja palvelussa. */
-    titleA: 'Irtoperä vaihtuu ajallaan.',
-    titleB: 'Kontti lähtee satamasta.',
+    titleA: 'Irtoperä, kontti, kuorma.',
+    titleB: 'Jokainen lähtee ajallaan.',
     titleC: 'Turhat puhelut jäävät pois.',
     lede:
-      'RAHTIS välittää irtoperien vaihdot ja konttikuljetukset hyväksytyille kuljetusliikkeille. Kun tilaus julkaistaan, se tavoittaa sopivat kuljetusliikkeet automaattisesti. Vastaukset voivat tulla jo minuuteissa, kuljetuksen eteneminen näkyy vaihe vaiheelta, ja kuvat sekä asiakirjat löytyvät lopuksi samasta paikasta.',
+      'RAHTIS välittää irtoperien vaihdot, konttikuljetukset ja pikakuljetukset hyväksytyille kuljetusliikkeille. Kun tilaus julkaistaan, se tavoittaa sopivat kuljetusliikkeet automaattisesti. Vastaukset voivat tulla jo minuuteissa, kuljetuksen eteneminen näkyy vaihe vaiheelta, ja kuvat sekä asiakirjat löytyvät lopuksi samasta paikasta.',
     /*
      * Toinen kappale puhuu hyödystä ja jakaa sen puolittain: toiselle
      * vähemmän käsityötä, toiselle keikkoja ilman soittelua. Ensimmäinen
      * kappale kuvaa palvelun, tämä vastaa kysymykseen «mitä minä hyödyn».
+     *
+     * Viimeinen virke sanoo ääneen sen, mitä kappale kiertää: aika on
+     * logistiikassa raha, ja me emme neuvottele hintaa alas vaan
+     * poistamme vaiheita, joissa aikaa kuluu.
      */
     lede2:
-      'Huolitsijoille ja operaattoreille RAHTIS vähentää manuaalista välitystyötä ja kokoaa kuljetuksen seurannan sekä sähköisen asiakirjaliikenteen yhteen. Kuljetusliikkeille se tarjoaa uusia keikkoja ilman jatkuvaa soittelua. Integraatio omiin järjestelmiin suunnitellaan yhdessä.',
+      'Huolitsijoille ja operaattoreille RAHTIS vähentää manuaalista välitystyötä ja kokoaa kuljetuksen seurannan sekä sähköisen asiakirjaliikenteen yhteen. Kuljetusliikkeille se tarjoaa uusia keikkoja ilman jatkuvaa soittelua. Sama työ tehtiin ennen puhelimella: säästetty aika on molemmilla puolilla säästettyä rahaa.',
     /* Kolme asiaa, joiden takia palveluun tullaan. */
     highlight1: 'Muutos ei pysäytä kuljetusta',
     highlight2: 'Emme kilpailuta hintaa alaspäin',
@@ -261,6 +273,31 @@ export const fi = {
     fleetLabel: 'hyväksyttyä autoa',
         regionsLabel: 'toiminta-aluetta',
     regions: 'Toiminta-alueet',
+
+    /*
+     * Kaksi haaraa — sama jako, jolla kuljetustarjonta on kabinetissa
+     * jaettu kahtia. Sivu kertoo tuotteen rakenteen sellaisena kuin se
+     * on, eikä keksi sille omaa jäsennystä: vetoautolla ajava näkee
+     * irtoperät ja kontit, paketti- tai kuorma-autolla ajava pikakuljetukset.
+     *
+     * Lohko on heti kärjen alla, koska se vastaa kysymykseen «ajatteko
+     * te minun rahtiani» kahdessa sekunnissa — ennen kuin kukaan lukee
+     * riviäkään muuta.
+     */
+    branchesEyebrow: 'Kaksi tapaa liikuttaa rahtia',
+    branchesTitle: 'Yksikkö liikkuu vai kuorma liikkuu',
+    branchesLede:
+      'Kumpikin kulkee alustalla samalla tavalla: julkaisu, tarjoukset, kuljetus vaihe vaiheelta, asiakirjat ja tilitys. Ero on vain siinä, mitä autolle annetaan.',
+    unitBranch: 'Yksikkö liikkuu',
+    unitBranchTitle: 'Irtoperä tai kontti',
+    unitBranchText:
+      'Vetoauto hakee yksikön sovitusta paikasta, hoitaa matkan pisteet ja jättää sen perille. Kontista kerrotaan pituus jalkoina, perävaunusta rekisterinumero — niiden mukaan kuljettaja löytää oikean yksikön ja alusta oikean auton.',
+    unitBranchTags: 'Satamat ja terminaalit · Skandinavia',
+    expressBranch: 'Kuorma liikkuu',
+    expressBranchTitle: 'Pakettiauto enintään 3,5 t tai kuorma-auto enintään 26 t',
+    expressBranchText:
+      'Kuorma kulkee auton kyydissä. Tilaaja kertoo nouto- ja toimitusosoitteen, lavametrit ja painon; mitat ja pakkaustapa lisätietoihin. Nouto ja toimitus kuitataan kartalle, ja rahtikirja sekä mahdolliset vauriokuvat tulevat mukana.',
+    expressBranchTags: 'Perälautanostin · Sivulastaus · Kylmäkone',
     /* Maat nimillä, ei tunnuksilla: nauha luetaan, ei tulkita. */
     country: { FI: 'Suomi', SE: 'Ruotsi', NO: 'Norja', DK: 'Tanska' },
 
@@ -299,7 +336,7 @@ export const fi = {
     timeEyebrow: 'Seisonta maksaa kaikille',
     timeTitle: 'Logistiikassa aika maksaa',
     timeLede:
-      'Kun kuljetuksen tilaaja etsii vapaata autoa puhelimitse, rahti odottaa. Kun kuljetusliike etsii seuraavaa kuormaa, auto seisoo. Molemmissa tapauksissa menetetään samaa asiaa: aikaa.',
+      'Kun kuljetuksen tilaaja etsii vapaata autoa puhelimitse, rahti odottaa. Kun kuljetusliike etsii seuraavaa kuormaa, auto seisoo. Molemmissa tapauksissa menetetään samaa asiaa: aikaa. RAHTIS ei neuvottele hintaa alas — se poistaa vaiheet, joissa aika kuluu.',
     /*
      * Rivit ovat pareja: vasen ja oikea sanovat saman asian, ennen ja
      * jälkeen. Aiemmin tässä oli kaksi erillistä kuuden virkkeen listaa,
@@ -321,9 +358,11 @@ export const fi = {
     timeNew5: 'Asiakirjat heti valmistuttua',
     timeOld6: 'Laskutus selviää jälkikäteen',
     timeNew6: 'Keikat ja tilitykset viikkoraportissa',
+    timeOld7: 'Kuriirin sijainti selviää soittamalla',
+    timeNew7: 'Nouto ja toimitus kuitataan kartalle',
 
     rolesEyebrow: 'Kenelle RAHTIS on tarkoitettu',
-    rolesTitle: 'Yksi alusta irtoperille ja konteille — molemmille osapuolille',
+    rolesTitle: 'Yksi alusta kolmelle kuljetustavalle — ja molemmille osapuolille',
     shipperEyebrow: 'Huolitsijalle ja operaattorille',
     shipperTitle: 'Kuljetusliikettä ei tarvitse etsiä yksi kerrallaan.',
     /*
