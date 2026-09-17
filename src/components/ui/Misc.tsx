@@ -24,7 +24,24 @@ export function Kv({
   return (
     <div className={cn('flex gap-3 text-[13px]', className)}>
       <span className="w-28 shrink-0 text-ink-faint">{k}</span>
-      <span className={cn('min-w-0 text-ink', mono && 'font-mono tracking-tight')}>{v}</span>
+      {/*
+        * Значение рвётся где угодно, если иначе не влезает.
+        *
+        * Почта и Y-tunnus переноситься негде: это одно слово без пробелов
+        * и дефисов. Пара с адресом mikhail.nefentyev@gmail.com не
+        * сжималась ниже 326 пунктов и делала шире экрана всю страницу
+        * личных данных — на 320 браузер отъезжал и показывал её
+        * уменьшенной. Разрыв внутри слова на телефоне честнее, чем
+        * уменьшенная страница.
+        */}
+      <span
+        className={cn(
+          'min-w-0 [overflow-wrap:anywhere] text-ink',
+          mono && 'font-mono tracking-tight',
+        )}
+      >
+        {v}
+      </span>
     </div>
   );
 }
