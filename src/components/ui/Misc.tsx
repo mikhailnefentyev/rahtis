@@ -3,6 +3,12 @@ import { cn } from '@/lib/cn';
 /**
  * Пара «подпись — значение» в одну строку.
  * Ширина подписи фиксирована, чтобы значения выстроились в колонку.
+ *
+ * Колонка в 112 пунктов взята по замеру самых длинных подписей, а не на
+ * глаз: прежние 80 не держали «Ajoneuvoluokka» (95), «Konttipituudet»
+ * (84) и английские «Container lengths» (106) и «Loading metres» (93) —
+ * подпись съедала зазор и упиралась в значение. Короткие подписи от
+ * запаса не страдают: они и так выстраиваются по левому краю.
  */
 export function Kv({
   k,
@@ -17,7 +23,7 @@ export function Kv({
 }) {
   return (
     <div className={cn('flex gap-3 text-[13px]', className)}>
-      <span className="w-20 shrink-0 text-ink-faint">{k}</span>
+      <span className="w-28 shrink-0 text-ink-faint">{k}</span>
       <span className={cn('min-w-0 text-ink', mono && 'font-mono tracking-tight')}>{v}</span>
     </div>
   );
