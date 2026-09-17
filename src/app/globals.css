@@ -1210,6 +1210,20 @@
 }
 .trip-preview__top { display: flex; align-items: center; gap: 10px; }
 .trip-preview__title { flex: 1 1 auto; min-width: 0; }
+/*
+ * Клетка бейджа: четыре состояния друг на друге, поэтому её ширина
+ * равна самому длинному и не зависит от стадии. Бейдж внутри прижат к
+ * правому краю и по-прежнему облегает свой текст — меняется только его
+ * левая граница, а не ширина, оставшаяся заголовку.
+ */
+.trip-preview__badges {
+  display: grid;
+  flex: none;
+  justify-items: end;
+  align-items: center;
+}
+.trip-preview__badges .trip-preview__badge { grid-area: 1 / 1; visibility: hidden; }
+.trip-preview__badges .trip-preview__badge[data-on] { visibility: visible; }
 .trip-preview__ids {
   display: flex;
   gap: 12px;
@@ -1227,6 +1241,8 @@
   color: var(--color-live);
   font-size: 11px;
   font-weight: 600;
+  /* Высота бейджа задана числом — перенос внутри пилюли её сломал бы. */
+  white-space: nowrap;
 }
 .trip-preview__ref { font-size: 11px; color: var(--color-ink-dim); }
 
@@ -1343,7 +1359,14 @@
 }
 .trip-cycle__tick[data-on] { width: 26px; background: rgba(255, 255, 255, 0.86); }
 .trip-cycle__tick:hover { background: rgba(255, 255, 255, 0.6); }
-.trip-cycle__label { line-height: 1.35; }
+/*
+ * Подписи стадий — тоже одна клетка на четыре строки: высота по самой
+ * длинной, поэтому переключение стадии не поднимает и не опускает то,
+ * что лежит ниже на странице.
+ */
+.trip-cycle__labels { display: grid; flex: 1 1 auto; min-width: 0; }
+.trip-cycle__label { grid-area: 1 / 1; line-height: 1.35; visibility: hidden; }
+.trip-cycle__label[data-on] { visibility: visible; }
 
 @media (max-width: 1000px) {
   .hero-port__inner { grid-template-columns: 1fr; gap: 40px; padding-top: 84px; }

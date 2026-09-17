@@ -79,7 +79,31 @@ export function TripCycle({
       >
         <div className="trip-preview__top">
           <span className="trip-preview__title">{trip.title}</span>
-          <span className="trip-preview__badge">{stage.status}</span>
+          {/*
+            * Все четыре бейджа лежат в одной клетке, видно текущий.
+            *
+            * Не ради красоты: бейдж — самая длинная переменная строка в
+            * карточке, и пока он менялся в потоке, вместе с ним менялась
+            * ширина, остающаяся заголовку. На узком экране заголовок от
+            * этого то умещался в строку, то переносился в две, карточка
+            * росла на строку и первый экран дёргался каждые 2,8 с.
+            *
+            * Клетка теперь всегда по самому длинному состоянию, поэтому
+            * заголовку достаётся одна и та же ширина на всех стадиях.
+            * Скрытые копии считаются вёрсткой и не читаются голосом:
+            * visibility прячет их и от экранного чтения тоже.
+            */}
+          <span className="trip-preview__badges">
+            {stages.map((s, n) => (
+              <span
+                key={s.status}
+                className="trip-preview__badge"
+                data-on={n === index ? '' : undefined}
+              >
+                {s.status}
+              </span>
+            ))}
+          </span>
         </div>
 
         <div className="trip-preview__ids">
@@ -131,7 +155,23 @@ export function TripCycle({
             />
           ))}
         </span>
-        <span className="trip-cycle__label">{stage.note}</span>
+        {/*
+          * Подписи стадий тоже стоят одна на другой. Порознь они разной
+          * длины: на телефоне одна умещается в строку, другая занимает
+          * две, и первый экран рос и опадал вслед за ними. Место теперь
+          * занято по самой длинной подписи и не меняется.
+          */}
+        <span className="trip-cycle__labels">
+          {stages.map((s, n) => (
+            <span
+              key={s.status}
+              className="trip-cycle__label"
+              data-on={n === index ? '' : undefined}
+            >
+              {s.note}
+            </span>
+          ))}
+        </span>
       </p>
     </div>
   );
