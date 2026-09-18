@@ -39,6 +39,8 @@ export const en = {
       'RAHTIS routes trailer swaps and container haulage to approved carriers across the ports of Finland, Sweden, Norway and Denmark. An order reaches the trucks in the area at once, the job is visible stop by stop, and the documents end up in one place.',
     termsDescription:
       'Terms of service for RAHTIS: responsibilities of the parties, how a job runs, payments and settlements, and the term of the agreement.',
+    customerTermsDescription:
+      'RAHTIS customer terms: the job and the price, loading and unloading time, ferries, documents, settlement periods and how to report damage.',
     privacyDescription:
       'How RAHTIS handles personal data: what is collected, what it is used for, how long it is kept and what rights the data subject has.',
     signinDescription: 'Sign in to RAHTIS as a shipper or as a carrier.',
@@ -1017,7 +1019,7 @@ export const en = {
     missing: 'This document has not been published yet.',
     clauseLink: 'Copy a link to this clause',
 
-    accept: 'I accept the terms of service and the privacy notice',
+    accept: 'I accept the following documents:',
     acceptRequired: 'The terms must be accepted before going live.',
 
     manage: 'Documents and versions',

@@ -377,6 +377,27 @@ export function RequisitesForm({ company }: { company: Company }) {
           >
             {t.legal.TERMS}
           </a>
+          {/*
+            * Условия для заказчиков показываются только заказчику:
+            * перевозчик их не принимает, у него свой договор, который
+            * ещё предстоит завести. Список документов в
+            * галочке обязан совпадать с тем, что запишет accept_legal, —
+            * иначе человек соглашается с одним, а в журнал ложится
+            * другое.
+            */}
+          {!isCarrier && (
+            <>
+              {' · '}
+              <a
+                href={`/${locale}/${locale === 'fi' ? 'tilausehdot' : 'customer-terms'}`}
+                target="_blank"
+                rel="noopener"
+                className="font-semibold text-accent hover:underline"
+              >
+                {t.legal.SHIPPER_AGREEMENT}
+              </a>
+            </>
+          )}
           {' · '}
           <a
             href={`/${locale}/${locale === 'fi' ? 'tietosuoja' : 'privacy'}`}

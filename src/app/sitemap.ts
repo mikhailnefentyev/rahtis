@@ -20,6 +20,7 @@ const PAGES: { fi: string; en: string; priority: number }[] = [
   { fi: '', en: '', priority: 1 },
   { fi: '/apply', en: '/apply', priority: 0.8 },
   { fi: '/kayttoehdot', en: '/terms', priority: 0.3 },
+  { fi: '/tilausehdot', en: '/customer-terms', priority: 0.3 },
   { fi: '/tietosuoja', en: '/privacy', priority: 0.3 },
 ];
 

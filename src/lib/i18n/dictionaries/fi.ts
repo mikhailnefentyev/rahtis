@@ -46,6 +46,8 @@ export const fi = {
       'RAHTIS välittää irtoperien vaihdot, konttikuljetukset ja pikakuljetukset pakettiautolla tai kuorma-autolla hyväksytyille kuljetusliikkeille Suomessa ja Skandinaviassa. Tilaus tavoittaa sopivat autot heti, kuljetus näkyy vaihe vaiheelta ja asiakirjat syntyvät samaan paikkaan.',
     termsDescription:
       'RAHTIS-palvelun käyttöehdot: osapuolten vastuut, kuljetuksen kulku, maksut ja tilitykset sekä sopimuksen voimassaolo.',
+    customerTermsDescription:
+      'RAHTIS-tilaajan ehdot: toimeksianto ja hinta, lastaus- ja purkuaika, lautat, asiakirjat, laskutuskaudet ja vahinkojen ilmoittaminen.',
     privacyDescription:
       'Miten RAHTIS käsittelee henkilötietoja: mitä tietoja kerätään, mihin niitä käytetään, kuinka kauan niitä säilytetään ja mitkä ovat rekisteröidyn oikeudet.',
     signinDescription: 'Kirjaudu RAHTIS-palveluun tilaajana tai kuljetusliikkeenä.',
@@ -1099,7 +1101,7 @@ export const fi = {
     missing: 'Asiakirjaa ei ole vielä julkaistu.',
     clauseLink: 'Kopioi linkki kohtaan',
 
-    accept: 'Hyväksyn käyttöehdot ja tietosuojaselosteen',
+    accept: 'Hyväksyn seuraavat asiakirjat:',
     acceptRequired: 'Ehdot on hyväksyttävä ennen käyttöönottoa.',
 
     /* Ylläpito */

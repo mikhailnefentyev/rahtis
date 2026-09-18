@@ -683,6 +683,12 @@ export async function LandingSections({ locale }: { locale: Locale }) {
               {t.legal.TERMS}
             </Link>
             <Link
+              href={`/${locale}/${locale === 'fi' ? 'tilausehdot' : 'customer-terms'}`}
+              className="hover:text-ink-muted"
+            >
+              {t.legal.SHIPPER_AGREEMENT}
+            </Link>
+            <Link
               href={`/${locale}/${locale === 'fi' ? 'tietosuoja' : 'privacy'}`}
               className="hover:text-ink-muted"
             >
