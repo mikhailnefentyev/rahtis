@@ -69,6 +69,199 @@ export type Database = {
         }
         Relationships: []
       }
+      claim_attachments: {
+        Row: {
+          author_role: Database["public"]["Enums"]["party_role"]
+          claim_id: string
+          created_at: string
+          file_name: string
+          id: string
+          mime_type: string
+          size_bytes: number
+          storage_path: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          author_role: Database["public"]["Enums"]["party_role"]
+          claim_id: string
+          created_at?: string
+          file_name: string
+          id?: string
+          mime_type: string
+          size_bytes: number
+          storage_path: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          author_role?: Database["public"]["Enums"]["party_role"]
+          claim_id?: string
+          created_at?: string
+          file_name?: string
+          id?: string
+          mime_type?: string
+          size_bytes?: number
+          storage_path?: string
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_attachments_claim_id_fkey"
+            columns: ["claim_id"]
+            isOneToOne: false
+            referencedRelation: "claims"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      claim_events: {
+        Row: {
+          attachment_id: string | null
+          author_id: string | null
+          author_role: Database["public"]["Enums"]["party_role"]
+          body: string | null
+          claim_id: string
+          created_at: string
+          id: number
+          kind: Database["public"]["Enums"]["claim_event_kind"]
+          status_from: Database["public"]["Enums"]["claim_status"] | null
+          status_to: Database["public"]["Enums"]["claim_status"] | null
+        }
+        Insert: {
+          attachment_id?: string | null
+          author_id?: string | null
+          author_role: Database["public"]["Enums"]["party_role"]
+          body?: string | null
+          claim_id: string
+          created_at?: string
+          id?: never
+          kind: Database["public"]["Enums"]["claim_event_kind"]
+          status_from?: Database["public"]["Enums"]["claim_status"] | null
+          status_to?: Database["public"]["Enums"]["claim_status"] | null
+        }
+        Update: {
+          attachment_id?: string | null
+          author_id?: string | null
+          author_role?: Database["public"]["Enums"]["party_role"]
+          body?: string | null
+          claim_id?: string
+          created_at?: string
+          id?: never
+          kind?: Database["public"]["Enums"]["claim_event_kind"]
+          status_from?: Database["public"]["Enums"]["claim_status"] | null
+          status_to?: Database["public"]["Enums"]["claim_status"] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_events_attachment_id_fkey"
+            columns: ["attachment_id"]
+            isOneToOne: false
+            referencedRelation: "claim_attachments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_events_claim_id_fkey"
+            columns: ["claim_id"]
+            isOneToOne: false
+            referencedRelation: "claims"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      claims: {
+        Row: {
+          against_company_id: string
+          amount_cents: number | null
+          created_at: string
+          description: string
+          filed_by: string | null
+          filed_by_company_id: string
+          filed_by_role: Database["public"]["Enums"]["party_role"]
+          id: string
+          kind: Database["public"]["Enums"]["claim_kind"]
+          mirrored_at: string | null
+          mirrored_to: string | null
+          order_id: string
+          ref: string
+          resolution: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          status: Database["public"]["Enums"]["claim_status"]
+          stop_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          against_company_id: string
+          amount_cents?: number | null
+          created_at?: string
+          description: string
+          filed_by?: string | null
+          filed_by_company_id: string
+          filed_by_role: Database["public"]["Enums"]["party_role"]
+          id?: string
+          kind: Database["public"]["Enums"]["claim_kind"]
+          mirrored_at?: string | null
+          mirrored_to?: string | null
+          order_id: string
+          ref: string
+          resolution?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: Database["public"]["Enums"]["claim_status"]
+          stop_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          against_company_id?: string
+          amount_cents?: number | null
+          created_at?: string
+          description?: string
+          filed_by?: string | null
+          filed_by_company_id?: string
+          filed_by_role?: Database["public"]["Enums"]["party_role"]
+          id?: string
+          kind?: Database["public"]["Enums"]["claim_kind"]
+          mirrored_at?: string | null
+          mirrored_to?: string | null
+          order_id?: string
+          ref?: string
+          resolution?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: Database["public"]["Enums"]["claim_status"]
+          stop_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claims_against_company_id_fkey"
+            columns: ["against_company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claims_filed_by_company_id_fkey"
+            columns: ["filed_by_company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claims_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claims_stop_id_fkey"
+            columns: ["stop_id"]
+            isOneToOne: false
+            referencedRelation: "order_stops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       companies: {
         Row: {
           activated_at: string | null
@@ -700,39 +893,60 @@ export type Database = {
       }
       order_documents: {
         Row: {
+          captured_at: string | null
+          captured_lat: number | null
+          captured_lon: number | null
           created_at: string
+          external_id: string | null
           file_name: string
           id: string
           kind: Database["public"]["Enums"]["trip_document_kind"]
           mime_type: string
           order_id: string
+          phase: Database["public"]["Enums"]["trip_phase"] | null
           size_bytes: number
+          source: Database["public"]["Enums"]["trip_document_source"]
           stop_id: string | null
           storage_path: string
+          subject: Database["public"]["Enums"]["photo_subject"] | null
           uploaded_by: string | null
         }
         Insert: {
+          captured_at?: string | null
+          captured_lat?: number | null
+          captured_lon?: number | null
           created_at?: string
+          external_id?: string | null
           file_name: string
           id?: string
           kind: Database["public"]["Enums"]["trip_document_kind"]
           mime_type: string
           order_id: string
+          phase?: Database["public"]["Enums"]["trip_phase"] | null
           size_bytes: number
+          source?: Database["public"]["Enums"]["trip_document_source"]
           stop_id?: string | null
           storage_path: string
+          subject?: Database["public"]["Enums"]["photo_subject"] | null
           uploaded_by?: string | null
         }
         Update: {
+          captured_at?: string | null
+          captured_lat?: number | null
+          captured_lon?: number | null
           created_at?: string
+          external_id?: string | null
           file_name?: string
           id?: string
           kind?: Database["public"]["Enums"]["trip_document_kind"]
           mime_type?: string
           order_id?: string
+          phase?: Database["public"]["Enums"]["trip_phase"] | null
           size_bytes?: number
+          source?: Database["public"]["Enums"]["trip_document_source"]
           stop_id?: string | null
           storage_path?: string
+          subject?: Database["public"]["Enums"]["photo_subject"] | null
           uploaded_by?: string | null
         }
         Relationships: [
@@ -1830,6 +2044,17 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      attach_to_claim: {
+        Args: {
+          p_claim_id: string
+          p_file_name: string
+          p_mime_type: string
+          p_note?: string
+          p_size_bytes: number
+          p_storage_path: string
+        }
+        Returns: string
+      }
       auth_throttle_hit: {
         Args: { p_key_hash: string; p_limit: number; p_window_seconds: number }
         Returns: boolean
@@ -1948,6 +2173,8 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      claim_detail: { Args: { p_claim_id: string }; Returns: Json }
+      claims_open_count: { Args: never; Returns: number }
       close_order: {
         Args: { p_order_id: string }
         Returns: {
@@ -1995,6 +2222,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      comment_claim: {
+        Args: { p_body: string; p_claim_id: string }
+        Returns: number
       }
       company_readiness: {
         Args: { p_company_id: string }
@@ -2297,6 +2528,42 @@ export type Database = {
       }
       driver_next_stop: { Args: { p_phone: string }; Returns: Json }
       expire_order_deadlines: { Args: never; Returns: number }
+      file_claim: {
+        Args: {
+          p_amount_cents?: number
+          p_description: string
+          p_kind: Database["public"]["Enums"]["claim_kind"]
+          p_order_id: string
+          p_stop_id?: string
+        }
+        Returns: {
+          against_company_id: string
+          amount_cents: number | null
+          created_at: string
+          description: string
+          filed_by: string | null
+          filed_by_company_id: string
+          filed_by_role: Database["public"]["Enums"]["party_role"]
+          id: string
+          kind: Database["public"]["Enums"]["claim_kind"]
+          mirrored_at: string | null
+          mirrored_to: string | null
+          order_id: string
+          ref: string
+          resolution: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          status: Database["public"]["Enums"]["claim_status"]
+          stop_id: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "claims"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       fleet_size: {
         Args: never
         Returns: {
@@ -2434,6 +2701,29 @@ export type Database = {
           vehicle_plate: string
         }[]
       }
+      my_claims: {
+        Args: { p_status?: Database["public"]["Enums"]["claim_status"] }
+        Returns: {
+          amount_cents: number
+          carrier_name: string
+          created_at: string
+          events_count: number
+          filed_by_role: Database["public"]["Enums"]["party_role"]
+          id: string
+          kind: Database["public"]["Enums"]["claim_kind"]
+          last_event_at: string
+          mine: boolean
+          order_id: string
+          order_ref: string
+          ref: string
+          route_from: string
+          route_to: string
+          shipper_name: string
+          status: Database["public"]["Enums"]["claim_status"]
+          updated_at: string
+          vehicle_plate: string
+        }[]
+      }
       new_legal_version: {
         Args: { p_kind: Database["public"]["Enums"]["legal_kind"] }
         Returns: {
@@ -2507,6 +2797,57 @@ export type Database = {
           ratings_count: number
         }[]
       }
+      period_claims: {
+        Args: { p_company?: string; p_from: string; p_to: string }
+        Returns: {
+          amount_cents: number
+          carrier_name: string
+          created_at: string
+          filed_by_role: Database["public"]["Enums"]["party_role"]
+          id: string
+          kind: Database["public"]["Enums"]["claim_kind"]
+          mine: boolean
+          order_ref: string
+          ref: string
+          resolution: string
+          resolved_at: string
+          shipper_name: string
+          status: Database["public"]["Enums"]["claim_status"]
+        }[]
+      }
+      period_report: {
+        Args: { p_company?: string; p_from: string; p_to: string }
+        Returns: {
+          carrier_country: string
+          carrier_id: string
+          carrier_name: string
+          claims: Json
+          closed_at: string
+          closed_on: string
+          cmr_count: number
+          commission_bps: number
+          commission_cents: number
+          container_feet: number
+          distance_km: number
+          documents_count: number
+          haul_kind: Database["public"]["Enums"]["haul_kind"]
+          id: string
+          order_type: Database["public"]["Enums"]["order_type"]
+          payout_cents: number
+          photos_count: number
+          rate_cents: number
+          ref: string
+          route: string
+          shipper_country: string
+          shipper_id: string
+          shipper_name: string
+          shipper_ref: string
+          stops_count: number
+          trailer: string
+          trailer_plate: string
+          vehicle_plate: string
+        }[]
+      }
       platform_pulse: {
         Args: never
         Returns: {
@@ -2548,6 +2889,24 @@ export type Database = {
           p_sqlstate?: string
         }
         Returns: number
+      }
+      register_trip_photo: {
+        Args: {
+          p_captured_at?: string
+          p_damage?: boolean
+          p_external_id?: string
+          p_file_name: string
+          p_lat?: number
+          p_lon?: number
+          p_mime_type: string
+          p_order_id: string
+          p_phase: Database["public"]["Enums"]["trip_phase"]
+          p_size_bytes: number
+          p_stop_id?: string
+          p_storage_path: string
+          p_subject?: Database["public"]["Enums"]["photo_subject"]
+        }
+        Returns: string
       }
       remove_stop: {
         Args: { p_stop_id: string }
@@ -2680,6 +3039,40 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      set_claim_status: {
+        Args: {
+          p_claim_id: string
+          p_note?: string
+          p_status: Database["public"]["Enums"]["claim_status"]
+        }
+        Returns: {
+          against_company_id: string
+          amount_cents: number | null
+          created_at: string
+          description: string
+          filed_by: string | null
+          filed_by_company_id: string
+          filed_by_role: Database["public"]["Enums"]["party_role"]
+          id: string
+          kind: Database["public"]["Enums"]["claim_kind"]
+          mirrored_at: string | null
+          mirrored_to: string | null
+          order_id: string
+          ref: string
+          resolution: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          status: Database["public"]["Enums"]["claim_status"]
+          stop_id: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "claims"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -2998,6 +3391,14 @@ export type Database = {
       chat_audience: "DRIVER" | "CARRIER" | "SHIPPER" | "ADMIN"
       chat_channel: "WEB" | "WHATSAPP"
       chat_sender: "USER" | "AGENT" | "OPERATOR"
+      claim_event_kind: "CREATED" | "COMMENT" | "STATUS" | "ATTACHMENT"
+      claim_kind:
+        | "CARGO_DAMAGE"
+        | "SHORTAGE"
+        | "DOWNTIME"
+        | "DEVIATION"
+        | "OTHER"
+      claim_status: "OPEN" | "IN_REVIEW" | "RESOLVED" | "REJECTED"
       company_status: "PENDING" | "APPROVED" | "ACTIVE" | "REJECTED"
       distance_source: "MANUAL" | "AUTO"
       document_kind: "CARRIER_LICENSE" | "INSURANCE"
@@ -3019,6 +3420,7 @@ export type Database = {
         | "MODERATION"
         | "REPORT"
         | "ADMIN_MESSAGE"
+        | "CLAIM"
       order_status:
         | "DRAFT"
         | "OPEN"
@@ -3029,6 +3431,7 @@ export type Database = {
         | "CANCELLED"
       order_type: "TRAILER_SWAP" | "ROUND_TRIP" | "ONE_WAY"
       party_role: "CARRIER" | "SHIPPER" | "ADMIN"
+      photo_subject: "TRAILER" | "CARGO" | "SEAL" | "DOCUMENT" | "OTHER"
       place_kind: "PORT" | "TERMINAL" | "PARKING" | "ADDRESS"
       report_kind: "WEEK" | "PERIOD"
       stop_role:
@@ -3043,6 +3446,8 @@ export type Database = {
         | "LOADING_PHOTO"
         | "UNLOADING_PHOTO"
         | "DAMAGE_PHOTO"
+      trip_document_source: "CABINET" | "DRIVER_APP"
+      trip_phase: "PICKUP" | "DELIVERY"
       vehicle_access: "DRAFT" | "PENDING" | "APPROVED" | "REJECTED"
       vehicle_class: "TRACTOR" | "VAN" | "TRUCK"
     }
@@ -3187,6 +3592,15 @@ export const Constants = {
       chat_audience: ["DRIVER", "CARRIER", "SHIPPER", "ADMIN"],
       chat_channel: ["WEB", "WHATSAPP"],
       chat_sender: ["USER", "AGENT", "OPERATOR"],
+      claim_event_kind: ["CREATED", "COMMENT", "STATUS", "ATTACHMENT"],
+      claim_kind: [
+        "CARGO_DAMAGE",
+        "SHORTAGE",
+        "DOWNTIME",
+        "DEVIATION",
+        "OTHER",
+      ],
+      claim_status: ["OPEN", "IN_REVIEW", "RESOLVED", "REJECTED"],
       company_status: ["PENDING", "APPROVED", "ACTIVE", "REJECTED"],
       distance_source: ["MANUAL", "AUTO"],
       document_kind: ["CARRIER_LICENSE", "INSURANCE"],
@@ -3209,6 +3623,7 @@ export const Constants = {
         "MODERATION",
         "REPORT",
         "ADMIN_MESSAGE",
+        "CLAIM",
       ],
       order_status: [
         "DRAFT",
@@ -3221,6 +3636,7 @@ export const Constants = {
       ],
       order_type: ["TRAILER_SWAP", "ROUND_TRIP", "ONE_WAY"],
       party_role: ["CARRIER", "SHIPPER", "ADMIN"],
+      photo_subject: ["TRAILER", "CARGO", "SEAL", "DOCUMENT", "OTHER"],
       place_kind: ["PORT", "TERMINAL", "PARKING", "ADDRESS"],
       report_kind: ["WEEK", "PERIOD"],
       stop_role: [
@@ -3237,6 +3653,8 @@ export const Constants = {
         "UNLOADING_PHOTO",
         "DAMAGE_PHOTO",
       ],
+      trip_document_source: ["CABINET", "DRIVER_APP"],
+      trip_phase: ["PICKUP", "DELIVERY"],
       vehicle_access: ["DRAFT", "PENDING", "APPROVED", "REJECTED"],
       vehicle_class: ["TRACTOR", "VAN", "TRUCK"],
     },

@@ -165,3 +165,105 @@ export const DRIVER_LANGUAGES = [
 
 /** Роли, у которых есть компания. У ADMIN её нет. */
 export type CompanyRole = Exclude<PartyRole, 'ADMIN'>;
+
+/* ── Claims: претензии и отклонения по рейсу ───────────────────── */
+
+export type ClaimKind = Database['public']['Enums']['claim_kind'];
+export type ClaimStatus = Database['public']['Enums']['claim_status'];
+export type ClaimEventKind = Database['public']['Enums']['claim_event_kind'];
+export type TripPhase = Database['public']['Enums']['trip_phase'];
+
+/** Строка списка claims: имена сторон уже обрезаны по роли в my_claims. */
+export type ClaimListItem = Database['public']['Functions']['my_claims']['Returns'][number];
+
+/**
+ * Карточка claim из claim_detail.
+ *
+ * Функция отдаёт jsonb, и генератор типов видит в нём только Json.
+ * Форма записана здесь рядом с функцией, которая её собирает; поля,
+ * которые роли знать не положено, приходят null — как в completed_orders.
+ */
+export type ClaimDetail = {
+  viewer: PartyRole;
+  /** Где идёт разговор: CABINET у подавшего и оператора, EMAIL у второй стороны. */
+  channel: 'CABINET' | 'EMAIL';
+  claim: {
+    id: string;
+    ref: string;
+    kind: ClaimKind;
+    status: ClaimStatus;
+    filed_by_role: PartyRole;
+    mine: boolean;
+    stop_id: string | null;
+    description: string;
+    amount_cents: number | null;
+    resolution: string | null;
+    resolved_at: string | null;
+    created_at: string;
+    updated_at: string;
+    mirrored_at: string | null;
+    /** Только оператору. */
+    mirrored_to: string | null;
+  };
+  order: {
+    id: string;
+    ref: string;
+    shipper_ref: string | null;
+    status: OrderStatus;
+    order_type: OrderType;
+    haul_kind: Database['public']['Enums']['haul_kind'];
+    container_feet: number | null;
+    trailer: string | null;
+    trailer_plate: string | null;
+    distance_km: number | null;
+    rate_cents: number | null;
+    closed_at: string | null;
+    vehicle_plate: string | null;
+    shipper_name: string | null;
+    carrier_name: string | null;
+    route_geometry: string | null;
+    route_bounds: number[] | null;
+    stops: OrderStop[] | null;
+  };
+  documents: Array<
+    Pick<
+      TripDocument,
+      | 'id'
+      | 'kind'
+      | 'file_name'
+      | 'storage_path'
+      | 'mime_type'
+      | 'size_bytes'
+      | 'stop_id'
+      | 'source'
+      | 'phase'
+      | 'subject'
+      | 'captured_at'
+      | 'created_at'
+    >
+  >;
+  attachments: Array<{
+    id: string;
+    file_name: string;
+    storage_path: string;
+    mime_type: string;
+    size_bytes: number;
+    author_role: PartyRole;
+    created_at: string;
+  }>;
+  events: Array<{
+    id: number;
+    kind: ClaimEventKind;
+    author_role: PartyRole;
+    body: string | null;
+    status_from: ClaimStatus | null;
+    status_to: ClaimStatus | null;
+    attachment_id: string | null;
+    created_at: string;
+  }>;
+};
+
+/* ── Отчёт за период ──────────────────────────────────────────── */
+
+export type PeriodReportRow = Database['public']['Functions']['period_report']['Returns'][number];
+export type PeriodClaim = Database['public']['Functions']['period_claims']['Returns'][number];

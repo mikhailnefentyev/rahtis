@@ -125,6 +125,8 @@ function cabinetTabs(locale: Locale, role: PartyRole, home: string, t: Dictionar
       { href: `/${locale}/carrier/desk`, label: t.desk.title },
       { href: `/${locale}/carrier/fleet`, label: t.fleet.title },
       { href: `/${locale}/carrier/done`, label: t.done.titleCarrier },
+      { href: `/${locale}/carrier/claims`, label: t.claims.title },
+      { href: `/${locale}/carrier/reports`, label: t.periodReport.title },
     ];
   }
 
@@ -133,12 +135,16 @@ function cabinetTabs(locale: Locale, role: PartyRole, home: string, t: Dictionar
       overview,
       { href: `/${locale}/shipper/orders`, label: t.orders.title },
       { href: `/${locale}/shipper/done`, label: t.done.titleShipper },
+      { href: `/${locale}/shipper/claims`, label: t.claims.title },
+      { href: `/${locale}/shipper/reports`, label: t.periodReport.title },
     ];
   }
 
   return [
     overview,
     { href: `/${locale}/admin/billing`, label: t.done.titleAdmin },
+    { href: `/${locale}/admin/claims`, label: t.claims.title },
+    { href: `/${locale}/admin/reports`, label: t.periodReport.title },
     { href: `/${locale}/admin/legal`, label: t.legal.manage },
     { href: `/${locale}/admin/outbox`, label: t.outbox.title },
   ];

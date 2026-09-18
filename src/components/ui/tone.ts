@@ -1,4 +1,4 @@
-import type { CompanyStatus, OrderStatus, VehicleAccess } from '@/types/db';
+import type { ClaimStatus, CompanyStatus, OrderStatus, VehicleAccess } from '@/types/db';
 
 /**
  * Тон — семантическая роль элемента, а не его цвет.
@@ -67,3 +67,10 @@ export const vehicleAccessTone = {
   APPROVED: 'ok',
   REJECTED: 'danger',
 } as const satisfies Record<VehicleAccess, StatusTone>;
+
+export const claimStatusTone = {
+  OPEN: 'warn',
+  IN_REVIEW: 'live',
+  RESOLVED: 'ok',
+  REJECTED: 'neutral',
+} as const satisfies Record<ClaimStatus, StatusTone>;

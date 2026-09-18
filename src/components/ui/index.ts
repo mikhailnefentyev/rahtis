@@ -15,6 +15,7 @@ export type { TabItem } from './Tabs';
 export { Waypoint, WaypointList } from './Waypoint';
 export type { WaypointKind } from './Waypoint';
 export {
+  claimStatusTone,
   companyStatusTone,
   orderStatusTone,
   statusTextClass,

@@ -6,6 +6,7 @@ import { HaulBadge } from '@/components/domain/HaulBadge';
 import { RouteStops } from '@/components/domain/RouteStops';
 import { RateTrip } from '@/components/domain/RateTrip';
 import { DocumentList } from '@/components/domain/TripDocuments';
+import { FileClaim } from '@/components/domain/claims/ClaimActions';
 import {
   Badge,
   Button,
@@ -37,9 +38,12 @@ import type { CompletedOrder, OrderStop, TripDocument, WeeklyTotal } from '@/typ
 export function CompletedList({
   orders,
   totals,
+  canClaim = false,
 }: {
   orders: CompletedOrder[];
   totals: WeeklyTotal[];
+  /** Сторона рейса может подать claim; оператор — нет, он посредник. */
+  canClaim?: boolean;
 }) {
   const { t, m, f } = useI18n();
   const [opened, setOpened] = useState<string | null>(null);
@@ -242,6 +246,12 @@ export function CompletedList({
                             <p className="label-micro mb-2.5">{t.trip.documents}</p>
                             <DocumentList documents={documents} />
                           </div>
+
+                          {canClaim && (
+                            <div className="mt-4 border-t border-line pt-4">
+                              <FileClaim orderId={order.id} stops={stops} />
+                            </div>
+                          )}
 
                           {/*
                            * Право оценить решает база: у заказчика рейса с

@@ -90,7 +90,7 @@ export async function CompletedCabinet({
         {subtitle} {vatNote}
       </p>
 
-      <CompletedList orders={orders ?? []} totals={totals ?? []} />
+      <CompletedList orders={orders ?? []} totals={totals ?? []} canClaim />
 
       {/*
         * Сказано прямо, где кончается список.
