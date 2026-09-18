@@ -389,7 +389,7 @@ export function RequisitesForm({ company }: { company: Company }) {
             <>
               {' · '}
               <a
-                href={`/${locale}/${locale === 'fi' ? 'tilausehdot' : 'customer-terms'}`}
+                href={`/${locale}/shipper/terms`}
                 target="_blank"
                 rel="noopener"
                 className="font-semibold text-accent hover:underline"

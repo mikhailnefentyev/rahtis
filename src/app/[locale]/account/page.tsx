@@ -106,6 +106,45 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
             </section>
           )}
 
+          {/*
+            * Документы компании собраны в одном месте кабинета.
+            *
+            * Общие два лежат на витрине: их читают до регистрации. Свой
+            * договор — здесь и только здесь: ставки, простой и сроки
+            * оплаты касаются сторон, а не прохожих. У оператора этого
+            * блока нет — он правит документы в разделе «Asiakirjat ja
+            * versiot».
+            */}
+          {company && (
+            <Card>
+              <CardBody className="flex flex-col gap-3">
+                <h2 className="text-[15px] font-semibold tracking-tight">
+                  {t.legal.ownDocuments}
+                </h2>
+                <div className="flex flex-col gap-2 text-[13px]">
+                  <Link
+                    href={`/${locale}/${company.kind === 'CARRIER' ? 'carrier' : 'shipper'}/terms`}
+                    className="font-semibold text-accent hover:underline"
+                  >
+                    {company.kind === 'CARRIER' ? t.legal.CARRIER_AGREEMENT : t.legal.SHIPPER_AGREEMENT}
+                  </Link>
+                  <Link
+                    href={`/${locale}/${locale === 'fi' ? 'kayttoehdot' : 'terms'}`}
+                    className="text-ink-muted hover:text-ink"
+                  >
+                    {t.legal.TERMS}
+                  </Link>
+                  <Link
+                    href={`/${locale}/${locale === 'fi' ? 'tietosuoja' : 'privacy'}`}
+                    className="text-ink-muted hover:text-ink"
+                  >
+                    {t.legal.PRIVACY}
+                  </Link>
+                </div>
+              </CardBody>
+            </Card>
+          )}
+
           <Card>
             <CardBody className="flex flex-col gap-4">
               <div>
