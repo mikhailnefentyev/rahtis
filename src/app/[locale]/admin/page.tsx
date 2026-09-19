@@ -107,13 +107,12 @@ export default async function AdminPage({
    * почему. Дублировать её условие значило бы завести второй список
    * правил, который однажды разойдётся с первым.
    */
-  const { data: disposable } = await supabase
-    .from('orders')
-    .select('id, ref, status, created_at, distance_km, rate_cents, shipper:companies!orders_company_fk(name)')
-    .in('status', ['DRAFT', 'OPEN', 'CANCELLED'])
-    .is('invoiced_at', null)
-    .order('created_at', { ascending: false })
-    .limit(30);
+  /*
+   * Функцией: invoiced_at закрыт колоночным грантом, и фильтр по нему у
+   * оператора падал с 42501 — список удаляемых заказов был всегда пуст.
+   */
+  const { data: disposableRows } = await supabase.rpc('admin_disposable_orders', { p_limit: 30 });
+  const disposable = (disposableRows ?? []).map((row) => ({ ...row, shipper: { name: row.shipper_name } }));
 
   /* Документы компаний, чьи машины сейчас на допуске: решение принимается вместе. */
   const vehicleCompanyIds = [...new Set((pendingVehicles ?? []).map((v) => v.company_id))];

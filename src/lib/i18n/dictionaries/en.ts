@@ -1540,10 +1540,10 @@ export const en = {
      * and the buyer accounts for the tax at home. See VAT_BPS in
      * lib/config.ts.
      */
-    addVat: 'VAT 0%',
+    addVat: 'excl. VAT',
     vatByCountry: 'Amounts exclude VAT. The rate follows the counterparty country.',
     calcNote:
-      'Amounts at VAT 0%. Reverse charge: the buyer accounts for the tax in their own country.',
+      'Amounts excl. VAT. For a Finnish company 25.5% is added; for a company in another country the reverse charge applies.',
 
     gross: 'Gross price',
     commission: 'Service fee',
@@ -1563,7 +1563,7 @@ export const en = {
     countInProgress: 'On the road',
     earnings: 'Earnings by week',
     spend: 'Costs by week',
-    vatFree: 'VAT 0%',
+    vatFree: 'excl. VAT',
     empty: 'The chart appears once the first job is completed.',
   },
 
@@ -1733,6 +1733,7 @@ export const en = {
     'event.vehicle.approved': 'Vehicle {plate} is approved',
     'event.vehicle.rejected': 'Vehicle {plate} was not approved',
 
+    'event.rating.received': 'The shipper rated trip {ref}: {score} / 5',
     'event.claim.opened': 'New claim {ref} on trip {order}',
     'event.claim.comment': 'New message in claim {ref}',
     'event.claim.attachment': 'New attachment in claim {ref}',

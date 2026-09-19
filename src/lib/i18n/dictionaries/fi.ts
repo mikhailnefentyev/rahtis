@@ -1630,10 +1630,16 @@ export const fi = {
      * käännetyllä verovelvollisuudella. Myyjä laskuttaa 0 %, ostaja
      * tilittää veron omassa maassaan. Ks. VAT_BPS lib/config.ts.
      */
-    addVat: 'alv 0 %',
+    /*
+     * Summat ovat verottomia; kanta riippuu vastapuolen maasta (25,5 %
+     * suomalaiselle, käännetty verovelvollisuus ulkomaiselle). Merkintä
+     * sanoo siksi 'ilman alv:tä', ei 'alv 0 %', joka väitti nollakantaa
+     * myös suomalaiselle asiakkaalle.
+     */
+    addVat: 'ilman alv:tä',
     vatByCountry: 'Summat ilman alv:ta. Kanta määräytyy vastapuolen maan mukaan.',
     calcNote:
-      'Summat alv 0 %. Käännetty verovelvollisuus: ostaja tilittää veron omassa maassaan.',
+      'Summat ilman alv:tä. Suomalaiselle yritykselle lisätään 25,5 %, muun maan yritykselle sovelletaan käännettyä verovelvollisuutta.',
 
     gross: 'Bruttohinta',
     commission: 'Palvelumaksu',
@@ -1661,7 +1667,7 @@ export const fi = {
     countInProgress: 'Ajossa',
     earnings: 'Ansiot viikoittain',
     spend: 'Kustannukset viikoittain',
-    vatFree: 'alv 0 %',
+    vatFree: 'ilman alv:tä',
     empty: 'Kaavio piirtyy, kun ensimmäinen kuljetus on valmis.',
   },
 
@@ -1838,6 +1844,7 @@ export const fi = {
     'event.vehicle.approved': 'Ajoneuvo {plate} on hyväksytty',
     'event.vehicle.rejected': 'Ajoneuvoa {plate} ei hyväksytty',
 
+    'event.rating.received': 'Tilaaja arvioi kuljetuksen {ref}: {score} / 5',
     'event.claim.opened': 'Uusi reklamaatio {ref} kuljetuksesta {order}',
     'event.claim.comment': 'Uusi viesti reklamaatiossa {ref}',
     'event.claim.attachment': 'Uusi liite reklamaatiossa {ref}',

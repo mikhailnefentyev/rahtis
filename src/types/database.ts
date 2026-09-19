@@ -1969,6 +1969,25 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_company_orders: {
+        Args: { p_company_id: string }
+        Returns: {
+          as_carrier: number
+          as_shipper: number
+        }[]
+      }
+      admin_disposable_orders: {
+        Args: { p_limit?: number }
+        Returns: {
+          created_at: string
+          distance_km: number
+          id: string
+          rate_cents: number
+          ref: string
+          shipper_name: string
+          status: Database["public"]["Enums"]["order_status"]
+        }[]
+      }
       agent_ask_operator: {
         Args: {
           p_conversation_id: string
@@ -2124,6 +2143,20 @@ export type Database = {
       auth_throttle_hit: {
         Args: { p_key_hash: string; p_limit: number; p_window_seconds: number }
         Returns: boolean
+      }
+      billing_queue: {
+        Args: { p_limit?: number }
+        Returns: {
+          billing: Database["public"]["Enums"]["billing_status"]
+          carrier_name: string
+          closed_at: string
+          commission_bps: number
+          id: string
+          invoice_ref: string
+          rate_cents: number
+          ref: string
+          shipper_name: string
+        }[]
       }
       cancel_order: {
         Args: { p_order_id: string }

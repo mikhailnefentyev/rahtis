@@ -89,12 +89,12 @@ export default async function BillingPage({
      * та функция описывает рейс, и добавлять в неё колонки бухгалтерии
      * значит показывать их всем, кто её зовёт, включая обе стороны.
      */
-    supabase
-      .from('orders')
-      .select('id, ref, rate_cents, commission_bps, billing, invoice_ref, closed_at')
-      .eq('status', 'DONE')
-      .order('closed_at', { ascending: false })
-      .limit(50),
+    /*
+     * Функцией, а не выборкой из orders: колонки расчётов закрыты
+     * колоночными грантами от всех вошедших (заказчик не должен видеть
+     * комиссию), и прямой запрос оператора молча возвращал ошибку.
+     */
+    supabase.rpc('billing_queue', { p_limit: 50 }),
   ]);
 
   const rows = (partners ?? []) as PartnerTotal[];

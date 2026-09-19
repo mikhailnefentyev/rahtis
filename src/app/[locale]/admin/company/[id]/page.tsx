@@ -61,7 +61,7 @@ export default async function AdminCompanyPage({
    * дорисовывается по частям. Заказы считаются с обеих сторон — компания
    * могла быть и заказчиком, и перевозчиком.
    */
-  const [{ data: documents }, { data: vehicles }, { data: people }, { count: asShipper }, { count: asCarrier }] =
+  const [{ data: documents }, { data: vehicles }, { data: people }, { data: counts }] =
     await Promise.all([
       supabase
         .from('company_documents')
@@ -74,15 +74,16 @@ export default async function AdminCompanyPage({
         .eq('company_id', id)
         .order('plate'),
       supabase.from('profiles').select('id, full_name, phone, role').eq('company_id', id),
-      supabase
-        .from('orders')
-        .select('id', { count: 'exact', head: true })
-        .eq('shipper_company_id', id),
-      supabase
-        .from('orders')
-        .select('id', { count: 'exact', head: true })
-        .eq('assigned_company_id', id),
+      /*
+       * Функцией: исполнитель заказа закрыт колоночным грантом от всех
+       * вошедших, и прямой фильтр по нему у оператора падал с 42501 —
+       * у перевозчика всегда выходило «нет рейсов».
+       */
+      supabase.rpc('admin_company_orders', { p_company_id: id }),
     ]);
+
+  const asShipper = Number(counts?.[0]?.as_shipper ?? 0);
+  const asCarrier = Number(counts?.[0]?.as_carrier ?? 0);
 
   const byKind = (kind: DocumentKind): CompanyDocument | null =>
     (documents ?? []).find((d) => d.kind === kind) ?? null;
