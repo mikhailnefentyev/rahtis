@@ -16,6 +16,7 @@ const TOOLS = {
   order_by_ref: { fn: 'agent_order_by_ref', args: ['ref'] },
   trip_status: { fn: 'agent_trip_status', args: ['ref'] },
   trip_documents: { fn: 'agent_trip_documents', args: ['ref'] },
+  claim: { fn: 'agent_claim', args: ['ref'] },
   company_money: { fn: 'agent_company_money', args: ['weeks'] },
   payout_schedule: { fn: 'agent_payout_schedule', args: ['periods'] },
   legal_clause: { fn: 'agent_legal_clause', args: ['number', 'kind', 'locale'] },

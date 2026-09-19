@@ -1997,6 +1997,27 @@ export type Database = {
         }
         Returns: Json
       }
+      agent_claim: {
+        Args: { p_conversation_id: string; p_ref: string; p_token: string }
+        Returns: {
+          amount_eur: number
+          carrier_name: string
+          created_at: string
+          description: string
+          filed_by: string
+          filed_by_you: boolean
+          forwarded_to_counterparty_at: string
+          kind: Database["public"]["Enums"]["claim_kind"]
+          last_operator_message: string
+          messages_count: number
+          order_ref: string
+          ref: string
+          resolution: string
+          resolved_at: string
+          shipper_name: string
+          status: Database["public"]["Enums"]["claim_status"]
+        }[]
+      }
       agent_company_money: {
         Args: { p_conversation_id: string; p_token: string; p_weeks?: number }
         Returns: {

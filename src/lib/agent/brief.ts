@@ -98,6 +98,24 @@ export function agentTools(audience: Audience): ToolSpec[] {
    */
   if (!driver) {
     tools.push(
+      /*
+       * Претензии — компаниям и оператору, не водителю. Права режет база:
+       * вторая сторона видит суть и решение, но не переписку подавшего с
+       * оператором.
+       */
+      {
+        name: 'claim',
+        description: admin
+          ? 'Претензия (reklamaatio) по её номеру CL-… или все претензии рейса по номеру RS-…: вид, статус, сумма, описание, решение, когда переслана второй стороне, число сообщений и последний ответ оператора.'
+          : 'Претензия (reklamaatio) своей компании по номеру CL-… или все претензии рейса по номеру RS-…: вид, статус, сумма, описание и решение оператора.',
+        input_schema: {
+          type: 'object',
+          properties: {
+            ref: { type: 'string', description: 'Номер претензии CL-RS-2026-0059-1 или номер рейса RS-2026-0059' },
+          },
+          required: ['ref'],
+        },
+      },
       {
         name: 'company_money',
         description: admin
@@ -171,7 +189,8 @@ export function agentTools(audience: Audience): ToolSpec[] {
         + 'Таблицы: companies, profiles, orders, order_stops, order_offers, order_documents, '
         + 'order_amendments, vehicles, company_documents, ratings, notifications, email_outbox, '
         + 'weekly_reports, support_messages, incidents, conversations, messages, legal_documents, '
-        + 'legal_clauses, place_guides. Только чтение, одна инструкция, до 1000 строк. '
+        + 'legal_clauses, place_guides, claims (претензии CL-…), claim_events (их лента), '
+        + 'claim_attachments, operator_profile (реквизиты Aivomaa Oy). Только чтение, одна инструкция, до 1000 строк. '
         + 'Суммы везде в центах. Пиши обычный SQL: from orders, а не from public.orders.',
       input_schema: {
         type: 'object',
