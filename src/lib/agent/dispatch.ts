@@ -20,6 +20,50 @@ import { emailLocaleOf } from '@/lib/email/text';
  */
 type Delivery = { url: string; secret: string; body: string; conversationId: string };
 
+/** Сколько прошлых реплик треда видит агент. */
+const HISTORY_MESSAGES = 12;
+/** Длинная реплика обрезается: история — контекст, а не архив. */
+const HISTORY_CHARS = 800;
+
+const SPEAKER: Record<string, string> = {
+  USER: 'Собеседник',
+  AGENT: 'Ты (помощник)',
+  OPERATOR: 'Оператор RAHTIS',
+};
+
+/**
+ * Наставление с хвостом переписки.
+ *
+ * Правило сказано явно: номер, который уже назван, не переспрашивать, а
+ * короткое «передай» или «да» — это согласие на то, что помощник сам
+ * только что предложил.
+ */
+function withHistory(
+  system: string,
+  history: Array<{ sender: string; body: string | null }>,
+): string {
+  const lines = history
+    .filter((m) => m.body && m.body.trim())
+    .map((m) => {
+      const body = m.body!.trim();
+      const cut = body.length > HISTORY_CHARS ? `${body.slice(0, HISTORY_CHARS)}…` : body;
+      return `[${SPEAKER[m.sender] ?? m.sender}] ${cut}`;
+    });
+
+  if (!lines.length) return system;
+
+  return [
+    system,
+    '',
+    'ПРЕДЫДУЩИЕ СООБЩЕНИЯ ЭТОГО РАЗГОВОРА (от старых к новым). Это контекст, а не новые вопросы:',
+    ...lines,
+    '',
+    'Номера заказов и претензий, уже названные выше, не переспрашивай — бери их отсюда. ' +
+      'Короткий ответ («передай», «да», «давай») — согласие на то, что ты сам предложил последним: ' +
+      'выполни это сразу, собрав вопрос из контекста.',
+  ].join('\n');
+}
+
 /**
  * Пометка ожидания и сбор запроса — без обращения к воркфлоу.
  *
@@ -70,8 +114,28 @@ export async function prepareDispatch(
           .eq('id', conversation.company_id)
           .single()
       : Promise.resolve({ data: null }),
-    admin.from('messages').select('body, sender_user_id').eq('id', messageId).single(),
+    admin.from('messages').select('body, sender_user_id, created_at').eq('id', messageId).single(),
   ]);
+
+  /*
+   * Прошлые реплики этого треда.
+   *
+   * Воркфлоу собирает запрос к модели из одного присланного сообщения, и
+   * без истории каждая реплика была для агента первой: на «передай» он
+   * снова спрашивал номер претензии, названный строкой выше. История
+   * едет в наставлении, а не отдельным полем: наставление воркфлоу уже
+   * передаёт модели как есть, и правка работает выкладкой сайта, без
+   * переимпорта сценария в n8n.
+   */
+  const { data: earlier } = message?.created_at
+    ? await admin
+        .from('messages')
+        .select('sender, body')
+        .eq('conversation_id', conversation.id)
+        .lt('created_at', message.created_at)
+        .order('created_at', { ascending: false })
+        .limit(HISTORY_MESSAGES)
+    : { data: [] };
 
   const body = JSON.stringify({
     conversation_id: conversation.id,
@@ -93,10 +157,13 @@ export async function prepareDispatch(
      * ответил оператору «платформа открывает мне только данные вашей
      * компании».
      */
-    system: agentSystemPrompt({
-      audience: conversation.audience,
-      companyName: company?.name ?? null,
-    }),
+    system: withHistory(
+      agentSystemPrompt({
+        audience: conversation.audience,
+        companyName: company?.name ?? null,
+      }),
+      (earlier ?? []).reverse(),
+    ),
     tools: agentTools(conversation.audience),
     /*
      * Язык переписки компании, а не константа.
@@ -114,7 +181,12 @@ export async function prepareDispatch(
 }
 
 /** Собственно обращение к воркфлоу: долгое, и делать его надо не на глазах у человека. */
-export async function deliverDispatch({ url, secret, body, conversationId }: Delivery): Promise<void> {
+export async function deliverDispatch({
+  url,
+  secret,
+  body,
+  conversationId,
+}: Delivery): Promise<void> {
   try {
     const response = await fetch(url, {
       method: 'POST',
@@ -139,9 +211,12 @@ export async function deliverDispatch({ url, secret, body, conversationId }: Del
       return;
     }
 
-    const outcome = (await response.json().catch(() => null)) as
-      | { ok?: boolean; stage?: string | null; detail?: string | null; tools?: string[] }
-      | null;
+    const outcome = (await response.json().catch(() => null)) as {
+      ok?: boolean;
+      stage?: string | null;
+      detail?: string | null;
+      tools?: string[];
+    } | null;
 
     if (!outcome?.ok) {
       console.error(
