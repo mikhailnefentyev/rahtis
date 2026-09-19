@@ -26,6 +26,11 @@ import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
  * страницей кабинета.
  */
 const s = StyleSheet.create({
+  parties: { flexDirection: 'row', marginTop: 14 },
+  party: { flex: 1, paddingRight: 12 },
+  partyLabel: { fontSize: 7, color: '#44546b', marginBottom: 2, textTransform: 'uppercase' },
+  partyName: { fontSize: 9, fontFamily: 'Helvetica-Bold' },
+  partyLine: { fontSize: 8, color: '#0c1626', marginTop: 1 },
   page: { paddingTop: 40, paddingBottom: 52, paddingHorizontal: 40, fontSize: 9, color: '#0c1626' },
 
   brand: { fontSize: 14, fontFamily: 'Helvetica-Bold', letterSpacing: 1 },
@@ -56,7 +61,13 @@ const s = StyleSheet.create({
   cell: { fontSize: 9, paddingRight: 6 },
   right: { textAlign: 'right' },
 
-  totals: { flexDirection: 'row', marginTop: 10, paddingTop: 6, borderTopWidth: 1, borderTopColor: '#0c1626' },
+  totals: {
+    flexDirection: 'row',
+    marginTop: 10,
+    paddingTop: 6,
+    borderTopWidth: 1,
+    borderTopColor: '#0c1626',
+  },
   vatRow: { flexDirection: 'row', marginTop: 4 },
   totalLabel: { fontSize: 9, fontFamily: 'Helvetica-Bold', paddingRight: 6 },
 
@@ -113,6 +124,13 @@ export type ReportTexts = {
   closingNote: string;
   operator: string;
   page: string;
+  /*
+   * Стороны документа. Слева — Aivomaa Oy с полными реквизитами:
+   * заказчику она продавец, перевозчику плательщик. Справа — компания,
+   * которой документ адресован. Без них сводка к оплате — таблица без
+   * того, кому и на какой счёт платить.
+   */
+  parties?: Array<{ label: string; lines: string[] }>;
 };
 
 export function WeeklyReport({
@@ -146,6 +164,21 @@ export function WeeklyReport({
           <Text style={s.brand}>RAHTIS</Text>
           <Text style={s.operator}>{texts.operator}</Text>
         </View>
+
+        {texts.parties?.length ? (
+          <View style={s.parties}>
+            {texts.parties.map((party) => (
+              <View key={party.label} style={s.party}>
+                <Text style={s.partyLabel}>{party.label}</Text>
+                {party.lines.map((line, i) => (
+                  <Text key={i} style={i === 0 ? s.partyName : s.partyLine}>
+                    {line}
+                  </Text>
+                ))}
+              </View>
+            ))}
+          </View>
+        ) : null}
 
         <Text style={s.title}>{texts.title}</Text>
         <Text style={s.period}>{texts.period}</Text>
@@ -213,12 +246,12 @@ export function WeeklyReport({
             </View>
 
             {/*
-              * Налог отдельными строками под итогом, а не приписанный к
-              * нему. Финская компания видит, из чего складывается сумма
-              * к оплате; иностранная этих строк не получает вовсе — у
-              * обратного начисления прибавлять нечего, и пустая строка
-              * «ALV 0 €» выглядела бы как забытое поле.
-              */}
+             * Налог отдельными строками под итогом, а не приписанный к
+             * нему. Финская компания видит, из чего складывается сумма
+             * к оплате; иностранная этих строк не получает вовсе — у
+             * обратного начисления прибавлять нечего, и пустая строка
+             * «ALV 0 €» выглядела бы как забытое поле.
+             */}
             {totals.vat ? (
               <>
                 <View style={s.vatRow}>
@@ -243,9 +276,7 @@ export function WeeklyReport({
         <View style={s.footer} fixed>
           <Text>{texts.operator}</Text>
           <Text
-            render={({ pageNumber, totalPages }) =>
-              `${texts.page} ${pageNumber} / ${totalPages}`
-            }
+            render={({ pageNumber, totalPages }) => `${texts.page} ${pageNumber} / ${totalPages}`}
           />
         </View>
       </Page>

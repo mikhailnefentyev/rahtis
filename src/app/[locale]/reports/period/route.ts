@@ -1,9 +1,9 @@
 import { renderToBuffer } from '@react-pdf/renderer';
 import { redirect } from 'next/navigation';
-import { APP } from '@/lib/config';
 import { noAccessPath, signInPath } from '@/lib/auth/paths';
 import { getViewer } from '@/lib/auth/viewer';
 import { defaultLocale, getI18n, isLocale } from '@/lib/i18n';
+import { getOperatorProfile, operatorLines } from '@/lib/operator/profile';
 import { buildPeriodReport } from '@/lib/reports/period';
 import {
   claimColumns,
@@ -137,11 +137,16 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
     label === t.periodReport.rowGross,
   ]);
 
+  const operator = await getOperatorProfile();
+
   const buffer = await renderToBuffer(
     PeriodReportPdf({
       title,
       subtitle: [period, who].filter(Boolean).join(' · '),
-      operator: `${APP.operator.legalName} · Y-tunnus ${APP.operator.businessId}`,
+      operator: operatorLines(operator, {
+        businessId: 'Y-tunnus',
+        vatNumber: t.report_.vatNumber,
+      }).join(' · '),
       basis: t.periodReport.basis,
       vatNote,
       tripsTitle: t.periodReport.trips,

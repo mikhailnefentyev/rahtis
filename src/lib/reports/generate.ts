@@ -1,18 +1,12 @@
 import 'server-only';
 
 import { renderToBuffer } from '@react-pdf/renderer';
-import {
-  APP,
-  COMMISSION_BPS,
-  commissionCents,
-  payoutCents,
-  vatBpsFor,
-  withVat,
-} from '@/lib/config';
+import { COMMISSION_BPS, commissionCents, payoutCents, vatBpsFor, withVat } from '@/lib/config';
 import { operatorInbox } from '@/lib/email';
 import { createFormat } from '@/lib/format';
 import { getDictionary, defaultLocale } from '@/lib/i18n';
 import { notify } from '@/lib/notify';
+import { getOperatorProfile, operatorLines } from '@/lib/operator/profile';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { WeeklyReport, type ReportRow, type ReportTexts } from './WeeklyReport';
 
@@ -186,10 +180,7 @@ async function run(span: Span): Promise<GenerateResult> {
     : { data: [] };
 
   const { data: vehicles } = ids.length
-    ? await admin
-        .from('order_offers')
-        .select('order_id, vehicles(plate)')
-        .in('order_id', ids)
+    ? await admin.from('order_offers').select('order_id, vehicles(plate)').in('order_id', ids)
     : { data: [] };
 
   /*
@@ -269,7 +260,9 @@ async function issue(
 
   const { data: company } = await admin
     .from('companies')
-    .select('name, country, contact_email, billing_email, frozen_at')
+    .select(
+      'name, country, contact_email, billing_email, frozen_at, business_id, vat_number, legal_name, legal_street, legal_postal_code, legal_city, legal_country, billing_street, billing_postal_code, billing_city, billing_country, billing_reference',
+    )
     .eq('id', companyId)
     .single();
 
@@ -306,12 +299,13 @@ async function issue(
     };
   });
 
-  const period = span.kind === 'WEEK'
-    ? t.report_.period
-        .replace('{week}', String(isoWeekNumber(week)))
-        .replace('{from}', f.date(week))
-        .replace('{to}', f.date(span.end))
-    : t.report_.periodRange.replace('{from}', f.date(week)).replace('{to}', f.date(span.end));
+  const period =
+    span.kind === 'WEEK'
+      ? t.report_.period
+          .replace('{week}', String(isoWeekNumber(week)))
+          .replace('{from}', f.date(week))
+          .replace('{to}', f.date(span.end))
+      : t.report_.periodRange.replace('{from}', f.date(week)).replace('{to}', f.date(span.end));
 
   const title =
     span.kind === 'WEEK'
@@ -343,7 +337,37 @@ async function issue(
   const vatBase = carrier ? net : gross;
   const vatAmount = withVat(vatBase, vatBps) - vatBase;
 
+  /*
+   * Стороны документа. Aivomaa Oy — продавец для заказчика и плательщик
+   * для перевозчика; реквизиты из operator_profile, адрес компании —
+   * платёжный, если он задан отдельно, иначе юридический.
+   */
+  const operator = await getOperatorProfile();
+  const ids = { businessId: 'Y-tunnus', vatNumber: t.report_.vatNumber };
+  const street = company.billing_street ?? company.legal_street;
+  const city = [
+    company.billing_postal_code ?? company.legal_postal_code,
+    company.billing_city ?? company.legal_city,
+  ]
+    .filter(Boolean)
+    .join(' ');
+  const recipient = [
+    company.legal_name ?? company.name,
+    [street, city, company.billing_country ?? company.legal_country].filter(Boolean).join(', '),
+    [
+      company.business_id ? `Y-tunnus ${company.business_id}` : null,
+      company.vat_number ? `${t.report_.vatNumber} ${company.vat_number}` : null,
+    ]
+      .filter(Boolean)
+      .join(' · '),
+    company.billing_reference ? `${t.report_.reference} ${company.billing_reference}` : null,
+  ].filter((line): line is string => Boolean(line && line.trim()));
+
   const texts: ReportTexts = {
+    parties: [
+      { label: carrier ? t.report_.payer : t.report_.seller, lines: operatorLines(operator, ids) },
+      { label: carrier ? t.report_.payee : t.report_.customer, lines: recipient },
+    ],
     title,
     period: `${period} · ${company.name}`,
     due,
@@ -360,7 +384,7 @@ async function issue(
     total: t.report_.total,
     empty: t.report_.empty,
     closingNote: span.kind === 'WEEK' ? t.report_.closingNote : t.report_.periodClosingNote,
-    operator: `${t.brand.legalEntity} · Y-tunnus ${APP.operator.businessId}`,
+    operator: `${operator.legal_name} · Y-tunnus ${operator.business_id}`,
     page: t.report_.page,
   };
 
@@ -395,30 +419,32 @@ async function issue(
 
   if (upload) throw new Error(`загрузка: ${upload.message}`);
 
-  const { data: saved } = await admin.from('weekly_reports').upsert(
-    {
-      week,
-      company_id: companyId,
-      role,
-      file_path: path,
-      bytes: buffer.length,
-      orders_count: orders.length,
-      gross_cents: gross,
-      commission_cents: carrier ? fee : null,
-      payout_cents: carrier ? net : null,
-      /*
-       * Ставка пишется, только если она одна на все рейсы недели. Взяв
-       * ставку первого, мы бы подписали отчёт числом, к остальным строкам
-       * не относящимся: у закрытых в разное время рейсов она разная.
-       */
-      commission_bps: uniformBps(orders),
-      vat_bps: vatBps,
-      kind: span.kind,
-      due_date: span.due ? (carrier ? span.due.carrier : span.due.shipper) : null,
-      generated_at: new Date().toISOString(),
-    },
-    { onConflict: 'week,company_id,role,kind' },
-  )
+  const { data: saved } = await admin
+    .from('weekly_reports')
+    .upsert(
+      {
+        week,
+        company_id: companyId,
+        role,
+        file_path: path,
+        bytes: buffer.length,
+        orders_count: orders.length,
+        gross_cents: gross,
+        commission_cents: carrier ? fee : null,
+        payout_cents: carrier ? net : null,
+        /*
+         * Ставка пишется, только если она одна на все рейсы недели. Взяв
+         * ставку первого, мы бы подписали отчёт числом, к остальным строкам
+         * не относящимся: у закрытых в разное время рейсов она разная.
+         */
+        commission_bps: uniformBps(orders),
+        vat_bps: vatBps,
+        kind: span.kind,
+        due_date: span.due ? (carrier ? span.due.carrier : span.due.shipper) : null,
+        generated_at: new Date().toISOString(),
+      },
+      { onConflict: 'week,company_id,role,kind' },
+    )
     .select('id')
     .single();
 

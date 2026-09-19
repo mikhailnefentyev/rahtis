@@ -62,23 +62,76 @@ function build(input: {
   };
 }
 
+/** Деньги письма: без налога, налог, итог. Ставка — строкой, или null при обратном начислении. */
+export type BillingAmounts = {
+  net: string;
+  vat: string | null;
+  vatRate: string | null;
+  total: string;
+};
+
+/** Реквизиты Aivomaa Oy в письме — продавца заказчику, плательщика перевозчику. */
+export type OperatorFacts = {
+  legalName: string;
+  businessId: string;
+  vatNumber: string | null;
+  address: string;
+  account: string | null;
+};
+
+function moneyRows(
+  t: ReturnType<typeof emailText>,
+  money: BillingAmounts,
+): Array<[string, string]> {
+  return money.vatRate && money.vat
+    ? [
+        [t.billing.fieldAmount, money.net],
+        [t.billing.fieldVat(money.vatRate), money.vat],
+        [t.billing.fieldTotal, money.total],
+      ]
+    : [[t.billing.fieldAmount, money.net]];
+}
+
+function operatorRows(
+  t: ReturnType<typeof emailText>,
+  label: string,
+  operator: OperatorFacts,
+): Array<[string, string]> {
+  const rows: Array<[string, string]> = [
+    [label, operator.legalName],
+    [t.billing.fieldBusinessId, operator.businessId],
+  ];
+  if (operator.vatNumber) rows.push([t.billing.fieldVatNumber, operator.vatNumber]);
+  if (operator.address) rows.push([t.billing.fieldAddress, operator.address]);
+  return rows;
+}
+
 export function invoicedEmail(input: {
   to: string;
   companyName: string;
   companyId: string;
   orderRef: string;
-  amount: string;
+  money: BillingAmounts;
   invoiceRef: string | null;
+  operator: OperatorFacts;
   operatorEmail: string;
   locale: EmailLocale;
 }): EmailMessage {
   const t = emailText(input.locale);
 
+  /*
+   * Счёт выставляет Aivomaa Oy под маркой RAHTIS — её реквизиты и счёт
+   * для оплаты стоят в письме, а не только имя. Налог — по стране
+   * заказчика: финской компании 25,5 %, иностранной обратное начисление.
+   */
   const rows: Array<[string, string]> = [
     [t.billing.fieldOrder, input.orderRef],
-    [t.billing.fieldAmount, input.amount],
+    ...moneyRows(t, input.money),
   ];
   if (input.invoiceRef) rows.push([t.billing.fieldInvoice, input.invoiceRef]);
+  rows.push(...operatorRows(t, t.billing.fieldSeller, input.operator));
+  if (input.operator.account) rows.push([t.billing.fieldAccount, input.operator.account]);
+  if (input.invoiceRef) rows.push([t.billing.fieldReference, input.invoiceRef]);
 
   return build({
     template: 'billing.invoiced',
@@ -86,16 +139,8 @@ export function invoicedEmail(input: {
     companyId: input.companyId,
     subject: t.billing.invoicedSubject(input.orderRef),
     heading: t.billing.invoicedHeading(input.orderRef),
-    preheader: t.billing.preheader(input.amount),
-    /*
-     * Ставка ноль, а не 25,5 %.
-     *
-     * Заказчики — иностранные компании, и перевозка между плательщиками
-     * ALV разных стран ЕС идёт по обратному начислению. Прежний текст
-     * обещал к счёту налог, которого в нём нет, — см. VAT_BPS в
-     * lib/config.ts.
-     */
-    lead: t.billing.invoicedLead,
+    preheader: t.billing.preheader(input.money.total),
+    lead: t.billing.invoicedLead(input.money.vatRate),
     rows,
     operatorEmail: input.operatorEmail,
     locale: input.locale,
@@ -107,7 +152,8 @@ export function settledEmail(input: {
   companyName: string;
   companyId: string;
   orderRef: string;
-  amount: string;
+  money: BillingAmounts;
+  operator: OperatorFacts;
   operatorEmail: string;
   locale: EmailLocale;
 }): EmailMessage {
@@ -119,11 +165,12 @@ export function settledEmail(input: {
     companyId: input.companyId,
     subject: t.billing.settledSubject(input.orderRef),
     heading: t.billing.settledHeading(input.orderRef),
-    preheader: t.billing.preheader(input.amount),
-    lead: t.billing.settledLead,
+    preheader: t.billing.preheader(input.money.total),
+    lead: t.billing.settledLead(input.money.vatRate),
     rows: [
       [t.billing.fieldOrder, input.orderRef],
-      [t.billing.fieldAmount, input.amount],
+      ...moneyRows(t, input.money),
+      ...operatorRows(t, t.billing.fieldPayer, input.operator),
     ],
     operatorEmail: input.operatorEmail,
     locale: input.locale,

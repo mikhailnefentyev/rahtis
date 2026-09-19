@@ -93,14 +93,24 @@ type Texts = {
   billing: {
     invoicedSubject: (ref: string) => string;
     invoicedHeading: (ref: string) => string;
-    invoicedLead: string;
+    /** Ставка налога словами или null — обратное начисление. */
+    invoicedLead: (vatRate: string | null) => string;
     settledSubject: (ref: string) => string;
     settledHeading: (ref: string) => string;
-    settledLead: string;
+    settledLead: (vatRate: string | null) => string;
     preheader: (amount: string) => string;
     fieldOrder: string;
     fieldAmount: string;
+    fieldVat: (rate: string) => string;
+    fieldTotal: string;
     fieldInvoice: string;
+    fieldSeller: string;
+    fieldPayer: string;
+    fieldBusinessId: string;
+    fieldVatNumber: string;
+    fieldAddress: string;
+    fieldAccount: string;
+    fieldReference: string;
     questions: (operator: string) => string;
   };
 };
@@ -175,15 +185,29 @@ const fi: Texts = {
   billing: {
     invoicedSubject: (ref) => `RAHTIS · lasku kuljetuksesta ${ref}`,
     invoicedHeading: (ref) => `Lasku kuljetuksesta ${ref}`,
-    invoicedLead:
-      'Kuljetuksesta on lähetetty lasku. Käännetty verovelvollisuus: ostaja tilittää veron omassa maassaan.',
+    invoicedLead: (vat) =>
+      vat
+        ? `Kuljetuksesta on lähetetty lasku. Laskuttaja on Aivomaa Oy (RAHTIS); summaan lisätään arvonlisävero ${vat}.`
+        : 'Kuljetuksesta on lähetetty lasku. Laskuttaja on Aivomaa Oy (RAHTIS). Käännetty verovelvollisuus: ostaja tilittää veron omassa maassaan.',
     settledSubject: (ref) => `RAHTIS · tilitys kuljetuksesta ${ref}`,
     settledHeading: (ref) => `Tilitys kuljetuksesta ${ref}`,
-    settledLead: 'Kuljetuksesta on maksettu tilitys. Summa on alv 0 %: käännetty verovelvollisuus.',
-    preheader: (amount) => `Summa ${amount} (alv 0 %).`,
+    settledLead: (vat) =>
+      vat
+        ? `Kuljetuksesta on maksettu tilitys. Maksaja on Aivomaa Oy (RAHTIS); summaan sisältyy arvonlisävero ${vat}.`
+        : 'Kuljetuksesta on maksettu tilitys. Maksaja on Aivomaa Oy (RAHTIS). Käännetty verovelvollisuus: summa on alv 0 %.',
+    preheader: (amount) => `Summa ${amount}.`,
     fieldOrder: 'Kuljetus',
-    fieldAmount: 'Summa (alv 0 %)',
+    fieldAmount: 'Veroton summa',
+    fieldVat: (rate) => `ALV ${rate}`,
+    fieldTotal: 'Yhteensä',
     fieldInvoice: 'Laskun numero',
+    fieldSeller: 'Laskuttaja',
+    fieldPayer: 'Maksaja',
+    fieldBusinessId: 'Y-tunnus',
+    fieldVatNumber: 'ALV-tunniste',
+    fieldAddress: 'Osoite',
+    fieldAccount: 'Tili',
+    fieldReference: 'Viite',
     questions: (operator) => `Kysymykset: ${operator}`,
   },
 };
@@ -258,15 +282,29 @@ const en: Texts = {
   billing: {
     invoicedSubject: (ref) => `RAHTIS · invoice for transport ${ref}`,
     invoicedHeading: (ref) => `Invoice for transport ${ref}`,
-    invoicedLead:
-      'An invoice for this transport has been sent. Reverse charge: the buyer accounts for the tax in their own country.',
+    invoicedLead: (vat) =>
+      vat
+        ? `An invoice for this transport has been sent. The seller is Aivomaa Oy (RAHTIS); VAT ${vat} is added to the amount.`
+        : 'An invoice for this transport has been sent. The seller is Aivomaa Oy (RAHTIS). Reverse charge: the buyer accounts for the tax in their own country.',
     settledSubject: (ref) => `RAHTIS · payout for transport ${ref}`,
     settledHeading: (ref) => `Payout for transport ${ref}`,
-    settledLead: 'The payout for this transport has been paid. The amount is at VAT 0%: reverse charge.',
-    preheader: (amount) => `Amount ${amount} (VAT 0%).`,
+    settledLead: (vat) =>
+      vat
+        ? `The payout for this transport has been paid. The payer is Aivomaa Oy (RAHTIS); the amount includes VAT ${vat}.`
+        : 'The payout for this transport has been paid. The payer is Aivomaa Oy (RAHTIS). Reverse charge: the amount is at VAT 0%.',
+    preheader: (amount) => `Amount ${amount}.`,
     fieldOrder: 'Transport',
-    fieldAmount: 'Amount (VAT 0%)',
+    fieldAmount: 'Net amount',
+    fieldVat: (rate) => `VAT ${rate}`,
+    fieldTotal: 'Total',
     fieldInvoice: 'Invoice number',
+    fieldSeller: 'Seller',
+    fieldPayer: 'Payer',
+    fieldBusinessId: 'Business ID',
+    fieldVatNumber: 'VAT no.',
+    fieldAddress: 'Address',
+    fieldAccount: 'Account',
+    fieldReference: 'Reference',
     questions: (operator) => `Questions: ${operator}`,
   },
 };

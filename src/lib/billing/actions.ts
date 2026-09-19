@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { explainAdmin, withAdminError } from '@/lib/admin/errors';
-import { COMMISSION_BPS, payoutCents } from '@/lib/config';
+import { COMMISSION_BPS, payoutCents, vatBpsFor, withVat } from '@/lib/config';
 import { operatorInbox } from '@/lib/email';
 import { emailLocaleOf } from '@/lib/email/text';
 import { invoicedEmail, settledEmail } from '@/lib/email/templates/billing';
@@ -11,6 +11,7 @@ import { getViewer } from '@/lib/auth/viewer';
 import { createFormat } from '@/lib/format';
 import { defaultLocale, getDictionary, isLocale, type Locale } from '@/lib/i18n';
 import { notify } from '@/lib/notify';
+import { formatIban, getOperatorProfile } from '@/lib/operator/profile';
 import { createClient } from '@/lib/supabase/server';
 import type { Database } from '@/types/database';
 
@@ -81,7 +82,7 @@ async function announce(order: Order, next: BillingStatus, locale: Locale): Prom
 
   const { data: company } = await supabase
     .from('companies')
-    .select('name, contact_email, billing_email, language')
+    .select('name, contact_email, billing_email, language, country')
     .eq('id', companyId)
     .single();
 
@@ -105,6 +106,31 @@ async function announce(order: Order, next: BillingStatus, locale: Locale): Prom
   const cents = invoiced ? rate : payoutCents(rate, order.commission_bps ?? COMMISSION_BPS);
   const amount = f.eur(cents);
 
+  /* Налог по стране получателя — то же правило, что в сводках периода. */
+  const vatBps = vatBpsFor(company.country);
+  const gross = withVat(cents, vatBps);
+  const money = {
+    net: amount,
+    vat: vatBps > 0 ? f.eur(gross - cents) : null,
+    vatRate: vatBps > 0 ? f.percent(vatBps / 10_000, 1) : null,
+    total: f.eur(gross),
+  };
+
+  const profile = await getOperatorProfile();
+  const operator = {
+    legalName: profile.legal_name,
+    businessId: profile.business_id,
+    vatNumber: profile.vat_number,
+    address: [profile.street, [profile.postal_code, profile.city].filter(Boolean).join(' ')]
+      .filter(Boolean)
+      .join(', '),
+    account: profile.iban
+      ? [formatIban(profile.iban), profile.bic ? `BIC ${profile.bic}` : null]
+          .filter(Boolean)
+          .join(' · ')
+      : null,
+  };
+
   await notify({
     companyId,
     kind: 'BILLING',
@@ -120,7 +146,8 @@ async function announce(order: Order, next: BillingStatus, locale: Locale): Prom
             companyName: company.name,
             companyId,
             orderRef: order.ref,
-            amount,
+            money,
+            operator,
             invoiceRef: order.invoice_ref,
             operatorEmail: operatorInbox(),
             locale: emailLocaleOf(company.language),
@@ -130,7 +157,8 @@ async function announce(order: Order, next: BillingStatus, locale: Locale): Prom
             companyName: company.name,
             companyId,
             orderRef: order.ref,
-            amount,
+            money,
+            operator,
             operatorEmail: operatorInbox(),
             locale: emailLocaleOf(company.language),
           })),

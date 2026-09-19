@@ -834,6 +834,72 @@ export type Database = {
           },
         ]
       }
+      operator_profile: {
+        Row: {
+          bank_name: string | null
+          bic: string | null
+          brand: string
+          business_id: string
+          city: string
+          country: string
+          einvoice_operator: string | null
+          einvoice_ovt: string | null
+          email: string
+          iban: string | null
+          legal_name: string
+          phone: string | null
+          postal_code: string
+          singleton: boolean
+          street: string
+          updated_at: string
+          updated_by: string | null
+          vat_number: string | null
+          website: string | null
+        }
+        Insert: {
+          bank_name?: string | null
+          bic?: string | null
+          brand?: string
+          business_id: string
+          city: string
+          country?: string
+          einvoice_operator?: string | null
+          einvoice_ovt?: string | null
+          email: string
+          iban?: string | null
+          legal_name: string
+          phone?: string | null
+          postal_code: string
+          singleton?: boolean
+          street: string
+          updated_at?: string
+          updated_by?: string | null
+          vat_number?: string | null
+          website?: string | null
+        }
+        Update: {
+          bank_name?: string | null
+          bic?: string | null
+          brand?: string
+          business_id?: string
+          city?: string
+          country?: string
+          einvoice_operator?: string | null
+          einvoice_ovt?: string | null
+          email?: string
+          iban?: string | null
+          legal_name?: string
+          phone?: string | null
+          postal_code?: string
+          singleton?: boolean
+          street?: string
+          updated_at?: string
+          updated_by?: string | null
+          vat_number?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
       order_amendments: {
         Row: {
           acknowledged_at: string | null
@@ -3319,6 +3385,36 @@ export type Database = {
         }
       }
       unread_notifications: { Args: never; Returns: number }
+      update_operator_profile: {
+        Args: { p: Json }
+        Returns: {
+          bank_name: string | null
+          bic: string | null
+          brand: string
+          business_id: string
+          city: string
+          country: string
+          einvoice_operator: string | null
+          einvoice_ovt: string | null
+          email: string
+          iban: string | null
+          legal_name: string
+          phone: string | null
+          postal_code: string
+          singleton: boolean
+          street: string
+          updated_at: string
+          updated_by: string | null
+          vat_number: string | null
+          website: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "operator_profile"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       weekly_totals: {
         Args: { p_weeks?: number }
         Returns: {

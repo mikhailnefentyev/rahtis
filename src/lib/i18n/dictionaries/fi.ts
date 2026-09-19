@@ -1319,12 +1319,48 @@ export const fi = {
     generated: 'Raportit muodostettu',
     generateFailed: 'Raportteja ei saatu muodostettua.',
     emailSubject: 'RAHTIS · viikkoraportti {week}',
+    seller: 'Laskuttaja',
+    customer: 'Asiakas',
+    payer: 'Maksaja',
+    payee: 'Saaja',
+    vatNumber: 'ALV-tunniste',
+    reference: 'Viite',
   },
 
   /*
    * Reklamaatiot. Sana on alalla vakiintunut: kuljetusliike ja tilaaja
    * puhuvat reklamaatiosta, eivät "vaateesta". Englanniksi claim.
    */
+  operator: {
+    title: 'Ylläpitäjän yritystiedot',
+    tab: 'Yritystiedot',
+    subtitle:
+      'Aivomaa Oy:n tiedot, jotka tulostuvat laskuihin, kauden erittelyihin, raportteihin ja laskutussähköposteihin. Muutos koskee seuraavia asiakirjoja; jo muodostetut säilyvät ennallaan.',
+    company: 'Yritys',
+    legalName: 'Virallinen nimi',
+    businessId: 'Y-tunnus',
+    vatNumber: 'ALV-tunniste',
+    email: 'Sähköposti',
+    phone: 'Puhelin',
+    website: 'Verkkosivu',
+    address: 'Osoite',
+    street: 'Katuosoite',
+    postalCode: 'Postinumero',
+    city: 'Kaupunki',
+    country: 'Maa (ISO)',
+    bank: 'Maksutiedot',
+    bankName: 'Pankki',
+    einvoiceOvt: 'Verkkolaskuosoite (OVT)',
+    einvoiceOperator: 'Verkkolaskuoperaattori',
+    save: 'Tallenna',
+    saving: 'Tallennetaan…',
+    saved: 'Tallennettu',
+    failed: 'Tietoja ei tallennettu. Tarkista kentät.',
+    ibanInvalid: 'IBAN ei ole kelvollinen.',
+    businessIdShape: 'Y-tunnus muodossa 1234567-8.',
+    updated: 'Päivitetty',
+  },
+
   claims: {
     title: 'Reklamaatiot',
     subtitle:
