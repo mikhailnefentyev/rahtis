@@ -184,7 +184,7 @@ const MIRROR = {
     closed: 'Päättyi',
     vehicle: 'Ajoneuvo',
     place: 'Missä tapahtui',
-    amount: 'Vaadittu summa (ALV 0 %)',
+    amount: 'Vaadittu summa (veroton)',
     files: 'Liitteet',
     filesAttached: (n: number) => `${n} kpl, liitteenä`,
     reply: (operator: string, ref: string) =>

@@ -3,8 +3,9 @@ import 'server-only';
 import { renderToBuffer } from '@react-pdf/renderer';
 import { COMMISSION_BPS, commissionCents, payoutCents, vatBpsFor, withVat } from '@/lib/config';
 import { operatorInbox } from '@/lib/email';
+import { emailLocaleOf, emailText } from '@/lib/email/text';
 import { createFormat } from '@/lib/format';
-import { getDictionary, defaultLocale } from '@/lib/i18n';
+import { getDictionary, type Locale } from '@/lib/i18n';
 import { notify } from '@/lib/notify';
 import { getOperatorProfile, operatorLines } from '@/lib/operator/profile';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -255,18 +256,30 @@ async function issue(
 ): Promise<boolean> {
   const companyId = key.split(':')[0]!;
   const week = span.start;
-  const t = await getDictionary(defaultLocale);
-  const f = createFormat(t.meta.intl);
 
   const { data: company } = await admin
     .from('companies')
     .select(
-      'name, country, contact_email, billing_email, frozen_at, business_id, vat_number, legal_name, legal_street, legal_postal_code, legal_city, legal_country, billing_street, billing_postal_code, billing_city, billing_country, billing_reference',
+      'name, country, language, contact_email, billing_email, frozen_at, business_id, vat_number, legal_name, legal_street, legal_postal_code, legal_city, legal_country, billing_street, billing_postal_code, billing_city, billing_country, billing_reference',
     )
     .eq('id', companyId)
     .single();
 
   if (!company) throw new Error('компания не найдена');
+
+  /*
+   * Язык компании, а не финский на всех.
+   *
+   * Отчёт и письмо к нему собирались словарём по умолчанию, и английская
+   * компания получала финский документ и финское письмо — при том, что
+   * приглашение, счёт и уведомление о претензии ей уже приходили
+   * по-английски. Язык переписки лежит в карточке компании, и документ
+   * обязан слушаться того же поля.
+   */
+  const locale = emailLocaleOf(company.language) as Locale;
+  const t = await getDictionary(locale);
+  const mail = emailText(emailLocaleOf(company.language));
+  const f = createFormat(t.meta.intl);
 
   const carrier = role === 'CARRIER';
 
@@ -486,19 +499,19 @@ async function issue(
                   .replace('{from}', f.date(week))
                   .replace('{to}', f.date(span.end)),
           text: [
-            'Hei,',
+            mail.greeting,
             '',
             `${texts.title}, ${texts.period}.`,
             '',
-            `Kuljetuksia: ${orders.length}`,
-            `Yhteensä: ${f.eur(net)}`,
+            `${t.report_.emailTrips}: ${orders.length}`,
+            `${t.report_.total}: ${f.eur(net)}`,
             ...(due ? ['', due] : []),
             '',
             texts.vatNote,
             '',
-            'Raportti on saatavilla omilla sivuillasi.',
+            t.report_.emailWhere,
             '',
-            `Kysymykset: ${operatorInbox()}`,
+            mail.billing.questions(operatorInbox()),
             '',
             texts.operator,
           ].join('\n'),

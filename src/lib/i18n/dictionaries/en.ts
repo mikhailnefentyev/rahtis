@@ -1185,6 +1185,8 @@ export const en = {
   },
 
   report_: {
+    emailTrips: 'Transports',
+    emailWhere: 'The report is available in your account.',
     seller: 'Seller',
     customer: 'Customer',
     payer: 'Payer',
