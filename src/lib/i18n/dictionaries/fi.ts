@@ -1762,6 +1762,7 @@ export const fi = {
     'money.marginRate': 'Kate · {rate, number, ::percent}',
 
     'report.weekTotal': 'Viikko yhteensä {amount}',
+    'report.notice': '{count, plural, one {# kuljetus} other {# kuljetusta}} · {amount}',
 
     'signup.submitted':
       'Tarkistamme yrityksen {company} (Y-tunnus {businessId}) tiedot rekisteristä ja lähetämme tunnukset osoitteeseen {email}.',

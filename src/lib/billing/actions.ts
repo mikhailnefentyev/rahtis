@@ -63,17 +63,16 @@ export async function setBillingAction(formData: FormData): Promise<void> {
     redirect(withAdminError(`/${locale}/admin/billing`, explainAdmin(error)));
   }
 
-  await announce(order, next, locale);
+  await announce(order, next);
   revalidatePath(`/${locale}/admin/billing`);
 }
 
 type Order = Database['public']['Tables']['orders']['Row'];
 
-async function announce(order: Order, next: BillingStatus, locale: Locale): Promise<void> {
+/* Язык уведомления и письма берётся из карточки компании, а не из админки. */
+async function announce(order: Order, next: BillingStatus): Promise<void> {
   if (next !== 'INVOICED' && next !== 'SETTLED') return;
 
-  const t = await getDictionary(locale);
-  const f = createFormat(t.meta.intl);
   const supabase = await createClient();
 
   const invoiced = next === 'INVOICED';
@@ -87,6 +86,17 @@ async function announce(order: Order, next: BillingStatus, locale: Locale): Prom
     .single();
 
   if (!company) return;
+
+  /*
+   * Язык получателя, а не оператора.
+   *
+   * Словарь брался по локали админки, и уведомление в кабинете финской
+   * компании становилось английским, стоило оператору переключить свой
+   * интерфейс. Письмо рядом уже слушалось карточки компании — теперь
+   * слушается и уведомление.
+   */
+  const t = await getDictionary(emailLocaleOf(company.language) as Locale);
+  const f = createFormat(t.meta.intl);
 
   /*
    * Счёт идёт на почту для счетов, если она задана: там его ждёт

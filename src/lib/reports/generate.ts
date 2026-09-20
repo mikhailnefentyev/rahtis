@@ -6,6 +6,7 @@ import { operatorInbox } from '@/lib/email';
 import { emailLocaleOf, emailText } from '@/lib/email/text';
 import { createFormat } from '@/lib/format';
 import { getDictionary, type Locale } from '@/lib/i18n';
+import { createMessages } from '@/lib/i18n/message';
 import { notify } from '@/lib/notify';
 import { getOperatorProfile, operatorLines } from '@/lib/operator/profile';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -280,6 +281,7 @@ async function issue(
   const t = await getDictionary(locale);
   const mail = emailText(emailLocaleOf(company.language));
   const f = createFormat(t.meta.intl);
+  const m = createMessages(t.meta.intl, t);
 
   const carrier = role === 'CARRIER';
 
@@ -474,7 +476,8 @@ async function issue(
     companyId,
     kind: 'REPORT',
     title: `${texts.title} · ${period}`,
-    body: `${orders.length} · ${f.eur(net)}`,
+    /* Словами: «2 kuljetusta · 450 €» вместо «2 · 450 €». */
+    body: m('report.notice', { count: orders.length, amount: f.eur(net) }),
     /*
      * Ссылка ведёт на сам отчёт, а не в раздел выполненных рейсов:
      * человек приходил туда, где отчёта нет, и искал его среди

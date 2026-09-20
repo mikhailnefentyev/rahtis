@@ -1656,6 +1656,7 @@ export const en = {
     'money.marginRate': 'Margin · {rate, number, ::percent}',
 
     'report.weekTotal': 'Week total {amount}',
+    'report.notice': '{count, plural, one {# transport} other {# transports}} · {amount}',
 
     'signup.submitted':
       'We will check {company} (Y-tunnus {businessId}) against the register and send the credentials to {email}.',
