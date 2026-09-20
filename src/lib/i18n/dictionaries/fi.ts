@@ -1600,7 +1600,7 @@ export const fi = {
     perpetual: 'toistaiseksi',
     expired: 'vanhentunut',
     notUploaded: 'ei ladattu',
-    tooLarge: 'Tiedosto on yli 10 MB',
+    tooLarge: 'Tiedosto on yli 10 Mt',
     wrongType: 'Sallitut muodot: PDF, JPG, PNG ja WEBP',
     uploadFailed: 'Lataus ei onnistunut. Yritä uudelleen.',
     replacedNotice: 'Vanha versio säilyy, koska aiemmat hyväksynnät perustuvat siihen.',
@@ -1831,10 +1831,15 @@ export const fi = {
 
     'landing.cycleStage': 'Vaihe {no} / {total}',
 
-    'pulse.week': 'vko {no}',
+    /*
+      * Pylvään alla pelkkä viikon numero: otsikko kertoo jo, että kyse on
+      * viikoista, ja lyhenne «vko» jäi lukijalle arvattavaksi. Koko sana
+      * on siellä, missä tilaa on — vihjeessä ja yhteissummassa.
+      */
+    'pulse.week': '{no}',
     'pulse.weekAmount': 'Viikko {no} · {amount}',
-    'pulse.totalOne': 'vko {no} yhteensä {amount}',
-    'pulse.totalRange': 'vko {from}–{to} yhteensä {amount}',
+    'pulse.totalOne': 'Viikko {no} yhteensä {amount}',
+    'pulse.totalRange': 'Viikot {from}–{to} yhteensä {amount}',
 
     'event.order.published': 'Uusi kuljetus {ref} · {from} → {to}',
     'event.offer.received': 'Uusi tarjous kuljetukseen {ref}',

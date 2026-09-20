@@ -1716,10 +1716,10 @@ export const en = {
 
     'landing.cycleStage': 'Stage {no} / {total}',
 
-    'pulse.week': 'wk {no}',
+    'pulse.week': '{no}',
     'pulse.weekAmount': 'Week {no} · {amount}',
-    'pulse.totalOne': 'wk {no} total {amount}',
-    'pulse.totalRange': 'wks {from}–{to} total {amount}',
+    'pulse.totalOne': 'Week {no} total {amount}',
+    'pulse.totalRange': 'Weeks {from}–{to} total {amount}',
 
     'event.order.published': 'New transport {ref} · {from} → {to}',
     'event.offer.received': 'New offer on transport {ref}',
