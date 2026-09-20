@@ -1491,7 +1491,7 @@ export const fi = {
       * seuraavalla rivillä, jossa vastapuoli tiedetään.
       */
     basis:
-      'Kuljetus kuuluu ajanjaksolle päättymispäivänsä mukaan (Suomen aika). Summat ovat verottomia; verokanta määräytyy vastapuolen maan mukaan.',
+      'Kuljetus kuuluu ajanjaksolle päättymispäivänsä mukaan (Suomen aika). Summat ovat verottomia.',
     colDate: 'Päättyi',
     colRef: 'Numero',
     colShipperRef: 'Tilaajan viite',

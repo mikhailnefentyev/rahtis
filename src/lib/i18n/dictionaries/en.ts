@@ -1394,7 +1394,7 @@ export const en = {
     titleCarrier: 'Haulage report',
     titleAdmin: 'Billing and payout report',
     basis:
-      'A trip belongs to the period of the day it was closed (Finnish time). Amounts exclude VAT; the rate follows the country of the counterparty.',
+      'A trip belongs to the period of the day it was closed (Finnish time). Amounts exclude VAT.',
     colDate: 'Closed',
     colRef: 'No.',
     colShipperRef: 'Shipper ref.',

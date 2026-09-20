@@ -1,5 +1,7 @@
 import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
 
+import './pdfFont';
+
 /**
  * Отчёт за период — PDF для чтения.
  *
