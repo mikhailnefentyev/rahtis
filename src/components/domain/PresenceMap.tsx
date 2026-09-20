@@ -5,6 +5,7 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import { cn } from '@/lib/cn';
 import { isMapConfigured, maptilerKey } from '@/lib/env';
 import { useI18n } from '@/lib/i18n/provider';
+import { presenceParts, presenceTotal } from '@/lib/presence';
 
 /**
  * Карта транспорта: где вообще есть кому везти.
@@ -27,9 +28,11 @@ export type PresencePoint = {
   lat: number;
   lon: number;
   /** Тягачи: перецепы и контейнеры. */
-  unit: number;
-  /** Грузовики и микроавтобусы: экспресс. */
-  express: number;
+  tractors: number;
+  /** Грузовики: экспресс с кузовом. */
+  trucks: number;
+  /** Фургоны: экспресс поменьше. */
+  vans: number;
 };
 
 /*
@@ -59,15 +62,14 @@ function dotSize(total: number): number {
 }
 
 function dotElement(point: PresencePoint): HTMLElement {
-  const total = point.unit + point.express;
+  const total = presenceTotal(point);
   const size = dotSize(total);
 
+  /* Цвет по ветке: тягачи — единицы, грузовик и фургон — экспресс. */
+  const express = point.trucks + point.vans;
+
   const color =
-    point.unit > 0 && point.express > 0
-      ? BOTH_COLOR
-      : point.express > 0
-        ? EXPRESS_COLOR
-        : UNIT_COLOR;
+    point.tractors > 0 && express > 0 ? BOTH_COLOR : express > 0 ? EXPRESS_COLOR : UNIT_COLOR;
 
   const el = document.createElement('div');
   el.style.cssText = [
@@ -148,13 +150,7 @@ export function PresenceMap({
           setReady(true);
 
           for (const point of points) {
-            const label = [
-              point.city,
-              point.unit > 0 ? m('presence.unitCount', { count: point.unit }) : null,
-              point.express > 0 ? m('presence.expressCount', { count: point.express }) : null,
-            ]
-              .filter(Boolean)
-              .join(' · ');
+            const label = [point.city, ...presenceParts(point, m)].join(' · ');
 
             new maplibre.Marker({ element: dotElement(point) })
               .setLngLat([point.lon, point.lat])

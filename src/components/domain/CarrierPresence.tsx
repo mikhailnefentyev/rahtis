@@ -1,6 +1,7 @@
 import { Badge, Card, CardBody } from '@/components/ui';
 import { PresenceMap, type PresencePoint } from '@/components/domain/PresenceMap';
 import { getI18n, type Locale } from '@/lib/i18n';
+import { presenceParts } from '@/lib/presence';
 import { createClient } from '@/lib/supabase/server';
 
 /**
@@ -32,14 +33,18 @@ export async function CarrierPresence({ locale }: { locale: Locale }) {
       country: row.country,
       lat: row.lat as number,
       lon: row.lon as number,
-      unit: row.unit_vehicles,
-      express: row.express_vehicles,
+      tractors: row.tractors,
+      trucks: row.trucks,
+      vans: row.vans,
     }));
 
   if (points.length === 0) return null;
 
-  const unit = points.reduce((sum, p) => sum + p.unit, 0);
-  const express = points.reduce((sum, p) => sum + p.express, 0);
+  const total = {
+    tractors: points.reduce((sum, p) => sum + p.tractors, 0),
+    trucks: points.reduce((sum, p) => sum + p.trucks, 0),
+    vans: points.reduce((sum, p) => sum + p.vans, 0),
+  };
 
   return (
     <section className="mt-8">
@@ -48,9 +53,15 @@ export async function CarrierPresence({ locale }: { locale: Locale }) {
           {t.presence.title}
         </h2>
         <div className="flex flex-wrap items-center gap-2">
-          {unit > 0 && <Badge tone="info">{m('presence.unitCount', { count: unit })}</Badge>}
-          {express > 0 && (
-            <Badge tone="warn">{m('presence.expressCount', { count: express })}</Badge>
+          {/* По классам машин, а не по веткам витрины: заказчик выбирает машину. */}
+          {total.tractors > 0 && (
+            <Badge tone="info">{m('presence.tractorCount', { count: total.tractors })}</Badge>
+          )}
+          {total.trucks > 0 && (
+            <Badge tone="warn">{m('presence.truckCount', { count: total.trucks })}</Badge>
+          )}
+          {total.vans > 0 && (
+            <Badge tone="warn">{m('presence.vanCount', { count: total.vans })}</Badge>
           )}
         </div>
       </div>
@@ -73,14 +84,7 @@ export async function CarrierPresence({ locale }: { locale: Locale }) {
             {points.map((point) => (
               <li key={`${point.country}-${point.city}`} className="text-[13px] text-ink">
                 {point.city}{' '}
-                <span className="font-mono text-xs text-ink-dim">
-                  {[
-                    point.unit > 0 ? m('presence.unitShort', { count: point.unit }) : null,
-                    point.express > 0 ? m('presence.expressShort', { count: point.express }) : null,
-                  ]
-                    .filter(Boolean)
-                    .join(' · ')}
-                </span>
+                <span className="text-xs text-ink-dim">{presenceParts(point, m).join(' · ')}</span>
               </li>
             ))}
           </ul>

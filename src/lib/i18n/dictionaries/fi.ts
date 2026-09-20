@@ -1802,10 +1802,13 @@ export const fi = {
     'trip.stageAt': '{stage} · {place}',
     'trip.progressCount': 'Tehty {done} / {total}',
     'trip.enRouteTo': 'Matkalla · {place}',
-    'presence.unitCount': '{count, plural, one {# vetoauto} other {# vetoautoa}}',
-    'presence.expressCount': '{count, plural, one {# paketti- tai kuorma-auto} other {# paketti- ja kuorma-autoa}}',
-    'presence.unitShort': '{count, number} vetoa',
-    'presence.expressShort': '{count, number} pika',
+    /*
+      * Kalustolaji kokonaisena sanana. Aiemmat lyhenteet «vetoa» ja
+      * «pika» eivät kertoneet, tuleeko pakettiauto vai kuorma-auto.
+      */
+    'presence.tractorCount': '{count, plural, one {# vetoauto} other {# vetoautoa}}',
+    'presence.truckCount': '{count, plural, one {# kuorma-auto} other {# kuorma-autoa}}',
+    'presence.vanCount': '{count, plural, one {# pakettiauto} other {# pakettiautoa}}',
     'trip.completedAt': 'Tehty klo {time}',
     /*
      * Poikkeama, ei koordinaatit. Numeropari ei kerro riitatilanteessa

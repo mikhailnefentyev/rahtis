@@ -2232,10 +2232,11 @@ export type Database = {
         Returns: {
           city: string
           country: string
-          express_vehicles: number
           lat: number
           lon: number
-          unit_vehicles: number
+          tractors: number
+          trucks: number
+          vans: number
         }[]
       }
       carrier_rating: {
