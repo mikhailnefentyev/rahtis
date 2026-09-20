@@ -101,9 +101,17 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
     return String(value);
   };
 
+  /*
+   * Ширина колонки — по большему из двух: типу значения и длине
+   * заголовка. Числа узкие, но слово «Asiakirjat» над ними шире любого
+   * из них, и при ширине «по числу» заголовок налезал на соседний.
+   */
   const flex = (kind: string, header: string): PdfColumn => ({
     header,
-    flex: { text: 1.6, money: 1, date: 1.2, percent: 1, int: 0.6 }[kind] ?? 1,
+    flex: Math.max(
+      { text: 1.6, money: 1, date: 1.2, percent: 1, int: 0.6 }[kind] ?? 1,
+      Math.min(1.8, header.length * 0.13),
+    ),
     right: kind !== 'text' && kind !== 'date',
   });
 
@@ -124,9 +132,14 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
   const who = report.role === 'ADMIN' ? report.companyName : (viewer.company?.name ?? null);
   const period = `${f.date(`${range.from}T12:00:00Z`)}–${f.date(`${range.to}T12:00:00Z`)}`;
 
+  /*
+   * Ставка называется там, где известен контрагент. У оператора в отчёте
+   * и финские, и иностранные стороны, и одного числа на всех нет —
+   * поэтому ему правило, а не ставка.
+   */
   const vatNote =
     report.role === 'ADMIN'
-      ? ''
+      ? t.money.vatByCountry
       : (report.totals.vatBps ?? 0) > 0
         ? t.done.vatNoteDomestic
         : t.done.vatNoteReverse;
