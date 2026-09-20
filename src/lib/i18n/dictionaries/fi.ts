@@ -1484,8 +1484,14 @@ export const fi = {
     titleShipper: 'Kuljetusraportti',
     titleCarrier: 'Ajoraportti',
     titleAdmin: 'Laskutus- ja tilitysraportti',
+    /*
+      * Perusrivi ei väitä verokantaa: se riippuu vastapuolen maasta, ja
+      * «vero lisätään laskulle» oli väärin ulkomaiselle yritykselle,
+      * jolla on käännetty verovelvollisuus. Kanta sanotaan erikseen
+      * seuraavalla rivillä, jossa vastapuoli tiedetään.
+      */
     basis:
-      'Kuljetus kuuluu ajanjaksolle päättymispäivänsä mukaan (Suomen aika). Summat ilman ALV:tä; vero lisätään laskulla.',
+      'Kuljetus kuuluu ajanjaksolle päättymispäivänsä mukaan (Suomen aika). Summat ovat verottomia; verokanta määräytyy vastapuolen maan mukaan.',
     colDate: 'Päättyi',
     colRef: 'Numero',
     colShipperRef: 'Tilaajan viite',
