@@ -989,7 +989,7 @@ export const fi = {
   billingDesk: {
     title: 'Laskutus ja tilitykset',
     subtitle:
-      'Kausi on kaksi viikkoa, maanantaista sunnuntaihin. Laskut lähtevät asiakkaille automaattisesti kauden päätyttyä. Sinä kirjaat saapuneet maksut ja tilitykset kuljetusliikkeille.',
+      'Kausi on puoli kuukautta: 1.–15. ja 16. päivästä kuun loppuun. Laskut lähtevät asiakkaille automaattisesti kauden päätyttyä. Sinä kirjaat saapuneet maksut ja tilitykset kuljetusliikkeille.',
     statAwaiting: 'Odottaa asiakkaiden maksua',
     statOverdue: 'Myöhässä',
     statToPay: 'Maksettavaa kuljetusliikkeille',
@@ -1337,7 +1337,7 @@ export const fi = {
     closingNote:
       'Kuljetus kuuluu sille viikolle, jona se päättyi. Perjantaina aloitettu ja maanantaina purettu kuljetus näkyy seuraavan viikon raportissa.',
     periodClosingNote:
-      'Kuljetus kuuluu sille kaudelle, jona se päättyi. Kausi on kaksi viikkoa maanantaista sunnuntaihin; kauden lopussa aloitettu ja sen jälkeen purettu kuljetus näkyy seuraavan kauden asiakirjoissa.',
+      'Kuljetus kuuluu sille kaudelle, jona se päättyi. Kausi on 1.–15. tai 16. päivästä kuun loppuun; kauden lopussa aloitettu ja sen jälkeen purettu kuljetus näkyy seuraavan kauden asiakirjoissa.',
     page: 'Sivu',
     archive: 'Viikkoraportit',
     archiveEmpty: 'Ei vielä raportteja',

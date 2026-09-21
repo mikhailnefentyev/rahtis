@@ -110,7 +110,7 @@ export async function generateWeeklyReports(week?: string): Promise<GenerateResu
  * Документы расчётного периода.
  *
  * Границы и оба срока берутся из базы, а не считаются здесь: правило
- * периодов (две недели, миграция two_week_periods) записано один раз, и
+ * периодов (1–15 и 16–конец, миграция half_month_periods) записано один раз, и
  * второй его экземпляр на TypeScript однажды разошёлся бы с первым.
  */
 export async function generatePeriodSettlement(moment?: string): Promise<GenerateResult> {
@@ -125,10 +125,11 @@ export async function generatePeriodSettlement(moment?: string): Promise<Generat
   const period = Array.isArray(data) ? data[0] : data;
 
   /*
-   * Планировщик зовёт маршрут каждый понедельник, а период длится две
-   * недели. Выпуск — только если вчера период закончился; в
-   * промежуточный понедельник ответ «пропущено», а не пустые документы.
-   * Явный момент (перевыпуск из админки) эту проверку обходит.
+   * Выпуск — только если вчера период закончился. Планировщик зовёт
+   * маршрут 1-го и 16-го, и проверка там всегда проходит; она страхует от
+   * ручного или сбойного вызова посреди периода, который иначе выпустил
+   * бы счёт за недоделанный период. Явный момент (перевыпуск из админки)
+   * эту проверку обходит.
    */
   if (!moment && period && period.period_end !== helsinkiDate(yesterday.toISOString())) {
     return { week: period.period_start, reports: 0, emails: 0, errors: [], skipped: true };

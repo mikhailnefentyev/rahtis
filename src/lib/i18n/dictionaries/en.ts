@@ -910,7 +910,7 @@ export const en = {
   billingDesk: {
     title: 'Invoicing and settlements',
     subtitle:
-      'A period is two weeks, Monday to Sunday. Invoices go to customers automatically when the period ends. You record incoming payments and settlements to carriers.',
+      'A period is half a month: the 1st to the 15th, and the 16th to the end of the month. Invoices go to customers automatically when the period ends. You record incoming payments and settlements to carriers.',
     statAwaiting: 'Awaiting customer payment',
     statOverdue: 'Overdue',
     statToPay: 'To pay to carriers',
@@ -1266,7 +1266,7 @@ export const en = {
     closingNote:
       'A transport belongs to the week it finished in. One started on Friday and unloaded on Monday appears in the following week’s report.',
     periodClosingNote:
-      'A transport belongs to the period in which it was completed. A period is two weeks, Monday to Sunday; one started at the end of a period and unloaded after it appears in the next period documents.',
+      'A transport belongs to the period in which it was completed. A period runs from the 1st to the 15th or from the 16th to the end of the month; one started at the end of a period and unloaded after it appears in the next period documents.',
     page: 'Page',
     archive: 'Weekly reports',
     archiveEmpty: 'No reports yet',
