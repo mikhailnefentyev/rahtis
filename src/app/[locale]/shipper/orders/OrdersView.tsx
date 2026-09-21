@@ -7,7 +7,14 @@ import { orderStatusTone } from '@/components/ui/tone';
 import { daysFromToday, todayInHelsinki } from '@/lib/dates';
 import { cityOfStop, routeEnds } from '@/lib/orders/route';
 import { useI18n } from '@/lib/i18n/provider';
-import type { KnownVehicle, OrderAmendment, OrderStop, ShipperOffer, ShipperOrder } from '@/types/db';
+import type {
+  KnownVehicle,
+  OrderAmendment,
+  OrderStop,
+  ShipperOffer,
+  ShipperOrder,
+  TripDocument,
+} from '@/types/db';
 import { OrderCard } from './OrderCard';
 
 /**
@@ -105,9 +112,11 @@ export function OrdersView({
   offersByOrder,
   amendmentsByOrder,
   knownVehicles,
+  documentsByOrder,
 }: {
   orders: ShipperOrder[];
   knownVehicles: KnownVehicle[];
+  documentsByOrder: Record<string, TripDocument[]>;
   stopsByOrder: Record<string, OrderStop[]>;
   offersByOrder: Record<string, ShipperOffer[]>;
   amendmentsByOrder: Record<string, OrderAmendment[]>;
@@ -221,6 +230,7 @@ export function OrdersView({
         offers={offersByOrder[order.id] ?? []}
         amendments={amendmentsByOrder[order.id] ?? []}
         knownVehicles={knownVehicles}
+        documents={documentsByOrder[order.id] ?? []}
         onRepeat={() => startComposing({ order, stops: stopsByOrder[order.id] ?? [] })}
       />
     );

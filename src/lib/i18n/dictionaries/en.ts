@@ -156,6 +156,10 @@ export const en = {
   },
 
   trip: {
+    photos: 'Photos and documents',
+    signature: 'Signature',
+    fromApp: 'From the driver app',
+    signatureNoCmr: 'The driver collected the recipient signature, but the consignment note was not photographed. Upload the CMR to close the job.',
     progress: 'Job progress',
     markDone: 'Mark as done',
     marking: 'Marking…',
@@ -2023,6 +2027,7 @@ export const en = {
     'presence.tractorCount': '{count, plural, one {# tractor unit} other {# tractor units}}',
     'presence.truckCount': '{count, plural, one {# truck} other {# trucks}}',
     'presence.vanCount': '{count, plural, one {# van} other {# vans}}',
+    'trip.arrivedAt': 'Arrived at {time}',
     'trip.completedAt': 'Done at {time}',
     'trip.markedNear': 'Marked {meters, number} m from the address',
     'trip.markedFar': 'Marked {km, number, ::.0#} km from the address',

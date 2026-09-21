@@ -9,7 +9,15 @@ import { Badge, Button, Card, CardBody, CardDivider, Mono, Plate } from '@/compo
 import { orderStatusTone } from '@/components/ui/tone';
 import { useI18n } from '@/lib/i18n/provider';
 import { routeEnds } from '@/lib/orders/route';
-import type { KnownVehicle, OrderAmendment, OrderStop, ShipperOffer, ShipperOrder } from '@/types/db';
+import { DocumentList } from '@/components/domain/TripDocuments';
+import type {
+  KnownVehicle,
+  OrderAmendment,
+  OrderStop,
+  ShipperOffer,
+  ShipperOrder,
+  TripDocument,
+} from '@/types/db';
 import { AmendPanel } from './AmendPanel';
 import { DirectWaiting, SendDirect } from './DirectPanel';
 import { AssignedCarrier, OffersPanel } from './OffersPanel';
@@ -31,8 +39,11 @@ export function OrderCard({
   offers,
   amendments,
   knownVehicles,
+  documents,
   onRepeat,
 }: {
+  /** Снимки и документы идущего рейса. */
+  documents: TripDocument[];
   order: ShipperOrder;
   stops: OrderStop[];
   offers: ShipperOffer[];
@@ -156,6 +167,13 @@ export function OrderCard({
                 */}
               {order.status === 'IN_PROGRESS' && stops.length > 0 && (
                 <TripStage stops={stops} className="mt-3" />
+              )}
+
+              {order.status === 'IN_PROGRESS' && documents.length > 0 && (
+                <div className="mt-3 rounded-control border border-line bg-sunken p-3">
+                  <p className="label-micro mb-2">{t.trip.photos}</p>
+                  <DocumentList documents={documents} />
+                </div>
               )}
 
               {/* Рейс идёт — выбирать не из чего, важно кто везёт. */}

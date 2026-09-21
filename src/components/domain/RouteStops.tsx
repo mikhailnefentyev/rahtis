@@ -22,6 +22,7 @@ type AnyStop = (OrderStop | DeskStop) & {
    * Координата отметки. У точки со стола её нет и быть не может: стол
    * показывает ещё не взятые заказы, в которых никто никуда не ездил.
    */
+  arrived_at?: string | null;
   completed_at?: string | null;
   completed_lat?: number | null;
   completed_lon?: number | null;
@@ -108,6 +109,26 @@ export function RouteStops({
      * Показывается не координата, а расхождение с адресом. Пара чисел в
      * споре не говорит ничего; «отмечено в 4 км от адреса» говорит всё.
      */
+    /*
+     * Прибытие и окончание работ — из приложения водителя. По разнице
+     * между ними виден простой на точке, ради которого прибытие и
+     * отмечается отдельно.
+     */
+    if (stop.arrived_at) {
+      chips.push(
+        <Badge key="arrived" tone="neutral">
+          {m('trip.arrivedAt', { time: f.time(stop.arrived_at) })}
+        </Badge>,
+      );
+    }
+    if (stop.completed_at) {
+      chips.push(
+        <Badge key="done" tone="ok">
+          {m('trip.completedAt', { time: f.time(stop.completed_at) })}
+        </Badge>,
+      );
+    }
+
     if (stop.completed_at) {
       const mark = markOf(stop);
 

@@ -163,6 +163,10 @@ export const fi = {
   },
 
   trip: {
+    photos: 'Kuvat ja asiakirjat',
+    signature: 'Allekirjoitus',
+    fromApp: 'Kuljettajan sovelluksesta',
+    signatureNoCmr: 'Kuljettaja otti vastaanottajan allekirjoituksen, mutta rahtikirjaa ei kuvattu. Lataa CMR, niin keikan voi sulkea.',
     progress: 'Kuljetuksen eteneminen',
     markDone: 'Merkitse tehdyksi',
     marking: 'Merkitään…',
@@ -2139,6 +2143,7 @@ export const fi = {
     'presence.tractorCount': '{count, plural, one {# vetoauto} other {# vetoautoa}}',
     'presence.truckCount': '{count, plural, one {# kuorma-auto} other {# kuorma-autoa}}',
     'presence.vanCount': '{count, plural, one {# pakettiauto} other {# pakettiautoa}}',
+    'trip.arrivedAt': 'Saapui klo {time}',
     'trip.completedAt': 'Tehty klo {time}',
     /*
      * Poikkeama, ei koordinaatit. Numeropari ei kerro riitatilanteessa

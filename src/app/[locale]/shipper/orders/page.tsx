@@ -6,7 +6,7 @@ import { requireRole } from '@/lib/auth/guard';
 import { accountPath } from '@/lib/auth/paths';
 import { getI18n, isLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
-import type { OrderAmendment, OrderStop, ShipperOffer } from '@/types/db';
+import type { OrderAmendment, OrderStop, ShipperOffer, TripDocument } from '@/types/db';
 import { OrdersView } from './OrdersView';
 
 export async function generateMetadata({
@@ -70,6 +70,8 @@ export default async function OrdersPage({ params }: { params: Promise<{ locale:
     )
     .map((o) => o.id);
 
+  const inProgressIds = (orders ?? []).filter((o) => o.status === 'IN_PROGRESS').map((o) => o.id);
+
   /*
    * Точки, отклики и правки зависят от списка заказов, но не друг от
    * друга, — значит идут вместе, а не в очередь.
@@ -79,7 +81,8 @@ export default async function OrdersPage({ params }: { params: Promise<{ locale:
    * последовательных похода стоили почти треть секунды ожидания на ровном
    * месте. Запросов столько же, ожидание одно.
    */
-  const [{ data: stops }, { data: offers }, { data: amendmentRows }, { data: known }] = await Promise.all([
+  const [{ data: stops }, { data: offers }, { data: amendmentRows }, { data: known }, { data: tripDocs }] =
+    await Promise.all([
     orderIds.length
       ? supabase.from('order_stops').select('*').in('order_id', orderIds).order('sequence')
       : Promise.resolve({ data: [] as OrderStop[] }),
@@ -91,7 +94,24 @@ export default async function OrdersPage({ params }: { params: Promise<{ locale:
       : Promise.resolve({ data: [] as OrderAmendment[] }),
     /* Знакомые машины — для прямого назначения в форме и со стола. */
     supabase.rpc('known_vehicles_for_shipper'),
+    /*
+     * Снимки и документы идущего рейса: водитель шлёт их из приложения
+     * по ходу, и заказчик видит состояние единицы при взятии сразу, а не
+     * после закрытия.
+     */
+    inProgressIds.length
+      ? supabase
+          .from('order_documents')
+          .select('*')
+          .in('order_id', inProgressIds)
+          .order('created_at')
+      : Promise.resolve({ data: [] as TripDocument[] }),
   ]);
+
+  const documentsByOrder: Record<string, TripDocument[]> = {};
+  for (const doc of tripDocs ?? []) {
+    (documentsByOrder[doc.order_id] ??= []).push(doc);
+  }
 
   const stopsByOrder: Record<string, OrderStop[]> = {};
   for (const stop of stops ?? []) {
@@ -141,6 +161,7 @@ export default async function OrdersPage({ params }: { params: Promise<{ locale:
           offersByOrder={offersByOrder}
           amendmentsByOrder={amendmentsByOrder}
           knownVehicles={known ?? []}
+          documentsByOrder={documentsByOrder}
         />
       )}
     </main>

@@ -42,8 +42,22 @@ export function ClosingPanel({
   const progress = tripProgress(stops);
   const hasCmr = documents.some((d) => d.kind === 'CMR');
 
-  /* Пока не пройдены все точки, закрывать нечего. */
-  if (!closed && !progress.finished) return null;
+  const signedOnly = !hasCmr && documents.some((d) => d.subject === 'SIGNATURE');
+
+  /*
+   * Пока не пройдены все точки, закрывать нечего — но снимки водителя
+   * уже идут из приложения, и перевозчик должен видеть их сразу, а не
+   * после последней точки: повреждение при взятии разбирают у ворот.
+   */
+  if (!closed && !progress.finished) {
+    if (documents.length === 0) return null;
+    return (
+      <div className="mt-4 rounded-control border border-line bg-sunken p-3">
+        <p className="label-micro mb-3">{t.trip.photos}</p>
+        <DocumentList documents={documents} />
+      </div>
+    );
+  }
 
   return (
     <div className="mt-4 rounded-control border border-line bg-sunken p-3">
@@ -53,6 +67,7 @@ export function ClosingPanel({
       </div>
 
       {!closed && <p className="mb-3 text-xs text-ink-faint">{t.trip.closingHint}</p>}
+      {!closed && signedOnly && <p className="mb-3 text-xs text-warn">{t.trip.signatureNoCmr}</p>}
 
       <DocumentList documents={documents} />
 
