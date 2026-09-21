@@ -1,5 +1,6 @@
 'use server';
 
+import { dispatchPublishedOrder, notifyDirectOrder, wasPublished } from '@/lib/orders/dispatch';
 import { revalidateOrder } from '@/lib/orders/revalidate';
 import { getViewer } from '@/lib/auth/viewer';
 import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
@@ -91,12 +92,74 @@ export async function confirmOrderAction(formData: FormData): Promise<void> {
   revalidateOrder(locale);
 }
 
-/** Откат до старта: доступен обеим сторонам (ТЗ §6). */
+/**
+ * Откат до старта: доступен обеим сторонам (ТЗ §6).
+ *
+ * После прямого назначения откат — первый выход заказа на общий стол, и
+ * перевозчики страны забора получают его письмом, как новую публикацию.
+ * Уведомления в кабинеты пишет триггер; здесь только почтовый дубль.
+ */
 export async function cancelOrderAction(formData: FormData): Promise<void> {
   const locale = toLocale(formData.get('locale'));
+  const orderId = String(formData.get('order_id') ?? '');
+
+  const published = await wasPublished(orderId);
 
   const supabase = await createClient();
-  await supabase.rpc('cancel_order', { p_order_id: String(formData.get('order_id') ?? '') });
+  const { data } = await supabase.rpc('cancel_order', { p_order_id: orderId });
+
+  if (!published && data?.status === 'OPEN') await dispatchPublishedOrder(orderId);
 
   revalidateOrder(locale);
+}
+
+export type DirectState = { error: string | null; done: boolean };
+
+/**
+ * Заказ со стола, на который ещё никто не откликнулся, — знакомой машине.
+ *
+ * Ошибки те же, что у публикации напрямую: машина перестала быть
+ * знакомой, не выходит на рейсы или не подходит заказу. Плюс гонка:
+ * пока заказчик выбирал машину, на заказ откликнулись.
+ */
+export async function directAssignAction(
+  _previous: DirectState,
+  formData: FormData,
+): Promise<DirectState> {
+  const locale = toLocale(formData.get('locale'));
+  const t = await getDictionary(locale);
+
+  const viewer = await getViewer();
+  if (viewer.status !== 'ready' || viewer.role !== 'SHIPPER') {
+    return { error: t.error.forbidden, done: false };
+  }
+
+  const orderId = String(formData.get('order_id') ?? '');
+  const vehicleId = String(formData.get('vehicle_id') ?? '');
+  if (!vehicleId) return { error: t.direct.chooseVehicle, done: false };
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc('direct_assign_order', {
+    p_order_id: orderId,
+    p_vehicle_id: vehicleId,
+  });
+
+  if (error) {
+    const message =
+      error.code === '42501'
+        ? t.direct.notKnown
+        : error.code === '55004'
+          ? t.direct.unavailable
+          : error.code === '55001' || error.code === '55002' || error.code === '55003'
+            ? t.direct.notFit
+            : error.code === '55000'
+              ? t.direct.hasOffers
+              : t.matching.failed;
+    return { error: message, done: false };
+  }
+
+  await notifyDirectOrder(orderId);
+
+  revalidateOrder(locale);
+  return { error: null, done: true };
 }

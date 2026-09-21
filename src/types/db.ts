@@ -85,9 +85,32 @@ export type AmendmentChange = { from: unknown; to: unknown };
  */
 export type ShipperOrder = Omit<
   Order,
-  'assigned_company_id' | 'assigned_vehicle_id' | 'chosen_offer_id' | 'shipper_company_id' | 'shipper_company_kind' | 'updated_at' | 'created_by' | 'route_computed_at' | 'route_fingerprint' | 'commission_bps' | 'closed_at' | 'billing' | 'invoice_ref' | 'invoiced_at' | 'paid_at' | 'settled_at' | 'terms_document_id'
+  'assigned_company_id' | 'assigned_vehicle_id' | 'assigned_driver_id' | 'chosen_offer_id' | 'shipper_company_id' | 'shipper_company_kind' | 'updated_at' | 'created_by' | 'route_computed_at' | 'route_fingerprint' | 'commission_bps' | 'closed_at' | 'billing' | 'invoice_ref' | 'invoiced_at' | 'paid_at' | 'settled_at' | 'terms_document_id'
 >;
 export type OrderStop = Tables<'order_stops'>;
+
+/* ── Водители ───────────────────────────────────────────────────── */
+
+export type Driver = Tables<'drivers'>;
+export type DriverShift = Tables<'driver_shifts'>;
+export type DriverBreak = Tables<'driver_breaks'>;
+export type TesRuleSet = Tables<'tes_rule_sets'>;
+export type DriverPayProfile = Tables<'driver_pay_profiles'>;
+export type PayModel = Database['public']['Enums']['pay_model'];
+
+/** Закрытый рейс водителя за период — public.driver_trips. */
+export type DriverTrip = Database['public']['Functions']['driver_trips']['Returns'][number];
+
+/* ── Знакомые машины и прямое назначение ────────────────────────── */
+
+export type LinkStatus = Database['public']['Enums']['link_status'];
+
+/** Заказчик, с которым перевозчик возил, и согласие на прямые заказы. */
+export type CarrierPartner = Database['public']['Functions']['carrier_partners']['Returns'][number];
+
+/** Знакомая машина заказчика: без названия перевозчика и телефона водителя. */
+export type KnownVehicle =
+  Database['public']['Functions']['known_vehicles_for_shipper']['Returns'][number];
 
 /** Что возвращает public.company_readiness — гейт стола заказов. */
 export type CompanyReadiness = Database['public']['Functions']['company_readiness']['Returns'][number];

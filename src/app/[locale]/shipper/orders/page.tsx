@@ -37,7 +37,7 @@ export default async function OrdersPage({ params }: { params: Promise<{ locale:
   const { data: orders } = await supabase
     .from('orders')
     .select(
-      'id,ref,shipper_ref,order_type,haul_kind,container_feet,ldm,trailer,trailer_plate,distance_km,rate_cents,comment,status,published_at,deadline_at,created_at,distance_source,distance_auto_km,route_geometry,route_bounds',
+      'id,ref,shipper_ref,order_type,haul_kind,container_feet,ldm,trailer,trailer_plate,distance_km,rate_cents,comment,status,published_at,deadline_at,created_at,distance_source,distance_auto_km,route_geometry,route_bounds,dispatch_mode',
     )
     .eq('shipper_company_id', company.id)
     /*
@@ -79,7 +79,7 @@ export default async function OrdersPage({ params }: { params: Promise<{ locale:
    * последовательных похода стоили почти треть секунды ожидания на ровном
    * месте. Запросов столько же, ожидание одно.
    */
-  const [{ data: stops }, { data: offers }, { data: amendmentRows }] = await Promise.all([
+  const [{ data: stops }, { data: offers }, { data: amendmentRows }, { data: known }] = await Promise.all([
     orderIds.length
       ? supabase.from('order_stops').select('*').in('order_id', orderIds).order('sequence')
       : Promise.resolve({ data: [] as OrderStop[] }),
@@ -89,6 +89,8 @@ export default async function OrdersPage({ params }: { params: Promise<{ locale:
     orderIds.length
       ? supabase.from('order_amendments').select('*').in('order_id', orderIds).order('created_at')
       : Promise.resolve({ data: [] as OrderAmendment[] }),
+    /* Знакомые машины — для прямого назначения в форме и со стола. */
+    supabase.rpc('known_vehicles_for_shipper'),
   ]);
 
   const stopsByOrder: Record<string, OrderStop[]> = {};
@@ -138,6 +140,7 @@ export default async function OrdersPage({ params }: { params: Promise<{ locale:
           stopsByOrder={stopsByOrder}
           offersByOrder={offersByOrder}
           amendmentsByOrder={amendmentsByOrder}
+          knownVehicles={known ?? []}
         />
       )}
     </main>

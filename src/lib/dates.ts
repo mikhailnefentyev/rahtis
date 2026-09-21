@@ -107,3 +107,56 @@ export function operationsInstant(date: string, time: string): number | null {
 
   return Number.isFinite(shown) ? asIfUtc - (shown - asIfUtc) : null;
 }
+
+/**
+ * Местное время операций из поля datetime-local («2026-09-18T06:30») в
+ * момент времени ISO.
+ *
+ * Поле формы не знает пояса, а смена водителя — это время по Хельсинки,
+ * где бы ни сидел диспетчер. Смещение уточняется вторым проходом: на
+ * границе перехода на летнее время первое приближение ошибается на час.
+ */
+export function operationsLocalToIso(local: string): string | null {
+  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(local.trim());
+  if (!match) return null;
+
+  const [, y, mo, d, h, mi] = match.map(Number);
+  const wall = Date.UTC(y, mo - 1, d, h, mi);
+
+  let guess = wall - offsetMinutesAt(wall) * 60_000;
+  guess = wall - offsetMinutesAt(guess) * 60_000;
+
+  return new Date(guess).toISOString();
+}
+
+/** Обратное: момент времени → значение для поля datetime-local по Хельсинки. */
+export function isoToOperationsLocal(iso: string): string {
+  const ms = Date.parse(iso);
+  return new Date(ms + offsetMinutesAt(ms) * 60_000).toISOString().slice(0, 16);
+}
+
+function offsetMinutesAt(ms: number): number {
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat('en-GB', {
+      timeZone: APP.timeZone,
+      hourCycle: 'h23',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+      .formatToParts(new Date(ms))
+      .map((p) => [p.type, p.value]),
+  );
+
+  const asUtc = Date.UTC(
+    Number(parts.year),
+    Number(parts.month) - 1,
+    Number(parts.day),
+    Number(parts.hour),
+    Number(parts.minute),
+  );
+
+  return Math.round((asUtc - Math.floor(ms / 60_000) * 60_000) / 60_000);
+}

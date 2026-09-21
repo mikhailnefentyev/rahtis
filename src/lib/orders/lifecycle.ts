@@ -4,6 +4,7 @@ import { revalidateOrder, revalidateOrderFinished } from '@/lib/orders/revalidat
 import { getViewer } from '@/lib/auth/viewer';
 import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
+import { dispatchPublishedOrder, wasPublished } from '@/lib/orders/dispatch';
 
 /**
  * Что делать, когда всё пошло не так.
@@ -120,13 +121,19 @@ export async function abandonOrderAction(
     return { error: (await getDictionary(locale)).error.forbidden, done: false };
   }
 
+  const orderId = str(formData, 'order_id');
+  /* Отказ от прямого назначения — первый выход заказа на стол, см. cancelOrderAction. */
+  const published = await wasPublished(orderId);
+
   const supabase = await createClient();
-  const { error } = await supabase.rpc('abandon_order', {
-    p_order_id: str(formData, 'order_id'),
+  const { data, error } = await supabase.rpc('abandon_order', {
+    p_order_id: orderId,
     p_reason: str(formData, 'reason'),
   });
 
   if (error) return { error: await explain(locale, error.code, error.message), done: false };
+
+  if (!published && data?.status === 'OPEN') await dispatchPublishedOrder(orderId);
 
   revalidateOrderFinished(locale);
   return { ...idle, done: true };

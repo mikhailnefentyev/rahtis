@@ -76,3 +76,71 @@ export function orderPublishedEmail(input: {
     companyId: input.companyId,
   };
 }
+
+/**
+ * Прямой заказ знакомой машине.
+ *
+ * В отличие от рассылки, адресат здесь один, и письмо не «есть работа,
+ * посмотри», а «тебя ждут». Срока нет, поэтому в письме его нет тоже:
+ * вместо отсчёта сказано, что заказ ждёт и что будет при отказе.
+ *
+ * Заказчик назван по имени — перевозчик видит его и на столе, и именно
+ * имя отличает постоянного клиента от случайного.
+ */
+export function directOrderEmail(input: {
+  to: string;
+  companyName: string;
+  companyId: string;
+  ref: string;
+  plate: string;
+  shipper: string;
+  from: string;
+  to_: string;
+  pickup: string | null;
+  unit: string | null;
+  distance: string | null;
+  rate: string | null;
+  link: string;
+  operatorEmail: string;
+  locale: EmailLocale;
+}): EmailMessage {
+  const t = emailText(input.locale);
+  const heading = t.direct.heading(input.plate);
+
+  const rows: Array<[string, string]> = [[t.dispatch.fieldOrder, input.ref]];
+  if (input.pickup) rows.push([t.dispatch.fieldPickup, input.pickup]);
+  rows.push([t.dispatch.fieldRoute, `${input.from} → ${input.to_}`]);
+  if (input.unit) rows.push([t.dispatch.fieldUnit, input.unit]);
+  if (input.distance) rows.push([t.dispatch.fieldDistance, input.distance]);
+  if (input.rate) rows.push([t.dispatch.fieldRate, input.rate]);
+
+  const blocks: EmailBlock[] = [
+    { kind: 'text', value: t.direct.lead(input.shipper) },
+    { kind: 'facts', rows },
+    { kind: 'button', label: t.direct.button, href: input.link },
+    { kind: 'note', value: t.direct.note },
+  ];
+
+  return {
+    template: 'order.direct',
+    to: input.to,
+    toName: input.companyName,
+    subject: t.direct.subject(input.ref, input.plate),
+    text: renderText({
+      heading,
+      blocks,
+      operatorEmail: input.operatorEmail,
+      signature: t.signature,
+      neverAsk: t.neverAsk,
+    }),
+    html: renderEmail({
+      heading,
+      preheader: t.direct.preheader(input.shipper),
+      blocks,
+      operatorEmail: input.operatorEmail,
+      tagline: t.brandTagline,
+      neverAsk: t.neverAsk,
+    }),
+    companyId: input.companyId,
+  };
+}

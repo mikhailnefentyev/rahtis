@@ -1,11 +1,12 @@
 'use client';
 
+import Link from 'next/link';
 import { useActionState, useEffect, useState } from 'react';
 import { AddressInput } from '@/components/domain/AddressInput';
 import { Button, Card, CardBody, Field, Input, InputMono, Select } from '@/components/ui';
 import { saveVehicleAction, type VehicleState } from '@/lib/fleet/actions';
 import { useI18n } from '@/lib/i18n/provider';
-import { DRIVER_LANGUAGES, type Vehicle, type VehicleClass } from '@/types/db';
+import type { Driver, Vehicle, VehicleClass } from '@/types/db';
 
 const initial: VehicleState = { error: null, done: false };
 
@@ -30,14 +31,18 @@ const AXLE_LABEL: Record<number, string> = {
 
 export function VehicleForm({
   vehicle,
+  drivers,
+  currentDriverId,
   onClose,
 }: {
   vehicle: Vehicle | null;
+  /** Действующие водители компании — из них выбирается водитель машины. */
+  drivers: Pick<Driver, 'id' | 'full_name' | 'phone'>[];
+  currentDriverId: string | null;
   onClose: () => void;
 }) {
   const { t, m, locale } = useI18n();
   const [state, formAction, pending] = useActionState(saveVehicleAction, initial);
-  const [languages, setLanguages] = useState<string[]>(vehicle?.languages ?? ['FI']);
 
   /*
    * Класс решает, какая половина карточки видна.
@@ -60,12 +65,6 @@ export function VehicleForm({
     if (state.done) onClose();
   }, [state.done, onClose]);
 
-  function toggleLanguage(code: string) {
-    setLanguages((current) =>
-      current.includes(code) ? current.filter((c) => c !== code) : [...current, code],
-    );
-  }
-
   return (
     <Card stripe="info">
       <CardBody>
@@ -76,9 +75,7 @@ export function VehicleForm({
         <form action={formAction} className="grid gap-4 sm:grid-cols-2">
           <input type="hidden" name="locale" value={locale} />
           {vehicle && <input type="hidden" name="id" value={vehicle.id} />}
-          {languages.map((code) => (
-            <input key={code} type="hidden" name="languages" value={code} />
-          ))}
+          <input type="hidden" name="current_driver_id" value={currentDriverId ?? ''} />
 
           <Field label={t.vehicle.class} hint={t.vehicle.classHint} className="sm:col-span-2">
             {(p) => (
@@ -114,28 +111,32 @@ export function VehicleForm({
             )}
           </Field>
 
-          <Field label={t.vehicle.driver} required>
-            {(p) => (
-              <Input
-                {...p}
-                name="driver_name"
-                required
-                defaultValue={vehicle?.driver_name ?? ''}
-                placeholder="Antti Nieminen"
-              />
-            )}
-          </Field>
-
-          <Field label={t.vehicle.whatsapp} required>
-            {(p) => (
-              <InputMono
-                {...p}
-                name="whatsapp"
-                required
-                defaultValue={vehicle?.whatsapp ?? '+358'}
-                placeholder="+358401112233"
-              />
-            )}
+          {/*
+            * Водитель выбирается из водителей компании, а не вписывается:
+            * у него есть телефон-идентификатор, смены и история машин, и
+            * живёт он на своей странице. Смена водителя допуска машины не
+            * снимает.
+            */}
+          <Field label={t.vehicle.driver} hint={t.drivers.driverHint} className="sm:col-span-2">
+            {(p) =>
+              drivers.length === 0 ? (
+                <p className="text-[13px] text-warn">
+                  {t.drivers.addDriverFirst}{' '}
+                  <Link href={`/${locale}/carrier/drivers`} className="underline">
+                    {t.drivers.manage}
+                  </Link>
+                </p>
+              ) : (
+                <Select {...p} name="driver_id" defaultValue={currentDriverId ?? ''}>
+                  <option value="">—</option>
+                  {drivers.map((d) => (
+                    <option key={d.id} value={d.id}>
+                      {d.full_name} · {d.phone}
+                    </option>
+                  ))}
+                </Select>
+              )
+            }
           </Field>
 
           {/*
@@ -361,31 +362,6 @@ export function VehicleForm({
             )}
           </Field>
 
-          <div className="sm:col-span-2">
-            <span className="label-micro mb-2 block">{t.vehicle.languages}</span>
-            <div className="flex flex-wrap gap-1.5">
-              {DRIVER_LANGUAGES.map((code) => {
-                const on = languages.includes(code);
-                return (
-                  <button
-                    key={code}
-                    type="button"
-                    aria-pressed={on}
-                    onClick={() => toggleLanguage(code)}
-                    className={
-                      on
-                        ? 'cursor-pointer rounded-control border border-accent bg-accent px-2.5 py-1 font-mono text-xs font-bold text-accent-ink'
-                        : 'cursor-pointer rounded-control border border-line bg-raised px-2.5 py-1 font-mono text-xs text-ink-faint transition-colors duration-150 hover:border-accent-line hover:text-ink'
-                    }
-                  >
-                    {code}
-                  </button>
-                );
-              })}
-            </div>
-            <p className="mt-2 text-xs text-ink-faint">{t.fleet.languagesHint}</p>
-          </div>
-
           {vehicle?.access === 'APPROVED' && (
             <p className="rounded-control border border-warn/35 bg-warn/10 px-3 py-2 text-[13px] text-warn sm:col-span-2">
               {t.fleet.onReview}
@@ -405,7 +381,7 @@ export function VehicleForm({
             <Button
               type="submit"
               variant="primary"
-              disabled={pending || languages.length === 0}
+              disabled={pending}
               className="flex-[2]"
             >
               {t.action.save}

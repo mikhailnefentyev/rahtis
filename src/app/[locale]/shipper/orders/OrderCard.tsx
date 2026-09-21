@@ -9,8 +9,9 @@ import { Badge, Button, Card, CardBody, CardDivider, Mono, Plate } from '@/compo
 import { orderStatusTone } from '@/components/ui/tone';
 import { useI18n } from '@/lib/i18n/provider';
 import { routeEnds } from '@/lib/orders/route';
-import type { OrderAmendment, OrderStop, ShipperOffer, ShipperOrder } from '@/types/db';
+import type { KnownVehicle, OrderAmendment, OrderStop, ShipperOffer, ShipperOrder } from '@/types/db';
 import { AmendPanel } from './AmendPanel';
+import { DirectWaiting, SendDirect } from './DirectPanel';
 import { AssignedCarrier, OffersPanel } from './OffersPanel';
 import { OrderTrouble } from './OrderTrouble';
 
@@ -29,12 +30,15 @@ export function OrderCard({
   stops,
   offers,
   amendments,
+  knownVehicles,
   onRepeat,
 }: {
   order: ShipperOrder;
   stops: OrderStop[];
   offers: ShipperOffer[];
   amendments: OrderAmendment[];
+  /** Знакомые машины заказчика — для отправки заказа со стола напрямую. */
+  knownVehicles: KnownVehicle[];
   /** Повторить этот рейс: открыть форму, заполненную по нему. */
   onRepeat?: () => void;
 }) {
@@ -42,6 +46,11 @@ export function OrderCard({
 
   const { from: pickup, to: delivery } = routeEnds(stops);
   const assigned = offers.find((o) => o.is_assigned);
+  /*
+   * Прямое назначение ждёт без срока: AWAIT_DRIVER с пустым deadline_at.
+   * Выбор отклика со стола срок ставит всегда.
+   */
+  const directWaiting = order.status === 'AWAIT_DRIVER' && !order.deadline_at;
   const amendmentsByOrder = { [order.id]: amendments };
 
   return (
@@ -124,8 +133,21 @@ export function OrderCard({
               </div>
 
               {/* Отклики требуют решения по таймеру — они выше маршрута. */}
-              {(order.status === 'REQUESTED' || order.status === 'AWAIT_DRIVER') && (
-                <OffersPanel order={order} offers={offers} />
+              {directWaiting ? (
+                <DirectWaiting orderId={order.id} plate={assigned?.plate ?? null} />
+              ) : (
+                (order.status === 'REQUESTED' || order.status === 'AWAIT_DRIVER') && (
+                  <OffersPanel order={order} offers={offers} />
+                )
+              )}
+
+              {/*
+                * Заказ на столе, на который никто не откликнулся, можно
+                * отдать знакомой машине. С откликами — нет: люди уже ждут
+                * решения, и увести заказ у них из-под руки нечестно.
+                */}
+              {order.status === 'OPEN' && (
+                <SendDirect orderId={order.id} vehicles={knownVehicles} haulKind={order.haul_kind} />
               )}
 
               {/*

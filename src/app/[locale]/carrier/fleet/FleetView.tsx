@@ -6,15 +6,20 @@ import { vehicleAccessTone } from '@/components/ui/tone';
 import { deleteDraftVehicleAction, submitVehicleAction } from '@/lib/fleet/actions';
 import { EURO_LABEL } from '@/lib/fleet/labels';
 import { useI18n } from '@/lib/i18n/provider';
-import type { Vehicle } from '@/types/db';
+import type { Driver, Vehicle } from '@/types/db';
 import { VehicleForm } from './VehicleForm';
 
 export function FleetView({
   vehicles,
+  drivers,
+  driverByVehicle,
   documentsOk,
   today,
 }: {
   vehicles: Vehicle[];
+  drivers: Pick<Driver, 'id' | 'full_name' | 'phone'>[];
+  /** Текущий водитель каждой машины: vehicle_id → driver_id. */
+  driverByVehicle: Record<string, string>;
   documentsOk: boolean;
   /** Считается на сервере: рендер обязан быть чистым, а часы клиента могут врать. */
   today: string;
@@ -39,7 +44,12 @@ export function FleetView({
 
       {editing !== null && (
         <div className="mb-4">
-          <VehicleForm vehicle={editing === 'new' ? null : editing} onClose={close} />
+          <VehicleForm
+            vehicle={editing === 'new' ? null : editing}
+            drivers={drivers}
+            currentDriverId={editing === 'new' ? null : (driverByVehicle[editing.id] ?? null)}
+            onClose={close}
+          />
         </div>
       )}
 
@@ -120,10 +130,19 @@ export function FleetView({
                         )}
                       </p>
                     )}
-                  <p className="mt-1 text-[13px] text-ink-muted">
-                    {vehicle.driver_name} · {vehicle.languages.join('/')} ·{' '}
-                    <Mono>{vehicle.whatsapp}</Mono>
-                  </p>
+                  {/*
+                    * Водитель — из текущей привязки. Машина без водителя
+                    * на рейсы не выходит, и сказано это здесь, а не
+                    * обнаруживается на столе пустым списком машин.
+                    */}
+                  {vehicle.driver_name ? (
+                    <p className="mt-1 text-[13px] text-ink-muted">
+                      {vehicle.driver_name} · {vehicle.languages.join('/')} ·{' '}
+                      <Mono>{vehicle.whatsapp}</Mono>
+                    </p>
+                  ) : (
+                    <p className="mt-1 text-[13px] text-warn">{t.drivers.vehicleNoDriver}</p>
+                  )}
                   <p className="mt-1 text-xs text-ink-dim">{vehicle.base_city}</p>
 
                   {vehicle.access === 'PENDING' && (

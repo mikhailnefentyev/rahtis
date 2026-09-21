@@ -69,6 +69,48 @@ export type Database = {
         }
         Relationships: []
       }
+      carrier_shipper_links: {
+        Row: {
+          carrier_company_id: string
+          created_at: string
+          decided_at: string | null
+          decided_by: string | null
+          shipper_company_id: string
+          status: Database["public"]["Enums"]["link_status"]
+        }
+        Insert: {
+          carrier_company_id: string
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          shipper_company_id: string
+          status?: Database["public"]["Enums"]["link_status"]
+        }
+        Update: {
+          carrier_company_id?: string
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          shipper_company_id?: string
+          status?: Database["public"]["Enums"]["link_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "carrier_shipper_links_carrier_company_id_fkey"
+            columns: ["carrier_company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "carrier_shipper_links_shipper_company_id_fkey"
+            columns: ["shipper_company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       claim_attachments: {
         Row: {
           author_role: Database["public"]["Enums"]["party_role"]
@@ -508,6 +550,309 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "companies"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      driver_breaks: {
+        Row: {
+          client_event_id: string | null
+          created_at: string
+          ended_at: string | null
+          id: string
+          shift_id: string
+          started_at: string
+        }
+        Insert: {
+          client_event_id?: string | null
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          shift_id: string
+          started_at: string
+        }
+        Update: {
+          client_event_id?: string | null
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          shift_id?: string
+          started_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "driver_breaks_shift_id_fkey"
+            columns: ["shift_id"]
+            isOneToOne: false
+            referencedRelation: "driver_shifts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      driver_notifications: {
+        Row: {
+          code: string
+          created_at: string
+          driver_id: string
+          id: number
+          order_id: string | null
+          params: Json
+          read_at: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          driver_id: string
+          id?: never
+          order_id?: string | null
+          params?: Json
+          read_at?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          driver_id?: string
+          id?: never
+          order_id?: string | null
+          params?: Json
+          read_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "driver_notifications_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "driver_notifications_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      driver_pay_profiles: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          driver_id: string
+          hourly_cents: number | null
+          id: string
+          model: Database["public"]["Enums"]["pay_model"]
+          per_km_cents: number | null
+          tes_rule_set_id: string | null
+          trip_bps: number | null
+          valid_from: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          driver_id: string
+          hourly_cents?: number | null
+          id?: string
+          model: Database["public"]["Enums"]["pay_model"]
+          per_km_cents?: number | null
+          tes_rule_set_id?: string | null
+          trip_bps?: number | null
+          valid_from: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          driver_id?: string
+          hourly_cents?: number | null
+          id?: string
+          model?: Database["public"]["Enums"]["pay_model"]
+          per_km_cents?: number | null
+          tes_rule_set_id?: string | null
+          trip_bps?: number | null
+          valid_from?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "driver_pay_profiles_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "driver_pay_profiles_tes_rule_set_id_fkey"
+            columns: ["tes_rule_set_id"]
+            isOneToOne: false
+            referencedRelation: "tes_rule_sets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      driver_shift_log: {
+        Row: {
+          action: string
+          actor_id: string | null
+          after: Json | null
+          before: Json | null
+          created_at: string
+          driver_id: string
+          id: number
+          shift_id: string
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          after?: Json | null
+          before?: Json | null
+          created_at?: string
+          driver_id: string
+          id?: never
+          shift_id: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          after?: Json | null
+          before?: Json | null
+          created_at?: string
+          driver_id?: string
+          id?: never
+          shift_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "driver_shift_log_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      driver_shifts: {
+        Row: {
+          client_event_id: string | null
+          created_at: string
+          created_by: string | null
+          driver_id: string
+          end_lat: number | null
+          end_lon: number | null
+          ended_at: string | null
+          id: string
+          note: string | null
+          odometer_end: number | null
+          odometer_start: number | null
+          source: Database["public"]["Enums"]["shift_source"]
+          start_lat: number | null
+          start_lon: number | null
+          started_at: string
+          updated_at: string
+          vehicle_id: string | null
+        }
+        Insert: {
+          client_event_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          driver_id: string
+          end_lat?: number | null
+          end_lon?: number | null
+          ended_at?: string | null
+          id?: string
+          note?: string | null
+          odometer_end?: number | null
+          odometer_start?: number | null
+          source?: Database["public"]["Enums"]["shift_source"]
+          start_lat?: number | null
+          start_lon?: number | null
+          started_at: string
+          updated_at?: string
+          vehicle_id?: string | null
+        }
+        Update: {
+          client_event_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          driver_id?: string
+          end_lat?: number | null
+          end_lon?: number | null
+          ended_at?: string | null
+          id?: string
+          note?: string | null
+          odometer_end?: number | null
+          odometer_start?: number | null
+          source?: Database["public"]["Enums"]["shift_source"]
+          start_lat?: number | null
+          start_lon?: number | null
+          started_at?: string
+          updated_at?: string
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "driver_shifts_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "driver_shifts_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      drivers: {
+        Row: {
+          archived_at: string | null
+          auth_user_id: string | null
+          company_id: string
+          company_kind: Database["public"]["Enums"]["party_role"]
+          created_at: string
+          full_name: string
+          id: string
+          languages: string[]
+          needs_review: boolean
+          phone: string
+          status: Database["public"]["Enums"]["driver_status"]
+          updated_at: string
+        }
+        Insert: {
+          archived_at?: string | null
+          auth_user_id?: string | null
+          company_id: string
+          company_kind?: Database["public"]["Enums"]["party_role"]
+          created_at?: string
+          full_name: string
+          id?: string
+          languages?: string[]
+          needs_review?: boolean
+          phone: string
+          status?: Database["public"]["Enums"]["driver_status"]
+          updated_at?: string
+        }
+        Update: {
+          archived_at?: string | null
+          auth_user_id?: string | null
+          company_id?: string
+          company_kind?: Database["public"]["Enums"]["party_role"]
+          created_at?: string
+          full_name?: string
+          id?: string
+          languages?: string[]
+          needs_review?: boolean
+          phone?: string
+          status?: Database["public"]["Enums"]["driver_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "drivers_company_fk"
+            columns: ["company_id", "company_kind"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id", "kind"]
           },
         ]
       }
@@ -957,6 +1302,61 @@ export type Database = {
           },
         ]
       }
+      order_direct_requests: {
+        Row: {
+          carrier_company_id: string
+          decided_at: string | null
+          id: number
+          order_id: string
+          outcome: Database["public"]["Enums"]["direct_outcome"]
+          sent_at: string
+          sent_by: string | null
+          vehicle_id: string
+        }
+        Insert: {
+          carrier_company_id: string
+          decided_at?: string | null
+          id?: never
+          order_id: string
+          outcome?: Database["public"]["Enums"]["direct_outcome"]
+          sent_at?: string
+          sent_by?: string | null
+          vehicle_id: string
+        }
+        Update: {
+          carrier_company_id?: string
+          decided_at?: string | null
+          id?: never
+          order_id?: string
+          outcome?: Database["public"]["Enums"]["direct_outcome"]
+          sent_at?: string
+          sent_by?: string | null
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_direct_requests_carrier_company_id_fkey"
+            columns: ["carrier_company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_direct_requests_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_direct_requests_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       order_documents: {
         Row: {
           captured_at: string | null
@@ -1077,6 +1477,7 @@ export type Database = {
           created_by: string | null
           id: string
           order_id: string
+          origin: Database["public"]["Enums"]["offer_origin"]
           vehicle_id: string
         }
         Insert: {
@@ -1085,6 +1486,7 @@ export type Database = {
           created_by?: string | null
           id?: string
           order_id: string
+          origin?: Database["public"]["Enums"]["offer_origin"]
           vehicle_id: string
         }
         Update: {
@@ -1093,6 +1495,7 @@ export type Database = {
           created_by?: string | null
           id?: string
           order_id?: string
+          origin?: Database["public"]["Enums"]["offer_origin"]
           vehicle_id?: string
         }
         Relationships: [
@@ -1290,6 +1693,7 @@ export type Database = {
       orders: {
         Row: {
           assigned_company_id: string | null
+          assigned_driver_id: string | null
           assigned_vehicle_id: string | null
           billing: Database["public"]["Enums"]["billing_status"]
           chosen_offer_id: string | null
@@ -1300,6 +1704,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           deadline_at: string | null
+          dispatch_mode: Database["public"]["Enums"]["dispatch_mode"]
           distance_auto_km: number | null
           distance_km: number | null
           distance_source: Database["public"]["Enums"]["distance_source"]
@@ -1329,6 +1734,7 @@ export type Database = {
         }
         Insert: {
           assigned_company_id?: string | null
+          assigned_driver_id?: string | null
           assigned_vehicle_id?: string | null
           billing?: Database["public"]["Enums"]["billing_status"]
           chosen_offer_id?: string | null
@@ -1339,6 +1745,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           deadline_at?: string | null
+          dispatch_mode?: Database["public"]["Enums"]["dispatch_mode"]
           distance_auto_km?: number | null
           distance_km?: number | null
           distance_source?: Database["public"]["Enums"]["distance_source"]
@@ -1368,6 +1775,7 @@ export type Database = {
         }
         Update: {
           assigned_company_id?: string | null
+          assigned_driver_id?: string | null
           assigned_vehicle_id?: string | null
           billing?: Database["public"]["Enums"]["billing_status"]
           chosen_offer_id?: string | null
@@ -1378,6 +1786,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           deadline_at?: string | null
+          dispatch_mode?: Database["public"]["Enums"]["dispatch_mode"]
           distance_auto_km?: number | null
           distance_km?: number | null
           distance_source?: Database["public"]["Enums"]["distance_source"]
@@ -1411,6 +1820,13 @@ export type Database = {
             columns: ["assigned_company_id"]
             isOneToOne: false
             referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_assigned_driver_id_fkey"
+            columns: ["assigned_driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
             referencedColumns: ["id"]
           },
           {
@@ -1525,6 +1941,42 @@ export type Database = {
           },
         ]
       }
+      shipper_vehicle_pool: {
+        Row: {
+          added_at: string
+          added_by: string | null
+          shipper_company_id: string
+          vehicle_id: string
+        }
+        Insert: {
+          added_at?: string
+          added_by?: string | null
+          shipper_company_id: string
+          vehicle_id: string
+        }
+        Update: {
+          added_at?: string
+          added_by?: string | null
+          shipper_company_id?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shipper_vehicle_pool_shipper_company_id_fkey"
+            columns: ["shipper_company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shipper_vehicle_pool_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       support_messages: {
         Row: {
           body: string
@@ -1568,6 +2020,138 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tes_rule_sets: {
+        Row: {
+          base_hourly_cents: number
+          based_on: string | null
+          company_id: string | null
+          created_at: string
+          created_by: string | null
+          daily_regular_minutes: number
+          evening_cents: number
+          evening_end: string | null
+          evening_start: string | null
+          id: string
+          name: string
+          night_cents: number
+          night_end: string | null
+          night_start: string | null
+          note: string | null
+          overtime1_bps: number
+          overtime1_minutes: number
+          overtime2_bps: number
+          saturday_bps: number
+          sunday_bps: number
+          updated_at: string
+          valid_from: string
+        }
+        Insert: {
+          base_hourly_cents: number
+          based_on?: string | null
+          company_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          daily_regular_minutes?: number
+          evening_cents?: number
+          evening_end?: string | null
+          evening_start?: string | null
+          id?: string
+          name: string
+          night_cents?: number
+          night_end?: string | null
+          night_start?: string | null
+          note?: string | null
+          overtime1_bps?: number
+          overtime1_minutes?: number
+          overtime2_bps?: number
+          saturday_bps?: number
+          sunday_bps?: number
+          updated_at?: string
+          valid_from: string
+        }
+        Update: {
+          base_hourly_cents?: number
+          based_on?: string | null
+          company_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          daily_regular_minutes?: number
+          evening_cents?: number
+          evening_end?: string | null
+          evening_start?: string | null
+          id?: string
+          name?: string
+          night_cents?: number
+          night_end?: string | null
+          night_start?: string | null
+          note?: string | null
+          overtime1_bps?: number
+          overtime1_minutes?: number
+          overtime2_bps?: number
+          saturday_bps?: number
+          sunday_bps?: number
+          updated_at?: string
+          valid_from?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tes_rule_sets_based_on_fkey"
+            columns: ["based_on"]
+            isOneToOne: false
+            referencedRelation: "tes_rule_sets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tes_rule_sets_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vehicle_drivers: {
+        Row: {
+          assigned_by: string | null
+          created_at: string
+          driver_id: string
+          during: unknown
+          id: number
+          vehicle_id: string
+        }
+        Insert: {
+          assigned_by?: string | null
+          created_at?: string
+          driver_id: string
+          during: unknown
+          id?: never
+          vehicle_id: string
+        }
+        Update: {
+          assigned_by?: string | null
+          created_at?: string
+          driver_id?: string
+          during?: unknown
+          id?: never
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_drivers_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_drivers_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
             referencedColumns: ["id"]
           },
         ]
@@ -1624,7 +2208,7 @@ export type Database = {
           company_kind: Database["public"]["Enums"]["party_role"]
           container_feet: number[]
           created_at: string
-          driver_name: string
+          driver_name: string | null
           euro_class: Database["public"]["Enums"]["euro_class"]
           id: string
           languages: string[]
@@ -1641,7 +2225,7 @@ export type Database = {
           tail_lift: boolean
           updated_at: string
           vehicle_class: Database["public"]["Enums"]["vehicle_class"]
-          whatsapp: string
+          whatsapp: string | null
         }
         Insert: {
           access?: Database["public"]["Enums"]["vehicle_access"]
@@ -1656,7 +2240,7 @@ export type Database = {
           company_kind?: Database["public"]["Enums"]["party_role"]
           container_feet?: number[]
           created_at?: string
-          driver_name: string
+          driver_name?: string | null
           euro_class: Database["public"]["Enums"]["euro_class"]
           id?: string
           languages?: string[]
@@ -1673,7 +2257,7 @@ export type Database = {
           tail_lift?: boolean
           updated_at?: string
           vehicle_class?: Database["public"]["Enums"]["vehicle_class"]
-          whatsapp: string
+          whatsapp?: string | null
         }
         Update: {
           access?: Database["public"]["Enums"]["vehicle_access"]
@@ -1688,7 +2272,7 @@ export type Database = {
           company_kind?: Database["public"]["Enums"]["party_role"]
           container_feet?: number[]
           created_at?: string
-          driver_name?: string
+          driver_name?: string | null
           euro_class?: Database["public"]["Enums"]["euro_class"]
           id?: string
           languages?: string[]
@@ -1705,7 +2289,7 @@ export type Database = {
           tail_lift?: boolean
           updated_at?: string
           vehicle_class?: Database["public"]["Enums"]["vehicle_class"]
-          whatsapp?: string
+          whatsapp?: string | null
         }
         Relationships: [
           {
@@ -1835,6 +2419,7 @@ export type Database = {
         Args: { p_order_id: string; p_reason?: string }
         Returns: {
           assigned_company_id: string | null
+          assigned_driver_id: string | null
           assigned_vehicle_id: string | null
           billing: Database["public"]["Enums"]["billing_status"]
           chosen_offer_id: string | null
@@ -1845,6 +2430,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           deadline_at: string | null
+          dispatch_mode: Database["public"]["Enums"]["dispatch_mode"]
           distance_auto_km: number | null
           distance_km: number | null
           distance_source: Database["public"]["Enums"]["distance_source"]
@@ -2150,6 +2736,11 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      archive_driver: { Args: { p_driver_id: string }; Returns: undefined }
+      assign_vehicle_driver: {
+        Args: { p_driver_id: string; p_vehicle_id: string }
+        Returns: undefined
+      }
       attach_to_claim: {
         Args: {
           p_claim_id: string
@@ -2183,6 +2774,7 @@ export type Database = {
         Args: { p_order_id: string }
         Returns: {
           assigned_company_id: string | null
+          assigned_driver_id: string | null
           assigned_vehicle_id: string | null
           billing: Database["public"]["Enums"]["billing_status"]
           chosen_offer_id: string | null
@@ -2193,6 +2785,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           deadline_at: string | null
+          dispatch_mode: Database["public"]["Enums"]["dispatch_mode"]
           distance_auto_km: number | null
           distance_km: number | null
           distance_source: Database["public"]["Enums"]["distance_source"]
@@ -2227,6 +2820,17 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      carrier_partners: {
+        Args: never
+        Returns: {
+          decided_at: string
+          last_trip_at: string
+          shipper_id: string
+          shipper_name: string
+          status: Database["public"]["Enums"]["link_status"]
+          trips: number
+        }[]
+      }
       carrier_presence: {
         Args: never
         Returns: {
@@ -2250,6 +2854,7 @@ export type Database = {
         Args: { p_offer_id: string }
         Returns: {
           assigned_company_id: string | null
+          assigned_driver_id: string | null
           assigned_vehicle_id: string | null
           billing: Database["public"]["Enums"]["billing_status"]
           chosen_offer_id: string | null
@@ -2260,6 +2865,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           deadline_at: string | null
+          dispatch_mode: Database["public"]["Enums"]["dispatch_mode"]
           distance_auto_km: number | null
           distance_km: number | null
           distance_source: Database["public"]["Enums"]["distance_source"]
@@ -2300,6 +2906,7 @@ export type Database = {
         Args: { p_order_id: string }
         Returns: {
           assigned_company_id: string | null
+          assigned_driver_id: string | null
           assigned_vehicle_id: string | null
           billing: Database["public"]["Enums"]["billing_status"]
           chosen_offer_id: string | null
@@ -2310,6 +2917,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           deadline_at: string | null
+          dispatch_mode: Database["public"]["Enums"]["dispatch_mode"]
           distance_auto_km: number | null
           distance_km: number | null
           distance_source: Database["public"]["Enums"]["distance_source"]
@@ -2443,6 +3051,7 @@ export type Database = {
         Args: { p_order_id: string }
         Returns: {
           assigned_company_id: string | null
+          assigned_driver_id: string | null
           assigned_vehicle_id: string | null
           billing: Database["public"]["Enums"]["billing_status"]
           chosen_offer_id: string | null
@@ -2453,6 +3062,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           deadline_at: string | null
+          dispatch_mode: Database["public"]["Enums"]["dispatch_mode"]
           distance_auto_km: number | null
           distance_km: number | null
           distance_source: Database["public"]["Enums"]["distance_source"]
@@ -2487,10 +3097,12 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      copy_tes_template: { Args: { p_template_id: string }; Returns: string }
       create_order: {
         Args: { p_order: Json; p_publish?: boolean; p_stops: Json }
         Returns: {
           assigned_company_id: string | null
+          assigned_driver_id: string | null
           assigned_vehicle_id: string | null
           billing: Database["public"]["Enums"]["billing_status"]
           chosen_offer_id: string | null
@@ -2501,6 +3113,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           deadline_at: string | null
+          dispatch_mode: Database["public"]["Enums"]["dispatch_mode"]
           distance_auto_km: number | null
           distance_km: number | null
           distance_source: Database["public"]["Enums"]["distance_source"]
@@ -2554,7 +3167,7 @@ export type Database = {
           company_kind: Database["public"]["Enums"]["party_role"]
           container_feet: number[]
           created_at: string
-          driver_name: string
+          driver_name: string | null
           euro_class: Database["public"]["Enums"]["euro_class"]
           id: string
           languages: string[]
@@ -2571,7 +3184,7 @@ export type Database = {
           tail_lift: boolean
           updated_at: string
           vehicle_class: Database["public"]["Enums"]["vehicle_class"]
-          whatsapp: string
+          whatsapp: string | null
         }
         SetofOptions: {
           from: "*"
@@ -2620,6 +3233,56 @@ export type Database = {
           open_orders: number
         }[]
       }
+      direct_assign_order: {
+        Args: { p_order_id: string; p_vehicle_id: string }
+        Returns: {
+          assigned_company_id: string | null
+          assigned_driver_id: string | null
+          assigned_vehicle_id: string | null
+          billing: Database["public"]["Enums"]["billing_status"]
+          chosen_offer_id: string | null
+          closed_at: string | null
+          comment: string | null
+          commission_bps: number | null
+          container_feet: number | null
+          created_at: string
+          created_by: string | null
+          deadline_at: string | null
+          dispatch_mode: Database["public"]["Enums"]["dispatch_mode"]
+          distance_auto_km: number | null
+          distance_km: number | null
+          distance_source: Database["public"]["Enums"]["distance_source"]
+          haul_kind: Database["public"]["Enums"]["haul_kind"]
+          id: string
+          invoice_ref: string | null
+          invoiced_at: string | null
+          ldm: number | null
+          order_type: Database["public"]["Enums"]["order_type"]
+          paid_at: string | null
+          published_at: string | null
+          rate_cents: number | null
+          ref: string
+          route_bounds: Json | null
+          route_computed_at: string | null
+          route_fingerprint: string | null
+          route_geometry: string | null
+          settled_at: string | null
+          shipper_company_id: string
+          shipper_company_kind: Database["public"]["Enums"]["party_role"]
+          shipper_ref: string | null
+          status: Database["public"]["Enums"]["order_status"]
+          terms_document_id: string | null
+          trailer: string | null
+          trailer_plate: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       documents_needing_attention: {
         Args: { p_within_days?: number }
         Returns: {
@@ -2648,6 +3311,20 @@ export type Database = {
         Returns: Json
       }
       driver_next_stop: { Args: { p_phone: string }; Returns: Json }
+      driver_trips: {
+        Args: { p_from: string; p_to: string }
+        Returns: {
+          closed_at: string
+          distance_km: number
+          driver_id: string
+          order_id: string
+          payout_cents: number
+          plate: string
+          ref: string
+          started_at: string
+          stops_done: number
+        }[]
+      }
       expire_order_deadlines: { Args: never; Returns: number }
       file_claim: {
         Args: {
@@ -2737,6 +3414,27 @@ export type Database = {
         }
       }
       handle_support_message: { Args: { p_id: number }; Returns: undefined }
+      known_vehicles_for_shipper: {
+        Args: never
+        Returns: {
+          available: boolean
+          axles: number
+          busy: boolean
+          container_feet: number[]
+          driver_name: string
+          euro_class: Database["public"]["Enums"]["euro_class"]
+          in_pool: boolean
+          last_trip_at: string
+          ldm: number
+          make: string
+          payload_kg: number
+          plate: string
+          rating: number
+          trips: number
+          vehicle_class: Database["public"]["Enums"]["vehicle_class"]
+          vehicle_id: string
+        }[]
+      }
       legal_clause: {
         Args: {
           p_kind: Database["public"]["Enums"]["legal_kind"]
@@ -2977,6 +3675,11 @@ export type Database = {
           value: number
         }[]
       }
+      pool_add_vehicle: { Args: { p_vehicle_id: string }; Returns: undefined }
+      pool_remove_vehicle: {
+        Args: { p_vehicle_id: string }
+        Returns: undefined
+      }
       prune_auth_throttle: { Args: never; Returns: number }
       prune_incidents: { Args: { p_keep_days?: number }; Returns: number }
       rate_order: {
@@ -3059,6 +3762,7 @@ export type Database = {
         }
         Returns: {
           assigned_company_id: string | null
+          assigned_driver_id: string | null
           assigned_vehicle_id: string | null
           billing: Database["public"]["Enums"]["billing_status"]
           chosen_offer_id: string | null
@@ -3069,6 +3773,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           deadline_at: string | null
+          dispatch_mode: Database["public"]["Enums"]["dispatch_mode"]
           distance_auto_km: number | null
           distance_km: number | null
           distance_source: Database["public"]["Enums"]["distance_source"]
@@ -3103,6 +3808,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      restore_driver: { Args: { p_driver_id: string }; Returns: undefined }
       role_privileges: {
         Args: { p_role: string }
         Returns: {
@@ -3120,6 +3826,7 @@ export type Database = {
         }
         Returns: {
           assigned_company_id: string | null
+          assigned_driver_id: string | null
           assigned_vehicle_id: string | null
           billing: Database["public"]["Enums"]["billing_status"]
           chosen_offer_id: string | null
@@ -3130,6 +3837,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           deadline_at: string | null
+          dispatch_mode: Database["public"]["Enums"]["dispatch_mode"]
           distance_auto_km: number | null
           distance_km: number | null
           distance_source: Database["public"]["Enums"]["distance_source"]
@@ -3202,6 +3910,10 @@ export type Database = {
         Args: { p_key: string; p_note?: string; p_value: string }
         Returns: Json
       }
+      set_shipper_link: {
+        Args: { p_allow: boolean; p_shipper_id: string }
+        Returns: undefined
+      }
       settlement_period: {
         Args: { p_moment?: string }
         Returns: {
@@ -3215,6 +3927,7 @@ export type Database = {
         Args: { p_order_id: string; p_route: Json }
         Returns: {
           assigned_company_id: string | null
+          assigned_driver_id: string | null
           assigned_vehicle_id: string | null
           billing: Database["public"]["Enums"]["billing_status"]
           chosen_offer_id: string | null
@@ -3225,6 +3938,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           deadline_at: string | null
+          dispatch_mode: Database["public"]["Enums"]["dispatch_mode"]
           distance_auto_km: number | null
           distance_km: number | null
           distance_source: Database["public"]["Enums"]["distance_source"]
@@ -3278,7 +3992,7 @@ export type Database = {
           company_kind: Database["public"]["Enums"]["party_role"]
           container_feet: number[]
           created_at: string
-          driver_name: string
+          driver_name: string | null
           euro_class: Database["public"]["Enums"]["euro_class"]
           id: string
           languages: string[]
@@ -3295,7 +4009,7 @@ export type Database = {
           tail_lift: boolean
           updated_at: string
           vehicle_class: Database["public"]["Enums"]["vehicle_class"]
-          whatsapp: string
+          whatsapp: string | null
         }
         SetofOptions: {
           from: "*"
@@ -3308,6 +4022,7 @@ export type Database = {
         Args: { p_order_id: string; p_vehicle_id: string }
         Returns: {
           assigned_company_id: string | null
+          assigned_driver_id: string | null
           assigned_vehicle_id: string | null
           billing: Database["public"]["Enums"]["billing_status"]
           chosen_offer_id: string | null
@@ -3318,6 +4033,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           deadline_at: string | null
+          dispatch_mode: Database["public"]["Enums"]["dispatch_mode"]
           distance_auto_km: number | null
           distance_km: number | null
           distance_source: Database["public"]["Enums"]["distance_source"]
@@ -3485,6 +4201,7 @@ export type Database = {
         Args: { p_order_id: string; p_reason?: string }
         Returns: {
           assigned_company_id: string | null
+          assigned_driver_id: string | null
           assigned_vehicle_id: string | null
           billing: Database["public"]["Enums"]["billing_status"]
           chosen_offer_id: string | null
@@ -3495,6 +4212,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           deadline_at: string | null
+          dispatch_mode: Database["public"]["Enums"]["dispatch_mode"]
           distance_auto_km: number | null
           distance_km: number | null
           distance_source: Database["public"]["Enums"]["distance_source"]
@@ -3551,8 +4269,11 @@ export type Database = {
         | "OTHER"
       claim_status: "OPEN" | "IN_REVIEW" | "RESOLVED" | "REJECTED"
       company_status: "PENDING" | "APPROVED" | "ACTIVE" | "REJECTED"
+      direct_outcome: "PENDING" | "ACCEPTED" | "DECLINED" | "WITHDRAWN"
+      dispatch_mode: "DESK" | "DIRECT"
       distance_source: "MANUAL" | "AUTO"
       document_kind: "CARRIER_LICENSE" | "INSURANCE"
+      driver_status: "ACTIVE" | "ARCHIVED"
       email_status: "PENDING" | "SENT" | "FAILED" | "SKIPPED"
       euro_class: "EURO_4" | "EURO_5" | "EURO_6"
       haul_branch: "UNIT" | "EXPRESS"
@@ -3565,6 +4286,7 @@ export type Database = {
         | "CARRIER_AGREEMENT"
         | "SHIPPER_AGREEMENT"
       legal_status: "DRAFT" | "ACTIVE" | "ARCHIVED"
+      link_status: "OFFERED" | "ACTIVE" | "REVOKED"
       notification_kind:
         | "ORDER"
         | "BILLING"
@@ -3572,6 +4294,7 @@ export type Database = {
         | "REPORT"
         | "ADMIN_MESSAGE"
         | "CLAIM"
+      offer_origin: "DESK" | "DIRECT"
       order_status:
         | "DRAFT"
         | "OPEN"
@@ -3582,9 +4305,11 @@ export type Database = {
         | "CANCELLED"
       order_type: "TRAILER_SWAP" | "ROUND_TRIP" | "ONE_WAY"
       party_role: "CARRIER" | "SHIPPER" | "ADMIN"
+      pay_model: "PER_KM" | "TRIP_PERCENT" | "FLAT_HOURLY" | "TES"
       photo_subject: "TRAILER" | "CARGO" | "SEAL" | "DOCUMENT" | "OTHER"
       place_kind: "PORT" | "TERMINAL" | "PARKING" | "ADDRESS"
       report_kind: "WEEK" | "PERIOD"
+      shift_source: "APP" | "MANUAL"
       stop_role:
         | "PICKUP"
         | "DELIVERY"
@@ -3753,8 +4478,11 @@ export const Constants = {
       ],
       claim_status: ["OPEN", "IN_REVIEW", "RESOLVED", "REJECTED"],
       company_status: ["PENDING", "APPROVED", "ACTIVE", "REJECTED"],
+      direct_outcome: ["PENDING", "ACCEPTED", "DECLINED", "WITHDRAWN"],
+      dispatch_mode: ["DESK", "DIRECT"],
       distance_source: ["MANUAL", "AUTO"],
       document_kind: ["CARRIER_LICENSE", "INSURANCE"],
+      driver_status: ["ACTIVE", "ARCHIVED"],
       email_status: ["PENDING", "SENT", "FAILED", "SKIPPED"],
       euro_class: ["EURO_4", "EURO_5", "EURO_6"],
       haul_branch: ["UNIT", "EXPRESS"],
@@ -3768,6 +4496,7 @@ export const Constants = {
         "SHIPPER_AGREEMENT",
       ],
       legal_status: ["DRAFT", "ACTIVE", "ARCHIVED"],
+      link_status: ["OFFERED", "ACTIVE", "REVOKED"],
       notification_kind: [
         "ORDER",
         "BILLING",
@@ -3776,6 +4505,7 @@ export const Constants = {
         "ADMIN_MESSAGE",
         "CLAIM",
       ],
+      offer_origin: ["DESK", "DIRECT"],
       order_status: [
         "DRAFT",
         "OPEN",
@@ -3787,9 +4517,11 @@ export const Constants = {
       ],
       order_type: ["TRAILER_SWAP", "ROUND_TRIP", "ONE_WAY"],
       party_role: ["CARRIER", "SHIPPER", "ADMIN"],
+      pay_model: ["PER_KM", "TRIP_PERCENT", "FLAT_HOURLY", "TES"],
       photo_subject: ["TRAILER", "CARGO", "SEAL", "DOCUMENT", "OTHER"],
       place_kind: ["PORT", "TERMINAL", "PARKING", "ADDRESS"],
       report_kind: ["WEEK", "PERIOD"],
+      shift_source: ["APP", "MANUAL"],
       stop_role: [
         "PICKUP",
         "DELIVERY",

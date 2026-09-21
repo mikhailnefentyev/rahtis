@@ -7,7 +7,7 @@ import { orderStatusTone } from '@/components/ui/tone';
 import { daysFromToday, todayInHelsinki } from '@/lib/dates';
 import { cityOfStop, routeEnds } from '@/lib/orders/route';
 import { useI18n } from '@/lib/i18n/provider';
-import type { OrderAmendment, OrderStop, ShipperOffer, ShipperOrder } from '@/types/db';
+import type { KnownVehicle, OrderAmendment, OrderStop, ShipperOffer, ShipperOrder } from '@/types/db';
 import { OrderCard } from './OrderCard';
 
 /**
@@ -104,8 +104,10 @@ export function OrdersView({
   stopsByOrder,
   offersByOrder,
   amendmentsByOrder,
+  knownVehicles,
 }: {
   orders: ShipperOrder[];
+  knownVehicles: KnownVehicle[];
   stopsByOrder: Record<string, OrderStop[]>;
   offersByOrder: Record<string, ShipperOffer[]>;
   amendmentsByOrder: Record<string, OrderAmendment[]>;
@@ -115,6 +117,7 @@ export function OrdersView({
   const [OrderForm, setOrderForm] = useState<React.ComponentType<{
     onPublished: () => void;
     template?: { order: ShipperOrder; stops: OrderStop[] };
+    knownVehicles: KnownVehicle[];
   }> | null>(null);
   /* Какой заказ повторяем. Пусто — форма открыта пустой. */
   const [template, setTemplate] = useState<{ order: ShipperOrder; stops: OrderStop[] } | null>(null);
@@ -217,6 +220,7 @@ export function OrdersView({
         stops={stopsByOrder[order.id] ?? []}
         offers={offersByOrder[order.id] ?? []}
         amendments={amendmentsByOrder[order.id] ?? []}
+        knownVehicles={knownVehicles}
         onRepeat={() => startComposing({ order, stops: stopsByOrder[order.id] ?? [] })}
       />
     );
@@ -270,6 +274,7 @@ export function OrdersView({
         <div className="mb-6">
           <OrderForm
             template={template ?? undefined}
+            knownVehicles={knownVehicles}
             onPublished={() => {
               setComposing(false);
               setTemplate(null);

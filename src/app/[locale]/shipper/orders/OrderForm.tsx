@@ -20,7 +20,8 @@ import { stopTitle, type HaulKind } from '@/lib/orders/haul';
 import { computeRouteAction, type RouteState } from '@/lib/routing/actions';
 import { useI18n } from '@/lib/i18n/provider';
 import { StopFields, type StopDefaults } from './StopFields';
-import type { OrderStop, ShipperOrder, StopRole } from '@/types/db';
+import type { KnownVehicle, OrderStop, ShipperOrder, StopRole } from '@/types/db';
+import { DispatchPicker } from './DirectPanel';
 
 const initial: PublishState = { error: null, ref: null };
 
@@ -106,9 +107,12 @@ function repeatableRole(role: StopRole): 'EXTRA_LOAD' | 'EXTRA_UNLOAD' | null {
 export function OrderForm({
   onPublished,
   template,
+  knownVehicles,
 }: {
   onPublished: () => void;
   template?: OrderTemplate;
+  /** Знакомые машины — для прямого назначения вместо стола. */
+  knownVehicles: KnownVehicle[];
 }) {
   const { t, m, locale } = useI18n();
   const [state, formAction, pending] = useActionState(publishOrderAction, initial);
@@ -814,6 +818,17 @@ export function OrderForm({
               )}
             </Field>
           </div>
+        </CardBody>
+      </Card>
+
+      {/*
+        * Куда уходит заказ — последним вопросом перед публикацией: маршрут
+        * и деньги одинаковы для обоих потоков, различается только то, кто
+        * его увидит.
+        */}
+      <Card>
+        <CardBody>
+          <DispatchPicker vehicles={knownVehicles} haulKind={haulKind} />
         </CardBody>
       </Card>
 

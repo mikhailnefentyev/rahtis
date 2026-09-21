@@ -152,9 +152,6 @@ function readVehicleForm(formData: FormData) {
       .trim()
       .toUpperCase()
       .replace(/\s+/g, ''),
-    driver_name: String(formData.get('driver_name') ?? '').trim(),
-    languages: formData.getAll('languages').map(String),
-    whatsapp: String(formData.get('whatsapp') ?? '').replace(/[\s-]/g, ''),
     /*
      * Оси у фургона и грузовика не спрашиваются: правило «две оси — 25
      * тонн» написано про седельный тягач и к кузову неприменимо. Колонка
@@ -215,9 +212,6 @@ export async function saveVehicleAction(
   const company = viewer.company!;
 
   const values = readVehicleForm(formData);
-  if (values.languages.length === 0) {
-    return { error: t.validation.required, done: false };
-  }
 
   /*
    * Грузоподъёмность и метры — не украшение карточки: по ним подбирается
@@ -235,19 +229,39 @@ export async function saveVehicleAction(
   const supabase = await createClient();
   const id = text(formData, 'id');
 
-  const { error } = id
-    ? await supabase.from('vehicles').update(values).eq('id', id)
-    : await supabase.from('vehicles').insert({ ...values, company_id: company.id });
+  const { data, error } = id
+    ? await supabase.from('vehicles').update(values).eq('id', id).select('id').single()
+    : await supabase
+        .from('vehicles')
+        .insert({ ...values, company_id: company.id })
+        .select('id')
+        .single();
 
-  if (error) {
+  if (error || !data) {
     /* 23505 — номер уже занят допущенной машиной другой компании. */
     return {
-      error: error.code === '23505' ? t.error.generic : (error.message ?? t.error.generic),
+      error: error?.code === '23505' ? t.error.generic : (error?.message ?? t.error.generic),
       done: false,
     };
   }
 
+  /*
+   * Водитель — отдельная привязка, а не поле карточки: у неё своя
+   * история, и пишет её только функция базы. Вызывается, лишь когда
+   * выбор изменился, — иначе каждое сохранение карточки рвало бы
+   * интервал привязки на два одинаковых.
+   */
+  const driverId = text(formData, 'driver_id');
+  if (driverId !== text(formData, 'current_driver_id')) {
+    const { error: assignError } = await supabase.rpc('assign_vehicle_driver', {
+      p_vehicle_id: data.id,
+      p_driver_id: driverId as string,
+    });
+    if (assignError) return { error: t.error.generic, done: false };
+  }
+
   revalidatePath(`/${locale}/carrier/fleet`);
+  revalidatePath(`/${locale}/carrier/drivers`);
   return { error: null, done: true };
 }
 

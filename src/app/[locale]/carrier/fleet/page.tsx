@@ -29,7 +29,13 @@ export default async function FleetPage({ params }: { params: Promise<{ locale: 
 
   const [{ t, m }, supabase] = await Promise.all([getI18n(locale), createClient()]);
 
-  const [{ data: vehicles }, { data: documents }, { data: readiness }] = await Promise.all([
+  const [
+    { data: vehicles },
+    { data: documents },
+    { data: readiness },
+    { data: drivers },
+    { data: assignments },
+  ] = await Promise.all([
     supabase
       .from('vehicles')
       .select('*')
@@ -42,7 +48,24 @@ export default async function FleetPage({ params }: { params: Promise<{ locale: 
      * значит рано или поздно получить расхождение.
      */
     supabase.rpc('company_readiness', { p_company_id: company.id }),
+    supabase
+      .from('drivers')
+      .select('id, full_name, phone')
+      .eq('company_id', company.id)
+      .eq('status', 'ACTIVE')
+      .order('full_name'),
+    supabase.from('vehicle_drivers').select('vehicle_id, driver_id, during'),
   ]);
+
+  /*
+   * Открытый интервал — водитель на машине сейчас. PostgREST не фильтрует
+   * по верхней границе диапазона, поэтому история приходит целиком и
+   * отбирается здесь: у диапазона без верхней границы текст кончается на «,)».
+   */
+  const driverByVehicle: Record<string, string> = {};
+  for (const row of assignments ?? []) {
+    if (String(row.during).endsWith(',)')) driverByVehicle[row.vehicle_id] = row.driver_id;
+  }
 
   const byKind = (kind: CompanyDocument['kind']) =>
     (documents ?? []).find((d) => d.kind === kind) ?? null;
@@ -109,6 +132,8 @@ export default async function FleetPage({ params }: { params: Promise<{ locale: 
         */}
       <FleetView
         vehicles={vehicles ?? []}
+        drivers={drivers ?? []}
+        driverByVehicle={driverByVehicle}
         documentsOk={state?.documents_ok ?? false}
         today={new Date().toISOString().slice(0, 10)}
       />

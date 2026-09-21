@@ -2,7 +2,7 @@ import 'server-only';
 
 import { siteUrl } from '@/lib/config';
 import { operatorInbox, sendEmail } from '@/lib/email';
-import { orderPublishedEmail } from '@/lib/email/templates/dispatch';
+import { directOrderEmail, orderPublishedEmail } from '@/lib/email/templates/dispatch';
 import { emailLocaleOf } from '@/lib/email/text';
 import { createFormat } from '@/lib/format';
 import { getDictionary, type Locale } from '@/lib/i18n';
@@ -135,4 +135,88 @@ export async function dispatchPublishedOrder(orderId: string): Promise<void> {
      */
     console.error('рассылка о заказе не ушла:', cause instanceof Error ? cause.message : cause);
   }
+}
+
+/**
+ * Письмо перевозчику о прямом заказе его машине.
+ *
+ * Уведомление в кабинет и во входящие водителя пишет триггер базы; это
+ * письмо — дубль для того, кто кабинет сейчас не открыт. Как и рассылка,
+ * оно не отменяет назначение: заказ ждёт машину, даже если письмо не
+ * ушло.
+ */
+export async function notifyDirectOrder(orderId: string): Promise<void> {
+  try {
+    const admin = createAdminClient();
+
+    const [{ data: card }, { data: order }] = await Promise.all([
+      admin.rpc('order_dispatch_card', { p_order_id: orderId }),
+      admin
+        .from('orders')
+        .select(
+          'status, deadline_at, assigned_company_id, carrier:companies!orders_assigned_company_id_fkey(name, contact_email, language), vehicle:vehicles!orders_assigned_vehicle_id_fkey(plate), shipper:companies!orders_company_fk(name)',
+        )
+        .eq('id', orderId)
+        .maybeSingle(),
+    ]);
+
+    const c = card as Card | null;
+    /* Уже подтверждён, отменён или это выбор со стола — писать не о чем. */
+    if (!c || !order || order.status !== 'AWAIT_DRIVER' || order.deadline_at) return;
+
+    const carrier = order.carrier as { name: string; contact_email: string | null; language: string | null } | null;
+    const plate = (order.vehicle as { plate: string } | null)?.plate ?? '';
+    const shipper = (order.shipper as { name: string } | null)?.name ?? '';
+
+    if (!carrier?.contact_email || !order.assigned_company_id) return;
+
+    const locale = emailLocaleOf(carrier.language) as Locale;
+    const t = await getDictionary(locale);
+    const f = createFormat(t.meta.intl);
+
+    const from = c.pickup_city ?? '—';
+    const pickupAt = c.pickup_date
+      ? [f.date(c.pickup_date), c.pickup_time?.slice(0, 5)].filter(Boolean).join(' · ')
+      : null;
+
+    await sendEmail(
+      directOrderEmail({
+        to: carrier.contact_email,
+        companyName: carrier.name,
+        companyId: order.assigned_company_id,
+        ref: c.ref,
+        plate,
+        shipper,
+        from,
+        to_: c.delivery_city ?? from,
+        pickup: [c.pickup_place, pickupAt].filter(Boolean).join(' · ') || null,
+        unit: unitLabel(c, t),
+        distance: c.distance_km ? `${f.number(c.distance_km)} km` : null,
+        rate: c.rate_cents ? f.eur(c.rate_cents) : null,
+        link: `${siteUrl()}/${locale}/carrier/desk`,
+        operatorEmail: operatorInbox(),
+        locale: emailLocaleOf(carrier.language),
+      }),
+    );
+  } catch (cause) {
+    console.error('письмо о прямом заказе не ушло:', cause instanceof Error ? cause.message : cause);
+  }
+}
+
+/**
+ * Был ли заказ хоть раз на общем столе.
+ *
+ * Спрашивается до отмены прямого назначения: после неё заказ впервые
+ * выходит на стол, и рассылать его нужно так же, как новую публикацию.
+ * Отличить это по одной строке после отмены нельзя — дату публикации к
+ * тому моменту уже поставил триггер.
+ */
+export async function wasPublished(orderId: string): Promise<boolean> {
+  const { data } = await createAdminClient()
+    .from('orders')
+    .select('published_at')
+    .eq('id', orderId)
+    .maybeSingle();
+
+  return Boolean(data?.published_at);
 }

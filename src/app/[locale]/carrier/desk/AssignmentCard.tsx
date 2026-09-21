@@ -47,6 +47,8 @@ export function AssignmentCard({
 
   const stops = (order.stops ?? []) as unknown as OrderStop[];
   const waiting = order.status === 'AWAIT_DRIVER';
+  /* Прямое назначение знакомой машине: ждёт без срока, отказ отправляет заказ на стол. */
+  const direct = waiting && !order.deadline_at;
   const amendments = amendmentsByOrder[order.id] ?? [];
 
   return (
@@ -85,8 +87,13 @@ export function AssignmentCard({
                 </p>
                 <p className="mt-1 text-xs text-ink-dim">{order.shipper_name}</p>
 
-                {waiting && (
-                  <p className="mt-2 text-[13px] text-warn">{t.matching.chosenYouHint}</p>
+                {direct ? (
+                  <p className="mt-2 flex flex-wrap items-center gap-2 text-[13px] text-ink">
+                    <Badge tone="info">{t.direct.badge}</Badge>
+                    {t.direct.carrierHint}
+                  </p>
+                ) : (
+                  waiting && <p className="mt-2 text-[13px] text-warn">{t.matching.chosenYouHint}</p>
                 )}
               </div>
 

@@ -2,9 +2,9 @@
 
 import { revalidatePath } from 'next/cache';
 import { getViewer } from '@/lib/auth/viewer';
-import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
+import { getDictionary, isLocale, type Dictionary, type Locale, defaultLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
-import { dispatchPublishedOrder } from '@/lib/orders/dispatch';
+import { dispatchPublishedOrder, notifyDirectOrder } from '@/lib/orders/dispatch';
 import { HAUL_KINDS, type HaulKind } from '@/lib/orders/haul';
 import { cityOf, hasCoordinates, tonnesToKg, type FieldReader } from '@/lib/orders/stopFields';
 import type { StopRole } from '@/types/db';
@@ -239,6 +239,22 @@ function haulKind(value: string): HaulKind {
   return (HAUL_KINDS as readonly string[]).includes(value) ? (value as HaulKind) : 'TRAILER';
 }
 
+/**
+ * Отказ публикации словами.
+ *
+ * У прямого назначения свои причины, и все они — про машину, а не про
+ * форму: машина перестала быть знакомой, сейчас не выходит на рейсы или
+ * не подходит заказу. Коды те же, что у отклика со стола.
+ */
+function explainPublish(t: Dictionary, code: string | undefined, message: string | undefined): string {
+  if (code === '55000' && message?.includes('реквизиты')) return t.orderForm.needActive;
+  if (code === '42501') return t.direct.notKnown;
+  if (code === '55004') return t.direct.unavailable;
+  if (code === '55001' || code === '55002' || code === '55003') return t.direct.notFit;
+  if (code === '55000') return t.orderForm.needActive;
+  return t.orderForm.failed;
+}
+
 export async function publishOrderAction(
   _previous: PublishState,
   formData: FormData,
@@ -262,6 +278,12 @@ export async function publishOrderAction(
   }
 
   const stops = collectStops(formData);
+
+  const direct = str(formData, 'dispatch') === 'DIRECT';
+  const directVehicle = str(formData, 'direct_vehicle_id');
+  if (direct && !directVehicle) {
+    return { error: t.direct.chooseVehicle, ref: null };
+  }
 
   /*
    * Заказ без координат не публикуется.
@@ -317,17 +339,19 @@ export async function publishOrderAction(
       route_geometry: str(formData, 'route_geometry'),
       route_bounds: parseBounds(formData.get('route_bounds')),
       route_fingerprint: str(formData, 'route_fingerprint'),
+      /*
+       * Прямое назначение знакомой машине вместо стола. Машина берётся
+       * только при явном выборе потока: скрытое поле от прошлого выбора
+       * не должно увести заказ мимо стола.
+       */
+      direct_vehicle_id: direct ? directVehicle : '',
     },
     p_stops: stops,
     p_publish: true,
   });
 
   if (error || !data) {
-    /* 55000 — компания не активна; остальное показываем общим текстом. */
-    return {
-      error: error?.code === '55000' ? t.orderForm.needActive : t.orderForm.failed,
-      ref: null,
-    };
+    return { error: explainPublish(t, error?.code, error?.message), ref: null };
   }
 
   /*
@@ -337,7 +361,8 @@ export async function publishOrderAction(
    * действии работа после ответа не гарантирована, а отправка занимает
    * доли секунды. Своих ошибок функция наружу не выпускает.
    */
-  await dispatchPublishedOrder(data.id);
+  if (direct) await notifyDirectOrder(data.id);
+  else await dispatchPublishedOrder(data.id);
 
   revalidatePath(`/${locale}/shipper`, 'layout');
   return { error: null, ref: data.ref };

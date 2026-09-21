@@ -90,6 +90,15 @@ type Texts = {
     fieldRate: string;
   };
 
+  direct: {
+    subject: (ref: string, plate: string) => string;
+    heading: (plate: string) => string;
+    preheader: (shipper: string) => string;
+    lead: (shipper: string) => string;
+    button: string;
+    note: string;
+  };
+
   billing: {
     invoicedSubject: (ref: string) => string;
     invoicedHeading: (ref: string) => string;
@@ -180,6 +189,16 @@ const fi: Texts = {
     fieldUnit: 'Yksikkö',
     fieldDistance: 'Matka',
     fieldRate: 'Hinta',
+  },
+
+  direct: {
+    subject: (ref, plate) => `RAHTIS · suora tilaus ${ref} autolle ${plate}`,
+    heading: (plate) => `Suora tilaus autolle ${plate}`,
+    preheader: (shipper) => `${shipper} lähetti kuljetuksen suoraan autollenne.`,
+    lead: (shipper) =>
+      `${shipper} lähetti kuljetuksen suoraan autollenne ohi yhteisen pöydän. Määräaikaa ei ole: kuljetus odottaa, kunnes te tai kuljettaja vahvistatte sen. Jos kieltäydytte, kuljetus siirtyy yhteiselle pöydälle.`,
+    button: 'Vahvista tai kieltäydy',
+    note: 'Saat tämän viestin, koska olet sallinut tälle tilaajalle suorat tilaukset. Luvan voi perua Asiakkaat-sivulla.',
   },
 
   billing: {
@@ -277,6 +296,16 @@ const en: Texts = {
     fieldUnit: 'Unit',
     fieldDistance: 'Distance',
     fieldRate: 'Price',
+  },
+
+  direct: {
+    subject: (ref, plate) => `RAHTIS · direct order ${ref} for ${plate}`,
+    heading: (plate) => `Direct order for ${plate}`,
+    preheader: (shipper) => `${shipper} sent a transport straight to your vehicle.`,
+    lead: (shipper) =>
+      `${shipper} sent this transport straight to your vehicle, bypassing the load board. There is no deadline: it waits until you or the driver confirm it. If you decline, it goes to the load board.`,
+    button: 'Confirm or decline',
+    note: 'You are getting this because you allowed this shipper to send you direct orders. You can withdraw that on the Customers page.',
   },
 
   billing: {
