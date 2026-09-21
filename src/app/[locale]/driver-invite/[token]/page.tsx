@@ -30,7 +30,7 @@ export default async function DriverInvitePage({
   if (!isLocale(locale)) notFound();
 
   const { t, m } = await getI18n(locale);
-  const { data } = await createAdminClient().rpc('driver_invite_preview', { p_token: token });
+  const { data } = await createAdminClient().rpc('driver_invite_lookup', { p_token: token });
   const invite = data?.[0] ?? null;
 
   return (

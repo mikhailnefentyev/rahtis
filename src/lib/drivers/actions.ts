@@ -372,7 +372,7 @@ export async function copyTesTemplateAction(formData: FormData): Promise<void> {
 
 /* ── Приложение водителя ────────────────────────────────────────── */
 
-export type InviteState = { error: string | null; link: string | null };
+export type InviteState = { error: string | null; link: string | null; code: string | null };
 
 /**
  * Приглашение в приложение: одноразовая ссылка на сутки.
@@ -390,13 +390,18 @@ export async function createInviteAction(
   await requireCarrier();
 
   const supabase = await createClient();
-  const { data: token, error } = await supabase.rpc('create_driver_invite', {
+  const { data, error } = await supabase.rpc('create_driver_invite', {
     p_driver_id: str(formData, 'driver_id'),
   });
+  const invite = data?.[0];
 
-  if (error || !token) return { error: t.error.generic, link: null };
+  if (error || !invite) return { error: t.error.generic, link: null, code: null };
 
-  return { error: null, link: `${siteUrl()}/${locale}/driver-invite/${token}` };
+  return {
+    error: null,
+    link: `${siteUrl()}/${locale}/driver-invite/${invite.token}`,
+    code: invite.code,
+  };
 }
 
 /**

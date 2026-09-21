@@ -88,9 +88,15 @@ export default async function DriverTaskPage({
   );
 }
 
-/* Где снимается осмотр и где получатель подтверждает сдачу. */
+/*
+ * Где снимается осмотр и где берётся подпись с накладной. Подпись и CMR
+ * — на каждой точке, где единица или груз переходят из рук в руки: на
+ * погрузке расписывается тот, кто отдаёт, на выгрузке — тот, кто
+ * принимает. Продолжение рейса — не передача, там подписывать некому.
+ */
 const INSPECT = new Set(['PICKUP', 'DELIVERY', 'TRAILER_RETURN']);
-const CONFIRM = new Set(['DELIVERY', 'EXTRA_UNLOAD', 'TRAILER_RETURN']);
+const CONFIRM = new Set(['PICKUP', 'EXTRA_LOAD', 'DELIVERY', 'EXTRA_UNLOAD', 'TRAILER_RETURN']);
+const HANDOVER_IN = new Set(['PICKUP', 'EXTRA_LOAD']);
 
 async function StopItem({
   task,
@@ -221,7 +227,12 @@ async function StopItem({
                 )}
 
                 {CONFIRM.has(stop.role) && (
-                  <Confirmation orderId={task.id} stopId={stop.id} photos={photos} />
+                  <Confirmation
+                    orderId={task.id}
+                    stopId={stop.id}
+                    photos={photos}
+                    pickup={HANDOVER_IN.has(stop.role)}
+                  />
                 )}
 
                 <StopDone stopId={stop.id} />

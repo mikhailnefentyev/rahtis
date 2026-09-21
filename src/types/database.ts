@@ -590,6 +590,7 @@ export type Database = {
       }
       driver_invites: {
         Row: {
+          code_hash: string | null
           created_at: string
           created_by: string | null
           driver_id: string
@@ -599,6 +600,7 @@ export type Database = {
           used_at: string | null
         }
         Insert: {
+          code_hash?: string | null
           created_at?: string
           created_by?: string | null
           driver_id: string
@@ -608,6 +610,7 @@ export type Database = {
           used_at?: string | null
         }
         Update: {
+          code_hash?: string | null
           created_at?: string
           created_by?: string | null
           driver_id?: string
@@ -2955,7 +2958,7 @@ export type Database = {
       }
       claim_detail: { Args: { p_claim_id: string }; Returns: Json }
       claim_driver_invite: {
-        Args: { p_token: string; p_user_id: string }
+        Args: { p_invite_id: string; p_user_id: string }
         Returns: string
       }
       claims_open_count: { Args: never; Returns: number }
@@ -3158,7 +3161,13 @@ export type Database = {
         }
       }
       copy_tes_template: { Args: { p_template_id: string }; Returns: string }
-      create_driver_invite: { Args: { p_driver_id: string }; Returns: string }
+      create_driver_invite: {
+        Args: { p_driver_id: string }
+        Returns: {
+          code: string
+          token: string
+        }[]
+      }
       create_order: {
         Args: { p_order: Json; p_publish?: boolean; p_stops: Json }
         Returns: {
@@ -3376,13 +3385,14 @@ export type Database = {
         Args: { p_phone: string; p_question: string }
         Returns: Json
       }
-      driver_invite_preview: {
-        Args: { p_token: string }
+      driver_invite_lookup: {
+        Args: { p_code?: string; p_phone?: string; p_token?: string }
         Returns: {
           auth_user_id: string
           company_name: string
           driver_id: string
           full_name: string
+          invite_id: string
         }[]
       }
       driver_me: { Args: never; Returns: Json }

@@ -34,26 +34,68 @@ export type DriverState = { error: string | null; done: boolean };
 
 /* ── Приглашение ────────────────────────────────────────────────── */
 
-/**
- * Принять приглашение: новый вход, привязка к водителю, сессия.
- *
- * Каждое приглашение заводит нового пользователя, а прежний удаляется.
- * Так потерянный телефон выходит сам: перевозчик отправляет новую ссылку,
- * и старая сессия перестаёт обновляться.
- *
- * Почта пользователя — служебная, на домене платформы, и письма на неё не
- * уходят никогда: вход подтверждается здесь же одноразовым токеном
- * generateLink → verifyOtp, без SMS и без письма.
- */
+/** Вход по ссылке: страница приглашения, кнопка «Aloita». */
 export async function acceptInviteAction(formData: FormData): Promise<void> {
   const locale = toLocale(formData.get('locale'));
   const token = str(formData, 'token');
   const back = `/${locale}/driver-invite/${encodeURIComponent(token)}`;
 
   const admin = createAdminClient();
-  const { data: preview } = await admin.rpc('driver_invite_preview', { p_token: token });
-  const invite = preview?.[0];
+  const { data } = await admin.rpc('driver_invite_lookup', { p_token: token });
+  const invite = data?.[0];
   if (!invite) redirect(`${back}?invalid=1`);
+
+  const result = await signInDriver(invite);
+  redirect(result === 'ok' ? `/${locale}/driver` : `${back}?${result}=1`);
+}
+
+export type CodeState = { error: string | null };
+
+/**
+ * Вход по телефону и коду — прямо из установленного приложения.
+ *
+ * Нужен там, где ссылка не помогает: на iPhone приложение с экрана
+ * «Домой» не видит вход, сделанный в Safari. Код можно ввести в любом
+ * порядке — до установки или после.
+ */
+export async function acceptCodeAction(_previous: CodeState, formData: FormData): Promise<CodeState> {
+  const locale = toLocale(formData.get('locale'));
+  const t = await getDictionary(locale);
+
+  const admin = createAdminClient();
+  const { data, error } = await admin.rpc('driver_invite_lookup', {
+    p_phone: str(formData, 'phone').replace(/[\s()-]/g, ''),
+    p_code: str(formData, 'code').replace(/\s/g, ''),
+  });
+
+  /* 54000 — пять попыток на номер за пятнадцать минут. */
+  if (error?.code === '54000') return { error: t.driverApp.codeThrottled };
+  const invite = data?.[0];
+  if (error || !invite) return { error: t.driverApp.codeInvalid };
+
+  const result = await signInDriver(invite);
+  if (result !== 'ok') return { error: t.driverApp.inviteFailed };
+
+  redirect(`/${locale}/driver`);
+}
+
+/**
+ * Общий конец обоих входов: новый пользователь, привязка, сессия.
+ *
+ * Каждое приглашение заводит нового пользователя, а прежний удаляется.
+ * Так потерянный телефон выходит сам: перевозчик отправляет новое
+ * приглашение, и старая сессия перестаёт обновляться.
+ *
+ * Почта пользователя — служебная, на домене платформы, и письма на неё не
+ * уходят никогда: вход подтверждается здесь же одноразовым токеном
+ * generateLink → verifyOtp, без SMS и без письма.
+ */
+async function signInDriver(invite: {
+  invite_id: string;
+  driver_id: string;
+  auth_user_id: string | null;
+}): Promise<'ok' | 'invalid' | 'failed'> {
+  const admin = createAdminClient();
 
   const email = `${invite.driver_id}.${Date.now()}@driver.rahtis.eu`;
   const { data: created, error: createError } = await admin.auth.admin.createUser({
@@ -61,15 +103,15 @@ export async function acceptInviteAction(formData: FormData): Promise<void> {
     email_confirm: true,
     app_metadata: { driver_id: invite.driver_id },
   });
-  if (createError || !created.user) redirect(`${back}?failed=1`);
+  if (createError || !created.user) return 'failed';
 
   const { error: claimError } = await admin.rpc('claim_driver_invite', {
-    p_token: token,
+    p_invite_id: invite.invite_id,
     p_user_id: created.user.id,
   });
   if (claimError) {
     await admin.auth.admin.deleteUser(created.user.id);
-    redirect(`${back}?invalid=1`);
+    return 'invalid';
   }
 
   /* Прежний вход водителя — на другом телефоне — гасится. */
@@ -77,13 +119,11 @@ export async function acceptInviteAction(formData: FormData): Promise<void> {
 
   const { data: link } = await admin.auth.admin.generateLink({ type: 'magiclink', email });
   const hashed = link?.properties?.hashed_token;
-  if (!hashed) redirect(`${back}?failed=1`);
+  if (!hashed) return 'failed';
 
   const supabase = await createClient();
   const { error: sessionError } = await supabase.auth.verifyOtp({ type: 'email', token_hash: hashed });
-  if (sessionError) redirect(`${back}?failed=1`);
-
-  redirect(`/${locale}/driver`);
+  return sessionError ? 'failed' : 'ok';
 }
 
 export async function driverSignOutAction(formData: FormData): Promise<void> {

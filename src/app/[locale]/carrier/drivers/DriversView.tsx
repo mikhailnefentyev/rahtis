@@ -347,7 +347,7 @@ function DriverForm({ driver, onClose }: { driver: Driver | null; onClose: () =>
   );
 }
 
-const noInvite: InviteState = { error: null, link: null };
+const noInvite: InviteState = { error: null, link: null, code: null };
 
 /**
  * Приглашение водителя в приложение.
@@ -362,7 +362,7 @@ function InvitePanel({ driver }: { driver: Driver }) {
   const [copied, setCopied] = useState(false);
 
   const smsHref = state.link
-    ? `sms:${driver.phone}?&body=${encodeURIComponent(m('drivers.smsBody', { link: state.link }))}`
+    ? `sms:${driver.phone}?&body=${encodeURIComponent(m('drivers.smsBody', { link: state.link, code: state.code ?? '' }))}`
     : null;
 
   return (
@@ -389,6 +389,12 @@ function InvitePanel({ driver }: { driver: Driver }) {
       {state.link && (
         <div className="flex flex-col gap-2 rounded-control border border-accent-line bg-accent-wash p-3">
           <p className="text-xs text-ink-muted">{t.drivers.inviteLink}</p>
+          {state.code && (
+            <p className="text-[13px]">
+              {t.drivers.inviteCode}:{' '}
+              <span className="font-mono text-lg font-bold tracking-[0.2em]">{state.code}</span>
+            </p>
+          )}
           <Input readOnly value={state.link} onFocus={(e) => e.currentTarget.select()} className="font-mono text-xs" />
           <div className="flex flex-wrap gap-2">
             <Button

@@ -8,18 +8,24 @@ import { useI18n } from '@/lib/i18n/provider';
 import { PhotoCapture } from './PhotoCapture';
 
 /**
- * Подтверждение сдачи: подпись получателя на экране или снимок
- * подписанной накладной — что удобнее на месте. Снимок накладной ложится
- * видом CMR, и перевозчик закрывает рейс без повторной загрузки скана.
+ * Подтверждение передачи: подпись на экране и снимок накладной.
+ *
+ * На погрузке расписывается тот, кто отдаёт единицу или груз, на
+ * выгрузке — тот, кто принимает: так у рейса есть подтверждение обоих
+ * концов. Снимок накладной ложится видом CMR, и перевозчик закрывает рейс
+ * без повторной загрузки скана.
  */
 export function Confirmation({
   orderId,
   stopId,
   photos,
+  pickup,
 }: {
   orderId: string;
   stopId: string;
   photos: TripPhoto[];
+  /** Погрузка: подписывает сдающий, а не получатель. */
+  pickup: boolean;
 }) {
   const { t } = useI18n();
   const here = photos.filter((p) => p.stopId === stopId);
@@ -28,7 +34,9 @@ export function Confirmation({
 
   return (
     <section className="flex flex-col gap-3">
-      <h3 className="text-[16px] font-semibold">{t.driverApp.confirmation}</h3>
+      <h3 className="text-[16px] font-semibold">
+        {pickup ? t.driverApp.confirmationPickup : t.driverApp.confirmation}
+      </h3>
 
       {signature ? (
         <p className="rounded-card bg-ok/10 px-3 py-2 text-[15px] font-semibold text-ok">
@@ -36,7 +44,7 @@ export function Confirmation({
           {signature.signerName ? ` · ${signature.signerName}` : ''}
         </p>
       ) : (
-        <SignaturePad orderId={orderId} stopId={stopId} />
+        <SignaturePad orderId={orderId} stopId={stopId} pickup={pickup} />
       )}
 
       <div className="rounded-card border border-line bg-surface p-3">
@@ -59,7 +67,15 @@ export function Confirmation({
  * уходит PNG вместе с именем подписавшего — подпись без имени в споре
  * ничего не доказывает.
  */
-function SignaturePad({ orderId, stopId }: { orderId: string; stopId: string }) {
+function SignaturePad({
+  orderId,
+  stopId,
+  pickup,
+}: {
+  orderId: string;
+  stopId: string;
+  pickup: boolean;
+}) {
   const { t, locale } = useI18n();
   const router = useRouter();
   const canvas = useRef<HTMLCanvasElement>(null);
@@ -116,7 +132,9 @@ function SignaturePad({ orderId, stopId }: { orderId: string; stopId: string }) 
 
   return (
     <div className="flex flex-col gap-2 rounded-card border border-line bg-surface p-3">
-      <span className="text-[15px] text-ink-muted">{t.driverApp.signHere}</span>
+      <span className="text-[15px] text-ink-muted">
+        {pickup ? t.driverApp.signHerePickup : t.driverApp.signHere}
+      </span>
       <canvas
         ref={canvas}
         className="h-40 w-full touch-none rounded-control border border-dashed border-line-strong bg-sunken"
@@ -143,7 +161,7 @@ function SignaturePad({ orderId, stopId }: { orderId: string; stopId: string }) 
       <input
         value={name}
         onChange={(e) => setName(e.target.value)}
-        placeholder={t.driverApp.signerName}
+        placeholder={pickup ? t.driverApp.signerNamePickup : t.driverApp.signerName}
         maxLength={120}
         className="h-12 rounded-control border border-line bg-sunken px-3 text-[16px]"
       />
