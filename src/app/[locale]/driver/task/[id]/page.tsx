@@ -1,8 +1,12 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { cn } from '@/lib/cn';
-import { getDriverTasks, nextStop, type DriverStop } from '@/lib/driverApp/tasks';
+import { getTripPhotos, type TripPhoto } from '@/lib/driverApp/photos';
+import { getDriverTasks, nextStop, type DriverStop, type DriverTask } from '@/lib/driverApp/tasks';
 import { getI18n, isLocale, type Locale } from '@/lib/i18n';
+import { Arrive } from './Arrive';
+import { Confirmation } from './Confirmation';
+import { Inspection } from './Inspection';
 import { ProblemForm } from './ProblemForm';
 import { StopDone } from './StopDone';
 
@@ -26,6 +30,8 @@ export default async function DriverTaskPage({
   if (!task) notFound();
 
   const current = task.status === 'IN_PROGRESS' ? nextStop(task) : null;
+  /* Снимки нужны только на идущем рейсе: там осмотр и сравнение сторон. */
+  const photos = current ? await getTripPhotos(task.id) : [];
 
   return (
     <main className="flex flex-col gap-4">
@@ -67,6 +73,8 @@ export default async function DriverTaskPage({
         {task.stops.map((stop, index) => (
           <StopItem
             key={stop.id}
+            task={task}
+            photos={photos}
             stop={stop}
             locale={locale}
             current={current?.id === stop.id}
@@ -80,19 +88,28 @@ export default async function DriverTaskPage({
   );
 }
 
+/* Где снимается осмотр и где получатель подтверждает сдачу. */
+const INSPECT = new Set(['PICKUP', 'DELIVERY', 'TRAILER_RETURN']);
+const CONFIRM = new Set(['DELIVERY', 'EXTRA_UNLOAD', 'TRAILER_RETURN']);
+
 async function StopItem({
+  task,
+  photos,
   stop,
   locale,
   current,
   last,
 }: {
+  task: DriverTask;
+  photos: TripPhoto[];
   stop: DriverStop;
   locale: Locale;
   current: boolean;
   last: boolean;
 }) {
-  const { t, f } = await getI18n(locale);
+  const { t, m, f } = await getI18n(locale);
   const done = Boolean(stop.completed_at);
+  const unit = task.haul_kind === 'TRAILER' || task.haul_kind === 'CONTAINER';
 
   const destination =
     stop.lat != null && stop.lon != null
@@ -184,7 +201,32 @@ async function StopItem({
               )}
             </div>
 
-            <StopDone stopId={stop.id} />
+            {!stop.arrived_at ? (
+              <Arrive stopId={stop.id} />
+            ) : (
+              <>
+                <p className="text-[15px] font-semibold text-ok">
+                  ✓ {m('driverApp.arrivedAt', { time: f.time(stop.arrived_at) })}
+                </p>
+
+                {INSPECT.has(stop.role) && (
+                  <Inspection
+                    orderId={task.id}
+                    stopId={stop.id}
+                    unit={unit}
+                    sealRequired={Boolean(stop.seal_required)}
+                    delivery={stop.role !== 'PICKUP'}
+                    photos={photos}
+                  />
+                )}
+
+                {CONFIRM.has(stop.role) && (
+                  <Confirmation orderId={task.id} stopId={stop.id} photos={photos} />
+                )}
+
+                <StopDone stopId={stop.id} />
+              </>
+            )}
           </div>
         )}
       </div>

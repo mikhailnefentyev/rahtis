@@ -1397,6 +1397,7 @@ export type Database = {
       }
       order_documents: {
         Row: {
+          angle: string | null
           captured_at: string | null
           captured_lat: number | null
           captured_lon: number | null
@@ -1408,6 +1409,7 @@ export type Database = {
           mime_type: string
           order_id: string
           phase: Database["public"]["Enums"]["trip_phase"] | null
+          signer_name: string | null
           size_bytes: number
           source: Database["public"]["Enums"]["trip_document_source"]
           stop_id: string | null
@@ -1416,6 +1418,7 @@ export type Database = {
           uploaded_by: string | null
         }
         Insert: {
+          angle?: string | null
           captured_at?: string | null
           captured_lat?: number | null
           captured_lon?: number | null
@@ -1427,6 +1430,7 @@ export type Database = {
           mime_type: string
           order_id: string
           phase?: Database["public"]["Enums"]["trip_phase"] | null
+          signer_name?: string | null
           size_bytes: number
           source?: Database["public"]["Enums"]["trip_document_source"]
           stop_id?: string | null
@@ -1435,6 +1439,7 @@ export type Database = {
           uploaded_by?: string | null
         }
         Update: {
+          angle?: string | null
           captured_at?: string | null
           captured_lat?: number | null
           captured_lon?: number | null
@@ -1446,6 +1451,7 @@ export type Database = {
           mime_type?: string
           order_id?: string
           phase?: Database["public"]["Enums"]["trip_phase"] | null
+          signer_name?: string | null
           size_bytes?: number
           source?: Database["public"]["Enums"]["trip_document_source"]
           stop_id?: string | null
@@ -1618,6 +1624,9 @@ export type Database = {
       order_stops: {
         Row: {
           address: string
+          arrived_at: string | null
+          arrived_lat: number | null
+          arrived_lon: number | null
           cargo_weight_kg: number | null
           city: string
           company_name: string | null
@@ -1652,6 +1661,9 @@ export type Database = {
         }
         Insert: {
           address: string
+          arrived_at?: string | null
+          arrived_lat?: number | null
+          arrived_lon?: number | null
           cargo_weight_kg?: number | null
           city: string
           company_name?: string | null
@@ -1686,6 +1698,9 @@ export type Database = {
         }
         Update: {
           address?: string
+          arrived_at?: string | null
+          arrived_lat?: number | null
+          arrived_lon?: number | null
           cargo_weight_kg?: number | null
           city?: string
           company_name?: string | null
@@ -3020,6 +3035,9 @@ export type Database = {
         }
         Returns: {
           address: string
+          arrived_at: string | null
+          arrived_lat: number | null
+          arrived_lon: number | null
           cargo_weight_kg: number | null
           city: string
           company_name: string | null
@@ -3339,6 +3357,10 @@ export type Database = {
         }[]
       }
       driver_active_trips: { Args: { p_phone: string }; Returns: Json }
+      driver_arrive_stop: {
+        Args: { p_lat?: number; p_lon?: number; p_stop_id: string }
+        Returns: undefined
+      }
       driver_complete_next_stop: {
         Args: {
           p_accuracy_m?: number
@@ -3365,6 +3387,25 @@ export type Database = {
       }
       driver_me: { Args: never; Returns: Json }
       driver_next_stop: { Args: { p_phone: string }; Returns: Json }
+      driver_register_photo: {
+        Args: {
+          p_angle?: string
+          p_captured_at?: string
+          p_cmr?: boolean
+          p_damage?: boolean
+          p_external_id?: string
+          p_lat?: number
+          p_lon?: number
+          p_mime_type: string
+          p_order_id: string
+          p_signer_name?: string
+          p_size_bytes: number
+          p_stop_id: string
+          p_storage_path: string
+          p_subject: Database["public"]["Enums"]["photo_subject"]
+        }
+        Returns: string
+      }
       driver_report_problem: {
         Args: { p_order_id: string; p_text: string }
         Returns: undefined
@@ -3393,6 +3434,20 @@ export type Database = {
           stops: Json
           trailer: string
           trailer_plate: string
+        }[]
+      }
+      driver_trip_photos: {
+        Args: { p_order_id: string }
+        Returns: {
+          angle: string
+          captured_at: string
+          id: string
+          kind: Database["public"]["Enums"]["trip_document_kind"]
+          phase: Database["public"]["Enums"]["trip_phase"]
+          signer_name: string
+          stop_id: string
+          storage_path: string
+          subject: Database["public"]["Enums"]["photo_subject"]
         }[]
       }
       driver_trips: {
@@ -4156,6 +4211,9 @@ export type Database = {
         Args: { p_stop_id: string }
         Returns: {
           address: string
+          arrived_at: string | null
+          arrived_lat: number | null
+          arrived_lon: number | null
           cargo_weight_kg: number | null
           city: string
           company_name: string | null
@@ -4390,7 +4448,13 @@ export type Database = {
       order_type: "TRAILER_SWAP" | "ROUND_TRIP" | "ONE_WAY"
       party_role: "CARRIER" | "SHIPPER" | "ADMIN"
       pay_model: "PER_KM" | "TRIP_PERCENT" | "FLAT_HOURLY" | "TES"
-      photo_subject: "TRAILER" | "CARGO" | "SEAL" | "DOCUMENT" | "OTHER"
+      photo_subject:
+        | "TRAILER"
+        | "CARGO"
+        | "SEAL"
+        | "DOCUMENT"
+        | "OTHER"
+        | "SIGNATURE"
       place_kind: "PORT" | "TERMINAL" | "PARKING" | "ADDRESS"
       report_kind: "WEEK" | "PERIOD"
       shift_source: "APP" | "MANUAL"
@@ -4602,7 +4666,14 @@ export const Constants = {
       order_type: ["TRAILER_SWAP", "ROUND_TRIP", "ONE_WAY"],
       party_role: ["CARRIER", "SHIPPER", "ADMIN"],
       pay_model: ["PER_KM", "TRIP_PERCENT", "FLAT_HOURLY", "TES"],
-      photo_subject: ["TRAILER", "CARGO", "SEAL", "DOCUMENT", "OTHER"],
+      photo_subject: [
+        "TRAILER",
+        "CARGO",
+        "SEAL",
+        "DOCUMENT",
+        "OTHER",
+        "SIGNATURE",
+      ],
       place_kind: ["PORT", "TERMINAL", "PARKING", "ADDRESS"],
       report_kind: ["WEEK", "PERIOD"],
       shift_source: ["APP", "MANUAL"],

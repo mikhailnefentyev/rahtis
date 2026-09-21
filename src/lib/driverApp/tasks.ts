@@ -31,6 +31,7 @@ export type DriverStop = {
   cargo_weight_kg: number | null;
   consignee: string | null;
   note: string | null;
+  arrived_at: string | null;
   completed_at: string | null;
   damage_note: string | null;
 };

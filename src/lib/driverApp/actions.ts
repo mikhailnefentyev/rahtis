@@ -176,3 +176,99 @@ export async function markReadAction(formData: FormData): Promise<void> {
 
   revalidateDriver(locale);
 }
+
+/* ── Прибытие и снимки ──────────────────────────────────────────── */
+
+export async function arriveStopAction(formData: FormData): Promise<void> {
+  const locale = toLocale(formData.get('locale'));
+  const supabase = await createClient();
+
+  await supabase.rpc('driver_arrive_stop', {
+    p_stop_id: str(formData, 'stop_id'),
+    p_lat: num(formData, 'lat') ?? undefined,
+    p_lon: num(formData, 'lon') ?? undefined,
+  });
+
+  revalidateDriver(locale);
+}
+
+const PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+const SUBJECTS = ['TRAILER', 'CARGO', 'SEAL', 'DOCUMENT', 'OTHER', 'SIGNATURE'] as const;
+const ANGLES = ['FRONT', 'BACK', 'LEFT', 'RIGHT'];
+
+/**
+ * Снимок осмотра, подпись или накладная.
+ *
+ * Порядок важен. Сначала сессия водителя подтверждает, что рейс его, —
+ * иначе служебный ключ положил бы файл за любого вошедшего. Потом файл
+ * кладётся в папку рейса, и только после этого строка регистрируется
+ * функцией базы под той же сессией. Не записалась строка — файл убирается:
+ * файл без строки не виден никому и только занимает место.
+ *
+ * Имя файла — идентификатор снимка на телефоне: повтор отправки кладёт
+ * тот же объект по тому же пути, а база возвращает прежнюю строку.
+ */
+export async function uploadPhotoAction(formData: FormData): Promise<DriverState> {
+  const locale = toLocale(formData.get('locale'));
+  const t = await getDictionary(locale);
+  const failed = { error: t.driverApp.failed, done: false };
+
+  const file = formData.get('file');
+  const orderId = str(formData, 'order_id');
+  const stopId = str(formData, 'stop_id');
+  const externalId = str(formData, 'external_id');
+  const subject = str(formData, 'subject') as (typeof SUBJECTS)[number];
+  const angle = str(formData, 'angle');
+
+  if (
+    !(file instanceof File) ||
+    file.size === 0 ||
+    file.size > 10 * 1024 * 1024 ||
+    !PHOTO_TYPES.includes(file.type) ||
+    /* Все три идут в путь файла — только идентификаторы, без «../». */
+    ![externalId, orderId, stopId].every((id) => /^[0-9a-f-]{36}$/i.test(id)) ||
+    !SUBJECTS.includes(subject) ||
+    (angle && !ANGLES.includes(angle))
+  ) {
+    return failed;
+  }
+
+  const supabase = await createClient();
+  const { data: tasks } = await supabase.rpc('driver_tasks');
+  const task = (tasks ?? []).find((x) => x.id === orderId);
+  if (!task || (task.status !== 'IN_PROGRESS' && task.status !== 'DONE')) return failed;
+
+  const ext = file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
+  const path = `${orderId}/app/${stopId}/${externalId}.${ext}`;
+
+  const admin = createAdminClient();
+  const { error: uploadError } = await admin.storage
+    .from('trip-docs')
+    .upload(path, file, { contentType: file.type, upsert: true });
+  if (uploadError) return failed;
+
+  const { error } = await supabase.rpc('driver_register_photo', {
+    p_order_id: orderId,
+    p_stop_id: stopId,
+    p_storage_path: path,
+    p_mime_type: file.type,
+    p_size_bytes: file.size,
+    p_subject: subject,
+    p_angle: angle || undefined,
+    p_damage: formData.get('damage') === '1',
+    p_cmr: formData.get('cmr') === '1',
+    p_signer_name: str(formData, 'signer_name') || undefined,
+    p_captured_at: str(formData, 'captured_at') || undefined,
+    p_lat: num(formData, 'lat') ?? undefined,
+    p_lon: num(formData, 'lon') ?? undefined,
+    p_external_id: externalId,
+  });
+
+  if (error) {
+    await admin.storage.from('trip-docs').remove([path]);
+    return failed;
+  }
+
+  revalidateDriver(locale);
+  return { error: null, done: true };
+}
