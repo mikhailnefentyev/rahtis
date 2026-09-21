@@ -3438,7 +3438,6 @@ export type Database = {
           valid_until: string
         }[]
       }
-      driver_active_trips: { Args: { p_phone: string }; Returns: Json }
       driver_arrive_stop: {
         Args: {
           p_at?: string
@@ -3448,17 +3447,6 @@ export type Database = {
           p_stop_id: string
         }
         Returns: undefined
-      }
-      driver_complete_next_stop: {
-        Args: {
-          p_accuracy_m?: number
-          p_damage_note?: string
-          p_expect?: Database["public"]["Enums"]["stop_role"]
-          p_lat?: number
-          p_lon?: number
-          p_phone: string
-        }
-        Returns: Json
       }
       driver_complete_stop: {
         Args: {
@@ -3472,10 +3460,6 @@ export type Database = {
         }
         Returns: undefined
       }
-      driver_escalate: {
-        Args: { p_phone: string; p_question: string }
-        Returns: Json
-      }
       driver_invite_lookup: {
         Args: { p_code?: string; p_phone?: string; p_token?: string }
         Returns: {
@@ -3487,7 +3471,6 @@ export type Database = {
         }[]
       }
       driver_me: { Args: never; Returns: Json }
-      driver_next_stop: { Args: { p_phone: string }; Returns: Json }
       driver_push_subscribe: {
         Args: {
           p_auth: string
@@ -3972,24 +3955,6 @@ export type Database = {
           p_sqlstate?: string
         }
         Returns: number
-      }
-      register_trip_photo: {
-        Args: {
-          p_captured_at?: string
-          p_damage?: boolean
-          p_external_id?: string
-          p_file_name: string
-          p_lat?: number
-          p_lon?: number
-          p_mime_type: string
-          p_order_id: string
-          p_phase: Database["public"]["Enums"]["trip_phase"]
-          p_size_bytes: number
-          p_stop_id?: string
-          p_storage_path: string
-          p_subject?: Database["public"]["Enums"]["photo_subject"]
-        }
-        Returns: string
       }
       remove_stop: {
         Args: { p_stop_id: string }

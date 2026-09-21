@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import Link from 'next/link';
 import { buttonClass, Card, CardBody, Mono } from '@/components/ui';
 import { APP } from '@/lib/config';
@@ -421,7 +420,7 @@ export async function LandingSections({ locale }: { locale: Locale }) {
         </div>
       </section>
 
-      {/* ── Помощник водителя ──────────────────────────────────── */}
+      {/* ── Приложение водителя ──────────────────────────────────── */}
       <section id="assistant" className="assistant">
         <div className="mx-auto w-full max-w-6xl px-5 py-20">
           <p className="label-micro">
@@ -436,9 +435,9 @@ export async function LandingSections({ locale }: { locale: Locale }) {
           <div className="mt-10 grid items-center gap-10 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
             <div className="assistant__stage">
               {/*
-                * Телефон собран разметкой, а не снят скриншотом: переписка
-                * переводится, и картинку пришлось бы переснимать на каждый
-                * язык и на каждую правку текста.
+                * Телефон собран разметкой, а не снят скриншотом: экран
+                * приложения переводится, и картинку пришлось бы переснимать
+                * на каждый язык и на каждую правку текста.
                 *
                 * aria-hidden целиком — это иллюстрация. Всё, что она
                 * говорит, сказано словами в соседней колонке, а озвучивать
@@ -453,71 +452,73 @@ export async function LandingSections({ locale }: { locale: Locale }) {
                 <div className="phone__screen">
                   <div className="phone__glare" />
 
-                  <div className="wa-status">
-                    <span>7.02</span>
-                    <span className="wa-status__icons">
+                  <div className="app-status">
+                    <span>7.12</span>
+                    <span className="app-status__icons">
                       <Signal />
                       <Wifi />
                       <Battery />
                     </span>
                   </div>
 
-                  <div className="wa-bar">
-                    <ArrowBack />
-                    <span className="wa-bar__avatar">
-                      {/* Марка вместо аватара: у помощника лицо платформы. */}
-                      <Image src="/mark.png" alt="" width={40} height={40} />
+                  <div className="app-head">
+                    <span>
+                      <ArrowBack /> {l.appBack}
                     </span>
-                    <span className="wa-bar__who">
-                      <span className="wa-bar__name">{l.aiBot}</span>
-                      <span className="wa-bar__state">{l.aiOnline}</span>
-                    </span>
-                    <span className="wa-bar__icons">
-                      <Video />
-                      <Phone />
-                      <Dots />
-                    </span>
+                    <span className="app-head__ref">RS-2026-0142</span>
                   </div>
 
-                  <div className="wa-chat">
-                    <span className="wa-day">{l.aiToday}</span>
+                  <div className="app-banner">
+                    <div className="app-banner__small">{l.appStopOf}</div>
+                    <div className="app-banner__big">{l.appBanner}</div>
+                  </div>
 
-                    {[
-                      { text: l.aiQ1, out: true, at: '6.58' },
-                      { text: l.aiA1, out: false, at: '6.58' },
-                      { text: l.aiQ2, out: true, at: '7.00' },
-                      { text: l.aiA2, out: false, at: '7.00' },
-                      { text: l.aiQ3, out: true, at: '7.02' },
-                    ].map((msg) => (
-                      <span
-                        key={msg.text}
-                        className={msg.out ? 'wa-msg wa-msg--out' : 'wa-msg wa-msg--in'}
-                      >
-                        {msg.text}
-                        <span className="wa-msg__meta">
-                          {msg.at}
-                          {msg.out && <Ticks />}
-                        </span>
+                  <div className="app-list">
+                    <div className="app-stop app-stop--done">
+                      <span className="app-stop__rail">
+                        <span className="app-dot app-dot--done">✓</span>
                       </span>
-                    ))}
+                      <span className="app-stop__body">
+                        <span className="app-stop__role block">{l.appPickupRole}</span>
+                        <span className="app-stop__place block">Vuosaari</span>
+                        <span className="app-stop__meta block">{l.appPickupDone}</span>
+                      </span>
+                    </div>
 
-                    {/* Ответ на последний вопрос ещё печатается — переписка живая. */}
-                    <span className="wa-typing">
-                      <i />
-                      <i />
-                      <i />
-                    </span>
+                    <div className="app-stop">
+                      <span className="app-stop__rail">
+                        <span className="app-dot app-dot--now" />
+                      </span>
+                      <span className="app-stop__body">
+                        <span className="app-stop__role block">{l.appUnloadRole}</span>
+                        <span className="app-stop__place block">Kotka, Hietanen</span>
+                        <span className="app-stop__meta block">{l.appArrived}</span>
+                        <span className="app-shots">
+                          <span className="app-shot">✓</span>
+                          <span className="app-shot">✓</span>
+                          <span className="app-shot app-shot--damage">!</span>
+                          <span className="app-shot">✓</span>
+                        </span>
+                        <span className="app-btn app-btn--ghost block">{l.appSign}</span>
+                        <span className="app-btn block">✓ {l.appDone}</span>
+                      </span>
+                    </div>
+
+                    <div className="app-stop">
+                      <span className="app-stop__rail">
+                        <span className="app-dot" />
+                      </span>
+                      <span className="app-stop__body">
+                        <span className="app-stop__role block">{l.appReturnRole}</span>
+                        <span className="app-stop__place block">Hamina</span>
+                      </span>
+                    </div>
                   </div>
 
-                  <div className="wa-input">
-                    <span className="wa-input__field">
-                      <Smile />
-                      <span>{l.aiPlaceholder}</span>
-                      <Clip />
-                    </span>
-                    <span className="wa-input__send">
-                      <Mic />
-                    </span>
+                  <div className="app-nav">
+                    <span className="app-nav__active">{l.appNavTasks}</span>
+                    <span>{l.appNavInbox}</span>
+                    <span>{l.appNavProfile}</span>
                   </div>
                 </div>
               </div>
@@ -530,17 +531,11 @@ export async function LandingSections({ locale }: { locale: Locale }) {
                 { title: l.ai3, text: l.ai3Text },
                 { title: l.ai4, text: l.ai4Text },
                 { title: l.ai5, text: l.ai5Text },
-                { title: l.ai6, text: null },
+                { title: l.ai6, text: l.ai6Text },
               ].map((item) => (
                 <div key={item.title} className="assistant__cell">
                   <h3>{item.title}</h3>
-                  {item.text ? (
-                    <p>{item.text}</p>
-                  ) : (
-                    <Mono className="mt-1.5 block text-[13px] tracking-[0.04em] text-night-faint">
-                      FI · SV · EN · ET · RU · PL · LT · LV · BG · RO · DE
-                    </Mono>
-                  )}
+                  <p>{item.text}</p>
                 </div>
               ))}
             </div>
@@ -618,15 +613,13 @@ export async function LandingSections({ locale }: { locale: Locale }) {
           </Card>
 
           {/*
-            * Приложение водителя — единственное на странице, чего ещё
-            * нет. Метка «Kehitteillä» и пунктир сказаны честно: обещание
-            * без срока лучше молчания, но только пока видно, что это
-            * обещание, а не работающая услуга.
+            * Приложение водителя работает — метка та же, что у веток
+            * перевозок. Пунктир «в разработке» здесь больше не правда.
             */}
-          <Card className="border-dashed">
+          <Card>
             <CardBody className="flex flex-col gap-3 p-6">
-              <span className="self-start rounded-pill border border-line-strong px-2.5 py-1 text-[11px] font-semibold text-ink-faint">
-                {l.serviceSoon}
+              <span className="self-start rounded-pill border border-accent-line bg-accent-wash px-2.5 py-1 text-[11px] font-semibold text-accent">
+                {l.serviceLive}
               </span>
               <h3 className="text-[20px] font-semibold tracking-tight">{l.service3}</h3>
               <p className="text-[16px] text-ink-muted">{l.service3Text}</p>
@@ -752,74 +745,10 @@ function ArrowBack() {
   );
 }
 
-function Video() {
-  return (
-    <svg width="15" height="15" viewBox="0 0 16 16" {...stroke}>
-      <rect x="1.5" y="4" width="9" height="8" rx="2" />
-      <path d="M10.5 8.2l4-2.2v4.4l-4-2.2z" />
-    </svg>
-  );
-}
 
-function Phone() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 16 16" {...stroke}>
-      <path d="M3 2.5h2.2l1 2.6-1.4 1a7.5 7.5 0 0 0 3.6 3.6l1-1.4 2.6 1V11a2 2 0 0 1-2.2 2A10.5 10.5 0 0 1 2.6 4.7 2 2 0 0 1 3 2.5z" />
-    </svg>
-  );
-}
 
-function Dots() {
-  return (
-    <svg width="4" height="15" viewBox="0 0 4 16" fill="currentColor">
-      <circle cx="2" cy="3" r="1.4" />
-      <circle cx="2" cy="8" r="1.4" />
-      <circle cx="2" cy="13" r="1.4" />
-    </svg>
-  );
-}
 
 /* Две галочки: сообщение доставлено и прочитано. */
-function Ticks() {
-  return (
-    <svg
-      className="wa-msg__tick"
-      width="13"
-      height="8"
-      viewBox="0 0 14 8"
-      {...stroke}
-      strokeWidth={1.5}
-    >
-      <path d="M1 4.4 3.2 6.6 7.6 1.4" />
-      <path d="M6 4.4 8.2 6.6 12.6 1.4" />
-    </svg>
-  );
-}
 
-function Smile() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 16 16" {...stroke} strokeWidth={1.4} style={{ flex: 'none' }}>
-      <circle cx="8" cy="8" r="6.2" />
-      <path d="M5.6 9.4a3 3 0 0 0 4.8 0" />
-      <circle cx="6" cy="6.4" r="0.5" fill="currentColor" stroke="none" />
-      <circle cx="10" cy="6.4" r="0.5" fill="currentColor" stroke="none" />
-    </svg>
-  );
-}
 
-function Clip() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 16 16" {...stroke} strokeWidth={1.4} style={{ flex: 'none' }}>
-      <path d="M11 4.5 5.9 9.6a1.8 1.8 0 0 0 2.5 2.5l5.1-5.1a3.4 3.4 0 0 0-4.8-4.8L3.4 7.5" />
-    </svg>
-  );
-}
 
-function Mic() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 16 16" {...stroke}>
-      <rect x="6" y="1.8" width="4" height="7" rx="2" />
-      <path d="M3.6 7.6a4.4 4.4 0 0 0 8.8 0M8 12v2.2" />
-    </svg>
-  );
-}

@@ -74,7 +74,7 @@ export const fi = {
     orders: 'Omat kuljetukset',
     report: 'Viikkoraportti',
     moderation: 'Tarkastus',
-    dispatch: 'Ajojärjestely · WhatsApp',
+    dispatch: 'Ajojärjestely',
     invoices: 'Laskutus',
     payouts: 'Tilitykset',
     signOut: 'Kirjaudu ulos',
@@ -360,8 +360,7 @@ export const fi = {
       'Näet alueesi avoimet keikat yhdessä paikassa. Kun edellinen kuljetus päättyy, voit etsiä seuraavan keikan suoraan samalta alueelta.',
     helpDriver: 'Kuljettajalle',
     helpDriverTitle: 'Kaikki keikan tiedot yhdessä paikassa',
-    helpDriverText:
-      'Osoitteet, yhteyshenkilöt, varaukset ja toimintaohjeet kulkevat mukana koko keikan ajan. Tarvittaessa kuljettaja saa apua suoraan WhatsAppissa.',
+    helpDriverText: 'Osoitteet, yhteyshenkilöt, varaukset ja toimintaohjeet kulkevat kuljettajan sovelluksessa koko keikan ajan. Kuittaukset ja kuvat hoituvat samasta paikasta.',
 
     timeEyebrow: 'Seisonta maksaa kaikille',
     timeTitle: 'Logistiikassa aika maksaa',
@@ -473,42 +472,43 @@ export const fi = {
     fault4Text:
       'Peruutettu keikka palautuu automaattisesti tarjolle ja siitä lähtee tieto sopiville kuljetusliikkeille.',
 
-    aiEyebrow: 'Kuljettajan avustaja',
-    aiTitle: 'Kuljettajalla on apu mukana koko keikan ajan',
+    aiEyebrow: 'Kuljettajan sovellus',
+    aiTitle: 'Keikka kulkee kuljettajan puhelimessa',
     aiLede:
-      'WhatsAppissa toimiva RAHTIS-avustaja tuntee kyseisen keikan tiedot ja pystyy vastaamaan kuljettajan kysymyksiin hänen omalla kielellään.',
+      'RAHTIS-kuljettajasovellus näyttää keikan pisteet, osoitteet, aikaikkunat ja yhteyshenkilöt. Saapuminen, kuvat, allekirjoitus ja kuittaus hoituvat napilla, ilman viestittelyä.',
     aiLede2:
-      'Kyse ei ole valikkobotista tai automaattivastaajasta. Avustaja käyttää keikan tietoja ja auttaa käytännön tilanteissa matkan aikana.',
-    aiOnline: 'WhatsApp · paikalla',
-    aiToday: 'Tänään',
-    aiPlaceholder: 'Viesti',
-    aiDriver: 'Kuljettaja',
-    aiBot: 'RAHTIS',
-    aiQ1: 'Milloin Kotkan portti on auki?',
-    aiA1:
-      'Hietasen portti on avoinna ma–pe klo 06.00–22.00 ja la klo 08.00–16.00. Sinun purkuaikasi on klo 07.00, joten portti on silloin auki.',
-    aiQ2: 'Mistä saan lisää liinoja ja kulmasuojia?',
-    aiA2:
-      'Lähin sopiva liike on reittisi varrella Kotkassa, noin 4 km ennen terminaalia. Liike on avoinna klo 18 asti.',
-    aiQ3: 'Ehdinkö vielä Turkuun tänään?',
-    aiA3:
-      'Ilmoitettujen tietojen mukaan ajoaikaa on jäljellä 3 h 20 min ja matka kestää noin 2 h 40 min. Nykyisillä tiedoilla ehdit perille ajoajan puitteissa.',
-    ai1: 'Tuntee keikan tiedot',
+      'Sovellus asennetaan puhelimen kotinäytölle kuljetusliikkeen lähettämällä linkillä tai koodilla. Se toimii myös satamassa ilman verkkoa.',
+    appBack: 'Tehtävät',
+    appStopOf: 'Pysähdys 2/3',
+    appBanner: 'Purku · Kotka',
+    appPickupRole: 'Nouto',
+    appPickupDone: 'Tehty 06.42',
+    appUnloadRole: 'Purku',
+    appArrived: 'Saapui 07.05',
+    appSign: 'Vastaanottajan allekirjoitus',
+    appDone: 'Merkitse tehdyksi',
+    appReturnRole: 'Perävaunun palautus',
+    appNavTasks: 'Tehtävät',
+    appNavInbox: 'Viestit',
+    appNavProfile: 'Profiili',
+    ai1: 'Keikka yhdessä näkymässä',
     ai1Text:
-      'Osoitteet, yhteyshenkilöt, varausnumerot, yksikön tai kuorman tiedot ja muut keikan tiedot ovat avustajan käytettävissä.',
-    ai2: 'Etsii tarvittaessa lisätietoa',
+      'Pisteet järjestyksessä, osoitteet, aikaikkunat, yhteyshenkilöt ja yksikön numero. Navigointi ja soitto yhdellä napilla.',
+    ai2: 'Saapuminen ja kuittaus napilla',
     ai2Text:
-      'Avustaja voi auttaa esimerkiksi terminaalien aukioloajoissa, yhteystiedoissa, tarvikkeiden hankinnassa ja sopivan taukopaikan löytämisessä.',
-    ai3: 'Auttaa ajoajan arvioinnissa',
+      'Kellonaika ja paikka tallentuvat kuittaushetkeltä. Seisonta näkyy saapumisesta, ja tila päivittyy tilaajalle ja kuljetusliikkeelle.',
+    ai3: 'Kuvat ja vauriot',
     ai3Text:
-      'Kun tarvittavat ajoaikatiedot ovat käytettävissä, avustaja voi arvioida, ehtiikö kuljettaja seuraavaan pisteeseen ajoajan puitteissa.',
-    ai4: 'Päivittää keikan kuljettajan viestistä',
+      'Perävaunun jokainen puoli, sinetti ja uusi vaurio kuvataan sovelluksessa. Toimituksessa noudon kuva on vieressä vertailua varten.',
+    ai4: 'Allekirjoitus ja rahtikirja',
     ai4Text:
-      'Kuljettaja voi esimerkiksi kirjoittaa WhatsAppiin ”purettu”, jolloin keikan tila päivittyy tilaajalle ja kuljetusliikkeelle.',
-    ai5: 'Siirtää asian ihmiselle tarvittaessa',
+      'Lastauksessa ja purussa sovellus ottaa allekirjoituksen ja rahtikirjan kuvan. Kuljetusliike sulkee keikan ilman erillistä latausta.',
+    ai5: 'Toimii ilman verkkoa',
     ai5Text:
-      'Jos avustaja ei pysty varmistamaan vastausta, asia siirtyy RAHTIS-ajojärjestelyyn.',
-    ai6: 'Palvelee kuljettajan kielellä',
+      'Merkinnät ja kuvat odottavat puhelimessa ja lähtevät, kun yhteys palaa. Aikana säilyy kuittaushetki, ei lähetyshetki.',
+    ai6: 'Ilmoitukset puhelimeen',
+    ai6Text:
+      'Uusi keikka, suora tilaus tai peruutus tulee ilmoituksena, vaikka sovellus olisi kiinni.',
 
     servicesEyebrow: 'Palvelu laajenee vaiheittain',
     /*
@@ -553,10 +553,8 @@ export const fi = {
 
     serviceSoon: 'Kehitteillä',
     service3: 'Kuljettajan sovellus',
-    service3Text:
-      'Keikat, pisteet ja asiakirjat omassa sovelluksessa. Sovellus on kehitteillä ja tulee WhatsApp-avustajan rinnalle, ei sen tilalle.',
-    service3Text2:
-      'Kuljettaja näkee saman keikan tiedot kuin nyt, mutta kuvat ja kuittaukset hoituvat ilman viestittelyä.',
+    service3Text: 'Keikat, pisteet, kuvat ja allekirjoitukset kuljettajan omassa sovelluksessa. Asennetaan puhelimen kotinäytölle, toimii myös ilman verkkoa.',
+    service3Text2: 'Kuljetusliike kutsuu kuljettajan linkillä tai koodilla ja näkee kuittaukset ja työajan suoraan palvelussa.',
 
     finalEyebrow: 'Näin pääset alkuun',
     finalTitle: 'Kerro yrityksestäsi – me hoidamme loput',
@@ -1542,7 +1540,7 @@ export const fi = {
     plate: 'Rekisterinumero',
     driver: 'Kuljettaja',
     languages: 'Kielet',
-    whatsapp: 'WhatsApp / puhelin',
+    whatsapp: 'Kuljettajan puhelin',
     axles: 'Vetoauton akselit',
     make: 'Merkki ja malli',
     euro: 'Päästöluokka',

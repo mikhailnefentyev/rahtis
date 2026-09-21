@@ -67,7 +67,7 @@ export const en = {
     orders: 'My orders',
     report: 'Weekly report',
     moderation: 'Review',
-    dispatch: 'Dispatch · WhatsApp',
+    dispatch: 'Dispatch',
     invoices: 'Invoicing',
     payouts: 'Payouts',
     signOut: 'Sign out',
@@ -318,8 +318,7 @@ export const en = {
       'The open jobs in your area are in one place. When one job ends, you can look for the next one in the same area.',
     helpDriver: 'For the driver',
     helpDriverTitle: 'Everything about the job in one place',
-    helpDriverText:
-      'Addresses, contacts, bookings and site instructions travel with the job. If the driver needs help, it is there on WhatsApp.',
+    helpDriverText: 'Addresses, contacts, bookings and instructions travel in the driver app for the whole job. Confirmations and photos are done in the same place.',
 
     timeEyebrow: 'Standing still costs both sides',
     timeTitle: 'In logistics, time is what you pay for',
@@ -424,42 +423,43 @@ export const en = {
     fault4Text:
       'A cancelled job returns to the board automatically and suitable carriers are notified.',
 
-    aiEyebrow: 'Driver’s assistant',
-    aiTitle: 'The driver always has someone to ask',
+    aiEyebrow: 'Driver app',
+    aiTitle: 'The job travels in the driver’s phone',
     aiLede:
-      'The RAHTIS assistant works in WhatsApp, knows the details of that particular job, and answers the driver in the driver’s own language.',
+      'The RAHTIS driver app shows the stops, addresses, time windows and contacts of the job. Arrival, photos, signature and confirmation are done with a tap, without messaging.',
     aiLede2:
-      'It is not a menu bot or an autoresponder. The assistant uses the job’s own data and helps with the practical things that come up on the road.',
-    aiOnline: 'WhatsApp · online',
-    aiToday: 'Today',
-    aiPlaceholder: 'Message',
-    aiDriver: 'Driver',
-    aiBot: 'RAHTIS',
-    aiQ1: 'When is the Kotka gate open?',
-    aiA1:
-      'The Hietanen gate is open Mon–Fri 06:00–22:00 and Sat 08:00–16:00. Your unloading slot is at 07:00, so the gate will be open.',
-    aiQ2: 'Where can I get more straps and corner protectors?',
-    aiA2:
-      'The nearest place on your route is in Kotka, about 4 km before the terminal. It is open until 18:00.',
-    aiQ3: 'Can I still make Turku today?',
-    aiA3:
-      'By the hours you have logged, you have 3 h 20 min of driving time left and the leg takes about 2 h 40 min. On those figures you make it inside your driving time.',
-    ai1: 'Knows the job',
+      'The app is installed on the phone’s home screen with a link or code from the carrier. It also works in the port without a network.',
+    appBack: 'Jobs',
+    appStopOf: 'Stop 2/3',
+    appBanner: 'Unloading · Kotka',
+    appPickupRole: 'Pickup',
+    appPickupDone: 'Done 06:42',
+    appUnloadRole: 'Unloading',
+    appArrived: 'Arrived 07:05',
+    appSign: 'Recipient signature',
+    appDone: 'Mark as done',
+    appReturnRole: 'Trailer return',
+    appNavTasks: 'Jobs',
+    appNavInbox: 'Messages',
+    appNavProfile: 'Profile',
+    ai1: 'The job in one view',
     ai1Text:
-      'Addresses, contacts, booking numbers, trailer details and everything else on the job are available to the assistant.',
-    ai2: 'Looks things up when needed',
+      'Stops in order, addresses, time windows, contacts and the unit number. Navigation and calling with one tap.',
+    ai2: 'Arrival and confirmation with a tap',
     ai2Text:
-      'It can help with terminal opening hours, contact details, where to buy equipment and where to take a break.',
-    ai3: 'Helps with driving time',
+      'The time and place are recorded at the moment of the tap. Waiting time shows from arrival, and the status updates for the shipper and the carrier.',
+    ai3: 'Photos and damage',
     ai3Text:
-      'When the driving-time figures are available, it can work out whether the driver makes the next stop within the hours left.',
-    ai4: 'Updates the job from a message',
+      'Every side of the trailer, the seal and any new damage are photographed in the app. At delivery the pickup photo is shown alongside for comparison.',
+    ai4: 'Signature and consignment note',
     ai4Text:
-      'The driver can simply write “unloaded” in WhatsApp, and the job status updates for the shipper and the carrier.',
-    ai5: 'Hands over to a person when it should',
+      'At loading and unloading the app takes the signature and a photo of the consignment note. The carrier closes the job without a separate upload.',
+    ai5: 'Works without a network',
     ai5Text:
-      'If the assistant cannot be sure of an answer, the question goes to RAHTIS dispatch.',
-    ai6: 'Speaks the driver’s language',
+      'Entries and photos wait on the phone and are sent when the connection returns. The time kept is the moment of the tap, not of sending.',
+    ai6: 'Notifications to the phone',
+    ai6Text:
+      'A new job, a direct order or a cancellation arrives as a notification, even when the app is closed.',
 
     servicesEyebrow: 'The service grows in stages',
     servicesTitle: 'We started with trailer swaps — containers and express are live too',
@@ -491,10 +491,8 @@ export const en = {
 
     serviceSoon: 'In development',
     service3: 'Driver app',
-    service3Text:
-      'Jobs, stops and documents in a dedicated app. The app is in development and will come alongside the WhatsApp assistant, not replace it.',
-    service3Text2:
-      'The driver sees the same job details as today, but photos and confirmations are handled without messaging.',
+    service3Text: 'Jobs, stops, photos and signatures in the driver’s own app. Installed on the phone’s home screen, and it also works without a network.',
+    service3Text2: 'The carrier invites the driver with a link or code and sees confirmations and working time directly in the service.',
 
     finalEyebrow: 'Getting started',
     finalTitle: 'Tell us about your company — we handle the rest',
@@ -1445,7 +1443,7 @@ export const en = {
     plate: 'Registration',
     driver: 'Driver',
     languages: 'Languages',
-    whatsapp: 'WhatsApp / phone',
+    whatsapp: 'Driver phone',
     axles: 'Tractor axles',
     make: 'Make and model',
     euro: 'Emission class',

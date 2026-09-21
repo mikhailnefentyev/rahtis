@@ -571,7 +571,7 @@
   position: relative;
   border-radius: 34px;
   overflow: hidden;
-  background: #ece5dd;
+  background: var(--color-ground);
   display: flex;
   flex-direction: column;
   aspect-ratio: 9 / 17.4;
@@ -623,188 +623,110 @@
   box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.12);
 }
 
-/* ── Строка состояния ─────────────────────────────────────────── */
-.wa-status {
+/*
+ * ── Экран приложения водителя ──────────────────────────────────
+ *
+ * Макет собран из тех же решений, что и настоящее приложение: баннер
+ * следующего действия, лента точек, одна крупная кнопка. Цвета — токены
+ * сайта, чтобы картинка на витрине и приложение в руке совпадали.
+ */
+.app-status {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 9px 16px 5px;
-  background: #075e54;
-  color: #ffffff;
+  color: var(--color-ink);
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.02em;
 }
-.wa-status__icons { display: flex; align-items: center; gap: 4px; }
+.app-status__icons { display: flex; align-items: center; gap: 4px; }
 
-/* ── Шапка переписки ──────────────────────────────────────────── */
-.wa-bar {
+.app-head {
   display: flex;
   align-items: center;
-  gap: 9px;
-  padding: 7px 12px 9px;
-  background: #075e54;
-  color: #ffffff;
+  justify-content: space-between;
+  padding: 6px 14px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-accent);
 }
-.wa-bar__avatar {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: #ffffff;
-  display: grid;
-  place-items: center;
+.app-head__ref { font-family: var(--font-geist-mono), monospace; color: var(--color-ink); font-weight: 700; }
+
+.app-banner {
+  margin: 0 12px;
+  border-radius: 10px;
+  padding: 9px 10px;
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+  text-align: center;
+}
+.app-banner__small { font-size: 9px; opacity: 0.8; }
+.app-banner__big { font-size: 13px; font-weight: 700; }
+
+.app-list { flex: 1 1 auto; padding: 12px 12px 0; display: flex; flex-direction: column; }
+.app-stop { display: flex; gap: 8px; }
+.app-stop__rail { display: flex; flex-direction: column; align-items: center; }
+.app-stop__rail::after { content: ''; flex: 1 1 auto; width: 2px; background: var(--color-line); margin: 2px 0; }
+.app-stop:last-child .app-stop__rail::after { display: none; }
+.app-dot {
+  width: 14px;
+  height: 14px;
   flex: none;
-  overflow: hidden;
-}
-.wa-bar__avatar img { width: 20px; height: 20px; object-fit: contain; }
-.wa-bar__who { min-width: 0; flex: 1 1 auto; }
-.wa-bar__name {
-  display: block;
-  font-size: 12.5px;
-  font-weight: 600;
-  line-height: 1.25;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.wa-bar__state {
-  display: block;
-  font-size: 9.5px;
-  color: rgba(255, 255, 255, 0.78);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.wa-bar__icons { display: flex; gap: 12px; flex: none; opacity: 0.9; }
-
-/* ── Лента ────────────────────────────────────────────────────── */
-
-/*
- * Подложка — свой узор из знаков перевозки, а не рисунок мессенджера:
- * чужую графику на своей странице не воспроизводим. Он почти не виден и
- * нужен только чтобы бумага под сообщениями не была пустой заливкой.
- *
- * Переписка держится середины экрана. Прижатая к низу, как в живом
- * чате, она вставала вплотную к полю ввода и оставляла всю пустую бумагу
- * над собой одной полосой; по центру обои видны сверху и снизу поровну.
- */
-.wa-chat {
-  flex: 1 1 auto;
-  overflow: hidden;
-  padding: 10px 9px 6px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 6px;
-  background-color: #ece5dd;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='132' height='132' viewBox='0 0 132 132'%3E%3Cg fill='none' stroke='%23bfae9a' stroke-width='1.1' stroke-linecap='round' opacity='.2'%3E%3Crect x='12' y='16' width='22' height='14' rx='2.5'/%3E%3Cpath d='M34 22h6l4 4v4h-10z'/%3E%3Ccircle cx='18' cy='32' r='2'/%3E%3Ccircle cx='40' cy='32' r='2'/%3E%3Cpath d='M88 14a7 7 0 0 0-7 7c0 5 7 12 7 12s7-7 7-12a7 7 0 0 0-7-7z'/%3E%3Ccircle cx='88' cy='21' r='2.4'/%3E%3Ccircle cx='30' cy='92' r='9'/%3E%3Cpath d='M30 87v5l3.5 2'/%3E%3Crect x='78' y='82' width='18' height='18' rx='2.5'/%3E%3Cpath d='M78 89h18M87 82v18'/%3E%3Cpath d='M108 52h14M110 57h10'/%3E%3Cpath d='M18 62h12M20 67h8'/%3E%3C/g%3E%3C/svg%3E");
-}
-
-.wa-day {
-  align-self: center;
-  margin-bottom: 2px;
-  padding: 2px 9px;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.82);
-  color: #5c6b73;
-  font-size: 8.5px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.wa-msg {
-  position: relative;
-  max-width: 84%;
-  padding: 5px 8px 4px;
-  border-radius: 8px;
-  font-size: 10.5px;
-  line-height: 1.38;
-  color: #10231f;
-  box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.13);
-  overflow-wrap: anywhere;
-}
-/*
- * Экран водителя, а не наш: его собственные сообщения справа и зелёные,
- * ответы помощника слева и белые. Обратный порядок читался бы как
- * переписка, снятая с чужого телефона.
- */
-.wa-msg--out { align-self: flex-end; background: #dcf8c6; border-top-right-radius: 2px; }
-.wa-msg--in { align-self: flex-start; background: #ffffff; border-top-left-radius: 2px; }
-
-.wa-msg__meta {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 3px;
-  margin-top: 1px;
-  font-size: 8px;
-  color: #6b7a72;
-}
-.wa-msg__tick { color: #53bdeb; flex: none; }
-
-/* Помощник печатает. Три точки — единственное движение на экране. */
-.wa-typing {
-  align-self: flex-start;
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  padding: 7px 9px;
-  border-radius: 8px;
-  border-top-left-radius: 2px;
-  background: #ffffff;
-  box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.13);
-}
-.wa-typing i {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: #9aa6a0;
-  animation: wa-type 1.3s ease-in-out infinite;
-}
-.wa-typing i:nth-child(2) { animation-delay: 0.18s; }
-.wa-typing i:nth-child(3) { animation-delay: 0.36s; }
-@keyframes wa-type {
-  0%, 60%, 100% { opacity: 0.32; transform: translateY(0); }
-  30% { opacity: 1; transform: translateY(-2px); }
-}
-
-/* ── Поле ввода ───────────────────────────────────────────────── */
-.wa-input {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  padding: 7px 8px 10px;
-  background: #ece5dd;
-}
-.wa-input__field {
-  flex: 1 1 auto;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  min-width: 0;
-  padding: 6px 9px;
   border-radius: 999px;
-  background: #ffffff;
-  color: #9aa6a0;
-  font-size: 10.5px;
-  box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.13);
+  border: 2px solid var(--color-line-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  font-weight: 700;
 }
-.wa-input__field span {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.app-dot--done { background: var(--color-ok); border-color: var(--color-ok); color: #fff; }
+.app-dot--now { background: var(--color-accent); border-color: var(--color-accent); }
+.app-stop__body { padding-bottom: 10px; min-width: 0; flex: 1 1 auto; }
+.app-stop__role { font-size: 8px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-ink-faint); }
+.app-stop__place { font-size: 11px; font-weight: 700; color: var(--color-ink); }
+.app-stop__meta { font-size: 9px; font-weight: 600; color: var(--color-ok); }
+.app-stop--done .app-stop__place { color: var(--color-ink-dim); }
+
+.app-shots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 6px; }
+.app-shot {
+  aspect-ratio: 1;
+  border-radius: 5px;
+  background: linear-gradient(135deg, #cfd7e3, #aab6c8);
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: 2px 3px;
+  font-size: 8px;
+  font-weight: 700;
+  color: #fff;
 }
-.wa-input__send {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: #25d366;
-  color: #ffffff;
-  display: grid;
-  place-items: center;
-  flex: none;
+.app-shot--damage { background: linear-gradient(135deg, #e8b4ae, #b93429); }
+
+.app-btn {
+  margin-top: 7px;
+  border-radius: 6px;
+  padding: 8px 0;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
 }
+.app-btn--ghost { background: var(--color-surface); color: var(--color-ink); border: 1px solid var(--color-line); }
+
+.app-nav {
+  display: flex;
+  justify-content: space-around;
+  border-top: 1px solid var(--color-line);
+  background: var(--color-surface);
+  padding: 9px 0 13px;
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--color-ink-muted);
+}
+.app-nav__active { color: var(--color-accent); }
 
 /* ── Правая колонка на тёмном ─────────────────────────────────── */
 .assistant__grid {
