@@ -343,3 +343,25 @@ async function uploadPhoto(formData: FormData): Promise<EventResult> {
 
   return { status: 'ok' };
 }
+
+/* ── Push-уведомления ───────────────────────────────────────────── */
+
+/**
+ * Подписать это устройство на push. Подписку браузер уже выдал — здесь
+ * только сохранение: адрес службы push и ключи шифрования сообщения.
+ */
+export async function pushSubscribeAction(formData: FormData): Promise<{ ok: boolean }> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc('driver_push_subscribe', {
+    p_endpoint: str(formData, 'endpoint'),
+    p_p256dh: str(formData, 'p256dh'),
+    p_auth: str(formData, 'auth'),
+    p_locale: toLocale(formData.get('locale')),
+  });
+  return { ok: !error };
+}
+
+export async function pushUnsubscribeAction(formData: FormData): Promise<void> {
+  const supabase = await createClient();
+  await supabase.rpc('driver_push_unsubscribe', { p_endpoint: str(formData, 'endpoint') });
+}

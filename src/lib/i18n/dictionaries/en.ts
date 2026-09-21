@@ -1682,6 +1682,13 @@ export const en = {
     offlineStale: 'Showing the last loaded state.',
     sending: 'Sending entries…',
     queuedBadge: 'queued',
+    pushTitle: 'Notifications',
+    pushHint: 'Get notified about a new job, a direct order or a cancellation, even when the app is closed.',
+    pushEnable: 'Turn on notifications',
+    pushDisable: 'Turn off notifications',
+    pushOn: 'Notifications are on for this phone.',
+    pushDenied: 'Notifications are blocked. Allow them for this app in the phone settings.',
+    pushUnsupported: 'This browser does not support notifications. On iPhone, install the app on the home screen first and open it from there.',
     offline: 'No connection. Check the network and try again.',
   },
 

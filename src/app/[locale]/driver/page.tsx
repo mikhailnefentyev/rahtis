@@ -4,6 +4,7 @@ import { acceptTaskAction, declineTaskAction } from '@/lib/driverApp/actions';
 import { getDriver } from '@/lib/driverApp/session';
 import { getDriverTasks, nextStop, type DriverTask } from '@/lib/driverApp/tasks';
 import { getI18n, isLocale, type Locale } from '@/lib/i18n';
+import { PushSetup } from './PushSetup';
 import { ShiftBar } from './ShiftBar';
 import { TaskTabs } from './TaskTabs';
 
@@ -39,6 +40,8 @@ export default async function DriverHome({
       </header>
 
       <ShiftBar shift={driver.shift} />
+
+      <PushSetup compact />
 
       <TaskTabs showDone={showDone} />
 

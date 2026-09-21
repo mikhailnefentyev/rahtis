@@ -1779,6 +1779,13 @@ export const fi = {
     offlineStale: 'Näytetään viimeksi ladattu tila.',
     sending: 'Lähetetään merkintöjä…',
     queuedBadge: 'jonossa',
+    pushTitle: 'Ilmoitukset',
+    pushHint: 'Saat ilmoituksen uudesta tehtävästä, suorasta tilauksesta ja peruutuksesta, vaikka sovellus olisi kiinni.',
+    pushEnable: 'Ota ilmoitukset käyttöön',
+    pushDisable: 'Poista ilmoitukset käytöstä',
+    pushOn: 'Ilmoitukset ovat käytössä tässä puhelimessa.',
+    pushDenied: 'Ilmoitukset on estetty. Salli ne puhelimen asetuksista tälle sovellukselle.',
+    pushUnsupported: 'Tämä selain ei tue ilmoituksia. iPhonessa asenna sovellus ensin kotinäytölle ja avaa se sieltä.',
     offline: 'Ei yhteyttä. Tarkista verkko ja yritä uudelleen.',
   },
 

@@ -760,6 +760,47 @@ export type Database = {
           },
         ]
       }
+      driver_push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          driver_id: string
+          endpoint: string
+          id: string
+          last_sent_at: string | null
+          locale: string
+          p256dh: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          driver_id: string
+          endpoint: string
+          id?: string
+          last_sent_at?: string | null
+          locale?: string
+          p256dh: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          driver_id?: string
+          endpoint?: string
+          id?: string
+          last_sent_at?: string | null
+          locale?: string
+          p256dh?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "driver_push_subscriptions_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       driver_shift_log: {
         Row: {
           action: string
@@ -3447,6 +3488,19 @@ export type Database = {
       }
       driver_me: { Args: never; Returns: Json }
       driver_next_stop: { Args: { p_phone: string }; Returns: Json }
+      driver_push_subscribe: {
+        Args: {
+          p_auth: string
+          p_endpoint: string
+          p_locale?: string
+          p_p256dh: string
+        }
+        Returns: undefined
+      }
+      driver_push_unsubscribe: {
+        Args: { p_endpoint: string }
+        Returns: undefined
+      }
       driver_register_photo: {
         Args: {
           p_angle?: string

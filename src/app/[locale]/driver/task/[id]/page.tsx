@@ -96,14 +96,23 @@ export default async function DriverTaskPage({
 }
 
 /*
- * Где снимается осмотр и где берётся подпись с накладной. Подпись и CMR
- * — на каждой точке, где единица или груз переходят из рук в руки: на
- * погрузке расписывается тот, кто отдаёт, на выгрузке — тот, кто
- * принимает. Продолжение рейса — не передача, там подписывать некому.
+ * Где снимается осмотр и где берутся подпись и накладная.
+ *
+ * Осмотр — там, где единица меняет состояние: зацеп, выгрузка, отцепка.
+ *
+ * Подпись и CMR — только на погрузке и выгрузке, где есть человек,
+ * который отдаёт или принимает груз. Зацеп и отцепка полуприцепа или
+ * контейнера проходят на площадке без людей, и подписывать там некому.
+ * У экспресса точка забора — это погрузка груза у отправителя, и там
+ * подпись берётся.
  */
 const INSPECT = new Set(['PICKUP', 'DELIVERY', 'TRAILER_RETURN']);
-const CONFIRM = new Set(['PICKUP', 'EXTRA_LOAD', 'DELIVERY', 'EXTRA_UNLOAD', 'TRAILER_RETURN']);
-const HANDOVER_IN = new Set(['PICKUP', 'EXTRA_LOAD']);
+
+function confirmationAt(role: string, unit: boolean): 'load' | 'unload' | null {
+  if (role === 'EXTRA_LOAD' || (role === 'PICKUP' && !unit)) return 'load';
+  if (role === 'DELIVERY' || role === 'EXTRA_UNLOAD') return 'unload';
+  return null;
+}
 
 async function StopItem({
   task,
@@ -123,6 +132,7 @@ async function StopItem({
   const { t, m, f } = await getI18n(locale);
   const done = Boolean(stop.completed_at);
   const unit = task.haul_kind === 'TRAILER' || task.haul_kind === 'CONTAINER';
+  const confirmation = confirmationAt(stop.role, unit);
 
   const destination =
     stop.lat != null && stop.lon != null
@@ -253,12 +263,12 @@ async function StopItem({
                     />
                   )}
 
-                  {CONFIRM.has(stop.role) && (
+                  {confirmation && (
                     <Confirmation
                       orderId={task.id}
                       stopId={stop.id}
                       photos={photos}
-                      pickup={HANDOVER_IN.has(stop.role)}
+                      pickup={confirmation === 'load'}
                     />
                   )}
 

@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { LocaleSwitch } from '@/components/layout/LocaleSwitch';
 import { getDriver } from '@/lib/driverApp/session';
 import { getI18n, isLocale } from '@/lib/i18n';
+import { PushSetup } from '../PushSetup';
 import { SignOut } from './SignOut';
 
 /**
@@ -43,6 +44,8 @@ export default async function DriverProfile({ params }: { params: Promise<{ loca
         <span className="text-[15px] text-ink-muted">{t.driverApp.language}</span>
         <LocaleSwitch current={locale} />
       </section>
+
+      <PushSetup />
 
       {/*
         * Установка на экран «Домой» — часть первого входа, а не совет в

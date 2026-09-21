@@ -12,7 +12,7 @@
  * При выходе из приложения кэш стирается целиком (profile/SignOut) —
  * следующий на этом телефоне не увидит чужие задания.
  */
-const CACHE = 'rahtis-driver-v2';
+const CACHE = 'rahtis-driver-v3';
 const OFFLINE = '/driver-offline.html';
 const DRIVER_PAGE = /^\/[a-z]{2}\/driver(\/|$)/;
 
@@ -65,4 +65,48 @@ self.addEventListener('fetch', (event) => {
   if (url.pathname.startsWith('/_next/static/') || url.pathname === '/icon.png') {
     event.respondWith(cacheFirst(request));
   }
+});
+
+/*
+ * Push-уведомление: новый рейс, прямой заказ, отмена. Текст собирает
+ * сайт на языке водителя; здесь — только показ и переход по нажатию.
+ * tag по рейсу: второе уведомление о том же рейсе заменяет первое, а не
+ * копится стопкой.
+ */
+self.addEventListener('push', (event) => {
+  let data = {};
+  try {
+    data = event.data ? event.data.json() : {};
+  } catch {
+    data = { body: event.data ? event.data.text() : '' };
+  }
+
+  event.waitUntil(
+    self.registration.showNotification(data.title || 'RAHTIS', {
+      body: data.body || '',
+      icon: '/icon.png',
+      badge: '/icon.png',
+      tag: data.tag,
+      renotify: Boolean(data.tag),
+      data: { url: data.url || '/driver' },
+    }),
+  );
+});
+
+/* Нажатие открывает рейс: в уже открытом окне приложения, если оно есть. */
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const target = new URL(event.notification.data?.url || '/driver', self.location.origin).href;
+
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windows) => {
+      for (const client of windows) {
+        if ('focus' in client) {
+          client.navigate(target);
+          return client.focus();
+        }
+      }
+      return self.clients.openWindow(target);
+    }),
+  );
 });
