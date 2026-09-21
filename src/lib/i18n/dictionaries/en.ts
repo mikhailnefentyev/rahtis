@@ -1069,6 +1069,10 @@ export const en = {
   },
 
   moderation: {
+    test: 'Test company',
+    markTest: 'Mark as test company',
+    unmarkTest: 'Remove test mark',
+    testHint: 'Jobs of a test company are not invoiced or settled.',
     queue: 'Review queue',
     applications: 'Applications',
     vehicles: 'Vehicles for approval',

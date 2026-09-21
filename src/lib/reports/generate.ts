@@ -191,9 +191,20 @@ async function run(span: Span): Promise<GenerateResult> {
     return { week: target, reports: 0, emails: 0, errors: [error.message] };
   }
 
+  /*
+   * Рейсы тестовых компаний в документы периода не попадают: счёт с
+   * номером из боевой серии, отданный тестовой компании, уже не вернуть.
+   * Недельный отчёт они получают — он для того, чтобы смотреть, как всё
+   * выглядит.
+   */
+  const { data: tests } =
+    span.kind === 'PERIOD' ? await admin.from('companies').select('id').eq('is_test', true) : { data: [] };
+  const test = new Set((tests ?? []).map((c) => c.id));
+
   const list = ((orders ?? []) as OrderRow[]).filter((order) => {
     const date = helsinkiDate(order.closed_at ?? order.updated_at);
-    return date >= target && date <= span.end;
+    if (date < target || date > span.end) return false;
+    return !test.has(order.shipper_company_id) && !(order.assigned_company_id && test.has(order.assigned_company_id));
   });
 
   /* Точки нужны для строки маршрута: первая и последняя из порядка. */

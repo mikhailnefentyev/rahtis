@@ -1149,6 +1149,10 @@ export const fi = {
   },
 
   moderation: {
+    test: 'Testiyritys',
+    markTest: 'Merkitse testiyritykseksi',
+    unmarkTest: 'Poista testimerkintä',
+    testHint: 'Testiyrityksen keikat eivät mene laskuihin eivätkä tilityksiin.',
     queue: 'Tarkastusjono',
     applications: 'Hakemukset',
     vehicles: 'Ajoneuvot hyväksyntään',

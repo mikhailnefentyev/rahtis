@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import {
   Badge,
+  Button,
   Card,
   CardBody,
   EmptyState,
@@ -11,6 +12,7 @@ import {
 } from '@/components/ui';
 import { companyStatusTone, vehicleAccessTone } from '@/components/ui/tone';
 import { requireRole } from '@/lib/auth/guard';
+import { setCompanyTestAction } from '@/lib/companies/actions';
 import { daysUntil } from '@/lib/dates';
 import { getI18n, isLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
@@ -133,6 +135,7 @@ export default async function AdminCompanyPage({
             </Badge>
             <Badge>{t.role[company.kind]}</Badge>
             {company.frozen_at && <Badge tone="danger">{t.moderation.frozen}</Badge>}
+            {company.is_test && <Badge tone="warn">{t.moderation.test}</Badge>}
           </div>
 
           <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-ink-muted">
@@ -155,6 +158,20 @@ export default async function AdminCompanyPage({
             <p className="mt-2 text-[13px] text-ink-muted">{company.rejection_reason}</p>
           )}
         </div>
+
+        {/*
+          * Тестовая компания не попадает в счета и выплаты. Переключатель
+          * здесь, у самой компании: решение про неё, а не про рейс.
+          */}
+        <form action={setCompanyTestAction} className="flex flex-col items-end gap-1">
+          <input type="hidden" name="locale" value={locale} />
+          <input type="hidden" name="company_id" value={company.id} />
+          <input type="hidden" name="test" value={company.is_test ? 'false' : 'true'} />
+          <Button type="submit" size="sm">
+            {company.is_test ? t.moderation.unmarkTest : t.moderation.markTest}
+          </Button>
+          <span className="max-w-60 text-right text-xs text-ink-dim">{t.moderation.testHint}</span>
+        </form>
 
         {rating && (
           <div className="flex items-center gap-2">

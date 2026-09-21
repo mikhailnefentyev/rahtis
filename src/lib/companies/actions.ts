@@ -332,6 +332,31 @@ export async function unfreezeCompanyAction(formData: FormData): Promise<void> {
 
 
 /**
+ * Отметка «тестовая компания». Рейсы тестовой компании не попадают в
+ * счета, выплаты и расчёты оператора: номер счёта из боевой серии,
+ * отданный тесту, уже не вернуть.
+ */
+export async function setCompanyTestAction(formData: FormData): Promise<void> {
+  const locale = toLocale(formData.get('locale'));
+  await requireAdmin();
+
+  const companyId = String(formData.get('company_id') ?? '');
+  const supabase = await createClient();
+  const { error } = await supabase.rpc('set_company_test', {
+    p_company_id: companyId,
+    p_test: formData.get('test') === 'true',
+  });
+
+  revalidatePath(`/${locale}/admin/company/${companyId}`);
+  revalidatePath(`/${locale}/admin/billing`);
+
+  if (error) {
+    console.error('Отметка тестовой компании не изменилась:', error.message);
+    redirect(withAdminError(`/${locale}/admin/company/${companyId}`, explainAdmin(error)));
+  }
+}
+
+/**
  * Удаление компании из разобранных заявок.
  *
  * Функция базы отказывается удалять компанию с заказами: внешние ключи

@@ -326,6 +326,7 @@ export type Database = {
           frozen_by: string | null
           iban: string | null
           id: string
+          is_test: boolean
           kind: Database["public"]["Enums"]["party_role"]
           language: string
           legal_city: string | null
@@ -361,6 +362,7 @@ export type Database = {
           frozen_by?: string | null
           iban?: string | null
           id?: string
+          is_test?: boolean
           kind: Database["public"]["Enums"]["party_role"]
           language?: string
           legal_city?: string | null
@@ -396,6 +398,7 @@ export type Database = {
           frozen_by?: string | null
           iban?: string | null
           id?: string
+          is_test?: boolean
           kind?: Database["public"]["Enums"]["party_role"]
           language?: string
           legal_city?: string | null
@@ -2654,6 +2657,7 @@ export type Database = {
           frozen_by: string | null
           iban: string | null
           id: string
+          is_test: boolean
           kind: Database["public"]["Enums"]["party_role"]
           language: string
           legal_city: string | null
@@ -3704,6 +3708,7 @@ export type Database = {
           frozen_by: string | null
           iban: string | null
           id: string
+          is_test: boolean
           kind: Database["public"]["Enums"]["party_role"]
           language: string
           legal_city: string | null
@@ -3788,6 +3793,7 @@ export type Database = {
           frozen_by: string | null
           iban: string | null
           id: string
+          is_test: boolean
           kind: Database["public"]["Enums"]["party_role"]
           language: string
           legal_city: string | null
@@ -4217,6 +4223,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      set_company_test: {
+        Args: { p_company_id: string; p_test: boolean }
+        Returns: undefined
+      }
       set_runtime_config: {
         Args: { p_key: string; p_note?: string; p_value: string }
         Returns: Json
@@ -4448,6 +4458,7 @@ export type Database = {
           frozen_by: string | null
           iban: string | null
           id: string
+          is_test: boolean
           kind: Database["public"]["Enums"]["party_role"]
           language: string
           legal_city: string | null
