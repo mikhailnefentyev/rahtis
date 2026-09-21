@@ -2885,6 +2885,39 @@ export type Database = {
         Args: { p_key_hash: string; p_limit: number; p_window_seconds: number }
         Returns: boolean
       }
+      billing_overview: {
+        Args: never
+        Returns: {
+          billing: Database["public"]["Enums"]["billing_status"]
+          carrier_bic: string
+          carrier_business_id: string
+          carrier_country: string
+          carrier_iban: string
+          carrier_id: string
+          carrier_name: string
+          closed_at: string
+          commission_cents: number
+          id: string
+          invoice_ref: string
+          invoiced_at: string
+          paid_at: string
+          payout_cents: number
+          rate_cents: number
+          ref: string
+          route_from: string
+          route_to: string
+          settled_at: string
+          shipper_billing_email: string
+          shipper_billing_reference: string
+          shipper_business_id: string
+          shipper_country: string
+          shipper_einvoice_operator: string
+          shipper_einvoice_ovt: string
+          shipper_id: string
+          shipper_name: string
+          shipper_ref: string
+        }[]
+      }
       billing_queue: {
         Args: { p_limit?: number }
         Returns: {
@@ -3460,6 +3493,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      driver_earnings: { Args: { p_from: string; p_to: string }; Returns: Json }
       driver_invite_lookup: {
         Args: { p_code?: string; p_phone?: string; p_token?: string }
         Returns: {

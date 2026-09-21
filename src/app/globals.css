@@ -865,16 +865,6 @@
 }
 
 /*
- * Второй абзац тише первого: первый описывает услугу, второй отвечает,
- * что с неё каждой стороне. Разница кеглем и яркостью, а не отступом.
- */
-.hero-port__lede--second {
-  margin-top: 12px;
-  font-size: 15px;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-/*
  * Три вещи, за которые сюда приходят.
  *
  * Колонки, а не строка с разделителями.
@@ -929,25 +919,49 @@
   }
 }
 
-.hero-port__doors { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 30px; }
+/*
+ * Две двери одного размера: равные колонки, одна высота и кегль. На
+ * телефоне — столбиком во всю ширину, под палец.
+ */
+.hero-port__doors {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  margin-top: 28px;
+  max-width: 520px;
+}
+@media (min-width: 480px) {
+  .hero-port__doors { grid-template-columns: 1fr 1fr; }
+}
 
-/* Вторая дверь — контурная: на тёмном заливка спорила бы с основной. */
-.hero-port__ghost {
-  display: inline-flex;
+.hero-port__door {
+  display: flex;
   align-items: center;
-  min-height: 46px;
-  padding: 0 22px;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 18px;
   border: 1px solid rgba(255, 255, 255, 0.42);
   border-radius: var(--radius-control);
   color: #ffffff;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
   text-decoration: none;
   transition: background 150ms ease, border-color 150ms ease;
 }
-.hero-port__ghost:hover {
+.hero-port__door:hover {
   background: rgba(255, 255, 255, 0.12);
   border-color: rgba(255, 255, 255, 0.68);
+}
+.hero-port__door--fill {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-accent-ink);
+}
+.hero-port__door--fill:hover {
+  background: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
 }
 
 .hero-port__fleet {

@@ -13,6 +13,7 @@ import { defaultLocale, getDictionary, isLocale, type Locale } from '@/lib/i18n'
 import { notify } from '@/lib/notify';
 import { formatIban, getOperatorProfile } from '@/lib/operator/profile';
 import { createClient } from '@/lib/supabase/server';
+import type { PostgrestError } from '@supabase/supabase-js';
 import type { Database } from '@/types/database';
 
 type BillingStatus = Database['public']['Enums']['billing_status'];
@@ -174,4 +175,49 @@ async function announce(order: Order, next: BillingStatus): Promise<void> {
           })),
     },
   });
+}
+
+/**
+ * Тот же шаг расчётов для нескольких рейсов сразу.
+ *
+ * Счёт заказчику обычно один на период, а не на рейс, и выплата
+ * перевозчику — один перевод. Поэтому на странице шаг делается по
+ * компании: все её рейсы этого этапа с одним номером счёта. Каждый рейс
+ * проходит через ту же set_billing — правила переходов и отметки времени
+ * остаются в одном месте. Отказ по одному рейсу не останавливает
+ * остальные: оператор увидит, какие не сдвинулись, по их этапу.
+ */
+export async function setBillingBatchAction(formData: FormData): Promise<void> {
+  const locale = toLocale(formData.get('locale'));
+  await requireAdmin();
+
+  const next = String(formData.get('next') ?? '') as BillingStatus;
+  const invoiceRef = String(formData.get('invoice_ref') ?? '').trim();
+  const ids = formData.getAll('order_id').map(String).filter(Boolean);
+
+  const supabase = await createClient();
+  let failed = false;
+  let firstError: PostgrestError | null = null;
+
+  for (const orderId of ids) {
+    const { data: order, error } = await supabase.rpc('set_billing', {
+      p_order_id: orderId,
+      p_next: next,
+      p_invoice_ref: invoiceRef || undefined,
+    });
+
+    if (error || !order) {
+      console.error('Состояние расчётов не изменилось:', orderId, error?.message);
+      failed = true;
+      firstError ??= error;
+      continue;
+    }
+
+    await announce(order, next);
+  }
+
+  revalidatePath(`/${locale}/admin/billing`);
+  if (failed) {
+    redirect(withAdminError(`/${locale}/admin/billing`, explainAdmin(firstError) ?? 'generic'));
+  }
 }

@@ -638,13 +638,15 @@ export async function LandingSections({ locale }: { locale: Locale }) {
           </h2>
           <p className="mx-auto mt-3.5 max-w-[52ch] text-[16px] text-ink-muted">{l.finalLede}</p>
           <p className="mx-auto mt-2.5 max-w-[52ch] text-[16px] text-ink-muted">{l.finalLede2}</p>
-          <p className="mx-auto mt-2.5 max-w-[52ch] text-[16px] text-ink-muted">{l.finalLede3}</p>
 
-          <div className="mt-7 flex flex-wrap justify-center gap-2.5">
-            <Link href={`/${locale}/apply`} className={buttonClass({ variant: 'primary', size: 'lg' })}>
+          <div className="mx-auto mt-7 grid max-w-[480px] gap-2.5 sm:grid-cols-2">
+            <Link
+              href={`/${locale}/apply`}
+              className={buttonClass({ variant: 'primary', size: 'lg', className: 'h-12 text-[15px]' })}
+            >
               {l.applyShipper}
             </Link>
-            <Link href={`/${locale}/apply`} className={buttonClass({ size: 'lg' })}>
+            <Link href={`/${locale}/apply`} className={buttonClass({ size: 'lg', className: 'h-12 text-[15px]' })}>
               {l.applyCarrier}
             </Link>
           </div>

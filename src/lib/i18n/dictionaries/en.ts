@@ -243,16 +243,7 @@ export const en = {
     titleA: 'Trailer, container, load.',
     titleB: 'Each one leaves on time.',
     titleC: 'The phone stops ringing.',
-    lede:
-      'RAHTIS passes trailer swaps, container haulage and express deliveries to approved carriers. Once an order is published it reaches suitable carriers automatically. Replies can arrive within minutes, the job’s progress is visible step by step, and photos and documents sit in one place at the end.',
-    /*
-     * The second paragraph speaks in benefits and splits them by side:
-     * less manual work for one, jobs without phone calls for the other.
-     * The first paragraph describes the service, this one answers
-     * “what is in it for me”.
-     */
-    lede2:
-      'For forwarders and operators, RAHTIS cuts manual dispatch work and brings tracking and electronic document flow together. For carriers, it offers new jobs without constant phone calls. The same work used to be done on the phone: time saved on either side is money saved.',
+    lede: 'Publish an order and suitable carriers get it at once. The job shows step by step, with photos and documents in one place.',
     /* The three things people come here for. */
     highlight1: 'A change does not stop the load',
     highlight2: 'We do not auction the price down',
@@ -496,16 +487,14 @@ export const en = {
 
     finalEyebrow: 'Getting started',
     finalTitle: 'Tell us about your company — we handle the rest',
-    finalLede: 'We need the company name, the Y-tunnus and an email address.',
+    finalLede: 'We need the company name, the Y-tunnus and an email address; from carriers also the operating licence and insurance.',
     /*
      * The same fact used to stand twice: here and as a footnote on the
      * first screen. The footnote also carried two things this line did
      * not — that you cannot sign up directly, and which registers we
      * check. They live here now, and the footnote is gone.
      */
-    finalLede2:
-      'You cannot sign up directly: we check the company against the PRH and YTJ registers and issue credentials once it is approved.',
-    finalLede3: 'From carriers we also need the operating licence and insurance details.',
+    finalLede2: 'We check the company against the PRH and YTJ registers and issue credentials once it is approved.',
     applyShipper: 'Forwarder application',
     applyCarrier: 'Carrier application',
     footerCountry: 'Finland',
@@ -916,6 +905,49 @@ export const en = {
     openFleet: 'Fleet',
     contactsHidden: 'The consignee’s contact details appear once you take the order.',
     details: 'Job details',
+  },
+
+  billingDesk: {
+    title: 'Invoicing and settlements',
+    subtitle:
+      'Money moves in three steps: invoice the customer, record the customer payment, settle with the carrier. Tax follows the counterparty’s country.',
+    statToInvoice: 'To invoice',
+    statAwaiting: 'Awaiting customer payment',
+    statToPay: 'To pay to carriers',
+    statSettled: 'Settled, 60 days',
+    statMargin: 'Margin',
+    step1: '1 · Invoice customers',
+    step1Hint:
+      'Completed jobs not yet invoiced. One invoice per customer: enter the invoice number and mark them all at once.',
+    step2: '2 · Awaiting customer payment',
+    step2Hint:
+      'Invoices sent. Payment is due 15 days after the end of the period — invoices older than 15 days are highlighted.',
+    step3: '3 · Settle with carriers',
+    step3Hint: 'The customer has paid. Pay the carrier the amount below and mark it settled.',
+    step4: '4 · Settled',
+    nothing: 'Nothing at this step.',
+    sendTo: 'Send to',
+    einvoice: 'E-invoice',
+    reference: 'Reference',
+    vatReverse: 'Reverse charge, VAT 0 %',
+    net: 'Net',
+    vat: 'VAT',
+    gross: 'Total',
+    invoiceNo: 'Invoice number',
+    markInvoiced: 'Mark invoiced',
+    markPaid: 'Payment received',
+    markSettled: 'Mark settled',
+    invoicedOn: 'Invoiced',
+    paidOn: 'Customer paid',
+    settledOn: 'Settled',
+    overdue: 'Over 15 days',
+    account: 'Account',
+    noIban: 'Bank account missing — ask the carrier to complete their payment details.',
+    colDate: 'Date',
+    colRef: 'Job',
+    colRoute: 'Route',
+    colAmount: 'Net',
+    summary: 'Summary by partner and by job',
   },
 
   billing: {
@@ -1585,6 +1617,11 @@ export const en = {
     tasks: 'Jobs',
     inbox: 'Messages',
     profile: 'Profile',
+    earnings: 'Earnings',
+    earningsMonth: 'Earned in total',
+    earningsNoPay: 'Your employer has not set your pay yet. Hours and jobs are still shown.',
+    earningsEmpty: 'No completed jobs this month yet.',
+    earningsRunning: 'Month so far',
     tabActive: 'Active',
     tabDone: 'Done',
     noTasks: 'You have no jobs.',
@@ -1787,7 +1824,7 @@ export const en = {
 
   workReport: {
     title: 'Driver report',
-    subtitle: 'Hours, kilometres, trips and indicative pay for a period — for internal payments.',
+    subtitle: 'Hours, kilometres, trips and pay for a period — for internal payments.',
     from: 'From',
     to: 'To',
     show: 'Show',
@@ -2116,6 +2153,13 @@ export const en = {
     'known.tripsCount': '{count, plural, one {# trip} other {# trips}} with you',
     'partners.tripsCount': '{count, plural, one {# trip} other {# trips}}',
     'pay.modelSince': '{model} from {date}',
+    'billingDesk.trips': '{count, plural, one {# job} other {# jobs}}',
+    'billingDesk.daysAgo': '{days, plural, =0 {today} one {# day ago} other {# days ago}}',
+    'billingDesk.waitingCustomer': '{count, plural, one {# job still awaits customer payment} other {# jobs still await customer payment}}',
+    'billingDesk.vatDomestic': 'VAT {rate}',
+    'billingDesk.markCount': '{label} ({count, plural, one {# job} other {# jobs}})',
+    'driverApp.earnTrips': '{count, plural, one {# job} other {# jobs}}',
+    'driverApp.earnHours': '{hours} h',
     'driverApp.welcome': 'Welcome, {name}',
     'driverApp.breakTotal': 'Breaks {minutes} min',
     'driverApp.stopOf': 'Stop {n}/{total}',

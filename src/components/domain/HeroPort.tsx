@@ -4,7 +4,7 @@ import {
   type CycleStage,
   type CycleTrip,
 } from '@/components/domain/TripCycle';
-import { buttonClass, Mono } from '@/components/ui';
+import { Mono } from '@/components/ui';
 import { fleetSize } from '@/lib/fleet/size';
 import { getI18n, type Locale } from '@/lib/i18n';
 
@@ -74,21 +74,16 @@ export async function HeroPort({ locale }: { locale: Locale }) {
           </h1>
 
           <p className="hero-port__lede">{t.landing.lede}</p>
-          {/*
-            * Второй абзац говорит выгодой и разделён по сторонам: одному
-            * меньше ручной работы, другому — рейсы без обзвона. Первый
-            * абзац описывает услугу, этот отвечает на «а мне зачем».
-            */}
-          <p className="hero-port__lede hero-port__lede--second">{t.landing.lede2}</p>
 
           <div className="hero-port__doors">
-            <Link
-              href="#roles"
-              className={buttonClass({ variant: 'primary', size: 'lg' })}
-            >
+            {/*
+              * Две двери равны: одна высота, ширина и кегль. Отличаются
+              * только заливкой — какая сторона главная, решает посетитель.
+              */}
+            <Link href="#roles" className="hero-port__door hero-port__door--fill">
               {t.landing.asShipper}
             </Link>
-            <Link href="#roles" className="hero-port__ghost">
+            <Link href="#roles" className="hero-port__door">
               {t.landing.asCarrier}
             </Link>
           </div>

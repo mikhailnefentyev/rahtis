@@ -253,19 +253,7 @@ export const fi = {
     titleA: 'Irtoperä, kontti, kuorma.',
     titleB: 'Jokainen lähtee ajallaan.',
     titleC: 'Turhat puhelut jäävät pois.',
-    lede:
-      'RAHTIS välittää irtoperien vaihdot, konttikuljetukset ja pikakuljetukset hyväksytyille kuljetusliikkeille. Kun tilaus julkaistaan, se tavoittaa sopivat kuljetusliikkeet automaattisesti. Vastaukset voivat tulla jo minuuteissa, kuljetuksen eteneminen näkyy vaihe vaiheelta, ja kuvat sekä asiakirjat löytyvät lopuksi samasta paikasta.',
-    /*
-     * Toinen kappale puhuu hyödystä ja jakaa sen puolittain: toiselle
-     * vähemmän käsityötä, toiselle keikkoja ilman soittelua. Ensimmäinen
-     * kappale kuvaa palvelun, tämä vastaa kysymykseen «mitä minä hyödyn».
-     *
-     * Viimeinen virke sanoo ääneen sen, mitä kappale kiertää: aika on
-     * logistiikassa raha, ja me emme neuvottele hintaa alas vaan
-     * poistamme vaiheita, joissa aikaa kuluu.
-     */
-    lede2:
-      'Huolitsijoille ja operaattoreille RAHTIS vähentää manuaalista välitystyötä ja kokoaa kuljetuksen seurannan sekä sähköisen asiakirjaliikenteen yhteen. Kuljetusliikkeille se tarjoaa uusia keikkoja ilman jatkuvaa soittelua. Sama työ tehtiin ennen puhelimella: säästetty aika on molemmilla puolilla säästettyä rahaa.',
+    lede: 'Julkaise tilaus, ja sopivat kuljetusliikkeet saavat sen heti. Kuljetus näkyy vaihe vaiheelta, kuvat ja asiakirjat samassa paikassa.',
     /* Kolme asiaa, joiden takia palveluun tullaan. */
     highlight1: 'Muutos ei pysäytä kuljetusta',
     highlight2: 'Emme kilpailuta hintaa alaspäin',
@@ -558,7 +546,7 @@ export const fi = {
 
     finalEyebrow: 'Näin pääset alkuun',
     finalTitle: 'Kerro yrityksestäsi – me hoidamme loput',
-    finalLede: 'Tarvitsemme yrityksen nimen, Y-tunnuksen ja sähköpostiosoitteen.',
+    finalLede: 'Tarvitsemme yrityksen nimen, Y-tunnuksen ja sähköpostin, kuljetusliikkeiltä myös liikenneluvan ja vakuutuksen.',
     /*
      * Sama asia seisoi aiemmin kahdesti: tässä ja ensimmäisen ruudun
      * alahuomautuksena. Huomautus kertoi lisäksi kaksi asiaa, joita tämä
@@ -566,9 +554,7 @@ export const fi = {
      * mitkä rekisterit tarkistetaan. Ne ovat nyt tässä, ja huomautus on
      * poissa.
      */
-    finalLede2:
-      'Palveluun ei voi rekisteröityä suoraan: tarkistamme yrityksen tiedot PRH:n ja YTJ:n rekistereistä ja avaamme tunnukset hyväksynnän jälkeen.',
-    finalLede3: 'Kuljetusliikkeiltä tarvitsemme lisäksi tiedot liikenneluvasta ja vakuutuksesta.',
+    finalLede2: 'Tarkistamme tiedot PRH:n ja YTJ:n rekistereistä ja avaamme tunnukset hyväksynnän jälkeen.',
     applyShipper: 'Huolitsijan hakemus',
     applyCarrier: 'Kuljetusliikkeen hakemus',
     footerCountry: 'Suomi',
@@ -998,6 +984,49 @@ export const fi = {
     openFleet: 'Kalusto',
     contactsHidden: 'Vastaanottajan yhteystiedot näkyvät, kun otat kuljetuksen.',
     details: 'Kuljetuksen tiedot',
+  },
+
+  billingDesk: {
+    title: 'Laskutus ja tilitykset',
+    subtitle:
+      'Raha kulkee kolmessa vaiheessa: laskuta asiakasta, kirjaa asiakkaan maksu, tilitä kuljetusliikkeelle. Vero lasketaan vastapuolen maan mukaan.',
+    statToInvoice: 'Laskutettavaa',
+    statAwaiting: 'Odottaa asiakkaan maksua',
+    statToPay: 'Maksettavaa kuljetusliikkeille',
+    statSettled: 'Tilitetty, 60 pv',
+    statMargin: 'Kate',
+    step1: '1 · Laskuta asiakkaita',
+    step1Hint:
+      'Valmiit keikat, joista ei ole vielä lähetetty laskua. Yksi lasku asiakasta kohden: anna laskun numero ja merkitse kaikki kerralla.',
+    step2: '2 · Odottaa asiakkaan maksua',
+    step2Hint:
+      'Lähetetyt laskut. Maksuaika on 15 päivää kauden päättymisestä — yli 15 päivää vanhat on korostettu.',
+    step3: '3 · Tilitä kuljetusliikkeille',
+    step3Hint: 'Asiakas on maksanut. Maksa kuljetusliikkeelle alla oleva summa ja merkitse tilitetyksi.',
+    step4: '4 · Tilitetty',
+    nothing: 'Ei mitään tässä vaiheessa.',
+    sendTo: 'Lähetä',
+    einvoice: 'Verkkolasku',
+    reference: 'Viite',
+    vatReverse: 'Käännetty verovelvollisuus, ALV 0 %',
+    net: 'Veroton',
+    vat: 'ALV',
+    gross: 'Yhteensä',
+    invoiceNo: 'Laskun numero',
+    markInvoiced: 'Merkitse laskutetuksi',
+    markPaid: 'Maksu saapunut',
+    markSettled: 'Merkitse tilitetyksi',
+    invoicedOn: 'Laskutettu',
+    paidOn: 'Asiakas maksoi',
+    settledOn: 'Tilitetty',
+    overdue: 'Yli 15 pv',
+    account: 'Tili',
+    noIban: 'Tilinumero puuttuu — pyydä kuljetusliikettä täydentämään maksutiedot.',
+    colDate: 'Päivä',
+    colRef: 'Keikka',
+    colRoute: 'Reitti',
+    colAmount: 'Veroton',
+    summary: 'Yhteenveto kumppaneittain ja keikoittain',
   },
 
   billing: {
@@ -1682,6 +1711,11 @@ export const fi = {
     tasks: 'Tehtävät',
     inbox: 'Viestit',
     profile: 'Profiili',
+    earnings: 'Ansiot',
+    earningsMonth: 'Ansiot yhteensä',
+    earningsNoPay: 'Työnantaja ei ole vielä kirjannut palkkaustasi. Tunnit ja keikat näkyvät silti.',
+    earningsEmpty: 'Tässä kuussa ei vielä valmiita keikkoja.',
+    earningsRunning: 'Kuussa yhteensä',
     tabActive: 'Aktiiviset',
     tabDone: 'Valmiit',
     noTasks: 'Sinulla ei ole tehtäviä.',
@@ -1884,7 +1918,7 @@ export const fi = {
 
   workReport: {
     title: 'Kuljettajaraportti',
-    subtitle: 'Tunnit, kilometrit, keikat ja suuntaa-antava palkka jaksolta — sisäisiin maksuihin.',
+    subtitle: 'Tunnit, kilometrit, keikat ja palkka jaksolta — sisäisiin maksuihin.',
     from: 'Alkaen',
     to: 'Päättyen',
     show: 'Näytä',
@@ -2242,6 +2276,13 @@ export const fi = {
     'known.tripsCount': '{count, plural, one {# keikka} other {# keikkaa}} kanssanne',
     'partners.tripsCount': '{count, plural, one {# keikka} other {# keikkaa}}',
     'pay.modelSince': '{model} {date} alkaen',
+    'billingDesk.trips': '{count, plural, one {# keikka} other {# keikkaa}}',
+    'billingDesk.daysAgo': '{days, plural, =0 {tänään} one {# päivä sitten} other {# päivää sitten}}',
+    'billingDesk.waitingCustomer': '{count, plural, one {# keikka odottaa vielä asiakkaan maksua} other {# keikkaa odottaa vielä asiakkaan maksua}}',
+    'billingDesk.vatDomestic': 'ALV {rate}',
+    'billingDesk.markCount': '{label} ({count, plural, one {# keikka} other {# keikkaa}})',
+    'driverApp.earnTrips': '{count, plural, one {# keikka} other {# keikkaa}}',
+    'driverApp.earnHours': '{hours} h',
     'driverApp.welcome': 'Tervetuloa, {name}',
     'driverApp.breakTotal': 'Tauot {minutes} min',
     'driverApp.stopOf': 'Pysähdys {n}/{total}',
