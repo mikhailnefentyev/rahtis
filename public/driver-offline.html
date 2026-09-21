@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="fi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>RAHTIS</title>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #eef1f6;
+        color: #0c1626;
+        font: 17px/1.5 system-ui, sans-serif;
+        text-align: center;
+        padding: 24px;
+      }
+      img { width: 72px; height: 72px; border-radius: 16px; }
+      button {
+        margin-top: 20px;
+        min-height: 56px;
+        width: 100%;
+        max-width: 320px;
+        border: 0;
+        border-radius: 8px;
+        background: #0d647f;
+        color: #fff;
+        font: 600 17px system-ui, sans-serif;
+      }
+      p { margin: 8px 0 0; color: #44546b; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <img src="/icon.png" alt="" />
+      <h1>Ei yhteyttä</h1>
+      <p>Tarkista verkko ja yritä uudelleen.</p>
+      <p lang="en">No connection. Check the network and try again.</p>
+      <button type="button" onclick="location.reload()">Yritä uudelleen · Retry</button>
+    </main>
+  </body>
+</html>

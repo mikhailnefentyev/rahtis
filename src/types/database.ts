@@ -588,6 +588,44 @@ export type Database = {
           },
         ]
       }
+      driver_invites: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          driver_id: string
+          expires_at: string
+          id: string
+          token_hash: string
+          used_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          driver_id: string
+          expires_at: string
+          id?: string
+          token_hash: string
+          used_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          driver_id?: string
+          expires_at?: string
+          id?: string
+          token_hash?: string
+          used_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "driver_invites_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       driver_notifications: {
         Row: {
           code: string
@@ -2901,6 +2939,10 @@ export type Database = {
         }
       }
       claim_detail: { Args: { p_claim_id: string }; Returns: Json }
+      claim_driver_invite: {
+        Args: { p_token: string; p_user_id: string }
+        Returns: string
+      }
       claims_open_count: { Args: never; Returns: number }
       close_order: {
         Args: { p_order_id: string }
@@ -3098,6 +3140,7 @@ export type Database = {
         }
       }
       copy_tes_template: { Args: { p_template_id: string }; Returns: string }
+      create_driver_invite: { Args: { p_driver_id: string }; Returns: string }
       create_order: {
         Args: { p_order: Json; p_publish?: boolean; p_stops: Json }
         Returns: {
@@ -3233,6 +3276,7 @@ export type Database = {
           open_orders: number
         }[]
       }
+      detach_driver_login: { Args: { p_driver_id: string }; Returns: string }
       direct_assign_order: {
         Args: { p_order_id: string; p_vehicle_id: string }
         Returns: {
@@ -3310,7 +3354,47 @@ export type Database = {
         Args: { p_phone: string; p_question: string }
         Returns: Json
       }
+      driver_invite_preview: {
+        Args: { p_token: string }
+        Returns: {
+          auth_user_id: string
+          company_name: string
+          driver_id: string
+          full_name: string
+        }[]
+      }
+      driver_me: { Args: never; Returns: Json }
       driver_next_stop: { Args: { p_phone: string }; Returns: Json }
+      driver_report_problem: {
+        Args: { p_order_id: string; p_text: string }
+        Returns: undefined
+      }
+      driver_shift_action: {
+        Args: { p_action: string; p_lat?: number; p_lon?: number }
+        Returns: undefined
+      }
+      driver_tasks: {
+        Args: never
+        Returns: {
+          closed_at: string
+          comment: string
+          container_feet: number
+          deadline_at: string
+          direct: boolean
+          distance_km: number
+          haul_kind: Database["public"]["Enums"]["haul_kind"]
+          id: string
+          ldm: number
+          order_type: Database["public"]["Enums"]["order_type"]
+          plate: string
+          ref: string
+          shipper_name: string
+          status: Database["public"]["Enums"]["order_status"]
+          stops: Json
+          trailer: string
+          trailer_plate: string
+        }[]
+      }
       driver_trips: {
         Args: { p_from: string; p_to: string }
         Returns: {

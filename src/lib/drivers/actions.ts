@@ -4,6 +4,8 @@ import { revalidatePath } from 'next/cache';
 import { getViewer } from '@/lib/auth/viewer';
 import { operationsLocalToIso } from '@/lib/dates';
 import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
+import { siteUrl } from '@/lib/config';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import type { PayModel } from '@/types/db';
 
@@ -366,4 +368,50 @@ export async function copyTesTemplateAction(formData: FormData): Promise<void> {
   await supabase.rpc('copy_tes_template', { p_template_id: str(formData, 'id') });
 
   revalidatePath(`/${locale}/carrier/drivers/tes`);
+}
+
+/* ── Приложение водителя ────────────────────────────────────────── */
+
+export type InviteState = { error: string | null; link: string | null };
+
+/**
+ * Приглашение в приложение: одноразовая ссылка на сутки.
+ *
+ * Ссылку перевозчик отправляет сам — SMS со своего телефона, мессенджер,
+ * вслух. Платформа ничего не шлёт водителю, поэтому и провайдер SMS не
+ * нужен. Токен показывается один раз: в базе только его хэш.
+ */
+export async function createInviteAction(
+  _previous: InviteState,
+  formData: FormData,
+): Promise<InviteState> {
+  const locale = toLocale(formData.get('locale'));
+  const t = await getDictionary(locale);
+  await requireCarrier();
+
+  const supabase = await createClient();
+  const { data: token, error } = await supabase.rpc('create_driver_invite', {
+    p_driver_id: str(formData, 'driver_id'),
+  });
+
+  if (error || !token) return { error: t.error.generic, link: null };
+
+  return { error: null, link: `${siteUrl()}/${locale}/driver-invite/${token}` };
+}
+
+/**
+ * Отвязать телефон водителя. Пользователь приложения удаляется целиком:
+ * только так гаснут его сессии на потерянном телефоне.
+ */
+export async function detachLoginAction(formData: FormData): Promise<void> {
+  const locale = toLocale(formData.get('locale'));
+  await requireCarrier();
+
+  const supabase = await createClient();
+  const id = str(formData, 'driver_id');
+  const { data: userId } = await supabase.rpc('detach_driver_login', { p_driver_id: id });
+
+  if (userId) await createAdminClient().auth.admin.deleteUser(userId);
+
+  revalidateDrivers(locale, id);
 }

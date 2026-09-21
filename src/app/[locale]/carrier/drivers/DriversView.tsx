@@ -19,8 +19,11 @@ import {
 import {
   archiveDriverAction,
   assignDriverAction,
+  createInviteAction,
+  detachLoginAction,
   saveDriverAction,
   type FormState,
+  type InviteState,
 } from '@/lib/drivers/actions';
 import { useI18n } from '@/lib/i18n/provider';
 import { DRIVER_LANGUAGES, type Driver, type PayModel } from '@/types/db';
@@ -136,6 +139,9 @@ function DriverCard({
             <h3 className="text-[15px] font-semibold tracking-tight">{driver.full_name}</h3>
             {plate ? <Plate>{plate}</Plate> : <Badge tone="neutral">{t.drivers.noVehicle}</Badge>}
             {row.payModel && <Badge tone="info">{t.payModel[row.payModel]}</Badge>}
+            <Badge tone={driver.auth_user_id ? 'ok' : 'neutral'}>
+              {driver.auth_user_id ? t.drivers.appLinked : t.drivers.appNotLinked}
+            </Badge>
           </div>
           <p className="mt-1 text-[13px] text-ink-muted">
             <Mono>{driver.phone}</Mono> · {driver.languages.join('/')}
@@ -145,6 +151,8 @@ function DriverCard({
           )}
 
           <AssignForm driverId={driver.id} currentVehicleId={row.vehicleId} vehicles={vehicles} />
+
+          <InvitePanel driver={driver} />
         </div>
 
         <div className="flex flex-col gap-2">
@@ -336,5 +344,71 @@ function DriverForm({ driver, onClose }: { driver: Driver | null; onClose: () =>
         </form>
       </CardBody>
     </Card>
+  );
+}
+
+const noInvite: InviteState = { error: null, link: null };
+
+/**
+ * Приглашение водителя в приложение.
+ *
+ * Ссылку отправляет перевозчик сам: «Lähetä tekstiviestinä» открывает SMS
+ * на его телефоне с готовым текстом, платформа ничего не шлёт. Новая
+ * ссылка после входа выводит прежний телефон водителя.
+ */
+function InvitePanel({ driver }: { driver: Driver }) {
+  const { t, m, locale } = useI18n();
+  const [state, action, pending] = useActionState(createInviteAction, noInvite);
+  const [copied, setCopied] = useState(false);
+
+  const smsHref = state.link
+    ? `sms:${driver.phone}?&body=${encodeURIComponent(m('drivers.smsBody', { link: state.link }))}`
+    : null;
+
+  return (
+    <div className="mt-3 flex flex-col gap-2">
+      <div className="flex flex-wrap gap-2">
+        <form action={action}>
+          <input type="hidden" name="locale" value={locale} />
+          <input type="hidden" name="driver_id" value={driver.id} />
+          <Button type="submit" size="sm" disabled={pending}>
+            {driver.auth_user_id || state.link ? t.drivers.inviteAgain : t.drivers.invite}
+          </Button>
+        </form>
+        {driver.auth_user_id && (
+          <form action={detachLoginAction}>
+            <input type="hidden" name="locale" value={locale} />
+            <input type="hidden" name="driver_id" value={driver.id} />
+            <Button type="submit" size="sm" variant="ghost">
+              {t.drivers.detach}
+            </Button>
+          </form>
+        )}
+      </div>
+
+      {state.link && (
+        <div className="flex flex-col gap-2 rounded-control border border-accent-line bg-accent-wash p-3">
+          <p className="text-xs text-ink-muted">{t.drivers.inviteLink}</p>
+          <Input readOnly value={state.link} onFocus={(e) => e.currentTarget.select()} className="font-mono text-xs" />
+          <div className="flex flex-wrap gap-2">
+            <Button
+              size="sm"
+              onClick={async () => {
+                await navigator.clipboard.writeText(state.link!);
+                setCopied(true);
+              }}
+            >
+              {copied ? t.drivers.copied : t.drivers.copy}
+            </Button>
+            {smsHref && (
+              <a href={smsHref} className={buttonClass({ size: 'sm', variant: 'primary' })}>
+                {t.drivers.sms}
+              </a>
+            )}
+          </div>
+        </div>
+      )}
+      {state.error && <p className="text-xs text-danger">{state.error}</p>}
+    </div>
   );
 }
