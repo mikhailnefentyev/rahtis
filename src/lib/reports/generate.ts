@@ -28,6 +28,11 @@ const BUCKET = 'reports';
 /** Разделитель точек маршрута. Только символы Windows-1252: см. ниже. */
 const LEG = ' - ';
 
+/** Дата по Хельсинки: YYYY-MM-DD. */
+function helsinkiDate(iso: string): string {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Helsinki' }).format(new Date(iso));
+}
+
 /** Понедельник недели, содержащей дату, по Хельсинки. */
 export function mondayOf(date: Date): string {
   const local = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Helsinki' }).format(date);
@@ -56,6 +61,8 @@ export type GenerateResult = {
   reports: number;
   emails: number;
   errors: string[];
+  /** Период ещё не закончился — выпускать нечего. */
+  skipped?: boolean;
 };
 
 /*
@@ -102,22 +109,30 @@ export async function generateWeeklyReports(week?: string): Promise<GenerateResu
 /**
  * Документы расчётного периода.
  *
- * Границы и день выплаты перевозчику берутся из базы, а не считаются
- * здесь: правило периодов — включая короткий февраль — записано в
- * payout_schedule, и второй его экземпляр на TypeScript разошёлся бы с
- * первым ровно в феврале.
- *
- * Срок оплаты заказчику, наоборот, живёт в config.ts: это коммерческое
- * условие, а не свойство календаря.
+ * Границы и оба срока берутся из базы, а не считаются здесь: правило
+ * периодов (две недели, миграция two_week_periods) записано один раз, и
+ * второй его экземпляр на TypeScript однажды разошёлся бы с первым.
  */
 export async function generatePeriodSettlement(moment?: string): Promise<GenerateResult> {
   const admin = createAdminClient();
 
+  const yesterday = new Date(Date.now() - 24 * 3600 * 1000);
+
   const { data, error } = await admin.rpc('settlement_period', {
-    p_moment: moment ?? new Date(Date.now() - 24 * 3600 * 1000).toISOString(),
+    p_moment: moment ?? yesterday.toISOString(),
   });
 
   const period = Array.isArray(data) ? data[0] : data;
+
+  /*
+   * Планировщик зовёт маршрут каждый понедельник, а период длится две
+   * недели. Выпуск — только если вчера период закончился; в
+   * промежуточный понедельник ответ «пропущено», а не пустые документы.
+   * Явный момент (перевыпуск из админки) эту проверку обходит.
+   */
+  if (!moment && period && period.period_end !== helsinkiDate(yesterday.toISOString())) {
+    return { week: period.period_start, reports: 0, emails: 0, errors: [], skipped: true };
+  }
 
   if (error || !period) {
     return {
@@ -150,10 +165,16 @@ async function run(span: Span): Promise<GenerateResult> {
   const target = span.start;
   const errors: string[] = [];
 
-  const from = `${target}T00:00:00+02:00`;
-  const to = new Date(new Date(`${span.end}T00:00:00Z`).getTime() + 24 * 3600 * 1000)
-    .toISOString()
-    .slice(0, 10);
+  /*
+   * Граница — дата по Хельсинки, как у периода в базе. Смещение +02:00,
+   * зашитое в запрос, летом сдвигало границу на час: рейс, закрытый в
+   * полночь по местному времени, попадал в документ другого периода,
+   * чем в расчётах оператора. Выборка берётся с запасом в сутки и
+   * отсекается по местной дате.
+   */
+  const day = 24 * 3600 * 1000;
+  const from = new Date(new Date(`${target}T00:00:00Z`).getTime() - day).toISOString();
+  const to = new Date(new Date(`${span.end}T00:00:00Z`).getTime() + 2 * day).toISOString();
 
   const { data: orders, error } = await admin
     .from('orders')
@@ -162,14 +183,17 @@ async function run(span: Span): Promise<GenerateResult> {
     )
     .eq('status', 'DONE')
     .gte('closed_at', from)
-    .lt('closed_at', `${to}T00:00:00+02:00`)
+    .lt('closed_at', to)
     .order('closed_at', { ascending: true });
 
   if (error) {
     return { week: target, reports: 0, emails: 0, errors: [error.message] };
   }
 
-  const list = (orders ?? []) as OrderRow[];
+  const list = ((orders ?? []) as OrderRow[]).filter((order) => {
+    const date = helsinkiDate(order.closed_at ?? order.updated_at);
+    return date >= target && date <= span.end;
+  });
 
   /* Точки нужны для строки маршрута: первая и последняя из порядка. */
   const ids = list.map((o) => o.id);
@@ -285,6 +309,18 @@ async function issue(
 
   const carrier = role === 'CARRIER';
 
+  /*
+   * Документ периода заказчику — счёт. Номер закрепляется до выпуска
+   * PDF: перевыпуск того же периода получает тот же номер.
+   */
+  const invoice =
+    span.kind === 'PERIOD' && !carrier
+      ? await admin.rpc('period_invoice', { p_company_id: companyId, p_period_start: week }).then(({ data, error }) => {
+          if (error || !data) throw new Error(`номер счёта: ${error?.message ?? 'нет ответа'}`);
+          return data;
+        })
+      : null;
+
   let gross = 0;
   let fee = 0;
   let net = 0;
@@ -329,7 +365,7 @@ async function issue(
         : t.report_.shipperTitle
       : carrier
         ? t.report_.settlementCarrierTitle
-        : t.report_.settlementShipperTitle;
+        : t.report_.settlementShipperTitle.replace('{number}', invoice?.number ?? '');
 
   /*
    * Срок стоит в шапке, а не в письме: письмо теряется, документ
@@ -339,7 +375,12 @@ async function issue(
   const due = span.due
     ? carrier
       ? t.report_.dueCarrier.replace('{date}', f.date(span.due.carrier))
-      : t.report_.dueShipper.replace('{date}', f.date(span.due.shipper))
+      : [
+          invoice ? t.report_.invoiceDate.replace('{date}', f.date(invoice.issued_on)) : null,
+          t.report_.dueShipper.replace('{date}', f.date(span.due.shipper)),
+        ]
+          .filter(Boolean)
+          .join(' · ')
     : null;
 
   /*
@@ -464,6 +505,22 @@ async function issue(
     .single();
 
   /*
+   * Счёт выпущен — рейсы периода выставлены. Только те, что ещё ждали:
+   * перевыпуск не откатывает оплаченные и выплаченные назад.
+   */
+  if (invoice) {
+    const { error: marked } = await admin
+      .from('orders')
+      .update({ billing: 'INVOICED', invoice_ref: invoice.number, invoiced_at: new Date().toISOString() })
+      .in(
+        'id',
+        orders.map((o) => o.id),
+      )
+      .eq('billing', 'PENDING');
+    if (marked) throw new Error(`отметка счёта: ${marked.message}`);
+  }
+
+  /*
    * Замороженной компании отчёт выпускается, но не рассылается: данные
    * для бухгалтерии нужны, а писать в кабинет, куда она не войдёт, и на
    * почту, с которой отношения закончились, незачем.
@@ -498,7 +555,8 @@ async function issue(
           subject:
             span.kind === 'WEEK'
               ? t.report_.emailSubject.replace('{week}', String(isoWeekNumber(week)))
-              : t.report_.settlementEmailSubject
+              : (invoice ? t.report_.invoiceEmailSubject : t.report_.settlementEmailSubject)
+                  .replace('{number}', invoice?.number ?? '')
                   .replace('{from}', f.date(week))
                   .replace('{to}', f.date(span.end)),
           text: [

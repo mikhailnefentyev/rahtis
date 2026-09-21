@@ -6,7 +6,6 @@ import {
   Button,
   Card,
   CardBody,
-  Input,
   Mono,
   Stars,
   Stat,
@@ -19,9 +18,9 @@ import {
 } from '@/components/ui';
 import { AdminError } from '@/components/layout/AdminError';
 import { requireRole } from '@/lib/auth/guard';
-import { setBillingBatchAction } from '@/lib/billing/actions';
+import { issuePeriodInvoicesAction, setBillingBatchAction } from '@/lib/billing/actions';
 import { COMPLETED_WEEKS, vatBpsFor, withVat } from '@/lib/config';
-import { weeksAgoMonday } from '@/lib/dates';
+import { todayInHelsinki, weeksAgoMonday } from '@/lib/dates';
 import { getI18n, isLocale, type Locale } from '@/lib/i18n';
 import { formatIban } from '@/lib/operator/profile';
 import { createClient } from '@/lib/supabase/server';
@@ -41,43 +40,84 @@ export async function generateMetadata({
 }
 
 type Row = Database['public']['Functions']['billing_overview']['Returns'][number];
+type I18n = Awaited<ReturnType<typeof getI18n>>;
 
-type Group = {
-  key: string;
+/** Рейсы одной компании в периоде: сумма без налога и с налогом по её стране. */
+type Party = {
+  id: string;
   rows: Row[];
   net: number;
-  vatBps: number;
+  gross: number;
 };
 
-/** Рейсы этапа, сгруппированные по ключу, с суммой без налога. */
-function groupBy(rows: Row[], key: (r: Row) => string, amount: (r: Row) => number, country: (r: Row) => string | null) {
-  const map = new Map<string, Group>();
+type Period = {
+  start: string;
+  end: string;
+  invoiceDue: string;
+  payoutDue: string;
+  rows: Row[];
+};
+
+function parties(
+  rows: Row[],
+  id: (r: Row) => string,
+  amount: (r: Row) => number,
+  country: (r: Row) => string | null,
+): Party[] {
+  const map = new Map<string, Party>();
   for (const row of rows) {
-    const k = key(row);
-    const g = map.get(k) ?? { key: k, rows: [], net: 0, vatBps: vatBpsFor(country(row)) };
-    g.rows.push(row);
-    g.net += amount(row);
-    map.set(k, g);
+    const key = id(row);
+    const party = map.get(key) ?? { id: key, rows: [], net: 0, gross: 0 };
+    party.rows.push(row);
+    party.net += amount(row);
+    map.set(key, party);
+  }
+  for (const party of map.values()) {
+    party.gross = withVat(party.net, vatBpsFor(country(party.rows[0]!)));
   }
   return [...map.values()];
 }
 
-const DAY = 86_400_000;
-/** Срок оплаты заказчиком — 15 дней (условия, 6.5). */
-const DUE_DAYS = 15;
+const shippersOf = (rows: Row[]) =>
+  parties(
+    rows,
+    (r) => r.shipper_id,
+    (r) => r.rate_cents,
+    (r) => r.shipper_country,
+  );
+
+const carriersOf = (rows: Row[]) =>
+  parties(
+    rows.filter((r) => r.carrier_id),
+    (r) => r.carrier_id,
+    (r) => r.payout_cents,
+    (r) => r.carrier_country,
+  );
+
+const sumOf = (list: Party[]) => list.reduce((s, p) => s + p.gross, 0);
+
+/** День после конца периода: утром планировщик выпускает счета. */
+function dayAfter(date: string): string {
+  const d = new Date(`${date}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + 1);
+  return d.toISOString().slice(0, 10);
+}
 
 /**
- * Laskutus ja tilitykset — расчёты оператора по шагам денег.
+ * Laskutus ja tilitykset — расчёты оператора по двухнедельным периодам.
  *
- * Страница отвечает на три вопроса в том порядке, в каком по ним идут
- * деньги: кому выставить счёт, кто ещё не заплатил, кому перевести
- * выплату. Каждый шаг — по компании, а не по рейсу: счёт заказчику один
- * на период, перевод перевозчику один. Налог считается по стране
- * контрагента тем же vatBpsFor, что в документах периода, и показан
- * числом — оператор выставляет и платит с ALV.
+ * Деньги живут периодами (две недели, пн–вс), и страница показывает их
+ * так же: сверху идущий период, ниже закрытые, свежие первыми. У
+ * закрытого периода две таблицы — счета заказчикам и выплаты
+ * перевозчикам, по строке на компанию, со статусом словами.
  *
- * Сводка по контрагентам и лента рейсов, которыми страница была раньше,
- * остались — внизу, за раскрытием: они для разбора, а не для работы.
+ * Счета оператор не выставляет: они уходят сами после конца периода,
+ * с номером, и рейсы сами становятся «выставленными». Руками — только
+ * то, чего платформа знать не может: деньги пришли, деньги ушли. Если
+ * выпуск не прошёл, у периода появляется кнопка выпустить его сейчас.
+ *
+ * Полностью закрытые периоды свёрнуты внизу, прежняя сводка по
+ * контрагентам — за раскрытием: они для разбора, а не для работы.
  */
 export default async function BillingPage({
   params,
@@ -92,58 +132,46 @@ export default async function BillingPage({
   await requireRole(locale, 'ADMIN');
   const { error: failure } = await searchParams;
 
-  const [{ t, m, f }, supabase] = await Promise.all([getI18n(locale), createClient()]);
+  const [i18n, supabase] = await Promise.all([getI18n(locale), createClient()]);
+  const { t, m, f } = i18n;
 
-  const [{ data: overview }, { data: partners }, { data: orders }, { data: totals }] = await Promise.all([
-    supabase.rpc('billing_overview'),
-    supabase.rpc('partner_totals', {}),
-    supabase.rpc('completed_orders', { p_from: weeksAgoMonday(COMPLETED_WEEKS * 2) }),
-    supabase.rpc('weekly_totals', { p_weeks: 12 }),
-  ]);
+  const [{ data: overview }, { data: current }, { data: partners }, { data: orders }, { data: totals }] =
+    await Promise.all([
+      supabase.rpc('billing_overview'),
+      supabase.rpc('settlement_period', {}),
+      supabase.rpc('partner_totals', {}),
+      supabase.rpc('completed_orders', { p_from: weeksAgoMonday(COMPLETED_WEEKS * 2) }),
+      supabase.rpc('weekly_totals', { p_weeks: 12 }),
+    ]);
 
+  const today = todayInHelsinki();
   const all = overview ?? [];
-  const now = new Date().getTime();
 
-  const pending = all.filter((r) => r.billing === 'PENDING');
-  const invoiced = all.filter((r) => r.billing === 'INVOICED');
-  const paid = all.filter((r) => r.billing === 'PAID');
-  const settled = all.filter((r) => r.billing === 'SETTLED');
+  const byStart = new Map<string, Period>();
+  for (const row of all) {
+    const period = byStart.get(row.period_start) ?? {
+      start: row.period_start,
+      end: row.period_end,
+      invoiceDue: row.invoice_due,
+      payoutDue: row.payout_due,
+      rows: [],
+    };
+    period.rows.push(row);
+    byStart.set(row.period_start, period);
+  }
+  const periods = [...byStart.values()].sort((a, b) => b.start.localeCompare(a.start));
 
-  const shipperGroups = (rows: Row[], byInvoice = false) =>
-    groupBy(
-      rows,
-      (r) => (byInvoice ? `${r.shipper_id}|${r.invoice_ref ?? ''}` : r.shipper_id),
-      (r) => r.rate_cents,
-      (r) => r.shipper_country,
-    );
-  const carrierGroups = (rows: Row[]) =>
-    groupBy(
-      rows,
-      (r) => r.carrier_id ?? 'none',
-      (r) => r.payout_cents,
-      (r) => r.carrier_country,
-    );
+  const running = periods.filter((p) => p.end >= today);
+  const closed = periods.filter((p) => p.end < today);
+  const open = closed.filter((p) => p.rows.some((r) => r.billing !== 'SETTLED'));
+  const finished = closed.filter((p) => p.rows.every((r) => r.billing === 'SETTLED'));
 
-  const gross = (g: Group) => withVat(g.net, g.vatBps);
-  const sumGross = (groups: Group[]) => groups.reduce((s, g) => s + gross(g), 0);
+  /* Итоги сверху: сколько ждём, сколько просрочено, сколько платить. */
+  const awaiting = all.filter((r) => r.billing === 'INVOICED');
+  const overdue = awaiting.filter((r) => r.invoice_due < today);
+  const margin = all.filter((r) => r.billing !== 'PENDING').reduce((s, r) => s + r.commission_cents, 0);
 
-  const toInvoice = shipperGroups(pending);
-  const awaiting = shipperGroups(invoiced, true);
-  const toPay = carrierGroups(paid);
-  const done = carrierGroups(settled);
-
-  const overdueCount = invoiced.filter(
-    (r) => r.invoiced_at && now - Date.parse(r.invoiced_at) > DUE_DAYS * DAY,
-  ).length;
-  const margin = all
-    .filter((r) => r.billing !== 'PENDING')
-    .reduce((s, r) => s + r.commission_cents, 0);
-
-  /* Налог словами: ставка или обратное начисление. */
-  const vatLabel = (bps: number) =>
-    bps > 0 ? m('billingDesk.vatDomestic', { rate: f.percent(bps / 10_000, 1) }) : t.billingDesk.vatReverse;
-
-  const days = (iso: string | null) => (iso ? Math.floor((now - Date.parse(iso)) / DAY) : 0);
+  const currentPeriod = Array.isArray(current) ? current[0] : current;
 
   return (
     <main className="mx-auto w-full max-w-6xl px-5 py-8">
@@ -154,184 +182,54 @@ export default async function BillingPage({
 
       <StatRow>
         <Stat
-          label={t.billingDesk.statToInvoice}
-          value={f.eur(sumGross(toInvoice))}
-          hint={m('billingDesk.trips', { count: pending.length })}
+          label={t.billingDesk.statAwaiting}
+          value={f.eur(sumOf(shippersOf(awaiting)))}
+          hint={m('billingDesk.trips', { count: awaiting.length })}
         />
         <Stat
-          label={t.billingDesk.statAwaiting}
-          value={f.eur(sumGross(awaiting))}
-          hint={
-            overdueCount > 0
-              ? `${m('billingDesk.trips', { count: invoiced.length })} · ${t.billingDesk.overdue}: ${overdueCount}`
-              : m('billingDesk.trips', { count: invoiced.length })
-          }
-          tone={overdueCount > 0 ? 'warn' : undefined}
+          label={t.billingDesk.statOverdue}
+          value={f.eur(sumOf(shippersOf(overdue)))}
+          hint={m('billingDesk.trips', { count: overdue.length })}
+          tone={overdue.length > 0 ? 'warn' : undefined}
         />
         <Stat
           label={t.billingDesk.statToPay}
-          value={f.eur(sumGross(toPay))}
-          hint={m('billingDesk.trips', { count: paid.length })}
+          value={f.eur(sumOf(carriersOf(all.filter((r) => r.billing === 'PAID'))))}
         />
         <Stat label={t.billingDesk.statMargin} value={f.eur(margin)} tone="ok" />
       </StatRow>
 
-      {/* ── 1 · Счета заказчикам ───────────────────────────────── */}
-      <Step title={t.billingDesk.step1} hint={t.billingDesk.step1Hint} empty={toInvoice.length === 0} t={t}>
-        {toInvoice.map((g) => {
-          const head = g.rows[0];
-          return (
-            <Card key={g.key}>
-              <CardBody className="flex flex-col gap-3">
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="text-[15px] font-semibold">
-                      {head.shipper_name} <Mono className="text-xs text-ink-dim">{head.shipper_business_id}</Mono>
-                    </p>
-                    <p className="mt-0.5 text-xs text-ink-muted">
-                      {t.billingDesk.sendTo}: {head.shipper_billing_email}
-                      {head.shipper_einvoice_ovt &&
-                        ` · ${t.billingDesk.einvoice}: ${head.shipper_einvoice_ovt}${head.shipper_einvoice_operator ? ` / ${head.shipper_einvoice_operator}` : ''}`}
-                      {head.shipper_billing_reference && ` · ${t.billingDesk.reference}: ${head.shipper_billing_reference}`}
-                    </p>
-                  </div>
-                  <Money group={g} vatLabel={vatLabel(g.vatBps)} locale={locale} />
-                </div>
+      {currentPeriod && (
+        <RunningPeriod
+          start={currentPeriod.period_start}
+          end={currentPeriod.period_end}
+          rows={running.flatMap((p) => p.rows)}
+          i18n={i18n}
+        />
+      )}
 
-                <Trips rows={g.rows} amount={(r) => r.rate_cents} locale={locale} />
+      {open.map((period) => (
+        <ClosedPeriod key={period.start} period={period} today={today} locale={locale} i18n={i18n} />
+      ))}
 
-                <form action={setBillingBatchAction} className="flex flex-wrap items-center justify-end gap-2">
-                  <input type="hidden" name="locale" value={locale} />
-                  <input type="hidden" name="next" value="INVOICED" />
-                  {g.rows.map((r) => (
-                    <input key={r.id} type="hidden" name="order_id" value={r.id} />
-                  ))}
-                  <Input
-                    name="invoice_ref"
-                    placeholder={t.billing.invoiceRefPlaceholder}
-                    aria-label={t.billingDesk.invoiceNo}
-                    className="h-9 w-36"
-                  />
-                  <Button type="submit" variant="primary" size="sm" formNoValidate>
-                    {m('billingDesk.markCount', { label: t.billingDesk.markInvoiced, count: g.rows.length })}
-                  </Button>
-                </form>
-              </CardBody>
-            </Card>
-          );
-        })}
-      </Step>
+      {periods.length === 0 && <p className="mt-10 text-[13px] text-ink-dim">{t.billingDesk.nothing}</p>}
 
-      {/* ── 2 · Ждём оплату ────────────────────────────────────── */}
-      <Step title={t.billingDesk.step2} hint={t.billingDesk.step2Hint} empty={awaiting.length === 0} t={t}>
-        {awaiting.map((g) => {
-          const head = g.rows[0];
-          const age = days(head.invoiced_at);
-          const late = age > DUE_DAYS;
-          return (
-            <Card key={g.key} stripe={late ? 'warn' : undefined}>
-              <CardBody className="flex flex-col gap-3">
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="text-[15px] font-semibold">
-                      {head.shipper_name} · <Mono>{head.invoice_ref ?? '—'}</Mono>
-                    </p>
-                    <p className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-ink-muted">
-                      {t.billingDesk.invoicedOn} {head.invoiced_at ? f.date(head.invoiced_at) : '—'} ·{' '}
-                      {m('billingDesk.daysAgo', { days: age })}
-                      {late && <Badge tone="warn">{t.billingDesk.overdue}</Badge>}
-                    </p>
-                  </div>
-                  <Money group={g} vatLabel={vatLabel(g.vatBps)} locale={locale} />
-                </div>
-
-                <Trips rows={g.rows} amount={(r) => r.rate_cents} locale={locale} />
-
-                <BatchButton
-                  ids={g.rows.map((r) => r.id)}
-                  next="PAID"
-                  label={m('billingDesk.markCount', { label: t.billingDesk.markPaid, count: g.rows.length })}
-                  locale={locale}
-                />
-              </CardBody>
-            </Card>
-          );
-        })}
-      </Step>
-
-      {/* ── 3 · Выплаты перевозчикам ───────────────────────────── */}
-      <Step title={t.billingDesk.step3} hint={t.billingDesk.step3Hint} empty={toPay.length === 0} t={t}>
-        {toPay.map((g) => {
-          const head = g.rows[0];
-          const waiting = [...pending, ...invoiced].filter((r) => r.carrier_id === head.carrier_id).length;
-          return (
-            <Card key={g.key}>
-              <CardBody className="flex flex-col gap-3">
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="text-[15px] font-semibold">
-                      {head.carrier_name ?? '—'} <Mono className="text-xs text-ink-dim">{head.carrier_business_id}</Mono>
-                    </p>
-                    {head.carrier_iban ? (
-                      <p className="mt-0.5 text-xs text-ink-muted">
-                        {t.billingDesk.account}: <Mono>{formatIban(head.carrier_iban)}</Mono>
-                        {head.carrier_bic && <> · BIC <Mono>{head.carrier_bic}</Mono></>}
-                      </p>
-                    ) : (
-                      <p className="mt-0.5 text-xs text-warn">{t.billingDesk.noIban}</p>
-                    )}
-                    {waiting > 0 && (
-                      <p className="mt-0.5 text-xs text-ink-dim">{m('billingDesk.waitingCustomer', { count: waiting })}</p>
-                    )}
-                  </div>
-                  <Money group={g} vatLabel={vatLabel(g.vatBps)} locale={locale} />
-                </div>
-
-                <Trips rows={g.rows} amount={(r) => r.payout_cents} locale={locale} />
-
-                <BatchButton
-                  ids={g.rows.map((r) => r.id)}
-                  next="SETTLED"
-                  label={m('billingDesk.markCount', { label: t.billingDesk.markSettled, count: g.rows.length })}
-                  locale={locale}
-                />
-              </CardBody>
-            </Card>
-          );
-        })}
-      </Step>
-
-      {/* ── 4 · Закрыто ────────────────────────────────────────── */}
-      {done.length > 0 && (
+      {finished.length > 0 && (
         <details className="mt-10">
           <summary className="cursor-pointer border-b border-line pb-2 text-[13px] font-semibold tracking-tight text-ink-faint">
-            {t.billingDesk.step4} · {f.eur(sumGross(done))}
+            {t.billingDesk.closed} · {finished.length}
           </summary>
-          <div className="mt-4 flex flex-col gap-3">
-            {done.map((g) => (
-              <Card key={g.key}>
-                <CardBody className="flex flex-wrap items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="text-[15px] font-semibold">{g.rows[0].carrier_name ?? '—'}</p>
-                    <p className="mt-0.5 text-xs text-ink-muted">
-                      {m('billingDesk.trips', { count: g.rows.length })} · {t.billingDesk.settledOn}{' '}
-                      {g.rows.map((r) => r.settled_at && f.date(r.settled_at)).filter(Boolean).at(-1)}
-                    </p>
-                  </div>
-                  <Money group={g} vatLabel={vatLabel(g.vatBps)} locale={locale} />
-                </CardBody>
-              </Card>
-            ))}
-          </div>
+          {finished.map((period) => (
+            <ClosedPeriod key={period.start} period={period} today={today} locale={locale} i18n={i18n} />
+          ))}
         </details>
       )}
 
-      {/* ── Сводка для разбора ─────────────────────────────────── */}
       <details className="mt-10">
         <summary className="cursor-pointer border-b border-line pb-2 text-[13px] font-semibold tracking-tight text-ink-faint">
           {t.billingDesk.summary}
         </summary>
-        <PartnerTables partners={(partners ?? []) as PartnerTotal[]} locale={locale} />
+        <PartnerTables partners={(partners ?? []) as PartnerTotal[]} i18n={i18n} />
         <div className="mt-8">
           <CompletedList orders={orders ?? []} totals={totals ?? []} />
         </div>
@@ -342,74 +240,245 @@ export default async function BillingPage({
   );
 }
 
-async function Step({
-  title,
-  hint,
-  empty,
-  t,
-  children,
+/** Идущий период: сколько уже набралось и когда уйдут счета. */
+function RunningPeriod({
+  start,
+  end,
+  rows,
+  i18n: { t, m, f },
 }: {
-  title: string;
-  hint: string;
-  empty: boolean;
-  t: Awaited<ReturnType<typeof getI18n>>['t'];
-  children: React.ReactNode;
+  start: string;
+  end: string;
+  rows: Row[];
+  i18n: I18n;
 }) {
+  const customers = shippersOf(rows);
   return (
     <section className="mt-10">
-      <h2 className="border-b border-line pb-2 text-[15px] font-semibold tracking-tight">{title}</h2>
-      <p className="mt-2 mb-4 max-w-2xl text-xs text-ink-muted">{hint}</p>
-      {empty ? <p className="text-[13px] text-ink-dim">{t.billingDesk.nothing}</p> : <div className="flex flex-col gap-3">{children}</div>}
+      <PeriodHead
+        title={m('billingDesk.period', { from: f.date(start), to: f.date(end) })}
+        badge={<Badge tone="info">{t.billingDesk.current}</Badge>}
+        lines={[m('billingDesk.autoInvoice', { date: f.date(dayAfter(end)) })]}
+      />
+      <Card>
+        <CardBody className="flex flex-wrap items-baseline justify-between gap-3">
+          <span className="text-[13px] text-ink-muted">{m('billingDesk.trips', { count: rows.length })}</span>
+          <span className="font-mono text-[15px] font-semibold">{f.eur(sumOf(customers))}</span>
+        </CardBody>
+      </Card>
     </section>
   );
 }
 
-/** Сумма группы: без налога, налог словами и числом, итог. */
-async function Money({ group, vatLabel, locale }: { group: Group; vatLabel: string; locale: Locale }) {
-  const { t, f } = await getI18n(locale);
-  const total = withVat(group.net, group.vatBps);
+function ClosedPeriod({
+  period,
+  today,
+  locale,
+  i18n,
+}: {
+  period: Period;
+  today: string;
+  locale: Locale;
+  i18n: I18n;
+}) {
+  const { t, m, f } = i18n;
+  const customers = shippersOf(period.rows);
+  const carriers = carriersOf(period.rows);
+  const notSent = period.rows.some((r) => r.billing === 'PENDING');
+
   return (
-    <dl className="grid grid-cols-[auto_auto] gap-x-4 gap-y-0.5 text-right text-[13px]">
-      <dt className="text-ink-muted">{t.billingDesk.net}</dt>
-      <dd className="font-mono">{f.eur(group.net)}</dd>
-      <dt className="text-ink-muted">{vatLabel}</dt>
-      <dd className="font-mono">{f.eur(total - group.net)}</dd>
-      <dt className="font-semibold">{t.billingDesk.gross}</dt>
-      <dd className="font-mono text-[15px] font-semibold">{f.eur(total)}</dd>
-    </dl>
+    <section className="mt-10">
+      <PeriodHead
+        title={m('billingDesk.period', { from: f.date(period.start), to: f.date(period.end) })}
+        lines={[
+          m('billingDesk.customerDue', { date: f.date(period.invoiceDue) }),
+          m('billingDesk.payoutDue', { date: f.date(period.payoutDue) }),
+        ]}
+      />
+
+      {notSent && (
+        <Card stripe="warn" className="mb-3">
+          <CardBody className="flex flex-wrap items-center justify-between gap-3">
+            <p className="text-[13px]">{t.billingDesk.notSent}</p>
+            <form action={issuePeriodInvoicesAction}>
+              <input type="hidden" name="locale" value={locale} />
+              <input type="hidden" name="period_start" value={period.start} />
+              <Button type="submit" variant="primary" size="sm">
+                {t.billingDesk.sendNow}
+              </Button>
+            </form>
+          </CardBody>
+        </Card>
+      )}
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <div>
+          <h3 className="mb-2 text-[13px] font-semibold text-ink-faint">{t.billingDesk.invoices}</h3>
+          <TableFrame>
+            <Table>
+              <thead>
+                <tr>
+                  <Th>{t.billingDesk.colCustomer}</Th>
+                  <Th numeric>{t.billingDesk.colGross}</Th>
+                  <Th>{t.billingDesk.colStatus}</Th>
+                  <Th />
+                </tr>
+              </thead>
+              <tbody>
+                {customers.map((c) => {
+                  const head = c.rows[0]!;
+                  const invoiced = c.rows.filter((r) => r.billing === 'INVOICED');
+                  const state = c.rows.some((r) => r.billing === 'PENDING')
+                    ? { tone: 'warn' as const, label: t.billingDesk.stNotSent }
+                    : invoiced.length > 0
+                      ? period.invoiceDue < today
+                        ? { tone: 'danger' as const, label: t.billingDesk.stOverdue }
+                        : { tone: 'info' as const, label: t.billingDesk.stSent }
+                      : { tone: 'ok' as const, label: t.billingDesk.stPaid };
+                  return (
+                    <Tr key={c.id}>
+                      <Td>
+                        <span className="font-semibold text-ink">{head.shipper_name}</span>
+                        <br />
+                        <span className="text-xs text-ink-dim">
+                          {head.invoice_ref ? (
+                            <>
+                              {t.billingDesk.colInvoice} <Mono>{head.invoice_ref}</Mono> ·{' '}
+                            </>
+                          ) : null}
+                          <Trips rows={c.rows} amount={(r) => r.rate_cents} i18n={i18n} />
+                        </span>
+                      </Td>
+                      <Td numeric>{f.eur(c.gross)}</Td>
+                      <Td>
+                        <Badge tone={state.tone}>{state.label}</Badge>
+                      </Td>
+                      <Td>
+                        {invoiced.length > 0 && (
+                          <BatchButton
+                            ids={invoiced.map((r) => r.id)}
+                            next="PAID"
+                            label={t.billingDesk.markPaid}
+                            locale={locale}
+                          />
+                        )}
+                      </Td>
+                    </Tr>
+                  );
+                })}
+              </tbody>
+            </Table>
+          </TableFrame>
+        </div>
+
+        <div>
+          <h3 className="mb-2 text-[13px] font-semibold text-ink-faint">{t.billingDesk.payouts}</h3>
+          <TableFrame>
+            <Table>
+              <thead>
+                <tr>
+                  <Th>{t.billingDesk.colCarrier}</Th>
+                  <Th numeric>{t.billingDesk.colGross}</Th>
+                  <Th>{t.billingDesk.colStatus}</Th>
+                  <Th />
+                </tr>
+              </thead>
+              <tbody>
+                {carriers.map((c) => {
+                  const head = c.rows[0]!;
+                  const ready = c.rows.filter((r) => r.billing === 'PAID');
+                  const waiting = c.rows.some((r) => r.billing === 'PENDING' || r.billing === 'INVOICED');
+                  const state =
+                    ready.length > 0
+                      ? { tone: 'warn' as const, label: t.billingDesk.stReady }
+                      : waiting
+                        ? { tone: 'neutral' as const, label: t.billingDesk.stWaiting }
+                        : { tone: 'ok' as const, label: t.billingDesk.stSettled };
+                  return (
+                    <Tr key={c.id}>
+                      <Td>
+                        <span className="font-semibold text-ink">{head.carrier_name ?? '—'}</span>
+                        <br />
+                        <span className="text-xs text-ink-dim">
+                          {head.carrier_iban ? (
+                            <>
+                              {t.billingDesk.account} <Mono>{formatIban(head.carrier_iban)}</Mono>
+                              {head.carrier_bic ? <> · {head.carrier_bic}</> : null} ·{' '}
+                            </>
+                          ) : (
+                            <span className="text-warn">{t.billingDesk.noIban} · </span>
+                          )}
+                          <Trips rows={c.rows} amount={(r) => r.payout_cents} i18n={i18n} />
+                        </span>
+                      </Td>
+                      <Td numeric>{f.eur(c.gross)}</Td>
+                      <Td>
+                        <Badge tone={state.tone}>{state.label}</Badge>
+                      </Td>
+                      <Td>
+                        {ready.length > 0 && (
+                          <BatchButton
+                            ids={ready.map((r) => r.id)}
+                            next="SETTLED"
+                            label={t.billingDesk.markSettled}
+                            locale={locale}
+                          />
+                        )}
+                      </Td>
+                    </Tr>
+                  );
+                })}
+              </tbody>
+            </Table>
+          </TableFrame>
+        </div>
+      </div>
+    </section>
   );
 }
 
-async function Trips({ rows, amount, locale }: { rows: Row[]; amount: (r: Row) => number; locale: Locale }) {
-  const { t, f } = await getI18n(locale);
+function PeriodHead({ title, badge, lines }: { title: string; badge?: React.ReactNode; lines: string[] }) {
   return (
-    <TableFrame>
-      <Table>
-        <thead>
+    <div className="mb-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-line pb-2">
+      <h2 className="flex items-center gap-2 text-[15px] font-semibold tracking-tight">
+        {title}
+        {badge}
+      </h2>
+      <p className="text-xs text-ink-muted">{lines.join(' · ')}</p>
+    </div>
+  );
+}
+
+/** Число рейсов; раскрывается в список: дата, номер, маршрут, сумма без налога. */
+function Trips({ rows, amount, i18n: { t, m, f } }: { rows: Row[]; amount: (r: Row) => number; i18n: I18n }) {
+  return (
+    <details className="inline">
+      <summary className="inline cursor-pointer underline decoration-dotted">
+        {m('billingDesk.trips', { count: rows.length })}
+      </summary>
+      <table className="mt-1.5 text-xs">
+        <thead className="sr-only">
           <tr>
-            <Th>{t.billingDesk.colDate}</Th>
-            <Th>{t.billingDesk.colRef}</Th>
-            <Th>{t.billingDesk.colRoute}</Th>
-            <Th numeric>{t.billingDesk.colAmount}</Th>
+            <th>{t.billingDesk.colDate}</th>
+            <th>{t.billingDesk.colRef}</th>
+            <th>{t.billingDesk.colRoute}</th>
+            <th>{t.billingDesk.colAmount}</th>
           </tr>
         </thead>
         <tbody>
           {rows.map((r) => (
-            <Tr key={r.id}>
-              <Td>{r.closed_at ? f.date(r.closed_at) : '—'}</Td>
-              <Td mono>
-                {r.ref}
-                {r.shipper_ref ? <span className="text-ink-dim"> · {r.shipper_ref}</span> : null}
-              </Td>
-              <Td>
+            <tr key={r.id}>
+              <td className="pr-3">{r.closed_at ? f.date(r.closed_at) : '—'}</td>
+              <td className="pr-3 font-mono">{r.ref}</td>
+              <td className="pr-3">
                 {r.route_from ?? '—'} → {r.route_to ?? '—'}
-              </Td>
-              <Td numeric>{f.eur(amount(r))}</Td>
-            </Tr>
+              </td>
+              <td className="text-right font-mono">{f.eur(amount(r))}</td>
+            </tr>
           ))}
         </tbody>
-      </Table>
-    </TableFrame>
+      </table>
+    </details>
   );
 }
 
@@ -425,13 +494,13 @@ function BatchButton({
   locale: Locale;
 }) {
   return (
-    <form action={setBillingBatchAction} className="flex justify-end">
+    <form action={setBillingBatchAction}>
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="next" value={next} />
       {ids.map((id) => (
         <input key={id} type="hidden" name="order_id" value={id} />
       ))}
-      <Button type="submit" variant="primary" size="sm">
+      <Button type="submit" size="sm" className="whitespace-nowrap">
         {label}
       </Button>
     </form>
@@ -439,8 +508,7 @@ function BatchButton({
 }
 
 /** Прежняя сводка по контрагентам — для разбора, а не для работы. */
-async function PartnerTables({ partners, locale }: { partners: PartnerTotal[]; locale: Locale }) {
-  const { t, m, f } = await getI18n(locale);
+function PartnerTables({ partners, i18n: { t, m, f } }: { partners: PartnerTotal[]; i18n: I18n }) {
   const clients = partners.filter((r) => r.party === 'SHIPPER');
   const carriers = partners.filter((r) => r.party === 'CARRIER');
 

@@ -12,6 +12,7 @@ import { createFormat } from '@/lib/format';
 import { defaultLocale, getDictionary, isLocale, type Locale } from '@/lib/i18n';
 import { notify } from '@/lib/notify';
 import { formatIban, getOperatorProfile } from '@/lib/operator/profile';
+import { generatePeriodSettlement } from '@/lib/reports/generate';
 import { createClient } from '@/lib/supabase/server';
 import type { PostgrestError } from '@supabase/supabase-js';
 import type { Database } from '@/types/database';
@@ -219,5 +220,33 @@ export async function setBillingBatchAction(formData: FormData): Promise<void> {
   revalidatePath(`/${locale}/admin/billing`);
   if (failed) {
     redirect(withAdminError(`/${locale}/admin/billing`, explainAdmin(firstError) ?? 'generic'));
+  }
+}
+
+/**
+ * Выпустить счета периода вручную.
+ *
+ * Та же функция, что зовёт планировщик после конца периода. Нужна, когда
+ * запуск не прошёл (сбой почты, выключенное расписание): на странице
+ * расчётов у закрытого периода остались невыставленные рейсы. Номера
+ * счетов закреплены за заказчиком и периодом, поэтому повторный выпуск
+ * не заводит новых.
+ */
+export async function issuePeriodInvoicesAction(formData: FormData): Promise<void> {
+  const locale = toLocale(formData.get('locale'));
+  await requireAdmin();
+
+  const start = String(formData.get('period_start') ?? '');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(start)) {
+    redirect(withAdminError(`/${locale}/admin/billing`, 'generic'));
+  }
+
+  /* Полдень первого дня: момент заведомо внутри периода при любом смещении. */
+  const result = await generatePeriodSettlement(`${start}T12:00:00Z`);
+
+  revalidatePath(`/${locale}/admin/billing`);
+  if (result.errors.length > 0) {
+    console.error('Счета периода выпущены с ошибками:', result.errors.join('; '));
+    redirect(withAdminError(`/${locale}/admin/billing`, 'generic'));
   }
 }

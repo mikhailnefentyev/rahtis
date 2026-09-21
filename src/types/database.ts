@@ -1095,6 +1095,41 @@ export type Database = {
         }
         Relationships: []
       }
+      invoices: {
+        Row: {
+          company_id: string
+          created_at: string
+          id: string
+          issued_on: string
+          number: string
+          period_start: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          id?: string
+          issued_on?: string
+          number: string
+          period_start: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          id?: string
+          issued_on?: string
+          number?: string
+          period_start?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       legal_acceptances: {
         Row: {
           accepted_at: string
@@ -2898,21 +2933,22 @@ export type Database = {
           closed_at: string
           commission_cents: number
           id: string
+          invoice_due: string
           invoice_ref: string
           invoiced_at: string
           paid_at: string
           payout_cents: number
+          payout_due: string
+          period_end: string
+          period_start: string
           rate_cents: number
           ref: string
           route_from: string
           route_to: string
           settled_at: string
           shipper_billing_email: string
-          shipper_billing_reference: string
           shipper_business_id: string
           shipper_country: string
-          shipper_einvoice_operator: string
-          shipper_einvoice_ovt: string
           shipper_id: string
           shipper_name: string
           shipper_ref: string
@@ -3909,6 +3945,23 @@ export type Database = {
           shipper_name: string
           status: Database["public"]["Enums"]["claim_status"]
         }[]
+      }
+      period_invoice: {
+        Args: { p_company_id: string; p_period_start: string }
+        Returns: {
+          company_id: string
+          created_at: string
+          id: string
+          issued_on: string
+          number: string
+          period_start: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "invoices"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       period_report: {
         Args: { p_company?: string; p_from: string; p_to: string }
