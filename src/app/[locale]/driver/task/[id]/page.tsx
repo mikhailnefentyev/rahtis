@@ -2,20 +2,25 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { cn } from '@/lib/cn';
 import { getTripPhotos, type TripPhoto } from '@/lib/driverApp/photos';
-import { getDriverTasks, nextStop, type DriverStop, type DriverTask } from '@/lib/driverApp/tasks';
+import { getDriverTasks, type DriverStop, type DriverTask } from '@/lib/driverApp/tasks';
 import { getI18n, isLocale, type Locale } from '@/lib/i18n';
 import { Arrive } from './Arrive';
 import { Confirmation } from './Confirmation';
 import { Inspection } from './Inspection';
 import { ProblemForm } from './ProblemForm';
 import { StopDone } from './StopDone';
+import { QueuedMark, StopDot, StopGate, TaskBanner, TaskProgress } from './TaskProgress';
 
 /**
  * Задание водителя.
  *
  * Сверху — баннер следующего действия, как у DFDS: водитель не ищет, что
  * делать, экран говорит это одной строкой. Ниже — лента точек: пройденные
- * серым с отметкой, текущая раскрыта и с одной кнопкой, будущие — адресом.
+ * с отметкой, текущая раскрыта, будущие — адресом.
+ *
+ * Действия непройденных точек рисуются заранее, а показывает их
+ * TaskProgress: без связи следующая точка должна открыться сразу после
+ * «Tehty», не дожидаясь, пока отметка дойдёт до сервера.
  */
 export default async function DriverTaskPage({
   params,
@@ -29,11 +34,20 @@ export default async function DriverTaskPage({
   const task = tasks.find((x) => x.id === id);
   if (!task) notFound();
 
-  const current = task.status === 'IN_PROGRESS' ? nextStop(task) : null;
+  const running = task.status === 'IN_PROGRESS';
   /* Снимки нужны только на идущем рейсе: там осмотр и сравнение сторон. */
-  const photos = current ? await getTripPhotos(task.id) : [];
+  const photos = running ? await getTripPhotos(task.id) : [];
 
-  return (
+  const progress = task.stops.map((stop) => ({
+    id: stop.id,
+    sequence: stop.sequence,
+    arrived: Boolean(stop.arrived_at),
+    completed: Boolean(stop.completed_at),
+    stopOf: m('driverApp.stopOf', { n: stop.sequence + 1, total: task.stops.length }),
+    title: `${t.stopKind[stop.role]} · ${stop.city}`,
+  }));
+
+  const content = (
     <main className="flex flex-col gap-4">
       <header className="flex items-center justify-between gap-3">
         <Link href={`/${locale}/driver`} className="flex h-12 items-center text-[16px] font-semibold text-accent">
@@ -42,22 +56,13 @@ export default async function DriverTaskPage({
         <span className="font-mono text-[17px] font-bold tracking-tight">{task.ref}</span>
       </header>
 
-      <div className="rounded-card bg-accent px-4 py-4 text-center text-accent-ink">
-        {current ? (
-          <>
-            <p className="text-sm opacity-80">
-              {m('driverApp.stopOf', { n: current.sequence + 1, total: task.stops.length })}
-            </p>
-            <p className="text-xl font-semibold">
-              {t.stopKind[current.role]} · {current.city}
-            </p>
-          </>
-        ) : (
-          <p className="text-[17px] font-semibold">
-            {task.status === 'IN_PROGRESS' ? t.driverApp.allDone : t.orderStatus[task.status]}
-          </p>
-        )}
-      </div>
+      {running ? (
+        <TaskBanner />
+      ) : (
+        <div className="rounded-card bg-accent px-4 py-4 text-center text-[17px] font-semibold text-accent-ink">
+          {t.orderStatus[task.status]}
+        </div>
+      )}
 
       {(task.trailer_plate || task.trailer || task.comment) && (
         <section className="rounded-card border border-line bg-surface px-4 py-3">
@@ -77,15 +82,17 @@ export default async function DriverTaskPage({
             photos={photos}
             stop={stop}
             locale={locale}
-            current={current?.id === stop.id}
+            running={running}
             last={index === task.stops.length - 1}
           />
         ))}
       </ol>
 
-      {task.status === 'IN_PROGRESS' && <ProblemForm orderId={task.id} />}
+      {running && <ProblemForm orderId={task.id} />}
     </main>
   );
+
+  return running ? <TaskProgress stops={progress}>{content}</TaskProgress> : content;
 }
 
 /*
@@ -103,14 +110,14 @@ async function StopItem({
   photos,
   stop,
   locale,
-  current,
+  running,
   last,
 }: {
   task: DriverTask;
   photos: TripPhoto[];
   stop: DriverStop;
   locale: Locale;
-  current: boolean;
+  running: boolean;
   last: boolean;
 }) {
   const { t, m, f } = await getI18n(locale);
@@ -125,14 +132,18 @@ async function StopItem({
   return (
     <li className="flex gap-3">
       <div className="flex flex-col items-center">
-        <span
-          className={cn(
-            'mt-1.5 flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-bold',
-            done ? 'bg-ok text-white' : current ? 'bg-accent text-accent-ink' : 'border-2 border-line-strong',
-          )}
-        >
-          {done ? '✓' : ''}
-        </span>
+        {running ? (
+          <StopDot stopId={stop.id} />
+        ) : (
+          <span
+            className={cn(
+              'mt-1.5 flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-bold',
+              done ? 'bg-ok text-white' : 'border-2 border-line-strong',
+            )}
+          >
+            {done ? '✓' : ''}
+          </span>
+        )}
         {!last && <span className="w-0.5 flex-1 bg-line" />}
       </div>
 
@@ -156,89 +167,106 @@ async function StopItem({
           </p>
         )}
 
-        {current && (
-          <div className="mt-3 flex flex-col gap-2">
-            <dl className="flex flex-col gap-1 text-[15px]">
-              {stop.external_ref && (
-                <div>
-                  <dt className="inline text-ink-muted">{t.driverApp.ref}: </dt>
-                  <dd className="inline font-mono font-semibold">{stop.external_ref}</dd>
-                </div>
-              )}
-              {stop.trailer_loaded != null && (
-                <div>
-                  {t.driverApp.unit}: {stop.trailer_loaded ? t.driverApp.loaded : t.driverApp.emptyUnit}
-                </div>
-              )}
-              {stop.cargo_weight_kg != null && (
-                <div>
-                  {t.driverApp.weight}: {f.number(stop.cargo_weight_kg)} kg
-                </div>
-              )}
-              {stop.seal_required && <div className="font-semibold text-warn">{t.driverApp.seal}</div>}
-              {stop.note && (
-                <div>
-                  {t.driverApp.note}: {stop.note}
-                </div>
-              )}
-              {stop.contact_name && (
-                <div>
-                  {t.driverApp.contact}: {stop.contact_name}
-                </div>
-              )}
-            </dl>
+        {running && !done && (
+          <>
+            <StopGate stopId={stop.id} when="completedQueued">
+              <p className="mt-1 text-[15px] font-semibold text-ok">
+                {t.driverApp.stopDone}
+                <QueuedMark />
+              </p>
+            </StopGate>
 
-            <div className="flex gap-2">
-              <a
-                href={`https://www.google.com/maps/dir/?api=1&destination=${destination}`}
-                target="_blank"
-                rel="noreferrer"
-                className="flex h-12 flex-1 items-center justify-center rounded-control border border-line bg-surface text-[15px] font-semibold"
-              >
-                {t.driverApp.navigate}
-              </a>
-              {stop.contact_phone && (
-                <a
-                  href={`tel:${stop.contact_phone}`}
-                  className="flex h-12 flex-1 items-center justify-center rounded-control border border-line bg-surface text-[15px] font-semibold"
-                >
-                  {t.driverApp.call}
-                </a>
-              )}
-            </div>
+            <StopGate stopId={stop.id} when="current">
+              <div className="mt-3 flex flex-col gap-2">
+                <dl className="flex flex-col gap-1 text-[15px]">
+                  {stop.external_ref && (
+                    <div>
+                      <dt className="inline text-ink-muted">{t.driverApp.ref}: </dt>
+                      <dd className="inline font-mono font-semibold">{stop.external_ref}</dd>
+                    </div>
+                  )}
+                  {stop.trailer_loaded != null && (
+                    <div>
+                      {t.driverApp.unit}: {stop.trailer_loaded ? t.driverApp.loaded : t.driverApp.emptyUnit}
+                    </div>
+                  )}
+                  {stop.cargo_weight_kg != null && (
+                    <div>
+                      {t.driverApp.weight}: {f.number(stop.cargo_weight_kg)} kg
+                    </div>
+                  )}
+                  {stop.seal_required && <div className="font-semibold text-warn">{t.driverApp.seal}</div>}
+                  {stop.note && (
+                    <div>
+                      {t.driverApp.note}: {stop.note}
+                    </div>
+                  )}
+                  {stop.contact_name && (
+                    <div>
+                      {t.driverApp.contact}: {stop.contact_name}
+                    </div>
+                  )}
+                </dl>
 
-            {!stop.arrived_at ? (
-              <Arrive stopId={stop.id} />
-            ) : (
-              <>
-                <p className="text-[15px] font-semibold text-ok">
-                  ✓ {m('driverApp.arrivedAt', { time: f.time(stop.arrived_at) })}
-                </p>
+                <div className="flex gap-2">
+                  <a
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${destination}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex h-12 flex-1 items-center justify-center rounded-control border border-line bg-surface text-[15px] font-semibold"
+                  >
+                    {t.driverApp.navigate}
+                  </a>
+                  {stop.contact_phone && (
+                    <a
+                      href={`tel:${stop.contact_phone}`}
+                      className="flex h-12 flex-1 items-center justify-center rounded-control border border-line bg-surface text-[15px] font-semibold"
+                    >
+                      {t.driverApp.call}
+                    </a>
+                  )}
+                </div>
 
-                {INSPECT.has(stop.role) && (
-                  <Inspection
-                    orderId={task.id}
-                    stopId={stop.id}
-                    unit={unit}
-                    sealRequired={Boolean(stop.seal_required)}
-                    delivery={stop.role !== 'PICKUP'}
-                    photos={photos}
-                  />
-                )}
+                <StopGate stopId={stop.id} when="beforeArrive">
+                  <Arrive stopId={stop.id} />
+                </StopGate>
 
-                {CONFIRM.has(stop.role) && (
-                  <Confirmation
-                    orderId={task.id}
-                    stopId={stop.id}
-                    photos={photos}
-                    pickup={HANDOVER_IN.has(stop.role)}
-                  />
-                )}
+                <StopGate stopId={stop.id} when="afterArrive">
+                  <p className="text-[15px] font-semibold text-ok">
+                    ✓{' '}
+                    {stop.arrived_at
+                      ? m('driverApp.arrivedAt', { time: f.time(stop.arrived_at) })
+                      : t.driverApp.arrive}
+                    <StopGate stopId={stop.id} when="arrivedQueued">
+                      <QueuedMark />
+                    </StopGate>
+                  </p>
 
-                <StopDone stopId={stop.id} />
-              </>
-            )}
-          </div>
+                  {INSPECT.has(stop.role) && (
+                    <Inspection
+                      orderId={task.id}
+                      stopId={stop.id}
+                      unit={unit}
+                      sealRequired={Boolean(stop.seal_required)}
+                      delivery={stop.role !== 'PICKUP'}
+                      photos={photos}
+                    />
+                  )}
+
+                  {CONFIRM.has(stop.role) && (
+                    <Confirmation
+                      orderId={task.id}
+                      stopId={stop.id}
+                      photos={photos}
+                      pickup={HANDOVER_IN.has(stop.role)}
+                    />
+                  )}
+
+                  <StopDone stopId={stop.id} />
+                </StopGate>
+              </div>
+            </StopGate>
+          </>
         )}
       </div>
     </li>

@@ -133,21 +133,6 @@ export async function driverSignOutAction(formData: FormData): Promise<void> {
   redirect(`/${locale}/driver`);
 }
 
-/* ── Смена ──────────────────────────────────────────────────────── */
-
-export async function shiftAction(formData: FormData): Promise<void> {
-  const locale = toLocale(formData.get('locale'));
-  const supabase = await createClient();
-
-  await supabase.rpc('driver_shift_action', {
-    p_action: str(formData, 'action'),
-    p_lat: num(formData, 'lat') ?? undefined,
-    p_lon: num(formData, 'lon') ?? undefined,
-  });
-
-  revalidateDriver(locale);
-}
-
 /* ── Рейс ───────────────────────────────────────────────────────── */
 
 export async function acceptTaskAction(formData: FormData): Promise<void> {
@@ -165,26 +150,6 @@ export async function declineTaskAction(formData: FormData): Promise<void> {
   const locale = toLocale(formData.get('locale'));
   await cancelOrderAction(formData);
   revalidateDriver(locale);
-}
-
-export async function completeStopAction(
-  _previous: DriverState,
-  formData: FormData,
-): Promise<DriverState> {
-  const locale = toLocale(formData.get('locale'));
-  const t = await getDictionary(locale);
-  const supabase = await createClient();
-
-  const { error } = await supabase.rpc('complete_stop', {
-    p_stop_id: str(formData, 'stop_id'),
-    p_damage_note: str(formData, 'damage_note') || undefined,
-    p_lat: num(formData, 'lat') ?? undefined,
-    p_lon: num(formData, 'lon') ?? undefined,
-    p_accuracy_m: num(formData, 'accuracy') != null ? Math.round(num(formData, 'accuracy')!) : undefined,
-  });
-
-  revalidateDriver(locale);
-  return error ? { error: t.driverApp.failed, done: false } : { error: null, done: true };
 }
 
 export async function reportProblemAction(
@@ -217,19 +182,88 @@ export async function markReadAction(formData: FormData): Promise<void> {
   revalidateDriver(locale);
 }
 
-/* ── Прибытие и снимки ──────────────────────────────────────────── */
+/* ── Очередь действий ───────────────────────────────────────────── */
 
-export async function arriveStopAction(formData: FormData): Promise<void> {
+/**
+ * Ответ очереди: принято, отклонено по делу или не дошло.
+ *
+ * ok — событие применено (или уже было применено раньше) и уходит из
+ * очереди. rejected — база отказала по существу: точка уже пройдена,
+ * смена уже идёт. Повторять такое бессмысленно, и оно тоже уходит, а
+ * водитель видит, что одно действие не принято. retry — не дошло до
+ * базы или она не ответила: событие остаётся и уйдёт со следующей
+ * попыткой.
+ */
+export type EventResult = { status: 'ok' | 'rejected' | 'retry' };
+
+/* Коды, при которых повтор ничего не изменит. */
+const FINAL = new Set(['55000', '42501', '22023', 'P0002', '23514', '23P01']);
+
+const outcome = (error: { code?: string } | null): EventResult => ({
+  status: !error ? 'ok' : error.code && FINAL.has(error.code) ? 'rejected' : 'retry',
+});
+
+/**
+ * Одно действие из очереди телефона.
+ *
+ * Все виды идут одним входом: очередь отправляет их строго по порядку
+ * нажатия, и отметка точки не должна обогнать прибытие на неё только
+ * потому, что ушла другим запросом.
+ */
+export async function applyDriverEventAction(formData: FormData): Promise<EventResult> {
   const locale = toLocale(formData.get('locale'));
   const supabase = await createClient();
+  const eventId = str(formData, 'event_id');
+  const at = str(formData, 'pressed_at') || undefined;
 
-  await supabase.rpc('driver_arrive_stop', {
-    p_stop_id: str(formData, 'stop_id'),
-    p_lat: num(formData, 'lat') ?? undefined,
-    p_lon: num(formData, 'lon') ?? undefined,
-  });
+  let result: EventResult;
 
-  revalidateDriver(locale);
+  switch (str(formData, 'kind')) {
+    case 'SHIFT': {
+      const { error } = await supabase.rpc('driver_shift_action', {
+        p_action: str(formData, 'action'),
+        p_lat: num(formData, 'lat') ?? undefined,
+        p_lon: num(formData, 'lon') ?? undefined,
+        p_at: at,
+        p_event_id: eventId,
+      });
+      result = outcome(error);
+      break;
+    }
+    case 'ARRIVE': {
+      const { error } = await supabase.rpc('driver_arrive_stop', {
+        p_stop_id: str(formData, 'stop_id'),
+        p_lat: num(formData, 'lat') ?? undefined,
+        p_lon: num(formData, 'lon') ?? undefined,
+        p_at: at,
+        p_event_id: eventId,
+      });
+      result = outcome(error);
+      break;
+    }
+    case 'COMPLETE': {
+      const accuracy = num(formData, 'accuracy');
+      const { error } = await supabase.rpc('driver_complete_stop', {
+        p_stop_id: str(formData, 'stop_id'),
+        p_damage_note: str(formData, 'damage_note') || undefined,
+        p_lat: num(formData, 'lat') ?? undefined,
+        p_lon: num(formData, 'lon') ?? undefined,
+        p_accuracy_m: accuracy != null ? Math.round(accuracy) : undefined,
+        p_at: at,
+        p_event_id: eventId,
+      });
+      result = outcome(error);
+      break;
+    }
+    case 'UPLOAD':
+      result = await uploadPhoto(formData);
+      break;
+    default:
+      result = { status: 'rejected' };
+  }
+
+  if (result.status === 'ok') revalidateDriver(locale);
+  return result;
 }
 
 const PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
@@ -245,18 +279,14 @@ const ANGLES = ['FRONT', 'BACK', 'LEFT', 'RIGHT'];
  * функцией базы под той же сессией. Не записалась строка — файл убирается:
  * файл без строки не виден никому и только занимает место.
  *
- * Имя файла — идентификатор снимка на телефоне: повтор отправки кладёт
+ * Имя файла — идентификатор действия с телефона: повтор из очереди кладёт
  * тот же объект по тому же пути, а база возвращает прежнюю строку.
  */
-export async function uploadPhotoAction(formData: FormData): Promise<DriverState> {
-  const locale = toLocale(formData.get('locale'));
-  const t = await getDictionary(locale);
-  const failed = { error: t.driverApp.failed, done: false };
-
+async function uploadPhoto(formData: FormData): Promise<EventResult> {
   const file = formData.get('file');
   const orderId = str(formData, 'order_id');
   const stopId = str(formData, 'stop_id');
-  const externalId = str(formData, 'external_id');
+  const eventId = str(formData, 'event_id');
   const subject = str(formData, 'subject') as (typeof SUBJECTS)[number];
   const angle = str(formData, 'angle');
 
@@ -266,26 +296,27 @@ export async function uploadPhotoAction(formData: FormData): Promise<DriverState
     file.size > 10 * 1024 * 1024 ||
     !PHOTO_TYPES.includes(file.type) ||
     /* Все три идут в путь файла — только идентификаторы, без «../». */
-    ![externalId, orderId, stopId].every((id) => /^[0-9a-f-]{36}$/i.test(id)) ||
+    ![eventId, orderId, stopId].every((id) => /^[0-9a-f-]{36}$/i.test(id)) ||
     !SUBJECTS.includes(subject) ||
     (angle && !ANGLES.includes(angle))
   ) {
-    return failed;
+    return { status: 'rejected' };
   }
 
   const supabase = await createClient();
-  const { data: tasks } = await supabase.rpc('driver_tasks');
+  const { data: tasks, error: tasksError } = await supabase.rpc('driver_tasks');
+  if (tasksError) return { status: 'retry' };
   const task = (tasks ?? []).find((x) => x.id === orderId);
-  if (!task || (task.status !== 'IN_PROGRESS' && task.status !== 'DONE')) return failed;
+  if (!task || (task.status !== 'IN_PROGRESS' && task.status !== 'DONE')) return { status: 'rejected' };
 
   const ext = file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
-  const path = `${orderId}/app/${stopId}/${externalId}.${ext}`;
+  const path = `${orderId}/app/${stopId}/${eventId}.${ext}`;
 
   const admin = createAdminClient();
   const { error: uploadError } = await admin.storage
     .from('trip-docs')
     .upload(path, file, { contentType: file.type, upsert: true });
-  if (uploadError) return failed;
+  if (uploadError) return { status: 'retry' };
 
   const { error } = await supabase.rpc('driver_register_photo', {
     p_order_id: orderId,
@@ -298,17 +329,17 @@ export async function uploadPhotoAction(formData: FormData): Promise<DriverState
     p_damage: formData.get('damage') === '1',
     p_cmr: formData.get('cmr') === '1',
     p_signer_name: str(formData, 'signer_name') || undefined,
-    p_captured_at: str(formData, 'captured_at') || undefined,
+    p_captured_at: str(formData, 'pressed_at') || undefined,
     p_lat: num(formData, 'lat') ?? undefined,
     p_lon: num(formData, 'lon') ?? undefined,
-    p_external_id: externalId,
+    p_external_id: eventId,
   });
 
   if (error) {
-    await admin.storage.from('trip-docs').remove([path]);
-    return failed;
+    const result = outcome(error);
+    if (result.status === 'rejected') await admin.storage.from('trip-docs').remove([path]);
+    return result;
   }
 
-  revalidateDriver(locale);
-  return { error: null, done: true };
+  return { status: 'ok' };
 }

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import type { TripPhoto } from '@/lib/driverApp/photos';
 import { useI18n } from '@/lib/i18n/provider';
-import { PhotoCapture, type PhotoTarget } from './PhotoCapture';
+import { PhotoCapture, useQueuedPhotos, type PhotoTarget } from './PhotoCapture';
 
 type Item = {
   key: string;
@@ -42,6 +42,7 @@ export function Inspection({
 }) {
   const { t } = useI18n();
   const [damage, setDamage] = useState<Record<string, boolean>>({});
+  const queued = useQueuedPhotos(stopId);
 
   const items: Item[] = unit
     ? [
@@ -54,14 +55,21 @@ export function Inspection({
     : [{ key: 'CARGO', label: t.driverApp.cargoPhoto, subject: 'CARGO' }];
 
   const here = photos.filter((p) => p.stopId === stopId);
-  const shotOf = (item: Item) =>
-    here.filter((p) => (item.angle ? p.angle === item.angle : p.subject === item.subject)).at(-1);
+  const matches = (item: Item, p: { angle: string | null; subject: string | null }) =>
+    item.angle ? p.angle === item.angle : p.subject === item.subject;
+  /* Свежее — из очереди телефона: оно снято позже всего, что уже на сервере. */
+  const shotOf = (item: Item) => {
+    const local = queued.filter((q) => matches(item, q)).at(-1);
+    if (local) return { url: local.url, damage: local.damage, queued: true };
+    const server = here.filter((p) => matches(item, p)).at(-1);
+    return server ? { url: server.url, damage: server.kind === 'DAMAGE_PHOTO', queued: false } : undefined;
+  };
   const pickupOf = (item: Item) =>
     delivery && item.angle
       ? photos.filter((p) => p.phase === 'PICKUP' && p.angle === item.angle).at(-1)
       : undefined;
 
-  const extra = here.filter((p) => p.subject === 'OTHER');
+  const extra = here.filter((p) => p.subject === 'OTHER').length + queued.filter((q) => q.subject === 'OTHER').length;
 
   return (
     <section className="flex flex-col gap-3">
@@ -105,7 +113,8 @@ export function Inspection({
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={shot.url} alt="" className="h-24 w-full rounded-control object-cover" />
                     <figcaption className="mt-0.5 text-xs text-ink-muted">
-                      {shot.kind === 'DAMAGE_PHOTO' ? t.driverApp.damageToggle : t.driverApp.stopDone}
+                      {shot.damage ? t.driverApp.damageToggle : t.driverApp.stopDone}
+                      {shot.queued ? ` · ${t.driverApp.queuedBadge}` : ''}
                     </figcaption>
                   </figure>
                 )}
@@ -126,7 +135,7 @@ export function Inspection({
       <div className="rounded-card border border-line bg-surface p-3">
         <span className="text-[16px] font-semibold">
           {t.driverApp.extraPhoto}
-          {extra.length > 0 ? ` · ${extra.length}` : ''}
+          {extra > 0 ? ` · ${extra}` : ''}
         </span>
         <PhotoCapture
           className="mt-2"

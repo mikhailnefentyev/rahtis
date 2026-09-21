@@ -553,6 +553,38 @@ export type Database = {
           },
         ]
       }
+      driver_app_events: {
+        Row: {
+          driver_id: string
+          id: string
+          kind: string
+          pressed_at: string | null
+          received_at: string
+        }
+        Insert: {
+          driver_id: string
+          id: string
+          kind: string
+          pressed_at?: string | null
+          received_at?: string
+        }
+        Update: {
+          driver_id?: string
+          id?: string
+          kind?: string
+          pressed_at?: string | null
+          received_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "driver_app_events_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       driver_breaks: {
         Row: {
           client_event_id: string | null
@@ -3367,7 +3399,13 @@ export type Database = {
       }
       driver_active_trips: { Args: { p_phone: string }; Returns: Json }
       driver_arrive_stop: {
-        Args: { p_lat?: number; p_lon?: number; p_stop_id: string }
+        Args: {
+          p_at?: string
+          p_event_id?: string
+          p_lat?: number
+          p_lon?: number
+          p_stop_id: string
+        }
         Returns: undefined
       }
       driver_complete_next_stop: {
@@ -3380,6 +3418,18 @@ export type Database = {
           p_phone: string
         }
         Returns: Json
+      }
+      driver_complete_stop: {
+        Args: {
+          p_accuracy_m?: number
+          p_at?: string
+          p_damage_note?: string
+          p_event_id?: string
+          p_lat?: number
+          p_lon?: number
+          p_stop_id: string
+        }
+        Returns: undefined
       }
       driver_escalate: {
         Args: { p_phone: string; p_question: string }
@@ -3421,7 +3471,13 @@ export type Database = {
         Returns: undefined
       }
       driver_shift_action: {
-        Args: { p_action: string; p_lat?: number; p_lon?: number }
+        Args: {
+          p_action: string
+          p_at?: string
+          p_event_id?: string
+          p_lat?: number
+          p_lon?: number
+        }
         Returns: undefined
       }
       driver_tasks: {

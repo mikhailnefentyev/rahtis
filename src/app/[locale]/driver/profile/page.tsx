@@ -1,9 +1,9 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { LocaleSwitch } from '@/components/layout/LocaleSwitch';
-import { driverSignOutAction } from '@/lib/driverApp/actions';
 import { getDriver } from '@/lib/driverApp/session';
 import { getI18n, isLocale } from '@/lib/i18n';
+import { SignOut } from './SignOut';
 
 /**
  * Профиль водителя: кто он, чей, на какой машине, язык, установка и выход.
@@ -58,12 +58,7 @@ export default async function DriverProfile({ params }: { params: Promise<{ loca
         {t.driverApp.privacy}
       </Link>
 
-      <form action={driverSignOutAction}>
-        <input type="hidden" name="locale" value={locale} />
-        <button className="h-14 w-full rounded-control border border-line bg-surface text-[16px] font-semibold text-danger">
-          {t.driverApp.signOut}
-        </button>
-      </form>
+      <SignOut />
     </main>
   );
 }

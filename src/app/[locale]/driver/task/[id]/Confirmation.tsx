@@ -1,11 +1,10 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-import { useEffect, useRef, useState, useTransition } from 'react';
-import { uploadPhotoAction } from '@/lib/driverApp/actions';
+import { useEffect, useRef, useState } from 'react';
 import type { TripPhoto } from '@/lib/driverApp/photos';
 import { useI18n } from '@/lib/i18n/provider';
-import { PhotoCapture } from './PhotoCapture';
+import { useOutbox } from '../../OutboxProvider';
+import { PhotoCapture, useQueuedPhotos } from './PhotoCapture';
 
 /**
  * Подтверждение передачи: подпись на экране и снимок накладной.
@@ -29,8 +28,16 @@ export function Confirmation({
 }) {
   const { t } = useI18n();
   const here = photos.filter((p) => p.stopId === stopId);
-  const signature = here.filter((p) => p.subject === 'SIGNATURE').at(-1);
-  const cmr = here.filter((p) => p.kind === 'CMR').at(-1);
+  const queued = useQueuedPhotos(stopId);
+  const queuedSignature = queued.filter((q) => q.subject === 'SIGNATURE').at(-1);
+  const serverSignature = here.filter((p) => p.subject === 'SIGNATURE').at(-1);
+  const signature = queuedSignature
+    ? { signerName: queuedSignature.signerName, queued: true }
+    : serverSignature
+      ? { signerName: serverSignature.signerName, queued: false }
+      : null;
+  const cmrQueued = queued.some((q) => q.cmr);
+  const cmr = cmrQueued || here.some((p) => p.kind === 'CMR');
 
   return (
     <section className="flex flex-col gap-3">
@@ -42,6 +49,7 @@ export function Confirmation({
         <p className="rounded-card bg-ok/10 px-3 py-2 text-[15px] font-semibold text-ok">
           ✓ {t.driverApp.signed}
           {signature.signerName ? ` · ${signature.signerName}` : ''}
+          {signature.queued ? ` · ${t.driverApp.queuedBadge}` : ''}
         </p>
       ) : (
         <SignaturePad orderId={orderId} stopId={stopId} pickup={pickup} />
@@ -50,12 +58,13 @@ export function Confirmation({
       <div className="rounded-card border border-line bg-surface p-3">
         <span className="text-[16px] font-semibold">
           {cmr ? `✓ ${t.driverApp.cmrDone}` : t.driverApp.scanCmr}
+          {cmrQueued ? ` · ${t.driverApp.queuedBadge}` : ''}
         </span>
         <PhotoCapture
           className="mt-2"
           target={{ orderId, stopId, subject: 'DOCUMENT', cmr: true }}
           label={t.driverApp.scanCmr}
-          done={Boolean(cmr)}
+          done={cmr}
         />
       </div>
     </section>
@@ -76,14 +85,13 @@ function SignaturePad({
   stopId: string;
   pickup: boolean;
 }) {
-  const { t, locale } = useI18n();
-  const router = useRouter();
+  const { t } = useI18n();
+  const { enqueue } = useOutbox();
   const canvas = useRef<HTMLCanvasElement>(null);
   const drawing = useRef(false);
   const [dirty, setDirty] = useState(false);
   const [name, setName] = useState('');
-  const [pending, start] = useTransition();
-  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     const el = canvas.current!;
@@ -108,26 +116,19 @@ function SignaturePad({
     setDirty(false);
   }
 
-  function save() {
-    start(async () => {
-      setError(null);
+  async function save() {
+    setBusy(true);
+    try {
       const blob = await new Promise<Blob | null>((resolve) => canvas.current!.toBlob(resolve, 'image/png'));
       if (!blob) return;
-
-      const form = new FormData();
-      form.set('locale', locale);
-      form.set('file', new File([blob], 'signature.png', { type: 'image/png' }));
-      form.set('order_id', orderId);
-      form.set('stop_id', stopId);
-      form.set('subject', 'SIGNATURE');
-      form.set('signer_name', name);
-      form.set('external_id', crypto.randomUUID());
-      form.set('captured_at', new Date().toISOString());
-
-      const result = await uploadPhotoAction(form);
-      if (result.error) setError(result.error);
-      else router.refresh();
-    });
+      await enqueue(
+        'UPLOAD',
+        { order_id: orderId, stop_id: stopId, subject: 'SIGNATURE', signer_name: name },
+        blob,
+      );
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
@@ -176,13 +177,12 @@ function SignaturePad({
         <button
           type="button"
           onClick={save}
-          disabled={!dirty || name.trim().length < 2 || pending}
+          disabled={!dirty || name.trim().length < 2 || busy}
           className="h-12 flex-[2] rounded-control bg-ink text-[15px] font-semibold text-surface disabled:opacity-50"
         >
-          {pending ? t.driverApp.uploading : t.driverApp.saveSignature}
+          {busy ? t.driverApp.uploading : t.driverApp.saveSignature}
         </button>
       </div>
-      {error && <p className="text-sm text-danger">{error}</p>}
     </div>
   );
 }

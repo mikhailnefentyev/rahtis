@@ -1,40 +1,39 @@
 'use client';
 
-import { startTransition, useActionState, useState, useTransition } from 'react';
-import { completeStopAction, type DriverState } from '@/lib/driverApp/actions';
+import { useState } from 'react';
 import { useI18n } from '@/lib/i18n/provider';
 import { askPosition } from '@/lib/orders/position';
-
-const idle: DriverState = { error: null, done: false };
+import { useOutbox } from '../../OutboxProvider';
 
 /**
  * Отметка точки водителем.
  *
  * Место берётся в момент нажатия — одна точка с точностью, как у отметки
  * из кабинета. Не дал браузер — отметка идёт без него: доказательство не
- * должно останавливать рейс.
+ * должно останавливать рейс. Без связи отметка встаёт в очередь, а экран
+ * сразу открывает следующую точку.
  */
 export function StopDone({ stopId }: { stopId: string }) {
-  const { t, locale } = useI18n();
-  const [state, action] = useActionState(completeStopAction, idle);
-  const [locating, startLocating] = useTransition();
+  const { t } = useI18n();
+  const { enqueue } = useOutbox();
+  const [busy, setBusy] = useState(false);
   const [note, setNote] = useState('');
 
-  function submit() {
-    startLocating(async () => {
-      const form = new FormData();
-      form.set('locale', locale);
-      form.set('stop_id', stopId);
-      form.set('damage_note', note);
-      const position = await askPosition(6000);
+  async function submit() {
+    setBusy(true);
+    try {
+      const fields: Record<string, string> = { stop_id: stopId, damage_note: note };
+      const position = await askPosition(5000);
       if (position) {
-        form.set('lat', String(position.lat));
-        form.set('lon', String(position.lon));
-        if (position.accuracyM != null) form.set('accuracy', String(position.accuracyM));
+        fields.lat = String(position.lat);
+        fields.lon = String(position.lon);
+        if (position.accuracyM != null) fields.accuracy = String(position.accuracyM);
       }
-      /* После await контекст перехода потерян — отправка оборачивается заново. */
-      startTransition(() => action(form));
-    });
+      await enqueue('COMPLETE', fields);
+      setNote('');
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
@@ -54,17 +53,11 @@ export function StopDone({ stopId }: { stopId: string }) {
       <button
         type="button"
         onClick={submit}
-        disabled={locating}
+        disabled={busy}
         className="h-14 rounded-control bg-accent text-[17px] font-semibold text-accent-ink disabled:opacity-60"
       >
-        {locating ? t.driverApp.locating : `✓ ${t.driverApp.markDone}`}
+        {busy ? t.driverApp.locating : `✓ ${t.driverApp.markDone}`}
       </button>
-
-      {state.error && (
-        <p role="alert" className="text-[15px] text-danger">
-          {state.error}
-        </p>
-      )}
     </div>
   );
 }

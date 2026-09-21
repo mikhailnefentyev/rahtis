@@ -4,6 +4,7 @@ import { getDriver } from '@/lib/driverApp/session';
 import { getI18n, isLocale } from '@/lib/i18n';
 import { DriverNav } from './DriverNav';
 import { NotLinked } from './NotLinked';
+import { OutboxBanner, OutboxProvider } from './OutboxProvider';
 import { ServiceWorker } from './ServiceWorker';
 
 export async function generateMetadata({
@@ -52,12 +53,13 @@ export default async function DriverLayout({
     <div className="min-h-dvh bg-ground text-ink">
       <ServiceWorker />
       {driver ? (
-        <>
+        <OutboxProvider>
           <div className="mx-auto w-full max-w-lg px-4 pt-[max(env(safe-area-inset-top),16px)] pb-28">
+            <OutboxBanner />
             {children}
           </div>
           <DriverNav unread={driver.unread} />
-        </>
+        </OutboxProvider>
       ) : (
         <NotLinked locale={locale} />
       )}
