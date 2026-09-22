@@ -41,7 +41,7 @@ export function tripColumns(report: PeriodReport, t: Dictionary): Column<ReportL
       get: (l) => l.shipperRef,
       width: 14,
     },
-    ...(report.role !== 'SHIPPER'
+    ...(report.role === 'ADMIN'
       ? [
           {
             header: p.colShipper,
@@ -122,7 +122,7 @@ export function claimColumns(report: PeriodReport, t: Dictionary): Column<Report
     },
     { header: p.colRef, kind: 'text', get: (c) => c.ref, width: 18 },
     { header: p.colOrder, kind: 'text', get: (c) => c.orderRef, width: 14 },
-    ...(report.role !== 'SHIPPER'
+    ...(report.role === 'ADMIN'
       ? [
           {
             header: p.colShipper,

@@ -1672,6 +1672,8 @@ export const fi = {
     edit: 'Muokkaa',
     name: 'Nimi',
     phone: 'Puhelin',
+    email: 'Sähköposti',
+    emailHint: 'Vapaaehtoinen. Näkyy tilaajalle, jolle olet sallinut suorat tilaukset.',
     phoneHint: 'Kansainvälisessä muodossa, esim. +358401112233.',
     phoneTaken: 'Tällä numerolla on jo toinen kuljettaja.',
     phoneInvalid: 'Tarkista numero: kansainvälinen muoto, alussa +.',
@@ -1976,7 +1978,7 @@ export const fi = {
     revoke: 'Peru lupa',
     none: 'Ei vielä ajettuja kuljetuksia',
     anonymity:
-      'Tilaaja näkee autosi rekisterinumeron, kuljettajan nimen ja arvosanan, mutta ei yrityksesi nimeä eikä kuljettajan puhelinta. Sopimuskumppani on edelleen Aivomaa Oy.',
+      'Asiakkaat näkyvät koodilla, ei nimellä. Tilaaja näkee autosi rekisterinumeron, arvosanan sekä kuljettajan nimen, puhelinnumeron ja sähköpostin yhteydenpitoa varten, mutta ei yrityksesi nimeä. Molempien sopimuskumppani on Aivomaa Oy.',
   },
 
   linkStatus: {

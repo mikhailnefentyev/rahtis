@@ -297,6 +297,19 @@ function DriverForm({ driver, onClose }: { driver: Driver | null; onClose: () =>
             )}
           </Field>
 
+          <Field label={t.drivers.email} hint={t.drivers.emailHint}>
+            {(p) => (
+              <Input
+                {...p}
+                type="email"
+                name="email"
+                autoComplete="off"
+                defaultValue={driver?.email ?? ''}
+                placeholder="antti@esimerkki.fi"
+              />
+            )}
+          </Field>
+
           <div className="sm:col-span-2">
             <span className="label-micro mb-2 block">{t.drivers.languages}</span>
             <div className="flex flex-wrap gap-1.5">

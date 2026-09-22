@@ -132,7 +132,7 @@ export function DeskList({ orders, vehicles }: { orders: DeskOrder[]; vehicles: 
                     ) : null}
                   </p>
 
-                  <p className="mt-1 text-xs text-ink-dim">{order.shipper_name}</p>
+                  {order.shipper_name && <p className="mt-1 text-xs text-ink-dim">{order.shipper_name}</p>}
 
                   {order.pickup_date && (
                     <p className="mt-1 font-mono text-xs text-ink-faint">

@@ -75,6 +75,7 @@ export async function saveDriverAction(_previous: FormState, formData: FormData)
   const values = {
     full_name: str(formData, 'full_name'),
     phone: str(formData, 'phone').replace(/[\s()-]/g, ''),
+    email: str(formData, 'email').toLowerCase() || null,
     languages: formData.getAll('languages').map(String),
   };
 
@@ -83,6 +84,9 @@ export async function saveDriverAction(_previous: FormState, formData: FormData)
   }
   if (!/^\+[1-9][0-9]{6,14}$/.test(values.phone)) {
     return { error: t.drivers.phoneInvalid, done: false };
+  }
+  if (values.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(values.email)) {
+    return { error: t.validation.email, done: false };
   }
 
   const supabase = await createClient();

@@ -933,6 +933,7 @@ export type Database = {
           company_id: string
           company_kind: Database["public"]["Enums"]["party_role"]
           created_at: string
+          email: string | null
           full_name: string
           id: string
           languages: string[]
@@ -947,6 +948,7 @@ export type Database = {
           company_id: string
           company_kind?: Database["public"]["Enums"]["party_role"]
           created_at?: string
+          email?: string | null
           full_name: string
           id?: string
           languages?: string[]
@@ -961,6 +963,7 @@ export type Database = {
           company_id?: string
           company_kind?: Database["public"]["Enums"]["party_role"]
           created_at?: string
+          email?: string | null
           full_name?: string
           id?: string
           languages?: string[]
@@ -3091,6 +3094,7 @@ export type Database = {
         Args: never
         Returns: {
           decided_at: string
+          last_route: string
           last_trip_at: string
           shipper_id: string
           shipper_name: string
@@ -3803,7 +3807,9 @@ export type Database = {
           axles: number
           busy: boolean
           container_feet: number[]
+          driver_email: string
           driver_name: string
+          driver_phone: string
           euro_class: Database["public"]["Enums"]["euro_class"]
           in_pool: boolean
           last_trip_at: string

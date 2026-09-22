@@ -1579,6 +1579,8 @@ export const en = {
     edit: 'Edit',
     name: 'Name',
     phone: 'Phone',
+    email: 'Email',
+    emailHint: 'Optional. Visible to shippers you have allowed to send direct orders.',
     phoneHint: 'International format, e.g. +358401112233.',
     phoneTaken: 'Another driver already has this number.',
     phoneInvalid: 'Check the number: international format starting with +.',
@@ -1883,7 +1885,7 @@ export const en = {
     revoke: 'Withdraw',
     none: 'No transports driven yet',
     anonymity:
-      'The shipper sees your vehicle plate, driver name and rating, but not your company name or the driver’s phone. The contracting party is still Aivomaa Oy.',
+      'Customers are shown by a code, not by name. The shipper sees your vehicle plate, rating and, for contact, the driver’s name, phone and email, but not your company name. Aivomaa Oy is the contracting party for both.',
   },
 
   linkStatus: {

@@ -50,7 +50,8 @@ export type DriverTask = {
   trailer_plate: string | null;
   distance_km: number | null;
   comment: string | null;
-  shipper_name: string;
+  /** Всегда пусто: заказчик водителю не показывается. */
+  shipper_name: string | null;
   plate: string | null;
   closed_at: string | null;
   stops: DriverStop[];

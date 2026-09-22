@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { createHash } from 'node:crypto';
 import { siteUrl } from '@/lib/config';
 import { operatorInbox, sendEmail } from '@/lib/email';
 import { directOrderEmail, orderPublishedEmail } from '@/lib/email/templates/dispatch';
@@ -154,7 +155,7 @@ export async function notifyDirectOrder(orderId: string): Promise<void> {
       admin
         .from('orders')
         .select(
-          'status, deadline_at, assigned_company_id, carrier:companies!orders_assigned_company_id_fkey(name, contact_email, language), vehicle:vehicles!orders_assigned_vehicle_id_fkey(plate), shipper:companies!orders_company_fk(name)',
+          'status, deadline_at, assigned_company_id, carrier:companies!orders_assigned_company_id_fkey(name, contact_email, language), vehicle:vehicles!orders_assigned_vehicle_id_fkey(plate), shipper_company_id',
         )
         .eq('id', orderId)
         .maybeSingle(),
@@ -166,7 +167,12 @@ export async function notifyDirectOrder(orderId: string): Promise<void> {
 
     const carrier = order.carrier as { name: string; contact_email: string | null; language: string | null } | null;
     const plate = (order.vehicle as { plate: string } | null)?.plate ?? '';
-    const shipper = (order.shipper as { name: string } | null)?.name ?? '';
+    /*
+     * Заказчик — кодом, как в разделе Asiakkaat (carrier_partners), а не
+     * названием: зная заказчика, перевозчик договорился бы с ним мимо
+     * платформы.
+     */
+    const shipper = `Asiakas ${createHash('md5').update(order.shipper_company_id).digest('hex').slice(0, 4).toUpperCase()}`;
 
     if (!carrier?.contact_email || !order.assigned_company_id) return;
 

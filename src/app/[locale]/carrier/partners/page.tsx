@@ -58,6 +58,7 @@ export default async function PartnersPage({ params }: { params: Promise<{ local
                   <p className="mt-1 text-[13px] text-ink-muted">
                     {m('partners.tripsCount', { count: p.trips })}
                     {p.last_trip_at && ` · ${t.partners.lastTrip} ${f.date(p.last_trip_at)}`}
+                    {p.last_route && ` · ${p.last_route}`}
                   </p>
                 </div>
 

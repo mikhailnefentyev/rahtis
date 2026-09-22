@@ -85,7 +85,7 @@ export function AssignmentCard({
                   <span className="font-semibold text-ink">{f.eur(order.rate_cents ?? 0)}</span>{' '}
                   <span className="text-ink-dim">{t.money.addVat}</span>
                 </p>
-                <p className="mt-1 text-xs text-ink-dim">{order.shipper_name}</p>
+                {order.shipper_name && <p className="mt-1 text-xs text-ink-dim">{order.shipper_name}</p>}
 
                 {direct ? (
                   <p className="mt-2 flex flex-wrap items-center gap-2 text-[13px] text-ink">

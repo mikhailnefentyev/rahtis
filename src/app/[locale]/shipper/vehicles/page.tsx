@@ -22,9 +22,10 @@ export async function generateMetadata({
 /**
  * Знакомые машины заказчика.
  *
- * Показываются машинами — номер, водитель, класс, рейтинг, — без
- * названия перевозчика: контрагент заказчика по-прежнему Aivomaa, и
- * состав полей записан в known_vehicles_for_shipper.
+ * Показываются машинами — номер, водитель с телефоном и почтой для
+ * связи, класс, рейтинг, — без названия перевозчика: контрагент
+ * заказчика по-прежнему Aivomaa, и состав полей записан в
+ * known_vehicles_for_shipper.
  */
 export default async function KnownVehiclesPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -91,8 +92,21 @@ async function VehicleList({
                     ? ` · ${m('vehicle.axlesCount', { count: v.axles })}`
                     : ` · ${v.payload_kg} kg · ${String(v.ldm).replace('.', ',')} ldm`}
                 </p>
+                <p className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1 text-[13px]">
+                  <span className="font-semibold text-ink">{v.driver_name ?? '—'}</span>
+                  {v.driver_phone && (
+                    <a href={`tel:${v.driver_phone}`} className="font-mono text-accent hover:underline">
+                      {v.driver_phone}
+                    </a>
+                  )}
+                  {v.driver_email && (
+                    <a href={`mailto:${v.driver_email}`} className="text-accent hover:underline">
+                      {v.driver_email}
+                    </a>
+                  )}
+                </p>
                 <p className="mt-1 text-[13px] text-ink-muted">
-                  {v.driver_name ?? '—'} · {m('known.tripsCount', { count: v.trips })}
+                  {m('known.tripsCount', { count: v.trips })}
                   {v.last_trip_at && ` · ${t.known.lastTrip} ${f.date(v.last_trip_at)}`}
                 </p>
               </div>
