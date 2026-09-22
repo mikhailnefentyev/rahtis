@@ -401,7 +401,8 @@ export const fi = {
     carrierTitle: 'Pidä auto ajossa myös keikkojen välillä.',
     carrier3: 'Voit löytää paluukeikan alueelta, jossa edellinen kuljetus päättyy.',
     carrier4: 'Jokainen auto hyväksytään palveluun erikseen.',
-    carrier5: 'Hinta, palvelumaksu ja sinulle jäävä osuus näkyvät ennen keikan hyväksymistä.',
+    carrier5:
+      'Keikan koko hinta jää sinulle: keikoista ei peritä palvelumaksua.',
     carrier6: 'Viikkoraportista näet ajetut keikat, ansiot ja tulevat tilitykset.',
 
     /*
@@ -412,9 +413,10 @@ export const fi = {
      * joka jää tekemättä — ei adjektiiveilla.
      */
     feeEyebrow: 'Palvelumaksu',
-    feeTitle: 'Pieni palvelumaksu, ja sen näkee ennen keikan ottamista',
+    feeTitle:
+      'Selkeä hinta: kuukausimaksu ajavista autoista, 3 % tilaajalta',
     feeLede:
-      'Emme kilpailuta keikkaa hinnalla alaspäin. Kuljetusliike hinnoittelee työnsä itse, ja palvelumaksu sekä jäljelle jäävä osuus näkyvät ennen kuin keikan ottaa vastaan. Maksu kattaa sen työn, joka muuten tehdään käsin.',
+      'Kuljetusliike maksaa 29,90 € + ALV kuukaudessa jokaisesta autosta, joka ajaa kuukauden aikana vähintään yhden keikan — ajamaton auto on maksuton, ja maksu vähennetään tilityksestä. Tilaaja maksaa 3 % yhteiseltä pöydältä tilatun kuljetuksen hinnasta; suorat tilaukset omille vakioautoille ovat maksuttomia. Ensimmäinen kuukausi on kaikille maksuton. Maksu kattaa sen työn, joka muuten tehdään käsin.',
     fee1: 'Sähköinen asiakirjaliikenne',
     fee1Text:
       'Rahtikirja, kuormakuvat ja vauriomerkinnät kulkevat keikan mukana ja päätyvät tilaajalle ilman erillistä lähettämistä.',
@@ -810,6 +812,7 @@ export const fi = {
   },
 
   orderForm: {
+    feeHint: 'Yhteiseltä pöydältä tilatusta kuljetuksesta laskutetaan lisäksi 3 % palvelumaksu; suora tilaus vakioautolle on maksuton.',
     title: 'Uusi kuljetus',
     subtitle: 'Täytä reitti kokonaan ja julkaise. Kuljetus näkyy kuljetusliikkeille heti.',
     type: 'Kuljetuksen tyyppi',
@@ -1016,6 +1019,7 @@ export const fi = {
     sendNow: 'Lähetä kauden laskut',
     account: 'Tili',
     noIban: 'Tilinumero puuttuu',
+    feeDeducted: 'Kuukausimaksu',
     closed: 'Loppuun käsitellyt kaudet',
     nothing: 'Ei vielä valmiita keikkoja.',
     colDate: 'Päivä',
@@ -1314,6 +1318,8 @@ export const fi = {
     settlementShipperTitle: 'Lasku {number}',
     invoiceDate: 'Laskun päivä {date}',
     invoiceEmailSubject: 'RAHTIS · lasku {number} · kausi {from}–{to}',
+    feeLine: 'Kuukausimaksu {month}: {count} aktiivista autoa × {unit} + ALV {vat}',
+    payable: 'Maksetaan kuljetusliikkeelle',
     settlementCarrierTitle: 'Kauden koontiraportti · ajetut kuljetukset',
     periodRange: 'Kausi {from}–{to}',
     dueShipper: 'Maksettava {date} mennessä',
@@ -1533,6 +1539,7 @@ export const fi = {
     colKm: 'km',
     colRate: 'Hinta',
     colCommission: 'Palvelumaksu',
+    colShipperFee: 'Tilaajan palvelumaksu',
     colCommissionRate: 'Palvelumaksu %',
     colPayout: 'Tilitys',
     colNet: 'Veroton',
@@ -1604,6 +1611,7 @@ export const fi = {
   },
 
   fleet: {
+    feeTitle: 'Kuukausimaksu',
     title: 'Kalusto',
     subtitle:
       'Avoimet kuljetukset näkyvät, kun yritykselläsi on vähintään yksi hyväksytty ajoneuvo ja vaaditut asiakirjat ovat voimassa.',
@@ -2304,6 +2312,8 @@ export const fi = {
     'billingDesk.customerDue': 'Asiakkaat maksavat {date} mennessä',
     'billingDesk.payoutDue': 'Tilitys kuljetusliikkeille {date}',
     'pay.experienceSince': 'ajokokemus {date} alkaen',
+    'fleet.feeRule': '{unit} + ALV kuukaudessa jokaisesta autosta, joka ajaa kuukauden aikana vähintään yhden keikan. Ajamaton auto on maksuton. Maksu vähennetään tilityksestä.',
+    'fleet.feeFree': 'Ensimmäinen kuukausi on maksuton: maksuton {date} asti.',
     'driverApp.welcome': 'Tervetuloa, {name}',
     'driverApp.breakTotal': 'Tauot {minutes} min',
     'driverApp.stopOf': 'Pysähdys {n}/{total}',

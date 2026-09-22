@@ -69,6 +69,38 @@ export type Database = {
         }
         Relationships: []
       }
+      carrier_fee_deductions: {
+        Row: {
+          amount_cents: number
+          created_at: string
+          fee_id: string
+          id: string
+          period_start: string
+        }
+        Insert: {
+          amount_cents: number
+          created_at?: string
+          fee_id: string
+          id?: string
+          period_start: string
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string
+          fee_id?: string
+          id?: string
+          period_start?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "carrier_fee_deductions_fee_id_fkey"
+            columns: ["fee_id"]
+            isOneToOne: false
+            referencedRelation: "carrier_subscription_fees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       carrier_shipper_links: {
         Row: {
           carrier_company_id: string
@@ -105,6 +137,50 @@ export type Database = {
           {
             foreignKeyName: "carrier_shipper_links_shipper_company_id_fkey"
             columns: ["shipper_company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      carrier_subscription_fees: {
+        Row: {
+          active_vehicles: number
+          carrier_company_id: string
+          created_at: string
+          gross_cents: number
+          id: string
+          month: string
+          net_cents: number
+          unit_cents: number
+          vat_bps: number
+        }
+        Insert: {
+          active_vehicles: number
+          carrier_company_id: string
+          created_at?: string
+          gross_cents: number
+          id?: string
+          month: string
+          net_cents: number
+          unit_cents: number
+          vat_bps: number
+        }
+        Update: {
+          active_vehicles?: number
+          carrier_company_id?: string
+          created_at?: string
+          gross_cents?: number
+          id?: string
+          month?: string
+          net_cents?: number
+          unit_cents?: number
+          vat_bps?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "carrier_subscription_fees_carrier_company_id_fkey"
+            columns: ["carrier_company_id"]
             isOneToOne: false
             referencedRelation: "companies"
             referencedColumns: ["id"]
@@ -1901,6 +1977,7 @@ export type Database = {
           settled_at: string | null
           shipper_company_id: string
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
+          shipper_fee_bps: number | null
           shipper_ref: string | null
           status: Database["public"]["Enums"]["order_status"]
           terms_document_id: string | null
@@ -1942,6 +2019,7 @@ export type Database = {
           settled_at?: string | null
           shipper_company_id: string
           shipper_company_kind?: Database["public"]["Enums"]["party_role"]
+          shipper_fee_bps?: number | null
           shipper_ref?: string | null
           status?: Database["public"]["Enums"]["order_status"]
           terms_document_id?: string | null
@@ -1983,6 +2061,7 @@ export type Database = {
           settled_at?: string | null
           shipper_company_id?: string
           shipper_company_kind?: Database["public"]["Enums"]["party_role"]
+          shipper_fee_bps?: number | null
           shipper_ref?: string | null
           status?: Database["public"]["Enums"]["order_status"]
           terms_document_id?: string | null
@@ -2686,6 +2765,7 @@ export type Database = {
           settled_at: string | null
           shipper_company_id: string
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
+          shipper_fee_bps: number | null
           shipper_ref: string | null
           status: Database["public"]["Enums"]["order_status"]
           terms_document_id: string | null
@@ -2972,6 +3052,20 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      apply_carrier_fees: {
+        Args: {
+          p_available_cents: number
+          p_company_id: string
+          p_period_start: string
+        }
+        Returns: {
+          active_vehicles: number
+          amount_cents: number
+          month: string
+          unit_cents: number
+          vat_bps: number
+        }[]
+      }
       archive_driver: { Args: { p_driver_id: string }; Returns: undefined }
       assign_vehicle_driver: {
         Args: { p_driver_id: string; p_vehicle_id: string }
@@ -3021,6 +3115,7 @@ export type Database = {
           shipper_billing_email: string
           shipper_business_id: string
           shipper_country: string
+          shipper_fee_cents: number
           shipper_id: string
           shipper_name: string
           shipper_ref: string
@@ -3076,6 +3171,7 @@ export type Database = {
           settled_at: string | null
           shipper_company_id: string
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
+          shipper_fee_bps: number | null
           shipper_ref: string | null
           status: Database["public"]["Enums"]["order_status"]
           terms_document_id: string | null
@@ -3157,6 +3253,7 @@ export type Database = {
           settled_at: string | null
           shipper_company_id: string
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
+          shipper_fee_bps: number | null
           shipper_ref: string | null
           status: Database["public"]["Enums"]["order_status"]
           terms_document_id: string | null
@@ -3213,6 +3310,7 @@ export type Database = {
           settled_at: string | null
           shipper_company_id: string
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
+          shipper_fee_bps: number | null
           shipper_ref: string | null
           status: Database["public"]["Enums"]["order_status"]
           terms_document_id: string | null
@@ -3361,6 +3459,7 @@ export type Database = {
           settled_at: string | null
           shipper_company_id: string
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
+          shipper_fee_bps: number | null
           shipper_ref: string | null
           status: Database["public"]["Enums"]["order_status"]
           terms_document_id: string | null
@@ -3419,6 +3518,7 @@ export type Database = {
           settled_at: string | null
           shipper_company_id: string
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
+          shipper_fee_bps: number | null
           shipper_ref: string | null
           status: Database["public"]["Enums"]["order_status"]
           terms_document_id: string | null
@@ -3555,6 +3655,7 @@ export type Database = {
           settled_at: string | null
           shipper_company_id: string
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
+          shipper_fee_bps: number | null
           shipper_ref: string | null
           status: Database["public"]["Enums"]["order_status"]
           terms_document_id: string | null
@@ -3800,6 +3901,10 @@ export type Database = {
         }
       }
       handle_support_message: { Args: { p_id: number }; Returns: undefined }
+      issue_monthly_subscriptions: {
+        Args: { p_month: string }
+        Returns: number
+      }
       known_vehicles_for_shipper: {
         Args: never
         Returns: {
@@ -4064,6 +4169,7 @@ export type Database = {
           ref: string
           route: string
           shipper_country: string
+          shipper_fee_cents: number
           shipper_id: string
           shipper_name: string
           shipper_ref: string
@@ -4182,6 +4288,7 @@ export type Database = {
           settled_at: string | null
           shipper_company_id: string
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
+          shipper_fee_bps: number | null
           shipper_ref: string | null
           status: Database["public"]["Enums"]["order_status"]
           terms_document_id: string | null
@@ -4246,6 +4353,7 @@ export type Database = {
           settled_at: string | null
           shipper_company_id: string
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
+          shipper_fee_bps: number | null
           shipper_ref: string | null
           status: Database["public"]["Enums"]["order_status"]
           terms_document_id: string | null
@@ -4351,6 +4459,7 @@ export type Database = {
           settled_at: string | null
           shipper_company_id: string
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
+          shipper_fee_bps: number | null
           shipper_ref: string | null
           status: Database["public"]["Enums"]["order_status"]
           terms_document_id: string | null
@@ -4446,6 +4555,7 @@ export type Database = {
           settled_at: string | null
           shipper_company_id: string
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
+          shipper_fee_bps: number | null
           shipper_ref: string | null
           status: Database["public"]["Enums"]["order_status"]
           terms_document_id: string | null
@@ -4629,6 +4739,7 @@ export type Database = {
           settled_at: string | null
           shipper_company_id: string
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
+          shipper_fee_bps: number | null
           shipper_ref: string | null
           status: Database["public"]["Enums"]["order_status"]
           terms_document_id: string | null

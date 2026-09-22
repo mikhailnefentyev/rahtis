@@ -137,6 +137,31 @@ export function withVat(cents: number, bps: number): number {
   return cents + Math.round((cents * bps) / 10_000);
 }
 
+/*
+ * Тарифы с 22.09.2026. Действующие значения живут в базе
+ * (app.subscription_unit_cents, app.current_shipper_fee_bps) — там они
+ * фиксируются в рейсах и начислениях; здесь копия для текстов кабинета.
+ */
+
+/** Месячный сбор перевозчика за активную машину, без ALV: 29,90 €. */
+export const SUBSCRIPTION_UNIT_CENTS = 2990;
+
+/** Плата заказчика за заказ со стола: 3 % сверху цены. */
+export const SHIPPER_FEE_BPS = 300;
+
+/**
+ * Последний бесплатный день компании: конец первого полного календарного
+ * месяца после одобрения (одобрена 10.10 — по 30.11, одобрена 1.10 — по
+ * 31.10). То же правило, что app.free_until в базе.
+ */
+export function freeUntil(approvedAt: string | null): string | null {
+  if (!approvedAt) return null;
+  const local = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Helsinki' }).format(new Date(approvedAt));
+  const [y, m, d] = local.split('-').map(Number);
+  const end = new Date(Date.UTC(y, m - 1 + (d === 1 ? 1 : 2), 0));
+  return end.toISOString().slice(0, 10);
+}
+
 /** Комиссия оператора с суммы в центах. */
 export function commissionCents(rateCents: number, bps: number = COMMISSION_BPS): number {
   return Math.round((rateCents * bps) / 10_000);

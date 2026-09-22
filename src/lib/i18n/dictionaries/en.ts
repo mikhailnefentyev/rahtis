@@ -362,13 +362,15 @@ export const en = {
     carrierTitle: 'Keep the truck working between jobs too.',
     carrier3: 'You can find a return load in the area where the last job ends.',
     carrier4: 'Every vehicle is approved onto the platform separately.',
-    carrier5: 'Price, service fee and your share are visible before you accept.',
+    carrier5:
+      'The full job price is yours: no fee is taken from jobs.',
     carrier6: 'The weekly report shows jobs driven, earnings and payouts due.',
 
     feeEyebrow: 'Service fee',
-    feeTitle: 'A small service fee, and it is visible before you take the job',
+    feeTitle:
+      'Clear pricing: a monthly fee for vehicles that drive, 3 % from the shipper',
     feeLede:
-      'We do not auction jobs down on price. The carrier prices its own work, and both the service fee and the remaining share are visible before the job is accepted. The fee covers the work that would otherwise be done by hand.',
+      'The carrier pays €29.90 + VAT a month for each vehicle that drives at least one job that month — a vehicle that does not drive costs nothing, and the fee is deducted from the settlement. The shipper pays 3 % of the price of a transport ordered from the load board; direct orders to its own regular vehicles are free. The first month is free for everyone. The fee covers the work that would otherwise be done by hand.',
     fee1: 'Electronic documents',
     fee1Text:
       'The consignment note, loading photos and damage notes travel with the job and reach the shipper without being sent separately.',
@@ -730,6 +732,7 @@ export const en = {
   },
 
   orderForm: {
+    feeHint: 'A 3 % service fee is added for a transport ordered from the load board; a direct order to a regular vehicle is free.',
     title: 'New order',
     subtitle: 'Fill in the whole route and publish. Carriers see it immediately.',
     type: 'Type of transport',
@@ -937,6 +940,7 @@ export const en = {
     sendNow: 'Send the period invoices',
     account: 'Account',
     noIban: 'Bank account missing',
+    feeDeducted: 'Monthly fee',
     closed: 'Fully processed periods',
     nothing: 'No completed jobs yet.',
     colDate: 'Date',
@@ -1243,6 +1247,8 @@ export const en = {
     settlementShipperTitle: 'Invoice {number}',
     invoiceDate: 'Invoice date {date}',
     invoiceEmailSubject: 'RAHTIS · invoice {number} · period {from}–{to}',
+    feeLine: 'Monthly fee {month}: {count} active vehicles × {unit} + VAT {vat}',
+    payable: 'Paid to the carrier',
     settlementCarrierTitle: 'Period statement · transports driven',
     periodRange: 'Period {from}–{to}',
     dueShipper: 'Due by {date}',
@@ -1440,6 +1446,7 @@ export const en = {
     colKm: 'km',
     colRate: 'Rate',
     colCommission: 'Service fee',
+    colShipperFee: 'Shipper service fee',
     colCommissionRate: 'Service fee %',
     colPayout: 'Payout',
     colNet: 'Net',
@@ -1511,6 +1518,7 @@ export const en = {
   },
 
   fleet: {
+    feeTitle: 'Monthly fee',
     title: 'Fleet',
     subtitle:
       'Open jobs appear once your company has at least one approved vehicle and valid documents.',
@@ -2182,6 +2190,8 @@ export const en = {
     'billingDesk.customerDue': 'Customers pay by {date}',
     'billingDesk.payoutDue': 'Carriers are paid on {date}',
     'pay.experienceSince': 'driving since {date}',
+    'fleet.feeRule': '{unit} + VAT a month for each vehicle that drives at least one job that month. A vehicle that does not drive costs nothing. The fee is deducted from the settlement.',
+    'fleet.feeFree': 'The first month is free: free until {date}.',
     'driverApp.welcome': 'Welcome, {name}',
     'driverApp.breakTotal': 'Breaks {minutes} min',
     'driverApp.stopOf': 'Stop {n}/{total}',

@@ -224,16 +224,18 @@ export async function PeriodReportCabinet({
                       <tr>
                         <Th>{t.periodReport.colDate}</Th>
                         <Th>{t.periodReport.colRef}</Th>
-                        {role !== 'SHIPPER' && <Th>{t.periodReport.colShipper}</Th>}
+                        {role === 'ADMIN' && <Th>{t.periodReport.colShipper}</Th>}
                         {role === 'ADMIN' && <Th>{t.periodReport.colCarrier}</Th>}
                         <Th>{t.periodReport.colRoute}</Th>
                         <Th>{t.periodReport.colVehicle}</Th>
                         <Th className="text-right">{t.periodReport.colKm}</Th>
                         <Th className="text-right">{t.periodReport.colRate}</Th>
-                        {role !== 'SHIPPER' && (
-                          <Th className="text-right">{t.periodReport.colCommission}</Th>
+                        {role !== 'CARRIER' && (
+                          <Th className="text-right">
+                            {role === 'ADMIN' ? t.periodReport.colShipperFee : t.periodReport.colCommission}
+                          </Th>
                         )}
-                        {role !== 'SHIPPER' && (
+                        {role === 'ADMIN' && (
                           <Th className="text-right">{t.periodReport.colPayout}</Th>
                         )}
                         <Th className="text-right">{t.periodReport.colVat}</Th>
@@ -250,7 +252,7 @@ export async function PeriodReportCabinet({
                           <Td>
                             <Mono>{line.ref}</Mono>
                           </Td>
-                          {role !== 'SHIPPER' && <Td>{line.shipper ?? '—'}</Td>}
+                          {role === 'ADMIN' && <Td>{line.shipper ?? '—'}</Td>}
                           {role === 'ADMIN' && <Td>{line.carrier ?? '—'}</Td>}
                           <Td>{line.route}</Td>
                           <Td>
@@ -262,12 +264,12 @@ export async function PeriodReportCabinet({
                           <Td className="text-right">
                             <Mono>{f.eur(line.rate)}</Mono>
                           </Td>
-                          {role !== 'SHIPPER' && (
+                          {role !== 'CARRIER' && (
                             <Td className="text-right">
-                              <Mono>{line.commission != null ? f.eur(line.commission) : '—'}</Mono>
+                              <Mono>{line.fee != null ? f.eur(line.fee) : '—'}</Mono>
                             </Td>
                           )}
-                          {role !== 'SHIPPER' && (
+                          {role === 'ADMIN' && (
                             <Td className="text-right">
                               <Mono>{line.payout != null ? f.eur(line.payout) : '—'}</Mono>
                             </Td>

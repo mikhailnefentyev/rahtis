@@ -48,7 +48,12 @@ type Party = {
   rows: Row[];
   net: number;
   gross: number;
+  /** Удержанный из выплаты месячный сбор (с ALV). Только у перевозчика. */
+  deducted: number;
 };
+
+/** Удержания сбора: перевозчик|начало периода → сумма с ALV. */
+type Deductions = Map<string, number>;
 
 type Period = {
   start: string;
@@ -67,7 +72,7 @@ function parties(
   const map = new Map<string, Party>();
   for (const row of rows) {
     const key = id(row);
-    const party = map.get(key) ?? { id: key, rows: [], net: 0, gross: 0 };
+    const party = map.get(key) ?? { id: key, rows: [], net: 0, gross: 0, deducted: 0 };
     party.rows.push(row);
     party.net += amount(row);
     map.set(key, party);
@@ -78,21 +83,31 @@ function parties(
   return [...map.values()];
 }
 
+/* Заказчику — цена плюс плата 3 % за заказ со стола. */
 const shippersOf = (rows: Row[]) =>
   parties(
     rows,
     (r) => r.shipper_id,
-    (r) => r.rate_cents,
+    (r) => r.rate_cents + r.shipper_fee_cents,
     (r) => r.shipper_country,
   );
 
-const carriersOf = (rows: Row[]) =>
-  parties(
+/* Перевозчику — выплата минус месячный сбор, удержанный в этом периоде. */
+const carriersOf = (rows: Row[], period?: string, deductions?: Deductions) => {
+  const list = parties(
     rows.filter((r) => r.carrier_id),
     (r) => r.carrier_id,
     (r) => r.payout_cents,
     (r) => r.carrier_country,
   );
+  if (period && deductions) {
+    for (const party of list) {
+      party.deducted = deductions.get(`${party.id}|${period}`) ?? 0;
+      party.gross -= party.deducted;
+    }
+  }
+  return list;
+};
 
 const sumOf = (list: Party[]) => list.reduce((s, p) => s + p.gross, 0);
 
@@ -135,14 +150,31 @@ export default async function BillingPage({
   const [i18n, supabase] = await Promise.all([getI18n(locale), createClient()]);
   const { t, m, f } = i18n;
 
-  const [{ data: overview }, { data: current }, { data: partners }, { data: orders }, { data: totals }] =
-    await Promise.all([
+  const [
+    { data: overview },
+    { data: current },
+    { data: partners },
+    { data: orders },
+    { data: totals },
+    { data: feeRows },
+  ] = await Promise.all([
       supabase.rpc('billing_overview'),
       supabase.rpc('settlement_period', {}),
       supabase.rpc('partner_totals', {}),
       supabase.rpc('completed_orders', { p_from: weeksAgoMonday(COMPLETED_WEEKS * 2) }),
       supabase.rpc('weekly_totals', { p_weeks: 12 }),
+      supabase
+        .from('carrier_fee_deductions')
+        .select('period_start, amount_cents, fee:carrier_subscription_fees(carrier_company_id)'),
     ]);
+
+  const deductions: Deductions = new Map();
+  for (const d of feeRows ?? []) {
+    const carrierId = (d.fee as { carrier_company_id: string } | null)?.carrier_company_id;
+    if (!carrierId) continue;
+    const key = `${carrierId}|${d.period_start}`;
+    deductions.set(key, (deductions.get(key) ?? 0) + d.amount_cents);
+  }
 
   const today = todayInHelsinki();
   const all = overview ?? [];
@@ -169,7 +201,10 @@ export default async function BillingPage({
   /* Итоги сверху: сколько ждём, сколько просрочено, сколько платить. */
   const awaiting = all.filter((r) => r.billing === 'INVOICED');
   const overdue = awaiting.filter((r) => r.invoice_due < today);
-  const margin = all.filter((r) => r.billing !== 'PENDING').reduce((s, r) => s + r.commission_cents, 0);
+  /* Доход оператора: плата заказчиков по выставленным счетам и удержанный сбор перевозчиков. */
+  const margin =
+    all.filter((r) => r.billing !== 'PENDING').reduce((s, r) => s + r.shipper_fee_cents + r.commission_cents, 0) +
+    [...deductions.values()].reduce((s, v) => s + v, 0);
 
   const currentPeriod = Array.isArray(current) ? current[0] : current;
 
@@ -194,7 +229,12 @@ export default async function BillingPage({
         />
         <Stat
           label={t.billingDesk.statToPay}
-          value={f.eur(sumOf(carriersOf(all.filter((r) => r.billing === 'PAID'))))}
+          value={f.eur(
+            periods.reduce(
+              (s, p) => s + sumOf(carriersOf(p.rows.filter((r) => r.billing === 'PAID'), p.start, deductions)),
+              0,
+            ),
+          )}
         />
         <Stat label={t.billingDesk.statMargin} value={f.eur(margin)} tone="ok" />
       </StatRow>
@@ -209,7 +249,14 @@ export default async function BillingPage({
       )}
 
       {open.map((period) => (
-        <ClosedPeriod key={period.start} period={period} today={today} locale={locale} i18n={i18n} />
+        <ClosedPeriod
+          key={period.start}
+          period={period}
+          today={today}
+          locale={locale}
+          i18n={i18n}
+          deductions={deductions}
+        />
       ))}
 
       {periods.length === 0 && <p className="mt-10 text-[13px] text-ink-dim">{t.billingDesk.nothing}</p>}
@@ -220,7 +267,14 @@ export default async function BillingPage({
             {t.billingDesk.closed} · {finished.length}
           </summary>
           {finished.map((period) => (
-            <ClosedPeriod key={period.start} period={period} today={today} locale={locale} i18n={i18n} />
+            <ClosedPeriod
+              key={period.start}
+              period={period}
+              today={today}
+              locale={locale}
+              i18n={i18n}
+              deductions={deductions}
+            />
           ))}
         </details>
       )}
@@ -275,15 +329,17 @@ function ClosedPeriod({
   today,
   locale,
   i18n,
+  deductions,
 }: {
   period: Period;
   today: string;
   locale: Locale;
   i18n: I18n;
+  deductions: Deductions;
 }) {
   const { t, m, f } = i18n;
   const customers = shippersOf(period.rows);
-  const carriers = carriersOf(period.rows);
+  const carriers = carriersOf(period.rows, period.start, deductions);
   const notSent = period.rows.some((r) => r.billing === 'PENDING');
 
   return (
@@ -346,7 +402,7 @@ function ClosedPeriod({
                               {t.billingDesk.colInvoice} <Mono>{head.invoice_ref}</Mono> ·{' '}
                             </>
                           ) : null}
-                          <Trips rows={c.rows} amount={(r) => r.rate_cents} i18n={i18n} />
+                          <Trips rows={c.rows} amount={(r) => r.rate_cents + r.shipper_fee_cents} i18n={i18n} />
                         </span>
                       </Td>
                       <Td numeric>{f.eur(c.gross)}</Td>
@@ -409,6 +465,7 @@ function ClosedPeriod({
                             <span className="text-warn">{t.billingDesk.noIban} · </span>
                           )}
                           <Trips rows={c.rows} amount={(r) => r.payout_cents} i18n={i18n} />
+                          {c.deducted > 0 && ` · ${t.billingDesk.feeDeducted} −${f.eur(c.deducted)}`}
                         </span>
                       </Td>
                       <Td numeric>{f.eur(c.gross)}</Td>

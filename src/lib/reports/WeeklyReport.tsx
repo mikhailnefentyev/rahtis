@@ -150,8 +150,16 @@ export function WeeklyReport({
     distance: string;
     /** Есть только там, где налог прибавляется: у контрагента из Финляндии. */
     vat?: { label: string; amount: string; grossLabel: string; gross: string } | null;
+    /** Удержания из выплаты перевозчику: месячный сбор за активные машины. */
+    deductions?: Array<{ label: string; amount: string }>;
+    /** Итог после удержаний. */
+    payable?: { label: string; amount: string } | null;
   };
-  /** У заказчика колонки комиссии нет: доля оператора — не его дело. */
+  /**
+   * Три денежные колонки — цена, плата, итог — вместо одной. У заказчика
+   * это цена рейса, плата 3 % за заказ со стола и сумма к оплате. Если
+   * платы в документе нет, остаётся одна колонка.
+   */
   withCommission: boolean;
 }) {
   const cols = withCommission
@@ -269,6 +277,21 @@ export function WeeklyReport({
                   </Text>
                 </View>
               </>
+            ) : null}
+
+            {totals.deductions?.map((d) => (
+              <View key={d.label} style={s.vatRow}>
+                <Text style={[s.cell, { flex: 1 }]}>{d.label}</Text>
+                <Text style={[s.cell, s.right, { width: withCommission ? cols.net : 70 }]}>{d.amount}</Text>
+              </View>
+            ))}
+            {totals.payable ? (
+              <View style={s.vatRow}>
+                <Text style={[s.totalLabel, { flex: 1 }]}>{totals.payable.label}</Text>
+                <Text style={[s.totalLabel, s.right, { width: withCommission ? cols.net : 70 }]}>
+                  {totals.payable.amount}
+                </Text>
+              </View>
             ) : null}
           </>
         )}

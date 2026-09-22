@@ -791,7 +791,7 @@ export function OrderForm({
               </p>
             )}
 
-            <Field label={`${t.orderForm.rate} ${perKm}`} hint={t.money.addVat} required>
+            <Field label={`${t.orderForm.rate} ${perKm}`} hint={`${t.money.addVat} ${t.orderForm.feeHint}`} required>
               {(p) => (
                 <InputMono
                   {...p}

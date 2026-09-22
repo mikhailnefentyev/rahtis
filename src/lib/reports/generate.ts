@@ -98,6 +98,8 @@ type OrderRow = {
   distance_km: number | null;
   rate_cents: number | null;
   commission_bps: number | null;
+  /** Плата заказчика сверху цены, зафиксированная при закрытии. */
+  shipper_fee_bps: number | null;
   shipper_company_id: string;
   assigned_company_id: string | null;
 };
@@ -153,6 +155,22 @@ export async function generatePeriodSettlement(moment?: string): Promise<Generat
    * выставления нет вовсе, назвать такую дату не мог и честно писал, что
    * не знает. От конца периода её знают оба.
    */
+  /*
+   * Конец месяца — начисляется месячный сбор перевозчиков за активные
+   * машины. До выпуска документов: отчёт за 16–конец удерживает его из
+   * выплаты. Повторный запуск ничего не дублирует.
+   */
+  const monthEnd = new Date(`${period.period_end}T00:00:00Z`);
+  monthEnd.setUTCDate(monthEnd.getUTCDate() + 1);
+  if (monthEnd.getUTCDate() === 1) {
+    const { error: feeError } = await admin.rpc('issue_monthly_subscriptions', {
+      p_month: `${period.period_end.slice(0, 7)}-01`,
+    });
+    if (feeError) {
+      return { week: period.period_start, reports: 0, emails: 0, errors: [`сбор: ${feeError.message}`] };
+    }
+  }
+
   return run({
     kind: 'PERIOD',
     start: period.period_start,
@@ -180,7 +198,7 @@ async function run(span: Span): Promise<GenerateResult> {
   const { data: orders, error } = await admin
     .from('orders')
     .select(
-      'id, ref, closed_at, updated_at, distance_km, rate_cents, commission_bps, shipper_company_id, assigned_company_id',
+      'id, ref, closed_at, updated_at, distance_km, rate_cents, commission_bps, shipper_fee_bps, shipper_company_id, assigned_company_id',
     )
     .eq('status', 'DONE')
     .gte('closed_at', from)
@@ -338,15 +356,20 @@ async function issue(
   let net = 0;
   let km = 0;
 
+  /*
+   * Деньги строки. Перевозчику — выплата (с 22.09.2026 процента с рейса
+   * нет, выплата равна цене). Заказчику — цена плюс плата 3 % за заказ со
+   * стола: в колонке «Palvelumaksu» и в сумме к оплате.
+   */
   const rows: ReportRow[] = orders.map((order) => {
     const rate = order.rate_cents ?? 0;
     const bps = order.commission_bps ?? COMMISSION_BPS;
-    const commission = commissionCents(rate, bps);
     const payout = payoutCents(rate, bps);
+    const shipperFee = Math.round((rate * (order.shipper_fee_bps ?? 0)) / 10_000);
 
     gross += rate;
-    fee += commission;
-    net += carrier ? payout : rate;
+    fee += carrier ? commissionCents(rate, bps) : shipperFee;
+    net += carrier ? payout : rate + shipperFee;
     km += order.distance_km ?? 0;
 
     return {
@@ -356,11 +379,14 @@ async function issue(
       vehicle: plate.get(order.id) ?? '—',
       distance: String(order.distance_km ?? 0),
       gross: f.eur(rate),
-      commission: carrier ? f.eur(commission) : null,
-      net: f.eur(carrier ? payout : rate),
+      commission: carrier ? null : f.eur(shipperFee),
+      net: f.eur(carrier ? payout : rate + shipperFee),
       documents: 0,
     };
   });
+
+  /* Колонки цены и платы — только в документе заказчика, где плата есть. */
+  const withFee = !carrier && fee > 0;
 
   const period =
     span.kind === 'WEEK'
@@ -402,8 +428,38 @@ async function issue(
    * правило, размноженное по локалям, разойдётся на первой же правке.
    */
   const vatBps = vatBpsFor(company.country);
-  const vatBase = carrier ? net : gross;
+  const vatBase = net;
   const vatAmount = withVat(vatBase, vatBps) - vatBase;
+
+  /*
+   * Месячный сбор за активные машины удерживается из выплаты перевозчику
+   * за период: сколько хватает, остаток — из следующих выплат. Перевыпуск
+   * документа сначала снимает удержания этого периода, потом считает
+   * заново.
+   */
+  const payGross = vatBase + vatAmount;
+  let deducted = 0;
+  const deductions: Array<{ label: string; amount: string }> = [];
+  if (carrier && span.kind === 'PERIOD') {
+    const { data: fees, error: feeError } = await admin.rpc('apply_carrier_fees', {
+      p_company_id: companyId,
+      p_period_start: week,
+      p_available_cents: payGross,
+    });
+    if (feeError) throw new Error(`удержание сбора: ${feeError.message}`);
+    for (const row of fees ?? []) {
+      deducted += row.amount_cents;
+      deductions.push({
+        label: t.report_.feeLine
+          .replace('{month}', `${Number(row.month.slice(5, 7))}/${row.month.slice(0, 4)}`)
+          .replace('{count}', String(row.active_vehicles))
+          .replace('{unit}', f.eur(row.unit_cents))
+          .replace('{vat}', f.percent(row.vat_bps / 10_000, 1)),
+        amount: `−${f.eur(row.amount_cents)}`,
+      });
+    }
+  }
+  const payable = payGross - deducted;
 
   /*
    * Стороны документа. Aivomaa Oy — продавец для заказчика и плательщик
@@ -462,8 +518,10 @@ async function issue(
       rows,
       totals: {
         gross: f.eur(gross),
-        commission: carrier ? f.eur(fee) : null,
+        commission: withFee ? f.eur(fee) : null,
         net: f.eur(net),
+        deductions,
+        payable: deductions.length > 0 ? { label: t.report_.payable, amount: f.eur(payable) } : null,
         distance: String(km),
         vat:
           vatBps > 0
@@ -475,7 +533,7 @@ async function issue(
               }
             : null,
       },
-      withCommission: carrier,
+      withCommission: withFee,
     }),
   );
 
@@ -498,7 +556,8 @@ async function issue(
         bytes: buffer.length,
         orders_count: orders.length,
         gross_cents: gross,
-        commission_cents: carrier ? fee : null,
+        /* Доля оператора: у заказчика — плата 3 %, у перевозчика — удержанный сбор. */
+        commission_cents: carrier ? deducted : fee,
         payout_cents: carrier ? net : null,
         /*
          * Ставка пишется, только если она одна на все рейсы недели. Взяв
@@ -577,7 +636,7 @@ async function issue(
             `${texts.title}, ${texts.period}.`,
             '',
             `${t.report_.emailTrips}: ${orders.length}`,
-            `${t.report_.total}: ${f.eur(net)}`,
+            `${t.report_.total}: ${f.eur(deductions.length > 0 ? payable : net)}`,
             ...(due ? ['', due] : []),
             '',
             texts.vatNote,

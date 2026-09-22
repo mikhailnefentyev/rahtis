@@ -37,7 +37,9 @@ export type ReportLine = {
   commissionBps: number | null;
   commission: number | null;
   payout: number | null;
-  /** База налога глазами роли: ставка у заказчика и оператора, выплата у перевозчика. */
+  /** Плата заказчика 3 % за заказ со стола. У перевозчика — null. */
+  fee: number | null;
+  /** База налога глазами роли: ставка с платой у заказчика и оператора, выплата у перевозчика. */
   net: number;
   vatBps: number;
   vat: number;
@@ -83,6 +85,8 @@ export type PeriodReport = {
     rate: number;
     commission: number | null;
     payout: number | null;
+    /** Плата заказчиков. У перевозчика — null. */
+    fee: number | null;
     net: number;
     vat: number;
     gross: number;
@@ -149,7 +153,8 @@ export async function buildPeriodReport(input: {
 
   const sum = (pick: (l: ReportLine) => number | null) =>
     lines.reduce((acc, l) => acc + (pick(l) ?? 0), 0);
-  const seesFees = input.role !== 'SHIPPER';
+  /* Процент с перевозчика отменён 22.09.2026 — его колонки видит только оператор, для истории. */
+  const seesFees = input.role === 'ADMIN';
   const rates = new Set(lines.map((l) => l.vatBps));
 
   return {
@@ -167,6 +172,7 @@ export async function buildPeriodReport(input: {
         rate: sum((l) => l.rate),
         commission: seesFees ? sum((l) => l.commission) : null,
         payout: seesFees ? sum((l) => l.payout) : null,
+        fee: input.role === 'CARRIER' ? null : sum((l) => l.fee),
         net: sum((l) => l.net),
         vat: sum((l) => l.vat),
         gross: sum((l) => l.gross),
@@ -180,7 +186,8 @@ export async function buildPeriodReport(input: {
 
 function line(row: PeriodReportRow, role: PartyRole, country: string | null): ReportLine {
   const rate = row.rate_cents ?? 0;
-  const net = role === 'CARRIER' ? (row.payout_cents ?? rate) : rate;
+  const fee = role === 'CARRIER' ? null : (row.shipper_fee_cents ?? 0);
+  const net = role === 'CARRIER' ? (row.payout_cents ?? rate) : rate + (fee ?? 0);
   const vatBps = vatBpsFor(role === 'ADMIN' ? row.shipper_country : country);
   const gross = withVat(net, vatBps);
 
@@ -196,6 +203,7 @@ function line(row: PeriodReportRow, role: PartyRole, country: string | null): Re
     commissionBps: row.commission_bps,
     commission: row.commission_cents,
     payout: row.payout_cents,
+    fee,
     net,
     vatBps,
     vat: gross - net,

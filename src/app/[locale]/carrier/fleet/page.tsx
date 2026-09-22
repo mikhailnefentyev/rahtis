@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { freeUntil, SUBSCRIPTION_UNIT_CENTS } from '@/lib/config';
+import { todayInHelsinki } from '@/lib/dates';
 import { Badge, Card, CardBody } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
 import { daysUntil } from '@/lib/dates';
@@ -27,7 +29,9 @@ export default async function FleetPage({ params }: { params: Promise<{ locale: 
   const viewer = await requireRole(locale, 'CARRIER');
   const company = viewer.company!;
 
-  const [{ t, m }, supabase] = await Promise.all([getI18n(locale), createClient()]);
+  const [{ t, m, f }, supabase] = await Promise.all([getI18n(locale), createClient()]);
+  const free = freeUntil(company.approved_at);
+  const today = todayInHelsinki();
 
   const [
     { data: vehicles },
@@ -104,6 +108,21 @@ export default async function FleetPage({ params }: { params: Promise<{ locale: 
             {m('fleet.approvedCount', { count: approved })}
           </span>
           {reason && <span className="text-[13px] text-warn">{reason}</span>}
+        </CardBody>
+      </Card>
+
+      {/*
+        * Сколько стоит автопарк — рядом с автопарком. Платят только машины,
+        * которые в этом месяце закрыли рейс; сбор удерживается из
+        * выплаты, отдельного счёта нет.
+        */}
+      <Card className="mb-8">
+        <CardBody className="flex flex-col gap-1">
+          <p className="text-[13px] font-semibold">{t.fleet.feeTitle}</p>
+          <p className="text-[13px] text-ink-muted">{m('fleet.feeRule', { unit: f.eur(SUBSCRIPTION_UNIT_CENTS) })}</p>
+          {free && free >= today && (
+            <p className="text-[13px] text-ok">{m('fleet.feeFree', { date: f.date(`${free}T12:00:00Z`) })}</p>
+          )}
         </CardBody>
       </Card>
 

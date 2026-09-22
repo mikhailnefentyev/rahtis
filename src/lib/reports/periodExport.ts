@@ -30,7 +30,9 @@ const percent = (bps: number | null) => (bps == null ? null : bps / 100);
 
 export function tripColumns(report: PeriodReport, t: Dictionary): Column<ReportLine>[] {
   const p = t.periodReport;
-  const fees = report.role !== 'SHIPPER';
+  /* Процент с перевозчика — история, только оператору. Плата заказчика — заказчику и оператору. */
+  const fees = report.role === 'ADMIN';
+  const shipperFee = report.role !== 'CARRIER';
 
   return [
     { header: p.colDate, kind: 'date', get: (l) => l.closedOn, width: 12 },
@@ -66,6 +68,16 @@ export function tripColumns(report: PeriodReport, t: Dictionary): Column<ReportL
     { header: p.colTrailer, kind: 'text', get: (l) => l.trailer, width: 11 },
     { header: p.colKm, kind: 'int', get: (l) => l.km, width: 8 },
     { header: p.colRate, kind: 'money', get: (l) => euros(l.rate), width: 12 },
+    ...(shipperFee
+      ? [
+          {
+            header: report.role === 'ADMIN' ? p.colShipperFee : p.colCommission,
+            kind: 'money' as const,
+            get: (l: ReportLine) => euros(l.fee),
+            width: 12,
+          },
+        ]
+      : []),
     ...(fees
       ? [
           {
@@ -184,10 +196,9 @@ export function summaryRows(report: PeriodReport, t: Dictionary): Array<[string,
     [p.rowDistance, s.km, 'int'],
     [p.rowRate, s.rate, 'money'],
   ];
-  if (s.commission != null) rows.push([p.rowCommission, s.commission, 'money']);
-  if (s.payout != null) rows.push([p.rowPayout, s.payout, 'money']);
-  if (report.role === 'ADMIN' && s.commission != null)
-    rows.push([p.rowMargin, s.commission, 'money']);
+  if (s.fee != null) rows.push([p.rowCommission, s.fee, 'money']);
+  if (report.role === 'ADMIN' && s.payout != null) rows.push([p.rowPayout, s.payout, 'money']);
+  if (report.role === 'ADMIN') rows.push([p.rowMargin, (s.fee ?? 0) + (s.commission ?? 0), 'money']);
   rows.push([p.rowVat, s.vat, 'money'], [p.rowGross, s.gross, 'money']);
   rows.push([p.rowClaims, s.claims, 'int'], [p.rowClaimed, s.claimed, 'money']);
   return rows;
