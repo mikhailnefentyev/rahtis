@@ -103,10 +103,10 @@ type Texts = {
     invoicedSubject: (ref: string) => string;
     invoicedHeading: (ref: string) => string;
     /** Ставка налога словами или null — обратное начисление. */
-    invoicedLead: (vatRate: string | null, charged?: boolean) => string;
+    invoicedLead: (vatRate: string | null) => string;
     settledSubject: (ref: string) => string;
     settledHeading: (ref: string) => string;
-    settledLead: (vatRate: string | null, charged?: boolean) => string;
+    settledLead: (vatRate: string | null) => string;
     preheader: (amount: string) => string;
     fieldOrder: string;
     fieldAmount: string;
@@ -204,18 +204,14 @@ const fi: Texts = {
   billing: {
     invoicedSubject: (ref) => `RAHTIS · lasku kuljetuksesta ${ref}`,
     invoicedHeading: (ref) => `Lasku kuljetuksesta ${ref}`,
-    invoicedLead: (vat, charged = true) =>
-      !charged
-        ? 'Kuljetuksesta on lähetetty lasku. Laskuttaja on Aivomaa Oy (RAHTIS). Arvonlisävero 0 %.'
-        : vat
+    invoicedLead: (vat) =>
+      vat
         ? `Kuljetuksesta on lähetetty lasku. Laskuttaja on Aivomaa Oy (RAHTIS); summaan lisätään arvonlisävero ${vat}.`
         : 'Kuljetuksesta on lähetetty lasku. Laskuttaja on Aivomaa Oy (RAHTIS). Käännetty verovelvollisuus: ostaja tilittää veron omassa maassaan.',
     settledSubject: (ref) => `RAHTIS · tilitys kuljetuksesta ${ref}`,
     settledHeading: (ref) => `Tilitys kuljetuksesta ${ref}`,
-    settledLead: (vat, charged = true) =>
-      !charged
-        ? 'Kuljetuksesta on maksettu tilitys. Maksaja on Aivomaa Oy (RAHTIS). Arvonlisävero 0 %.'
-        : vat
+    settledLead: (vat) =>
+      vat
         ? `Kuljetuksesta on maksettu tilitys. Maksaja on Aivomaa Oy (RAHTIS); summaan sisältyy arvonlisävero ${vat}.`
         : 'Kuljetuksesta on maksettu tilitys. Maksaja on Aivomaa Oy (RAHTIS). Käännetty verovelvollisuus: summa on alv 0 %.',
     preheader: (amount) => `Summa ${amount}.`,
@@ -315,18 +311,14 @@ const en: Texts = {
   billing: {
     invoicedSubject: (ref) => `RAHTIS · invoice for transport ${ref}`,
     invoicedHeading: (ref) => `Invoice for transport ${ref}`,
-    invoicedLead: (vat, charged = true) =>
-      !charged
-        ? 'An invoice for this transport has been sent. The seller is Aivomaa Oy (RAHTIS). VAT 0 %.'
-        : vat
+    invoicedLead: (vat) =>
+      vat
         ? `An invoice for this transport has been sent. The seller is Aivomaa Oy (RAHTIS); VAT ${vat} is added to the amount.`
         : 'An invoice for this transport has been sent. The seller is Aivomaa Oy (RAHTIS). Reverse charge: the buyer accounts for the tax in their own country.',
     settledSubject: (ref) => `RAHTIS · payout for transport ${ref}`,
     settledHeading: (ref) => `Payout for transport ${ref}`,
-    settledLead: (vat, charged = true) =>
-      !charged
-        ? 'The payout for this transport has been paid. The payer is Aivomaa Oy (RAHTIS). VAT 0 %.'
-        : vat
+    settledLead: (vat) =>
+      vat
         ? `The payout for this transport has been paid. The payer is Aivomaa Oy (RAHTIS); the amount includes VAT ${vat}.`
         : 'The payout for this transport has been paid. The payer is Aivomaa Oy (RAHTIS). Reverse charge: the amount is at VAT 0%.',
     preheader: (amount) => `Amount ${amount}.`,

@@ -14,7 +14,6 @@ import {
 } from '@/lib/reports/periodExport';
 import { parseRange } from '@/lib/reports/periods';
 import { PeriodReportPdf, type PdfColumn } from '@/lib/reports/PeriodReportPdf';
-import { VAT_CHARGED } from '@/lib/config';
 
 /**
  * Скачать отчёт за период: PDF, XLSX или CSV.
@@ -139,13 +138,11 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
    * поэтому ему правило, а не ставка.
    */
   const vatNote =
-    report.role === 'ADMIN' && VAT_CHARGED
+    report.role === 'ADMIN'
       ? t.money.vatByCountry
       : (report.totals.vatBps ?? 0) > 0
         ? t.done.vatNoteDomestic
-        : VAT_CHARGED
-          ? t.done.vatNoteReverse
-          : t.done.vatNoteNone;
+        : t.done.vatNoteReverse;
 
   const summary = summaryRows(report, t).map(([label, value, kind]): [string, string, boolean] => [
     label,

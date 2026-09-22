@@ -1,7 +1,6 @@
 import { renderEmail, renderText, type EmailBlock } from '../layout';
 import { emailText, type EmailLocale } from '../text';
 import type { EmailMessage } from '../types';
-import { VAT_CHARGED } from '@/lib/config';
 
 /**
  * Письма о расчётах.
@@ -141,7 +140,7 @@ export function invoicedEmail(input: {
     subject: t.billing.invoicedSubject(input.orderRef),
     heading: t.billing.invoicedHeading(input.orderRef),
     preheader: t.billing.preheader(input.money.total),
-    lead: t.billing.invoicedLead(input.money.vatRate, VAT_CHARGED),
+    lead: t.billing.invoicedLead(input.money.vatRate),
     rows,
     operatorEmail: input.operatorEmail,
     locale: input.locale,
@@ -167,7 +166,7 @@ export function settledEmail(input: {
     subject: t.billing.settledSubject(input.orderRef),
     heading: t.billing.settledHeading(input.orderRef),
     preheader: t.billing.preheader(input.money.total),
-    lead: t.billing.settledLead(input.money.vatRate, VAT_CHARGED),
+    lead: t.billing.settledLead(input.money.vatRate),
     rows: [
       [t.billing.fieldOrder, input.orderRef],
       ...moneyRows(t, input.money),

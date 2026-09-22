@@ -3,7 +3,6 @@ import { getI18n, type Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import type { Dictionary } from '@/lib/i18n';
 import type { PartyRole } from '@/types/db';
-import { VAT_CHARGED } from '@/lib/config';
 
 /**
  * Нижняя часть кабинета: что идёт прямо сейчас и что было за восемь недель.
@@ -95,7 +94,8 @@ export async function CabinetPulse({ locale, role }: { locale: Locale; role: Par
           <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
             <p className="label-micro">
               {carrier ? t.pulse.earnings : t.pulse.spend}
-              {VAT_CHARGED && ` · ${t.pulse.vatFree}`}
+              {' · '}
+              {t.pulse.vatFree}
             </p>
             {first && last && (
               <Mono className="text-[13px] font-semibold">

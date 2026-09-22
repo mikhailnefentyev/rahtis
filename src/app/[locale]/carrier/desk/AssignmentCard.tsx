@@ -23,7 +23,6 @@ import { ClosingPanel } from './ClosingPanel';
 import { TripPanel } from './TripPanel';
 import type { Database } from '@/types/database';
 import type { OrderAmendment, OrderStop, TripDocument } from '@/types/db';
-import { VAT_CHARGED } from '@/lib/config';
 
 type Assignment = Database['public']['Functions']['my_assignments']['Returns'][number];
 
@@ -84,7 +83,7 @@ export function AssignmentCard({
                   {order.trailer ? `${order.trailer} · ` : ''}
                   {m('order.distance', { km: order.distance_km ?? 0 })} ·{' '}
                   <span className="font-semibold text-ink">{f.eur(order.rate_cents ?? 0)}</span>{' '}
-                  {VAT_CHARGED && <span className="text-ink-dim">{t.money.addVat}</span>}
+                  <span className="text-ink-dim">{t.money.addVat}</span>
                 </p>
                 {order.shipper_name && <p className="mt-1 text-xs text-ink-dim">{order.shipper_name}</p>}
 

@@ -370,7 +370,7 @@ export const en = {
     feeTitle:
       'Clear pricing: a monthly fee for vehicles that drive, 3 % from the shipper',
     feeLede:
-      'The carrier pays €29.90 a month for each vehicle that drives at least one job that month — a vehicle that does not drive costs nothing, and the fee is deducted from the settlement. The shipper pays 3 % of the price of a transport ordered from the load board; direct orders to its own regular vehicles are free. The first month is free for everyone. The fee covers the work that would otherwise be done by hand.',
+      'The carrier pays €29.90 (excl. VAT) a month for each vehicle that drives at least one job that month — a vehicle that does not drive costs nothing, and the fee is deducted from the settlement. The shipper pays 3 % of the price of a transport ordered from the load board; direct orders to its own regular vehicles are free. The first month is free for everyone. The fee covers the work that would otherwise be done by hand.',
     fee1: 'Electronic documents',
     fee1Text:
       'The consignment note, loading photos and damage notes travel with the job and reach the shipper without being sent separately.',
@@ -522,7 +522,6 @@ export const en = {
      * buyer accounts for it, and the document must say so in words
      * rather than with a blank line.
      */
-    vatNoteNone: 'Amounts include VAT at 0 %.',
     vatNoteDomestic: 'Amounts exclude VAT. VAT at 25.5% is added on the invoice.',
     vatNoteReverse:
       'Amounts at VAT 0%: reverse charge, the buyer accounts for the tax in its own country.',
@@ -912,7 +911,6 @@ export const en = {
   },
 
   billingDesk: {
-    vatNone: 'VAT 0 %',
     title: 'Invoicing and settlements',
     subtitle:
       'A period is half a month: the 1st to the 15th, and the 16th to the end of the month. Invoices go to customers automatically when the period ends. You record incoming payments and settlements to carriers.',
@@ -927,7 +925,7 @@ export const en = {
     colCarrier: 'Carrier',
     colInvoice: 'Invoice',
     colTrips: 'Jobs',
-    colGross: 'Amount',
+    colGross: 'Amount incl. VAT',
     colStatus: 'Status',
     stSent: 'Sent',
     stPaid: 'Paid',
@@ -1249,7 +1247,7 @@ export const en = {
     settlementShipperTitle: 'Invoice {number}',
     invoiceDate: 'Invoice date {date}',
     invoiceEmailSubject: 'RAHTIS · invoice {number} · period {from}–{to}',
-    feeLine: 'Monthly fee {month}: {count} active vehicles × {unit}',
+    feeLine: 'Monthly fee {month}: {count} active vehicles × {unit} + VAT {vat}',
     payable: 'Paid to the carrier',
     settlementCarrierTitle: 'Period statement · transports driven',
     periodRange: 'Period {from}–{to}',
@@ -1473,7 +1471,7 @@ export const en = {
     rowPayout: 'Payouts',
     rowMargin: 'Margin',
     rowVat: 'VAT',
-    rowGross: 'Total',
+    rowGross: 'Total incl. VAT',
     rowClaims: 'Claims',
     rowClaimed: 'Total claimed',
     reverseCharge: 'reverse charge',
@@ -2192,7 +2190,7 @@ export const en = {
     'billingDesk.customerDue': 'Customers pay by {date}',
     'billingDesk.payoutDue': 'Carriers are paid on {date}',
     'pay.experienceSince': 'driving since {date}',
-    'fleet.feeRule': '{unit} a month for each vehicle that drives at least one job that month. A vehicle that does not drive costs nothing. The fee is deducted from the settlement.',
+    'fleet.feeRule': '{unit} (excl. VAT) a month for each vehicle that drives at least one job that month. A vehicle that does not drive costs nothing. The fee is deducted from the settlement.',
     'fleet.feeFree': 'The first month is free: free until {date}.',
     'driverApp.welcome': 'Welcome, {name}',
     'driverApp.breakTotal': 'Breaks {minutes} min',

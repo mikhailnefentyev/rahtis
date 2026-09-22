@@ -20,7 +20,6 @@ import {
 } from '@/components/ui';
 import { useI18n } from '@/lib/i18n/provider';
 import type { CompletedOrder, OrderStop, TripDocument, WeeklyTotal } from '@/types/db';
-import { VAT_CHARGED } from '@/lib/config';
 
 /**
  * Выполненные рейсы, собранные по неделям (ТЗ §11).
@@ -112,7 +111,7 @@ export function CompletedList({
                 )}
 
                 {/* Все числа выше нетто — налог добавляется в счёте. */}
-                {VAT_CHARGED && <span className="text-ink-dim">{t.money.addVat}</span>}
+                <span className="text-ink-dim">{t.money.addVat}</span>
               </div>
             </div>
 

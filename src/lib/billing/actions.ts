@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { explainAdmin, withAdminError } from '@/lib/admin/errors';
-import { COMMISSION_BPS, payoutCents, VAT_CHARGED, vatBpsFor, withVat } from '@/lib/config';
+import { COMMISSION_BPS, payoutCents, vatBpsFor, withVat } from '@/lib/config';
 import { operatorInbox } from '@/lib/email';
 import { emailLocaleOf } from '@/lib/email/text';
 import { invoicedEmail, settledEmail } from '@/lib/email/templates/billing';
@@ -149,7 +149,7 @@ async function announce(order: Order, next: BillingStatus): Promise<void> {
     title: invoiced
       ? `${t.billing.INVOICED} · ${order.ref}`
       : `${t.billing.SETTLED} · ${order.ref}`,
-    body: VAT_CHARGED ? `${amount} · ${t.money.calcNote}` : amount,
+    body: `${amount} · ${t.money.calcNote}`,
     link: invoiced ? '/shipper/done' : '/carrier/done',
     email: {
       ...(invoiced

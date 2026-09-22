@@ -5,7 +5,7 @@ import { OrderRouteMap } from '@/components/domain/RouteMap';
 import { RouteStops } from '@/components/domain/RouteStops';
 import { HaulBadge } from '@/components/domain/HaulBadge';
 import { Badge, Button, Card, CardBody, CardDivider, EmptyState, Mono, Plate, Select } from '@/components/ui';
-import { MATCHING, VAT_CHARGED } from '@/lib/config';
+import { MATCHING } from '@/lib/config';
 import { takeOrderAction, type MatchingState } from '@/lib/orders/matching';
 import { useI18n } from '@/lib/i18n/provider';
 import type { DeskOrder, DeskStop, Vehicle } from '@/types/db';
@@ -122,7 +122,7 @@ export function DeskList({ orders, vehicles }: { orders: DeskOrder[]; vehicles: 
                     {cargoKg ? `${cargoKg} kg · ` : ''}
                     {m('order.distance', { km: order.distance_km ?? 0 })} ·{' '}
                     <span className="font-semibold text-ink">{f.eur(order.rate_cents ?? 0)}</span>{' '}
-                    {VAT_CHARGED && <span className="text-ink-dim">{t.money.addVat}</span>}{' '}
+                    <span className="text-ink-dim">{t.money.addVat}</span>{' '}
                     {order.distance_km && order.rate_cents ? (
                       <span className="text-ink-dim">
                         · {m('order.ratePerKm', {
