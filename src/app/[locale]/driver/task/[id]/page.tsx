@@ -3,7 +3,8 @@ import { notFound } from 'next/navigation';
 import { cn } from '@/lib/cn';
 import { getTripPhotos, type TripPhoto } from '@/lib/driverApp/photos';
 import { getDriverTasks, type DriverStop, type DriverTask } from '@/lib/driverApp/tasks';
-import { getI18n, isLocale, type Locale } from '@/lib/i18n';
+import { isLocale, type Locale } from '@/lib/i18n';
+import { getDriverI18n } from '@/lib/driverApp/i18n';
 import { Arrive } from './Arrive';
 import { Confirmation } from './Confirmation';
 import { Inspection } from './Inspection';
@@ -30,7 +31,7 @@ export default async function DriverTaskPage({
   const { locale, id } = await params;
   if (!isLocale(locale)) notFound();
 
-  const [tasks, { t, m }] = await Promise.all([getDriverTasks(), getI18n(locale)]);
+  const [tasks, { t, m }] = await Promise.all([getDriverTasks(), getDriverI18n(locale)]);
   const task = tasks.find((x) => x.id === id);
   if (!task) notFound();
 
@@ -129,7 +130,7 @@ async function StopItem({
   running: boolean;
   last: boolean;
 }) {
-  const { t, m, f } = await getI18n(locale);
+  const { t, m, f } = await getDriverI18n(locale);
   const done = Boolean(stop.completed_at);
   const unit = task.haul_kind === 'TRAILER' || task.haul_kind === 'CONTAINER';
   const confirmation = confirmationAt(stop.role, unit);

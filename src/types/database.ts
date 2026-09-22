@@ -1070,6 +1070,7 @@ export type Database = {
       }
       drivers: {
         Row: {
+          app_language: string | null
           archived_at: string | null
           auth_user_id: string | null
           company_id: string
@@ -1085,6 +1086,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          app_language?: string | null
           archived_at?: string | null
           auth_user_id?: string | null
           company_id: string
@@ -1100,6 +1102,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          app_language?: string | null
           archived_at?: string | null
           auth_user_id?: string | null
           company_id?: string
@@ -4472,6 +4475,7 @@ export type Database = {
         Args: { p_company_id: string; p_test: boolean }
         Returns: undefined
       }
+      set_driver_language: { Args: { p_language: string }; Returns: undefined }
       set_runtime_config: {
         Args: { p_key: string; p_note?: string; p_value: string }
         Returns: Json

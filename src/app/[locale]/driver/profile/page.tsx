@@ -1,8 +1,9 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { LocaleSwitch } from '@/components/layout/LocaleSwitch';
+import { LanguagePicker } from './LanguagePicker';
 import { getDriver } from '@/lib/driverApp/session';
-import { getI18n, isLocale } from '@/lib/i18n';
+import { isLocale } from '@/lib/i18n';
+import { getDriverI18n } from '@/lib/driverApp/i18n';
 import { PushSetup } from '../PushSetup';
 import { SignOut } from './SignOut';
 
@@ -16,7 +17,7 @@ export default async function DriverProfile({ params }: { params: Promise<{ loca
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
 
-  const [driver, { t }] = await Promise.all([getDriver(), getI18n(locale)]);
+  const [driver, { t }] = await Promise.all([getDriver(), getDriverI18n(locale)]);
   if (!driver) return null;
 
   const rows: Array<[string, string]> = [
@@ -42,7 +43,7 @@ export default async function DriverProfile({ params }: { params: Promise<{ loca
 
       <section className="flex items-center justify-between gap-3 rounded-card border border-line bg-surface px-4 py-3.5">
         <span className="text-[15px] text-ink-muted">{t.driverApp.language}</span>
-        <LocaleSwitch current={locale} />
+        <LanguagePicker current={driver.app_language} />
       </section>
 
       <PushSetup />

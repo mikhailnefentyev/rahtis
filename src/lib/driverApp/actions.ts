@@ -133,6 +133,25 @@ export async function driverSignOutAction(formData: FormData): Promise<void> {
   redirect(`/${locale}/driver`);
 }
 
+/**
+ * Язык приложения. Пусто — снова по языку телефона.
+ *
+ * Язык живёт у водителя, поэтому переживает переустановку приложения и
+ * смену телефона: вход по коду с нового устройства не должен возвращать
+ * язык, которого водитель не знает.
+ */
+export async function setDriverLanguageAction(formData: FormData): Promise<void> {
+  const locale = toLocale(formData.get('locale'));
+  const supabase = await createClient();
+
+  const { error } = await supabase.rpc('set_driver_language', {
+    p_language: String(formData.get('language') ?? ''),
+  });
+  if (error) console.error('Язык приложения не сохранён:', error.message);
+
+  revalidatePath(`/${locale}/driver`, 'layout');
+}
+
 /* ── Рейс ───────────────────────────────────────────────────────── */
 
 export async function acceptTaskAction(formData: FormData): Promise<void> {

@@ -16,6 +16,8 @@ export type DriverMe = {
   full_name: string;
   phone: string;
   languages: string[];
+  /** Выбранный язык приложения; NULL — по языку телефона. */
+  app_language: string | null;
   company_name: string;
   vehicle_id: string | null;
   plate: string | null;

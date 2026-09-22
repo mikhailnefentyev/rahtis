@@ -3,7 +3,8 @@ import { notFound } from 'next/navigation';
 import { acceptTaskAction, declineTaskAction } from '@/lib/driverApp/actions';
 import { getDriver } from '@/lib/driverApp/session';
 import { getDriverTasks, nextStop, type DriverTask } from '@/lib/driverApp/tasks';
-import { getI18n, isLocale, type Locale } from '@/lib/i18n';
+import { isLocale, type Locale } from '@/lib/i18n';
+import { getDriverI18n } from '@/lib/driverApp/i18n';
 import { PushSetup } from './PushSetup';
 import { ShiftBar } from './ShiftBar';
 import { TaskTabs } from './TaskTabs';
@@ -24,7 +25,7 @@ export default async function DriverHome({
   const [{ locale }, { tab }] = await Promise.all([params, searchParams]);
   if (!isLocale(locale)) notFound();
 
-  const [driver, tasks, { t, m }] = await Promise.all([getDriver(), getDriverTasks(), getI18n(locale)]);
+  const [driver, tasks, { t, m }] = await Promise.all([getDriver(), getDriverTasks(), getDriverI18n(locale)]);
   if (!driver) return null;
 
   const showDone = tab === 'done';
@@ -61,7 +62,7 @@ export default async function DriverHome({
 }
 
 async function TaskCard({ task, locale }: { task: DriverTask; locale: Locale }) {
-  const { t, f } = await getI18n(locale);
+  const { t, f } = await getDriverI18n(locale);
   const stop = nextStop(task) ?? task.stops[0];
   const unit = task.trailer_plate ?? (task.container_feet ? `${task.container_feet} ft` : null);
 

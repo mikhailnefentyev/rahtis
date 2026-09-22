@@ -393,6 +393,7 @@ export const fi = {
     shipper4:
       'Jos reitti, aikataulu tai muu tieto muuttuu kesken keikan, päivitys menee suoraan kuljetusliikkeelle ja kuljettajalle.',
     shipper6: 'Viikkoraportista näet keikat, summat, asiakirjat ja palautteet.',
+    shipper7: 'Integraatio omaan järjestelmään (ERP/TMS) rajapinnan kautta on mahdollinen – sovitaan erikseen.',
     shipper5:
       'Jos auto peruu tai ei vahvista, keikka palaa tarjolle itsestään ja välittyy seuraaville sopiville autoille saman tien.',
     carrier2:
@@ -1812,6 +1813,7 @@ export const fi = {
     noVehicle: 'Ei autoa',
     phone: 'Puhelin',
     language: 'Kieli',
+    languageAuto: 'Puhelimen mukaan',
     privacy: 'Tietosuoja',
     inboxEmpty: 'Ei viestejä.',
     markRead: 'Merkitse luetuksi',

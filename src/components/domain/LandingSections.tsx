@@ -272,7 +272,7 @@ export async function LandingSections({ locale }: { locale: Locale }) {
             {
               eyebrow: l.shipperEyebrow,
               title: l.shipperTitle,
-              lines: [l.shipper2, l.shipper3, l.shipper4, l.shipper5, l.shipper6],
+              lines: [l.shipper2, l.shipper3, l.shipper4, l.shipper5, l.shipper6, l.shipper7],
             },
             {
               eyebrow: l.carrierEyebrow,

@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from 'next';
 import { notFound } from 'next/navigation';
 import { getDriver } from '@/lib/driverApp/session';
-import { getI18n, isLocale } from '@/lib/i18n';
+import { isLocale } from '@/lib/i18n';
+import { getDriverI18n } from '@/lib/driverApp/i18n';
+import { I18nProvider } from '@/lib/i18n/provider';
 import { DriverNav } from './DriverNav';
 import { NotLinked } from './NotLinked';
 import { OutboxBanner, OutboxProvider } from './OutboxProvider';
@@ -14,7 +16,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   if (!isLocale(locale)) return {};
-  const { t } = await getI18n(locale);
+  const { t } = await getDriverI18n(locale);
   return {
     title: t.driverApp.title,
     manifest: '/driver.webmanifest',
@@ -47,22 +49,24 @@ export default async function DriverLayout({
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
 
-  const driver = await getDriver();
+  const [driver, { t }] = await Promise.all([getDriver(), getDriverI18n(locale)]);
 
   return (
-    <div className="min-h-dvh bg-ground text-ink">
-      <ServiceWorker />
-      {driver ? (
-        <OutboxProvider>
-          <div className="mx-auto w-full max-w-lg px-4 pt-[max(env(safe-area-inset-top),16px)] pb-28">
-            <OutboxBanner />
-            {children}
-          </div>
-          <DriverNav unread={driver.unread} />
-        </OutboxProvider>
-      ) : (
-        <NotLinked locale={locale} />
-      )}
-    </div>
+    <I18nProvider locale={locale} dictionary={t}>
+      <div className="min-h-dvh bg-ground text-ink">
+        <ServiceWorker />
+        {driver ? (
+          <OutboxProvider>
+            <div className="mx-auto w-full max-w-lg px-4 pt-[max(env(safe-area-inset-top),16px)] pb-28">
+              <OutboxBanner />
+              {children}
+            </div>
+            <DriverNav unread={driver.unread} />
+          </OutboxProvider>
+        ) : (
+          <NotLinked locale={locale} />
+        )}
+      </div>
+    </I18nProvider>
   );
 }

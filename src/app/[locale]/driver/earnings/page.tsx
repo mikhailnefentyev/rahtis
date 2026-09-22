@@ -3,7 +3,8 @@ import { notFound } from 'next/navigation';
 import { todayInHelsinki } from '@/lib/dates';
 import { getDriverEarnings, monthOf, shiftMonth } from '@/lib/driverApp/earnings';
 import { getDriver } from '@/lib/driverApp/session';
-import { getI18n, isLocale } from '@/lib/i18n';
+import { isLocale } from '@/lib/i18n';
+import { getDriverI18n } from '@/lib/driverApp/i18n';
 
 /**
  * Ansiot — сколько водитель заработал.
@@ -27,15 +28,15 @@ export default async function DriverEarnings({
   const [driver, earnings, { t, m, f }] = await Promise.all([
     getDriver(),
     getDriverEarnings(month),
-    getI18n(locale),
+    getDriverI18n(locale),
   ]);
   if (!driver) return null;
 
   const current = todayInHelsinki().slice(0, 7);
-  const monthName = new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(
+  const monthName = new Intl.DateTimeFormat(t.meta.intl, { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(
     new Date(`${month}-01T12:00:00Z`),
   );
-  const dayName = new Intl.DateTimeFormat(locale, { weekday: 'short', timeZone: 'UTC' });
+  const dayName = new Intl.DateTimeFormat(t.meta.intl, { weekday: 'short', timeZone: 'UTC' });
   const hours = (minutes: number) => m('driverApp.earnHours', { hours: f.decimal(minutes / 60, 1) });
   const base = `/${locale}/driver/earnings`;
 

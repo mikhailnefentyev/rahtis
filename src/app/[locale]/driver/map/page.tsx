@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { getDriver } from '@/lib/driverApp/session';
-import { getI18n, isLocale } from '@/lib/i18n';
+import { isLocale } from '@/lib/i18n';
+import { driverLocaleOf, getDriverI18n } from '@/lib/driverApp/i18n';
 import { createClient } from '@/lib/supabase/server';
 import { PlacesMap, type Place } from './PlacesMap';
 
@@ -16,14 +17,20 @@ export default async function DriverMap({ params }: { params: Promise<{ locale: 
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
 
-  const [driver, { t }, supabase] = await Promise.all([getDriver(), getI18n(locale), createClient()]);
+  const [driver, { t }, driverLocale, supabase] = await Promise.all([
+    getDriver(),
+    getDriverI18n(locale),
+    driverLocaleOf(locale),
+    createClient(),
+  ]);
   if (!driver) return null;
 
   const { data } = await supabase
     .from('driver_places')
     .select('id, country, kinds, name_fi, name_en, network, address, lat, lon, approx, hours_fi, hours_en, phone, free, secured, sauna, warning, details');
 
-  const fi = locale === 'fi';
+  /* Точки переведены на финский и английский: финну финский, остальным английский. */
+  const fi = driverLocale === 'fi';
   const places: Place[] = (data ?? []).map((p) => ({
     id: p.id,
     country: p.country,

@@ -354,6 +354,7 @@ export const en = {
     shipper4:
       'If the route, the schedule or anything else changes mid-job, the update goes straight to the carrier and the driver.',
     shipper6: 'The weekly report shows jobs, amounts, documents and feedback.',
+    shipper7: 'Integration with your own system (ERP/TMS) through an API is possible – agreed case by case.',
     shipper5:
       'If a truck cancels or does not confirm, the job returns to the board on its own and reaches the next suitable trucks right away.',
     carrier2:
@@ -1719,6 +1720,7 @@ export const en = {
     noVehicle: 'No vehicle',
     phone: 'Phone',
     language: 'Language',
+    languageAuto: 'Follow the phone',
     privacy: 'Privacy',
     inboxEmpty: 'No messages.',
     markRead: 'Mark as read',

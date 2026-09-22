@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { markReadAction } from '@/lib/driverApp/actions';
-import { getI18n, isLocale } from '@/lib/i18n';
+import { isLocale } from '@/lib/i18n';
+import { getDriverI18n } from '@/lib/driverApp/i18n';
 import { createClient } from '@/lib/supabase/server';
 
 /**
@@ -14,7 +15,7 @@ export default async function DriverInbox({ params }: { params: Promise<{ locale
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
 
-  const [{ t, m, f }, supabase] = await Promise.all([getI18n(locale), createClient()]);
+  const [{ t, m, f }, supabase] = await Promise.all([getDriverI18n(locale), createClient()]);
 
   const { data: rows } = await supabase
     .from('driver_notifications')

@@ -1,4 +1,4 @@
-import { getI18n } from '@/lib/i18n';
+import { getDriverI18n } from '@/lib/driverApp/i18n';
 import type { Locale } from '@/lib/i18n';
 import { CodeForm } from './CodeForm';
 
@@ -8,7 +8,7 @@ import { CodeForm } from './CodeForm';
  * приглашению перевозчика: по ссылке или здесь, телефоном и кодом.
  */
 export async function NotLinked({ locale }: { locale?: Locale } = {}) {
-  const { t } = await getI18n(locale ?? 'fi');
+  const { t } = await getDriverI18n(locale ?? 'fi');
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-lg flex-col items-center justify-center gap-4 px-6 py-10 text-center">
