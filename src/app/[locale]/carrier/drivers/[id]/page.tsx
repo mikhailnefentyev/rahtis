@@ -51,8 +51,15 @@ export default async function DriverPage({
   const since = new Date(`${period.from}T00:00:00Z`);
   since.setUTCDate(since.getUTCDate() - 1);
 
-  const [{ data: driver }, { data: profiles }, { data: sets }, { data: vehicles }, { data: shifts }, report] =
-    await Promise.all([
+  const [
+    { data: driver },
+    { data: profiles },
+    { data: sets },
+    { data: vehicles },
+    { data: shifts },
+    report,
+    { data: rates },
+  ] = await Promise.all([
       supabase.from('drivers').select('*').eq('id', id).maybeSingle(),
       supabase
         .from('driver_pay_profiles')
@@ -71,7 +78,13 @@ export default async function DriverPage({
         .lte('started_at', `${period.to}T23:59:59Z`)
         .order('started_at', { ascending: false }),
       buildDriverReport({ from: period.from, to: period.to, driverId: id }),
+      /* Категории таблиц ставок — для выбора в модели оплаты; одна строка на категорию. */
+      supabase.from('tes_wage_rates').select('rule_set_id, grade, label, sort').order('sort'),
     ]);
+
+  const grades = [
+    ...new Map((rates ?? []).map((r) => [`${r.rule_set_id}:${r.grade}`, r])).values(),
+  ];
 
   if (!driver || driver.company_id !== company.id) notFound();
 
@@ -112,6 +125,7 @@ export default async function DriverPage({
           driverId={driver.id}
           profiles={profiles ?? []}
           sets={sets ?? []}
+          grades={grades}
           today={helsinkiToday()}
         />
       </section>

@@ -25,10 +25,14 @@ export default async function TesPage({ params }: { params: Promise<{ locale: st
   const [{ t }, supabase] = await Promise.all([getI18n(locale), createClient()]);
 
   /* RLS отдаёт свои наборы и шаблоны оператора (company_id is null). */
-  const { data: sets } = await supabase
-    .from('tes_rule_sets')
-    .select('*')
-    .order('valid_from', { ascending: false });
+  const [{ data: sets }, { data: rates }] = await Promise.all([
+    supabase.from('tes_rule_sets').select('*').order('valid_from', { ascending: false }),
+    supabase
+      .from('tes_wage_rates')
+      .select('rule_set_id, grade, label, sort, valid_from, hourly_cents')
+      .order('sort')
+      .order('valid_from'),
+  ]);
 
   return (
     <main className="mx-auto w-full max-w-4xl px-5 py-8">
@@ -42,6 +46,7 @@ export default async function TesPage({ params }: { params: Promise<{ locale: st
       <TesView
         own={(sets ?? []).filter((s) => s.company_id !== null)}
         templates={(sets ?? []).filter((s) => s.company_id === null)}
+        rates={rates ?? []}
       />
     </main>
   );

@@ -47,6 +47,8 @@ type RawProfile = {
   per_km_cents: number | null;
   hourly_cents: number | null;
   tes: TesRuleSet | null;
+  tes_grade: string | null;
+  rates: Array<{ grade: string; valid_from: string; hourly_cents: number }>;
 };
 
 export type EarningTrip = {
@@ -112,7 +114,8 @@ export async function getDriverEarnings(month: string): Promise<DriverEarnings> 
     perKmCents: p.per_km_cents,
     tripBps: p.model === 'TRIP_PERCENT' ? 10_000 : null,
     hourlyCents: p.hourly_cents,
-    tes: p.tes ? tesRules(p.tes) : null,
+    tes: p.tes ? tesRules(p.tes, p.rates) : null,
+    tesGrade: p.tes_grade,
   }));
 
   const shifts: ShiftInput[] = raw.shifts.map((s) => ({

@@ -6,6 +6,7 @@ import {
   type DriverSummary,
   type PayProfileInput,
   type ShiftInput,
+  type TesRate,
   type TesRules,
 } from '@/lib/driverPay';
 import { createClient } from '@/lib/supabase/server';
@@ -34,8 +35,20 @@ export type DriverReport = {
   entries: DriverReportEntry[];
 };
 
-export function tesRules(set: TesRuleSet): TesRules {
+/** Строки набора и его таблицы ставок → правила калькулятора. */
+export function tesRules(
+  set: TesRuleSet,
+  rates: Array<{ grade: string; valid_from: string; hourly_cents: number }> = [],
+): TesRules {
   return {
+    rates: rates.map((r): TesRate => ({ grade: r.grade, validFrom: r.valid_from, hourlyCents: r.hourly_cents })),
+    overtimeBasis: set.overtime_basis === 'PERIOD' ? 'PERIOD' : 'DAY',
+    periodRegularMinutes: set.period_regular_minutes,
+    periodAnchor: set.period_anchor,
+    eveningBps: set.evening_bps,
+    nightBps: set.night_bps,
+    holidaysAsSunday: set.holidays_as_sunday,
+    minPaidMinutes: set.min_paid_minutes,
     baseHourlyCents: set.base_hourly_cents,
     dailyRegularMinutes: set.daily_regular_minutes,
     overtime1Minutes: set.overtime1_minutes,
@@ -67,11 +80,12 @@ export async function buildDriverReport(input: {
   const supabase = await createClient();
 
   /*
-   * Смены берутся с запасом в сутки с обеих сторон: граница периода —
-   * местная дата начала смены, а в запросе время в UTC. Лишнее отсекается
-   * после расчёта, по дате дня.
+   * Смены берутся с запасом: граница периода — местная дата начала смены,
+   * а в запросе время в UTC, и сверхурочные по TES считаются за
+   * 2-недельный период, который может начаться до начала отчёта. Лишнее
+   * отсекается после расчёта, по дате дня.
    */
-  const since = `${shiftDate(input.from, -1)}T00:00:00Z`;
+  const since = `${shiftDate(input.from, -14)}T00:00:00Z`;
   const until = `${shiftDate(input.to, 2)}T00:00:00Z`;
 
   let driversQuery = supabase
@@ -88,16 +102,19 @@ export async function buildDriverReport(input: {
     .order('started_at');
   if (input.driverId) shiftsQuery = shiftsQuery.eq('driver_id', input.driverId);
 
-  const [{ data: drivers }, { data: shifts }, { data: trips }, { data: profiles }, { data: sets }] =
+  const [{ data: drivers }, { data: shifts }, { data: trips }, { data: profiles }, { data: sets }, { data: rates }] =
     await Promise.all([
       driversQuery,
       shiftsQuery,
       supabase.rpc('driver_trips', { p_from: input.from, p_to: input.to }),
       supabase.from('driver_pay_profiles').select('*'),
       supabase.from('tes_rule_sets').select('*'),
+      supabase.from('tes_wage_rates').select('rule_set_id, grade, valid_from, hourly_cents'),
     ]);
 
-  const rulesById = new Map((sets ?? []).map((s) => [s.id, tesRules(s)]));
+  const rulesById = new Map(
+    (sets ?? []).map((s) => [s.id, tesRules(s, (rates ?? []).filter((r) => r.rule_set_id === s.id))]),
+  );
   const now = Date.now();
 
   const entries: DriverReportEntry[] = [];
@@ -122,6 +139,7 @@ export async function buildDriverReport(input: {
         tripBps: p.trip_bps,
         hourlyCents: p.hourly_cents,
         tes: p.tes_rule_set_id ? (rulesById.get(p.tes_rule_set_id) ?? null) : null,
+        tesGrade: p.tes_grade,
       }));
 
     const summary = summarizeDriver({

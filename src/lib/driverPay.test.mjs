@@ -6,7 +6,7 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { splitShift, summarizeDriver, payableKm, profileOn } from './driverPay.ts';
+import { splitShift, summarizeDriver, payableKm, profileOn, finnishHolidays, tesBaseOn } from './driverPay.ts';
 
 const NOW = Date.parse('2026-12-31T00:00:00Z');
 
@@ -132,4 +132,109 @@ test('км: одометр важнее пробега рейсов, проце�
 test('незакрытая смена считается до текущей минуты', () => {
   const s = splitShift(shift('2026-09-18T05:00:00Z', null), null, Date.parse('2026-09-18T07:30:00Z'));
   assert.equal(s.workMinutes, 150);
+});
+
+/* ── Kuorma-autoalan TES 2025–2028 ─────────────────────────────── */
+
+const kuorma = {
+  ...tes,
+  baseHourlyCents: 1609,
+  overtimeBasis: 'PERIOD',
+  periodRegularMinutes: 4800,
+  periodAnchor: '2026-01-05',
+  overtime1Minutes: 720,
+  overtime1Bps: 5000,
+  overtime2Bps: 10000,
+  eveningCents: 0,
+  eveningBps: 1500,
+  nightCents: 0,
+  nightBps: 2000,
+  saturdayBps: 0,
+  sundayBps: 10000,
+  holidaysAsSunday: true,
+  minPaidMinutes: 285,
+  rates: [
+    { grade: 'TRUCK_0', validFrom: '2025-03-01', hourlyCents: 1577 },
+    { grade: 'TRUCK_0', validFrom: '2026-06-01', hourlyCents: 1623 },
+  ],
+};
+const kuormaProfile = (grade = null) => ({
+  validFrom: '2025-03-01',
+  model: 'TES',
+  perKmCents: null,
+  tripBps: null,
+  hourlyCents: null,
+  tes: kuorma,
+  tesGrade: grade,
+});
+
+test('праздники Финляндии 2026: подвижные и кануны', () => {
+  const h = finnishHolidays(2026);
+  for (const d of ['2026-04-03', '2026-04-04', '2026-04-06', '2026-05-14', '2026-06-19', '2026-06-20', '2026-10-31', '2026-12-24']) {
+    assert.ok(h.has(d), d);
+  }
+  assert.ok(!h.has('2026-04-05'), 'пасхальное воскресенье узнаётся по дню недели');
+});
+
+test('ставка по категории меняется в день повышения', () => {
+  assert.equal(tesBaseOn(kuormaProfile('TRUCK_0'), '2026-05-31'), 1577);
+  assert.equal(tesBaseOn(kuormaProfile('TRUCK_0'), '2026-06-01'), 1623);
+  assert.equal(tesBaseOn(kuormaProfile(null), '2026-06-01'), 1609);
+});
+
+test('TES § 14.2: сверхурочные сверх 80 ч за 2 недели, 12 ч по +50 %, дальше +100 %', () => {
+  // период 14.–27.9.2026; десять дней по 10 ч, 06:00–16:00 местного
+  const days = ['14', '15', '16', '17', '18', '21', '22', '23', '24', '25'];
+  const summary = summarizeDriver({
+    shifts: days.map((d) => shift(`2026-09-${d}T03:00:00Z`, `2026-09-${d}T13:00:00Z`)),
+    trips: [],
+    profiles: [kuormaProfile('TRUCK_0')],
+    now: NOW,
+  });
+  const byDate = Object.fromEntries(summary.days.map((d) => [d.date, d]));
+  assert.equal(byDate['2026-09-23'].overtime1Minutes, 0); // 80 ч ровно к концу 8-го дня
+  assert.equal(byDate['2026-09-24'].overtime1Minutes, 600);
+  assert.equal(byDate['2026-09-25'].overtime1Minutes, 120);
+  assert.equal(byDate['2026-09-25'].overtime2Minutes, 480);
+  // ставка с 1.6.2026: 10 ч × 16,23 + 2 ч × 8,115 + 8 ч × 16,23
+  assert.equal(byDate['2026-09-25'].amountCents, 16230 + 1623 + 12984);
+});
+
+test('TES § 11.3: короткий день оплачивается как 4 ч 45 мин', () => {
+  const summary = summarizeDriver({
+    shifts: [shift('2026-09-16T05:00:00Z', '2026-09-16T07:00:00Z')],
+    trips: [],
+    profiles: [kuormaProfile('TRUCK_0')],
+    now: NOW,
+  });
+  const [day] = summary.days;
+  assert.equal(day.workMinutes, 120);
+  assert.equal(day.paidMinutes, 285);
+  assert.equal(day.parts.baseCents, Math.round((285 * 1623) / 60));
+});
+
+test('TES § 10.1: вечер +15 %, ночь +20 % от ставки категории', () => {
+  // пятница 18.09.2026, 16:00–23:00 местного
+  const summary = summarizeDriver({
+    shifts: [shift('2026-09-18T13:00:00Z', '2026-09-18T20:00:00Z')],
+    trips: [],
+    profiles: [kuormaProfile('TRUCK_0')],
+    now: NOW,
+  });
+  const [day] = summary.days;
+  assert.equal(day.parts.eveningCents, Math.round((240 * 1623 * 1500) / 60 / 10_000));
+  assert.equal(day.parts.nightCents, Math.round((60 * 1623 * 2000) / 60 / 10_000));
+});
+
+test('TES § 11.4, § 14.5: сочельник оплачивается как воскресенье', () => {
+  // четверг 24.12.2026, 10:00–12:00 местного (UTC+2)
+  const summary = summarizeDriver({
+    shifts: [shift('2026-12-24T08:00:00Z', '2026-12-24T10:00:00Z')],
+    trips: [],
+    profiles: [kuormaProfile('TRUCK_0')],
+    now: NOW,
+  });
+  const [day] = summary.days;
+  assert.equal(day.sundayMinutes, 120);
+  assert.equal(day.parts.weekendCents, Math.round((120 * 1623 * 10_000) / 60 / 10_000));
 });

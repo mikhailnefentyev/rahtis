@@ -1,7 +1,7 @@
 'use client';
 
 import { useActionState, useCallback, useEffect, useState } from 'react';
-import { Button, Card, CardBody, EmptyState, Field, Input, InputMono, Textarea } from '@/components/ui';
+import { Button, Card, CardBody, EmptyState, Field, Input, InputMono, Select, Textarea } from '@/components/ui';
 import {
   copyTesTemplateAction,
   deleteTesAction,
@@ -13,14 +13,33 @@ import type { TesRuleSet } from '@/types/db';
 
 const initial: FormState = { error: null, done: false };
 
+export type WageRate = {
+  rule_set_id: string;
+  grade: string;
+  label: string;
+  sort: number;
+  valid_from: string;
+  hourly_cents: number;
+};
+
 /**
  * Наборы правил TES.
  *
- * Числа вводит перевозчик из текста своего договора — платформа их не
- * подставляет. Шаблоны оператора, если они есть, копируются к себе и
- * дальше правятся как свои: договор у каждого может отличаться.
+ * Шаблон оператора (Kuorma-autoalan TES 2025–2028) несёт правила и
+ * таблицу ставок по категориям. Его можно выбрать в модели оплаты
+ * водителя напрямую — тогда повышения по договору подхватываются сами —
+ * или скопировать к себе и править как свой: местный договор может
+ * отличаться. Свой набор перевозчик заводит и с нуля.
  */
-export function TesView({ own, templates }: { own: TesRuleSet[]; templates: TesRuleSet[] }) {
+export function TesView({
+  own,
+  templates,
+  rates,
+}: {
+  own: TesRuleSet[];
+  templates: TesRuleSet[];
+  rates: WageRate[];
+}) {
   const { t, f, locale } = useI18n();
   const [editing, setEditing] = useState<TesRuleSet | null | 'new'>(null);
   const close = useCallback(() => setEditing(null), []);
@@ -28,16 +47,27 @@ export function TesView({ own, templates }: { own: TesRuleSet[]; templates: TesR
   const pct = (bps: number) => `${f.decimal(bps / 100, 0)} %`;
   const span = (a: string | null, b: string | null) => (a && b ? `${a.slice(0, 5)}–${b.slice(0, 5)}` : '—');
 
+  /* Доплата окна: сумма, процент или обе — как записано в наборе. */
+  const extra = (cents: number, bps: number) =>
+    [cents > 0 ? f.eur(cents) : null, bps > 0 ? pct(bps) : null].filter(Boolean).join(' + ') || '—';
+
   const describe = (s: TesRuleSet) =>
     [
       `${f.eur(s.base_hourly_cents)} / h`,
-      `${f.decimal(s.daily_regular_minutes / 60, 1)} h`,
+      s.overtime_basis === 'PERIOD'
+        ? `${f.decimal(s.period_regular_minutes / 60, 0)} h / 2 vk`
+        : `${f.decimal(s.daily_regular_minutes / 60, 1)} h`,
       `${t.workReport.colOvertime} ${pct(s.overtime1_bps)} / ${pct(s.overtime2_bps)}`,
-      `${t.workReport.colEvening} ${span(s.evening_start, s.evening_end)} ${f.eur(s.evening_cents)}`,
-      `${t.workReport.colNight} ${span(s.night_start, s.night_end)} ${f.eur(s.night_cents)}`,
-      `${t.workReport.colSaturday} ${pct(s.saturday_bps)}`,
+      `${t.workReport.colEvening} ${span(s.evening_start, s.evening_end)} ${extra(s.evening_cents, s.evening_bps)}`,
+      `${t.workReport.colNight} ${span(s.night_start, s.night_end)} ${extra(s.night_cents, s.night_bps)}`,
+      s.saturday_bps > 0 ? `${t.workReport.colSaturday} ${pct(s.saturday_bps)}` : null,
       `${t.workReport.colSunday} ${pct(s.sunday_bps)}`,
-    ].join(' · ');
+      s.min_paid_minutes > 0 ? `min ${f.decimal(s.min_paid_minutes / 60, 2)} h` : null,
+    ]
+      .filter(Boolean)
+      .join(' · ');
+
+  const ratesOf = (id: string) => rates.filter((r) => r.rule_set_id === id);
 
   return (
     <div className="flex flex-col gap-8">
@@ -70,6 +100,7 @@ export function TesView({ own, templates }: { own: TesRuleSet[]; templates: TesR
                     </p>
                     <p className="mt-1 text-xs text-ink-muted">{describe(s)}</p>
                     {s.note && <p className="mt-1 text-xs text-ink-dim">{s.note}</p>}
+                    <RatesTable rates={ratesOf(s.id)} />
                   </div>
                   <div className="flex gap-1.5">
                     <Button size="sm" onClick={() => setEditing(s)}>
@@ -98,6 +129,8 @@ export function TesView({ own, templates }: { own: TesRuleSet[]; templates: TesR
                       {s.name} · {f.date(`${s.valid_from}T12:00:00Z`)}
                     </p>
                     <p className="mt-1 text-xs text-ink-muted">{describe(s)}</p>
+                    {s.note && <p className="mt-1 text-xs text-ink-dim">{s.note}</p>}
+                    <RatesTable rates={ratesOf(s.id)} />
                   </div>
                   <form action={copyTesTemplateAction}>
                     <input type="hidden" name="locale" value={locale} />
@@ -113,6 +146,52 @@ export function TesView({ own, templates }: { own: TesRuleSet[]; templates: TesR
         </section>
       )}
     </div>
+  );
+}
+
+/** Таблица ставок: категория строкой, даты повышений столбцами. */
+function RatesTable({ rates }: { rates: WageRate[] }) {
+  const { t, f } = useI18n();
+  if (rates.length === 0) return null;
+
+  const dates = [...new Set(rates.map((r) => r.valid_from))].sort();
+  const grades = [...new Map(rates.map((r) => [r.grade, r])).values()].sort((a, b) => a.sort - b.sort);
+  const cell = (grade: string, date: string) =>
+    rates.find((r) => r.grade === grade && r.valid_from === date)?.hourly_cents;
+
+  return (
+    <details className="mt-2">
+      <summary className="cursor-pointer text-xs font-semibold text-ink-muted">{t.tes.rates}</summary>
+      <div className="mt-2 overflow-x-auto">
+        <table className="text-xs">
+          <thead>
+            <tr className="text-left text-ink-faint">
+              <th className="py-1 pr-4 font-medium">{t.tes.grade}</th>
+              {dates.map((d) => (
+                <th key={d} className="py-1 pr-3 text-right font-medium whitespace-nowrap">
+                  {t.tes.since} {f.date(`${d}T12:00:00Z`)}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {grades.map((g) => (
+              <tr key={g.grade} className="border-t border-line">
+                <td className="py-1 pr-4">{g.label}</td>
+                {dates.map((d) => {
+                  const value = cell(g.grade, d);
+                  return (
+                    <td key={d} className="py-1 pr-3 text-right font-mono">
+                      {value == null ? '—' : f.eur(value)}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </details>
   );
 }
 
@@ -159,10 +238,31 @@ function TesForm({ set, onClose }: { set: TesRuleSet | null; onClose: () => void
             {(p) => <Input {...p} type="date" name="valid_from" required defaultValue={set?.valid_from ?? ''} />}
           </Field>
 
-          <Field label={t.tes.base} required>
+          <Field label={t.tes.base} hint={t.tes.basePlaceholderHint} required>
             {(p) => (
               <InputMono {...p} name="base_hourly" required inputMode="decimal" defaultValue={eur(set?.base_hourly_cents)} />
             )}
+          </Field>
+          <Field label={t.tes.overtimeBasis}>
+            {(p) => (
+              <Select {...p} name="overtime_basis" defaultValue={set?.overtime_basis ?? 'DAY'}>
+                <option value="DAY">{t.tes.basisDay}</option>
+                <option value="PERIOD">{t.tes.basisPeriod}</option>
+              </Select>
+            )}
+          </Field>
+          <Field label={t.tes.periodHours}>
+            {(p) => (
+              <InputMono
+                {...p}
+                name="period_regular_hours"
+                inputMode="decimal"
+                defaultValue={hrs(set?.period_regular_minutes ?? 4800)}
+              />
+            )}
+          </Field>
+          <Field label={t.tes.periodAnchor}>
+            {(p) => <Input {...p} type="date" name="period_anchor" defaultValue={set?.period_anchor ?? '2026-01-05'} />}
           </Field>
           <Field label={t.tes.regular} required>
             {(p) => (
@@ -201,6 +301,7 @@ function TesForm({ set, onClose }: { set: TesRuleSet | null; onClose: () => void
             start={set?.evening_start ?? ''}
             end={set?.evening_end ?? ''}
             cents={eur(set?.evening_cents)}
+            percent={pct(set?.evening_bps)}
           />
           <WindowFields
             label={t.tes.night}
@@ -208,6 +309,7 @@ function TesForm({ set, onClose }: { set: TesRuleSet | null; onClose: () => void
             start={set?.night_start ?? ''}
             end={set?.night_end ?? ''}
             cents={eur(set?.night_cents)}
+            percent={pct(set?.night_bps)}
           />
 
           <Field label={t.tes.saturday}>
@@ -216,6 +318,16 @@ function TesForm({ set, onClose }: { set: TesRuleSet | null; onClose: () => void
           <Field label={t.tes.sunday}>
             {(p) => <InputMono {...p} name="sunday_pct" inputMode="decimal" defaultValue={pct(set?.sunday_bps)} />}
           </Field>
+
+          <Field label={t.tes.minPaid}>
+            {(p) => (
+              <InputMono {...p} name="min_paid_hours" inputMode="decimal" defaultValue={hrs(set?.min_paid_minutes ?? 0)} />
+            )}
+          </Field>
+          <label className="flex items-center gap-2 self-end pb-2 text-[13px]">
+            <input type="checkbox" name="holidays_as_sunday" defaultChecked={set?.holidays_as_sunday ?? false} />
+            {t.tes.holidays}
+          </label>
 
           <Field label={t.tes.note} className="sm:col-span-2">
             {(p) => <Textarea {...p} name="note" rows={2} maxLength={1000} defaultValue={set?.note ?? ''} />}
@@ -241,23 +353,29 @@ function TesForm({ set, onClose }: { set: TesRuleSet | null; onClose: () => void
   );
 }
 
-/** Окно доплаты: с, по и сумма за час. Окно через полночь (22–06) допустимо. */
+/**
+ * Окно доплаты: с, по, сумма за час и процент от ставки. Окно через
+ * полночь (22–06) допустимо. Отраслевой TES пишет вечер и ночь
+ * процентом, местные договоры — часто суммой; можно и то и другое.
+ */
 function WindowFields({
   label,
   prefix,
   start,
   end,
   cents,
+  percent,
 }: {
   label: string;
   prefix: string;
   start: string;
   end: string;
   cents: string;
+  percent: string;
 }) {
   const { t } = useI18n();
   return (
-    <fieldset className="grid grid-cols-3 gap-2 sm:col-span-2">
+    <fieldset className="grid grid-cols-2 gap-2 sm:col-span-2 sm:grid-cols-4">
       <legend className="label-micro mb-1.5">{label}</legend>
       <Field label={t.tes.from}>
         {(p) => <Input {...p} type="time" name={`${prefix}_start`} defaultValue={start.slice(0, 5)} />}
@@ -267,6 +385,9 @@ function WindowFields({
       </Field>
       <Field label={t.tes.perHour}>
         {(p) => <InputMono {...p} name={prefix} inputMode="decimal" defaultValue={cents} />}
+      </Field>
+      <Field label={t.tes.pctOfBase}>
+        {(p) => <InputMono {...p} name={`${prefix}_pct`} inputMode="decimal" defaultValue={percent} />}
       </Field>
     </fieldset>
   );

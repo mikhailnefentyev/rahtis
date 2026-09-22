@@ -25,6 +25,7 @@ export function PayProfilePanel({
   driverId,
   profiles,
   sets,
+  grades,
   today,
 }: {
   driverId: string;
@@ -33,10 +34,16 @@ export function PayProfilePanel({
   /** По убыванию даты начала. */
   profiles: DriverPayProfile[];
   sets: Pick<TesRuleSet, 'id' | 'name' | 'valid_from' | 'company_id'>[];
+  /** Категории таблиц ставок: по одной строке на набор и категорию. */
+  grades: Array<{ rule_set_id: string; grade: string; label: string }>;
 }) {
   const { t, m, f, locale } = useI18n();
   const [state, formAction, pending] = useActionState(savePayProfileAction, initial);
   const [model, setModel] = useState<PayModel>(profiles[0]?.model ?? 'FLAT_HOURLY');
+  const [setId, setSetId] = useState<string>(profiles[0]?.tes_rule_set_id ?? sets[0]?.id ?? '');
+  const setGrades = grades.filter((g) => g.rule_set_id === setId);
+  const gradeLabel = (p: DriverPayProfile) =>
+    grades.find((g) => g.rule_set_id === p.tes_rule_set_id && g.grade === p.tes_grade)?.label;
 
   const current = profiles.find((p) => p.valid_from <= today) ?? null;
   const setName = (id: string | null) => sets.find((s) => s.id === id)?.name ?? '—';
@@ -50,7 +57,7 @@ export function PayProfilePanel({
       case 'TRIP_PERCENT':
         return `${f.decimal((p.trip_bps ?? 0) / 100, 1)} %`;
       case 'TES':
-        return setName(p.tes_rule_set_id);
+        return [setName(p.tes_rule_set_id), gradeLabel(p)].filter(Boolean).join(' · ');
     }
   };
 
@@ -125,17 +132,48 @@ export function PayProfilePanel({
                   </Link>
                 </p>
               ) : (
-                <Field label={t.pay.tesSet} required>
-                  {(p) => (
-                    <Select {...p} name="tes_rule_set_id" required>
-                      {sets.map((s) => (
-                        <option key={s.id} value={s.id}>
-                          {s.name} · {f.date(`${s.valid_from}T12:00:00Z`)}
-                        </option>
-                      ))}
-                    </Select>
+                <>
+                  <Field label={t.pay.tesSet} required>
+                    {(p) => (
+                      <Select
+                        {...p}
+                        name="tes_rule_set_id"
+                        required
+                        value={setId}
+                        onChange={(e) => setSetId(e.target.value)}
+                      >
+                        {sets.map((s) => (
+                          <option key={s.id} value={s.id}>
+                            {s.name} · {f.date(`${s.valid_from}T12:00:00Z`)}
+                          </option>
+                        ))}
+                      </Select>
+                    )}
+                  </Field>
+                  {/* Категория — только у набора с таблицей ставок; ставка по ней растёт сама. */}
+                  {setGrades.length > 0 && (
+                    <Field label={t.pay.tesGrade} required>
+                      {(p) => (
+                        <Select
+                          {...p}
+                          key={setId}
+                          name="tes_grade"
+                          required
+                          defaultValue={profiles[0]?.tes_rule_set_id === setId ? (profiles[0]?.tes_grade ?? '') : ''}
+                        >
+                          <option value="" disabled>
+                            —
+                          </option>
+                          {setGrades.map((g) => (
+                            <option key={g.grade} value={g.grade}>
+                              {g.label}
+                            </option>
+                          ))}
+                        </Select>
+                      )}
+                    </Field>
                   )}
-                </Field>
+                </>
               ))}
 
             {state.error && (

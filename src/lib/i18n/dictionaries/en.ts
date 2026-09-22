@@ -1768,6 +1768,7 @@ export const en = {
     perKm: '€ / km',
     hourly: '€ / h',
     tripPercent: '% of settlement',
+    tesGrade: 'Pay grade and experience',
     tesSet: 'CBA rule set',
     save: 'Save model',
     current: 'Current model',
@@ -1795,6 +1796,18 @@ export const en = {
   },
 
   tes: {
+    basePlaceholderHint: 'Used when no pay grade is chosen for the driver.',
+    overtimeBasis: 'Overtime',
+    basisDay: 'Per day',
+    basisPeriod: 'Per 2-week period',
+    periodHours: 'Regular hours in the period, h',
+    periodAnchor: 'Period starts (Monday)',
+    pctOfBase: '% of table wage',
+    holidays: 'Public holidays and the days off of TES § 11.4 like Sunday',
+    minPaid: 'Minimum paid work per day, h',
+    rates: 'Wage table',
+    grade: 'Pay grade',
+    since: 'from',
     title: 'CBA rules',
     subtitle:
       'Enter the figures from your current collective agreement. When the agreement is renewed, create a new rule set with a new start date — earlier periods keep the old rules.',
@@ -1818,7 +1831,8 @@ export const en = {
     copy: 'Copy as my own',
     own: 'My rule sets',
     none: 'No rule sets yet',
-    later: 'Public holidays, weekly overtime and daily rest will be added later.',
+    later:
+      'The operator template Kuorma-autoalan TES 2025–2028 includes the wage tables and supplements. Use it directly in a driver pay model, or copy it and edit your own.',
     save: 'Save',
     inUse: 'This rule set is used by a pay model and cannot be deleted.',
     delete: 'Delete',

@@ -718,6 +718,7 @@ export type Database = {
           id: string
           model: Database["public"]["Enums"]["pay_model"]
           per_km_cents: number | null
+          tes_grade: string | null
           tes_rule_set_id: string | null
           trip_bps: number | null
           valid_from: string
@@ -730,6 +731,7 @@ export type Database = {
           id?: string
           model: Database["public"]["Enums"]["pay_model"]
           per_km_cents?: number | null
+          tes_grade?: string | null
           tes_rule_set_id?: string | null
           trip_bps?: number | null
           valid_from: string
@@ -742,6 +744,7 @@ export type Database = {
           id?: string
           model?: Database["public"]["Enums"]["pay_model"]
           per_km_cents?: number | null
+          tes_grade?: string | null
           tes_rule_set_id?: string | null
           trip_bps?: number | null
           valid_from?: string
@@ -2199,18 +2202,25 @@ export type Database = {
           created_at: string
           created_by: string | null
           daily_regular_minutes: number
+          evening_bps: number
           evening_cents: number
           evening_end: string | null
           evening_start: string | null
+          holidays_as_sunday: boolean
           id: string
+          min_paid_minutes: number
           name: string
+          night_bps: number
           night_cents: number
           night_end: string | null
           night_start: string | null
           note: string | null
+          overtime_basis: string
           overtime1_bps: number
           overtime1_minutes: number
           overtime2_bps: number
+          period_anchor: string
+          period_regular_minutes: number
           saturday_bps: number
           sunday_bps: number
           updated_at: string
@@ -2223,18 +2233,25 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           daily_regular_minutes?: number
+          evening_bps?: number
           evening_cents?: number
           evening_end?: string | null
           evening_start?: string | null
+          holidays_as_sunday?: boolean
           id?: string
+          min_paid_minutes?: number
           name: string
+          night_bps?: number
           night_cents?: number
           night_end?: string | null
           night_start?: string | null
           note?: string | null
+          overtime_basis?: string
           overtime1_bps?: number
           overtime1_minutes?: number
           overtime2_bps?: number
+          period_anchor?: string
+          period_regular_minutes?: number
           saturday_bps?: number
           sunday_bps?: number
           updated_at?: string
@@ -2247,18 +2264,25 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           daily_regular_minutes?: number
+          evening_bps?: number
           evening_cents?: number
           evening_end?: string | null
           evening_start?: string | null
+          holidays_as_sunday?: boolean
           id?: string
+          min_paid_minutes?: number
           name?: string
+          night_bps?: number
           night_cents?: number
           night_end?: string | null
           night_start?: string | null
           note?: string | null
+          overtime_basis?: string
           overtime1_bps?: number
           overtime1_minutes?: number
           overtime2_bps?: number
+          period_anchor?: string
+          period_regular_minutes?: number
           saturday_bps?: number
           sunday_bps?: number
           updated_at?: string
@@ -2277,6 +2301,44 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tes_wage_rates: {
+        Row: {
+          grade: string
+          hourly_cents: number
+          id: string
+          label: string
+          rule_set_id: string
+          sort: number
+          valid_from: string
+        }
+        Insert: {
+          grade: string
+          hourly_cents: number
+          id?: string
+          label: string
+          rule_set_id: string
+          sort?: number
+          valid_from: string
+        }
+        Update: {
+          grade?: string
+          hourly_cents?: number
+          id?: string
+          label?: string
+          rule_set_id?: string
+          sort?: number
+          valid_from?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tes_wage_rates_rule_set_id_fkey"
+            columns: ["rule_set_id"]
+            isOneToOne: false
+            referencedRelation: "tes_rule_sets"
             referencedColumns: ["id"]
           },
         ]

@@ -162,6 +162,7 @@ export async function savePayProfileAction(
     hourly_cents: model === 'FLAT_HOURLY' ? cents(formData, 'hourly') : null,
     trip_bps: model === 'TRIP_PERCENT' ? bps(formData, 'trip_percent') : null,
     tes_rule_set_id: model === 'TES' ? opt(formData, 'tes_rule_set_id') : null,
+    tes_grade: model === 'TES' ? opt(formData, 'tes_grade') : null,
   };
 
   const supabase = await createClient();
@@ -325,6 +326,16 @@ export async function saveTesAction(_previous: FormState, formData: FormData): P
     night_cents: cents(formData, 'night') ?? 0,
     saturday_bps: bps(formData, 'saturday_pct') ?? 0,
     sunday_bps: bps(formData, 'sunday_pct') ?? 0,
+    evening_bps: bps(formData, 'evening_pct') ?? 0,
+    night_bps: bps(formData, 'night_pct') ?? 0,
+    overtime_basis: str(formData, 'overtime_basis') === 'PERIOD' ? 'PERIOD' : 'DAY',
+    period_regular_minutes: hours('period_regular_hours') ?? 4800,
+    /* Отсчёт периодов — понедельник; база это проверит. */
+    period_anchor: /^\d{4}-\d{2}-\d{2}$/.test(str(formData, 'period_anchor'))
+      ? str(formData, 'period_anchor')
+      : '2026-01-05',
+    holidays_as_sunday: formData.get('holidays_as_sunday') === 'on',
+    min_paid_minutes: hours('min_paid_hours') ?? 0,
     note: opt(formData, 'note'),
   };
 
