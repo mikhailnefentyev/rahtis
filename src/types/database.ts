@@ -718,6 +718,7 @@ export type Database = {
           id: string
           model: Database["public"]["Enums"]["pay_model"]
           per_km_cents: number | null
+          tes_experience_since: string | null
           tes_grade: string | null
           tes_rule_set_id: string | null
           trip_bps: number | null
@@ -731,6 +732,7 @@ export type Database = {
           id?: string
           model: Database["public"]["Enums"]["pay_model"]
           per_km_cents?: number | null
+          tes_experience_since?: string | null
           tes_grade?: string | null
           tes_rule_set_id?: string | null
           trip_bps?: number | null
@@ -744,6 +746,7 @@ export type Database = {
           id?: string
           model?: Database["public"]["Enums"]["pay_model"]
           per_km_cents?: number | null
+          tes_experience_since?: string | null
           tes_grade?: string | null
           tes_rule_set_id?: string | null
           trip_bps?: number | null

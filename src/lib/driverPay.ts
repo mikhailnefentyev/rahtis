@@ -75,8 +75,13 @@ export type PayProfileInput = {
   tripBps: number | null;
   hourlyCents: number | null;
   tes: TesRules | null;
-  /** Категория и стаж водителя в таблице ставок набора. */
+  /**
+   * Категория водителя в таблице ставок набора: TRUCK — ступень стажа
+   * считается от tesExperienceSince; TRUCK_4 — ступень задана явно.
+   */
   tesGrade?: string | null;
+  /** Начало стажа водителя (YYYY-MM-DD). */
+  tesExperienceSince?: string | null;
 };
 
 /** Итог одного дня. День — местная дата начала смены (см. splitShift). */
@@ -379,13 +384,39 @@ export function payableKm(day: Pick<WorkDay, 'odometerKm' | 'tripKm'>): number {
   return day.odometerKm > 0 ? day.odometerKm : day.tripKm;
 }
 
-/** Ставка часа на дату: по категории водителя из таблицы набора, иначе базовая. */
+/** Полных лет между датами YYYY-MM-DD. */
+function fullYears(since: string, date: string): number {
+  const years = Number(date.slice(0, 4)) - Number(since.slice(0, 4));
+  return date.slice(5) < since.slice(5) ? years - 1 : years;
+}
+
+/**
+ * Строка таблицы ставок на дату.
+ *
+ * Если у категории есть ступени стажа (TRUCK_0, TRUCK_4…), а у водителя
+ * указано начало стажа, ступень считается на каждый день: меньше 4 лет,
+ * 4–8, 8–12, 12 и больше (TES § 8). Ставка поднимается сама в день
+ * перехода. Явно заданная ступень (TRUCK_4) берётся как есть.
+ */
+export function tesGradeOn(profile: PayProfileInput, date: string): string | null {
+  const grade = profile.tesGrade ?? null;
+  const since = profile.tesExperienceSince;
+  if (!grade || !since || /_(0|4|8|12)$/.test(grade)) return grade;
+  if (!(profile.tes?.rates ?? []).some((r) => r.grade === `${grade}_0`)) return grade;
+
+  const years = Math.max(0, fullYears(since, date));
+  const step = years >= 12 ? 12 : years >= 8 ? 8 : years >= 4 ? 4 : 0;
+  return `${grade}_${step}`;
+}
+
+/** Ставка часа на дату: по категории и стажу из таблицы набора, иначе базовая. */
 export function tesBaseOn(profile: PayProfileInput, date: string): number {
   const rules = profile.tes;
   if (!rules) return 0;
+  const grade = tesGradeOn(profile, date);
   let best: TesRate | null = null;
   for (const rate of rules.rates ?? []) {
-    if (rate.grade !== profile.tesGrade || rate.validFrom > date) continue;
+    if (rate.grade !== grade || rate.validFrom > date) continue;
     if (!best || rate.validFrom > best.validFrom) best = rate;
   }
   return best?.hourlyCents ?? rules.baseHourlyCents;

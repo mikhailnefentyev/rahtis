@@ -163,6 +163,10 @@ export async function savePayProfileAction(
     trip_bps: model === 'TRIP_PERCENT' ? bps(formData, 'trip_percent') : null,
     tes_rule_set_id: model === 'TES' ? opt(formData, 'tes_rule_set_id') : null,
     tes_grade: model === 'TES' ? opt(formData, 'tes_grade') : null,
+    tes_experience_since:
+      model === 'TES' && /^\d{4}-\d{2}-\d{2}$/.test(str(formData, 'tes_experience_since'))
+        ? str(formData, 'tes_experience_since')
+        : null,
   };
 
   const supabase = await createClient();

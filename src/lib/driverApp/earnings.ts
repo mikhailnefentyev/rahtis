@@ -48,6 +48,7 @@ type RawProfile = {
   hourly_cents: number | null;
   tes: TesRuleSet | null;
   tes_grade: string | null;
+  tes_experience_since: string | null;
   rates: Array<{ grade: string; valid_from: string; hourly_cents: number }>;
 };
 
@@ -116,6 +117,7 @@ export async function getDriverEarnings(month: string): Promise<DriverEarnings> 
     hourlyCents: p.hourly_cents,
     tes: p.tes ? tesRules(p.tes, p.rates) : null,
     tesGrade: p.tes_grade,
+    tesExperienceSince: p.tes_experience_since,
   }));
 
   const shifts: ShiftInput[] = raw.shifts.map((s) => ({

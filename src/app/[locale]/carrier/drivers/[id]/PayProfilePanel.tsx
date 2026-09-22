@@ -40,10 +40,48 @@ export function PayProfilePanel({
   const { t, m, f, locale } = useI18n();
   const [state, formAction, pending] = useActionState(savePayProfileAction, initial);
   const [model, setModel] = useState<PayModel>(profiles[0]?.model ?? 'FLAT_HOURLY');
-  const [setId, setSetId] = useState<string>(profiles[0]?.tes_rule_set_id ?? sets[0]?.id ?? '');
-  const setGrades = grades.filter((g) => g.rule_set_id === setId);
-  const gradeLabel = (p: DriverPayProfile) =>
-    grades.find((g) => g.rule_set_id === p.tes_rule_set_id && g.grade === p.tes_grade)?.label;
+  /*
+   * Категории водителя без ступени стажа: из «TRUCK_4 · …, 4–8 v» остаётся
+   * «TRUCK · …». Ступень калькулятор выводит сам из даты начала стажа.
+   */
+  /*
+   * Ступень — окончание _0/_4/_8/_12, и только у категории, где ступени
+   * есть: INTL_8 — это «+8 %», а не восьмая ступень.
+   */
+  const baseCode = (set: string | null, grade: string | null | undefined) => {
+    if (!grade) return null;
+    const base = grade.replace(/_(0|4|8|12)$/, '');
+    return base !== grade && grades.some((g) => g.rule_set_id === set && g.grade === `${base}_0`) ? base : grade;
+  };
+
+  const categories = [
+    ...new Map(
+      grades.map((g) => {
+        const code = baseCode(g.rule_set_id, g.grade)!;
+        const label = code === g.grade ? g.label : g.label.replace(/,\s[^,]*\sv$/, '');
+        return [`${g.rule_set_id}:${code}`, { rule_set_id: g.rule_set_id, code, label }];
+      }),
+    ).values(),
+  ];
+  const stepped = (set: string | null, code: string | null) =>
+    grades.some((g) => g.rule_set_id === set && g.grade === `${code}_0`);
+
+  /* По умолчанию — набор с таблицей ставок: там и категория, и стаж. */
+  const [setId, setSetId] = useState<string>(
+    profiles[0]?.tes_rule_set_id ?? categories[0]?.rule_set_id ?? sets[0]?.id ?? '',
+  );
+  const setCategories = categories.filter((c) => c.rule_set_id === setId);
+  const last = profiles[0]?.tes_rule_set_id === setId ? profiles[0] : null;
+  const [category, setCategory] = useState<string>(baseCode(setId, last?.tes_grade) ?? '');
+
+  const gradeLabel = (p: DriverPayProfile) => {
+    const code = baseCode(p.tes_rule_set_id, p.tes_grade);
+    const label = categories.find((c) => c.rule_set_id === p.tes_rule_set_id && c.code === code)?.label;
+    const since = p.tes_experience_since
+      ? m('pay.experienceSince', { date: f.date(`${p.tes_experience_since}T12:00:00Z`) })
+      : null;
+    return [label, since].filter(Boolean).join(' · ');
+  };
 
   const current = profiles.find((p) => p.valid_from <= today) ?? null;
   const setName = (id: string | null) => sets.find((s) => s.id === id)?.name ?? '—';
@@ -140,7 +178,10 @@ export function PayProfilePanel({
                         name="tes_rule_set_id"
                         required
                         value={setId}
-                        onChange={(e) => setSetId(e.target.value)}
+                        onChange={(e) => {
+                          setSetId(e.target.value);
+                          setCategory('');
+                        }}
                       >
                         {sets.map((s) => (
                           <option key={s.id} value={s.id}>
@@ -150,28 +191,48 @@ export function PayProfilePanel({
                       </Select>
                     )}
                   </Field>
-                  {/* Категория — только у набора с таблицей ставок; ставка по ней растёт сама. */}
-                  {setGrades.length > 0 && (
-                    <Field label={t.pay.tesGrade} required>
-                      {(p) => (
-                        <Select
-                          {...p}
-                          key={setId}
-                          name="tes_grade"
-                          required
-                          defaultValue={profiles[0]?.tes_rule_set_id === setId ? (profiles[0]?.tes_grade ?? '') : ''}
-                        >
-                          <option value="" disabled>
-                            —
-                          </option>
-                          {setGrades.map((g) => (
-                            <option key={g.grade} value={g.grade}>
-                              {g.label}
+                  {/*
+                    * Категория и стаж — у набора с таблицей ставок. Стаж —
+                    * датой: ступень (меньше 4 лет, 4–8, 8–12, больше 12)
+                    * калькулятор выводит на каждый день сам.
+                    */}
+                  {setCategories.length > 0 && (
+                    <>
+                      <Field label={t.pay.tesGrade} required>
+                        {(p) => (
+                          <Select
+                            {...p}
+                            name="tes_grade"
+                            required
+                            value={category}
+                            onChange={(e) => setCategory(e.target.value)}
+                          >
+                            <option value="" disabled>
+                              —
                             </option>
-                          ))}
-                        </Select>
+                            {setCategories.map((c) => (
+                              <option key={c.code} value={c.code}>
+                                {c.label}
+                              </option>
+                            ))}
+                          </Select>
+                        )}
+                      </Field>
+                      {(category === '' || stepped(setId, category)) && (
+                        <Field label={t.pay.tesExperience} hint={t.pay.tesExperienceHint} required>
+                          {(p) => (
+                            <Input
+                              {...p}
+                              type="date"
+                              name="tes_experience_since"
+                              required
+                              max={today}
+                              defaultValue={last?.tes_experience_since ?? ''}
+                            />
+                          )}
+                        </Field>
                       )}
-                    </Field>
+                    </>
                   )}
                 </>
               ))}

@@ -6,7 +6,7 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { splitShift, summarizeDriver, payableKm, profileOn, finnishHolidays, tesBaseOn } from './driverPay.ts';
+import { splitShift, summarizeDriver, payableKm, profileOn, finnishHolidays, tesBaseOn, tesGradeOn } from './driverPay.ts';
 
 const NOW = Date.parse('2026-12-31T00:00:00Z');
 
@@ -156,6 +156,8 @@ const kuorma = {
   rates: [
     { grade: 'TRUCK_0', validFrom: '2025-03-01', hourlyCents: 1577 },
     { grade: 'TRUCK_0', validFrom: '2026-06-01', hourlyCents: 1623 },
+    { grade: 'TRUCK_4', validFrom: '2025-03-01', hourlyCents: 1594 },
+    { grade: 'TRUCK_4', validFrom: '2026-06-01', hourlyCents: 1640 },
   ],
 };
 const kuormaProfile = (grade = null) => ({
@@ -237,4 +239,14 @@ test('TES § 11.4, § 14.5: сочельник оплачивается как �
   const [day] = summary.days;
   assert.equal(day.sundayMinutes, 120);
   assert.equal(day.parts.weekendCents, Math.round((120 * 1623 * 10_000) / 60 / 10_000));
+});
+
+test('TES § 8: ступень стажа считается от даты начала стажа', () => {
+  const profile = { ...kuormaProfile('TRUCK'), tesExperienceSince: '2022-10-01' };
+  assert.equal(tesGradeOn(profile, '2026-09-30'), 'TRUCK_0');
+  assert.equal(tesGradeOn(profile, '2026-10-01'), 'TRUCK_4');
+  assert.equal(tesBaseOn(profile, '2026-09-30'), 1623);
+  assert.equal(tesBaseOn(profile, '2026-10-01'), 1640);
+  // явная ступень не пересчитывается
+  assert.equal(tesGradeOn({ ...profile, tesGrade: 'TRUCK_0' }, '2030-01-01'), 'TRUCK_0');
 });

@@ -140,6 +140,7 @@ export async function buildDriverReport(input: {
         hourlyCents: p.hourly_cents,
         tes: p.tes_rule_set_id ? (rulesById.get(p.tes_rule_set_id) ?? null) : null,
         tesGrade: p.tes_grade,
+        tesExperienceSince: p.tes_experience_since,
       }));
 
     const summary = summarizeDriver({
