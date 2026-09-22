@@ -1717,7 +1717,39 @@ export const fi = {
     detach: 'Kirjaa ulos puhelimesta',
   },
 
+  places: {
+    kind: {
+      FUEL: 'Tankkaus',
+      PARKING: 'Pysäköinti',
+      SHOWER: 'Suihku',
+      SERVICE: 'Huolto',
+    },
+    free: 'Ilmainen',
+    secured: 'Vartioitu',
+    sauna: 'Sauna',
+    warning: 'Huomio',
+    approx: 'Sijainti on likimääräinen – navigointi hakee paikan nimellä.',
+    hours: 'Aukioloajat',
+    navigate: 'Navigoi',
+    call: 'Soita',
+    close: 'Sulje',
+    nearest: 'Lähimmät',
+    locate: 'Näytä lähimmät',
+    locating: 'Haetaan sijaintia…',
+    locateHint: 'Salli sijainti, niin näet lähimmät paikat etäisyyksineen.',
+    noMap: 'Kartta ei ole käytettävissä. Lähimmät paikat näet sijainnin avulla.',
+    source:
+      'Tiedot on koottu 22.9.2026 ketjujen sivuilta, viranomaisilta ja kuljettajien arvioista. Hinnat ja käytännöt voivat muuttua – varmista tärkeät asiat puhelimella.',
+    detail: {
+      price: 'Hinta',
+      security: 'Turvallisuus',
+      facilities: 'Palvelut',
+      capacity: 'Paikkoja',
+    },
+  },
+
   driverApp: {
+    map: 'Kartta',
     title: 'RAHTIS Kuljettaja',
     tasks: 'Tehtävät',
     inbox: 'Viestit',
@@ -2314,6 +2346,7 @@ export const fi = {
     'pay.experienceSince': 'ajokokemus {date} alkaen',
     'fleet.feeRule': '{unit} (ilman alv:tä) kuukaudessa jokaisesta autosta, joka ajaa kuukauden aikana vähintään yhden keikan. Ajamaton auto on maksuton. Maksu vähennetään tilityksestä.',
     'fleet.feeFree': 'Ensimmäinen kuukausi on maksuton: maksuton {date} asti.',
+    'places.count': '{count, plural, one {# paikka} other {# paikkaa}}',
     'driverApp.welcome': 'Tervetuloa, {name}',
     'driverApp.breakTotal': 'Tauot {minutes} min',
     'driverApp.stopOf': 'Pysähdys {n}/{total}',

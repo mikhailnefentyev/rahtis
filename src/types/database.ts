@@ -845,6 +845,72 @@ export type Database = {
           },
         ]
       }
+      driver_places: {
+        Row: {
+          address: string | null
+          approx: boolean
+          country: string
+          details: Json
+          free: boolean
+          hours_en: string | null
+          hours_fi: string | null
+          id: string
+          kinds: string[]
+          lat: number
+          lon: number
+          name_en: string
+          name_fi: string
+          network: string | null
+          phone: string | null
+          sauna: boolean
+          secured: boolean
+          updated_at: string
+          warning: boolean
+        }
+        Insert: {
+          address?: string | null
+          approx?: boolean
+          country: string
+          details?: Json
+          free?: boolean
+          hours_en?: string | null
+          hours_fi?: string | null
+          id: string
+          kinds: string[]
+          lat: number
+          lon: number
+          name_en: string
+          name_fi: string
+          network?: string | null
+          phone?: string | null
+          sauna?: boolean
+          secured?: boolean
+          updated_at?: string
+          warning?: boolean
+        }
+        Update: {
+          address?: string | null
+          approx?: boolean
+          country?: string
+          details?: Json
+          free?: boolean
+          hours_en?: string | null
+          hours_fi?: string | null
+          id?: string
+          kinds?: string[]
+          lat?: number
+          lon?: number
+          name_en?: string
+          name_fi?: string
+          network?: string | null
+          phone?: string | null
+          sauna?: boolean
+          secured?: boolean
+          updated_at?: string
+          warning?: boolean
+        }
+        Relationships: []
+      }
       driver_push_subscriptions: {
         Row: {
           auth: string

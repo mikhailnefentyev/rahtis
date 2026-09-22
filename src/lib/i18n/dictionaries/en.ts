@@ -1624,7 +1624,39 @@ export const en = {
     detach: 'Sign out from the phone',
   },
 
+  places: {
+    kind: {
+      FUEL: 'Fuel',
+      PARKING: 'Parking',
+      SHOWER: 'Shower',
+      SERVICE: 'Service',
+    },
+    free: 'Free',
+    secured: 'Secured',
+    sauna: 'Sauna',
+    warning: 'Caution',
+    approx: 'The location is approximate – navigation searches for the place by name.',
+    hours: 'Opening hours',
+    navigate: 'Navigate',
+    call: 'Call',
+    close: 'Close',
+    nearest: 'Nearest',
+    locate: 'Show nearest',
+    locating: 'Getting location…',
+    locateHint: 'Allow location to see the nearest places and their distance.',
+    noMap: 'The map is not available. Use your location to see the nearest places.',
+    source:
+      'Compiled on 22 Sep 2026 from chain websites, authorities and driver reviews. Prices and rules may change – confirm anything important by phone.',
+    detail: {
+      price: 'Price',
+      security: 'Security',
+      facilities: 'Facilities',
+      capacity: 'Spaces',
+    },
+  },
+
   driverApp: {
+    map: 'Map',
     title: 'RAHTIS Driver',
     tasks: 'Jobs',
     inbox: 'Messages',
@@ -2192,6 +2224,7 @@ export const en = {
     'pay.experienceSince': 'driving since {date}',
     'fleet.feeRule': '{unit} (excl. VAT) a month for each vehicle that drives at least one job that month. A vehicle that does not drive costs nothing. The fee is deducted from the settlement.',
     'fleet.feeFree': 'The first month is free: free until {date}.',
+    'places.count': '{count, plural, one {# place} other {# places}}',
     'driverApp.welcome': 'Welcome, {name}',
     'driverApp.breakTotal': 'Breaks {minutes} min',
     'driverApp.stopOf': 'Stop {n}/{total}',
