@@ -9,6 +9,7 @@ import {
 } from '@/lib/orders/lifecycle';
 import { repricedRateCents } from '@/lib/orders/pricing';
 import { useI18n } from '@/lib/i18n/provider';
+import { VAT_CHARGED } from '@/lib/config';
 
 /**
  * Что делать заказчику, когда с заказом что-то не так.
@@ -174,7 +175,7 @@ function RepriceForm({
           )}
         </Field>
 
-        <Field label={t.orderForm.rate} hint={t.money.addVat} required>
+        <Field label={t.orderForm.rate} hint={VAT_CHARGED ? t.money.addVat : undefined} required>
           {(p) => (
             <Input
               {...p}

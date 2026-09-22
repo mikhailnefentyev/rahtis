@@ -416,7 +416,7 @@ export const fi = {
     feeTitle:
       'Selkeä hinta: kuukausimaksu ajavista autoista, 3 % tilaajalta',
     feeLede:
-      'Kuljetusliike maksaa 29,90 € + ALV kuukaudessa jokaisesta autosta, joka ajaa kuukauden aikana vähintään yhden keikan — ajamaton auto on maksuton, ja maksu vähennetään tilityksestä. Tilaaja maksaa 3 % yhteiseltä pöydältä tilatun kuljetuksen hinnasta; suorat tilaukset omille vakioautoille ovat maksuttomia. Ensimmäinen kuukausi on kaikille maksuton. Maksu kattaa sen työn, joka muuten tehdään käsin.',
+      'Kuljetusliike maksaa 29,90 € kuukaudessa jokaisesta autosta, joka ajaa kuukauden aikana vähintään yhden keikan — ajamaton auto on maksuton, ja maksu vähennetään tilityksestä. Tilaaja maksaa 3 % yhteiseltä pöydältä tilatun kuljetuksen hinnasta; suorat tilaukset omille vakioautoille ovat maksuttomia. Ensimmäinen kuukausi on kaikille maksuton. Maksu kattaa sen työn, joka muuten tehdään käsin.',
     fee1: 'Sähköinen asiakirjaliikenne',
     fee1Text:
       'Rahtikirja, kuormakuvat ja vauriomerkinnät kulkevat keikan mukana ja päätyvät tilaajalle ilman erillistä lähettämistä.',
@@ -587,6 +587,7 @@ export const fi = {
      * verovelvollisuudessa veron tilittää ostaja, ja asiakirjan on
      * sanottava se sanoin eikä tyhjällä rivillä.
      */
+    vatNoteNone: 'Summat sisältävät arvonlisäveron 0 %.',
     vatNoteDomestic: 'Summat ilman arvonlisäveroa. Alv 25,5 % lisätään laskulle.',
     vatNoteReverse:
       'Summat alv 0 %: käännetty verovelvollisuus, ostaja tilittää veron omassa maassaan.',
@@ -990,6 +991,7 @@ export const fi = {
   },
 
   billingDesk: {
+    vatNone: 'ALV 0 %',
     title: 'Laskutus ja tilitykset',
     subtitle:
       'Kausi on puoli kuukautta: 1.–15. ja 16. päivästä kuun loppuun. Laskut lähtevät asiakkaille automaattisesti kauden päätyttyä. Sinä kirjaat saapuneet maksut ja tilitykset kuljetusliikkeille.',
@@ -1004,7 +1006,7 @@ export const fi = {
     colCarrier: 'Kuljetusliike',
     colInvoice: 'Lasku',
     colTrips: 'Keikat',
-    colGross: 'Summa sis. ALV',
+    colGross: 'Summa',
     colStatus: 'Tila',
     stSent: 'Lähetetty',
     stPaid: 'Maksettu',
@@ -1318,7 +1320,7 @@ export const fi = {
     settlementShipperTitle: 'Lasku {number}',
     invoiceDate: 'Laskun päivä {date}',
     invoiceEmailSubject: 'RAHTIS · lasku {number} · kausi {from}–{to}',
-    feeLine: 'Kuukausimaksu {month}: {count} aktiivista autoa × {unit} + ALV {vat}',
+    feeLine: 'Kuukausimaksu {month}: {count} aktiivista autoa × {unit}',
     payable: 'Maksetaan kuljetusliikkeelle',
     settlementCarrierTitle: 'Kauden koontiraportti · ajetut kuljetukset',
     periodRange: 'Kausi {from}–{to}',
@@ -1564,7 +1566,7 @@ export const fi = {
     rowPayout: 'Tilitettävä',
     rowMargin: 'Kate',
     rowVat: 'ALV',
-    rowGross: 'Yhteensä sis. ALV',
+    rowGross: 'Yhteensä',
     rowClaims: 'Reklamaatioita',
     rowClaimed: 'Vaadittu yhteensä',
     reverseCharge: 'käännetty verovelvollisuus',
@@ -2312,7 +2314,7 @@ export const fi = {
     'billingDesk.customerDue': 'Asiakkaat maksavat {date} mennessä',
     'billingDesk.payoutDue': 'Tilitys kuljetusliikkeille {date}',
     'pay.experienceSince': 'ajokokemus {date} alkaen',
-    'fleet.feeRule': '{unit} + ALV kuukaudessa jokaisesta autosta, joka ajaa kuukauden aikana vähintään yhden keikan. Ajamaton auto on maksuton. Maksu vähennetään tilityksestä.',
+    'fleet.feeRule': '{unit} kuukaudessa jokaisesta autosta, joka ajaa kuukauden aikana vähintään yhden keikan. Ajamaton auto on maksuton. Maksu vähennetään tilityksestä.',
     'fleet.feeFree': 'Ensimmäinen kuukausi on maksuton: maksuton {date} asti.',
     'driverApp.welcome': 'Tervetuloa, {name}',
     'driverApp.breakTotal': 'Tauot {minutes} min',

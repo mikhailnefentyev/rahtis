@@ -107,9 +107,17 @@ export const COMMISSION_BPS = 0;
  */
 export const VAT_BPS_FI = 2550;
 
+/*
+ * ALV пока не начисляется никому (решение пользователя от 22.09.2026:
+ * «все цены НДС 0 %, потом добавляем финнам»). Ставка по стране остаётся
+ * готовой: чтобы начислять финским компаниям 25,5 %, включить здесь и в
+ * базе (app.vat_charged) — вместе, иначе документы и сбор разойдутся.
+ */
+export const VAT_CHARGED = false;
+
 /** Ставка налога для контрагента из страны. */
 export function vatBpsFor(country: string | null | undefined): number {
-  return country === 'FI' ? VAT_BPS_FI : 0;
+  return VAT_CHARGED && country === 'FI' ? VAT_BPS_FI : 0;
 }
 
 /*

@@ -3,7 +3,7 @@ import { CompletedList } from '@/components/domain/CompletedList';
 import { Stars } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
 import { cabinetPath } from '@/lib/auth/paths';
-import { COMPLETED_WEEKS, vatBpsFor } from '@/lib/config';
+import { COMPLETED_WEEKS, VAT_CHARGED, vatBpsFor } from '@/lib/config';
 import { weeksAgoMonday } from '@/lib/dates';
 import { getI18n, type Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
@@ -62,7 +62,11 @@ export async function CompletedCabinet({
    * была единственной, какая есть.
    */
   const vatNote =
-    vatBpsFor(viewer.company?.country) > 0 ? t.done.vatNoteDomestic : t.done.vatNoteReverse;
+    vatBpsFor(viewer.company?.country) > 0
+      ? t.done.vatNoteDomestic
+      : VAT_CHARGED
+        ? t.done.vatNoteReverse
+        : t.done.vatNoteNone;
 
   return (
     <main className="mx-auto w-full max-w-4xl px-5 py-8">

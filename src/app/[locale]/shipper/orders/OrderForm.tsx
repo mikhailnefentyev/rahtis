@@ -22,6 +22,7 @@ import { useI18n } from '@/lib/i18n/provider';
 import { StopFields, type StopDefaults } from './StopFields';
 import type { KnownVehicle, OrderStop, ShipperOrder, StopRole } from '@/types/db';
 import { DispatchPicker } from './DirectPanel';
+import { VAT_CHARGED } from '@/lib/config';
 
 const initial: PublishState = { error: null, ref: null };
 
@@ -791,7 +792,7 @@ export function OrderForm({
               </p>
             )}
 
-            <Field label={`${t.orderForm.rate} ${perKm}`} hint={`${t.money.addVat} ${t.orderForm.feeHint}`} required>
+            <Field label={`${t.orderForm.rate} ${perKm}`} hint={VAT_CHARGED ? `${t.money.addVat} ${t.orderForm.feeHint}` : t.orderForm.feeHint} required>
               {(p) => (
                 <InputMono
                   {...p}

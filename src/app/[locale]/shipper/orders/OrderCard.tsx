@@ -22,6 +22,7 @@ import { AmendPanel } from './AmendPanel';
 import { DirectWaiting, SendDirect } from './DirectPanel';
 import { AssignedCarrier, OffersPanel } from './OffersPanel';
 import { OrderTrouble } from './OrderTrouble';
+import { VAT_CHARGED } from '@/lib/config';
 
 /**
  * Раскрытая карточка заказа.
@@ -106,7 +107,7 @@ export function OrderCard({
                     {order.trailer ? `${order.trailer} · ` : ''}
                     {m('order.distance', { km: order.distance_km ?? 0 })} ·{' '}
                     <span className="font-semibold text-ink">{f.eur(order.rate_cents ?? 0)}</span>{' '}
-                    <span className="text-ink-dim">{t.money.addVat}</span>{' '}
+                    {VAT_CHARGED && <span className="text-ink-dim">{t.money.addVat}</span>}{' '}
                     {order.distance_km && order.rate_cents ? (
                       <span className="text-ink-dim">
                         · {m('order.ratePerKm', {

@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { renderToBuffer } from '@react-pdf/renderer';
-import { COMMISSION_BPS, commissionCents, payoutCents, vatBpsFor, withVat } from '@/lib/config';
+import { COMMISSION_BPS, commissionCents, payoutCents, VAT_CHARGED, vatBpsFor, withVat } from '@/lib/config';
 import { operatorInbox } from '@/lib/email';
 import { emailLocaleOf, emailText } from '@/lib/email/text';
 import { createFormat } from '@/lib/format';
@@ -495,7 +495,7 @@ async function issue(
     title,
     period: `${period} · ${company.name}`,
     due,
-    vatNote: vatBps > 0 ? t.done.vatNoteDomestic : t.done.vatNoteReverse,
+    vatNote: vatBps > 0 ? t.done.vatNoteDomestic : VAT_CHARGED ? t.done.vatNoteReverse : t.done.vatNoteNone,
     colRef: t.report_.colRef,
     colDate: t.report_.colDate,
     colRoute: t.report_.colRoute,
