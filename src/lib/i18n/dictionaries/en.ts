@@ -376,6 +376,8 @@ export const en = {
     carrier5:
       'We handle the invoice to the client, the consignment notes and the claims. You pay 3 % of the job price, with no monthly fee.',
     carrier6: 'The weekly report shows jobs driven, earnings and payouts due.',
+    carrier7:
+      'The driver app is included: jobs, working time, load photos, the consignment note, the place map and the language the driver speaks.',
 
     ownEyebrow: 'For carriers · your own clients',
     ownTitle: 'Drive your own clients with our tools.',
@@ -455,6 +457,16 @@ export const en = {
     ai6: 'Notifications to the phone',
     ai6Text:
       'A new job, a direct order or a cancellation arrives as a notification, even when the app is closed.',
+
+    ai7: 'A map of rest and service places',
+    ai7Text:
+      'Over 500 places in Finland, Sweden, Norway and Denmark: fuel, parking, showers and workshops. The app shows the nearest ones also while the truck stands on a break — free and guarded marked separately.',
+    ai8: 'The driver sees the earnings',
+    ai8Text:
+      'After a job the app shows what it came to and where the month now stands. The figures come from the model the carrier chose or from the collective agreement tables.',
+    ai9: 'The driver\'s own language',
+    ai9Text:
+      'The app speaks the language of the phone: Finnish, English, Estonian, Russian, Swedish, Latvian, Lithuanian, Polish, Norwegian and Danish. The language can also be chosen in the profile.',
 
     servicesEyebrow: 'The service grows in stages',
     servicesTitle: 'We started with trailer swaps — containers and express are live too',

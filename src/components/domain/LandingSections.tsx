@@ -284,7 +284,7 @@ export async function LandingSections({ locale }: { locale: Locale }) {
             {
               eyebrow: l.carrierEyebrow,
               title: l.carrierTitle,
-              lines: [l.carrier2, l.carrier3, l.carrier4, l.carrier5, l.carrier6],
+              lines: [l.carrier2, l.carrier3, l.carrier4, l.carrier5, l.carrier6, l.carrier7],
             },
             {
               eyebrow: l.ownEyebrow,
@@ -506,6 +506,9 @@ export async function LandingSections({ locale }: { locale: Locale }) {
                 { title: l.ai4, text: l.ai4Text },
                 { title: l.ai5, text: l.ai5Text },
                 { title: l.ai6, text: l.ai6Text },
+                { title: l.ai7, text: l.ai7Text },
+                { title: l.ai8, text: l.ai8Text },
+                { title: l.ai9, text: l.ai9Text },
               ].map((item) => (
                 <div key={item.title} className="assistant__cell">
                   <h3>{item.title}</h3>

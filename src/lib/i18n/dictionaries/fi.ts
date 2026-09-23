@@ -415,6 +415,8 @@ export const fi = {
     carrier5:
       'Laskun asiakkaalle, rahtikirjat ja reklamaatiot hoidamme me. Maksat 3 % keikan hinnasta, kuukausimaksua ei ole.',
     carrier6: 'Viikkoraportista näet ajetut keikat, ansiot ja tulevat tilitykset.',
+    carrier7:
+      'Kuljettajan sovellus kuuluu mukaan: keikat, työaika, kuormakuvat, rahtikirja, paikkakartta ja kuljettajan oma kieli.',
 
     /*
      * Kolmas kortti: kuljetusliike, jolla on jo asiakkaat. Hän ei osta
@@ -498,6 +500,22 @@ export const fi = {
     ai6: 'Ilmoitukset puhelimeen',
     ai6Text:
       'Uusi keikka, suora tilaus tai peruutus tulee ilmoituksena, vaikka sovellus olisi kiinni.',
+
+    /*
+     * Kolme myöhemmin valmistunutta osaa, joita osio ei tuntenut:
+     * paikkakartta, ansiot ja kuljettajan oma kieli. Kaksi ensimmäistä
+     * ovat syitä, joiden vuoksi kuljettaja avaa sovelluksen silloinkin,
+     * kun auto seisoo; kolmas on syy, jonka vuoksi hän ymmärtää sen.
+     */
+    ai7: 'Kartta tauko- ja huoltopaikoista',
+    ai7Text:
+      'Yli 500 paikkaa Suomessa, Ruotsissa, Norjassa ja Tanskassa: tankkaus, pysäköinti, suihku ja korjaamo. Sovellus näyttää lähimmät myös silloin, kun auto seisoo tauolla — maksuttomat ja vartioidut erikseen merkittynä.',
+    ai8: 'Kuljettaja näkee ansionsa',
+    ai8Text:
+      'Keikan jälkeen sovellus näyttää, paljonko siitä kertyi ja mihin kuukauden summa on noussut. Laskenta tulee kuljetusliikkeen valitsemasta mallista tai työehtosopimuksen taulukoista.',
+    ai9: 'Kuljettajan oma kieli',
+    ai9Text:
+      'Sovellus puhuu puhelimen kieltä: suomi, englanti, viro, venäjä, ruotsi, latvia, liettua, puola, norja ja tanska. Kielen voi myös valita itse profiilista.',
 
     servicesEyebrow: 'Palvelu laajenee vaiheittain',
     /*
