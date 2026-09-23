@@ -2079,6 +2079,9 @@ export const fi = {
   },
 
   known: {
+    directBilling: 'Laskuttaa sinua suoraan',
+    directBillingHint: 'Tämän auton kuljetusliike laskuttaa sinua itse ja vastaa kuljetuksesta. Maksa sen tilille laskun mukaan.',
+    carrierAccount: 'Tilinumero',
     title: 'Omat autot',
     subtitle:
       'Autot, jotka ovat ajaneet kuljetuksianne ja joiden kuljetusliike on sallinut suorat tilaukset. Suora tilaus menee autolle ohi yhteisen pöydän.',

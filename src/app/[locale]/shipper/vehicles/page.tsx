@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { Badge, Button, Card, CardBody, EmptyState, Plate } from '@/components/ui';
+import { Badge, Button, Card, CardBody, EmptyState, Mono, Plate } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
 import { EURO_LABEL } from '@/lib/fleet/labels';
 import { getI18n, isLocale, type Locale } from '@/lib/i18n';
+import { formatIban } from '@/lib/operator/profile';
 import { poolVehicleAction } from '@/lib/partners/actions';
 import { createClient } from '@/lib/supabase/server';
 import type { KnownVehicle } from '@/types/db';
@@ -109,6 +110,37 @@ async function VehicleList({
                   {m('known.tripsCount', { count: v.trips })}
                   {v.last_trip_at && ` · ${t.known.lastTrip} ${f.date(v.last_trip_at)}`}
                 </p>
+
+                {/*
+                  * Перевозчик и его реквизиты — только там, где счёт
+                  * выставляет он сам. У машин, работающих через нас,
+                  * заказчик платит нам, и знать перевозчика ему незачем.
+                  */}
+                {v.direct_billing && (
+                  <div className="mt-2 flex flex-col gap-0.5 border-t border-line pt-2 text-[13px]">
+                    <p className="font-semibold text-ink">
+                      {v.carrier_name}
+                      {v.carrier_business_id && (
+                        <span className="ml-2 font-normal text-ink-muted">
+                          Y-tunnus <Mono>{v.carrier_business_id}</Mono>
+                        </span>
+                      )}
+                    </p>
+                    {v.carrier_iban && (
+                      <p className="text-ink-muted">
+                        {t.known.carrierAccount}{' '}
+                        <Mono>{formatIban(v.carrier_iban)}</Mono>
+                        {v.carrier_bic && (
+                          <>
+                            {' · '}
+                            <Mono>{v.carrier_bic}</Mono>
+                          </>
+                        )}
+                      </p>
+                    )}
+                    <p className="text-[12px] text-ink-dim">{t.known.directBillingHint}</p>
+                  </div>
+                )}
               </div>
 
               <form action={poolVehicleAction}>

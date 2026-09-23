@@ -1986,6 +1986,9 @@ export const en = {
   },
 
   known: {
+    directBilling: 'Invoices you directly',
+    directBillingHint: 'The carrier of this vehicle invoices you itself and is liable for the transport. Pay to its account as stated on the invoice.',
+    carrierAccount: 'Account number',
     title: 'My vehicles',
     subtitle:
       'Vehicles that have driven your transports and whose carrier allows direct orders. A direct order goes to the vehicle without the load board.',

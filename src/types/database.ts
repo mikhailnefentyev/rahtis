@@ -4012,7 +4012,9 @@ export type Database = {
           available: boolean
           axles: number
           busy: boolean
+          carrier_bic: string
           carrier_business_id: string
+          carrier_iban: string
           carrier_name: string
           container_feet: number[]
           direct_billing: boolean
