@@ -1396,6 +1396,9 @@ export const fi = {
     periodClosingNote:
       'Kuljetus kuuluu sille kaudelle, jona se päättyi. Kausi on 1.–15. tai 16. päivästä kuun loppuun; kauden lopussa aloitettu ja sen jälkeen purettu kuljetus näkyy seuraavan kauden asiakirjoissa.',
     page: 'Sivu',
+    kindWeek: 'Viikkoraportti',
+    kindPeriod: 'Kauden asiakirja',
+    kindSubscription: 'Kuukausimaksulasku',
     archive: 'Viikkoraportit',
     archiveEmpty: 'Ei vielä raportteja',
     download: 'Lataa PDF',

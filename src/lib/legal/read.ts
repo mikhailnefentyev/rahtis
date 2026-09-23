@@ -86,5 +86,12 @@ export const activeLegalDocument = unstable_cache(
     return { version: data.version, effective_from: data.effective_from, clauses };
   },
   ['legal-document'],
-  { tags: [LEGAL_TAG] },
+  /*
+   * Метка снимается при активации редакции — это главный путь. Срок в
+   * пять минут стоит рядом как страховка: если редакцию активировали
+   * мимо приложения (запросом в базе, из другого окружения), посетитель
+   * не должен читать прежние условия бесконечно. Цена страховки — одно
+   * чтение в пять минут на экземпляр.
+   */
+  { tags: [LEGAL_TAG], revalidate: 300 },
 );

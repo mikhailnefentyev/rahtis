@@ -1325,6 +1325,9 @@ export const en = {
     periodClosingNote:
       'A transport belongs to the period in which it was completed. A period runs from the 1st to the 15th or from the 16th to the end of the month; one started at the end of a period and unloaded after it appears in the next period documents.',
     page: 'Page',
+    kindWeek: 'Weekly report',
+    kindPeriod: 'Period document',
+    kindSubscription: 'Monthly fee invoice',
     archive: 'Weekly reports',
     archiveEmpty: 'No reports yet',
     download: 'Download PDF',

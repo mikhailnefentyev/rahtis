@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 import type { PartyRole } from '@/types/db';
 
 /**
- * Архив недельных отчётов компании.
+ * Архив документов компании.
  *
  * Ссылки подписанные и живут час. Бакет закрытый, и постоянной публичной
  * ссылки у отчёта быть не должно: в нём ставки, выплаты и контрагенты —
@@ -16,7 +16,7 @@ export async function ReportArchive({ locale, role }: { locale: Locale; role: Pa
 
   const { data: reports } = await supabase
     .from('weekly_reports')
-    .select('id, week, file_path, orders_count, bytes')
+    .select('id, week, kind, file_path, orders_count, bytes')
     .eq('role', role)
     .order('week', { ascending: false })
     .limit(12);
@@ -43,9 +43,24 @@ export async function ReportArchive({ locale, role }: { locale: Locale; role: Pa
               key={report.id}
               className="flex flex-wrap items-baseline justify-between gap-x-4 border-t border-line pt-1.5 first:border-t-0 first:pt-0"
             >
+              {/*
+                * Вид документа словом: в списке рядом лежат недельный
+                * отчёт, документ периода и счёт за месячный сбор. Без
+                * подписи счёт выглядел отчётом с нулём рейсов.
+                */}
               <span className="text-[13px]">
                 <Mono>{f.date(report.week)}</Mono>{' '}
-                <span className="text-ink-muted">· {report.orders_count}</span>
+                <span className="text-ink-muted">
+                  ·{' '}
+                  {report.kind === 'SUBSCRIPTION'
+                    ? t.report_.kindSubscription
+                    : report.kind === 'PERIOD'
+                      ? t.report_.kindPeriod
+                      : t.report_.kindWeek}
+                </span>
+                {report.kind !== 'SUBSCRIPTION' && (
+                  <span className="text-ink-dim"> · {report.orders_count}</span>
+                )}
               </span>
 
               {report.url && (
