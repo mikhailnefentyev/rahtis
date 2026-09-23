@@ -740,7 +740,35 @@
 @media (min-width: 640px) {
   .assistant__grid { grid-template-columns: 1fr 1fr; }
 }
+/*
+ * На широком экране — три колонки.
+ *
+ * Карточек стало девять, и в две колонки они выстраивались в пять рядов:
+ * список выходил вдвое выше телефона рядом с ним, а телефон повисал в
+ * пустоте посередине. Три колонки дают три ряда, и обе половины раздела
+ * снова одного роста.
+ */
+@media (min-width: 1024px) {
+  .assistant__grid { grid-template-columns: repeat(3, 1fr); }
+}
+/*
+ * Нечётная последняя ячейка занимает обе колонки.
+ *
+ * Сетка двухколонная, и при нечётном числе карточек в последнем ряду
+ * оставалась дыра: фон решётки просвечивал пустым прямоугольником рядом
+ * с текстом. Растянутая ячейка закрывает ряд целиком, и правило работает
+ * при любом числе карточек — их число меняется всякий раз, когда в
+ * приложении появляется что-то новое.
+ */
 .assistant__cell { background: var(--color-night-raised); padding: 20px; }
+@media (min-width: 640px) {
+  .assistant__cell:last-child:nth-child(odd) { grid-column: 1 / -1; }
+}
+/* То же на трёх колонках: остаток ряда закрывает последняя карточка. */
+@media (min-width: 1024px) {
+  .assistant__cell:last-child:nth-child(3n + 1) { grid-column: span 3; }
+  .assistant__cell:last-child:nth-child(3n + 2) { grid-column: span 2; }
+}
 .assistant__cell h3 { font-size: 14px; font-weight: 600; color: var(--color-night-ink); }
 .assistant__cell p { margin-top: 6px; font-size: 13px; color: var(--color-night-muted); }
 
