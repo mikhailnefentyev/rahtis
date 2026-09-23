@@ -160,3 +160,23 @@ function offsetMinutesAt(ms: number): number {
 
   return Math.round((asUtc - Math.floor(ms / 60_000) * 60_000) / 60_000);
 }
+
+/**
+ * Номер недели по ISO 8601 — так недели называют в финских отчётах.
+ *
+ * Лежит здесь, а не рядом с местом использования: то же число считают
+ * кабинетный пульс, недельный отчёт и сводка оператора, и три копии
+ * одной формулы разъезжаются молча — расхождение видно только в неделе,
+ * которая выпала на стык года.
+ */
+export function isoWeekNumber(isoDate: string): number {
+  const date = new Date(`${isoDate}T00:00:00Z`);
+
+  /* Четверг той же недели определяет год и номер по ISO. */
+  date.setUTCDate(date.getUTCDate() + 3);
+  const firstThursday = new Date(Date.UTC(date.getUTCFullYear(), 0, 4));
+  const shift = (firstThursday.getUTCDay() + 6) % 7;
+  firstThursday.setUTCDate(firstThursday.getUTCDate() - shift + 3);
+
+  return 1 + Math.round((date.getTime() - firstThursday.getTime()) / (7 * 24 * 3600 * 1000));
+}

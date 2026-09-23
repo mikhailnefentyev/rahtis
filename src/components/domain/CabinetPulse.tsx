@@ -1,4 +1,5 @@
 import { Bars, Card, CardBody, Mono } from '@/components/ui';
+import { isoWeekNumber } from '@/lib/dates';
 import { getI18n, type Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import type { Dictionary } from '@/lib/i18n';
@@ -100,10 +101,10 @@ export async function CabinetPulse({ locale, role }: { locale: Locale; role: Par
             {first && last && (
               <Mono className="text-[13px] font-semibold">
                 {first === last
-                  ? m('pulse.totalOne', { no: isoWeek(first.week), amount: f.eur(total) })
+                  ? m('pulse.totalOne', { no: isoWeekNumber(first.week), amount: f.eur(total) })
                   : m('pulse.totalRange', {
-                      from: isoWeek(first.week),
-                      to: isoWeek(last.week),
+                      from: isoWeekNumber(first.week),
+                      to: isoWeekNumber(last.week),
                       amount: f.eur(total),
                     })}
               </Mono>
@@ -114,9 +115,9 @@ export async function CabinetPulse({ locale, role }: { locale: Locale; role: Par
             <Bars
               points={series.map((point) => ({
                 value: point.cents,
-                label: m('pulse.week', { no: isoWeek(point.week) }),
+                label: m('pulse.week', { no: isoWeekNumber(point.week) }),
                 title: m('pulse.weekAmount', {
-                  no: isoWeek(point.week),
+                  no: isoWeekNumber(point.week),
                   amount: f.eur(point.cents),
                 }),
               }))}
@@ -196,15 +197,3 @@ function mondayBefore(weeksBack: number): string {
   return date.toISOString().slice(0, 10);
 }
 
-/** Номер недели по ISO 8601 — так недели называют в финских отчётах. */
-function isoWeek(isoDate: string): number {
-  const date = new Date(`${isoDate}T00:00:00Z`);
-
-  /* Четверг той же недели определяет год и номер по ISO. */
-  date.setUTCDate(date.getUTCDate() + 3);
-  const firstThursday = new Date(Date.UTC(date.getUTCFullYear(), 0, 4));
-  const shift = (firstThursday.getUTCDay() + 6) % 7;
-  firstThursday.setUTCDate(firstThursday.getUTCDate() - shift + 3);
-
-  return 1 + Math.round((date.getTime() - firstThursday.getTime()) / (7 * 24 * 3600 * 1000));
-}

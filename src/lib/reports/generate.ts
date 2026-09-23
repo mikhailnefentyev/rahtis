@@ -4,6 +4,7 @@ import { renderToBuffer } from '@react-pdf/renderer';
 import { COMMISSION_BPS, commissionCents, payoutCents, vatBpsFor, withVat } from '@/lib/config';
 import { operatorInbox } from '@/lib/email';
 import { emailLocaleOf, emailText } from '@/lib/email/text';
+import { isoWeekNumber } from '@/lib/dates';
 import { createFormat } from '@/lib/format';
 import { getDictionary, type Locale } from '@/lib/i18n';
 import { createMessages } from '@/lib/i18n/message';
@@ -46,14 +47,6 @@ export function lastWeek(now: Date = new Date()): string {
   const d = new Date(`${mondayOf(now)}T00:00:00Z`);
   d.setUTCDate(d.getUTCDate() - 7);
   return d.toISOString().slice(0, 10);
-}
-
-function isoWeekNumber(isoDate: string): number {
-  const d = new Date(`${isoDate}T00:00:00Z`);
-  d.setUTCDate(d.getUTCDate() + 3);
-  const jan4 = new Date(Date.UTC(d.getUTCFullYear(), 0, 4));
-  jan4.setUTCDate(jan4.getUTCDate() - ((jan4.getUTCDay() + 6) % 7) + 3);
-  return 1 + Math.round((d.getTime() - jan4.getTime()) / (7 * 24 * 3600 * 1000));
 }
 
 export type GenerateResult = {

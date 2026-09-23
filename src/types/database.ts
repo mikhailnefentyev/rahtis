@@ -4847,6 +4847,7 @@ export type Database = {
           orders_count: number
           payout_cents: number
           rate_cents: number
+          shipper_fee_cents: number
           week: string
         }[]
       }

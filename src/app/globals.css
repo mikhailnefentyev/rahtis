@@ -748,7 +748,7 @@
  * пустоте посередине. Три колонки дают три ряда, и обе половины раздела
  * снова одного роста.
  */
-@media (min-width: 1024px) {
+@media (min-width: 1280px) {
   .assistant__grid { grid-template-columns: repeat(3, 1fr); }
 }
 /*
@@ -765,7 +765,7 @@
   .assistant__cell:last-child:nth-child(odd) { grid-column: 1 / -1; }
 }
 /* То же на трёх колонках: остаток ряда закрывает последняя карточка. */
-@media (min-width: 1024px) {
+@media (min-width: 1280px) {
   .assistant__cell:last-child:nth-child(3n + 1) { grid-column: span 3; }
   .assistant__cell:last-child:nth-child(3n + 2) { grid-column: span 2; }
 }

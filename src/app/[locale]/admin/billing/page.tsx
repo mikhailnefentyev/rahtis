@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { CompletedList } from '@/components/domain/CompletedList';
+import { OperatorTrend } from '@/components/domain/OperatorTrend';
 import {
   Badge,
   Button,
@@ -286,6 +287,12 @@ export default async function BillingPage({
           ))}
         </details>
       )}
+
+      {/*
+        * Динамика стоит после периодов и до сборов: сначала оператор
+        * видит, что нужно сделать сегодня, потом — куда движется дело.
+        */}
+      <OperatorTrend totals={totals ?? []} weeks={12} i18n={i18n} />
 
       <SubscriptionFees rows={(subscriptions ?? []) as SubscriptionFee[]} locale={locale} i18n={i18n} />
 
