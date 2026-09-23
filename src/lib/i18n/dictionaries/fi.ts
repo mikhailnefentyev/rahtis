@@ -403,7 +403,7 @@ export const fi = {
     carrier3: 'Voit löytää paluukeikan alueelta, jossa edellinen kuljetus päättyy.',
     carrier4: 'Jokainen auto hyväksytään palveluun erikseen.',
     carrier5:
-      'Keikan koko hinta jää sinulle: keikoista ei peritä palvelumaksua.',
+      'Valitset itse: pelkkä alusta kuukausimaksulla tai alihankinta, jossa laskut ja asiakirjat hoidetaan puolestasi.',
     carrier6: 'Viikkoraportista näet ajetut keikat, ansiot ja tulevat tilitykset.',
 
     /*
@@ -415,9 +415,9 @@ export const fi = {
      */
     feeEyebrow: 'Palvelumaksu',
     feeTitle:
-      'Selkeä hinta: kuukausimaksu ajavista autoista, 3 % tilaajalta',
+      'Kaksi tapaa käyttää: alusta kuukausimaksulla tai alihankinta 3 %:lla',
     feeLede:
-      'Kuljetusliike maksaa 29,90 € (ilman alv:tä) kuukaudessa jokaisesta autosta, joka ajaa kuukauden aikana vähintään yhden keikan — ajamaton auto on maksuton, ja maksu vähennetään tilityksestä. Tilaaja maksaa 3 % yhteiseltä pöydältä tilatun kuljetuksen hinnasta; suorat tilaukset omille vakioautoille ovat maksuttomia. Ensimmäinen kuukausi on kaikille maksuton. Maksu kattaa sen työn, joka muuten tehdään käsin.',
+      'Omat asiakkaasi: 29,90 € (ilman alv:tä) kuukaudessa jokaisesta autosta, joka ajoi kuukauden aikana vähintään yhden keikan — ajamaton auto on maksuton. Laskut ja asiakirjat pysyvät sinun nimissäsi, emme ole rahaliikenteessä mukana. Meidän kauttamme ajetut keikat: 3 % keikan hinnasta, ja lasku tilaajalle, rahtikirjat, raportit ja reklamaatiot hoidamme me. Tarjouspöydältä otettu keikka on aina alihankintaa: tilaaja maksaa 3 % ja kuljetusliike 3 %. Ensimmäinen kuukausi on kaikille maksuton.',
     fee1: 'Sähköinen asiakirjaliikenne',
     fee1Text:
       'Rahtikirja, kuormakuvat ja vauriomerkinnät kulkevat keikan mukana ja päätyvät tilaajalle ilman erillistä lähettämistä.',

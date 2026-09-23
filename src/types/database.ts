@@ -411,6 +411,7 @@ export type Database = {
           legal_postal_code: string | null
           legal_street: string | null
           name: string
+          partnership: Database["public"]["Enums"]["partnership_mode"] | null
           rejected_at: string | null
           rejection_reason: string | null
           status: Database["public"]["Enums"]["company_status"]
@@ -447,6 +448,7 @@ export type Database = {
           legal_postal_code?: string | null
           legal_street?: string | null
           name: string
+          partnership?: Database["public"]["Enums"]["partnership_mode"] | null
           rejected_at?: string | null
           rejection_reason?: string | null
           status?: Database["public"]["Enums"]["company_status"]
@@ -483,6 +485,7 @@ export type Database = {
           legal_postal_code?: string | null
           legal_street?: string | null
           name?: string
+          partnership?: Database["public"]["Enums"]["partnership_mode"] | null
           rejected_at?: string | null
           rejection_reason?: string | null
           status?: Database["public"]["Enums"]["company_status"]
@@ -2022,6 +2025,7 @@ export type Database = {
           comment: string | null
           commission_bps: number | null
           container_feet: number | null
+          contract_party: Database["public"]["Enums"]["contract_party"]
           created_at: string
           created_by: string | null
           deadline_at: string | null
@@ -2064,6 +2068,7 @@ export type Database = {
           comment?: string | null
           commission_bps?: number | null
           container_feet?: number | null
+          contract_party?: Database["public"]["Enums"]["contract_party"]
           created_at?: string
           created_by?: string | null
           deadline_at?: string | null
@@ -2106,6 +2111,7 @@ export type Database = {
           comment?: string | null
           commission_bps?: number | null
           container_feet?: number | null
+          contract_party?: Database["public"]["Enums"]["contract_party"]
           created_at?: string
           created_by?: string | null
           deadline_at?: string | null
@@ -2810,6 +2816,7 @@ export type Database = {
           comment: string | null
           commission_bps: number | null
           container_feet: number | null
+          contract_party: Database["public"]["Enums"]["contract_party"]
           created_at: string
           created_by: string | null
           deadline_at: string | null
@@ -2883,6 +2890,7 @@ export type Database = {
           legal_postal_code: string | null
           legal_street: string | null
           name: string
+          partnership: Database["public"]["Enums"]["partnership_mode"] | null
           rejected_at: string | null
           rejection_reason: string | null
           status: Database["public"]["Enums"]["company_status"]
@@ -3216,6 +3224,7 @@ export type Database = {
           comment: string | null
           commission_bps: number | null
           container_feet: number | null
+          contract_party: Database["public"]["Enums"]["contract_party"]
           created_at: string
           created_by: string | null
           deadline_at: string | null
@@ -3298,6 +3307,7 @@ export type Database = {
           comment: string | null
           commission_bps: number | null
           container_feet: number | null
+          contract_party: Database["public"]["Enums"]["contract_party"]
           created_at: string
           created_by: string | null
           deadline_at: string | null
@@ -3355,6 +3365,7 @@ export type Database = {
           comment: string | null
           commission_bps: number | null
           container_feet: number | null
+          contract_party: Database["public"]["Enums"]["contract_party"]
           created_at: string
           created_by: string | null
           deadline_at: string | null
@@ -3504,6 +3515,7 @@ export type Database = {
           comment: string | null
           commission_bps: number | null
           container_feet: number | null
+          contract_party: Database["public"]["Enums"]["contract_party"]
           created_at: string
           created_by: string | null
           deadline_at: string | null
@@ -3563,6 +3575,7 @@ export type Database = {
           comment: string | null
           commission_bps: number | null
           container_feet: number | null
+          contract_party: Database["public"]["Enums"]["contract_party"]
           created_at: string
           created_by: string | null
           deadline_at: string | null
@@ -3700,6 +3713,7 @@ export type Database = {
           comment: string | null
           commission_bps: number | null
           container_feet: number | null
+          contract_party: Database["public"]["Enums"]["contract_party"]
           created_at: string
           created_by: string | null
           deadline_at: string | null
@@ -3956,6 +3970,7 @@ export type Database = {
           legal_postal_code: string | null
           legal_street: string | null
           name: string
+          partnership: Database["public"]["Enums"]["partnership_mode"] | null
           rejected_at: string | null
           rejection_reason: string | null
           status: Database["public"]["Enums"]["company_status"]
@@ -4047,6 +4062,7 @@ export type Database = {
           legal_postal_code: string | null
           legal_street: string | null
           name: string
+          partnership: Database["public"]["Enums"]["partnership_mode"] | null
           rejected_at: string | null
           rejection_reason: string | null
           status: Database["public"]["Enums"]["company_status"]
@@ -4333,6 +4349,7 @@ export type Database = {
           comment: string | null
           commission_bps: number | null
           container_feet: number | null
+          contract_party: Database["public"]["Enums"]["contract_party"]
           created_at: string
           created_by: string | null
           deadline_at: string | null
@@ -4398,6 +4415,7 @@ export type Database = {
           comment: string | null
           commission_bps: number | null
           container_feet: number | null
+          contract_party: Database["public"]["Enums"]["contract_party"]
           created_at: string
           created_by: string | null
           deadline_at: string | null
@@ -4471,6 +4489,13 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      set_company_partnership: {
+        Args: {
+          p_company_id: string
+          p_mode: Database["public"]["Enums"]["partnership_mode"]
+        }
+        Returns: undefined
+      }
       set_company_test: {
         Args: { p_company_id: string; p_test: boolean }
         Returns: undefined
@@ -4505,6 +4530,7 @@ export type Database = {
           comment: string | null
           commission_bps: number | null
           container_feet: number | null
+          contract_party: Database["public"]["Enums"]["contract_party"]
           created_at: string
           created_by: string | null
           deadline_at: string | null
@@ -4601,6 +4627,7 @@ export type Database = {
           comment: string | null
           commission_bps: number | null
           container_feet: number | null
+          contract_party: Database["public"]["Enums"]["contract_party"]
           created_at: string
           created_by: string | null
           deadline_at: string | null
@@ -4718,6 +4745,7 @@ export type Database = {
           legal_postal_code: string | null
           legal_street: string | null
           name: string
+          partnership: Database["public"]["Enums"]["partnership_mode"] | null
           rejected_at: string | null
           rejection_reason: string | null
           status: Database["public"]["Enums"]["company_status"]
@@ -4785,6 +4813,7 @@ export type Database = {
           comment: string | null
           commission_bps: number | null
           container_feet: number | null
+          contract_party: Database["public"]["Enums"]["contract_party"]
           created_at: string
           created_by: string | null
           deadline_at: string | null
@@ -4846,6 +4875,7 @@ export type Database = {
         | "OTHER"
       claim_status: "OPEN" | "IN_REVIEW" | "RESOLVED" | "REJECTED"
       company_status: "PENDING" | "APPROVED" | "ACTIVE" | "REJECTED"
+      contract_party: "RAHTIS" | "CARRIER"
       direct_outcome: "PENDING" | "ACCEPTED" | "DECLINED" | "WITHDRAWN"
       dispatch_mode: "DESK" | "DIRECT"
       distance_source: "MANUAL" | "AUTO"
@@ -4881,6 +4911,7 @@ export type Database = {
         | "DONE"
         | "CANCELLED"
       order_type: "TRAILER_SWAP" | "ROUND_TRIP" | "ONE_WAY"
+      partnership_mode: "SUBCONTRACTOR" | "SUBSCRIBER"
       party_role: "CARRIER" | "SHIPPER" | "ADMIN"
       pay_model: "PER_KM" | "TRIP_PERCENT" | "FLAT_HOURLY" | "TES"
       photo_subject:
@@ -5061,6 +5092,7 @@ export const Constants = {
       ],
       claim_status: ["OPEN", "IN_REVIEW", "RESOLVED", "REJECTED"],
       company_status: ["PENDING", "APPROVED", "ACTIVE", "REJECTED"],
+      contract_party: ["RAHTIS", "CARRIER"],
       direct_outcome: ["PENDING", "ACCEPTED", "DECLINED", "WITHDRAWN"],
       dispatch_mode: ["DESK", "DIRECT"],
       distance_source: ["MANUAL", "AUTO"],
@@ -5099,6 +5131,7 @@ export const Constants = {
         "CANCELLED",
       ],
       order_type: ["TRAILER_SWAP", "ROUND_TRIP", "ONE_WAY"],
+      partnership_mode: ["SUBCONTRACTOR", "SUBSCRIBER"],
       party_role: ["CARRIER", "SHIPPER", "ADMIN"],
       pay_model: ["PER_KM", "TRIP_PERCENT", "FLAT_HOURLY", "TES"],
       photo_subject: [

@@ -364,14 +364,14 @@ export const en = {
     carrier3: 'You can find a return load in the area where the last job ends.',
     carrier4: 'Every vehicle is approved onto the platform separately.',
     carrier5:
-      'The full job price is yours: no fee is taken from jobs.',
+      'You choose: the platform alone for a monthly fee, or subcontracting where the invoices and documents are handled for you.',
     carrier6: 'The weekly report shows jobs driven, earnings and payouts due.',
 
     feeEyebrow: 'Service fee',
     feeTitle:
-      'Clear pricing: a monthly fee for vehicles that drive, 3 % from the shipper',
+      'Two ways to use it: the platform for a monthly fee, or subcontracting for 3 %',
     feeLede:
-      'The carrier pays €29.90 (excl. VAT) a month for each vehicle that drives at least one job that month — a vehicle that does not drive costs nothing, and the fee is deducted from the settlement. The shipper pays 3 % of the price of a transport ordered from the load board; direct orders to its own regular vehicles are free. The first month is free for everyone. The fee covers the work that would otherwise be done by hand.',
+      'Your own clients: €29.90 (excl. VAT) a month for each vehicle that drove at least one job that month — a vehicle that does not drive costs nothing. Invoices and documents stay in your name; we are not part of the money. Jobs driven through us: 3 % of the job price, and we handle the invoice to the shipper, the consignment notes, the reports and the claims. A job taken from the load board is always subcontracting: the shipper pays 3 % and the carrier 3 %. The first month is free for everyone.',
     fee1: 'Electronic documents',
     fee1Text:
       'The consignment note, loading photos and damage notes travel with the job and reach the shipper without being sent separately.',
