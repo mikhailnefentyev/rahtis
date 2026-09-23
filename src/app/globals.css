@@ -761,7 +761,7 @@
  * приложении появляется что-то новое.
  */
 .assistant__cell { background: var(--color-night-raised); padding: 20px; }
-@media (min-width: 640px) {
+@media (min-width: 640px) and (max-width: 1279.98px) {
   .assistant__cell:last-child:nth-child(odd) { grid-column: 1 / -1; }
 }
 /* То же на трёх колонках: остаток ряда закрывает последняя карточка. */
