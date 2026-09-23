@@ -102,6 +102,8 @@ type OrderRow = {
   shipper_fee_bps: number | null;
   shipper_company_id: string;
   assigned_company_id: string | null;
+  /** Чей договор с клиентом: наш подряд или собственный рейс перевозчика. */
+  contract_party: 'RAHTIS' | 'CARRIER';
 };
 
 export async function generateWeeklyReports(week?: string): Promise<GenerateResult> {
@@ -198,7 +200,7 @@ async function run(span: Span): Promise<GenerateResult> {
   const { data: orders, error } = await admin
     .from('orders')
     .select(
-      'id, ref, closed_at, updated_at, distance_km, rate_cents, commission_bps, shipper_fee_bps, shipper_company_id, assigned_company_id',
+      'id, ref, closed_at, updated_at, distance_km, rate_cents, commission_bps, shipper_fee_bps, shipper_company_id, assigned_company_id, contract_party',
     )
     .eq('status', 'DONE')
     .gte('closed_at', from)
@@ -260,9 +262,17 @@ async function run(span: Span): Promise<GenerateResult> {
     if (v?.plate && !plate.has(row.order_id)) plate.set(row.order_id, v.plate);
   }
 
+  /*
+   * Рейс своего клиента подписчика в документы периода не попадает: счёт
+   * заказчику выставляет перевозчик, деньги идут мимо нас, и наш счёт с
+   * номером из боевой серии там был бы чужим. В недельный отчёт такой
+   * рейс входит — это отчёт о проделанной работе, а не требование денег.
+   */
+  const documented = span.kind === 'PERIOD' ? list.filter((o) => o.contract_party !== 'CARRIER') : list;
+
   /* Кому какие рейсы. Одна и та же строка попадает в два отчёта разными числами. */
   const byCompany = new Map<string, { role: 'CARRIER' | 'SHIPPER'; orders: OrderRow[] }>();
-  for (const order of list) {
+  for (const order of documented) {
     push(byCompany, order.shipper_company_id, 'SHIPPER', order);
     if (order.assigned_company_id) push(byCompany, order.assigned_company_id, 'CARRIER', order);
   }
@@ -361,16 +371,29 @@ async function issue(
    * нет, выплата равна цене). Заказчику — цена плюс плата 3 % за заказ со
    * стола: в колонке «Palvelumaksu» и в сумме к оплате.
    */
+  let direct = 0;
+
   const rows: ReportRow[] = orders.map((order) => {
     const rate = order.rate_cents ?? 0;
     const bps = order.commission_bps ?? COMMISSION_BPS;
     const payout = payoutCents(rate, bps);
     const shipperFee = Math.round((rate * (order.shipper_fee_bps ?? 0)) / 10_000);
 
-    gross += rate;
-    fee += carrier ? commissionCents(rate, bps) : shipperFee;
-    net += carrier ? payout : rate + shipperFee;
+    /*
+     * Рейс своего клиента идёт в отчёт работой, но не деньгами: эту цену
+     * перевозчик выставляет сам, и складывать её с нашей выплатой значит
+     * обещать то, чего мы не платим.
+     */
+    const own = order.contract_party === 'CARRIER';
+
     km += order.distance_km ?? 0;
+    if (own) {
+      direct += rate;
+    } else {
+      gross += rate;
+      fee += carrier ? commissionCents(rate, bps) : shipperFee;
+      net += carrier ? payout : rate + shipperFee;
+    }
 
     return {
       ref: order.ref,
@@ -459,6 +482,14 @@ async function issue(
       });
     }
   }
+  /*
+   * Что перевозчик выставляет сам. Строка идёт тем же списком, что и
+   * удержания, но вычитать её не из чего: этих денег у нас нет.
+   */
+  if (direct > 0) {
+    deductions.push({ label: t.report_.directLine, amount: f.eur(direct) });
+  }
+
   const payable = payGross - deducted;
 
   /*
@@ -521,7 +552,7 @@ async function issue(
         commission: withFee ? f.eur(fee) : null,
         net: f.eur(net),
         deductions,
-        payable: deductions.length > 0 ? { label: t.report_.payable, amount: f.eur(payable) } : null,
+        payable: deducted > 0 ? { label: t.report_.payable, amount: f.eur(payable) } : null,
         distance: String(km),
         vat:
           vatBps > 0
@@ -636,7 +667,7 @@ async function issue(
             `${texts.title}, ${texts.period}.`,
             '',
             `${t.report_.emailTrips}: ${orders.length}`,
-            `${t.report_.total}: ${f.eur(deductions.length > 0 ? payable : net)}`,
+            `${t.report_.total}: ${f.eur(deducted > 0 ? payable : net)}`,
             ...(due ? ['', due] : []),
             '',
             texts.vatNote,

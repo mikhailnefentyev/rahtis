@@ -1320,6 +1320,7 @@ export const fi = {
     invoiceDate: 'Laskun päivä {date}',
     invoiceEmailSubject: 'RAHTIS · lasku {number} · kausi {from}–{to}',
     feeLine: 'Kuukausimaksu {month}: {count} aktiivista autoa × {unit} + ALV {vat}',
+    directLine: 'Omat asiakkaat: laskutat itse suoraan',
     payable: 'Maksetaan kuljetusliikkeelle',
     settlementCarrierTitle: 'Kauden koontiraportti · ajetut kuljetukset',
     periodRange: 'Kausi {from}–{to}',

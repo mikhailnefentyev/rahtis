@@ -1249,6 +1249,7 @@ export const en = {
     invoiceDate: 'Invoice date {date}',
     invoiceEmailSubject: 'RAHTIS · invoice {number} · period {from}–{to}',
     feeLine: 'Monthly fee {month}: {count} active vehicles × {unit} + VAT {vat}',
+    directLine: 'Your own clients: you invoice them directly',
     payable: 'Paid to the carrier',
     settlementCarrierTitle: 'Period statement · transports driven',
     periodRange: 'Period {from}–{to}',
