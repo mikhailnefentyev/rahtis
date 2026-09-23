@@ -41,9 +41,9 @@ export const fi = {
    * сайте занимало слово, которое никто не ищет.
    */
   seo: {
-    homeTitle: 'Kuljetusalusta: irtoperät, kontit ja pikakuljetukset',
+    homeTitle: 'Kuljetusalusta ja tarjouspöytä: irtoperät, kontit ja pikakuljetukset',
     homeDescription:
-      'RAHTIS välittää irtoperien vaihdot, konttikuljetukset ja pikakuljetukset pakettiautolla tai kuorma-autolla hyväksytyille kuljetusliikkeille Suomessa ja Skandinaviassa. Tilaus tavoittaa sopivat autot heti, kuljetus näkyy vaihe vaiheelta ja asiakirjat syntyvät samaan paikkaan.',
+      'RAHTIS välittää irtoperien vaihdot, konttikuljetukset ja pikakuljetukset hyväksytyille kuljetusliikkeille Suomessa ja Skandinaviassa — ja toimii alustana kuljetusliikkeelle, joka ajaa omia asiakkaitaan: kuljettajan sovellus, työaika, rahtikirjat ja raportit. Tilaus tavoittaa sopivat autot heti, kuljetus näkyy vaihe vaiheelta ja asiakirjat syntyvät samaan paikkaan.',
     termsDescription:
       'RAHTIS-palvelun käyttöehdot: osapuolten vastuut, kuljetuksen kulku, maksut ja tilitykset sekä sopimuksen voimassaolo.',
     privacyDescription:
@@ -347,7 +347,7 @@ export const fi = {
     helpEyebrow: 'Mitä RAHTIS tekee',
     helpTitle: 'Pidämme rahdin liikkeessä ja autot ajossa',
     helpLede:
-      'RAHTIS ei korvaa huolitsijaa, ajojärjestelyä tai kuljetusliikettä. Se poistaa työstä turhan etsimisen, soittelun, saman asian selvittämisen moneen kertaan ja hajallaan olevat asiakirjat.',
+      'RAHTIS on kaksi asiaa samassa: tarjouspöytä, jolta kuljetusliike saa työtä ja tilaaja tekijän, sekä alusta, jolla kuljetusliike ajaa omat asiakkaansa. Emme korvaa huolitsijaa, ajojärjestelyä tai kuljetusliikettä — poistamme etsimisen, soittelun, saman asian selvittämisen moneen kertaan ja hajallaan olevat asiakirjat.',
     helpCargo: 'Huolitsijalle ja operaattorille',
     helpCargoTitle: 'Tilaus liikkeelle nopeasti',
     helpCargoText:
@@ -363,7 +363,7 @@ export const fi = {
     timeEyebrow: 'Seisonta maksaa kaikille',
     timeTitle: 'Logistiikassa aika maksaa',
     timeLede:
-      'Kun kuljetuksen tilaaja etsii vapaata autoa puhelimitse, rahti odottaa. Kun kuljetusliike etsii seuraavaa kuormaa, auto seisoo. Molemmissa tapauksissa menetetään samaa asiaa: aikaa. RAHTIS ei neuvottele hintaa alas — se poistaa vaiheet, joissa aika kuluu.',
+      'Kun kuljetuksen tilaaja etsii vapaata autoa puhelimitse, rahti odottaa. Kun kuljetusliike etsii seuraavaa kuormaa, auto seisoo. Ja kun auto ajaa omia asiakkaita, aika kuluu rahtikirjoihin, laskuihin ja työaikakirjanpitoon. RAHTIS ei neuvottele hintaa alas — se poistaa vaiheet, joissa aika kuluu.',
     /*
      * Rivit ovat pareja: vasen ja oikea sanovat saman asian, ennen ja
      * jälkeen. Aiemmin tässä oli kaksi erillistä kuuden virkkeen listaa,
@@ -389,7 +389,7 @@ export const fi = {
     timeNew7: 'Nouto ja toimitus kuitataan kartalle',
 
     rolesEyebrow: 'Kenelle RAHTIS on tarkoitettu',
-    rolesTitle: 'Yksi alusta kolmelle kuljetustavalle — ja molemmille osapuolille',
+    rolesTitle: 'Yksi alusta, kolme tapaa tulla mukaan',
     shipperEyebrow: 'Huolitsijalle ja operaattorille',
     shipperTitle: 'Kuljetusliikettä ei tarvitse etsiä yksi kerrallaan.',
     /*
@@ -408,13 +408,26 @@ export const fi = {
       'Jos auto peruu tai ei vahvista, keikka palaa tarjolle itsestään ja välittyy seuraaville sopiville autoille saman tien.',
     carrier2:
       'Vähemmän tyhjäajoa tarkoittaa enemmän ajettuja kilometrejä samalla autolla ja samalla kuljettajalla.',
-    carrierEyebrow: 'Kuljetusliikkeelle',
+    carrierEyebrow: 'Kuljetusliikkeelle · alihankinta',
     carrierTitle: 'Pidä auto ajossa myös keikkojen välillä.',
     carrier3: 'Voit löytää paluukeikan alueelta, jossa edellinen kuljetus päättyy.',
     carrier4: 'Jokainen auto hyväksytään palveluun erikseen.',
     carrier5:
-      'Valitset itse: pelkkä alusta kuukausimaksulla tai alihankinta, jossa laskut ja asiakirjat hoidetaan puolestasi.',
+      'Laskun asiakkaalle, rahtikirjat ja reklamaatiot hoidamme me. Maksat 3 % keikan hinnasta, kuukausimaksua ei ole.',
     carrier6: 'Viikkoraportista näet ajetut keikat, ansiot ja tulevat tilitykset.',
+
+    /*
+     * Kolmas kortti: kuljetusliike, jolla on jo asiakkaat. Hän ei osta
+     * meiltä työtä vaan työkalut, ja hinta on siksi toinen.
+     */
+    ownEyebrow: 'Kuljetusliikkeelle · omat asiakkaat',
+    ownTitle: 'Aja omat asiakkaasi meidän työkaluillamme.',
+    own1: 'Kuljettajan sovellus: keikat, työaika, kuormakuvat, rahtikirja ja allekirjoitus puhelimessa.',
+    own2: 'Työaika ja suuntaa-antava palkka omilla hinnoillasi tai työehtosopimuksen taulukoilla.',
+    own3: 'Kartta tauko-, pesu- ja huoltopaikoista Suomessa, Ruotsissa, Norjassa ja Tanskassa.',
+    own4: 'Asiakkaasi lähettää tilauksen suoraan autollesi. Laskutat sen itse ja pidät koko hinnan.',
+    own5: 'Maksat 29,90 € kuukaudessa autosta, joka ajoi. Seisova auto on maksuton.',
+    own6: 'Tarjouspöytä on silti käytössäsi, kun auto jää vapaaksi.',
 
     /*
      * Palvelumaksu puolustetaan työllä, ei prosentilla.

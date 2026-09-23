@@ -34,9 +34,9 @@ export const en = {
 
 
   seo: {
-    homeTitle: 'Haulage platform: trailer swaps, containers, express',
+    homeTitle: 'Haulage platform and offer table: trailer swaps, containers, express',
     homeDescription:
-      'RAHTIS routes trailer swaps and container haulage to approved carriers across the ports of Finland, Sweden, Norway and Denmark. An order reaches the trucks in the area at once, the job is visible stop by stop, and the documents end up in one place.',
+      'RAHTIS routes trailer swaps and container haulage to approved carriers across the ports of Finland, Sweden, Norway and Denmark — and serves as the platform for a carrier running its own clients: the driver app, working time, consignment notes and reports. An order reaches the trucks in the area at once, the job is visible stop by stop, and the documents end up in one place.',
     termsDescription:
       'Terms of service for RAHTIS: responsibilities of the parties, how a job runs, payments and settlements, and the term of the agreement.',
     privacyDescription:
@@ -308,7 +308,7 @@ export const en = {
     helpEyebrow: 'What RAHTIS does',
     helpTitle: 'We keep freight moving and trucks working',
     helpLede:
-      'RAHTIS does not replace your forwarder, your dispatcher or your carrier. It takes out the searching, the phone calls, explaining the same job over and over, and documents scattered across inboxes.',
+      'RAHTIS is two things at once: an offer table where a carrier finds work and a shipper finds a performer, and a platform a carrier uses to run its own clients. We do not replace a freight forwarder, a dispatcher or a carrier — we remove the searching, the phone calls, explaining the same thing several times and documents scattered around.',
     helpCargo: 'For forwarders and operators',
     helpCargoTitle: 'Orders move quickly',
     helpCargoText:
@@ -324,7 +324,7 @@ export const en = {
     timeEyebrow: 'Standing still costs both sides',
     timeTitle: 'In logistics, time is what you pay for',
     timeLede:
-      'While a shipper rings round for a free truck, the freight waits. While a carrier rings round for the next load, the truck stands. Both are losing the same thing: time. RAHTIS does not negotiate the price down — it removes the steps where the time goes.',
+      'While a shipper rings round for a free truck, the freight waits. While a carrier rings round for the next load, the truck stands. And when the truck drives its own clients, the time goes into consignment notes, invoices and working time records. RAHTIS does not negotiate the price down — it removes the steps where the time goes.',
     /*
      * The rows are pairs: left and right say the same thing, before and
      * after. This used to be two separate lists of six sentences, and the
@@ -350,7 +350,7 @@ export const en = {
     timeNew7: 'Pickup and delivery marked on the map',
 
     rolesEyebrow: 'Who RAHTIS is for',
-    rolesTitle: 'One platform for three kinds of haulage — and for both sides',
+    rolesTitle: 'One platform, three ways to join',
     shipperEyebrow: 'For forwarders and operators',
     shipperTitle: 'You do not have to find a carrier one call at a time.',
     /*
@@ -369,13 +369,22 @@ export const en = {
       'If a truck cancels or does not confirm, the job returns to the board on its own and reaches the next suitable trucks right away.',
     carrier2:
       'Less empty running means more paid kilometres with the same truck and the same driver.',
-    carrierEyebrow: 'For the carrier',
+    carrierEyebrow: 'For carriers · subcontracting',
     carrierTitle: 'Keep the truck working between jobs too.',
     carrier3: 'You can find a return load in the area where the last job ends.',
     carrier4: 'Every vehicle is approved onto the platform separately.',
     carrier5:
-      'You choose: the platform alone for a monthly fee, or subcontracting where the invoices and documents are handled for you.',
+      'We handle the invoice to the client, the consignment notes and the claims. You pay 3 % of the job price, with no monthly fee.',
     carrier6: 'The weekly report shows jobs driven, earnings and payouts due.',
+
+    ownEyebrow: 'For carriers · your own clients',
+    ownTitle: 'Drive your own clients with our tools.',
+    own1: 'The driver app: jobs, working time, load photos, the consignment note and the signature on the phone.',
+    own2: 'Working time and an indicative wage from your own rates or the collective agreement tables.',
+    own3: 'A map of rest, wash and service places in Finland, Sweden, Norway and Denmark.',
+    own4: 'Your client sends the order straight to your vehicle. You invoice it yourself and keep the whole price.',
+    own5: 'You pay €29.90 a month per vehicle that drove. A vehicle standing still costs nothing.',
+    own6: 'The offer table is still there when a vehicle comes free.',
 
     feeEyebrow: 'Service fee',
     feeTitle:

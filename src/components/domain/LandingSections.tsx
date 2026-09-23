@@ -267,7 +267,14 @@ export async function LandingSections({ locale }: { locale: Locale }) {
           {l.rolesTitle}
         </h2>
 
-        <div className="mt-8 grid gap-4 md:grid-cols-2">
+        {/*
+          * Три карточки, а не две: у перевозчика теперь два разных
+          * способа работать, и они продаются разным людям. Тому, у кого
+          * клиентов нет, нужна работа; тому, у кого есть, — инструменты.
+          * Смешать их в одну карточку значит не сказать ни одному из
+          * двух, что он здесь найдёт.
+          */}
+        <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {[
             {
               eyebrow: l.shipperEyebrow,
@@ -278,6 +285,11 @@ export async function LandingSections({ locale }: { locale: Locale }) {
               eyebrow: l.carrierEyebrow,
               title: l.carrierTitle,
               lines: [l.carrier2, l.carrier3, l.carrier4, l.carrier5, l.carrier6],
+            },
+            {
+              eyebrow: l.ownEyebrow,
+              title: l.ownTitle,
+              lines: [l.own1, l.own2, l.own3, l.own4, l.own5, l.own6],
             },
           ].map((role) => (
             <Card key={role.title}>
