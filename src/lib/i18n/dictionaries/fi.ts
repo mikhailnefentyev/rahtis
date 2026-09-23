@@ -148,7 +148,9 @@ export const fi = {
       '29,90 € (ilman alv:tä) kuukaudessa jokaisesta autosta, joka ajoi kuukauden aikana. Omat asiakkaasi ja heidän suorat tilauksensa laskutat itse; tarjouspöydältä otetusta keikasta 3 %.',
     partnershipConText:
       '3 % jokaisen keikan hinnasta, vähennetään tilityksestä. Laskut asiakkaille, rahtikirjat ja reklamaatiot hoidamme me; kuukausimaksua ei peritä.',
-    partnershipChange: 'Tavan vaihto sovitaan meidän kanssamme.',
+    partnershipSwitch: 'Vaihda: {mode}',
+    partnershipBusy: 'Vaihto onnistuu, kun kesken olevat keikat on ajettu.',
+    partnershipAfter: 'Vaihto koskee uusia keikkoja. Jo valmistuneiden keikkojen maksut eivät muutu.',
     freeUntil: 'Maksuton {date} asti',
     feeOpen: 'Maksamaton kuukausimaksu {amount}',
   },

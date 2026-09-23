@@ -367,6 +367,31 @@ export async function setCompanyTestAction(formData: FormData): Promise<void> {
 }
 
 /**
+ * Перевозчик меняет формат сотрудничества сам.
+ *
+ * Он выбирает, кем быть, — значит, он же и переключает. База не даст
+ * сделать это посреди рейсов в работе: у них сторона договора
+ * пересчитывается при закрытии, и переключение на ходу увело бы деньги
+ * незакрытого рейса не туда.
+ *
+ * Ошибка не роняет страницу: кабинет и так показывает, когда смена
+ * недоступна, а гонка между двумя вкладками не повод ломать экран.
+ */
+export async function setOwnPartnershipAction(formData: FormData): Promise<void> {
+  const locale = toLocale(formData.get('locale'));
+  const mode = String(formData.get('mode') ?? '');
+  const supabase = await createClient();
+
+  const { error } = await supabase.rpc('set_own_partnership', {
+    p_mode: mode === 'SUBSCRIBER' ? 'SUBSCRIBER' : 'SUBCONTRACTOR',
+  });
+
+  if (error) console.error('Формат сотрудничества не изменён:', error.message);
+
+  revalidatePath(`/${locale}/carrier`);
+}
+
+/**
  * Ветка перевозчика: подписка или подряд.
  *
  * Решение денежное и потому за оператором: подрядчик платит 3 % со всех

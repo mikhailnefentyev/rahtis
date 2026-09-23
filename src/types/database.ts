@@ -4524,6 +4524,10 @@ export type Database = {
         Returns: undefined
       }
       set_driver_language: { Args: { p_language: string }; Returns: undefined }
+      set_own_partnership: {
+        Args: { p_mode: Database["public"]["Enums"]["partnership_mode"] }
+        Returns: undefined
+      }
       set_runtime_config: {
         Args: { p_key: string; p_note?: string; p_value: string }
         Returns: Json

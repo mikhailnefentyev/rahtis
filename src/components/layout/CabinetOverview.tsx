@@ -3,9 +3,10 @@ import { AgentChat } from '@/components/domain/AgentChat';
 import { CabinetPulse } from '@/components/domain/CabinetPulse';
 import { CarrierPresence } from '@/components/domain/CarrierPresence';
 import { ReportArchive } from '@/components/domain/ReportArchive';
-import { Badge, buttonClass, Card, CardBody, Kv, Mono } from '@/components/ui';
+import { Badge, Button, buttonClass, Card, CardBody, Kv, Mono } from '@/components/ui';
 import { companyStatusTone } from '@/components/ui/tone';
 import { accountPath } from '@/lib/auth/paths';
+import { setOwnPartnershipAction } from '@/lib/companies/actions';
 import { freeUntil } from '@/lib/config';
 import { todayInHelsinki } from '@/lib/dates';
 import { getI18n, type Locale } from '@/lib/i18n';
@@ -48,6 +49,22 @@ export async function CabinetOverview({
    */
   const subscriber = role === 'CARRIER' && company?.partnership === 'SUBSCRIBER';
   const free = role === 'CARRIER' ? freeUntil(company?.approved_at ?? null) : null;
+
+  /*
+   * Рейсы в работе. Смену ветки база при них не даст: у незакрытого
+   * рейса сторона договора пересчитывается при закрытии, и переключение
+   * на ходу увело бы его деньги не туда. Кабинет говорит об этом до
+   * нажатия, а не после отказа.
+   */
+  let busy = 0;
+  if (role === 'CARRIER' && company) {
+    const supabase = await createClient();
+    const { count } = await supabase
+      .from('orders')
+      .select('id', { count: 'exact', head: true })
+      .in('status', ['AWAIT_DRIVER', 'IN_PROGRESS']);
+    busy = count ?? 0;
+  }
 
   let openFee = 0;
   if (subscriber) {
@@ -126,7 +143,25 @@ export async function CabinetOverview({
                         {t.cabinet.feeOpen.replace('{amount}', f.eur(openFee))}
                       </p>
                     )}
-                    <p className="text-[12px] text-ink-dim">{t.cabinet.partnershipChange}</p>
+                    {busy > 0 ? (
+                      <p className="text-[12px] text-ink-dim">{t.cabinet.partnershipBusy}</p>
+                    ) : (
+                      <form action={setOwnPartnershipAction} className="mt-1 flex flex-col gap-1">
+                        <input type="hidden" name="locale" value={locale} />
+                        <input
+                          type="hidden"
+                          name="mode"
+                          value={subscriber ? 'SUBCONTRACTOR' : 'SUBSCRIBER'}
+                        />
+                        <Button type="submit" size="sm" variant="ghost" className="self-start">
+                          {t.cabinet.partnershipSwitch.replace(
+                            '{mode}',
+                            subscriber ? t.cabinet.partnershipCon : t.cabinet.partnershipSub,
+                          )}
+                        </Button>
+                        <span className="text-[12px] text-ink-dim">{t.cabinet.partnershipAfter}</span>
+                      </form>
+                    )}
                   </div>
                 )}
               </>

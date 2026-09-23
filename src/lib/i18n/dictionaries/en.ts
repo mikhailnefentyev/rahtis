@@ -141,7 +141,9 @@ export const en = {
       '€29.90 (excl. VAT) a month for each vehicle that drove during the month. You invoice your own clients and their direct orders yourself; 3 % on a job taken from the offer table.',
     partnershipConText:
       '3 % of the price of every job, deducted from the settlement. We handle the invoices to clients, the consignment notes and the claims; no monthly fee is charged.',
-    partnershipChange: 'Changing the way you use the service is agreed with us.',
+    partnershipSwitch: 'Switch to: {mode}',
+    partnershipBusy: 'You can switch once the jobs in progress have been driven.',
+    partnershipAfter: 'The switch applies to new jobs. The fees on jobs already completed do not change.',
     freeUntil: 'Free of charge until {date}',
     feeOpen: 'Unpaid monthly fee {amount}',
   },
