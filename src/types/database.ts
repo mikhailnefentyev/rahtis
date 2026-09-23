@@ -150,8 +150,10 @@ export type Database = {
           created_at: string
           gross_cents: number
           id: string
+          invoice_id: string | null
           month: string
           net_cents: number
+          paid_at: string | null
           unit_cents: number
           vat_bps: number
         }
@@ -161,8 +163,10 @@ export type Database = {
           created_at?: string
           gross_cents: number
           id?: string
+          invoice_id?: string | null
           month: string
           net_cents: number
+          paid_at?: string | null
           unit_cents: number
           vat_bps: number
         }
@@ -172,8 +176,10 @@ export type Database = {
           created_at?: string
           gross_cents?: number
           id?: string
+          invoice_id?: string | null
           month?: string
           net_cents?: number
+          paid_at?: string | null
           unit_cents?: number
           vat_bps?: number
         }
@@ -183,6 +189,13 @@ export type Database = {
             columns: ["carrier_company_id"]
             isOneToOne: false
             referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "carrier_subscription_fees_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
             referencedColumns: ["id"]
           },
         ]
@@ -1261,6 +1274,7 @@ export type Database = {
           created_at: string
           id: string
           issued_on: string
+          kind: Database["public"]["Enums"]["invoice_kind"]
           number: string
           period_start: string
         }
@@ -1269,6 +1283,7 @@ export type Database = {
           created_at?: string
           id?: string
           issued_on?: string
+          kind?: Database["public"]["Enums"]["invoice_kind"]
           number: string
           period_start: string
         }
@@ -1277,6 +1292,7 @@ export type Database = {
           created_at?: string
           id?: string
           issued_on?: string
+          kind?: Database["public"]["Enums"]["invoice_kind"]
           number?: string
           period_start?: string
         }
@@ -3985,6 +4001,7 @@ export type Database = {
         }
       }
       handle_support_message: { Args: { p_id: number }; Returns: undefined }
+      invoice_subscription_fees: { Args: { p_month: string }; Returns: number }
       issue_monthly_subscriptions: {
         Args: { p_month: string }
         Returns: number
@@ -4223,6 +4240,7 @@ export type Database = {
           created_at: string
           id: string
           issued_on: string
+          kind: Database["public"]["Enums"]["invoice_kind"]
           number: string
           period_start: string
         }
@@ -4512,6 +4530,10 @@ export type Database = {
         Args: { p_allow: boolean; p_shipper_id: string }
         Returns: undefined
       }
+      set_subscription_paid: {
+        Args: { p_fee_id: string; p_paid: boolean }
+        Returns: undefined
+      }
       settlement_period: {
         Args: { p_moment?: string }
         Returns: {
@@ -4617,6 +4639,28 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      subscription_fees_overview: {
+        Args: never
+        Returns: {
+          active_vehicles: number
+          carrier_country: string
+          carrier_email: string
+          carrier_id: string
+          carrier_name: string
+          deducted_cents: number
+          fee_id: string
+          gross_cents: number
+          invoice_number: string
+          invoiced_on: string
+          month: string
+          net_cents: number
+          open_cents: number
+          paid_at: string
+          partnership: Database["public"]["Enums"]["partnership_mode"]
+          unit_cents: number
+          vat_bps: number
+        }[]
       }
       take_order: {
         Args: { p_order_id: string; p_vehicle_id: string }
@@ -4890,6 +4934,7 @@ export type Database = {
       haul_kind: "TRAILER" | "CONTAINER" | "VAN" | "TRUCK"
       incident_severity: "WARN" | "ERROR" | "FATAL"
       incident_status: "OPEN" | "ACKED" | "RESOLVED"
+      invoice_kind: "TRANSPORT" | "SUBSCRIPTION"
       legal_kind:
         | "TERMS"
         | "PRIVACY"
@@ -4925,7 +4970,7 @@ export type Database = {
         | "OTHER"
         | "SIGNATURE"
       place_kind: "PORT" | "TERMINAL" | "PARKING" | "ADDRESS"
-      report_kind: "WEEK" | "PERIOD"
+      report_kind: "WEEK" | "PERIOD" | "SUBSCRIPTION"
       shift_source: "APP" | "MANUAL"
       stop_role:
         | "PICKUP"
@@ -5107,6 +5152,7 @@ export const Constants = {
       haul_kind: ["TRAILER", "CONTAINER", "VAN", "TRUCK"],
       incident_severity: ["WARN", "ERROR", "FATAL"],
       incident_status: ["OPEN", "ACKED", "RESOLVED"],
+      invoice_kind: ["TRANSPORT", "SUBSCRIPTION"],
       legal_kind: [
         "TERMS",
         "PRIVACY",
@@ -5146,7 +5192,7 @@ export const Constants = {
         "SIGNATURE",
       ],
       place_kind: ["PORT", "TERMINAL", "PARKING", "ADDRESS"],
-      report_kind: ["WEEK", "PERIOD"],
+      report_kind: ["WEEK", "PERIOD", "SUBSCRIPTION"],
       shift_source: ["APP", "MANUAL"],
       stop_role: [
         "PICKUP",

@@ -164,21 +164,41 @@ export async function generatePeriodSettlement(moment?: string): Promise<Generat
    */
   const monthEnd = new Date(`${period.period_end}T00:00:00Z`);
   monthEnd.setUTCDate(monthEnd.getUTCDate() + 1);
-  if (monthEnd.getUTCDate() === 1) {
-    const { error: feeError } = await admin.rpc('issue_monthly_subscriptions', {
-      p_month: `${period.period_end.slice(0, 7)}-01`,
-    });
+  const month = monthEnd.getUTCDate() === 1 ? `${period.period_end.slice(0, 7)}-01` : null;
+
+  if (month) {
+    const { error: feeError } = await admin.rpc('issue_monthly_subscriptions', { p_month: month });
     if (feeError) {
       return { week: period.period_start, reports: 0, emails: 0, errors: [`сбор: ${feeError.message}`] };
     }
   }
 
-  return run({
+  const result = await run({
     kind: 'PERIOD',
     start: period.period_start,
     end: period.period_end,
     due: { shipper: period.invoice_due, carrier: period.payout_due },
   });
+
+  /*
+   * Месяц закрыт расчётами — что не ушло удержанием, уходит счётом.
+   * Порядок важен: выписывать до выплат значило бы требовать деньги,
+   * которые через минуту сами удержатся.
+   */
+  if (month) {
+    const { error: invoiceError } = await admin.rpc('invoice_subscription_fees', { p_month: month });
+    if (invoiceError) {
+      result.errors.push(`счёт за сбор: ${invoiceError.message}`);
+      return result;
+    }
+
+    const sent = await issueSubscriptionInvoices(admin, month, period.invoice_due);
+    result.reports += sent.reports;
+    result.emails += sent.emails;
+    result.errors.push(...sent.errors);
+  }
+
+  return result;
 }
 
 async function run(span: Span): Promise<GenerateResult> {
@@ -695,4 +715,250 @@ async function issue(
   return result.emailSent;
 }
 
+/*
+ * Счета за месячный сбор.
+ *
+ * Выписываются после документов периода: сначала месяц закрывается
+ * расчётами и удержаниями, и только непокрытый остаток идёт счётом. У
+ * подписчика, который возит своих клиентов, выплаты от нас нет вовсе —
+ * для него это единственный способ заплатить.
+ */
+async function issueSubscriptionInvoices(
+  admin: ReturnType<typeof createAdminClient>,
+  month: string,
+  due: string | null,
+): Promise<GenerateResult> {
+  const errors: string[] = [];
+  let reports = 0;
+  let emails = 0;
+
+  const { data: fees, error } = await admin
+    .from('carrier_subscription_fees')
+    .select(
+      'id, month, active_vehicles, unit_cents, net_cents, vat_bps, gross_cents, carrier_company_id, invoices(number)',
+    )
+    .eq('month', month)
+    .not('invoice_id', 'is', null);
+
+  if (error) return { week: month, reports: 0, emails: 0, errors: [`счета за сбор: ${error.message}`] };
+  if (!fees?.length) return { week: month, reports: 0, emails: 0, errors: [] };
+
+  const { data: taken } = await admin
+    .from('carrier_fee_deductions')
+    .select('fee_id, amount_cents')
+    .in(
+      'fee_id',
+      fees.map((f) => f.id),
+    );
+
+  const deductedBy = new Map<string, number>();
+  for (const row of taken ?? []) {
+    deductedBy.set(row.fee_id, (deductedBy.get(row.fee_id) ?? 0) + row.amount_cents);
+  }
+
+  for (const fee of fees) {
+    try {
+      const number = (fee.invoices as { number: string } | null)?.number ?? '';
+      const deducted = deductedBy.get(fee.id) ?? 0;
+      const open = Math.max(fee.gross_cents - deducted, 0);
+      if (open <= 0) continue;
+
+      const { data: company } = await admin
+        .from('companies')
+        .select(
+          'name, country, language, contact_email, billing_email, frozen_at, business_id, vat_number, legal_name, legal_street, legal_postal_code, legal_city, legal_country, billing_street, billing_postal_code, billing_city, billing_country, billing_reference',
+        )
+        .eq('id', fee.carrier_company_id)
+        .single();
+
+      if (!company) continue;
+
+      const locale = emailLocaleOf(company.language) as Locale;
+      const t = await getDictionary(locale);
+      const mail = emailText(emailLocaleOf(company.language));
+      const f = createFormat(t.meta.intl);
+      const operator = await getOperatorProfile();
+      const ids = { businessId: 'Y-tunnus', vatNumber: t.report_.vatNumber };
+
+      const monthLabel = `${Number(fee.month.slice(5, 7))}/${fee.month.slice(0, 4)}`;
+      const description = t.report_.feeLine
+        .replace('{month}', monthLabel)
+        .replace('{count}', String(fee.active_vehicles))
+        .replace('{unit}', f.eur(fee.unit_cents))
+        .replace('{vat}', f.percent(fee.vat_bps / 10_000, 1));
+
+      const street = company.billing_street ?? company.legal_street;
+      const city = [
+        company.billing_postal_code ?? company.legal_postal_code,
+        company.billing_city ?? company.legal_city,
+      ]
+        .filter(Boolean)
+        .join(' ');
+
+      /* Срок тот же, что у счёта заказчику: 15 дней после конца периода. */
+      const dueLine = due ? t.report_.dueShipper.replace('{date}', f.date(due)) : null;
+
+      const texts: ReportTexts = {
+        parties: [
+          { label: t.report_.seller, lines: operatorLines(operator, ids) },
+          {
+            label: t.report_.customer,
+            lines: [
+              company.legal_name ?? company.name,
+              [street, city, company.billing_country ?? company.legal_country].filter(Boolean).join(', '),
+              [
+                company.business_id ? `Y-tunnus ${company.business_id}` : null,
+                company.vat_number ? `${t.report_.vatNumber} ${company.vat_number}` : null,
+              ]
+                .filter(Boolean)
+                .join(' · '),
+            ].filter((line): line is string => Boolean(line && line.trim())),
+          },
+        ],
+        title: `${t.report_.subTitle} ${number}`,
+        period: `${monthLabel} · ${company.name}`,
+        due: dueLine,
+        vatNote: fee.vat_bps > 0 ? t.done.vatNoteDomestic : t.done.vatNoteReverse,
+        colRef: t.report_.subColRef,
+        colDate: t.report_.subColMonth,
+        colRoute: t.report_.subColDescription,
+        colVehicle: t.report_.subColVehicles,
+        colDistance: '',
+        colGross: t.report_.subColUnit,
+        colCommission: t.report_.colCommission,
+        colNet: t.report_.colNetShipper,
+        colDocuments: t.report_.colDocuments,
+        total: t.report_.total,
+        empty: t.report_.empty,
+        closingNote: t.report_.periodClosingNote,
+        operator: `${operator.legal_name} · Y-tunnus ${operator.business_id}`,
+        page: t.report_.page,
+      };
+
+      const vatAmount = fee.gross_cents - fee.net_cents;
+
+      const buffer = await renderToBuffer(
+        WeeklyReport({
+          texts,
+          rows: [
+            {
+              ref: number,
+              closedAt: monthLabel,
+              route: description,
+              vehicle: String(fee.active_vehicles),
+              distance: '',
+              gross: f.eur(fee.unit_cents),
+              commission: null,
+              net: f.eur(fee.net_cents),
+              documents: 0,
+            },
+          ],
+          totals: {
+            gross: f.eur(fee.net_cents),
+            commission: null,
+            net: f.eur(fee.net_cents),
+            deductions: deducted > 0 ? [{ label: t.report_.subDeducted, amount: `−${f.eur(deducted)}` }] : [],
+            payable: deducted > 0 ? { label: t.report_.payable, amount: f.eur(open) } : null,
+            distance: '',
+            vat:
+              fee.vat_bps > 0
+                ? {
+                    label: t.report_.vatLine.replace('{rate}', f.percent(fee.vat_bps / 10_000, 1)),
+                    amount: f.eur(vatAmount),
+                    grossLabel: t.report_.totalWithVat,
+                    gross: f.eur(fee.gross_cents),
+                  }
+                : null,
+          },
+          withCommission: false,
+        }),
+      );
+
+      const path = `${fee.carrier_company_id}/${month}-subscription.pdf`;
+      const { error: upload } = await admin.storage
+        .from(BUCKET)
+        .upload(path, buffer, { contentType: 'application/pdf', upsert: true });
+      if (upload) throw new Error(`загрузка: ${upload.message}`);
+
+      const { data: saved } = await admin
+        .from('weekly_reports')
+        .upsert(
+          {
+            week: month,
+            company_id: fee.carrier_company_id,
+            role: 'CARRIER',
+            file_path: path,
+            bytes: buffer.length,
+            orders_count: 0,
+            gross_cents: fee.net_cents,
+            commission_cents: fee.net_cents,
+            payout_cents: null,
+            commission_bps: null,
+            vat_bps: fee.vat_bps,
+            kind: 'SUBSCRIPTION',
+            due_date: due,
+            generated_at: new Date().toISOString(),
+          },
+          { onConflict: 'week,company_id,role,kind' },
+        )
+        .select('id')
+        .single();
+
+      reports += 1;
+
+      if (company.frozen_at) continue;
+      const to = company.billing_email ?? company.contact_email;
+
+      const result = await notify({
+        companyId: fee.carrier_company_id,
+        kind: 'REPORT',
+        title: `${texts.title} · ${monthLabel}`,
+        body: description,
+        link: saved?.id ? `/reports/${saved.id}` : '/carrier/done',
+        email: to
+          ? {
+              to,
+              template: 'subscription_invoice',
+              subject: t.report_.subEmailSubject.replace('{number}', number).replace('{month}', monthLabel),
+              text: [
+                mail.greeting,
+                '',
+                `${texts.title}, ${monthLabel}.`,
+                '',
+                t.report_.subEmailLine,
+                description,
+                `${t.report_.total}: ${f.eur(open)}`,
+                ...(dueLine ? ['', dueLine] : []),
+                '',
+                texts.vatNote,
+                '',
+                t.report_.emailWhere,
+                '',
+                mail.billing.questions(operatorInbox()),
+                '',
+                texts.operator,
+              ].join('\n'),
+            }
+          : undefined,
+      });
+
+      if (result.emailSent) {
+        emails += 1;
+        await admin
+          .from('weekly_reports')
+          .update({ emailed_at: new Date().toISOString() })
+          .eq('week', month)
+          .eq('company_id', fee.carrier_company_id)
+          .eq('role', 'CARRIER')
+          .eq('kind', 'SUBSCRIPTION');
+      }
+    } catch (cause) {
+      errors.push(`${fee.carrier_company_id}: ${cause instanceof Error ? cause.message : String(cause)}`);
+    }
+  }
+
+  return { week: month, reports, emails, errors };
+}
+
 export const REPORTS_BUCKET = BUCKET;
+

@@ -18,7 +18,11 @@ import {
 } from '@/components/ui';
 import { AdminError } from '@/components/layout/AdminError';
 import { requireRole } from '@/lib/auth/guard';
-import { issuePeriodInvoicesAction, setBillingBatchAction } from '@/lib/billing/actions';
+import {
+  issuePeriodInvoicesAction,
+  setBillingBatchAction,
+  setSubscriptionPaidAction,
+} from '@/lib/billing/actions';
 import { COMPLETED_WEEKS, vatBpsFor, withVat } from '@/lib/config';
 import { todayInHelsinki, weeksAgoMonday } from '@/lib/dates';
 import { getI18n, isLocale, type Locale } from '@/lib/i18n';
@@ -134,6 +138,8 @@ function dayAfter(date: string): string {
  * Полностью закрытые периоды свёрнуты внизу, прежняя сводка по
  * контрагентам — за раскрытием: они для разбора, а не для работы.
  */
+type SubscriptionFee = Database['public']['Functions']['subscription_fees_overview']['Returns'][number];
+
 export default async function BillingPage({
   params,
   searchParams,
@@ -157,6 +163,7 @@ export default async function BillingPage({
     { data: orders },
     { data: totals },
     { data: feeRows },
+    { data: subscriptions },
   ] = await Promise.all([
       supabase.rpc('billing_overview'),
       supabase.rpc('settlement_period', {}),
@@ -166,6 +173,7 @@ export default async function BillingPage({
       supabase
         .from('carrier_fee_deductions')
         .select('period_start, amount_cents, fee:carrier_subscription_fees(carrier_company_id)'),
+      supabase.rpc('subscription_fees_overview'),
     ]);
 
   const deductions: Deductions = new Map();
@@ -279,6 +287,8 @@ export default async function BillingPage({
         </details>
       )}
 
+      <SubscriptionFees rows={(subscriptions ?? []) as SubscriptionFee[]} locale={locale} i18n={i18n} />
+
       <details className="mt-10">
         <summary className="cursor-pointer border-b border-line pb-2 text-[13px] font-semibold tracking-tight text-ink-faint">
           {t.billingDesk.summary}
@@ -291,6 +301,104 @@ export default async function BillingPage({
 
       <ReportsButton locale={locale} />
     </main>
+  );
+}
+
+/**
+ * Месячные сборы подписчиков.
+ *
+ * Отдельным разделом, а не строкой в периоде: сбор живёт по месяцам, а
+ * не по полумесячным периодам, и у подписчика, возящего своих клиентов,
+ * выплаты нет вовсе — вычесть не из чего, остаётся счёт. Пока такой
+ * сбор не оплачен, он единственное, чего оператор не увидит больше
+ * нигде.
+ */
+function SubscriptionFees({
+  rows,
+  locale,
+  i18n: { t, f },
+}: {
+  rows: SubscriptionFee[];
+  locale: Locale;
+  i18n: I18n;
+}) {
+  if (rows.length === 0) {
+    return (
+      <section className="mt-10">
+        <h2 className="border-b border-line pb-2 text-[13px] font-semibold tracking-tight">{t.billingDesk.subsTitle}</h2>
+        <p className="mt-3 text-[13px] text-ink-dim">{t.billingDesk.subsNone}</p>
+      </section>
+    );
+  }
+
+  return (
+    <section className="mt-10">
+      <h2 className="border-b border-line pb-2 text-[13px] font-semibold tracking-tight">{t.billingDesk.subsTitle}</h2>
+      <p className="mt-2 mb-3 max-w-2xl text-[13px] leading-relaxed text-ink-muted">{t.billingDesk.subsLede}</p>
+
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[720px] border-collapse text-[13px]">
+          <thead>
+            <tr className="border-b border-line text-left text-ink-faint">
+              <th className="py-2 pr-3 font-medium">{t.billingDesk.subsColMonth}</th>
+              <th className="py-2 pr-3 font-medium">{t.billingDesk.colCarrier}</th>
+              <th className="py-2 pr-3 text-right font-medium">{t.billingDesk.subsColVehicles}</th>
+              <th className="py-2 pr-3 text-right font-medium">{t.billingDesk.subsColTotal}</th>
+              <th className="py-2 pr-3 text-right font-medium">{t.billingDesk.subsColDeducted}</th>
+              <th className="py-2 pr-3 text-right font-medium">{t.billingDesk.subsColOpen}</th>
+              <th className="py-2 pr-3 font-medium">{t.billingDesk.colInvoice}</th>
+              <th className="py-2 font-medium">{t.billingDesk.colStatus}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row) => (
+              <tr key={row.fee_id} className="border-b border-line/60">
+                <td className="py-2 pr-3 tabular-nums">{row.month.slice(0, 7)}</td>
+                <td className="py-2 pr-3">{row.carrier_name}</td>
+                <td className="py-2 pr-3 text-right tabular-nums">{row.active_vehicles}</td>
+                <td className="py-2 pr-3 text-right tabular-nums">{f.eur(row.gross_cents)}</td>
+                <td className="py-2 pr-3 text-right tabular-nums text-ink-muted">
+                  {row.deducted_cents > 0 ? f.eur(row.deducted_cents) : '—'}
+                </td>
+                <td className="py-2 pr-3 text-right tabular-nums">
+                  {row.open_cents > 0 ? f.eur(row.open_cents) : '—'}
+                </td>
+                <td className="py-2 pr-3 tabular-nums">
+                  {row.invoice_number ?? <span className="text-ink-dim">{t.billingDesk.subsNoInvoice}</span>}
+                </td>
+                <td className="py-2">
+                  {row.open_cents === 0 ? (
+                    <span className="text-ink-dim">—</span>
+                  ) : row.paid_at ? (
+                    <form action={setSubscriptionPaidAction} className="flex items-center gap-2">
+                      <input type="hidden" name="locale" value={locale} />
+                      <input type="hidden" name="fee" value={row.fee_id} />
+                      <input type="hidden" name="paid" value="false" />
+                      <span className="text-ok">{t.billingDesk.subsPaid}</span>
+                      <button type="submit" className="text-[12px] text-ink-dim underline underline-offset-2">
+                        {t.billingDesk.subsUndo}
+                      </button>
+                    </form>
+                  ) : (
+                    <form action={setSubscriptionPaidAction}>
+                      <input type="hidden" name="locale" value={locale} />
+                      <input type="hidden" name="fee" value={row.fee_id} />
+                      <input type="hidden" name="paid" value="true" />
+                      <button
+                        type="submit"
+                        className="rounded-control border border-line px-2.5 py-1 text-[12px] font-medium hover:bg-surface"
+                      >
+                        {t.billingDesk.subsMarkPaid}
+                      </button>
+                    </form>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
   );
 }
 

@@ -250,3 +250,28 @@ export async function issuePeriodInvoicesAction(formData: FormData): Promise<voi
     redirect(withAdminError(`/${locale}/admin/billing`, 'generic'));
   }
 }
+
+/**
+ * Отметить оплату месячного сбора.
+ *
+ * Сбор, который не удалось удержать из выплаты, уходит счётом, и его
+ * поступление оператор отмечает руками — как и поступление по счёту
+ * заказчика. Повторное нажатие снимает отметку: ошибиться легко, а
+ * исправить иначе было бы нечем.
+ */
+export async function setSubscriptionPaidAction(formData: FormData): Promise<void> {
+  await requireAdmin();
+  const locale = toLocale(formData.get('locale'));
+  const supabase = await createClient();
+
+  const { error } = await supabase.rpc('set_subscription_paid', {
+    p_fee_id: String(formData.get('fee') ?? ''),
+    p_paid: String(formData.get('paid') ?? '') === 'true',
+  });
+
+  if (error) {
+    redirect(withAdminError(`/${locale}/admin/billing`, explainAdmin(error as PostgrestError)));
+  }
+
+  revalidatePath(`/${locale}/admin/billing`);
+}
