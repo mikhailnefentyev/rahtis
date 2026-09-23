@@ -120,16 +120,14 @@ export async function CabinetOverview({
                   {company.approved_at && (
                     <Kv k={t.companyStatus.APPROVED} v={<Mono>{f.date(company.approved_at)}</Mono>} />
                   )}
-                  {role === 'CARRIER' && company.partnership && (
-                    <Kv
-                      k={t.cabinet.partnership}
-                      v={subscriber ? t.cabinet.partnershipSub : t.cabinet.partnershipCon}
-                    />
-                  )}
                 </div>
 
                 {role === 'CARRIER' && company.partnership && (
                   <div className="mt-1 flex flex-col gap-1 border-t border-line pt-2.5">
+                    <p className="label-micro">{t.cabinet.partnership}</p>
+                    <p className="text-[13px] font-semibold">
+                      {subscriber ? t.cabinet.partnershipSub : t.cabinet.partnershipCon}
+                    </p>
                     <p className="text-[12px] leading-relaxed text-ink-muted">
                       {subscriber ? t.cabinet.partnershipSubText : t.cabinet.partnershipConText}
                     </p>
