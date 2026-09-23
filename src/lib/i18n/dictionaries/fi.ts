@@ -1703,6 +1703,8 @@ export const fi = {
     uploading: 'Ladataan…',
     view: 'Avaa',
     file: 'Tiedosto',
+    chooseFile: 'Valitse tiedosto',
+    dropFile: 'tai vedä se tähän · PDF, JPG, PNG tai WEBP, enintään 10 Mt',
     validUntil: 'Voimassa',
     validUntilRequired: 'Vakuutukselle voimassaolo on pakollinen',
     perpetual: 'toistaiseksi',

@@ -1,7 +1,7 @@
 'use client';
 
 import { useActionState, useTransition } from 'react';
-import { Badge, Button, Card, CardBody, Field, Input, Mono } from '@/components/ui';
+import { Badge, Button, Card, CardBody, Field, FileDrop, Input, Mono } from '@/components/ui';
 import { documentUrlAction, uploadDocumentAction, type UploadState } from '@/lib/fleet/actions';
 import { useI18n } from '@/lib/i18n/provider';
 import type { CompanyDocument, DocumentKind } from '@/types/db';
@@ -80,18 +80,21 @@ export function DocumentCard({
           <input type="hidden" name="locale" value={locale} />
           <input type="hidden" name="kind" value={kind} />
 
-          <Field label={t.documents.file}>
-            {(p) => (
-              <input
-                {...p}
-                type="file"
-                name="file"
-                required
-                accept="application/pdf,image/jpeg,image/png,image/webp"
-                className="w-full text-[13px] text-ink-muted file:mr-3 file:cursor-pointer file:rounded-control file:border file:border-line file:bg-raised file:px-3 file:py-1.5 file:text-[13px] file:font-semibold file:text-ink"
-              />
-            )}
-          </Field>
+          {/*
+            * Перетаскивание и проверка до отправки: лицензию и страховку
+            * грузят с рабочего стола, а узнавать о неподходящем файле
+            * после десяти мегабайт по мобильной связи незачем.
+            */}
+          <FileDrop
+            name="file"
+            accept="application/pdf,image/jpeg,image/png,image/webp"
+            maxBytes={10 * 1024 * 1024}
+            required
+            choose={t.documents.chooseFile}
+            drop={t.documents.dropFile}
+            tooLarge={t.documents.tooLarge}
+            wrongType={t.documents.wrongType}
+          />
 
           <Field
             label={t.documents.validUntil}

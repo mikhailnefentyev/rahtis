@@ -1607,6 +1607,8 @@ export const en = {
     uploading: 'Uploading…',
     view: 'Open',
     file: 'File',
+    chooseFile: 'Choose a file',
+    dropFile: 'or drag it here · PDF, JPG, PNG or WEBP, up to 10 MB',
     validUntil: 'Valid',
     validUntilRequired: 'An expiry date is required for insurance',
     perpetual: 'indefinitely',

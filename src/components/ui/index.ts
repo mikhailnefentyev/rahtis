@@ -3,6 +3,7 @@ export { Badge, Dot } from './Badge';
 export { Button, buttonClass } from './Button';
 export { Card, CardBody, CardHeader, CardTitle, CardDivider } from './Card';
 export { Countdown } from './Countdown';
+export { FileDrop } from './FileDrop';
 export { DocChip } from './DocChip';
 export { Field, Input, InputMono, Select, Textarea } from './Field';
 export { EmptyState, Kv, Mono, Plate, SectionTitle } from './Misc';
