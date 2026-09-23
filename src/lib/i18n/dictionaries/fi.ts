@@ -429,31 +429,6 @@ export const fi = {
     own5: 'Maksat 29,90 € kuukaudessa autosta, joka ajoi. Seisova auto on maksuton.',
     own6: 'Tarjouspöytä on silti käytössäsi, kun auto jää vapaaksi.',
 
-    /*
-     * Palvelumaksu puolustetaan työllä, ei prosentilla.
-     *
-     * Välittäjän maksu herättää kuljetusyrittäjässä yhden kysymyksen:
-     * mistä minä maksan. Siihen vastataan luettelemalla se käsityö,
-     * joka jää tekemättä — ei adjektiiveilla.
-     */
-    feeEyebrow: 'Palvelumaksu',
-    feeTitle:
-      'Kaksi tapaa käyttää: alusta kuukausimaksulla tai alihankinta 3 %:lla',
-    feeLede:
-      'Omat asiakkaasi: 29,90 € (ilman alv:tä) kuukaudessa jokaisesta autosta, joka ajoi kuukauden aikana vähintään yhden keikan — ajamaton auto on maksuton. Laskut ja asiakirjat pysyvät sinun nimissäsi, emme ole rahaliikenteessä mukana. Meidän kauttamme ajetut keikat: 3 % keikan hinnasta, ja lasku tilaajalle, rahtikirjat, raportit ja reklamaatiot hoidamme me. Tarjouspöydältä otettu keikka on aina alihankintaa: tilaaja maksaa 3 % ja kuljetusliike 3 %. Ensimmäinen kuukausi on kaikille maksuton.',
-    fee1: 'Sähköinen asiakirjaliikenne',
-    fee1Text:
-      'Rahtikirja, kuormakuvat ja vauriomerkinnät kulkevat keikan mukana ja päätyvät tilaajalle ilman erillistä lähettämistä.',
-    fee2: 'Automaattiset laskut ja tilitykset',
-    fee2Text:
-      'Jakson keikat kootaan itsestään laskuksi tilaajalle ja tilitykseksi kuljetusliikkeelle. Maksupäivä on tiedossa etukäteen.',
-    fee3: 'Raportit',
-    fee3Text:
-      'Viikkoraportista näkee ajetut keikat, summat ja tulevat maksupäivät ilman omaa kirjanpitoa.',
-    fee4: 'Työn ja tekijän löytyminen',
-    fee4Text:
-      'Tilaaja löytää vapaan auton ja kuljetusliike seuraavan keikan ilman soittokierrosta. Sama työ tehtiin ennen puhelimella.',
-
     stepsEyebrow: 'Näin keikka etenee',
     stepsTitle: 'Hakemuksesta valmiiseen kuljetukseen neljässä vaiheessa',
     step1: 'Yrityksen tarkastus',

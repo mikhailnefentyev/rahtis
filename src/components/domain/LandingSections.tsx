@@ -321,44 +321,6 @@ export async function LandingSections({ locale }: { locale: Locale }) {
         </div>
       </section>
 
-      {/* ── Плата за услугу ────────────────────────────────────── */}
-      {/*
-        * Блок стоит вплотную к карточкам ролей, потому что вопрос «мне
-        * сколько это стоит» возникает ровно там, где человек прочитал,
-        * что ему обещают.
-        *
-        * С 22.09.2026 цена названа прямо: перевозчик платит помесячно за
-        * машины, которые ездили, заказчик — 3 % за заказ со стола, первый
-        * месяц бесплатно. Числа живут в базе (app.subscription_unit_cents,
-        * app.current_shipper_fee_bps) — при их смене текст правится вместе.
-        * Ниже — работа, за которую эта плата: документы, счета, отчёты.
-        */}
-      <section className="border-y border-line bg-surface">
-        <div className="mx-auto w-full max-w-6xl px-5 py-20">
-          <p className="label-micro">{l.feeEyebrow}</p>
-          <h2 className="mt-2.5 max-w-[24ch] text-[clamp(26px,3vw,34px)] leading-tight font-semibold tracking-tight text-balance">
-            {l.feeTitle}
-          </h2>
-          <p className="mt-3 max-w-[62ch] text-[16px] text-ink-muted">{l.feeLede}</p>
-
-          <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {[
-              { title: l.fee1, text: l.fee1Text },
-              { title: l.fee2, text: l.fee2Text },
-              { title: l.fee3, text: l.fee3Text },
-              { title: l.fee4, text: l.fee4Text },
-            ].map((item) => (
-              <Card key={item.title} className="border-t-2 border-t-accent">
-                <CardBody>
-                  <h3 className="text-[18px] font-semibold tracking-tight">{item.title}</h3>
-                  <p className="mt-2.5 text-[16px] text-ink-muted">{item.text}</p>
-                </CardBody>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ── Путь рейса ─────────────────────────────────────────── */}
       <section id="steps" className="border-y border-line bg-surface">
         <div className="mx-auto w-full max-w-6xl px-5 py-20">

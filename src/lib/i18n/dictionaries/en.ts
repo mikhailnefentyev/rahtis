@@ -386,24 +386,6 @@ export const en = {
     own5: 'You pay €29.90 a month per vehicle that drove. A vehicle standing still costs nothing.',
     own6: 'The offer table is still there when a vehicle comes free.',
 
-    feeEyebrow: 'Service fee',
-    feeTitle:
-      'Two ways to use it: the platform for a monthly fee, or subcontracting for 3 %',
-    feeLede:
-      'Your own clients: €29.90 (excl. VAT) a month for each vehicle that drove at least one job that month — a vehicle that does not drive costs nothing. Invoices and documents stay in your name; we are not part of the money. Jobs driven through us: 3 % of the job price, and we handle the invoice to the shipper, the consignment notes, the reports and the claims. A job taken from the load board is always subcontracting: the shipper pays 3 % and the carrier 3 %. The first month is free for everyone.',
-    fee1: 'Electronic documents',
-    fee1Text:
-      'The consignment note, loading photos and damage notes travel with the job and reach the shipper without being sent separately.',
-    fee2: 'Automated invoices and settlements',
-    fee2Text:
-      'The jobs of a period are assembled on their own into an invoice for the shipper and a settlement for the carrier. The payment date is known in advance.',
-    fee3: 'Reports',
-    fee3Text:
-      'The weekly report shows the jobs driven, the sums and the coming payment dates without separate bookkeeping.',
-    fee4: 'Finding the work and the hauler',
-    fee4Text:
-      'The shipper finds an available truck and the carrier finds the next job without a round of phone calls. That same work used to be done by telephone.',
-
     stepsEyebrow: 'How a job runs',
     stepsTitle: 'From application to completed job in four steps',
     step1: 'Company check',
