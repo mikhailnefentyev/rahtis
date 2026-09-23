@@ -133,6 +133,13 @@ export default async function AdminCompanyPage({
             <Badge tone={companyStatusTone[company.status]}>
               {t.companyStatus[company.status]}
             </Badge>
+            {carrier && company.partnership && (
+              <Badge tone={company.partnership === 'SUBSCRIBER' ? 'info' : 'neutral'}>
+                {company.partnership === 'SUBSCRIBER'
+                  ? t.moderation.partnershipSub
+                  : t.moderation.partnershipCon}
+              </Badge>
+            )}
             <Badge>{t.role[company.kind]}</Badge>
             {company.frozen_at && <Badge tone="danger">{t.moderation.frozen}</Badge>}
             {company.is_test && <Badge tone="warn">{t.moderation.test}</Badge>}
@@ -173,42 +180,6 @@ export default async function AdminCompanyPage({
           <span className="max-w-60 text-right text-xs text-ink-dim">{t.moderation.testHint}</span>
         </form>
 
-        {/*
-          * Ветка перевозчика: за что он платит. Стоит рядом с тестовой
-          * отметкой — оба решения про саму компанию, а не про рейс, и
-          * оба меняют деньги.
-          */}
-        {carrier && (
-          <form action={setPartnershipAction} className="flex flex-col items-end gap-1">
-            <input type="hidden" name="locale" value={locale} />
-            <input type="hidden" name="company_id" value={company.id} />
-            <input
-              type="hidden"
-              name="mode"
-              value={company.partnership === 'SUBSCRIBER' ? 'SUBCONTRACTOR' : 'SUBSCRIBER'}
-            />
-            <span className="label-micro">{t.moderation.partnership}</span>
-            <Badge tone={company.partnership === 'SUBSCRIBER' ? 'info' : 'neutral'}>
-              {company.partnership === 'SUBSCRIBER'
-                ? t.moderation.partnershipSub
-                : t.moderation.partnershipCon}
-            </Badge>
-            <span className="max-w-72 text-right text-xs text-ink-dim">
-              {company.partnership === 'SUBSCRIBER'
-                ? t.moderation.partnershipSubHint
-                : t.moderation.partnershipConHint}
-            </span>
-            <Button type="submit" size="sm" variant="ghost">
-              {t.moderation.partnershipSwitch.replace(
-                '{mode}',
-                company.partnership === 'SUBSCRIBER'
-                  ? t.moderation.partnershipCon
-                  : t.moderation.partnershipSub,
-              )}
-            </Button>
-          </form>
-        )}
-
         {rating && (
           <div className="flex items-center gap-2">
             <span className="label-micro">{t.rating.company}</span>
@@ -225,6 +196,51 @@ export default async function AdminCompanyPage({
         {m('admin.companyOrders', { count: orders })}
         {orders > 0 && ` · ${t.moderation.removeBlocked}`}
       </p>
+
+      {/*
+         * Формат сотрудничества отдельным разделом, а не отметкой в
+         * шапке: это решение про деньги — кто кому выставляет счета, —
+         * и оно должно называться словом и стоять там, где его ищут.
+         */}
+      {carrier && (
+        <section className="mt-8">
+          <h2 className="label-micro mb-3">{t.moderation.partnership}</h2>
+          <Card>
+            <CardBody className="flex flex-wrap items-start justify-between gap-4">
+              <div className="min-w-0 max-w-2xl">
+                <p className="text-[13px] font-semibold">
+                  {company.partnership === 'SUBSCRIBER'
+                    ? t.moderation.partnershipSub
+                    : t.moderation.partnershipCon}
+                </p>
+                <p className="mt-1 text-[13px] leading-relaxed text-ink-muted">
+                  {company.partnership === 'SUBSCRIBER'
+                    ? t.moderation.partnershipSubHint
+                    : t.moderation.partnershipConHint}
+                </p>
+              </div>
+
+              <form action={setPartnershipAction} className="flex flex-col items-end gap-1">
+                <input type="hidden" name="locale" value={locale} />
+                <input type="hidden" name="company_id" value={company.id} />
+                <input
+                  type="hidden"
+                  name="mode"
+                  value={company.partnership === 'SUBSCRIBER' ? 'SUBCONTRACTOR' : 'SUBSCRIBER'}
+                />
+                <Button type="submit" size="sm">
+                  {t.moderation.partnershipSwitch.replace(
+                    '{mode}',
+                    company.partnership === 'SUBSCRIBER'
+                      ? t.moderation.partnershipCon
+                      : t.moderation.partnershipSub,
+                  )}
+                </Button>
+              </form>
+            </CardBody>
+          </Card>
+        </section>
+      )}
 
       {carrier && (
         <section className="mt-8">

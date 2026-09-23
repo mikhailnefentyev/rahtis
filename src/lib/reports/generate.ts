@@ -789,7 +789,15 @@ async function issueSubscriptionInvoices(
         .join(' ');
 
       /* Срок тот же, что у счёта заказчику: 15 дней после конца периода. */
-      const dueLine = due ? t.report_.dueShipper.replace('{date}', f.date(due)) : null;
+      /*
+       * Срок считается от дня выставления, а не от расчётного периода.
+       *
+       * Репетиция показала, зачем: счёт за август, выписанный в сентябре,
+       * получил срок 15.09 — то есть уже прошедший. У сбора нет периода
+       * поставки, есть месяц и обычные условия оплаты: пятнадцать дней.
+       */
+      const dueDay = new Date(Date.now() + 15 * 24 * 3600 * 1000).toISOString().slice(0, 10);
+      const dueLine = t.report_.dueShipper.replace('{date}', f.date(dueDay));
 
       const texts: ReportTexts = {
         parties: [
@@ -811,7 +819,11 @@ async function issueSubscriptionInvoices(
         title: `${t.report_.subTitle} ${number}`,
         period: `${monthLabel} · ${company.name}`,
         due: dueLine,
-        vatNote: fee.vat_bps > 0 ? t.done.vatNoteDomestic : t.done.vatNoteReverse,
+        /*
+         * Общая пометка «суммы без алв, алв добавится к счёту» здесь
+         * лгала бы: это и есть счёт, и налог в итоговой сумме уже стоит.
+         */
+        vatNote: fee.vat_bps > 0 ? t.report_.subVatNote : t.report_.subVatNoteReverse,
         colRef: t.report_.subColRef,
         colDate: t.report_.subColMonth,
         colRoute: t.report_.subColDescription,
@@ -920,7 +932,9 @@ async function issueSubscriptionInvoices(
                 '',
                 t.report_.subEmailLine,
                 description,
-                `${t.report_.total}: ${f.eur(open)}`,
+                `${t.report_.subNet}: ${f.eur(fee.net_cents)}`,
+                ...(deducted > 0 ? [`${t.report_.subDeducted}: −${f.eur(deducted)}`] : []),
+                `${t.report_.subPayable}: ${f.eur(open)}`,
                 ...(dueLine ? ['', dueLine] : []),
                 '',
                 texts.vatNote,
