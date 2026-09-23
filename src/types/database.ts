@@ -3995,7 +3995,10 @@ export type Database = {
           available: boolean
           axles: number
           busy: boolean
+          carrier_business_id: string
+          carrier_name: string
           container_feet: number[]
+          direct_billing: boolean
           driver_email: string
           driver_name: string
           driver_phone: string
