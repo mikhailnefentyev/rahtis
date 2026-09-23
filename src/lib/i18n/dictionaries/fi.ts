@@ -141,6 +141,16 @@ export const fi = {
       'Yritys on hyväksytty. Lataa liikennelupa ja vakuutus sekä lisää ajoneuvot, niin avoimet kuljetukset tulevat näkyviin. Hyväksymme jokaisen ajoneuvon erikseen.',
     approvedShipperHint:
       'Yritys on hyväksytty. Täydennä yritystiedot, niin voit julkaista kuljetuksia.',
+    partnership: 'Tapa käyttää palvelua',
+    partnershipSub: 'Alusta kuukausimaksulla',
+    partnershipCon: 'Alihankinta',
+    partnershipSubText:
+      '29,90 € (ilman alv:tä) kuukaudessa jokaisesta autosta, joka ajoi kuukauden aikana. Omat asiakkaasi ja heidän suorat tilauksensa laskutat itse; tarjouspöydältä otetusta keikasta 3 %.',
+    partnershipConText:
+      '3 % jokaisen keikan hinnasta, vähennetään tilityksestä. Laskut asiakkaille, rahtikirjat ja reklamaatiot hoidamme me; kuukausimaksua ei peritä.',
+    partnershipChange: 'Tavan vaihto sovitaan meidän kanssamme.',
+    freeUntil: 'Maksuton {date} asti',
+    feeOpen: 'Maksamaton kuukausimaksu {amount}',
   },
 
   orderStatus: {

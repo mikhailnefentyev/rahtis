@@ -134,6 +134,16 @@ export const en = {
       'Your company is approved. Upload your operating licence and insurance and add your vehicles, and the load board opens. Every vehicle is approved separately.',
     approvedShipperHint:
       'Your company is approved. Complete the company details and you can publish orders.',
+    partnership: 'How you use the service',
+    partnershipSub: 'The platform for a monthly fee',
+    partnershipCon: 'Subcontracting',
+    partnershipSubText:
+      '€29.90 (excl. VAT) a month for each vehicle that drove during the month. You invoice your own clients and their direct orders yourself; 3 % on a job taken from the offer table.',
+    partnershipConText:
+      '3 % of the price of every job, deducted from the settlement. We handle the invoices to clients, the consignment notes and the claims; no monthly fee is charged.',
+    partnershipChange: 'Changing the way you use the service is agreed with us.',
+    freeUntil: 'Free of charge until {date}',
+    feeOpen: 'Unpaid monthly fee {amount}',
   },
 
   orderStatus: {
