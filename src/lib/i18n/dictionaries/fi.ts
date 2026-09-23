@@ -149,7 +149,10 @@ export const fi = {
     partnershipConText:
       '3 % jokaisen keikan hinnasta, vähennetään tilityksestä. Laskut asiakkaille, rahtikirjat ja reklamaatiot hoidamme me; kuukausimaksua ei peritä.',
     partnershipSwitch: 'Vaihda: {mode}',
-    partnershipBusy: 'Vaihto onnistuu, kun kesken olevat keikat on ajettu.',
+    partnershipNow: 'Vaihto alihankintaan tulee voimaan heti. Se koskee vasta tämän jälkeen vahvistettuja keikkoja.',
+    partnershipNextMonth: 'Paluu kuukausimaksuun tulee voimaan seuraavan kuukauden alusta: alihankintana otettu työ ajetaan loppuun samoilla ehdoilla.',
+    partnershipPending: 'Vaihto tapaan {mode} on tilattu {date} alkaen.',
+    partnershipCancel: 'Peru vaihto',
     partnershipAfter: 'Vaihto koskee uusia keikkoja. Jo valmistuneiden keikkojen maksut eivät muutu.',
     freeUntil: 'Maksuton {date} asti',
     feeOpen: 'Maksamaton kuukausimaksu {amount}',

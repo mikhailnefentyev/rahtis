@@ -425,6 +425,10 @@ export type Database = {
           legal_street: string | null
           name: string
           partnership: Database["public"]["Enums"]["partnership_mode"] | null
+          pending_partnership:
+            | Database["public"]["Enums"]["partnership_mode"]
+            | null
+          pending_partnership_from: string | null
           rejected_at: string | null
           rejection_reason: string | null
           status: Database["public"]["Enums"]["company_status"]
@@ -462,6 +466,10 @@ export type Database = {
           legal_street?: string | null
           name: string
           partnership?: Database["public"]["Enums"]["partnership_mode"] | null
+          pending_partnership?:
+            | Database["public"]["Enums"]["partnership_mode"]
+            | null
+          pending_partnership_from?: string | null
           rejected_at?: string | null
           rejection_reason?: string | null
           status?: Database["public"]["Enums"]["company_status"]
@@ -499,6 +507,10 @@ export type Database = {
           legal_street?: string | null
           name?: string
           partnership?: Database["public"]["Enums"]["partnership_mode"] | null
+          pending_partnership?:
+            | Database["public"]["Enums"]["partnership_mode"]
+            | null
+          pending_partnership_from?: string | null
           rejected_at?: string | null
           rejection_reason?: string | null
           status?: Database["public"]["Enums"]["company_status"]
@@ -2907,6 +2919,10 @@ export type Database = {
           legal_street: string | null
           name: string
           partnership: Database["public"]["Enums"]["partnership_mode"] | null
+          pending_partnership:
+            | Database["public"]["Enums"]["partnership_mode"]
+            | null
+          pending_partnership_from: string | null
           rejected_at: string | null
           rejection_reason: string | null
           status: Database["public"]["Enums"]["company_status"]
@@ -3159,6 +3175,7 @@ export type Database = {
           vat_bps: number
         }[]
       }
+      apply_pending_partnerships: { Args: never; Returns: number }
       archive_driver: { Args: { p_driver_id: string }; Returns: undefined }
       assign_vehicle_driver: {
         Args: { p_driver_id: string; p_vehicle_id: string }
@@ -3987,6 +4004,10 @@ export type Database = {
           legal_street: string | null
           name: string
           partnership: Database["public"]["Enums"]["partnership_mode"] | null
+          pending_partnership:
+            | Database["public"]["Enums"]["partnership_mode"]
+            | null
+          pending_partnership_from: string | null
           rejected_at: string | null
           rejection_reason: string | null
           status: Database["public"]["Enums"]["company_status"]
@@ -4085,6 +4106,10 @@ export type Database = {
           legal_street: string | null
           name: string
           partnership: Database["public"]["Enums"]["partnership_mode"] | null
+          pending_partnership:
+            | Database["public"]["Enums"]["partnership_mode"]
+            | null
+          pending_partnership_from: string | null
           rejected_at: string | null
           rejection_reason: string | null
           status: Database["public"]["Enums"]["company_status"]
@@ -4526,7 +4551,7 @@ export type Database = {
       set_driver_language: { Args: { p_language: string }; Returns: undefined }
       set_own_partnership: {
         Args: { p_mode: Database["public"]["Enums"]["partnership_mode"] }
-        Returns: undefined
+        Returns: string
       }
       set_runtime_config: {
         Args: { p_key: string; p_note?: string; p_value: string }
@@ -4799,6 +4824,10 @@ export type Database = {
           legal_street: string | null
           name: string
           partnership: Database["public"]["Enums"]["partnership_mode"] | null
+          pending_partnership:
+            | Database["public"]["Enums"]["partnership_mode"]
+            | null
+          pending_partnership_from: string | null
           rejected_at: string | null
           rejection_reason: string | null
           status: Database["public"]["Enums"]["company_status"]

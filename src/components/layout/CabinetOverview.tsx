@@ -50,22 +50,6 @@ export async function CabinetOverview({
   const subscriber = role === 'CARRIER' && company?.partnership === 'SUBSCRIBER';
   const free = role === 'CARRIER' ? freeUntil(company?.approved_at ?? null) : null;
 
-  /*
-   * Рейсы в работе. Смену ветки база при них не даст: у незакрытого
-   * рейса сторона договора пересчитывается при закрытии, и переключение
-   * на ходу увело бы его деньги не туда. Кабинет говорит об этом до
-   * нажатия, а не после отказа.
-   */
-  let busy = 0;
-  if (role === 'CARRIER' && company) {
-    const supabase = await createClient();
-    const { count } = await supabase
-      .from('orders')
-      .select('id', { count: 'exact', head: true })
-      .in('status', ['AWAIT_DRIVER', 'IN_PROGRESS']);
-    busy = count ?? 0;
-  }
-
   let openFee = 0;
   if (subscriber) {
     const supabase = await createClient();
@@ -141,8 +125,28 @@ export async function CabinetOverview({
                         {t.cabinet.feeOpen.replace('{amount}', f.eur(openFee))}
                       </p>
                     )}
-                    {busy > 0 ? (
-                      <p className="text-[12px] text-ink-dim">{t.cabinet.partnershipBusy}</p>
+                    {/*
+                      * Заявленная смена показывается вместо кнопки: пока
+                      * она висит, нажимать нечего — кроме отмены.
+                      */}
+                    {company.pending_partnership && company.pending_partnership_from ? (
+                      <form action={setOwnPartnershipAction} className="mt-1 flex flex-col gap-1">
+                        <input type="hidden" name="locale" value={locale} />
+                        <input type="hidden" name="mode" value={company.partnership} />
+                        <p className="text-[12px] font-medium text-warn">
+                          {t.cabinet.partnershipPending
+                            .replace(
+                              '{mode}',
+                              company.pending_partnership === 'SUBSCRIBER'
+                                ? t.cabinet.partnershipSub
+                                : t.cabinet.partnershipCon,
+                            )
+                            .replace('{date}', f.date(company.pending_partnership_from))}
+                        </p>
+                        <Button type="submit" size="sm" variant="default" className="self-start">
+                          {t.cabinet.partnershipCancel}
+                        </Button>
+                      </form>
                     ) : (
                       <form action={setOwnPartnershipAction} className="mt-1 flex flex-col gap-1">
                         <input type="hidden" name="locale" value={locale} />
@@ -161,7 +165,14 @@ export async function CabinetOverview({
                             subscriber ? t.cabinet.partnershipCon : t.cabinet.partnershipSub,
                           )}
                         </Button>
-                        <span className="text-[12px] text-ink-dim">{t.cabinet.partnershipAfter}</span>
+                        {/*
+                          * Когда смена вступит в силу, сказано до нажатия:
+                          * уход из подряда действует со следующего месяца,
+                          * и узнавать об этом постфактум неприятно.
+                          */}
+                        <span className="text-[12px] text-ink-dim">
+                          {subscriber ? t.cabinet.partnershipNow : t.cabinet.partnershipNextMonth}
+                        </span>
                       </form>
                     )}
                   </div>

@@ -142,7 +142,10 @@ export const en = {
     partnershipConText:
       '3 % of the price of every job, deducted from the settlement. We handle the invoices to clients, the consignment notes and the claims; no monthly fee is charged.',
     partnershipSwitch: 'Switch to: {mode}',
-    partnershipBusy: 'You can switch once the jobs in progress have been driven.',
+    partnershipNow: 'Switching to subcontracting takes effect at once. It applies to jobs confirmed after the switch.',
+    partnershipNextMonth: 'Returning to the monthly fee takes effect from the start of the next month: work taken as subcontracting is driven to the end on the same terms.',
+    partnershipPending: 'A switch to {mode} is scheduled from {date}.',
+    partnershipCancel: 'Cancel the switch',
     partnershipAfter: 'The switch applies to new jobs. The fees on jobs already completed do not change.',
     freeUntil: 'Free of charge until {date}',
     feeOpen: 'Unpaid monthly fee {amount}',
