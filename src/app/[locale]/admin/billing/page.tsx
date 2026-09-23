@@ -343,37 +343,35 @@ function SubscriptionFees({
       <h2 className="border-b border-line pb-2 text-[13px] font-semibold tracking-tight">{t.billingDesk.subsTitle}</h2>
       <p className="mt-2 mb-3 max-w-2xl text-[13px] leading-relaxed text-ink-muted">{t.billingDesk.subsLede}</p>
 
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[720px] border-collapse text-[13px]">
+      <TableFrame>
+        <Table>
           <thead>
-            <tr className="border-b border-line text-left text-ink-faint">
-              <th className="py-2 pr-3 font-medium">{t.billingDesk.subsColMonth}</th>
-              <th className="py-2 pr-3 font-medium">{t.billingDesk.colCarrier}</th>
-              <th className="py-2 pr-3 text-right font-medium">{t.billingDesk.subsColVehicles}</th>
-              <th className="py-2 pr-3 text-right font-medium">{t.billingDesk.subsColTotal}</th>
-              <th className="py-2 pr-3 text-right font-medium">{t.billingDesk.subsColDeducted}</th>
-              <th className="py-2 pr-3 text-right font-medium">{t.billingDesk.subsColOpen}</th>
-              <th className="py-2 pr-3 font-medium">{t.billingDesk.colInvoice}</th>
-              <th className="py-2 font-medium">{t.billingDesk.colStatus}</th>
-            </tr>
+            <Tr>
+              <Th>{t.billingDesk.subsColMonth}</Th>
+              <Th>{t.billingDesk.colCarrier}</Th>
+              <Th numeric>{t.billingDesk.subsColVehicles}</Th>
+              <Th numeric>{t.billingDesk.subsColTotal}</Th>
+              <Th numeric>{t.billingDesk.subsColDeducted}</Th>
+              <Th numeric>{t.billingDesk.subsColOpen}</Th>
+              <Th>{t.billingDesk.colInvoice}</Th>
+              <Th>{t.billingDesk.colStatus}</Th>
+            </Tr>
           </thead>
           <tbody>
             {rows.map((row) => (
-              <tr key={row.fee_id} className="border-b border-line/60">
-                <td className="py-2 pr-3 tabular-nums">{row.month.slice(0, 7)}</td>
-                <td className="py-2 pr-3">{row.carrier_name}</td>
-                <td className="py-2 pr-3 text-right tabular-nums">{row.active_vehicles}</td>
-                <td className="py-2 pr-3 text-right tabular-nums">{f.eur(row.gross_cents)}</td>
-                <td className="py-2 pr-3 text-right tabular-nums text-ink-muted">
+              <Tr key={row.fee_id}>
+                <Td mono>{row.month.slice(0, 7)}</Td>
+                <Td>{row.carrier_name}</Td>
+                <Td numeric>{row.active_vehicles}</Td>
+                <Td numeric>{f.eur(row.gross_cents)}</Td>
+                <Td numeric className="text-ink-muted">
                   {row.deducted_cents > 0 ? f.eur(row.deducted_cents) : '—'}
-                </td>
-                <td className="py-2 pr-3 text-right tabular-nums">
-                  {row.open_cents > 0 ? f.eur(row.open_cents) : '—'}
-                </td>
-                <td className="py-2 pr-3 tabular-nums">
+                </Td>
+                <Td numeric>{row.open_cents > 0 ? f.eur(row.open_cents) : '—'}</Td>
+                <Td mono>
                   {row.invoice_number ?? <span className="text-ink-dim">{t.billingDesk.subsNoInvoice}</span>}
-                </td>
-                <td className="py-2">
+                </Td>
+                <Td>
                   {row.open_cents === 0 ? (
                     <span className="text-ink-dim">—</span>
                   ) : row.paid_at ? (
@@ -391,20 +389,17 @@ function SubscriptionFees({
                       <input type="hidden" name="locale" value={locale} />
                       <input type="hidden" name="fee" value={row.fee_id} />
                       <input type="hidden" name="paid" value="true" />
-                      <button
-                        type="submit"
-                        className="rounded-control border border-line px-2.5 py-1 text-[12px] font-medium hover:bg-surface"
-                      >
+                      <Button type="submit" size="sm" variant="ghost">
                         {t.billingDesk.subsMarkPaid}
-                      </button>
+                      </Button>
                     </form>
                   )}
-                </td>
-              </tr>
+                </Td>
+              </Tr>
             ))}
           </tbody>
-        </table>
-      </div>
+        </Table>
+      </TableFrame>
     </section>
   );
 }
