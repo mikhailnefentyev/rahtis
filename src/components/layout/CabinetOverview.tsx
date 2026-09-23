@@ -153,7 +153,11 @@ export async function CabinetOverview({
                           name="mode"
                           value={subscriber ? 'SUBCONTRACTOR' : 'SUBSCRIBER'}
                         />
-                        <Button type="submit" size="sm" variant="ghost" className="self-start">
+                        {/*
+                          * Кнопка акцентная: это выбор, за который платят,
+                          * и он не должен выглядеть служебной ссылкой.
+                          */}
+                        <Button type="submit" size="md" variant="primary" className="self-start">
                           {t.cabinet.partnershipSwitch.replace(
                             '{mode}',
                             subscriber ? t.cabinet.partnershipCon : t.cabinet.partnershipSub,
