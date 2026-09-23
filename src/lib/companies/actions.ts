@@ -57,11 +57,21 @@ export async function submitApplicationAction(
   if (!isValidBusinessId(businessId)) return { error: t.validation.businessId, done: false };
   if (!/^\S+@\S+\.\S+$/.test(email)) return { error: t.validation.email, done: false };
 
+  /*
+   * Ветка перевозчика — его пожелание, а не решение. Окончательно её
+   * ставит оператор, проверяя компанию; до одобрения она ни на что не
+   * влияет, потому что рейсов ещё нет. У заказчика ветки не бывает.
+   */
+  const wish = String(formData.get('partnership') ?? '');
+  const partnership =
+    kind === 'CARRIER' ? (wish === 'SUBSCRIBER' ? 'SUBSCRIBER' : 'SUBCONTRACTOR') : null;
+
   const admin = createAdminClient();
   const { data: company, error } = await admin
     .from('companies')
     .insert({
       kind,
+      partnership,
       name,
       business_id: businessId,
       contact_email: email,
@@ -352,6 +362,36 @@ export async function setCompanyTestAction(formData: FormData): Promise<void> {
 
   if (error) {
     console.error('Отметка тестовой компании не изменилась:', error.message);
+    redirect(withAdminError(`/${locale}/admin/company/${companyId}`, explainAdmin(error)));
+  }
+}
+
+/**
+ * Ветка перевозчика: подписка или подряд.
+ *
+ * Решение денежное и потому за оператором: подрядчик платит 3 % со всех
+ * рейсов и счета клиентам идут через нас, подписчик платит за машины и
+ * рассчитывается со своими заказчиками сам. Перевозчик выбирает ветку в
+ * заявке, но окончательно её ставит тот, кто компанию проверял.
+ */
+export async function setPartnershipAction(formData: FormData): Promise<void> {
+  const locale = toLocale(formData.get('locale'));
+  await requireAdmin();
+
+  const companyId = String(formData.get('company_id') ?? '');
+  const mode = String(formData.get('mode') ?? '');
+  const supabase = await createClient();
+
+  const { error } = await supabase.rpc('set_company_partnership', {
+    p_company_id: companyId,
+    p_mode: mode === 'SUBSCRIBER' ? 'SUBSCRIBER' : 'SUBCONTRACTOR',
+  });
+
+  revalidatePath(`/${locale}/admin/company/${companyId}`);
+  revalidatePath(`/${locale}/admin/billing`);
+
+  if (error) {
+    console.error('Ветка перевозчика не изменилась:', error.message);
     redirect(withAdminError(`/${locale}/admin/company/${companyId}`, explainAdmin(error)));
   }
 }

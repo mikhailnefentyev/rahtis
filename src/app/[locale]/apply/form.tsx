@@ -15,6 +15,12 @@ export function ApplyForm() {
   const [state, formAction, pending] = useActionState(submitApplicationAction, initial);
 
   const [kind, setKind] = useState<CompanyRole>('CARRIER');
+  /*
+   * Ветка перевозчика. По умолчанию подряд: он ничего не стоит, пока
+   * нет работы, и человек, пришедший «посмотреть», не должен случайно
+   * подписаться на ежемесячный счёт.
+   */
+  const [mode, setMode] = useState<'SUBCONTRACTOR' | 'SUBSCRIBER'>('SUBCONTRACTOR');
   const [name, setName] = useState('');
   const [businessId, setBusinessId] = useState('');
   const [email, setEmail] = useState('');
@@ -50,6 +56,7 @@ export function ApplyForm() {
         <form action={formAction} className="flex flex-col gap-4">
           <input type="hidden" name="locale" value={locale} />
           <input type="hidden" name="kind" value={kind} />
+          <input type="hidden" name="partnership" value={mode} />
 
           <div
             role="radiogroup"
@@ -78,6 +85,39 @@ export function ApplyForm() {
               </button>
             ))}
           </div>
+
+          {/*
+            * Ветка нужна только перевозчику: заказчик ничего не платит
+            * помесячно, и спрашивать его об этом не о чем.
+            */}
+          {kind === 'CARRIER' && (
+            <div className="flex flex-col gap-2">
+              <span className="label-micro">{t.apply.howTitle}</span>
+              {(
+                [
+                  ['SUBCONTRACTOR', t.apply.howCon, t.apply.howConText],
+                  ['SUBSCRIBER', t.apply.howSub, t.apply.howSubText],
+                ] as const
+              ).map(([value, label, text]) => (
+                <button
+                  key={value}
+                  type="button"
+                  role="radio"
+                  aria-checked={mode === value}
+                  onClick={() => setMode(value)}
+                  className={
+                    mode === value
+                      ? 'cursor-pointer rounded-control border border-accent bg-accent/5 p-3 text-left'
+                      : 'cursor-pointer rounded-control border border-line p-3 text-left transition-colors duration-150 hover:border-ink-dim'
+                  }
+                >
+                  <span className="block text-[13px] font-semibold tracking-tight">{label}</span>
+                  <span className="mt-1 block text-[12px] leading-relaxed text-ink-muted">{text}</span>
+                </button>
+              ))}
+              <p className="text-[12px] leading-relaxed text-ink-dim">{t.apply.howNote}</p>
+            </div>
+          )}
 
           <Field label={t.company.name} required>
             {(p) => (

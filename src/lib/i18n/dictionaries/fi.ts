@@ -1169,6 +1169,12 @@ export const fi = {
     test: 'Testiyritys',
     markTest: 'Merkitse testiyritykseksi',
     unmarkTest: 'Poista testimerkintä',
+    partnership: 'Kuljetusliikkeen tapa',
+    partnershipSub: 'Kuukausimaksu',
+    partnershipCon: 'Alihankinta',
+    partnershipSubHint: '29,90 € kuukaudessa ajanutta autoa kohden. Omat asiakkaat ja suorat tilaukset laskuttaa kuljetusliike itse; pöydältä otetusta keikasta 3 %.',
+    partnershipConHint: '3 % jokaisesta keikasta. Laskut asiakkaille, rahtikirjat ja reklamaatiot hoidamme me; kuukausimaksua ei peritä.',
+    partnershipSwitch: 'Vaihda tavaksi {mode}',
     testHint: 'Testiyrityksen keikat eivät mene laskuihin eivätkä tilityksiin.',
     queue: 'Tarkastusjono',
     applications: 'Hakemukset',
@@ -1204,6 +1210,14 @@ export const fi = {
     title: 'Hakemus',
     subtitle:
       'Avointa rekisteröitymistä ei ole. Tarkistamme jokaisen yrityksen tiedot rekisteristä ja lähetämme tunnukset antamaasi osoitteeseen.',
+    howTitle: 'Miten haluat käyttää palvelua?',
+    howSub: 'Alusta kuukausimaksulla',
+    howSubText:
+      'Ajat omia asiakkaitasi ja käytät sovellusta, työaikaa, karttaa ja tarjouspöytää. 29,90 € kuukaudessa jokaisesta autosta, joka ajoi kuukauden aikana. Laskutat asiakkaasi itse.',
+    howCon: 'Alihankinta',
+    howConText:
+      'Me hankimme työn, laskutamme asiakkaan, hoidamme rahtikirjat ja reklamaatiot. 3 % keikan hinnasta, ei kuukausimaksua.',
+    howNote: 'Voit vaihtaa tapaa myöhemmin. Tarjouspöydältä otettu keikka ajetaan aina alihankintana.',
     iAmCarrier: 'Kuljetusliike',
     iAmShipper: 'Tilaaja',
     submit: 'Lähetä hakemus',

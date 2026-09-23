@@ -1089,6 +1089,12 @@ export const en = {
     test: 'Test company',
     markTest: 'Mark as test company',
     unmarkTest: 'Remove test mark',
+    partnership: 'How the carrier works',
+    partnershipSub: 'Monthly fee',
+    partnershipCon: 'Subcontracting',
+    partnershipSubHint: '€29.90 a month per vehicle that drove. The carrier invoices its own clients and direct orders itself; 3 % on a job taken from the table.',
+    partnershipConHint: '3 % of every job. We handle the invoices to clients, the consignment notes and the claims; no monthly fee.',
+    partnershipSwitch: 'Switch to {mode}',
     testHint: 'Jobs of a test company are not invoiced or settled.',
     queue: 'Review queue',
     applications: 'Applications',
@@ -1124,6 +1130,14 @@ export const en = {
     title: 'Application',
     subtitle:
       'There is no open sign-up. We check every company against the register and send the credentials to the address you give.',
+    howTitle: 'How do you want to use the service?',
+    howSub: 'The platform for a monthly fee',
+    howSubText:
+      'You drive your own clients and use the app, working time, the map and the offer table. €29.90 a month for each vehicle that drove during the month. You invoice your clients yourself.',
+    howCon: 'Subcontracting',
+    howConText:
+      'We find the work, invoice the client, handle the consignment notes and the claims. 3 % of the job price, no monthly fee.',
+    howNote: 'You can change this later. A job taken from the offer table is always performed as subcontracting.',
     iAmCarrier: 'Carrier',
     iAmShipper: 'Shipper',
     submit: 'Send application',

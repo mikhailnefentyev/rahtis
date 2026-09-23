@@ -12,7 +12,7 @@ import {
 } from '@/components/ui';
 import { companyStatusTone, vehicleAccessTone } from '@/components/ui/tone';
 import { requireRole } from '@/lib/auth/guard';
-import { setCompanyTestAction } from '@/lib/companies/actions';
+import { setCompanyTestAction, setPartnershipAction } from '@/lib/companies/actions';
 import { daysUntil } from '@/lib/dates';
 import { getI18n, isLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
@@ -172,6 +172,42 @@ export default async function AdminCompanyPage({
           </Button>
           <span className="max-w-60 text-right text-xs text-ink-dim">{t.moderation.testHint}</span>
         </form>
+
+        {/*
+          * Ветка перевозчика: за что он платит. Стоит рядом с тестовой
+          * отметкой — оба решения про саму компанию, а не про рейс, и
+          * оба меняют деньги.
+          */}
+        {carrier && (
+          <form action={setPartnershipAction} className="flex flex-col items-end gap-1">
+            <input type="hidden" name="locale" value={locale} />
+            <input type="hidden" name="company_id" value={company.id} />
+            <input
+              type="hidden"
+              name="mode"
+              value={company.partnership === 'SUBSCRIBER' ? 'SUBCONTRACTOR' : 'SUBSCRIBER'}
+            />
+            <span className="label-micro">{t.moderation.partnership}</span>
+            <Badge tone={company.partnership === 'SUBSCRIBER' ? 'info' : 'neutral'}>
+              {company.partnership === 'SUBSCRIBER'
+                ? t.moderation.partnershipSub
+                : t.moderation.partnershipCon}
+            </Badge>
+            <span className="max-w-72 text-right text-xs text-ink-dim">
+              {company.partnership === 'SUBSCRIBER'
+                ? t.moderation.partnershipSubHint
+                : t.moderation.partnershipConHint}
+            </span>
+            <Button type="submit" size="sm" variant="ghost">
+              {t.moderation.partnershipSwitch.replace(
+                '{mode}',
+                company.partnership === 'SUBSCRIBER'
+                  ? t.moderation.partnershipCon
+                  : t.moderation.partnershipSub,
+              )}
+            </Button>
+          </form>
+        )}
 
         {rating && (
           <div className="flex items-center gap-2">
