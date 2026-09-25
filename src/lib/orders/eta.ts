@@ -1,6 +1,7 @@
 import 'server-only';
 
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { ETA_MAX_AVG_KMH } from '@/lib/config';
 import { routingConfigured, truckProfile } from '@/lib/routing';
 import { tomtom } from '@/lib/routing/tomtom';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -75,9 +76,15 @@ export async function refineEtaAfter(
       { traffic: true },
     );
 
+    /*
+     * Пробки удлиняют путь, но не делают его медленнее средней скорости
+     * сцепки: на свободной трассе TomTom всё равно слишком оптимистичен.
+     */
+    const seconds = Math.max(route.durationS, route.distanceM / (ETA_MAX_AVG_KMH / 3.6));
+
     await session.rpc('set_stop_eta', {
       p_stop_id: next.id,
-      p_eta: new Date(Date.now() + route.durationS * 1000).toISOString(),
+      p_eta: new Date(Date.now() + seconds * 1000).toISOString(),
       p_source: 'TRAFFIC',
     });
   } catch (error) {
