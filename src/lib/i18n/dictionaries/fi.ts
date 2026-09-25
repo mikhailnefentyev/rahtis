@@ -1390,6 +1390,19 @@ export const fi = {
     linkExpired: 'Linkki ei kelpaa tai on vanhentunut. Pyydä uusi kutsu RAHTIS-tuesta.',
   },
 
+  /*
+   * Sähköpostin linkki avautuu tänne eikä kirjaa sisään suoraan:
+   * sähköpostipalvelujen turvaskannerit avaavat linkit, mutta eivät paina
+   * painiketta, joten kertakäyttöinen linkki säilyy ihmiselle.
+   */
+  linkContinue: {
+    inviteTitle: 'Tervetuloa RAHTISiin',
+    inviteText: 'Jatka painikkeesta, niin pääset asettamaan salasanan.',
+    recoveryTitle: 'Salasanan palautus',
+    recoveryText: 'Jatka painikkeesta, niin pääset asettamaan uuden salasanan.',
+    continue: 'Jatka',
+  },
+
   report: {
     weeklyPayouts: 'Viikkotilitykset kuljetusliikkeille',
     dailyInvoices: 'Päivittäinen yhteenveto tilaajittain',

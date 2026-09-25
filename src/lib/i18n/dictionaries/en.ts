@@ -1295,6 +1295,14 @@ export const en = {
     linkExpired: 'This link is invalid or has expired. Ask RAHTIS support for a new invite.',
   },
 
+  linkContinue: {
+    inviteTitle: 'Welcome to RAHTIS',
+    inviteText: 'Continue with the button to set your password.',
+    recoveryTitle: 'Password reset',
+    recoveryText: 'Continue with the button to set a new password.',
+    continue: 'Continue',
+  },
+
   report: {
     weeklyPayouts: 'Weekly payouts to carriers',
     dailyInvoices: 'Daily summary by shipper',
