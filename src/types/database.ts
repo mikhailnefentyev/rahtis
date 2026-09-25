@@ -4573,6 +4573,59 @@ export type Database = {
         Args: { p_allow: boolean; p_shipper_id: string }
         Returns: undefined
       }
+      set_stop_eta: {
+        Args: {
+          p_eta: string
+          p_source?: Database["public"]["Enums"]["eta_source"]
+          p_stop_id: string
+        }
+        Returns: {
+          address: string
+          arrived_at: string | null
+          arrived_lat: number | null
+          arrived_lon: number | null
+          cargo_weight_kg: number | null
+          city: string
+          company_name: string | null
+          completed_accuracy_m: number | null
+          completed_at: string | null
+          completed_lat: number | null
+          completed_lon: number | null
+          consignee: string | null
+          contact_name: string | null
+          contact_phone: string | null
+          country: string | null
+          created_at: string
+          damage_note: string | null
+          eta_at: string | null
+          eta_source: Database["public"]["Enums"]["eta_source"] | null
+          eta_updated_at: string | null
+          external_ref: string | null
+          geocode_score: number | null
+          id: string
+          lat: number | null
+          leg_distance_m: number | null
+          leg_duration_s: number | null
+          lon: number | null
+          note: string | null
+          order_id: string
+          place_kind: Database["public"]["Enums"]["place_kind"] | null
+          place_name: string | null
+          role: Database["public"]["Enums"]["stop_role"]
+          scheduled_date: string | null
+          scheduled_time: string | null
+          seal_required: boolean | null
+          sequence: number
+          trailer_loaded: boolean | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "order_stops"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       set_subscription_paid: {
         Args: { p_fee_id: string; p_paid: boolean }
         Returns: undefined
@@ -4753,59 +4806,6 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "orders"
-          isOneToOne: true
-          isSetofReturn: false
-        }
-      }
-      set_stop_eta: {
-        Args: {
-          p_eta: string
-          p_source?: Database["public"]["Enums"]["eta_source"]
-          p_stop_id: string
-        }
-        Returns: {
-          address: string
-          arrived_at: string | null
-          arrived_lat: number | null
-          arrived_lon: number | null
-          cargo_weight_kg: number | null
-          city: string
-          company_name: string | null
-          completed_accuracy_m: number | null
-          completed_at: string | null
-          completed_lat: number | null
-          completed_lon: number | null
-          consignee: string | null
-          contact_name: string | null
-          contact_phone: string | null
-          country: string | null
-          created_at: string
-          damage_note: string | null
-          eta_at: string | null
-          eta_source: Database["public"]["Enums"]["eta_source"] | null
-          eta_updated_at: string | null
-          external_ref: string | null
-          geocode_score: number | null
-          id: string
-          lat: number | null
-          leg_distance_m: number | null
-          leg_duration_s: number | null
-          lon: number | null
-          note: string | null
-          order_id: string
-          place_kind: Database["public"]["Enums"]["place_kind"] | null
-          place_name: string | null
-          role: Database["public"]["Enums"]["stop_role"]
-          scheduled_date: string | null
-          scheduled_time: string | null
-          seal_required: boolean | null
-          sequence: number
-          trailer_loaded: boolean | null
-          updated_at: string
-        }
-        SetofOptions: {
-          from: "*"
-          to: "order_stops"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -5030,10 +5030,10 @@ export type Database = {
       direct_outcome: "PENDING" | "ACCEPTED" | "DECLINED" | "WITHDRAWN"
       dispatch_mode: "DESK" | "DIRECT"
       distance_source: "MANUAL" | "AUTO"
-      eta_source: "ROUTE" | "TRAFFIC" | "CARRIER"
       document_kind: "CARRIER_LICENSE" | "INSURANCE"
       driver_status: "ACTIVE" | "ARCHIVED"
       email_status: "PENDING" | "SENT" | "FAILED" | "SKIPPED"
+      eta_source: "ROUTE" | "TRAFFIC" | "CARRIER"
       euro_class: "EURO_4" | "EURO_5" | "EURO_6"
       haul_branch: "UNIT" | "EXPRESS"
       haul_kind: "TRAILER" | "CONTAINER" | "VAN" | "TRUCK"
@@ -5249,10 +5249,10 @@ export const Constants = {
       direct_outcome: ["PENDING", "ACCEPTED", "DECLINED", "WITHDRAWN"],
       dispatch_mode: ["DESK", "DIRECT"],
       distance_source: ["MANUAL", "AUTO"],
-      eta_source: ["ROUTE", "TRAFFIC", "CARRIER"],
       document_kind: ["CARRIER_LICENSE", "INSURANCE"],
       driver_status: ["ACTIVE", "ARCHIVED"],
       email_status: ["PENDING", "SENT", "FAILED", "SKIPPED"],
+      eta_source: ["ROUTE", "TRAFFIC", "CARRIER"],
       euro_class: ["EURO_4", "EURO_5", "EURO_6"],
       haul_branch: ["UNIT", "EXPRESS"],
       haul_kind: ["TRAILER", "CONTAINER", "VAN", "TRUCK"],
