@@ -4443,9 +4443,9 @@
    "name_fi": "St1 Äänekoski Hirvaskangas",
    "name_en": "St1 Äänekoski Hirvaskangas",
    "network": "St1",
-   "address": "Suonenjoentie 9, 44250 Ääneskoivisto",
-   "lat": 62.51557,
-   "lon": 25.68966,
+   "address": "Suonenjoentie 9, 44250 Äänekoivisto",
+   "lat": 62.51546,
+   "lon": 25.69072,
    "approx": false,
    "hours_fi": "24/7",
    "hours_en": "24/7",
@@ -4469,6 +4469,26 @@
      "k": "facilities",
      "fi": "RISTIRIITAISET ARVIOT: yhden kuljettajan mukaan sauna ja suihku ovat ilmaisia, toista ei päästetty ilman ketjun korttia. Tarkista paikan päällä. Ei sama kuin tien toisella puolella oleva ABC Hirvaskangas",
      "en": "CONFLICTING REVIEWS: one driver says the sauna and shower are free, another was not let in without the chain's card. Check on site. Not the same as ABC Hirvaskangas across the road"
+    },
+    {
+     "k": "notes",
+     "fi": "VT13. Suihku ja sauna, AdBlue, raskaan kaluston mittari",
+     "en": "VT13. Shower and sauna, AdBlue, heavy-vehicle pump"
+    },
+    {
+     "k": "facilities",
+     "fi": "Sopii pitkille yhdistelmille",
+     "en": "Suitable for long combinations"
+    },
+    {
+     "k": "notes",
+     "fi": "Yöpysäköintiä ei ole vahvistettu",
+     "en": "Overnight parking not confirmed"
+    },
+    {
+     "k": "notes",
+     "fi": "Tiedot tarkistettu 24.9.2026",
+     "en": "Details checked on 24 Sep 2026"
     }
    ]
   },
@@ -4957,7 +4977,8 @@
    "id": "fi-abc-juva",
    "country": "FI",
    "kinds": [
-    "FUEL"
+    "FUEL",
+    "PARKING"
    ],
    "name_fi": "ABC Juva",
    "name_en": "ABC Juva",
@@ -4978,6 +4999,16 @@
      "k": "notes",
      "fi": "Kätevä liittymä valtatieltä",
      "en": "Easy exit from the highway"
+    },
+    {
+     "k": "notes",
+     "fi": "VT14. Pysäköinti raskaalle liikenteelle ja taukotila rahtareille",
+     "en": "VT14. Heavy-vehicle parking and a drivers’ rest room"
+    },
+    {
+     "k": "notes",
+     "fi": "Tiedot tarkistettu 24.9.2026",
+     "en": "Details checked on 24 Sep 2026"
     }
    ]
   },
@@ -6231,9 +6262,9 @@
    "name_fi": "St1 Kangasala Ruutana",
    "name_en": "St1 Kangasala Ruutana",
    "network": "St1",
-   "address": "Ruutanantie 1049, 36240 Kangasala",
-   "lat": 61.53615,
-   "lon": 23.99331,
+   "address": "Ruutanantie 1049, 36110 Ruutana",
+   "lat": 61.53635,
+   "lon": 23.99338,
    "approx": false,
    "hours_fi": "Ma–pe 05–21, la 07–21, su 08–21",
    "hours_en": "Mon–Fri 05:00–21:00, Sat 07:00–21:00, Sun 08:00–21:00",
@@ -6257,6 +6288,26 @@
      "k": "facilities",
      "fi": "St1 Business / SKAL / Rahtarit",
      "en": "St1 Business / SKAL / Rahtarit"
+    },
+    {
+     "k": "notes",
+     "fi": "VT12. Rahtarisuihku, AdBlue, raskaan kaluston mittari",
+     "en": "VT12. Drivers’ shower, AdBlue, heavy-vehicle pump"
+    },
+    {
+     "k": "facilities",
+     "fi": "Sopii pitkille yhdistelmille",
+     "en": "Suitable for long combinations"
+    },
+    {
+     "k": "notes",
+     "fi": "Yöpysäköintiä ei ole vahvistettu",
+     "en": "Overnight parking not confirmed"
+    },
+    {
+     "k": "notes",
+     "fi": "Tiedot tarkistettu 24.9.2026",
+     "en": "Details checked on 24 Sep 2026"
     }
    ]
   },
@@ -6380,13 +6431,13 @@
    "name_fi": "St1 Laukaa Lievestuore",
    "name_en": "St1 Laukaa Lievestuore",
    "network": "St1",
-   "address": "Laukaa Lievestuore",
-   "lat": 62.25073,
+   "address": "Liepeentie 2 A, 41400 Lievestuore",
+   "lat": 62.25072,
    "lon": 26.17713,
    "approx": false,
-   "hours_fi": null,
-   "hours_en": null,
-   "phone": "+358 800 131031",
+   "hours_fi": "Ma–pe 05–22, la–su 07–22",
+   "hours_en": "Mon–Fri 05–22, Sat–Sun 07–22",
+   "phone": "+358 40 1739837",
    "free": true,
    "secured": false,
    "sauna": true,
@@ -6406,6 +6457,26 @@
      "k": "facilities",
      "fi": "St1 Business / SKAL / Rahtarit",
      "en": "St1 Business / SKAL / Rahtarit"
+    },
+    {
+     "k": "notes",
+     "fi": "VT13. Suihku ja sauna",
+     "en": "VT13. Shower and sauna"
+    },
+    {
+     "k": "facilities",
+     "fi": "Sopii pitkille yhdistelmille",
+     "en": "Suitable for long combinations"
+    },
+    {
+     "k": "notes",
+     "fi": "Yöpysäköintiä ei ole vahvistettu",
+     "en": "Overnight parking not confirmed"
+    },
+    {
+     "k": "notes",
+     "fi": "Tiedot tarkistettu 24.9.2026",
+     "en": "Details checked on 24 Sep 2026"
     }
    ]
   },
@@ -6477,8 +6548,8 @@
    "name_en": "St1 Liperi Ylämylly",
    "network": "St1",
    "address": "Ylämyllyntie 77, 80400 Ylämylly",
-   "lat": 62.6142,
-   "lon": 29.5427,
+   "lat": 62.61441,
+   "lon": 29.54393,
    "approx": false,
    "hours_fi": "24/7",
    "hours_en": "24/7",
@@ -6522,6 +6593,21 @@
      "k": "facilities",
      "fi": "St1 Business / SKAL / Rahtarit",
      "en": "St1 Business / SKAL / Rahtarit"
+    },
+    {
+     "k": "notes",
+     "fi": "VT23. Suihku ja sauna, ravintola, AdBlue",
+     "en": "VT23. Shower and sauna, restaurant, AdBlue"
+    },
+    {
+     "k": "facilities",
+     "fi": "Sopii pitkille yhdistelmille",
+     "en": "Suitable for long combinations"
+    },
+    {
+     "k": "notes",
+     "fi": "Tiedot tarkistettu 24.9.2026",
+     "en": "Details checked on 24 Sep 2026"
     }
    ]
   },
@@ -6601,9 +6687,9 @@
    "name_fi": "St1 Raasepori Karjaa",
    "name_en": "St1 Raasepori Karjaa",
    "network": "St1",
-   "address": "Lepinpellonkatu 1, 10320 Raasepori",
-   "lat": 60.05382,
-   "lon": 23.64812,
+   "address": "Lepinpellonkatu 1, 10320 Karjaa",
+   "lat": 60.05378,
+   "lon": 23.64777,
    "approx": false,
    "hours_fi": "24/7",
    "hours_en": "24/7",
@@ -6627,6 +6713,26 @@
      "k": "facilities",
      "fi": "St1 Business / SKAL / Rahtarit",
      "en": "St1 Business / SKAL / Rahtarit"
+    },
+    {
+     "k": "notes",
+     "fi": "VT25. AdBlue ja HVO",
+     "en": "VT25. AdBlue and HVO"
+    },
+    {
+     "k": "facilities",
+     "fi": "Sopii pitkille yhdistelmille",
+     "en": "Suitable for long combinations"
+    },
+    {
+     "k": "notes",
+     "fi": "Yöpysäköintiä ei ole vahvistettu",
+     "en": "Overnight parking not confirmed"
+    },
+    {
+     "k": "notes",
+     "fi": "Tiedot tarkistettu 24.9.2026",
+     "en": "Details checked on 24 Sep 2026"
     }
    ]
   },
@@ -6640,13 +6746,13 @@
    "name_fi": "St1 Mäntsälä P",
    "name_en": "St1 Mäntsälä P",
    "network": "St1",
-   "address": "Mäntsälä",
-   "lat": 60.67399,
-   "lon": 25.35518,
+   "address": "Pohjoinen Pikatie 1, 04600 Mäntsälä",
+   "lat": 60.67363,
+   "lon": 25.35419,
    "approx": false,
-   "hours_fi": null,
-   "hours_en": null,
-   "phone": "+358 800 131031",
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
+   "phone": "+358 40 6373011",
    "free": true,
    "secured": false,
    "sauna": true,
@@ -6666,6 +6772,26 @@
      "k": "facilities",
      "fi": "St1 Business / SKAL / Rahtarit",
      "en": "St1 Business / SKAL / Rahtarit"
+    },
+    {
+     "k": "notes",
+     "fi": "VT25. HVO ja AdBlue",
+     "en": "VT25. HVO and AdBlue"
+    },
+    {
+     "k": "facilities",
+     "fi": "Sopii pitkille yhdistelmille",
+     "en": "Suitable for long combinations"
+    },
+    {
+     "k": "notes",
+     "fi": "Yöpysäköintiä ei ole vahvistettu",
+     "en": "Overnight parking not confirmed"
+    },
+    {
+     "k": "notes",
+     "fi": "Tiedot tarkistettu 24.9.2026",
+     "en": "Details checked on 24 Sep 2026"
     }
    ]
   },
@@ -14351,6 +14477,762 @@
      "k": "facilities",
      "fi": "Maksa pesu",
      "en": "Pay for a wash"
+    }
+   ]
+  },
+  {
+   "id": "fi-abc-kiikoinen",
+   "country": "FI",
+   "kinds": [
+    "FUEL",
+    "PARKING"
+   ],
+   "name_fi": "ABC Kiikoinen",
+   "name_en": "ABC Kiikoinen",
+   "network": "ABC",
+   "address": "Taitajantie 3, 38360 Sastamala",
+   "lat": 61.47439,
+   "lon": 22.55657,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": null,
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "VT11. Pysäköinti raskaalle liikenteelle ja taukotila rahtareille. Suihkua ei ole vahvistettu",
+     "en": "VT11. Heavy-vehicle parking and a drivers’ rest room. Shower not confirmed"
+    },
+    {
+     "k": "notes",
+     "fi": "Tiedot tarkistettu 24.9.2026",
+     "en": "Details checked on 24 Sep 2026"
+    }
+   ]
+  },
+  {
+   "id": "fi-st1-iitti-kausala",
+   "country": "FI",
+   "kinds": [
+    "FUEL"
+   ],
+   "name_fi": "St1 Iitti Kausala",
+   "name_en": "St1 Iitti Kausala",
+   "network": "St1",
+   "address": "Niinimäentie 1, 47400 Kausala",
+   "lat": 60.88296,
+   "lon": 26.3858,
+   "approx": false,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
+   "phone": "+358 800 131031",
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "VT12. Raskaan kaluston mittari, yhdistelmät 25,25 m asti",
+     "en": "VT12. Heavy-vehicle pump, rigs up to 25.25 m"
+    },
+    {
+     "k": "notes",
+     "fi": "Yöpysäköintiä ei ole vahvistettu",
+     "en": "Overnight parking not confirmed"
+    },
+    {
+     "k": "notes",
+     "fi": "Tiedot tarkistettu 24.9.2026",
+     "en": "Details checked on 24 Sep 2026"
+    }
+   ]
+  },
+  {
+   "id": "fi-st1-kokkola-vitsari",
+   "country": "FI",
+   "kinds": [
+    "FUEL",
+    "SHOWER"
+   ],
+   "name_fi": "St1 Kokkola Vitsari",
+   "name_en": "St1 Kokkola Vitsari",
+   "network": "St1",
+   "address": "Pohjanlahdentie 137, 67410 Kokkola",
+   "lat": 63.85164,
+   "lon": 23.20473,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": "+358 40 6617709",
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "VT13. Rahtarisuihku, AdBlue, raskaan kaluston mittari",
+     "en": "VT13. Drivers’ shower, AdBlue, heavy-vehicle pump"
+    },
+    {
+     "k": "facilities",
+     "fi": "Sopii pitkille yhdistelmille",
+     "en": "Suitable for long combinations"
+    },
+    {
+     "k": "notes",
+     "fi": "Yöpysäköintiä ei ole vahvistettu",
+     "en": "Overnight parking not confirmed"
+    },
+    {
+     "k": "notes",
+     "fi": "Tiedot tarkistettu 24.9.2026",
+     "en": "Details checked on 24 Sep 2026"
+    }
+   ]
+  },
+  {
+   "id": "fi-st1-kyyjarvi",
+   "country": "FI",
+   "kinds": [
+    "FUEL",
+    "SHOWER"
+   ],
+   "name_fi": "St1 Kyyjärvi",
+   "name_en": "St1 Kyyjärvi",
+   "network": "St1",
+   "address": "Honkalehdontie 2, 43700 Kyyjärvi",
+   "lat": 63.04327,
+   "lon": 24.56174,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": "+358 40 6645954",
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": true,
+   "details": [
+    {
+     "k": "state",
+     "fi": "POLTTOAINETTA EI MYYDÄ 29.10.2026 asti: mittarikentän remontti, muut palvelut käytössä (St1)",
+     "en": "NO FUEL SALES until 29 Oct 2026: pump area under renovation, other services open (St1)"
+    },
+    {
+     "k": "notes",
+     "fi": "VT13 / VT16. Suihku",
+     "en": "VT13 / VT16. Shower"
+    },
+    {
+     "k": "notes",
+     "fi": "Tiedot tarkistettu 24.9.2026",
+     "en": "Details checked on 24 Sep 2026"
+    }
+   ]
+  },
+  {
+   "id": "fi-st1-punkaharju",
+   "country": "FI",
+   "kinds": [
+    "FUEL"
+   ],
+   "name_fi": "St1 Punkaharju",
+   "name_en": "St1 Punkaharju",
+   "network": "St1",
+   "address": "Oikotie 5, 58500 Punkaharju",
+   "lat": 61.75654,
+   "lon": 29.3938,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": "+358 15 441601",
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "VT14. Raskaan kaluston mittari, AdBlue, yhdistelmät 25,25 m asti",
+     "en": "VT14. Heavy-vehicle pump, AdBlue, rigs up to 25.25 m"
+    },
+    {
+     "k": "notes",
+     "fi": "Yöpysäköintiä ei ole vahvistettu",
+     "en": "Overnight parking not confirmed"
+    },
+    {
+     "k": "notes",
+     "fi": "Tiedot tarkistettu 24.9.2026",
+     "en": "Details checked on 24 Sep 2026"
+    }
+   ]
+  },
+  {
+   "id": "fi-st1-mantyharju-karankamaki",
+   "country": "FI",
+   "kinds": [
+    "FUEL"
+   ],
+   "name_fi": "St1 Mäntyharju Karankamäki",
+   "name_en": "St1 Mäntyharju Karankamäki",
+   "network": "St1",
+   "address": "Motellintie 1, 52720 Karankamäki",
+   "lat": 61.43491,
+   "lon": 26.59569,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": "+358 15 685160",
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "VT15. Raskaan kaluston mittari, AdBlue",
+     "en": "VT15. Heavy-vehicle pump, AdBlue"
+    },
+    {
+     "k": "facilities",
+     "fi": "Sopii pitkille yhdistelmille",
+     "en": "Suitable for long combinations"
+    },
+    {
+     "k": "notes",
+     "fi": "Yöpysäköintiä ei ole vahvistettu",
+     "en": "Overnight parking not confirmed"
+    },
+    {
+     "k": "notes",
+     "fi": "Tiedot tarkistettu 24.9.2026",
+     "en": "Details checked on 24 Sep 2026"
+    }
+   ]
+  },
+  {
+   "id": "fi-st1-lapua-tamppari",
+   "country": "FI",
+   "kinds": [
+    "FUEL",
+    "SHOWER"
+   ],
+   "name_fi": "St1 Lapua Tamppari",
+   "name_en": "St1 Lapua Tamppari",
+   "network": "St1",
+   "address": "Vasunmäentie 10, 62100 Lapua",
+   "lat": 62.95972,
+   "lon": 23.05145,
+   "approx": false,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
+   "phone": "+358 40 1715322",
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "VT16 / VT19. Suihku, AdBlue, raskaan kaluston mittari",
+     "en": "VT16 / VT19. Shower, AdBlue, heavy-vehicle pump"
+    },
+    {
+     "k": "facilities",
+     "fi": "Sopii pitkille yhdistelmille",
+     "en": "Suitable for long combinations"
+    },
+    {
+     "k": "notes",
+     "fi": "Yöpysäköintiä ei ole vahvistettu",
+     "en": "Overnight parking not confirmed"
+    },
+    {
+     "k": "notes",
+     "fi": "Tiedot tarkistettu 24.9.2026",
+     "en": "Details checked on 24 Sep 2026"
+    }
+   ]
+  },
+  {
+   "id": "fi-st1-petajavesi",
+   "country": "FI",
+   "kinds": [
+    "FUEL"
+   ],
+   "name_fi": "St1 Petäjävesi",
+   "name_en": "St1 Petäjävesi",
+   "network": "St1",
+   "address": "Karikontie 1, 41900 Petäjävesi",
+   "lat": 62.25261,
+   "lon": 25.19372,
+   "approx": false,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
+   "phone": "+358 800 131031",
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "VT18. Raskaan kaluston mittari, HVO",
+     "en": "VT18. Heavy-vehicle pump, HVO"
+    },
+    {
+     "k": "facilities",
+     "fi": "Sopii pitkille yhdistelmille",
+     "en": "Suitable for long combinations"
+    },
+    {
+     "k": "notes",
+     "fi": "Yöpysäköintiä ei ole vahvistettu",
+     "en": "Overnight parking not confirmed"
+    },
+    {
+     "k": "notes",
+     "fi": "Tiedot tarkistettu 24.9.2026",
+     "en": "Details checked on 24 Sep 2026"
+    }
+   ]
+  },
+  {
+   "id": "fi-abc-alavus",
+   "country": "FI",
+   "kinds": [
+    "FUEL"
+   ],
+   "name_fi": "ABC Alavus",
+   "name_en": "ABC Alavus",
+   "network": "ABC",
+   "address": "Kuulantie 6, 63300 Alavus",
+   "lat": 62.58628,
+   "lon": 23.61638,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": "+358 6 516111",
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "VT18. Palvelut ammattiautoilijoille, ravintola ja WC. Rekkapysäköintiä ja suihkua ei ole vahvistettu",
+     "en": "VT18. Services for professional drivers, restaurant and WC. Truck parking and shower not confirmed"
+    },
+    {
+     "k": "notes",
+     "fi": "Tiedot tarkistettu 24.9.2026",
+     "en": "Details checked on 24 Sep 2026"
+    }
+   ]
+  },
+  {
+   "id": "fi-abc-pudasjarvi",
+   "country": "FI",
+   "kinds": [
+    "FUEL",
+    "PARKING"
+   ],
+   "name_fi": "ABC Pudasjärvi",
+   "name_en": "ABC Pudasjärvi",
+   "network": "ABC",
+   "address": "Varsitie 2, 93100 Pudasjärvi",
+   "lat": 65.35779,
+   "lon": 26.98463,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": null,
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "VT20. Pysäköinti raskaalle liikenteelle (Matkaparkki), WC ja ravintola. Suihkua ei ole vahvistettu",
+     "en": "VT20. Heavy-vehicle parking (Matkaparkki), WC and restaurant. Shower not confirmed"
+    },
+    {
+     "k": "notes",
+     "fi": "Tiedot tarkistettu 24.9.2026",
+     "en": "Details checked on 24 Sep 2026"
+    }
+   ]
+  },
+  {
+   "id": "fi-st1-truck-kuusamo",
+   "country": "FI",
+   "kinds": [
+    "FUEL"
+   ],
+   "name_fi": "St1 Truck Kuusamo Revontulentie",
+   "name_en": "St1 Truck Kuusamo Revontulentie",
+   "network": "St1",
+   "address": "Revontulentie 6, 93600 Kuusamo",
+   "lat": 65.95768,
+   "lon": 29.15122,
+   "approx": false,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
+   "phone": "+358 800 131031",
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "VT20. Truck-asema: rekkadiesel ja AdBlue",
+     "en": "VT20. Truck station: truck diesel and AdBlue"
+    },
+    {
+     "k": "notes",
+     "fi": "Tiedot tarkistettu 24.9.2026",
+     "en": "Details checked on 24 Sep 2026"
+    }
+   ]
+  },
+  {
+   "id": "fi-st1-pello",
+   "country": "FI",
+   "kinds": [
+    "FUEL"
+   ],
+   "name_fi": "St1 Pello",
+   "name_en": "St1 Pello",
+   "network": "St1",
+   "address": "Pellontie 31, 95700 Pello",
+   "lat": 66.77586,
+   "lon": 23.96546,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": "+358 16 512771",
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "VT21. Kahvila. Rekkapalveluita ja suihkua ei ole ilmoitettu",
+     "en": "VT21. Café. No truck services or shower listed"
+    },
+    {
+     "k": "notes",
+     "fi": "Tiedot tarkistettu 24.9.2026",
+     "en": "Details checked on 24 Sep 2026"
+    }
+   ]
+  },
+  {
+   "id": "fi-neste-muonio",
+   "country": "FI",
+   "kinds": [
+    "FUEL"
+   ],
+   "name_fi": "Neste Muonio Miljoonatie",
+   "name_en": "Neste Muonio Miljoonatie",
+   "network": "Neste",
+   "address": "Miljoonatie 1, 99300 Muonio",
+   "lat": 67.95242,
+   "lon": 23.68792,
+   "approx": false,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
+   "phone": "+358 40 1824098",
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "VT21. Suihkua ei ole ilmoitettu",
+     "en": "VT21. No shower listed"
+    },
+    {
+     "k": "notes",
+     "fi": "Tiedot tarkistettu 24.9.2026",
+     "en": "Details checked on 24 Sep 2026"
+    }
+   ]
+  },
+  {
+   "id": "fi-st1-enontekio",
+   "country": "FI",
+   "kinds": [
+    "FUEL"
+   ],
+   "name_fi": "St1 Enontekiö",
+   "name_en": "St1 Enontekiö",
+   "network": "St1",
+   "address": "Hetantie 2, 99400 Enontekiö",
+   "lat": 68.38578,
+   "lon": 23.60324,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": "+358 16 521020",
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "VT21. Suihkua ja rekkapalveluita ei ole vahvistettu",
+     "en": "VT21. Shower and truck services not confirmed"
+    },
+    {
+     "k": "notes",
+     "fi": "Tiedot tarkistettu 24.9.2026",
+     "en": "Details checked on 24 Sep 2026"
+    }
+   ]
+  },
+  {
+   "id": "fi-abc-vaala",
+   "country": "FI",
+   "kinds": [
+    "FUEL"
+   ],
+   "name_fi": "ABC Vaala",
+   "name_en": "ABC Vaala",
+   "network": "ABC",
+   "address": "Vaalantie 285, 91700 Vaala",
+   "lat": 64.56687,
+   "lon": 26.8742,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": "+358 44 7884874",
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "VT22. Ravintola ja WC. Rekkapysäköintiä ja suihkua ei ole ilmoitettu",
+     "en": "VT22. Restaurant and WC. No truck parking or shower listed"
+    },
+    {
+     "k": "notes",
+     "fi": "Tiedot tarkistettu 24.9.2026",
+     "en": "Details checked on 24 Sep 2026"
+    }
+   ]
+  },
+  {
+   "id": "fi-st1-kajaani-sotkamontie",
+   "country": "FI",
+   "kinds": [
+    "FUEL"
+   ],
+   "name_fi": "St1 Kajaani Sotkamontie",
+   "name_en": "St1 Kajaani Sotkamontie",
+   "network": "St1",
+   "address": "Sotkamontie 20, 87300 Kajaani",
+   "lat": 64.21107,
+   "lon": 27.7324,
+   "approx": false,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
+   "phone": "+358 800 131031",
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "VT22. AdBlue, raskaan kaluston mittari",
+     "en": "VT22. AdBlue, heavy-vehicle pump"
+    },
+    {
+     "k": "facilities",
+     "fi": "Sopii pitkille yhdistelmille",
+     "en": "Suitable for long combinations"
+    },
+    {
+     "k": "notes",
+     "fi": "Yöpysäköintiä ei ole vahvistettu",
+     "en": "Overnight parking not confirmed"
+    },
+    {
+     "k": "notes",
+     "fi": "Tiedot tarkistettu 24.9.2026",
+     "en": "Details checked on 24 Sep 2026"
+    }
+   ]
+  },
+  {
+   "id": "fi-st1-parkano-pahkalantie",
+   "country": "FI",
+   "kinds": [
+    "FUEL"
+   ],
+   "name_fi": "St1 Parkano Pahkalantie",
+   "name_en": "St1 Parkano Pahkalantie",
+   "network": "St1",
+   "address": "Pahkalantie 2, 39700 Parkano",
+   "lat": 62.00544,
+   "lon": 23.01205,
+   "approx": false,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
+   "phone": "+358 40 6314534",
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "VT23. Ravintola, aamiainen klo 4 alkaen, AdBlue",
+     "en": "VT23. Restaurant, breakfast from 04:00, AdBlue"
+    },
+    {
+     "k": "facilities",
+     "fi": "Sopii pitkille yhdistelmille",
+     "en": "Suitable for long combinations"
+    },
+    {
+     "k": "notes",
+     "fi": "Yöpysäköintiä ei ole vahvistettu",
+     "en": "Overnight parking not confirmed"
+    },
+    {
+     "k": "notes",
+     "fi": "Tiedot tarkistettu 24.9.2026",
+     "en": "Details checked on 24 Sep 2026"
+    }
+   ]
+  },
+  {
+   "id": "fi-st1-truck-varkaus",
+   "country": "FI",
+   "kinds": [
+    "FUEL"
+   ],
+   "name_fi": "St1 Truck Varkaus Mäkikatu",
+   "name_en": "St1 Truck Varkaus Mäkikatu",
+   "network": "St1",
+   "address": "Mäkikatu 1, 78250 Varkaus",
+   "lat": 62.30331,
+   "lon": 27.91811,
+   "approx": false,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
+   "phone": "+358 800 131031",
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "VT23. Truck-asema: rekkadiesel ja AdBlue",
+     "en": "VT23. Truck station: truck diesel and AdBlue"
+    },
+    {
+     "k": "notes",
+     "fi": "Tiedot tarkistettu 24.9.2026",
+     "en": "Details checked on 24 Sep 2026"
+    }
+   ]
+  },
+  {
+   "id": "fi-st1-jamsa",
+   "country": "FI",
+   "kinds": [
+    "FUEL",
+    "SHOWER"
+   ],
+   "name_fi": "St1 Jämsä",
+   "name_en": "St1 Jämsä",
+   "network": "St1",
+   "address": "Kauhkialantie 116, 42100 Jämsä",
+   "lat": 61.85186,
+   "lon": 25.17434,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": "+358 40 1739850",
+   "free": false,
+   "secured": false,
+   "sauna": true,
+   "warning": true,
+   "details": [
+    {
+     "k": "state",
+     "fi": "POLTTOAINETTA EI MYYDÄ 20.11.2026 asti: mittarikentän remontti, suihku ja sauna käytössä (St1)",
+     "en": "NO FUEL SALES until 20 Nov 2026: pump area under renovation, shower and sauna open (St1)"
+    },
+    {
+     "k": "notes",
+     "fi": "VT24. Suihku ja sauna",
+     "en": "VT24. Shower and sauna"
+    },
+    {
+     "k": "notes",
+     "fi": "Tiedot tarkistettu 24.9.2026",
+     "en": "Details checked on 24 Sep 2026"
+    }
+   ]
+  },
+  {
+   "id": "fi-st1-lohja-hankoniementie",
+   "country": "FI",
+   "kinds": [
+    "FUEL"
+   ],
+   "name_fi": "St1 Lohja Hankoniementie",
+   "name_en": "St1 Lohja Hankoniementie",
+   "network": "St1",
+   "address": "Hankoniementie 546, 08700 Lohja",
+   "lat": 60.17842,
+   "lon": 23.99788,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": "+358 19 341645",
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "VT25. Raskaan kaluston mittari",
+     "en": "VT25. Heavy-vehicle pump"
+    },
+    {
+     "k": "facilities",
+     "fi": "Sopii pitkille yhdistelmille",
+     "en": "Suitable for long combinations"
+    },
+    {
+     "k": "notes",
+     "fi": "Yöpysäköintiä ei ole vahvistettu",
+     "en": "Overnight parking not confirmed"
+    },
+    {
+     "k": "notes",
+     "fi": "Tiedot tarkistettu 24.9.2026",
+     "en": "Details checked on 24 Sep 2026"
     }
    ]
   }
