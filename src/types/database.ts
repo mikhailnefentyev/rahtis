@@ -429,8 +429,8 @@ export type Database = {
             | Database["public"]["Enums"]["partnership_mode"]
             | null
           pending_partnership_from: string | null
-          rejected_at: string | null
           registry_check: Json | null
+          rejected_at: string | null
           rejection_reason: string | null
           status: Database["public"]["Enums"]["company_status"]
           updated_at: string
@@ -471,8 +471,8 @@ export type Database = {
             | Database["public"]["Enums"]["partnership_mode"]
             | null
           pending_partnership_from?: string | null
-          rejected_at?: string | null
           registry_check?: Json | null
+          rejected_at?: string | null
           rejection_reason?: string | null
           status?: Database["public"]["Enums"]["company_status"]
           updated_at?: string
@@ -513,8 +513,8 @@ export type Database = {
             | Database["public"]["Enums"]["partnership_mode"]
             | null
           pending_partnership_from?: string | null
-          rejected_at?: string | null
           registry_check?: Json | null
+          rejected_at?: string | null
           rejection_reason?: string | null
           status?: Database["public"]["Enums"]["company_status"]
           updated_at?: string
@@ -2935,6 +2935,7 @@ export type Database = {
             | Database["public"]["Enums"]["partnership_mode"]
             | null
           pending_partnership_from: string | null
+          registry_check: Json | null
           rejected_at: string | null
           rejection_reason: string | null
           status: Database["public"]["Enums"]["company_status"]
@@ -4023,6 +4024,7 @@ export type Database = {
             | Database["public"]["Enums"]["partnership_mode"]
             | null
           pending_partnership_from: string | null
+          registry_check: Json | null
           rejected_at: string | null
           rejection_reason: string | null
           status: Database["public"]["Enums"]["company_status"]
@@ -4125,6 +4127,7 @@ export type Database = {
             | Database["public"]["Enums"]["partnership_mode"]
             | null
           pending_partnership_from: string | null
+          registry_check: Json | null
           rejected_at: string | null
           rejection_reason: string | null
           status: Database["public"]["Enums"]["company_status"]
@@ -4899,6 +4902,7 @@ export type Database = {
             | Database["public"]["Enums"]["partnership_mode"]
             | null
           pending_partnership_from: string | null
+          registry_check: Json | null
           rejected_at: string | null
           rejection_reason: string | null
           status: Database["public"]["Enums"]["company_status"]
