@@ -17,7 +17,11 @@ import { createClient } from '@/lib/supabase/server';
 import { getViewer } from '@/lib/auth/viewer';
 import { isValidBusinessId } from '@/lib/format';
 import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
+import { checkRegistry, type RegistryCheck } from '@/lib/registry/prh';
 import type { CompanyRole } from '@/types/db';
+
+/* Карточка компании на сайте YTJ: там видны и toiminimi, которых нет в открытых данных. */
+const ytjUrl = (businessId: string) => `https://tietopalvelu.ytj.fi/yritys/${businessId}`;
 
 function toLocale(value: FormDataEntryValue | null): Locale {
   const raw = String(value ?? '');
@@ -26,7 +30,21 @@ function toLocale(value: FormDataEntryValue | null): Locale {
 
 /* ── Публичная форма заявки ─────────────────────────────────────── */
 
-export type ApplyState = { error: string | null; done: boolean };
+/**
+ * Что заявитель видит о сверке с реестром сразу после отправки.
+ *
+ * Только вердикт и название из реестра — публичные данные о компании,
+ * номер которой он сам ввёл. Замечания оператору (ennakkoperintä, ALV)
+ * заявителю не показываются: это повод для разговора, а не отказ, и
+ * решает его человек.
+ */
+export type ApplyRegistry = {
+  verdict: RegistryCheck['verdict'];
+  officialName: string | null;
+  nameMatch: RegistryCheck['nameMatch'];
+};
+
+export type ApplyState = { error: string | null; done: boolean; registry?: ApplyRegistry };
 
 /**
  * Приём заявки на регистрацию.
@@ -94,6 +112,15 @@ export async function submitApplicationAction(
     };
   }
 
+  /*
+   * Сверка с реестром — после вставки: заявка принята в тот момент, когда
+   * строка легла в базу, и недоступный PRH не должен её отменять.
+   * checkRegistry не бросает; снимок пишется до писем, чтобы оператор,
+   * открыв очередь по письму, уже видел то же, что в письме.
+   */
+  const registry = await checkRegistry(businessId, name);
+  await admin.from('companies').update({ registry_check: registry }).eq('id', company.id);
+
   await announceApplication({
     companyId: company.id,
     companyName: name,
@@ -101,9 +128,18 @@ export async function submitApplicationAction(
     email,
     kind,
     locale: emailLocaleOf(locale),
+    registry,
   });
 
-  return { error: null, done: true };
+  return {
+    error: null,
+    done: true,
+    registry: {
+      verdict: registry.verdict,
+      officialName: registry.officialName,
+      nameMatch: registry.nameMatch,
+    },
+  };
 }
 
 /**
@@ -133,6 +169,7 @@ async function announceApplication(input: {
   email: string;
   kind: CompanyRole;
   locale: EmailLocale;
+  registry: RegistryCheck;
 }): Promise<void> {
   /*
    * Роль называется дважды и по-разному.
@@ -153,6 +190,8 @@ async function announceApplication(input: {
       businessId: input.businessId,
       role: forOperator.role[input.kind],
       queueLink: `${siteUrl()}/${EMAIL_LOCALE}/admin`,
+      registry: input.registry,
+      ytjLink: ytjUrl(input.businessId),
     }),
   );
 
@@ -288,6 +327,34 @@ export async function resendInviteAction(formData: FormData): Promise<void> {
     revalidatePath(`/${locale}/admin`);
     if (!sent) redirect(withAdminError(`/${locale}/admin`, 'inviteNotSent'));
     return;
+  }
+
+  revalidatePath(`/${locale}/admin`);
+}
+
+/**
+ * Перепроверка в реестре PRH из очереди модерации.
+ *
+ * Нужна, когда при подаче реестр не ответил, или компания обещала
+ * встать в ennakkoperintärekisteri и говорит, что уже встала. Снимок
+ * перезаписывается: решение принимается по нынешнему состоянию реестра.
+ */
+export async function recheckRegistryAction(formData: FormData): Promise<void> {
+  const locale = toLocale(formData.get('locale'));
+  await requireAdmin();
+
+  const companyId = String(formData.get('company_id') ?? '');
+  const admin = createAdminClient();
+
+  const { data: company } = await admin
+    .from('companies')
+    .select('name, business_id')
+    .eq('id', companyId)
+    .single();
+
+  if (company) {
+    const registry = await checkRegistry(company.business_id, company.name);
+    await admin.from('companies').update({ registry_check: registry }).eq('id', companyId);
   }
 
   revalidatePath(`/${locale}/admin`);

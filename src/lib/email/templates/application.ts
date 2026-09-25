@@ -1,6 +1,7 @@
 import { renderEmail, renderText, type EmailBlock } from '../layout';
 import { emailText, type EmailLocale } from '../text';
 import type { EmailMessage } from '../types';
+import type { RegistryCheck } from '@/lib/registry/prh';
 
 /**
  * Два письма одной заявки.
@@ -110,8 +111,34 @@ export function applicationFiledEmail(input: {
   businessId: string;
   role: string;
   queueLink: string;
+  registry: RegistryCheck;
+  ytjLink: string;
 }): EmailMessage {
   const heading = `Uusi hakemus: ${input.companyName}`;
+  const r = input.registry;
+
+  /*
+   * Итог сверки — в теме и первой строкой: по ним видно, можно ли
+   * одобрять сразу или нужно разбираться, ещё до открытия письма.
+   */
+  const verdict = {
+    OK: 'PRH: kaikki täsmää',
+    ATTENTION: 'PRH: tarkistettavaa',
+    NOT_FOUND: 'PRH: ei avoimessa datassa',
+    ERROR: 'PRH: ei vastausta',
+  }[r.verdict];
+  const yes = (value: boolean | null) => (value === null ? '–' : value ? 'kyllä' : 'EI');
+
+  const registryRows: Array<[string, string]> = r.officialName
+    ? [
+        ['Nimi rekisterissä', r.officialName],
+        ['Yhtiömuoto', r.form ?? '–'],
+        ['Rekisteröity', r.registeredOn ?? '–'],
+        ['Ennakkoperintärekisteri', yes(r.prepayment)],
+        ['Arvonlisäverorekisteri', yes(r.vat)],
+        ['Työnantajarekisteri', yes(r.employer)],
+      ]
+    : [];
 
   const blocks: EmailBlock[] = [
     {
@@ -123,9 +150,14 @@ export function applicationFiledEmail(input: {
         ['Sähköposti', input.applicantEmail],
       ],
     },
+    { kind: 'text', value: verdict },
+    ...(registryRows.length > 0 ? [{ kind: 'facts' as const, rows: registryRows }] : []),
+    ...r.issues.map((issue) => ({ kind: 'note' as const, value: issue })),
     {
       kind: 'text',
-      value: 'Hakemus odottaa tarkastusjonossa. Tarkista Y-tunnus rekisteristä ennen hyväksyntää.',
+      value:
+        'Avoin data ei kerro yrityksen vastuuhenkilöitä: se, että hakija edustaa yritystä, tarkistetaan edelleen käsin. Yrityksen kortti YTJ:ssä: ' +
+        input.ytjLink,
     },
     { kind: 'button', label: 'Avaa tarkastusjono', href: input.queueLink },
   ];
@@ -134,7 +166,7 @@ export function applicationFiledEmail(input: {
     template: 'application.filed',
     to: input.operatorInbox,
     replyTo: input.applicantEmail,
-    subject: `RAHTIS · uusi hakemus: ${input.companyName}`,
+    subject: `RAHTIS · uusi hakemus: ${input.companyName} · ${verdict}`,
     text: renderText({
       heading,
       blocks,

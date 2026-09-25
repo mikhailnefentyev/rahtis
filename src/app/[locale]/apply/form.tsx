@@ -26,12 +26,36 @@ export function ApplyForm() {
   const [email, setEmail] = useState('');
 
   if (state.done) {
+    /*
+     * Итог сверки с реестром — сразу, пока человек ещё на странице.
+     * Нашёлся с тем же названием — «ок, ждите проверки». Нашёлся с другим —
+     * показываем, что в реестре: опечатку в Y-tunnus лучше заметить сейчас.
+     * Не нашёлся (toiminimi нет в открытых данных) или реестр молчит —
+     * нейтральное «проверим вручную», не ошибка.
+     */
+    const registry = state.registry;
+    const registryText =
+      registry?.officialName && registry.nameMatch !== 'DIFFERENT'
+        ? m('apply.registryOk', { name: registry.officialName })
+        : registry?.officialName
+          ? m('apply.registryOther', { name: registry.officialName })
+          : t.apply.registryManual;
+
     return (
       <Card stripe="ok">
         <CardBody className="p-6">
           <h1 className="text-[15px] font-semibold tracking-tight">{t.apply.sentTitle}</h1>
           <p className="mt-2 text-[13px] leading-relaxed text-ink-muted">
             {m('signup.submitted', { company: name, businessId, email })}
+          </p>
+          <p
+            className={
+              registry?.nameMatch === 'DIFFERENT'
+                ? 'mt-3 rounded-control border border-warn/35 bg-warn/10 px-3 py-2 text-[13px] leading-relaxed text-warn'
+                : 'mt-3 text-[13px] leading-relaxed text-ink'
+            }
+          >
+            {registryText}
           </p>
           <p className="mt-3 text-[13px] leading-relaxed text-ink-muted">
             {kind === 'CARRIER' ? t.apply.carrierNote : t.apply.shipperNote}

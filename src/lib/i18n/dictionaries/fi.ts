@@ -1221,6 +1221,26 @@ export const fi = {
     applications: 'Hakemukset',
     vehicles: 'Ajoneuvot hyväksyntään',
     approveAndInvite: 'Hyväksy ja lähetä kutsu',
+    /*
+     * PRH-tarkistus hakemuksen jättämishetkellä. Avoin data ei kerro
+     * vastuuhenkilöitä eikä toiminimiä, joten tulos on apu, ei päätös.
+     */
+    registry: 'PRH-tarkistus',
+    registryVerdict: {
+      OK: 'Kaikki täsmää',
+      ATTENTION: 'Tarkistettavaa',
+      NOT_FOUND: 'Ei avoimessa datassa',
+      ERROR: 'Rekisteri ei vastannut',
+    },
+    registryNone: 'Ei tarkistettu',
+    registryName: 'Nimi rekisterissä',
+    registryPrepayment: 'Ennakkoperintä',
+    registryVat: 'ALV',
+    registryEmployer: 'Työnantaja',
+    registryYes: 'kyllä',
+    registryNo: 'ei',
+    registryRecheck: 'Tarkista uudelleen',
+    registryPeople: 'Vastuuhenkilöt eivät ole avoimessa datassa: hakijan oikeus edustaa yritystä tarkistetaan käsin.',
     rejectWithReason: 'Hylkää',
     reasonLabel: 'Hylkäyksen syy',
     reasonPlaceholder: 'Y-tunnusta ei löydy PRH:n rekisteristä',
@@ -1269,6 +1289,8 @@ export const fi = {
     sentTitle: 'Hakemus lähetetty',
     duplicate: 'Tällä Y-tunnuksella on jo hakemus vireillä tai hyväksytty.',
     failed: 'Lähetys ei onnistunut. Yritä uudelleen.',
+    /* Toiminimi ei ole avoimessa datassa, tai rekisteri ei vastannut — ei virhe. */
+    registryManual: 'Tarkistamme yrityksen tiedot käsin ja ilmoitamme sähköpostilla, kun hakemus on käsitelty.',
   },
 
   requisites: {
@@ -2301,6 +2323,14 @@ export const fi = {
 
     'signup.submitted':
       'Tarkistamme yrityksen {company} (Y-tunnus {businessId}) tiedot rekisteristä ja lähetämme tunnukset osoitteeseen {email}.',
+    /*
+     * Rekisteritarkistuksen tulos hakijalle heti lähetyksen jälkeen. Vain
+     * se, löytyikö Y-tunnus ja millä nimellä: huomautukset (ennakkoperintä,
+     * ALV) käsittelee ylläpito, eivätkä ne ole hylkäys.
+     */
+    'apply.registryOk': 'Y-tunnus löytyi rekisteristä: {name}. Hakemus odottaa ylläpidon tarkastusta.',
+    'apply.registryOther':
+      'Tällä Y-tunnuksella rekisterissä on ”{name}”. Jos Y-tunnus on väärin, vastaa vahvistusviestiin, niin korjaamme sen. Hakemus odottaa ylläpidon tarkastusta.',
     'moderation.pendingCount':
       '{count, plural, =0 {Ei uusia hakemuksia} one {# hakemus odottaa} other {# hakemusta odottaa}}',
     'moderation.invitedTo': 'Kutsu lähetetty osoitteeseen {email}',

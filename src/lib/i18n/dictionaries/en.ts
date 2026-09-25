@@ -1133,6 +1133,22 @@ export const en = {
     applications: 'Applications',
     vehicles: 'Vehicles for approval',
     approveAndInvite: 'Approve and send invite',
+    registry: 'PRH check',
+    registryVerdict: {
+      OK: 'All matches',
+      ATTENTION: 'Needs a look',
+      NOT_FOUND: 'Not in open data',
+      ERROR: 'Register did not respond',
+    },
+    registryNone: 'Not checked',
+    registryName: 'Name in register',
+    registryPrepayment: 'Prepayment',
+    registryVat: 'VAT',
+    registryEmployer: 'Employer',
+    registryYes: 'yes',
+    registryNo: 'no',
+    registryRecheck: 'Check again',
+    registryPeople: 'Responsible persons are not in open data: whether the applicant may represent the company is checked by hand.',
     rejectWithReason: 'Reject',
     reasonLabel: 'Reason for rejection',
     reasonPlaceholder: 'The Y-tunnus is not in the PRH register',
@@ -1181,6 +1197,7 @@ export const en = {
     sentTitle: 'Application sent',
     duplicate: 'There is already an application for this Y-tunnus, pending or approved.',
     failed: 'Sending failed. Try again.',
+    registryManual: 'We will check the company details by hand and email you once the application has been reviewed.',
   },
 
   requisites: {
@@ -2185,6 +2202,9 @@ export const en = {
 
     'signup.submitted':
       'We will check {company} (Y-tunnus {businessId}) against the register and send the credentials to {email}.',
+    'apply.registryOk': 'Y-tunnus found in the register: {name}. The application is waiting for review by our team.',
+    'apply.registryOther':
+      'The register has “{name}” under this Y-tunnus. If the Y-tunnus is wrong, reply to the confirmation email and we will correct it. The application is waiting for review by our team.',
     'moderation.pendingCount':
       '{count, plural, =0 {No new applications} one {# application waiting} other {# applications waiting}}',
     'moderation.invitedTo': 'Invite sent to {email}',

@@ -3,9 +3,76 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { Badge, Button, Card, CardBody, Kv, Mono, Textarea } from '@/components/ui';
-import { approveCompanyAction, rejectCompanyAction } from '@/lib/companies/actions';
+import {
+  approveCompanyAction,
+  recheckRegistryAction,
+  rejectCompanyAction,
+} from '@/lib/companies/actions';
 import { useI18n } from '@/lib/i18n/provider';
+import type { RegistryCheck } from '@/lib/registry/prh';
 import type { Company } from '@/types/db';
+
+const verdictTone = { OK: 'ok', ATTENTION: 'warn', NOT_FOUND: 'warn', ERROR: 'danger' } as const;
+
+/**
+ * Итог сверки с PRH на момент заявки.
+ *
+ * Замечания показываются как есть, по-фински: их же оператор получил в
+ * письме, и две разные формулировки одного замечания только путают.
+ */
+function RegistryBlock({ company }: { company: Company }) {
+  const { t, locale, f } = useI18n();
+  const r = company.registry_check as RegistryCheck | null;
+  const yes = (value: boolean | null) =>
+    value === null ? '–' : value ? t.moderation.registryYes : t.moderation.registryNo;
+
+  return (
+    <div className="flex flex-col gap-1.5 rounded-control border border-line bg-sunken p-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="label-micro">{t.moderation.registry}</span>
+          {r ? (
+            <Badge tone={verdictTone[r.verdict]}>{t.moderation.registryVerdict[r.verdict]}</Badge>
+          ) : (
+            <Badge tone="neutral">{t.moderation.registryNone}</Badge>
+          )}
+          {r && <Mono className="text-xs text-ink-faint">{f.dateTime(r.checkedAt)}</Mono>}
+        </div>
+        <form action={recheckRegistryAction}>
+          <input type="hidden" name="locale" value={locale} />
+          <input type="hidden" name="company_id" value={company.id} />
+          <button
+            type="submit"
+            className="text-xs text-ink-faint underline underline-offset-2 hover:text-ink-muted"
+          >
+            {t.moderation.registryRecheck}
+          </button>
+        </form>
+      </div>
+
+      {r?.officialName && (
+        <div className="flex flex-col gap-1">
+          <Kv
+            k={t.moderation.registryName}
+            v={`${r.officialName}${r.form ? ` · ${r.form}` : ''}`}
+          />
+          <Kv
+            k={`${t.moderation.registryPrepayment} · ${t.moderation.registryVat} · ${t.moderation.registryEmployer}`}
+            v={`${yes(r.prepayment)} · ${yes(r.vat)} · ${yes(r.employer)}`}
+          />
+        </div>
+      )}
+
+      {r?.issues.map((issue) => (
+        <p key={issue} className="text-xs text-warn">
+          {issue}
+        </p>
+      ))}
+
+      <p className="text-xs text-ink-faint">{t.moderation.registryPeople}</p>
+    </div>
+  );
+}
 
 /**
  * Заявка в очереди модерации.
@@ -71,6 +138,8 @@ export function ApplicationCard({ company, ytjUrl }: { company: Company; ytjUrl:
             </div>
           )}
         </div>
+
+        <RegistryBlock company={company} />
 
         {rejecting && (
           <form action={rejectCompanyAction} className="flex flex-col gap-2 border-t border-line pt-3">
