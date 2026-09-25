@@ -29,6 +29,7 @@ import {
 import { daysUntil } from '@/lib/dates';
 import { AgentChat } from '@/components/domain/AgentChat';
 import { getI18n, isLocale } from '@/lib/i18n';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { handleSupportAction } from '@/lib/support/actions';
 import { ApplicationCard } from './ApplicationCard';
@@ -124,8 +125,29 @@ export default async function AdminPage({
         .eq('is_current', true)
     : { data: [] };
 
-  /* У какой компании уже есть пользователь — значит приглашение дошло. */
+  /* У какой компании уже есть пользователь — значит приглашение выписано. */
   const withUsers = new Set((profiles ?? []).map((p) => p.company_id));
+
+  /*
+   * А вошёл ли по нему кто-нибудь. Пользователь заводится в момент
+   * приглашения, поэтому «есть пользователь» не значит «ссылка сработала»:
+   * 25.09.2026 приглашения первых клиентов истекли непрочитанными, а
+   * кнопка повторной отправки была спрятана — пользователь-то есть.
+   * Вход виден только в Auth, отсюда служебный ключ; страница за
+   * requireRole('ADMIN').
+   */
+  const service = createAdminClient();
+  const { data: authPage } = await service.auth.admin.listUsers({ perPage: 1000 });
+  const signedIn = new Set(
+    (authPage?.users ?? []).filter((u) => u.last_sign_in_at).map((u) => u.id),
+  );
+  const { data: profileUsers } = await service
+    .from('profiles')
+    .select('id, company_id')
+    .not('company_id', 'is', null);
+  const withSignIn = new Set(
+    (profileUsers ?? []).filter((p) => signedIn.has(p.id)).map((p) => p.company_id),
+  );
 
   const queue = pending ?? [];
   const history = decided ?? [];
@@ -359,13 +381,17 @@ export default async function AdminPage({
                     <Td>
                       {company.status === 'REJECTED' ? (
                         <span className="text-ink-dim">—</span>
-                      ) : withUsers.has(company.id) ? (
-                        <span className="text-ok">{t.moderation.inviteSent}</span>
+                      ) : withSignIn.has(company.id) ? (
+                        <span className="text-ok">{t.moderation.signedIn}</span>
                       ) : (
                         <form action={resendInviteAction} className="flex items-center gap-2">
                           <input type="hidden" name="locale" value={locale} />
                           <input type="hidden" name="company_id" value={company.id} />
-                          <span className="text-warn">{t.moderation.noUsersYet}</span>
+                          <span className="text-warn">
+                            {withUsers.has(company.id)
+                              ? t.moderation.inviteNotOpened
+                              : t.moderation.noUsersYet}
+                          </span>
                           <Button type="submit" size="sm">
                             {t.moderation.resendInvite}
                           </Button>

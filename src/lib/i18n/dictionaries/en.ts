@@ -1159,6 +1159,8 @@ export const en = {
     resendInvite: 'Send the invite again',
     accessGranted: 'Credentials issued',
     noUsersYet: 'No invite sent',
+    inviteNotOpened: 'Invite not opened',
+    signedIn: 'Signed in',
     recent: 'Processed applications',
     decidedAt: 'Decision',
     freeze: 'Freeze',

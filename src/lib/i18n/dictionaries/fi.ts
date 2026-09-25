@@ -1251,6 +1251,9 @@ export const fi = {
     resendInvite: 'Lähetä kutsu uudelleen',
     accessGranted: 'Tunnukset annettu',
     noUsersYet: 'Kutsua ei ole lähetetty',
+    /* Käyttäjä luotiin kutsun yhteydessä, mutta kukaan ei ole kirjautunut. */
+    inviteNotOpened: 'Kutsua ei ole avattu',
+    signedIn: 'Kirjautunut',
     recent: 'Käsitellyt hakemukset',
     decidedAt: 'Päätös',
     freeze: 'Jäädytä',
