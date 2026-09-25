@@ -201,6 +201,22 @@ export const fi = {
     passed: 'Tehty',
     nextStop: 'Seuraava piste',
     allDone: 'Kaikki pisteet tehty',
+    /*
+     * Arvioitu saapuminen seuraavalle pisteelle. Lähde kerrotaan aina:
+     * reitin mukaan laskettu arvio ilman ruuhkia ja kuljetusliikkeen oma
+     * ilmoitus ovat eri painoisia lupauksia.
+     */
+    eta: 'Arvioitu saapuminen',
+    etaChange: 'Muuta arviota',
+    etaSave: 'Tallenna arvio',
+    etaCancel: 'Peruuta',
+    etaInvalid: 'Tarkista aika: arvio voi olla enintään viikon päähän eikä menneisyydessä.',
+    etaLocked: 'Arvion voi antaa vain seuraavalle pisteelle ennen sinne saapumista.',
+    etaSource: {
+      ROUTE: 'reitin mukaan',
+      TRAFFIC: 'liikenne huomioiden',
+      CARRIER: 'kuljetusliikkeen ilmoitus',
+    },
     failed: 'Merkintä ei onnistunut. Päivitä sivu ja yritä uudelleen.',
     outOfOrder: 'Pisteet merkitään järjestyksessä. Merkitse ensin edelliset pisteet.',
     notYours: 'Vain kuljetusta ajava kuljetusliike voi merkitä pisteitä.',
@@ -2324,6 +2340,7 @@ export const fi = {
     'trip.stageAt': '{stage} · {place}',
     'trip.progressCount': 'Tehty {done} / {total}',
     'trip.enRouteTo': 'Matkalla · {place}',
+    'trip.enRouteEta': 'Matkalla · {place} · arvio {time}',
     /*
       * Kalustolaji kokonaisena sanana. Aiemmat lyhenteet «vetoa» ja
       * «pika» eivät kertoneet, tuleeko pakettiauto vai kuorma-auto.
@@ -2333,6 +2350,7 @@ export const fi = {
     'presence.vanCount': '{count, plural, one {# pakettiauto} other {# pakettiautoa}}',
     'trip.arrivedAt': 'Saapui klo {time}',
     'trip.completedAt': 'Tehty klo {time}',
+    'trip.etaAt': 'Arvio {time} · {source}',
     /*
      * Poikkeama, ei koordinaatit. Numeropari ei kerro riitatilanteessa
      * mitään; etäisyys osoitteesta kertoo kaiken.

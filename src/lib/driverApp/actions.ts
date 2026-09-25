@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { isLocale, type Locale, defaultLocale, getDictionary } from '@/lib/i18n';
 import { cancelOrderAction } from '@/lib/orders/matching';
+import { refineEtaAfter } from '@/lib/orders/eta';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 
@@ -272,6 +273,8 @@ export async function applyDriverEventAction(formData: FormData): Promise<EventR
         p_event_id: eventId,
       });
       result = outcome(error);
+      /* Отметка из очереди старше четверти часа пересчёт пропустит сама. */
+      if (!error) await refineEtaAfter(supabase, str(formData, 'stop_id'));
       break;
     }
     case 'UPLOAD':

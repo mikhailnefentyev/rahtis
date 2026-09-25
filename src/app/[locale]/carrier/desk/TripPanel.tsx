@@ -1,11 +1,17 @@
 'use client';
 
 import { startTransition, useActionState, useState } from 'react';
-import { Button, Textarea } from '@/components/ui';
-import { stopPlace, tripProgress, type TripStop } from '@/lib/orders/progress';
+import { Button, Input, Textarea } from '@/components/ui';
+import { etaTime, showsEta, stopPlace, tripProgress, type TripStop } from '@/lib/orders/progress';
 import { stopTitle, type HaulKind } from '@/lib/orders/haul';
 import { askPosition } from '@/lib/orders/position';
-import { completeStopAction, uncompleteStopAction, type TripState } from '@/lib/orders/trip';
+import {
+  completeStopAction,
+  setStopEtaAction,
+  uncompleteStopAction,
+  type TripState,
+} from '@/lib/orders/trip';
+import { isoToOperationsLocal } from '@/lib/dates';
 import { useI18n } from '@/lib/i18n/provider';
 
 const initial: TripState = { error: null };
@@ -145,6 +151,9 @@ export function TripPanel({
         <p className="text-[13px] text-ok">{t.trip.allDone}</p>
       )}
 
+      {/* Отдельной формой: вложенная форма в HTML не существует. */}
+      {next && !next.arrived_at && <EtaEditor stop={next} />}
+
       {/* Снять отметку можно только с последней — иначе в маршруте дыра. */}
       {last && (
         <form action={uncompleteStopAction} className="mt-3 border-t border-line pt-2.5">
@@ -170,6 +179,85 @@ export function TripPanel({
             </Button>
           </div>
         </form>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Оценка прибытия на следующую точку — посмотреть и поправить.
+ *
+ * Считает её платформа: после отметки точки — по маршруту, затем с
+ * пробками. Поле ввода здесь для того, чего карта не знает: паром ушёл без
+ * машины, водитель встал на обязательный отдых. Слово перевозчика после
+ * этого пересчётом не перетирается.
+ *
+ * Поле скрыто, пока его не открыли: обычно оценка верна, и лишнее поле
+ * в панели отметки только отвлекало бы от главной кнопки.
+ */
+function EtaEditor({ stop }: { stop: TripStop & { id: string } }) {
+  const { t, f, locale } = useI18n();
+  const [state, formAction, pending] = useActionState(setStopEtaAction, initial);
+  const [open, setOpen] = useState(false);
+
+  const current = showsEta(stop) ? stop : null;
+
+  return (
+    <div className="mt-3 border-t border-line pt-2.5">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <span className="text-xs text-ink-muted">
+          {t.trip.eta}:{' '}
+          {current ? (
+            <>
+              <span className="text-ink">{etaTime(f, current.eta_at)}</span>
+              <span className="text-ink-faint"> · {t.trip.etaSource[current.eta_source ?? 'ROUTE']}</span>
+            </>
+          ) : (
+            '—'
+          )}
+        </span>
+        {!open && (
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            className="text-xs text-ink-faint underline underline-offset-2 hover:text-ink-muted"
+          >
+            {t.trip.etaChange}
+          </button>
+        )}
+      </div>
+
+      {open && (
+        <form
+          action={(payload) => {
+            formAction(payload);
+            setOpen(false);
+          }}
+          className="mt-2 flex flex-wrap items-center gap-2"
+        >
+          <input type="hidden" name="locale" value={locale} />
+          <input type="hidden" name="stop_id" value={stop.id} />
+          <Input
+            type="datetime-local"
+            name="eta"
+            required
+            aria-label={t.trip.eta}
+            defaultValue={current ? isoToOperationsLocal(current.eta_at) : ''}
+            className="w-auto"
+          />
+          <Button type="submit" size="sm" variant="primary" disabled={pending}>
+            {t.trip.etaSave}
+          </Button>
+          <Button type="button" size="sm" onClick={() => setOpen(false)}>
+            {t.trip.etaCancel}
+          </Button>
+        </form>
+      )}
+
+      {state.error && (
+        <p role="alert" className="mt-1.5 text-xs text-danger">
+          {state.error}
+        </p>
       )}
     </div>
   );

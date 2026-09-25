@@ -3,8 +3,11 @@
 import { Badge, Waypoint, WaypointList } from '@/components/ui';
 import { stopTitle, type HaulKind } from '@/lib/orders/haul';
 import { markOf } from '@/lib/orders/position';
+import { etaTime, showsEta } from '@/lib/orders/progress';
 import { useI18n } from '@/lib/i18n/provider';
 import type { DeskStop, OrderStop, PlaceKind, StopRole } from '@/types/db';
+
+type EtaSource = 'ROUTE' | 'TRAFFIC' | 'CARRIER';
 
 /**
  * Маршрут заказа.
@@ -24,6 +27,8 @@ type AnyStop = (OrderStop | DeskStop) & {
    */
   arrived_at?: string | null;
   completed_at?: string | null;
+  eta_at?: string | null;
+  eta_source?: EtaSource | null;
   completed_lat?: number | null;
   completed_lon?: number | null;
   completed_accuracy_m?: number | null;
@@ -114,6 +119,22 @@ export function RouteStops({
      * между ними виден простой на точке, ради которого прибытие и
      * отмечается отдельно.
      */
+    /*
+     * Оценка прибытия — у следующей точки, пока на неё не приехали. После
+     * прибытия пилюля уступает место факту: две цифры рядом заставили бы
+     * гадать, какая из них правда.
+     */
+    if (showsEta(stop)) {
+      chips.push(
+        <Badge key="eta" tone="info">
+          {m('trip.etaAt', {
+            time: etaTime(f, stop.eta_at),
+            source: t.trip.etaSource[stop.eta_source ?? 'ROUTE'],
+          })}
+        </Badge>,
+      );
+    }
+
     if (stop.arrived_at) {
       chips.push(
         <Badge key="arrived" tone="neutral">

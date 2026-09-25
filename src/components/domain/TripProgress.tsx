@@ -1,7 +1,14 @@
 'use client';
 
 import { Badge, Mono } from '@/components/ui';
-import { stopPlace, tripProgress, tripStageKey, type TripStop } from '@/lib/orders/progress';
+import {
+  etaTime,
+  showsEta,
+  stopPlace,
+  tripProgress,
+  tripStageKey,
+  type TripStop,
+} from '@/lib/orders/progress';
 import { useI18n } from '@/lib/i18n/provider';
 
 /**
@@ -40,7 +47,20 @@ export function TripStage({ stops, className }: { stops: TripStop[]; className?:
          */}
         {progress.next && progress.done > 0 && (
           <span className="text-xs text-ink-muted">
-            {m('trip.enRouteTo', { place: stopPlace(progress.next) })}
+            {showsEta(progress.next) ? (
+              <>
+                {m('trip.enRouteEta', {
+                  place: stopPlace(progress.next),
+                  time: etaTime(f, progress.next.eta_at),
+                })}
+                <span className="text-ink-faint">
+                  {' · '}
+                  {t.trip.etaSource[progress.next.eta_source ?? 'ROUTE']}
+                </span>
+              </>
+            ) : (
+              m('trip.enRouteTo', { place: stopPlace(progress.next) })
+            )}
           </span>
         )}
       </div>

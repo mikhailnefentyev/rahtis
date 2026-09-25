@@ -4,6 +4,8 @@ import { revalidateOrder, revalidateOrderFinished } from '@/lib/orders/revalidat
 import { getViewer } from '@/lib/auth/viewer';
 import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
+import { refineEtaAfter } from '@/lib/orders/eta';
+import { operationsLocalToIso } from '@/lib/dates';
 
 /**
  * Отметки прохождения рейса.
@@ -81,17 +83,60 @@ export async function completeStopAction(
    */
   const position = readPosition(formData);
 
+  const stopId = String(formData.get('stop_id') ?? '');
+
   const supabase = await createClient();
   const { error } = await supabase.rpc('complete_stop', {
-    p_stop_id: String(formData.get('stop_id') ?? ''),
+    p_stop_id: stopId,
     p_damage_note: String(formData.get('damage_note') ?? '').trim() || undefined,
     p_lat: position?.lat,
     p_lon: position?.lon,
     p_accuracy_m: position?.accuracyM ?? undefined,
   });
 
+  /*
+   * Оценку по маршруту следующей точке база уже поставила; здесь она
+   * уточняется пробками до перерисовки, чтобы заказчик и перевозчик
+   * сразу видели одну и ту же цифру.
+   */
+  if (!error) await refineEtaAfter(supabase, stopId);
+
   revalidateOrder(locale);
 
+  return { error: error ? await explain(locale, error.code, error.message) : null };
+}
+
+/**
+ * Перевозчик сам называет время прибытия на следующую точку.
+ *
+ * Время вводится по Хельсинки — как смены водителей и как всё время на
+ * платформе: оценку показывают по Хельсинки, и ввод по поясу устройства
+ * дал бы у водителя в Стокгольме цифру на час раньше сказанной.
+ */
+export async function setStopEtaAction(
+  _previous: TripState,
+  formData: FormData,
+): Promise<TripState> {
+  const locale = toLocale(formData.get('locale'));
+
+  const forbidden = await guard(locale);
+  if (forbidden) return { error: forbidden };
+
+  const t = await getDictionary(locale);
+  const eta = operationsLocalToIso(String(formData.get('eta') ?? ''));
+  if (!eta) return { error: t.trip.etaInvalid };
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc('set_stop_eta', {
+    p_stop_id: String(formData.get('stop_id') ?? ''),
+    p_eta: eta,
+    p_source: 'CARRIER',
+  });
+
+  revalidateOrder(locale);
+
+  if (error?.code === '22023') return { error: t.trip.etaInvalid };
+  if (error?.code === '55000') return { error: t.trip.etaLocked };
   return { error: error ? await explain(locale, error.code, error.message) : null };
 }
 
