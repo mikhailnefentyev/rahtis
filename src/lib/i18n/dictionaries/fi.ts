@@ -1357,7 +1357,7 @@ export const fi = {
     submit: 'Lähetä linkki',
     sending: 'Lähetetään…',
     sent:
-      'Jos osoite on rekisteröity, linkki on matkalla. Tarkista myös roskapostikansio — linkki on voimassa tunnin.',
+      'Jos osoite on rekisteröity, linkki on matkalla. Tarkista myös roskapostikansio — linkki on voimassa vuorokauden.',
     badEmail: 'Tarkista sähköpostiosoite',
     backToSignIn: 'Takaisin kirjautumiseen',
   },

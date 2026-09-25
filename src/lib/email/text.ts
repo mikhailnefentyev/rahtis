@@ -147,11 +147,11 @@ const fi: Texts = {
   recovery: {
     heading: 'Salasanan palautus',
     subject: 'RAHTIS · salasanan palautus',
-    preheader: 'Aseta uusi salasana tunnin sisällä.',
+    preheader: 'Aseta uusi salasana vuorokauden sisällä.',
     body: 'Pyysit uutta salasanaa RAHTIS-tunnuksellesi. Aseta se alla olevasta linkistä.',
     button: 'Aseta uusi salasana',
     note:
-      'Linkki on kertakäyttöinen ja voimassa tunnin. ' +
+      'Linkki on kertakäyttöinen ja voimassa vuorokauden. ' +
       'Jos et pyytänyt uutta salasanaa, voit jättää viestin huomiotta — ' +
       'salasanasi ei muutu ennen kuin linkkiä käytetään.',
   },
@@ -254,11 +254,11 @@ const en: Texts = {
   recovery: {
     heading: 'Password reset',
     subject: 'RAHTIS · password reset',
-    preheader: 'Set a new password within the hour.',
+    preheader: 'Set a new password within 24 hours.',
     body: 'You asked for a new password for your RAHTIS account. Set it from the link below.',
     button: 'Set a new password',
     note:
-      'The link works once and is valid for one hour. ' +
+      'The link works once and is valid for 24 hours. ' +
       'If you did not ask for a new password, you can ignore this message — ' +
       'your password does not change until the link is used.',
   },

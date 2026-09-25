@@ -1263,7 +1263,7 @@ export const en = {
     submit: 'Send link',
     sending: 'Sending…',
     sent:
-      'If the address is registered, the link is on its way. Check your spam folder too — the link is valid for an hour.',
+      'If the address is registered, the link is on its way. Check your spam folder too — the link is valid for 24 hours.',
     badEmail: 'Check the email address',
     backToSignIn: 'Back to sign in',
   },
