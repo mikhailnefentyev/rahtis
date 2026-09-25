@@ -476,7 +476,7 @@ export const en = {
 
     ai7: 'A map of rest and service places',
     ai7Text:
-      'Over 500 places in Finland, Sweden, Norway and Denmark: fuel, parking, showers and workshops. The app shows the nearest ones also while the truck stands on a break — free and guarded marked separately.',
+      'Over 520 places in Finland, Sweden, Norway and Denmark: fuel, parking, showers and workshops. The app shows the nearest ones also while the truck stands on a break — free and guarded marked separately.',
     ai8: 'The driver sees the earnings',
     ai8Text:
       'After a job the app shows what it came to and where the month now stands. The figures come from the model the carrier chose or from the collective agreement tables.',

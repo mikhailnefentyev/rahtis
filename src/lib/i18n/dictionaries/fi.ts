@@ -530,7 +530,7 @@ export const fi = {
      */
     ai7: 'Kartta tauko- ja huoltopaikoista',
     ai7Text:
-      'Yli 500 paikkaa Suomessa, Ruotsissa, Norjassa ja Tanskassa: tankkaus, pysäköinti, suihku ja korjaamo. Sovellus näyttää lähimmät myös silloin, kun auto seisoo tauolla — maksuttomat ja vartioidut erikseen merkittynä.',
+      'Yli 520 paikkaa Suomessa, Ruotsissa, Norjassa ja Tanskassa: tankkaus, pysäköinti, suihku ja korjaamo. Sovellus näyttää lähimmät myös silloin, kun auto seisoo tauolla — maksuttomat ja vartioidut erikseen merkittynä.',
     ai8: 'Kuljettaja näkee ansionsa',
     ai8Text:
       'Keikan jälkeen sovellus näyttää, paljonko siitä kertyi ja mihin kuukauden summa on noussut. Laskenta tulee kuljetusliikkeen valitsemasta mallista tai työehtosopimuksen taulukoista.',
