@@ -62,6 +62,7 @@ export function AddressInput({
   defaultChosen,
   near,
   onChosen,
+  cityLevel = false,
   id,
   'aria-describedby': describedBy,
 }: {
@@ -84,10 +85,16 @@ export function AddressInput({
   /** Смещение выдачи: обычно координаты города точки. */
   near?: LatLon;
   onChosen?: (chosen: ChosenAddress | null) => void;
+  /*
+   * Ищется город, а не ворота склада: база машины. Город из подсказки
+   * всегда «неточный», и предупреждение «tarkista osoite ja kilometrit»
+   * там только сбивало — километров в карточке машины нет.
+   */
+  cityLevel?: boolean;
   id?: string;
   'aria-describedby'?: string;
 }) {
-  const { t, locale } = useI18n();
+  const { t, m, locale } = useI18n();
 
   const [value, setValue] = useState(defaultValue ?? '');
   const [chosen, setChosen] = useState<ChosenAddress | null>(defaultChosen ?? null);
@@ -113,7 +120,23 @@ export function AddressInput({
   const settled = Boolean(chosen && chosen.address === query);
   const ready = query.length >= MIN_CHARS && !settled;
 
-  const items = ready ? (answer?.key === key ? answer.list : (cache.get(key) ?? [])) : [];
+  const raw = ready ? (answer?.key === key ? answer.list : (cache.get(key) ?? [])) : [];
+
+  /*
+   * Город из запроса. Поставщик ищет по улице и молча предлагает её в
+   * других городах, если в названном такой нет: «Teollisuuskatu 5
+   * Vantaa» отдавал Оутокумпу первой строкой, и заказ получал 1 186 км
+   * (прогон 26.09.2026). Последнее слово запроса, если это слово, а не
+   * номер, сверяется с подписями: совпавшие встают первыми, а если не
+   * совпало ни одно — список говорит об этом вслух.
+   */
+  const words = query.split(/\s+/);
+  const lastWord = words[words.length - 1] ?? '';
+  const cityWord = words.length >= 2 && /^[\p{L}-]{3,}$/u.test(lastWord) ? lastWord : null;
+  const fold = (text: string) => text.toLocaleLowerCase('fi').normalize('NFD').replace(/\p{M}/gu, '');
+  const hasCity = (item: AddressSuggestion) => (cityWord ? fold(item.label).includes(fold(cityWord)) : true);
+  const items = cityWord ? [...raw.filter(hasCity), ...raw.filter((item) => !hasCity(item))] : raw;
+  const cityMissing = Boolean(cityWord) && raw.length > 0 && !raw.some(hasCity);
 
   useEffect(() => {
     /* Уже есть в кэше или спрашивать нечего — вызова не будет. */
@@ -185,7 +208,7 @@ export function AddressInput({
    * (0,99 против 7,87 на одном и том же адресе), поэтому порога по числу
    * здесь нет — см. комментарий в lib/routing/index.ts.
    */
-  const weak = chosen !== null && !chosen.precise;
+  const weak = !cityLevel && chosen !== null && !chosen.precise;
 
   return (
     <div ref={boxRef} className="relative">
@@ -230,6 +253,11 @@ export function AddressInput({
           role="listbox"
           className="absolute z-20 mt-1 w-full overflow-hidden rounded-control border border-line-strong bg-raised shadow-lg"
         >
+          {cityMissing && (
+            <li role="presentation" className="border-b border-line bg-warn/10 px-3 py-2 text-[12px] text-warn">
+              {m('routing.cityNotFound', { word: cityWord ?? '' })}
+            </li>
+          )}
           {items.map((item) => (
             <li key={item.id}>
               <button

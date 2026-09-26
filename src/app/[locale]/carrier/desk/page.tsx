@@ -7,7 +7,7 @@ import { getI18n, isLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import type { OrderAmendment, TripDocument } from '@/types/db';
 import { Assignments } from './Assignments';
-import { DeskList } from './DeskList';
+import { DeskList, type DeskBusy } from './DeskList';
 
 export async function generateMetadata({
   params,
@@ -63,6 +63,35 @@ export default async function DeskPage({
    * Документы рейсов одним запросом на все закреплённые заказы, а не по
    * одному на карточку. RLS отдаёт только те, где компания — сторона.
    */
+  /*
+   * Занятость машин — для предупреждения на столе. Решение пользователя от
+   * 26.09.2026: пересечение не запрещается, а показывается. Прогон того же
+   * дня: один тягач откликнулся на рейсы в 08:00 и 10:00, и платформа
+   * промолчала. Занятость — это закреплённые рейсы (my_assignments) и
+   * собственные отклики, ждущие выбора заказчика. День — по дате забора:
+   * длительность погрузок никто не знает, а «в тот же день» — честная
+   * граница для «проверь, успеешь ли».
+   */
+  const { data: myOffers } = await supabase
+    .from('order_offers')
+    .select('order_id, vehicle_id')
+    .eq('carrier_company_id', company.id);
+  const plateToId = new Map((vehicles ?? []).map((v) => [v.plate, v.id]));
+  const busy: DeskBusy[] = [];
+  for (const a of assignments ?? []) {
+    const vehicleId = a.vehicle_plate ? plateToId.get(a.vehicle_plate) : undefined;
+    const first = (a.stops as { scheduled_date: string | null; scheduled_time: string | null }[] | null)?.[0];
+    if (vehicleId && first?.scheduled_date) {
+      busy.push({ vehicleId, ref: a.ref, date: first.scheduled_date, time: first.scheduled_time });
+    }
+  }
+  for (const offer of myOffers ?? []) {
+    const o = (orders ?? []).find((x) => x.id === offer.order_id);
+    if (o?.pickup_date) {
+      busy.push({ vehicleId: offer.vehicle_id, ref: o.ref, date: o.pickup_date, time: o.pickup_time });
+    }
+  }
+
   const assignedIds = (assignments ?? []).map((o) => o.id);
   const { data: tripDocs } = assignedIds.length
     ? await supabase
@@ -166,7 +195,7 @@ export default async function DeskPage({
             {m('desk.ordersCount', { count: (orders ?? []).length })}
           </p>
 
-          <DeskList orders={orders ?? []} vehicles={vehicles ?? []} />
+          <DeskList orders={orders ?? []} vehicles={vehicles ?? []} busy={busy} />
         </>
       )}
     </main>

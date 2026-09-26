@@ -160,6 +160,11 @@ export const ru = {
     DELIVERY: 'Выгрузка',
     CONTINUATION: 'Дальнейшая перевозка',
   },
+  haulStops: {
+    CONTAINER: { pickup: 'Забор контейнера', return: 'Возврат контейнера' },
+    CARGO: { pickup: 'Забор груза', return: 'Доставка' },
+  },
+
   orderStatus: {
     DRAFT: 'Черновик',
     OPEN: 'Открыт',

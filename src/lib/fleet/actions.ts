@@ -240,7 +240,8 @@ export async function saveVehicleAction(
   if (error || !data) {
     /* 23505 — номер уже занят допущенной машиной другой компании. */
     return {
-      error: error?.code === '23505' ? t.error.generic : (error?.message ?? t.error.generic),
+      /* Текст ошибки базы — по-русски; на экран идёт только общий перевод. */
+      error: t.error.generic,
       done: false,
     };
   }

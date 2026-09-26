@@ -32,7 +32,14 @@ export default async function PartnersPage({ params }: { params: Promise<{ local
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
 
-  await requireRole(locale, 'CARRIER');
+  const viewer = await requireRole(locale, 'CARRIER');
+  /*
+   * Кто кого видит, зависит от ветки: на подписке прямые рейсы
+   * выставляются напрямую, и стороны видят друг друга по имени (TERMS
+   * 6.7). Прежде страница всем писала «клиенты видны кодом, договор с
+   * Aivomaa» — у подписчика это было неправдой.
+   */
+  const subscriber = viewer.company?.partnership === 'SUBSCRIBER';
   const [{ t, m, f }, supabase] = await Promise.all([getI18n(locale), createClient()]);
 
   const { data: partners } = await supabase.rpc('carrier_partners');
@@ -41,7 +48,7 @@ export default async function PartnersPage({ params }: { params: Promise<{ local
     <main className="mx-auto w-full max-w-4xl px-5 py-8">
       <h1 className="text-xl font-semibold tracking-tight">{t.partners.title}</h1>
       <p className="mt-2 max-w-xl text-[13px] leading-relaxed text-ink-muted">{t.partners.subtitle}</p>
-      <p className="mt-2 mb-6 max-w-xl text-xs text-ink-dim">{t.partners.anonymity}</p>
+      <p className="mt-2 mb-6 max-w-xl text-xs text-ink-dim">{subscriber ? t.partners.anonymitySubscriber : t.partners.anonymity}</p>
 
       {(partners ?? []).length === 0 ? (
         <EmptyState title={t.partners.none} />

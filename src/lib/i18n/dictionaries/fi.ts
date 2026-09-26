@@ -238,8 +238,8 @@ export const fi = {
     hint: 'Muuta pisteitä, joilla ei ole vielä käyty. Kuljetusliike näkee muutoksen heti.',
     edit: 'Muuta',
     insertBefore: 'Lisää piste tämän eteen',
-    insertLoad: 'Lastaus',
-    insertUnload: 'Purku',
+    insertLoad: '+ Lastaus',
+    insertUnload: '+ Purku',
     remove: 'Poista piste',
     removing: 'Poistetaan…',
     save: 'Tallenna muutos',
@@ -889,6 +889,8 @@ export const fi = {
     expressCommentPlaceholder: 'Mitat, pakkaus, nostotapa, lämpötila…',
     cargoWeight: 'Paino, t',
     cargoWeightHint: 'Enintään 76 tonnia eli HCT-yhdistelmän suurin sallittu massa',
+    cargoWeightHintVan: 'Kuorman paino. Pakettiauton kantavuus on yleensä 1–1,5 tonnia',
+    cargoWeightHintTruck: 'Kuorman paino. Kuorma-auton kantavuus on yleensä enintään 15 tonnia',
     consignee: 'Kuorman vastaanottaja',
     consigneeHint: 'Kenelle kuorma menee tältä pisteeltä',
     loadingRef: 'Lastauksen viite',
@@ -911,7 +913,8 @@ export const fi = {
      * otsikot — kuljettaja etsii kentältä eri esinettä.
      */
     containerNumber: 'Kontin numero',
-    containerNumberHint: 'ISO 6346, esimerkiksi MSCU1234567. Kuljettaja löytää kontin sillä terminaalista.',
+    containerNumberInvalid: 'Kontin numero ei ole kelvollinen: tarkista kirjaimet ja viimeinen tarkistusnumero.',
+    containerNumberHint: 'ISO 6346, esimerkiksi MSCU1234566. Kuljettaja löytää kontin sillä terminaalista.',
     containerFeet: 'Kontin pituus',
     containerFeetHint: 'Jaloissa. Määrää, mikä alusta kontin ottaa.',
     containerType: 'Kontin tyyppi',
@@ -920,6 +923,7 @@ export const fi = {
     rate: 'Hinta, €',
 
     publish: 'Julkaise · näkyy alueen kuljetusliikkeille',
+    publishDirect: 'Lähetä valitulle autolle',
     publishing: 'Julkaistaan…',
     published: 'Kuljetus julkaistu',
     needActive: 'Täydennä yritystiedot. Ilman niitä kuljetusta ei voi julkaista.',
@@ -2149,6 +2153,8 @@ export const fi = {
     allow: 'Salli suorat tilaukset',
     revoke: 'Peru lupa',
     none: 'Ei vielä ajettuja kuljetuksia',
+    anonymitySubscriber:
+      'Suorat tilaukset laskutat itse: asiakas, jolle olet sallinut suorat tilaukset, näkee yrityksesi nimen, y-tunnuksen ja tilinumeron sekä kuljettajan yhteystiedot, ja sinä näet hänen nimensä. Tarjouspöydältä otetuissa keikoissa sopimuskumppani on Aivomaa Oy, ja asiakkaat näkyvät koodilla.',
     anonymity:
       'Asiakkaat näkyvät koodilla, ei nimellä. Tilaaja näkee autosi rekisterinumeron, arvosanan sekä kuljettajan nimen, puhelinnumeron ja sähköpostin yhteydenpitoa varten, mutta ei yrityksesi nimeä. Molempien sopimuskumppani on Aivomaa Oy.',
   },
@@ -2384,6 +2390,8 @@ export const fi = {
     'order.stopsCount': 'Reitillä {count, plural, one {# piste} other {# pistettä}}',
     'order.publishedAt': 'Julkaistu {date}',
     'matching.slotsTaken': '{count} / {max}',
+    'routing.cityNotFound': 'Hakusanaa ”{word}” ei löytynyt ehdotuksista. Tarkista kaupunki ennen kuin valitset.',
+    'matching.vehicleBusy': 'Autolla {plate} on jo kuljetus {ref} samana päivänä ({when}). Tarkista, ehtiikö se molemmat.',
     'matching.variant': 'Vaihtoehto {no}',
     'matching.basedIn': 'Kotipaikka {city}',
     'matching.offersCount':

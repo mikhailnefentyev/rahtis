@@ -160,6 +160,11 @@ export const sv = {
     DELIVERY: 'Lossning',
     CONTINUATION: 'Vidaretransport',
   },
+  haulStops: {
+    CONTAINER: { pickup: 'Hämtning av container', return: 'Återlämning av container' },
+    CARGO: { pickup: 'Hämtning av gods', return: 'Leverans' },
+  },
+
   orderStatus: {
     DRAFT: 'Utkast',
     OPEN: 'Öppen',

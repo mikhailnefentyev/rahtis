@@ -51,8 +51,16 @@ function defaultsOf(stop: OrderStop): StopDefaults {
 
 type Editing =
   | { kind: 'edit'; stop: OrderStop }
-  /** Новая точка встанет перед stop. */
-  | { kind: 'add'; stop: OrderStop; role: StopRole };
+  /**
+   * Новая точка встанет ПОСЛЕ stop, то есть перед before.
+   *
+   * Кнопки вставки стоят под точкой, и форма открывается под ней — значит,
+   * и точка обязана встать после неё. Прежде вставка шла перед выбранной
+   * точкой, и «+ Purku» под забором прицепа ставил выгрузку раньше забора
+   * (прогон 26.09.2026). База вставляет перед заданной точкой, поэтому
+   * форма передаёт следующую.
+   */
+  | { kind: 'add'; stop: OrderStop; before: OrderStop; role: StopRole };
 
 export function AmendPanel({
   orderId,
@@ -69,7 +77,10 @@ export function AmendPanel({
   const { t } = useI18n();
   const [editing, setEditing] = useState<Editing | null>(null);
 
-  const pending = stops.filter((s) => s.completed_at === null).sort((a, b) => a.sequence - b.sequence);
+  const ordered = [...stops].sort((a, b) => a.sequence - b.sequence);
+  const pending = ordered.filter((s) => s.completed_at === null);
+  /* Точка, перед которой встанет новая: следующая за выбранной. */
+  const nextOf = (stop: OrderStop) => ordered.find((s) => s.sequence > stop.sequence) ?? null;
 
   if (pending.length === 0) return null;
 
@@ -85,6 +96,8 @@ export function AmendPanel({
           const open = editing?.stop.id === stop.id ? editing : null;
           /* Концы рейса не убираются: без них перецепа не бывает. */
           const removable = stop.role === 'EXTRA_LOAD' || stop.role === 'EXTRA_UNLOAD';
+          /* После последней точки (возврат, продолжение) рейс кончается — вставлять некуда. */
+          const next = nextOf(stop);
 
           return (
             <div key={stop.id} className="rounded-control border border-line bg-sunken p-3">
@@ -103,30 +116,34 @@ export function AmendPanel({
                   >
                     {t.amend.edit}
                   </Button>
-                  <Button
-                    size="sm"
-                    onClick={() =>
-                      setEditing(
-                        open?.kind === 'add' && open.role === 'EXTRA_LOAD'
-                          ? null
-                          : { kind: 'add', stop, role: 'EXTRA_LOAD' },
-                      )
-                    }
-                  >
-                    {t.amend.insertLoad}
-                  </Button>
-                  <Button
-                    size="sm"
-                    onClick={() =>
-                      setEditing(
-                        open?.kind === 'add' && open.role === 'EXTRA_UNLOAD'
-                          ? null
-                          : { kind: 'add', stop, role: 'EXTRA_UNLOAD' },
-                      )
-                    }
-                  >
-                    {t.amend.insertUnload}
-                  </Button>
+                  {next && (
+                    <>
+                      <Button
+                        size="sm"
+                        onClick={() =>
+                          setEditing(
+                            open?.kind === 'add' && open.role === 'EXTRA_LOAD'
+                              ? null
+                              : { kind: 'add', stop, before: next, role: 'EXTRA_LOAD' },
+                          )
+                        }
+                      >
+                        {t.amend.insertLoad}
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={() =>
+                          setEditing(
+                            open?.kind === 'add' && open.role === 'EXTRA_UNLOAD'
+                              ? null
+                              : { kind: 'add', stop, before: next, role: 'EXTRA_UNLOAD' },
+                          )
+                        }
+                      >
+                        {t.amend.insertUnload}
+                      </Button>
+                    </>
+                  )}
                   {removable && <RemoveStop orderId={orderId} stopId={stop.id} />}
                 </div>
               </div>
@@ -190,7 +207,7 @@ function StopEditor({
       <input type="hidden" name="role" value={role} />
 
       {adding ? (
-        <input type="hidden" name="before_stop_id" value={editing.stop.id} />
+        <input type="hidden" name="before_stop_id" value={editing.before.id} />
       ) : (
         <>
           <input type="hidden" name="stop_id" value={editing.stop.id} />

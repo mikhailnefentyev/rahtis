@@ -5,6 +5,7 @@ import { getDriver } from '@/lib/driverApp/session';
 import { getDriverTasks, nextStop, type DriverTask } from '@/lib/driverApp/tasks';
 import { isLocale, type Locale } from '@/lib/i18n';
 import { getDriverI18n } from '@/lib/driverApp/i18n';
+import { stopTitle } from '@/lib/orders/haul';
 import { PushSetup } from './PushSetup';
 import { ShiftBar } from './ShiftBar';
 import { TaskTabs } from './TaskTabs';
@@ -88,7 +89,7 @@ async function TaskCard({ task, locale }: { task: DriverTask; locale: Locale }) 
         {stop && (
           <div>
             <p className="label-micro">
-              {t.driverApp.next} · {t.stopKind[stop.role]}
+              {t.driverApp.next} · {stopTitle(t, stop.role, task.haul_kind)}
             </p>
             <p className="text-[17px] font-semibold">{stop.place_name ?? stop.company_name ?? stop.city}</p>
             <p className="text-[15px] text-ink-muted">

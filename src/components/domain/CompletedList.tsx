@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { OrderRouteMap } from '@/components/domain/RouteMap';
 import { HaulBadge } from '@/components/domain/HaulBadge';
 import { RouteStops } from '@/components/domain/RouteStops';
+import { routeLabel } from '@/lib/orders/route';
 import { RateTrip } from '@/components/domain/RateTrip';
 import { DocumentList } from '@/components/domain/TripDocuments';
 import { FileClaim } from '@/components/domain/claims/ClaimActions';
@@ -145,7 +146,7 @@ export function CompletedList({
 
                           {first && last && (
                             <p className="mt-2 font-mono text-sm tracking-tight text-accent">
-                              {first.city} → {last.city}
+                              {routeLabel(stops)}
                             </p>
                           )}
 

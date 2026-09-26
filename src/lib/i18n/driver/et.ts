@@ -160,6 +160,11 @@ export const et = {
     DELIVERY: 'Mahalaadimine',
     CONTINUATION: 'Edasivedu',
   },
+  haulStops: {
+    CONTAINER: { pickup: 'Konteineri pealevõtmine', return: 'Konteineri tagastamine' },
+    CARGO: { pickup: 'Kauba pealevõtmine', return: 'Kohaletoimetamine' },
+  },
+
   orderStatus: {
     DRAFT: 'Mustand',
     OPEN: 'Avatud',

@@ -160,6 +160,11 @@ export const lt = {
     DELIVERY: 'Iškrovimas',
     CONTINUATION: 'Tolesnis vežimas',
   },
+  haulStops: {
+    CONTAINER: { pickup: 'Konteinerio paėmimas', return: 'Konteinerio grąžinimas' },
+    CARGO: { pickup: 'Krovinio paėmimas', return: 'Pristatymas' },
+  },
+
   orderStatus: {
     DRAFT: 'Juodraštis',
     OPEN: 'Atviras',

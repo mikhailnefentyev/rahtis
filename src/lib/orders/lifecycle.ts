@@ -52,7 +52,14 @@ async function explain(
 
   if (code === '42501') return t.lifecycle.notAllowed;
   if (code === 'P0002') return t.lifecycle.notFound;
-  if (code === '55000') return message ?? t.lifecycle.failed;
+  /*
+   * Текст ошибки базы — по-русски, для разработчика: на экран финскому
+   * пользователю он не идёт (прогон 26.09.2026). Причина остаётся в журнале.
+   */
+  if (code === '55000') {
+    console.warn('[orders] отказ 55000:', message);
+    return t.lifecycle.failed;
+  }
 
   /*
    * Незнакомый код — это наша поломка, а не действие пользователя, и

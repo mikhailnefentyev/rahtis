@@ -2,7 +2,6 @@
 
 import { useActionState, useState } from 'react';
 import {
-  Badge,
   Button,
   Card,
   CardBody,
@@ -51,13 +50,12 @@ export function RequisitesForm({ company }: { company: Company }) {
     return (
       <Card stripe="ok">
         <CardBody className="p-6">
-          <div className="flex flex-wrap items-center gap-2.5">
-            <h2 className="text-[15px] font-semibold tracking-tight">{t.requisites.saved}</h2>
-            <Badge tone="ok">{t.companyStatus.ACTIVE}</Badge>
-          </div>
-          <p className="mt-2 text-[13px] leading-relaxed text-ink-muted">
-            {t.requisites.alreadyActive}
-          </p>
+          {/*
+            * Только подтверждение: статус «Käytössä» и пояснение к нему
+            * страница над формой показывает сама, и повтор здесь давал два
+            * одинаковых блока подряд (прогон 26.09.2026).
+            */}
+          <h2 className="text-[15px] font-semibold tracking-tight">{t.requisites.saved}</h2>
         </CardBody>
       </Card>
     );
@@ -378,26 +376,23 @@ export function RequisitesForm({ company }: { company: Company }) {
             {t.legal.TERMS}
           </a>
           {/*
-            * Условия для заказчиков показываются только заказчику:
-            * перевозчик их не принимает, у него свой договор, который
-            * ещё предстоит завести. Список документов в
-            * галочке обязан совпадать с тем, что запишет accept_legal, —
-            * иначе человек соглашается с одним, а в журнал ложится
-            * другое.
+            * Договор стороны — свой у каждого вида компании: заказчику
+            * условия заказчика, перевозчику договор перевозчика (с
+            * 26.09.2026). Список документов в галочке обязан совпадать с
+            * тем, что запишет accept_legal, — иначе человек соглашается с
+            * одним, а в журнал ложится другое. Так и было, пока договор
+            * перевозчика не завели: галочка его не называла, а
+            * accept_legal уже принимал.
             */}
-          {!isCarrier && (
-            <>
-              {' · '}
-              <a
-                href={`/${locale}/shipper/terms`}
-                target="_blank"
-                rel="noopener"
-                className="font-semibold text-accent hover:underline"
-              >
-                {t.legal.SHIPPER_AGREEMENT}
-              </a>
-            </>
-          )}
+          {' · '}
+          <a
+            href={`/${locale}/${isCarrier ? 'carrier' : 'shipper'}/terms`}
+            target="_blank"
+            rel="noopener"
+            className="font-semibold text-accent hover:underline"
+          >
+            {isCarrier ? t.legal.CARRIER_AGREEMENT : t.legal.SHIPPER_AGREEMENT}
+          </a>
           {' · '}
           <a
             href={`/${locale}/${locale === 'fi' ? 'tietosuoja' : 'privacy'}`}

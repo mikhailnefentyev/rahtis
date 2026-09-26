@@ -63,7 +63,14 @@ async function explain(
   const t = await getDictionary(locale);
 
   if (code === '42501') return t.amend.notYours;
-  if (code === '55000') return message ?? t.amend.failed;
+  /*
+   * Текст ошибки базы — по-русски, для разработчика: на экран финскому
+   * пользователю он не идёт (прогон 26.09.2026). Причина остаётся в журнале.
+   */
+  if (code === '55000') {
+    console.warn('[orders] отказ 55000:', message);
+    return t.amend.failed;
+  }
 
   return t.amend.failed;
 }

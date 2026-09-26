@@ -160,6 +160,11 @@ export const nb = {
     DELIVERY: 'Lossing',
     CONTINUATION: 'Videretransport',
   },
+  haulStops: {
+    CONTAINER: { pickup: 'Henting av container', return: 'Levering av container' },
+    CARGO: { pickup: 'Henting av gods', return: 'Levering' },
+  },
+
   orderStatus: {
     DRAFT: 'Utkast',
     OPEN: 'Åpen',

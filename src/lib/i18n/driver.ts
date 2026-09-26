@@ -37,6 +37,12 @@ export type DriverPack = {
   driverApp: Dictionary['driverApp'];
   places: Dictionary['places'];
   stopKind: Dictionary['stopKind'];
+  /*
+   * Забор и возврат зависят от того, что везут: общий stopKind называет их
+   * «прицепом», и экспресс на фургоне в приложении получал «забор
+   * прицепа» (прогон 26.09.2026). driverDictionary кладёт их в haul.
+   */
+  haulStops: Record<'CONTAINER' | 'CARGO', { pickup: string; return: string }>;
   orderStatus: Dictionary['orderStatus'];
   haulKind: Dictionary['haulKind'];
   /** Единственная строка из раздела оплаты, которую видит водитель. */
@@ -57,6 +63,10 @@ function packOf(dictionary: Dictionary): DriverPack {
     driverApp: dictionary.driverApp,
     places: dictionary.places,
     stopKind: dictionary.stopKind,
+    haulStops: {
+      CONTAINER: { pickup: dictionary.haul.CONTAINER.stopPickup, return: dictionary.haul.CONTAINER.stopReturn },
+      CARGO: { pickup: dictionary.haul.VAN.stopPickup, return: dictionary.haul.VAN.stopReturn },
+    },
     orderStatus: dictionary.orderStatus,
     haulKind: dictionary.haulKind,
     payDisclaimer: dictionary.pay.disclaimer,
@@ -109,9 +119,21 @@ export async function driverDictionary(
     driverApp: pack.driverApp,
     places: pack.places,
     stopKind: pack.stopKind,
+    /*
+     * Забор и возврат по виду перевозки: страницы водителя зовут тот же
+     * stopTitle, что кабинеты, и он берёт названия отсюда. Остальные поля
+     * haul (разделы формы заказа) водителю не показываются.
+     */
+    haul: {
+      TRAILER: { ...base.haul.TRAILER, stopPickup: pack.stopKind.PICKUP, stopReturn: pack.stopKind.TRAILER_RETURN },
+      CONTAINER: { ...base.haul.CONTAINER, stopPickup: pack.haulStops.CONTAINER.pickup, stopReturn: pack.haulStops.CONTAINER.return },
+      VAN: { ...base.haul.VAN, stopPickup: pack.haulStops.CARGO.pickup, stopReturn: pack.haulStops.CARGO.return },
+      TRUCK: { ...base.haul.TRUCK, stopPickup: pack.haulStops.CARGO.pickup, stopReturn: pack.haulStops.CARGO.return },
+    },
     orderStatus: pack.orderStatus,
     haulKind: pack.haulKind,
     pay: { ...base.pay, disclaimer: pack.payDisclaimer },
     msg: { ...base.msg, ...pack.msg },
   };
 }
+

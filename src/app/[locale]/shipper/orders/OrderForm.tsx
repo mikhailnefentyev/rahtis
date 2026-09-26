@@ -15,6 +15,7 @@ import {
   Textarea,
 } from '@/components/ui';
 import type { ChosenAddress } from '@/components/domain/AddressInput';
+import { isValidContainerNumber } from '@/lib/containerNumber';
 import { publishOrderAction, type PublishState } from '@/lib/orders/actions';
 import { stopTitle, type HaulKind } from '@/lib/orders/haul';
 import { computeRouteAction, type RouteState } from '@/lib/routing/actions';
@@ -106,10 +107,13 @@ function repeatableRole(role: StopRole): 'EXTRA_LOAD' | 'EXTRA_UNLOAD' | null {
 
 export function OrderForm({
   onPublished,
+  onNew,
   template,
   knownVehicles,
 }: {
   onPublished: () => void;
+  /* Следующий заказ сразу из плашки «julkaistu» — без её закрытия. */
+  onNew?: () => void;
   template?: OrderTemplate;
   /** Знакомые машины — для прямого назначения вместо стола. */
   knownVehicles: KnownVehicle[];
@@ -137,6 +141,21 @@ export function OrderForm({
 
   const [haulKind, setHaulKind] = useState<HaulKind>(origin?.haul_kind ?? 'TRAILER');
   const container = haulKind === 'CONTAINER';
+  /*
+   * Номер контейнера проверяется по контрольной цифре ISO 6346 прямо при
+   * вводе: опечатка — это чужой контейнер в терминале. Номер прицепа
+   * контрольной цифры не имеет, его поле остаётся свободным.
+   */
+  const [unitPlate, setUnitPlate] = useState('');
+  /*
+   * Прямой заказ уходит одной машине, а не всем перевозчикам региона, —
+   * подпись кнопки «näkyy alueen kuljetusliikkeille» там была неправдой.
+   */
+  const [direct, setDirect] = useState(false);
+  const containerNumberError =
+    container && unitPlate.trim().length >= 11 && !isValidContainerNumber(unitPlate)
+      ? t.orderForm.containerNumberInvalid
+      : undefined;
 
   /*
    * Экспресс — ветка, а не разновидность перецепа.
@@ -370,7 +389,12 @@ export function OrderForm({
         <CardBody className="flex flex-wrap items-center gap-3">
           <Badge tone="ok">{t.orderForm.published}</Badge>
           <Mono className="text-[13px]">{state.ref}</Mono>
-          <Button size="sm" onClick={onPublished} className="ml-auto">
+          {onNew && (
+            <Button size="sm" variant="primary" onClick={onNew} className="ml-auto">
+              {t.orders.newOrder}
+            </Button>
+          )}
+          <Button size="sm" onClick={onPublished} className={onNew ? undefined : 'ml-auto'}>
             {t.action.close}
           </Button>
         </CardBody>
@@ -671,6 +695,7 @@ export function OrderForm({
             <Field
               label={container ? t.orderForm.containerNumber : t.orderForm.trailerPlate}
               hint={container ? t.orderForm.containerNumberHint : t.orderForm.trailerPlateHint}
+              error={containerNumberError}
               required
               className="sm:col-span-2"
             >
@@ -679,7 +704,9 @@ export function OrderForm({
                   {...p}
                   name="trailer_plate"
                   required
-                  placeholder={container ? 'MSCU1234567' : 'ABC-123'}
+                  value={unitPlate}
+                  onChange={(e) => setUnitPlate(e.target.value)}
+                  placeholder={container ? 'MSCU1234566' : 'ABC-123'}
                   style={{ textTransform: 'uppercase' }}
                 />
               )}
@@ -828,7 +855,7 @@ export function OrderForm({
         */}
       <Card>
         <CardBody>
-          <DispatchPicker vehicles={knownVehicles} haulKind={haulKind} />
+          <DispatchPicker vehicles={knownVehicles} haulKind={haulKind} onDirectChange={setDirect} />
         </CardBody>
       </Card>
 
@@ -857,10 +884,10 @@ export function OrderForm({
           type="submit"
           variant="primary"
           size="lg"
-          disabled={pending || !canRoute}
+          disabled={pending || !canRoute || Boolean(containerNumberError)}
           className="flex-[3]"
         >
-          {pending ? t.orderForm.publishing : t.orderForm.publish}
+          {pending ? t.orderForm.publishing : direct ? t.orderForm.publishDirect : t.orderForm.publish}
         </Button>
       </div>
     </form>

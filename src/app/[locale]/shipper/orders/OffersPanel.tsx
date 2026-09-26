@@ -123,7 +123,26 @@ export function OffersPanel({ order, offers }: { order: ShipperOrder; offers: Sh
  * признак это слабый: по номеру перевозчика можно найти в реестре, но
  * работать без этих данных заказчик не сможет.
  */
-export function AssignedCarrier({ offer }: { offer: ShipperOffer }) {
+/*
+ * Прямой рейс перевозчика на подписке — исключение из правила выше:
+ * договор между ним и заказчиком, счёт выставляет он, платить ему. Тогда
+ * исполнителем значится сам перевозчик, с реквизитами для оплаты (TERMS
+ * 6.7). Прежде здесь и в прямом рейсе стояла Aivomaa, и заказчик видел
+ * одно имя в карточке рейса и другое в «Omat autot».
+ */
+export type DirectCarrier = {
+  name: string;
+  businessId: string;
+  iban: string | null;
+};
+
+export function AssignedCarrier({
+  offer,
+  direct = null,
+}: {
+  offer: ShipperOffer;
+  direct?: DirectCarrier | null;
+}) {
   const { t, m } = useI18n();
 
   return (
@@ -133,8 +152,16 @@ export function AssignedCarrier({ offer }: { offer: ShipperOffer }) {
       <div className="rounded-control border border-line bg-sunken px-3 py-2.5">
         <div className="mb-2.5 flex flex-wrap items-center gap-2.5">
           {offer.plate && <Plate>{offer.plate}</Plate>}
-          <Badge tone="ok">{APP.operator.legalName}</Badge>
+          <Badge tone="ok">{direct ? direct.name : APP.operator.legalName}</Badge>
         </div>
+
+        {direct && (
+          <div className="mb-2.5 flex flex-col gap-1">
+            <Kv k="Y-tunnus" v={direct.businessId} />
+            {direct.iban && <Kv k={t.known.carrierAccount} v={direct.iban} />}
+            <p className="text-xs text-ink-muted">{t.known.directBillingHint}</p>
+          </div>
+        )}
 
         <div className="flex flex-col gap-1">
           {offer.driver_name && <Kv k={t.vehicle.driver} v={offer.driver_name} />}

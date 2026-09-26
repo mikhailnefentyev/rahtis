@@ -212,7 +212,18 @@ export function StopFields({
 
       {cargo ? (
         <>
-          <Field label={t.orderForm.cargoWeight} hint={t.orderForm.cargoWeightHint} required={requireWeight}>
+          <Field label={t.orderForm.cargoWeight} hint={
+            /*
+             * Предел массы зависит от машины: 76 т — это сцепка HCT, у
+             * экспресса груз едет в кузове, и подсказка про 76 т там
+             * бессмысленна (прогон 26.09.2026).
+             */
+            haulKind === 'VAN'
+              ? t.orderForm.cargoWeightHintVan
+              : haulKind === 'TRUCK'
+                ? t.orderForm.cargoWeightHintTruck
+                : t.orderForm.cargoWeightHint
+          } required={requireWeight}>
             {(p) => (
               <InputMono
                 {...p}

@@ -160,6 +160,11 @@ export const pl = {
     DELIVERY: 'Rozładunek',
     CONTINUATION: 'Dalszy przewóz',
   },
+  haulStops: {
+    CONTAINER: { pickup: 'Odbiór kontenera', return: 'Zwrot kontenera' },
+    CARGO: { pickup: 'Odbiór ładunku', return: 'Dostawa' },
+  },
+
   orderStatus: {
     DRAFT: 'Szkic',
     OPEN: 'Otwarte',

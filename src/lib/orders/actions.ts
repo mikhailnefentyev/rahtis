@@ -1,5 +1,6 @@
 'use server';
 
+import { isValidContainerNumber } from '@/lib/containerNumber';
 import { revalidatePath } from 'next/cache';
 import { getViewer } from '@/lib/auth/viewer';
 import { getDictionary, isLocale, type Dictionary, type Locale, defaultLocale } from '@/lib/i18n';
@@ -276,6 +277,11 @@ export async function publishOrderAction(
 
   if (!rateCents || !Number.isFinite(distance) || distance <= 0) {
     return { error: t.validation.positiveNumber, ref: null };
+  }
+
+  /* Та же проверка, что в форме: форму можно обойти, сервер — нет. */
+  if (haulKind(str(formData, 'haul_kind')) === 'CONTAINER' && !isValidContainerNumber(str(formData, 'trailer_plate'))) {
+    return { error: t.orderForm.containerNumberInvalid, ref: null };
   }
 
   const stops = collectStops(formData);

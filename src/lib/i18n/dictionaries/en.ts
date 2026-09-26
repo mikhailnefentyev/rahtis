@@ -221,8 +221,8 @@ export const en = {
     hint: 'Change stops that have not been reached yet. The carrier sees it immediately.',
     edit: 'Change',
     insertBefore: 'Add a stop before this one',
-    insertLoad: 'Loading',
-    insertUnload: 'Unloading',
+    insertLoad: '+ Loading',
+    insertUnload: '+ Unloading',
     remove: 'Remove stop',
     removing: 'Removing…',
     save: 'Save change',
@@ -801,6 +801,8 @@ export const en = {
     expressCommentPlaceholder: 'Dimensions, packaging, handling, temperature…',
     cargoWeight: 'Weight, t',
     cargoWeightHint: 'Up to 76 tonnes, the maximum for an HCT combination',
+    cargoWeightHintVan: 'Weight of the load. A van usually carries 1–1.5 tonnes',
+    cargoWeightHintTruck: 'Weight of the load. A truck usually carries up to 15 tonnes',
     consignee: 'Consignee',
     consigneeHint: 'Who receives the cargo from this stop',
     loadingRef: 'Loading reference',
@@ -823,7 +825,8 @@ export const en = {
      * different labels — the driver is looking for a different object.
      */
     containerNumber: 'Container number',
-    containerNumberHint: 'ISO 6346, for example MSCU1234567. This is how the driver finds it at the terminal.',
+    containerNumberInvalid: 'The container number is not valid: check the letters and the final check digit.',
+    containerNumberHint: 'ISO 6346, for example MSCU1234566. This is how the driver finds it at the terminal.',
     containerFeet: 'Container length',
     containerFeetHint: 'In feet. It decides which chassis can take it.',
     containerType: 'Container type',
@@ -832,6 +835,7 @@ export const en = {
     rate: 'Price, €',
 
     publish: 'Publish · goes to trucks in the area',
+    publishDirect: 'Send to the chosen vehicle',
     publishing: 'Publishing…',
     published: 'Order published',
     needActive: 'Complete your company details first. Without them an order cannot be published.',
@@ -2036,6 +2040,8 @@ export const en = {
     allow: 'Allow direct orders',
     revoke: 'Withdraw',
     none: 'No transports driven yet',
+    anonymitySubscriber:
+      'You invoice direct orders yourself: a customer you have allowed direct orders from sees your company name, business ID and bank account and the driver contact details, and you see their name. For jobs taken from the offer desk the contracting party is Aivomaa Oy and customers appear as codes.',
     anonymity:
       'Customers are shown by a code, not by name. The shipper sees your vehicle plate, rating and, for contact, the driver’s name, phone and email, but not your company name. Aivomaa Oy is the contracting party for both.',
   },
@@ -2251,6 +2257,8 @@ export const en = {
     'order.stopsCount': '{count, plural, one {# stop} other {# stops}} on the route',
     'order.publishedAt': 'Published {date}',
     'matching.slotsTaken': '{count} / {max}',
+    'routing.cityNotFound': '“{word}” was not found in the suggestions. Check the city before choosing.',
+    'matching.vehicleBusy': '{plate} already has transport {ref} on the same day ({when}). Check that it can make both.',
     'matching.variant': 'Option {no}',
     'matching.basedIn': 'Based in {city}',
     'matching.offersCount':

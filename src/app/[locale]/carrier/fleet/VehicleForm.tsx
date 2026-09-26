@@ -344,6 +344,7 @@ export function VehicleForm({
                 {...p}
                 name="base_city"
                 required
+                cityLevel
                 defaultValue={vehicle?.base_city ?? ''}
                 defaultChosen={
                   vehicle?.base_lat != null && vehicle?.base_lon != null

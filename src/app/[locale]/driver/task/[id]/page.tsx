@@ -5,6 +5,7 @@ import { getTripPhotos, type TripPhoto } from '@/lib/driverApp/photos';
 import { getDriverTasks, type DriverStop, type DriverTask } from '@/lib/driverApp/tasks';
 import { isLocale, type Locale } from '@/lib/i18n';
 import { getDriverI18n } from '@/lib/driverApp/i18n';
+import { stopTitle } from '@/lib/orders/haul';
 import { Arrive } from './Arrive';
 import { Confirmation } from './Confirmation';
 import { Inspection } from './Inspection';
@@ -45,7 +46,7 @@ export default async function DriverTaskPage({
     arrived: Boolean(stop.arrived_at),
     completed: Boolean(stop.completed_at),
     stopOf: m('driverApp.stopOf', { n: stop.sequence + 1, total: task.stops.length }),
-    title: `${t.stopKind[stop.role]} · ${stop.city}`,
+    title: `${stopTitle(t, stop.role, task.haul_kind)} · ${stop.city}`,
   }));
 
   const content = (
@@ -159,7 +160,7 @@ async function StopItem({
       </div>
 
       <div className={cn('flex-1 pb-6', done && 'text-ink-dim')}>
-        <p className="label-micro">{t.stopKind[stop.role]}</p>
+        <p className="label-micro">{stopTitle(t, stop.role, task.haul_kind)}</p>
         <p className="text-[17px] font-semibold">{stop.place_name ?? stop.company_name ?? stop.city}</p>
         <p className="text-[15px]">
           {stop.address}, {stop.city}

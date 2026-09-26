@@ -50,9 +50,12 @@ function VehicleOptions({ vehicles }: { vehicles: KnownVehicle[] }) {
 export function DispatchPicker({
   vehicles,
   haulKind,
+  onDirectChange,
 }: {
   vehicles: KnownVehicle[];
   haulKind: HaulKind;
+  /* Форма подписывает кнопку: «на стол» и «одной машине» — разные действия. */
+  onDirectChange?: (direct: boolean) => void;
 }) {
   const { t } = useI18n();
   const fitting = fittingVehicles(vehicles, haulKind);
@@ -87,7 +90,10 @@ export function DispatchPicker({
                   value={value}
                   checked={on}
                   disabled={disabled}
-                  onChange={() => setMode(value)}
+                  onChange={() => {
+                    setMode(value);
+                    onDirectChange?.(value === 'DIRECT' && fitting.length > 0);
+                  }}
                   className="accent-[var(--color-accent)]"
                 />
                 {value === 'DESK' ? t.direct.desk : t.direct.direct}

@@ -57,6 +57,18 @@ export function OrderCard({
 
   const { from: pickup, to: delivery } = routeEnds(stops);
   const assigned = offers.find((o) => o.is_assigned);
+  /* Прямой рейс подписчика: реквизиты перевозчика — из «знакомых машин». */
+  const directVehicle =
+    order.contract_party === 'CARRIER' && assigned?.plate
+      ? knownVehicles.find((v) => v.plate === assigned.plate && v.direct_billing)
+      : undefined;
+  const directCarrier = directVehicle
+    ? {
+        name: directVehicle.carrier_name,
+        businessId: directVehicle.carrier_business_id,
+        iban: directVehicle.carrier_iban || null,
+      }
+    : null;
   /*
    * Прямое назначение ждёт без срока: AWAIT_DRIVER с пустым deadline_at.
    * Выбор отклика со стола срок ставит всегда.
@@ -178,7 +190,7 @@ export function OrderCard({
 
               {/* Рейс идёт — выбирать не из чего, важно кто везёт. */}
               {order.status === 'IN_PROGRESS' && assigned && (
-                <AssignedCarrier offer={assigned} />
+                <AssignedCarrier offer={assigned} direct={directCarrier} />
               )}
 
               {stops.length > 0 && (

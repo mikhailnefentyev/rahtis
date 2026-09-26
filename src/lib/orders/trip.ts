@@ -36,7 +36,14 @@ async function explain(locale: Locale, code: string | undefined, message: string
 
   if (code === '42501') return t.trip.notYours;
   if (code === '55000' && message?.includes('по порядку')) return t.trip.outOfOrder;
-  if (code === '55000') return message ?? t.trip.failed;
+  /*
+   * Текст ошибки базы — по-русски, для разработчика: на экран финскому
+   * пользователю он не идёт (прогон 26.09.2026). Причина остаётся в журнале.
+   */
+  if (code === '55000') {
+    console.warn('[orders] отказ 55000:', message);
+    return t.trip.failed;
+  }
 
   return t.trip.failed;
 }

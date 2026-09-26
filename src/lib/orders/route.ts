@@ -21,7 +21,9 @@ import type { OrderStop } from '@/types/db';
  * Если работы нет вовсе — а такой заказ опубликовать нельзя, но прочитать
  * можно, — берётся отцепка: она хотя бы существует.
  */
-export function routeEnds(stops: OrderStop[]): { from: OrderStop | null; to: OrderStop | null } {
+export function routeEnds<S extends Pick<OrderStop, 'id' | 'role' | 'sequence'>>(
+  stops: S[],
+): { from: S | null; to: S | null } {
   const ordered = [...stops].sort((a, b) => a.sequence - b.sequence);
 
   const from = ordered.find((s) => s.role === 'PICKUP') ?? ordered[0] ?? null;
@@ -30,6 +32,20 @@ export function routeEnds(stops: OrderStop[]): { from: OrderStop | null; to: Ord
   const to = work.at(-1) ?? ordered.findLast((s) => s.role === 'TRAILER_RETURN') ?? null;
 
   return { from, to: to && to.id === from?.id ? null : to };
+}
+
+/*
+ * Та же строка «откуда → куда» для всех экранов. Стол и выполненные
+ * прежде писали забор → последняя точка, и кругорейс выглядел как
+ * «Hanko → Hanko», а у заказчика в списке — «Hanko → Vantaa»
+ * (прогон 26.09.2026).
+ */
+export function routeLabel<S extends Pick<OrderStop, 'id' | 'role' | 'sequence' | 'city'>>(
+  stops: S[],
+): string | null {
+  const { from, to } = routeEnds(stops);
+  if (!from) return null;
+  return to ? `${from.city} → ${to.city}` : from.city;
 }
 
 /** Город точки: название площадки его не заменяет — города короче и их сравнивают. */

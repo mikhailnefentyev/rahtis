@@ -160,6 +160,11 @@ export const da = {
     DELIVERY: 'Aflæsning',
     CONTINUATION: 'Viderekørsel',
   },
+  haulStops: {
+    CONTAINER: { pickup: 'Afhentning af container', return: 'Aflevering af container' },
+    CARGO: { pickup: 'Afhentning af gods', return: 'Levering' },
+  },
+
   orderStatus: {
     DRAFT: 'Kladde',
     OPEN: 'Åben',

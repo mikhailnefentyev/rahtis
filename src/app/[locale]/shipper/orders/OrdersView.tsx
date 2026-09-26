@@ -125,6 +125,7 @@ export function OrdersView({
   const [composing, setComposing] = useState(false);
   const [OrderForm, setOrderForm] = useState<React.ComponentType<{
     onPublished: () => void;
+    onNew?: () => void;
     template?: { order: ShipperOrder; stops: OrderStop[] };
     knownVehicles: KnownVehicle[];
   }> | null>(null);
@@ -154,6 +155,9 @@ export function OrdersView({
    * Форма публикации большая и нужна не при каждом заходе, поэтому её код
    * подгружается при первом нажатии, а не вместе со списком заказов.
    */
+  /* Ключ формы: смена даёт чистую форму для следующего заказа. */
+  const [formKey, setFormKey] = useState(0);
+
   async function startComposing(from?: { order: ShipperOrder; stops: OrderStop[] }) {
     if (!OrderForm) {
       const mod = await import('./OrderForm');
@@ -283,7 +287,12 @@ export function OrdersView({
       {composing && OrderForm && (
         <div className="mb-6">
           <OrderForm
+            key={formKey}
             template={template ?? undefined}
+            onNew={() => {
+              setTemplate(null);
+              setFormKey((k) => k + 1);
+            }}
             knownVehicles={knownVehicles}
             onPublished={() => {
               setComposing(false);

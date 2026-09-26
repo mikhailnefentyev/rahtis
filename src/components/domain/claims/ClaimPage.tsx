@@ -12,6 +12,18 @@ import { getI18n, type Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import type { ClaimDetail, PartyRole } from '@/types/db';
 
+/*
+ * Где случилось: название места, иначе компания, иначе город. Прежде
+ * бралось одно название места, и у выгрузки, где заполнена только
+ * компания, претензия показывала «Koko kuljetus» — хотя точка выбрана.
+ */
+function claimStopLabel(
+  stop: { place_name?: string | null; company_name?: string | null; city?: string | null } | undefined,
+): string | null {
+  if (!stop) return null;
+  return stop.place_name ?? stop.company_name ?? stop.city ?? null;
+}
+
 /**
  * Карточка claim: суть спора, рейс, доказательства, лента.
  *
@@ -82,7 +94,7 @@ export async function ClaimPage({
               />
               <Kv
                 k={t.claims.stop}
-                v={stops.find((s) => s.id === claim.stop_id)?.place_name ?? t.claims.stopWhole}
+                v={claimStopLabel(stops.find((s) => s.id === claim.stop_id)) ?? t.claims.stopWhole}
               />
             </div>
             {claim.resolution && (

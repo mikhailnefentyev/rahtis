@@ -3,6 +3,7 @@
 import { useActionState, useState } from 'react';
 import { OrderRouteMap } from '@/components/domain/RouteMap';
 import { RouteStops } from '@/components/domain/RouteStops';
+import { routeLabel } from '@/lib/orders/route';
 import { HaulBadge } from '@/components/domain/HaulBadge';
 import { Badge, Button, Card, CardBody, CardDivider, EmptyState, Mono, Plate, Select } from '@/components/ui';
 import { MATCHING } from '@/lib/config';
@@ -12,6 +13,9 @@ import type { DeskOrder, DeskStop, Vehicle } from '@/types/db';
 
 const initialTake: MatchingState = { error: null };
 
+/** Рейс или отклик, которым машина уже занята в какой-то день. */
+export type DeskBusy = { vehicleId: string; ref: string; date: string; time: string | null };
+
 /**
  * Кнопка «Беру».
  *
@@ -19,9 +23,31 @@ const initialTake: MatchingState = { error: null };
  * отклик подаётся конкретной. С одной машиной выбирать нечего — селект
  * не показывается.
  */
-function TakeButton({ orderId, vehicles }: { orderId: string; vehicles: Vehicle[] }) {
-  const { t, locale } = useI18n();
+function TakeButton({
+  orderId,
+  vehicles,
+  pickupDate,
+  busy,
+}: {
+  orderId: string;
+  vehicles: Vehicle[];
+  pickupDate: string | null;
+  busy: DeskBusy[];
+}) {
+  const { t, m, f, locale } = useI18n();
   const [state, formAction, pending] = useActionState(takeOrderAction, initialTake);
+  const [vehicleId, setVehicleId] = useState(vehicles[0]?.id ?? '');
+
+  /*
+   * Предупреждение, а не запрет (решение пользователя от 26.09.2026): два
+   * рейса в один день бывают законно — утренний короткий и дневной.
+   * Перевозчик должен увидеть пересечение до отклика, а не узнать о нём,
+   * когда оба заказчика ждут одну машину.
+   */
+  const clash = pickupDate
+    ? busy.find((b) => b.vehicleId === vehicleId && b.date === pickupDate)
+    : undefined;
+  const clashPlate = vehicles.find((v) => v.id === vehicleId)?.plate ?? '';
 
   return (
     <form action={formAction} className="flex flex-col items-end gap-2">
@@ -33,7 +59,13 @@ function TakeButton({ orderId, vehicles }: { orderId: string; vehicles: Vehicle[
       ) : (
         <label className="flex flex-col items-end gap-1">
           <span className="label-micro">{t.matching.chooseVehicle}</span>
-          <Select name="vehicle_id" required className="w-44">
+          <Select
+            name="vehicle_id"
+            required
+            className="w-44"
+            value={vehicleId}
+            onChange={(e) => setVehicleId(e.target.value)}
+          >
             {vehicles.map((vehicle) => (
               <option key={vehicle.id} value={vehicle.id}>
                 {vehicle.plate}
@@ -41,6 +73,16 @@ function TakeButton({ orderId, vehicles }: { orderId: string; vehicles: Vehicle[
             ))}
           </Select>
         </label>
+      )}
+
+      {clash && (
+        <p className="max-w-60 text-right text-xs text-warn">
+          {m('matching.vehicleBusy', {
+            plate: clashPlate,
+            ref: clash.ref,
+            when: clash.time ? `${f.date(`${clash.date}T12:00:00Z`)} ${clash.time.slice(0, 5)}` : f.date(`${clash.date}T12:00:00Z`),
+          })}
+        </p>
       )}
 
       <Button type="submit" variant="primary" size="sm" disabled={pending}>
@@ -63,7 +105,15 @@ function TakeButton({ orderId, vehicles }: { orderId: string; vehicles: Vehicle[
  * desk_orders. Об этом сказано прямо в карточке: иначе перевозчик решит,
  * что заказчик не заполнил контакт.
  */
-export function DeskList({ orders, vehicles }: { orders: DeskOrder[]; vehicles: Vehicle[] }) {
+export function DeskList({
+  orders,
+  vehicles,
+  busy = [],
+}: {
+  orders: DeskOrder[];
+  vehicles: Vehicle[];
+  busy?: DeskBusy[];
+}) {
   const { t, m, f } = useI18n();
   const [expanded, setExpanded] = useState<string | null>(null);
 
@@ -106,7 +156,7 @@ export function DeskList({ orders, vehicles }: { orders: DeskOrder[]; vehicles: 
                   </div>
 
                   <p className="mt-2 font-mono text-sm tracking-tight text-accent">
-                    {order.pickup_city} → {order.finish_city ?? '—'}
+                    {routeLabel((order.stops ?? []) as DeskStop[]) ?? `${order.pickup_city} → ${order.finish_city ?? '—'}`}
                   </p>
 
                   <p className="mt-1.5 text-[13px] text-ink-muted">
@@ -157,7 +207,12 @@ export function DeskList({ orders, vehicles }: { orders: DeskOrder[]; vehicles: 
                       })}
                     </Badge>
                   ) : (
-                    <TakeButton orderId={order.id} vehicles={vehicles} />
+                    <TakeButton
+                      orderId={order.id}
+                      vehicles={vehicles}
+                      pickupDate={order.pickup_date}
+                      busy={busy.filter((b) => b.ref !== order.ref)}
+                    />
                   )}
 
                   {order.offers_count > 0 && !order.taken_by_me && (
