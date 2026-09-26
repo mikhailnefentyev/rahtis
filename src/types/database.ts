@@ -4141,13 +4141,6 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      my_pending_legal: {
-        Args: never
-        Returns: {
-          kind: Database["public"]["Enums"]["legal_kind"]
-          version: number
-        }[]
-      }
       my_assignments: {
         Args: never
         Returns: {
@@ -4192,6 +4185,13 @@ export type Database = {
           status: Database["public"]["Enums"]["claim_status"]
           updated_at: string
           vehicle_plate: string
+        }[]
+      }
+      my_pending_legal: {
+        Args: never
+        Returns: {
+          kind: Database["public"]["Enums"]["legal_kind"]
+          version: number
         }[]
       }
       new_legal_version: {
