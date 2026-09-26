@@ -247,6 +247,7 @@ function haulKind(value: string): HaulKind {
  * не подходит заказу. Коды те же, что у отклика со стола.
  */
 function explainPublish(t: Dictionary, code: string | undefined, message: string | undefined): string {
+  if (code === '55009') return t.legal.reacceptNeeded;
   if (code === '55000' && message?.includes('реквизиты')) return t.orderForm.needActive;
   if (code === '42501') return t.direct.notKnown;
   if (code === '55004') return t.direct.unavailable;

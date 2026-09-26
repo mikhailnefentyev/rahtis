@@ -24,6 +24,8 @@ async function explain(locale: Locale, code: string | undefined, message: string
   const t = await getDictionary(locale);
 
   if (code === '23505') return t.matching.alreadyTaken;
+  /* 55009 — есть непринятая новая редакция условий (миграция legal_reaccept). */
+  if (code === '55009') return t.legal.reacceptNeeded;
   /*
    * 55001 — своя ошибка take_order: груза больше, чем берёт тягач с
    * таким числом осей. Отдельный код, а не разбор текста: сообщение из
@@ -146,15 +148,17 @@ export async function directAssignAction(
 
   if (error) {
     const message =
-      error.code === '42501'
-        ? t.direct.notKnown
-        : error.code === '55004'
-          ? t.direct.unavailable
-          : error.code === '55001' || error.code === '55002' || error.code === '55003'
-            ? t.direct.notFit
-            : error.code === '55000'
-              ? t.direct.hasOffers
-              : t.matching.failed;
+      error.code === '55009'
+        ? t.legal.reacceptNeeded
+        : error.code === '42501'
+          ? t.direct.notKnown
+          : error.code === '55004'
+            ? t.direct.unavailable
+            : error.code === '55001' || error.code === '55002' || error.code === '55003'
+              ? t.direct.notFit
+              : error.code === '55000'
+                ? t.direct.hasOffers
+                : t.matching.failed;
     return { error: message, done: false };
   }
 

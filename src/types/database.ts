@@ -4141,6 +4141,13 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      my_pending_legal: {
+        Args: never
+        Returns: {
+          kind: Database["public"]["Enums"]["legal_kind"]
+          version: number
+        }[]
+      }
       my_assignments: {
         Args: never
         Returns: {

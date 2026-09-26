@@ -1188,6 +1188,12 @@ export const fi = {
     ownDocuments: 'Omat asiakirjat',
     acceptRequired: 'Ehdot on hyväksyttävä ennen käyttöönottoa.',
 
+    /* Uusi versio voimassa olevalle yritykselle: ennen uusia kuljetuksia. */
+    reacceptTitle: 'Palvelun ehdot ovat muuttuneet',
+    reacceptText: 'Hyväksy uudet versiot ennen uusia kuljetuksia. Käynnissä olevat kuljetukset jatkuvat normaalisti:',
+    reacceptButton: 'Hyväksyn uudet ehdot',
+    reacceptNeeded: 'Palvelun ehdot ovat muuttuneet. Hyväksy uudet versiot sivun yläreunasta, niin voit jatkaa.',
+
     /* Ylläpito */
     manage: 'Asiakirjat ja versiot',
     newVersion: 'Uusi versio',

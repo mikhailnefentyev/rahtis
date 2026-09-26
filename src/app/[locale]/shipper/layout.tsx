@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import { CabinetHeader } from '@/components/layout/CabinetHeader';
+import { LegalReaccept } from '@/components/layout/LegalReaccept';
 import { requireRole } from '@/lib/auth/guard';
 import { isLocale } from '@/lib/i18n';
 
@@ -23,6 +24,7 @@ export default async function ShipperLayout({
   return (
     <>
       <CabinetHeader locale={locale} role="SHIPPER" company={viewer.company} />
+      <LegalReaccept locale={locale} companyStatus={viewer.company?.status} />
       {children}
     </>
   );

@@ -1101,6 +1101,11 @@ export const en = {
     ownDocuments: 'Your documents',
     acceptRequired: 'The terms must be accepted before going live.',
 
+    reacceptTitle: 'The terms of the service have changed',
+    reacceptText: 'Accept the new versions before new transports. Transports in progress continue as normal:',
+    reacceptButton: 'I accept the new terms',
+    reacceptNeeded: 'The terms of the service have changed. Accept the new versions at the top of the page to continue.',
+
     manage: 'Documents and versions',
     newVersion: 'New version',
     activate: 'Publish',
