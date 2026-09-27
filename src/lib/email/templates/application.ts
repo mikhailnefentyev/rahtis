@@ -90,6 +90,67 @@ export function applicationReceivedEmail(input: {
 }
 
 /**
+ * Заявителю: заявка отклонена.
+ *
+ * Текст — оператора, как он его написал: форма отказа обещает «компания
+ * получит это как есть». Поэтому ни приветствия, ни подписи от шаблона —
+ * оператор пишет письмо целиком, двойное «Hei,» хуже, чем никакого.
+ * Реквизиты ниже — чтобы было понятно, о какой заявке речь.
+ */
+export function applicationRejectedEmail(input: {
+  to: string;
+  companyName: string;
+  companyId: string;
+  businessId: string;
+  reason: string;
+  operatorEmail: string;
+  locale: EmailLocale;
+}): EmailMessage {
+  const t = emailText(input.locale);
+  const heading = t.rejected.heading;
+
+  const blocks: EmailBlock[] = [
+    ...input.reason
+      .split(/\r?\n\s*\r?\n/)
+      .map((part) => part.trim())
+      .filter(Boolean)
+      .map((value): EmailBlock => ({ kind: 'text', value })),
+    {
+      kind: 'facts',
+      rows: [
+        [t.application.fieldCompany, input.companyName],
+        [t.application.fieldBusinessId, input.businessId],
+      ],
+    },
+    { kind: 'note', value: t.rejected.note(input.operatorEmail) },
+  ];
+
+  return {
+    template: 'application.rejected',
+    to: input.to,
+    toName: input.companyName,
+    replyTo: input.operatorEmail,
+    subject: t.rejected.subject(input.companyName),
+    text: renderText({
+      heading,
+      blocks,
+      operatorEmail: input.operatorEmail,
+      incoming: true,
+      neverAsk: t.neverAsk,
+    }),
+    html: renderEmail({
+      heading,
+      preheader: t.rejected.preheader,
+      blocks,
+      operatorEmail: input.operatorEmail,
+      tagline: t.brandTagline,
+      neverAsk: t.neverAsk,
+    }),
+    companyId: input.companyId,
+  };
+}
+
+/**
  * Оператору: пришла новая заявка.
  *
  * Письмо приходит НАМ, поэтому подписи «Rahtis Team» под ним нет —

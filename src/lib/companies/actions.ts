@@ -10,6 +10,7 @@ import { emailLocaleOf, type EmailLocale } from '@/lib/email/text';
 import {
   applicationFiledEmail,
   applicationReceivedEmail,
+  applicationRejectedEmail,
 } from '@/lib/email/templates/application';
 import { inviteEmail } from '@/lib/email/templates/invite';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -293,12 +294,41 @@ export async function rejectCompanyAction(formData: FormData): Promise<void> {
   const locale = toLocale(formData.get('locale'));
   await requireAdmin();
 
+  const companyId = String(formData.get('company_id') ?? '');
+  const reason = String(formData.get('reason') ?? '').trim();
+
   const supabase = await createClient();
-  await supabase.rpc('moderate_company', {
-    p_company_id: String(formData.get('company_id') ?? ''),
+  const { error } = await supabase.rpc('moderate_company', {
+    p_company_id: companyId,
     p_decision: 'REJECTED',
-    p_note: String(formData.get('reason') ?? '').trim() || undefined,
+    p_note: reason || undefined,
   });
+
+  /*
+   * Кабинета у заявителя нет, пока заявку не одобрили, — узнать об отказе
+   * он может только из письма. Без него форма обещала бы «компания
+   * получит причину», а причина оставалась бы в базе.
+   */
+  if (!error && reason) {
+    const { data: company } = await supabase
+      .from('companies')
+      .select('name, business_id, contact_email, language')
+      .eq('id', companyId)
+      .single();
+    if (company?.contact_email) {
+      await sendEmail(
+        applicationRejectedEmail({
+          to: company.contact_email,
+          companyName: company.name,
+          companyId,
+          businessId: company.business_id,
+          reason,
+          operatorEmail: emailReplyTo(),
+          locale: emailLocaleOf(company.language),
+        }),
+      );
+    }
+  }
 
   revalidatePath(`/${locale}/admin`);
 }

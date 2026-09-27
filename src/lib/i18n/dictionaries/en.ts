@@ -1162,7 +1162,7 @@ export const en = {
     reasonLabel: 'Reason for rejection',
     reasonPlaceholder: 'The Y-tunnus is not in the PRH register',
     vehicleReasonPlaceholder: 'The insurance does not cover international transport',
-    reasonRequired: 'Write a reason. The company sees it as written',
+    reasonRequired: 'Write a reason. It is emailed to the company as written',
     inviteSent: 'Invite sent',
     inviteFailed: 'The company was approved, but the message did not go out',
     resendInvite: 'Send the invite again',

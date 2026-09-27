@@ -69,6 +69,14 @@ type Texts = {
     fieldEmail: string;
   };
 
+  /* Отказ по заявке: текст пишет оператор, письмо только обрамляет его. */
+  rejected: {
+    heading: string;
+    subject: (company: string) => string;
+    preheader: string;
+    note: (operator: string) => string;
+  };
+
   /*
    * Рассылка о новом заказе. Единственное письмо, которое уходит не
    * адресату события, а всем, кому работа открыта, — поэтому оно короче
@@ -190,6 +198,14 @@ const fi: Texts = {
     fieldEmail: 'Sähköposti',
   },
 
+  rejected: {
+    heading: 'Päätös hakemuksesta',
+    subject: (company) => `RAHTIS · päätös hakemuksesta — ${company}`,
+    preheader: 'Hakemuksenne on käsitelty.',
+    note: (operator) =>
+      `Jos haluat kysyä päätöksestä, vastaa tähän viestiin tai kirjoita osoitteeseen ${operator}.`,
+  },
+
   dispatch: {
     subject: (ref, from, to) => `RAHTIS · uusi kuljetus ${ref} · ${from} → ${to}`,
     heading: (from, to) => `Uusi kuljetus: ${from} → ${to}`,
@@ -304,6 +320,14 @@ const en: Texts = {
     fieldBusinessId: 'Y-tunnus',
     fieldRole: 'Role',
     fieldEmail: 'Email',
+  },
+
+  rejected: {
+    heading: 'Decision on your application',
+    subject: (company) => `RAHTIS · decision on your application — ${company}`,
+    preheader: 'Your application has been processed.',
+    note: (operator) =>
+      `If you have questions about the decision, reply to this message or write to ${operator}.`,
   },
 
   dispatch: {

@@ -1255,7 +1255,7 @@ export const fi = {
     reasonLabel: 'Hylkäyksen syy',
     reasonPlaceholder: 'Y-tunnusta ei löydy PRH:n rekisteristä',
     vehicleReasonPlaceholder: 'Vakuutus ei kata kansainvälisiä kuljetuksia',
-    reasonRequired: 'Kirjoita syy. Yritys näkee sen sellaisenaan',
+    reasonRequired: 'Kirjoita syy. Teksti lähtee yritykselle sähköpostilla sellaisenaan',
     inviteSent: 'Kutsu lähetetty',
     inviteFailed: 'Yritys hyväksyttiin, mutta viesti ei lähtenyt',
     resendInvite: 'Lähetä kutsu uudelleen',

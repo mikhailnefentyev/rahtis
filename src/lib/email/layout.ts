@@ -77,7 +77,8 @@ function escape(value: string): string {
 function block(item: EmailBlock): string {
   switch (item.kind) {
     case 'text':
-      return `<p style="margin:0 0 14px;font:400 15px/1.55 ${FONT};color:${INK_MUTED};">${escape(item.value)}</p>`;
+      /* Переносы строк сохраняются: текст оператора (отказ) уходит как написан. */
+      return `<p style="margin:0 0 14px;font:400 15px/1.55 ${FONT};color:${INK_MUTED};">${escape(item.value).replace(/\r?\n/g, '<br>')}</p>`;
 
     /* Мелкая строка под основным текстом: предупреждение, срок, оговорка. */
     case 'note':
