@@ -28,7 +28,9 @@ import { CheatSheet } from './CheatSheet';
 import { Quiz } from './Quiz';
 import { ShiftPlanner } from './ShiftPlanner';
 import { TachoDisplay } from './TachoDisplay';
-import { Segmented } from './ui';
+import { cn } from '@/lib/cn';
+import { MODULE_ICONS } from './icons';
+import { Segmented, UnderlineTabs } from './ui';
 
 export type TrainingTab = 'train' | 'practice' | 'rules';
 
@@ -147,22 +149,62 @@ export function TrainingApp({
 
   return (
     <main className="flex flex-col gap-4">
-      <header className="flex flex-col gap-3">
+      <header className="flex items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold tracking-tight">{texts.title}</h1>
-        <Segmented
-          label={texts.modeLabel}
-          size="md"
-          items={[
-            { key: 'pro', label: texts.modePro },
-            { key: 'new', label: texts.modeNew },
-          ]}
-          active={mode}
-          onChange={(next) => {
-            setMode(next);
-            writePrefs({ mode: next });
-          }}
-        />
+        {/* Уровень — настройка, а не навигация: компактно в шапке, а не полосой во всю ширину. */}
+        <div className="w-52 shrink-0">
+          <Segmented
+            label={texts.modeLabel}
+            size="md"
+            items={[
+              { key: 'pro', label: texts.modePro },
+              { key: 'new', label: texts.modeNew },
+            ]}
+            active={mode}
+            onChange={(next) => {
+              setMode(next);
+              writePrefs({ mode: next });
+            }}
+          />
+        </div>
       </header>
+
+      {TRAINING_MODULES.length > 1 && (
+        <div className="grid grid-cols-2 gap-2.5" role="group" aria-label={texts.moduleLabel}>
+          {TRAINING_MODULES.map((item) => {
+            const on = item.id === topic;
+            const Icon = MODULE_ICONS[item.id];
+            const itemKeys = cards.filter((card) => card.module === item.id).map((card) => card.key);
+            const itemDue = dueCount(itemKeys, progress, now);
+            return (
+              <button
+                key={item.id}
+                type="button"
+                aria-pressed={on}
+                onClick={() => setTopic(item.id)}
+                className={cn(
+                  'flex min-h-24 flex-col items-start justify-between gap-2 rounded-card border-[1.5px] p-3 text-left',
+                  on ? 'border-accent bg-accent-wash' : 'border-line bg-surface',
+                )}
+              >
+                <span
+                  className={cn(
+                    'flex size-10 items-center justify-center rounded-control',
+                    on ? 'bg-accent text-accent-ink' : 'bg-raised text-ink-muted',
+                  )}
+                >
+                  <Icon />
+                </span>
+                <span className="text-[16px] leading-tight font-semibold">{texts.modules[item.id].name}</span>
+                <span className="flex w-full items-center justify-between font-mono text-[13px] text-ink-muted">
+                  <span>{freshness(itemKeys, progress, now)}%</span>
+                  {itemDue > 0 && <span className="rounded-pill bg-accent px-1.5 text-accent-ink">{itemDue}</span>}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       <TachoDisplay
         module={texts.modules[topic].lcd}
@@ -171,51 +213,44 @@ export function TrainingApp({
         due={dueCount(keys, progress, now)}
       />
 
-      {TRAINING_MODULES.length > 1 && (
-        <Segmented
-          label={texts.moduleLabel}
-          items={TRAINING_MODULES.map((item) => ({ key: item.id, label: texts.modules[item.id].name }))}
-          active={topic}
-          onChange={setTopic}
+      {/* Вкладки и их содержимое — одна карточка: видно, чему принадлежит подчёркивание. */}
+      <div className="overflow-hidden rounded-card border border-line bg-surface">
+        <UnderlineTabs
+          label={texts.title}
+          items={[
+            { key: 'train' as const, label: texts.tabTrain },
+            ...(hasPractice ? [{ key: 'practice' as const, label: texts.tabPractice }] : []),
+            { key: 'rules' as const, label: texts.tabRules },
+          ]}
+          active={activeTab}
+          onChange={setTab}
         />
-      )}
 
-      <Segmented
-        label={texts.title}
-        size="md"
-        items={[
-          { key: 'train' as const, label: texts.tabTrain },
-          ...(hasPractice ? [{ key: 'practice' as const, label: texts.tabPractice }] : []),
-          { key: 'rules' as const, label: texts.tabRules },
-        ]}
-        active={activeTab}
-        onChange={setTab}
-      />
-
-      <section className="rounded-card border border-line bg-surface p-4">
-        {activeTab === 'train' &&
-          (moduleCards.length === 0 ? (
-            <p className="py-6 text-center text-[16px] text-ink-muted">{texts.empty}</p>
-          ) : (
-            <Quiz
-              key={topic}
-              moduleIntro={texts.modules[topic].intro}
-              due={dueCount(keys, progress, now)}
-              fresh={newCount(keys, progress)}
-              mode={mode}
-              buildRound={round}
-              onAnswer={answer}
-              onReset={() => void reset()}
-              onFinish={() => setNow(Date.now())}
-              freshness={freshness(keys, progress, now)}
-              hasPractice={hasPractice}
-              onPractice={() => setTab('practice')}
-            />
-          ))}
-        {activeTab === 'practice' && spec.practice === 'shift' && <ShiftPlanner mode={mode} />}
-        {activeTab === 'practice' && spec.practice === 'cargo' && <CargoGame mode={mode} />}
-        {activeTab === 'rules' && <CheatSheet module={topic} />}
-      </section>
+        <section className="p-4">
+          {activeTab === 'train' &&
+            (moduleCards.length === 0 ? (
+              <p className="py-6 text-center text-[16px] text-ink-muted">{texts.empty}</p>
+            ) : (
+              <Quiz
+                key={topic}
+                moduleIntro={texts.modules[topic].intro}
+                due={dueCount(keys, progress, now)}
+                fresh={newCount(keys, progress)}
+                mode={mode}
+                buildRound={round}
+                onAnswer={answer}
+                onReset={() => void reset()}
+                onFinish={() => setNow(Date.now())}
+                freshness={freshness(keys, progress, now)}
+                hasPractice={hasPractice}
+                onPractice={() => setTab('practice')}
+              />
+            ))}
+          {activeTab === 'practice' && spec.practice === 'shift' && <ShiftPlanner mode={mode} />}
+          {activeTab === 'practice' && spec.practice === 'cargo' && <CargoGame mode={mode} />}
+          {activeTab === 'rules' && <CheatSheet module={topic} />}
+        </section>
+      </div>
 
       <footer className="flex flex-col gap-1.5 px-1 text-[13px] text-ink-muted">
         {driverId ? (
