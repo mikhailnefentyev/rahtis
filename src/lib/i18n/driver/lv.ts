@@ -1,4 +1,5 @@
 import type { DriverPack } from '../driver';
+import { lv as trainingLv } from './training/lv';
 
 /** Латышский: приложение водителя. Платформа остаётся на fi/en. */
 export const lv = {
@@ -122,6 +123,8 @@ export const lv = {
       'Šis pārlūks neatbalsta paziņojumus. iPhone vispirms instalē lietotni sākuma ekrānā un atver to no turienes.',
     offline: 'Nav savienojuma. Pārbaudi tīklu un mēģini vēlreiz.',
   },
+  training: trainingLv.training,
+  certificates: trainingLv.certificates,
   places: {
     kind: {
       FUEL: 'Degviela',
@@ -183,6 +186,7 @@ export const lv = {
   payDisclaimer:
     'Aprēķins ir orientējošs. Galīgo samaksu nosaka darba devējs un darba vai koplīgums.',
   msg: {
+    ...trainingLv.msg,
     'driverApp.earnTrips': '{count, plural, zero {# reisu} one {# reiss} other {# reisi}}',
     'driverApp.earnHours': '{hours} h',
     'places.count': '{count, plural, zero {# vietu} one {# vieta} other {# vietas}}',

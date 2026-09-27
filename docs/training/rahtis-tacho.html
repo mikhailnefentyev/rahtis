@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RAHTIS · Тренажёр водителя</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0E1628; --surface:#16233F; --text:#E8EEF6; --muted:#93A3BA; --line:#2A3D62;
+  --blue:#18C8F0; --blue-ink:#06202B; --amber:#F2B632; --ok:#3CC58A; --bad:#F06A5E;
+  --lcd-bg:#061A24; --lcd-fg:#7FE3FA;
+  color-scheme:dark;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Barlow",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:17px;line-height:1.45}
+.wrap{max-width:640px;margin:0 auto;padding:16px 16px 40px}
+header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.brand{color:var(--text);font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:28px;letter-spacing:.5px;line-height:1}
+.brand small{display:block;font-family:"Barlow",sans-serif;font-weight:500;font-size:14px;color:var(--muted);letter-spacing:0;margin-top:3px}
+.mode{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+.mode button{border:0;background:transparent;color:var(--muted);font:600 14px "Barlow",sans-serif;padding:8px 10px;cursor:pointer}
+.mode button[aria-pressed="true"]{background:var(--blue);color:var(--blue-ink)}
+
+/* The tachograph display: the one bold element */
+.tacho{background:#1B2B4B;border-radius:10px;padding:10px;box-shadow:inset 0 -3px 0 #15181A;margin-bottom:18px}
+.tacho-face{display:flex;gap:10px;align-items:stretch}
+.lcd{flex:1;background:var(--lcd-bg);color:var(--lcd-fg);font-family:"Share Tech Mono",ui-monospace,Consolas,monospace;border-radius:4px;padding:10px 12px;font-size:18px;line-height:1.35;text-shadow:0 0 6px rgba(127,227,250,.35);min-width:0}
+.lcd .row{display:flex;justify-content:space-between;gap:8px;white-space:nowrap;overflow:hidden}
+.lcd .big{font-size:30px}
+.slots{display:flex;flex-direction:column;gap:6px;justify-content:center}
+.slot{width:54px;height:10px;background:#15181A;border-radius:2px}
+.keys{display:flex;gap:6px;margin-top:6px}
+.keys span{width:28px;height:18px;background:#3A4146;border-radius:3px}
+.bar{height:6px;background:rgba(127,227,250,.18);border-radius:3px;margin-top:6px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--lcd-fg)}
+
+nav.tabs{display:flex;gap:6px;margin-bottom:16px}
+nav.tabs button{flex:1;border:1px solid var(--line);background:var(--surface);color:var(--text);font:600 15px "Barlow",sans-serif;padding:10px 6px;border-radius:8px;cursor:pointer}
+nav.tabs button[aria-selected="true"]{border-color:var(--blue);box-shadow:inset 0 -3px 0 var(--blue)}
+button:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px}
+h2{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-size:24px;margin:0 0 6px;line-height:1.15}
+.muted{color:var(--muted)}
+.progress{font-size:14px;color:var(--muted);margin-bottom:10px}
+.q{font-size:19px;font-weight:600;margin:0 0 14px}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{text-align:left;border:1.5px solid var(--line);background:transparent;color:var(--text);font:500 16px "Barlow",sans-serif;padding:12px 14px;border-radius:8px;cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--blue)}
+.opt.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+.opt.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,transparent)}
+.opt:disabled{cursor:default}
+.explain{margin-top:14px;padding:12px 14px;border-left:4px solid var(--blue);background:color-mix(in srgb,var(--blue) 8%,transparent);border-radius:0 8px 8px 0}
+.explain .ref{font-size:13px;color:var(--muted);margin-top:6px}
+.hint{margin:0 0 14px;padding:10px 12px;border:1px dashed var(--amber);border-radius:8px;font-size:15px}
+.btn{border:0;background:var(--blue);color:var(--blue-ink);font:700 16px "Barlow",sans-serif;padding:12px 18px;border-radius:8px;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--blue);border:1.5px solid var(--blue)}
+.btn.small{font-size:14px;padding:8px 12px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+
+/* planner */
+.scen{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 12px}
+.scen button{border:1px solid var(--line);background:transparent;color:var(--text);font:600 14px "Barlow",sans-serif;padding:7px 10px;border-radius:20px;cursor:pointer}
+.scen button[aria-pressed="true"]{background:var(--text);color:var(--surface);border-color:var(--text)}
+.task{font-size:16px;margin-bottom:12px}
+.timeline{display:flex;height:34px;border-radius:6px;overflow:hidden;background:repeating-linear-gradient(90deg,transparent 0 calc(100%/13 - 1px),var(--line) calc(100%/13 - 1px) calc(100%/13));border:1px solid var(--line)}
+.seg{height:100%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;overflow:hidden;white-space:nowrap;border-right:1px solid rgba(255,255,255,.5)}
+.seg.drive{background:var(--blue);color:var(--blue-ink)} .seg.break{background:var(--ok)} .seg.work{background:var(--amber);color:#1F2933}
+.seg.over{background:var(--bad)}
+.scale{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:4px}
+.totals{display:flex;gap:14px;flex-wrap:wrap;font-size:15px;margin:10px 0 14px}
+.totals b{font-variant-numeric:tabular-nums}
+.add{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.add button{border:0;border-radius:8px;padding:10px 4px;font:600 14px "Barlow",sans-serif;cursor:pointer;color:#fff}
+.add .d{background:var(--blue);color:var(--blue-ink)} .add .b{background:var(--ok);color:#06202B} .add .w{background:var(--amber);color:#1F2933}
+.result{margin-top:14px}
+.result p{margin:6px 0;padding:10px 12px;border-radius:8px}
+.result .e{background:color-mix(in srgb,var(--bad) 12%,transparent);border-left:4px solid var(--bad)}
+.result .s{background:color-mix(in srgb,var(--ok) 14%,transparent);border-left:4px solid var(--ok)}
+.result .n{background:color-mix(in srgb,var(--amber) 16%,transparent);border-left:4px solid var(--amber)}
+
+.modules{margin:0 0 12px}
+.opt-group{margin:0 0 14px}
+.opt-group .lbl{font-weight:600;font-size:15px;margin-bottom:6px}
+.seg2{display:flex;gap:6px;flex-wrap:wrap}
+.seg2 button{flex:1;min-width:130px;border:1.5px solid var(--line);background:transparent;color:var(--text);font:500 15px "Barlow",sans-serif;padding:10px;border-radius:8px;cursor:pointer;text-align:left}
+.seg2 button[aria-pressed="true"]{border-color:var(--blue);background:color-mix(in srgb,var(--blue) 12%,transparent)}
+.stepper{display:flex;align-items:center;gap:12px}
+.stepper button{width:44px;height:44px;border-radius:8px;border:1.5px solid var(--line);background:transparent;color:var(--text);font:700 22px "Barlow",sans-serif;cursor:pointer}
+.stepper b{font-size:24px;min-width:2ch;text-align:center;font-variant-numeric:tabular-nums}
+table.calc{width:100%;border-collapse:collapse;font-size:15px;margin-top:8px}
+table.calc td{padding:6px 4px;border-bottom:1px solid var(--line)}
+table.calc td:last-child{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.small{font-size:13px;color:var(--muted)}
+.rules dl{margin:0}
+.rules dt{font-weight:700;margin-top:12px}
+.rules dd{margin:2px 0 0;color:var(--muted)}
+footer{font-size:13px;color:var(--muted);margin-top:22px}
+@media (prefers-reduced-motion:no-preference){ .bar i{transition:width .6s ease} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">RAHTIS<small>Тренажёр водителя</small></div>
+    <div class="mode" role="group" aria-label="Режим">
+      <button id="m-pro" aria-pressed="true">Опытный</button>
+      <button id="m-new" aria-pressed="false">Новичок</button>
+    </div>
+  </header>
+
+  <section class="tacho" aria-label="Состояние знаний">
+    <div class="tacho-face">
+      <div class="lcd">
+        <div class="row"><span id="lcd-mod">ТАХОГРАФ</span><span id="lcd-due">К ПОВТОРУ 0</span></div>
+        <div class="row big"><span id="lcd-fresh">0%</span><span id="lcd-state">НОВ.</span></div>
+        <div class="bar"><i id="lcd-bar" style="width:0%"></i></div>
+      </div>
+      <div class="slots" aria-hidden="true"><div class="slot"></div><div class="slot"></div></div>
+    </div>
+    <div class="keys" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+  </section>
+
+  <div class="scen modules" role="group" aria-label="Тема">
+    <button data-mod="tacho" aria-pressed="true">Тахограф</button>
+    <button data-mod="cargo" aria-pressed="false">Крепление груза</button>
+  </div>
+  <nav class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-tab="train">Тренировка</button>
+    <button role="tab" aria-selected="false" data-tab="plan">Практика</button>
+    <button role="tab" aria-selected="false" data-tab="rules">Правила</button>
+  </nav>
+
+  <main id="view" class="panel"></main>
+
+  <footer>Прототип. Тахограф: Регламенты (ЕС) 561/2006 в ред. 2020/1054 и 165/2014. Крепление груза: EN 12195-1 и Директива 2014/47/ЕС. Перед запуском содержание должен проверить инструктор. Прогресс хранится только на этом устройстве.</footer>
+</div>
+
+<script>
+const CARDS=[
+{id:"d1",q:"Сколько максимум можно вести грузовик за сутки?",o:["8 ч","9 ч, до 10 ч не более двух раз в неделю","10 ч каждый день","11 ч"],a:1,e:"Суточное вождение — 9 ч. Дважды за неделю его можно продлить до 10 ч.",r:"561/2006, ст. 6(1)",h:"Ищи ответ, где есть и базовый лимит, и исключение."},
+{id:"d2",q:"Какой лимит вождения за одну неделю?",o:["48 ч","56 ч","60 ч","90 ч"],a:1,e:"За неделю — не более 56 ч вождения.",r:"561/2006, ст. 6(2)",h:"Это меньше, чем 9 ч × 6 дней."},
+{id:"d3",q:"Сколько можно водить за две недели подряд в сумме?",o:["90 ч","100 ч","112 ч","120 ч"],a:0,e:"За любые две недели подряд — не более 90 ч. Поэтому две недели по 56 ч подряд невозможны.",r:"561/2006, ст. 6(3)",h:"Две недели по максимуму не проехать."},
+{id:"b1",q:"Проехал 4 ч 30 мин без перерыва. Что дальше?",o:["Перерыв 30 мин","Перерыв 45 мин","Перерыв 15 мин","Можно ехать до 5 ч"],a:1,e:"После 4 ч 30 мин вождения — перерыв не менее 45 мин, если он не был разделён раньше.",r:"561/2006, ст. 7",h:"Это самое известное правило тахографа."},
+{id:"b2",q:"Можно ли разделить 45-минутный перерыв как 30 + 15 минут?",o:["Да, в любом порядке","Нет, только 15, затем 30","Да, но только на пароме","Нет, делить нельзя вообще"],a:1,e:"Перерыв делится только так: сначала не менее 15 мин, потом не менее 30 мин. Порядок 30 + 15 не засчитывается.",r:"561/2006, ст. 7",h:"Порядок имеет значение."},
+{id:"b3",q:"Погрузка заняла 45 минут. Это засчитывается как перерыв?",o:["Да, если не за рулём","Да, если стоял на месте","Нет, это «другая работа»","Только если погрузку делал не ты"],a:2,e:"Погрузка, разгрузка, осмотр машины — это «другая работа» (символ скрещённых молотков). Перерыв — только отдых.",r:"561/2006, ст. 4; 2002/15/EC",h:"Перерыв — это время, когда ты свободен от любой работы."},
+{id:"r1",q:"Сколько длится обычный ежедневный отдых?",o:["9 ч","10 ч","11 ч, можно разделить 3 + 9","12 ч без разделения"],a:2,e:"Регулярный ежедневный отдых — 11 ч. Можно разделить: сначала не менее 3 ч, затем не менее 9 ч (итого 12 ч).",r:"561/2006, ст. 4(g), 8",h:"При разделении общее время увеличивается."},
+{id:"r2",q:"Как часто можно брать сокращённый ежедневный отдых 9 ч?",o:["Каждый день","Не более 3 раз между двумя еженедельными отдыхами","Не более 2 раз в неделю","Только в международных рейсах"],a:1,e:"Сокращённый ежедневный отдых (от 9 до 11 ч) — не более трёх раз между двумя еженедельными отдыхами.",r:"561/2006, ст. 8(4)",h:"Число совпадает с количеством продлений? Нет, больше."},
+{id:"w1",q:"Можно ли проводить регулярный еженедельный отдых (45 ч) в кабине?",o:["Да, если есть спальное место","Да, на охраняемой стоянке","Нет, нужно жильё с подходящими условиями","Да, если водитель согласен"],a:2,e:"Регулярный еженедельный отдых и отдых 45 ч+ в качестве компенсации в кабине проводить нельзя. Жильё организует и оплачивает работодатель.",r:"561/2006, ст. 8(8a)",h:"Это одно из ключевых изменений Пакета мобильности."},
+{id:"w2",q:"Минимальный сокращённый еженедельный отдых — это…",o:["9 ч","24 ч","36 ч","45 ч"],a:1,e:"Сокращённый еженедельный отдых — не менее 24 ч. Недостающее время нужно компенсировать одним блоком до конца третьей недели после неё.",r:"561/2006, ст. 8(6)",h:"Ровно одни сутки."},
+{id:"w3",q:"Когда должен начаться еженедельный отдых?",o:["После 56 ч вождения","Не позже 6 периодов по 24 ч после предыдущего","В воскресенье","Через 7 дней после выхода на работу"],a:1,e:"Еженедельный отдых начинается не позднее конца шести 24-часовых периодов после окончания предыдущего.",r:"561/2006, ст. 8(6)",h:"Шесть суток работы — максимум."},
+{id:"w4",q:"Как часто водитель в международных рейсах должен иметь возможность вернуться домой или на базу?",o:["Раз в 2 недели","Раз в 4 недели","Раз в 6 недель","Раз в квартал"],a:1,e:"Работодатель организует возвращение водителя на базу или по месту жительства в течение каждых 4 недель подряд.",r:"561/2006, ст. 8(8a)",h:"Примерно раз в месяц."},
+{id:"c1",q:"Проверка на дороге. За какой период нужно показать записи?",o:["Текущий день и 28 предыдущих","Текущий день и 56 предыдущих","Только текущую неделю","Последние 90 дней"],a:1,e:"С 31.12.2024 водитель предъявляет записи за текущий день и 56 предыдущих дней.",r:"165/2014, ст. 36 (ред. 2020/1054)",h:"Раньше было 28 — теперь вдвое больше."},
+{id:"c2",q:"Как часто нужно скачивать данные с карты водителя?",o:["Раз в 7 дней","Раз в 28 дней","Раз в 90 дней","Раз в год"],a:1,e:"Данные карты водителя скачиваются не реже чем раз в 28 дней. Данные бортового блока — не реже раза в 90 дней.",r:"Регламент (ЕС) 581/2010",h:"Для карты срок короче, чем для блока."},
+{id:"c3",q:"Карта водителя сломалась в рейсе. Что верно?",o:["Сразу прекращаю работу","Езжу без записи, запишу потом","Заявляю, прошу замену в течение 7 дней; до 15 дней езжу с распечатками в начале и конце смены","Беру карту коллеги"],a:2,e:"О неисправности или утере карты сообщают властям и подают на замену в течение 7 календарных дней. Ездить без карты можно до 15 дней, делая распечатки в начале и в конце смены и подписывая их.",r:"165/2014, ст. 29, 35",h:"Чужую карту использовать нельзя никогда."},
+{id:"c4",q:"Пересёк границу. Что делаешь с тахографом (если он не записывает это сам)?",o:["Ничего","Ввожу символ страны на первой возможной остановке после границы","Ввожу страну только в конце смены","Делаю распечатку"],a:1,e:"Символ страны вводится на первом возможном месте остановки после пересечения границы. Смарт-тахографы второго поколения делают это автоматически.",r:"165/2014, ст. 34(7)",h:"Не на ходу — на первой остановке."},
+{id:"c5",q:"Что означает символ скрещённых молотков?",o:["Вождение","Другая работа","Готовность","Отдых"],a:1,e:"Молотки — другая работа. Руль — вождение. Квадрат с диагональю — готовность. Кровать — отдых и перерыв.",r:"165/2014, Приложение IC",h:"Молоток — инструмент работы."},
+{id:"x1",q:"До места еженедельного отдыха дома осталось 1,5 ч, а лимит вождения исчерпан. Что разрешено?",o:["Ничего, нужно встать","Доехать, если перед этим был перерыв 30 мин, и записать причину вручную","Доехать без условий","Позвонить диспетчеру — он разрешит"],a:1,e:"В исключительных случаях можно превысить лимит до 1 ч, а до 2 ч — если сразу перед этим сделан непрерывный перерыв 30 мин, чтобы добраться домой или на базу на регулярный еженедельный отдых. Причину нужно записать вручную, а превышение компенсировать.",r:"561/2006, ст. 12",h:"Исключение есть, но с условиями и документированием."},
+{id:"x2",q:"Ежедневный отдых на пароме: сколько раз можно его прервать?",o:["Нельзя прерывать","Не более 2 раз, в сумме не более 1 ч, при наличии спального места","Сколько угодно","Один раз до 2 ч"],a:1,e:"Отдых на пароме или поезде можно прервать не более двух раз, в сумме не более часа. Водитель должен иметь доступ к спальному месту.",r:"561/2006, ст. 9",h:"Два раза, один час."}
+];
+
+let MOD="tacho";
+const modCards=()=>CARDS.filter(c=>(c.m||"tacho")===MOD);
+const MODNAME={tacho:"ТАХОГРАФ",cargo:"ГРУЗ"};
+const DAY=86400000, INTERVALS=[0,1,3,7,16,35];
+const KEY="rahtis-tacho-v1";
+let state={cards:{},mode:"pro"};
+try{const s=localStorage.getItem(KEY); if(s){const p=JSON.parse(s); if(p&&p.cards) state=Object.assign(state,p);}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+
+function freshness(){
+  const now=Date.now(); let sum=0;
+  modCards().forEach(c=>{const s=state.cards[c.id]; if(!s||!s.box) return;
+    let f=s.box/5;
+    if(now>s.due){const span=(INTERVALS[s.box]||1)*DAY*2+DAY; f*=Math.max(0.3,1-(now-s.due)/span);}
+    sum+=f;});
+  return Math.round(sum/modCards().length*100);
+}
+function dueCount(){const now=Date.now(); return modCards().filter(c=>{const s=state.cards[c.id]; return s&&s.box&&s.due<=now;}).length;}
+function renderLCD(){
+  const f=freshness(), d=dueCount(), seen=modCards().filter(c=>state.cards[c.id]).length;
+  document.getElementById("lcd-mod").textContent=MODNAME[MOD];document.getElementById("lcd-fresh").textContent=f+"%";
+  document.getElementById("lcd-due").textContent="К ПОВТОРУ "+d;
+  document.getElementById("lcd-state").textContent= seen===0?"НОВ.": f>=75?"СВЕЖО": f>=40?"НОРМА":"ЗАБЫТО";
+  document.getElementById("lcd-bar").style.width=f+"%";
+}
+
+// mode
+const mPro=document.getElementById("m-pro"), mNew=document.getElementById("m-new");
+function setMode(m){state.mode=m;save();mPro.setAttribute("aria-pressed",m==="pro");mNew.setAttribute("aria-pressed",m==="new");if(currentTab==="train"&&session)renderQuestion();}
+mPro.onclick=()=>setMode("pro"); mNew.onclick=()=>setMode("new");
+
+// tabs
+let currentTab="train";
+document.querySelectorAll("nav.tabs button").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("nav.tabs button").forEach(x=>x.setAttribute("aria-selected",x===b));
+  currentTab=b.dataset.tab; show();});
+const view=document.getElementById("view");
+function show(){ if(currentTab==="train") trainHome(); else if(currentTab==="plan") (MOD==="tacho"?planner():cargoGame()); else (MOD==="tacho"?rules():cargoRules()); }
+
+// ---------- training ----------
+let session=null;
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function buildSession(){
+  const now=Date.now();
+  const due=modCards().filter(c=>{const s=state.cards[c.id];return s&&s.box&&s.due<=now;});
+  const fresh=modCards().filter(c=>!state.cards[c.id]);
+  const list=shuffle(due).slice(0,6).concat(fresh.slice(0,Math.max(2,8-Math.min(due.length,6))));
+  return list.slice(0,8);
+}
+function trainHome(){
+  session=null;
+  const d=dueCount(), newc=modCards().filter(c=>!state.cards[c.id]).length;
+  view.innerHTML=`<h2>Тренировка на 3 минуты</h2>
+  <p class="muted">${MOD==="tacho"?"Короткие вопросы по времени вождения, отдыху и работе с тахографом.":"Короткие вопросы по креплению груза: силы, трение, ремни, блокировка."} То, что знаешь, будет появляться реже, а ошибки — чаще.</p>
+  <p>К повтору: <b>${d}</b> · Новых вопросов: <b>${newc}</b></p>
+  <div class="actions"><button class="btn" id="go">${d||newc?"Начать":"Повторить всё равно"}</button>
+  <button class="btn ghost small" id="reset">Сбросить прогресс</button></div>`;
+  document.getElementById("go").onclick=()=>{let l=buildSession(); if(!l.length) l=shuffle(modCards()).slice(0,6); session={list:l,i:0,right:0,answered:false}; renderQuestion();};
+  document.getElementById("reset").onclick=()=>{if(confirm("Сбросить весь прогресс на этом устройстве?")){state.cards={};save();renderLCD();trainHome();}};
+}
+function renderQuestion(){
+  const c=session.list[session.i];
+  if(!session.order||session.orderFor!==c.id){session.order=shuffle(c.o.map((_,k)=>k));session.orderFor=c.id;session.answered=false;}
+  const hint=state.mode==="new"?`<p class="hint"><b>Подсказка:</b> ${c.h}</p>`:"";
+  view.innerHTML=`<div class="progress">Вопрос ${session.i+1} из ${session.list.length}</div>
+  <p class="q">${c.q}</p>${hint}
+  <div class="opts">${session.order.map(k=>`<button class="opt" data-k="${k}">${c.o[k]}</button>`).join("")}</div>
+  <div id="after"></div>`;
+  view.querySelectorAll(".opt").forEach(b=>b.onclick=()=>answer(+b.dataset.k));
+}
+function answer(k){
+  if(session.answered) return; session.answered=true;
+  const c=session.list[session.i], ok=k===c.a, now=Date.now();
+  const s=state.cards[c.id]||{box:0,due:now};
+  if(ok){s.box=Math.min((s.box||0)+1,5); s.due=now+INTERVALS[s.box]*DAY; session.right++;}
+  else {s.box=1; s.due=now;}
+  state.cards[c.id]=s; save(); renderLCD();
+  view.querySelectorAll(".opt").forEach(b=>{b.disabled=true;const kk=+b.dataset.k; if(kk===c.a)b.classList.add("right"); else if(kk===k)b.classList.add("wrong");});
+  const last=session.i===session.list.length-1;
+  document.getElementById("after").innerHTML=`<div class="explain"><b>${ok?"Верно.":"Неверно."}</b> ${c.e}<div class="ref">${c.r}</div></div>
+  <div class="actions"><button class="btn" id="next">${last?"Закончить":"Дальше"}</button></div>`;
+  const nb=document.getElementById("next"); nb.focus();
+  nb.onclick=()=>{ if(last) finish(); else {session.i++; renderQuestion();} };
+}
+function finish(){
+  const n=session.list.length, r=session.right;
+  view.innerHTML=`<h2>${r===n?"Всё верно":"Тренировка закончена"}</h2>
+  <p>Правильно: <b>${r} из ${n}</b>. Свежесть знаний: <b>${freshness()}%</b>.</p>
+  <p class="muted">${r===n?"Эти вопросы вернутся через несколько дней, чтобы закрепить результат.":"Вопросы с ошибками вернутся уже в следующей тренировке."}</p>
+  <div class="actions"><button class="btn" id="again">Ещё раунд</button><button class="btn ghost" id="toplan">Перейти к практике</button></div>`;
+  document.getElementById("again").onclick=trainHome;
+  document.getElementById("toplan").onclick=()=>document.querySelector('[data-tab="plan"]').click();
+}
+
+// ---------- planner ----------
+const SCEN=[
+ {id:"s1",name:"Короткий рейс",task:"Погрузка 1 ч, затем 8 ч вождения до клиента. Составь смену без нарушений.",drive:480,work:60,limit:540},
+ {id:"s2",name:"Длинный день",task:"Нужно проехать 9 ч 30 мин. На этой неделе ты уже продлевал вождение до 10 ч один раз.",drive:570,work:0,limit:600},
+ {id:"s3",name:"Разгрузка в пути",task:"8 ч вождения, по дороге промежуточная разгрузка 45 мин. Помни: разгрузка — не перерыв.",drive:480,work:45,limit:540}
+];
+let plan={scen:0,blocks:[],result:null};
+const fmt=m=>{const h=Math.floor(m/60),mm=m%60;return h?(mm?`${h} ч ${mm} мин`:`${h} ч`):`${mm} мин`;};
+function merged(){const out=[];plan.blocks.forEach(b=>{const l=out[out.length-1]; if(l&&l.t===b.t) l.m+=b.m; else out.push({t:b.t,m:b.m});});return out;}
+function check(){
+  const sc=SCEN[plan.scen], seq=merged(); const msgs=[];
+  let since=0, first=false, flagged=false, drive=0, work=0, t=0;
+  seq.forEach(b=>{
+    if(b.t==="drive"){since+=b.m;drive+=b.m;
+      if(since>270&&!flagged){flagged=true;msgs.push(["e",`Около ${fmt(t+b.m-(since-270))} от начала смены непрерывное вождение превысило 4 ч 30 мин без положенного перерыва.`]);}}
+    else if(b.t==="break"){
+      if(b.m>=45){since=0;first=false;flagged=false;}
+      else if(first&&b.m>=30){since=0;first=false;flagged=false;}
+      else if(b.m>=15&&!first){first=true; if(b.m>=30) msgs.push(["n","Перерыв 30 мин засчитан только как первая часть. После него нужен ещё перерыв не менее 30 мин — порядок «15, затем 30»."]);}
+    } else work+=b.m;
+    t+=b.m;});
+  if(drive!==sc.drive) msgs.push(["e",`Вождение в плане: ${fmt(drive)}, а нужно ${fmt(sc.drive)}.`]);
+  if(drive>sc.limit) msgs.push(["e",`Суточный лимит вождения ${fmt(sc.limit)} превышен.`]);
+  else if(drive>540&&sc.limit===600) msgs.push(["n","Использовано продление до 10 ч. На этой неделе это второе и последнее."]);
+  if(work!==sc.work) msgs.push(["e",`Другая работа в плане: ${fmt(work)}, а нужно ${fmt(sc.work)}.`]);
+  if(t>780) msgs.push(["n",`Смена длится ${fmt(t)}. Регулярный отдых 11 ч в пределах 24 ч уже не помещается — только сокращённый 9 ч (лимит смены 15 ч).`]);
+  if(!msgs.some(m=>m[0]==="e")) msgs.unshift(["s",`Смена без нарушений. Общая длительность: ${fmt(t)}.`]);
+  return msgs;
+}
+function planner(){
+  const sc=SCEN[plan.scen], seq=merged();
+  const total=seq.reduce((a,b)=>a+b.m,0), scaleMax=Math.max(780,total);
+  let since=0,first=false;
+  const segs=seq.map(b=>{let over=false;
+    if(b.t==="drive"){since+=b.m; over=since>270;}
+    else if(b.t==="break"){ if(b.m>=45||(first&&b.m>=30)){since=0;first=false;} else if(b.m>=15&&!first) first=true; }
+    const lab=b.t==="drive"?"Руль":b.t==="break"?"Перерыв":"Работа";
+    return `<div class="seg ${b.t}${over?" over":""}" style="width:${b.m/scaleMax*100}%" title="${lab} ${fmt(b.m)}">${b.m>=45?fmt(b.m):""}</div>`;}).join("");
+  const d=seq.filter(b=>b.t==="drive").reduce((a,b)=>a+b.m,0), w=seq.filter(b=>b.t==="work").reduce((a,b)=>a+b.m,0);
+  view.innerHTML=`<h2>Спланируй смену</h2>
+  <div class="scen" role="group" aria-label="Сценарий">${SCEN.map((s,i)=>`<button data-i="${i}" aria-pressed="${i===plan.scen}">${s.name}</button>`).join("")}</div>
+  <p class="task">${sc.task}</p>
+  <div class="timeline" aria-label="План смены">${segs}</div>
+  <div class="scale"><span>0 ч</span><span>${Math.round(scaleMax/60)} ч</span></div>
+  <div class="totals"><span>Вождение: <b>${fmt(d)}</b> / ${fmt(sc.drive)}</span><span>Работа: <b>${fmt(w)}</b> / ${fmt(sc.work)}</span><span>Смена: <b>${fmt(total)}</b></span></div>
+  <div class="add">
+    <button class="d" data-t="drive" data-m="30">+ Руль 30 мин</button>
+    <button class="d" data-t="drive" data-m="60">+ Руль 1 ч</button>
+    <button class="w" data-t="work" data-m="15">+ Работа 15 мин</button>
+    <button class="b" data-t="break" data-m="15">+ Перерыв 15</button>
+    <button class="b" data-t="break" data-m="30">+ Перерыв 30</button>
+    <button class="b" data-t="break" data-m="45">+ Перерыв 45</button>
+  </div>
+  <div class="actions"><button class="btn" id="chk">Проверить смену</button><button class="btn ghost small" id="undo">Отменить</button><button class="btn ghost small" id="clr">Очистить</button></div>
+  <div class="result" id="res">${plan.result?plan.result.map(m=>`<p class="${m[0]}">${m[1]}</p>`).join(""):(state.mode==="new"?'<p class="n">Добавляй блоки по порядку. Красный цвет на полосе — вождение без положенного перерыва.</p>':"")}</div>`;
+  view.querySelectorAll(".scen button").forEach(b=>b.onclick=()=>{plan={scen:+b.dataset.i,blocks:[],result:null};planner();});
+  view.querySelectorAll(".add button").forEach(b=>b.onclick=()=>{plan.blocks.push({t:b.dataset.t,m:+b.dataset.m});plan.result=null;planner();});
+  document.getElementById("undo").onclick=()=>{plan.blocks.pop();plan.result=null;planner();};
+  document.getElementById("clr").onclick=()=>{plan.blocks=[];plan.result=null;planner();};
+  document.getElementById("chk").onclick=()=>{plan.result=plan.blocks.length?check():[["e","План пуст. Добавь блоки вождения, перерывов и работы."]];planner();document.getElementById("res").scrollIntoView({block:"nearest"});};
+}
+
+// ---------- rules ----------
+function rules(){
+  view.innerHTML=`<div class="rules"><h2>Шпаргалка</h2><dl>
+  <dt>Вождение</dt><dd>9 ч в сутки, до 10 ч дважды в неделю. 56 ч в неделю. 90 ч за две недели подряд.</dd>
+  <dt>Перерыв</dt><dd>После 4 ч 30 мин вождения — 45 мин. Можно разделить: сначала 15, потом 30. Другая работа перерывом не считается.</dd>
+  <dt>Ежедневный отдых</dt><dd>11 ч, или 3 + 9 ч. Сокращённый 9 ч — не более 3 раз между еженедельными отдыхами.</dd>
+  <dt>Еженедельный отдых</dt><dd>45 ч, сокращённый — от 24 ч с компенсацией до конца третьей недели. Начинается не позже чем через 6 суток. Регулярный — не в кабине.</dd>
+  <dt>Возвращение домой</dt><dd>Работодатель организует возвращение на базу или домой каждые 4 недели.</dd>
+  <dt>Проверка</dt><dd>Записи за текущий день и 56 предыдущих. Карту скачивать раз в 28 дней.</dd>
+  <dt>Неисправность карты</dt><dd>Заявить и запросить замену в течение 7 дней. До 15 дней — с распечатками в начале и конце смены.</dd>
+  <dt>Граница</dt><dd>Символ страны — на первой возможной остановке после границы, если тахограф не записывает сам.</dd>
+  </dl></div>`;
+}
+
+// ---------- cargo module ----------
+CARDS.push(
+{m:"cargo",id:"g1",q:"На какую силу инерции рассчитывают крепление груза вперёд (при торможении)?",o:["0,3 от веса груза","0,5 от веса груза","0,8 от веса груза","1,0 от веса груза"],a:2,e:"Для дорожных перевозок крепление вперёд рассчитывают на 0,8 g — это 80% веса груза.",r:"EN 12195-1",h:"Вперёд — самая большая сила из всех направлений."},
+{m:"cargo",id:"g2",q:"А вбок и назад?",o:["0,5 g","0,8 g","0,2 g","1,0 g"],a:0,e:"Вбок и назад — 0,5 g, то есть половина веса груза.",r:"EN 12195-1",h:"Половина."},
+{m:"cargo",id:"g3",q:"Что означает STF на этикетке ремня?",o:["Максимальная нагрузка на разрыв","Сила натяжения, которую даёт храповик при обычном усилии руки","Длина ремня","Год выпуска"],a:1,e:"STF (Standard Tension Force) — сила натяжения храповиком в daN. Именно она важна при креплении прижимом (ремень через верх груза).",r:"EN 12195-2",h:"Буква T — tension, натяжение."},
+{m:"cargo",id:"g4",q:"Что означает LC на этикетке ремня?",o:["Допустимая нагрузка на ремень при прямом креплении","Сила натяжения храповиком","Коэффициент трения","Класс груза"],a:0,e:"LC (Lashing Capacity) — максимальная сила, которую ремень может выдержать при прямом креплении (ремень от груза к точке крепления).",r:"EN 12195-2",h:"Capacity — вместимость, допустимая нагрузка."},
+{m:"cargo",id:"g5",q:"Ремень через верх груза натянут под углом 30° вместо почти 90°. Что с прижимом?",o:["Почти не меняется","Уменьшается примерно вдвое","Увеличивается","Уменьшается на 10%"],a:1,e:"Прижим пропорционален синусу угла: sin 90° = 1, sin 30° = 0,5. Пологий ремень прижимает вдвое слабее — ремней понадобится вдвое больше.",r:"EN 12195-1",h:"Чем круче ремень, тем сильнее он прижимает."},
+{m:"cargo",id:"g6",q:"Зачем класть антискользящий коврик под груз?",o:["Чтобы не поцарапать пол","Он повышает трение, и ремней нужно меньше","Он заменяет ремни полностью","Для амортизации при погрузке"],a:1,e:"Коврик повышает коэффициент трения (например, с 0,45 до 0,6). Трение само удерживает часть силы, и нагрузка на ремни падает.",r:"EN 12195-1, Приложение B",h:"Резина цепляется лучше дерева."},
+{m:"cargo",id:"g7",q:"Между грузом и передним бортом остался зазор 50 см. Чем это плохо?",o:["Ничем, если есть ремни","При торможении груз разгоняется и бьёт в борт, а блокировка бортом не работает","Только тем, что груз может поцарапаться","Нарушается распределение по осям, и всё"],a:1,e:"Груз с зазором при торможении успевает сдвинуться и ударяет в борт с большей силой. Зазор нужно убрать или заполнить: пустыми паллетами, воздушными подушками, распорками.",r:"EU Best Practice Guidelines on Cargo Securing",h:"Удар сильнее, чем плавное давление."},
+{m:"cargo",id:"g8",q:"У ремня оторвана этикетка, но выглядит он нормально. Можно использовать?",o:["Да, если нет порезов","Да, если натянуть сильнее","Нет, без этикетки ремень не используют","Только для лёгкого груза"],a:2,e:"Ремень без этикетки выводят из работы: неизвестны его LC и STF. То же касается ремней с порезами и повреждённых храповиков.",r:"EN 12195-2",h:"Без маркировки неизвестно, что ремень выдержит."},
+{m:"cargo",id:"g9",q:"Зачем нужны защитные уголки под ремень?",o:["Для красоты","Защищают ремень от острых кромок и распределяют натяжение","Чтобы ремень не скользил по тенту","Их используют только для ADR"],a:1,e:"Уголки защищают ремень от порезов и помогают натяжению распределиться по грузу, а не остаться на одной стороне.",r:"EU Best Practice Guidelines on Cargo Securing",h:"Острая кромка режет ремень."},
+{m:"cargo",id:"g10",q:"Удерживают ли боковые шторы тентованного полуприцепа груз?",o:["Да, всегда","Обычно нет — только если кузов сертифицирован для этого и груз размещён по сертификату","Да, если их туго затянуть","Да, для груза до 10 т"],a:1,e:"Обычные шторы — защита от погоды, а не крепление. Учитывать их можно только если кузов сертифицирован (EN 12642, класс XL) и груз уложен по условиям сертификата.",r:"EN 12642",h:"Ткань — не борт."},
+{m:"cargo",id:"g11",q:"Почему груз вперёд лучше блокировать передним бортом, чем держать ремнями через верх?",o:["Так быстрее","Против силы 0,8 g ремней через верх нужно очень много","Ремни через верх вообще не держат","Так требует заказчик"],a:1,e:"Ремень через верх держит только за счёт трения. Против 0,8 g вперёд таких ремней нужно много. Блокировка бортом принимает эту силу напрямую, в пределах прочности борта.",r:"EN 12195-1",h:"Сравни силы вперёд и вбок."},
+{m:"cargo",id:"g12",q:"Грузил склад, водитель не участвовал. Кто отвечает за крепление в пути?",o:["Только склад","Только заказчик","Водитель тоже обязан проверить крепление перед выездом","Никто, если есть CMR"],a:2,e:"Водитель отвечает за безопасность своего транспортного средства и груза на дороге. Даже если грузили другие, он должен проверить крепление перед выездом и в пути.",r:"Tieliikennelaki 729/2018",h:"На проверке спросят с водителя."},
+{m:"cargo",id:"g13",q:"Ремень STF 400 daN. Это примерно…",o:["40 кг силы","400 кг силы","4 000 кг силы","40 000 кг силы"],a:1,e:"1 daN (декаНьютон) ≈ 1 кг силы. STF 400 daN — примерно 400 кг натяжения.",r:"Единицы СИ",h:"daN почти равен килограмму."},
+{m:"cargo",id:"g14",q:"Как правильно разместить тяжёлый и лёгкий груз?",o:["Тяжёлый наверх, чтобы прижимал","Тяжёлый вниз и по центру, с учётом нагрузки на оси","Как удобнее грузить","Тяжёлый в самый конец прицепа"],a:1,e:"Тяжёлое — вниз и ближе к продольной оси, чтобы центр тяжести был низко и нагрузка на оси не превышала допустимую.",r:"EU Best Practice Guidelines on Cargo Securing",h:"Низкий центр тяжести — устойчивость."}
+);
+
+let cargo={pos:"gap",base:"wood",angle:30,edges:false,strap:"ok",n:6,result:null};
+function cargoCalc(){
+  const mg=9810, stf=400, mu=cargo.base==="mat"?0.6:0.45, sin=Math.sin(cargo.angle*Math.PI/180);
+  const per=mu*2*stf*sin;
+  const need=c=>Math.max(0,Math.ceil(((c-mu)*mg)/per-1e-9));
+  const fwd=cargo.pos==="block"?0:need(0.8), side=need(0.5), back=need(0.5);
+  return {mu,per:Math.round(per),fwd,side,back,req:Math.max(fwd,side,back)};
+}
+function cargoCheck(){
+  const c=cargoCalc(), m=[];
+  if(cargo.strap==="damaged") m.push(["e","Ремень без этикетки использовать нельзя: неизвестно, что он выдержит. Замени его."]);
+  if(cargo.n<c.req) m.push(["e",`Ремней мало: нужно не меньше ${c.req}, а стоит ${cargo.n}. Больше всего ремней требует направление «${c.fwd===c.req?"вперёд":"вбок/назад"}».`]);
+  if(c.req===0&&cargo.n===0) m.push(["e","По расчёту трения хватает, но на неровностях груз подпрыгивает и прижим на мгновение пропадает. Совсем без ремней ехать нельзя."]);
+  if(cargo.pos==="gap") m.push(["n","Зазор у переднего борта: блокировка не работает, и всю силу торможения держат ремни. Убери зазор или заполни его."]);
+  if(cargo.angle===30) m.push(["n","Пологий ремень (30°) прижимает вдвое слабее, чем крутой."]);
+  if(!cargo.edges) m.push(["n","Без уголков ремень может порезаться о кромку, а натяжение хуже расходится по грузу."]);
+  if(!m.some(x=>x[0]==="e")) m.unshift(["s",`Груз закреплён. Ремней по расчёту: ${c.req}, у тебя ${cargo.n}.`]);
+  return {m,c};
+}
+function cargoGame(){
+  const tg=(key,val,label)=>`<button data-k="${key}" data-v="${val}" aria-pressed="${String(cargo[key])===String(val)}">${label}</button>`;
+  const r=cargo.result;
+  view.innerHTML=`<h2>Закрепи груз</h2>
+  <p class="task">Полуприцеп, пол из фанеры. Груз — паллеты, 10 т. Ремни через верх груза, STF 400 daN, в наличии до 12 шт. Выбери, как закрепить, и проверь.</p>
+  <div class="opt-group"><div class="lbl">Положение груза</div><div class="seg2">${tg("pos","gap","Зазор 50 см до борта")}${tg("pos","block","Вплотную к переднему борту")}</div></div>
+  <div class="opt-group"><div class="lbl">Под грузом</div><div class="seg2">${tg("base","wood","Дерево по фанере")}${tg("base","mat","Антискользящий коврик")}</div></div>
+  <div class="opt-group"><div class="lbl">Угол ремня</div><div class="seg2">${tg("angle","30","Пологий, около 30°")}${tg("angle","90","Крутой, почти 90°")}</div></div>
+  <div class="opt-group"><div class="lbl">Защитные уголки</div><div class="seg2">${tg("edges","false","Без уголков")}${tg("edges","true","С уголками")}</div></div>
+  <div class="opt-group"><div class="lbl">Ремни</div><div class="seg2">${tg("strap","ok","Этикетки на месте")}${tg("strap","damaged","На одном нет этикетки")}</div></div>
+  <div class="opt-group"><div class="lbl">Сколько ремней ставишь</div><div class="stepper"><button id="minus" aria-label="Меньше">−</button><b>${cargo.n}</b><button id="plus" aria-label="Больше">+</button></div></div>
+  ${state.mode==="new"?'<p class="hint"><b>Подсказка:</b> сначала подумай, какое направление самое трудное — вперёд, вбок или назад — и чем его можно закрыть без ремней.</p>':""}
+  <div class="actions"><button class="btn" id="chk">Проверить крепление</button></div>
+  <div class="result" id="res">${r?r.m.map(x=>`<p class="${x[0]}">${x[1]}</p>`).join("")+`
+    <table class="calc"><tr><td>Коэффициент трения</td><td>${r.c.mu}</td></tr>
+    <tr><td>Удержание одним ремнём</td><td>≈ ${r.c.per} daN</td></tr>
+    <tr><td>Ремней против силы вперёд (0,8 g)</td><td>${cargo.pos==="block"?"держит борт":r.c.fwd}</td></tr>
+    <tr><td>Ремней против силы вбок (0,5 g)</td><td>${r.c.side}</td></tr>
+    <tr><td>Ремней против силы назад (0,5 g)</td><td>${r.c.back}</td></tr></table>
+    <p class="small">Упрощённый учебный расчёт по принципу EN 12195-1, без коэффициентов запаса и проверки прочности борта. Для реального груза используй таблицы и методику из обучения.</p>`:""}</div>`;
+  view.querySelectorAll(".seg2 button").forEach(b=>b.onclick=()=>{const k=b.dataset.k,v=b.dataset.v;
+    cargo[k]=k==="angle"?+v:(k==="edges"?v==="true":v); cargo.result=null; cargoGame();});
+  document.getElementById("minus").onclick=()=>{cargo.n=Math.max(0,cargo.n-1);cargo.result=null;cargoGame();};
+  document.getElementById("plus").onclick=()=>{cargo.n=Math.min(12,cargo.n+1);cargo.result=null;cargoGame();};
+  document.getElementById("chk").onclick=()=>{cargo.result=cargoCheck();cargoGame();document.getElementById("res").scrollIntoView({block:"nearest"});};
+}
+function cargoRules(){
+  view.innerHTML=`<div class="rules"><h2>Шпаргалка</h2><dl>
+  <dt>Силы</dt><dd>Вперёд — 0,8 веса груза. Вбок и назад — 0,5 веса.</dd>
+  <dt>Трение</dt><dd>Помогает, но не заменяет крепление. Антискользящий коврик заметно уменьшает нужное число ремней.</dd>
+  <dt>Блокировка</dt><dd>Вплотную к борту — самый эффективный способ против силы вперёд. Зазоры убрать или заполнить.</dd>
+  <dt>Ремень через верх</dt><dd>Держит только прижимом. Важен STF и угол: чем круче, тем лучше. При 30° — вдвое слабее.</dd>
+  <dt>Этикетка ремня</dt><dd>LC — нагрузка при прямом креплении, STF — натяжение храповиком. Нет этикетки или есть порез — ремень не использовать.</dd>
+  <dt>Уголки</dt><dd>Защищают ремень от кромок и распределяют натяжение.</dd>
+  <dt>Шторы</dt><dd>Не крепление, кроме сертифицированных кузовов при укладке по сертификату.</dd>
+  <dt>Ответственность</dt><dd>Водитель проверяет крепление перед выездом, даже если грузил не он.</dd>
+  </dl></div>`;
+}
+
+document.querySelectorAll(".modules button").forEach(b=>b.onclick=()=>{
+  MOD=b.dataset.mod; state.mod=MOD; save(); session=null;
+  document.querySelectorAll(".modules button").forEach(x=>x.setAttribute("aria-pressed",x===b));
+  renderLCD(); show();});
+if(state.mod==="cargo"){MOD="cargo";document.querySelectorAll(".modules button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.mod==="cargo"));}
+renderLCD(); setMode(state.mode||"pro"); show();
+</script>
+</body>
+</html>

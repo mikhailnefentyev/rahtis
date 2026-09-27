@@ -1,4 +1,5 @@
 import type { DriverPack } from '../driver';
+import { et as trainingEt } from './training/et';
 
 /** Эстонский: приложение водителя. Платформа остаётся на fi/en. */
 export const et = {
@@ -122,6 +123,8 @@ export const et = {
       'See brauser ei toeta teateid. iPhone’is paigalda rakendus esmalt avakuvale ja ava see sealt.',
     offline: 'Ühendust ei ole. Kontrolli võrku ja proovi uuesti.',
   },
+  training: trainingEt.training,
+  certificates: trainingEt.certificates,
   places: {
     kind: {
       FUEL: 'Tankimine',
@@ -183,6 +186,7 @@ export const et = {
   payDisclaimer:
     'Kalkulaator on suunanäitaja. Lõpliku palga määravad tööandja ja tööleping või kollektiivleping.',
   msg: {
+    ...trainingEt.msg,
     'driverApp.earnTrips': '{count, plural, one {# reis} other {# reisi}}',
     'driverApp.earnHours': '{hours} h',
     'places.count': '{count, plural, one {# koht} other {# kohta}}',

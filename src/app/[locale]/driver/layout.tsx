@@ -1,12 +1,8 @@
 import type { Metadata, Viewport } from 'next';
 import { notFound } from 'next/navigation';
-import { getDriver } from '@/lib/driverApp/session';
 import { isLocale } from '@/lib/i18n';
 import { getDriverI18n } from '@/lib/driverApp/i18n';
 import { I18nProvider } from '@/lib/i18n/provider';
-import { DriverNav } from './DriverNav';
-import { NotLinked } from './NotLinked';
-import { OutboxBanner, OutboxProvider } from './OutboxProvider';
 import { ServiceWorker } from './ServiceWorker';
 
 export async function generateMetadata({
@@ -33,13 +29,14 @@ export const viewport: Viewport = {
 };
 
 /**
- * Приложение водителя.
+ * Оболочка приложения водителя: язык и service worker.
  *
- * Своя оболочка, без шапки кабинета: телефон в кабине, большие цели,
- * навигация внизу под большим пальцем. Вход — только по приглашению, и
- * без привязанного водителя вместо приложения экран «попросите ссылку».
+ * Своя, без шапки кабинета: телефон в кабине, большие цели, навигация
+ * внизу под большим пальцем. Кого пускать, решают вложенные раскладки:
+ * задания, карта и профиль — только привязанному водителю ((app)),
+ * тренажёр — и гостю (training).
  */
-export default async function DriverLayout({
+export default async function DriverShell({
   children,
   params,
 }: {
@@ -49,23 +46,13 @@ export default async function DriverLayout({
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
 
-  const [driver, { t }] = await Promise.all([getDriver(), getDriverI18n(locale)]);
+  const { t } = await getDriverI18n(locale);
 
   return (
     <I18nProvider locale={locale} dictionary={t}>
-      <div className="min-h-dvh bg-ground text-ink">
+      <div data-app="driver" className="min-h-dvh bg-ground text-ink">
         <ServiceWorker />
-        {driver ? (
-          <OutboxProvider>
-            <div className="mx-auto w-full max-w-lg px-4 pt-[max(env(safe-area-inset-top),16px)] pb-28">
-              <OutboxBanner />
-              {children}
-            </div>
-            <DriverNav unread={driver.unread} />
-          </OutboxProvider>
-        ) : (
-          <NotLinked locale={locale} />
-        )}
+        {children}
       </div>
     </I18nProvider>
   );

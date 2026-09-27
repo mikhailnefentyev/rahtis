@@ -24,7 +24,10 @@ export {
 } from './driverLocale';
 
 /** Сообщения ICU, которые нужны приложению водителя. */
-export type DriverMessageKey = Extract<MessageKey, `driverApp.${string}` | `places.${string}`>;
+export type DriverMessageKey = Extract<
+  MessageKey,
+  `driverApp.${string}` | `places.${string}` | `training.${string}`
+>;
 
 /**
  * Срез словаря для приложения водителя.
@@ -36,6 +39,9 @@ export type DriverPack = {
   intl: string;
   driverApp: Dictionary['driverApp'];
   places: Dictionary['places'];
+  /** Тренажёр и сроки сертификатов — экраны водителя, на его языке. */
+  training: Dictionary['training'];
+  certificates: Dictionary['certificates'];
   stopKind: Dictionary['stopKind'];
   /*
    * Забор и возврат зависят от того, что везут: общий stopKind называет их
@@ -54,7 +60,7 @@ export type DriverPack = {
 function packOf(dictionary: Dictionary): DriverPack {
   const msg = Object.fromEntries(
     Object.entries(dictionary.msg).filter(
-      ([key]) => key.startsWith('driverApp.') || key.startsWith('places.'),
+      ([key]) => key.startsWith('driverApp.') || key.startsWith('places.') || key.startsWith('training.'),
     ),
   ) as Record<DriverMessageKey, string>;
 
@@ -62,6 +68,8 @@ function packOf(dictionary: Dictionary): DriverPack {
     intl: dictionary.meta.intl,
     driverApp: dictionary.driverApp,
     places: dictionary.places,
+    training: dictionary.training,
+    certificates: dictionary.certificates,
     stopKind: dictionary.stopKind,
     haulStops: {
       CONTAINER: { pickup: dictionary.haul.CONTAINER.stopPickup, return: dictionary.haul.CONTAINER.stopReturn },
@@ -118,6 +126,8 @@ export async function driverDictionary(
     meta: { ...base.meta, intl: pack.intl },
     driverApp: pack.driverApp,
     places: pack.places,
+    training: pack.training,
+    certificates: pack.certificates,
     stopKind: pack.stopKind,
     /*
      * Забор и возврат по виду перевозки: страницы водителя зовут тот же

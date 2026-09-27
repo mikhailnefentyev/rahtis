@@ -1,4 +1,5 @@
 import type { DriverPack } from '../driver';
+import { pl as trainingPl } from './training/pl';
 
 /** Польский: приложение водителя. Платформа остаётся на fi/en. */
 export const pl = {
@@ -122,6 +123,8 @@ export const pl = {
       'Ta przeglądarka nie obsługuje powiadomień. Na iPhonie najpierw zainstaluj aplikację na ekranie głównym i otwórz ją stamtąd.',
     offline: 'Brak połączenia. Sprawdź sieć i spróbuj ponownie.',
   },
+  training: trainingPl.training,
+  certificates: trainingPl.certificates,
   places: {
     kind: {
       FUEL: 'Tankowanie',
@@ -183,6 +186,7 @@ export const pl = {
   payDisclaimer:
     'Wyliczenie ma charakter orientacyjny. Ostateczne wynagrodzenie ustalają pracodawca oraz umowa o pracę lub układ zbiorowy.',
   msg: {
+    ...trainingPl.msg,
     'driverApp.earnTrips': '{count, plural, one {# kurs} few {# kursy} many {# kursów} other {# kursu}}',
     'driverApp.earnHours': '{hours} h',
     'places.count': '{count, plural, one {# miejsce} few {# miejsca} many {# miejsc} other {# miejsca}}',

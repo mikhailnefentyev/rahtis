@@ -1351,3 +1351,15 @@
   .hero-port__pulse::after { animation: none; }
   .trip-preview[data-waiting] { animation: none; }
 }
+
+/*
+ * Приложение водителя: отклик на нажатие.
+ *
+ * Перчатка кнопку не чувствует, а сеть в порту медленная — без отклика
+ * водитель жмёт второй раз. Затемнение, а не сдвиг: форма кнопки не
+ * меняется и соседние цели не прыгают, и при «меньше движения» оно
+ * остаётся честным сигналом, а не анимацией.
+ */
+[data-app='driver'] :is(button, a, [role='button'], label:has(input)):not(:disabled):active {
+  filter: brightness(0.9);
+}

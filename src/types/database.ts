@@ -730,6 +730,79 @@ export type Database = {
           },
         ]
       }
+      driver_certificate_reminders: {
+        Row: {
+          certificate_id: string
+          expires_at: string
+          sent_at: string
+          stage: string
+        }
+        Insert: {
+          certificate_id: string
+          expires_at: string
+          sent_at?: string
+          stage: string
+        }
+        Update: {
+          certificate_id?: string
+          expires_at?: string
+          sent_at?: string
+          stage?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "driver_certificate_reminders_certificate_id_fkey"
+            columns: ["certificate_id"]
+            isOneToOne: false
+            referencedRelation: "driver_certificates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      driver_certificates: {
+        Row: {
+          created_at: string
+          document_url: string | null
+          driver_id: string
+          expires_at: string
+          id: string
+          issued_at: string | null
+          type: Database["public"]["Enums"]["driver_certificate_type"]
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          document_url?: string | null
+          driver_id: string
+          expires_at: string
+          id?: string
+          issued_at?: string | null
+          type: Database["public"]["Enums"]["driver_certificate_type"]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          document_url?: string | null
+          driver_id?: string
+          expires_at?: string
+          id?: string
+          issued_at?: string | null
+          type?: Database["public"]["Enums"]["driver_certificate_type"]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "driver_certificates_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       driver_invites: {
         Row: {
           code_hash: string | null
@@ -2542,6 +2615,101 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      training_progress: {
+        Row: {
+          box: number
+          card_key: string
+          correct_count: number
+          driver_id: string
+          due_at: string
+          last_answered_at: string
+          wrong_count: number
+        }
+        Insert: {
+          box: number
+          card_key: string
+          correct_count?: number
+          driver_id: string
+          due_at: string
+          last_answered_at: string
+          wrong_count?: number
+        }
+        Update: {
+          box?: number
+          card_key?: string
+          correct_count?: number
+          driver_id?: string
+          due_at?: string
+          last_answered_at?: string
+          wrong_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "training_progress_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      training_questions: {
+        Row: {
+          active: boolean
+          card_key: string
+          correct_index: number
+          created_at: string
+          explanation: string
+          hint: string | null
+          id: string
+          legal_ref: string | null
+          locale: string
+          module: string
+          options: Json
+          question: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          updated_at: string
+          valid_from: string | null
+        }
+        Insert: {
+          active?: boolean
+          card_key: string
+          correct_index: number
+          created_at?: string
+          explanation: string
+          hint?: string | null
+          id?: string
+          legal_ref?: string | null
+          locale: string
+          module: string
+          options: Json
+          question: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          updated_at?: string
+          valid_from?: string | null
+        }
+        Update: {
+          active?: boolean
+          card_key?: string
+          correct_index?: number
+          created_at?: string
+          explanation?: string
+          hint?: string | null
+          id?: string
+          legal_ref?: string | null
+          locale?: string
+          module?: string
+          options?: Json
+          question?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          updated_at?: string
+          valid_from?: string | null
+        }
+        Relationships: []
       }
       vehicle_drivers: {
         Row: {
@@ -4924,6 +5092,7 @@ export type Database = {
         }
       }
       unread_notifications: { Args: never; Returns: number }
+      training_sync: { Args: { p_cards: Json }; Returns: number }
       update_operator_profile: {
         Args: { p: Json }
         Returns: {
@@ -5045,6 +5214,16 @@ export type Database = {
       dispatch_mode: "DESK" | "DIRECT"
       distance_source: "MANUAL" | "AUTO"
       document_kind: "CARRIER_LICENSE" | "INSURANCE"
+      driver_certificate_type:
+        | "CODE95"
+        | "ADR_BASIC"
+        | "ADR_TANK"
+        | "ADR_CLASS1"
+        | "ADR_CLASS7"
+        | "TYOTURVA"
+        | "EA1"
+        | "TIETURVA1"
+        | "TACHO_CARD"
       driver_status: "ACTIVE" | "ARCHIVED"
       email_status: "PENDING" | "SENT" | "FAILED" | "SKIPPED"
       eta_source: "ROUTE" | "TRAFFIC" | "CARRIER"
@@ -5068,6 +5247,7 @@ export type Database = {
         | "REPORT"
         | "ADMIN_MESSAGE"
         | "CLAIM"
+        | "DRIVER"
       offer_origin: "DESK" | "DIRECT"
       order_status:
         | "DRAFT"
@@ -5264,6 +5444,17 @@ export const Constants = {
       dispatch_mode: ["DESK", "DIRECT"],
       distance_source: ["MANUAL", "AUTO"],
       document_kind: ["CARRIER_LICENSE", "INSURANCE"],
+      driver_certificate_type: [
+        "CODE95",
+        "ADR_BASIC",
+        "ADR_TANK",
+        "ADR_CLASS1",
+        "ADR_CLASS7",
+        "TYOTURVA",
+        "EA1",
+        "TIETURVA1",
+        "TACHO_CARD",
+      ],
       driver_status: ["ACTIVE", "ARCHIVED"],
       email_status: ["PENDING", "SENT", "FAILED", "SKIPPED"],
       eta_source: ["ROUTE", "TRAFFIC", "CARRIER"],
@@ -5288,6 +5479,7 @@ export const Constants = {
         "REPORT",
         "ADMIN_MESSAGE",
         "CLAIM",
+        "DRIVER",
       ],
       offer_origin: ["DESK", "DIRECT"],
       order_status: [

@@ -7,6 +7,7 @@ import { buildDriverReport } from '@/lib/drivers/report';
 import { getI18n, isLocale } from '@/lib/i18n';
 import { helsinkiToday } from '@/lib/reports/periods';
 import { createClient } from '@/lib/supabase/server';
+import { DriverCertificates } from '@/components/domain/DriverCertificates';
 import { PayProfilePanel } from './PayProfilePanel';
 import { ShiftsPanel } from './ShiftsPanel';
 import { WorkSummary } from '../WorkSummary';
@@ -59,6 +60,7 @@ export default async function DriverPage({
     { data: shifts },
     report,
     { data: rates },
+    { data: certificates },
   ] = await Promise.all([
       supabase.from('drivers').select('*').eq('id', id).maybeSingle(),
       supabase
@@ -80,6 +82,12 @@ export default async function DriverPage({
       buildDriverReport({ from: period.from, to: period.to, driverId: id }),
       /* Категории таблиц ставок — для выбора в модели оплаты; одна строка на категорию. */
       supabase.from('tes_wage_rates').select('rule_set_id, grade, label, sort').order('sort'),
+      /* Сроки документов — да; результаты тренажёра перевозчику не отдаются вовсе. */
+      supabase
+        .from('driver_certificates')
+        .select('id, type, issued_at, expires_at')
+        .eq('driver_id', id)
+        .order('expires_at'),
     ]);
 
   const grades = [
@@ -118,6 +126,21 @@ export default async function DriverPage({
       </p>
 
       <section className="mt-8">
+        <h2 className="mb-2 border-b border-line pb-2 text-[13px] font-semibold tracking-tight text-ink-faint">
+          {t.certificates.title}
+        </h2>
+        <p className="mb-3 text-[12px] text-ink-muted">{t.certificates.carrierHint}</p>
+        <div className="max-w-md">
+          <DriverCertificates
+            driverId={driver.id}
+            rows={certificates ?? []}
+            today={helsinkiToday()}
+            variant="cabinet"
+          />
+        </div>
+      </section>
+
+      <section className="mt-10">
         <h2 className="mb-4 border-b border-line pb-2 text-[13px] font-semibold tracking-tight text-ink-faint">
           {t.pay.title}
         </h2>

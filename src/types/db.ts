@@ -290,3 +290,6 @@ export type ClaimDetail = {
 
 export type PeriodReportRow = Database['public']['Functions']['period_report']['Returns'][number];
 export type PeriodClaim = Database['public']['Functions']['period_claims']['Returns'][number];
+
+/** Вид сертификата водителя: Код 95, ADR, Työturva, EA1, карта водителя. */
+export type DriverCertificateType = Database['public']['Enums']['driver_certificate_type'];

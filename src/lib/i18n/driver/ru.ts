@@ -1,4 +1,5 @@
 import type { DriverPack } from '../driver';
+import { ru as trainingRu } from './training/ru';
 
 /** Русский: приложение водителя. Платформа остаётся на fi/en. */
 export const ru = {
@@ -122,6 +123,8 @@ export const ru = {
       'Этот браузер не поддерживает уведомления. На iPhone сначала установите приложение на главный экран и откройте его оттуда.',
     offline: 'Нет связи. Проверьте сеть и попробуйте снова.',
   },
+  training: trainingRu.training,
+  certificates: trainingRu.certificates,
   places: {
     kind: {
       FUEL: 'Заправка',
@@ -183,6 +186,7 @@ export const ru = {
   payDisclaimer:
     'Расчёт справочный. Окончательную оплату определяют работодатель и трудовой или коллективный договор.',
   msg: {
+    ...trainingRu.msg,
     'driverApp.earnTrips':
       '{count, plural, one {# рейс} few {# рейса} many {# рейсов} other {# рейса}}',
     'driverApp.earnHours': '{hours} ч',

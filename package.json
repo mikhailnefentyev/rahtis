@@ -12,6 +12,7 @@
     "backup": "node scripts/backup.mjs",
     "places:import": "node scripts/import-driver-places.mjs",
     "email:test": "node scripts/send-test-email.mjs",
+    "training:rls": "node scripts/check-training-rls.mjs",
     "types": "npx --yes supabase gen types typescript --linked > src/types/database.ts",
     "predev": "node scripts/sync-maplibre.mjs",
     "prebuild": "node scripts/sync-maplibre.mjs",

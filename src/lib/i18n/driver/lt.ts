@@ -1,4 +1,5 @@
 import type { DriverPack } from '../driver';
+import { lt as trainingLt } from './training/lt';
 
 /** Литовский: приложение водителя. Платформа остаётся на fi/en. */
 export const lt = {
@@ -122,6 +123,8 @@ export const lt = {
       'Ši naršyklė nepalaiko pranešimų. „iPhone“ pirmiausia įdiek programėlę pradžios ekrane ir atidaryk ją iš ten.',
     offline: 'Nėra ryšio. Patikrink tinklą ir bandyk dar kartą.',
   },
+  training: trainingLt.training,
+  certificates: trainingLt.certificates,
   places: {
     kind: {
       FUEL: 'Degalinė',
@@ -183,6 +186,7 @@ export const lt = {
   payDisclaimer:
     'Skaičiavimas orientacinis. Galutinį atlygį nustato darbdavys ir darbo arba kolektyvinė sutartis.',
   msg: {
+    ...trainingLt.msg,
     'driverApp.earnTrips': '{count, plural, one {# reisas} few {# reisai} many {# reiso} other {# reisų}}',
     'driverApp.earnHours': '{hours} h',
     'places.count': '{count, plural, one {# vieta} few {# vietos} many {# vietos} other {# vietų}}',

@@ -99,6 +99,20 @@ type Texts = {
     note: string;
   };
 
+  /*
+   * Срок удостоверения водителя подходит к концу (6, 3, 1 месяц).
+   * Уходит перевозчику: ему нужен допущенный водитель. Результатов
+   * тренажёра в письме нет и быть не может.
+   */
+  certificate: {
+    subject: (driver: string, type: string) => string;
+    heading: (driver: string) => string;
+    preheader: (type: string, date: string) => string;
+    lead: (driver: string, type: string, date: string) => string;
+    button: string;
+    note: string;
+  };
+
   billing: {
     invoicedSubject: (ref: string) => string;
     invoicedHeading: (ref: string) => string;
@@ -199,6 +213,15 @@ const fi: Texts = {
       `${shipper} lähetti kuljetuksen suoraan autollenne ohi yhteisen pöydän. Määräaikaa ei ole: kuljetus odottaa, kunnes te tai kuljettaja vahvistatte sen. Jos kieltäydytte, kuljetus siirtyy yhteiselle pöydälle.`,
     button: 'Vahvista tai kieltäydy',
     note: 'Saat tämän viestin, koska olet sallinut tälle tilaajalle suorat tilaukset. Luvan voi perua Asiakkaat-sivulla.',
+  },
+
+  certificate: {
+    subject: (driver, type) => `${driver}: ${type} vanhenee pian`,
+    heading: (driver) => `Kuljettajan ${driver} pätevyys vanhenee`,
+    preheader: (type, date) => `${type} on voimassa ${date} asti.`,
+    lead: (driver, type, date) => `Kuljettajan ${driver} ${type} on voimassa ${date} asti. Varmista uusiminen ajoissa, jotta kuljettaja voi jatkaa keikkoja.`,
+    button: 'Avaa kuljettajan kortti',
+    note: 'Kun pätevyys on uusittu, päivitä uusi päättymispäivä kuljettajan korttiin tai pyydä kuljettajaa tekemään se sovelluksessa.',
   },
 
   billing: {
@@ -306,6 +329,15 @@ const en: Texts = {
       `${shipper} sent this transport straight to your vehicle, bypassing the load board. There is no deadline: it waits until you or the driver confirm it. If you decline, it goes to the load board.`,
     button: 'Confirm or decline',
     note: 'You are getting this because you allowed this shipper to send you direct orders. You can withdraw that on the Customers page.',
+  },
+
+  certificate: {
+    subject: (driver, type) => `${driver}: ${type} expires soon`,
+    heading: (driver) => `A qualification of ${driver} is expiring`,
+    preheader: (type, date) => `${type} is valid until ${date}.`,
+    lead: (driver, type, date) => `The ${type} of ${driver} is valid until ${date}. Make sure it is renewed in time so the driver can keep taking jobs.`,
+    button: 'Open the driver card',
+    note: 'Once it is renewed, update the new expiry date on the driver card, or ask the driver to do it in the app.',
   },
 
   billing: {

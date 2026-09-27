@@ -1,4 +1,5 @@
 import type { DriverPack } from '../driver';
+import { sv as trainingSv } from './training/sv';
 
 /** Шведский: приложение водителя. Платформа остаётся на fi/en. */
 export const sv = {
@@ -122,6 +123,8 @@ export const sv = {
       'Den här webbläsaren stöder inte aviseringar. På iPhone: installera appen på hemskärmen först och öppna den därifrån.',
     offline: 'Ingen anslutning. Kontrollera nätet och försök igen.',
   },
+  training: trainingSv.training,
+  certificates: trainingSv.certificates,
   places: {
     kind: {
       FUEL: 'Tankning',
@@ -183,6 +186,7 @@ export const sv = {
   payDisclaimer:
     'Beräkningen är vägledande. Den slutliga lönen bestäms av arbetsgivaren och anställnings- eller kollektivavtalet.',
   msg: {
+    ...trainingSv.msg,
     'driverApp.earnTrips': '{count, plural, one {# körning} other {# körningar}}',
     'driverApp.earnHours': '{hours} h',
     'places.count': '{count, plural, one {# plats} other {# platser}}',

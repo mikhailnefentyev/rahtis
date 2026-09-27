@@ -1,4 +1,5 @@
 import type { DriverPack } from '../driver';
+import { da as trainingDa } from './training/da';
 
 /** Датский: приложение водителя. Платформа остаётся на fi/en. */
 export const da = {
@@ -122,6 +123,8 @@ export const da = {
       'Denne browser understøtter ikke notifikationer. På iPhone skal du først installere appen på hjemmeskærmen og åbne den derfra.',
     offline: 'Ingen forbindelse. Tjek netværket, og prøv igen.',
   },
+  training: trainingDa.training,
+  certificates: trainingDa.certificates,
   places: {
     kind: {
       FUEL: 'Tankning',
@@ -183,6 +186,7 @@ export const da = {
   payDisclaimer:
     'Beregningen er vejledende. Den endelige løn fastsættes af arbejdsgiveren og ansættelses- eller overenskomstaftalen.',
   msg: {
+    ...trainingDa.msg,
     'driverApp.earnTrips': '{count, plural, one {# tur} other {# ture}}',
     'driverApp.earnHours': '{hours} t',
     'places.count': '{count, plural, one {# sted} other {# steder}}',

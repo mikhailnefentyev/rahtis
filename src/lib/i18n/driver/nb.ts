@@ -1,4 +1,5 @@
 import type { DriverPack } from '../driver';
+import { nb as trainingNb } from './training/nb';
 
 /** Норвежский (букмол): приложение водителя. Платформа остаётся на fi/en. */
 export const nb = {
@@ -122,6 +123,8 @@ export const nb = {
       'Denne nettleseren støtter ikke varsler. På iPhone må du først installere appen på hjemskjermen og åpne den derfra.',
     offline: 'Ingen forbindelse. Sjekk nettet og prøv igjen.',
   },
+  training: trainingNb.training,
+  certificates: trainingNb.certificates,
   places: {
     kind: {
       FUEL: 'Drivstoff',
@@ -183,6 +186,7 @@ export const nb = {
   payDisclaimer:
     'Beregningen er veiledende. Endelig lønn bestemmes av arbeidsgiveren og arbeids- eller tariffavtalen.',
   msg: {
+    ...trainingNb.msg,
     'driverApp.earnTrips': '{count, plural, one {# tur} other {# turer}}',
     'driverApp.earnHours': '{hours} t',
     'places.count': '{count, plural, one {# sted} other {# steder}}',
