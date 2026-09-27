@@ -160,7 +160,7 @@ export function TrainingApp({
 
   return (
     <main className="flex flex-col gap-4">
-      <header className="flex items-center justify-between gap-3">
+      <header className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold tracking-tight">{texts.title}</h1>
         {/* Уровень — настройка, а не навигация: компактно в шапке, а не полосой во всю ширину. */}
         <div className="w-52 shrink-0">
