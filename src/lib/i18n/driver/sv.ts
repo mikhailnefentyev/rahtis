@@ -5,6 +5,8 @@ import { sv as trainingSv } from './training/sv';
 export const sv = {
   intl: 'sv-SE',
   driverApp: {
+    /* Нижнее меню: короткие формы, принятые в приложениях на этом языке. Заголовки разделов — полные. */
+    nav: { tasks: 'Uppdrag', earnings: 'Inkomst', map: 'Karta', inbox: 'Inkorg', profile: 'Profil' },
     map: 'Karta',
     title: 'RAHTIS Förare',
     tasks: 'Uppdrag',

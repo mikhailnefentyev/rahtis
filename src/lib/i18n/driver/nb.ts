@@ -5,6 +5,8 @@ import { nb as trainingNb } from './training/nb';
 export const nb = {
   intl: 'nb-NO',
   driverApp: {
+    /* Нижнее меню: короткие формы, принятые в приложениях на этом языке. Заголовки разделов — полные. */
+    nav: { tasks: 'Oppdrag', earnings: 'Inntekt', map: 'Kart', inbox: 'Meldinger', profile: 'Profil' },
     map: 'Kart',
     title: 'RAHTIS Sjåfør',
     tasks: 'Oppdrag',

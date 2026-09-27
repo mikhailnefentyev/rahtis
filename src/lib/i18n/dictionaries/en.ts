@@ -1771,6 +1771,8 @@ export const en = {
   },
 
   driverApp: {
+    /* Нижнее меню: короткие формы, принятые в приложениях на этом языке. Заголовки разделов — полные. */
+    nav: { tasks: 'Jobs', earnings: 'Earnings', map: 'Map', inbox: 'Inbox', profile: 'Profile' },
     map: 'Map',
     title: 'RAHTIS Driver',
     tasks: 'Jobs',

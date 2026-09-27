@@ -5,6 +5,8 @@ import { ru as trainingRu } from './training/ru';
 export const ru = {
   intl: 'ru-RU',
   driverApp: {
+    /* Нижнее меню: короткие формы, принятые в приложениях на этом языке. Заголовки разделов — полные. */
+    nav: { tasks: 'Задания', earnings: 'Доход', map: 'Карта', inbox: 'Входящие', profile: 'Профиль' },
     map: 'Карта',
     title: 'RAHTIS Водитель',
     tasks: 'Задания',

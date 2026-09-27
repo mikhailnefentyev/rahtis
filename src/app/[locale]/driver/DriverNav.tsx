@@ -25,20 +25,20 @@ export function DriverNav({ unread }: { unread: number }) {
   const items = [
     {
       href: base,
-      label: t.driverApp.tasks,
+      label: t.driverApp.nav.tasks,
       icon: TasksIcon,
       active: pathname === base || pathname.startsWith(`${base}/task`),
     },
-    { href: `${base}/earnings`, label: t.driverApp.earnings, icon: EarningsIcon, active: pathname.startsWith(`${base}/earnings`) },
-    { href: `${base}/map`, label: t.driverApp.map, icon: MapIcon, active: pathname.startsWith(`${base}/map`) },
+    { href: `${base}/earnings`, label: t.driverApp.nav.earnings, icon: EarningsIcon, active: pathname.startsWith(`${base}/earnings`) },
+    { href: `${base}/map`, label: t.driverApp.nav.map, icon: MapIcon, active: pathname.startsWith(`${base}/map`) },
     {
       href: `${base}/inbox`,
-      label: t.driverApp.inbox,
+      label: t.driverApp.nav.inbox,
       icon: InboxIcon,
       active: pathname.startsWith(`${base}/inbox`),
       badge: unread,
     },
-    { href: `${base}/profile`, label: t.driverApp.profile, icon: ProfileIcon, active: pathname.startsWith(`${base}/profile`) },
+    { href: `${base}/profile`, label: t.driverApp.nav.profile, icon: ProfileIcon, active: pathname.startsWith(`${base}/profile`) },
   ];
 
   return (

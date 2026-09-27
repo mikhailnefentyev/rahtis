@@ -5,6 +5,8 @@ import { pl as trainingPl } from './training/pl';
 export const pl = {
   intl: 'pl-PL',
   driverApp: {
+    /* Нижнее меню: короткие формы, принятые в приложениях на этом языке. Заголовки разделов — полные. */
+    nav: { tasks: 'Zadania', earnings: 'Zarobki', map: 'Mapa', inbox: 'Skrzynka', profile: 'Profil' },
     map: 'Mapa',
     title: 'RAHTIS Kierowca',
     tasks: 'Zadania',

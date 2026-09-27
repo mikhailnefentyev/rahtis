@@ -5,6 +5,8 @@ import { et as trainingEt } from './training/et';
 export const et = {
   intl: 'et-EE',
   driverApp: {
+    /* Нижнее меню: короткие формы, принятые в приложениях на этом языке. Заголовки разделов — полные. */
+    nav: { tasks: 'Ülesanded', earnings: 'Teenistus', map: 'Kaart', inbox: 'Sõnumid', profile: 'Profiil' },
     map: 'Kaart',
     title: 'RAHTIS Juht',
     tasks: 'Ülesanded',

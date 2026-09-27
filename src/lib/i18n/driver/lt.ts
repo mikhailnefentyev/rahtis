@@ -5,6 +5,8 @@ import { lt as trainingLt } from './training/lt';
 export const lt = {
   intl: 'lt-LT',
   driverApp: {
+    /* Нижнее меню: короткие формы, принятые в приложениях на этом языке. Заголовки разделов — полные. */
+    nav: { tasks: 'Užduotys', earnings: 'Uždarbis', map: 'Žemėlapis', inbox: 'Žinutės', profile: 'Profilis' },
     map: 'Žemėlapis',
     title: 'RAHTIS Vairuotojas',
     tasks: 'Užduotys',

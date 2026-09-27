@@ -5,6 +5,8 @@ import { lv as trainingLv } from './training/lv';
 export const lv = {
   intl: 'lv-LV',
   driverApp: {
+    /* Нижнее меню: короткие формы, принятые в приложениях на этом языке. Заголовки разделов — полные. */
+    nav: { tasks: 'Uzdevumi', earnings: 'Ienākumi', map: 'Karte', inbox: 'Ziņas', profile: 'Profils' },
     map: 'Karte',
     title: 'RAHTIS Vadītājs',
     tasks: 'Uzdevumi',

@@ -1884,6 +1884,8 @@ export const fi = {
   },
 
   driverApp: {
+    /* Нижнее меню: короткие формы, принятые в приложениях на этом языке. Заголовки разделов — полные. */
+    nav: { tasks: 'Tehtävät', earnings: 'Ansiot', map: 'Kartta', inbox: 'Viestit', profile: 'Profiili' },
     map: 'Kartta',
     title: 'RAHTIS Kuljettaja',
     tasks: 'Tehtävät',

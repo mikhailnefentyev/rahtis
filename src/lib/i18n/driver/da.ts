@@ -5,6 +5,8 @@ import { da as trainingDa } from './training/da';
 export const da = {
   intl: 'da-DK',
   driverApp: {
+    /* Нижнее меню: короткие формы, принятые в приложениях на этом языке. Заголовки разделов — полные. */
+    nav: { tasks: 'Opgaver', earnings: 'Indtægt', map: 'Kort', inbox: 'Beskeder', profile: 'Profil' },
     map: 'Kort',
     title: 'RAHTIS Chauffør',
     tasks: 'Opgaver',
