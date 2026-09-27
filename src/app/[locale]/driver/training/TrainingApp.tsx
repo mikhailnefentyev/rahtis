@@ -23,7 +23,10 @@ import {
   writePrefs,
   writeProgress,
 } from '@/lib/training/store';
+import { AdrGame } from './AdrGame';
+import { AxleGame } from './AxleGame';
 import { CargoGame } from './CargoGame';
+import { InspectionGame } from './InspectionGame';
 import { CheatSheet } from './CheatSheet';
 import { Quiz } from './Quiz';
 import { ShiftPlanner } from './ShiftPlanner';
@@ -68,6 +71,7 @@ export function TrainingApp({
   const [now, setNow] = useState(serverNow);
 
   const progressRef = useRef(progress);
+  const strip = useRef<HTMLDivElement>(null);
   const synced = useRef<Progress>(serverProgress);
 
   const flush = useCallback(async () => {
@@ -107,6 +111,13 @@ export function TrainingApp({
     // Один раз при открытии: сервер отдал прогресс на момент загрузки страницы.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  /* Выбранный модуль — в поле зрения ленты, в том числе когда он пришёл из адреса. */
+  useEffect(() => {
+    const el = strip.current;
+    const on = el?.querySelector<HTMLElement>('[data-on]');
+    if (el && on) el.scrollLeft = on.offsetLeft - (el.clientWidth - on.clientWidth) / 2;
+  }, [topic]);
 
   /* Модуль и вкладка — в адресе: «назад» и обновление страницы не сбрасывают экран. */
   useEffect(() => {
@@ -170,7 +181,16 @@ export function TrainingApp({
       </header>
 
       {TRAINING_MODULES.length > 1 && (
-        <div className="grid grid-cols-2 gap-2.5" role="group" aria-label={texts.moduleLabel}>
+        /*
+         * Модули — лентой в один ряд с прокруткой вбок: при восьми модулях
+         * сетка занимала весь первый экран, и до практики приходилось листать.
+         */
+        <div
+          ref={strip}
+          className="relative -mx-4 flex snap-x snap-proximity gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none]"
+          role="group"
+          aria-label={texts.moduleLabel}
+        >
           {TRAINING_MODULES.map((item) => {
             const on = item.id === topic;
             const Icon = MODULE_ICONS[item.id];
@@ -181,24 +201,27 @@ export function TrainingApp({
                 key={item.id}
                 type="button"
                 aria-pressed={on}
+                data-on={on ? '' : undefined}
                 onClick={() => setTopic(item.id)}
                 className={cn(
-                  'flex min-h-24 flex-col items-start justify-between gap-2 rounded-card border-[1.5px] p-3 text-left',
+                  'flex min-h-16 w-44 shrink-0 snap-start items-center gap-2.5 rounded-card border-[1.5px] px-2.5 py-2 text-left',
                   on ? 'border-accent bg-accent-wash' : 'border-line bg-surface',
                 )}
               >
                 <span
                   className={cn(
-                    'flex size-10 items-center justify-center rounded-control',
+                    'flex size-10 shrink-0 items-center justify-center rounded-control',
                     on ? 'bg-accent text-accent-ink' : 'bg-raised text-ink-muted',
                   )}
                 >
                   <Icon />
                 </span>
-                <span className="text-[16px] leading-tight font-semibold">{texts.modules[item.id].name}</span>
-                <span className="flex w-full items-center justify-between font-mono text-[13px] text-ink-muted">
-                  <span>{freshness(itemKeys, progress, now)}%</span>
-                  {itemDue > 0 && <span className="rounded-pill bg-accent px-1.5 text-accent-ink">{itemDue}</span>}
+                <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+                  <span className="text-[14px] leading-tight font-semibold break-words">{texts.modules[item.id].name}</span>
+                  <span className="flex items-center gap-1.5 font-mono text-[12px] text-ink-muted">
+                    {freshness(itemKeys, progress, now)}%
+                    {itemDue > 0 && <span className="rounded-pill bg-accent px-1.5 text-accent-ink">{itemDue}</span>}
+                  </span>
                 </span>
               </button>
             );
@@ -248,6 +271,9 @@ export function TrainingApp({
             ))}
           {activeTab === 'practice' && spec.practice === 'shift' && <ShiftPlanner mode={mode} />}
           {activeTab === 'practice' && spec.practice === 'cargo' && <CargoGame mode={mode} />}
+          {activeTab === 'practice' && spec.practice === 'axles' && <AxleGame mode={mode} />}
+          {activeTab === 'practice' && spec.practice === 'inspection' && <InspectionGame mode={mode} />}
+          {activeTab === 'practice' && spec.practice === 'adr' && <AdrGame mode={mode} />}
           {activeTab === 'rules' && <CheatSheet module={topic} />}
         </section>
       </div>
@@ -264,7 +290,8 @@ export function TrainingApp({
           </p>
         )}
         <p>{texts.notOfficial}</p>
-        <p>{texts.sources}</p>
+        {/* Источники в подвале — только тахографа и крепления; у остальных модулей норма стоит под каждым вопросом. */}
+        {(topic === 'tacho' || topic === 'cargo') && <p>{texts.sources}</p>}
       </footer>
     </main>
   );

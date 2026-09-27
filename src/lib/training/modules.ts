@@ -9,10 +9,23 @@ import type { ShiftScenario } from './shift';
  * ADR, Työturva, Ensiapu и остальные добавляются так же, без переделки
  * экранов.
  */
+export type PracticeKind = 'shift' | 'cargo' | 'axles' | 'inspection' | 'adr';
+
+/*
+ * Порядок — по частоте нарушений на проверках полиции (массовая проверка
+ * 27–31.10.2025: режим труда и отдыха и тахограф, крепление груза,
+ * перегруз), дальше техсостояние, ADR и темы карт.
+ */
 export const TRAINING_MODULES = [
   { id: 'tacho', practice: 'shift' },
   { id: 'cargo', practice: 'cargo' },
-] as const satisfies ReadonlyArray<{ id: string; practice: 'shift' | 'cargo' | null }>;
+  { id: 'masses', practice: 'axles' },
+  { id: 'tech', practice: 'inspection' },
+  { id: 'adr', practice: 'adr' },
+  { id: 'tyoturva', practice: null },
+  { id: 'ensiapu', practice: null },
+  { id: 'tieturva', practice: null },
+] as const satisfies ReadonlyArray<{ id: string; practice: PracticeKind | null }>;
 
 export type TrainingModuleId = (typeof TRAINING_MODULES)[number]['id'];
 
@@ -31,6 +44,20 @@ export const SHIFT_SCENARIOS = [
 ] as const satisfies ReadonlyArray<ShiftScenario & { id: string }>;
 
 export type ShiftScenarioId = (typeof SHIFT_SCENARIOS)[number]['id'];
+
+/**
+ * Сценарии «Jaa kuorma». `place` — расставить груз из запаса по местам;
+ * `unload` — прицеп полон, на промежуточной точке выгрузить заданное
+ * число рядов. Числа подобраны так, чтобы очевидная раскладка ошибалась:
+ * выгрузка сзади перегружает ведущую ось.
+ */
+export const AXLE_SCENARIOS = [
+  { id: 'load', mode: 'place', pool: Array(10).fill(2.2) as number[], start: null, unload: 0 },
+  { id: 'drop', mode: 'unload', pool: [] as number[], start: Array(11).fill(2.2) as number[], unload: 5 },
+  { id: 'heavy', mode: 'place', pool: [7, 7], start: null, unload: 0 },
+] as const;
+
+export type AxleScenarioId = (typeof AXLE_SCENARIOS)[number]['id'];
 
 /** Вопрос, готовый к показу: уже на одном языке. */
 export type TrainingCard = {
