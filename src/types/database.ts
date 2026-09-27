@@ -4991,6 +4991,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      training_sync: { Args: { p_cards: Json }; Returns: number }
       uncomplete_stop: {
         Args: { p_stop_id: string }
         Returns: {
@@ -5092,7 +5093,6 @@ export type Database = {
         }
       }
       unread_notifications: { Args: never; Returns: number }
-      training_sync: { Args: { p_cards: Json }; Returns: number }
       update_operator_profile: {
         Args: { p: Json }
         Returns: {
