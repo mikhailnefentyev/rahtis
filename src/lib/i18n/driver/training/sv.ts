@@ -4,7 +4,7 @@ import type { TrainingPack } from './index';
 export const sv = {
   training: {
     title: 'Utbildning',
-    entryHint: 'Repetera färdskrivarreglerna och lastsäkring på några minuter.',
+    entryHint: 'Färdskrivare, last, ADR, fordonskontroll och mer – några minuter åt gången.',
     modeLabel: 'Nivå',
     modePro: 'Erfaren',
     modeNew: 'Nybörjare',

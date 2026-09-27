@@ -1890,7 +1890,7 @@ export const en = {
   /* TODO: tarkistettava — translation of the driver trainer awaits review. */
   training: {
     title: 'Training',
-    entryHint: 'Refresh tachograph rules and cargo securing in a few minutes.',
+    entryHint: 'Tachograph, cargo, ADR, vehicle check and more – a few minutes at a time.',
     modeLabel: 'Level',
     modePro: 'Experienced',
     modeNew: 'Beginner',
@@ -2337,6 +2337,9 @@ export const en = {
     correctMark: 'correct',
     empty: 'No questions match the filters.',
     failed: 'Could not save. Check the fields.',
+    bulkTitle: 'Mark everything shown as reviewed',
+    bulkHint: 'Applies only to the questions in this list: the chosen topic and language. Drivers see them straight away.',
+    bulkButton: 'Mark {count} reviewed',
   },
 
   shifts: {

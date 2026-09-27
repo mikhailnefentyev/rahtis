@@ -4,7 +4,7 @@ import type { TrainingPack } from './index';
 export const et = {
   training: {
     title: 'Koolitus',
-    entryHint: 'Korda sõidumeeriku reegleid ja koorma kinnitamist mõne minutiga.',
+    entryHint: 'Sõidumeerik, koorem, ADR, ülevaatus ja muu – mõni minut korraga.',
     modeLabel: 'Tase',
     modePro: 'Kogenud',
     modeNew: 'Algaja',

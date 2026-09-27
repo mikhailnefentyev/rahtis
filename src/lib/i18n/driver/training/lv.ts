@@ -4,7 +4,7 @@ import type { TrainingPack } from './index';
 export const lv = {
   training: {
     title: 'Apmācība',
-    entryHint: 'Atkārto tahogrāfa noteikumus un kravas nostiprināšanu dažās minūtēs.',
+    entryHint: 'Tahogrāfs, krava, ADR, apskate un cits – pa dažām minūtēm.',
     modeLabel: 'Līmenis',
     modePro: 'Pieredzējis',
     modeNew: 'Iesācējs',

@@ -4,7 +4,7 @@ import type { TrainingPack } from './index';
 export const ru = {
   training: {
     title: 'Тренажёр',
-    entryHint: 'Повторите правила тахографа и крепление груза за несколько минут.',
+    entryHint: 'Тахограф, груз, ADR, осмотр и другое — по несколько минут.',
     modeLabel: 'Уровень',
     modePro: 'Опытный',
     modeNew: 'Новичок',

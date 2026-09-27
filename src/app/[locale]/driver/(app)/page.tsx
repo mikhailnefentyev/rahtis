@@ -6,6 +6,7 @@ import { getDriverTasks, nextStop, type DriverTask } from '@/lib/driverApp/tasks
 import { isLocale, type Locale } from '@/lib/i18n';
 import { getDriverI18n } from '@/lib/driverApp/i18n';
 import { stopTitle } from '@/lib/orders/haul';
+import { GaugeIcon } from '../training/icons';
 import { PushSetup } from './PushSetup';
 import { ShiftBar } from './ShiftBar';
 import { TaskTabs } from './TaskTabs';
@@ -40,6 +41,27 @@ export default async function DriverHome({
         <span className="font-mono text-[17px] font-bold tracking-tight">{driver.plate ?? t.driverApp.noVehicle}</span>
       </header>
 
+      {/*
+        Тренажёр — первым блоком: при пустом списке заданий он иначе висел
+        посреди экрана под «заданий нет». Одна строка, не больше карточки
+        смены: задания и смена остаются главным на экране.
+      */}
+      <Link
+        href={`/${locale}/driver/training`}
+        className="flex min-h-16 items-center gap-3 rounded-card border border-line bg-surface px-4 py-3"
+      >
+        <span className="flex size-11 shrink-0 items-center justify-center rounded-control bg-accent-wash text-accent">
+          <GaugeIcon />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-[16px] font-semibold">{t.training.title}</span>
+          <span className="block text-[14px] leading-snug text-ink-muted">{t.training.entryHint}</span>
+        </span>
+        <span aria-hidden className="text-xl text-accent">
+          ›
+        </span>
+      </Link>
+
       <ShiftBar shift={driver.shift} />
 
       <PushSetup compact />
@@ -58,19 +80,6 @@ export default async function DriverHome({
         </ul>
       )}
 
-      {/* Тренажёр — повод открыть приложение между рейсами, поэтому под заданиями, а не вместо них. */}
-      <Link
-        href={`/${locale}/driver/training`}
-        className="flex items-center justify-between gap-3 rounded-card border border-line bg-surface px-4 py-3.5"
-      >
-        <span>
-          <span className="block text-[16px] font-semibold">{t.training.title}</span>
-          <span className="block text-[14px] text-ink-muted">{t.training.entryHint}</span>
-        </span>
-        <span aria-hidden className="text-xl text-accent">
-          ›
-        </span>
-      </Link>
     </main>
   );
 }

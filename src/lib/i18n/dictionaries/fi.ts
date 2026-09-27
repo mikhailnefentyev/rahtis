@@ -2006,7 +2006,7 @@ export const fi = {
    */
   training: {
     title: 'Koulutus',
-    entryHint: 'Kertaa ajopiirturin säännöt ja kuorman sidonta muutamassa minuutissa.',
+    entryHint: 'Ajopiirturi, kuorma, ADR, tarkastus ja muuta – muutama minuutti kerrallaan.',
     modeLabel: 'Taso',
     modePro: 'Kokenut',
     modeNew: 'Aloittelija',
@@ -2443,6 +2443,9 @@ export const fi = {
     correctMark: 'oikea',
     empty: 'Ei kysymyksiä valituilla ehdoilla.',
     failed: 'Tallennus epäonnistui. Tarkista kentät.',
+    bulkTitle: 'Merkitse kaikki näytetyt tarkastetuiksi',
+    bulkHint: 'Koskee vain tämän listan kysymyksiä: valittu aihe ja kieli. Kuljettaja näkee ne heti.',
+    bulkButton: 'Merkitse {count} tarkastetuksi',
   },
 
   shifts: {

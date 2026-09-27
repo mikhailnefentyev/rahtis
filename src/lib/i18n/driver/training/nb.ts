@@ -4,7 +4,7 @@ import type { TrainingPack } from './index';
 export const nb = {
   training: {
     title: 'Opplæring',
-    entryHint: 'Repeter fartsskriverreglene og lastsikring på noen minutter.',
+    entryHint: 'Fartsskriver, last, ADR, kjøretøykontroll og mer – noen minutter om gangen.',
     modeLabel: 'Nivå',
     modePro: 'Erfaren',
     modeNew: 'Nybegynner',

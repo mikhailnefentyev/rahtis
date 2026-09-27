@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { defaultLocale, getDictionary, isLocale, type Locale } from '@/lib/i18n';
 import { DRIVER_LOCALES } from '@/lib/i18n/driverLocale';
 import { createClient } from '@/lib/supabase/server';
+import { isTrainingModule } from './modules';
 
 /**
  * Вопросы тренажёра в админке: добавить, править, отметить проверку,
@@ -95,6 +96,30 @@ export async function reviewQuestionAction(formData: FormData): Promise<void> {
     .from('training_questions')
     .update({ reviewed_by: reviewer, reviewed_at: new Date().toISOString() })
     .eq('id', id);
+  revalidate(locale);
+}
+
+/**
+ * Отметить проверенными все непроверенные вопросы, что оператор видит в
+ * списке: выбранная тема (или все) и язык. Те же условия, что у фильтра
+ * страницы, поэтому отмечается ровно то, что было на экране.
+ */
+export async function reviewShownQuestionsAction(formData: FormData): Promise<void> {
+  const locale = toLocale(formData.get('locale'));
+  const reviewer = str(formData, 'reviewer');
+  const topic = str(formData, 'module');
+  const lang = str(formData, 'lang');
+  if (!reviewer || !(DRIVER_LOCALES as readonly string[]).includes(lang)) return;
+
+  const supabase = await createClient();
+  let request = supabase
+    .from('training_questions')
+    .update({ reviewed_by: reviewer, reviewed_at: new Date().toISOString() })
+    .eq('locale', lang)
+    .eq('active', true)
+    .is('reviewed_at', null);
+  if (isTrainingModule(topic)) request = request.eq('module', topic);
+  await request;
   revalidate(locale);
 }
 

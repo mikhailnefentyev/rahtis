@@ -4,7 +4,7 @@ import type { TrainingPack } from './index';
 export const lt = {
   training: {
     title: 'Mokymai',
-    entryHint: 'Pakartok tachografo taisykles ir krovinio tvirtinimą per kelias minutes.',
+    entryHint: 'Tachografas, krovinys, ADR, apžiūra ir kt. – po kelias minutes.',
     modeLabel: 'Lygis',
     modePro: 'Patyręs',
     modeNew: 'Pradedantysis',

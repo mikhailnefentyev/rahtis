@@ -4,7 +4,7 @@ import type { TrainingPack } from './index';
 export const pl = {
   training: {
     title: 'Szkolenie',
-    entryHint: 'Powtórz zasady tachografu i mocowanie ładunku w kilka minut.',
+    entryHint: 'Tachograf, ładunek, ADR, kontrola pojazdu i więcej – po kilka minut.',
     modeLabel: 'Poziom',
     modePro: 'Doświadczony',
     modeNew: 'Początkujący',

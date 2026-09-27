@@ -1,10 +1,11 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { Button, Card, CardBody, EmptyState, Select } from '@/components/ui';
+import { Button, Card, CardBody, EmptyState, Input, Select } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
 import { getI18n, isLocale } from '@/lib/i18n';
 import { DRIVER_LOCALES, DRIVER_LOCALE_NAMES } from '@/lib/i18n/driverLocale';
 import { createClient } from '@/lib/supabase/server';
+import { reviewShownQuestionsAction } from '@/lib/training/admin';
 import { TRAINING_MODULES } from '@/lib/training/modules';
 import { QuestionCard } from './QuestionCard';
 import { QuestionForm } from './QuestionForm';
@@ -120,6 +121,29 @@ export default async function TrainingAdminPage({
           </CardBody>
         </Card>
       </details>
+
+      {state === 'unreviewed' && questions.length > 0 && (
+        <Card className="mt-6">
+          <CardBody>
+            <form action={reviewShownQuestionsAction} className="flex flex-col gap-3">
+              <input type="hidden" name="locale" value={locale} />
+              <input type="hidden" name="module" value={topic} />
+              <input type="hidden" name="lang" value={lang} />
+              <div>
+                <p className="text-[14px] font-semibold">{texts.bulkTitle}</p>
+                <p className="mt-0.5 text-[13px] text-ink-muted">{texts.bulkHint}</p>
+              </div>
+              <div className="flex flex-wrap items-end gap-3">
+                <label className="flex flex-col gap-1 text-[12px] text-ink-muted">
+                  {texts.reviewer}
+                  <Input name="reviewer" required placeholder={texts.reviewerHint} />
+                </label>
+                <Button type="submit">{texts.bulkButton.replace('{count}', String(questions.length))}</Button>
+              </div>
+            </form>
+          </CardBody>
+        </Card>
+      )}
 
       <div className="mt-6 flex flex-col gap-3">
         {questions.length === 0 ? (
