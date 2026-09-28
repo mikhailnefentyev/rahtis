@@ -1,0 +1,44 @@
+-- ═══════════════════════════════════════════════════════════════════
+-- RAHTIS · карта транспорта у заказчика — снова весь парк
+--
+-- 20260929120000_test_world ограничила карту контуром заказчика. Решение
+-- пользователя 29.09.2026: общее число машин видят все, и тестовые, и
+-- настоящие. Карта — агрегат по городам, без названий компаний, и работать
+-- с машиной из другого контура она не даёт: стол заказов, взятие заказа,
+-- прямое назначение и рассылка по-прежнему раздельные.
+-- ═══════════════════════════════════════════════════════════════════
+
+CREATE OR REPLACE FUNCTION public.carrier_presence()
+ RETURNS TABLE(city text, country text, lat double precision, lon double precision, tractors integer, trucks integer, vans integer)
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+ SET search_path TO ''
+AS $function$
+begin
+  if (select app.current_party_role()) not in ('SHIPPER', 'ADMIN') then
+    raise exception 'Карта транспорта доступна заказчику и оператору.' using errcode = '42501';
+  end if;
+
+  return query
+  select
+    min(btrim(v.base_city))::text,
+    max(v.base_country)::text,
+    avg(v.base_lat)::double precision,
+    avg(v.base_lon)::double precision,
+    count(*) filter (where v.vehicle_class = 'TRACTOR')::integer,
+    count(*) filter (where v.vehicle_class = 'TRUCK')::integer,
+    count(*) filter (where v.vehicle_class = 'VAN')::integer
+  from public.vehicles v
+  join public.companies c on c.id = v.company_id
+  where v.access = 'APPROVED'
+    and v.base_lat is not null
+    and c.kind = 'CARRIER'
+    and c.status = 'ACTIVE'
+    and c.frozen_at is null
+    /* Документы просрочены — машина заказы не берёт, и на карте её нет. */
+    and app.company_documents_ok(c.id)
+  group by v.base_country, lower(btrim(v.base_city))
+  order by 5 desc, 6 desc, 7 desc, 1;
+end;
+$function$
+;
