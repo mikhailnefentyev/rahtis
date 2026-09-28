@@ -4991,6 +4991,13 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      retention_photo_candidates: {
+        Args: { p_limit?: number }
+        Returns: {
+          id: string
+          storage_path: string
+        }[]
+      }
       training_sync: { Args: { p_cards: Json }; Returns: number }
       uncomplete_stop: {
         Args: { p_stop_id: string }
