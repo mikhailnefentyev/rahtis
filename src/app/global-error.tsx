@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { reportRenderFailure } from '@/lib/incidents/action';
+import { errorClass, isStaleBundle, reloadOnce } from '@/lib/incidents/stale';
 
 /**
  * Последний рубеж: упал сам корневой layout.
@@ -22,8 +23,10 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    void reportRenderFailure({ digest: error.digest, path: window.location.pathname });
-  }, [error.digest]);
+    /* Старая сборка после выкладки: одна перезагрузка лечит, журнал не нужен. */
+    if (isStaleBundle(error) && reloadOnce()) return;
+    void reportRenderFailure({ digest: error.digest, path: window.location.pathname, name: errorClass(error) });
+  }, [error]);
 
   return (
     <html lang="fi">

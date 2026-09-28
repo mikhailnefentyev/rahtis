@@ -19,7 +19,7 @@ import { recordIncident } from './record';
  * счётчик одной строки, а не создаст тысячу — свернуть поток по
  * отпечатку журнал умеет по построению.
  */
-export async function reportRenderFailure(input: { digest?: string; path?: string }) {
+export async function reportRenderFailure(input: { digest?: string; path?: string; name?: string }) {
   /*
    * digest — отпечаток, который Next выдаёт вместо текста ошибки на
    * боевой сборке. Он ничего не рассказывает сам по себе, но по нему
@@ -27,12 +27,19 @@ export async function reportRenderFailure(input: { digest?: string; path?: strin
    */
   const digest = typeof input.digest === 'string' ? input.digest.slice(0, 64) : null;
 
+  /*
+   * Класс ошибки — одно слово вроде ChunkLoadError или TypeError. Без
+   * него все браузерные сбои сливались в «отрисовка прервана», и понять,
+   * что сломалось, было не по чему. Текст сообщения по-прежнему не берём.
+   */
+  const name = typeof input.name === 'string' && /^[A-Za-z][A-Za-z0-9]{0,39}$/.test(input.name) ? input.name : null;
+
   await recordIncident({
     source: 'render',
     severity: 'FATAL',
     path: typeof input.path === 'string' ? input.path : null,
     error: Object.assign(new Error(digest ? `digest ${digest}` : 'отрисовка прервана'), {
-      name: 'RenderError',
+      name: name ?? 'RenderError',
     }),
   });
 }

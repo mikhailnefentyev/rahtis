@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useEffect } from 'react';
 import { Button, buttonClass, Card, CardBody, Mono } from '@/components/ui';
 import { reportRenderFailure } from '@/lib/incidents/action';
+import { errorClass, isStaleBundle, reloadOnce } from '@/lib/incidents/stale';
 import { useI18n } from '@/lib/i18n/provider';
 
 /**
@@ -34,8 +35,10 @@ export default function LocaleError({
      * Путь берётся здесь, а не на сервере: серверное действие видит свой
      * собственный адрес, а не тот, на котором упало.
      */
-    void reportRenderFailure({ digest: error.digest, path: window.location.pathname });
-  }, [error.digest]);
+    /* Старая сборка после выкладки: одна перезагрузка лечит, журнал не нужен. */
+    if (isStaleBundle(error) && reloadOnce()) return;
+    void reportRenderFailure({ digest: error.digest, path: window.location.pathname, name: errorClass(error) });
+  }, [error]);
 
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 items-center px-5 py-16">
