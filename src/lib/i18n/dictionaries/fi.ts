@@ -585,6 +585,30 @@ export const fi = {
     service3Text: 'Keikat, pisteet, kuvat ja allekirjoitukset kuljettajan omassa sovelluksessa. Asennetaan puhelimen kotinäytölle, toimii myös ilman verkkoa.',
     service3Text2: 'Kuljetusliike kutsuu kuljettajan linkillä tai koodilla ja näkee kuittaukset ja työajan suoraan palvelussa.',
 
+    apiEyebrow: 'Rajapinta tilaajille',
+    apiTitle: 'Tilaukset suoraan omasta järjestelmästäsi',
+    apiLede:
+      'Liitä toiminnanohjauksesi tai TMS:si RAHTISiin: tilaus lähtee pöydälle tai omalle autolle ilman käsin kirjoittamista, ja tiedät jokaisen vaiheen heti, kun se tapahtuu.',
+    apiFreeEyebrow: 'Maksuton',
+    apiFreeTitle: 'Ei kuukausimaksua, ei kutsuhintaa',
+    apiFreeText:
+      'Rajapinnan käyttö ei maksa mitään. Maksat vain kuljetuksista kuten kabinetissa: suora tilaus tutulle autolle ilman palvelumaksua, tarjouspöydän tilaus 3 %.',
+    apiFastEyebrow: 'Nopea',
+    apiFastTitle: 'Tilaus sekunneissa, muutos minuutissa',
+    apiFastText:
+      'Reitti ja kilometrit raskaalle kalustolle lasketaan automaattisesti. Webhook kertoo palvelimellesi saapumisesta, kuittauksesta, uudesta arviosta tai CMR:stä noin minuutissa.',
+    apiAllEyebrow: 'Kaikki yhdessä',
+    apiAllTitle: 'Koko keikka yhdestä rajapinnasta',
+    apiAllText:
+      'Tilaus, tarjoukset tai suora auto, seuranta saapumisineen, kuittauksineen ja kuvineen sijainteineen, CMR, reittimuutokset ajon aikana, odotusaika, arvio ja reklamaatiot.',
+    apiSafeEyebrow: 'Turvallinen',
+    apiSafeTitle: 'Testiympäristö ja allekirjoitetut ilmoitukset',
+    apiSafeText:
+      'Kokeile testiavaimella ilman oikeita tilauksia. Jokainen webhook on allekirjoitettu, epäonnistunut toimitus uusitaan automaattisesti, ja avaimen voi perua kabinetista heti.',
+    apiExampleLabel: 'Näin se toimii',
+    apiExampleNote: 'Avain luodaan kabinetissa välilehdellä API. OpenAPI-kuvaus toimii suoraan Postmanissa ja asiakasgeneraattoreissa.',
+    apiDocs: 'Lue API-dokumentaatio',
+    footerApi: 'API',
     finalEyebrow: 'Näin pääset alkuun',
     finalTitle: 'Kerro yrityksestäsi – me hoidamme loput',
     finalLede: 'Tarvitsemme yrityksen nimen, Y-tunnuksen ja sähköpostin, kuljetusliikkeiltä myös liikenneluvan ja vakuutuksen.',

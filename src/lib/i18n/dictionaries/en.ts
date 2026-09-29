@@ -518,6 +518,30 @@ export const en = {
     service3Text: 'Jobs, stops, photos and signatures in the driver’s own app. Installed on the phone’s home screen, and it also works without a network.',
     service3Text2: 'The carrier invites the driver with a link or code and sees confirmations and working time directly in the service.',
 
+    apiEyebrow: 'API for shippers',
+    apiTitle: 'Orders straight from your own system',
+    apiLede:
+      'Connect your ERP or TMS to RAHTIS: the order goes to the desk or to your own vehicle without retyping, and you know about every step the moment it happens.',
+    apiFreeEyebrow: 'Free',
+    apiFreeTitle: 'No monthly fee, no price per call',
+    apiFreeText:
+      'Using the API costs nothing. You pay only for transports, just as in the cabinet: a direct order to a known vehicle without a service fee, a desk order 3 %.',
+    apiFastEyebrow: 'Fast',
+    apiFastTitle: 'An order in seconds, a change within a minute',
+    apiFastText:
+      'The route and the kilometres for heavy vehicles are calculated automatically. A webhook tells your server about an arrival, a confirmation, a new ETA or a CMR in about a minute.',
+    apiAllEyebrow: 'All in one',
+    apiAllTitle: 'The whole job through one interface',
+    apiAllText:
+      'The order, offers or a direct vehicle, tracking with arrivals, confirmations and photos with their places, CMR, route changes on the way, waiting time, rating and claims.',
+    apiSafeEyebrow: 'Safe',
+    apiSafeTitle: 'Test environment and signed notifications',
+    apiSafeText:
+      'Try it with a test key without real orders. Every webhook is signed, a failed delivery is retried automatically, and a key can be revoked from the cabinet at once.',
+    apiExampleLabel: 'How it works',
+    apiExampleNote: 'The key is created in the cabinet on the API tab. The OpenAPI description works directly in Postman and client generators.',
+    apiDocs: 'Read the API documentation',
+    footerApi: 'API',
     finalEyebrow: 'Getting started',
     finalTitle: 'Tell us about your company — we handle the rest',
     finalLede: 'We need the company name, the Y-tunnus and an email address; from carriers also the operating licence and insurance.',

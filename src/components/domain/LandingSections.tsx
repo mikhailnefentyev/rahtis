@@ -606,6 +606,74 @@ export async function LandingSections({ locale }: { locale: Locale }) {
         </div>
       </section>
 
+      {/* ── API для заказчиков ─────────────────────────────────── */}
+      {/*
+        * Продаём то, что есть, и столько, сколько есть. «Бесплатно» здесь —
+        * про сам интерфейс: ни абонентской платы, ни цены за запрос; за
+        * перевозки платят так же, как из кабинета (прямой заказ своей
+        * машине — без сбора, со стола — 3 %). «Быстро» — с цифрами, которые
+        * платформа держит: вебхук уходит будильником раз в минуту.
+        *
+        * Справа — настоящий запрос, а не картинка: программист заказчика
+        * решает по нему, стоит ли открывать документацию.
+        */}
+      <section id="api" className="mx-auto w-full max-w-6xl px-5 py-20">
+        <p className="label-micro">{l.apiEyebrow}</p>
+        <h2 className="mt-2.5 max-w-[24ch] text-[clamp(26px,3vw,34px)] leading-tight font-semibold tracking-tight text-balance">
+          {l.apiTitle}
+        </h2>
+        <p className="mt-3 max-w-[62ch] text-[16px] text-ink-muted">{l.apiLede}</p>
+
+        <div className="mt-8 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+          <div className="grid gap-4 sm:grid-cols-2">
+            {[
+              { eyebrow: l.apiFreeEyebrow, title: l.apiFreeTitle, text: l.apiFreeText },
+              { eyebrow: l.apiFastEyebrow, title: l.apiFastTitle, text: l.apiFastText },
+              { eyebrow: l.apiAllEyebrow, title: l.apiAllTitle, text: l.apiAllText },
+              { eyebrow: l.apiSafeEyebrow, title: l.apiSafeTitle, text: l.apiSafeText },
+            ].map((card) => (
+              <Card key={card.title} className="border-t-2 border-t-accent">
+                <CardBody>
+                  <p className="label-micro" data-accent>
+                    {card.eyebrow}
+                  </p>
+                  <h3 className="mt-2 text-[18px] leading-snug font-semibold tracking-tight">{card.title}</h3>
+                  <p className="mt-2 text-[15px] text-ink-muted">{card.text}</p>
+                </CardBody>
+              </Card>
+            ))}
+          </div>
+
+          <Card className="min-w-0">
+            <CardBody className="flex h-full min-w-0 flex-col">
+              <p className="label-micro">{l.apiExampleLabel}</p>
+              <pre className="mt-3 flex-1 overflow-x-auto rounded-control border border-line bg-sunken p-4 text-[12px] leading-relaxed">
+                <code>{`curl -X POST https://www.rahtis.eu/api/v1/orders \\
+  -H "Authorization: Bearer rhs_live_…" \\
+  -H "Idempotency-Key: PO-4471" \\
+  -d '{ "order_type": "ONE_WAY",
+        "rate": { "amount": 300 },
+        "stops": [ … ] }'
+
+→ 201  RS-2026-0142 · 151 km · OPEN
+
+POST https://erp.example.fi/rahtis
+Rahtis-Event: order.stop_arrived`}</code>
+              </pre>
+              <p className="mt-3 text-[13px] text-ink-muted">{l.apiExampleNote}</p>
+              <div className="mt-4 flex flex-wrap gap-2.5">
+                <Link href={`/${locale}/api-docs`} className={buttonClass({ variant: 'primary', size: 'lg', className: 'h-11 text-[15px]' })}>
+                  {l.apiDocs}
+                </Link>
+                <Link href={`/${locale}/apply`} className={buttonClass({ size: 'lg', className: 'h-11 text-[15px]' })}>
+                  {l.applyShipper}
+                </Link>
+              </div>
+            </CardBody>
+          </Card>
+        </div>
+      </section>
+
       {/* ── Финал ──────────────────────────────────────────────── */}
       <section className="border-y border-line bg-surface">
         <div className="mx-auto w-full max-w-6xl px-5 py-20 text-center">
@@ -659,6 +727,9 @@ export async function LandingSections({ locale }: { locale: Locale }) {
               className="hover:text-ink-muted"
             >
               {t.legal.PRIVACY}
+            </Link>
+            <Link href={`/${locale}/api-docs`} className="hover:text-ink-muted">
+              {l.footerApi}
             </Link>
           </span>
         </div>
