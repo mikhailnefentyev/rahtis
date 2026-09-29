@@ -192,6 +192,7 @@ export const fi = {
      * mutta kaikki kolme osapuolta näkevät, ettei merkintää syntynyt.
      */
     noPosition: 'Ilman sijaintia',
+    photoPlace: 'Kuvauspaikka',
     positionAway: 'Merkitty etäältä',
     undo: 'Peru merkintä',
     damageQuestion: 'Vauriot tällä pisteellä',
@@ -2935,6 +2936,8 @@ export const fi = {
     'trip.markedNear': 'Merkitty {meters, number} m päässä osoitteesta',
     'trip.markedFar': 'Merkitty {km, number, ::.0#} km päässä osoitteesta',
     'trip.markedHere': 'Merkitty paikan päällä',
+    'trip.arrivedNear': '{meters, number} m osoitteesta',
+    'trip.arrivedFar': '{km, number, ::.0#} km osoitteesta',
     'trip.damageAt': 'Vaurio · {place}',
 
     'trip.stepReported': 'Kuljetus {ref}: kuljettaja merkitsi ”{step}”.',

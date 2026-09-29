@@ -13,7 +13,14 @@ import type { TripDocument } from '@/types/db';
  * разметке страницы утёк бы вместе с ней — в историю браузера, в
  * пересланный скриншот, в кэш.
  */
-export function DocumentList({ documents }: { documents: TripDocument[] }) {
+export function DocumentList({
+  documents,
+  withPlace = false,
+}: {
+  documents: TripDocument[];
+  /* Где сделан снимок — только заказчику и оператору (PRIVACY 2.4). */
+  withPlace?: boolean;
+}) {
   const { t, f } = useI18n();
   const [pending, start] = useTransition();
 
@@ -58,6 +65,19 @@ export function DocumentList({ documents }: { documents: TripDocument[] }) {
             )}
             {' · '}
             <Mono className="text-ink-faint">{f.dateTime(doc.captured_at ?? doc.created_at)}</Mono>
+            {withPlace && doc.captured_lat != null && doc.captured_lon != null && (
+              <>
+                {' · '}
+                <a
+                  href={`https://www.openstreetmap.org/?mlat=${doc.captured_lat}&mlon=${doc.captured_lon}#map=17/${doc.captured_lat}/${doc.captured_lon}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline underline-offset-2 hover:text-ink"
+                >
+                  {t.trip.photoPlace}
+                </a>
+              </>
+            )}
           </span>
 
           <Button size="sm" onClick={() => open(doc.storage_path)} disabled={pending}>

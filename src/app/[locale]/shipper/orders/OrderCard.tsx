@@ -184,7 +184,7 @@ export function OrderCard({
               {order.status === 'IN_PROGRESS' && documents.length > 0 && (
                 <div className="mt-3 rounded-control border border-line bg-sunken p-3">
                   <p className="label-micro mb-2">{t.trip.photos}</p>
-                  <DocumentList documents={documents} />
+                  <DocumentList documents={documents} withPlace />
                 </div>
               )}
 
@@ -199,7 +199,7 @@ export function OrderCard({
                   <p className="label-micro mb-3">
                     {m('order.stopsCount', { count: stops.length })}
                   </p>
-                  <RouteStops stops={stops} haulKind={order.haul_kind} />
+                  <RouteStops stops={stops} haulKind={order.haul_kind} arrivalPlace />
 
                   {/* Карта под списком: список — источник, карта — проверка. */}
                   <OrderRouteMap

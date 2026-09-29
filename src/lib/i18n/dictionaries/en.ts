@@ -180,6 +180,7 @@ export const en = {
     marking: 'Marking…',
     locating: 'Getting location…',
     noPosition: 'No location',
+    photoPlace: 'Photo location',
     positionAway: 'Marked from a distance',
     undo: 'Undo',
     damageQuestion: 'Damage at this stop',
@@ -2801,6 +2802,8 @@ export const en = {
     'trip.markedNear': 'Marked {meters, number} m from the address',
     'trip.markedFar': 'Marked {km, number, ::.0#} km from the address',
     'trip.markedHere': 'Marked on site',
+    'trip.arrivedNear': '{meters, number} m from the address',
+    'trip.arrivedFar': '{km, number, ::.0#} km from the address',
     'trip.damageAt': 'Damage · {place}',
 
     'trip.stepReported': 'Order {ref}: the driver marked “{step}”.',

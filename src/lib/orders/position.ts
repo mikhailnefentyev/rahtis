@@ -64,7 +64,19 @@ export function metersBetween(
  * а смысл у них противоположный: «ещё не были» и «были, но не записались».
  */
 export function markOf(stop: Stop): Mark {
-  const { completed_lat: lat, completed_lon: lon, completed_accuracy_m: accuracy } = stop;
+  return markAt(stop, stop.completed_lat, stop.completed_lon, stop.completed_accuracy_m);
+}
+
+/**
+ * То же для любого замера у точки: прибытие, снимок, отметка «пройдена».
+ * У прибытия и снимка погрешность не хранится — тогда accuracy null.
+ */
+export function markAt(
+  stop: { lat?: number | null; lon?: number | null },
+  lat: number | null | undefined,
+  lon: number | null | undefined,
+  accuracy?: number | null,
+): Mark {
   if (lat == null || lon == null) return { kind: 'none' };
 
   const accuracyM = accuracy ?? null;

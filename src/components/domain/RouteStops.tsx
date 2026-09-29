@@ -2,7 +2,7 @@
 
 import { Badge, Waypoint, WaypointList } from '@/components/ui';
 import { stopTitle, type HaulKind } from '@/lib/orders/haul';
-import { markOf } from '@/lib/orders/position';
+import { markAt, markOf } from '@/lib/orders/position';
 import { etaTime, showsEta } from '@/lib/orders/progress';
 import { useI18n } from '@/lib/i18n/provider';
 import type { DeskStop, OrderStop, PlaceKind, StopRole } from '@/types/db';
@@ -32,13 +32,18 @@ type AnyStop = (OrderStop | DeskStop) & {
   completed_lat?: number | null;
   completed_lon?: number | null;
   completed_accuracy_m?: number | null;
+  arrived_lat?: number | null;
+  arrived_lon?: number | null;
 };
 
 export function RouteStops({
   stops,
   haulKind = 'TRAILER',
+  arrivalPlace = false,
 }: {
   stops: AnyStop[];
+  /* Где водитель отметил прибытие — только заказчику и оператору (PRIVACY 2.4). */
+  arrivalPlace?: boolean;
   /* Забор и возврат называются по единице: у контейнера нет перевозчика прицепа. */
   haulKind?: HaulKind;
 }) {
@@ -139,6 +144,7 @@ export function RouteStops({
       chips.push(
         <Badge key="arrived" tone="neutral">
           {m('trip.arrivedAt', { time: f.time(stop.arrived_at) })}
+          {arrivalPlace && arrivalMark(stop)}
         </Badge>,
       );
     }
@@ -178,6 +184,14 @@ export function RouteStops({
 
     return chips.length > 0 ? chips : undefined;
   };
+
+  /* Расстояние прибытия до адреса — тем же правилом, что у отметки «пройдена». */
+  function arrivalMark(stop: AnyStop) {
+    const mark = markAt(stop, stop.arrived_lat, stop.arrived_lon);
+    if (mark.kind === 'far') return ` · ${m('trip.arrivedFar', { km: mark.meters / 1000 })}`;
+    if (mark.kind === 'near') return ` · ${m('trip.arrivedNear', { meters: mark.meters })}`;
+    return null;
+  }
 
   return (
     <WaypointList>

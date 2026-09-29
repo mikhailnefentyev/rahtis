@@ -141,3 +141,17 @@ test('отказы базы переводятся для программист
   assert.equal(translateRule('Перецеп заканчивается отцепкой прицепа — укажите, где его оставить.').field, 'stops');
   assert.equal(translateRule('Что-то новое, чего нет в списке.'), null);
 });
+
+test('точка водителя: расстояние до адреса точки', async () => {
+  const { markAt, metersBetween } = await import('../orders/position.ts');
+  const stop = { lat: 60.2934, lon: 25.0378 }; // Tikkurilantie 10, Vantaa
+  assert.deepEqual(markAt(stop, null, null), { kind: 'none' });
+  assert.deepEqual(markAt({ lat: null, lon: null }, 60.3, 25.0), { kind: 'unknown', accuracyM: null });
+  const near = markAt(stop, 60.2936, 25.0381);
+  assert.equal(near.kind, 'near');
+  assert.ok(near.meters < 50);
+  assert.equal(markAt(stop, 60.17, 24.94).kind, 'far'); // Helsingin keskusta
+  // погрешность больше промаха — промахом не считается
+  assert.equal(markAt(stop, 60.2934, 25.06, 2000).kind, 'near');
+  assert.equal(metersBetween(stop, stop), 0);
+});
