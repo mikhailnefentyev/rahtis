@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { buttonClass, Card, CardBody, Mono } from '@/components/ui';
 import { signInPath } from '@/lib/auth/paths';
@@ -711,7 +712,8 @@ Rahtis-Event: order.stop_arrived`}</code>
       <footer className="border-t border-line bg-surface">
         <div className="mx-auto grid w-full max-w-6xl gap-10 px-5 pt-14 pb-10 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr]">
           <div className="max-w-[34ch]">
-            <p className="font-mono text-[15px] font-semibold tracking-[0.18em] text-ink">RAHTIS</p>
+            {/* Та же марка, что в шапке: подвал и шапка — одна витрина. */}
+            <Image src="/logo-header.png" alt={t.brand.name} width={954} height={240} className="h-[22px] w-auto" />
             <p className="mt-3 text-[14px] leading-relaxed text-ink-muted">{l.footerTagline}</p>
             <address className="mt-5 text-[13px] leading-relaxed text-ink-faint not-italic">
               <span className="font-semibold text-ink-muted">{t.brand.legalEntity}</span>
