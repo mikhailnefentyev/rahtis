@@ -25,8 +25,8 @@ import { SITE_URL } from '@/lib/seo';
 const PAGES: { fi: string; en: string; priority: number; updated: string }[] = [
   { fi: '', en: '', priority: 1, updated: '2026-09-23' },
   { fi: '/apply', en: '/apply', priority: 0.8, updated: '2026-09-25' },
-  { fi: '/kayttoehdot', en: '/terms', priority: 0.3, updated: '2026-09-25' },
-  { fi: '/tietosuoja', en: '/privacy', priority: 0.3, updated: '2026-09-25' },
+  { fi: '/kayttoehdot', en: '/terms', priority: 0.3, updated: '2026-09-29' },
+  { fi: '/tietosuoja', en: '/privacy', priority: 0.3, updated: '2026-09-29' },
   { fi: '/api-docs', en: '/api-docs', priority: 0.4, updated: '2026-09-29' },
 ];
 
