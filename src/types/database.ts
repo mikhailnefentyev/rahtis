@@ -39,6 +39,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      api_idempotency: {
+        Row: {
+          created_at: string
+          http_status: number | null
+          idem_key: string
+          key_id: string
+          request_hash: string
+          response: Json | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          http_status?: number | null
+          idem_key: string
+          key_id: string
+          request_hash: string
+          response?: Json | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          http_status?: number | null
+          idem_key?: string
+          key_id?: string
+          request_hash?: string
+          response?: Json | null
+          status?: string
+        }
+        Relationships: []
+      }
       api_keys: {
         Row: {
           company_id: string
@@ -3429,6 +3459,14 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      api_create_order: {
+        Args: { p_key_id: string; p_order: Json; p_stops: Json }
+        Returns: { id: string; ref: string }[]
+      }
+      api_withdraw_order: {
+        Args: { p_key_id: string; p_reason?: string; p_ref: string }
+        Returns: undefined
       }
       api_authenticate: {
         Args: { p_hash: string }

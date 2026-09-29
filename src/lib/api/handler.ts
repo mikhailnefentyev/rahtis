@@ -29,6 +29,8 @@ export type ApiErrorCode =
   | 'rate_limited'
   | 'not_found'
   | 'bad_request'
+  | 'unprocessable'
+  | 'conflict'
   | 'internal';
 
 const STATUS: Record<ApiErrorCode, number> = {
@@ -37,6 +39,8 @@ const STATUS: Record<ApiErrorCode, number> = {
   rate_limited: 429,
   not_found: 404,
   bad_request: 400,
+  unprocessable: 422,
+  conflict: 409,
   internal: 500,
 };
 
@@ -44,13 +48,23 @@ export class ApiError extends Error {
   constructor(
     public code: ApiErrorCode,
     message: string,
+    /** Что именно не так: поле и причина — для программы, а не для человека. */
+    public details?: { field: string; issue: string }[],
   ) {
     super(message);
   }
 }
 
-export function apiError(code: ApiErrorCode, message: string, headers?: HeadersInit): Response {
-  return Response.json({ error: { code, message } }, { status: STATUS[code], headers });
+export function apiError(
+  code: ApiErrorCode,
+  message: string,
+  headers?: HeadersInit,
+  details?: { field: string; issue: string }[],
+): Response {
+  return Response.json(
+    { error: { code, message, ...(details?.length ? { details } : {}) } },
+    { status: STATUS[code], headers },
+  );
 }
 
 const RATE_LIMIT = 60;
@@ -103,7 +117,7 @@ export function withApi<P extends RouteParams = RouteParams>(
         response = await handler(ctx, request, await route.params);
       } catch (cause) {
         if (cause instanceof ApiError) {
-          response = apiError(cause.code, cause.message);
+          response = apiError(cause.code, cause.message, undefined, cause.details);
         } else {
           await recordIncident({ source: 'route', error: cause, path: '/api/v1' });
           response = apiError('internal', 'Unexpected error. The request was not completed.');
