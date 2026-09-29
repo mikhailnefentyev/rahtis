@@ -542,6 +542,7 @@ export const en = {
     apiExampleNote: 'The key is created in the cabinet on the API tab. The OpenAPI description works directly in Postman and client generators.',
     apiDocs: 'Read the API documentation',
     footerApi: 'API',
+    menuApply: 'Apply',
     footerApiDocs: 'API documentation',
     footerTagline: 'Haulage platform for trailer swaps, containers and express transport in the ports and terminals of the Nordics.',
     footerService: 'Service',

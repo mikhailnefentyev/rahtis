@@ -96,6 +96,7 @@ export function SiteHeader() {
     { href: '#roles', label: t.landing.menuRoles },
     { href: '#steps', label: t.landing.menuSteps },
     { href: '#assistant', label: t.landing.menuAssistant },
+    { href: '#api', label: t.landing.footerApi },
   ];
 
   const home = `/${locale}`;
@@ -164,6 +165,10 @@ export function SiteHeader() {
           <LocaleSwitch current={locale} />
           <Link href={signInPath(locale)} className="site-head__signin">
             {t.landing.menuSignIn}
+          </Link>
+          {/* Заявка — главное действие витрины: кнопка, а не ещё одна ссылка в ряду. */}
+          <Link href={`/${locale}/apply`} className="site-head__apply">
+            {t.landing.menuApply}
           </Link>
         </div>
       </div>

@@ -609,6 +609,7 @@ export const fi = {
     apiExampleNote: 'Avain luodaan kabinetissa välilehdellä API. OpenAPI-kuvaus toimii suoraan Postmanissa ja asiakasgeneraattoreissa.',
     apiDocs: 'Lue API-dokumentaatio',
     footerApi: 'API',
+    menuApply: 'Hae mukaan',
     footerApiDocs: 'API-dokumentaatio',
     footerTagline: 'Kuljetusalusta irtoperille, konteille ja pikakuljetuksille Pohjoismaiden satamissa ja terminaaleissa.',
     footerService: 'Palvelu',

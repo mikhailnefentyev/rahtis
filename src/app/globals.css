@@ -331,17 +331,20 @@
     border-color 260ms ease;
 }
 .site-head[data-solid] {
-  background: var(--color-ground);
+  /* Полупрозрачная подложка с размытием: под шапкой видно, что страница едет. */
+  background: color-mix(in srgb, var(--color-ground) 88%, transparent);
+  backdrop-filter: saturate(1.4) blur(10px);
   border-bottom-color: var(--color-line);
 }
 
 .site-head__inner {
   max-width: 1180px;
   margin-inline: auto;
-  padding: 14px 20px;
+  padding: 12px 20px;
+  min-height: 64px;
   display: flex;
   align-items: center;
-  gap: 28px;
+  gap: 32px;
 }
 
 .site-head__mark {
@@ -384,18 +387,37 @@
  */
 .site-head__menu {
   display: none;
-  gap: 22px;
+  gap: 26px;
   margin-right: auto;
 }
-@media (min-width: 900px) {
+@media (min-width: 1024px) {
   .site-head__menu { display: flex; }
 }
 .site-head__menu a {
-  font-size: 13px;
+  position: relative;
+  padding-block: 6px;
+  font-size: 14px;
   font-weight: 500;
   text-decoration: none;
-  color: rgba(255, 255, 255, 0.76);
+  color: rgba(255, 255, 255, 0.8);
   transition: color 150ms ease;
+}
+/* Черта под пунктом при наведении — видно, что это ссылка, без подчёркивания всего ряда. */
+.site-head__menu a::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 180ms ease;
+}
+.site-head__menu a:hover::after,
+.site-head__menu a:focus-visible::after { transform: scaleX(1); }
+@media (prefers-reduced-motion: reduce) {
+  .site-head__menu a::after { transition: none; }
 }
 .site-head__menu a:hover { color: #ffffff; }
 .site-head[data-solid] .site-head__menu a { color: var(--color-ink-muted); }
@@ -404,19 +426,45 @@
 .site-head__side {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 10px;
   margin-left: auto;
 }
 
-.site-head__signin {
-  font-size: 13px;
+/*
+ * Две кнопки справа: «Kirjaudu» — контур, «Hae mukaan» — заливка.
+ * Высота 40 — палец попадает и на телефоне; поверх съёмки контур белый,
+ * на светлой шапке — цветом марки.
+ */
+.site-head__signin,
+.site-head__apply {
+  display: inline-flex;
+  align-items: center;
+  height: 40px;
+  padding-inline: 16px;
+  border-radius: 999px;
+  font-size: 14px;
   font-weight: 600;
   text-decoration: none;
-  color: rgba(255, 255, 255, 0.9);
-  transition: color 150ms ease;
+  white-space: nowrap;
+  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
 }
-.site-head__signin:hover { color: #ffffff; text-decoration: underline; }
-.site-head[data-solid] .site-head__signin { color: var(--color-accent); }
+.site-head__signin {
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  color: #ffffff;
+}
+.site-head__signin:hover { background: rgba(255, 255, 255, 0.12); border-color: rgba(255, 255, 255, 0.8); }
+.site-head[data-solid] .site-head__signin { border-color: var(--color-line-strong); color: var(--color-ink); }
+.site-head[data-solid] .site-head__signin:hover { background: var(--color-sunken); border-color: var(--color-ink-faint); }
+
+.site-head__apply {
+  display: none;
+  background: var(--color-accent);
+  color: #ffffff;
+}
+.site-head__apply:hover { filter: brightness(1.08); }
+@media (min-width: 640px) {
+  .site-head__apply { display: inline-flex; }
+}
 
 /* Поверх съёмки рамка переключателя не видна — та же подложка, что была
    в углу первого экрана. */
