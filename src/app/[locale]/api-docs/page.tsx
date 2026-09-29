@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { LocaleSwitch } from '@/components/layout/LocaleSwitch';
 import { APP, siteUrl } from '@/lib/config';
 import { getI18n, isLocale } from '@/lib/i18n';
+import { WEBHOOK_EVENTS } from '@/lib/api/events';
 import { pageMetadata } from '@/lib/seo';
 import { DOCS } from './content';
 
@@ -77,6 +78,37 @@ do {
   -H "Authorization: Bearer $RAHTIS_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{ "reason": "Customer cancelled" }'`,
+    trip: `GET ${base}/orders/RS-2026-0142
+
+"stops": [{
+  "sequence": 1, "role": "DELIVERY", "city": "Vantaa",
+  "eta": { "at": "2026-10-05T12:40:00Z", "source": "TRAFFIC", "updated_at": "2026-10-05T10:02:11Z" },
+  "arrival": { "at": "2026-10-05T12:31:08Z",
+               "position": { "lat": 60.2936, "lon": 25.0381, "accuracy_m": null, "distance_m": 24 } },
+  "completion": { "at": "2026-10-05T13:05:40Z",
+                  "position": { "lat": 60.2935, "lon": 25.0379, "accuracy_m": 12, "distance_m": 18 } }
+}]`,
+    assign: `curl ${base}/vehicles -H "Authorization: Bearer $RAHTIS_KEY"
+
+curl -X POST ${base}/orders/RS-2026-0142/assign \\
+  -H "Authorization: Bearer $RAHTIS_KEY" -H "Content-Type: application/json" \\
+  -d '{ "vehicle_id": "9451acc9-5893-4741-b2c1-21f1ecbf0113" }'`,
+    amend: `curl -X PATCH ${base}/orders/RS-2026-0142/stops/1 \\
+  -H "Authorization: Bearer $RAHTIS_KEY" -H "Content-Type: application/json" \\
+  -d '{ "scheduled_time": "14:30", "note": "Gate 3", "contact": { "name": "Anna", "phone": "+358401234567" } }'
+
+curl -X POST ${base}/orders/RS-2026-0142/reprice \\
+  -H "Authorization: Bearer $RAHTIS_KEY" -H "Content-Type: application/json" \\
+  -d '{ "rate": { "amount": 360 } }'`,
+    claims: `curl -X POST ${base}/claims \\
+  -H "Authorization: Bearer $RAHTIS_KEY" -H "Content-Type: application/json" \\
+  -H "Idempotency-Key: claim-PO-4471" \\
+  -d '{ "order_ref": "RS-2026-0142", "kind": "DOWNTIME", "stop_sequence": 1,
+        "description": "Waited 2 h at the unloading gate.", "amount": { "amount": 120 } }'
+
+curl -X POST ${base}/claims/CL-RS-2026-0142-1/attachments \\
+  -H "Authorization: Bearer $RAHTIS_KEY" \\
+  -F "file=@waiting-slip.pdf;type=application/pdf" -F "note=Gate log"`,
     payload: `POST /your/webhook
 Rahtis-Event: order.stop_completed
 Rahtis-Delivery: 3f1c9a52-6a0e-4c43-9d7e-5b2f0e8d1a44
@@ -137,6 +169,10 @@ def verify(header: str, raw_body: bytes, secret: str) -> bool:
       <Section id="orders" section={d.details} />
       <Section id="create" section={d.create} code={[examples.create, examples.error]} />
       <Section id="withdraw" section={d.withdraw} code={[examples.withdraw]} />
+      <Section id="trip" section={d.trip} code={[examples.trip]} />
+      <Section id="offers" section={d.offers} code={[examples.assign]} />
+      <Section id="amend" section={d.amend} code={[examples.amend]} />
+      <Section id="claims" section={d.claims} code={[examples.claims]} />
 
       <Section id="webhooks" section={d.webhooks}>
         <table className="mt-4 w-full text-left text-[13px]">
@@ -147,7 +183,7 @@ def verify(header: str, raw_body: bytes, secret: str) -> bool:
             </tr>
           </thead>
           <tbody>
-            {Object.entries(d.events).map(([event, when]) => (
+            {WEBHOOK_EVENTS.map((event) => [event, t.api.hooks.eventNames[event]] as const).map(([event, when]) => (
               <tr key={event} className="border-b border-line/60 align-top">
                 <td className="py-2 pr-4 font-mono text-[12px] whitespace-nowrap">{event}</td>
                 <td className="py-2 text-ink-muted">{when}</td>

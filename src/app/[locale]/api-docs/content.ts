@@ -19,8 +19,11 @@ type DocsText = {
   details: Section;
   create: Section;
   withdraw: Section;
+  trip: Section;
+  offers: Section;
+  amend: Section;
+  claims: Section;
   webhooks: Section;
-  events: Record<string, string>;
   verify: Section;
   errors: Section;
   errorCodes: Record<string, string>;
@@ -35,13 +38,13 @@ const fi: DocsText = {
   title: 'API-dokumentaatio',
   description: 'RAHTIS-rajapinta tilaajille: tilausten luku ja luonti omasta järjestelmästä sekä tapahtumailmoitukset (webhook).',
   intro:
-    'Rajapinnalla tilaaja liittää oman toiminnanohjauksensa RAHTIS-palveluun: lukee tilaukset ja niiden etenemisen, luo ja peruu tilauksia ja saa ilmoituksen omaan osoitteeseensa, kun tilaus muuttuu. Vastaukset ja virhekoodit ovat englanniksi, jotta ohjelma voi haarautua niiden mukaan.',
+    'Rajapinnalla tilaaja hoitaa tilauksen koko elinkaaren omasta toiminnanohjauksestaan: luo tilauksen, valitsee tarjouksen tai määrää tutun auton, seuraa ajoa saapumisineen, kuittauksineen ja kuvineen, muuttaa reittiä ajon aikana, arvioi kuljetusliikkeen, hoitaa reklamaatiot ja saa ilmoituksen omaan osoitteeseensa, kun jotain muuttuu. Vastaukset ja virhekoodit ovat englanniksi, jotta ohjelma voi haarautua niiden mukaan.',
   openapi: 'Koneluettava kuvaus (OpenAPI 3.1) Postmaniin, Insomniaan tai asiakasgeneraattoriin:',
   cabinet: 'Avaimet ja webhookit luodaan kabinetissa, välilehdellä API.',
   start: {
     title: 'Aloitus',
     paragraphs: [
-      'Luo avain kabinetissa. Avain näytetään vain kerran — tallenna se salaisuuksien hallintaan. Lukuavain riittää tilausten seurantaan; tilausten luontiin ja perumiseen tarvitaan kirjoitusoikeus.',
+      'Luo avain kabinetissa. Avain näytetään vain kerran — tallenna se salaisuuksien hallintaan. Lukuavain riittää tilausten seurantaan; kaikkiin muutoksiin (luonti, valinta, määrääminen, reittimuutokset, arvio, reklamaatiot) tarvitaan kirjoitusoikeus.',
       'Testiyrityksen avain alkaa rhs_test_ ja näkee vain testiympäristön tilaukset; vastauksissa on silloin otsake Rahtis-Environment: test. Oikean yrityksen avain alkaa rhs_live_.',
       'Avain annetaan jokaisessa pyynnössä otsakkeessa Authorization: Bearer.',
     ],
@@ -57,7 +60,7 @@ const fi: DocsText = {
     title: 'Tilaus, tapahtumat ja asiakirjat',
     paragraphs: [
       'GET /orders/{ref} palauttaa tilauksen reittipisteineen, etenemisen ja kuljettajan ajoneuvon, kun kuljetusliike on ottanut tilauksen.',
-      'GET /orders/{ref}/events on aikajana: tilan muutokset sekä saapumiset ja kuittaukset reittipisteillä.',
+      'GET /orders/{ref}/events on aikajana: tilan muutokset, saapumiset ja kuittaukset reittipisteillä, asiakirjat ja reittimuutokset.',
       'GET /orders/{ref}/documents palauttaa CMR:t ja rahtikuvat. Jokainen linkki on voimassa 5 minuuttia — hae luettelo uudelleen, kun tarvitset tiedoston.',
     ],
   },
@@ -73,21 +76,44 @@ const fi: DocsText = {
     title: 'Tilauksen peruminen',
     paragraphs: ['POST /orders/{ref}/withdraw peruu tilauksen; runko { "reason": "…" } on vapaaehtoinen. Suoritettua ajoa ei voi perua (409).'],
   },
+  trip: {
+    title: 'Ajon seuranta',
+    paragraphs: [
+      'Jokaisella reittipisteellä on eta (arvioitu saapuminen, päivittyy liikenteen mukaan jokaisen kuittauksen jälkeen), arrival (kuljettaja saapui) ja completion (piste kuitattu). Saapumisessa ja kuittauksessa on aika ja position: laitteen sijainti sillä hetkellä sekä distance_m, etäisyys pisteen osoitteesta. Etäisyydestä näkee, oliko kuljettaja paikalla — esimerkiksi odotusajan selvittämiseksi.',
+      'GET /orders/{ref}/documents palauttaa jokaiselle kuvalle ja CMR:lle captured_position (kuvauspaikka ja etäisyys pisteestä) sekä damage, jos kyse on vauriokuvasta.',
+      'Sijainti on yksi piste kyseiseltä hetkeltä, ei jatkuvaa seurantaa. Pisteet säilytetään 24 kuukautta ajon päättymisestä.',
+    ],
+  },
+  offers: {
+    title: 'Tarjoukset ja auton määrääminen',
+    paragraphs: [
+      'GET /orders/{ref}/offers näyttää kuljetusliikkeiden tarjoamat autot kuljettajineen ja arvioineen. POST /orders/{ref}/offers/{id}/choose valitsee tarjouksen.',
+      'Tuttu auto määrätään suoraan: GET /vehicles antaa autot, jotka ovat ajaneet teille, ja POST /orders/{ref}/assign { "vehicle_id" } määrää sen tilaukselle, jolla ei vielä ole tarjouksia. Kuljetusliike ja kuljettaja saavat ilmoituksen.',
+      'POST /orders/{ref}/unassign peruu määräyksen ennen ajon alkua, ja tilaus palaa pöydälle.',
+    ],
+  },
+  amend: {
+    title: 'Muutokset ajon aikana ja arvio',
+    paragraphs: [
+      'Ajon aikana reittipistettä voi muuttaa: PATCH /orders/{ref}/stops/{sequence} — vain lähetetyt kentät muuttuvat, null tyhjentää kentän. POST /orders/{ref}/stops lisää lisälastauksen tai -purun (before_sequence kertoo paikan), DELETE /orders/{ref}/stops/{sequence} poistaa ohittamattoman pisteen. Kuormausta ja perävaunun palautusta ei poisteta. Kuljetusliike saa ilmoituksen muutoksesta, ja reitti lasketaan uudelleen.',
+      'POST /orders/{ref}/reprice { "rate": { "amount" } } muuttaa hinnan; matka on oletuksena uudelleen laskettu reitti. GET /orders/{ref}/amendments listaa muutokset ja sen, onko kuljetusliike kuitannut ne.',
+      'Ajon päätyttyä POST /orders/{ref}/rating { "score": 1–5, "comment" } arvioi kuljetusliikkeen; uusi arvio korvaa edellisen.',
+    ],
+  },
+  claims: {
+    title: 'Reklamaatiot',
+    paragraphs: [
+      'GET /claims listaa yrityksen jättämät ja sitä koskevat reklamaatiot, GET /claims/{ref} näyttää viestit ja liitteet (linkit voimassa 5 minuuttia).',
+      'POST /claims { "order_ref", "kind", "description", "stop_sequence"?, "amount"? } jättää reklamaation käynnissä olevasta tai päättyneestä ajosta. POST /claims/{ref}/comments lisää viestin ja POST /claims/{ref}/attachments liitteen (multipart/form-data: file ja note; PDF, JPEG, PNG tai WebP, enintään 10 Mt). Toinen osapuoli ja ylläpitäjä saavat ilmoituksen sähköpostilla, kuten kabinetista jätettäessä.',
+    ],
+  },
   webhooks: {
     title: 'Webhookit',
     paragraphs: [
       'Kabinetissa annetaan https-osoite ja valitaan tapahtumat. Allekirjoitussalaisuus näytetään kerran. Osoitteen on oltava julkinen (portti 443); uudelleenohjauksia ei seurata.',
       'Ilmoituksessa on tilausnumero ja se, mikä muuttui — koko tilaus haetaan tarvittaessa GET /orders/{ref}.',
-      'Vastaa 2xx 10 sekunnin kuluessa ja käsittele ilmoitus vasta sen jälkeen. Muuten toimitus yritetään uudelleen 1, 5, 15 ja 60 minuutin sekä 3, 6, 12 ja 24 tunnin kuluttua. Sama ilmoitus voi tulla kahdesti: tunnista se kentästä id. Kabinetin painike ”Lähetä testi” lähettää tapahtuman ping.',
+      'Vastaa 2xx 10 sekunnin kuluessa ja käsittele ilmoitus vasta sen jälkeen. Muuten toimitus yritetään uudelleen 1, 5, 15 ja 60 minuutin sekä 3, 6, 12 ja 24 tunnin kuluttua. Sama ilmoitus voi tulla kahdesti: tunnista se kentästä id. Ilmoitukset lähetetään rinnakkain eivätkä välttämättä saavu syntymisjärjestyksessä — järjestä ne kentän created_at mukaan. Kabinetin painike ”Lähetä testi” lähettää tapahtuman ping.',
     ],
-  },
-  events: {
-    'order.taken': 'kuljetusliike otti tilauksen',
-    'order.reopened': 'kuljetusliike luopui, tilaus on taas pöydällä',
-    'order.stop_completed': 'reittipiste kuitattu',
-    'order.closed': 'ajo suoritettu',
-    'order.cancelled': 'tilaus peruttu',
-    'document.added': 'CMR tai rahtikuva lisätty',
   },
   verify: {
     title: 'Allekirjoituksen tarkistus',
@@ -104,7 +130,7 @@ const fi: DocsText = {
     bad_request: 'pyyntö on väärin muotoiltu (400)',
     unauthorized: 'avain puuttuu, on väärä tai peruttu (401)',
     forbidden: 'lukuavain, yritys ei ole aktiivinen tai voimassa olevia ehtoja ei ole hyväksytty (403)',
-    not_found: 'tilausta ei ole yrityksellä (404)',
+    not_found: 'tilausta, pistettä, tarjousta tai reklamaatiota ei ole yrityksellä (404)',
     conflict: 'tila ei salli toimintoa tai sama Idempotency-Key on käsittelyssä (409)',
     unprocessable: 'sisältö ei kelpaa: sijainti, reitti tai liiketoimintasääntö (422)',
     rate_limited: 'yli 60 pyyntöä minuutissa (429, Retry-After)',
@@ -127,13 +153,13 @@ const en: DocsText = {
   title: 'API documentation',
   description: 'RAHTIS API for shippers: read and create orders from your own system and receive webhooks.',
   intro:
-    'The API connects your own ERP or TMS to RAHTIS: read orders and their progress, create and withdraw orders, and get a notification at your own URL when an order changes. Responses and error codes are in English so your program can branch on them.',
+    'The API runs the whole life of an order from your own ERP or TMS: create the order, choose an offer or assign a known vehicle, follow the trip with arrivals, stop confirmations and photos, amend the route in progress, rate the carrier, handle claims, and get a notification at your own URL whenever something changes. Responses and error codes are in English so your program can branch on them.',
   openapi: 'Machine-readable description (OpenAPI 3.1) for Postman, Insomnia or a client generator:',
   cabinet: 'Keys and webhooks are created in the cabinet, on the API tab.',
   start: {
     title: 'Getting started',
     paragraphs: [
-      'Create a key in the cabinet. The key is shown once — store it in your secret manager. A read key is enough to follow orders; creating and withdrawing orders needs write access.',
+      'Create a key in the cabinet. The key is shown once — store it in your secret manager. A read key is enough to follow orders; every change (creating, choosing, assigning, route changes, rating, claims) needs write access.',
       'A key of a test company starts with rhs_test_ and only sees test orders; responses then carry Rahtis-Environment: test. A key of a live company starts with rhs_live_.',
       'Send the key in every request as Authorization: Bearer.',
     ],
@@ -149,7 +175,7 @@ const en: DocsText = {
     title: 'Order, timeline and documents',
     paragraphs: [
       'GET /orders/{ref} returns the order with its stops, progress and — once a carrier has taken it — the vehicle.',
-      'GET /orders/{ref}/events is the timeline: status changes and stop arrivals and completions.',
+      'GET /orders/{ref}/events is the timeline: status changes, stop arrivals and completions, documents and route amendments.',
       'GET /orders/{ref}/documents returns CMRs and trip photos. Each link is valid for 5 minutes — request the list again when you need the file.',
     ],
   },
@@ -165,21 +191,44 @@ const en: DocsText = {
     title: 'Withdrawing an order',
     paragraphs: ['POST /orders/{ref}/withdraw cancels the order; the body { "reason": "…" } is optional. A completed trip cannot be withdrawn (409).'],
   },
+  trip: {
+    title: 'Following the trip',
+    paragraphs: [
+      'Every stop has eta (estimated arrival, recalculated with traffic after each confirmation), arrival (the driver arrived) and completion (the stop was confirmed). Arrival and completion carry the time and a position: the device location at that moment plus distance_m, the distance to the stop address. The distance tells whether the driver was there — for example to settle waiting time.',
+      'GET /orders/{ref}/documents returns captured_position (where it was taken and the distance to the stop) for every photo and CMR, and damage for damage photos.',
+      'A position is one point from that moment, not continuous tracking. Points are kept for 24 months after the trip ends.',
+    ],
+  },
+  offers: {
+    title: 'Offers and assigning a vehicle',
+    paragraphs: [
+      'GET /orders/{ref}/offers shows the vehicles offered by carriers, with driver and rating. POST /orders/{ref}/offers/{id}/choose chooses an offer.',
+      'A known vehicle can be assigned directly: GET /vehicles lists the vehicles that have driven for you, and POST /orders/{ref}/assign { "vehicle_id" } assigns one to an order that has no offers yet. The carrier and the driver are notified.',
+      'POST /orders/{ref}/unassign cancels the assignment before the trip starts, and the order returns to the desk.',
+    ],
+  },
+  amend: {
+    title: 'Changes in progress and rating',
+    paragraphs: [
+      'During the trip a stop can be changed: PATCH /orders/{ref}/stops/{sequence} — only the fields you send change, null clears a field. POST /orders/{ref}/stops adds an extra loading or unloading (before_sequence says where), and DELETE /orders/{ref}/stops/{sequence} removes a stop not yet passed. Pickup and trailer return cannot be removed. The carrier is notified and the route is recalculated.',
+      'POST /orders/{ref}/reprice { "rate": { "amount" } } changes the rate; the distance defaults to the recalculated route. GET /orders/{ref}/amendments lists the changes and whether the carrier has acknowledged them.',
+      'After the trip, POST /orders/{ref}/rating { "score": 1–5, "comment" } rates the carrier; a new rating replaces the previous one.',
+    ],
+  },
+  claims: {
+    title: 'Claims',
+    paragraphs: [
+      'GET /claims lists the claims filed by your company and against it; GET /claims/{ref} shows messages and attachments (links valid for 5 minutes).',
+      'POST /claims { "order_ref", "kind", "description", "stop_sequence"?, "amount"? } files a claim for a trip in progress or completed. POST /claims/{ref}/comments adds a message and POST /claims/{ref}/attachments a file (multipart/form-data: file and note; PDF, JPEG, PNG or WebP up to 10 MB). The other party and the operator are notified by email, as when filing from the cabinet.',
+    ],
+  },
   webhooks: {
     title: 'Webhooks',
     paragraphs: [
       'In the cabinet, enter an https URL and choose the events. The signing secret is shown once. The URL must be public (port 443); redirects are not followed.',
       'A notification carries the order number and what changed — fetch GET /orders/{ref} for the full order when you need it.',
-      'Answer 2xx within 10 seconds and do the work afterwards. Otherwise the delivery is retried after 1, 5, 15 and 60 minutes, then 3, 6, 12 and 24 hours. The same notification can arrive twice: recognise it by id. The Send test button in the cabinet sends a ping event.',
+      'Answer 2xx within 10 seconds and do the work afterwards. Otherwise the delivery is retried after 1, 5, 15 and 60 minutes, then 3, 6, 12 and 24 hours. The same notification can arrive twice: recognise it by id. Notifications are sent in parallel and may arrive out of order — order them by created_at. The Send test button in the cabinet sends a ping event.',
     ],
-  },
-  events: {
-    'order.taken': 'a carrier took the order',
-    'order.reopened': 'the carrier gave it up; the order is back on the desk',
-    'order.stop_completed': 'a stop was completed',
-    'order.closed': 'the trip is done',
-    'order.cancelled': 'the order was withdrawn',
-    'document.added': 'a CMR or trip photo was added',
   },
   verify: {
     title: 'Verifying the signature',
@@ -196,7 +245,7 @@ const en: DocsText = {
     bad_request: 'the request is malformed (400)',
     unauthorized: 'the key is missing, wrong or revoked (401)',
     forbidden: 'read-only key, inactive company, or the current terms are not accepted (403)',
-    not_found: 'no such order in your company (404)',
+    not_found: 'no such order, stop, offer or claim in your company (404)',
     conflict: 'the state does not allow it, or the same Idempotency-Key is being processed (409)',
     unprocessable: 'the content is not acceptable: location, route or a business rule (422)',
     rate_limited: 'more than 60 requests per minute (429, Retry-After)',

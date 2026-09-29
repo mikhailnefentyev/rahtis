@@ -14,6 +14,9 @@ import { WEBHOOK_EVENTS } from './events';
 const STATUS = ['DRAFT', 'OPEN', 'REQUESTED', 'AWAIT_DRIVER', 'IN_PROGRESS', 'DONE', 'CANCELLED'];
 const ROLES = ['PICKUP', 'DELIVERY', 'EXTRA_LOAD', 'EXTRA_UNLOAD', 'TRAILER_RETURN'];
 const EVENTS: readonly string[] = WEBHOOK_EVENTS;
+const AMENDMENT_KINDS = ['STOP_ADDED', 'STOP_CHANGED', 'STOP_REMOVED', 'ORDER_REPRICED', 'ORDER_CANCELLED', 'ORDER_RELEASED'];
+const CLAIM_KINDS = ['CARGO_DAMAGE', 'SHORTAGE', 'DOWNTIME', 'DEVIATION', 'OTHER'];
+const CLAIM_STATUSES = ['OPEN', 'IN_REVIEW', 'RESOLVED', 'REJECTED'];
 
 const nullable = (type: string, extra: Record<string, unknown> = {}) => ({ type: [type, 'null'], ...extra });
 const ref = (name: string) => ({ $ref: `#/components/schemas/${name}` });
@@ -39,6 +42,22 @@ const refParam = {
   schema: { type: 'string', pattern: '^[A-Za-z]{2}-\\d{4}-\\d{3,6}$' },
 };
 
+const sequenceParam = {
+  name: 'sequence',
+  in: 'path',
+  required: true,
+  description: 'Stop sequence number from the order (0 is the first stop).',
+  schema: { type: 'integer', minimum: 0 },
+};
+
+const claimParam = {
+  name: 'claim_ref',
+  in: 'path',
+  required: true,
+  description: 'Claim number, e.g. CL-RS-2026-0142-1.',
+  schema: { type: 'string', pattern: '^CL-[A-Za-z]{2}-\\d{4}-\\d{3,6}-\\d{1,3}$' },
+};
+
 const idempotencyHeader = {
   name: 'Idempotency-Key',
   in: 'header',
@@ -53,9 +72,9 @@ export function openApi(serverUrl: string) {
     openapi: '3.1.0',
     info: {
       title: 'RAHTIS Shipper API',
-      version: '1.0.0',
+      version: '1.1.0',
       description:
-        'Read and create your company\'s orders on RAHTIS and receive webhooks when they change. Keys are issued in the cabinet (API tab). A key from a test company starts with rhs_test_ and only sees the test environment; responses then carry Rahtis-Environment: test.',
+        'Work with your company\'s orders on RAHTIS from start to finish: create orders, choose offers or assign known vehicles, follow the trip with arrivals, stop confirmations, photos and their positions, amend the route in progress, rate the carrier, handle claims, and receive webhooks when anything changes. Webhooks are delivered in parallel and may arrive out of order: order them by created_at. Keys are issued in the cabinet (API tab). A key from a test company starts with rhs_test_ and only sees the test environment; responses then carry Rahtis-Environment: test.',
     },
     servers: [{ url: `${serverUrl}/api/v1` }],
     security: [{ bearer: [] }],
@@ -184,6 +203,288 @@ export function openApi(serverUrl: string) {
           },
         },
       },
+      '/orders/{ref}/offers': {
+        get: {
+          tags: ['Orders'],
+          summary: 'Carrier offers',
+          operationId: 'getOrderOffers',
+          description: 'Vehicles offered for the order, as in the cabinet. The carrier\'s name is not shown when Aivomaa Oy is your contracting party.',
+          parameters: [refParam],
+          responses: {
+            '200': {
+              description: 'Offers.',
+              content: json({ type: 'object', properties: { ref: { type: 'string' }, data: { type: 'array', items: ref('Offer') } } }),
+            },
+            '404': errorResponse('No order with this number in your company.'),
+            ...COMMON_ERRORS,
+          },
+        },
+      },
+      '/orders/{ref}/offers/{id}/choose': {
+        post: {
+          tags: ['Write'],
+          summary: 'Choose an offer',
+          operationId: 'chooseOffer',
+          parameters: [refParam, { name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }, idempotencyHeader],
+          responses: {
+            '200': { description: 'The order with the chosen vehicle.', content: json(ref('Order')) },
+            '404': errorResponse('No such order or offer.'),
+            '409': errorResponse('Offers can no longer be chosen in the order\'s current status.'),
+            ...COMMON_ERRORS,
+          },
+        },
+      },
+      '/vehicles': {
+        get: {
+          tags: ['Orders'],
+          summary: 'Known vehicles',
+          operationId: 'listKnownVehicles',
+          description: 'Vehicles that have driven for you and can be assigned directly. Carrier bank details and driver contacts are not included.',
+          responses: {
+            '200': { description: 'Vehicles.', content: json({ type: 'object', properties: { data: { type: 'array', items: ref('KnownVehicle') } } }) },
+            ...COMMON_ERRORS,
+          },
+        },
+      },
+      '/orders/{ref}/assign': {
+        post: {
+          tags: ['Write'],
+          summary: 'Assign a known vehicle',
+          operationId: 'assignVehicle',
+          description: 'Direct assignment of an order on the desk that has no offers yet. The carrier and driver are notified.',
+          parameters: [refParam, idempotencyHeader],
+          requestBody: {
+            required: true,
+            content: json({ type: 'object', required: ['vehicle_id'], properties: { vehicle_id: { type: 'string', format: 'uuid' } } }),
+          },
+          responses: {
+            '200': { description: 'The assigned order.', content: json(ref('Order')) },
+            '403': errorResponse('The vehicle is not among your known vehicles.'),
+            '404': errorResponse('No order with this number in your company.'),
+            '409': errorResponse('The order already has offers, is not on the desk, the vehicle is unavailable, or its carrier has not accepted the current terms.'),
+            '422': errorResponse('The vehicle does not fit the order.'),
+            ...COMMON_ERRORS,
+          },
+        },
+      },
+      '/orders/{ref}/unassign': {
+        post: {
+          tags: ['Write'],
+          summary: 'Cancel the assignment',
+          operationId: 'unassign',
+          description: 'Before the trip starts: the carrier is released and the order returns to the desk.',
+          parameters: [refParam, idempotencyHeader],
+          responses: {
+            '200': { description: 'The order, back on the desk.', content: json(ref('Order')) },
+            '404': errorResponse('No order with this number in your company.'),
+            '409': errorResponse('The trip has already started.'),
+            ...COMMON_ERRORS,
+          },
+        },
+      },
+      '/orders/{ref}/amendments': {
+        get: {
+          tags: ['Orders'],
+          summary: 'Route amendments',
+          operationId: 'getOrderAmendments',
+          parameters: [refParam],
+          responses: {
+            '200': {
+              description: 'Amendments, oldest first.',
+              content: json({ type: 'object', properties: { ref: { type: 'string' }, data: { type: 'array', items: ref('Amendment') } } }),
+            },
+            '404': errorResponse('No order with this number in your company.'),
+            ...COMMON_ERRORS,
+          },
+        },
+      },
+      '/orders/{ref}/stops': {
+        post: {
+          tags: ['Write'],
+          summary: 'Add a stop to a trip in progress',
+          operationId: 'addStop',
+          description: 'An extra loading or unloading. The truck route and distance are recalculated; use POST /orders/{ref}/reprice to adjust the rate.',
+          parameters: [refParam, idempotencyHeader],
+          requestBody: { required: true, content: json(ref('NewStop')) },
+          responses: {
+            '200': { description: 'The order with the new stop.', content: json(ref('Order')) },
+            '404': errorResponse('No such order or stop.'),
+            '409': errorResponse('The trip is not in progress.'),
+            '422': errorResponse('The stop could not be located, or a rule rejected it. See error.details.'),
+            ...COMMON_ERRORS,
+          },
+        },
+      },
+      '/orders/{ref}/stops/{sequence}': {
+        patch: {
+          tags: ['Write'],
+          summary: 'Amend a stop in a trip in progress',
+          operationId: 'amendStop',
+          description: 'The carrier is notified of the change. A completed stop cannot be changed.',
+          parameters: [refParam, sequenceParam, idempotencyHeader],
+          requestBody: { required: true, content: json(ref('StopPatch')) },
+          responses: {
+            '200': { description: 'The amended order.', content: json(ref('Order')) },
+            '404': errorResponse('No such order or stop.'),
+            '409': errorResponse('The trip is not in progress, or the stop is already completed.'),
+            '422': errorResponse('A field is invalid or the new place could not be located. See error.details.'),
+            ...COMMON_ERRORS,
+          },
+        },
+        delete: {
+          tags: ['Write'],
+          summary: 'Remove a stop from a trip in progress',
+          operationId: 'removeStop',
+          description: 'Pickup and trailer return cannot be removed, nor a completed stop.',
+          parameters: [refParam, sequenceParam],
+          responses: {
+            '200': { description: 'The order without the stop.', content: json(ref('Order')) },
+            '404': errorResponse('No such order or stop.'),
+            '409': errorResponse('The trip is not in progress, or the stop is already completed.'),
+            '422': errorResponse('This stop cannot be removed.'),
+            ...COMMON_ERRORS,
+          },
+        },
+      },
+      '/orders/{ref}/reprice': {
+        post: {
+          tags: ['Write'],
+          summary: 'Change the rate',
+          operationId: 'repriceOrder',
+          description: 'distance_km defaults to the truck route calculated after the latest amendments.',
+          parameters: [refParam, idempotencyHeader],
+          requestBody: {
+            required: true,
+            content: json({
+              type: 'object',
+              required: ['rate'],
+              properties: {
+                rate: { type: 'object', required: ['amount'], properties: { amount: { type: 'number', exclusiveMinimum: 0 } } },
+                distance_km: { type: 'integer', exclusiveMinimum: 0 },
+              },
+            }),
+          },
+          responses: {
+            '200': { description: 'The repriced order.', content: json(ref('Order')) },
+            '404': errorResponse('No order with this number in your company.'),
+            '409': errorResponse('The order is completed or withdrawn.'),
+            ...COMMON_ERRORS,
+          },
+        },
+      },
+      '/orders/{ref}/rating': {
+        post: {
+          tags: ['Write'],
+          summary: 'Rate the carrier',
+          operationId: 'rateOrder',
+          description: 'After the trip is closed. Rating again replaces the previous rating.',
+          parameters: [refParam, idempotencyHeader],
+          requestBody: {
+            required: true,
+            content: json({
+              type: 'object',
+              required: ['score'],
+              properties: { score: { type: 'integer', minimum: 1, maximum: 5 }, comment: { type: 'string', maxLength: 1000 } },
+            }),
+          },
+          responses: {
+            '200': { description: 'The order with your rating.', content: json(ref('Order')) },
+            '404': errorResponse('No order with this number in your company.'),
+            '409': errorResponse('The trip is not closed yet or has no carrier.'),
+            ...COMMON_ERRORS,
+          },
+        },
+      },
+      '/claims': {
+        get: {
+          tags: ['Orders'],
+          summary: 'List claims',
+          operationId: 'listClaims',
+          description: 'Claims filed by your company and against it, newest first (up to 200).',
+          parameters: [{ name: 'status', in: 'query', description: 'Comma-separated statuses.', schema: { type: 'string' }, example: 'OPEN,IN_REVIEW' }],
+          responses: {
+            '200': { description: 'Claims.', content: json({ type: 'object', properties: { data: { type: 'array', items: ref('Claim') } } }) },
+            '400': errorResponse('Invalid status.'),
+            ...COMMON_ERRORS,
+          },
+        },
+        post: {
+          tags: ['Write'],
+          summary: 'File a claim',
+          operationId: 'fileClaim',
+          description: 'For a trip in progress or completed. The other party and the operator are notified by email.',
+          parameters: [idempotencyHeader],
+          requestBody: { required: true, content: json(ref('ClaimInput')) },
+          responses: {
+            '201': { description: 'The filed claim.', content: json(ref('ClaimDetail')) },
+            '400': errorResponse('A required field is missing. See error.details.'),
+            '404': errorResponse('No such order or stop.'),
+            '409': errorResponse('The trip is not in progress or completed.'),
+            ...COMMON_ERRORS,
+          },
+        },
+      },
+      '/claims/{claim_ref}': {
+        get: {
+          tags: ['Orders'],
+          summary: 'Get a claim',
+          operationId: 'getClaim',
+          parameters: [claimParam],
+          responses: {
+            '200': { description: 'The claim with its messages and attachments.', content: json(ref('ClaimDetail')) },
+            '404': errorResponse('No such claim for your company.'),
+            ...COMMON_ERRORS,
+          },
+        },
+      },
+      '/claims/{claim_ref}/comments': {
+        post: {
+          tags: ['Write'],
+          summary: 'Add a message to a claim',
+          operationId: 'commentClaim',
+          parameters: [claimParam, idempotencyHeader],
+          requestBody: {
+            required: true,
+            content: json({ type: 'object', required: ['body'], properties: { body: { type: 'string', maxLength: 5000 } } }),
+          },
+          responses: {
+            '201': { description: 'The claim with the new message.', content: json(ref('ClaimDetail')) },
+            '404': errorResponse('No such claim for your company.'),
+            '409': errorResponse('The claim is closed.'),
+            ...COMMON_ERRORS,
+          },
+        },
+      },
+      '/claims/{claim_ref}/attachments': {
+        post: {
+          tags: ['Write'],
+          summary: 'Attach a file to a claim',
+          operationId: 'attachToClaim',
+          parameters: [claimParam],
+          requestBody: {
+            required: true,
+            content: {
+              'multipart/form-data': {
+                schema: {
+                  type: 'object',
+                  required: ['file'],
+                  properties: {
+                    file: { type: 'string', format: 'binary', description: 'PDF, JPEG, PNG or WebP, up to 10 MB.' },
+                    note: { type: 'string', maxLength: 5000 },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            '201': { description: 'The claim with the new attachment.', content: json(ref('ClaimDetail')) },
+            '404': errorResponse('No such claim for your company.'),
+            '409': errorResponse('The claim is closed.'),
+            '422': errorResponse('The file is too large or of an unsupported type.'),
+            ...COMMON_ERRORS,
+          },
+        },
+      },
     },
     webhooks: Object.fromEntries(
       [...EVENTS, 'ping'].map((event) => [
@@ -280,7 +581,21 @@ export function openApi(serverUrl: string) {
                 stops: { type: 'array', items: ref('Stop') },
                 progress: {
                   type: 'object',
-                  properties: { stops_total: { type: 'integer' }, stops_completed: { type: 'integer' } },
+                  properties: {
+                    stops_total: { type: 'integer' },
+                    stops_arrived: { type: 'integer' },
+                    stops_completed: { type: 'integer' },
+                  },
+                },
+                rating: {
+                  description: 'Your rating of the carrier, once given (POST /orders/{ref}/rating).',
+                  oneOf: [
+                    { type: 'null' },
+                    {
+                      type: 'object',
+                      properties: { score: { type: 'integer', minimum: 1, maximum: 5 }, comment: nullable('string'), rated_at: { type: 'string', format: 'date-time' } },
+                    },
+                  ],
                 },
                 vehicle: {
                   description: 'Once a carrier has taken the order.',
@@ -330,6 +645,46 @@ export function openApi(serverUrl: string) {
             seal_required: nullable('boolean'),
             note: nullable('string'),
             damage_note: nullable('string'),
+            eta: {
+              description: 'Estimated arrival, recalculated with traffic after each completed stop.',
+              oneOf: [
+                { type: 'null' },
+                {
+                  type: 'object',
+                  properties: {
+                    at: { type: 'string', format: 'date-time' },
+                    source: { enum: ['ROUTE', 'TRAFFIC', 'CARRIER'] },
+                    updated_at: { type: 'string', format: 'date-time' },
+                  },
+                },
+              ],
+            },
+            arrival: {
+              description: 'When and where the driver marked arrival at this stop.',
+              oneOf: [{ type: 'null' }, ref('StopEvent')],
+            },
+            completion: {
+              description: 'When and where the driver marked this stop as done.',
+              oneOf: [{ type: 'null' }, ref('StopEvent')],
+            },
+          },
+        },
+        StopEvent: {
+          type: 'object',
+          properties: {
+            at: { type: 'string', format: 'date-time' },
+            position: { oneOf: [{ type: 'null' }, ref('Position')] },
+          },
+        },
+        Position: {
+          type: 'object',
+          description:
+            'One point from the driver\'s device at that moment (not continuous tracking). distance_m is the distance to the stop address and is what tells whether the driver was there.',
+          properties: {
+            lat: { type: 'number' },
+            lon: { type: 'number' },
+            accuracy_m: nullable('integer', { description: 'Device-reported accuracy; only for stop completion.' }),
+            distance_m: nullable('integer'),
           },
         },
         TimelineEvent: {
@@ -337,21 +692,26 @@ export function openApi(serverUrl: string) {
           required: ['at', 'type'],
           properties: {
             at: { type: 'string', format: 'date-time' },
-            type: { enum: ['status', 'stop_arrived', 'stop_completed'] },
+            type: { enum: ['status', 'stop_arrived', 'stop_completed', 'document', 'amendment'] },
             from: { enum: [...STATUS, null], description: 'type=status' },
             to: { enum: STATUS, description: 'type=status' },
-            sequence: { type: 'integer', description: 'type=stop_*' },
+            sequence: nullable('integer', { description: 'type=stop_*, document, amendment' }),
             role: { enum: ROLES, description: 'type=stop_*' },
             city: { type: 'string', description: 'type=stop_*' },
+            document_id: { type: 'string', format: 'uuid', description: 'type=document' },
+            amendment_id: { type: 'integer', description: 'type=amendment' },
+            kind: { type: 'string', description: 'type=document or amendment' },
+            stop_label: nullable('string', { description: 'type=amendment' }),
           },
         },
         Document: {
           type: 'object',
           properties: {
             id: { type: 'string', format: 'uuid' },
-            kind: { type: 'string' },
+            kind: { enum: ['CMR', 'LOADING_PHOTO', 'UNLOADING_PHOTO', 'DAMAGE_PHOTO'] },
+            damage: { type: 'boolean', description: 'kind is DAMAGE_PHOTO.' },
             phase: nullable('string'),
-            subject: nullable('string'),
+            subject: { enum: ['TRAILER', 'CARGO', 'SEAL', 'DOCUMENT', 'OTHER', 'SIGNATURE', null], description: 'What is on the photo.' },
             angle: nullable('string'),
             stop_sequence: nullable('integer'),
             file_name: nullable('string'),
@@ -360,6 +720,10 @@ export function openApi(serverUrl: string) {
             signer_name: nullable('string'),
             created_at: { type: 'string', format: 'date-time' },
             captured_at: nullable('string', { format: 'date-time' }),
+            captured_position: {
+              description: 'Where the photo was taken, with distance to the stop address.',
+              oneOf: [{ type: 'null' }, ref('Position')],
+            },
             url: nullable('string', { format: 'uri' }),
             url_expires_at: { type: 'string', format: 'date-time' },
           },
@@ -442,14 +806,206 @@ export function openApi(serverUrl: string) {
                 previous_status: { enum: STATUS },
                 stop: {
                   type: 'object',
-                  properties: { sequence: { type: 'integer' }, role: { enum: ROLES }, city: { type: 'string' }, completed_at: { type: 'string', format: 'date-time' } },
+                  description: 'order.stop_arrived, order.stop_completed, order.eta_changed',
+                  properties: {
+                    sequence: { type: 'integer' },
+                    role: { enum: ROLES },
+                    city: { type: 'string' },
+                    arrived_at: { type: 'string', format: 'date-time' },
+                    completed_at: { type: 'string', format: 'date-time' },
+                    eta_at: { type: 'string', format: 'date-time' },
+                    previous_eta_at: nullable('string', { format: 'date-time' }),
+                    source: { enum: ['ROUTE', 'TRAFFIC', 'CARRIER'] },
+                  },
                 },
                 document: {
                   type: 'object',
+                  description: 'document.added',
                   properties: { id: { type: 'string', format: 'uuid' }, kind: { type: 'string' }, phase: nullable('string'), created_at: { type: 'string', format: 'date-time' } },
+                },
+                offer: {
+                  type: 'object',
+                  description: 'offer.received — see GET /orders/{ref}/offers',
+                  properties: { id: { type: 'string', format: 'uuid' }, origin: { enum: ['DESK', 'DIRECT'] }, created_at: { type: 'string', format: 'date-time' } },
+                },
+                amendment: {
+                  type: 'object',
+                  description: 'order.amended — see GET /orders/{ref}/amendments',
+                  properties: {
+                    id: { type: 'integer' },
+                    kind: { enum: AMENDMENT_KINDS },
+                    stop_sequence: nullable('integer'),
+                    created_at: { type: 'string', format: 'date-time' },
+                  },
+                },
+                claim_ref: { type: 'string', description: 'claim.updated' },
+                order_ref: { type: 'string', description: 'claim.updated' },
+                change: { enum: ['CREATED', 'COMMENT', 'STATUS', 'ATTACHMENT'], description: 'claim.updated' },
+                at: { type: 'string', format: 'date-time', description: 'claim.updated' },
+              },
+            },
+          },
+        },
+        Offer: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            variant_no: { type: 'integer' },
+            chosen: { type: 'boolean' },
+            assigned: { type: 'boolean' },
+            created_at: { type: 'string', format: 'date-time' },
+            vehicle: {
+              type: 'object',
+              properties: {
+                plate: { type: 'string' },
+                make: nullable('string'),
+                euro_class: nullable('string'),
+                axles: nullable('integer'),
+                base_city: nullable('string'),
+                driver_name: nullable('string'),
+                driver_languages: { type: 'array', items: { type: 'string' } },
+                carrier_rating: nullable('number'),
+              },
+            },
+          },
+        },
+        Amendment: {
+          type: 'object',
+          properties: {
+            id: { type: 'integer' },
+            kind: { enum: AMENDMENT_KINDS },
+            stop_sequence: nullable('integer'),
+            stop_role: { enum: [...ROLES, null] },
+            stop_label: nullable('string'),
+            changes: { type: 'object', description: 'Changed fields: { field: { from, to } }.', additionalProperties: true },
+            created_at: { type: 'string', format: 'date-time' },
+            acknowledged_at: nullable('string', { format: 'date-time', description: 'When the carrier confirmed it saw the change.' }),
+          },
+        },
+        KnownVehicle: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid', description: 'Use as vehicle_id in POST /orders/{ref}/assign.' },
+            plate: { type: 'string' },
+            make: nullable('string'),
+            vehicle_class: { enum: ['TRACTOR', 'VAN', 'TRUCK'] },
+            euro_class: nullable('string'),
+            axles: nullable('integer'),
+            payload_kg: nullable('integer'),
+            ldm: nullable('number'),
+            container_feet: nullable('array', { items: { type: 'integer' } }),
+            driver_name: nullable('string'),
+            carrier_name: nullable('string'),
+            direct_billing: { type: 'boolean', description: 'The carrier invoices you directly for direct jobs.' },
+            carrier_rating: nullable('number'),
+            trips_with_you: { type: 'integer' },
+            last_trip_at: nullable('string', { format: 'date-time' }),
+            available: { type: 'boolean' },
+            busy: { type: 'boolean' },
+          },
+        },
+        StopPatch: {
+          type: 'object',
+          description:
+            'Only the fields you send are changed; null clears a field. Changing address or location needs a precise place: send location, or an address with a house number recognised in the city.',
+          properties: {
+            place_name: nullable('string'),
+            company_name: nullable('string'),
+            address: { type: 'string' },
+            city: { type: 'string' },
+            location: ref('Location'),
+            contact: { type: 'object', properties: { name: { type: 'string' }, phone: { type: 'string' } } },
+            scheduled_date: nullable('string', { format: 'date' }),
+            scheduled_time: nullable('string', { pattern: '^([01]\\d|2[0-3]):[0-5]\\d$' }),
+            external_ref: nullable('string'),
+            note: nullable('string'),
+            cargo_weight_kg: nullable('integer'),
+            consignee: nullable('string'),
+            seal_required: nullable('boolean'),
+            trailer_loaded: nullable('boolean'),
+          },
+        },
+        NewStop: {
+          allOf: [
+            ref('StopPatch'),
+            {
+              type: 'object',
+              required: ['role', 'before_sequence', 'address', 'city'],
+              properties: {
+                role: { enum: ['EXTRA_LOAD', 'EXTRA_UNLOAD'] },
+                before_sequence: { type: 'integer', description: 'The new stop is inserted before this one; not before the pickup.' },
+              },
+            },
+          ],
+        },
+        Claim: {
+          type: 'object',
+          properties: {
+            ref: { type: 'string', example: 'CL-RS-2026-0142-1' },
+            order_ref: { type: 'string' },
+            stop_sequence: nullable('integer'),
+            kind: { enum: CLAIM_KINDS },
+            status: { enum: CLAIM_STATUSES },
+            direction: { enum: ['filed', 'received'], description: 'Filed by your company, or against it.' },
+            filed_by_role: { enum: ['SHIPPER', 'CARRIER', 'ADMIN'] },
+            description: nullable('string'),
+            amount: { oneOf: [{ type: 'null' }, ref('Money')] },
+            resolution: nullable('string'),
+            resolved_at: nullable('string', { format: 'date-time' }),
+            created_at: { type: 'string', format: 'date-time' },
+            updated_at: { type: 'string', format: 'date-time' },
+          },
+        },
+        ClaimDetail: {
+          allOf: [
+            ref('Claim'),
+            {
+              type: 'object',
+              properties: {
+                events: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      at: { type: 'string', format: 'date-time' },
+                      kind: { enum: ['CREATED', 'COMMENT', 'STATUS', 'ATTACHMENT'] },
+                      author_role: { type: 'string' },
+                      body: nullable('string'),
+                      status_from: { enum: [...CLAIM_STATUSES, null] },
+                      status_to: { enum: [...CLAIM_STATUSES, null] },
+                      attachment_id: nullable('string', { format: 'uuid' }),
+                    },
+                  },
+                },
+                attachments: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      id: { type: 'string', format: 'uuid' },
+                      file_name: { type: 'string' },
+                      mime_type: { type: 'string' },
+                      size_bytes: { type: 'integer' },
+                      author_role: { type: 'string' },
+                      created_at: { type: 'string', format: 'date-time' },
+                      url: nullable('string', { format: 'uri', description: 'Signed link, valid 5 minutes.' }),
+                      url_expires_at: { type: 'string', format: 'date-time' },
+                    },
+                  },
                 },
               },
             },
+          ],
+        },
+        ClaimInput: {
+          type: 'object',
+          required: ['order_ref', 'kind', 'description'],
+          properties: {
+            order_ref: { type: 'string' },
+            kind: { enum: CLAIM_KINDS },
+            description: { type: 'string', minLength: 10, maxLength: 5000 },
+            stop_sequence: { type: 'integer', description: 'The stop the claim is about, if any.' },
+            amount: { type: 'object', properties: { amount: { type: 'number', minimum: 0 } }, description: 'Claimed amount in euros.' },
           },
         },
       },
