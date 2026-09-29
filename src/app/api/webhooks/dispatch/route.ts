@@ -1,3 +1,4 @@
+import { bearerMatches } from '@/lib/auth/bearer';
 import { dispatchWebhooks } from '@/lib/api/webhooks';
 import { recordIncident } from '@/lib/incidents/record';
 
@@ -16,7 +17,7 @@ export async function POST(request: Request) {
   if (!expected) {
     return Response.json({ error: 'REPORTS_CRON_SECRET is not set' }, { status: 503 });
   }
-  if (request.headers.get('authorization') !== `Bearer ${expected}`) {
+  if (!bearerMatches(request.headers.get('authorization'), expected)) {
     return Response.json({ error: 'forbidden' }, { status: 401 });
   }
 

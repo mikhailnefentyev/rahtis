@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { explainAdmin, withAdminError } from '@/lib/admin/errors';
 import { confirmLink } from '@/lib/auth/links';
+import { clientIp, throttleAllowed } from '@/lib/auth/throttle';
 import { siteUrl } from '@/lib/config';
 import { EMAIL_LOCALE, emailReplyTo, operatorInbox, sendEmail } from '@/lib/email';
 import { emailLocaleOf, type EmailLocale } from '@/lib/email/text';
@@ -61,6 +62,16 @@ export async function submitApplicationAction(
 ): Promise<ApplyState> {
   const locale = toLocale(formData.get('locale'));
   const t = await getDictionary(locale);
+
+  /*
+   * Форма открыта всем, и каждая заявка — строка в базе, запрос в PRH и
+   * два письма. Без ограничения бот заваливает оператора поддельными
+   * заявками. Пять в час с одного адреса хватает любой настоящей компании
+   * (проверка безопасности 29.09.2026).
+   */
+  if (!(await throttleAllowed(`apply:${await clientIp()}`, { limit: 5, seconds: 3600 }))) {
+    return { error: t.apply.tooMany, done: false };
+  }
 
   const kind = String(formData.get('kind') ?? '') as CompanyRole;
   const name = String(formData.get('name') ?? '').trim();

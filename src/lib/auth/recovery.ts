@@ -1,6 +1,5 @@
 'use server';
 
-import { createHmac } from 'node:crypto';
 import { headers } from 'next/headers';
 import { sendEmail, operatorInbox } from '@/lib/email';
 import { emailLocaleOf } from '@/lib/email/text';
@@ -9,7 +8,7 @@ import { getDictionary, isLocale, defaultLocale, type Locale } from '@/lib/i18n'
 import { confirmLink } from '@/lib/auth/links';
 import { siteUrl } from '@/lib/config';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { supabaseSecretKey } from '@/lib/env.server';
+import { throttleAllowed } from '@/lib/auth/throttle';
 
 /**
  * Запрос на восстановление пароля.
@@ -38,42 +37,6 @@ const PER_IP = { limit: 10, seconds: 3600 };
  * текста, и её обычно упускают.
  */
 const FLOOR_MS = 900;
-
-/**
- * Отпечаток адреса для счётчика.
- *
- * HMAC с серверным ключом, а не голый хэш: утёкшая таблица со списком
- * sha256 от почты перебирается по словарю адресов за минуты, с ключом —
- * не перебирается вовсе.
- */
-function fingerprint(value: string): string {
-  return createHmac('sha256', supabaseSecretKey())
-    .update(value.trim().toLowerCase())
-    .digest('hex')
-    .slice(0, 48);
-}
-
-async function allowed(key: string, rule: { limit: number; seconds: number }): Promise<boolean> {
-  const admin = createAdminClient();
-
-  const { data, error } = await admin.rpc('auth_throttle_hit', {
-    p_key_hash: fingerprint(key),
-    p_limit: rule.limit,
-    p_window_seconds: rule.seconds,
-  });
-
-  /*
-   * Счётчик недоступен — пускаем. Сломанный ограничитель не должен
-   * оставлять людей без возможности войти; злоупотребление в эти минуты
-   * дешевле, чем запертый кабинет.
-   */
-  if (error) {
-    console.error('throttle:', error.message);
-    return true;
-  }
-
-  return data !== false;
-}
 
 export async function requestPasswordReset(
   _previous: RecoveryState,
@@ -109,8 +72,8 @@ export async function requestPasswordReset(
   const forwarded = (await headers()).get('x-forwarded-for');
   const ip = forwarded?.split(',')[0]?.trim() || 'unknown';
 
-  if (!(await allowed(`email:${email}`, PER_EMAIL))) return wait();
-  if (!(await allowed(`ip:${ip}`, PER_IP))) return wait();
+  if (!(await throttleAllowed(`email:${email}`, PER_EMAIL))) return wait();
+  if (!(await throttleAllowed(`ip:${ip}`, PER_IP))) return wait();
 
   const site = siteUrl();
   const admin = createAdminClient();

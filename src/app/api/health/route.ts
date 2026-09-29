@@ -1,3 +1,4 @@
+import { bearerMatches } from '@/lib/auth/bearer';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 /**
@@ -23,7 +24,7 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: Request) {
   const secret = process.env.HEALTH_SECRET?.trim();
   const detailed =
-    Boolean(secret) && request.headers.get('authorization') === `Bearer ${secret}`;
+    bearerMatches(request.headers.get('authorization'), secret);
 
   const supabase = createAdminClient();
   const { data, error } = await supabase.rpc('platform_pulse');

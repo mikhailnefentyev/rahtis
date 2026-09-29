@@ -1,3 +1,4 @@
+import { bearerMatches } from '@/lib/auth/bearer';
 import { sendCertificateReminders } from '@/lib/drivers/reminders';
 
 /**
@@ -18,7 +19,7 @@ export async function POST(request: Request) {
     return Response.json({ error: 'REPORTS_CRON_SECRET is not set' }, { status: 503 });
   }
 
-  if (request.headers.get('authorization') !== `Bearer ${expected}`) {
+  if (!bearerMatches(request.headers.get('authorization'), expected)) {
     return Response.json({ error: 'forbidden' }, { status: 401 });
   }
 

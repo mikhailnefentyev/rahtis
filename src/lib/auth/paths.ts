@@ -56,5 +56,20 @@ export function homePath(locale: Locale): string {
 export function safeRedirect(next: string | null | undefined, fallback: string): string {
   if (!next) return fallback;
   if (!next.startsWith('/') || next.startsWith('//')) return fallback;
-  return next;
+  /*
+   * Обратная косая и управляющие символы — отказ. Браузер и new URL читают
+   * «/\evil.com» как «//evil.com» и уводят на чужой хост; табуляция и
+   * перевод строки вырезаются парсером и склеивают такие же обходы.
+   * Найдено проверкой безопасности 29.09.2026.
+   */
+  if (/[\\\u0000-\u001f\u007f]/.test(next)) return fallback;
+  /* Последняя сверка — тем же парсером, что поведёт браузер: хост не должен смениться. */
+  try {
+    const base = 'https://rahtis.invalid';
+    const url = new URL(next, base);
+    if (url.origin !== base) return fallback;
+    return `${url.pathname}${url.search}${url.hash}`;
+  } catch {
+    return fallback;
+  }
 }

@@ -1332,6 +1332,7 @@ export const fi = {
     shipperNote: 'Hyväksynnän jälkeen: kirjautuminen, yritystiedot, kuljetusten julkaisu.',
     sentTitle: 'Hakemus lähetetty',
     duplicate: 'Tällä Y-tunnuksella on jo hakemus vireillä tai hyväksytty.',
+    tooMany: 'Liian monta hakemusta lyhyessä ajassa. Yritä tunnin kuluttua tai kirjoita osoitteeseen admin@rahtis.eu.',
     failed: 'Lähetys ei onnistunut. Yritä uudelleen.',
     /* Toiminimi ei ole avoimessa datassa, tai rekisteri ei vastannut — ei virhe. */
     registryManual: 'Tarkistamme yrityksen tiedot käsin ja ilmoitamme sähköpostilla, kun hakemus on käsitelty.',

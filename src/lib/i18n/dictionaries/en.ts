@@ -1238,6 +1238,7 @@ export const en = {
     shipperNote: 'After approval: sign-in, company details, publishing orders.',
     sentTitle: 'Application sent',
     duplicate: 'There is already an application for this Y-tunnus, pending or approved.',
+    tooMany: 'Too many applications in a short time. Try again in an hour or write to admin@rahtis.eu.',
     failed: 'Sending failed. Try again.',
     registryManual: 'We will check the company details by hand and email you once the application has been reviewed.',
   },
