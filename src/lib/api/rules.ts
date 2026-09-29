@@ -28,6 +28,27 @@ const RULES: Rule[] = [
   { prefix: 'Укажите адрес доставки', field: 'stops', message: 'The route needs a DELIVERY stop.' },
   { prefix: 'Укажите вес груза', field: 'stops', message: 'cargo_weight_kg must be given on at least one stop; it is used to match the vehicle.' },
   { prefix: 'Укажите пробег и ставку', field: 'rate.amount', message: 'Distance and rate must both be positive.' },
+
+  /* Действия с заказом в пути и после (этап 2 полного цикла). */
+  { prefix: 'Выбор больше недоступен', field: 'status', message: 'Offers can no longer be chosen in the order\'s current status.' },
+  { prefix: 'Откат возможен только до начала рейса', field: 'status', message: 'The assignment can only be cancelled before the trip starts.' },
+  { prefix: 'Сначала опубликуйте заказ', field: 'status', message: 'The order must be on the desk before it can be assigned.' },
+  { prefix: 'Живая корректировка возможна только в идущем рейсе', field: 'status', message: 'The route can only be amended while the trip is in progress.' },
+  { prefix: 'Точка уже пройдена', field: 'stop', message: 'This stop is already completed and cannot be changed.' },
+  { prefix: 'В идущий рейс добавляется только загрузка или выгрузка', field: 'role', message: 'Only EXTRA_LOAD or EXTRA_UNLOAD stops can be added to a trip in progress.' },
+  { prefix: 'Перед забором точку не добавить', field: 'before_sequence', message: 'A stop cannot be added before the pickup; insert it after the pickup.' },
+  { prefix: 'Забор и отцепку прицепа из маршрута не убирают', field: 'stop', message: 'PICKUP and TRAILER_RETURN stops cannot be removed.' },
+  { prefix: 'Пересчёт недоступен', field: 'status', message: 'Distance and rate cannot be changed in the order\'s current status.' },
+  { prefix: 'Нужны и пробег, и ставка', field: 'rate.amount', message: 'Both distance and rate are required.' },
+  { prefix: 'Оценка ставится по шкале от 1 до 5', field: 'score', message: 'score must be an integer from 1 to 5.' },
+  { prefix: 'Оценка ставится после закрытия рейса', field: 'status', message: 'An order can be rated only after the trip is closed.' },
+  { prefix: 'У рейса нет перевозчика', field: 'status', message: 'The order has no carrier to rate.' },
+  { prefix: 'Опишите, что произошло', field: 'description', message: 'description is required.' },
+  { prefix: 'Пустой комментарий', field: 'body', message: 'body must not be empty.' },
+  { prefix: 'Точка не из этого рейса', field: 'stop_sequence', message: 'The stop does not belong to this order.' },
+  { prefix: 'Claim подаётся по идущему или выполненному рейсу', field: 'order_ref', message: 'A claim can be filed only for a trip in progress or completed.' },
+  { prefix: 'Claim закрыт', field: 'status', message: 'The claim is closed.' },
+  { prefix: 'Вторая сторона ведёт claim с оператором по почте', field: 'claim', message: 'This claim is handled by the operator by email; reply to the operator\'s message.' },
 ];
 
 export function translateRule(message: string): { field: string; message: string } | null {

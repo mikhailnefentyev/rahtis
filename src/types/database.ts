@@ -3600,6 +3600,32 @@ export type Database = {
         }
         Returns: undefined
       }
+      api_known_vehicles: {
+        Args: { p_key_id: string }
+        Returns: {
+          available: boolean
+          axles: number
+          busy: boolean
+          carrier_name: string
+          container_feet: number[]
+          direct_billing: boolean
+          driver_name: string
+          euro_class: string
+          last_trip_at: string
+          ldm: number
+          make: string
+          payload_kg: number
+          plate: string
+          rating: number
+          trips: number
+          vehicle_class: string
+          vehicle_id: string
+        }[]
+      }
+      api_order_action: {
+        Args: { p_action: string; p_args: Json; p_key_id: string }
+        Returns: Json
+      }
       api_order_offers: {
         Args: { p_key_id: string; p_order_ids: string[] }
         Returns: {

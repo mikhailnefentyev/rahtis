@@ -233,7 +233,7 @@ export async function listOrders(ctx: ApiContext, url: URL) {
   };
 }
 
-async function findOrder(ctx: ApiContext, ref: string): Promise<OrderRow> {
+export async function findOrder(ctx: ApiContext, ref: string): Promise<OrderRow> {
   if (!/^[A-Z]{2}-\d{4}-\d{3,6}$/.test(ref)) throw new ApiError('not_found', 'Order not found.');
   const admin = createAdminClient();
   const { data, error } = await admin

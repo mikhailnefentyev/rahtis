@@ -31,7 +31,7 @@ import { translateRule } from './rules';
 
 const ORDER_TYPES = ['TRAILER_SWAP', 'ROUND_TRIP', 'ONE_WAY'] as const;
 const HAUL_KINDS = ['TRAILER', 'CONTAINER', 'VAN', 'TRUCK'] as const;
-const ROLES = ['PICKUP', 'DELIVERY', 'EXTRA_LOAD', 'EXTRA_UNLOAD', 'TRAILER_RETURN'] as const;
+export const ROLES = ['PICKUP', 'DELIVERY', 'EXTRA_LOAD', 'EXTRA_UNLOAD', 'TRAILER_RETURN'] as const;
 const PLACE_KINDS = ['PORT', 'TERMINAL', 'PARKING', 'ADDRESS'] as const;
 
 /*
@@ -45,7 +45,7 @@ type Issue = { field: string; issue: string };
 type StopIn = Record<string, unknown>;
 
 /** Адрес → координаты. Своё место (порт, терминал) — первым, как в форме. */
-async function geocode(address: string, city: string | undefined): Promise<AddressSuggestion | null> {
+export async function geocode(address: string, city: string | undefined): Promise<AddressSuggestion | null> {
   const query = [address, city].filter(Boolean).join(', ');
   const own = findPlaces(query)[0];
   if (own) return toSuggestion(own);

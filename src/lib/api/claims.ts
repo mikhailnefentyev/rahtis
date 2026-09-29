@@ -133,3 +133,13 @@ export async function getClaim(ctx: ApiContext, ref: string) {
     })),
   };
 }
+
+/** Идентификатор претензии по номеру — только своей стороне. */
+export async function claimIdOf(ctx: ApiContext, ref: string): Promise<string> {
+  if (!/^CL-[A-Z]{2}-\d{4}-\d{3,6}-\d{1,3}$/.test(ref)) throw new ApiError('not_found', 'Claim not found.');
+  const admin = createAdminClient();
+  const { data, error } = await admin.from('claims').select('id').eq('ref', ref).or(party(ctx)).maybeSingle();
+  if (error) throw error;
+  if (!data) throw new ApiError('not_found', 'Claim not found.');
+  return data.id;
+}
