@@ -49,17 +49,23 @@ const DIRECT_CODES: Record<string, [code: 'forbidden' | 'conflict' | 'unprocessa
   '55002': ['unprocessable', 'The vehicle does not fit this order.'],
   '55003': ['unprocessable', 'The vehicle does not fit this order.'],
   '55000': ['conflict', 'The order already has offers or is not on the desk; choose an offer instead.'],
+  /*
+   * Назначение создаёт отклик от имени перевозчика, и согласие с
+   * условиями база проверяет у него (on_offer_legal); своё заказчик уже
+   * подтвердил, опубликовав заказ.
+   */
+  '55009': ['conflict', "The vehicle's carrier has not accepted the current RAHTIS terms yet, so the vehicle cannot be assigned. Choose another vehicle or ask the carrier to sign in to RAHTIS."],
 };
 
 async function explain(action: Action, error: { code?: string; message?: string }): Promise<ApiError> {
   const code = error.code ?? '';
   const msg = error.message ?? '';
 
-  if (code === '55009') return new ApiError('forbidden', 'The current terms must be accepted in the RAHTIS cabinet first.');
   if (action === 'direct_assign_order' && DIRECT_CODES[code]) {
     const [c, m] = DIRECT_CODES[code];
     return new ApiError(c, m);
   }
+  if (code === '55009') return new ApiError('forbidden', 'The current terms must be accepted in the RAHTIS cabinet first.');
   if (code === 'P0002') return new ApiError('not_found', 'Not found.');
   if (code === '22P02') return new ApiError('bad_request', 'An identifier or value has the wrong format.');
 

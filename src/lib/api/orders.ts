@@ -324,7 +324,7 @@ export async function orderEvents(ctx: ApiContext, ref: string) {
   const admin = createAdminClient();
 
   const [events, stops, docs, amendments] = await Promise.all([
-    admin.from('order_events').select('from_status,to_status,created_at').eq('order_id', order.id).order('created_at'),
+    admin.from('order_events').select('from_status,to_status,created_at').eq('order_id', order.id).order('created_at').order('id'),
     admin.from('order_stops').select('sequence,role,city,arrived_at,completed_at').eq('order_id', order.id),
     admin.from('order_documents').select('id,kind,created_at,stop:order_stops(sequence)').eq('order_id', order.id),
     admin.from('order_amendments').select('id,kind,stop_label,created_at,stop:order_stops(sequence)').eq('order_id', order.id),
