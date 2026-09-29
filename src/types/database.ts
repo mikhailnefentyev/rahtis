@@ -2390,6 +2390,8 @@ export type Database = {
           trailer: string | null
           trailer_plate: string | null
           updated_at: string
+          waiting: Json
+          waiting_cents: number
         }
         Insert: {
           assigned_company_id?: string | null
@@ -2433,6 +2435,8 @@ export type Database = {
           trailer?: string | null
           trailer_plate?: string | null
           updated_at?: string
+          waiting?: Json
+          waiting_cents?: number
         }
         Update: {
           assigned_company_id?: string | null
@@ -2476,6 +2480,8 @@ export type Database = {
           trailer?: string | null
           trailer_plate?: string | null
           updated_at?: string
+          waiting?: Json
+          waiting_cents?: number
         }
         Relationships: [
           {
@@ -3245,6 +3251,8 @@ export type Database = {
           commission_bps: number | null
           container_feet: number | null
           contract_party: Database["public"]["Enums"]["contract_party"]
+          waiting: Json
+          waiting_cents: number
           created_at: string
           created_by: string | null
           deadline_at: string | null
@@ -3781,6 +3789,8 @@ export type Database = {
           commission_bps: number | null
           container_feet: number | null
           contract_party: Database["public"]["Enums"]["contract_party"]
+          waiting: Json
+          waiting_cents: number
           created_at: string
           created_by: string | null
           deadline_at: string | null
@@ -3864,6 +3874,8 @@ export type Database = {
           commission_bps: number | null
           container_feet: number | null
           contract_party: Database["public"]["Enums"]["contract_party"]
+          waiting: Json
+          waiting_cents: number
           created_at: string
           created_by: string | null
           deadline_at: string | null
@@ -3922,6 +3934,8 @@ export type Database = {
           commission_bps: number | null
           container_feet: number | null
           contract_party: Database["public"]["Enums"]["contract_party"]
+          waiting: Json
+          waiting_cents: number
           created_at: string
           created_by: string | null
           deadline_at: string | null
@@ -4075,6 +4089,8 @@ export type Database = {
           commission_bps: number | null
           container_feet: number | null
           contract_party: Database["public"]["Enums"]["contract_party"]
+          waiting: Json
+          waiting_cents: number
           created_at: string
           created_by: string | null
           deadline_at: string | null
@@ -4135,6 +4151,8 @@ export type Database = {
           commission_bps: number | null
           container_feet: number | null
           contract_party: Database["public"]["Enums"]["contract_party"]
+          waiting: Json
+          waiting_cents: number
           created_at: string
           created_by: string | null
           deadline_at: string | null
@@ -4273,6 +4291,8 @@ export type Database = {
           commission_bps: number | null
           container_feet: number | null
           contract_party: Database["public"]["Enums"]["contract_party"]
+          waiting: Json
+          waiting_cents: number
           created_at: string
           created_by: string | null
           deadline_at: string | null
@@ -4933,6 +4953,8 @@ export type Database = {
           commission_bps: number | null
           container_feet: number | null
           contract_party: Database["public"]["Enums"]["contract_party"]
+          waiting: Json
+          waiting_cents: number
           created_at: string
           created_by: string | null
           deadline_at: string | null
@@ -5006,6 +5028,8 @@ export type Database = {
           commission_bps: number | null
           container_feet: number | null
           contract_party: Database["public"]["Enums"]["contract_party"]
+          waiting: Json
+          waiting_cents: number
           created_at: string
           created_by: string | null
           deadline_at: string | null
@@ -5182,6 +5206,8 @@ export type Database = {
           commission_bps: number | null
           container_feet: number | null
           contract_party: Database["public"]["Enums"]["contract_party"]
+          waiting: Json
+          waiting_cents: number
           created_at: string
           created_by: string | null
           deadline_at: string | null
@@ -5301,6 +5327,8 @@ export type Database = {
           commission_bps: number | null
           container_feet: number | null
           contract_party: Database["public"]["Enums"]["contract_party"]
+          waiting: Json
+          waiting_cents: number
           created_at: string
           created_by: string | null
           deadline_at: string | null
@@ -5497,6 +5525,8 @@ export type Database = {
           commission_bps: number | null
           container_feet: number | null
           contract_party: Database["public"]["Enums"]["contract_party"]
+          waiting: Json
+          waiting_cents: number
           created_at: string
           created_by: string | null
           deadline_at: string | null

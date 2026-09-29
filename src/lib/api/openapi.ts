@@ -570,6 +570,32 @@ export function openApi(serverUrl: string) {
             deadline_at: nullable('string', { format: 'date-time' }),
             closed_at: nullable('string', { format: 'date-time' }),
             updated_at: { type: 'string', format: 'date-time' },
+            waiting: {
+              type: 'object',
+              description:
+                'Waiting-time surcharge, fixed when the trip is closed. Each loading and unloading stop has one free hour, counted from arrival but not before the agreed time; an excess of at least 15 minutes is charged at EUR 45 excl. VAT per hour begun. Only for orders where Aivomaa Oy is your contracting party.',
+              properties: {
+                amount: { type: 'string', example: '45.00' },
+                currency: { const: 'EUR' },
+                vat_included: { const: false },
+                lines: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      stop_sequence: { type: 'integer' },
+                      role: { enum: ROLES },
+                      city: nullable('string'),
+                      started_at: { type: 'string', format: 'date-time' },
+                      completed_at: { type: 'string', format: 'date-time' },
+                      minutes: { type: 'integer' },
+                      hours: { type: 'integer' },
+                      amount: { type: 'string' },
+                    },
+                  },
+                },
+              },
+            },
           },
         },
         Order: {

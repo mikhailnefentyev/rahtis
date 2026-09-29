@@ -21,7 +21,7 @@ import { ApiError, type ApiContext } from './handler';
  */
 
 const ORDER_COLUMNS =
-  'id,ref,shipper_ref,order_type,haul_kind,container_feet,ldm,trailer,trailer_plate,distance_km,rate_cents,comment,status,dispatch_mode,created_at,published_at,deadline_at,closed_at,updated_at';
+  'id,ref,shipper_ref,order_type,haul_kind,container_feet,ldm,trailer,trailer_plate,distance_km,rate_cents,comment,status,dispatch_mode,created_at,published_at,deadline_at,closed_at,updated_at,waiting_cents,waiting';
 
 const STOP_COLUMNS =
   'order_id,sequence,role,place_name,company_name,address,city,country,lat,lon,scheduled_date,scheduled_time,eta_at,arrived_at,completed_at,trailer_loaded,cargo_weight_kg,consignee,contact_name,contact_phone,external_ref,seal_required,note,damage_note,arrived_lat,arrived_lon,completed_lat,completed_lon,completed_accuracy_m,eta_source,eta_updated_at';
@@ -46,6 +46,8 @@ type OrderRow = {
   deadline_at: string | null;
   closed_at: string | null;
   updated_at: string;
+  waiting_cents: number;
+  waiting: { sequence: number; role: string; city: string | null; started_at: string; completed_at: string; minutes: number; hours: number; cents: number }[];
 };
 
 type StopRow = {
@@ -159,6 +161,22 @@ function orderOut(o: OrderRow) {
     deadline_at: o.deadline_at,
     closed_at: o.closed_at,
     updated_at: o.updated_at,
+    /* Доплата за простой: фиксируется при закрытии рейса Aivomaa (договор заказчика 5). */
+    waiting: {
+      amount: (o.waiting_cents / 100).toFixed(2),
+      currency: 'EUR',
+      vat_included: false,
+      lines: (o.waiting ?? []).map((w) => ({
+        stop_sequence: w.sequence,
+        role: w.role,
+        city: w.city,
+        started_at: w.started_at,
+        completed_at: w.completed_at,
+        minutes: w.minutes,
+        hours: w.hours,
+        amount: (w.cents / 100).toFixed(2),
+      })),
+    },
   };
 }
 

@@ -154,6 +154,8 @@ export function WeeklyReport({
     deductions?: Array<{ label: string; amount: string }>;
     /** Итог после удержаний. */
     payable?: { label: string; amount: string } | null;
+    /** Простой по точкам: уже входит в суммы строк и в итог, здесь — расшифровка. */
+    waiting?: { title: string; lines: Array<{ label: string; amount: string }> } | null;
   };
   /**
    * Три денежные колонки — цена, плата, итог — вместо одной. У заказчика
@@ -238,6 +240,20 @@ export function WeeklyReport({
                 </Text>
               </View>
             ))}
+
+            {totals.waiting ? (
+              <>
+                <View style={s.vatRow}>
+                  <Text style={[s.totalLabel, { flex: 1 }]}>{totals.waiting.title}</Text>
+                </View>
+                {totals.waiting.lines.map((line) => (
+                  <View key={line.label} style={s.vatRow} wrap={false}>
+                    <Text style={[s.cell, { flex: 1 }]}>{line.label}</Text>
+                    <Text style={[s.cell, s.right, { width: withCommission ? cols.net : 70 }]}>{line.amount}</Text>
+                  </View>
+                ))}
+              </>
+            ) : null}
 
             <View style={s.totals}>
               <Text style={[s.totalLabel, { flex: 1 }]}>{texts.total}</Text>

@@ -97,6 +97,20 @@ type OrderRow = {
   assigned_company_id: string | null;
   /** Чей договор с клиентом: наш подряд или собственный рейс перевозчика. */
   contract_party: 'RAHTIS' | 'CARRIER';
+  /** Доплата за простой, зафиксированная при закрытии, и её строки по точкам. */
+  waiting_cents: number | null;
+  waiting: WaitingLine[] | null;
+};
+
+type WaitingLine = {
+  sequence: number;
+  role: string;
+  city: string | null;
+  started_at: string;
+  completed_at: string;
+  minutes: number;
+  hours: number;
+  cents: number;
 };
 
 export async function generateWeeklyReports(week?: string): Promise<GenerateResult> {
@@ -213,7 +227,7 @@ async function run(span: Span): Promise<GenerateResult> {
   const { data: orders, error } = await admin
     .from('orders')
     .select(
-      'id, ref, closed_at, updated_at, distance_km, rate_cents, commission_bps, shipper_fee_bps, shipper_company_id, assigned_company_id, contract_party',
+      'id, ref, closed_at, updated_at, distance_km, rate_cents, commission_bps, shipper_fee_bps, shipper_company_id, assigned_company_id, contract_party, waiting_cents, waiting',
     )
     .eq('status', 'DONE')
     .gte('closed_at', from)
@@ -386,6 +400,14 @@ async function issue(
    */
   let direct = 0;
 
+  /*
+   * Простой — отдельными строками под таблицей: договор заказчика 5.6
+   * требует показать точку, время, начисленные часы. В сумму рейса он
+   * входит целиком и перевозчику идёт без сервисного сбора (договор
+   * перевозчика 9.2).
+   */
+  const waitingLines: Array<{ label: string; amount: string }> = [];
+
   const rows: ReportRow[] = orders.map((order) => {
     const rate = order.rate_cents ?? 0;
     const bps = order.commission_bps ?? COMMISSION_BPS;
@@ -399,13 +421,29 @@ async function issue(
      */
     const own = order.contract_party === 'CARRIER';
 
+    const waiting = own ? 0 : (order.waiting_cents ?? 0);
+
     km += order.distance_km ?? 0;
     if (own) {
       direct += rate;
     } else {
       gross += rate;
       fee += carrier ? commissionCents(rate, bps) : shipperFee;
-      net += carrier ? payout : rate + shipperFee;
+      net += (carrier ? payout : rate + shipperFee) + waiting;
+      for (const w of order.waiting ?? []) {
+        const loading = w.role === 'PICKUP' || w.role === 'EXTRA_LOAD';
+        waitingLines.push({
+          label: t.report_.waitingLine
+            .replace('{ref}', order.ref)
+            .replace('{stop}', `${w.sequence + 1}. ${w.city ?? ''}`.trim())
+            .replace('{operation}', loading ? t.report_.waitingLoading : t.report_.waitingUnloading)
+            .replace('{from}', f.time(w.started_at))
+            .replace('{to}', f.time(w.completed_at))
+            .replace('{minutes}', String(w.minutes))
+            .replace('{hours}', String(w.hours)),
+          amount: f.eur(w.cents),
+        });
+      }
     }
 
     return {
@@ -416,7 +454,7 @@ async function issue(
       distance: String(order.distance_km ?? 0),
       gross: f.eur(rate),
       commission: carrier ? null : f.eur(shipperFee),
-      net: f.eur(carrier ? payout : rate + shipperFee),
+      net: f.eur((carrier ? payout : rate + shipperFee) + waiting),
       documents: 0,
     };
   });
@@ -564,6 +602,7 @@ async function issue(
         gross: f.eur(gross),
         commission: withFee ? f.eur(fee) : null,
         net: f.eur(net),
+        waiting: waitingLines.length ? { title: t.report_.waitingTitle, lines: waitingLines } : null,
         deductions,
         payable: deducted > 0 ? { label: t.report_.payable, amount: f.eur(payable) } : null,
         distance: String(km),
