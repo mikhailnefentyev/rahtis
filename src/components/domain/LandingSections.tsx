@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { buttonClass, Card, CardBody, Mono } from '@/components/ui';
+import { signInPath } from '@/lib/auth/paths';
 import { APP } from '@/lib/config';
 import { getI18n, type Locale } from '@/lib/i18n';
 import { placeCountries } from '@/lib/routing/places';
@@ -699,39 +700,96 @@ Rahtis-Event: order.stop_arrived`}</code>
       </section>
 
       {/* ── Подвал ─────────────────────────────────────────────── */}
-      <footer className="mx-auto w-full max-w-6xl px-5 py-12">
-        <div className="flex flex-wrap items-baseline gap-x-8 gap-y-4 text-xs text-ink-faint">
-          {/*
-            * Здесь юрлицо, а не марка: рядом стоит Y-tunnus, а он
-            * принадлежит Aivomaa Oy. Подвал витрины — то место, где по
-            * закону должно быть видно, с кем человек имеет дело.
-            */}
-          <span>
-            <span className="font-semibold text-ink-muted">{t.brand.legalEntity}</span> ·{' '}
-            <Mono>{APP.operator.businessId}</Mono> · {l.footerCountry}
-          </span>
-          <a href={`mailto:${APP.operator.email}`} className="hover:text-ink-muted">
-            {APP.operator.email}
-          </a>
+      {/*
+        * Подвал — последнее, что видит дочитавший, и место, куда ищут
+        * «кто это» и «где условия». Была одна строка мелкого серого текста:
+        * реквизиты, почта и две ссылки подряд читались как служебная
+        * сноска. Теперь четыре колонки: кто мы (юрлицо с Y-tunnus и
+        * адресом — по закону должно быть видно, с кем человек имеет дело),
+        * разделы страницы, с чего начать и документы. Внизу — год и язык.
+        */}
+      <footer className="border-t border-line bg-surface">
+        <div className="mx-auto grid w-full max-w-6xl gap-10 px-5 pt-14 pb-10 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr]">
+          <div className="max-w-[34ch]">
+            <p className="font-mono text-[15px] font-semibold tracking-[0.18em] text-ink">RAHTIS</p>
+            <p className="mt-3 text-[14px] leading-relaxed text-ink-muted">{l.footerTagline}</p>
+            <address className="mt-5 text-[13px] leading-relaxed text-ink-faint not-italic">
+              <span className="font-semibold text-ink-muted">{t.brand.legalEntity}</span>
+              <br />
+              Y-tunnus <Mono>{APP.operator.businessId}</Mono>
+              <br />
+              {APP.operator.address}
+              <br />
+              <a href={`mailto:${APP.operator.email}`} className="text-ink-muted underline-offset-2 hover:text-ink hover:underline">
+                {APP.operator.email}
+              </a>
+            </address>
+          </div>
 
-          {/* Условия читают до согласия, поэтому ссылка на них — на витрине. */}
-          <span className="flex gap-4">
-            <Link
-              href={`/${locale}/${locale === 'fi' ? 'kayttoehdot' : 'terms'}`}
-              className="hover:text-ink-muted"
-            >
-              {t.legal.TERMS}
-            </Link>
-            <Link
-              href={`/${locale}/${locale === 'fi' ? 'tietosuoja' : 'privacy'}`}
-              className="hover:text-ink-muted"
-            >
-              {t.legal.PRIVACY}
-            </Link>
-            <Link href={`/${locale}/api-docs`} className="hover:text-ink-muted">
-              {l.footerApi}
-            </Link>
-          </span>
+          {[
+            {
+              title: l.footerService,
+              links: [
+                { href: '#service', label: l.menuService },
+                { href: '#roles', label: l.menuRoles },
+                { href: '#steps', label: l.menuSteps },
+                { href: '#assistant', label: l.menuAssistant },
+                { href: '#api', label: l.footerApi },
+              ],
+            },
+            {
+              title: l.footerStart,
+              links: [
+                { href: `/${locale}/apply`, label: l.applyShipper },
+                { href: `/${locale}/apply`, label: l.applyCarrier },
+                { href: signInPath(locale), label: l.menuSignIn },
+                { href: `/${locale}/api-docs`, label: l.footerApiDocs },
+              ],
+            },
+            {
+              title: l.footerDocuments,
+              links: [
+                { href: `/${locale}/${locale === 'fi' ? 'kayttoehdot' : 'terms'}`, label: t.legal.TERMS },
+                { href: `/${locale}/${locale === 'fi' ? 'tietosuoja' : 'privacy'}`, label: t.legal.PRIVACY },
+                { href: '/api/v1/openapi.json', label: 'OpenAPI' },
+              ],
+            },
+          ].map((column) => (
+            <nav key={column.title} aria-label={column.title}>
+              <p className="label-micro">{column.title}</p>
+              <ul className="mt-4 flex flex-col gap-2.5">
+                {column.links.map((link) => (
+                  <li key={link.label}>
+                    {link.href.startsWith('/') ? (
+                      <Link href={link.href} className="text-[14px] text-ink-muted transition-colors hover:text-ink">
+                        {link.label}
+                      </Link>
+                    ) : (
+                      <a href={link.href} className="text-[14px] text-ink-muted transition-colors hover:text-ink">
+                        {link.label}
+                      </a>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          ))}
+        </div>
+
+        <div className="border-t border-line">
+          <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-5 text-[12px] text-ink-faint">
+            <span>
+              © {new Date().getFullYear()} {t.brand.legalEntity} · {l.footerCountry}
+            </span>
+            <span className="flex gap-3" aria-label="Language">
+              <Link href="/fi" className={locale === 'fi' ? 'font-semibold text-ink' : 'hover:text-ink'} hrefLang="fi">
+                Suomi
+              </Link>
+              <Link href="/en" className={locale === 'en' ? 'font-semibold text-ink' : 'hover:text-ink'} hrefLang="en">
+                English
+              </Link>
+            </span>
+          </div>
         </div>
       </footer>
     </>

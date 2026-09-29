@@ -19,6 +19,8 @@ export const APP = {
     legalName: 'Aivomaa Oy',
     businessId: '3592993-6',
     email: 'admin@rahtis.eu',
+    /* Как в TERMS 1.1 — подвал витрины показывает то же, что условия. */
+    address: 'Kankarepolku 5F B335, 00770 Helsinki',
     country: 'FI',
   },
   /** Операции ведутся в финском времени независимо от локали интерфейса. */
