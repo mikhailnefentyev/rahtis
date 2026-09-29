@@ -31,8 +31,11 @@ const HAUL_KINDS = ['TRAILER', 'CONTAINER', 'VAN', 'TRUCK'] as const;
 const ROLES = ['PICKUP', 'DELIVERY', 'EXTRA_LOAD', 'EXTRA_UNLOAD', 'TRAILER_RETURN'] as const;
 const PLACE_KINDS = ['PORT', 'TERMINAL', 'PARKING', 'ADDRESS'] as const;
 
-/* Замер геокодера: настоящие адреса 7,9–10,3, несуществующие 4,7–6,1. */
-const MIN_SCORE = 7.5;
+/*
+ * Нижняя граница оценки — только от совсем случайных совпадений. Главная
+ * проверка — сверка улицы, номера дома и города (см. geocode).
+ */
+const MIN_SCORE = 3;
 
 type Issue = { field: string; issue: string };
 
@@ -62,12 +65,31 @@ async function geocode(address: string, city: string | undefined): Promise<Addre
   if (own) return toSuggestion(own);
 
   if (!routingConfigured()) return null;
-  const found = (await tomtom.suggest(normalizeQuery(query), { limit: 1 }))[0];
+
+  /*
+   * Точность проверяется сверкой, а не оценкой. Замер 29.09: настоящий
+   * «Tikkurilantie 10, Vantaa» пришёл домом (Point Address) с оценкой 5,8
+   * — ниже любого разумного порога, — а первым геокодер вообще поставил
+   * улицу. Поэтому адрес принимается, только если результат — дом или
+   * диапазон домов, начинается той же улицей с тем же номером, что в
+   * запросе, и лежит в указанном городе. «Satama» без номера так не
+   * пройдёт никогда — для таких мест есть location.
+   */
+  const norm = (s: string) => s.toLocaleLowerCase('fi').replace(/[.,]/g, ' ').replace(/\s+/g, ' ').trim();
+  const street = norm(address.split(',')[0]);
+  if (!/\d/.test(street)) return null;
+  const wantedCity = city ? norm(city) : null;
+
+  const found = (await tomtom.suggest(normalizeQuery(query), { limit: 6 })).find(
+    (s) =>
+      s.precise &&
+      s.score >= MIN_SCORE &&
+      norm(s.label.includes(' — ') ? s.label.slice(s.label.indexOf(' — ') + 3) : s.label).startsWith(street) &&
+      (!wantedCity || norm(s.city ?? '') === wantedCity),
+  );
   if (!found) return null;
 
-  const exact = found.position ? found : await tomtom.resolve(found.id);
-  if (!exact?.position) return null;
-  return exact.precise && exact.score >= MIN_SCORE ? exact : null;
+  return found.position ? found : await tomtom.resolve(found.id);
 }
 
 type Prepared = { order: Record<string, unknown>; stops: Record<string, unknown>[] };
@@ -221,7 +243,16 @@ function explain(error: { code?: string; message?: string }): ApiError {
   if (error.code === '55009') return new ApiError('forbidden', 'The current terms must be accepted in the RAHTIS cabinet first.');
   if (error.code === '42501') return new ApiError('forbidden', 'This key cannot create orders.');
   if (error.code === '55000') return new ApiError('forbidden', 'The company account must be active with billing details filled in.');
-  if (error.code === '22023' || error.code === '23514') return new ApiError('unprocessable', msg || 'The order was rejected.');
+  if (error.code === '23514') {
+    /* Нарушено правило точки: например, вес груза у выгрузки. Имя правила — программисту. */
+    const rule = msg.match(/check constraint "([^"]+)"/)?.[1];
+    return new ApiError(
+      'unprocessable',
+      `A field is not allowed for this order or stop${rule ? ` (rule: ${rule})` : ''}.`,
+      rule ? [{ field: 'stops', issue: rule }] : undefined,
+    );
+  }
+  if (error.code === '22023') return new ApiError('unprocessable', msg || 'The order was rejected.');
   return new ApiError('internal', 'The order could not be created.');
 }
 

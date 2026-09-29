@@ -67,7 +67,15 @@ export type Database = {
           response?: Json | null
           status?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "api_idempotency_key_id_fkey"
+            columns: ["key_id"]
+            isOneToOne: false
+            referencedRelation: "api_keys"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       api_keys: {
         Row: {
@@ -3460,14 +3468,6 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      api_create_order: {
-        Args: { p_key_id: string; p_order: Json; p_stops: Json }
-        Returns: { id: string; ref: string }[]
-      }
-      api_withdraw_order: {
-        Args: { p_key_id: string; p_reason?: string; p_ref: string }
-        Returns: undefined
-      }
       api_authenticate: {
         Args: { p_hash: string }
         Returns: {
@@ -3477,6 +3477,13 @@ export type Database = {
           limited: boolean
           scope: Database["public"]["Enums"]["api_scope"]
           user_id: string
+        }[]
+      }
+      api_create_order: {
+        Args: { p_key_id: string; p_order: Json; p_stops: Json }
+        Returns: {
+          id: string
+          ref: string
         }[]
       }
       api_key_create: {
@@ -3511,6 +3518,10 @@ export type Database = {
           plate: string
           rating: number
         }[]
+      }
+      api_withdraw_order: {
+        Args: { p_key_id: string; p_reason?: string; p_ref: string }
+        Returns: undefined
       }
       apply_carrier_fees: {
         Args: {
