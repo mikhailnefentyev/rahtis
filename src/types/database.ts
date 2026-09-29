@@ -127,6 +127,44 @@ export type Database = {
           },
         ]
       }
+      api_requests: {
+        Row: {
+          created_at: string
+          duration_ms: number
+          id: number
+          key_id: string
+          method: string
+          path: string
+          status: number
+        }
+        Insert: {
+          created_at?: string
+          duration_ms: number
+          id?: never
+          key_id: string
+          method: string
+          path: string
+          status: number
+        }
+        Update: {
+          created_at?: string
+          duration_ms?: number
+          id?: never
+          key_id?: string
+          method?: string
+          path?: string
+          status?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "api_requests_key_id_fkey"
+            columns: ["key_id"]
+            isOneToOne: false
+            referencedRelation: "api_keys"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       api_webhook_deliveries: {
         Row: {
           attempts: number
@@ -217,44 +255,6 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      api_requests: {
-        Row: {
-          created_at: string
-          duration_ms: number
-          id: number
-          key_id: string
-          method: string
-          path: string
-          status: number
-        }
-        Insert: {
-          created_at?: string
-          duration_ms: number
-          id?: never
-          key_id: string
-          method: string
-          path: string
-          status: number
-        }
-        Update: {
-          created_at?: string
-          duration_ms?: number
-          id?: never
-          key_id?: string
-          method?: string
-          path?: string
-          status?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "api_requests_key_id_fkey"
-            columns: ["key_id"]
-            isOneToOne: false
-            referencedRelation: "api_keys"
             referencedColumns: ["id"]
           },
         ]
@@ -3251,8 +3251,6 @@ export type Database = {
           commission_bps: number | null
           container_feet: number | null
           contract_party: Database["public"]["Enums"]["contract_party"]
-          waiting: Json
-          waiting_cents: number
           created_at: string
           created_by: string | null
           deadline_at: string | null
@@ -3284,6 +3282,8 @@ export type Database = {
           trailer: string | null
           trailer_plate: string | null
           updated_at: string
+          waiting: Json
+          waiting_cents: number
         }
         SetofOptions: {
           from: "*"
@@ -3598,16 +3598,6 @@ export type Database = {
         Returns: string
       }
       api_key_revoke: { Args: { p_id: string }; Returns: undefined }
-      api_log: {
-        Args: {
-          p_duration_ms: number
-          p_key_id: string
-          p_method: string
-          p_path: string
-          p_status: number
-        }
-        Returns: undefined
-      }
       api_known_vehicles: {
         Args: { p_key_id: string }
         Returns: {
@@ -3629,6 +3619,16 @@ export type Database = {
           vehicle_class: string
           vehicle_id: string
         }[]
+      }
+      api_log: {
+        Args: {
+          p_duration_ms: number
+          p_key_id: string
+          p_method: string
+          p_path: string
+          p_status: number
+        }
+        Returns: undefined
       }
       api_order_action: {
         Args: { p_action: string; p_args: Json; p_key_id: string }
@@ -3789,8 +3789,6 @@ export type Database = {
           commission_bps: number | null
           container_feet: number | null
           contract_party: Database["public"]["Enums"]["contract_party"]
-          waiting: Json
-          waiting_cents: number
           created_at: string
           created_by: string | null
           deadline_at: string | null
@@ -3822,6 +3820,8 @@ export type Database = {
           trailer: string | null
           trailer_plate: string | null
           updated_at: string
+          waiting: Json
+          waiting_cents: number
         }
         SetofOptions: {
           from: "*"
@@ -3874,8 +3874,6 @@ export type Database = {
           commission_bps: number | null
           container_feet: number | null
           contract_party: Database["public"]["Enums"]["contract_party"]
-          waiting: Json
-          waiting_cents: number
           created_at: string
           created_by: string | null
           deadline_at: string | null
@@ -3907,6 +3905,8 @@ export type Database = {
           trailer: string | null
           trailer_plate: string | null
           updated_at: string
+          waiting: Json
+          waiting_cents: number
         }
         SetofOptions: {
           from: "*"
@@ -3934,8 +3934,6 @@ export type Database = {
           commission_bps: number | null
           container_feet: number | null
           contract_party: Database["public"]["Enums"]["contract_party"]
-          waiting: Json
-          waiting_cents: number
           created_at: string
           created_by: string | null
           deadline_at: string | null
@@ -3967,6 +3965,8 @@ export type Database = {
           trailer: string | null
           trailer_plate: string | null
           updated_at: string
+          waiting: Json
+          waiting_cents: number
         }
         SetofOptions: {
           from: "*"
@@ -4089,8 +4089,6 @@ export type Database = {
           commission_bps: number | null
           container_feet: number | null
           contract_party: Database["public"]["Enums"]["contract_party"]
-          waiting: Json
-          waiting_cents: number
           created_at: string
           created_by: string | null
           deadline_at: string | null
@@ -4122,6 +4120,8 @@ export type Database = {
           trailer: string | null
           trailer_plate: string | null
           updated_at: string
+          waiting: Json
+          waiting_cents: number
         }
         SetofOptions: {
           from: "*"
@@ -4151,8 +4151,6 @@ export type Database = {
           commission_bps: number | null
           container_feet: number | null
           contract_party: Database["public"]["Enums"]["contract_party"]
-          waiting: Json
-          waiting_cents: number
           created_at: string
           created_by: string | null
           deadline_at: string | null
@@ -4184,6 +4182,8 @@ export type Database = {
           trailer: string | null
           trailer_plate: string | null
           updated_at: string
+          waiting: Json
+          waiting_cents: number
         }
         SetofOptions: {
           from: "*"
@@ -4291,8 +4291,6 @@ export type Database = {
           commission_bps: number | null
           container_feet: number | null
           contract_party: Database["public"]["Enums"]["contract_party"]
-          waiting: Json
-          waiting_cents: number
           created_at: string
           created_by: string | null
           deadline_at: string | null
@@ -4324,6 +4322,8 @@ export type Database = {
           trailer: string | null
           trailer_plate: string | null
           updated_at: string
+          waiting: Json
+          waiting_cents: number
         }
         SetofOptions: {
           from: "*"
@@ -4953,8 +4953,6 @@ export type Database = {
           commission_bps: number | null
           container_feet: number | null
           contract_party: Database["public"]["Enums"]["contract_party"]
-          waiting: Json
-          waiting_cents: number
           created_at: string
           created_by: string | null
           deadline_at: string | null
@@ -4986,6 +4984,8 @@ export type Database = {
           trailer: string | null
           trailer_plate: string | null
           updated_at: string
+          waiting: Json
+          waiting_cents: number
         }
         SetofOptions: {
           from: "*"
@@ -5028,8 +5028,6 @@ export type Database = {
           commission_bps: number | null
           container_feet: number | null
           contract_party: Database["public"]["Enums"]["contract_party"]
-          waiting: Json
-          waiting_cents: number
           created_at: string
           created_by: string | null
           deadline_at: string | null
@@ -5061,6 +5059,8 @@ export type Database = {
           trailer: string | null
           trailer_plate: string | null
           updated_at: string
+          waiting: Json
+          waiting_cents: number
         }
         SetofOptions: {
           from: "*"
@@ -5206,8 +5206,6 @@ export type Database = {
           commission_bps: number | null
           container_feet: number | null
           contract_party: Database["public"]["Enums"]["contract_party"]
-          waiting: Json
-          waiting_cents: number
           created_at: string
           created_by: string | null
           deadline_at: string | null
@@ -5239,6 +5237,8 @@ export type Database = {
           trailer: string | null
           trailer_plate: string | null
           updated_at: string
+          waiting: Json
+          waiting_cents: number
         }
         SetofOptions: {
           from: "*"
@@ -5327,8 +5327,6 @@ export type Database = {
           commission_bps: number | null
           container_feet: number | null
           contract_party: Database["public"]["Enums"]["contract_party"]
-          waiting: Json
-          waiting_cents: number
           created_at: string
           created_by: string | null
           deadline_at: string | null
@@ -5360,6 +5358,8 @@ export type Database = {
           trailer: string | null
           trailer_plate: string | null
           updated_at: string
+          waiting: Json
+          waiting_cents: number
         }
         SetofOptions: {
           from: "*"
@@ -5525,8 +5525,6 @@ export type Database = {
           commission_bps: number | null
           container_feet: number | null
           contract_party: Database["public"]["Enums"]["contract_party"]
-          waiting: Json
-          waiting_cents: number
           created_at: string
           created_by: string | null
           deadline_at: string | null
@@ -5558,6 +5556,8 @@ export type Database = {
           trailer: string | null
           trailer_plate: string | null
           updated_at: string
+          waiting: Json
+          waiting_cents: number
         }
         SetofOptions: {
           from: "*"
