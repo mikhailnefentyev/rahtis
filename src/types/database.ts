@@ -4050,12 +4050,12 @@ export type Database = {
         Args: { p_from?: string; p_to?: string }
         Returns: {
           can_rate: boolean
-          contract_party: Database["public"]["Enums"]["contract_party"]
           carrier_name: string
           closed_at: string
           commission_bps: number
           commission_cents: number
           container_feet: number
+          contract_party: Database["public"]["Enums"]["contract_party"]
           distance_km: number
           documents: Json
           haul_kind: Database["public"]["Enums"]["haul_kind"]
