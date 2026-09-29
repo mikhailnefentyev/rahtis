@@ -2509,6 +2509,41 @@ export const en = {
     REVOKED: 'Not allowed',
   },
 
+  api: {
+    title: 'Interface (API)',
+    subtitle:
+      'Connect your own system to RAHTIS: read your orders, their status, events and documents through the interface. A key acts on behalf of your company and sees the same data as this view.',
+    name: 'Key name',
+    nameHint: 'Which system the key is for, e.g. ERP or TMS.',
+    nameRequired: 'Give the key a name (up to 60 characters).',
+    scope: 'Rights',
+    scopes: { READ: 'Read only', WRITE: 'Read and write' },
+    create: 'Create key',
+    createdTitle: 'New key',
+    createdHint:
+      'Copy the key now and store it securely. It will not be shown again — a lost key is replaced by creating a new one.',
+    copy: 'Copy',
+    copied: 'Copied',
+    activeKeys: 'Active keys',
+    revokedKeys: 'Revoked keys',
+    none: 'No keys',
+    noneHint: 'Create a key above and give it to the system that reads your orders.',
+    created: 'created',
+    lastUsed: 'last used',
+    neverUsed: 'not used yet',
+    revoke: 'Revoke',
+    revokedAt: 'revoked',
+    quickStart: 'Quick start',
+    quickStartHint:
+      'Send the key with every request in the Authorization header. Responses are JSON; prices are in euros excluding VAT.',
+    limits:
+      'Up to 60 requests per minute per key. Creating orders through the interface and notifications to your own system (webhooks) come next.',
+    tooMany: 'The company already has ten active keys. Revoke one you no longer need first.',
+    needActive: 'A key can be created once the company account is active.',
+    createFailed: 'Creating the key failed. Please try again.',
+    nav: 'API',
+  },
+
   known: {
     directBilling: 'Invoices you directly',
     directBillingHint: 'The carrier of this vehicle invoices you itself and is liable for the transport. Pay to its account as stated on the invoice.',

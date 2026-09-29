@@ -140,6 +140,7 @@ function cabinetTabs(locale: Locale, role: PartyRole, home: string, t: Dictionar
       { href: `/${locale}/shipper/done`, label: t.done.titleShipper },
       { href: `/${locale}/shipper/claims`, label: t.claims.title },
       { href: `/${locale}/shipper/reports`, label: t.periodReport.title },
+      { href: `/${locale}/shipper/api`, label: t.api.nav },
     ];
   }
 

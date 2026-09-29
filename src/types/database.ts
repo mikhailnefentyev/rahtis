@@ -39,6 +39,78 @@ export type Database = {
   }
   public: {
     Tables: {
+      api_keys: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          key_hash: string
+          last_used_at: string | null
+          name: string
+          prefix: string
+          revoked_at: string | null
+          revoked_by: string | null
+          scope: Database["public"]["Enums"]["api_scope"]
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          key_hash: string
+          last_used_at?: string | null
+          name: string
+          prefix: string
+          revoked_at?: string | null
+          revoked_by?: string | null
+          scope?: Database["public"]["Enums"]["api_scope"]
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          key_hash?: string
+          last_used_at?: string | null
+          name?: string
+          prefix?: string
+          revoked_at?: string | null
+          revoked_by?: string | null
+          scope?: Database["public"]["Enums"]["api_scope"]
+        }
+        Relationships: []
+      }
+      api_requests: {
+        Row: {
+          created_at: string
+          duration_ms: number
+          id: number
+          key_id: string
+          method: string
+          path: string
+          status: number
+        }
+        Insert: {
+          created_at?: string
+          duration_ms: number
+          id?: never
+          key_id: string
+          method: string
+          path: string
+          status: number
+        }
+        Update: {
+          created_at?: string
+          duration_ms?: number
+          id?: never
+          key_id?: string
+          method?: string
+          path?: string
+          status?: number
+        }
+        Relationships: []
+      }
       audit_log: {
         Row: {
           action: string
@@ -3012,6 +3084,50 @@ export type Database = {
       }
     }
     Functions: {
+      api_authenticate: {
+        Args: { p_hash: string }
+        Returns: {
+          company_id: string
+          is_test: boolean
+          key_id: string
+          limited: boolean
+          scope: Database["public"]["Enums"]["api_scope"]
+          user_id: string
+        }[]
+      }
+      api_key_create: {
+        Args: {
+          p_hash: string
+          p_name: string
+          p_prefix: string
+          p_scope: Database["public"]["Enums"]["api_scope"]
+        }
+        Returns: string
+      }
+      api_key_revoke: { Args: { p_id: string }; Returns: undefined }
+      api_log: {
+        Args: {
+          p_duration_ms: number
+          p_key_id: string
+          p_method: string
+          p_path: string
+          p_status: number
+        }
+        Returns: undefined
+      }
+      api_order_vehicles: {
+        Args: { p_key_id: string; p_order_ids: string[] }
+        Returns: {
+          axles: number
+          driver_name: string
+          euro_class: string
+          languages: string[]
+          make: string
+          order_id: string
+          plate: string
+          rating: number
+        }[]
+      }
       abandon_order: {
         Args: { p_order_id: string; p_reason?: string }
         Returns: {
@@ -5196,6 +5312,7 @@ export type Database = {
       }
     }
     Enums: {
+      api_scope: "READ" | "WRITE"
       amendment_kind:
         | "STOP_ADDED"
         | "STOP_CHANGED"
@@ -5424,6 +5541,7 @@ export const Constants = {
   },
   public: {
     Enums: {
+      api_scope: ["READ", "WRITE"],
       amendment_kind: [
         "STOP_ADDED",
         "STOP_CHANGED",

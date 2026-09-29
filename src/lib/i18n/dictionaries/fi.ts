@@ -2615,6 +2615,41 @@ export const fi = {
     REVOKED: 'Ei sallittu',
   },
 
+  api: {
+    title: 'Rajapinta (API)',
+    subtitle:
+      'Liitä oma järjestelmäsi RAHTISiin: hae tilaukset, niiden tila, tapahtumat ja asiakirjat rajapinnan kautta. Avain toimii yrityksesi nimissä ja näkee samat tiedot kuin tämä näkymä.',
+    name: 'Avaimen nimi',
+    nameHint: 'Mihin järjestelmään avain annetaan, esim. ERP tai TMS.',
+    nameRequired: 'Anna avaimelle nimi (enintään 60 merkkiä).',
+    scope: 'Oikeudet',
+    scopes: { READ: 'Vain luku', WRITE: 'Luku ja kirjoitus' },
+    create: 'Luo avain',
+    createdTitle: 'Uusi avain',
+    createdHint:
+      'Kopioi avain nyt ja tallenna se turvallisesti. Sitä ei näytetä uudelleen — kadonneen avaimen tilalle luodaan uusi.',
+    copy: 'Kopioi',
+    copied: 'Kopioitu',
+    activeKeys: 'Voimassa olevat avaimet',
+    revokedKeys: 'Poistetut avaimet',
+    none: 'Ei avaimia',
+    noneHint: 'Luo avain yllä ja anna se järjestelmälle, joka hakee tilauksesi.',
+    created: 'luotu',
+    lastUsed: 'käytetty viimeksi',
+    neverUsed: 'ei vielä käytetty',
+    revoke: 'Poista käytöstä',
+    revokedAt: 'poistettu',
+    quickStart: 'Pikaohje',
+    quickStartHint:
+      'Lähetä avain jokaisessa pyynnössä otsakkeessa Authorization. Vastaukset ovat JSON-muodossa; hinnat euroina ilman arvonlisäveroa.',
+    limits:
+      'Enintään 60 pyyntöä minuutissa avainta kohden. Tilausten luonti rajapinnan kautta ja ilmoitukset omaan järjestelmään (webhookit) tulevat seuraavaksi.',
+    tooMany: 'Yrityksellä on jo kymmenen voimassa olevaa avainta. Poista tarpeeton ensin.',
+    needActive: 'Avaimen voi luoda, kun yrityksen tili on aktiivinen.',
+    createFailed: 'Avaimen luonti epäonnistui. Yritä uudelleen.',
+    nav: 'API',
+  },
+
   known: {
     directBilling: 'Laskuttaa sinua suoraan',
     directBillingHint: 'Tämän auton kuljetusliike laskuttaa sinua itse ja vastaa kuljetuksesta. Maksa sen tilille laskun mukaan.',
