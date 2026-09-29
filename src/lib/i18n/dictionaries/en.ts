@@ -2534,6 +2534,7 @@ export const en = {
     revoke: 'Revoke',
     revokedAt: 'revoked',
     quickStart: 'Quick start',
+    docsLink: 'Full documentation and OpenAPI description',
     quickStartHint:
       'Send the key with every request in the Authorization header. Responses are JSON; prices are in euros excluding VAT.',
     limits:

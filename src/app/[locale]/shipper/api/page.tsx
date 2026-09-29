@@ -118,6 +118,11 @@ curl ${base}/orders/RS-2026-0001/events
 curl ${base}/orders/RS-2026-0001/documents`}</code>
         </pre>
         <p className="mt-3 max-w-2xl text-[12px] leading-relaxed text-ink-dim">{t.api.limits}</p>
+        <p className="mt-3 text-[13px]">
+          <a href={`/${locale}/api-docs`} className="text-ink underline underline-offset-2">
+            {t.api.docsLink} →
+          </a>
+        </p>
       </section>
 
       <section className="mb-8">

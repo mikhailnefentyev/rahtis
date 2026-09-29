@@ -2640,6 +2640,7 @@ export const fi = {
     revoke: 'Poista käytöstä',
     revokedAt: 'poistettu',
     quickStart: 'Pikaohje',
+    docsLink: 'Koko dokumentaatio ja OpenAPI-kuvaus',
     quickStartHint:
       'Lähetä avain jokaisessa pyynnössä otsakkeessa Authorization. Vastaukset ovat JSON-muodossa; hinnat euroina ilman arvonlisäveroa.',
     limits:

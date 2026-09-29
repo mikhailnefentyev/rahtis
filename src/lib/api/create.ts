@@ -2,17 +2,20 @@ import 'server-only';
 
 import { createHash } from 'node:crypto';
 import { isValidContainerNumber } from '@/lib/containerNumber';
+import { recordIncident } from '@/lib/incidents/record';
 import { dispatchPublishedOrder } from '@/lib/orders/dispatch';
 import { metresToKm, routeFingerprint, routingConfigured } from '@/lib/routing';
 import { findPlaces, toSuggestion } from '@/lib/routing/places';
 import { truckProfile } from '@/lib/routing/profiles';
 import { normalizeQuery } from '@/lib/routing/query';
 import { tomtom } from '@/lib/routing/tomtom';
-import type { AddressSuggestion, LatLon } from '@/lib/routing/types';
+import type { AddressSuggestion } from '@/lib/routing/types';
 import { createAdminClient } from '@/lib/supabase/admin';
 import type { Json } from '@/types/database';
 import { ApiError, type ApiContext } from './handler';
+import { isObj, locationOf, oneOf, sameAddress, streetOf, text, type LatLon } from './input';
 import { getOrder } from './orders';
+import { translateRule } from './rules';
 
 /**
  * Создание заказа через API.
@@ -41,23 +44,6 @@ type Issue = { field: string; issue: string };
 
 type StopIn = Record<string, unknown>;
 
-const isObj = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v);
-const text = (v: unknown, max = 500): string | undefined =>
-  typeof v === 'string' && v.trim() ? v.trim().slice(0, max) : undefined;
-
-function oneOf<T extends readonly string[]>(v: unknown, list: T): T[number] | undefined {
-  return typeof v === 'string' && (list as readonly string[]).includes(v.toUpperCase()) ? (v.toUpperCase() as T[number]) : undefined;
-}
-
-function locationOf(v: unknown): LatLon | undefined {
-  if (!isObj(v)) return undefined;
-  const lat = Number(v.lat);
-  const lon = Number(v.lon);
-  if (!Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) return undefined;
-  if (lat === 0 && lon === 0) return undefined;
-  return { lat, lon };
-}
-
 /** Адрес → координаты. Своё место (порт, терминал) — первым, как в форме. */
 async function geocode(address: string, city: string | undefined): Promise<AddressSuggestion | null> {
   const query = [address, city].filter(Boolean).join(', ');
@@ -75,17 +61,11 @@ async function geocode(address: string, city: string | undefined): Promise<Addre
    * запросе, и лежит в указанном городе. «Satama» без номера так не
    * пройдёт никогда — для таких мест есть location.
    */
-  const norm = (s: string) => s.toLocaleLowerCase('fi').replace(/[.,]/g, ' ').replace(/\s+/g, ' ').trim();
-  const street = norm(address.split(',')[0]);
-  if (!/\d/.test(street)) return null;
-  const wantedCity = city ? norm(city) : null;
+  const street = streetOf(address);
+  if (!street) return null;
 
   const found = (await tomtom.suggest(normalizeQuery(query), { limit: 6 })).find(
-    (s) =>
-      s.precise &&
-      s.score >= MIN_SCORE &&
-      norm(s.label.includes(' — ') ? s.label.slice(s.label.indexOf(' — ') + 3) : s.label).startsWith(street) &&
-      (!wantedCity || norm(s.city ?? '') === wantedCity),
+    (s) => s.precise && s.score >= MIN_SCORE && sameAddress(s.label, s.city, street, city),
   );
   if (!found) return null;
 
@@ -252,7 +232,12 @@ function explain(error: { code?: string; message?: string }): ApiError {
       rule ? [{ field: 'stops', issue: rule }] : undefined,
     );
   }
-  if (error.code === '22023') return new ApiError('unprocessable', msg || 'The order was rejected.');
+  if (error.code === '22023') {
+    const rule = translateRule(msg);
+    return rule
+      ? new ApiError('unprocessable', rule.message, [{ field: rule.field, issue: rule.message }])
+      : new ApiError('unprocessable', 'The order was rejected by a business rule.');
+  }
   return new ApiError('internal', 'The order could not be created.');
 }
 
@@ -266,7 +251,13 @@ export async function createOrder(ctx: ApiContext, body: unknown) {
     p_order: JSON.parse(JSON.stringify(prepared.order)) as Json,
     p_stops: JSON.parse(JSON.stringify(prepared.stops)) as Json,
   });
-  if (error || !data?.[0]) throw explain(error ?? {});
+  if (error || !data?.[0]) {
+    /* Отказ без перевода — в инциденты: заказчик видит общий текст, а перевод надо добавить в rules.ts. */
+    if (error?.code === '22023' && !translateRule(error.message)) {
+      await recordIncident({ source: 'route', error, path: '/api/v1/orders', severity: 'WARN' });
+    }
+    throw explain(error ?? {});
+  }
 
   /* Письма перевозчикам — как после формы; их ошибки заказ не отменяют. */
   await dispatchPublishedOrder(data[0].id);

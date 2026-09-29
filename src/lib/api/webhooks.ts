@@ -1,16 +1,15 @@
 import 'server-only';
 
-import { createHmac, randomBytes } from 'node:crypto';
+import { randomBytes } from 'node:crypto';
 import { lookup } from 'node:dns/promises';
 import { isIP } from 'node:net';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { privateV4, privateV6, sign, urlShapeProblem } from './signature';
 
 /**
  * Вебхуки: подпись, проверка адреса и отправка очереди.
  *
- * Подпись как у Stripe: заголовок Rahtis-Signature: t=<unix>,v1=<hex>,
- * где v1 = HMAC-SHA256(секрет, "<t>.<тело>"). Время в подписи не даёт
- * переиграть старое событие: получатель отвергает t старше пяти минут.
+ * Подпись и правила адреса — в signature.ts.
  *
  * Адрес проверяется перед каждой отправкой, а не только при сохранении:
  * имя хоста может начать указывать на внутреннюю сеть позже. Наш сервер
@@ -32,50 +31,11 @@ export function generateSecret(): string {
   return `whsec_${randomBytes(24).toString('hex')}`;
 }
 
-export function sign(secret: string, timestamp: number, body: string): string {
-  return createHmac('sha256', secret).update(`${timestamp}.${body}`, 'utf8').digest('hex');
-}
-
-function privateV4(ip: string): boolean {
-  const [a, b] = ip.split('.').map(Number);
-  return (
-    a === 0 ||
-    a === 10 ||
-    a === 127 ||
-    (a === 100 && b >= 64 && b <= 127) ||
-    (a === 169 && b === 254) ||
-    (a === 172 && b >= 16 && b <= 31) ||
-    (a === 192 && b === 168) ||
-    (a === 192 && b === 0) ||
-    (a === 198 && (b === 18 || b === 19)) ||
-    a >= 224
-  );
-}
-
-function privateV6(ip: string): boolean {
-  const v = ip.toLowerCase();
-  if (v === '::1' || v === '::') return true;
-  if (v.startsWith('fc') || v.startsWith('fd') || v.startsWith('fe80')) return true;
-  const mapped = v.match(/^::ffff:(\d+\.\d+\.\d+\.\d+)$/);
-  return mapped ? privateV4(mapped[1]) : false;
-}
-
 /** null — адрес годится; иначе причина словами (для кабинета и журнала). */
 export async function checkUrl(raw: string): Promise<string | null> {
-  let url: URL;
-  try {
-    url = new URL(raw);
-  } catch {
-    return 'not a valid URL';
-  }
-  if (url.protocol !== 'https:') return 'must use https';
-  if (url.username || url.password) return 'credentials in URL are not allowed';
-  if (url.port && url.port !== '443') return 'only the standard https port 443 is allowed';
-
-  const host = url.hostname.replace(/^\[|\]$/g, '');
-  if (host === 'localhost' || host.endsWith('.localhost') || host.endsWith('.local') || host.endsWith('.internal')) {
-    return 'private host names are not allowed';
-  }
+  const shape = urlShapeProblem(raw);
+  if ('problem' in shape) return shape.problem;
+  const { host } = shape;
 
   const addresses = isIP(host) ? [{ address: host, family: isIP(host) }] : await lookup(host, { all: true }).catch(() => []);
   if (addresses.length === 0) return 'host name does not resolve';

@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { createAdminClient } from '@/lib/supabase/admin';
+import { decodeCursor, encodeCursor } from './cursor';
 import { ApiError, type ApiContext } from './handler';
 
 /**
@@ -127,19 +128,6 @@ function orderOut(o: OrderRow) {
   };
 }
 
-/** Курсор — updated_at и id последней строки: стабилен при одинаковом времени. */
-function encodeCursor(o: OrderRow): string {
-  return Buffer.from(`${o.updated_at}|${o.id}`, 'utf8').toString('base64url');
-}
-
-function decodeCursor(cursor: string): { at: string; id: string } {
-  const [at, id] = Buffer.from(cursor, 'base64url').toString('utf8').split('|');
-  if (!at || !id || Number.isNaN(Date.parse(at)) || !/^[0-9a-f-]{36}$/.test(id)) {
-    throw new ApiError('bad_request', 'Invalid cursor.');
-  }
-  return { at, id };
-}
-
 export async function listOrders(ctx: ApiContext, url: URL) {
   const admin = createAdminClient();
 
@@ -173,6 +161,7 @@ export async function listOrders(ctx: ApiContext, url: URL) {
   const cursor = url.searchParams.get('cursor');
   if (cursor) {
     const c = decodeCursor(cursor);
+    if (!c) throw new ApiError('bad_request', 'Invalid cursor.');
     query = query.or(`updated_at.gt.${c.at},and(updated_at.eq.${c.at},id.gt.${c.id})`);
   }
 
@@ -181,7 +170,8 @@ export async function listOrders(ctx: ApiContext, url: URL) {
 
   const rows = (data ?? []) as unknown as OrderRow[];
   const page = rows.slice(0, limit);
-  const next = rows.length > limit ? encodeCursor(page[page.length - 1]) : null;
+  const last = page[page.length - 1];
+  const next = rows.length > limit ? encodeCursor(last.updated_at, last.id) : null;
 
   /* Откуда и куда — первая и последняя точка, для списка этого хватает. */
   const ends = new Map<string, { from: string | null; to: string | null }>();
