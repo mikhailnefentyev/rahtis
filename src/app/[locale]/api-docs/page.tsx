@@ -203,7 +203,7 @@ function Section({
     <section id={id} className="mt-10 scroll-mt-6">
       <h2 className="border-b border-line pb-2 text-lg font-semibold tracking-tight">{section.title}</h2>
       {section.paragraphs.map((p) => (
-        <p key={p} className="mt-3 text-[14px] leading-relaxed text-ink-muted">
+        <p key={p} className="mt-3 text-[14px] leading-relaxed break-words text-ink-muted">
           {p}
         </p>
       ))}
