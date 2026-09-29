@@ -79,7 +79,15 @@ export type Database = {
           revoked_by?: string | null
           scope?: Database["public"]["Enums"]["api_scope"]
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "api_keys_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       api_requests: {
         Row: {
@@ -109,7 +117,15 @@ export type Database = {
           path?: string
           status?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "api_requests_key_id_fkey"
+            columns: ["key_id"]
+            isOneToOne: false
+            referencedRelation: "api_keys"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       audit_log: {
         Row: {
@@ -3084,50 +3100,6 @@ export type Database = {
       }
     }
     Functions: {
-      api_authenticate: {
-        Args: { p_hash: string }
-        Returns: {
-          company_id: string
-          is_test: boolean
-          key_id: string
-          limited: boolean
-          scope: Database["public"]["Enums"]["api_scope"]
-          user_id: string
-        }[]
-      }
-      api_key_create: {
-        Args: {
-          p_hash: string
-          p_name: string
-          p_prefix: string
-          p_scope: Database["public"]["Enums"]["api_scope"]
-        }
-        Returns: string
-      }
-      api_key_revoke: { Args: { p_id: string }; Returns: undefined }
-      api_log: {
-        Args: {
-          p_duration_ms: number
-          p_key_id: string
-          p_method: string
-          p_path: string
-          p_status: number
-        }
-        Returns: undefined
-      }
-      api_order_vehicles: {
-        Args: { p_key_id: string; p_order_ids: string[] }
-        Returns: {
-          axles: number
-          driver_name: string
-          euro_class: string
-          languages: string[]
-          make: string
-          order_id: string
-          plate: string
-          rating: number
-        }[]
-      }
       abandon_order: {
         Args: { p_order_id: string; p_reason?: string }
         Returns: {
@@ -3457,6 +3429,50 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      api_authenticate: {
+        Args: { p_hash: string }
+        Returns: {
+          company_id: string
+          is_test: boolean
+          key_id: string
+          limited: boolean
+          scope: Database["public"]["Enums"]["api_scope"]
+          user_id: string
+        }[]
+      }
+      api_key_create: {
+        Args: {
+          p_hash: string
+          p_name: string
+          p_prefix: string
+          p_scope: Database["public"]["Enums"]["api_scope"]
+        }
+        Returns: string
+      }
+      api_key_revoke: { Args: { p_id: string }; Returns: undefined }
+      api_log: {
+        Args: {
+          p_duration_ms: number
+          p_key_id: string
+          p_method: string
+          p_path: string
+          p_status: number
+        }
+        Returns: undefined
+      }
+      api_order_vehicles: {
+        Args: { p_key_id: string; p_order_ids: string[] }
+        Returns: {
+          axles: number
+          driver_name: string
+          euro_class: string
+          languages: string[]
+          make: string
+          order_id: string
+          plate: string
+          rating: number
+        }[]
       }
       apply_carrier_fees: {
         Args: {
@@ -4747,6 +4763,13 @@ export type Database = {
         }
       }
       restore_driver: { Args: { p_driver_id: string }; Returns: undefined }
+      retention_photo_candidates: {
+        Args: { p_limit?: number }
+        Returns: {
+          id: string
+          storage_path: string
+        }[]
+      }
       role_privileges: {
         Args: { p_role: string }
         Returns: {
@@ -5107,13 +5130,6 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      retention_photo_candidates: {
-        Args: { p_limit?: number }
-        Returns: {
-          id: string
-          storage_path: string
-        }[]
-      }
       training_sync: { Args: { p_cards: Json }; Returns: number }
       uncomplete_stop: {
         Args: { p_stop_id: string }
@@ -5312,7 +5328,6 @@ export type Database = {
       }
     }
     Enums: {
-      api_scope: "READ" | "WRITE"
       amendment_kind:
         | "STOP_ADDED"
         | "STOP_CHANGED"
@@ -5320,6 +5335,7 @@ export type Database = {
         | "ORDER_REPRICED"
         | "ORDER_CANCELLED"
         | "ORDER_RELEASED"
+      api_scope: "READ" | "WRITE"
       billing_status: "PENDING" | "INVOICED" | "PAID" | "SETTLED"
       chat_audience: "DRIVER" | "CARRIER" | "SHIPPER" | "ADMIN"
       chat_channel: "WEB" | "WHATSAPP"
@@ -5541,7 +5557,6 @@ export const Constants = {
   },
   public: {
     Enums: {
-      api_scope: ["READ", "WRITE"],
       amendment_kind: [
         "STOP_ADDED",
         "STOP_CHANGED",
@@ -5550,6 +5565,7 @@ export const Constants = {
         "ORDER_CANCELLED",
         "ORDER_RELEASED",
       ],
+      api_scope: ["READ", "WRITE"],
       billing_status: ["PENDING", "INVOICED", "PAID", "SETTLED"],
       chat_audience: ["DRIVER", "CARRIER", "SHIPPER", "ADMIN"],
       chat_channel: ["WEB", "WHATSAPP"],
