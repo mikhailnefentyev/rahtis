@@ -2537,7 +2537,38 @@ export const en = {
     quickStartHint:
       'Send the key with every request in the Authorization header. Responses are JSON; prices are in euros excluding VAT.',
     limits:
-      'Up to 60 requests per minute per key. Creating orders through the interface and notifications to your own system (webhooks) come next.',
+      'Up to 60 requests per minute per key. Creating (POST /orders) and withdrawing (POST /orders/{ref}/withdraw) orders need a key with write rights; the Idempotency-Key header prevents a duplicate order if a request is repeated.',
+    hooks: {
+      title: 'Notifications to your own system (webhooks)',
+      subtitle:
+        'RAHTIS sends an event to your server as soon as an order moves forward — no need to poll for status. The event carries the order number and the change; the full order is available from the interface.',
+      url: 'Address (https)',
+      urlHint: 'The address of your server that receives POST requests. https and a public address only.',
+      events: 'Events',
+      eventNames: {
+        'order.taken': 'a carrier took the order',
+        'order.reopened': 'the order returned to the board',
+        'order.stop_completed': 'a route stop was passed',
+        'order.closed': 'the job ended',
+        'order.cancelled': 'the order was withdrawn',
+        'document.added': 'a consignment note or photo was added',
+      },
+      create: 'Add webhook',
+      createdTitle: 'Signing secret',
+      createdHint:
+        'Save the secret now: it lets you verify that a notification came from RAHTIS. It will not be shown again.',
+      chooseEvents: 'Choose at least one event.',
+      badUrl: 'The address cannot be used',
+      tooMany: 'The company already has five webhooks.',
+      failed: 'Adding the webhook failed.',
+      failures: 'Failed deliveries in a row',
+      ping: 'Send test',
+      remove: 'Remove',
+      recent: 'Recent deliveries',
+      statuses: { SENT: 'delivered', FAILED: 'failed', PENDING: 'queued' },
+      verifyHint:
+        'Every notification is signed with the Rahtis-Signature header: t=<time>,v1=<HMAC-SHA256>. Verify the signature and reject anything older than five minutes. A failed delivery is retried for a day.',
+    },
     tooMany: 'The company already has ten active keys. Revoke one you no longer need first.',
     needActive: 'A key can be created once the company account is active.',
     createFailed: 'Creating the key failed. Please try again.',

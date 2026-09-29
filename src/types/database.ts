@@ -127,6 +127,100 @@ export type Database = {
           },
         ]
       }
+      api_webhook_deliveries: {
+        Row: {
+          attempts: number
+          created_at: string
+          delivered_at: string | null
+          event: string
+          id: string
+          last_error: string | null
+          last_status: number | null
+          next_attempt_at: string
+          payload: Json
+          status: string
+          webhook_id: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          delivered_at?: string | null
+          event: string
+          id?: string
+          last_error?: string | null
+          last_status?: number | null
+          next_attempt_at?: string
+          payload: Json
+          status?: string
+          webhook_id: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          delivered_at?: string | null
+          event?: string
+          id?: string
+          last_error?: string | null
+          last_status?: number | null
+          next_attempt_at?: string
+          payload?: Json
+          status?: string
+          webhook_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "api_webhook_deliveries_webhook_id_fkey"
+            columns: ["webhook_id"]
+            isOneToOne: false
+            referencedRelation: "api_webhooks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      api_webhooks: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string | null
+          disabled_at: string | null
+          events: string[]
+          failures: number
+          id: string
+          secret: string
+          url: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          disabled_at?: string | null
+          events: string[]
+          failures?: number
+          id?: string
+          secret: string
+          url: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          disabled_at?: string | null
+          events?: string[]
+          failures?: number
+          id?: string
+          secret?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "api_webhooks_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       api_requests: {
         Row: {
           created_at: string
@@ -3518,6 +3612,28 @@ export type Database = {
           plate: string
           rating: number
         }[]
+      }
+      api_webhook_claim: {
+        Args: { p_limit?: number }
+        Returns: {
+          attempts: number
+          created_at: string
+          event: string
+          id: string
+          payload: Json
+          secret: string
+          url: string
+        }[]
+      }
+      api_webhook_create: {
+        Args: { p_events: string[]; p_secret: string; p_url: string }
+        Returns: string
+      }
+      api_webhook_delete: { Args: { p_id: string }; Returns: undefined }
+      api_webhook_ping: { Args: { p_id: string }; Returns: undefined }
+      api_webhook_report: {
+        Args: { p_error: string; p_id: string; p_ok: boolean; p_status: number }
+        Returns: undefined
       }
       api_withdraw_order: {
         Args: { p_key_id: string; p_reason?: string; p_ref: string }

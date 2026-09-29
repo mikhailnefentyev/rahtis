@@ -2643,7 +2643,38 @@ export const fi = {
     quickStartHint:
       'Lähetä avain jokaisessa pyynnössä otsakkeessa Authorization. Vastaukset ovat JSON-muodossa; hinnat euroina ilman arvonlisäveroa.',
     limits:
-      'Enintään 60 pyyntöä minuutissa avainta kohden. Tilausten luonti rajapinnan kautta ja ilmoitukset omaan järjestelmään (webhookit) tulevat seuraavaksi.',
+      'Enintään 60 pyyntöä minuutissa avainta kohden. Tilauksen luonti (POST /orders) ja peruminen (POST /orders/{ref}/withdraw) vaativat avaimen, jolla on kirjoitusoikeus; Idempotency-Key-otsake estää tuplatilauksen, jos pyyntö toistetaan.',
+    hooks: {
+      title: 'Ilmoitukset omaan järjestelmään (webhookit)',
+      subtitle:
+        'RAHTIS lähettää tapahtuman palvelimellesi heti, kun tilaus etenee — sinun ei tarvitse kysellä tilaa jatkuvasti. Tapahtumassa on tilausnumero ja muutos; koko tilauksen saat rajapinnasta.',
+      url: 'Osoite (https)',
+      urlHint: 'Palvelimesi osoite, joka vastaanottaa POST-pyynnöt. Vain https ja julkinen osoite.',
+      events: 'Tapahtumat',
+      eventNames: {
+        'order.taken': 'kuljetusliike otti tilauksen',
+        'order.reopened': 'tilaus palasi pöydälle',
+        'order.stop_completed': 'reittipiste ohitettu',
+        'order.closed': 'keikka päättyi',
+        'order.cancelled': 'tilaus peruttu',
+        'document.added': 'rahtikirja tai kuva lisätty',
+      },
+      create: 'Lisää webhook',
+      createdTitle: 'Allekirjoitussalaisuus',
+      createdHint:
+        'Tallenna salaisuus nyt: sillä tarkistat, että ilmoitus tuli RAHTISilta. Sitä ei näytetä uudelleen.',
+      chooseEvents: 'Valitse vähintään yksi tapahtuma.',
+      badUrl: 'Osoitetta ei voi käyttää',
+      tooMany: 'Yrityksellä on jo viisi webhookia.',
+      failed: 'Webhookin lisääminen epäonnistui.',
+      failures: 'Epäonnistuneita toimituksia peräkkäin',
+      ping: 'Lähetä testi',
+      remove: 'Poista',
+      recent: 'Viimeisimmät toimitukset',
+      statuses: { SENT: 'toimitettu', FAILED: 'epäonnistui', PENDING: 'jonossa' },
+      verifyHint:
+        'Jokainen ilmoitus on allekirjoitettu otsakkeella Rahtis-Signature: t=<aika>,v1=<HMAC-SHA256>. Tarkista allekirjoitus ja hylkää yli viisi minuuttia vanhat. Epäonnistunut toimitus yritetään uudelleen vuorokauden ajan.',
+    },
     tooMany: 'Yrityksellä on jo kymmenen voimassa olevaa avainta. Poista tarpeeton ensin.',
     needActive: 'Avaimen voi luoda, kun yrityksen tili on aktiivinen.',
     createFailed: 'Avaimen luonti epäonnistui. Yritä uudelleen.',

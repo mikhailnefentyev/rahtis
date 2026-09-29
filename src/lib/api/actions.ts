@@ -5,6 +5,7 @@ import { getViewer } from '@/lib/auth/viewer';
 import { defaultLocale, getDictionary, isLocale, type Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import { generateKey } from './key';
+import { checkUrl, generateSecret, WEBHOOK_EVENTS } from './webhooks';
 
 /**
  * Выпуск и отзыв ключей API из кабинета заказчика.
@@ -54,6 +55,64 @@ export async function createApiKeyAction(_previous: CreateKeyState, formData: Fo
 
   revalidatePath(`/${locale}/shipper/api`);
   return { error: null, key: fresh.key, name };
+}
+
+export type CreateWebhookState = { error: string | null; secret: string | null; url: string | null };
+
+/**
+ * Новый вебхук. Адрес проверяется сразу (https, не внутренняя сеть), а
+ * секрет подписи показывается один раз — как ключ API.
+ */
+export async function createWebhookAction(
+  _previous: CreateWebhookState,
+  formData: FormData,
+): Promise<CreateWebhookState> {
+  const locale = toLocale(formData.get('locale'));
+  const t = await getDictionary(locale);
+
+  const viewer = await getViewer();
+  if (viewer.status !== 'ready' || viewer.role !== 'SHIPPER' || !viewer.company) {
+    return { error: t.error.forbidden, secret: null, url: null };
+  }
+
+  const url = String(formData.get('url') ?? '').trim();
+  const events = formData
+    .getAll('events')
+    .map(String)
+    .filter((e): e is (typeof WEBHOOK_EVENTS)[number] => (WEBHOOK_EVENTS as readonly string[]).includes(e));
+  if (events.length === 0) return { error: t.api.hooks.chooseEvents, secret: null, url: null };
+
+  const problem = await checkUrl(url);
+  if (problem) return { error: `${t.api.hooks.badUrl}: ${problem}`, secret: null, url: null };
+
+  const secret = generateSecret();
+  const supabase = await createClient();
+  const { error } = await supabase.rpc('api_webhook_create', { p_url: url, p_events: events, p_secret: secret });
+  if (error) {
+    const message = error.code === '55001' ? t.api.hooks.tooMany : error.code === '55000' ? t.api.needActive : t.api.hooks.failed;
+    return { error: message, secret: null, url: null };
+  }
+
+  revalidatePath(`/${locale}/shipper/api`);
+  return { error: null, secret, url };
+}
+
+export async function deleteWebhookAction(formData: FormData): Promise<void> {
+  const locale = toLocale(formData.get('locale'));
+  const id = String(formData.get('id') ?? '');
+  if (!/^[0-9a-f-]{36}$/.test(id)) return;
+  const supabase = await createClient();
+  await supabase.rpc('api_webhook_delete', { p_id: id });
+  revalidatePath(`/${locale}/shipper/api`);
+}
+
+export async function pingWebhookAction(formData: FormData): Promise<void> {
+  const locale = toLocale(formData.get('locale'));
+  const id = String(formData.get('id') ?? '');
+  if (!/^[0-9a-f-]{36}$/.test(id)) return;
+  const supabase = await createClient();
+  await supabase.rpc('api_webhook_ping', { p_id: id });
+  revalidatePath(`/${locale}/shipper/api`);
 }
 
 export async function revokeApiKeyAction(formData: FormData): Promise<void> {

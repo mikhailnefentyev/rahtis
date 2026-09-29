@@ -1,12 +1,13 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Badge, Button, Card, CardBody, EmptyState, Mono } from '@/components/ui';
-import { revokeApiKeyAction } from '@/lib/api/actions';
+import { deleteWebhookAction, pingWebhookAction, revokeApiKeyAction } from '@/lib/api/actions';
 import { requireRole } from '@/lib/auth/guard';
 import { siteUrl } from '@/lib/config';
 import { getI18n, isLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import { CreateKeyForm } from './CreateKeyForm';
+import { CreateWebhookForm } from './CreateWebhookForm';
 
 export async function generateMetadata({
   params,
@@ -41,6 +42,21 @@ export default async function ApiKeysPage({ params }: { params: Promise<{ locale
   const active = keys.filter((k) => !k.revoked_at);
   const revoked = keys.filter((k) => k.revoked_at);
   const base = `${siteUrl()}/api/v1`;
+
+  const [{ data: hooksData }, { data: deliveriesData }] = await Promise.all([
+    supabase
+      .from('api_webhooks')
+      .select('id,url,events,created_at,disabled_at,failures')
+      .is('disabled_at', null)
+      .order('created_at'),
+    supabase
+      .from('api_webhook_deliveries')
+      .select('id,webhook_id,event,status,attempts,last_status,last_error,created_at,delivered_at')
+      .order('created_at', { ascending: false })
+      .limit(20),
+  ]);
+  const hooks = hooksData ?? [];
+  const deliveries = deliveriesData ?? [];
 
   return (
     <main className="mx-auto w-full max-w-4xl px-5 py-8">
@@ -102,6 +118,84 @@ curl ${base}/orders/RS-2026-0001/events
 curl ${base}/orders/RS-2026-0001/documents`}</code>
         </pre>
         <p className="mt-3 max-w-2xl text-[12px] leading-relaxed text-ink-dim">{t.api.limits}</p>
+      </section>
+
+      <section className="mb-8">
+        <h2 className="mb-4 border-b border-line pb-2 text-[13px] font-semibold tracking-tight text-ink-faint">
+          {t.api.hooks.title}
+        </h2>
+        <p className="mb-4 max-w-2xl text-[13px] leading-relaxed text-ink-muted">{t.api.hooks.subtitle}</p>
+
+        {hooks.length > 0 && (
+          <div className="mb-4 flex flex-col gap-3">
+            {hooks.map((h) => (
+              <Card key={h.id} stripe={h.failures > 0 ? 'warn' : 'ok'}>
+                <CardBody className="flex flex-wrap items-start justify-between gap-4">
+                  <div className="min-w-0">
+                    <Mono className="break-all text-[13px]">{h.url}</Mono>
+                    <p className="mt-1 text-[12px] text-ink-muted">{h.events.join(' · ')}</p>
+                    {h.failures > 0 && (
+                      <p className="mt-1 text-[12px] text-warn">
+                        {t.api.hooks.failures}: {h.failures}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex gap-2">
+                    <form action={pingWebhookAction}>
+                      <input type="hidden" name="locale" value={locale} />
+                      <input type="hidden" name="id" value={h.id} />
+                      <Button type="submit" size="sm">
+                        {t.api.hooks.ping}
+                      </Button>
+                    </form>
+                    <form action={deleteWebhookAction}>
+                      <input type="hidden" name="locale" value={locale} />
+                      <input type="hidden" name="id" value={h.id} />
+                      <Button type="submit" size="sm" variant="danger">
+                        {t.api.hooks.remove}
+                      </Button>
+                    </form>
+                  </div>
+                </CardBody>
+              </Card>
+            ))}
+          </div>
+        )}
+
+        <Card className="mb-4">
+          <CardBody>
+            <CreateWebhookForm locale={locale} />
+          </CardBody>
+        </Card>
+
+        {deliveries.length > 0 && (
+          <div className="mb-4">
+            <p className="label-micro mb-2">{t.api.hooks.recent}</p>
+            <ul className="flex flex-col gap-1 text-[12px]">
+              {deliveries.map((d) => (
+                <li key={d.id} className="flex flex-wrap gap-x-3 text-ink-muted">
+                  <Mono>{f.dateTime(d.created_at)}</Mono>
+                  <Mono className="text-ink">{d.event}</Mono>
+                  <Badge tone={d.status === 'SENT' ? 'ok' : d.status === 'FAILED' ? 'danger' : 'neutral'}>
+                    {t.api.hooks.statuses[d.status as 'SENT' | 'FAILED' | 'PENDING']}
+                  </Badge>
+                  {d.last_status ? <span>HTTP {d.last_status}</span> : null}
+                  {d.last_error && d.status !== 'SENT' ? <span>{d.last_error}</span> : null}
+                  {d.attempts > 1 ? <span>× {d.attempts}</span> : null}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <p className="mb-2 max-w-2xl text-[13px] leading-relaxed text-ink-muted">{t.api.hooks.verifyHint}</p>
+        <pre className="overflow-x-auto rounded-control border border-line bg-sunken p-4 text-[12px] leading-relaxed">
+          <code>{`// Node.js
+const [t, v1] = req.headers['rahtis-signature'].split(',').map((p) => p.split('=')[1]);
+const expected = crypto.createHmac('sha256', SECRET).update(\`\${t}.\${rawBody}\`).digest('hex');
+const ok = crypto.timingSafeEqual(Buffer.from(v1), Buffer.from(expected))
+  && Math.abs(Date.now() / 1000 - Number(t)) < 300;`}</code>
+        </pre>
       </section>
 
       {revoked.length > 0 && (
