@@ -1,3 +1,5 @@
+import { WEBHOOK_EVENTS } from './events';
+
 /**
  * Описание API заказчиков в OpenAPI 3.1 — отдаётся по /api/v1/openapi.json.
  *
@@ -11,7 +13,7 @@
 
 const STATUS = ['DRAFT', 'OPEN', 'REQUESTED', 'AWAIT_DRIVER', 'IN_PROGRESS', 'DONE', 'CANCELLED'];
 const ROLES = ['PICKUP', 'DELIVERY', 'EXTRA_LOAD', 'EXTRA_UNLOAD', 'TRAILER_RETURN'];
-const EVENTS = ['order.taken', 'order.reopened', 'order.stop_completed', 'order.closed', 'order.cancelled', 'document.added'];
+const EVENTS: readonly string[] = WEBHOOK_EVENTS;
 
 const nullable = (type: string, extra: Record<string, unknown> = {}) => ({ type: [type, 'null'], ...extra });
 const ref = (name: string) => ({ $ref: `#/components/schemas/${name}` });

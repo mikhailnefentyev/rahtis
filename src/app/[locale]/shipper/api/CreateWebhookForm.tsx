@@ -3,19 +3,13 @@
 import { useActionState, useState } from 'react';
 import { Button, Field, Input, Mono } from '@/components/ui';
 import { createWebhookAction, type CreateWebhookState } from '@/lib/api/actions';
+import { WEBHOOK_EVENTS } from '@/lib/api/events';
 import type { Locale } from '@/lib/i18n';
 import { useI18n } from '@/lib/i18n/provider';
 
 const INITIAL: CreateWebhookState = { error: null, secret: null, url: null };
 
-const EVENTS = [
-  'order.taken',
-  'order.reopened',
-  'order.stop_completed',
-  'order.closed',
-  'order.cancelled',
-  'document.added',
-] as const;
+const EVENTS = WEBHOOK_EVENTS;
 
 /** Новый вебхук: адрес, события; секрет подписи — один раз. */
 export function CreateWebhookForm({ locale }: { locale: Locale }) {

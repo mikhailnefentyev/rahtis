@@ -18,14 +18,7 @@ import { privateV4, privateV6, sign, urlShapeProblem } from './signature';
  * снаружи не достать.
  */
 
-export const WEBHOOK_EVENTS = [
-  'order.taken',
-  'order.reopened',
-  'order.stop_completed',
-  'order.closed',
-  'order.cancelled',
-  'document.added',
-] as const;
+export { WEBHOOK_EVENTS } from './events';
 
 export function generateSecret(): string {
   return `whsec_${randomBytes(24).toString('hex')}`;
