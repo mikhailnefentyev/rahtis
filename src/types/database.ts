@@ -4050,6 +4050,7 @@ export type Database = {
         Args: { p_from?: string; p_to?: string }
         Returns: {
           can_rate: boolean
+          contract_party: Database["public"]["Enums"]["contract_party"]
           carrier_name: string
           closed_at: string
           commission_bps: number

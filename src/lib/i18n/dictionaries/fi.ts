@@ -1544,6 +1544,8 @@ export const fi = {
     subtitle:
       'Vauriot, vajaukset, odotusajat ja poikkeamat kuljetuksittain. RAHTIS käsittelee jokaisen reklamaation ja välittää osapuolten välillä.',
     subtitleAdmin: 'Kaikki reklamaatiot. Avoimet ja käsittelyssä olevat ensin.',
+    directDeal:
+      'Tämä on suora kuljetus kuukausimaksua käyttävän kuljetusliikkeen kanssa: kuljetussopimus on osapuolten välinen, ja reklamaatiot sovitaan suoraan toisen osapuolen kanssa. Kuljetuksen asiakirjat ja kuvat ovat molempien käytettävissä.',
     none: 'Ei reklamaatioita',
     noneHint: 'Reklamaation voi tehdä valmiin tai käynnissä olevan kuljetuksen kortista.',
     all: 'Kaikki',

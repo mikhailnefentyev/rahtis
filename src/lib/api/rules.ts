@@ -47,6 +47,11 @@ const RULES: Rule[] = [
   { prefix: 'Пустой комментарий', field: 'body', message: 'body must not be empty.' },
   { prefix: 'Точка не из этого рейса', field: 'stop_sequence', message: 'The stop does not belong to this order.' },
   { prefix: 'Claim подаётся по идущему или выполненному рейсу', field: 'order_ref', message: 'A claim can be filed only for a trip in progress or completed.' },
+  {
+    prefix: 'По прямому рейсу перевозчика на подписке претензию',
+    field: 'order_ref',
+    message: 'This is a direct transport with a carrier on the monthly plan: the contract of carriage is between you and the carrier, so claims are settled directly with them, not through RAHTIS.',
+  },
   { prefix: 'Claim закрыт', field: 'status', message: 'The claim is closed.' },
   { prefix: 'Вторая сторона ведёт claim с оператором по почте', field: 'claim', message: 'This claim is handled by the operator by email; reply to the operator\'s message.' },
 ];

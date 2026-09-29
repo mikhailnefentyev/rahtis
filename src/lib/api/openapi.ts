@@ -419,7 +419,7 @@ export function openApi(serverUrl: string) {
             '201': { description: 'The filed claim.', content: json(ref('ClaimDetail')) },
             '400': errorResponse('A required field is missing. See error.details.'),
             '404': errorResponse('No such order or stop.'),
-            '409': errorResponse('The trip is not in progress or completed.'),
+            '409': errorResponse('The trip is not in progress or completed, or it is a direct transport with a carrier on the monthly plan (claims are then settled directly between the parties).'),
             ...COMMON_ERRORS,
           },
         },

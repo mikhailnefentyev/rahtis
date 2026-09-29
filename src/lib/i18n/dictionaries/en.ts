@@ -1441,6 +1441,8 @@ export const en = {
     subtitle:
       'Damage, shortages, downtime and deviations, trip by trip. RAHTIS reviews every claim and mediates between the parties.',
     subtitleAdmin: 'All claims. Open and in-review first.',
+    directDeal:
+      'This is a direct transport with a carrier on the monthly plan: the contract of carriage is between the parties, and claims are settled directly with the other party. The documents and photos of the transport are available to both.',
     none: 'No claims',
     noneHint: 'A claim can be filed from the card of a completed or running trip.',
     all: 'All',

@@ -248,11 +248,18 @@ export function CompletedList({
                             <DocumentList documents={documents} />
                           </div>
 
-                          {canClaim && (
-                            <div className="mt-4 border-t border-line pt-4">
-                              <FileClaim orderId={order.id} stops={stops} />
-                            </div>
-                          )}
+                          {/*
+                           * Прямой рейс перевозчика на подписке: Aivomaa не сторона
+                           * договора, спор стороны решают сами (решение 29.09.2026).
+                           */}
+                          {canClaim &&
+                            (order.contract_party === 'CARRIER' ? (
+                              <p className="mt-4 border-t border-line pt-4 text-xs text-ink-muted">{t.claims.directDeal}</p>
+                            ) : (
+                              <div className="mt-4 border-t border-line pt-4">
+                                <FileClaim orderId={order.id} stops={stops} />
+                              </div>
+                            ))}
 
                           {/*
                            * Право оценить решает база: у заказчика рейса с
