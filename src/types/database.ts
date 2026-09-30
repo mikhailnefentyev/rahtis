@@ -4304,6 +4304,31 @@ export type Database = {
           trips: number
         }[]
       }
+      price_guide: {
+        Args: { p_distance_km: number; p_haul_kind: Database["public"]["Enums"]["haul_kind"] }
+        Returns: {
+          high_cents: number
+          low_cents: number
+          median_cents: number
+          samples: number
+        }[]
+      }
+      admin_orders_without_offers: {
+        Args: never
+        Returns: {
+          distance_km: number
+          finish_city: string
+          haul_kind: Database["public"]["Enums"]["haul_kind"]
+          id: string
+          is_test: boolean
+          minutes_open: number
+          pickup_city: string
+          published_at: string
+          rate_cents: number
+          ref: string
+          shipper_name: string
+        }[]
+      }
       desk_orders: {
         Args: { p_limit?: number; p_region?: string }
         Returns: {

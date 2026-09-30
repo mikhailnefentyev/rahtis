@@ -928,6 +928,10 @@ export const fi = {
     sealRequired: 'Sinetti',
   },
 
+  priceGuide: {
+    low: 'Hinta on selvästi tavallista alempi — tarjouksia voi tulla vähemmän tai ei lainkaan.',
+  },
+
   orderForm: {
     feeHint: 'Yhteiseltä pöydältä tilatusta kuljetuksesta laskutetaan lisäksi 3 % palvelumaksu; suora tilaus vakioautolle on maksuton.',
     title: 'Uusi kuljetus',
@@ -3141,6 +3145,10 @@ export const fi = {
     'scorecard.directHint': '{count, plural, =0 {ei päätettyjä} one {# päätetty} other {# päätettyä}}',
     'scorecard.offerTrips': '{count, plural, one {# keikka} other {# keikkaa}} 12 kk',
     'scorecard.offerOnTime': '{pct} % ajallaan',
+    'priceGuide.range': 'Vastaavat keikat: tavallisesti {low}–{high}, mediaani {median} ({count, plural, one {# keikka} other {# keikkaa}}, 12 kk).',
+    'event.order.no_offers': 'Kuljetukseen {ref} ei ole tullut tarjouksia {minutes} minuutissa. Harkitse hinnan nostamista tai lähetä se suoraan tutulle autolle.',
+    'noOffers.title': '{count, plural, one {# kuljetus} other {# kuljetusta}} ilman tarjouksia yli 30 min',
+    'noOffers.open': 'pöydällä {minutes} min',
     'event.trip.late': 'Kuljetus {ref}: auto on myöhässä pisteestä {city} noin {minutes} min',
     'event.trip.waiting': 'Kuljetus {ref}: maksuton odotustunti pisteessä {city} päättyi{charged, select, yes { — odotuslisä {euros} € alkavalta tunnilta 15 minuutin kuluttua} other {}}',
     'event.invite.approved': 'Kutsumanne asiakas {shipper} on hyväksytty. Se voi nyt lähettää suoria tilauksia autoillenne.',

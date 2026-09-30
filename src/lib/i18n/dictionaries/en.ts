@@ -840,6 +840,10 @@ export const en = {
     sealRequired: 'Seal',
   },
 
+  priceGuide: {
+    low: 'The price is clearly below the usual — there may be fewer offers or none.',
+  },
+
   orderForm: {
     feeHint: 'A 3 % service fee is added for a transport ordered from the load board; a direct order to a regular vehicle is free.',
     title: 'New order',
@@ -3001,6 +3005,10 @@ export const en = {
     'scorecard.directHint': '{count, plural, =0 {none decided} one {# decided} other {# decided}}',
     'scorecard.offerTrips': '{count, plural, one {# job} other {# jobs}} in 12 months',
     'scorecard.offerOnTime': '{pct} % on time',
+    'priceGuide.range': 'Similar jobs: usually {low}–{high}, median {median} ({count, plural, one {# job} other {# jobs}}, 12 months).',
+    'event.order.no_offers': 'Transport {ref} has had no offers in {minutes} minutes. Consider raising the price or sending it directly to a vehicle you know.',
+    'noOffers.title': '{count, plural, one {# transport} other {# transports}} without offers for over 30 min',
+    'noOffers.open': 'on the board for {minutes} min',
     'event.trip.late': 'Transport {ref}: the vehicle is about {minutes} min late for {city}',
     'event.trip.waiting': 'Transport {ref}: the free waiting hour at {city} has ended{charged, select, yes { — a waiting surcharge of {euros} € per started hour starts in 15 minutes} other {}}',
     'event.invite.approved': 'Your invited customer {shipper} has been approved. It can now send direct orders to your vehicles.',

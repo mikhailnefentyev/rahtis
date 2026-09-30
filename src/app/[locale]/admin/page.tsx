@@ -67,6 +67,7 @@ export default async function AdminPage({
     { data: questions },
     { data: pendingVehicles },
     { data: attention },
+    { data: withoutOffers },
   ] = await Promise.all([
     supabase
       .from('companies')
@@ -96,6 +97,8 @@ export default async function AdminPage({
       .eq('access', 'PENDING')
       .order('submitted_at', { ascending: true }),
     supabase.rpc('documents_needing_attention', { p_within_days: 30 }),
+    /* Заказы на столе дольше получаса без откликов — сигнал оператору. */
+    supabase.rpc('admin_orders_without_offers'),
   ]);
 
   /*
@@ -243,6 +246,29 @@ export default async function AdminPage({
           </div>
         )}
       </section>
+
+      {(withoutOffers ?? []).length > 0 && (
+        <section className="mt-10">
+          <h2 className="mb-4 border-b border-line pb-2 text-[13px] font-semibold tracking-tight text-ink-faint">
+            {m('noOffers.title', { count: (withoutOffers ?? []).length })}
+          </h2>
+          <ul className="flex flex-col gap-1.5">
+            {(withoutOffers ?? []).map((o) => (
+              <li key={o.id} className="flex flex-wrap items-center gap-2 text-[13px]">
+                <Mono className="text-xs">{o.ref}</Mono>
+                {o.is_test && <Badge tone="neutral">{t.moderation.test}</Badge>}
+                <span>
+                  {o.pickup_city} → {o.finish_city}
+                </span>
+                <span className="text-ink-dim">
+                  {o.shipper_name} · {t.haulKind[o.haul_kind]} · {m('order.distance', { km: o.distance_km ?? 0 })} ·{' '}
+                  {f.eur(o.rate_cents ?? 0)} · {m('noOffers.open', { minutes: o.minutes_open })}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <section className="mt-10">
         <h2 className="mb-4 border-b border-line pb-2 text-[13px] font-semibold tracking-tight text-ink-faint">

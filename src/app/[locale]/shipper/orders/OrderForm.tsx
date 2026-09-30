@@ -17,6 +17,7 @@ import {
 import type { ChosenAddress } from '@/components/domain/AddressInput';
 import { isValidContainerNumber } from '@/lib/containerNumber';
 import { publishOrderAction, type PublishState } from '@/lib/orders/actions';
+import { priceGuideAction, type PriceGuide } from '@/lib/orders/priceGuide';
 import { stopTitle, type HaulKind } from '@/lib/orders/haul';
 import { computeRouteAction, type RouteState } from '@/lib/routing/actions';
 import { useI18n } from '@/lib/i18n/provider';
@@ -118,7 +119,7 @@ export function OrderForm({
   /** Знакомые машины — для прямого назначения вместо стола. */
   knownVehicles: KnownVehicle[];
 }) {
-  const { t, m, locale } = useI18n();
+  const { t, m, f, locale } = useI18n();
   const [state, formAction, pending] = useActionState(publishOrderAction, initial);
 
   /*
@@ -382,6 +383,19 @@ export function OrderForm({
     Number.isFinite(km) && km > 0 && Number.isFinite(euros) && euros > 0
       ? `€${(euros / km).toFixed(2)}/${t.unit.km}`
       : '';
+
+  /*
+   * Подсказка цены: похожие выполненные рейсы той же единицы. Спрашивается
+   * с задержкой, когда пробег перестал меняться; нет данных — молчим.
+   */
+  const [guide, setGuide] = useState<PriceGuide | null>(null);
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      setGuide(Number.isFinite(km) && km > 0 ? await priceGuideAction(haulKind, km) : null);
+    }, 600);
+    return () => clearTimeout(timer);
+  }, [haulKind, km]);
+  const lowRate = guide !== null && Number.isFinite(euros) && euros > 0 && euros * 100 < guide.median * 0.8;
 
   if (state.ref) {
     return (
@@ -831,6 +845,17 @@ export function OrderForm({
                 />
               )}
             </Field>
+            {guide && (
+              <p className={`sm:col-span-3 self-end pb-2 text-xs ${lowRate ? 'text-warn' : 'text-ink-muted'}`} role="status">
+                {m('priceGuide.range', {
+                  low: f.eur(guide.low),
+                  high: f.eur(guide.high),
+                  median: f.eur(guide.median),
+                  count: guide.samples,
+                })}
+                {lowRate && <> {t.priceGuide.low}</>}
+              </p>
+            )}
             <Field label={t.order.comment} className="sm:col-span-4">
               {(p) => (
                 <Textarea
