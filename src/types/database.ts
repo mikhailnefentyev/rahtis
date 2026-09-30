@@ -327,6 +327,7 @@ export type Database = {
           created_at: string
           decided_at: string | null
           decided_by: string | null
+          origin: string
           shipper_company_id: string
           status: Database["public"]["Enums"]["link_status"]
         }
@@ -335,6 +336,7 @@ export type Database = {
           created_at?: string
           decided_at?: string | null
           decided_by?: string | null
+          origin?: string
           shipper_company_id: string
           status?: Database["public"]["Enums"]["link_status"]
         }
@@ -343,6 +345,7 @@ export type Database = {
           created_at?: string
           decided_at?: string | null
           decided_by?: string | null
+          origin?: string
           shipper_company_id?: string
           status?: Database["public"]["Enums"]["link_status"]
         }
@@ -1813,10 +1816,33 @@ export type Database = {
         ]
       }
       onboarding_reminders: {
-        Row: { company_id: string; day: number; sent_at: string; stage: string }
-        Insert: { company_id: string; day: number; sent_at?: string; stage: string }
-        Update: { company_id?: string; day?: number; sent_at?: string; stage?: string }
-        Relationships: []
+        Row: {
+          company_id: string
+          day: number
+          sent_at: string
+          stage: string
+        }
+        Insert: {
+          company_id: string
+          day: number
+          sent_at?: string
+          stage: string
+        }
+        Update: {
+          company_id?: string
+          day?: number
+          sent_at?: string
+          stage?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "onboarding_reminders_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       operator_profile: {
         Row: {
@@ -1883,6 +1909,32 @@ export type Database = {
           website?: string | null
         }
         Relationships: []
+      }
+      order_alerts: {
+        Row: {
+          created_at: string
+          kind: string
+          order_id: string
+        }
+        Insert: {
+          created_at?: string
+          kind: string
+          order_id: string
+        }
+        Update: {
+          created_at?: string
+          kind?: string
+          order_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_alerts_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       order_amendments: {
         Row: {
@@ -2218,6 +2270,35 @@ export type Database = {
             columns: ["shipper_company_id"]
             isOneToOne: false
             referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_stop_alerts: {
+        Row: {
+          created_at: string
+          kind: string
+          minutes: number
+          stop_id: string
+        }
+        Insert: {
+          created_at?: string
+          kind: string
+          minutes: number
+          stop_id: string
+        }
+        Update: {
+          created_at?: string
+          kind?: string
+          minutes?: number
+          stop_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_stop_alerts_stop_id_fkey"
+            columns: ["stop_id"]
+            isOneToOne: false
+            referencedRelation: "order_stops"
             referencedColumns: ["id"]
           },
         ]
@@ -2625,6 +2706,60 @@ export type Database = {
           },
         ]
       }
+      shipper_invites: {
+        Row: {
+          applied_at: string | null
+          applied_company_id: string | null
+          business_id: string
+          carrier_company_id: string
+          company_name: string
+          created_at: string
+          created_by: string | null
+          email: string
+          id: string
+          token_hash: string
+        }
+        Insert: {
+          applied_at?: string | null
+          applied_company_id?: string | null
+          business_id: string
+          carrier_company_id: string
+          company_name: string
+          created_at?: string
+          created_by?: string | null
+          email: string
+          id?: string
+          token_hash: string
+        }
+        Update: {
+          applied_at?: string | null
+          applied_company_id?: string | null
+          business_id?: string
+          carrier_company_id?: string
+          company_name?: string
+          created_at?: string
+          created_by?: string | null
+          email?: string
+          id?: string
+          token_hash?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shipper_invites_applied_company_id_fkey"
+            columns: ["applied_company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shipper_invites_carrier_company_id_fkey"
+            columns: ["carrier_company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shipper_vehicle_pool: {
         Row: {
           added_at: string
@@ -2660,12 +2795,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      shipper_invites: {
-        Row: { applied_at: string | null; applied_company_id: string | null; business_id: string; carrier_company_id: string; company_name: string; created_at: string; created_by: string | null; email: string; id: string; token_hash: string }
-        Insert: { applied_at?: string | null; applied_company_id?: string | null; business_id: string; carrier_company_id: string; company_name: string; created_at?: string; created_by?: string | null; email: string; id?: string; token_hash: string }
-        Update: { applied_at?: string | null; applied_company_id?: string | null; business_id?: string; carrier_company_id?: string; company_name?: string; created_at?: string; created_by?: string | null; email?: string; id?: string; token_hash?: string }
-        Relationships: []
       }
       support_messages: {
         Row: {
@@ -3432,6 +3561,22 @@ export type Database = {
           status: Database["public"]["Enums"]["order_status"]
         }[]
       }
+      admin_orders_without_offers: {
+        Args: never
+        Returns: {
+          distance_km: number
+          finish_city: string
+          haul_kind: Database["public"]["Enums"]["haul_kind"]
+          id: string
+          is_test: boolean
+          minutes_open: number
+          pickup_city: string
+          published_at: string
+          rate_cents: number
+          ref: string
+          shipper_name: string
+        }[]
+      }
       agent_ask_operator: {
         Args: {
           p_conversation_id: string
@@ -3858,7 +4003,12 @@ export type Database = {
         }
       }
       carrier_invite_shipper: {
-        Args: { p_business_id: string; p_email: string; p_name: string; p_token_hash: string }
+        Args: {
+          p_business_id: string
+          p_email: string
+          p_name: string
+          p_token_hash: string
+        }
         Returns: string
       }
       carrier_partners: {
@@ -3890,6 +4040,21 @@ export type Database = {
         Returns: {
           ratings_count: number
           score: number
+        }[]
+      }
+      carrier_scorecard: {
+        Args: { p_company_id?: string }
+        Returns: {
+          abandoned: number
+          claims: number
+          direct_accept_pct: number
+          direct_decided: number
+          docs_pct: number
+          on_time_pct: number
+          rating: number
+          ratings_count: number
+          timed_stops: number
+          trips: number
         }[]
       }
       choose_offer: {
@@ -4287,79 +4452,6 @@ export type Database = {
         Returns: string
       }
       delete_order: { Args: { p_order_id: string }; Returns: string }
-      shipper_sites_waiting: {
-        Args: never
-        Returns: {
-          address: string
-          city: string
-          median_minutes: number
-          my_stops: number
-          over_hour_pct: number
-          place_name: string
-          samples: number
-        }[]
-      }
-      stop_waiting_typical: {
-        Args: { p_stop_ids: string[] }
-        Returns: {
-          median_minutes: number
-          over_hour_pct: number
-          samples: number
-          stop_id: string
-        }[]
-      }
-      carrier_scorecard: {
-        Args: { p_company_id?: string }
-        Returns: {
-          abandoned: number
-          claims: number
-          direct_accept_pct: number | null
-          direct_decided: number
-          docs_pct: number | null
-          on_time_pct: number | null
-          rating: number | null
-          ratings_count: number
-          timed_stops: number
-          trips: number
-        }[]
-      }
-      offer_scorecards: {
-        Args: { p_order_ids: string[] }
-        Returns: {
-          offer_id: string
-          on_time_pct: number | null
-          trips: number
-        }[]
-      }
-      price_guide: {
-        Args: { p_distance_km: number; p_haul_kind: Database["public"]["Enums"]["haul_kind"] }
-        Returns: {
-          high_cents: number
-          low_cents: number
-          median_cents: number
-          samples: number
-        }[]
-      }
-      admin_orders_without_offers: {
-        Args: never
-        Returns: {
-          distance_km: number
-          finish_city: string
-          haul_kind: Database["public"]["Enums"]["haul_kind"]
-          id: string
-          is_test: boolean
-          minutes_open: number
-          pickup_city: string
-          published_at: string
-          rate_cents: number
-          ref: string
-          shipper_name: string
-        }[]
-      }
-      group_take_order: {
-        Args: { p_order_id: string; p_vehicle_id: string }
-        Returns: Database["public"]["Tables"]["orders"]["Row"]
-      }
       desk_orders: {
         Args: { p_limit?: number; p_region?: string }
         Returns: {
@@ -4367,6 +4459,8 @@ export type Database = {
           container_feet: number
           distance_km: number
           finish_city: string
+          group_until: string
+          group_vehicle_ids: string[]
           haul_kind: Database["public"]["Enums"]["haul_kind"]
           id: string
           ldm: number
@@ -4385,8 +4479,6 @@ export type Database = {
           taken_by_me: boolean
           trailer: string
           trailer_plate: string
-          group_until: string | null
-          group_vehicle_ids: string[] | null
         }[]
       }
       desk_regions: {
@@ -4690,6 +4782,63 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      group_take_order: {
+        Args: { p_order_id: string; p_vehicle_id: string }
+        Returns: {
+          assigned_company_id: string | null
+          assigned_driver_id: string | null
+          assigned_vehicle_id: string | null
+          billing: Database["public"]["Enums"]["billing_status"]
+          chosen_offer_id: string | null
+          closed_at: string | null
+          comment: string | null
+          commission_bps: number | null
+          container_feet: number | null
+          contract_party: Database["public"]["Enums"]["contract_party"]
+          created_at: string
+          created_by: string | null
+          deadline_at: string | null
+          dispatch_mode: Database["public"]["Enums"]["dispatch_mode"]
+          distance_auto_km: number | null
+          distance_km: number | null
+          distance_source: Database["public"]["Enums"]["distance_source"]
+          group_released_at: string | null
+          group_until: string | null
+          group_vehicle_ids: string[] | null
+          haul_kind: Database["public"]["Enums"]["haul_kind"]
+          id: string
+          invoice_ref: string | null
+          invoiced_at: string | null
+          ldm: number | null
+          order_type: Database["public"]["Enums"]["order_type"]
+          paid_at: string | null
+          published_at: string | null
+          rate_cents: number | null
+          ref: string
+          route_bounds: Json | null
+          route_computed_at: string | null
+          route_fingerprint: string | null
+          route_geometry: string | null
+          settled_at: string | null
+          shipper_company_id: string
+          shipper_company_kind: Database["public"]["Enums"]["party_role"]
+          shipper_fee_bps: number | null
+          shipper_ref: string | null
+          status: Database["public"]["Enums"]["order_status"]
+          terms_document_id: string | null
+          trailer: string | null
+          trailer_plate: string | null
+          updated_at: string
+          waiting: Json
+          waiting_cents: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       handle_support_message: { Args: { p_id: number }; Returns: undefined }
       invoice_subscription_fees: { Args: { p_month: string }; Returns: number }
       issue_monthly_subscriptions: {
@@ -4874,6 +5023,14 @@ export type Database = {
         }
         Returns: number
       }
+      offer_scorecards: {
+        Args: { p_order_ids: string[] }
+        Returns: {
+          offer_id: string
+          on_time_pct: number
+          trips: number
+        }[]
+      }
       offers_for_shipper: {
         Args: { p_order_ids: string[] }
         Returns: {
@@ -4891,16 +5048,6 @@ export type Database = {
           plate: string
           rating: number
           variant_no: number
-        }[]
-      }
-      order_dispatch_card: { Args: { p_order_id: string }; Returns: Json }
-      order_dispatch_recipients: {
-        Args: { p_order_id: string }
-        Returns: {
-          company_id: string
-          company_name: string
-          contact_email: string
-          language: string
         }[]
       }
       onboarding_status: {
@@ -4921,6 +5068,16 @@ export type Database = {
           stage_since: string
           user_id: string
           vehicles: number
+        }[]
+      }
+      order_dispatch_card: { Args: { p_order_id: string }; Returns: Json }
+      order_dispatch_recipients: {
+        Args: { p_order_id: string }
+        Returns: {
+          company_id: string
+          company_name: string
+          contact_email: string
+          language: string
         }[]
       }
       partner_totals: {
@@ -5021,6 +5178,18 @@ export type Database = {
       pool_remove_vehicle: {
         Args: { p_vehicle_id: string }
         Returns: undefined
+      }
+      price_guide: {
+        Args: {
+          p_distance_km: number
+          p_haul_kind: Database["public"]["Enums"]["haul_kind"]
+        }
+        Returns: {
+          high_cents: number
+          low_cents: number
+          median_cents: number
+          samples: number
+        }[]
       }
       prune_auth_throttle: { Args: never; Returns: number }
       prune_incidents: { Args: { p_keep_days?: number }; Returns: number }
@@ -5339,6 +5508,27 @@ export type Database = {
           payout_due: string
           period_end: string
           period_start: string
+        }[]
+      }
+      shipper_sites_waiting: {
+        Args: never
+        Returns: {
+          address: string
+          city: string
+          median_minutes: number
+          my_stops: number
+          over_hour_pct: number
+          place_name: string
+          samples: number
+        }[]
+      }
+      stop_waiting_typical: {
+        Args: { p_stop_ids: string[] }
+        Returns: {
+          median_minutes: number
+          over_hour_pct: number
+          samples: number
+          stop_id: string
         }[]
       }
       store_route: {
