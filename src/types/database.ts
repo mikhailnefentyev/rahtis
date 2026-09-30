@@ -2372,6 +2372,9 @@ export type Database = {
           distance_auto_km: number | null
           distance_km: number | null
           distance_source: Database["public"]["Enums"]["distance_source"]
+          group_released_at: string | null
+          group_until: string | null
+          group_vehicle_ids: string[] | null
           haul_kind: Database["public"]["Enums"]["haul_kind"]
           id: string
           invoice_ref: string | null
@@ -2417,6 +2420,9 @@ export type Database = {
           distance_auto_km?: number | null
           distance_km?: number | null
           distance_source?: Database["public"]["Enums"]["distance_source"]
+          group_released_at?: string | null
+          group_until?: string | null
+          group_vehicle_ids?: string[] | null
           haul_kind?: Database["public"]["Enums"]["haul_kind"]
           id?: string
           invoice_ref?: string | null
@@ -2462,6 +2468,9 @@ export type Database = {
           distance_auto_km?: number | null
           distance_km?: number | null
           distance_source?: Database["public"]["Enums"]["distance_source"]
+          group_released_at?: string | null
+          group_until?: string | null
+          group_vehicle_ids?: string[] | null
           haul_kind?: Database["public"]["Enums"]["haul_kind"]
           id?: string
           invoice_ref?: string | null
@@ -3270,6 +3279,9 @@ export type Database = {
           distance_auto_km: number | null
           distance_km: number | null
           distance_source: Database["public"]["Enums"]["distance_source"]
+          group_released_at: string | null
+          group_until: string | null
+          group_vehicle_ids: string[] | null
           haul_kind: Database["public"]["Enums"]["haul_kind"]
           id: string
           invoice_ref: string | null
@@ -3808,6 +3820,9 @@ export type Database = {
           distance_auto_km: number | null
           distance_km: number | null
           distance_source: Database["public"]["Enums"]["distance_source"]
+          group_released_at: string | null
+          group_until: string | null
+          group_vehicle_ids: string[] | null
           haul_kind: Database["public"]["Enums"]["haul_kind"]
           id: string
           invoice_ref: string | null
@@ -3897,6 +3912,9 @@ export type Database = {
           distance_auto_km: number | null
           distance_km: number | null
           distance_source: Database["public"]["Enums"]["distance_source"]
+          group_released_at: string | null
+          group_until: string | null
+          group_vehicle_ids: string[] | null
           haul_kind: Database["public"]["Enums"]["haul_kind"]
           id: string
           invoice_ref: string | null
@@ -3957,6 +3975,9 @@ export type Database = {
           distance_auto_km: number | null
           distance_km: number | null
           distance_source: Database["public"]["Enums"]["distance_source"]
+          group_released_at: string | null
+          group_until: string | null
+          group_vehicle_ids: string[] | null
           haul_kind: Database["public"]["Enums"]["haul_kind"]
           id: string
           invoice_ref: string | null
@@ -4113,6 +4134,9 @@ export type Database = {
           distance_auto_km: number | null
           distance_km: number | null
           distance_source: Database["public"]["Enums"]["distance_source"]
+          group_released_at: string | null
+          group_until: string | null
+          group_vehicle_ids: string[] | null
           haul_kind: Database["public"]["Enums"]["haul_kind"]
           id: string
           invoice_ref: string | null
@@ -4175,6 +4199,9 @@ export type Database = {
           distance_auto_km: number | null
           distance_km: number | null
           distance_source: Database["public"]["Enums"]["distance_source"]
+          group_released_at: string | null
+          group_until: string | null
+          group_vehicle_ids: string[] | null
           haul_kind: Database["public"]["Enums"]["haul_kind"]
           id: string
           invoice_ref: string | null
@@ -4329,6 +4356,10 @@ export type Database = {
           shipper_name: string
         }[]
       }
+      group_take_order: {
+        Args: { p_order_id: string; p_vehicle_id: string }
+        Returns: Database["public"]["Tables"]["orders"]["Row"]
+      }
       desk_orders: {
         Args: { p_limit?: number; p_region?: string }
         Returns: {
@@ -4354,6 +4385,8 @@ export type Database = {
           taken_by_me: boolean
           trailer: string
           trailer_plate: string
+          group_until: string | null
+          group_vehicle_ids: string[] | null
         }[]
       }
       desk_regions: {
@@ -4384,6 +4417,9 @@ export type Database = {
           distance_auto_km: number | null
           distance_km: number | null
           distance_source: Database["public"]["Enums"]["distance_source"]
+          group_released_at: string | null
+          group_until: string | null
+          group_vehicle_ids: string[] | null
           haul_kind: Database["public"]["Enums"]["haul_kind"]
           id: string
           invoice_ref: string | null
@@ -5066,6 +5102,9 @@ export type Database = {
           distance_auto_km: number | null
           distance_km: number | null
           distance_source: Database["public"]["Enums"]["distance_source"]
+          group_released_at: string | null
+          group_until: string | null
+          group_vehicle_ids: string[] | null
           haul_kind: Database["public"]["Enums"]["haul_kind"]
           id: string
           invoice_ref: string | null
@@ -5141,6 +5180,9 @@ export type Database = {
           distance_auto_km: number | null
           distance_km: number | null
           distance_source: Database["public"]["Enums"]["distance_source"]
+          group_released_at: string | null
+          group_until: string | null
+          group_vehicle_ids: string[] | null
           haul_kind: Database["public"]["Enums"]["haul_kind"]
           id: string
           invoice_ref: string | null
@@ -5319,6 +5361,9 @@ export type Database = {
           distance_auto_km: number | null
           distance_km: number | null
           distance_source: Database["public"]["Enums"]["distance_source"]
+          group_released_at: string | null
+          group_until: string | null
+          group_vehicle_ids: string[] | null
           haul_kind: Database["public"]["Enums"]["haul_kind"]
           id: string
           invoice_ref: string | null
@@ -5440,6 +5485,9 @@ export type Database = {
           distance_auto_km: number | null
           distance_km: number | null
           distance_source: Database["public"]["Enums"]["distance_source"]
+          group_released_at: string | null
+          group_until: string | null
+          group_vehicle_ids: string[] | null
           haul_kind: Database["public"]["Enums"]["haul_kind"]
           id: string
           invoice_ref: string | null
@@ -5638,6 +5686,9 @@ export type Database = {
           distance_auto_km: number | null
           distance_km: number | null
           distance_source: Database["public"]["Enums"]["distance_source"]
+          group_released_at: string | null
+          group_until: string | null
+          group_vehicle_ids: string[] | null
           haul_kind: Database["public"]["Enums"]["haul_kind"]
           id: string
           invoice_ref: string | null

@@ -8,11 +8,48 @@ import { formatWaitMinutes, type SiteWaiting } from '@/lib/orders/waiting';
 import { HaulBadge } from '@/components/domain/HaulBadge';
 import { Badge, Button, Card, CardBody, CardDivider, EmptyState, Mono, Plate, Select } from '@/components/ui';
 import { MATCHING } from '@/lib/config';
-import { takeOrderAction, type MatchingState } from '@/lib/orders/matching';
+import { groupTakeAction, takeOrderAction, type MatchingState } from '@/lib/orders/matching';
 import { useI18n } from '@/lib/i18n/provider';
 import type { DeskOrder, DeskStop, Vehicle } from '@/types/db';
 
 const initialTake: MatchingState = { error: null };
+
+/**
+ * «Беру» для заказа, предложенного группе машин заказчика: первый
+ * получает, сразу подтверждено. Машины — только свои из группы.
+ */
+function GroupTakeButton({ orderId, vehicles }: { orderId: string; vehicles: Vehicle[] }) {
+  const { t, locale } = useI18n();
+  const [state, formAction, pending] = useActionState(groupTakeAction, initialTake);
+  const [vehicleId, setVehicleId] = useState(vehicles[0]?.id ?? '');
+
+  return (
+    <form action={formAction} className="flex flex-col items-end gap-2">
+      <input type="hidden" name="locale" value={locale} />
+      <input type="hidden" name="order_id" value={orderId} />
+      {vehicles.length === 1 ? (
+        <input type="hidden" name="vehicle_id" value={vehicles[0]!.id} />
+      ) : (
+        <Select
+          name="vehicle_id"
+          value={vehicleId}
+          onChange={(e) => setVehicleId(e.target.value)}
+          aria-label={t.direct.chooseVehicle}
+        >
+          {vehicles.map((v) => (
+            <option key={v.id} value={v.id}>
+              {v.plate}
+            </option>
+          ))}
+        </Select>
+      )}
+      <Button type="submit" variant="primary" disabled={pending || vehicles.length === 0}>
+        {t.direct.groupTake}
+      </Button>
+      {state.error && <p className="max-w-60 text-right text-xs text-danger">{state.error}</p>}
+    </form>
+  );
+}
 
 /** Рейс или отклик, которым машина уже занята в какой-то день. */
 export type DeskBusy = { vehicleId: string; ref: string; date: string; time: string | null };
@@ -216,7 +253,15 @@ export function DeskList({
                 </div>
 
                 <div className="flex flex-col items-end gap-2">
-                  {order.taken_by_me ? (
+                  {order.group_until ? (
+                    <>
+                      <Badge tone="info">{m('direct.groupBadge', { time: f.time(order.group_until) })}</Badge>
+                      <GroupTakeButton
+                        orderId={order.id}
+                        vehicles={vehicles.filter((v) => (order.group_vehicle_ids ?? []).includes(v.id))}
+                      />
+                    </>
+                  ) : order.taken_by_me ? (
                     <>
                       <Badge tone="warn">{t.matching.taken}</Badge>
                       <span className="text-xs text-ink-faint">{t.matching.waitingChoice}</span>

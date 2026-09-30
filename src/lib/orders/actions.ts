@@ -254,6 +254,7 @@ function explainPublish(t: Dictionary, code: string | undefined, message: string
   if (code === '55004') return t.direct.unavailable;
   if (code === '55001' || code === '55002' || code === '55003') return t.direct.notFit;
   if (code === '55000') return t.orderForm.needActive;
+  if (code === '22023' && message?.includes('групп')) return t.direct.groupPickTwo;
   return t.orderForm.failed;
 }
 
@@ -287,6 +288,12 @@ export async function publishOrderAction(
   const stops = collectStops(formData);
 
   const direct = str(formData, 'dispatch') === 'DIRECT';
+  /* Группа своих машин: первые минуты заказ видят и берут только они. */
+  const group = str(formData, 'dispatch') === 'GROUP';
+  const groupVehicles = group ? formData.getAll('group_vehicle_ids').map(String).filter(Boolean) : [];
+  if (group && groupVehicles.length < 2) {
+    return { error: t.direct.groupPickTwo, ref: null };
+  }
   const directVehicle = str(formData, 'direct_vehicle_id');
   if (direct && !directVehicle) {
     return { error: t.direct.chooseVehicle, ref: null };
@@ -352,6 +359,7 @@ export async function publishOrderAction(
        * не должно увести заказ мимо стола.
        */
       direct_vehicle_id: direct ? directVehicle : '',
+      ...(group ? { group_vehicle_ids: groupVehicles, group_minutes: str(formData, 'group_minutes') } : {}),
     },
     p_stops: stops,
     p_publish: true,

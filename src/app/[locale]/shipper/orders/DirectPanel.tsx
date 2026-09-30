@@ -59,21 +59,24 @@ export function DispatchPicker({
 }) {
   const { t } = useI18n();
   const fitting = fittingVehicles(vehicles, haulKind);
-  const [mode, setMode] = useState<'DESK' | 'DIRECT'>('DESK');
+  const [mode, setMode] = useState<'DESK' | 'DIRECT' | 'GROUP'>('DESK');
   const [vehicleId, setVehicleId] = useState('');
 
   const chosen = fitting.find((v) => v.vehicle_id === vehicleId) ?? null;
   const direct = mode === 'DIRECT' && fitting.length > 0;
+  const group = mode === 'GROUP' && fitting.length > 1;
+  const effective = direct ? 'DIRECT' : group ? 'GROUP' : 'DESK';
 
   return (
     <fieldset className="flex flex-col gap-3">
       <legend className="label-micro mb-1">{t.direct.dispatch}</legend>
-      <input type="hidden" name="dispatch" value={direct ? 'DIRECT' : 'DESK'} />
+      <input type="hidden" name="dispatch" value={effective} />
 
-      <div className="grid gap-2 sm:grid-cols-2">
-        {(['DESK', 'DIRECT'] as const).map((value) => {
-          const disabled = value === 'DIRECT' && fitting.length === 0;
-          const on = (value === 'DIRECT') === direct;
+      <div className="grid gap-2 sm:grid-cols-3">
+        {(['DESK', 'DIRECT', 'GROUP'] as const).map((value) => {
+          const disabled =
+            (value === 'DIRECT' && fitting.length === 0) || (value === 'GROUP' && fitting.length < 2);
+          const on = value === effective;
           return (
             <label
               key={value}
@@ -96,14 +99,18 @@ export function DispatchPicker({
                   }}
                   className="accent-[var(--color-accent)]"
                 />
-                {value === 'DESK' ? t.direct.desk : t.direct.direct}
+                {value === 'DESK' ? t.direct.desk : value === 'DIRECT' ? t.direct.direct : t.direct.group}
               </span>
               <span className="text-xs text-ink-muted">
                 {value === 'DESK'
                   ? t.direct.deskHint
                   : disabled
-                    ? t.direct.noKnown
-                    : t.direct.directHint}
+                    ? value === 'GROUP'
+                      ? t.direct.groupNeedsTwo
+                      : t.direct.noKnown
+                    : value === 'DIRECT'
+                      ? t.direct.directHint
+                      : t.direct.groupHint}
               </span>
             </label>
           );
@@ -128,6 +135,38 @@ export function DispatchPicker({
       )}
 
       {direct && chosen?.busy && <p className="text-xs text-warn">{t.direct.busyWarn}</p>}
+
+      {group && (
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-1.5">
+            <span className="label-micro">{t.direct.groupVehicles}</span>
+            {fitting.map((v) => (
+              <label key={v.vehicle_id} className="flex min-h-9 items-center gap-2 text-[13px]">
+                <input
+                  type="checkbox"
+                  name="group_vehicle_ids"
+                  value={v.vehicle_id}
+                  defaultChecked
+                  className="size-4 accent-[var(--color-accent)]"
+                />
+                <span className="font-mono">{v.plate}</span>
+                {v.busy && <span className="text-xs text-warn">{t.direct.groupBusy}</span>}
+              </label>
+            ))}
+          </div>
+          <Field label={t.direct.groupWindow}>
+            {(p) => (
+              <Select {...p} name="group_minutes" defaultValue="30">
+                {[15, 30, 60, 120].map((min) => (
+                  <option key={min} value={min}>
+                    {min} min
+                  </option>
+                ))}
+              </Select>
+            )}
+          </Field>
+        </div>
+      )}
     </fieldset>
   );
 }

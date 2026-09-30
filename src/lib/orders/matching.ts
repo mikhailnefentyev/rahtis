@@ -45,6 +45,8 @@ async function explain(locale: Locale, code: string | undefined, message: string
    * а не в занятом заказе, и выбрать другую.
    */
   if (code === '55003') return t.matching.wrongClass;
+  /* 55005 — окно группы машин заказчика ещё открыто (take_order). */
+  if (code === '55005') return t.direct.groupOnly;
   if (code === '55000' && message?.includes('Мест нет')) return t.matching.noSlotsLeft;
   if (code === '55000') return t.matching.tooLate;
 
@@ -65,6 +67,32 @@ export async function takeOrderAction(
 
   const supabase = await createClient();
   const { error } = await supabase.rpc('take_order', {
+    p_order_id: String(formData.get('order_id') ?? ''),
+    p_vehicle_id: String(formData.get('vehicle_id') ?? ''),
+  });
+
+  revalidateOrder(locale);
+
+  return { error: error ? await explain(locale, error.code, error.message) : null };
+}
+
+/**
+ * Перевозчик берёт заказ, предложенный группе машин заказчика: первый
+ * получает, сразу подтверждено (group_take_order).
+ */
+export async function groupTakeAction(
+  _previous: MatchingState,
+  formData: FormData,
+): Promise<MatchingState> {
+  const locale = toLocale(formData.get('locale'));
+
+  const viewer = await getViewer();
+  if (viewer.status !== 'ready' || viewer.role !== 'CARRIER') {
+    return { error: (await getDictionary(locale)).error.forbidden };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc('group_take_order', {
     p_order_id: String(formData.get('order_id') ?? ''),
     p_vehicle_id: String(formData.get('vehicle_id') ?? ''),
   });

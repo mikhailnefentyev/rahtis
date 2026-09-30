@@ -169,6 +169,16 @@ export function OrderCard({
                 * отдать знакомой машине. С откликами — нет: люди уже ждут
                 * решения, и увести заказ у них из-под руки нечестно.
                 */}
+              {/* Предложен группе своих машин — видят только они, до времени окна. */}
+              {order.status === 'OPEN' && order.group_until && !order.group_released_at && (
+                <p className="mt-3 rounded-control border border-accent-line bg-accent-wash px-3 py-2.5 text-[13px]">
+                  {m('direct.groupWaiting', {
+                    count: order.group_vehicle_ids?.length ?? 0,
+                    time: f.time(order.group_until),
+                  })}
+                </p>
+              )}
+
               {order.status === 'OPEN' && (
                 <SendDirect orderId={order.id} vehicles={knownVehicles} haulKind={order.haul_kind} />
               )}
