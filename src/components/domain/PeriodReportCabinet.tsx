@@ -16,6 +16,7 @@ import {
   buttonClass,
   claimStatusTone,
 } from '@/components/ui';
+import { SiteWaitingTable } from '@/components/domain/SiteWaitingTable';
 import { requireRole } from '@/lib/auth/guard';
 import { cabinetPath } from '@/lib/auth/paths';
 import { getI18n, type Locale } from '@/lib/i18n';
@@ -320,6 +321,9 @@ export async function PeriodReportCabinet({
           </section>
         </>
       )}
+
+      {/* Площадки заказчика: где его машины стоят дольше всего. */}
+      {role === 'SHIPPER' && <SiteWaitingTable locale={locale} />}
     </main>
   );
 }

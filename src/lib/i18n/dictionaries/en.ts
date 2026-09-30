@@ -1008,6 +1008,7 @@ export const en = {
   },
 
   desk: {
+    typicalWait: 'Typical waiting:',
     title: 'Load board',
     subtitle: 'Open orders in the areas where your trucks are.',
     allRegions: 'All areas',
@@ -1606,6 +1607,17 @@ export const en = {
     IN_REVIEW: 'In review',
     RESOLVED: 'Resolved',
     REJECTED: 'Rejected',
+  },
+
+  siteWaiting: {
+    title: 'Waiting times at your sites',
+    text: 'How long vehicles usually wait at your loading and unloading sites: from arrival, but not before the agreed time, until the stop is confirmed. The figures are calculated from all jobs in the service at the site over the last 12 months; a site is shown once it has at least three jobs.',
+    caption: 'Longest waits first',
+    colPlace: 'Site',
+    colMedian: 'Typical waiting',
+    colOverHour: 'Over an hour',
+    colTrips: 'Yours / all jobs',
+    empty: 'There are not enough jobs at your sites yet.',
   },
 
   periodReport: {

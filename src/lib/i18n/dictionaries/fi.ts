@@ -1095,6 +1095,7 @@ export const fi = {
   },
 
   desk: {
+    typicalWait: 'Tavallinen odotus:',
     title: 'Avoimet kuljetukset',
     subtitle: 'Avoimet kuljetukset alueilta, joilla ajoneuvosi ovat.',
     allRegions: 'Kaikki alueet',
@@ -1715,6 +1716,17 @@ export const fi = {
    * Raportti vapaavalintaiselta ajanjaksolta. Kirjanpito kysyy eri
    * kysymyksen kuin viikkoraportti: "mitä tapahtui 1.7.–30.9.".
    */
+  siteWaiting: {
+    title: 'Paikkojen odotusajat',
+    text: 'Kuinka kauan autot tavallisesti odottavat lastaus- ja purkupaikoillanne: saapumisesta, mutta aikaisintaan sovitusta ajasta, siihen kun piste on kuitattu. Luvut lasketaan kaikista palvelun keikoista paikalla viimeisen 12 kuukauden ajalta; paikka näkyy, kun keikkoja on vähintään kolme.',
+    caption: 'Pisimmät odotukset ensin',
+    colPlace: 'Paikka',
+    colMedian: 'Tavallinen odotus',
+    colOverHour: 'Yli tunnin',
+    colTrips: 'Teidän / kaikki keikat',
+    empty: 'Paikoista ei ole vielä tarpeeksi keikkoja.',
+  },
+
   periodReport: {
     title: 'Raportit',
     subtitle:

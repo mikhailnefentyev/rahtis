@@ -4260,6 +4260,27 @@ export type Database = {
         Returns: string
       }
       delete_order: { Args: { p_order_id: string }; Returns: string }
+      shipper_sites_waiting: {
+        Args: never
+        Returns: {
+          address: string
+          city: string
+          median_minutes: number
+          my_stops: number
+          over_hour_pct: number
+          place_name: string
+          samples: number
+        }[]
+      }
+      stop_waiting_typical: {
+        Args: { p_stop_ids: string[] }
+        Returns: {
+          median_minutes: number
+          over_hour_pct: number
+          samples: number
+          stop_id: string
+        }[]
+      }
       desk_orders: {
         Args: { p_limit?: number; p_region?: string }
         Returns: {

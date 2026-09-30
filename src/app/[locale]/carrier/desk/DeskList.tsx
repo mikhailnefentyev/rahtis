@@ -4,6 +4,7 @@ import { useActionState, useState } from 'react';
 import { OrderRouteMap } from '@/components/domain/RouteMap';
 import { RouteStops } from '@/components/domain/RouteStops';
 import { routeLabel } from '@/lib/orders/route';
+import { formatWaitMinutes, type SiteWaiting } from '@/lib/orders/waiting';
 import { HaulBadge } from '@/components/domain/HaulBadge';
 import { Badge, Button, Card, CardBody, CardDivider, EmptyState, Mono, Plate, Select } from '@/components/ui';
 import { MATCHING } from '@/lib/config';
@@ -109,10 +110,13 @@ export function DeskList({
   orders,
   vehicles,
   busy = [],
+  waiting = {},
 }: {
   orders: DeskOrder[];
   vehicles: Vehicle[];
   busy?: DeskBusy[];
+  /** Простой на площадках по id точки — где набралась статистика. */
+  waiting?: Record<string, SiteWaiting>;
 }) {
   const { t, m, f } = useI18n();
   const [expanded, setExpanded] = useState<string | null>(null);
@@ -133,6 +137,9 @@ export function DeskList({
          */
         const cargoKg = stops.reduce((max, stop) => Math.max(max, stop.cargo_weight_kg ?? 0), 0);
         const open = expanded === order.id;
+        const waits = stops
+          .map((stop) => ({ stop, w: waiting[stop.id] }))
+          .filter((x): x is { stop: DeskStop; w: SiteWaiting } => Boolean(x.w));
 
         return (
           <Card key={order.id} stripe="info">
@@ -188,6 +195,22 @@ export function DeskList({
                     <p className="mt-1 font-mono text-xs text-ink-faint">
                       {f.date(`${order.pickup_date}T12:00:00Z`)}
                       {order.pickup_time ? ` ${order.pickup_time.slice(0, 5)}` : ''}
+                    </p>
+                  )}
+
+                  {/* Сколько обычно стоят на этих площадках — до отклика, а не в счёте. */}
+                  {waits.length > 0 && (
+                    <p className="mt-1 text-xs text-ink-muted">
+                      {t.desk.typicalWait}{' '}
+                      {waits.map(({ stop, w }, i) => (
+                        <span key={stop.id}>
+                          {i > 0 ? ' · ' : ''}
+                          {stop.city}{' '}
+                          <span className={w.medianMinutes > 60 ? 'font-semibold text-warn' : 'font-semibold text-ink'}>
+                            {formatWaitMinutes(w.medianMinutes)}
+                          </span>
+                        </span>
+                      ))}
                     </p>
                   )}
                 </div>

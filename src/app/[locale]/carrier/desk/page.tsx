@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { Card, CardBody, buttonClass } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
 import { getI18n, isLocale } from '@/lib/i18n';
+import type { SiteWaiting } from '@/lib/orders/waiting';
 import { createClient } from '@/lib/supabase/server';
 import type { OrderAmendment, TripDocument } from '@/types/db';
 import { Assignments } from './Assignments';
@@ -72,6 +73,23 @@ export default async function DeskPage({
    * длительность погрузок никто не знает, а «в тот же день» — честная
    * граница для «проверь, успеешь ли».
    */
+  /*
+   * Простой на площадках точек стола — одним запросом. Цифра есть только
+   * там, где по площадке набралось три рейса (stop_waiting_typical).
+   */
+  const deskStopIds = (orders ?? []).flatMap((o) =>
+    ((o.stops ?? []) as unknown as { id: string }[]).map((s) => s.id),
+  );
+  const { data: waitingRows } = deskStopIds.length
+    ? await supabase.rpc('stop_waiting_typical', { p_stop_ids: deskStopIds })
+    : { data: [] };
+  const waiting: Record<string, SiteWaiting> = Object.fromEntries(
+    (waitingRows ?? []).map((w) => [
+      w.stop_id,
+      { samples: w.samples, medianMinutes: w.median_minutes, overHourPct: w.over_hour_pct },
+    ]),
+  );
+
   const { data: myOffers } = await supabase
     .from('order_offers')
     .select('order_id, vehicle_id')
@@ -195,7 +213,7 @@ export default async function DeskPage({
             {m('desk.ordersCount', { count: (orders ?? []).length })}
           </p>
 
-          <DeskList orders={orders ?? []} vehicles={vehicles ?? []} busy={busy} />
+          <DeskList orders={orders ?? []} vehicles={vehicles ?? []} busy={busy} waiting={waiting} />
         </>
       )}
     </main>
