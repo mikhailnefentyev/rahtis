@@ -2784,6 +2784,17 @@ export const en = {
     km: 'km',
   },
 
+  scorecard: {
+    title: 'Carrier scorecard · 12 months',
+    trips: 'Jobs',
+    onTime: 'On time',
+    docs: 'Consignment note uploaded',
+    abandoned: 'Jobs given up',
+    claims: 'Claims',
+    directAccept: 'Direct orders accepted',
+    note: 'Calculated automatically from completed jobs. On time = arrival no later than 15 min after the agreed time. A percentage is shown once there are at least five observations. In offers the shipper sees the number of jobs and the on-time share, without the company name.',
+  },
+
   rating: {
     title: 'Rating',
     none: 'no ratings',
@@ -2986,6 +2997,10 @@ export const en = {
     'event.order.direct': 'Direct order {ref} for {plate} — {shipper}',
     'event.direct.accepted': '{plate} confirmed transport {ref}',
     'event.direct.released': '{plate} did not take transport {ref} — it is now on the load board',
+    'scorecard.onTimeHint': '{count, plural, =0 {no scheduled stops} one {# stop} other {# stops}}',
+    'scorecard.directHint': '{count, plural, =0 {none decided} one {# decided} other {# decided}}',
+    'scorecard.offerTrips': '{count, plural, one {# job} other {# jobs}} in 12 months',
+    'scorecard.offerOnTime': '{pct} % on time',
     'event.trip.late': 'Transport {ref}: the vehicle is about {minutes} min late for {city}',
     'event.trip.waiting': 'Transport {ref}: the free waiting hour at {city} has ended{charged, select, yes { — a waiting surcharge of {euros} € per started hour starts in 15 minutes} other {}}',
     'event.invite.approved': 'Your invited customer {shipper} has been approved. It can now send direct orders to your vehicles.',

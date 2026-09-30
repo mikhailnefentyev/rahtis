@@ -135,6 +135,9 @@ export type ShipperOffer = Omit<
   /* Появляются только у назначенной машины — до выбора это опознавательный признак. */
   plate: string | null;
   driver_name: string | null;
+  /* Карточка перевозчика без имени (offer_scorecards): рейсы и приезд вовремя за 12 месяцев. */
+  trips?: number;
+  on_time_pct?: number | null;
 };
 
 /**

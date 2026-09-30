@@ -118,9 +118,18 @@ export default async function OrdersPage({ params }: { params: Promise<{ locale:
     (stopsByOrder[stop.order_id] ??= []).push(stop);
   }
 
+  /* К откликам — карточка перевозчика без имени: рейсы и приезд вовремя. */
+  const { data: scores } = (offers ?? []).length
+    ? await supabase.rpc('offer_scorecards', { p_order_ids: withCarrierIds })
+    : { data: [] };
+  const scoreByOffer = new Map((scores ?? []).map((s) => [s.offer_id, s]));
+
   const offersByOrder: Record<string, ShipperOffer[]> = {};
   for (const offer of (offers ?? []) as ShipperOffer[]) {
-    (offersByOrder[offer.order_id] ??= []).push(offer);
+    const score = scoreByOffer.get(offer.offer_id);
+    (offersByOrder[offer.order_id] ??= []).push(
+      score ? { ...offer, trips: score.trips, on_time_pct: score.on_time_pct } : offer,
+    );
   }
 
   /*

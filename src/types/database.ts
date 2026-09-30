@@ -4281,6 +4281,29 @@ export type Database = {
           stop_id: string
         }[]
       }
+      carrier_scorecard: {
+        Args: { p_company_id?: string }
+        Returns: {
+          abandoned: number
+          claims: number
+          direct_accept_pct: number | null
+          direct_decided: number
+          docs_pct: number | null
+          on_time_pct: number | null
+          rating: number | null
+          ratings_count: number
+          timed_stops: number
+          trips: number
+        }[]
+      }
+      offer_scorecards: {
+        Args: { p_order_ids: string[] }
+        Returns: {
+          offer_id: string
+          on_time_pct: number | null
+          trips: number
+        }[]
+      }
       desk_orders: {
         Args: { p_limit?: number; p_region?: string }
         Returns: {

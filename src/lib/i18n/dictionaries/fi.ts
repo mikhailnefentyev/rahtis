@@ -2903,6 +2903,17 @@ export const fi = {
     km: 'km',
   },
 
+  scorecard: {
+    title: 'Kuljetusliikkeen tunnusluvut · 12 kk',
+    trips: 'Keikat',
+    onTime: 'Ajallaan',
+    docs: 'Rahtikirja ladattu',
+    abandoned: 'Luovutetut keikat',
+    claims: 'Reklamaatiot',
+    directAccept: 'Suorat tilaukset hyväksytty',
+    note: 'Luvut lasketaan automaattisesti valmiista keikoista. Ajallaan = saapuminen enintään 15 min sovitun ajan jälkeen. Prosentti näytetään, kun havaintoja on vähintään viisi. Tilaaja näkee tarjouksissa keikkojen määrän ja ajallaan-osuuden ilman yrityksen nimeä.',
+  },
+
   rating: {
     title: 'Arvosana',
     none: 'ei arvioita',
@@ -3126,6 +3137,10 @@ export const fi = {
     'event.order.direct': 'Suora tilaus {ref} autolle {plate} — {shipper}',
     'event.direct.accepted': 'Auto {plate} vahvisti kuljetuksen {ref}',
     'event.direct.released': 'Auto {plate} ei ottanut kuljetusta {ref} — se on nyt yhteisellä pöydällä',
+    'scorecard.onTimeHint': '{count, plural, =0 {ei aikataulutettuja pisteitä} one {# piste} other {# pistettä}}',
+    'scorecard.directHint': '{count, plural, =0 {ei päätettyjä} one {# päätetty} other {# päätettyä}}',
+    'scorecard.offerTrips': '{count, plural, one {# keikka} other {# keikkaa}} 12 kk',
+    'scorecard.offerOnTime': '{pct} % ajallaan',
     'event.trip.late': 'Kuljetus {ref}: auto on myöhässä pisteestä {city} noin {minutes} min',
     'event.trip.waiting': 'Kuljetus {ref}: maksuton odotustunti pisteessä {city} päättyi{charged, select, yes { — odotuslisä {euros} € alkavalta tunnilta 15 minuutin kuluttua} other {}}',
     'event.invite.approved': 'Kutsumanne asiakas {shipper} on hyväksytty. Se voi nyt lähettää suoria tilauksia autoillenne.',

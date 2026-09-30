@@ -5,6 +5,7 @@ import { requireRole } from '@/lib/auth/guard';
 import { cabinetPath } from '@/lib/auth/paths';
 import { COMPLETED_WEEKS, vatBpsFor } from '@/lib/config';
 import { weeksAgoMonday } from '@/lib/dates';
+import { CarrierScorecard } from '@/components/domain/CarrierScorecard';
 import { getI18n, type Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 
@@ -89,6 +90,8 @@ export async function CompletedCabinet({
       <p className="mt-2 mb-6 max-w-xl text-[13px] leading-relaxed text-ink-muted">
         {subtitle} {vatNote}
       </p>
+
+      {role === 'CARRIER' && <CarrierScorecard locale={locale} />}
 
       <CompletedList orders={orders ?? []} totals={totals ?? []} canClaim />
 

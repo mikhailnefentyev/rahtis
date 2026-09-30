@@ -32,6 +32,13 @@ function VehicleLine({ offer, badge }: { offer: ShipperOffer; badge?: React.Reac
         {badge}
       </div>
 
+      {offer.trips ? (
+        <p className="mt-1 text-xs text-ink-muted">
+          {m('scorecard.offerTrips', { count: offer.trips })}
+          {offer.on_time_pct != null && <>{' · '}{m('scorecard.offerOnTime', { pct: offer.on_time_pct })}</>}
+        </p>
+      ) : null}
+
       <p className="mt-1 text-xs text-ink-muted">
         {offer.make} · {m('vehicle.axlesCount', { count: offer.axles })} ·{' '}
         {EURO_LABEL[offer.euro_class]}

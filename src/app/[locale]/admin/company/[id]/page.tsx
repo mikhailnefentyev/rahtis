@@ -15,6 +15,7 @@ import { requireRole } from '@/lib/auth/guard';
 import { setCompanyTestAction, setPartnershipAction } from '@/lib/companies/actions';
 import { daysUntil } from '@/lib/dates';
 import { getI18n, isLocale } from '@/lib/i18n';
+import { CarrierScorecard } from '@/components/domain/CarrierScorecard';
 import { createClient } from '@/lib/supabase/server';
 import type { CompanyDocument, DocumentKind } from '@/types/db';
 import { AdminDocument } from './AdminDocument';
@@ -187,6 +188,12 @@ export default async function AdminCompanyPage({
           </div>
         )}
       </header>
+
+      {carrier && (
+        <div className="mt-6">
+          <CarrierScorecard locale={locale} companyId={id} />
+        </div>
+      )}
 
       {/*
         * Заказы числом, а не списком: здесь решают, можно ли компанию
