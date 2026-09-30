@@ -75,3 +75,29 @@ test('закрытая запись «Rekisteröimätön» не отменяет
   const r = evaluate('Aivomaa Oy', [aivomaa()]);
   assert.equal(r.tradeRegister, true);
 });
+
+test('адрес из реестра для автозаполнения активации', async () => {
+  const { addressOf } = await import('./prh.ts');
+  const office = (city, lang) => ({ city, languageCode: lang });
+  const company = {
+    addresses: [
+      { type: 1, street: 'Satamatie', buildingNumber: '1', postCode: '10900', postOffices: [office('HANKO', '1')] },
+      {
+        type: 2,
+        street: 'Kankarepolku',
+        buildingNumber: '5',
+        entrance: 'B',
+        apartmentNumber: '335',
+        postCode: '00770',
+        postOffices: [office('HELSINGFORS', '2'), office('HELSINKI', '1')],
+      },
+    ],
+  };
+  assert.deepEqual(addressOf([company]), { street: 'Kankarepolku 5 B 335', postalCode: '00770', city: 'Helsinki' });
+  // без почтового — адрес посещения; регистр города по-фински
+  assert.deepEqual(addressOf([{ addresses: [company.addresses[0]] }]), { street: 'Satamatie 1', postalCode: '10900', city: 'Hanko' });
+  assert.equal(addressOf([{ addresses: [{ type: 2, street: 'X', postCode: '1', endDate: '2020-01-01' }] }]), null);
+  assert.equal(addressOf([]), null);
+  assert.equal(addressOf([{ addresses: [{ type: 2, postOfficeBox: '12', postCode: '00100' }] }]), null);
+  assert.equal(addressOf([{ addresses: [{ type: 2, street: 'Asema-aukio', buildingNumber: '2', postCode: '04400', postOffices: [office('JÄRVENPÄÄ', '1')] }] }]).city, 'Järvenpää');
+});

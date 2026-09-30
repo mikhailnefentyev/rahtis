@@ -146,6 +146,7 @@ function cabinetTabs(locale: Locale, role: PartyRole, home: string, t: Dictionar
 
   return [
     overview,
+    { href: `/${locale}/admin/onboarding`, label: t.onboardingAdmin.nav },
     { href: `/${locale}/admin/billing`, label: t.done.titleAdmin },
     { href: `/${locale}/admin/claims`, label: t.claims.title },
     { href: `/${locale}/admin/reports`, label: t.periodReport.title },

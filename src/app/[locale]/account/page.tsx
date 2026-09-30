@@ -8,6 +8,7 @@ import { companyStatusTone } from '@/components/ui/tone';
 import { noAccessPath, signInPath } from '@/lib/auth/paths';
 import { getViewer } from '@/lib/auth/viewer';
 import { getI18n, isLocale } from '@/lib/i18n';
+import { lookupAddress } from '@/lib/registry/prh';
 import { RequisitesForm } from '../requisites/form';
 import { ChangePasswordForm } from './form';
 
@@ -50,6 +51,12 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
   /* Отклонённой компании тут править нечего — реквизиты ей не помогут. */
   const company =
     viewer.status === 'ready' && viewer.company?.status !== 'REJECTED' ? viewer.company : null;
+
+  /* Своего адреса ещё нет — подставляем из реестра PRH (финская компания). */
+  const prefill =
+    company && !company.legal_street && company.business_id && (company.country ?? 'FI') === 'FI'
+      ? await lookupAddress(company.business_id)
+      : null;
 
   return (
     <>
@@ -102,7 +109,7 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
                     : t.requisites.subtitleShipper}
               </p>
 
-              <RequisitesForm company={company} />
+              <RequisitesForm company={company} prefill={prefill} />
             </section>
           )}
 

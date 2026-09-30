@@ -25,7 +25,18 @@ import type { Company } from '@/types/db';
 
 const initial: RequisitesState = { error: null, done: false };
 
-export function RequisitesForm({ company }: { company: Company }) {
+export function RequisitesForm({
+  company,
+  prefill,
+}: {
+  company: Company;
+  /*
+   * Адрес из реестра PRH, когда своего ещё нет. Длинная пустая форма —
+   * место, где одобренные перевозчики останавливались: из девяти ни один
+   * не дошёл дальше неё (29.09.2026). Остаются IBAN и согласие.
+   */
+  prefill?: { street: string; postalCode: string; city: string } | null;
+}) {
   const { t, locale } = useI18n();
   const [state, formAction, pending] = useActionState(saveRequisitesAction, initial);
 
@@ -93,7 +104,7 @@ export function RequisitesForm({ company }: { company: Company }) {
                   {...p}
                   name="legal_street"
                   required
-                  defaultValue={company.legal_street ?? ''}
+                  defaultValue={company.legal_street ?? prefill?.street ?? ''}
                   placeholder="Satamakatu 1"
                 />
               )}
@@ -105,7 +116,7 @@ export function RequisitesForm({ company }: { company: Company }) {
                   {...p}
                   name="legal_postal_code"
                   required
-                  defaultValue={company.legal_postal_code ?? ''}
+                  defaultValue={company.legal_postal_code ?? prefill?.postalCode ?? ''}
                   placeholder="10900"
                 />
               )}
@@ -117,7 +128,7 @@ export function RequisitesForm({ company }: { company: Company }) {
                   {...p}
                   name="legal_city"
                   required
-                  defaultValue={company.legal_city ?? ''}
+                  defaultValue={company.legal_city ?? prefill?.city ?? ''}
                   placeholder="Hanko"
                 />
               )}
@@ -193,7 +204,7 @@ export function RequisitesForm({ company }: { company: Company }) {
                       name="billing_email"
                       type="email"
                       required
-                      defaultValue={company.billing_email ?? ''}
+                      defaultValue={company.billing_email ?? company.contact_email ?? ''}
                       placeholder="laskutus@company.fi"
                     />
                   )}

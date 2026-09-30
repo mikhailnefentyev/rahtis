@@ -46,6 +46,50 @@ export type RegistryCheck = {
 
 const API = 'https://avoindata.prh.fi/opendata-ytj-api/v3/companies';
 
+/** Адрес из реестра для автозаполнения активации. */
+export type RegistryAddress = { street: string; postalCode: string; city: string };
+
+type Address = {
+  type?: number;
+  street?: string;
+  buildingNumber?: string;
+  entrance?: string;
+  apartmentNumber?: string;
+  apartmentIdSuffix?: string;
+  postOfficeBox?: string;
+  postCode?: string;
+  postOffices?: Array<{ city?: string; languageCode?: string }>;
+  endDate?: string | null;
+};
+
+/* «HELSINKI» → «Helsinki», «JÄRVENPÄÄ» → «Järvenpää», «ETELÄ-POHJANMAA» → «Etelä-Pohjanmaa». */
+function titleCase(value: string): string {
+  return value.toLocaleLowerCase('fi').replace(/(^|[\s-])(\p{L})/gu, (_, sep: string, ch: string) => sep + ch.toLocaleUpperCase('fi'));
+}
+
+/**
+ * Адрес компании из ответа PRH. Сначала действующий почтовый (тип 2) —
+ * по нему приходят счета, — иначе адрес посещения (тип 1). Город —
+ * по-фински. Абонентский ящик без улицы не годится для юридического адреса.
+ */
+export function addressOf(companies: unknown[]): RegistryAddress | null {
+  const company = companies[0] as { addresses?: Address[] } | undefined;
+  const live = (company?.addresses ?? []).filter((a) => !a.endDate && a.street && a.postCode);
+  const picked = live.find((a) => a.type === 2) ?? live.find((a) => a.type === 1);
+  if (!picked) return null;
+
+  const house = [picked.buildingNumber, picked.entrance, [picked.apartmentNumber, picked.apartmentIdSuffix].filter(Boolean).join('')]
+    .filter(Boolean)
+    .join(' ');
+  const city = picked.postOffices?.find((p) => p.languageCode === '1')?.city ?? picked.postOffices?.[0]?.city ?? '';
+
+  return {
+    street: [picked.street, house].filter(Boolean).join(' '),
+    postalCode: picked.postCode ?? '',
+    city: city ? titleCase(city) : '',
+  };
+}
+
 /* Коды реестров PRH (описание REK). */
 const REGISTER = { trade: '1', prepayment: '5', vat: '6', employer: '7' } as const;
 
@@ -168,6 +212,24 @@ export function evaluate(appliedName: string, companies: unknown[], now = new Da
     employer,
     issues,
   };
+}
+
+/**
+ * Адрес из PRH для формы активации. Никогда не бросает: реестр недоступен
+ * или компании нет в открытых данных — форма просто остаётся пустой.
+ */
+export async function lookupAddress(businessId: string): Promise<RegistryAddress | null> {
+  try {
+    const response = await fetch(`${API}?businessId=${encodeURIComponent(businessId)}`, {
+      signal: AbortSignal.timeout(4000),
+      headers: { accept: 'application/json' },
+    });
+    if (!response.ok) return null;
+    const data = (await response.json()) as { companies?: unknown[] };
+    return addressOf(data.companies ?? []);
+  } catch {
+    return null;
+  }
 }
 
 /**

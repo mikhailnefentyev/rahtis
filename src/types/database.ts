@@ -1812,6 +1812,12 @@ export type Database = {
           },
         ]
       }
+      onboarding_reminders: {
+        Row: { company_id: string; day: number; sent_at: string; stage: string }
+        Insert: { company_id: string; day: number; sent_at?: string; stage: string }
+        Update: { company_id?: string; day?: number; sent_at?: string; stage?: string }
+        Relationships: []
+      }
       operator_profile: {
         Row: {
           bank_name: string | null
@@ -4780,6 +4786,26 @@ export type Database = {
           company_name: string
           contact_email: string
           language: string
+        }[]
+      }
+      onboarding_status: {
+        Args: never
+        Returns: {
+          approved_vehicles: number
+          company_id: string
+          contact_email: string
+          days_on_stage: number
+          drivers: number
+          has_documents: boolean
+          kind: string
+          language: string
+          last_sign_in_at: string
+          name: string
+          reminders_sent: number
+          stage: string
+          stage_since: string
+          user_id: string
+          vehicles: number
         }[]
       }
       partner_totals: {

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { AgentChat } from '@/components/domain/AgentChat';
 import { CabinetPulse } from '@/components/domain/CabinetPulse';
 import { CarrierPresence } from '@/components/domain/CarrierPresence';
+import { OnboardingSteps } from '@/components/domain/OnboardingSteps';
 import { ReportArchive } from '@/components/domain/ReportArchive';
 import { Badge, Button, buttonClass, Card, CardBody, Kv, Mono } from '@/components/ui';
 import { companyStatusTone } from '@/components/ui/tone';
@@ -80,7 +81,13 @@ export async function CabinetOverview({
           : null
       : null;
 
-  const aside = needsRequisites || hint !== null;
+  /*
+   * Компании кабинета путь к работе показывает чек-лист (OnboardingSteps);
+   * прежняя карточка «заполните реквизиты» остаётся только там, где
+   * чек-листа нет.
+   */
+  const steps = company && (role === 'CARRIER' || role === 'SHIPPER');
+  const aside = !steps && (needsRequisites || hint !== null);
 
   return (
     <main className="mx-auto w-full max-w-6xl px-5 py-8">
@@ -212,6 +219,8 @@ export async function CabinetOverview({
           </Card>
         )}
       </div>
+
+      {steps && company && <OnboardingSteps locale={locale} company={company} />}
 
       <CabinetPulse locale={locale} role={role} />
 

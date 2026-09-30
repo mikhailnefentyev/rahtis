@@ -47,6 +47,15 @@ type Texts = {
     note: (operator: string) => string;
   };
 
+  /** Напоминания застрявшим на пути к первой работе (2, 5, 10 день на шаге). */
+  onboarding: {
+    subject: Record<'ACTIVATE' | 'SETUP' | 'FIRST_ORDER', (company: string) => string>;
+    heading: Record<'ACTIVATE' | 'SETUP' | 'FIRST_ORDER', string>;
+    body: Record<'ACTIVATE' | 'SETUP' | 'FIRST_ORDER', string>;
+    button: Record<'ACTIVATE' | 'SETUP' | 'FIRST_ORDER', string>;
+    help: (operator: string) => string;
+  };
+
   recovery: {
     heading: string;
     subject: string;
@@ -164,6 +173,33 @@ const fi: Texts = {
     note: (operator) =>
       'Linkki on kertakäyttöinen ja voimassa vuorokauden. ' +
       `Jos se ehtii vanhentua, pyydä uusi osoitteesta ${operator}.`,
+  },
+
+  onboarding: {
+    subject: {
+      ACTIVATE: (company) => `RAHTIS · ${company}: kaksi minuuttia käyttöönottoon`,
+      SETUP: (company) => `RAHTIS · ${company}: lisää auto, niin tarjouspöytä aukeaa`,
+      FIRST_ORDER: (company) => `RAHTIS · ${company}: ensimmäinen kuljetus`,
+    },
+    heading: {
+      ACTIVATE: 'Yrityksenne on hyväksytty — viimeistellään käyttöönotto',
+      SETUP: 'Tarjouspöytä on vielä kiinni',
+      FIRST_ORDER: 'Valmis ensimmäiseen kuljetukseen',
+    },
+    body: {
+      ACTIVATE:
+        'Osoite haetaan valmiiksi kaupparekisteristä, kun se löytyy sieltä. Lisää tilinumero, tarkista tiedot ja hyväksy ehdot — sen jälkeen voitte ladata luvat ja lisätä autot.',
+      SETUP:
+        'Avoimet kuljetukset näkyvät, kun liikennelupa ja vakuutus on ladattu, vähintään yksi auto on hyväksytty ja autolla on kuljettaja. Kabinetin etusivu näyttää, mikä vaihe puuttuu.',
+      FIRST_ORDER:
+        'Julkaise kuljetus tarjouspöydälle tai lähetä se suoraan tutulle autolle. Näette etenemisen, kuvat ja rahtikirjan samassa paikassa.',
+    },
+    button: {
+      ACTIVATE: 'Viimeistele käyttöönotto',
+      SETUP: 'Avaa kabinetti',
+      FIRST_ORDER: 'Uusi tilaus',
+    },
+    help: (operator) => `Jos jokin on epäselvää, vastaa tähän viestiin tai kirjoita osoitteeseen ${operator} — autamme mielellämme.`,
   },
 
   recovery: {
@@ -288,6 +324,33 @@ const en: Texts = {
     note: (operator) =>
       'The link works once and is valid for 24 hours. ' +
       `If it expires, ask for a new one at ${operator}.`,
+  },
+
+  onboarding: {
+    subject: {
+      ACTIVATE: (company) => `RAHTIS · ${company}: two minutes to get started`,
+      SETUP: (company) => `RAHTIS · ${company}: add a vehicle to open the load board`,
+      FIRST_ORDER: (company) => `RAHTIS · ${company}: your first transport`,
+    },
+    heading: {
+      ACTIVATE: 'Your company is approved — let us finish the setup',
+      SETUP: 'The load board is still closed',
+      FIRST_ORDER: 'Ready for your first transport',
+    },
+    body: {
+      ACTIVATE:
+        'The address is filled in from the trade register when it is found there. Add your account number, check the details and accept the terms — after that you can upload licences and add vehicles.',
+      SETUP:
+        'Open transports become visible once the operating licence and insurance are uploaded, at least one vehicle is approved and the vehicle has a driver. The cabinet home page shows which step is missing.',
+      FIRST_ORDER:
+        'Publish a transport on the load board or send it directly to a known vehicle. You see the progress, photos and consignment note in one place.',
+    },
+    button: {
+      ACTIVATE: 'Finish setup',
+      SETUP: 'Open the cabinet',
+      FIRST_ORDER: 'New order',
+    },
+    help: (operator) => `If anything is unclear, reply to this message or write to ${operator} — we are happy to help.`,
   },
 
   recovery: {
