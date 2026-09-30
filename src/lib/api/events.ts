@@ -10,6 +10,8 @@ export const WEBHOOK_EVENTS = [
   'order.stop_arrived',
   'order.stop_completed',
   'order.eta_changed',
+  'order.late',
+  'order.waiting',
   'order.amended',
   'order.closed',
   'order.cancelled',

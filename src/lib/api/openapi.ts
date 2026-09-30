@@ -832,7 +832,7 @@ export function openApi(serverUrl: string) {
                 previous_status: { enum: STATUS },
                 stop: {
                   type: 'object',
-                  description: 'order.stop_arrived, order.stop_completed, order.eta_changed',
+                  description: 'order.stop_arrived, order.stop_completed, order.eta_changed, order.late, order.waiting',
                   properties: {
                     sequence: { type: 'integer' },
                     role: { enum: ROLES },
@@ -841,6 +841,11 @@ export function openApi(serverUrl: string) {
                     completed_at: { type: 'string', format: 'date-time' },
                     eta_at: { type: 'string', format: 'date-time' },
                     previous_eta_at: nullable('string', { format: 'date-time' }),
+                    scheduled_at: { type: 'string', format: 'date-time', description: 'order.late: the agreed time of the stop.' },
+                    late_minutes: { type: 'integer', description: 'order.late: expected arrival minus the agreed time; sent once per stop, from 30 minutes.' },
+                    waiting_started_at: { type: 'string', format: 'date-time', description: 'order.waiting: arrival, but not before the agreed time.' },
+                    free_until: { type: 'string', format: 'date-time', description: 'order.waiting: end of the free hour; sent once per stop when it has passed.' },
+                    surcharge_from: nullable('string', { format: 'date-time', description: 'order.waiting: when the waiting surcharge starts, if it applies to this order.' }),
                     source: { enum: ['ROUTE', 'TRAFFIC', 'CARRIER'] },
                   },
                 },
