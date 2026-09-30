@@ -6,6 +6,7 @@ import { signInPath } from '@/lib/auth/paths';
 import { LocaleSwitch } from '@/components/layout/LocaleSwitch';
 import { getI18n, isLocale } from '@/lib/i18n';
 import { pageMetadata, samePath } from '@/lib/seo';
+import { inviteByToken } from '@/lib/partners/invites';
 import { ApplyForm } from './form';
 
 export async function generateMetadata({
@@ -24,11 +25,18 @@ export async function generateMetadata({
   });
 }
 
-export default async function ApplyPage({ params }: { params: Promise<{ locale: string }> }) {
+export default async function ApplyPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<{ invite?: string }>;
+}) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
 
-  const { t } = await getI18n(locale);
+  const [{ t }, { invite: token }] = await Promise.all([getI18n(locale), searchParams]);
+  const invite = token ? await inviteByToken(token) : null;
 
   return (
     <main className="relative flex flex-1 items-center justify-center px-5 py-12">
@@ -51,7 +59,7 @@ export default async function ApplyPage({ params }: { params: Promise<{ locale: 
           <p className="label-micro mt-2">{t.brand.tagline}</p>
         </div>
 
-        <ApplyForm />
+        <ApplyForm invite={invite} />
 
         <p className="mt-5 text-center text-[13px] text-ink-muted">
           <Link href={signInPath(locale)} className="text-accent hover:underline">

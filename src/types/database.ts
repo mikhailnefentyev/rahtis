@@ -2652,6 +2652,12 @@ export type Database = {
           },
         ]
       }
+      shipper_invites: {
+        Row: { applied_at: string | null; applied_company_id: string | null; business_id: string; carrier_company_id: string; company_name: string; created_at: string; created_by: string | null; email: string; id: string; token_hash: string }
+        Insert: { applied_at?: string | null; applied_company_id?: string | null; business_id: string; carrier_company_id: string; company_name: string; created_at?: string; created_by?: string | null; email: string; id?: string; token_hash: string }
+        Update: { applied_at?: string | null; applied_company_id?: string | null; business_id?: string; carrier_company_id?: string; company_name?: string; created_at?: string; created_by?: string | null; email?: string; id?: string; token_hash?: string }
+        Relationships: []
+      }
       support_messages: {
         Row: {
           body: string
@@ -3835,6 +3841,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      carrier_invite_shipper: {
+        Args: { p_business_id: string; p_email: string; p_name: string; p_token_hash: string }
+        Returns: string
       }
       carrier_partners: {
         Args: never

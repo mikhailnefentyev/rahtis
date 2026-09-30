@@ -5,25 +5,26 @@ import { Button, Card, CardBody, Field, Input, InputMono } from '@/components/ui
 import { submitApplicationAction, type ApplyState } from '@/lib/companies/actions';
 import { isValidBusinessId } from '@/lib/format';
 import { useI18n } from '@/lib/i18n/provider';
+import type { ApplyInvite } from '@/lib/partners/invites';
 import type { CompanyRole } from '@/types/db';
 
 const initial: ApplyState = { error: null, done: false };
 
-export function ApplyForm() {
+export function ApplyForm({ invite = null }: { invite?: ApplyInvite | null }) {
   const { t, m } = useI18n();
   const { locale } = useI18n();
   const [state, formAction, pending] = useActionState(submitApplicationAction, initial);
 
-  const [kind, setKind] = useState<CompanyRole>('CARRIER');
+  const [kind, setKind] = useState<CompanyRole>(invite ? 'SHIPPER' : 'CARRIER');
   /*
    * Ветка перевозчика. По умолчанию подряд: он ничего не стоит, пока
    * нет работы, и человек, пришедший «посмотреть», не должен случайно
    * подписаться на ежемесячный счёт.
    */
   const [mode, setMode] = useState<'SUBCONTRACTOR' | 'SUBSCRIBER'>('SUBCONTRACTOR');
-  const [name, setName] = useState('');
-  const [businessId, setBusinessId] = useState('');
-  const [email, setEmail] = useState('');
+  const [name, setName] = useState(invite?.name ?? '');
+  const [businessId, setBusinessId] = useState(invite?.businessId ?? '');
+  const [email, setEmail] = useState(invite?.email ?? '');
 
   if (state.done) {
     /*
@@ -81,6 +82,12 @@ export function ApplyForm() {
           <input type="hidden" name="locale" value={locale} />
           <input type="hidden" name="kind" value={kind} />
           <input type="hidden" name="partnership" value={mode} />
+          {invite && <input type="hidden" name="invite" value={invite.token} />}
+          {invite && (
+            <p className="rounded-control border border-accent-line bg-accent-wash px-3 py-2 text-[13px] leading-relaxed text-ink">
+              {t.apply.invitedBy.replace('{carrier}', invite.carrierName)}
+            </p>
+          )}
 
           <div
             role="radiogroup"

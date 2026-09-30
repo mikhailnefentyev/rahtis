@@ -47,6 +47,17 @@ type Texts = {
     note: (operator: string) => string;
   };
 
+  /** Перевозчик приглашает своего заказчика. */
+  shipperInvite: {
+    subject: (carrier: string) => string;
+    heading: (carrier: string) => string;
+    preheader: string;
+    body: (carrier: string) => string;
+    points: string[];
+    button: string;
+    note: (operator: string) => string;
+  };
+
   /** Напоминания застрявшим на пути к первой работе (2, 5, 10 день на шаге). */
   onboarding: {
     subject: Record<'ACTIVATE' | 'SETUP' | 'FIRST_ORDER', (company: string) => string>;
@@ -173,6 +184,22 @@ const fi: Texts = {
     note: (operator) =>
       'Linkki on kertakäyttöinen ja voimassa vuorokauden. ' +
       `Jos se ehtii vanhentua, pyydä uusi osoitteesta ${operator}.`,
+  },
+
+  shipperInvite: {
+    subject: (carrier) => `${carrier} kutsuu teidät RAHTIS-palveluun`,
+    heading: (carrier) => `${carrier} kutsuu teidät RAHTISiin`,
+    preheader: 'Tilatkaa kuljetukset suoraan tutulta kuljetusliikkeeltä yhdessä paikassa.',
+    body: (carrier) =>
+      `Kuljetusliikkeenne ${carrier} käyttää RAHTIS-palvelua ja kutsuu teidät tilaamaan kuljetukset sen kautta.`,
+    points: [
+      'Suora tilaus tutulle autolle — ilman palvelumaksua.',
+      'Seuraatte ajoa: saapumiset, kuittaukset, kuvat ja rahtikirjat samassa paikassa.',
+      'Tarvittaessa sama tilaus tarjouspöydälle muille kuljetusliikkeille.',
+    ],
+    button: 'Hae mukaan — tiedot on täytetty valmiiksi',
+    note: (operator) =>
+      `Hakemus tarkistetaan ennen tunnusten lähettämistä. Jos ette odottaneet tätä viestiä, voitte jättää sen huomiotta tai kirjoittaa osoitteeseen ${operator}.`,
   },
 
   onboarding: {
@@ -324,6 +351,21 @@ const en: Texts = {
     note: (operator) =>
       'The link works once and is valid for 24 hours. ' +
       `If it expires, ask for a new one at ${operator}.`,
+  },
+
+  shipperInvite: {
+    subject: (carrier) => `${carrier} invites you to RAHTIS`,
+    heading: (carrier) => `${carrier} invites you to RAHTIS`,
+    preheader: 'Order transports directly from a carrier you know, all in one place.',
+    body: (carrier) => `Your carrier ${carrier} uses RAHTIS and invites you to order your transports through it.`,
+    points: [
+      'A direct order to a known vehicle — without a service fee.',
+      'Follow the trip: arrivals, confirmations, photos and consignment notes in one place.',
+      'When needed, the same order can go to the load board for other carriers.',
+    ],
+    button: 'Apply — the details are already filled in',
+    note: (operator) =>
+      `The application is checked before credentials are sent. If you did not expect this message, you can ignore it or write to ${operator}.`,
   },
 
   onboarding: {

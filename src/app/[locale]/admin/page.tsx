@@ -125,6 +125,23 @@ export default async function AdminPage({
         .eq('is_current', true)
     : { data: [] };
 
+  /* Заявки по приглашению перевозчика: оператор видит, кто позвал. */
+  const queueIds = (pending ?? []).map((c) => c.id);
+  const { data: invites } = queueIds.length
+    ? await supabase
+        .from('shipper_invites')
+        .select('applied_company_id, carrier_company_id')
+        .in('applied_company_id', queueIds)
+    : { data: [] };
+  const inviterIds = [...new Set((invites ?? []).map((i) => i.carrier_company_id))];
+  const { data: inviters } = inviterIds.length
+    ? await supabase.from('companies').select('id, name').in('id', inviterIds)
+    : { data: [] };
+  const inviterName = new Map((inviters ?? []).map((c) => [c.id, c.name]));
+  const invitedBy = new Map(
+    (invites ?? []).map((i) => [i.applied_company_id, inviterName.get(i.carrier_company_id) ?? null]),
+  );
+
   /* У какой компании уже есть пользователь — значит приглашение выписано. */
   const withUsers = new Set((profiles ?? []).map((p) => p.company_id));
 
@@ -218,6 +235,7 @@ export default async function AdminPage({
               <ApplicationCard
                 key={company.id}
                 company={company}
+                invitedBy={invitedBy.get(company.id) ?? null}
                 /* Реестр PRH/YTJ — оператор сверяет Y-tunnus вручную (ТЗ §3). */
                 ytjUrl={`https://tietopalvelu.ytj.fi/yritys/${company.business_id}`}
               />

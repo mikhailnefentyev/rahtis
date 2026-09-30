@@ -1,6 +1,12 @@
 'use server';
 
+import { createHash, randomBytes } from 'node:crypto';
 import { revalidatePath } from 'next/cache';
+import { siteUrl } from '@/lib/config';
+import { operatorInbox, sendEmail } from '@/lib/email';
+import { shipperInviteEmail } from '@/lib/email/templates/shipperInvite';
+import { isValidBusinessId } from '@/lib/format';
+import { getDictionary } from '@/lib/i18n';
 import { getViewer } from '@/lib/auth/viewer';
 import { isLocale, type Locale, defaultLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
@@ -50,4 +56,63 @@ export async function poolVehicleAction(formData: FormData): Promise<void> {
 
   revalidatePath(`/${locale}/shipper/vehicles`);
   revalidatePath(`/${locale}/shipper/orders`);
+}
+
+/* ── Пригласить своего заказчика ───────────────────────────────── */
+
+export type InviteShipperState = { error: string | null; sentTo: string | null };
+
+/**
+ * Перевозчик приглашает клиента. Ссылка одноразовая по смыслу: в базе —
+ * только её SHA-256, по ней заявка узнаёт, кто пригласил. Язык письма
+ * выбирает перевозчик: он знает, на каком языке пишет его клиент.
+ */
+export async function inviteShipperAction(
+  _previous: InviteShipperState,
+  formData: FormData,
+): Promise<InviteShipperState> {
+  const locale = toLocale(formData.get('locale'));
+  const t = await getDictionary(locale);
+
+  const viewer = await getViewer();
+  if (viewer.status !== 'ready' || viewer.role !== 'CARRIER' || !viewer.company) {
+    return { error: t.error.forbidden, sentTo: null };
+  }
+
+  const name = String(formData.get('name') ?? '').trim().slice(0, 200);
+  const businessId = String(formData.get('business_id') ?? '').trim();
+  const email = String(formData.get('email') ?? '').trim().toLowerCase();
+  const language = String(formData.get('language') ?? 'fi') === 'en' ? 'en' : 'fi';
+
+  if (!name || !isValidBusinessId(businessId) || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+    return { error: t.partners.inviteInvalid, sentTo: null };
+  }
+
+  const token = randomBytes(32).toString('hex');
+  const hash = createHash('sha256').update(token).digest('hex');
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc('carrier_invite_shipper', {
+    p_name: name,
+    p_business_id: businessId,
+    p_email: email,
+    p_token_hash: hash,
+  });
+  if (error) {
+    return { error: error.code === '55001' ? t.partners.inviteTooMany : t.partners.inviteFailed, sentTo: null };
+  }
+
+  const result = await sendEmail(
+    shipperInviteEmail({
+      to: email,
+      carrierName: viewer.company.name,
+      link: `${siteUrl()}/${language}/apply?invite=${token}`,
+      operatorEmail: operatorInbox(),
+      locale: language,
+    }),
+  );
+  if (result.outboxId === null) return { error: t.partners.inviteFailed, sentTo: null };
+
+  revalidatePath(`/${locale}/carrier/partners`);
+  return { error: null, sentTo: email };
 }

@@ -1,5 +1,6 @@
 'use server';
 
+import { createHash } from 'node:crypto';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { explainAdmin, withAdminError } from '@/lib/admin/errors';
@@ -121,6 +122,20 @@ export async function submitApplicationAction(
       error: error?.code === '23505' ? t.apply.duplicate : t.apply.failed,
       done: false,
     };
+  }
+
+  /*
+   * Пришёл по приглашению перевозчика — заявка помечается им: после
+   * одобрения связь с пригласившим станет активной (on_invited_shipper_approved).
+   * Ссылка из письма живёт до первой заявки.
+   */
+  const inviteToken = String(formData.get('invite') ?? '');
+  if (kind === 'SHIPPER' && /^[0-9a-f]{64}$/.test(inviteToken)) {
+    await admin
+      .from('shipper_invites')
+      .update({ applied_company_id: company.id, applied_at: new Date().toISOString() })
+      .eq('token_hash', createHash('sha256').update(inviteToken).digest('hex'))
+      .is('applied_company_id', null);
   }
 
   /*

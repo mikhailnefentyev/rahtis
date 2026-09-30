@@ -6,6 +6,7 @@ import { requireRole } from '@/lib/auth/guard';
 import { getI18n, isLocale } from '@/lib/i18n';
 import { setShipperLinkAction } from '@/lib/partners/actions';
 import { createClient } from '@/lib/supabase/server';
+import { InviteShipperForm } from './InviteShipperForm';
 import type { LinkStatus } from '@/types/db';
 
 export async function generateMetadata({
@@ -42,13 +43,58 @@ export default async function PartnersPage({ params }: { params: Promise<{ local
   const subscriber = viewer.company?.partnership === 'SUBSCRIBER';
   const [{ t, m, f }, supabase] = await Promise.all([getI18n(locale), createClient()]);
 
-  const { data: partners } = await supabase.rpc('carrier_partners');
+  const [{ data: partners }, { data: invites }] = await Promise.all([
+    supabase.rpc('carrier_partners'),
+    supabase
+      .from('shipper_invites')
+      .select('id, company_name, email, created_at, applied_company_id, applied_at')
+      .order('created_at', { ascending: false })
+      .limit(50),
+  ]);
+  /* Одобренный — тот, с кем уже есть активная связь. */
+  const approved = new Set((partners ?? []).filter((p) => p.status === 'ACTIVE').map((p) => p.shipper_id));
+  const active = viewer.company?.status === 'ACTIVE';
 
   return (
     <main className="mx-auto w-full max-w-4xl px-5 py-8">
       <h1 className="text-xl font-semibold tracking-tight">{t.partners.title}</h1>
       <p className="mt-2 max-w-xl text-[13px] leading-relaxed text-ink-muted">{t.partners.subtitle}</p>
       <p className="mt-2 mb-6 max-w-xl text-xs text-ink-dim">{subscriber ? t.partners.anonymitySubscriber : t.partners.anonymity}</p>
+
+      {/*
+        * Свои клиенты — главный источник заказов: реальных заказчиков на
+        * платформе нет, а у каждого перевозчика они есть (30.09.2026).
+        */}
+      {active && (
+        <Card className="mb-6" stripe="ok">
+          <CardBody className="flex flex-col gap-3">
+            <h2 className="text-[15px] font-semibold tracking-tight">{t.partners.inviteTitle}</h2>
+            <p className="max-w-2xl text-[13px] leading-relaxed text-ink-muted">{t.partners.inviteText}</p>
+            <InviteShipperForm />
+          </CardBody>
+        </Card>
+      )}
+
+      {(invites ?? []).length > 0 && (
+        <section className="mb-6">
+          <p className="label-micro mb-2">{t.partners.invitesTitle}</p>
+          <ul className="flex flex-col gap-1.5 text-[13px]">
+            {(invites ?? []).map((i) => {
+              const state = i.applied_company_id && approved.has(i.applied_company_id) ? 'approved' : i.applied_at ? 'applied' : 'sent';
+              return (
+                <li key={i.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 text-ink-muted">
+                  <span className="font-semibold text-ink">{i.company_name}</span>
+                  <span>{i.email}</span>
+                  <span>{f.date(i.created_at)}</span>
+                  <Badge tone={state === 'approved' ? 'ok' : state === 'applied' ? 'warn' : 'neutral'}>
+                    {state === 'approved' ? t.partners.inviteStatusApproved : state === 'applied' ? t.partners.inviteStatusApplied : t.partners.inviteStatusSent}
+                  </Badge>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
 
       {(partners ?? []).length === 0 ? (
         <EmptyState title={t.partners.none} />

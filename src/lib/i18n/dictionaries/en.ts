@@ -1221,6 +1221,7 @@ export const en = {
     applications: 'Applications',
     vehicles: 'Vehicles for approval',
     approveAndInvite: 'Approve and send invite',
+    invitedBy: 'Invited by',
     registry: 'PRH check',
     registryVerdict: {
       OK: 'All matches',
@@ -1286,6 +1287,7 @@ export const en = {
     shipperNote: 'After approval: sign-in, company details, publishing orders.',
     sentTitle: 'Application sent',
     duplicate: 'There is already an application for this Y-tunnus, pending or approved.',
+    invitedBy: '{carrier} invited you. The details are filled in — check them and send the application. Once approved, you can send direct orders to their vehicles.',
     tooMany: 'Too many applications in a short time. Try again in an hour or write to admin@rahtis.eu.',
     failed: 'Sending failed. Try again.',
     registryManual: 'We will check the company details by hand and email you once the application has been reviewed.',
@@ -2576,6 +2578,22 @@ export const en = {
 
   partners: {
     title: 'Customers',
+    inviteTitle: 'Invite your own customer',
+    inviteText:
+      'Your customer gets an email with the application already filled in. Once we approve it, the customer can send direct orders to your vehicles straight away — without a service fee.',
+    inviteName: 'Company name',
+    inviteBusinessId: 'Business ID',
+    inviteEmail: 'Email',
+    inviteLanguage: 'Message language',
+    inviteSend: 'Send invitation',
+    inviteSent: 'Invitation sent to {email}.',
+    inviteInvalid: 'Check the name, business ID and email.',
+    inviteTooMany: 'At most 20 invitations per day.',
+    inviteFailed: 'The invitation could not be sent. Try again in a moment.',
+    invitesTitle: 'Sent invitations',
+    inviteStatusSent: 'Sent',
+    inviteStatusApplied: 'Applied',
+    inviteStatusApproved: 'Approved',
     subtitle:
       'Shippers whose transports you have driven. You can allow them to send transports straight to your vehicles — bypassing the load board.',
     trips: 'Trips',
@@ -2954,6 +2972,7 @@ export const en = {
     'event.order.direct': 'Direct order {ref} for {plate} — {shipper}',
     'event.direct.accepted': '{plate} confirmed transport {ref}',
     'event.direct.released': '{plate} did not take transport {ref} — it is now on the load board',
+    'event.invite.approved': 'Your invited customer {shipper} has been approved. It can now send direct orders to your vehicles.',
     'event.link.offer': 'You drove your first transport for {shipper}. Allow direct orders?',
     'drivers.count': '{count, plural, =0 {No drivers} one {# driver} other {# drivers}}',
     'drivers.onVehicle': 'On {plate}',

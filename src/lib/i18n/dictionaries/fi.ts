@@ -1310,6 +1310,7 @@ export const fi = {
     applications: 'Hakemukset',
     vehicles: 'Ajoneuvot hyväksyntään',
     approveAndInvite: 'Hyväksy ja lähetä kutsu',
+    invitedBy: 'Kutsuja',
     /*
      * PRH-tarkistus hakemuksen jättämishetkellä. Avoin data ei kerro
      * vastuuhenkilöitä eikä toiminimiä, joten tulos on apu, ei päätös.
@@ -1380,6 +1381,7 @@ export const fi = {
     shipperNote: 'Hyväksynnän jälkeen: kirjautuminen, yritystiedot, kuljetusten julkaisu.',
     sentTitle: 'Hakemus lähetetty',
     duplicate: 'Tällä Y-tunnuksella on jo hakemus vireillä tai hyväksytty.',
+    invitedBy: '{carrier} kutsui teidät. Tiedot on täytetty valmiiksi — tarkistakaa ne ja lähettäkää hakemus. Hyväksynnän jälkeen voitte lähettää suoria tilauksia heidän autoilleen.',
     tooMany: 'Liian monta hakemusta lyhyessä ajassa. Yritä tunnin kuluttua tai kirjoita osoitteeseen admin@rahtis.eu.',
     failed: 'Lähetys ei onnistunut. Yritä uudelleen.',
     /* Toiminimi ei ole avoimessa datassa, tai rekisteri ei vastannut — ei virhe. */
@@ -2682,6 +2684,22 @@ export const fi = {
 
   partners: {
     title: 'Asiakkaat',
+    inviteTitle: 'Kutsu oma asiakkaasi',
+    inviteText:
+      'Asiakkaasi saa sähköpostin, jossa hakemus on valmiiksi täytetty. Kun hyväksymme sen, asiakas voi lähettää suoria tilauksia autoillesi heti — ilman palvelumaksua.',
+    inviteName: 'Yrityksen nimi',
+    inviteBusinessId: 'Y-tunnus',
+    inviteEmail: 'Sähköposti',
+    inviteLanguage: 'Viestin kieli',
+    inviteSend: 'Lähetä kutsu',
+    inviteSent: 'Kutsu lähetetty osoitteeseen {email}.',
+    inviteInvalid: 'Tarkista nimi, Y-tunnus ja sähköposti.',
+    inviteTooMany: 'Enintään 20 kutsua vuorokaudessa.',
+    inviteFailed: 'Kutsua ei voitu lähettää. Yritä hetken kuluttua uudelleen.',
+    invitesTitle: 'Lähetetyt kutsut',
+    inviteStatusSent: 'Lähetetty',
+    inviteStatusApplied: 'Hakemus jätetty',
+    inviteStatusApproved: 'Hyväksytty',
     subtitle:
       'Tilaajat, joiden kuljetuksia olet ajanut. Voit sallia heidän lähettää kuljetuksia suoraan autoillesi — ohi yhteisen pöydän.',
     trips: 'Keikat',
@@ -3094,6 +3112,7 @@ export const fi = {
     'event.order.direct': 'Suora tilaus {ref} autolle {plate} — {shipper}',
     'event.direct.accepted': 'Auto {plate} vahvisti kuljetuksen {ref}',
     'event.direct.released': 'Auto {plate} ei ottanut kuljetusta {ref} — se on nyt yhteisellä pöydällä',
+    'event.invite.approved': 'Kutsumanne asiakas {shipper} on hyväksytty. Se voi nyt lähettää suoria tilauksia autoillenne.',
     'event.link.offer': 'Ajoit ensimmäisen kuljetuksen tilaajalle {shipper}. Sallitaanko suorat tilaukset?',
     'drivers.count': '{count, plural, =0 {Ei kuljettajia} one {# kuljettaja} other {# kuljettajaa}}',
     'drivers.onVehicle': 'Autolla {plate}',

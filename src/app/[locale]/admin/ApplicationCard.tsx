@@ -81,7 +81,16 @@ function RegistryBlock({ company }: { company: Company }) {
  * без объяснения превращается в звонок оператору. Поэтому форма отказа
  * раскрывается отдельным шагом, а не отправляется одним кликом.
  */
-export function ApplicationCard({ company, ytjUrl }: { company: Company; ytjUrl: string }) {
+export function ApplicationCard({
+  company,
+  ytjUrl,
+  invitedBy = null,
+}: {
+  company: Company;
+  ytjUrl: string;
+  /** Перевозчик, пригласивший заказчика: после одобрения связь с ним сразу активна. */
+  invitedBy?: string | null;
+}) {
   const { t, locale, f } = useI18n();
   const [rejecting, setRejecting] = useState(false);
   const [reason, setReason] = useState('');
@@ -119,6 +128,7 @@ export function ApplicationCard({ company, ytjUrl }: { company: Company; ytjUrl:
                 }
               />
               <Kv k={t.company.email} v={company.contact_email} />
+              {invitedBy && <Kv k={t.moderation.invitedBy} v={invitedBy} />}
               <Kv k={t.moderation.decidedAt} v={<Mono>{f.dateTime(company.created_at)}</Mono>} />
             </div>
           </div>
