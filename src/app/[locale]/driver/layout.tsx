@@ -26,6 +26,12 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
+  /*
+   * Клавиатура сжимает страницу, а не наезжает на неё: на Android иначе
+   * закреплённые снизу элементы оставались за клавиатурой и всплывали
+   * при прокрутке.
+   */
+  interactiveWidget: 'resizes-content',
 };
 
 /**
@@ -50,7 +56,7 @@ export default async function DriverShell({
 
   return (
     <I18nProvider locale={locale} dictionary={t}>
-      <div data-app="driver" className="min-h-dvh bg-ground text-ink">
+      <div data-app="driver" className="min-h-dvh overflow-x-clip bg-ground text-ink">
         <ServiceWorker />
         {children}
       </div>

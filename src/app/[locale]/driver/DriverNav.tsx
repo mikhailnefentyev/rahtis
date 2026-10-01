@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { cn } from '@/lib/cn';
 import { useI18n } from '@/lib/i18n/provider';
 
@@ -21,6 +22,7 @@ export function DriverNav({ unread }: { unread: number }) {
   const { t, locale } = useI18n();
   const pathname = usePathname();
   const base = `/${locale}/driver`;
+  const typing = useTyping();
 
   const items = [
     {
@@ -42,7 +44,20 @@ export function DriverNav({ unread }: { unread: number }) {
   ];
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-surface pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_16px_rgb(0_0_0/0.06)]">
+    /*
+     * Полоса прячется, пока водитель печатает: с открытой клавиатурой
+     * закреплённая снизу полоса на Android повисала посреди экрана, а на
+     * iPhone прыгала при прокрутке («меню гуляет», 2.10.2026 — после
+     * переписки на экране рейса печатать стали чаще). translateZ — свой
+     * слой, чтобы на iPhone полоса не дрожала при инерционной прокрутке.
+     */
+    <nav
+      aria-hidden={typing || undefined}
+      className={cn(
+        'fixed inset-x-0 bottom-0 z-20 border-t border-line bg-surface pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_16px_rgb(0_0_0/0.06)] [transform:translateZ(0)]',
+        typing && 'hidden',
+      )}
+    >
       <ul className="mx-auto flex max-w-lg">
         {items.map(({ href, label, icon: Icon, active, badge }) => (
           <li key={href} className="min-w-0 flex-1">
@@ -81,6 +96,32 @@ export function DriverNav({ unread }: { unread: number }) {
       </ul>
     </nav>
   );
+}
+
+/** Печатает ли водитель: в фокусе поле ввода текста. */
+function useTyping(): boolean {
+  const [typing, setTyping] = useState(false);
+
+  useEffect(() => {
+    const editable = (el: EventTarget | null) => {
+      if (!(el instanceof HTMLElement)) return false;
+      if (el.isContentEditable || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT') return true;
+      if (el.tagName !== 'INPUT') return false;
+      const type = (el as HTMLInputElement).type;
+      return !['checkbox', 'radio', 'button', 'submit', 'reset', 'file', 'range', 'color', 'hidden'].includes(type);
+    };
+    const onIn = (e: FocusEvent) => setTyping(editable(e.target));
+    /* Фокус уходит на кнопку «Отправить» и т. п. — полоса возвращается. */
+    const onOut = (e: FocusEvent) => setTyping(editable(e.relatedTarget));
+    document.addEventListener('focusin', onIn);
+    document.addEventListener('focusout', onOut);
+    return () => {
+      document.removeEventListener('focusin', onIn);
+      document.removeEventListener('focusout', onOut);
+    };
+  }, []);
+
+  return typing;
 }
 
 /* Значки: встроенный SVG, штрих 2 px, как в тренажёре. Скрыты от чтения с экрана — рядом подпись. */
