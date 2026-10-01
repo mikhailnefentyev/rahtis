@@ -66,7 +66,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Первый запрос к Claude: вопрос, наставление и инструменты.\n//\n// Наставление собирает платформа и присылает готовым — так правда о ролях\n// лежит в одном месте и едет вместе с кодом. Раньше оно жило только\n// здесь, и это стоило дорого: аудиторию оператора завели в базе и в файле\n// воркфлоу, а в работающем n8n осталась прежняя ветка, и помощник ответил\n// оператору «платформа открывает мне только данные вашей компании».\n//\n// Но и падать без него нельзя. Выкладка приложения и перезалив сценария\n// происходят в разное время, и в промежутке чат ложился целиком —\n// проверено на живых людях. Поэтому запасной путь есть, и он ниже.\n//\n// ЗАПАСНОЕ НАСТАВЛЕНИЕ НАМЕРЕННО КОРОТКОЕ. Оно не повторяет присланное, а\n// говорит модели ровно одно: с кем она разговаривает. Полный список\n// инструментов при этом отдаётся всем, и это безопасно: право на каждый\n// инструмент проверяет функция в базе по аудитории треда. Список — это\n// подсказка модели, а не защита; чего роли не положено, база откажет.\n//\n// Компания в инструменты НЕ передаётся: она выводится из треда по\n// dispatch_token внутри базы, и поля, куда вписать чужую, не существует.\n//\n// state нужен циклу инструментов: «Разобрать ответ» берёт его отсюда на\n// первом круге, дальше — у «Добавить результат».\n\nconst src = $json;\n\nconst ref = { type: 'string', description: 'Номер заказа, например RS-2026-0043' };\n\nconst fallbackTools = [\n  { name: 'claim', description: 'Претензия (reklamaatio) по номеру CL-… или все претензии рейса по номеру RS-…: вид, статус, сумма, описание, решение.',\n    input_schema: { type: 'object', properties: { ref: { type: 'string', description: 'CL-RS-2026-0059-1 или RS-2026-0059' } }, required: ['ref'] } },\n  { name: 'order_by_ref', description: 'Карточка заказа по номеру: статус, единица, пробег, ставка, даты.',\n    input_schema: { type: 'object', properties: { ref }, required: ['ref'] } },\n  { name: 'trip_status', description: 'Где рейс сейчас: пройденные точки, этап, следующая точка.',\n    input_schema: { type: 'object', properties: { ref }, required: ['ref'] } },\n  { name: 'trip_documents', description: 'Документы рейса: рахтикирья, фото, повреждения.',\n    input_schema: { type: 'object', properties: { ref }, required: ['ref'] } },\n  { name: 'company_money', description: 'Суммы по неделям.',\n    input_schema: { type: 'object', properties: { weeks: { type: 'integer' } }, required: [] } },\n  { name: 'payout_schedule', description: 'Расчётные периоды и даты оплаты.',\n    input_schema: { type: 'object', properties: { periods: { type: 'integer' } }, required: [] } },\n  { name: 'legal_clause', description: 'Текст пункта условий или политики по номеру.',\n    input_schema: { type: 'object', properties: { number: { type: 'string' }, kind: { type: 'string', enum: ['TERMS', 'PRIVACY'] }, locale: { type: 'string', enum: ['fi', 'en'] } }, required: ['number'] } },\n  { name: 'place_guide', description: 'Площадка справочника: адрес ворот и координаты. Часов работы там НЕТ.',\n    input_schema: { type: 'object', properties: { query: { type: 'string' }, locale: { type: 'string', enum: ['fi', 'en'] } }, required: ['query'] } },\n  { name: 'sql', description: 'Свободный запрос SELECT по базе. Только оператору. Суммы в центах.',\n    input_schema: { type: 'object', properties: { query: { type: 'string' }, limit: { type: 'integer' } }, required: ['query'] } },\n];\n\nfunction fallbackSystem(audience, companyName) {\n  const admin = audience === 'ADMIN';\n  const driver = audience === 'DRIVER';\n  const carrier = audience === 'CARRIER' || driver;\n\n  const who = admin\n    ? 'Ты — помощник оператора платформы RAHTIS (Aivomaa Oy). Собеседник ведёт платформу, а не возит и не заказывает.'\n    : driver\n      ? 'Ты — помощник платформы RAHTIS для водителя грузовика.'\n      : carrier\n        ? 'Ты — помощник платформы RAHTIS для транспортной компании (перевозчика).'\n        : 'Ты — помощник платформы RAHTIS для заказчика: экспедитора или логистического оператора.';\n\n  const scope = admin\n    ? 'Тебе доступна вся платформа: любой заказ, обе стороны сделки, деньги в целом. Не хватило готового инструмента — бери sql. Суммы в базе в центах.'\n    : 'Ты видишь ТОЛЬКО данные своей компании: инструменты сами ограничивают выдачу тредом.';\n\n  return [\n    who,\n    admin ? 'Компании у него нет: оператор посредник, а не сторона сделки.' : 'Компания пользователя: ' + (companyName || 'не указана') + '.',\n    '',\n    scope,\n    driver ? 'Деньги — дело компании, а не водителя: ставок и выплат ты не показываешь.' : '',\n    '',\n    'Не выдумывай суммы, даты, статусы и номера. Нужен факт — возьми его инструментом.',\n    'Инструмента не хватило или база отказала — так и скажи и предложи написать оператору.',\n    '',\n    'Отвечай коротко и по делу. Язык ответа — тот же, на котором написал собеседник.',\n  ].filter(Boolean).join(String.fromCharCode(10));\n}\n\nconst system = src.system || fallbackSystem(src.audience, src.company_name);\nconst tools = Array.isArray(src.tools) && src.tools.length ? src.tools : fallbackTools;\n\nconst state = {\n  /*\n   * Тред и пропуск едут в состоянии: их берёт узел подписи инструмента.\n   * Переписывая этот узел, я их потерял, и вызов инструмента ушёл без\n   * них — сервер ответил «conversation_id, dispatch_token and tool are\n   * required», а модель пересказала это как «база не отвечает».\n   */\n  conversation_id: src.conversation_id,\n  dispatch_token: src.dispatch_token,\n  system,\n  tools,\n  iterations: 0,\n  messages: [{ role: 'user', content: String(src.text || '') }],\n};\n\nreturn [{ json: { state, payload: JSON.stringify({\n  model: 'claude-opus-5',\n  max_tokens: 2048,\n  output_config: { effort: 'medium' },\n  system: state.system,\n  tools: state.tools,\n  tool_choice: { type: 'auto', disable_parallel_tool_use: true },\n  messages: state.messages,\n}) } }];\n"
+        "jsCode": "// Первый запрос к модели (OpenAI): вопрос, наставление и инструменты.\n//\n// Наставление собирает платформа и присылает готовым — так правда о ролях\n// лежит в одном месте и едет вместе с кодом. Раньше оно жило только\n// здесь, и это стоило дорого: аудиторию оператора завели в базе и в файле\n// воркфлоу, а в работающем n8n осталась прежняя ветка, и помощник ответил\n// оператору «платформа открывает мне только данные вашей компании».\n//\n// Но и падать без него нельзя. Выкладка приложения и перезалив сценария\n// происходят в разное время, и в промежутке чат ложился целиком —\n// проверено на живых людях. Поэтому запасной путь есть, и он ниже.\n//\n// ЗАПАСНОЕ НАСТАВЛЕНИЕ НАМЕРЕННО КОРОТКОЕ. Оно не повторяет присланное, а\n// говорит модели ровно одно: с кем она разговаривает. Полный список\n// инструментов при этом отдаётся всем, и это безопасно: право на каждый\n// инструмент проверяет функция в базе по аудитории треда. Список — это\n// подсказка модели, а не защита; чего роли не положено, база откажет.\n//\n// Компания в инструменты НЕ передаётся: она выводится из треда по\n// dispatch_token внутри базы, и поля, куда вписать чужую, не существует.\n//\n// state нужен циклу инструментов: «Разобрать ответ» берёт его отсюда на\n// первом круге, дальше — у «Добавить результат».\n\nconst src = $json;\n\nconst ref = { type: 'string', description: 'Номер заказа, например RS-2026-0043' };\n\nconst fallbackTools = [\n  { name: 'claim', description: 'Претензия (reklamaatio) по номеру CL-… или все претензии рейса по номеру RS-…: вид, статус, сумма, описание, решение.',\n    input_schema: { type: 'object', properties: { ref: { type: 'string', description: 'CL-RS-2026-0059-1 или RS-2026-0059' } }, required: ['ref'] } },\n  { name: 'order_by_ref', description: 'Карточка заказа по номеру: статус, единица, пробег, ставка, даты.',\n    input_schema: { type: 'object', properties: { ref }, required: ['ref'] } },\n  { name: 'trip_status', description: 'Где рейс сейчас: пройденные точки, этап, следующая точка.',\n    input_schema: { type: 'object', properties: { ref }, required: ['ref'] } },\n  { name: 'trip_documents', description: 'Документы рейса: рахтикирья, фото, повреждения.',\n    input_schema: { type: 'object', properties: { ref }, required: ['ref'] } },\n  { name: 'company_money', description: 'Суммы по неделям.',\n    input_schema: { type: 'object', properties: { weeks: { type: 'integer' } }, required: [] } },\n  { name: 'payout_schedule', description: 'Расчётные периоды и даты оплаты.',\n    input_schema: { type: 'object', properties: { periods: { type: 'integer' } }, required: [] } },\n  { name: 'legal_clause', description: 'Текст пункта условий или политики по номеру.',\n    input_schema: { type: 'object', properties: { number: { type: 'string' }, kind: { type: 'string', enum: ['TERMS', 'PRIVACY'] }, locale: { type: 'string', enum: ['fi', 'en'] } }, required: ['number'] } },\n  { name: 'place_guide', description: 'Площадка справочника: адрес ворот и координаты. Часов работы там НЕТ.',\n    input_schema: { type: 'object', properties: { query: { type: 'string' }, locale: { type: 'string', enum: ['fi', 'en'] } }, required: ['query'] } },\n  { name: 'sql', description: 'Свободный запрос SELECT по базе. Только оператору. Суммы в центах.',\n    input_schema: { type: 'object', properties: { query: { type: 'string' }, limit: { type: 'integer' } }, required: ['query'] } },\n];\n\nfunction fallbackSystem(audience, companyName) {\n  const admin = audience === 'ADMIN';\n  const driver = audience === 'DRIVER';\n  const carrier = audience === 'CARRIER' || driver;\n\n  const who = admin\n    ? 'Ты — помощник оператора платформы RAHTIS (Aivomaa Oy). Собеседник ведёт платформу, а не возит и не заказывает.'\n    : driver\n      ? 'Ты — помощник платформы RAHTIS для водителя грузовика.'\n      : carrier\n        ? 'Ты — помощник платформы RAHTIS для транспортной компании (перевозчика).'\n        : 'Ты — помощник платформы RAHTIS для заказчика: экспедитора или логистического оператора.';\n\n  const scope = admin\n    ? 'Тебе доступна вся платформа: любой заказ, обе стороны сделки, деньги в целом. Не хватило готового инструмента — бери sql. Суммы в базе в центах.'\n    : 'Ты видишь ТОЛЬКО данные своей компании: инструменты сами ограничивают выдачу тредом.';\n\n  return [\n    who,\n    admin ? 'Компании у него нет: оператор посредник, а не сторона сделки.' : 'Компания пользователя: ' + (companyName || 'не указана') + '.',\n    '',\n    scope,\n    driver ? 'Деньги — дело компании, а не водителя: ставок и выплат ты не показываешь.' : '',\n    '',\n    'Не выдумывай суммы, даты, статусы и номера. Нужен факт — возьми его инструментом.',\n    'Инструмента не хватило или база отказала — так и скажи и предложи написать оператору.',\n    '',\n    'Отвечай коротко и по делу. Язык ответа — тот же, на котором написал собеседник.',\n  ].filter(Boolean).join(String.fromCharCode(10));\n}\n\nconst system = src.system || fallbackSystem(src.audience, src.company_name);\nconst tools = Array.isArray(src.tools) && src.tools.length ? src.tools : fallbackTools;\n\n/*\n * Платформа присылает инструменты в формате Anthropic (input_schema) —\n * здесь они переводятся в формат функций OpenAI. Список и права те же.\n */\nconst toOpenAi = (t) => t && t.type === 'function' ? t : {\n  type: 'function',\n  function: { name: t.name, description: t.description || '', parameters: t.input_schema || { type: 'object', properties: {} } },\n};\n\nconst state = {\n  conversation_id: src.conversation_id,\n  dispatch_token: src.dispatch_token,\n  system,\n  tools: tools.map(toOpenAi),\n  iterations: 0,\n  messages: [{ role: 'user', content: String(src.text || '') }],\n};\n\nreturn [{ json: { state, payload: JSON.stringify({\n  model: 'gpt-4.1-mini',\n  max_completion_tokens: 2048,\n  temperature: 0.2,\n  messages: [{ role: 'system', content: state.system }].concat(state.messages),\n  tools: state.tools,\n  tool_choice: 'auto',\n  parallel_tool_calls: false,\n}) } }];\n"
       },
       "id": "build-first",
       "name": "Собрать первый запрос",
@@ -80,47 +80,41 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://api.anthropic.com/v1/messages",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "content-type",
-              "value": "application/json"
-            },
-            {
-              "name": "anthropic-version",
-              "value": "2023-06-01"
-            }
-          ]
-        },
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
         "sendBody": true,
         "contentType": "json",
         "specifyBody": "json",
         "jsonBody": "={{ JSON.parse($json.payload) }}",
         "options": {
+          "timeout": 60000,
           "response": {
             "response": {
               "neverError": true
             }
           }
-        },
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth"
+        }
       },
       "id": "http-claude",
-      "name": "Claude: ответить",
+      "name": "OpenAI: ответить",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
         -300,
         220
       ],
-      "onError": "continueRegularOutput"
+      "onError": "continueRegularOutput",
+      "credentials": {
+        "openAiApi": {
+          "id": "WaDq0AeJ9M1aNO0b",
+          "name": "OpenAi account 2"
+        }
+      }
     },
     {
       "parameters": {
-        "jsCode": "// Разбор ответа модели.\n//\n// Ответ ассистента кладётся в историю ЦЕЛИКОМ, вместе с блоками tool_use:\n// следующий запрос обязан содержать тот же tool_use, к которому мы вернём\n// tool_result, иначе API не свяжет их.\n\n// Состояние разговора берётся у предыдущего узла, а не из ответа HTTP:\n// узел HTTP заменяет элемент целиком, и всё, что мы к нему прикрепили,\n// до сюда не доезжает. На первом круге состояние даёт сборщик запроса,\n// на следующих — последний прогон «Добавить результат».\nlet prev = null;\ntry {\n  const added = $('Добавить результат').all();\n  if (added.length) prev = added[added.length - 1].json.__state;\n} catch (e) {\n  prev = null;\n}\nif (!prev) prev = $('Собрать первый запрос').first().json.state;\n\nconst res = $json;\n\nif (res.error || !Array.isArray(res.content)) {\n  const why = res.error ? (res.error.message || JSON.stringify(res.error)) : (res.message || 'ответ модели не разобран');\nreturn [{ json: { __state: prev, done: true, failed: true, model_error: String(why).slice(0, 300),\n  reply: 'Palvelu ei vastaa juuri nyt. / Служба сейчас не отвечает.' } }];\n}\n\nconst messages = prev.messages.concat([{ role: 'assistant', content: res.content }]);\nconst next = Object.assign({}, prev, { messages });\n\nconst toolUse = res.content.find((b) => b.type === 'tool_use');\nconst text = res.content.filter((b) => b.type === 'text').map((b) => b.text).join('').trim();\n\n// Потолок на круги: модель, зациклившаяся на инструментах, не должна\n// молотить бесконечно. Четырёх хватает на «найди заказ, посмотри статус,\n// подними пункт договора».\nconst overLimit = next.iterations >= 4;\n\nif (res.stop_reason === 'tool_use' && toolUse && !overLimit) {\n  return [{ json: { __state: next, done: false, tool: toolUse.name, tool_use_id: toolUse.id, args: toolUse.input || {} } }];\n}\n\nreturn [{ json: {\n  __state: next,\n  done: true,\n  reply: text || 'En löytänyt vastausta. Ole yhteydessä operaattoriin. / Ответа не нашёл, напишите оператору.',\n} }];"
+        "jsCode": "// Разбор ответа модели (OpenAI chat completions).\n//\n// Сообщение ассистента кладётся в историю вместе с tool_calls: следующий\n// запрос обязан содержать тот же вызов, к которому мы вернём ответ\n// инструмента (role: tool, tool_call_id), иначе API его не свяжет.\n\nlet prev = null;\ntry {\n  const added = $('Добавить результат').all();\n  if (added.length) prev = added[added.length - 1].json.__state;\n} catch (e) {\n  prev = null;\n}\nif (!prev) prev = $('Собрать первый запрос').first().json.state;\n\nconst res = $json;\nconst msg = res && Array.isArray(res.choices) && res.choices[0] ? res.choices[0].message : null;\n\nif (res.error || !msg) {\n  const why = res.error ? (res.error.message || JSON.stringify(res.error)) : 'ответ модели не разобран';\n  return [{ json: { __state: prev, done: true, failed: true, model_error: String(why).slice(0, 300),\n    reply: 'Palvelu ei vastaa juuri nyt. / Служба сейчас не отвечает.' } }];\n}\n\n/* Один вызов за круг: parallel_tool_calls выключен, но держим и здесь. */\nconst call = Array.isArray(msg.tool_calls) && msg.tool_calls.length ? msg.tool_calls[0] : null;\nconst assistant = call\n  ? { role: 'assistant', content: msg.content || null, tool_calls: [call] }\n  : { role: 'assistant', content: msg.content || '' };\n\nconst messages = prev.messages.concat([assistant]);\nconst next = Object.assign({}, prev, { messages });\nconst text = String(msg.content || '').trim();\n\n// Потолок на круги: четырёх хватает на «найди заказ, посмотри статус,\n// подними пункт договора».\nconst overLimit = next.iterations >= 4;\n\nif (call && !overLimit) {\n  let args = {};\n  try { args = JSON.parse(call.function.arguments || '{}'); } catch (e) { args = {}; }\n  return [{ json: { __state: next, done: false, tool: call.function.name, tool_use_id: call.id, args } }];\n}\n\nreturn [{ json: {\n  __state: next,\n  done: true,\n  reply: text || 'En löytänyt vastausta. Ole yhteydessä operaattoriin. / Ответа не нашёл, напишите оператору.',\n} }];\n"
       },
       "id": "parse-claude",
       "name": "Разобрать ответ",
@@ -220,7 +214,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Результат инструмента обратно в разговор.\n//\n// Отказ тоже возвращается модели — блоком с is_error, а не молчанием:\n// «заказа с таким номером нет» это ответ, который модель должна\n// пересказать пользователю, а не повод оборвать разговор.\n\n// last(), а не item(): узел отрабатывает по разу на каждый круг\n// инструментов, и нужен самый свежий прогон.\nconst runs = $('Подпись: инструмент').all();\nconst signed = runs[runs.length - 1].json;\nconst st = signed.__state;\nconst res = $json;\n\nconst isError = Boolean(res.error);\nconst content = isError\n  ? String(res.error) + (res.detail ? ': ' + res.detail : '')\n  : JSON.stringify(res);\n\nconst messages = st.messages.concat([{\n  role: 'user',\n  content: [{\n    type: 'tool_result',\n    tool_use_id: signed.tool_use_id,\n    content,\n    is_error: isError,\n  }],\n}]);\n\nconst next = Object.assign({}, st, { messages, iterations: st.iterations + 1 });\n\nreturn [{ json: { __state: next, payload: JSON.stringify({\n  model: 'claude-opus-5',\n  max_tokens: 2048,\n  output_config: { effort: 'medium' },\n  system: next.system,\n  tools: next.tools,\n  tool_choice: { type: 'auto', disable_parallel_tool_use: true },\n  messages: next.messages,\n}) } }];"
+        "jsCode": "// Результат инструмента обратно в разговор (OpenAI: role tool).\n//\n// Отказ тоже возвращается модели текстом с пометкой ошибки, а не\n// молчанием: «заказа с таким номером нет» модель должна пересказать.\n\nconst runs = $('Подпись: инструмент').all();\nconst signed = runs[runs.length - 1].json;\nconst st = signed.__state;\nconst res = $json;\n\nconst isError = Boolean(res.error);\nconst content = isError\n  ? 'ERROR: ' + String(res.error) + (res.detail ? ': ' + res.detail : '')\n  : JSON.stringify(res);\n\nconst messages = st.messages.concat([{ role: 'tool', tool_call_id: signed.tool_use_id, content }]);\nconst next = Object.assign({}, st, { messages, iterations: st.iterations + 1 });\n\nreturn [{ json: { __state: next, payload: JSON.stringify({\n  model: 'gpt-4.1-mini',\n  max_completion_tokens: 2048,\n  temperature: 0.2,\n  messages: [{ role: 'system', content: next.system }].concat(next.messages),\n  tools: next.tools,\n  tool_choice: 'auto',\n  parallel_tool_calls: false,\n}) } }];\n"
       },
       "id": "add-result",
       "name": "Добавить результат",
@@ -374,18 +368,7 @@
       "main": [
         [
           {
-            "node": "Claude: ответить",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Claude: ответить": {
-      "main": [
-        [
-          {
-            "node": "Разобрать ответ",
+            "node": "OpenAI: ответить",
             "type": "main",
             "index": 0
           }
@@ -447,7 +430,7 @@
       "main": [
         [
           {
-            "node": "Claude: ответить",
+            "node": "OpenAI: ответить",
             "type": "main",
             "index": 0
           }
@@ -492,6 +475,17 @@
         [
           {
             "node": "Ответ платформе",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI: ответить": {
+      "main": [
+        [
+          {
+            "node": "Разобрать ответ",
             "type": "main",
             "index": 0
           }
