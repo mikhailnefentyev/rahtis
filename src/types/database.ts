@@ -2207,7 +2207,22 @@ export type Database = {
           source_lang?: string | null
           translations?: Json
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "order_messages_author_driver_id_fkey"
+            columns: ["author_driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_messages_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       order_offers: {
         Row: {
@@ -4511,11 +4526,6 @@ export type Database = {
         Returns: string
       }
       delete_order: { Args: { p_order_id: string }; Returns: string }
-      order_chat: { Args: { p_order_id: string }; Returns: Json }
-      post_order_message: {
-        Args: { p_body: string; p_order_id: string; p_quick?: string }
-        Returns: Json
-      }
       desk_orders: {
         Args: { p_limit?: number; p_region?: string }
         Returns: {
@@ -5137,6 +5147,7 @@ export type Database = {
           vehicles: number
         }[]
       }
+      order_chat: { Args: { p_order_id: string }; Returns: Json }
       order_dispatch_card: { Args: { p_order_id: string }; Returns: Json }
       order_dispatch_recipients: {
         Args: { p_order_id: string }
@@ -5245,6 +5256,10 @@ export type Database = {
       pool_remove_vehicle: {
         Args: { p_vehicle_id: string }
         Returns: undefined
+      }
+      post_order_message: {
+        Args: { p_body: string; p_order_id: string; p_quick?: string }
+        Returns: Json
       }
       price_guide: {
         Args: {
