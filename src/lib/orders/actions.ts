@@ -360,6 +360,8 @@ export async function publishOrderAction(
        */
       direct_vehicle_id: direct ? directVehicle : '',
       ...(group ? { group_vehicle_ids: groupVehicles, group_minutes: str(formData, 'group_minutes') } : {}),
+      /* Стол «напрямую с перевозчиком»: договор между сторонами, только подписчики. */
+      desk_contract: !direct && !group && str(formData, 'desk_contract') === 'CARRIER' ? 'CARRIER' : 'RAHTIS',
     },
     p_stops: stops,
     p_publish: true,

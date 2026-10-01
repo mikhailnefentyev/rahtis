@@ -153,8 +153,26 @@ export function withVat(cents: number, bps: number): number {
  */
 export const SUBSCRIPTION_UNIT_CENTS = 2990;
 
-/** Плата заказчика за заказ со стола: 3 % сверху цены. */
-export const SHIPPER_FEE_BPS = 300;
+/**
+ * Плата заказчика за рейс подряда (Aivomaa — сторона договора): 5 %
+ * сверху цены, с 1.10.2026. Прямые рейсы подписчика и стол «напрямую» —
+ * без платы.
+ */
+export const SHIPPER_FEE_BPS = 500;
+
+/** Минимум оператора с рейса подряда, заказчик и перевозчик вместе: 15 €. */
+export const MIN_FEE_CENTS = 1500;
+
+/**
+ * Ставка заказчика с минимумом — копия app.shipper_fee_bps_for: 5 %, а
+ * если вместе с удержанием перевозчика меньше 15 €, столько, чтобы
+ * хватило. Вверх, чтобы округление не увело сумму ниже минимума.
+ */
+export function shipperFeeBps(rateCents: number, commissionBps: number = COMMISSION_BPS): number {
+  if (!Number.isFinite(rateCents) || rateCents <= 0) return SHIPPER_FEE_BPS;
+  const carrier = Math.round((rateCents * commissionBps) / 10_000);
+  return Math.max(SHIPPER_FEE_BPS, Math.ceil(((MIN_FEE_CENTS - carrier) * 10_000) / rateCents));
+}
 
 /**
  * Последний бесплатный день компании: конец первого полного календарного

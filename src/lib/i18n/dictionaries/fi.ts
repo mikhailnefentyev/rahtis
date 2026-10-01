@@ -193,7 +193,7 @@ export const fi = {
     partnershipSub: 'Alusta kuukausimaksulla',
     partnershipCon: 'Alihankinta',
     partnershipSubText:
-      '29,90 € (ilman alv:tä) kuukaudessa jokaisesta autosta, joka ajoi kuukauden aikana. Omat asiakkaasi ja heidän suorat tilauksensa laskutat itse; tarjouspöydältä otetusta keikasta 3 %.',
+      '29,90 € (ilman alv:tä) kuukaudessa jokaisesta autosta, joka ajoi kuukauden aikana. Omat asiakkaasi ja heidän suorat tilauksensa laskutat itse, samoin pöydän suorat sopimukset; tarjouspöydältä Aivomaan vastuulla otetusta keikasta 3 %.',
     partnershipConText:
       '3 % jokaisen keikan hinnasta, vähennetään tilityksestä. Laskut asiakkaille, rahtikirjat ja reklamaatiot hoidamme me; kuukausimaksua ei peritä.',
     partnershipSwitch: 'Vaihda: {mode}',
@@ -640,7 +640,7 @@ export const fi = {
     apiFreeEyebrow: 'Maksuton',
     apiFreeTitle: 'Ei kuukausimaksua, ei kutsuhintaa',
     apiFreeText:
-      'Rajapinnan käyttö ei maksa mitään. Maksat vain kuljetuksista kuten kabinetissa: suora tilaus tutulle autolle ilman palvelumaksua, tarjouspöydän tilaus 3 %.',
+      'Rajapinnan käyttö ei maksa mitään. Maksat vain kuljetuksista kuten kabinetissa: kun Aivomaa on sopimuskumppanisi, palvelumaksu on 5 % (vähintään 15 € keikalta yhdessä kuljetusliikkeen maksun kanssa); suora sopimus kuukausimaksua käyttävän kuljetusliikkeen kanssa on maksuton.',
     apiFastEyebrow: 'Nopea',
     apiFastTitle: 'Tilaus sekunneissa, muutos minuutissa',
     apiFastText:
@@ -933,7 +933,7 @@ export const fi = {
   },
 
   orderForm: {
-    feeHint: 'Yhteiseltä pöydältä tilatusta kuljetuksesta laskutetaan lisäksi 3 % palvelumaksu; suora tilaus vakioautolle on maksuton.',
+    feeHint: 'Kun Aivomaa vastaa kuljetuksesta, laskutetaan lisäksi 5 % palvelumaksu (vähintään 15 € keikalta yhdessä kuljetusliikkeen maksun kanssa). Suora sopimus kuukausimaksua käyttävän kuljetusliikkeen kanssa on maksuton.',
     title: 'Uusi kuljetus',
     subtitle: 'Täytä reitti kokonaan ja julkaise. Kuljetus näkyy kuljetusliikkeille heti.',
     type: 'Kuljetuksen tyyppi',
@@ -1148,7 +1148,7 @@ export const fi = {
     trendTitle: 'Kehitys',
     trendTurnover: 'Kuljetusten arvo',
     trendRevenue: 'Meidän osuutemme',
-    trendHint: 'Viikot maanantaista sunnuntaihin, summat ilman alv:tä. Osuus on kuljetusliikkeen 3 % alihankinnasta ja tilaajan 3 % pöydältä otetusta keikasta; kuukausimaksut eivät ole mukana.',
+    trendHint: 'Viikot maanantaista sunnuntaihin, summat ilman alv:tä. Osuus on kuljetusliikkeen 3 % ja tilaajan 5 % (vähintään 15 € yhteensä) keikoista, joissa Aivomaa on sopimuskumppani; kuukausimaksut eivät ole mukana.',
     subsTitle: 'Kuukausimaksut',
     subsLede: 'Kuukausimaksu peritään kuukausimaksullisilta kuljetusliikkeiltä ajaneista autoista. Ensin se vähennetään tilityksestä; kattamaton osa laskutetaan.',
     subsColMonth: 'Kuukausi',
@@ -1307,7 +1307,7 @@ export const fi = {
     partnership: 'Kuljetusliikkeen tapa',
     partnershipSub: 'Kuukausimaksu',
     partnershipCon: 'Alihankinta',
-    partnershipSubHint: '29,90 € kuukaudessa ajanutta autoa kohden. Omat asiakkaat ja suorat tilaukset laskuttaa kuljetusliike itse; pöydältä otetusta keikasta 3 %.',
+    partnershipSubHint: '29,90 € kuukaudessa ajanutta autoa kohden. Omat asiakkaat, suorat tilaukset ja pöydän suorat sopimukset laskuttaa kuljetusliike itse; pöydältä Aivomaan vastuulla otetusta keikasta 3 %.',
     partnershipConHint: '3 % jokaisesta keikasta. Laskut asiakkaille, rahtikirjat ja reklamaatiot hoidamme me; kuukausimaksua ei peritä.',
     partnershipSwitch: 'Vaihda tavaksi {mode}',
     testHint: 'Testiyrityksen keikat eivät mene laskuihin eivätkä tilityksiin.',
@@ -2702,7 +2702,7 @@ export const fi = {
     title: 'Asiakkaat',
     inviteTitle: 'Kutsu oma asiakkaasi',
     inviteText:
-      'Asiakkaasi saa sähköpostin, jossa hakemus on valmiiksi täytetty. Kun hyväksymme sen, asiakas voi lähettää suoria tilauksia autoillesi heti — ilman palvelumaksua.',
+      'Asiakkaasi saa sähköpostin, jossa hakemus on valmiiksi täytetty. Kun hyväksymme sen, asiakas voi lähettää suoria tilauksia autoillesi heti. Jos käytät kuukausimaksua, näistä keikoista ei peritä palvelumaksua.',
     inviteName: 'Yrityksen nimi',
     inviteBusinessId: 'Y-tunnus',
     inviteEmail: 'Sähköposti',
@@ -2862,6 +2862,14 @@ export const fi = {
     groupWindow: 'Aikaa ennen yhteistä pöytää',
     groupTake: 'Otan — vahvistettu',
     groupOnly: 'Kuljetus on nyt tarjolla vain tilaajan omille autoille.',
+    deskContract: 'Sopimus',
+    contractRahtis: 'Aivomaa vastaa',
+    contractRahtisHint: 'Aivomaa on sopimuskumppanisi: yksi lasku, vastuu kuljetuksesta ja reklamaatiot meillä. Palvelumaksu 5 %, vähintään 15 € keikalta yhdessä kuljetusliikkeen maksun kanssa.',
+    contractCarrier: 'Suoraan kuljetusliikkeen kanssa',
+    contractCarrierHint: 'Sopimus ja lasku teidän ja kuljetusliikkeen välillä, palvelumaksua ei ole. Vain kuukausimaksua käyttävät kuljetusliikkeet näkevät ja voivat ottaa tilauksen.',
+    deskDirectBadge: 'Suora sopimus tilaajan kanssa',
+    deskDirectShipper: 'Suora sopimus: kuljetusliike laskuttaa teitä itse, palvelumaksua ei ole. Tilauksen näkevät vain kuukausimaksua käyttävät kuljetusliikkeet.',
+    subscribersOnly: 'Suoran sopimuksen tilauksen voivat ottaa vain kuukausimaksua käyttävät kuljetusliikkeet.',
   },
 
   money: {

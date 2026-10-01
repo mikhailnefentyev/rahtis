@@ -170,6 +170,10 @@ export function OrderCard({
                 * решения, и увести заказ у них из-под руки нечестно.
                 */}
               {/* Предложен группе своих машин — видят только они, до времени окна. */}
+              {order.status === 'OPEN' && order.desk_contract === 'CARRIER' && (
+                <p className="mt-3 text-xs text-ink-muted">{t.direct.deskDirectShipper}</p>
+              )}
+
               {order.status === 'OPEN' && order.group_until && !order.group_released_at && (
                 <p className="mt-3 rounded-control border border-accent-line bg-accent-wash px-3 py-2.5 text-[13px]">
                   {m('direct.groupWaiting', {

@@ -66,6 +66,7 @@ export function DispatchPicker({
   const direct = mode === 'DIRECT' && fitting.length > 0;
   const group = mode === 'GROUP' && fitting.length > 1;
   const effective = direct ? 'DIRECT' : group ? 'GROUP' : 'DESK';
+  const [deskContract, setDeskContract] = useState<'RAHTIS' | 'CARRIER'>('RAHTIS');
 
   return (
     <fieldset className="flex flex-col gap-3">
@@ -132,6 +133,32 @@ export function DispatchPicker({
             </Select>
           )}
         </Field>
+      )}
+
+      {/* Стол: Aivomaa отвечает (подряд) или договор напрямую с перевозчиком-подписчиком. */}
+      {effective === 'DESK' && (
+        <div className="flex flex-col gap-2">
+          <input type="hidden" name="desk_contract" value={deskContract} />
+          <span className="label-micro">{t.direct.deskContract}</span>
+          {(['RAHTIS', 'CARRIER'] as const).map((value) => (
+            <label key={value} className="flex cursor-pointer items-start gap-2 text-[13px]">
+              <input
+                type="radio"
+                name="desk_contract_choice"
+                value={value}
+                checked={deskContract === value}
+                onChange={() => setDeskContract(value)}
+                className="mt-0.5 accent-[var(--color-accent)]"
+              />
+              <span>
+                <span className="font-semibold">{value === 'RAHTIS' ? t.direct.contractRahtis : t.direct.contractCarrier}</span>
+                <span className="block text-xs text-ink-muted">
+                  {value === 'RAHTIS' ? t.direct.contractRahtisHint : t.direct.contractCarrierHint}
+                </span>
+              </span>
+            </label>
+          ))}
+        </div>
       )}
 
       {direct && chosen?.busy && <p className="text-xs text-warn">{t.direct.busyWarn}</p>}

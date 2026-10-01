@@ -37,7 +37,7 @@ export type ReportLine = {
   commissionBps: number | null;
   commission: number | null;
   payout: number | null;
-  /** Плата заказчика 3 % за заказ со стола. У перевозчика — null. */
+  /** Плата заказчика за рейс подряда (5 %, минимум 15 € вместе). У перевозчика — null. */
   fee: number | null;
   /** База налога глазами роли: ставка с платой у заказчика и оператора, выплата у перевозчика. */
   net: number;

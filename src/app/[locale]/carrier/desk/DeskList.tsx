@@ -197,6 +197,8 @@ export function DeskList({
                     <Mono className="text-xs text-ink-dim">{order.ref}</Mono>
                     {/* Номер прицепа — по нему водитель находит железо на площадке. */}
                     {order.trailer_plate && <Plate>{order.trailer_plate}</Plate>}
+                    {/* Договор напрямую с заказчиком: без нашей платы, счёт выставляет перевозчик. */}
+                    {order.desk_contract === 'CARRIER' && <Badge tone="info">{t.direct.deskDirectBadge}</Badge>}
                   </div>
 
                   <p className="mt-2 font-mono text-sm tracking-tight text-accent">

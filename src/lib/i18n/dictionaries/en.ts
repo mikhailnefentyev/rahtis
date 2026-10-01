@@ -186,7 +186,7 @@ export const en = {
     partnershipSub: 'The platform for a monthly fee',
     partnershipCon: 'Subcontracting',
     partnershipSubText:
-      '€29.90 (excl. VAT) a month for each vehicle that drove during the month. You invoice your own clients and their direct orders yourself; 3 % on a job taken from the offer table.',
+      '€29.90 (excl. VAT) a month for each vehicle that drove during the month. You invoice your own clients, their direct orders and direct-contract board jobs yourself; 3 % on a job taken from the offer table under Aivomaa’s responsibility.',
     partnershipConText:
       '3 % of the price of every job, deducted from the settlement. We handle the invoices to clients, the consignment notes and the claims; no monthly fee is charged.',
     partnershipSwitch: 'Switch to: {mode}',
@@ -573,7 +573,7 @@ export const en = {
     apiFreeEyebrow: 'Free',
     apiFreeTitle: 'No monthly fee, no price per call',
     apiFreeText:
-      'Using the API costs nothing. You pay only for transports, just as in the cabinet: a direct order to a known vehicle without a service fee, a desk order 3 %.',
+      'Using the API costs nothing. You pay only for transports, just as in the cabinet: when Aivomaa is your contracting party, the service fee is 5 % (at least 15 € per job together with the carrier fee); a direct contract with a carrier on the monthly plan is free.',
     apiFastEyebrow: 'Fast',
     apiFastTitle: 'An order in seconds, a change within a minute',
     apiFastText:
@@ -845,7 +845,7 @@ export const en = {
   },
 
   orderForm: {
-    feeHint: 'A 3 % service fee is added for a transport ordered from the load board; a direct order to a regular vehicle is free.',
+    feeHint: 'When Aivomaa is responsible for the transport, a 5 % service fee is added (at least 15 € per job together with the carrier fee). A direct contract with a carrier on the monthly plan is free.',
     title: 'New order',
     subtitle: 'Fill in the whole route and publish. Carriers see it immediately.',
     type: 'Type of transport',
@@ -1061,7 +1061,7 @@ export const en = {
     trendTitle: 'Trend',
     trendTurnover: 'Value of transports',
     trendRevenue: 'Our share',
-    trendHint: 'Weeks run Monday to Sunday, amounts excl. VAT. The share is the carrier 3 % from subcontracting and the shipper 3 % on a job taken from the table; monthly fees are not included.',
+    trendHint: 'Weeks run Monday to Sunday, amounts excl. VAT. The share is the carrier 3 % and the shipper 5 % (at least 15 € together) on jobs where Aivomaa is the contracting party; monthly fees are not included.',
     subsTitle: 'Monthly fees',
     subsLede: 'The monthly fee is charged to carriers on the monthly plan for the vehicles that drove. It is first deducted from the settlement; the uncovered part is invoiced.',
     subsColMonth: 'Month',
@@ -1218,7 +1218,7 @@ export const en = {
     partnership: 'How the carrier works',
     partnershipSub: 'Monthly fee',
     partnershipCon: 'Subcontracting',
-    partnershipSubHint: '€29.90 a month per vehicle that drove. The carrier invoices its own clients and direct orders itself; 3 % on a job taken from the table.',
+    partnershipSubHint: '€29.90 a month per vehicle that drove. The carrier invoices its own clients, direct orders and direct-contract board jobs itself; 3 % on a job taken from the table under Aivomaa’s responsibility.',
     partnershipConHint: '3 % of every job. We handle the invoices to clients, the consignment notes and the claims; no monthly fee.',
     partnershipSwitch: 'Switch to {mode}',
     testHint: 'Jobs of a test company are not invoiced or settled.',
@@ -2596,7 +2596,7 @@ export const en = {
     title: 'Customers',
     inviteTitle: 'Invite your own customer',
     inviteText:
-      'Your customer gets an email with the application already filled in. Once we approve it, the customer can send direct orders to your vehicles straight away — without a service fee.',
+      'Your customer gets an email with the application already filled in. Once we approve it, the customer can send direct orders to your vehicles straight away. If you use the monthly plan, no service fee is charged on these jobs.',
     inviteName: 'Company name',
     inviteBusinessId: 'Business ID',
     inviteEmail: 'Email',
@@ -2755,6 +2755,14 @@ export const en = {
     groupWindow: 'Time before the shared board',
     groupTake: 'Take — confirmed',
     groupOnly: 'The transport is currently offered only to the shipper’s own vehicles.',
+    deskContract: 'Contract',
+    contractRahtis: 'Aivomaa is responsible',
+    contractRahtisHint: 'Aivomaa is your contracting party: one invoice, we are responsible for the transport and handle claims. Service fee 5 %, at least 15 € per job together with the carrier fee.',
+    contractCarrier: 'Directly with the carrier',
+    contractCarrierHint: 'The contract and invoice are between you and the carrier, no service fee. Only carriers on the monthly plan see and can take the order.',
+    deskDirectBadge: 'Direct contract with the shipper',
+    deskDirectShipper: 'Direct contract: the carrier invoices you itself, no service fee. Only carriers on the monthly plan see the order.',
+    subscribersOnly: 'A direct-contract order can be taken only by carriers on the monthly plan.',
     hasOffers: 'Offers have already arrived for this transport — choose from them.',
   },
 

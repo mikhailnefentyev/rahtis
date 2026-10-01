@@ -91,6 +91,10 @@ async function prepare(body: unknown): Promise<Prepared> {
     issues.push({ field: 'rate.currency', issue: 'only EUR is supported' });
   }
 
+  /* Договор стола: RAHTIS — Aivomaa отвечает, DIRECT — напрямую с перевозчиком-подписчиком. */
+  const contract = body.contract === undefined ? 'RAHTIS' : body.contract;
+  if (contract !== 'RAHTIS' && contract !== 'DIRECT') issues.push({ field: 'contract', issue: 'one of RAHTIS, DIRECT' });
+
   const trailerPlate = text(body.trailer_plate, 20)?.toUpperCase();
   if (haulKind === 'CONTAINER' && trailerPlate && !isValidContainerNumber(trailerPlate)) {
     issues.push({ field: 'trailer_plate', issue: 'not a valid ISO 6346 container number' });
@@ -212,6 +216,7 @@ async function prepare(body: unknown): Promise<Prepared> {
       route_geometry: route.geometry,
       route_bounds: route.bounds,
       route_fingerprint: routeFingerprint(points, countryCode),
+      desk_contract: contract === 'DIRECT' ? 'CARRIER' : 'RAHTIS',
     },
     stops,
   };
