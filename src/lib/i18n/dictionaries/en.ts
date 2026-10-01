@@ -186,7 +186,7 @@ export const en = {
     partnershipSub: 'The platform for a monthly fee',
     partnershipCon: 'Subcontracting',
     partnershipSubText:
-      '€29.90 (excl. VAT) a month for each vehicle that drove during the month. You invoice your own clients, their direct orders and direct-contract board jobs yourself; 3 % on a job taken from the offer table under Aivomaa’s responsibility.',
+      '€29.90 (excl. VAT) a month for each vehicle that drove during the month. No percentage is charged on your own clients, direct orders and direct-contract board jobs, and you get a weekly report of them. Other jobs from the offer table: 3 %.',
     partnershipConText:
       '3 % of the price of every job, deducted from the settlement. We handle the invoices to clients, the consignment notes and the claims; no monthly fee is charged.',
     partnershipSwitch: 'Switch to: {mode}',
@@ -449,7 +449,7 @@ export const en = {
     own1: 'The driver app: jobs, working time, load photos, the consignment note and the signature on the phone.',
     own2: 'Working time and an indicative wage from your own rates or the collective agreement tables.',
     own3: 'A map of rest, wash and service places in Finland, Sweden, Norway and Denmark.',
-    own4: 'Your client sends the order straight to your vehicle. You invoice it yourself and keep the whole price.',
+    own4: 'Your client sends the order straight to your vehicle. The whole price is yours, and the job goes into your weekly report.',
     own5: 'You pay €29.90 a month per vehicle that drove. A vehicle standing still costs nothing.',
     own6: 'The offer table is still there when a vehicle comes free.',
 
@@ -573,7 +573,7 @@ export const en = {
     apiFreeEyebrow: 'Free',
     apiFreeTitle: 'No monthly fee, no price per call',
     apiFreeText:
-      'Using the API costs nothing. You pay only for transports, just as in the cabinet: when Aivomaa is your contracting party, the service fee is 5 % (at least 15 € per job together with the carrier fee); a direct contract with a carrier on the monthly plan is free.',
+      'Using the API costs nothing. You pay only for transports, just as in the cabinet: a service fee of 5 % (at least 15 € per job together with the carrier fee); a direct contract with a carrier on the monthly plan is free.',
     apiFastEyebrow: 'Fast',
     apiFastTitle: 'An order in seconds, a change within a minute',
     apiFastText:
@@ -845,7 +845,7 @@ export const en = {
   },
 
   orderForm: {
-    feeHint: 'When Aivomaa is responsible for the transport, a 5 % service fee is added (at least 15 € per job together with the carrier fee). A direct contract with a carrier on the monthly plan is free.',
+    feeHint: 'Service fee 5 % (at least 15 € per job together with the carrier fee). A direct contract with a carrier on the monthly plan is free.',
     title: 'New order',
     subtitle: 'Fill in the whole route and publish. Carriers see it immediately.',
     type: 'Type of transport',
@@ -1061,7 +1061,7 @@ export const en = {
     trendTitle: 'Trend',
     trendTurnover: 'Value of transports',
     trendRevenue: 'Our share',
-    trendHint: 'Weeks run Monday to Sunday, amounts excl. VAT. The share is the carrier 3 % and the shipper 5 % (at least 15 € together) on jobs where Aivomaa is the contracting party; monthly fees are not included.',
+    trendHint: 'Weeks run Monday to Sunday, amounts excl. VAT. The share is the carrier 3 % and the shipper 5 % (at least 15 € together); direct contracts and monthly fees are not included.',
     subsTitle: 'Monthly fees',
     subsLede: 'The monthly fee is charged to carriers on the monthly plan for the vehicles that drove. It is first deducted from the settlement; the uncovered part is invoiced.',
     subsColMonth: 'Month',
@@ -1218,7 +1218,7 @@ export const en = {
     partnership: 'How the carrier works',
     partnershipSub: 'Monthly fee',
     partnershipCon: 'Subcontracting',
-    partnershipSubHint: '€29.90 a month per vehicle that drove. The carrier invoices its own clients, direct orders and direct-contract board jobs itself; 3 % on a job taken from the table under Aivomaa’s responsibility.',
+    partnershipSubHint: '€29.90 a month per vehicle that drove. No percentage on own clients, direct orders and direct-contract board jobs, with a weekly report; other board jobs 3 %.',
     partnershipConHint: '3 % of every job. We handle the invoices to clients, the consignment notes and the claims; no monthly fee.',
     partnershipSwitch: 'Switch to {mode}',
     testHint: 'Jobs of a test company are not invoiced or settled.',
@@ -1278,7 +1278,7 @@ export const en = {
     howTitle: 'How do you want to use the service?',
     howSub: 'The platform for a monthly fee',
     howSubText:
-      'You drive your own clients and use the app, working time, the map and the offer table. €29.90 a month for each vehicle that drove during the month. You invoice your clients yourself.',
+      'You drive your own clients and use the app, working time, the map and the offer table. €29.90 a month for each vehicle that drove during the month. You get a weekly report of the jobs.',
     howCon: 'Subcontracting',
     howConText:
       'We find the work, invoice the client, handle the consignment notes and the claims. 3 % of the job price, no monthly fee.',
@@ -1431,7 +1431,7 @@ export const en = {
     invoiceDate: 'Invoice date {date}',
     invoiceEmailSubject: 'RAHTIS · invoice {number} · period {from}–{to}',
     feeLine: 'Monthly fee {month}: {count} active vehicles × {unit} + VAT {vat}',
-    directLine: 'Your own clients: you invoice them directly',
+    directLine: 'Own clients: no percentage, weekly report',
     subTitle: 'Monthly fee',
     subColRef: 'Invoice',
     subColMonth: 'Month',
@@ -2646,9 +2646,9 @@ export const en = {
     revoke: 'Withdraw',
     none: 'No transports driven yet',
     anonymitySubscriber:
-      'You invoice direct orders yourself: a customer you have allowed direct orders from sees your company name, business ID and bank account and the driver contact details, and you see their name. For jobs taken from the offer desk the contracting party is Aivomaa Oy and customers appear as codes.',
+      'A client you have allowed to send direct orders sees your company name, business ID and account number and the driver’s contact details, and you see their name. In other offer-table jobs clients are shown by a code.',
     anonymity:
-      'Customers are shown by a code, not by name. The shipper sees your vehicle plate, rating and, for contact, the driver’s name, phone and email, but not your company name. Aivomaa Oy is the contracting party for both.',
+      'Clients are shown by a code, not by name. The shipper sees your vehicle’s registration number, rating and, for contact, the driver’s name, phone number and email, but not your company name.',
   },
 
   linkStatus: {
@@ -2734,7 +2734,7 @@ export const en = {
 
   known: {
     directBilling: 'Invoices you directly',
-    directBillingHint: 'The carrier of this vehicle invoices you itself and is liable for the transport. Pay to its account as stated on the invoice.',
+    directBillingHint: 'Direct contract with the carrier: no service fee, and the job goes into your weekly report.',
     carrierAccount: 'Account number',
     title: 'My vehicles',
     subtitle:
@@ -2784,12 +2784,12 @@ export const en = {
     groupTake: 'Take — confirmed',
     groupOnly: 'The transport is currently offered only to the shipper’s own vehicles.',
     deskContract: 'Contract',
-    contractRahtis: 'Aivomaa is responsible',
-    contractRahtisHint: 'Aivomaa is your contracting party: one invoice, we are responsible for the transport and handle claims. Service fee 5 %, at least 15 € per job together with the carrier fee.',
-    contractCarrier: 'Directly with the carrier',
-    contractCarrierHint: 'The contract and invoice are between you and the carrier, no service fee. Only carriers on the monthly plan see and can take the order.',
+    contractRahtis: 'RAHTIS service',
+    contractRahtisHint: 'Service fee 5 %, at least 15 € per job together with the carrier fee.',
+    contractCarrier: 'Direct contract',
+    contractCarrierHint: 'No service fee. Carriers on the monthly plan see and can take the order. The job goes into a weekly report.',
     deskDirectBadge: 'Direct contract with the shipper',
-    deskDirectShipper: 'Direct contract: the carrier invoices you itself, no service fee. Only carriers on the monthly plan see the order.',
+    deskDirectShipper: 'Direct contract: no service fee. Carriers on the monthly plan see the order.',
     subscribersOnly: 'A direct-contract order can be taken only by carriers on the monthly plan.',
     hasOffers: 'Offers have already arrived for this transport — choose from them.',
   },

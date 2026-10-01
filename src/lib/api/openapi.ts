@@ -770,7 +770,7 @@ export function openApi(serverUrl: string) {
               enum: ['RAHTIS', 'DIRECT'],
               default: 'RAHTIS',
               description:
-                'RAHTIS: Aivomaa Oy is your contracting party and invoices you; service fee 5 % of the price, at least 15 € per job together with the carrier fee. DIRECT: the contract and invoice are between you and the carrier; only carriers on the monthly plan can take it; no service fee.',
+                'RAHTIS: the RAHTIS service, service fee 5 % of the price, at least 15 € per job together with the carrier fee. DIRECT: a direct contract with a carrier on the monthly plan, no service fee; only such carriers see and can take the order.',
             },
             trailer: { type: 'string', maxLength: 120, description: 'Trailer description, e.g. "Curtainsider 13.6 m".' },
             trailer_plate: {

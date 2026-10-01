@@ -193,7 +193,7 @@ const fi: Texts = {
     body: (carrier) =>
       `Kuljetusliikkeenne ${carrier} käyttää RAHTIS-palvelua ja kutsuu teidät tilaamaan kuljetukset sen kautta.`,
     points: [
-      'Suora tilaus tutulle autolle — sopimus ja lasku suoraan kuljetusliikkeen kanssa, jos se käyttää kuukausimaksua.',
+      'Suora tilaus tutulle autolle muutamalla napautuksella.',
       'Seuraatte ajoa: saapumiset, kuittaukset, kuvat ja rahtikirjat samassa paikassa.',
       'Tarvittaessa sama tilaus tarjouspöydälle muille kuljetusliikkeille.',
     ],
@@ -359,7 +359,7 @@ const en: Texts = {
     preheader: 'Order transports directly from a carrier you know, all in one place.',
     body: (carrier) => `Your carrier ${carrier} uses RAHTIS and invites you to order your transports through it.`,
     points: [
-      'A direct order to a known vehicle — contract and invoice directly with the carrier if it uses the monthly plan.',
+      'A direct order to a known vehicle in a few taps.',
       'Follow the trip: arrivals, confirmations, photos and consignment notes in one place.',
       'When needed, the same order can go to the load board for other carriers.',
     ],
