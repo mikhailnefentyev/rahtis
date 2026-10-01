@@ -48,13 +48,14 @@ export function DriverNav({ unread }: { unread: number }) {
      * Полоса прячется, пока водитель печатает: с открытой клавиатурой
      * закреплённая снизу полоса на Android повисала посреди экрана, а на
      * iPhone прыгала при прокрутке («меню гуляет», 2.10.2026 — после
-     * переписки на экране рейса печатать стали чаще). translateZ — свой
-     * слой, чтобы на iPhone полоса не дрожала при инерционной прокрутке.
+     * переписки на экране рейса печатать стали чаще). Полоса больше не
+     * закреплена поверх страницы: она последняя строка экрана (см.
+     * ScrollArea в раскладке).
      */
     <nav
       aria-hidden={typing || undefined}
       className={cn(
-        'fixed inset-x-0 bottom-0 z-20 border-t border-line bg-surface pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_16px_rgb(0_0_0/0.06)] [transform:translateZ(0)]',
+        'relative z-20 shrink-0 border-t border-line bg-surface pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_16px_rgb(0_0_0/0.06)]',
         typing && 'hidden',
       )}
     >

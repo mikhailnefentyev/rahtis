@@ -3,6 +3,7 @@ import { getDriver } from '@/lib/driverApp/session';
 import { isLocale } from '@/lib/i18n';
 import { DriverNav } from '../DriverNav';
 import { NotLinked } from '../NotLinked';
+import { ScrollArea } from '../ScrollArea';
 import { OutboxBanner, OutboxProvider } from '../OutboxProvider';
 
 /**
@@ -27,11 +28,19 @@ export default async function DriverAppLayout({
 
   return (
     <OutboxProvider>
-      <div className="mx-auto w-full max-w-lg px-4 pt-[max(env(safe-area-inset-top),16px)] pb-28">
-        <OutboxBanner />
-        {children}
+      {/*
+        * Экран по высоте телефона: прокручивается середина, меню — нижняя
+        * строка. См. ScrollArea: на iPhone закреплённое меню уезжало.
+        */}
+      <div className="flex h-dvh flex-col">
+        <ScrollArea>
+          <div className="mx-auto w-full max-w-lg px-4 pt-[max(env(safe-area-inset-top),16px)] pb-6">
+            <OutboxBanner />
+            {children}
+          </div>
+        </ScrollArea>
+        <DriverNav unread={driver.unread} />
       </div>
-      <DriverNav unread={driver.unread} />
     </OutboxProvider>
   );
 }
