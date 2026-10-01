@@ -114,6 +114,7 @@ export const lv = {
     offlineStale: 'Rāda pēdējo ielādēto stāvokli.',
     sending: 'Nosūta atzīmes…',
     queuedBadge: 'rindā',
+    pushWhy: 'Bez paziņojumiem tiešo pasūtījumu redzēsiet tikai tad, kad atvērsiet lietotni.',
     pushTitle: 'Paziņojumi',
     pushHint:
       'Saņemsi paziņojumu par jaunu uzdevumu, tiešo pasūtījumu un atcelšanu arī tad, ja lietotne ir aizvērta.',

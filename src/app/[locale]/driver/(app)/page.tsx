@@ -41,6 +41,9 @@ export default async function DriverHome({
         <span className="font-mono text-[17px] font-bold tracking-tight">{driver.plate ?? t.driverApp.noVehicle}</span>
       </header>
 
+      {/* Без уведомлений прямой заказ водитель увидит, только открыв приложение. */}
+      <PushSetup compact />
+
       {/*
         Тренажёр — первым блоком: при пустом списке заданий он иначе висел
         посреди экрана под «заданий нет». Одна строка, не больше карточки
@@ -64,7 +67,6 @@ export default async function DriverHome({
 
       <ShiftBar shift={driver.shift} />
 
-      <PushSetup compact />
 
       <TaskTabs showDone={showDone} />
 

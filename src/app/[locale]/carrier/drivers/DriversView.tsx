@@ -32,6 +32,8 @@ export type DriverRow = {
   driver: Driver;
   vehicleId: string | null;
   payModel: PayModel | null;
+  /** Устройства, на которых водитель включил push-уведомления. */
+  pushDevices: number;
 };
 
 type VehicleOption = { id: string; plate: string };
@@ -142,6 +144,11 @@ function DriverCard({
             <Badge tone={driver.auth_user_id ? 'ok' : 'neutral'}>
               {driver.auth_user_id ? t.drivers.appLinked : t.drivers.appNotLinked}
             </Badge>
+            {driver.auth_user_id && (
+              <Badge tone={row.pushDevices > 0 ? 'ok' : 'warn'}>
+                {row.pushDevices > 0 ? t.drivers.pushOn : t.drivers.pushOff}
+              </Badge>
+            )}
           </div>
           <p className="mt-1 text-[13px] text-ink-muted">
             <Mono>{driver.phone}</Mono> · {driver.languages.join('/')}
@@ -151,6 +158,8 @@ function DriverCard({
           )}
 
           <AssignForm driverId={driver.id} currentVehicleId={row.vehicleId} vehicles={vehicles} />
+
+          {driver.auth_user_id && row.pushDevices === 0 && <PushReminder driver={driver} />}
 
           <InvitePanel driver={driver} />
         </div>
@@ -175,6 +184,48 @@ function DriverCard({
         </div>
       </CardBody>
     </Card>
+  );
+}
+
+/**
+ * Водитель вошёл в приложение, но уведомления не включил: прямой заказ он
+ * увидит, только открыв приложение. Напоминание — SMS с телефона
+ * перевозчика, как и приглашение: свой номер водитель знает и откроет.
+ */
+function PushReminder({ driver }: { driver: Driver }) {
+  const { t, m } = useI18n();
+  const [copied, setCopied] = useState(false);
+
+  const text = () => m('drivers.pushReminderSms', { link: `${window.location.origin}/fi/driver/profile` });
+
+  return (
+    <div className="mt-3 rounded-control border border-warn/40 bg-warn/5 px-3 py-2.5">
+      <p className="text-[13px] text-ink">{t.drivers.pushOffHint}</p>
+      <div className="mt-2 flex flex-wrap gap-2">
+        <Button
+          size="sm"
+          variant="primary"
+          onClick={() => {
+            window.location.href = `sms:${driver.phone}?&body=${encodeURIComponent(text())}`;
+          }}
+        >
+          {t.drivers.pushRemindSms}
+        </Button>
+        <Button
+          size="sm"
+          onClick={async () => {
+            try {
+              await navigator.clipboard.writeText(text());
+              setCopied(true);
+            } catch {
+              setCopied(false);
+            }
+          }}
+        >
+          {copied ? t.drivers.pushCopied : t.drivers.pushCopy}
+        </Button>
+      </div>
+    </div>
   );
 }
 

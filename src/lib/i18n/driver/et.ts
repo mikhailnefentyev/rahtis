@@ -114,6 +114,7 @@ export const et = {
     offlineStale: 'Näitame viimati laaditud seisu.',
     sending: 'Saadan märkeid…',
     queuedBadge: 'järjekorras',
+    pushWhy: 'Ilma teavitusteta näed otsetellimust alles siis, kui rakenduse avad.',
     pushTitle: 'Teated',
     pushHint:
       'Saad teate uuest ülesandest, otsetellimusest ja tühistamisest ka siis, kui rakendus on suletud.',

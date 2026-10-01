@@ -114,6 +114,7 @@ export const pl = {
     offlineStale: 'Pokazujemy ostatnio pobrany stan.',
     sending: 'Wysyłanie wpisów…',
     queuedBadge: 'w kolejce',
+    pushWhy: 'Bez powiadomień zlecenie bezpośrednie zobaczysz dopiero po otwarciu aplikacji.',
     pushTitle: 'Powiadomienia',
     pushHint:
       'Dostaniesz powiadomienie o nowym zadaniu, zleceniu bezpośrednim i anulowaniu, nawet gdy aplikacja jest zamknięta.',

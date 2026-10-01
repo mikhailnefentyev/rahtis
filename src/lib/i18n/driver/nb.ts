@@ -114,6 +114,7 @@ export const nb = {
     offlineStale: 'Viser sist hentede status.',
     sending: 'Sender registreringer…',
     queuedBadge: 'i kø',
+    pushWhy: 'Uten varsler ser du en direkteordre først når du åpner appen.',
     pushTitle: 'Varsler',
     pushHint:
       'Du får varsel om nytt oppdrag, direktebestilling og avbestilling selv om appen er lukket.',

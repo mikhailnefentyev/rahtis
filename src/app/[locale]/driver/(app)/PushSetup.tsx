@@ -104,11 +104,25 @@ export function PushSetup({ compact = false }: { compact?: boolean }) {
   }
 
   if (state === 'loading') return null;
-  if (compact && state !== 'off') return null;
+  /*
+   * На главном — пока уведомления не работают по любой причине: не
+   * включены, запрещены или телефон не умеет (iPhone без установки на
+   * экран «Домой»). Раньше карточка показывалась только для «не включены»,
+   * и водитель с запретом или без установки не узнавал, что прямые
+   * заказы до него не дойдут.
+   */
+  if (compact && state === 'on') return null;
 
   return (
-    <section className="rounded-card border border-line bg-surface px-4 py-3.5">
+    <section
+      className={
+        compact
+          ? 'rounded-card border-2 border-warn bg-surface px-4 py-3.5'
+          : 'rounded-card border border-line bg-surface px-4 py-3.5'
+      }
+    >
       <p className="text-[16px] font-semibold">{t.driverApp.pushTitle}</p>
+      {compact && <p className="mt-1 text-[15px] font-semibold text-warn">{t.driverApp.pushWhy}</p>}
       <p className="mt-1 text-[15px] text-ink-muted">
         {state === 'unsupported'
           ? t.driverApp.pushUnsupported

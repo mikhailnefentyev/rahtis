@@ -114,6 +114,7 @@ export const da = {
     offlineStale: 'Viser senest hentede status.',
     sending: 'Sender registreringer…',
     queuedBadge: 'i kø',
+    pushWhy: 'Uden notifikationer ser du først en direkte ordre, når du åbner appen.',
     pushTitle: 'Notifikationer',
     pushHint:
       'Du får besked om ny opgave, direkte bestilling og afbestilling, også når appen er lukket.',

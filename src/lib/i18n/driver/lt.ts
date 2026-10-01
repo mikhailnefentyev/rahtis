@@ -114,6 +114,7 @@ export const lt = {
     offlineStale: 'Rodoma paskutinė įkelta būsena.',
     sending: 'Siunčiamos žymos…',
     queuedBadge: 'eilėje',
+    pushWhy: 'Be pranešimų tiesioginį užsakymą pamatysite tik atidarę programėlę.',
     pushTitle: 'Pranešimai',
     pushHint:
       'Gausi pranešimą apie naują užduotį, tiesioginį užsakymą ir atšaukimą, net kai programėlė uždaryta.',

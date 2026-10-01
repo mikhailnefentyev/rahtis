@@ -27,7 +27,7 @@ export default async function DriversPage({ params }: { params: Promise<{ locale
 
   const [{ t }, supabase] = await Promise.all([getI18n(locale), createClient()]);
 
-  const [{ data: drivers }, { data: vehicles }, { data: assignments }, { data: profiles }] =
+  const [{ data: drivers }, { data: vehicles }, { data: assignments }, { data: profiles }, { data: push }] =
     await Promise.all([
       supabase.from('drivers').select('*').eq('company_id', company.id).order('full_name'),
       supabase
@@ -37,7 +37,10 @@ export default async function DriversPage({ params }: { params: Promise<{ locale
         .order('plate'),
       supabase.from('vehicle_drivers').select('vehicle_id, driver_id, during'),
       supabase.from('driver_pay_profiles').select('driver_id, model, valid_from'),
+      /* Уведомления на телефоне: без них прямой заказ водитель видит, только открыв приложение. */
+      supabase.rpc('carrier_drivers_push'),
     ]);
+  const pushDevices = new Map((push ?? []).map((p) => [p.driver_id, p.devices]));
 
   /* Открытый интервал — у диапазона без верхней границы текст кончается на «,)». */
   const vehicleByDriver = new Map<string, string>();
@@ -64,6 +67,7 @@ export default async function DriversPage({ params }: { params: Promise<{ locale
     driver: d,
     vehicleId: vehicleByDriver.get(d.id) ?? null,
     payModel: (modelByDriver.get(d.id)?.model as DriverRow['payModel']) ?? null,
+    pushDevices: pushDevices.get(d.id) ?? 0,
   }));
 
   return (

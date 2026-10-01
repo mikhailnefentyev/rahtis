@@ -4461,6 +4461,14 @@ export type Database = {
         Returns: string
       }
       delete_order: { Args: { p_order_id: string }; Returns: string }
+      carrier_drivers_push: {
+        Args: never
+        Returns: {
+          devices: number
+          driver_id: string
+          last_sent_at: string
+        }[]
+      }
       desk_orders: {
         Args: { p_limit?: number; p_region?: string }
         Returns: {

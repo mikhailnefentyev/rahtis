@@ -114,6 +114,7 @@ export const sv = {
     offlineStale: 'Visar senast hämtade läge.',
     sending: 'Skickar noteringar…',
     queuedBadge: 'i kö',
+    pushWhy: 'Utan aviseringar syns en direktorder först när du öppnar appen.',
     pushTitle: 'Aviseringar',
     pushHint:
       'Du får avisering om nytt uppdrag, direktbokning och avbokning även när appen är stängd.',
