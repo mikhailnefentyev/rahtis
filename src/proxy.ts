@@ -33,6 +33,25 @@ export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const [, first, second] = pathname.split('/');
 
+  /*
+   * Корень — настоящая страница, а не редирект (1.10.2026). Раньше любой
+   * запрос на / получал 307 на язык, и поисковик видел на месте
+   * rahtis.eu перенаправление: в индексе были /fi и /en, а сам домен —
+   * нет. Теперь редирект остаётся тем, чей язык известен (кука или
+   * Accept-Language: fi, en), а всем остальным — и роботам, которые
+   * приходят без языка, — корень отдаёт английскую витрину с ответом
+   * 200 и своим canonical (x-default). Метку x-rahtis-root читает главная.
+   */
+  if (pathname === '/' && !preferredLocale(request)) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/en';
+    const headers = new Headers(request.headers);
+    headers.set('x-rahtis-root', '1');
+    const rewrite = NextResponse.rewrite(url, { request: { headers } });
+    rewrite.headers.set('Vary', 'Accept-Language, Cookie');
+    return rewrite;
+  }
+
   if (!isLocale(first)) {
     const url = request.nextUrl.clone();
     /*
@@ -86,10 +105,15 @@ export async function proxy(request: NextRequest) {
  * географии языком, которого они не читают.
  */
 function resolveLocale(request: NextRequest): string {
+  return preferredLocale(request) ?? 'en';
+}
+
+/** Язык, который пришедший выбрал сам или который назвал браузер; иначе — ничего. */
+function preferredLocale(request: NextRequest): string | undefined {
   const fromCookie = request.cookies.get(LOCALE_COOKIE)?.value;
   if (isLocale(fromCookie)) return fromCookie;
 
-  return matchLocale(request.headers.get('accept-language')) ?? 'en';
+  return matchLocale(request.headers.get('accept-language'));
 }
 
 export const config = {

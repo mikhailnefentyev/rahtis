@@ -23,15 +23,33 @@ import { SITE_URL } from '@/lib/seo';
  * витрину или активируешь редакцию документа — поправь дату здесь.
  */
 const PAGES: { fi: string; en: string; priority: number; updated: string }[] = [
-  { fi: '', en: '', priority: 1, updated: '2026-09-23' },
+  { fi: '', en: '', priority: 1, updated: '2026-10-01' },
   { fi: '/apply', en: '/apply', priority: 0.8, updated: '2026-09-25' },
-  { fi: '/kayttoehdot', en: '/terms', priority: 0.3, updated: '2026-09-29' },
-  { fi: '/tietosuoja', en: '/privacy', priority: 0.3, updated: '2026-09-29' },
+  { fi: '/kayttoehdot', en: '/terms', priority: 0.3, updated: '2026-10-01' },
+  { fi: '/tietosuoja', en: '/privacy', priority: 0.3, updated: '2026-10-01' },
   { fi: '/api-docs', en: '/api-docs', priority: 0.4, updated: '2026-09-29' },
 ];
 
+/*
+ * Корень — отдельной строкой: с 1.10.2026 он отвечает страницей, а не
+ * редиректом, и он же x-default главной.
+ */
+const ROOT_UPDATED = '2026-10-01';
+
 export default function sitemap(): MetadataRoute.Sitemap {
-  return PAGES.flatMap((page) =>
+  const home = {
+    fi: `${SITE_URL}/fi`,
+    en: `${SITE_URL}/en`,
+    'x-default': `${SITE_URL}/`,
+  };
+  const root: MetadataRoute.Sitemap[number] = {
+    url: `${SITE_URL}/`,
+    lastModified: ROOT_UPDATED,
+    changeFrequency: 'monthly',
+    priority: 1,
+    alternates: { languages: home },
+  };
+  return [root].concat(PAGES.flatMap((page) =>
     (['fi', 'en'] as const).map((locale) => ({
       url: `${SITE_URL}/${locale}${page[locale]}`,
       lastModified: page.updated,
@@ -41,10 +59,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
         languages: {
           fi: `${SITE_URL}/fi${page.fi}`,
           en: `${SITE_URL}/en${page.en}`,
-          /* Как в разметке страниц: без языка в браузере — английская. */
-          'x-default': `${SITE_URL}/en${page.en}`,
+          /* Как в разметке страниц: без языка в браузере — английская, у главной — корень. */
+          'x-default': page.en === '' ? `${SITE_URL}/` : `${SITE_URL}/en${page.en}`,
         },
       },
     })),
-  );
+  ));
 }

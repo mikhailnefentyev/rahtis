@@ -53,8 +53,12 @@ export function pageMetadata(input: {
   description: string;
   /** Страницы входа и заявки поисковику не нужны. */
   noindex?: boolean;
+  /** Свой адрес вместо языкового: корень сайта, отданный без редиректа. */
+  canonical?: string;
+  /** x-default, если не английская версия: у главной это корень сайта. */
+  xDefault?: string;
 }): Metadata {
-  const { locale, paths, title, description, noindex } = input;
+  const { locale, paths, title, description, noindex, canonical, xDefault } = input;
 
   const url = (l: Locale) => `${SITE_URL}/${l}${paths[l]}`;
 
@@ -64,19 +68,19 @@ export function pageMetadata(input: {
     ...(title ? { title } : {}),
     description,
     alternates: {
-      canonical: url(locale),
+      canonical: canonical ?? url(locale),
       languages: {
         ...languages,
         /*
          * Для читателя, чей язык не наш, — английская версия. Тем же
          * правилом, по которому его встречает proxy.
          */
-        'x-default': url('en'),
+        'x-default': xDefault ?? url('en'),
       },
     },
     openGraph: {
       type: 'website',
-      url: url(locale),
+      url: canonical ?? url(locale),
       siteName: 'RAHTIS',
       title,
       description,

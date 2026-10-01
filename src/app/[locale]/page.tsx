@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { HeroPort } from '@/components/domain/HeroPort';
 import { LandingSections } from '@/components/domain/LandingSections';
@@ -29,13 +30,29 @@ export async function generateMetadata({
   const { locale } = await params;
   if (!isLocale(locale)) return {};
   const { t } = await getI18n(locale);
+  const root = locale === 'en' && (await headers()).get('x-rahtis-root') === '1';
 
-  return pageMetadata({
+  const metadata = pageMetadata({
     locale,
     paths: samePath(''),
     title: t.seo.homeTitle,
     description: t.seo.homeDescription,
+    canonical: root ? `${SITE_URL}/` : undefined,
+    xDefault: `${SITE_URL}/`,
   });
+
+  /*
+   * Марка — первым словом. Шаблон «%s · RAHTIS» из layout на страницу
+   * того же сегмента не действует, и главная называлась без имени: по
+   * запросу «RAHTIS» ей было нечем совпасть.
+   */
+  const title = `${t.brand.name} – ${t.seo.homeTitle}`;
+  return {
+    ...metadata,
+    title: { absolute: title },
+    openGraph: { ...metadata.openGraph, title },
+    twitter: { ...metadata.twitter, title },
+  };
 }
 
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
@@ -43,6 +60,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   if (!isLocale(locale)) notFound();
 
   const { t } = await getI18n(locale);
+  const root = locale === 'en' && (await headers()).get('x-rahtis-root') === '1';
+  const pageUrl = root ? `${SITE_URL}/` : `${SITE_URL}/${locale}`;
 
   /*
    * Карточка организации для машин.
@@ -62,7 +81,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     '@type': 'Organization',
     name: t.brand.name,
     legalName: APP.operator.legalName,
-    url: `${SITE_URL}/${locale}`,
+    url: pageUrl,
     logo: `${SITE_URL}/og.png`,
     description: t.seo.homeDescription,
     email: APP.operator.email,
@@ -73,6 +92,16 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     })),
   };
 
+  /* Сайт целиком: имя и языки — по ним ответчики узнают, что rahtis.eu и RAHTIS одно и то же. */
+  const website = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: t.brand.name,
+    url: `${SITE_URL}/`,
+    inLanguage: ['fi', 'en'],
+    publisher: { '@type': 'Organization', name: APP.operator.legalName },
+  };
+
   return (
     <>
       <script
@@ -80,7 +109,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         /*
          * Значения свои, из словаря и настроек, чужого текста здесь нет.
          */
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(organisation) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify([organisation, website]) }}
       />
 
       <SiteHeader />
