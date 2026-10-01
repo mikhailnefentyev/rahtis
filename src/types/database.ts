@@ -3448,6 +3448,10 @@ export type Database = {
       }
     }
     Functions: {
+      merge_message_translation: {
+        Args: { p_id: number; p_lang: string; p_source?: string; p_text?: string }
+        Returns: undefined
+      }
       abandon_order: {
         Args: { p_order_id: string; p_reason?: string }
         Returns: {

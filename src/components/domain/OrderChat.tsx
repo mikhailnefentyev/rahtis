@@ -42,9 +42,9 @@ export function OrderChat({
   const [original, setOriginal] = useState<Set<number>>(new Set());
 
   const load = useCallback(async () => {
-    const next = await loadChatAction(orderId);
+    const next = await loadChatAction(orderId, lang);
     if (next) setChat(next);
-  }, [orderId]);
+  }, [orderId, lang]);
 
   useEffect(() => {
     if (!open) return;
