@@ -20,7 +20,8 @@ export function GET() {
       scope: '/',
       display: 'standalone',
       orientation: 'portrait',
-      background_color: '#eef1f6',
+      /* Заставка Android: тёмный фон под иконкой — как экран загрузки. */
+      background_color: '#050b16',
       theme_color: '#0d647f',
       icons: [
         { src: '/icon.png', sizes: '512x512', type: 'image/png', purpose: 'any' },

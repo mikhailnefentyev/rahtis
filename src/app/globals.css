@@ -1434,3 +1434,36 @@
 [data-app='driver'] input[type='date']::-webkit-date-and-time-value {
   text-align: left;
 }
+
+/*
+ * Экран загрузки приложения водителя: тёмный фон и буква R, как заставка
+ * iPhone. Гаснет сам через долю секунды и не перехватывает нажатия.
+ */
+.boot-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 46%, rgb(31 143 196 / 0.45), rgb(15 79 122 / 0.18) 22%, transparent 42%),
+    linear-gradient(#050b16, #0a1830);
+  animation: boot-splash-out 0.35s ease-out 0.7s forwards;
+}
+.boot-splash img {
+  width: min(34vw, 160px);
+  height: auto;
+  margin-bottom: 8vh;
+}
+@keyframes boot-splash-out {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .boot-splash {
+    animation-duration: 0.01s;
+  }
+}

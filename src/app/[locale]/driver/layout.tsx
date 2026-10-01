@@ -16,10 +16,26 @@ export async function generateMetadata({
   return {
     title: t.driverApp.title,
     manifest: '/driver.webmanifest',
-    appleWebApp: { capable: true, title: 'RAHTIS', statusBarStyle: 'default' },
+    /*
+     * Заставка iPhone при запуске с экрана «Домой»: без неё iOS показывает
+     * белый экран, пока грузится страница. Картинки под размеры экранов —
+     * public/splash (тёмный фон, буква R), подбираются по media.
+     */
+    appleWebApp: { capable: true, title: 'RAHTIS', statusBarStyle: 'default', startupImage: SPLASH },
     robots: { index: false },
   };
 }
+
+/* iPhone: CSS-ширина, высота и плотность экрана — как в public/splash. */
+const SPLASH = (
+  [
+    [440, 956, 3], [430, 932, 3], [402, 874, 3], [393, 852, 3], [390, 844, 3],
+    [428, 926, 3], [414, 896, 3], [414, 896, 2], [375, 812, 3], [414, 736, 3], [375, 667, 2],
+  ] as const
+).map(([w, h, dpr]) => ({
+  url: `/splash/iphone-${w * dpr}x${h * dpr}.png`,
+  media: `(device-width: ${w}px) and (device-height: ${h}px) and (-webkit-device-pixel-ratio: ${dpr}) and (orientation: portrait)`,
+}));
 
 export const viewport: Viewport = {
   themeColor: '#0d647f',
@@ -57,6 +73,16 @@ export default async function DriverShell({
   return (
     <I18nProvider locale={locale} dictionary={t}>
       <div data-app="driver" className="min-h-dvh overflow-x-clip bg-ground text-ink">
+        {/*
+          * Экран загрузки: тот же, что заставка iPhone, — без белой вспышки
+          * между заставкой и приложением. Приходит с первыми байтами
+          * страницы и гаснет сам (CSS, без ожидания скриптов); при переходах
+          * внутри приложения оболочка не перерисовывается, и его нет.
+          */}
+        <div aria-hidden className="boot-splash">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/splash/mark-dark.png" alt="" width={512} height={521} />
+        </div>
         <ServiceWorker />
         {children}
       </div>
