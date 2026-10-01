@@ -76,7 +76,11 @@ export function DriverCertificates({
 
   const app = variant === 'app';
   const control = cn(
-    'w-full rounded-control border border-line bg-sunken px-3 text-ink',
+    /*
+     * min-w-0 и appearance-none: поле даты на iPhone иначе держит свою
+     * ширину, распирает колонку и делает страницу шире экрана.
+     */
+    'block w-full min-w-0 appearance-none rounded-control border border-line bg-sunken px-3 text-left text-ink',
     app ? 'h-12 text-[16px]' : 'h-9 text-[13px]',
   );
   const label = app ? 'text-[14px] text-ink-muted' : 'text-[12px] text-ink-muted';
@@ -153,11 +157,11 @@ export function DriverCertificates({
             </select>
           </label>
           <div className="grid grid-cols-2 gap-2.5">
-            <label className="flex flex-col gap-1">
+            <label className="flex min-w-0 flex-col gap-1">
               <span className={label}>{texts.issued}</span>
               <input type="date" name="issued_at" className={control} />
             </label>
-            <label className="flex flex-col gap-1">
+            <label className="flex min-w-0 flex-col gap-1">
               <span className={label}>{texts.expires}</span>
               <input type="date" name="expires_at" required className={control} />
             </label>

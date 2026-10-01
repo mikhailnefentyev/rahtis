@@ -28,7 +28,8 @@ export function LanguagePicker({ current }: { current: string | null }) {
         disabled={pending}
         aria-label={t.driverApp.language}
         onChange={() => start(() => form.current?.requestSubmit())}
-        className="h-11 w-44"
+        /* 16 px: мельче — iPhone увеличивает страницу при нажатии, и нижнее меню уезжает. */
+        className="h-11 w-44 text-[16px]"
       >
         <option value="">{t.driverApp.languageAuto}</option>
         {DRIVER_LOCALES.map((code) => (
