@@ -4,7 +4,8 @@ import { cn } from '@/lib/cn';
 import { getTripPhotos, type TripPhoto } from '@/lib/driverApp/photos';
 import { getDriverTasks, type DriverStop, type DriverTask } from '@/lib/driverApp/tasks';
 import { isLocale, type Locale } from '@/lib/i18n';
-import { getDriverI18n } from '@/lib/driverApp/i18n';
+import { driverLocaleOf, getDriverI18n } from '@/lib/driverApp/i18n';
+import { OrderChat } from '@/components/domain/OrderChat';
 import { stopTitle } from '@/lib/orders/haul';
 import { Arrive } from './Arrive';
 import { Confirmation } from './Confirmation';
@@ -32,7 +33,7 @@ export default async function DriverTaskPage({
   const { locale, id } = await params;
   if (!isLocale(locale)) notFound();
 
-  const [tasks, { t, m }] = await Promise.all([getDriverTasks(), getDriverI18n(locale)]);
+  const [tasks, { t, m }, chatLang] = await Promise.all([getDriverTasks(), getDriverI18n(locale), driverLocaleOf(locale)]);
   const task = tasks.find((x) => x.id === id);
   if (!task) notFound();
 
@@ -91,6 +92,9 @@ export default async function DriverTaskPage({
       </ol>
 
       {running && <ProblemForm orderId={task.id} />}
+
+      {/* Переписка с заказчиком и диспетчером: быстрые ответы — одной кнопкой. */}
+      <OrderChat orderId={task.id} lang={chatLang} variant="driver" />
     </main>
   );
 

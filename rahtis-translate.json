@@ -1,0 +1,241 @@
+{
+  "name": "RAHTIS · перевод переписки по рейсу",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "rahtis-translate",
+        "responseMode": "responseNode",
+        "options": {
+          "rawBody": true
+        }
+      },
+      "id": "wh-translate",
+      "name": "Сообщение из рейса",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -800,
+        300
+      ],
+      "webhookId": "rahtis-translate"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Проверка подписи RAHTIS на входящем вопросе.\n//\n// Платформа подписывает исходящий запрос тем же секретом, которым мы\n// подписываем обратные: HMAC-SHA256 на AGENT_WEBHOOK_SECRET от строки\n// `${timestamp}.${body}`, заголовок x-rahtis-signature вида sha256=<hex>.\n//\n// Без проверки вебхук открыт: кто узнал адрес, тот пришлёт свой\n// conversation_id и получит ответ агента в чужой тред.\n\nconst crypto = require('crypto');\n\n// Секрет для подписи.\n//\n// $env в узлах Code на n8n Cloud закрыт наглухо: с версии 2.0\n// N8N_BLOCK_ENV_ACCESS_IN_NODE по умолчанию true, и на облаке этот\n// переключатель недоступен. Поэтому секрет берётся из переменных n8n\n// ($vars — планы Pro и Enterprise Cloud).\n//\n// Если у вас Starter, где переменных нет, впишите значение в SECRET\n// ниже. Оно останется видимым каждому, у кого есть доступ в n8n, —\n// это плата за отсутствие хранилища секретов на этом тарифе.\nlet SECRET = '';\ntry { if (typeof $vars !== 'undefined' && $vars.AGENT_WEBHOOK_SECRET) SECRET = $vars.AGENT_WEBHOOK_SECRET; } catch (e) {}\nif (!SECRET) throw new Error('AGENT_WEBHOOK_SECRET не задан: создайте переменную в n8n или впишите значение в SECRET.');\nconst secret = SECRET;\n\n// Сырое тело подписи. n8n отдаёт его по-разному: строкой, буфером,\n// разобранным объектом, а при rawBody иногда двоичным вложением. Подпись\n// считается от БАЙТОВ, которые прислала платформа, поэтому читаем все\n// формы, а разбор JSON оставляем на потом.\nfunction rawBody() {\n  try {\n    const bin = $input.item.binary;\n    if (bin && bin.data && bin.data.data) return Buffer.from(bin.data.data, 'base64').toString('utf8');\n  } catch (e) {}\n  const b = $json.body;\n  if (typeof b === 'string') return b;\n  if (Buffer.isBuffer(b)) return b.toString('utf8');\n  if (b && b.type === 'Buffer' && Array.isArray(b.data)) return Buffer.from(b.data).toString('utf8');\n  return JSON.stringify(b || {});\n}\nconst raw = rawBody();\nconst ts = $json.headers['x-rahtis-timestamp'] || '';\nconst given = $json.headers['x-rahtis-signature'] || '';\n\n// Окно 300 секунд: перехваченный запрос нельзя повторить назавтра.\nconst age = Math.abs(Math.floor(Date.now() / 1000) - Number(ts));\nconst fresh = Number.isFinite(age) && age <= 300;\n\nconst expected = 'sha256=' + crypto.createHmac('sha256', secret).update(ts + '.' + raw).digest('hex');\nconst a = Buffer.from(expected);\nconst b = Buffer.from(given);\nconst signed = a.length === b.length && crypto.timingSafeEqual(a, b);\n\nlet p = {};\ntry { p = JSON.parse(raw); } catch (e) { try { p = (typeof $json.body === 'object' && $json.body) || {}; } catch (e2) { p = {}; } }\n\nconst LANGS = ['fi', 'en', 'sv', 'nb', 'da', 'et', 'lv', 'lt', 'pl', 'ru'];\nreturn [{\n  json: {\n    ok: signed && fresh,\n    why: signed ? (fresh ? null : 'stale') : 'signature',\n    text: typeof p.text === 'string' ? p.text.slice(0, 1000) : '',\n    targets: Array.isArray(p.targets) ? p.targets.filter((l) => LANGS.includes(l)) : [],\n  },\n}];"
+      },
+      "id": "verify",
+      "name": "Проверить подпись RAHTIS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -580,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.ok && $json.text.length > 0 && $json.targets.length > 0 }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-signed",
+      "name": "Подпись верна?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -360,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Запрос к OpenAI: определить язык и перевести на нужные языки.\n// Ответ — строго JSON, чтобы сайт мог положить его в базу без разбора.\nconst NAMES = { fi: 'Finnish', en: 'English', sv: 'Swedish', nb: 'Norwegian Bokmål', da: 'Danish', et: 'Estonian', lv: 'Latvian', lt: 'Lithuanian', pl: 'Polish', ru: 'Russian' };\nconst targets = $json.targets;\nconst system = [\n  'You translate short chat messages between a shipper, a transport company and a truck driver about one transport job in the Nordics.',\n  'Detect the language of the message. Translate it into each requested language.',\n  'Keep it short and natural, as a driver or dispatcher would write. Do not add anything.',\n  'Never translate or change registration plates, container numbers, order numbers, addresses, gate or door numbers, times, phone numbers or names.',\n  'Reply with JSON only: {\"source\": \"<ISO 639-1 code>\", \"translations\": {\"<code>\": \"<text>\", ...}}.',\n  'Requested languages: ' + targets.map((l) => l + ' (' + NAMES[l] + ')').join(', ') + '.',\n].join(' ');\nreturn [{ json: { payload: JSON.stringify({\n  model: 'gpt-4.1-mini',\n  temperature: 0,\n  response_format: { type: 'json_object' },\n  messages: [ { role: 'system', content: system }, { role: 'user', content: $json.text } ],\n}) } }];"
+      },
+      "id": "build",
+      "name": "Собрать запрос",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -140,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.parse($json.payload) }}",
+        "options": {
+          "timeout": 15000,
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "http-openai",
+      "name": "OpenAI: перевести",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        80,
+        220
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Ответ OpenAI → то, что ждёт сайт. Ошибку не прячем: сайт покажет оригинал.\nconst LANGS = ['fi', 'en', 'sv', 'nb', 'da', 'et', 'lv', 'lt', 'pl', 'ru'];\nlet out = { ok: false, source: null, translations: {} };\ntry {\n  const content = $json.choices[0].message.content;\n  const data = JSON.parse(content);\n  const translations = {};\n  for (const [lang, text] of Object.entries(data.translations || {})) {\n    if (LANGS.includes(lang) && typeof text === 'string' && text.length <= 2000) translations[lang] = text;\n  }\n  out = { ok: true, source: typeof data.source === 'string' ? data.source.slice(0, 5).toLowerCase() : null, translations };\n} catch (e) {\n  out = { ok: false, source: null, translations: {}, detail: ($json.error && $json.error.message) || 'parse' };\n}\nreturn [{ json: out }];"
+      },
+      "id": "parse",
+      "name": "Разобрать ответ",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        300,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { ok: false, source: null, translations: {}, detail: $json.why || 'bad request' } }];"
+      },
+      "id": "denied",
+      "name": "Отказано",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -140,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"ok\": $json.ok === true, \"source\": $json.source || null, \"translations\": $json.translations || {}, \"detail\": $json.detail || null } }}",
+        "options": {}
+      },
+      "id": "respond",
+      "name": "Ответ платформе",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        520,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Сообщение из рейса": {
+      "main": [
+        [
+          {
+            "node": "Проверить подпись RAHTIS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Проверить подпись RAHTIS": {
+      "main": [
+        [
+          {
+            "node": "Подпись верна?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Подпись верна?": {
+      "main": [
+        [
+          {
+            "node": "Собрать запрос",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Отказано",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Собрать запрос": {
+      "main": [
+        [
+          {
+            "node": "OpenAI: перевести",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI: перевести": {
+      "main": [
+        [
+          {
+            "node": "Разобрать ответ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Разобрать ответ": {
+      "main": [
+        [
+          {
+            "node": "Ответ платформе",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Отказано": {
+      "main": [
+        [
+          {
+            "node": "Ответ платформе",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

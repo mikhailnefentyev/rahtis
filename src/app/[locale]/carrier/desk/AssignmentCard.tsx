@@ -19,6 +19,7 @@ import { orderStatusTone } from '@/components/ui/tone';
 import { cancelOrderAction, confirmOrderAction } from '@/lib/orders/matching';
 import { useI18n } from '@/lib/i18n/provider';
 import { AbandonPanel } from './AbandonPanel';
+import { OrderChat } from '@/components/domain/OrderChat';
 import { ClosingPanel } from './ClosingPanel';
 import { TripPanel } from './TripPanel';
 import type { Database } from '@/types/database';
@@ -173,6 +174,9 @@ export function AssignmentCard({
                 )}
 
                 <p className="mt-3 text-xs text-ink-dim">{t.matching.contactsNow}</p>
+
+                {/* Переписка с заказчиком и водителем; диспетчер может ответить за водителя. */}
+                <OrderChat orderId={order.id} lang={locale} className="mt-4" />
               </>
             )}
 

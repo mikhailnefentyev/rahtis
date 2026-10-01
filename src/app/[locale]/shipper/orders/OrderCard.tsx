@@ -19,6 +19,7 @@ import type {
   TripDocument,
 } from '@/types/db';
 import { AmendPanel } from './AmendPanel';
+import { OrderChat } from '@/components/domain/OrderChat';
 import { DirectWaiting, SendDirect } from './DirectPanel';
 import { AssignedCarrier, OffersPanel } from './OffersPanel';
 import { OrderTrouble } from './OrderTrouble';
@@ -53,7 +54,7 @@ export function OrderCard({
   /** Повторить этот рейс: открыть форму, заполненную по нему. */
   onRepeat?: () => void;
 }) {
-  const { t, m, f } = useI18n();
+  const { t, m, f, locale } = useI18n();
 
   const { from: pickup, to: delivery } = routeEnds(stops);
   const assigned = offers.find((o) => o.is_assigned);
@@ -170,6 +171,11 @@ export function OrderCard({
                 * решения, и увести заказ у них из-под руки нечестно.
                 */}
               {/* Предложен группе своих машин — видят только они, до времени окна. */}
+              {/* Переписка с перевозчиком и водителем — с назначения машины. */}
+              {(order.status === 'AWAIT_DRIVER' || order.status === 'IN_PROGRESS') && (
+                <OrderChat orderId={order.id} lang={locale} className="mt-3" />
+              )}
+
               {order.status === 'OPEN' && order.desk_contract === 'CARRIER' && (
                 <p className="mt-3 text-xs text-ink-muted">{t.direct.deskDirectShipper}</p>
               )}

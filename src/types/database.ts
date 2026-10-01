@@ -2167,6 +2167,48 @@ export type Database = {
           },
         ]
       }
+      order_messages: {
+        Row: {
+          author_driver_id: string | null
+          author_name: string | null
+          author_role: string
+          author_user_id: string | null
+          body: string
+          created_at: string
+          id: number
+          order_id: string
+          quick_code: string | null
+          source_lang: string | null
+          translations: Json
+        }
+        Insert: {
+          author_driver_id?: string | null
+          author_name?: string | null
+          author_role: string
+          author_user_id?: string | null
+          body: string
+          created_at?: string
+          id?: never
+          order_id: string
+          quick_code?: string | null
+          source_lang?: string | null
+          translations?: Json
+        }
+        Update: {
+          author_driver_id?: string | null
+          author_name?: string | null
+          author_role?: string
+          author_user_id?: string | null
+          body?: string
+          created_at?: string
+          id?: never
+          order_id?: string
+          quick_code?: string | null
+          source_lang?: string | null
+          translations?: Json
+        }
+        Relationships: []
+      }
       order_offers: {
         Row: {
           carrier_company_id: string
@@ -4469,6 +4511,11 @@ export type Database = {
         Returns: string
       }
       delete_order: { Args: { p_order_id: string }; Returns: string }
+      order_chat: { Args: { p_order_id: string }; Returns: Json }
+      post_order_message: {
+        Args: { p_body: string; p_order_id: string; p_quick?: string }
+        Returns: Json
+      }
       desk_orders: {
         Args: { p_limit?: number; p_region?: string }
         Returns: {

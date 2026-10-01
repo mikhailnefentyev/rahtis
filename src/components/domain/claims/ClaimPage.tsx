@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { OrderChat } from '@/components/domain/OrderChat';
 import { notFound } from 'next/navigation';
 import { ClaimAttachments, ClaimEvidence } from '@/components/domain/claims/ClaimEvidence';
 import { ClaimComposer, ClaimModeration } from '@/components/domain/claims/ClaimActions';
@@ -243,6 +244,9 @@ export async function ClaimPage({
           )}
         </div>
       </section>
+
+      {/* Переписка рейса: оператор видит её только при претензии (order_chat). */}
+      {detail.viewer === 'ADMIN' && <OrderChat orderId={order.id} lang={locale} className="mt-6" />}
 
       {(detail.viewer === 'ADMIN' || (claim.mine && !closed)) && (
         <section className="mt-6 border-t border-line pt-4">
