@@ -34,13 +34,15 @@ export async function loadChatAction(orderId: string, lang?: string): Promise<Ch
       await Promise.all(
         missing.map(async (message) => {
           const result = await translateMessage(message.body, [lang]);
-          if (!result) return;
+          if (!result?.source) return;
           const text = result.translations[lang as keyof typeof result.translations] ?? null;
+          /* Язык совпал с исходным — переводить нечего, но язык запоминается, чтобы не спрашивать снова. */
+          if (!text && result.source !== lang) return;
           await admin.rpc('merge_message_translation', {
             p_id: message.id,
             p_lang: lang,
-            p_text: text ?? undefined,
-            p_source: result.source ?? undefined,
+            p_text: text ?? '',
+            p_source: result.source,
           });
           message.source_lang = message.source_lang ?? result.source;
           if (text && result.source !== lang) message.translations = { ...message.translations, [lang]: text };
