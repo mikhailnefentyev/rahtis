@@ -2449,8 +2449,8 @@ export type Database = {
           created_at: string
           created_by: string | null
           deadline_at: string | null
-          dispatch_mode: Database["public"]["Enums"]["dispatch_mode"]
           desk_contract: Database["public"]["Enums"]["contract_party"]
+          dispatch_mode: Database["public"]["Enums"]["dispatch_mode"]
           distance_auto_km: number | null
           distance_km: number | null
           distance_source: Database["public"]["Enums"]["distance_source"]
@@ -2498,8 +2498,8 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           deadline_at?: string | null
-          dispatch_mode?: Database["public"]["Enums"]["dispatch_mode"]
           desk_contract?: Database["public"]["Enums"]["contract_party"]
+          dispatch_mode?: Database["public"]["Enums"]["dispatch_mode"]
           distance_auto_km?: number | null
           distance_km?: number | null
           distance_source?: Database["public"]["Enums"]["distance_source"]
@@ -2547,8 +2547,8 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           deadline_at?: string | null
-          dispatch_mode?: Database["public"]["Enums"]["dispatch_mode"]
           desk_contract?: Database["public"]["Enums"]["contract_party"]
+          dispatch_mode?: Database["public"]["Enums"]["dispatch_mode"]
           distance_auto_km?: number | null
           distance_km?: number | null
           distance_source?: Database["public"]["Enums"]["distance_source"]
@@ -4466,11 +4466,11 @@ export type Database = {
         Returns: {
           comment: string
           container_feet: number
+          desk_contract: Database["public"]["Enums"]["contract_party"]
           distance_km: number
           finish_city: string
           group_until: string
           group_vehicle_ids: string[]
-          desk_contract: Database["public"]["Enums"]["contract_party"]
           haul_kind: Database["public"]["Enums"]["haul_kind"]
           id: string
           ldm: number
