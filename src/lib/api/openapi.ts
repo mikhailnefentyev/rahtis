@@ -222,7 +222,7 @@ export function openApi(serverUrl: string) {
           tags: ['Orders'],
           summary: 'Carrier offers',
           operationId: 'getOrderOffers',
-          description: 'Vehicles offered for the order, as in the cabinet. The carrier\'s name is not shown when Aivomaa Oy is your contracting party.',
+          description: 'Vehicles offered for the order, as in the cabinet. The carrier\'s name is shown on DIRECT orders only.',
           parameters: [refParam],
           responses: {
             '200': {
