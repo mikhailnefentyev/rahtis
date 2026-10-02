@@ -15,6 +15,15 @@ type DocsText = {
   openapi: string;
   cabinet: string;
   start: Section;
+  access: Section;
+  lifecycle: Section;
+  statuses: Record<string, string>;
+  types: Section;
+  typeRows: Record<string, string>;
+  roles: Record<string, string>;
+  roleHeader: string;
+  statusHeader: string;
+  typeHeader: string;
   sync: Section;
   details: Section;
   create: Section;
@@ -27,7 +36,9 @@ type DocsText = {
   verify: Section;
   errors: Section;
   errorCodes: Record<string, string>;
+  claimKinds: Record<string, string>;
   limits: Section;
+  changes: Section;
   eventHeader: string;
   whenHeader: string;
   codeHeader: string;
@@ -49,6 +60,55 @@ const fi: DocsText = {
       'Avain annetaan jokaisessa pyynnössä otsakkeessa Authorization: Bearer.',
     ],
   },
+  access: {
+    title: 'Pääsy ja testiympäristö',
+    paragraphs: [
+      'Rajapintaa käyttää hyväksytty tilaajayritys: hae mukaan sivulla rahtis.eu/fi/apply, ja kun yritys on hyväksytty ja tiedot täytetty, avaimet luodaan kabinetin API-välilehdellä. Rajapinnan käyttö on maksutonta.',
+      'Testiympäristön (rhs_test_-avain, testiyritys, testikuljetusliikkeet ja -autot) saat pyytämällä osoitteesta admin@rahtis.eu. Testitilaukset eivät näy oikeille kuljetusliikkeille eivätkä mene laskulle.',
+      'Ajat: rajapinnan aikaleimat (created_at, arrival.at, eta.at …) ovat UTC-aikaa ISO 8601 -muodossa. Reittipisteen scheduled_date ja scheduled_time ovat paikallista aikaa pisteen maassa (Suomi, Ruotsi, Norja, Tanska) — sama, jonka kuljettaja näkee.',
+      'Rahat: kaikki summat ovat euroina ilman arvonlisäveroa (vat_included: false). Arvonlisävero lisätään laskulla maan mukaan.',
+    ],
+  },
+  lifecycle: {
+    title: 'Tilauksen tilat',
+    paragraphs: [
+      'Tilaus kulkee tilasta toiseen alla olevassa järjestyksessä. Jokaisesta muutoksesta tulee webhook (order.taken, order.started, order.reopened, order.closed, order.cancelled), ja muutoksen näkee myös GET /orders/{ref}/events.',
+      'deadline_at on päätöksen määräaika: tilaajalla on 15 minuuttia valita tarjous ensimmäisestä tarjouksesta, ja valitulla kuljetusliikkeellä 15 minuuttia vahvistaa. Jos määräaika umpeutuu, tilaus palaa tilaan OPEN. Suoralla määräyksellä (POST /orders/{ref}/assign) määräaikaa ei ole: tilaus odottaa auton vahvistusta.',
+    ],
+  },
+  statuses: {
+    OPEN: 'tarjouspöydällä, odottaa tarjouksia (enintään kolme)',
+    REQUESTED: 'tarjouksia on tullut — valitse yksi (POST …/offers/{id}/choose) deadline_at mennessä',
+    AWAIT_DRIVER: 'auto on valittu tai määrätty, odottaa kuljetusliikkeen tai kuljettajan vahvistusta',
+    IN_PROGRESS: 'vahvistettu, ajo käynnissä: reittipisteitä kuitataan',
+    DONE: 'ajo päättynyt: maksut ja odotusaikalisä on kirjattu, asiakirjat saatavilla',
+    CANCELLED: 'peruttu (POST …/withdraw tai kabinetista)',
+    DRAFT: 'luonnos kabinetissa, ei julkaistu — rajapinnan kautta luotu tilaus julkaistaan heti',
+  },
+  types: {
+    title: 'Tilaustyypit ja reittipisteet',
+    paragraphs: [
+      'haul_kind kertoo, mitä kuljetetaan: TRAILER (puoliperävaunu), CONTAINER (kontti; container_feet pakollinen) — näissä kuljetusyksikkö on numeroitu, ja trailer_plate (perävaunun rekisterinumero tai ISO 6346 -konttinumero) on pakollinen. VAN ja TRUCK ovat pikakuljetuksia autossa: ldm (lastausmetrit) ja vähintään yhden pisteen cargo_weight_kg ovat pakollisia.',
+      'Pisteet annetaan ajojärjestyksessä (2–20). Jokaisessa tilauksessa on yksi PICKUP. Alla, mitä kukin tyyppi vaatii; puuttuvasta pisteestä tulee 422 ja selitys kentässä details.',
+      'Lähetä kontrakti kentässä contract: RAHTIS (oletus) — RAHTIS-palvelu, palvelumaksu 5 % hinnasta, vähintään 15 € keikalta yhdessä kuljetusliikkeen maksun kanssa; DIRECT — suora sopimus kuukausimaksua käyttävän kuljetusliikkeen kanssa, ei palvelumaksua, ja tilauksen näkevät vain tällaiset kuljetusliikkeet. Kenttä contract näkyy myös tilauksen tiedoissa.',
+    ],
+  },
+  typeRows: {
+    'TRAILER_SWAP (TRAILER, CONTAINER)': 'Perävaunun tai kontin vaihto: PICKUP (yksikön nouto) → vähintään yksi DELIVERY, EXTRA_LOAD tai EXTRA_UNLOAD → TRAILER_RETURN (mihin yksikkö jätetään).',
+    'ONE_WAY (TRAILER, CONTAINER)': 'Yksikkö noudetaan ja viedään perille: PICKUP → vähintään yksi DELIVERY, EXTRA_LOAD tai EXTRA_UNLOAD; TRAILER_RETURN ei pakollinen.',
+    'ROUND_TRIP (TRAILER, CONTAINER)': 'Kuten ONE_WAY, mutta yksikkö palaa lähtöpaikkaan — lisää loppuun TRAILER_RETURN.',
+    'ONE_WAY (VAN, TRUCK)': 'Pikakuljetus: PICKUP (lastaus) → DELIVERY (purku), välissä EXTRA_LOAD / EXTRA_UNLOAD tarvittaessa. order_type on aina ONE_WAY.',
+  },
+  roles: {
+    PICKUP: 'nouto: yksikön nouto tai tavaran lastaus — aina ensimmäinen',
+    DELIVERY: 'purku vastaanottajalle; company_name pakollinen',
+    EXTRA_LOAD: 'lisälastaus matkalla; consignee kertoo, kenelle lisäkuorma on',
+    EXTRA_UNLOAD: 'lisäpurku matkalla',
+    TRAILER_RETURN: 'tyhjän tai lastatun yksikön jättöpaikka (trailer_loaded kertoo kumpi)',
+  },
+  roleHeader: 'Rooli',
+  statusHeader: 'Tila',
+  typeHeader: 'Tyyppi',
   sync: {
     title: 'Tilausten synkronointi',
     paragraphs: [
@@ -136,11 +196,24 @@ const fi: DocsText = {
     rate_limited: 'yli 60 pyyntöä minuutissa (429, Retry-After)',
     internal: 'odottamaton virhe, pyyntöä ei suoritettu (500)',
   },
+  claimKinds: {
+    CARGO_DAMAGE: 'lastin tai perävaunun vaurio',
+    SHORTAGE: 'vajaus',
+    DOWNTIME: 'odotusaika',
+    DEVIATION: 'poikkeama reitistä tai aikataulusta',
+    OTHER: 'muu',
+  },
   limits: {
     title: 'Rajat ja lokit',
     paragraphs: [
       '60 pyyntöä minuutissa avainta kohden. Pyynnöistä kirjataan avain, menetelmä, polku, vastauskoodi ja kesto; loki säilytetään 90 päivää. Webhook-toimitusten loki säilytetään 30 päivää, ja 100 peräkkäisen epäonnistumisen jälkeen osoite poistetaan käytöstä.',
       'Avain lakkaa toimimasta, kun se perutaan tai kun yrityksen tai avaimen luoneen käyttäjän oikeudet päättyvät.',
+    ],
+  },
+  changes: {
+    title: 'Muutokset rajapintaan',
+    paragraphs: [
+      'Versio on polussa (/api/v1) ja kuvauksessa (info.version). Uusia kenttiä, tapahtumia ja arvoja lisätään ilman ennakkoilmoitusta — ohita tuntemattomat kentät ja arvot. Taaksepäin yhteensopimattomista muutoksista ilmoitetaan etukäteen sähköpostilla avainten luojille.',
     ],
   },
   eventHeader: 'Tapahtuma',
@@ -164,6 +237,55 @@ const en: DocsText = {
       'Send the key in every request as Authorization: Bearer.',
     ],
   },
+  access: {
+    title: 'Access and test environment',
+    paragraphs: [
+      'The API is for approved shipper companies: apply at rahtis.eu/en/apply, and once the company is approved and its details are filled in, keys are created on the API tab of the cabinet. Using the API is free.',
+      'For a test environment (an rhs_test_ key, a test company, test carriers and vehicles), write to admin@rahtis.eu. Test orders are not shown to real carriers and are not invoiced.',
+      'Times: API timestamps (created_at, arrival.at, eta.at …) are UTC in ISO 8601. A stop\'s scheduled_date and scheduled_time are local time in the stop\'s country (Finland, Sweden, Norway, Denmark) — the same the driver sees.',
+      'Money: all amounts are euros excluding VAT (vat_included: false). VAT is added on the invoice according to the country.',
+    ],
+  },
+  lifecycle: {
+    title: 'Order statuses',
+    paragraphs: [
+      'An order moves through the statuses below. Every change sends a webhook (order.taken, order.started, order.reopened, order.closed, order.cancelled) and appears in GET /orders/{ref}/events.',
+      'deadline_at is the decision deadline: you have 15 minutes from the first offer to choose one, and the chosen carrier has 15 minutes to confirm. When it passes, the order returns to OPEN. A direct assignment (POST /orders/{ref}/assign) has no deadline: the order waits for the vehicle to confirm.',
+    ],
+  },
+  statuses: {
+    OPEN: 'on the offer table, waiting for offers (at most three)',
+    REQUESTED: 'offers have arrived — choose one (POST …/offers/{id}/choose) before deadline_at',
+    AWAIT_DRIVER: 'a vehicle is chosen or assigned and waits for the carrier or driver to confirm',
+    IN_PROGRESS: 'confirmed, the trip is under way: stops are being confirmed',
+    DONE: 'the trip has ended: fees and the waiting surcharge are fixed, documents are available',
+    CANCELLED: 'withdrawn (POST …/withdraw or in the cabinet)',
+    DRAFT: 'a draft in the cabinet, not published — an order created through the API is published at once',
+  },
+  types: {
+    title: 'Order types and stops',
+    paragraphs: [
+      'haul_kind says what is moved: TRAILER (semi-trailer) and CONTAINER (container_feet required) move a numbered unit, and trailer_plate (trailer registration or ISO 6346 container number) is required. VAN and TRUCK are express transport inside the vehicle: ldm (loading metres) and cargo_weight_kg on at least one stop are required.',
+      'Stops are given in driving order (2–20). Every order has one PICKUP. The table shows what each type requires; a missing stop returns 422 with the reason in details.',
+      'Send the contract in the contract field: RAHTIS (default) — the RAHTIS service, service fee 5 % of the price, at least 15 € per job together with the carrier fee; DIRECT — a direct contract with a carrier on the monthly plan, no service fee, and only such carriers see the order. contract is also returned with the order.',
+    ],
+  },
+  typeRows: {
+    'TRAILER_SWAP (TRAILER, CONTAINER)': 'Trailer or container swap: PICKUP (collect the unit) → at least one DELIVERY, EXTRA_LOAD or EXTRA_UNLOAD → TRAILER_RETURN (where the unit is left).',
+    'ONE_WAY (TRAILER, CONTAINER)': 'The unit is collected and delivered: PICKUP → at least one DELIVERY, EXTRA_LOAD or EXTRA_UNLOAD; TRAILER_RETURN optional.',
+    'ROUND_TRIP (TRAILER, CONTAINER)': 'Like ONE_WAY, but the unit comes back — end with TRAILER_RETURN.',
+    'ONE_WAY (VAN, TRUCK)': 'Express: PICKUP (loading) → DELIVERY (unloading), with EXTRA_LOAD / EXTRA_UNLOAD in between if needed. order_type is always ONE_WAY.',
+  },
+  roles: {
+    PICKUP: 'collection: the unit is picked up or the goods are loaded — always first',
+    DELIVERY: 'unloading at the consignee; company_name required',
+    EXTRA_LOAD: 'extra loading on the way; consignee says whom the extra load is for',
+    EXTRA_UNLOAD: 'extra unloading on the way',
+    TRAILER_RETURN: 'where the empty or loaded unit is left (trailer_loaded says which)',
+  },
+  roleHeader: 'Role',
+  statusHeader: 'Status',
+  typeHeader: 'Type',
   sync: {
     title: 'Synchronising orders',
     paragraphs: [
@@ -251,11 +373,24 @@ const en: DocsText = {
     rate_limited: 'more than 60 requests per minute (429, Retry-After)',
     internal: 'unexpected error; the request was not completed (500)',
   },
+  claimKinds: {
+    CARGO_DAMAGE: 'damage to the cargo or trailer',
+    SHORTAGE: 'shortage',
+    DOWNTIME: 'waiting time',
+    DEVIATION: 'deviation from the route or schedule',
+    OTHER: 'other',
+  },
   limits: {
     title: 'Limits and logs',
     paragraphs: [
       '60 requests per minute per key. For each request the key, method, path, response code and duration are logged; the log is kept for 90 days. The webhook delivery log is kept for 30 days, and a URL is disabled after 100 consecutive failures.',
       'A key stops working when it is revoked or when the rights of the company or of the user who created it end.',
+    ],
+  },
+  changes: {
+    title: 'Changes to the API',
+    paragraphs: [
+      'The version is in the path (/api/v1) and in the description (info.version). New fields, events and values are added without notice — ignore fields and values you do not know. Backward-incompatible changes are announced in advance by email to the key creators.',
     ],
   },
   eventHeader: 'Event',

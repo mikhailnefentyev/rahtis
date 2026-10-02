@@ -16,6 +16,20 @@ const ROLES = ['PICKUP', 'DELIVERY', 'EXTRA_LOAD', 'EXTRA_UNLOAD', 'TRAILER_RETU
 const EVENTS: readonly string[] = WEBHOOK_EVENTS;
 const AMENDMENT_KINDS = ['STOP_ADDED', 'STOP_CHANGED', 'STOP_REMOVED', 'ORDER_REPRICED', 'ORDER_CANCELLED', 'ORDER_RELEASED'];
 const CLAIM_KINDS = ['CARGO_DAMAGE', 'SHORTAGE', 'DOWNTIME', 'DEVIATION', 'OTHER'];
+
+/* Пояснения к перечислениям — то же, что таблицы на странице документации. */
+const STATUS_DOC =
+  'OPEN — on the offer table, waiting for offers (at most three). REQUESTED — offers have arrived; choose one before deadline_at (15 min). AWAIT_DRIVER — a vehicle is chosen or assigned and waits for the carrier or driver to confirm (15 min after choosing an offer; no deadline after a direct assignment). IN_PROGRESS — confirmed, the trip is under way. DONE — the trip has ended; fees and the waiting surcharge are fixed. CANCELLED — withdrawn. DRAFT — a cabinet draft; API orders are published at once. When a deadline passes, the order returns to OPEN.';
+const ORDER_TYPE_DOC =
+  'TRAILER_SWAP (TRAILER, CONTAINER): PICKUP → at least one DELIVERY / EXTRA_LOAD / EXTRA_UNLOAD → TRAILER_RETURN. ONE_WAY: PICKUP → at least one DELIVERY / EXTRA_LOAD / EXTRA_UNLOAD; for VAN and TRUCK always ONE_WAY with PICKUP → DELIVERY. ROUND_TRIP: like ONE_WAY, the unit comes back — end with TRAILER_RETURN.';
+const HAUL_DOC =
+  'TRAILER — semi-trailer, CONTAINER — container (container_feet required); both need trailer_plate. VAN, TRUCK — express inside the vehicle; ldm and cargo_weight_kg on at least one stop required.';
+const ROLE_DOC =
+  'PICKUP — collect the unit or load the goods, always first. DELIVERY — unloading at the consignee (company_name required). EXTRA_LOAD — extra loading on the way (consignee: whom it is for). EXTRA_UNLOAD — extra unloading on the way. TRAILER_RETURN — where the unit is left (trailer_loaded: empty or loaded).';
+const CLAIM_DOC =
+  'CARGO_DAMAGE — damage to the cargo or trailer. SHORTAGE — shortage. DOWNTIME — waiting time. DEVIATION — deviation from the route or schedule. OTHER — other.';
+const CONTRACT_DOC =
+  'RAHTIS — the RAHTIS service: service fee 5 % of the price, at least 15 € per job together with the carrier fee. DIRECT — a direct contract with a carrier on the monthly plan: no service fee; only such carriers see and can take the order.';
 const CLAIM_STATUSES = ['OPEN', 'IN_REVIEW', 'RESOLVED', 'REJECTED'];
 
 const nullable = (type: string, extra: Record<string, unknown> = {}) => ({ type: [type, 'null'], ...extra });
@@ -72,9 +86,9 @@ export function openApi(serverUrl: string) {
     openapi: '3.1.0',
     info: {
       title: 'RAHTIS Shipper API',
-      version: '1.1.0',
+      version: '1.2.0',
       description:
-        'Work with your company\'s orders on RAHTIS from start to finish: create orders, choose offers or assign known vehicles, follow the trip with arrivals, stop confirmations, photos and their positions, amend the route in progress, rate the carrier, handle claims, and receive webhooks when anything changes. Webhooks are delivered in parallel and may arrive out of order: order them by created_at. Keys are issued in the cabinet (API tab). A key from a test company starts with rhs_test_ and only sees the test environment; responses then carry Rahtis-Environment: test.',
+        'Work with your company\'s orders on RAHTIS from start to finish: create orders, choose offers or assign known vehicles, follow the trip with arrivals, stop confirmations, photos and their positions, amend the route in progress, rate the carrier, handle claims, and receive webhooks when anything changes. Webhooks are delivered in parallel and may arrive out of order: order them by created_at. Keys are issued in the cabinet (API tab) of an approved shipper company — apply at https://www.rahtis.eu/en/apply; using the API is free. A key from a test company starts with rhs_test_ and only sees the test environment; responses then carry Rahtis-Environment: test. For a test environment, write to admin@rahtis.eu. Timestamps are UTC (ISO 8601); a stop\'s scheduled_date and scheduled_time are local time in the stop\'s country. All amounts are euros excluding VAT. New fields, events and enum values may be added without notice — ignore what you do not know; backward-incompatible changes are announced in advance.',
     },
     servers: [{ url: `${serverUrl}/api/v1` }],
     security: [{ bearer: [] }],
@@ -554,9 +568,9 @@ export function openApi(serverUrl: string) {
           properties: {
             ref: { type: 'string', example: 'RS-2026-0142' },
             shipper_ref: nullable('string', { description: 'Your own reference.' }),
-            status: { enum: STATUS },
-            order_type: { enum: ['TRAILER_SWAP', 'ROUND_TRIP', 'ONE_WAY'] },
-            haul_kind: { enum: ['TRAILER', 'CONTAINER', 'VAN', 'TRUCK'] },
+            status: { enum: STATUS, description: STATUS_DOC },
+            order_type: { enum: ['TRAILER_SWAP', 'ROUND_TRIP', 'ONE_WAY'], description: ORDER_TYPE_DOC },
+            haul_kind: { enum: ['TRAILER', 'CONTAINER', 'VAN', 'TRUCK'], description: HAUL_DOC },
             container_feet: nullable('integer'),
             ldm: nullable('number'),
             trailer: nullable('string'),
@@ -564,7 +578,8 @@ export function openApi(serverUrl: string) {
             distance_km: { type: 'integer' },
             rate: ref('Money'),
             comment: nullable('string'),
-            dispatch: nullable('string'),
+            dispatch: nullable('string', { description: 'How the order reached the vehicle: DESK — the offer table, DIRECT — a direct assignment.' }),
+            contract: { enum: ['RAHTIS', 'DIRECT'], description: CONTRACT_DOC },
             created_at: { type: 'string', format: 'date-time' },
             published_at: nullable('string', { format: 'date-time' }),
             deadline_at: nullable('string', { format: 'date-time' }),
@@ -573,7 +588,7 @@ export function openApi(serverUrl: string) {
             waiting: {
               type: 'object',
               description:
-                'Waiting-time surcharge, fixed when the trip is closed. Each loading and unloading stop has one free hour, counted from arrival but not before the agreed time; an excess of at least 15 minutes is charged at EUR 45 excl. VAT per hour begun. Only for orders where Aivomaa Oy is your contracting party.',
+                'Waiting-time surcharge, fixed when the trip is closed. Each loading and unloading stop has one free hour, counted from arrival but not before the agreed time; an excess of at least 15 minutes is charged at EUR 45 excl. VAT per hour begun. Only for RAHTIS-service orders (contract RAHTIS).',
               properties: {
                 amount: { type: 'string', example: '45.00' },
                 currency: { const: 'EUR' },
@@ -758,8 +773,8 @@ export function openApi(serverUrl: string) {
           type: 'object',
           required: ['order_type', 'rate', 'stops'],
           properties: {
-            order_type: { enum: ['TRAILER_SWAP', 'ROUND_TRIP', 'ONE_WAY'] },
-            haul_kind: { enum: ['TRAILER', 'CONTAINER', 'VAN', 'TRUCK'], default: 'TRAILER' },
+            order_type: { enum: ['TRAILER_SWAP', 'ROUND_TRIP', 'ONE_WAY'], description: ORDER_TYPE_DOC },
+            haul_kind: { enum: ['TRAILER', 'CONTAINER', 'VAN', 'TRUCK'], default: 'TRAILER', description: HAUL_DOC },
             rate: {
               type: 'object',
               required: ['amount'],
@@ -799,7 +814,7 @@ export function openApi(serverUrl: string) {
           type: 'object',
           required: ['role', 'address', 'city'],
           properties: {
-            role: { enum: ROLES },
+            role: { enum: ROLES, description: ROLE_DOC },
             address: { type: 'string', maxLength: 200 },
             city: { type: 'string', maxLength: 100 },
             country: { type: 'string', minLength: 2, maxLength: 2, description: 'ISO 3166-1 alpha-2.' },
@@ -981,7 +996,7 @@ export function openApi(serverUrl: string) {
             ref: { type: 'string', example: 'CL-RS-2026-0142-1' },
             order_ref: { type: 'string' },
             stop_sequence: nullable('integer'),
-            kind: { enum: CLAIM_KINDS },
+            kind: { enum: CLAIM_KINDS, description: CLAIM_DOC },
             status: { enum: CLAIM_STATUSES },
             direction: { enum: ['filed', 'received'], description: 'Filed by your company, or against it.' },
             filed_by_role: { enum: ['SHIPPER', 'CARRIER', 'ADMIN'] },
@@ -1039,7 +1054,7 @@ export function openApi(serverUrl: string) {
           required: ['order_ref', 'kind', 'description'],
           properties: {
             order_ref: { type: 'string' },
-            kind: { enum: CLAIM_KINDS },
+            kind: { enum: CLAIM_KINDS, description: CLAIM_DOC },
             description: { type: 'string', minLength: 10, maxLength: 5000 },
             stop_sequence: { type: 'integer', description: 'The stop the claim is about, if any.' },
             amount: { type: 'object', properties: { amount: { type: 'number', minimum: 0 } }, description: 'Claimed amount in euros.' },

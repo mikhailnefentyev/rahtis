@@ -21,7 +21,7 @@ import { ApiError, type ApiContext } from './handler';
  */
 
 const ORDER_COLUMNS =
-  'id,ref,shipper_ref,order_type,haul_kind,container_feet,ldm,trailer,trailer_plate,distance_km,rate_cents,comment,status,dispatch_mode,created_at,published_at,deadline_at,closed_at,updated_at,waiting_cents,waiting';
+  'id,ref,shipper_ref,order_type,haul_kind,container_feet,ldm,trailer,trailer_plate,distance_km,rate_cents,comment,status,dispatch_mode,contract_party,desk_contract,created_at,published_at,deadline_at,closed_at,updated_at,waiting_cents,waiting';
 
 const STOP_COLUMNS =
   'order_id,sequence,role,place_name,company_name,address,city,country,lat,lon,scheduled_date,scheduled_time,eta_at,arrived_at,completed_at,trailer_loaded,cargo_weight_kg,consignee,contact_name,contact_phone,external_ref,seal_required,note,damage_note,arrived_lat,arrived_lon,completed_lat,completed_lon,completed_accuracy_m,eta_source,eta_updated_at';
@@ -41,6 +41,8 @@ type OrderRow = {
   comment: string | null;
   status: string;
   dispatch_mode: string | null;
+  contract_party: string;
+  desk_contract: string;
   created_at: string;
   published_at: string | null;
   deadline_at: string | null;
@@ -156,12 +158,14 @@ function orderOut(o: OrderRow) {
     rate: money(o.rate_cents),
     comment: o.comment,
     dispatch: o.dispatch_mode,
+    /* RAHTIS — сервис с платой, DIRECT — прямой договор с перевозчиком на подписке. */
+    contract: o.contract_party === 'CARRIER' || o.desk_contract === 'CARRIER' ? 'DIRECT' : 'RAHTIS',
     created_at: o.created_at,
     published_at: o.published_at,
     deadline_at: o.deadline_at,
     closed_at: o.closed_at,
     updated_at: o.updated_at,
-    /* Доплата за простой: фиксируется при закрытии рейса Aivomaa (договор заказчика 5). */
+    /* Доплата за простой: фиксируется при закрытии рейса RAHTIS-сервиса (договор заказчика 5). */
     waiting: {
       amount: (o.waiting_cents / 100).toFixed(2),
       currency: 'EUR',

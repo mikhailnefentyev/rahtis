@@ -165,6 +165,14 @@ def verify(header: str, raw_body: bytes, secret: str) -> bool:
       <p className="mt-2 text-[14px] leading-relaxed text-ink-muted">{d.cabinet}</p>
 
       <Section id="start" section={d.start} code={[examples.start]} />
+      <Section id="access" section={d.access} />
+      <Section id="statuses" section={d.lifecycle}>
+        <Table head={[d.statusHeader, '']} rows={Object.entries(d.statuses)} />
+      </Section>
+      <Section id="types" section={d.types}>
+        <Table head={[d.typeHeader, '']} rows={Object.entries(d.typeRows)} />
+        <Table head={[d.roleHeader, '']} rows={Object.entries(d.roles)} />
+      </Section>
       <Section id="sync" section={d.sync} code={[examples.sync]} />
       <Section id="orders" section={d.details} />
       <Section id="create" section={d.create} code={[examples.create, examples.error]} />
@@ -172,7 +180,9 @@ def verify(header: str, raw_body: bytes, secret: str) -> bool:
       <Section id="trip" section={d.trip} code={[examples.trip]} />
       <Section id="offers" section={d.offers} code={[examples.assign]} />
       <Section id="amend" section={d.amend} code={[examples.amend]} />
-      <Section id="claims" section={d.claims} code={[examples.claims]} />
+      <Section id="claims" section={d.claims} code={[examples.claims]}>
+        <Table head={['kind', '']} rows={Object.entries(d.claimKinds)} />
+      </Section>
 
       <Section id="webhooks" section={d.webhooks}>
         <table className="mt-4 w-full text-left text-[13px]">
@@ -216,6 +226,7 @@ def verify(header: str, raw_body: bytes, secret: str) -> bool:
       </Section>
 
       <Section id="limits" section={d.limits} />
+      <Section id="changes" section={d.changes} />
 
       <p className="mt-10 border-t border-line pt-4 text-xs text-ink-dim">
         {t.brand.legalEntity} · {APP.operator.businessId} · {t.landing.footerCountry}
@@ -248,6 +259,30 @@ function Section({
       ))}
       {children}
     </section>
+  );
+}
+
+/** Таблица «значение — пояснение»: статусы, типы, роли, виды претензий. */
+function Table({ head, rows }: { head: [string, string]; rows: [string, string][] }) {
+  return (
+    <div className="mt-4 overflow-x-auto">
+      <table className="w-full text-left text-[13px]">
+        <thead>
+          <tr className="border-b border-line text-ink-faint">
+            <th className="py-2 pr-4 font-medium">{head[0]}</th>
+            <th className="py-2 font-medium">{head[1]}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map(([key, text]) => (
+            <tr key={key} className="border-b border-line/60 align-top">
+              <td className="py-2 pr-4 font-mono text-[12px] whitespace-nowrap">{key}</td>
+              <td className="py-2 text-ink-muted">{text}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 
