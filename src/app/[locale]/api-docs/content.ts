@@ -61,10 +61,9 @@ const fi: DocsText = {
     ],
   },
   access: {
-    title: 'Pääsy ja testiympäristö',
+    title: 'Pääsy, ajat ja rahat',
     paragraphs: [
       'Rajapintaa käyttää hyväksytty tilaajayritys: hae mukaan sivulla rahtis.eu/fi/apply, ja kun yritys on hyväksytty ja tiedot täytetty, avaimet luodaan kabinetin API-välilehdellä. Rajapinnan käyttö on maksutonta.',
-      'Testiympäristön (rhs_test_-avain, testiyritys, testikuljetusliikkeet ja -autot) saat pyytämällä osoitteesta admin@rahtis.eu. Testitilaukset eivät näy oikeille kuljetusliikkeille eivätkä mene laskulle.',
       'Ajat: rajapinnan aikaleimat (created_at, arrival.at, eta.at …) ovat UTC-aikaa ISO 8601 -muodossa. Reittipisteen scheduled_date ja scheduled_time ovat paikallista aikaa pisteen maassa (Suomi, Ruotsi, Norja, Tanska) — sama, jonka kuljettaja näkee.',
       'Rahat: kaikki summat ovat euroina ilman arvonlisäveroa (vat_included: false). Arvonlisävero lisätään laskulla maan mukaan.',
     ],
@@ -213,7 +212,7 @@ const fi: DocsText = {
   changes: {
     title: 'Muutokset rajapintaan',
     paragraphs: [
-      'Versio on polussa (/api/v1) ja kuvauksessa (info.version). Uusia kenttiä, tapahtumia ja arvoja lisätään ilman ennakkoilmoitusta — ohita tuntemattomat kentät ja arvot. Taaksepäin yhteensopimattomista muutoksista ilmoitetaan etukäteen sähköpostilla avainten luojille.',
+      'Versio on polussa (/api/v1) ja kuvauksessa (info.version). Uusia kenttiä, tapahtumia ja arvoja voi tulla — ohita tuntemattomat kentät ja arvot.',
     ],
   },
   eventHeader: 'Tapahtuma',
@@ -238,10 +237,9 @@ const en: DocsText = {
     ],
   },
   access: {
-    title: 'Access and test environment',
+    title: 'Access, times and money',
     paragraphs: [
       'The API is for approved shipper companies: apply at rahtis.eu/en/apply, and once the company is approved and its details are filled in, keys are created on the API tab of the cabinet. Using the API is free.',
-      'For a test environment (an rhs_test_ key, a test company, test carriers and vehicles), write to admin@rahtis.eu. Test orders are not shown to real carriers and are not invoiced.',
       'Times: API timestamps (created_at, arrival.at, eta.at …) are UTC in ISO 8601. A stop\'s scheduled_date and scheduled_time are local time in the stop\'s country (Finland, Sweden, Norway, Denmark) — the same the driver sees.',
       'Money: all amounts are euros excluding VAT (vat_included: false). VAT is added on the invoice according to the country.',
     ],
@@ -390,7 +388,7 @@ const en: DocsText = {
   changes: {
     title: 'Changes to the API',
     paragraphs: [
-      'The version is in the path (/api/v1) and in the description (info.version). New fields, events and values are added without notice — ignore fields and values you do not know. Backward-incompatible changes are announced in advance by email to the key creators.',
+      'The version is in the path (/api/v1) and in the description (info.version). New fields, events and values may appear — ignore fields and values you do not know.',
     ],
   },
   eventHeader: 'Event',
