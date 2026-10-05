@@ -83,6 +83,7 @@ export async function inviteShipperAction(
   const businessId = String(formData.get('business_id') ?? '').trim();
   const email = String(formData.get('email') ?? '').trim().toLowerCase();
   const language = String(formData.get('language') ?? 'fi') === 'en' ? 'en' : 'fi';
+  const kind = String(formData.get('kind') ?? 'SHIPPER') === 'CARRIER' ? 'CARRIER' : 'SHIPPER';
 
   if (!name || !isValidBusinessId(businessId) || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
     return { error: t.partners.inviteInvalid, sentTo: null };
@@ -92,7 +93,8 @@ export async function inviteShipperAction(
   const hash = createHash('sha256').update(token).digest('hex');
 
   const supabase = await createClient();
-  const { error } = await supabase.rpc('carrier_invite_shipper', {
+  const { error } = await supabase.rpc('carrier_invite_company', {
+    p_kind: kind,
     p_name: name,
     p_business_id: businessId,
     p_email: email,
@@ -109,6 +111,7 @@ export async function inviteShipperAction(
       link: `${siteUrl()}/${language}/apply?invite=${token}`,
       operatorEmail: operatorInbox(),
       locale: language,
+      kind,
     }),
   );
   if (result.outboxId === null) return { error: t.partners.inviteFailed, sentTo: null };

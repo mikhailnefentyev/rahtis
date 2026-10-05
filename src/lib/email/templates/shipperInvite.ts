@@ -15,9 +15,12 @@ export function shipperInviteEmail(input: {
   link: string;
   operatorEmail: string;
   locale: EmailLocale;
+  /** Кого зовут: заказчика (по умолчанию) или перевозчика — у каждого своё письмо. */
+  kind?: 'SHIPPER' | 'CARRIER';
 }): EmailMessage {
   const t = emailText(input.locale);
-  const i = t.shipperInvite;
+  const carrier = input.kind === 'CARRIER';
+  const i = carrier ? t.carrierInvite : t.shipperInvite;
   const heading = i.heading(input.carrierName);
 
   const blocks: EmailBlock[] = [
@@ -29,7 +32,7 @@ export function shipperInviteEmail(input: {
   ];
 
   return {
-    template: 'shipper.invite',
+    template: carrier ? 'carrier.invite' : 'shipper.invite',
     to: input.to,
     subject: i.subject(input.carrierName),
     text: renderText({ heading, blocks, operatorEmail: input.operatorEmail, signature: t.signature, neverAsk: t.neverAsk }),

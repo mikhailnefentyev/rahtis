@@ -47,7 +47,7 @@ export default async function PartnersPage({ params }: { params: Promise<{ local
     supabase.rpc('carrier_partners'),
     supabase
       .from('shipper_invites')
-      .select('id, company_name, email, created_at, applied_company_id, applied_at')
+      .select('id, company_name, email, created_at, applied_company_id, applied_at, invite_kind')
       .order('created_at', { ascending: false })
       .limit(50),
   ]);
@@ -81,9 +81,11 @@ export default async function PartnersPage({ params }: { params: Promise<{ local
           <ul className="flex flex-col gap-1.5 text-[13px]">
             {(invites ?? []).map((i) => {
               const state = i.applied_company_id && approved.has(i.applied_company_id) ? 'approved' : i.applied_at ? 'applied' : 'sent';
+              const carrierInvite = i.invite_kind === 'CARRIER';
               return (
                 <li key={i.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 text-ink-muted">
                   <span className="font-semibold text-ink">{i.company_name}</span>
+                  <Badge tone="info">{carrierInvite ? t.partners.inviteKindCarrier : t.partners.inviteKindShipper}</Badge>
                   <span>{i.email}</span>
                   <span>{f.date(i.created_at)}</span>
                   <Badge tone={state === 'approved' ? 'ok' : state === 'applied' ? 'warn' : 'neutral'}>

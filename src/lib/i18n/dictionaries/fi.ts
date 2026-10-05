@@ -1387,6 +1387,7 @@ export const fi = {
     sentTitle: 'Hakemus lähetetty',
     duplicate: 'Tällä Y-tunnuksella on jo hakemus vireillä tai hyväksytty.',
     invitedBy: '{carrier} kutsui teidät. Tiedot on täytetty valmiiksi — tarkistakaa ne ja lähettäkää hakemus. Hyväksynnän jälkeen voitte lähettää suoria tilauksia heidän autoilleen.',
+    invitedByCarrier: '{carrier} kutsui kuljetusliikkeenne. Tiedot on täytetty valmiiksi — tarkistakaa ne ja lähettäkää hakemus.',
     tooMany: 'Liian monta hakemusta lyhyessä ajassa. Yritä tunnin kuluttua tai kirjoita osoitteeseen admin@rahtis.eu.',
     failed: 'Lähetys ei onnistunut. Yritä uudelleen.',
     /* Toiminimi ei ole avoimessa datassa, tai rekisteri ei vastannut — ei virhe. */
@@ -2728,9 +2729,14 @@ export const fi = {
 
   partners: {
     title: 'Asiakkaat',
-    inviteTitle: 'Kutsu oma asiakkaasi',
+    inviteTitle: 'Kutsu asiakas tai kuljetusliike',
+    inviteKind: 'Keneen kutsu kohdistuu',
+    inviteKindShipper: 'Asiakas',
+    inviteKindCarrier: 'Kuljetusliike',
+    inviteKindShipperHint: 'Asiakas voi hyväksynnän jälkeen lähettää suoria tilauksia autoillesi.',
+    inviteKindCarrierHint: 'Kuljetusliike saa keikkoja tarjouspöydältä ja oman työalustan; saat ilmoituksen, kun se hyväksytään.',
     inviteText:
-      'Asiakkaasi saa sähköpostin, jossa hakemus on valmiiksi täytetty. Kun hyväksymme sen, asiakas voi lähettää suoria tilauksia autoillesi heti. Jos käytät kuukausimaksua, näistä keikoista ei peritä palvelumaksua.',
+      'Kutsuttu saa sähköpostin, jossa hakemus on valmiiksi täytetty. Hakemus tarkistetaan ennen tunnusten lähettämistä.',
     inviteName: 'Yrityksen nimi',
     inviteBusinessId: 'Y-tunnus',
     inviteEmail: 'Sähköposti',
@@ -3199,6 +3205,7 @@ export const fi = {
     'event.group.released': 'Kukaan omista autoista ei ottanut kuljetusta {ref} — se on nyt yhteisellä pöydällä',
     'event.trip.late': 'Kuljetus {ref}: auto on myöhässä pisteestä {city} noin {minutes} min',
     'event.trip.waiting': 'Kuljetus {ref}: maksuton odotustunti pisteessä {city} päättyi{charged, select, yes { — odotuslisä {euros} € alkavalta tunnilta 15 minuutin kuluttua} other {}}',
+    'event.invite.carrier_approved': 'Kutsumasi kuljetusliike {carrier} on hyväksytty RAHTISiin.',
     'event.invite.approved': 'Kutsumanne asiakas {shipper} on hyväksytty. Se voi nyt lähettää suoria tilauksia autoillenne.',
     'event.link.offer': 'Ajoit ensimmäisen kuljetuksen tilaajalle {shipper}. Sallitaanko suorat tilaukset?',
     'drivers.count': '{count, plural, =0 {Ei kuljettajia} one {# kuljettaja} other {# kuljettajaa}}',

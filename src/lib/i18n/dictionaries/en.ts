@@ -1293,6 +1293,7 @@ export const en = {
     sentTitle: 'Application sent',
     duplicate: 'There is already an application for this Y-tunnus, pending or approved.',
     invitedBy: '{carrier} invited you. The details are filled in — check them and send the application. Once approved, you can send direct orders to their vehicles.',
+    invitedByCarrier: '{carrier} invited your transport company. The details are filled in — check them and send the application.',
     tooMany: 'Too many applications in a short time. Try again in an hour or write to admin@rahtis.eu.',
     failed: 'Sending failed. Try again.',
     registryManual: 'We will check the company details by hand and email you once the application has been reviewed.',
@@ -2622,9 +2623,14 @@ export const en = {
 
   partners: {
     title: 'Customers',
-    inviteTitle: 'Invite your own customer',
+    inviteTitle: 'Invite a customer or a transport company',
+    inviteKind: 'Who you are inviting',
+    inviteKindShipper: 'Customer',
+    inviteKindCarrier: 'Transport company',
+    inviteKindShipperHint: 'Once approved, the customer can send direct orders to your vehicles.',
+    inviteKindCarrierHint: 'The transport company gets jobs from the offer table and its own platform; you are notified when it is approved.',
     inviteText:
-      'Your customer gets an email with the application already filled in. Once we approve it, the customer can send direct orders to your vehicles straight away. If you use the monthly plan, no service fee is charged on these jobs.',
+      'The invited company gets an email with the application already filled in. The application is checked before credentials are sent.',
     inviteName: 'Company name',
     inviteBusinessId: 'Business ID',
     inviteEmail: 'Email',
@@ -3059,6 +3065,7 @@ export const en = {
     'event.group.released': 'None of your own vehicles took transport {ref} — it is now on the shared board',
     'event.trip.late': 'Transport {ref}: the vehicle is about {minutes} min late for {city}',
     'event.trip.waiting': 'Transport {ref}: the free waiting hour at {city} has ended{charged, select, yes { — a waiting surcharge of {euros} € per started hour starts in 15 minutes} other {}}',
+    'event.invite.carrier_approved': 'The transport company you invited, {carrier}, has been approved on RAHTIS.',
     'event.invite.approved': 'Your invited customer {shipper} has been approved. It can now send direct orders to your vehicles.',
     'event.link.offer': 'You drove your first transport for {shipper}. Allow direct orders?',
     'drivers.count': '{count, plural, =0 {No drivers} one {# driver} other {# drivers}}',

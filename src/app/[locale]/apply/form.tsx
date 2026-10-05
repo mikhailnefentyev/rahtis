@@ -15,7 +15,7 @@ export function ApplyForm({ invite = null }: { invite?: ApplyInvite | null }) {
   const { locale } = useI18n();
   const [state, formAction, pending] = useActionState(submitApplicationAction, initial);
 
-  const [kind, setKind] = useState<CompanyRole>(invite ? 'SHIPPER' : 'CARRIER');
+  const [kind, setKind] = useState<CompanyRole>(invite?.kind ?? 'CARRIER');
   /*
    * Ветка перевозчика. По умолчанию подряд: он ничего не стоит, пока
    * нет работы, и человек, пришедший «посмотреть», не должен случайно
@@ -85,7 +85,7 @@ export function ApplyForm({ invite = null }: { invite?: ApplyInvite | null }) {
           {invite && <input type="hidden" name="invite" value={invite.token} />}
           {invite && (
             <p className="rounded-control border border-accent-line bg-accent-wash px-3 py-2 text-[13px] leading-relaxed text-ink">
-              {t.apply.invitedBy.replace('{carrier}', invite.carrierName)}
+              {(invite.kind === 'CARRIER' ? t.apply.invitedByCarrier : t.apply.invitedBy).replace('{carrier}', invite.carrierName)}
             </p>
           )}
 

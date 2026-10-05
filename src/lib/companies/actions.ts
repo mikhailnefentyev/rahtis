@@ -130,11 +130,13 @@ export async function submitApplicationAction(
    * Ссылка из письма живёт до первой заявки.
    */
   const inviteToken = String(formData.get('invite') ?? '');
-  if (kind === 'SHIPPER' && /^[0-9a-f]{64}$/.test(inviteToken)) {
+  /* Ссылка привязывается к заявке той роли, в которую звали: заказчик — к заказчику, перевозчик — к перевозчику. */
+  if (/^[0-9a-f]{64}$/.test(inviteToken)) {
     await admin
       .from('shipper_invites')
       .update({ applied_company_id: company.id, applied_at: new Date().toISOString() })
       .eq('token_hash', createHash('sha256').update(inviteToken).digest('hex'))
+      .eq('invite_kind', kind)
       .is('applied_company_id', null);
   }
 

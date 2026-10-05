@@ -2777,6 +2777,7 @@ export type Database = {
           created_by: string | null
           email: string
           id: string
+          invite_kind: string
           token_hash: string
         }
         Insert: {
@@ -2789,6 +2790,7 @@ export type Database = {
           created_by?: string | null
           email: string
           id?: string
+          invite_kind?: string
           token_hash: string
         }
         Update: {
@@ -2801,6 +2803,7 @@ export type Database = {
           created_by?: string | null
           email?: string
           id?: string
+          invite_kind?: string
           token_hash?: string
         }
         Relationships: [
@@ -4526,6 +4529,10 @@ export type Database = {
         Returns: string
       }
       delete_order: { Args: { p_order_id: string }; Returns: string }
+      carrier_invite_company: {
+        Args: { p_business_id: string; p_email: string; p_kind: string; p_name: string; p_token_hash: string }
+        Returns: string
+      }
       desk_orders: {
         Args: { p_limit?: number; p_region?: string }
         Returns: {

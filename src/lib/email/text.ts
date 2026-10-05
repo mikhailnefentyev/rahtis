@@ -58,6 +58,17 @@ type Texts = {
     note: (operator: string) => string;
   };
 
+  /** Перевозчик приглашает другого перевозчика. */
+  carrierInvite: {
+    subject: (carrier: string) => string;
+    heading: (carrier: string) => string;
+    preheader: string;
+    body: (carrier: string) => string;
+    points: string[];
+    button: string;
+    note: (operator: string) => string;
+  };
+
   /** Напоминания застрявшим на пути к первой работе (2, 5, 10 день на шаге). */
   onboarding: {
     subject: Record<'ACTIVATE' | 'SETUP' | 'FIRST_ORDER', (company: string) => string>;
@@ -196,6 +207,21 @@ const fi: Texts = {
       'Suora tilaus tutulle autolle muutamalla napautuksella.',
       'Seuraatte ajoa: saapumiset, kuittaukset, kuvat ja rahtikirjat samassa paikassa.',
       'Tarvittaessa sama tilaus tarjouspöydälle muille kuljetusliikkeille.',
+    ],
+    button: 'Hae mukaan — tiedot on täytetty valmiiksi',
+    note: (operator) =>
+      `Hakemus tarkistetaan ennen tunnusten lähettämistä. Jos ette odottaneet tätä viestiä, voitte jättää sen huomiotta tai kirjoittaa osoitteeseen ${operator}.`,
+  },
+
+  carrierInvite: {
+    subject: (carrier) => `${carrier} kutsuu kuljetusliikkeenne RAHTIS-palveluun`,
+    heading: (carrier) => `${carrier} kutsuu teidät RAHTISiin`,
+    preheader: 'Keikkoja tarjouspöydältä ja oma työalusta kuljetusliikkeelle.',
+    body: (carrier) => `${carrier} käyttää RAHTIS-palvelua ja kutsuu kuljetusliikkeenne mukaan.`,
+    points: [
+      'Keikkoja tarjouspöydältä: perävaunujen vaihdot, kontit ja pikakuljetukset satamissa ja koko Suomessa.',
+      'Kuljettajan sovellus kymmenellä kielellä: saapumiset, kuvat ja rahtikirjat ilman paperia.',
+      'Omat asiakkaat samaan paikkaan: 29,90 € kuukaudessa ajanutta autoa kohden, ensimmäinen kuukausi maksutta.',
     ],
     button: 'Hae mukaan — tiedot on täytetty valmiiksi',
     note: (operator) =>
@@ -362,6 +388,21 @@ const en: Texts = {
       'A direct order to a known vehicle in a few taps.',
       'Follow the trip: arrivals, confirmations, photos and consignment notes in one place.',
       'When needed, the same order can go to the load board for other carriers.',
+    ],
+    button: 'Apply — the details are already filled in',
+    note: (operator) =>
+      `The application is checked before credentials are sent. If you did not expect this message, you can ignore it or write to ${operator}.`,
+  },
+
+  carrierInvite: {
+    subject: (carrier) => `${carrier} invites your transport company to RAHTIS`,
+    heading: (carrier) => `${carrier} invites you to RAHTIS`,
+    preheader: 'Jobs from the offer table and an operations platform for your transport company.',
+    body: (carrier) => `${carrier} uses RAHTIS and invites your transport company to join.`,
+    points: [
+      'Jobs from the offer table: trailer swaps, containers and express transport in ports and across Finland.',
+      'A driver app in ten languages: arrivals, photos and consignment notes without paper.',
+      'Your own clients in the same place: €29.90 a month per vehicle that drove, first month free.',
     ],
     button: 'Apply — the details are already filled in',
     note: (operator) =>
