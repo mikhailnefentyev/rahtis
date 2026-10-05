@@ -4075,6 +4075,16 @@ export type Database = {
           last_sent_at: string
         }[]
       }
+      carrier_invite_company: {
+        Args: {
+          p_business_id: string
+          p_email: string
+          p_kind: string
+          p_name: string
+          p_token_hash: string
+        }
+        Returns: string
+      }
       carrier_invite_shipper: {
         Args: {
           p_business_id: string
@@ -4529,10 +4539,6 @@ export type Database = {
         Returns: string
       }
       delete_order: { Args: { p_order_id: string }; Returns: string }
-      carrier_invite_company: {
-        Args: { p_business_id: string; p_email: string; p_kind: string; p_name: string; p_token_hash: string }
-        Returns: string
-      }
       desk_orders: {
         Args: { p_limit?: number; p_region?: string }
         Returns: {
