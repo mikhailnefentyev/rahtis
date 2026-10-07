@@ -2865,6 +2865,51 @@ export const fi = {
       'Auto tulee tänne, kun se on ajanut kuljetuksenne ja sen kuljetusliike sallii suorat tilaukset.',
   },
 
+  own: {
+    title: 'Omat keikat',
+    subtitle:
+      'Oman asiakkaanne kuljetus suoraan omalle autollenne: kuljettaja saa sen sovellukseen, ja keikka tulee viikkoraporttiin. Ei prosenttia.',
+    newJob: 'Uusi oma keikka',
+    clientSection: 'Asiakas',
+    clientPick: 'Asiakas',
+    clientNew: 'Uusi asiakas',
+    clientName: 'Asiakkaan nimi',
+    clientBusinessId: 'Y-tunnus',
+    clientEmail: 'Asiakkaan sähköposti',
+    clientEmailHint: 'Asiakas saa linkin, josta näkee kuljetuksen etenemisen.',
+    optional: 'vapaaehtoinen',
+    vehicleSection: 'Auto',
+    vehicle: 'Auto ja kuljettaja',
+    busy: 'ajossa',
+    noVehicles: 'Kalustossa ei ole tähän sopivaa autoa, joka voi ottaa keikkoja.',
+    send: 'Lähetä kuljettajalle',
+    sending: 'Lähetetään…',
+    sent: 'Lähetetty kuljettajalle',
+    rateLabel: 'Hinta',
+    rateHint: 'ALV 0 %. Näkyy vain teidän raportissanne.',
+    clientRequired: 'Valitse asiakas tai kirjoita uuden asiakkaan nimi.',
+    clientInvalid: 'Tarkista asiakkaan Y-tunnus (1234567-8) ja sähköposti.',
+    subscriptionOnly:
+      'Omat keikat kuuluvat tilaukseen: 29,90 € kuukaudessa ajanutta autoa kohden, ilman prosenttia. Ensimmäinen kuukausi on maksuton.',
+    trackLink: 'Seurantalinkki asiakkaalle',
+    copy: 'Kopioi linkki',
+    copied: 'Kopioitu',
+    recent: 'Viimeisimmät omat keikat',
+    empty: 'Ei vielä omia keikkoja.',
+  },
+
+  track: {
+    title: 'Kuljetuksen seuranta',
+    carrier: 'Kuljetusliike',
+    status: 'Tila',
+    route: 'Reitti',
+    arrived: 'Saapui',
+    completed: 'Valmis',
+    eta: 'Arvioitu saapuminen',
+    planned: 'Suunniteltu',
+    notFound: 'Linkki ei ole voimassa.',
+  },
+
   direct: {
     dispatch: 'Lähetys',
     desk: 'Yhteiselle pöydälle',
@@ -3028,6 +3073,8 @@ export const fi = {
    * «3 / 5» eikä «3 viidestä».
    */
   msg: {
+    'own.subscriptionContact': 'Tilauksen saa käyttöön kirjoittamalla osoitteeseen {email}.',
+    'track.questions': 'Kysymykset kuljetuksesta: {carrier}.',
     'order.offersCounter':
       '{count, plural, one {# tarjous} other {# tarjousta}} / {max} — valitse kuljetusliike',
     'order.offersFull': 'Paikat täynnä {count} / {max}',

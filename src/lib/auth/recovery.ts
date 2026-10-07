@@ -116,6 +116,8 @@ export async function requestPasswordReset(
     .from('companies')
     .select('language')
     .eq('contact_email', email)
+    /* Клиенты перевозчиков — записи справочника: входа у них нет, и почта может совпасть. */
+    .is('client_of', null)
     .maybeSingle();
 
   await sendEmail(

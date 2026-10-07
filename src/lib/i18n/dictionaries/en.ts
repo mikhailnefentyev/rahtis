@@ -2759,6 +2759,51 @@ export const en = {
       'A vehicle appears here once it has driven your transport and its carrier allows direct orders.',
   },
 
+  own: {
+    title: 'Own jobs',
+    subtitle:
+      "Your own client's transport, straight to your own vehicle: the driver gets it in the app and the job appears in the weekly report. No percentage.",
+    newJob: 'New own job',
+    clientSection: 'Client',
+    clientPick: 'Client',
+    clientNew: 'New client',
+    clientName: 'Client name',
+    clientBusinessId: 'Business ID',
+    clientEmail: 'Client email',
+    clientEmailHint: 'The client gets a link to follow the transport.',
+    optional: 'optional',
+    vehicleSection: 'Vehicle',
+    vehicle: 'Vehicle and driver',
+    busy: 'on a job',
+    noVehicles: 'Your fleet has no suitable vehicle that can take jobs.',
+    send: 'Send to driver',
+    sending: 'Sending…',
+    sent: 'Sent to driver',
+    rateLabel: 'Price',
+    rateHint: 'VAT 0 %. Shown only in your report.',
+    clientRequired: 'Choose a client or type the name of a new one.',
+    clientInvalid: "Check the client's business ID (1234567-8) and email.",
+    subscriptionOnly:
+      'Own jobs are part of the subscription: €29.90 a month per vehicle that drove, no percentage. The first month is free.',
+    trackLink: 'Tracking link for the client',
+    copy: 'Copy link',
+    copied: 'Copied',
+    recent: 'Recent own jobs',
+    empty: 'No own jobs yet.',
+  },
+
+  track: {
+    title: 'Transport tracking',
+    carrier: 'Carrier',
+    status: 'Status',
+    route: 'Route',
+    arrived: 'Arrived',
+    completed: 'Done',
+    eta: 'Estimated arrival',
+    planned: 'Planned',
+    notFound: 'This link is not valid.',
+  },
+
   direct: {
     dispatch: 'Dispatch',
     desk: 'To the load board',
@@ -2908,6 +2953,8 @@ export const en = {
    * directly.
    */
   msg: {
+    'own.subscriptionContact': 'To switch to the subscription, write to {email}.',
+    'track.questions': 'Questions about the transport: {carrier}.',
     'order.offersCounter': '{count, plural, one {# offer} other {# offers}} / {max} — pick a carrier',
     'order.offersFull': 'Slots full {count} / {max}',
     'order.containerSize': '{feet, number} ft',

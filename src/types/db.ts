@@ -85,7 +85,7 @@ export type AmendmentChange = { from: unknown; to: unknown };
  */
 export type ShipperOrder = Omit<
   Order,
-  'assigned_company_id' | 'assigned_vehicle_id' | 'assigned_driver_id' | 'chosen_offer_id' | 'shipper_company_id' | 'shipper_company_kind' | 'updated_at' | 'created_by' | 'route_computed_at' | 'route_fingerprint' | 'commission_bps' | 'shipper_fee_bps' | 'closed_at' | 'billing' | 'invoice_ref' | 'invoiced_at' | 'paid_at' | 'settled_at' | 'terms_document_id' | 'waiting' | 'waiting_cents'
+  'assigned_company_id' | 'assigned_vehicle_id' | 'assigned_driver_id' | 'chosen_offer_id' | 'shipper_company_id' | 'shipper_company_kind' | 'updated_at' | 'created_by' | 'route_computed_at' | 'route_fingerprint' | 'commission_bps' | 'shipper_fee_bps' | 'closed_at' | 'billing' | 'invoice_ref' | 'invoiced_at' | 'paid_at' | 'settled_at' | 'terms_document_id' | 'waiting' | 'waiting_cents' | 'track_token'
 >;
 export type OrderStop = Tables<'order_stops'>;
 
@@ -296,3 +296,11 @@ export type PeriodClaim = Database['public']['Functions']['period_claims']['Retu
 
 /** Вид сертификата водителя: Код 95, ADR, Työturva, EA1, карта водителя. */
 export type DriverCertificateType = Database['public']['Enums']['driver_certificate_type'];
+
+/* ── Свои рейсы перевозчика ─────────────────────────────────────── */
+
+/** Клиент перевозчика из справочника — для формы своего рейса. */
+export type CarrierClient = Database['public']['Functions']['carrier_clients']['Returns'][number];
+
+/** Своя машина перевозчика для своего рейса. */
+export type OwnVehicle = Database['public']['Functions']['carrier_own_vehicles']['Returns'][number];

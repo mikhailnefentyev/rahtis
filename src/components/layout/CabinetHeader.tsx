@@ -123,6 +123,7 @@ function cabinetTabs(locale: Locale, role: PartyRole, home: string, t: Dictionar
     return [
       overview,
       { href: `/${locale}/carrier/desk`, label: t.desk.title },
+      { href: `/${locale}/carrier/own`, label: t.own.title },
       { href: `/${locale}/carrier/fleet`, label: t.fleet.title },
       { href: `/${locale}/carrier/drivers`, label: t.drivers.title },
       { href: `/${locale}/carrier/partners`, label: t.partners.title },

@@ -73,11 +73,14 @@ export default async function AdminPage({
       .from('companies')
       .select('*')
       .eq('status', 'PENDING')
+      .is('client_of', null)
       .order('created_at', { ascending: true }),
     supabase
       .from('companies')
       .select('*')
       .neq('status', 'PENDING')
+      /* Клиенты перевозчиков — справочник для своих рейсов, а не участники платформы. */
+      .is('client_of', null)
       .order('updated_at', { ascending: false })
       .limit(20),
     supabase.from('profiles').select('company_id').not('company_id', 'is', null),

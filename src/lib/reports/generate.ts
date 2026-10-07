@@ -297,10 +297,21 @@ async function run(span: Span): Promise<GenerateResult> {
    */
   const documented = span.kind === 'PERIOD' ? list.filter((o) => o.contract_party !== 'CARRIER') : list;
 
+  /*
+   * Клиент перевозчика отчётов не получает: это запись справочника для
+   * своих рейсов перевозчика, а не участник платформы. Рейс входит в
+   * отчёт перевозчика; клиент следит за ним по ссылке.
+   */
+  const shipperIds = [...new Set(documented.map((o) => o.shipper_company_id))];
+  const { data: carrierClients } = shipperIds.length
+    ? await admin.from('companies').select('id').in('id', shipperIds).not('client_of', 'is', null)
+    : { data: [] };
+  const clientOfCarrier = new Set((carrierClients ?? []).map((c) => c.id));
+
   /* Кому какие рейсы. Одна и та же строка попадает в два отчёта разными числами. */
   const byCompany = new Map<string, { role: 'CARRIER' | 'SHIPPER'; orders: OrderRow[] }>();
   for (const order of documented) {
-    push(byCompany, order.shipper_company_id, 'SHIPPER', order);
+    if (!clientOfCarrier.has(order.shipper_company_id)) push(byCompany, order.shipper_company_id, 'SHIPPER', order);
     if (order.assigned_company_id) push(byCompany, order.assigned_company_id, 'CARRIER', order);
   }
 

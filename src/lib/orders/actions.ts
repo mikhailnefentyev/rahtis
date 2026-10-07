@@ -9,6 +9,12 @@ import { dispatchPublishedOrder, notifyDirectOrder } from '@/lib/orders/dispatch
 import { HAUL_KINDS, type HaulKind } from '@/lib/orders/haul';
 import { cityOf, hasCoordinates, tonnesToKg, type FieldReader } from '@/lib/orders/stopFields';
 import type { StopRole } from '@/types/db';
+import type { Json } from '@/types/database';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { sendEmail, operatorInbox } from '@/lib/email';
+import { emailLocaleOf } from '@/lib/email/text';
+import { ownTrackEmail } from '@/lib/email/templates/ownTrack';
+import { siteUrl } from '@/lib/config';
 
 export type PublishState = { error: string | null; ref: string | null };
 
@@ -258,46 +264,29 @@ function explainPublish(t: Dictionary, code: string | undefined, message: string
   return t.orderForm.failed;
 }
 
-export async function publishOrderAction(
-  _previous: PublishState,
+/**
+ * Общая часть формы заказа: деньги, единица, маршрут.
+ *
+ * Одна и та же у заказа заказчика и у своего рейса перевозчика: форма
+ * одна, и проверки у неё должны быть одни.
+ */
+function readOrderForm(
   formData: FormData,
-): Promise<PublishState> {
-  const locale = toLocale(formData.get('locale'));
-  const t = await getDictionary(locale);
-
-  const viewer = await getViewer();
-  if (viewer.status !== 'ready' || viewer.role !== 'SHIPPER' || !viewer.company) {
-    return { error: t.error.forbidden, ref: null };
-  }
-  if (viewer.company.status !== 'ACTIVE') {
-    return { error: t.orderForm.needActive, ref: null };
-  }
-
+  t: Dictionary,
+): { error: string } | { order: Record<string, unknown>; stops: StopInput[] } {
   const rateCents = toCents(str(formData, 'rate'));
   const distance = Number.parseInt(str(formData, 'distance_km').replace(/\D/g, ''), 10);
 
   if (!rateCents || !Number.isFinite(distance) || distance <= 0) {
-    return { error: t.validation.positiveNumber, ref: null };
+    return { error: t.validation.positiveNumber };
   }
 
   /* Та же проверка, что в форме: форму можно обойти, сервер — нет. */
   if (haulKind(str(formData, 'haul_kind')) === 'CONTAINER' && !isValidContainerNumber(str(formData, 'trailer_plate'))) {
-    return { error: t.orderForm.containerNumberInvalid, ref: null };
+    return { error: t.orderForm.containerNumberInvalid };
   }
 
   const stops = collectStops(formData);
-
-  const direct = str(formData, 'dispatch') === 'DIRECT';
-  /* Группа своих машин: первые минуты заказ видят и берут только они. */
-  const group = str(formData, 'dispatch') === 'GROUP';
-  const groupVehicles = group ? formData.getAll('group_vehicle_ids').map(String).filter(Boolean) : [];
-  if (group && groupVehicles.length < 2) {
-    return { error: t.direct.groupPickTwo, ref: null };
-  }
-  const directVehicle = str(formData, 'direct_vehicle_id');
-  if (direct && !directVehicle) {
-    return { error: t.direct.chooseVehicle, ref: null };
-  }
 
   /*
    * Заказ без координат не публикуется.
@@ -316,13 +305,12 @@ export async function publishOrderAction(
    * где пишутся данные.
    */
   if (stops.some((stop) => !hasCoordinates(stop))) {
-    return { error: t.routing.addressRequired, ref: null };
+    return { error: t.routing.addressRequired };
   }
 
-  const supabase = await createClient();
-
-  const { data, error } = await supabase.rpc('create_order', {
-    p_order: {
+  return {
+    stops,
+    order: {
       order_type: str(formData, 'order_type'),
       /*
        * Чем выполняется рейс — вторая ось рядом с типом рейса. Значение
@@ -353,6 +341,45 @@ export async function publishOrderAction(
       route_geometry: str(formData, 'route_geometry'),
       route_bounds: parseBounds(formData.get('route_bounds')),
       route_fingerprint: str(formData, 'route_fingerprint'),
+    },
+  };
+}
+
+export async function publishOrderAction(
+  _previous: PublishState,
+  formData: FormData,
+): Promise<PublishState> {
+  const locale = toLocale(formData.get('locale'));
+  const t = await getDictionary(locale);
+
+  const viewer = await getViewer();
+  if (viewer.status !== 'ready' || viewer.role !== 'SHIPPER' || !viewer.company) {
+    return { error: t.error.forbidden, ref: null };
+  }
+  if (viewer.company.status !== 'ACTIVE') {
+    return { error: t.orderForm.needActive, ref: null };
+  }
+
+  const form = readOrderForm(formData, t);
+  if ('error' in form) return { error: form.error, ref: null };
+
+  const direct = str(formData, 'dispatch') === 'DIRECT';
+  /* Группа своих машин: первые минуты заказ видят и берут только они. */
+  const group = str(formData, 'dispatch') === 'GROUP';
+  const groupVehicles = group ? formData.getAll('group_vehicle_ids').map(String).filter(Boolean) : [];
+  if (group && groupVehicles.length < 2) {
+    return { error: t.direct.groupPickTwo, ref: null };
+  }
+  const directVehicle = str(formData, 'direct_vehicle_id');
+  if (direct && !directVehicle) {
+    return { error: t.direct.chooseVehicle, ref: null };
+  }
+
+  const supabase = await createClient();
+
+  const { data, error } = await supabase.rpc('create_order', {
+    p_order: {
+      ...form.order,
       /*
        * Прямое назначение знакомой машине вместо стола. Машина берётся
        * только при явном выборе потока: скрытое поле от прошлого выбора
@@ -363,7 +390,7 @@ export async function publishOrderAction(
       /* Стол «напрямую с перевозчиком»: договор между сторонами, только подписчики. */
       desk_contract: !direct && !group && str(formData, 'desk_contract') === 'CARRIER' ? 'CARRIER' : 'RAHTIS',
     },
-    p_stops: stops,
+    p_stops: form.stops,
     p_publish: true,
   });
 
@@ -383,4 +410,90 @@ export async function publishOrderAction(
 
   revalidatePath(`/${locale}/shipper`, 'layout');
   return { error: null, ref: data.ref };
+}
+
+/**
+ * Свой рейс перевозчика: клиент перевозчика, своя машина, мимо стола.
+ *
+ * Форма та же, что у заказчика, — общая часть читается readOrderForm.
+ * Своё здесь только клиент и машина. Если указана почта клиента, ему
+ * уходит ссылка на ход рейса; письмо ждётся, но его сбой рейс не
+ * отменяет — ссылку перевозчик видит в карточке и может переслать сам.
+ */
+export async function ownOrderAction(_previous: PublishState, formData: FormData): Promise<PublishState> {
+  const locale = toLocale(formData.get('locale'));
+  const t = await getDictionary(locale);
+
+  const viewer = await getViewer();
+  if (viewer.status !== 'ready' || viewer.role !== 'CARRIER' || !viewer.company) {
+    return { error: t.error.forbidden, ref: null };
+  }
+
+  const form = readOrderForm(formData, t);
+  if ('error' in form) return { error: form.error, ref: null };
+
+  const vehicle = str(formData, 'own_vehicle_id');
+  if (!vehicle) return { error: t.direct.chooseVehicle, ref: null };
+
+  const clientId = str(formData, 'client_id');
+  const clientName = str(formData, 'client_name');
+  if (!clientId && clientName.length < 2) return { error: t.own.clientRequired, ref: null };
+
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc('carrier_create_own_order', {
+    p_client: clientId
+      ? { id: clientId, email: str(formData, 'client_email') }
+      : { name: clientName, business_id: str(formData, 'client_business_id'), email: str(formData, 'client_email') },
+    p_order: form.order as Json,
+    p_stops: form.stops as unknown as Json,
+    p_vehicle_id: vehicle,
+  });
+
+  if (error || !data) {
+    if (error?.code === '55010') return { error: t.own.subscriptionOnly, ref: null };
+    if (error?.code === '22023' && error.message.includes('клиент')) return { error: t.own.clientInvalid, ref: null };
+    return { error: explainPublish(t, error?.code, error?.message), ref: null };
+  }
+
+  if (data.track_token) await sendOwnTrack(data.id, data.ref, data.track_token, viewer.company.id);
+
+  revalidatePath(`/${locale}/carrier`, 'layout');
+  return { error: null, ref: data.ref };
+}
+
+/** Ссылка клиенту, если у него есть почта. Ошибки наружу не выпускает. */
+async function sendOwnTrack(orderId: string, ref: string, token: string, carrierId: string): Promise<void> {
+  try {
+    const admin = createAdminClient();
+    const [{ data: order }, { data: carrier }, { data: stops }] = await Promise.all([
+      admin.from('orders').select('shipper_company_id').eq('id', orderId).single(),
+      admin.from('companies').select('name, language').eq('id', carrierId).single(),
+      admin.from('order_stops').select('city, place_name').eq('order_id', orderId).order('sequence'),
+    ]);
+    if (!order || !carrier) return;
+    const { data: client } = await admin
+      .from('companies')
+      .select('contact_email')
+      .eq('id', order.shipper_company_id)
+      .single();
+    if (!client?.contact_email) return;
+
+    const locale = emailLocaleOf(carrier.language);
+    const labels = (stops ?? []).map((s) => s.place_name || s.city).filter(Boolean);
+    const route = labels.length > 1 ? `${labels[0]} - ${labels[labels.length - 1]}` : (labels[0] ?? '');
+
+    await sendEmail(
+      ownTrackEmail({
+        to: client.contact_email,
+        carrierName: carrier.name,
+        ref,
+        route,
+        link: `${siteUrl()}/${locale}/track/${token}`,
+        operatorEmail: operatorInbox(),
+        locale,
+      }),
+    );
+  } catch {
+    /* Ссылка остаётся в карточке рейса — перевозчик перешлёт её сам. */
+  }
 }

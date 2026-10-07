@@ -24,6 +24,8 @@ export default function robots(): MetadataRoute.Robots {
         '/en/shipper/',
         '/fi/carrier/',
         '/en/carrier/',
+        '/fi/track/',
+        '/en/track/',
         '/fi/admin/',
         '/en/admin/',
         '/fi/account',

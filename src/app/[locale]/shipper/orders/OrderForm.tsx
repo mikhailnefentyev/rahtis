@@ -16,14 +16,15 @@ import {
 } from '@/components/ui';
 import type { ChosenAddress } from '@/components/domain/AddressInput';
 import { isValidContainerNumber } from '@/lib/containerNumber';
-import { publishOrderAction, type PublishState } from '@/lib/orders/actions';
+import { ownOrderAction, publishOrderAction, type PublishState } from '@/lib/orders/actions';
 import { priceGuideAction, type PriceGuide } from '@/lib/orders/priceGuide';
 import { stopTitle, type HaulKind } from '@/lib/orders/haul';
 import { computeRouteAction, type RouteState } from '@/lib/routing/actions';
 import { useI18n } from '@/lib/i18n/provider';
 import { StopFields, type StopDefaults } from './StopFields';
-import type { KnownVehicle, OrderStop, ShipperOrder, StopRole } from '@/types/db';
+import type { CarrierClient, KnownVehicle, OrderStop, OwnVehicle, ShipperOrder, StopRole } from '@/types/db';
 import { DispatchPicker } from './DirectPanel';
+import { OwnPicker } from '../../carrier/own/OwnPicker';
 
 const initial: PublishState = { error: null, ref: null };
 
@@ -111,6 +112,7 @@ export function OrderForm({
   onNew,
   template,
   knownVehicles,
+  own,
 }: {
   onPublished: () => void;
   /* Следующий заказ сразу из плашки «julkaistu» — без её закрытия. */
@@ -118,9 +120,14 @@ export function OrderForm({
   template?: OrderTemplate;
   /** Знакомые машины — для прямого назначения вместо стола. */
   knownVehicles: KnownVehicle[];
+  /**
+   * Свой рейс перевозчика: та же форма, но вместо стола — клиент
+   * перевозчика и его машина, а цена — только для его отчёта.
+   */
+  own?: { clients: CarrierClient[]; vehicles: OwnVehicle[] };
 }) {
   const { t, m, f, locale } = useI18n();
-  const [state, formAction, pending] = useActionState(publishOrderAction, initial);
+  const [state, formAction, pending] = useActionState(own ? ownOrderAction : publishOrderAction, initial);
 
   /*
    * Что тянут — вторая ось рядом с типом рейса.
@@ -391,17 +398,17 @@ export function OrderForm({
   const [guide, setGuide] = useState<PriceGuide | null>(null);
   useEffect(() => {
     const timer = setTimeout(async () => {
-      setGuide(Number.isFinite(km) && km > 0 ? await priceGuideAction(haulKind, km) : null);
+      setGuide(!own && Number.isFinite(km) && km > 0 ? await priceGuideAction(haulKind, km) : null);
     }, 600);
     return () => clearTimeout(timer);
-  }, [haulKind, km]);
+  }, [haulKind, km, own]);
   const lowRate = guide !== null && Number.isFinite(euros) && euros > 0 && euros * 100 < guide.median * 0.8;
 
   if (state.ref) {
     return (
       <Card stripe="ok">
         <CardBody className="flex flex-wrap items-center gap-3">
-          <Badge tone="ok">{t.orderForm.published}</Badge>
+          <Badge tone="ok">{own ? t.own.sent : t.orderForm.published}</Badge>
           <Mono className="text-[13px]">{state.ref}</Mono>
           {onNew && (
             <Button size="sm" variant="primary" onClick={onNew} className="ml-auto">
@@ -832,7 +839,11 @@ export function OrderForm({
               </p>
             )}
 
-            <Field label={`${t.orderForm.rate} ${perKm}`} hint={`${t.money.addVat} ${t.orderForm.feeHint}`} required>
+            <Field
+              label={`${own ? t.own.rateLabel : t.orderForm.rate} ${perKm}`}
+              hint={own ? t.own.rateHint : `${t.money.addVat} ${t.orderForm.feeHint}`}
+              required
+            >
               {(p) => (
                 <InputMono
                   {...p}
@@ -880,7 +891,11 @@ export function OrderForm({
         */}
       <Card>
         <CardBody>
-          <DispatchPicker vehicles={knownVehicles} haulKind={haulKind} onDirectChange={setDirect} />
+          {own ? (
+            <OwnPicker clients={own.clients} vehicles={own.vehicles} haulKind={haulKind} />
+          ) : (
+            <DispatchPicker vehicles={knownVehicles} haulKind={haulKind} onDirectChange={setDirect} />
+          )}
         </CardBody>
       </Card>
 
@@ -912,7 +927,15 @@ export function OrderForm({
           disabled={pending || !canRoute || Boolean(containerNumberError)}
           className="flex-[3]"
         >
-          {pending ? t.orderForm.publishing : direct ? t.orderForm.publishDirect : t.orderForm.publish}
+          {own
+            ? pending
+              ? t.own.sending
+              : t.own.send
+            : pending
+              ? t.orderForm.publishing
+              : direct
+                ? t.orderForm.publishDirect
+                : t.orderForm.publish}
         </Button>
       </div>
     </form>

@@ -69,6 +69,17 @@ type Texts = {
     note: (operator: string) => string;
   };
 
+  /** Клиенту перевозчика: ссылка на ход его рейса. */
+  ownTrack: {
+    subject: (carrier: string, ref: string) => string;
+    heading: (carrier: string) => string;
+    preheader: string;
+    body: (carrier: string) => string;
+    route: (route: string) => string;
+    button: string;
+    note: (carrier: string) => string;
+  };
+
   /** Напоминания застрявшим на пути к первой работе (2, 5, 10 день на шаге). */
   onboarding: {
     subject: Record<'ACTIVATE' | 'SETUP' | 'FIRST_ORDER', (company: string) => string>;
@@ -226,6 +237,17 @@ const fi: Texts = {
     button: 'Hae mukaan — tiedot on täytetty valmiiksi',
     note: (operator) =>
       `Hakemus tarkistetaan ennen tunnusten lähettämistä. Jos ette odottaneet tätä viestiä, voitte jättää sen huomiotta tai kirjoittaa osoitteeseen ${operator}.`,
+  },
+
+  ownTrack: {
+    subject: (carrier, ref) => `${carrier} · kuljetus ${ref}`,
+    heading: (carrier) => `${carrier} on ottanut kuljetuksenne`,
+    preheader: 'Seuraa kuljetuksen etenemistä ja rahtikirjaa yhdestä linkistä.',
+    body: (carrier) => `${carrier} hoitaa kuljetuksenne ja jakaa sen etenemisen teille RAHTIS-palvelun kautta.`,
+    route: (route) => `Reitti: ${route}`,
+    button: 'Seuraa kuljetusta',
+    note: (carrier) =>
+      `Linkki toimii ilman tunnuksia. Kysymykset kuljetuksesta: ${carrier}. Jos ette odottaneet tätä viestiä, voitte jättää sen huomiotta.`,
   },
 
   onboarding: {
@@ -407,6 +429,17 @@ const en: Texts = {
     button: 'Apply — the details are already filled in',
     note: (operator) =>
       `The application is checked before credentials are sent. If you did not expect this message, you can ignore it or write to ${operator}.`,
+  },
+
+  ownTrack: {
+    subject: (carrier, ref) => `${carrier} · transport ${ref}`,
+    heading: (carrier) => `${carrier} has taken your transport`,
+    preheader: 'Follow the transport and its consignment note from one link.',
+    body: (carrier) => `${carrier} is handling your transport and shares its progress with you through RAHTIS.`,
+    route: (route) => `Route: ${route}`,
+    button: 'Follow the transport',
+    note: (carrier) =>
+      `The link works without an account. Questions about the transport: ${carrier}. If you did not expect this message, you can ignore it.`,
   },
 
   onboarding: {

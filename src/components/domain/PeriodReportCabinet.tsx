@@ -56,7 +56,7 @@ export async function PeriodReportCabinet({
 
   const companies =
     role === 'ADMIN'
-      ? ((await (await createClient()).from('companies').select('id, name, kind').order('name'))
+      ? ((await (await createClient()).from('companies').select('id, name, kind').is('client_of', null).order('name'))
           .data ?? [])
       : [];
 

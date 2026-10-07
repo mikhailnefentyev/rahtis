@@ -628,6 +628,7 @@ export type Database = {
           billing_reference: string | null
           billing_street: string | null
           business_id: string
+          client_of: string | null
           contact_email: string
           country: string
           created_at: string
@@ -670,6 +671,7 @@ export type Database = {
           billing_reference?: string | null
           billing_street?: string | null
           business_id: string
+          client_of?: string | null
           contact_email: string
           country?: string
           created_at?: string
@@ -712,6 +714,7 @@ export type Database = {
           billing_reference?: string | null
           billing_street?: string | null
           business_id?: string
+          client_of?: string | null
           contact_email?: string
           country?: string
           created_at?: string
@@ -743,7 +746,15 @@ export type Database = {
           updated_at?: string
           vat_number?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "companies_client_of_fkey"
+            columns: ["client_of"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       company_documents: {
         Row: {
@@ -2535,6 +2546,7 @@ export type Database = {
           shipper_ref: string | null
           status: Database["public"]["Enums"]["order_status"]
           terms_document_id: string | null
+          track_token: string | null
           trailer: string | null
           trailer_plate: string | null
           updated_at: string
@@ -2584,6 +2596,7 @@ export type Database = {
           shipper_ref?: string | null
           status?: Database["public"]["Enums"]["order_status"]
           terms_document_id?: string | null
+          track_token?: string | null
           trailer?: string | null
           trailer_plate?: string | null
           updated_at?: string
@@ -2633,6 +2646,7 @@ export type Database = {
           shipper_ref?: string | null
           status?: Database["public"]["Enums"]["order_status"]
           terms_document_id?: string | null
+          track_token?: string | null
           trailer?: string | null
           trailer_plate?: string | null
           updated_at?: string
@@ -3496,6 +3510,7 @@ export type Database = {
           shipper_ref: string | null
           status: Database["public"]["Enums"]["order_status"]
           terms_document_id: string | null
+          track_token: string | null
           trailer: string | null
           trailer_plate: string | null
           updated_at: string
@@ -3524,6 +3539,7 @@ export type Database = {
           billing_reference: string | null
           billing_street: string | null
           business_id: string
+          client_of: string | null
           contact_email: string
           country: string
           created_at: string
@@ -4054,6 +4070,82 @@ export type Database = {
           shipper_ref: string | null
           status: Database["public"]["Enums"]["order_status"]
           terms_document_id: string | null
+          track_token: string | null
+          trailer: string | null
+          trailer_plate: string | null
+          updated_at: string
+          waiting: Json
+          waiting_cents: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      carrier_clients: {
+        Args: never
+        Returns: {
+          business_id: string
+          contact_email: string
+          id: string
+          last_order_at: string
+          name: string
+          orders: number
+        }[]
+      }
+      carrier_create_own_order: {
+        Args: {
+          p_client: Json
+          p_order: Json
+          p_stops: Json
+          p_vehicle_id: string
+        }
+        Returns: {
+          assigned_company_id: string | null
+          assigned_driver_id: string | null
+          assigned_vehicle_id: string | null
+          billing: Database["public"]["Enums"]["billing_status"]
+          chosen_offer_id: string | null
+          closed_at: string | null
+          comment: string | null
+          commission_bps: number | null
+          container_feet: number | null
+          contract_party: Database["public"]["Enums"]["contract_party"]
+          created_at: string
+          created_by: string | null
+          deadline_at: string | null
+          desk_contract: Database["public"]["Enums"]["contract_party"]
+          dispatch_mode: Database["public"]["Enums"]["dispatch_mode"]
+          distance_auto_km: number | null
+          distance_km: number | null
+          distance_source: Database["public"]["Enums"]["distance_source"]
+          group_released_at: string | null
+          group_until: string | null
+          group_vehicle_ids: string[] | null
+          haul_kind: Database["public"]["Enums"]["haul_kind"]
+          id: string
+          invoice_ref: string | null
+          invoiced_at: string | null
+          ldm: number | null
+          order_type: Database["public"]["Enums"]["order_type"]
+          paid_at: string | null
+          published_at: string | null
+          rate_cents: number | null
+          ref: string
+          route_bounds: Json | null
+          route_computed_at: string | null
+          route_fingerprint: string | null
+          route_geometry: string | null
+          settled_at: string | null
+          shipper_company_id: string
+          shipper_company_kind: Database["public"]["Enums"]["party_role"]
+          shipper_fee_bps: number | null
+          shipper_ref: string | null
+          status: Database["public"]["Enums"]["order_status"]
+          terms_document_id: string | null
+          track_token: string | null
           trailer: string | null
           trailer_plate: string | null
           updated_at: string
@@ -4093,6 +4185,17 @@ export type Database = {
           p_token_hash: string
         }
         Returns: string
+      }
+      carrier_own_vehicles: {
+        Args: never
+        Returns: {
+          available: boolean
+          busy: boolean
+          driver_name: string
+          plate: string
+          vehicle_class: Database["public"]["Enums"]["vehicle_class"]
+          vehicle_id: string
+        }[]
       }
       carrier_partners: {
         Args: never
@@ -4185,6 +4288,7 @@ export type Database = {
           shipper_ref: string | null
           status: Database["public"]["Enums"]["order_status"]
           terms_document_id: string | null
+          track_token: string | null
           trailer: string | null
           trailer_plate: string | null
           updated_at: string
@@ -4249,6 +4353,7 @@ export type Database = {
           shipper_ref: string | null
           status: Database["public"]["Enums"]["order_status"]
           terms_document_id: string | null
+          track_token: string | null
           trailer: string | null
           trailer_plate: string | null
           updated_at: string
@@ -4409,6 +4514,7 @@ export type Database = {
           shipper_ref: string | null
           status: Database["public"]["Enums"]["order_status"]
           terms_document_id: string | null
+          track_token: string | null
           trailer: string | null
           trailer_plate: string | null
           updated_at: string
@@ -4475,6 +4581,7 @@ export type Database = {
           shipper_ref: string | null
           status: Database["public"]["Enums"]["order_status"]
           terms_document_id: string | null
+          track_token: string | null
           trailer: string | null
           trailer_plate: string | null
           updated_at: string
@@ -4622,6 +4729,7 @@ export type Database = {
           shipper_ref: string | null
           status: Database["public"]["Enums"]["order_status"]
           terms_document_id: string | null
+          track_token: string | null
           trailer: string | null
           trailer_plate: string | null
           updated_at: string
@@ -4833,6 +4941,7 @@ export type Database = {
           billing_reference: string | null
           billing_street: string | null
           business_id: string
+          client_of: string | null
           contact_email: string
           country: string
           created_at: string
@@ -4916,6 +5025,7 @@ export type Database = {
           shipper_ref: string | null
           status: Database["public"]["Enums"]["order_status"]
           terms_document_id: string | null
+          track_token: string | null
           trailer: string | null
           trailer_plate: string | null
           updated_at: string
@@ -4998,6 +5108,7 @@ export type Database = {
           billing_reference: string | null
           billing_street: string | null
           business_id: string
+          client_of: string | null
           contact_email: string
           country: string
           created_at: string
@@ -5175,6 +5286,7 @@ export type Database = {
           language: string
         }[]
       }
+      own_orders_access: { Args: never; Returns: boolean }
       partner_totals: {
         Args: { p_from?: string; p_to?: string }
         Returns: {
@@ -5395,6 +5507,7 @@ export type Database = {
           shipper_ref: string | null
           status: Database["public"]["Enums"]["order_status"]
           terms_document_id: string | null
+          track_token: string | null
           trailer: string | null
           trailer_plate: string | null
           updated_at: string
@@ -5474,6 +5587,7 @@ export type Database = {
           shipper_ref: string | null
           status: Database["public"]["Enums"]["order_status"]
           terms_document_id: string | null
+          track_token: string | null
           trailer: string | null
           trailer_plate: string | null
           updated_at: string
@@ -5677,6 +5791,7 @@ export type Database = {
           shipper_ref: string | null
           status: Database["public"]["Enums"]["order_status"]
           terms_document_id: string | null
+          track_token: string | null
           trailer: string | null
           trailer_plate: string | null
           updated_at: string
@@ -5802,6 +5917,7 @@ export type Database = {
           shipper_ref: string | null
           status: Database["public"]["Enums"]["order_status"]
           terms_document_id: string | null
+          track_token: string | null
           trailer: string | null
           trailer_plate: string | null
           updated_at: string
@@ -5878,6 +5994,7 @@ export type Database = {
           billing_reference: string | null
           billing_street: string | null
           business_id: string
+          client_of: string | null
           contact_email: string
           country: string
           created_at: string
@@ -6004,6 +6121,7 @@ export type Database = {
           shipper_ref: string | null
           status: Database["public"]["Enums"]["order_status"]
           terms_document_id: string | null
+          track_token: string | null
           trailer: string | null
           trailer_plate: string | null
           updated_at: string
