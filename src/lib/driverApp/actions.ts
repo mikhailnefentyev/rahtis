@@ -311,12 +311,14 @@ async function uploadPhoto(formData: FormData): Promise<EventResult> {
   const eventId = str(formData, 'event_id');
   const subject = str(formData, 'subject') as (typeof SUBJECTS)[number];
   const angle = str(formData, 'angle');
+  /* PDF — только скан накладной из сканера приложения (ScanCapture). */
+  const pdf = file instanceof File && file.type === 'application/pdf';
 
   if (
     !(file instanceof File) ||
     file.size === 0 ||
     file.size > 10 * 1024 * 1024 ||
-    !PHOTO_TYPES.includes(file.type) ||
+    !(PHOTO_TYPES.includes(file.type) || (pdf && subject === 'DOCUMENT' && formData.get('cmr') === '1')) ||
     /* Все три идут в путь файла — только идентификаторы, без «../». */
     ![eventId, orderId, stopId].every((id) => /^[0-9a-f-]{36}$/i.test(id)) ||
     !SUBJECTS.includes(subject) ||
@@ -331,7 +333,7 @@ async function uploadPhoto(formData: FormData): Promise<EventResult> {
   const task = (tasks ?? []).find((x) => x.id === orderId);
   if (!task || (task.status !== 'IN_PROGRESS' && task.status !== 'DONE')) return { status: 'rejected' };
 
-  const ext = file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
+  const ext = pdf ? 'pdf' : file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
   const path = `${orderId}/app/${stopId}/${eventId}.${ext}`;
 
   const admin = createAdminClient();

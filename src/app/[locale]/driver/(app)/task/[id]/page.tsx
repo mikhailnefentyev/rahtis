@@ -8,6 +8,7 @@ import { driverLocaleOf, getDriverI18n } from '@/lib/driverApp/i18n';
 import { OrderChat } from '@/components/domain/OrderChat';
 import { stopTitle } from '@/lib/orders/haul';
 import { Arrive } from './Arrive';
+import { CmrMissing, CmrReminder } from './CmrMissing';
 import { Confirmation } from './Confirmation';
 import { Inspection } from './Inspection';
 import { ProblemForm } from './ProblemForm';
@@ -41,6 +42,10 @@ export default async function DriverTaskPage({
   /* Снимки нужны только на идущем рейсе: там осмотр и сравнение сторон. */
   const photos = running ? await getTripPhotos(task.id) : [];
 
+  const hasCmr = photos.some((p) => p.kind === 'CMR');
+  const lastStop = task.stops[task.stops.length - 1];
+  const allDone = task.stops.length > 0 && task.stops.every((s) => s.completed_at);
+
   const progress = task.stops.map((stop) => ({
     id: stop.id,
     sequence: stop.sequence,
@@ -67,6 +72,8 @@ export default async function DriverTaskPage({
         </div>
       )}
 
+      {running && allDone && lastStop && <CmrMissing orderId={task.id} stopId={lastStop.id} hasCmr={hasCmr} />}
+
       {(task.trailer_plate || task.trailer || task.comment) && (
         <section className="rounded-card border border-line bg-surface px-4 py-3">
           {task.trailer_plate && (
@@ -87,6 +94,7 @@ export default async function DriverTaskPage({
             locale={locale}
             running={running}
             last={index === task.stops.length - 1}
+            hasCmr={hasCmr}
           />
         ))}
       </ol>
@@ -127,6 +135,7 @@ async function StopItem({
   locale,
   running,
   last,
+  hasCmr,
 }: {
   task: DriverTask;
   photos: TripPhoto[];
@@ -134,6 +143,7 @@ async function StopItem({
   locale: Locale;
   running: boolean;
   last: boolean;
+  hasCmr: boolean;
 }) {
   const { t, m, f } = await getDriverI18n(locale);
   const done = Boolean(stop.completed_at);
@@ -276,6 +286,10 @@ async function StopItem({
                       photos={photos}
                       pickup={confirmation === 'load'}
                     />
+                  )}
+
+                  {last && (
+                    <CmrReminder orderId={task.id} stopId={stop.id} hasCmr={hasCmr} withScan={!confirmation} />
                   )}
 
                   <StopDone stopId={stop.id} />

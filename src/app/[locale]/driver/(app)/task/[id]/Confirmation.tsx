@@ -4,14 +4,15 @@ import { useEffect, useRef, useState } from 'react';
 import type { TripPhoto } from '@/lib/driverApp/photos';
 import { useI18n } from '@/lib/i18n/provider';
 import { useOutbox } from '../../../OutboxProvider';
-import { PhotoCapture, useQueuedPhotos } from './PhotoCapture';
+import { useQueuedPhotos } from './PhotoCapture';
+import { ScanCapture } from './ScanCapture';
 
 /**
  * Подтверждение передачи: подпись на экране и снимок накладной.
  *
  * На погрузке расписывается тот, кто отдаёт единицу или груз, на
  * выгрузке — тот, кто принимает: так у рейса есть подтверждение обоих
- * концов. Снимок накладной ложится видом CMR, и перевозчик закрывает рейс
+ * концов. Скан накладной (PDF из ScanCapture) ложится видом CMR, и перевозчик закрывает рейс
  * без повторной загрузки скана.
  */
 export function Confirmation({
@@ -60,12 +61,7 @@ export function Confirmation({
           {cmr ? `✓ ${t.driverApp.cmrDone}` : t.driverApp.scanCmr}
           {cmrQueued ? ` · ${t.driverApp.queuedBadge}` : ''}
         </span>
-        <PhotoCapture
-          className="mt-2"
-          target={{ orderId, stopId, subject: 'DOCUMENT', cmr: true }}
-          label={t.driverApp.scanCmr}
-          done={cmr}
-        />
+        <ScanCapture className="mt-2" orderId={orderId} stopId={stopId} done={cmr} />
       </div>
     </section>
   );
