@@ -120,7 +120,7 @@ export default async function AdminCompanyPage({
   const filled = requisites.filter(([, value]) => Boolean(value));
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-5 py-8">
+    <main className="cab-page">
       <nav className="mb-6">
         <Link href={`/${locale}/admin`} className="text-[13px] text-ink-muted hover:text-ink">
           ← {t.role.ADMIN}
@@ -130,7 +130,7 @@ export default async function AdminCompanyPage({
       <header className="flex flex-wrap items-start justify-between gap-4 border-b border-line pb-4">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2.5">
-            <h1 className="text-xl font-semibold tracking-tight">{company.name}</h1>
+            <h1 className="page-title">{company.name}</h1>
             <Badge tone={companyStatusTone[company.status]}>
               {t.companyStatus[company.status]}
             </Badge>

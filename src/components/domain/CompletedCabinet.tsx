@@ -1,8 +1,6 @@
-import Link from 'next/link';
 import { CompletedList } from '@/components/domain/CompletedList';
 import { Stars } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
-import { cabinetPath } from '@/lib/auth/paths';
 import { COMPLETED_WEEKS, vatBpsFor } from '@/lib/config';
 import { weeksAgoMonday } from '@/lib/dates';
 import { CarrierScorecard } from '@/components/domain/CarrierScorecard';
@@ -66,18 +64,10 @@ export async function CompletedCabinet({
     vatBpsFor(viewer.company?.country) > 0 ? t.done.vatNoteDomestic : t.done.vatNoteReverse;
 
   return (
-    <main className="mx-auto w-full max-w-4xl px-5 py-8">
-      <nav className="mb-6">
-        <Link
-          href={cabinetPath(locale, role)}
-          className="text-[13px] text-ink-muted hover:text-ink"
-        >
-          ← {t.role[role]}
-        </Link>
-      </nav>
+    <main className="cab-page">
 
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-xl font-semibold tracking-tight">{title}</h1>
+        <h1 className="page-title">{title}</h1>
 
         {own && (
           <div className="flex items-center gap-2">

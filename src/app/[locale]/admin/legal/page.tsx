@@ -96,11 +96,11 @@ export default async function LegalAdminPage({
   const byId = new Map(docs.map((d) => [d.id, d]));
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-5 py-8">
+    <main className="cab-page">
       <AdminError locale={locale} code={failure} />
 
 
-      <h1 className="text-xl font-semibold tracking-tight">{t.legal.manage}</h1>
+      <h1 className="page-title">{t.legal.manage}</h1>
 
       <div className="mt-6 flex flex-col gap-4">
         {KINDS.map((kind) => {

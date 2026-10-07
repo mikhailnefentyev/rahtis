@@ -41,8 +41,8 @@ export default async function KnownVehiclesPage({ params }: { params: Promise<{ 
   const others = vehicles.filter((v) => !v.in_pool);
 
   return (
-    <main className="mx-auto w-full max-w-4xl px-5 py-8">
-      <h1 className="text-xl font-semibold tracking-tight">{t.known.title}</h1>
+    <main className="cab-page">
+      <h1 className="page-title">{t.known.title}</h1>
       <p className="mt-2 mb-6 max-w-xl text-[13px] leading-relaxed text-ink-muted">{t.known.subtitle}</p>
 
       {vehicles.length === 0 ? (

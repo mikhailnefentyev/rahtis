@@ -59,8 +59,8 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
       : null;
 
   const content = (
-    <main className="mx-auto w-full max-w-3xl px-5 py-8">
-      <h1 className="text-xl font-semibold tracking-tight">{t.account.title}</h1>
+    <main className="cab-page cab-page--narrow">
+      <h1 className="page-title">{t.account.title}</h1>
 
       <div className="mt-6 flex flex-col gap-4">
         <Card>

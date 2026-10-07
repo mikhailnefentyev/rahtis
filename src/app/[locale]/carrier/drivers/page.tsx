@@ -71,9 +71,9 @@ export default async function DriversPage({ params }: { params: Promise<{ locale
   }));
 
   return (
-    <main className="mx-auto w-full max-w-4xl px-5 py-8">
+    <main className="cab-page">
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <h1 className="text-xl font-semibold tracking-tight">{t.drivers.title}</h1>
+        <h1 className="page-title">{t.drivers.title}</h1>
         <div className="flex flex-wrap gap-2">
           <Link
             href={`/${locale}/carrier/drivers/report`}

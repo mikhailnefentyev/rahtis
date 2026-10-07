@@ -178,11 +178,11 @@ export default async function AdminPage({
   const active = history.filter((c) => c.status === 'ACTIVE').length;
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-5 py-8">
+    <main className="cab-page">
       <AdminError locale={locale} code={failure} />
 
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-xl font-semibold tracking-tight">{t.moderation.applications}</h1>
+        <h1 className="page-title">{t.moderation.applications}</h1>
 
         <div className="flex flex-wrap gap-2">
           {/* Журнал писем рядом с допусками: приглашение уходит отсюда же. */}

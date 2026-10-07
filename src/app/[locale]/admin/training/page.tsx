@@ -73,8 +73,8 @@ export default async function TrainingAdminPage({
   }));
 
   return (
-    <main className="mx-auto w-full max-w-4xl px-5 py-8">
-      <h1 className="text-xl font-semibold tracking-tight">{texts.title}</h1>
+    <main className="cab-page">
+      <h1 className="page-title">{texts.title}</h1>
       <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-ink-muted">{texts.lede}</p>
 
       <form method="get" className="mt-6 flex flex-wrap items-end gap-3">

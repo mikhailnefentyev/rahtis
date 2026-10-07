@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
+import { CabinetShell } from '@/components/layout/CabinetShell';
 import { LocaleSwitch } from '@/components/layout/LocaleSwitch';
 import { Button, Card, CardBody, EmptyState, Mono } from '@/components/ui';
 import { markAllReadAction } from '@/lib/notifications/actions';
@@ -71,17 +72,21 @@ export default async function NotificationsPage({
     }
   };
 
-  return (
-    <main className="mx-auto w-full max-w-3xl px-5 py-8">
-      <nav className="mb-6 flex items-center justify-between gap-4">
-        <Link href={back} className="text-[13px] text-ink-muted hover:text-ink">
-          ← {viewer.status === 'ready' ? t.role[viewer.role] : t.brand.operator}
-        </Link>
-        <LocaleSwitch current={locale} />
-      </nav>
+  const ready = viewer.status === 'ready';
+  const content = (
+    <main className="cab-page cab-page--narrow">
+      {/* Без роли каркаса нет — остаётся возврат и язык. */}
+      {!ready && (
+        <nav className="mb-6 flex items-center justify-between gap-4">
+          <Link href={back} className="text-[13px] text-ink-muted hover:text-ink">
+            ← {t.brand.operator}
+          </Link>
+          <LocaleSwitch current={locale} />
+        </nav>
+      )}
 
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-xl font-semibold tracking-tight">{t.notify.title}</h1>
+        <h1 className="page-title">{t.notify.title}</h1>
 
         {unread > 0 && (
           <form action={markAllReadAction}>
@@ -134,5 +139,13 @@ export default async function NotificationsPage({
         </ul>
       )}
     </main>
+  );
+
+  return ready ? (
+    <CabinetShell locale={locale} role={viewer.role} company={viewer.company}>
+      {content}
+    </CabinetShell>
+  ) : (
+    content
   );
 }

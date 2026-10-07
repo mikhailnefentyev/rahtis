@@ -59,7 +59,7 @@ export async function ClaimPage({
   const attachmentsById = new Map(detail.attachments.map((a) => [a.id, a]));
 
   return (
-    <main className="mx-auto w-full max-w-4xl px-5 py-8">
+    <main className="cab-page">
       <nav className="mb-6">
         <Link href={claimsRoot(locale, role)} className="text-[13px] text-ink-muted hover:text-ink">
           ← {t.claims.back}
@@ -68,7 +68,7 @@ export async function ClaimPage({
 
       <div className="flex flex-wrap items-center gap-2.5">
         <Badge tone={claimStatusTone[claim.status]}>{t.claimStatus[claim.status]}</Badge>
-        <h1 className="text-xl font-semibold tracking-tight">{t.claimKind[claim.kind]}</h1>
+        <h1 className="page-title">{t.claimKind[claim.kind]}</h1>
         <Mono className="text-sm text-ink-dim">{claim.ref}</Mono>
       </div>
 

@@ -35,11 +35,11 @@ export default async function TesPage({ params }: { params: Promise<{ locale: st
   ]);
 
   return (
-    <main className="mx-auto w-full max-w-4xl px-5 py-8">
+    <main className="cab-page">
       <Link href={`/${locale}/carrier/drivers`} className="text-[13px] text-ink-faint hover:text-ink">
         ← {t.drivers.back}
       </Link>
-      <h1 className="mt-3 text-xl font-semibold tracking-tight">{t.tes.title}</h1>
+      <h1 className="page-title mt-3">{t.tes.title}</h1>
       <p className="mt-2 mb-2 max-w-xl text-[13px] leading-relaxed text-ink-muted">{t.tes.subtitle}</p>
       <p className="mb-6 max-w-xl text-xs text-ink-dim">{t.tes.later}</p>
 

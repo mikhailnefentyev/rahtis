@@ -218,7 +218,10 @@ export function CompletedList({
                         {open && (
                           <div className="mt-4 border-t border-line pt-4">
                             <div className="mb-4 grid gap-1.5 sm:grid-cols-2">
-                              <Kv k={t.order.trailer} v={order.trailer ?? '—'} />
+                              {/* У экспресса прицепа нет — строка «Perävaunu —» была бы шумом. */}
+                              {(order.haul_kind === 'TRAILER' || order.haul_kind === 'CONTAINER') && (
+                                <Kv k={t.order.trailer} v={order.trailer ?? '—'} />
+                              )}
                               <Kv
                                 k={t.order.ratePerKm}
                                 v={

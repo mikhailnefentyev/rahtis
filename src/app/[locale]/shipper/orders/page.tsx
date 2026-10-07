@@ -152,8 +152,8 @@ export default async function OrdersPage({
   }
 
   return (
-    <main className="mx-auto w-full max-w-4xl px-5 py-8">
-      <h1 className="text-xl font-semibold tracking-tight">{t.orders.title}</h1>
+    <main className="cab-page">
+      <h1 className="page-title">{t.orders.title}</h1>
       <p className="mt-2 mb-6 max-w-xl text-[13px] leading-relaxed text-ink-muted">
         {t.orders.subtitle}
       </p>

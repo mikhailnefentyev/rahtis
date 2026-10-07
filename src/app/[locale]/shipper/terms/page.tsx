@@ -40,7 +40,7 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
   const { t } = await getI18n(locale);
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-5 py-8">
+    <main className="cab-page cab-page--narrow">
       <h1 className="text-2xl font-semibold tracking-tight">{t.legal.SHIPPER_AGREEMENT}</h1>
       <LegalDocument locale={locale} kind="SHIPPER_AGREEMENT" />
     </main>

@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { Badge, Card, CardBody, EmptyState, Mono, Plate, claimStatusTone } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
-import { cabinetPath } from '@/lib/auth/paths';
 import { getI18n, type Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import type { ClaimStatus, PartyRole } from '@/types/db';
@@ -38,17 +37,9 @@ export async function ClaimsCabinet({
   const root = claimsRoot(locale, role);
 
   return (
-    <main className="mx-auto w-full max-w-4xl px-5 py-8">
-      <nav className="mb-6">
-        <Link
-          href={cabinetPath(locale, role)}
-          className="text-[13px] text-ink-muted hover:text-ink"
-        >
-          ← {t.role[role]}
-        </Link>
-      </nav>
+    <main className="cab-page">
 
-      <h1 className="text-xl font-semibold tracking-tight">{t.claims.title}</h1>
+      <h1 className="page-title">{t.claims.title}</h1>
       <p className="mt-2 mb-5 max-w-xl text-[13px] leading-relaxed text-ink-muted">
         {role === 'ADMIN' ? t.claims.subtitleAdmin : t.claims.subtitle}
       </p>

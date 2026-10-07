@@ -359,8 +359,9 @@ export function OrdersView({
         </div>
       )}
 
-      {orders.length === 0 && !composing ? (
-        <EmptyState title={t.orders.none} description={t.orders.noneHint} />
+      {orders.length === 0 ? (
+        /* Первый заказ пишется в открытой форме — «нет совпадений» под ней было бы неправдой. */
+        composing ? null : <EmptyState title={t.orders.none} description={t.orders.noneHint} />
       ) : visible.length === 0 ? (
         /* Пусто из-за отбора, а не потому, что заказов нет: так и сказано. */
         <EmptyState title={t.orders.nothingFound} description={t.orders.nothingFoundHint} />

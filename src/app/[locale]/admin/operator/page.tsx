@@ -35,8 +35,8 @@ export default async function OperatorPage({ params }: { params: Promise<{ local
   if (!profile) notFound();
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-5 py-8">
-      <h1 className="text-xl font-semibold tracking-tight">{t.operator.title}</h1>
+    <main className="cab-page cab-page--narrow">
+      <h1 className="page-title">{t.operator.title}</h1>
       <p className="mt-2 mb-5 max-w-xl text-[13px] leading-relaxed text-ink-muted">
         {t.operator.subtitle}
       </p>

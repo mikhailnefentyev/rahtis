@@ -91,9 +91,9 @@ export default async function FleetPage({ params }: { params: Promise<{ locale: 
       : null;
 
   return (
-    <main className="mx-auto w-full max-w-4xl px-5 py-8">
+    <main className="cab-page">
 
-      <h1 className="text-xl font-semibold tracking-tight">{t.fleet.title}</h1>
+      <h1 className="page-title">{t.fleet.title}</h1>
       <p className="mt-2 mb-6 max-w-xl text-[13px] leading-relaxed text-ink-muted">
         {t.fleet.subtitle}
       </p>

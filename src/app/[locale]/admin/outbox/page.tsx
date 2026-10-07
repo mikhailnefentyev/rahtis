@@ -54,8 +54,8 @@ export default async function OutboxPage({ params }: { params: Promise<{ locale:
   const sending = list.some((row) => row.provider !== 'stub');
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-5 py-8">
-      <h1 className="text-xl font-semibold tracking-tight">{t.outbox.title}</h1>
+    <main className="cab-page">
+      <h1 className="page-title">{t.outbox.title}</h1>
       <p className="mt-2 max-w-xl text-[13px] leading-relaxed text-ink-muted">
         {t.outbox.subtitle}
       </p>

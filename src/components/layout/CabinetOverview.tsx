@@ -101,7 +101,7 @@ export async function CabinetOverview({
    * кнопкой в углу, а не карточкой на пол-экрана.
    */
   return (
-    <main className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-5 py-7">
+    <main className="cab-page flex flex-col gap-6">
       <div className="rise flex flex-wrap items-end gap-4" style={{ '--i': 0 } as React.CSSProperties}>
         <div className="min-w-0">
           <p className="label-micro">

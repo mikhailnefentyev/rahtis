@@ -18,7 +18,6 @@ import {
 } from '@/components/ui';
 import { SiteWaitingTable } from '@/components/domain/SiteWaitingTable';
 import { requireRole } from '@/lib/auth/guard';
-import { cabinetPath } from '@/lib/auth/paths';
 import { getI18n, type Locale } from '@/lib/i18n';
 import { buildPeriodReport } from '@/lib/reports/period';
 import { summaryRows } from '@/lib/reports/periodExport';
@@ -86,17 +85,9 @@ export async function PeriodReportCabinet({
   };
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-5 py-8">
-      <nav className="mb-6">
-        <Link
-          href={cabinetPath(locale, role)}
-          className="text-[13px] text-ink-muted hover:text-ink"
-        >
-          ← {t.role[role]}
-        </Link>
-      </nav>
+    <main className="cab-page">
 
-      <h1 className="text-xl font-semibold tracking-tight">{t.periodReport.title}</h1>
+      <h1 className="page-title">{t.periodReport.title}</h1>
       <p className="mt-2 mb-5 max-w-xl text-[13px] leading-relaxed text-ink-muted">
         {t.periodReport.subtitle}
       </p>

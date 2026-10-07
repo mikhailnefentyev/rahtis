@@ -107,13 +107,13 @@ export default async function DriverPage({
   };
 
   return (
-    <main className="mx-auto w-full max-w-4xl px-5 py-8">
+    <main className="cab-page">
       <Link href={`/${locale}/carrier/drivers`} className="text-[13px] text-ink-faint hover:text-ink">
         ← {t.drivers.back}
       </Link>
 
       <div className="mt-3 flex flex-wrap items-center gap-2.5">
-        <h1 className="text-xl font-semibold tracking-tight">{driver.full_name}</h1>
+        <h1 className="page-title">{driver.full_name}</h1>
         {driver.status === 'ARCHIVED' && <Badge tone="neutral">{t.drivers.archived}</Badge>}
       </div>
       <p className="mt-1 text-[13px] text-ink-muted">

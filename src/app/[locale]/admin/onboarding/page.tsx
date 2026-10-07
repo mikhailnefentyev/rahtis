@@ -40,8 +40,8 @@ export default async function OnboardingAdminPage({ params }: { params: Promise<
   const rows = data ?? [];
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-5 py-8">
-      <h1 className="text-xl font-semibold tracking-tight">{o.title}</h1>
+    <main className="cab-page">
+      <h1 className="page-title">{o.title}</h1>
       <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-ink-muted">{o.subtitle}</p>
 
       {rows.length === 0 ? (

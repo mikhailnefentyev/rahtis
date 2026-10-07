@@ -78,11 +78,11 @@ export default async function DriverReportPage({
   const hours = (minutes: number) => f.decimal(minutes / 60, 2);
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-5 py-8">
+    <main className="cab-page">
       <Link href={`/${locale}/carrier/drivers`} className="text-[13px] text-ink-faint hover:text-ink">
         ← {t.drivers.back}
       </Link>
-      <h1 className="mt-3 text-xl font-semibold tracking-tight">{t.workReport.title}</h1>
+      <h1 className="page-title mt-3">{t.workReport.title}</h1>
       <p className="mt-2 mb-4 max-w-xl text-[13px] leading-relaxed text-ink-muted">
         {t.workReport.subtitle}
       </p>

@@ -56,8 +56,8 @@ export default async function PartnersPage({ params }: { params: Promise<{ local
   const active = viewer.company?.status === 'ACTIVE';
 
   return (
-    <main className="mx-auto w-full max-w-4xl px-5 py-8">
-      <h1 className="text-xl font-semibold tracking-tight">{t.partners.title}</h1>
+    <main className="cab-page">
+      <h1 className="page-title">{t.partners.title}</h1>
       <p className="mt-2 max-w-xl text-[13px] leading-relaxed text-ink-muted">{t.partners.subtitle}</p>
       <p className="mt-2 mb-6 max-w-xl text-xs text-ink-dim">{subscriber ? t.partners.anonymitySubscriber : t.partners.anonymity}</p>
 

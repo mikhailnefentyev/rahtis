@@ -1907,3 +1907,34 @@
   .pulse-bars__bar, .trip-seg i, .assistant-fab { animation: none; }
   .assistant-drawer { transition: none; }
 }
+
+
+/* ── Шаблон внутренней страницы кабинета (8.10.2026) ────────────────
+   Один левый край у всех страниц: заголовок и содержимое начинаются в
+   одной точке, а не плавают узкой колонкой посреди экрана. Текстовые
+   страницы — узким вариантом. */
+
+.cab-page {
+  width: 100%;
+  max-width: 1180px;
+  padding: 28px 20px 40px;
+  animation: rise-in 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.cab-page--narrow { max-width: 860px; }
+@media (min-width: 640px) {
+  .cab-page { padding-inline: 32px; }
+}
+
+.page-title {
+  margin: 0;
+  font-family: var(--font-display), var(--font-sans);
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cab-page { animation: none; }
+}
