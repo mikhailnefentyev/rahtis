@@ -1510,6 +1510,10 @@
   padding: 4px 10px 2px;
 }
 .cab-brand span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: 10px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -1922,6 +1926,8 @@
   animation: rise-in 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
 .cab-page--narrow { max-width: 860px; }
+/* Таблицы оператора и отчётов: широкий экран отдаётся им целиком. */
+.cab-page--wide { max-width: 1680px; }
 @media (min-width: 640px) {
   .cab-page { padding-inline: 32px; }
 }

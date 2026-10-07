@@ -218,7 +218,7 @@ export default async function BillingPage({
   const currentPeriod = Array.isArray(current) ? current[0] : current;
 
   return (
-    <main className="cab-page">
+    <main className="cab-page cab-page--wide">
       <AdminError locale={locale} code={failure} />
 
       <h1 className="page-title">{t.billingDesk.title}</h1>

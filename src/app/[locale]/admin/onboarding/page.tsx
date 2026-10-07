@@ -40,7 +40,7 @@ export default async function OnboardingAdminPage({ params }: { params: Promise<
   const rows = data ?? [];
 
   return (
-    <main className="cab-page">
+    <main className="cab-page cab-page--wide">
       <h1 className="page-title">{o.title}</h1>
       <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-ink-muted">{o.subtitle}</p>
 

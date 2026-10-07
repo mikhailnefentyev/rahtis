@@ -85,7 +85,7 @@ export async function PeriodReportCabinet({
   };
 
   return (
-    <main className="cab-page">
+    <main className="cab-page cab-page--wide">
 
       <h1 className="page-title">{t.periodReport.title}</h1>
       <p className="mt-2 mb-5 max-w-xl text-[13px] leading-relaxed text-ink-muted">

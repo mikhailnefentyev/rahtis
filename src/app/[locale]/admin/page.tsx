@@ -3,7 +3,6 @@ import { notFound } from 'next/navigation';
 import {
   Badge,
   Button,
-  buttonClass,
   Card,
   CardBody,
   EmptyState,
@@ -178,37 +177,11 @@ export default async function AdminPage({
   const active = history.filter((c) => c.status === 'ACTIVE').length;
 
   return (
-    <main className="cab-page">
+    <main className="cab-page cab-page--wide">
       <AdminError locale={locale} code={failure} />
 
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="page-title">{t.moderation.applications}</h1>
-
-        <div className="flex flex-wrap gap-2">
-          {/* Журнал писем рядом с допусками: приглашение уходит отсюда же. */}
-          <Link
-            href={`/${locale}/admin/legal`}
-            className={buttonClass({ variant: 'default', size: 'md' })}
-          >
-            {t.legal.manage}
-          </Link>
-
-          <Link
-            href={`/${locale}/admin/outbox`}
-            className={buttonClass({ variant: 'default', size: 'md' })}
-          >
-            {t.outbox.title}
-          </Link>
-
-          {/* Счета и выплаты — соседний пульт: там деньги, здесь допуски. */}
-          <Link
-            href={`/${locale}/admin/billing`}
-            className={buttonClass({ variant: 'primary', size: 'md' })}
-          >
-            {t.done.titleAdmin}
-          </Link>
-        </div>
-      </div>
+      {/* Разделы — в боковой панели; кнопки-дубли над заголовком убраны (8.10.2026). */}
+      <h1 className="page-title">{t.moderation.applications}</h1>
 
       <StatRow className="mt-6">
         <Stat
