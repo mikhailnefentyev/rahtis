@@ -46,17 +46,20 @@ export function AssistantDock({
 
       {open && <button type="button" className="assistant-scrim" aria-label={closeLabel} onClick={() => setOpen(false)} />}
 
-      <aside id="assistant-drawer" className="assistant-drawer" data-open={open || undefined} aria-label={label} aria-hidden={!open}>
-        <header className="assistant-drawer__head">
-          <h2 className="font-display text-base font-bold">{label}</h2>
-          <button type="button" className="cab-icon-btn ml-auto" aria-label={closeLabel} onClick={() => setOpen(false)}>
-            <svg aria-hidden viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
-              <path d="M6 6l12 12M18 6 6 18" />
-            </svg>
-          </button>
-        </header>
-        <div className="assistant-drawer__body">{children}</div>
-      </aside>
+      {/* Слой обрезает спрятанную за краем панель: без него страница прокручивалась вбок. */}
+      <div className="assistant-layer">
+        <aside id="assistant-drawer" className="assistant-drawer" data-open={open || undefined} aria-label={label} aria-hidden={!open}>
+          <header className="assistant-drawer__head">
+            <h2 className="font-display text-base font-bold">{label}</h2>
+            <button type="button" className="cab-icon-btn ml-auto" aria-label={closeLabel} onClick={() => setOpen(false)}>
+              <svg aria-hidden viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
+                <path d="M6 6l12 12M18 6 6 18" />
+              </svg>
+            </button>
+          </header>
+          <div className="assistant-drawer__body">{children}</div>
+        </aside>
+      </div>
     </>
   );
 }
