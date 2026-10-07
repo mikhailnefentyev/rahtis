@@ -20,6 +20,7 @@ const TOOLS = {
   company_money: { fn: 'agent_company_money', args: ['weeks'] },
   payout_schedule: { fn: 'agent_payout_schedule', args: ['periods'] },
   legal_clause: { fn: 'agent_legal_clause', args: ['number', 'kind', 'locale'] },
+  legal_search: { fn: 'agent_legal_search', args: ['query', 'locale'] },
   place_guide: { fn: 'agent_place_guide', args: ['query', 'locale'] },
   /*
    * Единственный пишущий инструмент. Компанию и автора берёт из треда,

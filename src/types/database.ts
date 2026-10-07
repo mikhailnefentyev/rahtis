@@ -3778,6 +3778,22 @@ export type Database = {
           version: number
         }[]
       }
+      agent_legal_search: {
+        Args: {
+          p_conversation_id: string
+          p_locale?: string
+          p_query: string
+          p_token: string
+        }
+        Returns: {
+          body: string
+          hits: number
+          kind: Database["public"]["Enums"]["legal_kind"]
+          number: string
+          section_title: string
+          version: number
+        }[]
+      }
       agent_order_by_ref: {
         Args: { p_conversation_id: string; p_ref: string; p_token: string }
         Returns: {
