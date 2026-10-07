@@ -8,6 +8,7 @@ export type ApplyInvite = {
   name: string;
   businessId: string;
   email: string;
+  /** Пусто, когда звала сама платформа (origin OPERATOR). */
   carrierName: string;
   /** Кого пригласили: заказчика или перевозчика — от этого роль в заявке. */
   kind: 'SHIPPER' | 'CARRIER';
@@ -29,7 +30,9 @@ export async function inviteByToken(token: string): Promise<ApplyInvite | null> 
     .eq('token_hash', createHash('sha256').update(token).digest('hex'))
     .maybeSingle();
   if (!data || data.applied_company_id) return null;
-  const { data: carrier } = await admin.from('companies').select('name').eq('id', data.carrier_company_id).maybeSingle();
+  const { data: carrier } = data.carrier_company_id
+    ? await admin.from('companies').select('name').eq('id', data.carrier_company_id).maybeSingle()
+    : { data: null };
   return {
     token,
     name: data.company_name,

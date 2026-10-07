@@ -139,13 +139,14 @@ export default async function AdminPage({
         .select('applied_company_id, carrier_company_id')
         .in('applied_company_id', queueIds)
     : { data: [] };
-  const inviterIds = [...new Set((invites ?? []).map((i) => i.carrier_company_id))];
+  const inviterIds = [...new Set((invites ?? []).map((i) => i.carrier_company_id).filter((id): id is string => Boolean(id)))];
   const { data: inviters } = inviterIds.length
     ? await supabase.from('companies').select('id, name').in('id', inviterIds)
     : { data: [] };
   const inviterName = new Map((inviters ?? []).map((c) => [c.id, c.name]));
   const invitedBy = new Map(
-    (invites ?? []).map((i) => [i.applied_company_id, inviterName.get(i.carrier_company_id) ?? null]),
+    /* Звала платформа — перевозчика нет, подпись «RAHTIS». */
+    (invites ?? []).map((i) => [i.applied_company_id, i.carrier_company_id ? (inviterName.get(i.carrier_company_id) ?? null) : 'RAHTIS']),
   );
 
   /* У какой компании уже есть пользователь — значит приглашение выписано. */

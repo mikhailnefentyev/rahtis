@@ -2698,6 +2698,68 @@ export type Database = {
           },
         ]
       }
+      outreach_targets: {
+        Row: {
+          approved: boolean
+          business_id: string | null
+          company_name: string
+          created_at: string
+          email: string
+          error: string | null
+          id: string
+          invite_id: string | null
+          kind: string
+          note: string | null
+          priority: number
+          sent_at: string | null
+          source: string
+          status: string
+          website: string | null
+        }
+        Insert: {
+          approved?: boolean
+          business_id?: string | null
+          company_name: string
+          created_at?: string
+          email: string
+          error?: string | null
+          id?: string
+          invite_id?: string | null
+          kind: string
+          note?: string | null
+          priority?: number
+          sent_at?: string | null
+          source: string
+          status?: string
+          website?: string | null
+        }
+        Update: {
+          approved?: boolean
+          business_id?: string | null
+          company_name?: string
+          created_at?: string
+          email?: string
+          error?: string | null
+          id?: string
+          invite_id?: string | null
+          kind?: string
+          note?: string | null
+          priority?: number
+          sent_at?: string | null
+          source?: string
+          status?: string
+          website?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "outreach_targets_invite_id_fkey"
+            columns: ["invite_id"]
+            isOneToOne: false
+            referencedRelation: "shipper_invites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       place_guides: {
         Row: {
           body: string
@@ -2785,39 +2847,42 @@ export type Database = {
           applied_at: string | null
           applied_company_id: string | null
           business_id: string
-          carrier_company_id: string
+          carrier_company_id: string | null
           company_name: string
           created_at: string
           created_by: string | null
           email: string
           id: string
           invite_kind: string
+          origin: string
           token_hash: string
         }
         Insert: {
           applied_at?: string | null
           applied_company_id?: string | null
           business_id: string
-          carrier_company_id: string
+          carrier_company_id?: string | null
           company_name: string
           created_at?: string
           created_by?: string | null
           email: string
           id?: string
           invite_kind?: string
+          origin?: string
           token_hash: string
         }
         Update: {
           applied_at?: string | null
           applied_company_id?: string | null
           business_id?: string
-          carrier_company_id?: string
+          carrier_company_id?: string | null
           company_name?: string
           created_at?: string
           created_by?: string | null
           email?: string
           id?: string
           invite_kind?: string
+          origin?: string
           token_hash?: string
         }
         Relationships: [

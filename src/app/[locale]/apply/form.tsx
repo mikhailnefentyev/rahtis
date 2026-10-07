@@ -85,7 +85,9 @@ export function ApplyForm({ invite = null }: { invite?: ApplyInvite | null }) {
           {invite && <input type="hidden" name="invite" value={invite.token} />}
           {invite && (
             <p className="rounded-control border border-accent-line bg-accent-wash px-3 py-2 text-[13px] leading-relaxed text-ink">
-              {(invite.kind === 'CARRIER' ? t.apply.invitedByCarrier : t.apply.invitedBy).replace('{carrier}', invite.carrierName)}
+              {invite.carrierName
+                ? (invite.kind === 'CARRIER' ? t.apply.invitedByCarrier : t.apply.invitedBy).replace('{carrier}', invite.carrierName)
+                : t.apply.invitedByRahtis}
             </p>
           )}
 

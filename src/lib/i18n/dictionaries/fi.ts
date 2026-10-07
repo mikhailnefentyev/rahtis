@@ -1388,6 +1388,7 @@ export const fi = {
     duplicate: 'Tällä Y-tunnuksella on jo hakemus vireillä tai hyväksytty.',
     invitedBy: '{carrier} kutsui teidät. Tiedot on täytetty valmiiksi — tarkistakaa ne ja lähettäkää hakemus. Hyväksynnän jälkeen voitte lähettää suoria tilauksia heidän autoilleen.',
     invitedByCarrier: '{carrier} kutsui kuljetusliikkeenne. Tiedot on täytetty valmiiksi — tarkistakaa ne ja lähettäkää hakemus.',
+    invitedByRahtis: 'Tiedot on täytetty kutsun perusteella — tarkistakaa ne ja lähettäkää hakemus.',
     tooMany: 'Liian monta hakemusta lyhyessä ajassa. Yritä tunnin kuluttua tai kirjoita osoitteeseen admin@rahtis.eu.',
     failed: 'Lähetys ei onnistunut. Yritä uudelleen.',
     /* Toiminimi ei ole avoimessa datassa, tai rekisteri ei vastannut — ei virhe. */

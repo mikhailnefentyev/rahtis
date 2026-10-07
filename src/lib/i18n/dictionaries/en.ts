@@ -1294,6 +1294,7 @@ export const en = {
     duplicate: 'There is already an application for this Y-tunnus, pending or approved.',
     invitedBy: '{carrier} invited you. The details are filled in — check them and send the application. Once approved, you can send direct orders to their vehicles.',
     invitedByCarrier: '{carrier} invited your transport company. The details are filled in — check them and send the application.',
+    invitedByRahtis: 'The details are filled in from the invitation — check them and send the application.',
     tooMany: 'Too many applications in a short time. Try again in an hour or write to admin@rahtis.eu.',
     failed: 'Sending failed. Try again.',
     registryManual: 'We will check the company details by hand and email you once the application has been reviewed.',

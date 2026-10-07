@@ -80,6 +80,19 @@ type Texts = {
     note: (carrier: string) => string;
   };
 
+  /** Приглашение от самой платформы: ежедневная рассылка оператора (outreach_targets). */
+  operatorInvite: Record<
+    'SHIPPER' | 'CARRIER',
+    {
+      subject: string;
+      heading: string;
+      preheader: string;
+      body: string;
+      points: string[];
+      button: string;
+    }
+  > & { note: (operator: string) => string };
+
   /** Напоминания застрявшим на пути к первой работе (2, 5, 10 день на шаге). */
   onboarding: {
     subject: Record<'ACTIVATE' | 'SETUP' | 'FIRST_ORDER', (company: string) => string>;
@@ -248,6 +261,36 @@ const fi: Texts = {
     button: 'Seuraa kuljetusta',
     note: (carrier) =>
       `Linkki toimii ilman tunnuksia. Kysymykset kuljetuksesta: ${carrier}. Jos ette odottaneet tätä viestiä, voitte jättää sen huomiotta.`,
+  },
+
+  operatorInvite: {
+    SHIPPER: {
+      subject: 'RAHTIS — perävaunun vaihdot ja kontit satamista, ensimmäinen kuukausi maksutta',
+      heading: 'Kuljetus satamasta: tilaus minuutissa, eteneminen ja rahtikirja samassa paikassa',
+      preheader: 'Tarkastetut kuljetusliikkeet, kuljettajan sovellus ja API omaan järjestelmään.',
+      body: 'RAHTIS on suomalainen palvelu perävaunujen vaihtoihin, kontteihin ja pikakuljetuksiin. Julkaisette kuljetuksen, tarkastetut kuljetusliikkeet ottavat sen, ja näette etenemisen, kuvat ja rahtikirjan yhdestä näkymästä.',
+      points: [
+        'Kuljetusliikkeiden liikenneluvat ja vakuutukset tarkistetaan ennen ensimmäistä keikkaa.',
+        'Kuljettajan sovellus: saapumiset, kuvat ja skannattu rahtikirja heti näkyvissä.',
+        'Rajapinta (API) omaan järjestelmäänne, viikkoraportti ja yksi lasku kaudelta.',
+        'Ensimmäinen kuukausi maksutta.',
+      ],
+      button: 'Hae mukaan',
+    },
+    CARRIER: {
+      subject: 'RAHTIS — keikkoja satamista ja työalusta kuljetusliikkeelle',
+      heading: 'Lisää keikkoja ja vähemmän paperia',
+      preheader: 'Keikkoja tarjouspöydältä ja oma työalusta kuljetusliikkeelle.',
+      body: 'RAHTIS on suomalainen palvelu, jossa tilaajat julkaisevat perävaunujen vaihtoja, kontteja ja pikakuljetuksia, ja kuljetusliikkeet ajavat niitä omilla autoillaan.',
+      points: [
+        'Keikkoja tarjouspöydältä satamista ja koko Suomesta.',
+        'Kuljettajan sovellus kymmenellä kielellä: saapumiset, kuvat ja rahtikirja skannattuna PDF:ksi.',
+        'Omat asiakkaat ja omat keikat samaan sovellukseen: 29,90 € kuukaudessa ajanutta autoa kohden, ensimmäinen kuukausi maksutta.',
+      ],
+      button: 'Hae mukaan',
+    },
+    note: (operator) =>
+      `Lähetimme tämän viestin yrityksenne julkiseen osoitteeseen. Jos ette halua viestejä meiltä, vastatkaa tähän viestiin, niin emme lähetä enempää. Kysymykset: ${operator}.`,
   },
 
   onboarding: {
@@ -440,6 +483,36 @@ const en: Texts = {
     button: 'Follow the transport',
     note: (carrier) =>
       `The link works without an account. Questions about the transport: ${carrier}. If you did not expect this message, you can ignore it.`,
+  },
+
+  operatorInvite: {
+    SHIPPER: {
+      subject: 'RAHTIS — trailer swaps and containers from ports, first month free',
+      heading: 'Transport from the port: order in a minute, progress and consignment note in one place',
+      preheader: 'Vetted carriers, a driver app and an API for your own system.',
+      body: 'RAHTIS is a Finnish service for trailer swaps, containers and express transport. You publish a transport, vetted carriers take it, and you see the progress, photos and consignment note in one view.',
+      points: [
+        "Carriers' transport licences and insurance are checked before their first job.",
+        'Driver app: arrivals, photos and the scanned consignment note visible at once.',
+        'An API for your own system, a weekly report and one invoice per period.',
+        'First month free.',
+      ],
+      button: 'Apply',
+    },
+    CARRIER: {
+      subject: 'RAHTIS — jobs from ports and an operations platform for your transport company',
+      heading: 'More jobs, less paper',
+      preheader: 'Jobs from the offer table and an operations platform for your transport company.',
+      body: 'RAHTIS is a Finnish service where shippers publish trailer swaps, containers and express transport, and transport companies drive them with their own vehicles.',
+      points: [
+        'Jobs from the offer table, from ports and across Finland.',
+        'A driver app in ten languages: arrivals, photos and the consignment note scanned to PDF.',
+        'Your own clients and own jobs in the same app: €29.90 a month per vehicle that drove, first month free.',
+      ],
+      button: 'Apply',
+    },
+    note: (operator) =>
+      `We sent this message to your company's public address. If you do not want messages from us, reply to this message and we will not send more. Questions: ${operator}.`,
   },
 
   onboarding: {
