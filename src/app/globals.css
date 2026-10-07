@@ -150,6 +150,14 @@
   --duration-quick: 150ms;
   --duration-state: 260ms;
   --duration-object: 420ms;
+
+  /* Тени (8.10.2026). Тонированы в синий: серые на этом фоне выглядят
+     грязными. Лежит, поднято под курсором, плавает (лист, панель);
+     и цветная тень главной кнопки. */
+  --shadow-card: 0 1px 2px rgb(12 22 38 / 0.05), 0 6px 16px -8px rgb(12 40 70 / 0.12);
+  --shadow-lift: 0 2px 4px rgb(12 22 38 / 0.06), 0 16px 34px -14px rgb(12 40 70 / 0.26);
+  --shadow-float: 0 24px 48px -16px rgb(12 22 38 / 0.38);
+  --shadow-primary: inset 0 1px 0 rgb(255 255 255 / 0.22), 0 8px 18px -8px rgb(13 100 127 / 0.7), 0 1px 2px rgb(12 22 38 / 0.18);
 }
 
 @layer base {
@@ -1466,4 +1474,436 @@
   .boot-splash {
     animation-duration: 0.01s;
   }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   Каркас кабинета (8.10.2026): боковая панель, строка сверху, нижнее
+   меню телефона. Панель тёмная — «ночь» марки, как первый экран сайта;
+   содержимое светлое, и рабочая поверхность не спорит с навигацией.
+   ═══════════════════════════════════════════════════════════════════ */
+
+.cab-shell {
+  display: grid;
+  grid-template-columns: 236px minmax(0, 1fr);
+  min-height: 100dvh;
+}
+
+.cab-side {
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 18px 12px;
+  background: var(--color-night);
+  color: var(--color-night-muted);
+  box-shadow: inset -1px 0 0 var(--color-night-line);
+}
+
+.cab-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 10px 2px;
+}
+.cab-brand span {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-night-faint);
+}
+
+.cab-group__label {
+  margin: 0 10px 6px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #61779a;
+}
+.cab-nav { display: flex; flex-direction: column; gap: 2px; }
+
+.cab-nav__link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 38px;
+  padding: 7px 10px;
+  border-radius: 9px;
+  color: var(--color-night-muted);
+  font-size: 13.5px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--duration-quick), color var(--duration-quick);
+}
+.cab-nav__link:hover { background: var(--color-night-raised); color: var(--color-night-ink); }
+.cab-nav__link[aria-current="page"] {
+  color: #ffffff;
+  background: linear-gradient(180deg, #18304a, #132740);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 6px 14px -8px rgb(0 168 216 / 0.55);
+}
+.cab-nav__link[aria-current="page"] svg { color: var(--color-accent-bright); }
+.cab-nav__count {
+  margin-left: auto;
+  padding: 0 7px;
+  border-radius: var(--radius-pill);
+  background: #1d3550;
+  color: #cfe8f2;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+.cab-side :focus-visible,
+.cab-sheet :focus-visible,
+.cab-tabbar :focus-visible { outline-color: var(--color-accent-bright); }
+
+.cab-company {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 12px;
+  background: var(--color-night-raised);
+  color: var(--color-night-ink);
+  font-size: 12.5px;
+  transition: background-color var(--duration-quick);
+}
+.cab-company:hover { background: #172a44; }
+.cab-company__sub { color: var(--color-night-muted); }
+.cab-avatar {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  color: #ffffff;
+  font-family: var(--font-display), var(--font-sans);
+  font-weight: 800;
+  background: linear-gradient(145deg, #0d647f, #00a8d8);
+  box-shadow: 0 4px 10px -4px rgb(0 168 216 / 0.7);
+}
+
+.cab-main { min-width: 0; display: flex; flex-direction: column; }
+
+.cab-top {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+  padding: 8px 24px;
+  background: color-mix(in srgb, var(--color-ground) 90%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--color-line);
+}
+.cab-top__brand { display: none; }
+.cab-content { min-width: 0; padding-bottom: 32px; }
+
+.cab-icon-btn {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--color-line);
+  border-radius: 10px;
+  background: var(--color-surface);
+  color: var(--color-ink-muted);
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+  transition: color var(--duration-quick), transform var(--duration-quick), box-shadow var(--duration-quick);
+}
+.cab-icon-btn:hover { color: var(--color-ink); transform: translateY(-1px); box-shadow: var(--shadow-lift); }
+.cab-icon-btn__badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: var(--radius-pill);
+  background: var(--color-danger);
+  color: #ffffff;
+  font-size: 10.5px;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
+  box-shadow: 0 0 0 2px var(--color-ground);
+}
+
+/* Строка об изменившихся условиях вместо полосы на каждой странице. */
+.cab-terms {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  max-width: 640px;
+  padding: 4px 4px 4px 12px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-ink-muted);
+  font-size: 12.5px;
+  box-shadow: var(--shadow-card);
+}
+.cab-terms i { flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--color-warn); }
+.cab-terms__btn {
+  flex: none;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.cab-terms__btn:hover { background: var(--color-accent-hover); }
+
+/* Нижнее меню и лист «Valikko» — только на телефоне. */
+.cab-tabbar,
+.cab-sheet { display: none; }
+
+@media (max-width: 899px) {
+  .cab-shell { grid-template-columns: minmax(0, 1fr); }
+  .cab-side { display: none; }
+  .cab-top { padding: 8px 16px; }
+  .cab-top__brand { display: flex; }
+  .cab-top__desktop,
+  .cab-top__status { display: none; }
+  .cab-terms span { display: none; }
+  .cab-content { padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px)); }
+
+  .cab-tabbar {
+    position: fixed;
+    inset: auto 0 0 0;
+    z-index: 45;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0px));
+    background: var(--color-night);
+    box-shadow: 0 -10px 24px -14px rgb(0 0 0 / 0.5);
+  }
+  .cab-tabbar__link {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    min-height: 48px;
+    padding: 6px 2px;
+    border-radius: 10px;
+    color: var(--color-night-muted);
+    font-size: 10.5px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .cab-tabbar__link span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .cab-tabbar__link[aria-current="page"] { color: #ffffff; background: var(--color-night-raised); }
+  .cab-tabbar__link[aria-current="page"] svg { color: var(--color-accent-bright); }
+  .cab-tabbar__dot {
+    position: absolute;
+    top: 6px;
+    right: calc(50% - 16px);
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--color-accent-bright);
+  }
+
+  .cab-sheet { display: block; position: fixed; inset: 0; z-index: 60; }
+  .cab-sheet__scrim { position: absolute; inset: 0; border: 0; background: rgb(5 10 20 / 0.55); }
+  .cab-sheet__panel {
+    position: absolute;
+    inset: auto 0 0 0;
+    max-height: 82dvh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 18px 12px calc(18px + env(safe-area-inset-bottom, 0px));
+    border-radius: 18px 18px 0 0;
+    background: var(--color-night);
+    color: var(--color-night-muted);
+    box-shadow: var(--shadow-float);
+    animation: cab-sheet-in var(--duration-state) cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+  .cab-sheet__extra {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-top: 12px;
+    border-top: 1px solid var(--color-night-line);
+  }
+}
+
+@keyframes cab-sheet-in {
+  from { transform: translateY(24px); opacity: 0.01; }
+}
+
+/* Появление содержимого волной: из видимого состояния, лёгкий подъём. */
+.rise {
+  animation: rise-in 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation-delay: calc(var(--i, 0) * 60ms);
+}
+@keyframes rise-in {
+  from { transform: translateY(10px); opacity: 0.01; }
+}
+
+/* Пульс «идёт сейчас»: рейс в работе. */
+.live-pulse {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-live);
+  animation: live-pulse 2s infinite;
+}
+@keyframes live-pulse {
+  0% { box-shadow: 0 0 0 0 rgb(68 72 207 / 0.45); }
+  70% { box-shadow: 0 0 0 8px rgb(68 72 207 / 0); }
+  100% { box-shadow: 0 0 0 0 rgb(68 72 207 / 0); }
+}
+
+/* Карточка задачи на обзоре: единственное место с объёмом. */
+.task-card {
+  position: relative;
+  overflow: hidden;
+  padding: 16px 16px 14px 18px;
+  border: 1px solid var(--color-line);
+  border-radius: 14px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card), inset 0 1px 0 rgb(255 255 255 / 0.9);
+  transform-style: preserve-3d;
+  transition: transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.25s;
+}
+.task-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--tone, var(--color-accent));
+}
+.task-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(260px 120px at var(--mx, 30%) var(--my, 0%), rgb(255 255 255 / 0.6), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+.task-card:hover { box-shadow: var(--shadow-lift), inset 0 1px 0 rgb(255 255 255 / 0.9); }
+.task-card:hover::after { opacity: 0.6; }
+
+@media (prefers-reduced-motion: reduce) {
+  .rise,
+  .live-pulse,
+  .cab-sheet__panel { animation: none; }
+  .task-card { transition: none; }
+}
+
+
+/* ── Обзор кабинета (8.10.2026) ─────────────────────────────────── */
+
+.font-display { font-family: var(--font-display), var(--font-sans); }
+
+/* Столбики недели: объём и рост снизу при появлении. */
+.pulse-bars__bar {
+  background: linear-gradient(180deg, #1590b3, var(--color-accent));
+  border-radius: 6px 6px 2px 2px;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.35), 0 6px 12px -8px rgb(13 100 127 / 0.8);
+  transform-origin: bottom;
+  animation: bar-rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.pulse-bars__col:last-child .pulse-bars__bar:not([data-zero]) {
+  background: linear-gradient(180deg, #22c2ee, #0a9cc8);
+}
+.pulse-bars__bar[data-zero] { box-shadow: none; animation: none; }
+@keyframes bar-rise { from { transform: scaleY(0); } }
+
+/* Прогресс точек рейса. */
+.trip-stops { display: flex; align-items: center; margin-top: 8px; }
+.trip-stop {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--color-line-strong);
+  background: var(--color-surface);
+}
+.trip-stop[data-state="done"] { background: var(--color-ok); border-color: var(--color-ok); }
+.trip-stop[data-state="now"] { border-color: var(--color-live); box-shadow: 0 0 0 4px rgb(68 72 207 / 0.14); }
+.trip-seg { flex: 1; height: 3px; overflow: hidden; border-radius: 2px; background: var(--color-line); }
+.trip-seg i {
+  display: block;
+  height: 100%;
+  width: var(--w, 0%);
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--color-ok), var(--color-live));
+  animation: seg-grow 1.1s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@keyframes seg-grow { from { width: 0; } }
+
+/* Помощник: кнопка в углу и выезжающая панель. */
+.assistant-fab {
+  position: fixed;
+  right: 22px;
+  bottom: calc(22px + env(safe-area-inset-bottom, 0px));
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px 8px 8px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  color: #ffffff;
+  font-weight: 600;
+  background: linear-gradient(160deg, #137896, #0b4f66);
+  box-shadow: 0 14px 30px -10px rgb(13 100 127 / 0.8), 0 2px 4px rgb(12 22 38 / 0.25), inset 0 1px 0 rgb(255 255 255 / 0.2);
+  cursor: pointer;
+  animation: fab-float 4s ease-in-out infinite;
+}
+.assistant-fab__bubble { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: rgb(255 255 255 / 0.14); }
+.assistant-fab:focus-visible { outline-color: var(--color-accent-bright); }
+@keyframes fab-float { 50% { transform: translateY(-3px); } }
+
+.assistant-scrim { position: fixed; inset: 0; z-index: 55; border: 0; background: rgb(5 10 20 / 0.3); }
+.assistant-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 56;
+  display: flex;
+  flex-direction: column;
+  width: min(420px, 100%);
+  padding-top: env(safe-area-inset-top, 0px);
+  background: var(--color-surface);
+  border-left: 1px solid var(--color-line);
+  box-shadow: var(--shadow-float);
+  transform: translateX(105%);
+  visibility: hidden;
+  transition: transform 0.32s cubic-bezier(0.2, 0.7, 0.2, 1), visibility 0s linear 0.32s;
+}
+.assistant-drawer[data-open] { transform: none; visibility: visible; transition: transform 0.32s cubic-bezier(0.2, 0.7, 0.2, 1); }
+.assistant-drawer__head { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--color-line); }
+.assistant-drawer__body { flex: 1; min-height: 0; overflow-y: auto; padding: 14px 16px calc(14px + env(safe-area-inset-bottom, 0px)); }
+
+@media (max-width: 899px) {
+  .assistant-fab { right: 16px; bottom: calc(80px + env(safe-area-inset-bottom, 0px)); padding: 8px; }
+  .assistant-fab__label { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulse-bars__bar, .trip-seg i, .assistant-fab { animation: none; }
+  .assistant-drawer { transition: none; }
 }

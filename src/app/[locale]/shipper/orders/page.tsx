@@ -20,7 +20,15 @@ export async function generateMetadata({
   return { title: t.orders.title };
 }
 
-export default async function OrdersPage({ params }: { params: Promise<{ locale: string }> }) {
+export default async function OrdersPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<{ new?: string }>;
+}) {
+  /* «+ Uusi tilaus» с обзора открывает форму сразу. */
+  const startNew = (await searchParams).new === '1';
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
 
@@ -171,6 +179,7 @@ export default async function OrdersPage({ params }: { params: Promise<{ locale:
           amendmentsByOrder={amendmentsByOrder}
           knownVehicles={known ?? []}
           documentsByOrder={documentsByOrder}
+          startNew={startNew}
         />
       )}
     </main>

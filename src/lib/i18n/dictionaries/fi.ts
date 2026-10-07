@@ -78,6 +78,17 @@ export const fi = {
     invoices: 'Laskutus',
     payouts: 'Tilitykset',
     signOut: 'Kirjaudu ulos',
+    groupWork: 'Työ',
+    groupCompany: 'Yritys',
+    groupDocuments: 'Asiakirjat',
+    groupPlatform: 'Alusta',
+    groupContent: 'Sisältö',
+    menu: 'Valikko',
+    deskShort: 'Pöytä',
+    ownShort: 'Omat',
+    doneShort: 'Ajetut',
+    ordersShort: 'Tilaukset',
+    reportsShort: 'Raportit',
   },
 
   action: {
@@ -2995,6 +3006,39 @@ export const fi = {
     total: 'Yhteensä',
   },
 
+  overview: {
+    needs: 'Tarvitsee huomiota',
+    awaitTitle: 'Odottaa vahvistusta',
+    awaitText: 'Vahvista tai kieltäydy, ettei tilaaja jää odottamaan.',
+    noCmrTitle: 'Rahtikirja puuttuu',
+    noCmrText: 'Pisteet on käyty. Kuljettaja voi skannata rahtikirjan sovelluksessa.',
+    deskTitle: 'Uutta pöydällä',
+    deskText: 'Avoimia keikkoja alueilta, joilla autosi ovat.',
+    offersTitle: 'Valitse kuljetusliike',
+    offersText: 'Kuljetuksiin on tullut tarjouksia.',
+    runningTitle: 'Matkalla',
+    runningText: 'Kuljetukset, joissa kuljettaja on liikkeellä.',
+    claimsTitle: 'Avoimet reklamaatiot',
+    claimsText: 'Käsittelyssä olevat reklamaatiot.',
+    open: 'Avaa',
+    live: 'Käynnissä',
+    eta: 'Arvioitu saapuminen',
+    awaiting: 'Odottaa vahvistusta',
+    week: 'Tämä viikko',
+    trips: 'keikkaa',
+    payout: 'tilitys',
+    spend: 'kustannus',
+    quick: 'Pikatoiminnot',
+    openDesk: 'Avaa pöytä',
+    newOwn: 'Uusi oma keikka',
+    inviteClient: 'Kutsu asiakas',
+    inviteClientText: 'Valmiiksi täytetty hakemus sähköpostiin',
+    reports: 'Raportit',
+    reportsText: 'Viikkoraportit ja kauden asiakirjat',
+    company: 'Yritys ja palvelumalli',
+    assistant: 'Kysy avustajalta',
+  },
+
   pulse: {
     now: 'Juuri nyt',
     nowEmpty: 'Ei käynnissä olevia kuljetuksia',
@@ -3091,6 +3135,8 @@ export const fi = {
    * «3 / 5» eikä «3 viidestä».
    */
   msg: {
+    'overview.greeting': 'Hei, {name}',
+    'overview.dateLine': '{date} · viikko {week}',
     'own.subscriptionContact': 'Tilauksen saa käyttöön kirjoittamalla osoitteeseen {email}.',
     'track.questions': 'Kysymykset kuljetuksesta: {carrier}.',
     'order.offersCounter':

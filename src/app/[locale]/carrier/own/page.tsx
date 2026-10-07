@@ -22,8 +22,16 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
  * период (public.own_orders_access). Без доступа страница говорит цену
  * и куда написать, а не прячет раздел.
  */
-export default async function OwnOrdersPage({ params }: { params: Promise<{ locale: string }> }) {
+export default async function OwnOrdersPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<{ new?: string }>;
+}) {
   const { locale } = await params;
+  /* «+ Uusi oma keikka» с обзора открывает форму сразу. */
+  const startNew = (await searchParams).new === '1';
   if (!isLocale(locale)) notFound();
 
   const viewer = await requireRole(locale, 'CARRIER');
@@ -90,7 +98,7 @@ export default async function OwnOrdersPage({ params }: { params: Promise<{ loca
           </CardBody>
         </Card>
       ) : (
-        <OwnView jobs={jobs} clients={clients ?? []} vehicles={vehicles ?? []} />
+        <OwnView jobs={jobs} clients={clients ?? []} vehicles={vehicles ?? []} startNew={startNew} />
       )}
     </main>
   );

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { AgentChat } from '@/components/domain/AgentChat';
-import { CabinetPulse } from '@/components/domain/CabinetPulse';
+import { AssistantDock } from '@/components/domain/overview/AssistantDock';
+import { isoWeek, OverviewBody } from '@/components/domain/overview/OverviewParts';
 import { CarrierPresence } from '@/components/domain/CarrierPresence';
 import { OnboardingSteps } from '@/components/domain/OnboardingSteps';
 import { ReportArchive } from '@/components/domain/ReportArchive';
@@ -38,7 +39,7 @@ export async function CabinetOverview({
   role: PartyRole;
   company: Company | null;
 }) {
-  const { t, f } = await getI18n(locale);
+  const { t, m, f } = await getI18n(locale);
 
   /*
    * Ветка и её цена. Перевозчик узнавал, за что с него берут, только из
@@ -89,12 +90,93 @@ export async function CabinetOverview({
   const steps = company && (role === 'CARRIER' || role === 'SHIPPER');
   const aside = !steps && (needsRequisites || hint !== null);
 
-  return (
-    <main className="mx-auto w-full max-w-6xl px-5 py-8">
-      <h1 className="text-xl font-semibold tracking-tight">{t.role[role]}</h1>
+  const today = todayInHelsinki();
+  const ownAccess =
+    role === 'CARRIER' ? (await (await createClient()).rpc('own_orders_access')).data === true : false;
 
-      <div className={`mt-6 grid gap-4 ${aside ? 'lg:grid-cols-2' : ''}`}>
-        <Card>
+  /*
+   * Обзор 8.10.2026: сверху — что ждёт человека, ниже — рейсы в работе и
+   * неделя. Компания и модель работы уехали вниз под раскрывашку: в них
+   * заходят раз в месяц, а обзор открывают каждое утро. Помощник —
+   * кнопкой в углу, а не карточкой на пол-экрана.
+   */
+  return (
+    <main className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-5 py-7">
+      <div className="rise flex flex-wrap items-end gap-4" style={{ '--i': 0 } as React.CSSProperties}>
+        <div className="min-w-0">
+          <p className="label-micro">
+            {m('overview.dateLine', { date: f.date(`${today}T12:00:00Z`), week: isoWeek(today) })}
+          </p>
+          <h1 className="font-display mt-1 text-[28px] leading-tight font-extrabold tracking-tight text-balance">
+            {company ? m('overview.greeting', { name: company.name }) : t.role[role]}
+          </h1>
+        </div>
+        <div className="ml-auto flex flex-wrap gap-2">
+          {role === 'CARRIER' && (
+            <Link href={`/${locale}/carrier/desk`} className={buttonClass({ variant: 'default', size: 'lg' })}>
+              {t.overview.openDesk}
+            </Link>
+          )}
+          {role === 'CARRIER' && ownAccess && (
+            <Link href={`/${locale}/carrier/own?new=1`} className={buttonClass({ variant: 'primary', size: 'lg' })}>
+              + {t.overview.newOwn}
+            </Link>
+          )}
+          {role === 'SHIPPER' && company?.status === 'ACTIVE' && (
+            <Link href={`/${locale}/shipper/orders?new=1`} className={buttonClass({ variant: 'primary', size: 'lg' })}>
+              + {t.orders.newOrder}
+            </Link>
+          )}
+        </div>
+      </div>
+
+      {aside && (
+        <Card stripe={needsRequisites ? 'warn' : 'neutral'}>
+          <CardBody className="flex flex-col gap-3">
+            {needsRequisites && (
+              <>
+                <p className="text-[13px] leading-relaxed text-ink">
+                  {t.requisites.fillToActivate}
+                </p>
+                <Link
+                  href={accountPath(locale)}
+                  className={buttonClass({
+                    variant: 'primary',
+                    size: 'md',
+                    className: 'self-start',
+                  })}
+                >
+                  {t.requisites.openForm}
+                </Link>
+              </>
+            )}
+            {hint && <p className="text-[13px] leading-relaxed text-ink-muted">{hint}</p>}
+          </CardBody>
+        </Card>
+      )}
+
+      {steps && company && <OnboardingSteps locale={locale} company={company} />}
+
+      {(role === 'CARRIER' || role === 'SHIPPER') && <OverviewBody locale={locale} role={role} />}
+
+      {/*
+        * Карта транспорта — только заказчику и оператору.
+        *
+        * Перевозчику она сказала бы, где стоят конкуренты, и не сказала
+        * бы ничего о его работе: заказы он ищет на столе, а не по чужим
+        * базам. Тот же круг зашит в carrier_presence, здесь только не
+        * делается лишний запрос.
+        */}
+      {role !== 'CARRIER' && <CarrierPresence locale={locale} />}
+
+      <details className="rounded-card border border-line bg-surface shadow-card [&[open]_summary_svg]:rotate-180">
+        <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-3 text-[14px] font-semibold">
+          {t.overview.company}
+          <svg aria-hidden viewBox="0 0 24 24" className="ml-auto size-4 text-ink-dim transition-transform" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
+            <path d="m6 9 6 6 6-6" />
+          </svg>
+        </summary>
+        <div className="border-t border-line">
           <CardBody className="flex flex-col gap-2.5">
             {company ? (
               <>
@@ -192,51 +274,14 @@ export async function CabinetOverview({
               </>
             )}
           </CardBody>
-        </Card>
-
-        {aside && (
-          <Card stripe={needsRequisites ? 'warn' : 'neutral'}>
-            <CardBody className="flex flex-col gap-3">
-              {needsRequisites && (
-                <>
-                  <p className="text-[13px] leading-relaxed text-ink">
-                    {t.requisites.fillToActivate}
-                  </p>
-                  <Link
-                    href={accountPath(locale)}
-                    className={buttonClass({
-                      variant: 'primary',
-                      size: 'md',
-                      className: 'self-start',
-                    })}
-                  >
-                    {t.requisites.openForm}
-                  </Link>
-                </>
-              )}
-              {hint && <p className="text-[13px] leading-relaxed text-ink-muted">{hint}</p>}
-            </CardBody>
-          </Card>
-        )}
-      </div>
-
-      {steps && company && <OnboardingSteps locale={locale} company={company} />}
-
-      <CabinetPulse locale={locale} role={role} />
-
-      {/*
-        * Карта транспорта — только заказчику и оператору.
-        *
-        * Перевозчику она сказала бы, где стоят конкуренты, и не сказала
-        * бы ничего о его работе: заказы он ищет на столе, а не по чужим
-        * базам. Тот же круг зашит в carrier_presence, здесь только не
-        * делается лишний запрос.
-        */}
-      {role !== 'CARRIER' && <CarrierPresence locale={locale} />}
-
-      <AgentChat locale={locale} role={role} />
+        </div>
+      </details>
 
       <ReportArchive locale={locale} role={role} />
+
+      <AssistantDock label={t.overview.assistant} closeLabel={t.action.close}>
+        <AgentChat locale={locale} role={role} bare />
+      </AssistantDock>
     </main>
   );
 }

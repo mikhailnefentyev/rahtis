@@ -29,14 +29,16 @@ export function OwnView({
   jobs,
   clients,
   vehicles,
+  startNew = false,
 }: {
+  startNew?: boolean;
   jobs: OwnJob[];
   clients: CarrierClient[];
   vehicles: OwnVehicle[];
 }) {
   const { t, f } = useI18n();
   const router = useRouter();
-  const [composing, setComposing] = useState(false);
+  const [composing, setComposing] = useState(startNew);
   const [formKey, setFormKey] = useState(0);
   const [copied, setCopied] = useState<string | null>(null);
 

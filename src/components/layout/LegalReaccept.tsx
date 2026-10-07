@@ -36,9 +36,12 @@ function documentHref(locale: Locale, kind: Kind): string {
 export async function LegalReaccept({
   locale,
   companyStatus,
+  compact = false,
 }: {
   locale: Locale;
   companyStatus: string | null | undefined;
+  /** Строка в шапке кабинета вместо полосы во всю ширину (каркас 8.10.2026). */
+  compact?: boolean;
 }) {
   if (companyStatus !== 'ACTIVE') return null;
 
@@ -47,6 +50,31 @@ export async function LegalReaccept({
   if (!pending || pending.length === 0) return null;
 
   const { t } = await getI18n(locale);
+
+  if (compact) {
+    return (
+      <div className="cab-terms" role="status">
+        <i aria-hidden />
+        <span className="min-w-0 truncate">
+          {t.legal.reacceptTitle}:{' '}
+          {pending.map((doc, i) => (
+            <span key={doc.kind}>
+              {i > 0 && ', '}
+              <Link href={documentHref(locale, doc.kind)} className="underline underline-offset-2 hover:no-underline">
+                {t.legal[doc.kind]} v{doc.version}
+              </Link>
+            </span>
+          ))}
+        </span>
+        <form action={acceptUpdatedLegalAction}>
+          <input type="hidden" name="locale" value={locale} />
+          <button type="submit" className="cab-terms__btn">
+            {t.legal.reacceptButton}
+          </button>
+        </form>
+      </div>
+    );
+  }
 
   return (
     <div className="border-b border-warn/35 bg-warn/10">

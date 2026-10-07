@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { CabinetHeader } from '@/components/layout/CabinetHeader';
+import { CabinetShell } from '@/components/layout/CabinetShell';
 import { requireRole } from '@/lib/auth/guard';
 import { isLocale } from '@/lib/i18n';
 
@@ -21,9 +21,8 @@ export default async function AdminLayout({
   const viewer = await requireRole(locale, 'ADMIN');
 
   return (
-    <>
-      <CabinetHeader locale={locale} role="ADMIN" company={viewer.company} />
+    <CabinetShell locale={locale} role="ADMIN" company={viewer.company}>
       {children}
-    </>
+    </CabinetShell>
   );
 }

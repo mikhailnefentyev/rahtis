@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { HaulBadge } from '@/components/domain/HaulBadge';
 import { Badge, Button, EmptyState, Input, Mono, Plate } from '@/components/ui';
 import { orderStatusTone } from '@/components/ui/tone';
@@ -113,7 +113,10 @@ export function OrdersView({
   amendmentsByOrder,
   knownVehicles,
   documentsByOrder,
+  startNew = false,
 }: {
+  /** Пришли с обзора по «+ Uusi tilaus» — форма открыта сразу. */
+  startNew?: boolean;
   orders: ShipperOrder[];
   knownVehicles: KnownVehicle[];
   documentsByOrder: Record<string, TripDocument[]>;
@@ -168,6 +171,17 @@ export function OrdersView({
     /* Повтор открывает форму наверху — иначе она уедет под раскрытую карточку. */
     if (from) window.scrollTo({ top: 0, behavior: 'smooth' });
   }
+  /* «+ Uusi tilaus» с обзора: форма открывается сама, один раз. */
+  const autoOpened = useRef(false);
+  useEffect(() => {
+    if (!startNew || autoOpened.current) return;
+    autoOpened.current = true;
+    void import('./OrderForm').then((mod) => {
+      setOrderForm(() => mod.OrderForm);
+      setComposing(true);
+    });
+  }, [startNew]);
+
 
   const bands = useMemo(() => {
     const decide: ShipperOrder[] = [];

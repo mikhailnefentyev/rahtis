@@ -1,6 +1,5 @@
 import { notFound } from 'next/navigation';
-import { CabinetHeader } from '@/components/layout/CabinetHeader';
-import { LegalReaccept } from '@/components/layout/LegalReaccept';
+import { CabinetShell } from '@/components/layout/CabinetShell';
 import { requireRole } from '@/lib/auth/guard';
 import { isLocale } from '@/lib/i18n';
 
@@ -22,10 +21,8 @@ export default async function CarrierLayout({
   const viewer = await requireRole(locale, 'CARRIER');
 
   return (
-    <>
-      <CabinetHeader locale={locale} role="CARRIER" company={viewer.company} />
-      <LegalReaccept locale={locale} companyStatus={viewer.company?.status} />
+    <CabinetShell locale={locale} role="CARRIER" company={viewer.company}>
       {children}
-    </>
+    </CabinetShell>
   );
 }

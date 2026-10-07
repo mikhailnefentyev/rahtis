@@ -13,7 +13,8 @@ const stripeClass: Record<StatusTone, string> = {
 /**
  * Карточка — основная поверхность интерфейса.
  *
- * Теней нет: глубину даёт поверхность и волосяная граница. Опциональная
+ * Мягкая тень (shadow-card, с 8.10.2026) и волосяная граница: карточка
+ * лежит на фоне, а не нарисована на нём. Опциональная
  * полоса слева окрашена в тон состояния — она позволяет считать статус
  * ленты карточек периферийным зрением, не читая ни одного бейджа.
  *
@@ -34,7 +35,7 @@ export function Card({
   return (
     <div
       className={cn(
-        'rounded-card border border-line bg-surface',
+        'rounded-card border border-line bg-surface shadow-card',
         stripe && cn('border-l-2', stripeClass[stripe]),
         attention && 'attention-ring',
         className,

@@ -5,8 +5,11 @@ type Size = 'sm' | 'md' | 'lg';
 
 const variantClass: Record<Variant, string> = {
   /** Одно главное действие на экран: «Беру», «Выбрать», «Опубликовать». */
-  primary: 'bg-accent text-accent-ink border-accent hover:bg-accent-hover hover:border-accent-hover',
-  default: 'bg-raised text-ink border-line hover:border-accent-line hover:text-ink',
+  /* Объём: свет сверху и цветная тень (8.10.2026). */
+  primary:
+    'bg-linear-to-b from-[#137896] to-accent text-accent-ink border-transparent shadow-primary hover:from-[#178aac] hover:to-[#0e6d8a] hover:-translate-y-px',
+  default:
+    'bg-surface text-ink border-line shadow-card hover:border-accent-line hover:text-ink hover:-translate-y-px hover:shadow-lift',
   ghost: 'bg-transparent text-ink-muted border-transparent hover:bg-raised hover:text-ink',
   /**
    * Разрушающее действие: откат рейса, отказ, отклонение заявки.
@@ -41,7 +44,7 @@ export function buttonClass({
      * глаз получили подтверждение; заметное движение в кнопке, которую
      * жмут сотню раз за смену, начинает раздражать на второй день.
      */
-    'transition-[color,background-color,border-color,transform] duration-150',
+    'transition-[color,background-color,border-color,transform,box-shadow] duration-150',
     'active:translate-y-[0.5px]',
     'disabled:pointer-events-none disabled:opacity-35 disabled:active:translate-y-0',
     sizeClass[size],

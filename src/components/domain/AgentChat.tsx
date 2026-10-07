@@ -18,9 +18,12 @@ import { AgentChatLive, type ChatMessage } from './AgentChatLive';
 export async function AgentChat({
   locale,
   role,
+  bare = false,
 }: {
   locale: Locale;
   role: 'CARRIER' | 'SHIPPER' | 'ADMIN';
+  /** Без карточки и заголовка — внутри выезжающей панели помощника. */
+  bare?: boolean;
 }) {
   const [{ t }, supabase] = await Promise.all([getI18n(locale), createClient()]);
 
@@ -40,6 +43,15 @@ export async function AgentChat({
         .order('created_at')
         .limit(100)
     : { data: [] };
+
+  if (bare) {
+    return (
+      <div className="flex flex-col gap-3">
+        <p className="text-[13px] text-ink-muted">{t.chat.hint}</p>
+        <AgentChatLive initial={(messages ?? []) as ChatMessage[]} conversationId={conversation?.id ?? null} />
+      </div>
+    );
+  }
 
   return (
     <Card className="mt-4">
