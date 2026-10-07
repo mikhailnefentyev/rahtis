@@ -188,7 +188,13 @@ function readVehicleForm(formData: FormData) {
           .filter((n) => Number.isFinite(n) && n > 0),
     make: String(formData.get('make') ?? '').trim(),
     euro_class: String(formData.get('euro_class') ?? '') as EuroClass,
-    base_city: String(formData.get('base_city') ?? '').trim(),
+    /*
+     * База — город, а не адрес площадки. Подсказка может предложить
+     * порт («Hangon satama — Korsmaninkatu 6, 10900 Hanko»), и тогда в
+     * базу ложился весь адрес: карта транспорта показывала Ханко двумя
+     * строками (8.10.2026). Город из выбранной подсказки важнее текста.
+     */
+    base_city: text(formData, 'base_city_city') ?? String(formData.get('base_city') ?? '').trim(),
     /*
      * Координата базы приходит скрытыми полями подсказки — теми же, что
      * у адреса точки маршрута. Набранный руками город координат не имеет,
