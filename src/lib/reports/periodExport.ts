@@ -187,6 +187,25 @@ export function claimColumns(report: PeriodReport, t: Dictionary): Column<Report
   ];
 }
 
+/** Колонки своих рейсов: отдельный блок, без денег расчёта. Одни в XLSX и PDF. */
+export function ownColumns(report: PeriodReport, t: Dictionary): Column<ReportLine>[] {
+  const p = t.periodReport;
+  return [
+    { header: p.colDate, kind: 'date', get: (l) => l.closedOn, width: 12 },
+    { header: p.colRef, kind: 'text', get: (l) => l.ref, width: 14 },
+    {
+      header: report.role === 'CARRIER' ? t.report_.colClient : t.report_.colCarrier,
+      kind: 'text',
+      get: (l) => (report.role === 'CARRIER' ? l.shipper : l.carrier),
+      width: 24,
+    },
+    { header: p.colRoute, kind: 'text', get: (l) => l.route, width: 40 },
+    { header: p.colVehicle, kind: 'text', get: (l) => l.vehicle, width: 12 },
+    { header: p.colKm, kind: 'int', get: (l) => l.km, width: 8 },
+    { header: p.colRate, kind: 'money', get: (l) => euros(l.rate), width: 12 },
+  ];
+}
+
 /** Итоги строками «подпись — значение»: одинаковы в XLSX и PDF. */
 export function summaryRows(report: PeriodReport, t: Dictionary): Array<[string, number, Kind]> {
   const p = t.periodReport;
@@ -234,6 +253,7 @@ function sheet<T>(columns: Column<T>[], rows: T[]): SheetData {
 export async function periodXlsx(report: PeriodReport, t: Dictionary): Promise<Buffer> {
   const trips = tripColumns(report, t);
   const claims = claimColumns(report, t);
+  const own = ownColumns(report, t);
 
   const summary: SheetData = [
     [
@@ -253,6 +273,17 @@ export async function periodXlsx(report: PeriodReport, t: Dictionary): Promise<B
       columns: trips.map((c) => ({ width: c.width ?? 12 })),
       stickyRowsCount: 1,
     },
+    /* Свои рейсы — своим листом: в расчёт и итоги они не входят. */
+    ...(report.own.lines.length
+      ? [
+          {
+            data: sheet(own, report.own.lines),
+            sheet: t.report_.ownTitle.slice(0, 31),
+            columns: own.map((c) => ({ width: c.width ?? 12 })),
+            stickyRowsCount: 1,
+          },
+        ]
+      : []),
     {
       data: sheet(claims, report.claims),
       sheet: t.periodReport.sheetClaims,

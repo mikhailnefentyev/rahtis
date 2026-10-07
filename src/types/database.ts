@@ -5352,6 +5352,7 @@ export type Database = {
           commission_bps: number
           commission_cents: number
           container_feet: number
+          contract_party: Database["public"]["Enums"]["contract_party"]
           distance_km: number
           documents_count: number
           haul_kind: Database["public"]["Enums"]["haul_kind"]

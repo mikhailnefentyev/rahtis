@@ -46,6 +46,8 @@ export type ReportLine = {
   gross: number;
   shipper: string | null;
   carrier: string | null;
+  /** Чей договор с клиентом: CARRIER — свой рейс перевозчика или прямой заказ подписчика. */
+  contract: 'RAHTIS' | 'CARRIER';
   documents: number;
   cmr: number;
   photos: number;
@@ -78,6 +80,12 @@ export type PeriodReport = {
   to: string;
   companyName: string | null;
   lines: ReportLine[];
+  /**
+   * Рейсы по договору перевозчика с клиентом — у участников отдельным
+   * блоком: работа, но не наши деньги, и в итогах расчёта их нет. У
+   * оператора они остаются в общей таблице, own пуст.
+   */
+  own: { lines: ReportLine[]; km: number; rate: number };
   claims: ReportClaim[];
   totals: {
     trips: number;
@@ -133,9 +141,10 @@ export async function buildPeriodReport(input: {
 
   if (error || claimsError) return { report: null, error: (error ?? claimsError)!.message };
 
-  const lines = ((rows ?? []) as PeriodReportRow[]).map((row) =>
-    line(row, input.role, input.country),
-  );
+  const all = ((rows ?? []) as PeriodReportRow[]).map((row) => line(row, input.role, input.country));
+  const separate = input.role !== 'ADMIN';
+  const lines = separate ? all.filter((l) => l.contract !== 'CARRIER') : all;
+  const ownLines = separate ? all.filter((l) => l.contract === 'CARRIER') : [];
   const claims = ((claimRows ?? []) as PeriodClaim[]).map((c): ReportClaim => ({
     ref: c.ref,
     orderRef: c.order_ref,
@@ -165,6 +174,11 @@ export async function buildPeriodReport(input: {
       to: input.to,
       companyName,
       lines,
+      own: {
+        lines: ownLines,
+        km: ownLines.reduce((acc, l) => acc + l.km, 0),
+        rate: ownLines.reduce((acc, l) => acc + l.rate, 0),
+      },
       claims,
       totals: {
         trips: lines.length,
@@ -210,6 +224,7 @@ function line(row: PeriodReportRow, role: PartyRole, country: string | null): Re
     gross,
     shipper: row.shipper_name,
     carrier: row.carrier_name,
+    contract: row.contract_party,
     documents: row.documents_count,
     cmr: row.cmr_count,
     photos: row.photos_count,

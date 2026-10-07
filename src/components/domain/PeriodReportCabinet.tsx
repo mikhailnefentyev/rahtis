@@ -299,6 +299,67 @@ export async function PeriodReportCabinet({
             )}
           </section>
 
+          {/*
+            * Свои рейсы и прямые заказы подписчика — отдельно от расчёта:
+            * цену выставляет перевозчик, в итогах выше её нет.
+            */}
+          {report.own.lines.length > 0 && (
+            <section className="mt-6">
+              <TableFrame caption={`${t.report_.ownTitle} · ${m('periodReport.tripsCount', { count: report.own.lines.length })}`}>
+                <p className="px-3 pt-2 text-xs text-ink-dim">{t.report_.ownNote}</p>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <thead>
+                      <tr>
+                        <Th>{t.periodReport.colDate}</Th>
+                        <Th>{t.periodReport.colRef}</Th>
+                        <Th>{role === 'CARRIER' ? t.report_.colClient : t.report_.colCarrier}</Th>
+                        <Th>{t.periodReport.colRoute}</Th>
+                        <Th>{t.periodReport.colVehicle}</Th>
+                        <Th className="text-right">{t.periodReport.colKm}</Th>
+                        <Th className="text-right">{t.periodReport.colRate}</Th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {report.own.lines.map((line) => (
+                        <Tr key={line.ref}>
+                          <Td>
+                            <Mono>{f.date(`${line.closedOn}T12:00:00Z`)}</Mono>
+                          </Td>
+                          <Td>
+                            <Mono>{line.ref}</Mono>
+                          </Td>
+                          <Td>{(role === 'CARRIER' ? line.shipper : line.carrier) ?? '—'}</Td>
+                          <Td>{line.route}</Td>
+                          <Td>
+                            <Mono>{line.vehicle ?? '—'}</Mono>
+                          </Td>
+                          <Td className="text-right">
+                            <Mono>{line.km}</Mono>
+                          </Td>
+                          <Td className="text-right">
+                            <Mono>{f.eur(line.rate)}</Mono>
+                          </Td>
+                        </Tr>
+                      ))}
+                      <Tr>
+                        <Td colSpan={5}>
+                          <span className="font-semibold">{t.report_.total}</span>
+                        </Td>
+                        <Td className="text-right">
+                          <Mono>{report.own.km}</Mono>
+                        </Td>
+                        <Td className="text-right">
+                          <Mono>{f.eur(report.own.rate)}</Mono>
+                        </Td>
+                      </Tr>
+                    </tbody>
+                  </Table>
+                </div>
+              </TableFrame>
+            </section>
+          )}
+
           <section className="mt-6">
             <p className="label-micro mb-2.5">{t.periodReport.claims}</p>
             {report.claims.length === 0 ? (

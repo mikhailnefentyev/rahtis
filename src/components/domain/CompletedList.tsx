@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { Fragment, useMemo, useState } from 'react';
 import { OrderRouteMap } from '@/components/domain/RouteMap';
 import { HaulBadge } from '@/components/domain/HaulBadge';
 import { RouteStops } from '@/components/domain/RouteStops';
@@ -70,6 +70,15 @@ export function CompletedList({
     <div className="flex flex-col gap-8">
       {weeks.map(([week, list]) => {
         const sum = totalOf(week);
+        /*
+         * Рейсы по договору перевозчика с клиентом — свои рейсы и прямые
+         * заказы подписчика — своей группой ниже и без итогов недели:
+         * цену выставляет перевозчик, это не наша выплата и не наш счёт.
+         */
+        const ownList = list.filter((o) => o.contract_party === 'CARRIER');
+        const paidList = list.filter((o) => o.contract_party !== 'CARRIER');
+        const ownRate = ownList.reduce((acc, o) => acc + (o.rate_cents ?? 0), 0);
+        const ownPayout = ownList.reduce((acc, o) => acc + (o.payout_cents ?? 0), 0);
 
         return (
           <section key={week}>
@@ -80,7 +89,7 @@ export function CompletedList({
 
               <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1 text-[13px]">
                 <span className="text-ink-muted">
-                  {m('order.tripsCount', { count: list.length })}
+                  {m('order.tripsCount', { count: paidList.length })}
                 </span>
 
                 {/*
@@ -92,7 +101,7 @@ export function CompletedList({
                 <span className="text-ink-muted">
                   {t.done.rate}{' '}
                   <span className="font-semibold text-ink">
-                    {f.eur(Number(sum?.rate_cents ?? 0))}
+                    {f.eur(Number(sum?.rate_cents ?? 0) - ownRate)}
                   </span>
                 </span>
 
@@ -106,7 +115,7 @@ export function CompletedList({
                   <span className="text-ink-muted">
                     {t.done.payout}{' '}
                     <span className="font-semibold text-ok">
-                      {f.eur(Number(sum.payout_cents))}
+                      {f.eur(Number(sum.payout_cents) - ownPayout)}
                     </span>
                   </span>
                 )}
@@ -117,180 +126,191 @@ export function CompletedList({
             </div>
 
             <div className="flex flex-col gap-2">
-              {list.map((order) => {
+              {[...paidList, ...ownList].map((order, index) => {
                 const open = opened === order.id;
+                const own = order.contract_party === 'CARRIER';
                 const stops = (order.stops ?? []) as unknown as OrderStop[];
                 const documents = (order.documents ?? []) as unknown as TripDocument[];
                 const first = stops[0];
                 const last = stops[stops.length - 1];
 
                 return (
-                  <Card key={order.id} stripe={open ? 'ok' : 'neutral'}>
-                    <CardBody>
-                      <div className="flex flex-wrap items-start justify-between gap-3">
-                        <div className="min-w-0">
-                          <div className="flex flex-wrap items-center gap-2.5">
-                            <Badge tone="ok">{t.orderStatus.DONE}</Badge>
-                            {/* Что везли — и в закрытом рейсе: по нему разбирают спор. */}
-                            <HaulBadge
-                              haulKind={order.haul_kind}
-                              containerFeet={order.container_feet}
-                            />
-                            <Mono className="text-xs text-ink-dim">{order.ref}</Mono>
-                            {order.shipper_ref && (
-                              <Mono className="text-xs text-ink-dim">{order.shipper_ref}</Mono>
+                  <Fragment key={order.id}>
+                    {index === paidList.length && (
+                      <p className="mt-3 text-[13px] text-ink-muted">
+                        <span className="font-semibold text-ink">{t.report_.ownTitle}</span>
+                        {' · '}
+                        {m('order.tripsCount', { count: ownList.length })} · {f.eur(ownRate)}
+                        <span className="block text-xs text-ink-dim">{t.report_.ownNote}</span>
+                      </p>
+                    )}
+                    <Card stripe={open ? 'ok' : 'neutral'}>
+                      <CardBody>
+                        <div className="flex flex-wrap items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <div className="flex flex-wrap items-center gap-2.5">
+                              <Badge tone="ok">{t.orderStatus.DONE}</Badge>
+                              {/* Что везли — и в закрытом рейсе: по нему разбирают спор. */}
+                              <HaulBadge
+                                haulKind={order.haul_kind}
+                                containerFeet={order.container_feet}
+                              />
+                              <Mono className="text-xs text-ink-dim">{order.ref}</Mono>
+                              {order.shipper_ref && (
+                                <Mono className="text-xs text-ink-dim">{order.shipper_ref}</Mono>
+                              )}
+                              {order.trailer_plate && <Plate>{order.trailer_plate}</Plate>}
+                              {order.vehicle_plate && <Plate>{order.vehicle_plate}</Plate>}
+                            </div>
+  
+                            {first && last && (
+                              <p className="mt-2 font-mono text-sm tracking-tight text-accent">
+                                {routeLabel(stops)}
+                              </p>
                             )}
-                            {order.trailer_plate && <Plate>{order.trailer_plate}</Plate>}
-                            {order.vehicle_plate && <Plate>{order.vehicle_plate}</Plate>}
+  
+                            <p className="mt-1.5 text-[13px] text-ink-muted">
+                              {m('order.distance', { km: order.distance_km ?? 0 })}
+                              {order.shipper_name ? ` · ${order.shipper_name}` : ''}
+                              {order.carrier_name ? ` · ${order.carrier_name}` : ''}
+                            </p>
+  
+                            {order.closed_at && (
+                              <p className="mt-1 text-xs text-ink-dim">
+                                {m('done.closedAt', { date: f.dateTime(order.closed_at) })}
+                              </p>
+                            )}
                           </div>
-
-                          {first && last && (
-                            <p className="mt-2 font-mono text-sm tracking-tight text-accent">
-                              {routeLabel(stops)}
-                            </p>
-                          )}
-
-                          <p className="mt-1.5 text-[13px] text-ink-muted">
-                            {m('order.distance', { km: order.distance_km ?? 0 })}
-                            {order.shipper_name ? ` · ${order.shipper_name}` : ''}
-                            {order.carrier_name ? ` · ${order.carrier_name}` : ''}
-                          </p>
-
-                          {order.closed_at && (
-                            <p className="mt-1 text-xs text-ink-dim">
-                              {m('done.closedAt', { date: f.dateTime(order.closed_at) })}
-                            </p>
-                          )}
-                        </div>
-
-                        <div className="flex flex-col items-end gap-1.5">
-                          <span className="text-[15px] font-semibold text-ink">
-                            {f.eur(order.rate_cents ?? 0)}
-                          </span>
-
-                          {order.payout_cents != null && (
-                            <span className="text-xs text-ink-muted">
-                              {t.done.payout}{' '}
-                              <span className="font-semibold text-ok">
-                                {f.eur(order.payout_cents)}
-                              </span>
+  
+                          <div className="flex flex-col items-end gap-1.5">
+                            <span className="text-[15px] font-semibold text-ink">
+                              {f.eur(order.rate_cents ?? 0)}
                             </span>
-                          )}
-
-                          {/*
-                           * Оценка видна и в свёрнутой строке: заказчик
-                           * ищет глазами неоценённые рейсы, а перевозчик —
-                           * те, где ему что-то поставили.
-                           */}
-                          {order.rating_score != null && <Stars value={order.rating_score} />}
-
-                          <Button size="sm" onClick={() => setOpened(open ? null : order.id)}>
-                            {open ? t.done.collapse : t.done.open}
-                          </Button>
+  
+                            {!own && order.payout_cents != null && (
+                              <span className="text-xs text-ink-muted">
+                                {t.done.payout}{' '}
+                                <span className="font-semibold text-ok">
+                                  {f.eur(order.payout_cents)}
+                                </span>
+                              </span>
+                            )}
+  
+                            {/*
+                             * Оценка видна и в свёрнутой строке: заказчик
+                             * ищет глазами неоценённые рейсы, а перевозчик —
+                             * те, где ему что-то поставили.
+                             */}
+                            {order.rating_score != null && <Stars value={order.rating_score} />}
+  
+                            <Button size="sm" onClick={() => setOpened(open ? null : order.id)}>
+                              {open ? t.done.collapse : t.done.open}
+                            </Button>
+                          </div>
                         </div>
-                      </div>
-
-                      {/*
-                       * Развёрнутое содержимое рисуется по нажатию, но
-                       * данные для него приехали вместе со списком: рейс
-                       * закрыт, меняться ему больше нечем, и второй поход
-                       * в базу дал бы задержку без единого нового факта.
-                       */}
-                      {open && (
-                        <div className="mt-4 border-t border-line pt-4">
-                          <div className="mb-4 grid gap-1.5 sm:grid-cols-2">
-                            <Kv k={t.order.trailer} v={order.trailer ?? '—'} />
-                            <Kv
-                              k={t.order.ratePerKm}
-                              v={
-                                <Mono>
-                                  {order.distance_km && order.rate_cents
-                                    ? (f.eurPerKm(order.rate_cents, order.distance_km) ?? '—')
-                                    : '—'}
-                                </Mono>
-                              }
-                            />
-                            {order.commission_cents != null && (
+  
+                        {/*
+                         * Развёрнутое содержимое рисуется по нажатию, но
+                         * данные для него приехали вместе со списком: рейс
+                         * закрыт, меняться ему больше нечем, и второй поход
+                         * в базу дал бы задержку без единого нового факта.
+                         */}
+                        {open && (
+                          <div className="mt-4 border-t border-line pt-4">
+                            <div className="mb-4 grid gap-1.5 sm:grid-cols-2">
+                              <Kv k={t.order.trailer} v={order.trailer ?? '—'} />
                               <Kv
-                                k={t.done.commission}
+                                k={t.order.ratePerKm}
                                 v={
                                   <Mono>
-                                    {f.eur(order.commission_cents)}
-                                    {order.commission_bps != null &&
-                                      ` · ${m('done.bps', { rate: order.commission_bps / 10000 })}`}
+                                    {order.distance_km && order.rate_cents
+                                      ? (f.eurPerKm(order.rate_cents, order.distance_km) ?? '—')
+                                      : '—'}
                                   </Mono>
                                 }
                               />
+                              {order.commission_cents != null && (
+                                <Kv
+                                  k={t.done.commission}
+                                  v={
+                                    <Mono>
+                                      {f.eur(order.commission_cents)}
+                                      {order.commission_bps != null &&
+                                        ` · ${m('done.bps', { rate: order.commission_bps / 10000 })}`}
+                                    </Mono>
+                                  }
+                                />
+                              )}
+                              {!own && order.payout_cents != null && (
+                                <Kv k={t.done.payout} v={<Mono>{f.eur(order.payout_cents)}</Mono>} />
+                              )}
+                            </div>
+  
+                            {stops.length > 0 && (
+                              <>
+                                <p className="label-micro mb-2.5">
+                                  {m('order.stopsCount', { count: stops.length })}
+                                </p>
+                                <RouteStops stops={stops} haulKind={order.haul_kind} />
+                                <OrderRouteMap
+                                  geometry={order.route_geometry}
+                                  bounds={order.route_bounds as number[] | null}
+                                  stops={stops}
+                                  haulKind={order.haul_kind}
+                                  className="mt-4"
+                                />
+                              </>
                             )}
-                            {order.payout_cents != null && (
-                              <Kv k={t.done.payout} v={<Mono>{f.eur(order.payout_cents)}</Mono>} />
-                            )}
-                          </div>
-
-                          {stops.length > 0 && (
-                            <>
-                              <p className="label-micro mb-2.5">
-                                {m('order.stopsCount', { count: stops.length })}
-                              </p>
-                              <RouteStops stops={stops} haulKind={order.haul_kind} />
-                              <OrderRouteMap
-                                geometry={order.route_geometry}
-                                bounds={order.route_bounds as number[] | null}
-                                stops={stops}
-                                haulKind={order.haul_kind}
-                                className="mt-4"
+  
+                            <div className="mt-4">
+                              <p className="label-micro mb-2.5">{t.trip.documents}</p>
+                              <DocumentList documents={documents} />
+                            </div>
+  
+                            {/*
+                             * Прямой рейс перевозчика на подписке: Aivomaa не сторона
+                             * договора, спор стороны решают сами (решение 29.09.2026).
+                             */}
+                            {canClaim &&
+                              (order.contract_party === 'CARRIER' ? (
+                                <p className="mt-4 border-t border-line pt-4 text-xs text-ink-muted">{t.claims.directDeal}</p>
+                              ) : (
+                                <div className="mt-4 border-t border-line pt-4">
+                                  <FileClaim orderId={order.id} stops={stops} />
+                                </div>
+                              ))}
+  
+                            {/*
+                             * Право оценить решает база: у заказчика рейса с
+                             * назначенным перевозчиком can_rate истинно, у
+                             * остальных нет. Условие «если заказчик» здесь
+                             * завело бы второе место, где это решается.
+                             */}
+                            {order.can_rate ? (
+                              <RateTrip
+                                orderId={order.id}
+                                score={order.rating_score}
+                                comment={order.rating_comment}
+                                className="mt-4 border-t border-line pt-4"
                               />
-                            </>
-                          )}
-
-                          <div className="mt-4">
-                            <p className="label-micro mb-2.5">{t.trip.documents}</p>
-                            <DocumentList documents={documents} />
-                          </div>
-
-                          {/*
-                           * Прямой рейс перевозчика на подписке: Aivomaa не сторона
-                           * договора, спор стороны решают сами (решение 29.09.2026).
-                           */}
-                          {canClaim &&
-                            (order.contract_party === 'CARRIER' ? (
-                              <p className="mt-4 border-t border-line pt-4 text-xs text-ink-muted">{t.claims.directDeal}</p>
                             ) : (
-                              <div className="mt-4 border-t border-line pt-4">
-                                <FileClaim orderId={order.id} stops={stops} />
-                              </div>
-                            ))}
-
-                          {/*
-                           * Право оценить решает база: у заказчика рейса с
-                           * назначенным перевозчиком can_rate истинно, у
-                           * остальных нет. Условие «если заказчик» здесь
-                           * завело бы второе место, где это решается.
-                           */}
-                          {order.can_rate ? (
-                            <RateTrip
-                              orderId={order.id}
-                              score={order.rating_score}
-                              comment={order.rating_comment}
-                              className="mt-4 border-t border-line pt-4"
-                            />
-                          ) : (
-                            order.rating_score != null && (
-                              <div className="mt-4 border-t border-line pt-4">
-                                <p className="label-micro mb-2">{t.rating.received}</p>
-                                <Stars value={order.rating_score} />
-                                {order.rating_comment && (
-                                  <p className="mt-2 rounded-control border border-line bg-sunken px-3 py-2 text-xs text-ink-muted">
-                                    {order.rating_comment}
-                                  </p>
-                                )}
-                              </div>
-                            )
-                          )}
-                        </div>
-                      )}
-                    </CardBody>
-                  </Card>
+                              order.rating_score != null && (
+                                <div className="mt-4 border-t border-line pt-4">
+                                  <p className="label-micro mb-2">{t.rating.received}</p>
+                                  <Stars value={order.rating_score} />
+                                  {order.rating_comment && (
+                                    <p className="mt-2 rounded-control border border-line bg-sunken px-3 py-2 text-xs text-ink-muted">
+                                      {order.rating_comment}
+                                    </p>
+                                  )}
+                                </div>
+                              )
+                            )}
+                          </div>
+                        )}
+                      </CardBody>
+                    </Card>
+                  </Fragment>
                 );
               })}
             </div>

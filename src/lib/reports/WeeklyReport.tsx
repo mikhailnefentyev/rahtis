@@ -74,6 +74,8 @@ const s = StyleSheet.create({
   totalLabel: { fontSize: 9, fontFamily: 'Helvetica-Bold', paddingRight: 6 },
 
   empty: { marginTop: 18, fontSize: 9, color: '#44546b' },
+  ownBlock: { marginTop: 22 },
+  ownTitle: { fontSize: 11, fontFamily: 'Helvetica-Bold', marginBottom: 2 },
 
   note: { marginTop: 22, fontSize: 8, color: '#44546b', lineHeight: 1.5 },
 
@@ -100,6 +102,31 @@ export type ReportRow = {
   commission: string | null;
   net: string;
   documents: number;
+};
+
+/** Рейс по договору перевозчика с клиентом: работа, но не наши деньги. */
+export type OwnRow = {
+  ref: string;
+  closedAt: string;
+  client: string;
+  route: string;
+  vehicle: string;
+  distance: string;
+  price: string;
+};
+
+/**
+ * Свои рейсы — отдельным блоком после расчёта: в общей таблице они
+ * смешивались с рейсами, по которым мы платим или выставляем счёт.
+ */
+export type OwnSection = {
+  title: string;
+  note: string;
+  colClient: string;
+  total: string;
+  rows: OwnRow[];
+  distance: string;
+  price: string;
 };
 
 export type ReportTexts = {
@@ -140,9 +167,11 @@ export function WeeklyReport({
   rows,
   totals,
   withCommission,
+  own,
 }: {
   texts: ReportTexts;
   rows: ReportRow[];
+  own?: OwnSection | null;
   totals: {
     gross: string;
     commission: string | null;
@@ -311,6 +340,38 @@ export function WeeklyReport({
             ) : null}
           </>
         )}
+
+        {own && own.rows.length > 0 ? (
+          <View style={s.ownBlock}>
+            <Text style={s.ownTitle}>{own.title}</Text>
+            <Text style={s.vat}>{own.note}</Text>
+            <View style={s.head}>
+              <Text style={[s.th, { width: 68 }]}>{texts.colRef}</Text>
+              <Text style={[s.th, { width: 58 }]}>{texts.colDate}</Text>
+              <Text style={[s.th, { width: 96 }]}>{own.colClient}</Text>
+              <Text style={[s.th, { flex: 1 }]}>{texts.colRoute}</Text>
+              <Text style={[s.th, { width: 52 }]}>{texts.colVehicle}</Text>
+              <Text style={[s.th, s.right, { width: 36 }]}>{texts.colDistance}</Text>
+              <Text style={[s.th, s.right, { width: 62 }]}>{texts.colGross}</Text>
+            </View>
+            {own.rows.map((row) => (
+              <View key={row.ref} style={s.row} wrap={false}>
+                <Text style={[s.cell, { width: 68 }]}>{row.ref}</Text>
+                <Text style={[s.cell, { width: 58 }]}>{row.closedAt}</Text>
+                <Text style={[s.cell, { width: 96 }]}>{row.client}</Text>
+                <Text style={[s.cell, { flex: 1 }]}>{row.route}</Text>
+                <Text style={[s.cell, { width: 52 }]}>{row.vehicle}</Text>
+                <Text style={[s.cell, s.right, { width: 36 }]}>{row.distance}</Text>
+                <Text style={[s.cell, s.right, { width: 62 }]}>{row.price}</Text>
+              </View>
+            ))}
+            <View style={s.totals}>
+              <Text style={[s.totalLabel, { flex: 1 }]}>{own.total}</Text>
+              <Text style={[s.totalLabel, s.right, { width: 36 }]}>{own.distance}</Text>
+              <Text style={[s.totalLabel, s.right, { width: 62 }]}>{own.price}</Text>
+            </View>
+          </View>
+        ) : null}
 
         <Text style={s.note}>{texts.closingNote}</Text>
 

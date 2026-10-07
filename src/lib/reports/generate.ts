@@ -11,7 +11,7 @@ import { createMessages } from '@/lib/i18n/message';
 import { notify } from '@/lib/notify';
 import { getOperatorProfile, operatorLines } from '@/lib/operator/profile';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { WeeklyReport, type ReportRow, type ReportTexts } from './WeeklyReport';
+import { WeeklyReport, type OwnRow, type OwnSection, type ReportRow, type ReportTexts } from './WeeklyReport';
 
 /**
  * Выпуск недельных отчётов.
@@ -410,8 +410,6 @@ async function issue(
    * (5 % с минимумом, замороженная в shipper_fee_bps): в колонке
    * «Palvelumaksu» и в сумме к оплате.
    */
-  let direct = 0;
-
   /*
    * Простой — отдельными строками под таблицей: договор заказчика 5.6
    * требует показать точку, время, начисленные часы. В сумму рейса он
@@ -420,42 +418,40 @@ async function issue(
    */
   const waitingLines: Array<{ label: string; amount: string }> = [];
 
-  const rows: ReportRow[] = orders.map((order) => {
+  /*
+   * Рейсы по договору перевозчика с клиентом — свои рейсы и прямые
+   * заказы подписчика — идут в отчёт работой, но не деньгами: цену
+   * выставляет перевозчик сам. С 7.10.2026 они отдельным блоком после
+   * расчёта, а не строками общей таблицы: там они мешались с рейсами,
+   * по которым мы платим или выставляем счёт.
+   */
+  const ownOrders = orders.filter((o) => o.contract_party === 'CARRIER');
+  const paidOrders = orders.filter((o) => o.contract_party !== 'CARRIER');
+
+  const rows: ReportRow[] = paidOrders.map((order) => {
     const rate = order.rate_cents ?? 0;
     const bps = order.commission_bps ?? COMMISSION_BPS;
     const payout = payoutCents(rate, bps);
     const shipperFee = Math.round((rate * (order.shipper_fee_bps ?? 0)) / 10_000);
-
-    /*
-     * Рейс своего клиента идёт в отчёт работой, но не деньгами: эту цену
-     * перевозчик выставляет сам, и складывать её с нашей выплатой значит
-     * обещать то, чего мы не платим.
-     */
-    const own = order.contract_party === 'CARRIER';
-
-    const waiting = own ? 0 : (order.waiting_cents ?? 0);
+    const waiting = order.waiting_cents ?? 0;
 
     km += order.distance_km ?? 0;
-    if (own) {
-      direct += rate;
-    } else {
-      gross += rate;
-      fee += carrier ? commissionCents(rate, bps) : shipperFee;
-      net += (carrier ? payout : rate + shipperFee) + waiting;
-      for (const w of order.waiting ?? []) {
-        const loading = w.role === 'PICKUP' || w.role === 'EXTRA_LOAD';
-        waitingLines.push({
-          label: t.report_.waitingLine
-            .replace('{ref}', order.ref)
-            .replace('{stop}', `${w.sequence + 1}. ${w.city ?? ''}`.trim())
-            .replace('{operation}', loading ? t.report_.waitingLoading : t.report_.waitingUnloading)
-            .replace('{from}', f.time(w.started_at))
-            .replace('{to}', f.time(w.completed_at))
-            .replace('{minutes}', String(w.minutes))
-            .replace('{hours}', String(w.hours)),
-          amount: f.eur(w.cents),
-        });
-      }
+    gross += rate;
+    fee += carrier ? commissionCents(rate, bps) : shipperFee;
+    net += (carrier ? payout : rate + shipperFee) + waiting;
+    for (const w of order.waiting ?? []) {
+      const loading = w.role === 'PICKUP' || w.role === 'EXTRA_LOAD';
+      waitingLines.push({
+        label: t.report_.waitingLine
+          .replace('{ref}', order.ref)
+          .replace('{stop}', `${w.sequence + 1}. ${w.city ?? ''}`.trim())
+          .replace('{operation}', loading ? t.report_.waitingLoading : t.report_.waitingUnloading)
+          .replace('{from}', f.time(w.started_at))
+          .replace('{to}', f.time(w.completed_at))
+          .replace('{minutes}', String(w.minutes))
+          .replace('{hours}', String(w.hours)),
+        amount: f.eur(w.cents),
+      });
     }
 
     return {
@@ -545,13 +541,41 @@ async function issue(
       });
     }
   }
-  /*
-   * Что перевозчик выставляет сам. Строка идёт тем же списком, что и
-   * удержания, но вычитать её не из чего: этих денег у нас нет.
-   */
-  if (direct > 0) {
-    deductions.push({ label: t.report_.directLine, amount: f.eur(direct) });
-  }
+  /* Свой блок: клиент перевозчика (или перевозчик — для заказчика) по имени. */
+  const counterpartIds = [
+    ...new Set(ownOrders.map((o) => (carrier ? o.shipper_company_id : o.assigned_company_id)).filter((id): id is string => Boolean(id))),
+  ];
+  const { data: counterparts } = counterpartIds.length
+    ? await admin.from('companies').select('id, name').in('id', counterpartIds)
+    : { data: [] };
+  const counterpartName = new Map((counterparts ?? []).map((c) => [c.id, c.name]));
+  let ownKm = 0;
+  let ownPrice = 0;
+  const ownRows: OwnRow[] = ownOrders.map((order) => {
+    ownKm += order.distance_km ?? 0;
+    ownPrice += order.rate_cents ?? 0;
+    const party = carrier ? order.shipper_company_id : order.assigned_company_id;
+    return {
+      ref: order.ref,
+      closedAt: f.date(order.closed_at ?? order.updated_at),
+      client: (party && counterpartName.get(party)) || '—',
+      route: route.get(order.id) ?? '—',
+      vehicle: plate.get(order.id) ?? '—',
+      distance: String(order.distance_km ?? 0),
+      price: f.eur(order.rate_cents ?? 0),
+    };
+  });
+  const own: OwnSection | null = ownRows.length
+    ? {
+        title: t.report_.ownTitle,
+        note: t.report_.ownNote,
+        colClient: carrier ? t.report_.colClient : t.report_.colCarrier,
+        total: t.report_.total,
+        rows: ownRows,
+        distance: String(ownKm),
+        price: f.eur(ownPrice),
+      }
+    : null;
 
   const payable = payGross - deducted;
 
@@ -629,6 +653,7 @@ async function issue(
             : null,
       },
       withCommission: withFee,
+      own,
     }),
   );
 

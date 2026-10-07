@@ -7,6 +7,7 @@ import { getOperatorProfile, operatorLines } from '@/lib/operator/profile';
 import { buildPeriodReport } from '@/lib/reports/period';
 import {
   claimColumns,
+  ownColumns,
   periodCsv,
   periodXlsx,
   summaryRows,
@@ -91,6 +92,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
   /* PDF: те же колонки, что в таблицах, но отформатированные для глаза. */
   const trips = tripColumns(report, t);
   const claims = claimColumns(report, t);
+  const own = ownColumns(report, t);
 
   const show = (kind: string, value: string | number | null): string => {
     if (value == null || value === '') return '—';
@@ -172,6 +174,16 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
       tripRows: report.lines.map((line) => trips.map((c) => show(c.kind, c.get(line)))),
       claimColumns: claims.map((c) => flex(c.kind, c.header)),
       claimRows: report.claims.map((claim) => claims.map((c) => show(c.kind, c.get(claim)))),
+      own: report.own.lines.length
+        ? {
+            title: t.report_.ownTitle,
+            note: t.report_.ownNote,
+            columns: own.map((c) =>
+              c.header === t.periodReport.colRoute ? { ...flex(c.kind, c.header), flex: 3 } : flex(c.kind, c.header),
+            ),
+            rows: report.own.lines.map((line) => own.map((c) => show(c.kind, c.get(line)))),
+          }
+        : null,
       summary,
     }),
   );

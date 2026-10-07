@@ -123,6 +123,8 @@ export type PeriodPdfInput = {
   tripRows: string[][];
   claimColumns: PdfColumn[];
   claimRows: string[][];
+  /** Свои рейсы и прямые заказы подписчика — отдельно от расчёта. */
+  own?: { title: string; note: string; columns: PdfColumn[]; rows: string[][] } | null;
   summary: Array<[string, string, boolean?]>;
 };
 
@@ -179,6 +181,14 @@ export function PeriodReportPdf(input: PeriodPdfInput) {
         ) : (
           <Table columns={input.tripColumns} rows={input.tripRows} />
         )}
+
+        {input.own && input.own.rows.length > 0 ? (
+          <>
+            <Text style={s.section}>{ansi(input.own.title)}</Text>
+            <Text style={s.note}>{ansi(input.own.note)}</Text>
+            <Table columns={input.own.columns} rows={input.own.rows} />
+          </>
+        ) : null}
 
         <Text style={s.section}>{ansi(input.claimsTitle)}</Text>
         {input.claimRows.length === 0 ? (
