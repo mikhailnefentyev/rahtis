@@ -1,6 +1,7 @@
 export { Bars, type BarPoint } from './Bars';
 export { Badge, Dot } from './Badge';
-export { Button, buttonClass } from './Button';
+export { Button } from './Button';
+export { buttonClass } from './buttonClass';
 export { Card, CardBody, CardHeader, CardTitle, CardDivider } from './Card';
 export { Countdown } from './Countdown';
 export { FileDrop } from './FileDrop';

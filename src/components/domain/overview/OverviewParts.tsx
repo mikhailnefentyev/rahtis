@@ -60,8 +60,21 @@ async function liveTrips(supabase: Supabase, role: Role): Promise<LiveTrip[]> {
 
 export async function OverviewBody({ locale, role }: { locale: Locale; role: Role }) {
   const [{ t, m, f }, supabase] = await Promise.all([getI18n(locale), createClient()]);
-  const trips = await liveTrips(supabase, role);
   const carrier = role === 'CARRIER';
+
+  /*
+   * Независимые запросы — разом, а не по очереди (8.10.2026): обзор
+   * собирался из шести последовательных походов в базу.
+   */
+  const [trips, weeklyRes, deskRes, offersRes, claimsRes] = await Promise.all([
+    liveTrips(supabase, role),
+    supabase.rpc('weekly_totals', { p_weeks: 8 }),
+    carrier ? supabase.rpc('desk_orders', { p_limit: 100 }) : Promise.resolve({ data: [] as unknown[] }),
+    carrier
+      ? Promise.resolve({ count: 0 })
+      : supabase.from('orders').select('id', { count: 'exact', head: true }).eq('status', 'REQUESTED'),
+    carrier ? Promise.resolve({ data: [] as Array<{ status: string }> }) : supabase.rpc('my_claims'),
+  ]);
 
   /* ── Что ждёт ─────────────────────────────────────────────────── */
   let cards: Array<{ href: string; count: number; title: string; text: string; tone: 'warn' | 'danger' | 'live' }>;
@@ -79,7 +92,7 @@ export async function OverviewBody({ locale, role }: { locale: Locale; role: Rol
           )
       : { data: [] };
     const withCmr = new Set((cmr ?? []).map((d) => d.order_id));
-    const { data: desk } = await supabase.rpc('desk_orders', { p_limit: 100 });
+    const desk = deskRes.data;
 
     cards = [
       {
@@ -105,10 +118,8 @@ export async function OverviewBody({ locale, role }: { locale: Locale; role: Rol
       },
     ];
   } else {
-    const [{ count: offers }, { data: claims }] = await Promise.all([
-      supabase.from('orders').select('id', { count: 'exact', head: true }).eq('status', 'REQUESTED'),
-      supabase.rpc('my_claims'),
-    ]);
+    const offers = offersRes.count;
+    const claims = claimsRes.data;
     cards = [
       {
         href: `/${locale}/shipper/orders`,
@@ -135,7 +146,7 @@ export async function OverviewBody({ locale, role }: { locale: Locale; role: Rol
   }
 
   /* ── Неделя ───────────────────────────────────────────────────── */
-  const { data: weekly } = await supabase.rpc('weekly_totals', { p_weeks: 8 });
+  const weekly = weeklyRes.data;
   const weeks = fillWeeks(
     (weekly ?? []).map((w) => ({
       week: w.week,

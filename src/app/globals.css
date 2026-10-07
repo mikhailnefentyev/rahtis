@@ -1945,3 +1945,30 @@
 @media (prefers-reduced-motion: reduce) {
   .cab-page { animation: none; }
 }
+
+
+/* ── Отклик на нажатие (8.10.2026) ──────────────────────────────── */
+
+/* Кнопка отправки, пока форма уходит. */
+.btn-spinner {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  animation: btn-spin 0.7s linear infinite;
+}
+@keyframes btn-spin { to { transform: rotate(360deg); } }
+
+/* Очертания содержимого, пока раздел загружается. */
+.skeleton {
+  border-radius: 12px;
+  background: linear-gradient(90deg, var(--color-raised) 0%, var(--color-sunken) 50%, var(--color-raised) 100%);
+  background-size: 200% 100%;
+  animation: skeleton-shine 1.2s ease-in-out infinite;
+}
+@keyframes skeleton-shine { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-spinner, .skeleton { animation: none; }
+}

@@ -1,67 +1,41 @@
-import { cn } from '@/lib/cn';
+'use client';
 
-type Variant = 'primary' | 'default' | 'ghost' | 'danger';
-type Size = 'sm' | 'md' | 'lg';
-
-const variantClass: Record<Variant, string> = {
-  /** Одно главное действие на экран: «Беру», «Выбрать», «Опубликовать». */
-  /* Объём: свет сверху и цветная тень (8.10.2026). */
-  primary:
-    'bg-linear-to-b from-[#137896] to-accent text-accent-ink border-transparent shadow-primary hover:from-[#178aac] hover:to-[#0e6d8a] hover:-translate-y-px',
-  default:
-    'bg-surface text-ink border-line shadow-card hover:border-accent-line hover:text-ink hover:-translate-y-px hover:shadow-lift',
-  ghost: 'bg-transparent text-ink-muted border-transparent hover:bg-raised hover:text-ink',
-  /**
-   * Разрушающее действие: откат рейса, отказ, отклонение заявки.
-   * Красным здесь окрашен текст, а не заливка — залитая красным кнопка
-   * притягивает взгляд сильнее основного действия рядом с ней.
-   */
-  danger: 'bg-transparent text-danger border-line hover:border-danger hover:bg-danger/10',
-};
-
-const sizeClass: Record<Size, string> = {
-  sm: 'h-7 gap-1.5 rounded-control px-2.5 text-xs', // внутри строк таблиц
-  md: 'h-9 gap-2 rounded-control px-3.5 text-[13px]',
-  lg: 'h-10 gap-2 rounded-control px-5 text-sm',
-};
+import { useFormStatus } from 'react-dom';
+import { buttonClass, type ButtonSize, type ButtonVariant } from './buttonClass';
 
 /**
- * Классы кнопки отдельно от самой кнопки.
+ * Кнопка. У кнопки отправки формы — мгновенный отклик (8.10.2026).
  *
- * Нужны там, где по смыслу ссылка, а по виду кнопка: переход в кабинет,
- * возврат на вход. Подменять <a> внутри <button> нельзя — получится
- * неверная разметка и сломанная навигация с клавиатуры.
+ * Серверное действие отвечает за полсекунды-секунду, и всё это время
+ * кнопка стояла как ни в чём не бывало: человек жал второй раз и
+ * думал, что сайт не реагирует. Теперь кнопка отправки сразу гаснет и
+ * крутит индикатор, пока форма уходит. Работает в любой форме без
+ * правок на месте: состояние берётся из useFormStatus ближайшей формы.
  */
-export function buttonClass({
-  variant = 'default',
-  size = 'md',
-  className,
-}: { variant?: Variant; size?: Size; className?: string } = {}): string {
-  return cn(
-    'inline-flex cursor-pointer items-center justify-center border font-semibold',
-    /*
-     * Отклик на нажатие — полпикселя вниз. Ровно столько, чтобы палец и
-     * глаз получили подтверждение; заметное движение в кнопке, которую
-     * жмут сотню раз за смену, начинает раздражать на второй день.
-     */
-    'transition-[color,background-color,border-color,transform,box-shadow] duration-150',
-    'active:translate-y-[0.5px]',
-    'disabled:pointer-events-none disabled:opacity-35 disabled:active:translate-y-0',
-    sizeClass[size],
-    variantClass[variant],
-    className,
-  );
-}
-
 export function Button({
   variant = 'default',
   size = 'md',
   className,
   type = 'button',
+  disabled,
+  children,
   ...props
 }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: Variant;
-  size?: Size;
+  variant?: ButtonVariant;
+  size?: ButtonSize;
 }) {
-  return <button type={type} className={buttonClass({ variant, size, className })} {...props} />;
+  const { pending } = useFormStatus();
+  const busy = type === 'submit' && pending;
+  return (
+    <button
+      type={type}
+      disabled={disabled || busy}
+      aria-busy={busy || undefined}
+      className={buttonClass({ variant, size, className })}
+      {...props}
+    >
+      {busy && <span className="btn-spinner" aria-hidden />}
+      {children}
+    </button>
+  );
 }

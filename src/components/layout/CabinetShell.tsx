@@ -34,8 +34,10 @@ export async function CabinetShell({
   company: Company | null;
   children: React.ReactNode;
 }) {
-  const [{ t }, supabase] = await Promise.all([getI18n(locale), createClient()]);
-  const { data: unread } = await supabase.rpc('unread_notifications');
+  const [{ t }, { data: unread }] = await Promise.all([
+    getI18n(locale),
+    createClient().then((supabase) => supabase.rpc('unread_notifications')),
+  ]);
 
   const home = cabinetPath(locale, role);
   const { groups, primary } = navigation(locale, role, home, t);
