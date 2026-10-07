@@ -50,7 +50,12 @@ export default async function OwnOrdersPage({
   const { data: orders } = ids.length
     ? await supabase
         .from('orders')
-        .select('id, ref, status, shipper_company_id, created_at, track_token, assigned_vehicle_id')
+        /*
+         * assigned_vehicle_id перевозчику по колонкам не открыт — номер
+         * машины берётся из my_assignments, как на столе. Выборка с
+         * закрытой колонкой падала целиком, и список был пуст (8.10.2026).
+         */
+        .select('id, ref, status, shipper_company_id, created_at, track_token')
         .in('shipper_company_id', ids)
         .order('created_at', { ascending: false })
         .limit(30)
@@ -68,7 +73,8 @@ export default async function OwnOrdersPage({
     if (label) list.push(label);
     route.set(s.order_id, list);
   }
-  const plates = new Map((vehicles ?? []).map((v) => [v.vehicle_id, v.plate]));
+  const { data: assignments } = await supabase.rpc('my_assignments');
+  const plates = new Map((assignments ?? []).map((a) => [a.id, a.vehicle_plate]));
   const site = siteUrl();
 
   const jobs: OwnJob[] = (orders ?? []).map((o) => {
@@ -79,7 +85,7 @@ export default async function OwnOrdersPage({
       status: o.status,
       client: names.get(o.shipper_company_id) ?? '',
       route: labels.length > 1 ? `${labels[0]} → ${labels[labels.length - 1]}` : (labels[0] ?? ''),
-      plate: (o.assigned_vehicle_id && plates.get(o.assigned_vehicle_id)) || '',
+      plate: plates.get(o.id) ?? '',
       created_at: o.created_at,
       track: o.track_token ? `${site}/${locale}/track/${o.track_token}` : null,
     };

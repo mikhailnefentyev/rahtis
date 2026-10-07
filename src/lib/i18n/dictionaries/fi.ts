@@ -2900,7 +2900,7 @@ export const fi = {
       'Oman asiakkaanne kuljetus suoraan omalle autollenne: kuljettaja saa sen sovellukseen, ja keikka tulee viikkoraporttiin. Ei prosenttia.',
     newJob: 'Uusi oma keikka',
     clientSection: 'Asiakas',
-    clientPick: 'Asiakas',
+    clientPick: 'Valitse asiakas',
     clientNew: 'Uusi asiakas',
     clientName: 'Asiakkaan nimi',
     clientBusinessId: 'Y-tunnus',

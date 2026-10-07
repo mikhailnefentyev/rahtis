@@ -2794,7 +2794,7 @@ export const en = {
       "Your own client's transport, straight to your own vehicle: the driver gets it in the app and the job appears in the weekly report. No percentage.",
     newJob: 'New own job',
     clientSection: 'Client',
-    clientPick: 'Client',
+    clientPick: 'Choose a client',
     clientNew: 'New client',
     clientName: 'Client name',
     clientBusinessId: 'Business ID',
