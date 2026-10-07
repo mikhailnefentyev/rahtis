@@ -339,7 +339,7 @@ export const en = {
     signIn: 'Sign in',
     apply: 'Send an application',
     fleetLabel: 'approved vehicles',
-        regionsLabel: 'operating areas',
+        regionsLabel: 'towns',
     regions: 'Operating areas',
 
     branchesEyebrow: 'Two ways to move freight',
@@ -440,7 +440,7 @@ export const en = {
     shipper4:
       'If the route, the schedule or anything else changes mid-job, the update goes straight to the carrier and the driver.',
     shipper6: 'The weekly report shows jobs, amounts, documents and feedback.',
-    shipper7: 'Integration with your own system (ERP/TMS) through an API is possible – agreed case by case.',
+    shipper7: 'Integration with your own system (ERP/TMS) through the API: you create the key yourself in the cabinet, and using it is free.',
     shipper5:
       'If a truck cancels or does not confirm, the job returns to the board on its own and reaches the next suitable trucks right away.',
     carrier2:
@@ -460,7 +460,7 @@ export const en = {
     own1: 'The driver app: jobs, working time, load photos, the consignment note and the signature on the phone.',
     own2: 'Working time and an indicative wage from your own rates or the collective agreement tables.',
     own3: 'A map of rest, wash and service places in Finland, Sweden, Norway and Denmark.',
-    own4: 'Your client sends the order straight to your vehicle. The whole price is yours, and the job goes into your weekly report.',
+    own4: 'Your client sends the order straight to your vehicle, or you add the job yourself and give it to your own vehicle. The client can get a tracking link. The whole price is yours, and the job goes into your weekly report.',
     own5: 'You pay €29.90 a month per vehicle that drove. A vehicle standing still costs nothing.',
     own6: 'The offer table is still there when a vehicle comes free.',
 
@@ -526,7 +526,7 @@ export const en = {
       'Every side of the trailer, the seal and any new damage are photographed in the app. At delivery the pickup photo is shown alongside for comparison.',
     ai4: 'Signature and consignment note',
     ai4Text:
-      'At loading and unloading the app takes the signature and a photo of the consignment note. The carrier closes the job without a separate upload.',
+      'At loading and unloading the app takes the signature and scans the consignment note to PDF. The carrier closes the job without a separate upload.',
     ai5: 'Works without a network',
     ai5Text:
       'Entries and photos wait on the phone and are sent when the connection returns. The time kept is the moment of the tap, not of sending.',
@@ -594,9 +594,9 @@ export const en = {
     apiAllText:
       'The order, offers or a direct vehicle, tracking with arrivals, confirmations and photos with their places, CMR, route changes on the way, waiting time, rating and claims.',
     apiSafeEyebrow: 'Safe',
-    apiSafeTitle: 'Test environment and signed notifications',
+    apiSafeTitle: 'Signed notifications',
     apiSafeText:
-      'Try it with a test key without real orders. Every webhook is signed, a failed delivery is retried automatically, and a key can be revoked from the cabinet at once.',
+      'Every webhook is signed, a failed delivery is retried automatically, and a key can be revoked from the cabinet at once.',
     apiExampleLabel: 'How it works',
     apiExampleNote: 'The key is created in the cabinet on the API tab. The OpenAPI description works directly in Postman and client generators.',
     apiDocs: 'Read the API documentation',

@@ -354,7 +354,7 @@ export const fi = {
     signIn: 'Kirjaudu palveluun',
     apply: 'Lähetä hakemus',
     fleetLabel: 'hyväksyttyä autoa',
-    regionsLabel: 'toiminta-aluetta',
+    regionsLabel: 'paikkakunnalla',
     regions: 'Toiminta-alueet',
 
     /*
@@ -484,7 +484,7 @@ export const fi = {
     shipper4:
       'Jos reitti, aikataulu tai muu tieto muuttuu kesken keikan, päivitys menee suoraan kuljetusliikkeelle ja kuljettajalle.',
     shipper6: 'Viikkoraportista näet keikat, summat, asiakirjat ja palautteet.',
-    shipper7: 'Integraatio omaan järjestelmään (ERP/TMS) rajapinnan kautta on mahdollinen – sovitaan erikseen.',
+    shipper7: 'Integraatio omaan järjestelmään (ERP/TMS) rajapinnan kautta: avaimen luot itse kabinetissa, ja käyttö on maksutonta.',
     shipper5:
       'Jos auto peruu tai ei vahvista, keikka palaa tarjolle itsestään ja välittyy seuraaville sopiville autoille saman tien.',
     carrier2:
@@ -508,7 +508,7 @@ export const fi = {
     own1: 'Kuljettajan sovellus: keikat, työaika, kuormakuvat, rahtikirja ja allekirjoitus puhelimessa.',
     own2: 'Työaika ja suuntaa-antava palkka omilla hinnoillasi tai työehtosopimuksen taulukoilla.',
     own3: 'Kartta tauko-, pesu- ja huoltopaikoista Suomessa, Ruotsissa, Norjassa ja Tanskassa.',
-    own4: 'Asiakkaasi lähettää tilauksen suoraan autollesi. Koko hinta on sinun, ja keikka tulee viikkoraporttiisi.',
+    own4: 'Asiakkaasi lähettää tilauksen suoraan autollesi, tai lisäät keikan itse ja annat sen omalle autolle. Asiakas saa halutessaan seurantalinkin. Koko hinta on sinun, ja keikka tulee viikkoraporttiisi.',
     own5: 'Maksat 29,90 € kuukaudessa autosta, joka ajoi. Seisova auto on maksuton.',
     own6: 'Tarjouspöytä on silti käytössäsi, kun auto jää vapaaksi.',
 
@@ -574,7 +574,7 @@ export const fi = {
       'Perävaunun jokainen puoli, sinetti ja uusi vaurio kuvataan sovelluksessa. Toimituksessa noudon kuva on vieressä vertailua varten.',
     ai4: 'Allekirjoitus ja rahtikirja',
     ai4Text:
-      'Lastauksessa ja purussa sovellus ottaa allekirjoituksen ja rahtikirjan kuvan. Kuljetusliike sulkee keikan ilman erillistä latausta.',
+      'Lastauksessa ja purussa sovellus ottaa allekirjoituksen ja skannaa rahtikirjan PDF:ksi. Kuljetusliike sulkee keikan ilman erillistä latausta.',
     ai5: 'Toimii ilman verkkoa',
     ai5Text:
       'Merkinnät ja kuvat odottavat puhelimessa ja lähtevät, kun yhteys palaa. Aikana säilyy kuittaushetki, ei lähetyshetki.',
@@ -661,9 +661,9 @@ export const fi = {
     apiAllText:
       'Tilaus, tarjoukset tai suora auto, seuranta saapumisineen, kuittauksineen ja kuvineen sijainteineen, CMR, reittimuutokset ajon aikana, odotusaika, arvio ja reklamaatiot.',
     apiSafeEyebrow: 'Turvallinen',
-    apiSafeTitle: 'Testiympäristö ja allekirjoitetut ilmoitukset',
+    apiSafeTitle: 'Allekirjoitetut ilmoitukset',
     apiSafeText:
-      'Kokeile testiavaimella ilman oikeita tilauksia. Jokainen webhook on allekirjoitettu, epäonnistunut toimitus uusitaan automaattisesti, ja avaimen voi perua kabinetista heti.',
+      'Jokainen webhook on allekirjoitettu, epäonnistunut toimitus uusitaan automaattisesti, ja avaimen voi perua kabinetista heti.',
     apiExampleLabel: 'Näin se toimii',
     apiExampleNote: 'Avain luodaan kabinetissa välilehdellä API. OpenAPI-kuvaus toimii suoraan Postmanissa ja asiakasgeneraattoreissa.',
     apiDocs: 'Lue API-dokumentaatio',
