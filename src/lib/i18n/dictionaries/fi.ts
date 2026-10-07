@@ -636,7 +636,7 @@ export const fi = {
     apiEyebrow: 'Rajapinta tilaajille',
     apiTitle: 'Tilaukset suoraan omasta järjestelmästäsi',
     apiLede:
-      'Liitä toiminnanohjauksesi tai TMS:si RAHTISiin: tilaus lähtee pöydälle tai omalle autolle ilman käsin kirjoittamista, ja tiedät jokaisen vaiheen heti, kun se tapahtuu.',
+      'Liitä toiminnanohjauksesi tai TMS:si RAHTIKSEEN: tilaus lähtee pöydälle tai omalle autolle ilman käsin kirjoittamista, ja tiedät jokaisen vaiheen heti, kun se tapahtuu.',
     apiFreeEyebrow: 'Maksuton',
     apiFreeTitle: 'Ei kuukausimaksua, ei kutsuhintaa',
     apiFreeText:
@@ -1494,7 +1494,7 @@ export const fi = {
    * painiketta, joten kertakäyttöinen linkki säilyy ihmiselle.
    */
   linkContinue: {
-    inviteTitle: 'Tervetuloa RAHTISiin',
+    inviteTitle: 'Tervetuloa RAHTIKSEEN',
     inviteText: 'Jatka painikkeesta, niin pääset asettamaan salasanan.',
     recoveryTitle: 'Salasanan palautus',
     recoveryText: 'Jatka painikkeesta, niin pääset asettamaan uuden salasanan.',
@@ -2772,7 +2772,7 @@ export const fi = {
   api: {
     title: 'Rajapinta (API)',
     subtitle:
-      'Liitä oma järjestelmäsi RAHTISiin: hae tilaukset, niiden tila, tapahtumat ja asiakirjat rajapinnan kautta. Avain toimii yrityksesi nimissä ja näkee samat tiedot kuin tämä näkymä.',
+      'Liitä oma järjestelmäsi RAHTIKSEEN: hae tilaukset, niiden tila, tapahtumat ja asiakirjat rajapinnan kautta. Avain toimii yrityksesi nimissä ja näkee samat tiedot kuin tämä näkymä.',
     name: 'Avaimen nimi',
     nameHint: 'Mihin järjestelmään avain annetaan, esim. ERP tai TMS.',
     nameRequired: 'Anna avaimelle nimi (enintään 60 merkkiä).',
@@ -2825,7 +2825,7 @@ export const fi = {
       create: 'Lisää webhook',
       createdTitle: 'Allekirjoitussalaisuus',
       createdHint:
-        'Tallenna salaisuus nyt: sillä tarkistat, että ilmoitus tuli RAHTISilta. Sitä ei näytetä uudelleen.',
+        'Tallenna salaisuus nyt: sillä tarkistat, että ilmoitus tuli RAHTIKSELTA. Sitä ei näytetä uudelleen.',
       chooseEvents: 'Valitse vähintään yksi tapahtuma.',
       badUrl: 'Osoitetta ei voi käyttää',
       tooMany: 'Yrityksellä on jo viisi webhookia.',
@@ -3205,7 +3205,7 @@ export const fi = {
     'event.group.released': 'Kukaan omista autoista ei ottanut kuljetusta {ref} — se on nyt yhteisellä pöydällä',
     'event.trip.late': 'Kuljetus {ref}: auto on myöhässä pisteestä {city} noin {minutes} min',
     'event.trip.waiting': 'Kuljetus {ref}: maksuton odotustunti pisteessä {city} päättyi{charged, select, yes { — odotuslisä {euros} € alkavalta tunnilta 15 minuutin kuluttua} other {}}',
-    'event.invite.carrier_approved': 'Kutsumasi kuljetusliike {carrier} on hyväksytty RAHTISiin.',
+    'event.invite.carrier_approved': 'Kutsumasi kuljetusliike {carrier} on hyväksytty RAHTIKSEEN.',
     'event.invite.approved': 'Kutsumanne asiakas {shipper} on hyväksytty. Se voi nyt lähettää suoria tilauksia autoillenne.',
     'event.link.offer': 'Ajoit ensimmäisen kuljetuksen tilaajalle {shipper}. Sallitaanko suorat tilaukset?',
     'drivers.count': '{count, plural, =0 {Ei kuljettajia} one {# kuljettaja} other {# kuljettajaa}}',

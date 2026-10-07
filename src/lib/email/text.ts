@@ -199,7 +199,7 @@ const fi: Texts = {
 
   shipperInvite: {
     subject: (carrier) => `${carrier} kutsuu teidät RAHTIS-palveluun`,
-    heading: (carrier) => `${carrier} kutsuu teidät RAHTISiin`,
+    heading: (carrier) => `${carrier} kutsuu teidät RAHTIKSEEN`,
     preheader: 'Tilatkaa kuljetukset suoraan tutulta kuljetusliikkeeltä yhdessä paikassa.',
     body: (carrier) =>
       `Kuljetusliikkeenne ${carrier} käyttää RAHTIS-palvelua ja kutsuu teidät tilaamaan kuljetukset sen kautta.`,
@@ -215,7 +215,7 @@ const fi: Texts = {
 
   carrierInvite: {
     subject: (carrier) => `${carrier} kutsuu kuljetusliikkeenne RAHTIS-palveluun`,
-    heading: (carrier) => `${carrier} kutsuu teidät RAHTISiin`,
+    heading: (carrier) => `${carrier} kutsuu teidät RAHTIKSEEN`,
     preheader: 'Keikkoja tarjouspöydältä ja oma työalusta kuljetusliikkeelle.',
     body: (carrier) => `${carrier} käyttää RAHTIS-palvelua ja kutsuu kuljetusliikkeenne mukaan.`,
     points: [
