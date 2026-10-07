@@ -3015,6 +3015,9 @@ export const en = {
    * directly.
    */
   msg: {
+    'legal.confirmNewer': 'Activate version {n} in place of version {current}? Companies accept the new terms at their next sign-in.',
+    'legal.confirmOlder': 'Version {n} is older than the current {current}. Restore it for all companies anyway?',
+    'legal.confirmFirst': 'Activate version {n}?',
     'overview.greeting': 'Hello, {name}',
     'overview.dateLine': '{date} · week {week}',
     'own.subscriptionContact': 'To switch to the subscription, write to {email}.',

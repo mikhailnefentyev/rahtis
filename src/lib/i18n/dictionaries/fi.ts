@@ -3135,6 +3135,9 @@ export const fi = {
    * «3 / 5» eikä «3 viidestä».
    */
   msg: {
+    'legal.confirmNewer': 'Otetaanko versio {n} käyttöön version {current} tilalle? Yritykset hyväksyvät uudet ehdot seuraavalla kirjautumisella.',
+    'legal.confirmOlder': 'Versio {n} on vanhempi kuin voimassa oleva {current}. Palautetaanko se silti käyttöön kaikille yrityksille?',
+    'legal.confirmFirst': 'Otetaanko versio {n} käyttöön?',
     'overview.greeting': 'Hei, {name}',
     'overview.dateLine': '{date} · viikko {week}',
     'own.subscriptionContact': 'Tilauksen saa käyttöön kirjoittamalla osoitteeseen {email}.',

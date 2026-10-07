@@ -17,7 +17,8 @@ import {
 import type { StatusTone } from '@/components/ui/tone';
 import { requireRole } from '@/lib/auth/guard';
 import { getI18n, isLocale } from '@/lib/i18n';
-import { activateLegalVersionAction, newLegalVersionAction } from '@/lib/legal/actions';
+import { newLegalVersionAction } from '@/lib/legal/actions';
+import { ActivateVersion } from './ActivateVersion';
 import { createClient } from '@/lib/supabase/server';
 import type { Database } from '@/types/database';
 
@@ -142,13 +143,12 @@ export default async function LegalAdminPage({
                         </span>
 
                         {doc.status !== 'ACTIVE' && (
-                          <form action={activateLegalVersionAction} className="ml-auto">
-                            <input type="hidden" name="locale" value={locale} />
-                            <input type="hidden" name="document_id" value={doc.id} />
-                            <Button type="submit" size="sm" variant="primary" formNoValidate>
-                              {t.legal.activate}
-                            </Button>
-                          </form>
+                          <ActivateVersion
+                            locale={locale}
+                            documentId={doc.id}
+                            version={doc.version}
+                            activeVersion={versions.find((v) => v.status === 'ACTIVE')?.version ?? null}
+                          />
                         )}
                       </li>
                     ))}
