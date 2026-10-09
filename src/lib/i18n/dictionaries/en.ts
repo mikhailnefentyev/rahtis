@@ -620,6 +620,7 @@ export const en = {
     applyShipper: 'Forwarder application',
     applyCarrier: 'Carrier application',
     footerCountry: 'Finland',
+    footerTrademark: 'RAHTIS® is a registered trademark of Aivomaa Oy in Finland.',
   },
 
   done: {

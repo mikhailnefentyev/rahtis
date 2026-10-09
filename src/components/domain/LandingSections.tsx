@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { Registered } from '@/components/layout/Registered';
 import Link from 'next/link';
 import { buttonClass, Card, CardBody, Mono } from '@/components/ui';
 import { signInPath } from '@/lib/auth/paths';
@@ -714,7 +715,9 @@ Rahtis-Event: order.stop_arrived`}</code>
         <div className="mx-auto grid w-full max-w-6xl gap-10 px-5 pt-14 pb-10 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr]">
           <div className="max-w-[34ch]">
             {/* Та же марка, что в шапке: подвал и шапка — одна витрина. */}
-            <Image src="/logo-header.png" alt={t.brand.name} width={954} height={240} className="h-[22px] w-auto" />
+            <Registered className="text-ink">
+              <Image src="/logo-header.png" alt={t.brand.name} width={954} height={240} className="h-[22px] w-auto" />
+            </Registered>
             <p className="mt-3 text-[14px] leading-relaxed text-ink-muted">{l.footerTagline}</p>
             <address className="mt-5 text-[13px] leading-relaxed text-ink-faint not-italic">
               <span className="font-semibold text-ink-muted">{t.brand.legalEntity}</span>
@@ -783,6 +786,8 @@ Rahtis-Event: order.stop_arrived`}</code>
           <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-5 text-[12px] text-ink-faint">
             <span>
               © {new Date().getFullYear()} {t.brand.legalEntity} · {l.footerCountry}
+              <br />
+              {l.footerTrademark}
             </span>
             <span className="flex gap-3" aria-label="Language">
               <Link href="/fi" className={locale === 'fi' ? 'font-semibold text-ink' : 'hover:text-ink'} hrefLang="fi">

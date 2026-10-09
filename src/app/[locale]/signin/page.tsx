@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
+import { Registered } from '@/components/layout/Registered';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Card, CardBody } from '@/components/ui';
@@ -50,14 +51,16 @@ export default async function SignInPage({
 
       <div className="w-full max-w-sm">
         <div className="mb-6 text-center">
-          <Image
-            src="/logo.png"
-            alt={t.brand.name}
-            width={1117}
-            height={281}
-            priority
-            className="mx-auto h-8 w-auto"
-          />
+          <Registered>
+            <Image
+              src="/logo.png"
+              alt={t.brand.name}
+              width={1117}
+              height={281}
+              priority
+              className="h-8 w-auto"
+            />
+          </Registered>
           <p className="label-micro mt-2">{t.brand.tagline}</p>
         </div>
 

@@ -385,8 +385,33 @@
 .site-head[data-solid] .site-head__logo--dark { opacity: 1; }
 
 @media (prefers-reduced-motion: reduce) {
-  .site-head__logo { transition: none; }
+  .site-head__logo,
+  .site-head__reg { transition: none; }
 }
+
+/*
+ * Знак ® у марки RAHTIS (словесный знак, PRH). Мелкий верхний индекс:
+ * обозначение, а не часть марки, поэтому не крупнее строчной буквы.
+ */
+.trademark {
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1;
+}
+.brand-reg {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 2px;
+}
+/* В шапке — вторая клетка сетки, цвет меняется тем же шагом, что и марка. */
+.site-head__reg {
+  grid-area: 1 / 2;
+  align-self: start;
+  margin-left: 2px;
+  color: #fff;
+  transition: color 260ms ease;
+}
+.site-head[data-solid] .site-head__reg { color: var(--color-ink); }
 
 /*
  * Разделы прячутся на узком экране. Бургер здесь был бы лишним: под
@@ -1509,7 +1534,7 @@
   gap: 10px;
   padding: 4px 10px 2px;
 }
-.cab-brand span {
+.cab-brand__role {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;

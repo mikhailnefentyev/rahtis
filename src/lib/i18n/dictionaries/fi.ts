@@ -688,6 +688,8 @@ export const fi = {
     applyShipper: 'Huolitsijan hakemus',
     applyCarrier: 'Kuljetusliikkeen hakemus',
     footerCountry: 'Suomi',
+    /* Rekisteröinti on kansallinen: ® pätee vain Suomessa, siksi maa sanotaan ääneen. */
+    footerTrademark: 'RAHTIS® on Aivomaa Oy:n rekisteröity tavaramerkki Suomessa.',
   },
 
   done: {

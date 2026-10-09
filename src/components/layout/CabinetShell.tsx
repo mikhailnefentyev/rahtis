@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { Registered } from '@/components/layout/Registered';
 import Link from 'next/link';
 import { LegalReaccept } from '@/components/layout/LegalReaccept';
 import { LocaleSwitch } from '@/components/layout/LocaleSwitch';
@@ -56,8 +57,10 @@ export async function CabinetShell({
     <div className="cab-shell">
       <aside className="cab-side" aria-label={t.nav.menu}>
         <Link href={home} className="cab-brand">
-          <Image src="/logo-header-light.png" alt={t.brand.name} width={954} height={240} priority className="h-5 w-auto" />
-          <span>{t.role[role]}</span>
+          <Registered>
+            <Image src="/logo-header-light.png" alt={t.brand.name} width={954} height={240} priority className="h-5 w-auto" />
+          </Registered>
+          <span className="cab-brand__role">{t.role[role]}</span>
         </Link>
 
         <SideNav groups={groups} home={home} />
@@ -79,7 +82,9 @@ export async function CabinetShell({
         <div className="cab-top">
           {/* На телефоне панели нет — марка в строке сверху. */}
           <Link href={home} className="cab-top__brand">
-            <Image src="/logo-header.png" alt={t.brand.name} width={954} height={240} className="h-5 w-auto" />
+            <Registered>
+              <Image src="/logo-header.png" alt={t.brand.name} width={954} height={240} className="h-5 w-auto" />
+            </Registered>
           </Link>
 
           {role !== 'ADMIN' && <LegalReaccept locale={locale} companyStatus={company?.status} compact />}

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
+import { Registered } from '@/components/layout/Registered';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { LocaleSwitch } from '@/components/layout/LocaleSwitch';
@@ -48,14 +49,16 @@ export default async function ForgotPage({ params }: { params: Promise<{ locale:
       <div className="w-full max-w-sm">
         <div className="mb-6 text-center">
           <Link href={`/${locale}`} className="inline-block">
-            <Image
-              src="/logo.png"
-              alt={t.brand.name}
-              width={1117}
-              height={281}
-              priority
-              className="mx-auto h-8 w-auto"
-            />
+            <Registered>
+              <Image
+                src="/logo.png"
+                alt={t.brand.name}
+                width={1117}
+                height={281}
+                priority
+                className="h-8 w-auto"
+              />
+            </Registered>
           </Link>
           <p className="label-micro mt-2">{t.brand.tagline}</p>
         </div>
