@@ -786,8 +786,6 @@ Rahtis-Event: order.stop_arrived`}</code>
           <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-5 text-[12px] text-ink-faint">
             <span>
               © {new Date().getFullYear()} {t.brand.legalEntity} · {l.footerCountry}
-              <br />
-              {l.footerTrademark}
             </span>
             <span className="flex gap-3" aria-label="Language">
               <Link href="/fi" className={locale === 'fi' ? 'font-semibold text-ink' : 'hover:text-ink'} hrefLang="fi">

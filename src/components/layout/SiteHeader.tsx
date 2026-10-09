@@ -151,7 +151,7 @@ export function SiteHeader() {
             height={240}
             className="site-head__logo site-head__logo--dark"
           />
-          {/* Словесный знак зарегистрирован в PRH; объяснение — сноска в подвале. */}
+          {/* Словесный знак RAHTIS зарегистрирован в PRH. */}
           <span className="trademark site-head__reg" aria-hidden="true">®</span>
         </Link>
 
