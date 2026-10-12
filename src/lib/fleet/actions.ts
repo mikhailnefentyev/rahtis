@@ -1,6 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { requireRole } from '@/lib/auth/guard';
 import { getViewer } from '@/lib/auth/viewer';
 import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
@@ -22,12 +23,14 @@ const text = (form: FormData, key: string): string | null => {
   return value.length > 0 ? value : null;
 };
 
-async function requireCarrier() {
-  const viewer = await getViewer();
-  if (viewer.status !== 'ready' || viewer.role !== 'CARRIER' || !viewer.company) {
-    throw new Error('forbidden');
-  }
-  return viewer;
+/*
+ * Не исключение, а увод — как на страницах кабинета. Сессия в открытой
+ * вкладке может смениться: истекла, вошли под другой ролью, в этом же
+ * браузере открыли приглашение водителя. Исключение здесь показывало
+ * перевозчику «страница не загрузилась» (сбой 2.10.2026).
+ */
+async function requireCarrier(locale: Locale) {
+  return requireRole(locale, 'CARRIER');
 }
 
 /* ── Документы компании ─────────────────────────────────────────── */
@@ -51,7 +54,7 @@ export async function uploadDocumentAction(
   const locale = toLocale(formData.get('locale'));
   const t = await getDictionary(locale);
 
-  const viewer = await requireCarrier();
+  const viewer = await requireCarrier(locale);
   const company = viewer.company!;
 
   const kind = String(formData.get('kind') ?? '') as DocumentKind;
@@ -214,7 +217,7 @@ export async function saveVehicleAction(
   const locale = toLocale(formData.get('locale'));
   const t = await getDictionary(locale);
 
-  const viewer = await requireCarrier();
+  const viewer = await requireCarrier(locale);
   const company = viewer.company!;
 
   const values = readVehicleForm(formData);
@@ -274,7 +277,7 @@ export async function saveVehicleAction(
 
 export async function submitVehicleAction(formData: FormData): Promise<void> {
   const locale = toLocale(formData.get('locale'));
-  await requireCarrier();
+  await requireCarrier(locale);
 
   const supabase = await createClient();
   await supabase.rpc('submit_vehicle', { p_vehicle_id: String(formData.get('id') ?? '') });
@@ -284,7 +287,7 @@ export async function submitVehicleAction(formData: FormData): Promise<void> {
 
 export async function deleteDraftVehicleAction(formData: FormData): Promise<void> {
   const locale = toLocale(formData.get('locale'));
-  await requireCarrier();
+  await requireCarrier(locale);
 
   const supabase = await createClient();
   /* Политика пропустит удаление только черновика — проверка не дублируется. */

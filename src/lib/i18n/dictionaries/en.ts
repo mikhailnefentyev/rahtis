@@ -127,6 +127,10 @@ export const en = {
     applyLink: 'Send an application',
 
     noAccessTitle: 'Your account is not available',
+    driverSessionTitle: 'You are signed in as a driver',
+    driverSessionText:
+      'The driver app has been opened in this browser, so the carrier cabinet is not available here. Sign out, then sign in to the cabinet with your own email and password. The driver app is best opened on the driver’s own phone.',
+    driverSessionOpenApp: 'Open the driver app',
     noProfileText:
       'The account exists but is not linked to a company. Contact RAHTIS support and we will open access.',
     frozenTitle: 'Access is frozen',
@@ -1849,6 +1853,8 @@ export const en = {
     manage: 'Drivers',
     invite: 'Invite to the app',
     inviteAgain: 'New invite link',
+    inviteSameBrowser: 'You are signed in to the carrier cabinet in this browser. The invite is meant for the driver’s phone: open the link there. If you continue here, the cabinet is signed out in this browser and replaced by the driver app.',
+    inviteSameBrowserButton: 'Continue as the driver anyway',
     inviteLink: 'The invite is valid for 24 hours and works once: the driver opens the link or enters the code in the app. A new invite signs the old phone out.',
     inviteCode: 'Code',
     copy: 'Copy',

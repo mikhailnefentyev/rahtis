@@ -1,5 +1,6 @@
+import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
-import { Button, Card, CardBody } from '@/components/ui';
+import { Button, buttonClass, Card, CardBody } from '@/components/ui';
 import { signOutAction } from '@/lib/auth/actions';
 import { cabinetPath, signInPath } from '@/lib/auth/paths';
 import { getViewer } from '@/lib/auth/viewer';
@@ -31,6 +32,15 @@ export default async function NoAccessPage({ params }: { params: Promise<{ local
     redirect(cabinetPath(locale, viewer.role));
   }
 
+  /*
+   * Третий случай, найден 2.10.2026: в браузере с кабинетом открыли
+   * приглашение водителя. Профиля у водителя нет, и «учётная запись не
+   * привязана к компании» рядом со служебным адресом владельцу ничего не
+   * объясняла. Водитель узнаётся по служебному домену почты — его выдаёт
+   * только signInDriver.
+   */
+  const driver = viewer.status === 'orphan' && Boolean(viewer.email?.endsWith('@driver.rahtis.eu'));
+
   const { t } = await getI18n(locale);
 
   return (
@@ -42,7 +52,7 @@ export default async function NoAccessPage({ params }: { params: Promise<{ local
       <Card className="w-full max-w-md" stripe={rejected ? 'danger' : 'warn'}>
         <CardBody className="p-6">
           <h1 className="text-[15px] font-semibold tracking-tight">
-            {frozen ? t.auth.frozenTitle : t.auth.noAccessTitle}
+            {frozen ? t.auth.frozenTitle : driver ? t.auth.driverSessionTitle : t.auth.noAccessTitle}
           </h1>
           {/*
             * Три разные причины — три разных текста. «Нет доступа» без
@@ -53,10 +63,12 @@ export default async function NoAccessPage({ params }: { params: Promise<{ local
               ? t.auth.frozenText
               : rejected
                 ? t.auth.rejectedText
-                : t.auth.noProfileText}
+                : driver
+                  ? t.auth.driverSessionText
+                  : t.auth.noProfileText}
           </p>
 
-          <p className="mt-4 font-mono text-xs text-ink-dim">{viewer.email}</p>
+          {!driver && <p className="mt-4 font-mono text-xs text-ink-dim">{viewer.email}</p>}
 
           <form action={signOutAction} className="mt-5">
             <input type="hidden" name="locale" value={locale} />
@@ -64,6 +76,15 @@ export default async function NoAccessPage({ params }: { params: Promise<{ local
               {t.auth.signOut}
             </Button>
           </form>
+
+          {driver && (
+            <Link
+              href={`/${locale}/driver`}
+              className={`${buttonClass({ variant: 'ghost', size: 'md' })} mt-2 w-full`}
+            >
+              {t.auth.driverSessionOpenApp}
+            </Link>
+          )}
         </CardBody>
       </Card>
     </main>

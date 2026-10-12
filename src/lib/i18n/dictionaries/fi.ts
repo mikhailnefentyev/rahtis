@@ -134,6 +134,10 @@ export const fi = {
     applyLink: 'Lähetä hakemus',
 
     noAccessTitle: 'Omat sivut eivät ole käytettävissä',
+    driverSessionTitle: 'Olet kirjautunut kuljettajana',
+    driverSessionText:
+      'Tässä selaimessa on avattu kuljettajan sovellus, joten kuljetusliikkeen hallinta ei ole käytössä. Kirjaudu ulos ja kirjaudu sitten hallintaan omalla sähköpostillasi ja salasanallasi. Kuljettajan sovellus kannattaa avata kuljettajan omassa puhelimessa.',
+    driverSessionOpenApp: 'Avaa kuljettajan sovellus',
     noProfileText:
       'Tunnus on olemassa, mutta sitä ei ole liitetty yritykseen. Ota yhteyttä RAHTIS-tukeen, niin avaamme pääsyn.',
     frozenTitle: 'Tunnukset on jäädytetty',
@@ -1962,6 +1966,8 @@ export const fi = {
     manage: 'Kuljettajat',
     invite: 'Kutsu sovellukseen',
     inviteAgain: 'Uusi kutsulinkki',
+    inviteSameBrowser: 'Olet kirjautunut tällä selaimella kuljetusliikkeen hallintaan. Kutsu on tarkoitettu kuljettajan puhelimeen: avaa linkki siellä. Jos jatkat tässä, hallinta kirjautuu ulos tästä selaimesta ja tilalle tulee kuljettajan sovellus.',
+    inviteSameBrowserButton: 'Jatka silti kuljettajana',
     inviteLink: 'Kutsu on voimassa vuorokauden ja toimii kerran: kuljettaja avaa linkin tai syöttää koodin sovellukseen. Uusi kutsu kirjaa vanhan puhelimen ulos.',
     inviteCode: 'Koodi',
     copy: 'Kopioi',

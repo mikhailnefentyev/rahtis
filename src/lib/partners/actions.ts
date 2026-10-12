@@ -7,6 +7,7 @@ import { operatorInbox, sendEmail } from '@/lib/email';
 import { shipperInviteEmail } from '@/lib/email/templates/shipperInvite';
 import { isValidBusinessId } from '@/lib/format';
 import { getDictionary } from '@/lib/i18n';
+import { requireRole } from '@/lib/auth/guard';
 import { getViewer } from '@/lib/auth/viewer';
 import { isLocale, type Locale, defaultLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
@@ -28,8 +29,7 @@ function toLocale(value: FormDataEntryValue | null): Locale {
 export async function setShipperLinkAction(formData: FormData): Promise<void> {
   const locale = toLocale(formData.get('locale'));
 
-  const viewer = await getViewer();
-  if (viewer.status !== 'ready' || viewer.role !== 'CARRIER') throw new Error('forbidden');
+  await requireRole(locale, 'CARRIER');
 
   const supabase = await createClient();
   await supabase.rpc('set_shipper_link', {
@@ -44,8 +44,7 @@ export async function setShipperLinkAction(formData: FormData): Promise<void> {
 export async function poolVehicleAction(formData: FormData): Promise<void> {
   const locale = toLocale(formData.get('locale'));
 
-  const viewer = await getViewer();
-  if (viewer.status !== 'ready' || viewer.role !== 'SHIPPER') throw new Error('forbidden');
+  await requireRole(locale, 'SHIPPER');
 
   const supabase = await createClient();
   const vehicleId = String(formData.get('vehicle_id') ?? '');

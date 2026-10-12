@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { getViewer } from '@/lib/auth/viewer';
+import { requireRole } from '@/lib/auth/guard';
 import { operationsLocalToIso } from '@/lib/dates';
 import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
 import { siteUrl } from '@/lib/config';
@@ -51,12 +51,14 @@ function int(form: FormData, key: string): number | null {
   return Number.isFinite(value) && value >= 0 ? value : null;
 }
 
-async function requireCarrier() {
-  const viewer = await getViewer();
-  if (viewer.status !== 'ready' || viewer.role !== 'CARRIER' || !viewer.company) {
-    throw new Error('forbidden');
-  }
-  return viewer;
+/*
+ * Не исключение, а увод — как на страницах кабинета. Сессия в открытой
+ * вкладке может смениться: истекла, вошли под другой ролью, в этом же
+ * браузере открыли приглашение водителя. Исключение здесь показывало
+ * перевозчику «страница не загрузилась» (сбой 2.10.2026).
+ */
+async function requireCarrier(locale: Locale) {
+  return requireRole(locale, 'CARRIER');
 }
 
 function revalidateDrivers(locale: Locale, driverId?: string) {
@@ -70,7 +72,7 @@ function revalidateDrivers(locale: Locale, driverId?: string) {
 export async function saveDriverAction(_previous: FormState, formData: FormData): Promise<FormState> {
   const locale = toLocale(formData.get('locale'));
   const t = await getDictionary(locale);
-  const viewer = await requireCarrier();
+  const viewer = await requireCarrier(locale);
 
   const values = {
     full_name: str(formData, 'full_name'),
@@ -108,7 +110,7 @@ export async function saveDriverAction(_previous: FormState, formData: FormData)
 /** Посадить водителя на машину или снять (пустой водитель). */
 export async function assignDriverAction(formData: FormData): Promise<void> {
   const locale = toLocale(formData.get('locale'));
-  await requireCarrier();
+  await requireCarrier(locale);
 
   const supabase = await createClient();
   await supabase.rpc('assign_vehicle_driver', {
@@ -122,13 +124,29 @@ export async function assignDriverAction(formData: FormData): Promise<void> {
 
 export async function archiveDriverAction(formData: FormData): Promise<void> {
   const locale = toLocale(formData.get('locale'));
-  await requireCarrier();
+  await requireCarrier(locale);
 
   const supabase = await createClient();
   const id = str(formData, 'id');
-  await supabase.rpc(formData.get('restore') ? 'restore_driver' : 'archive_driver', {
+  const restore = Boolean(formData.get('restore'));
+
+  /*
+   * Архив отвязывает вход в базе, но пользователь приложения при этом
+   * оставался: сессия на телефоне уволенного водителя жила дальше. Удаляем
+   * его так же, как при «отвязать телефон». Строку читаем под сессией
+   * перевозчика — чужого водителя RLS не отдаст.
+   */
+  const { data: before } = restore
+    ? { data: null }
+    : await supabase.from('drivers').select('auth_user_id').eq('id', id).maybeSingle();
+
+  const { error } = await supabase.rpc(restore ? 'restore_driver' : 'archive_driver', {
     p_driver_id: id,
   });
+
+  if (!error && before?.auth_user_id) {
+    await createAdminClient().auth.admin.deleteUser(before.auth_user_id);
+  }
 
   revalidateDrivers(locale, id);
 }
@@ -143,7 +161,7 @@ export async function savePayProfileAction(
 ): Promise<FormState> {
   const locale = toLocale(formData.get('locale'));
   const t = await getDictionary(locale);
-  await requireCarrier();
+  await requireCarrier(locale);
 
   const model = str(formData, 'model') as PayModel;
   const driverId = str(formData, 'driver_id');
@@ -194,7 +212,7 @@ export async function savePayProfileAction(
 
 export async function deletePayProfileAction(formData: FormData): Promise<void> {
   const locale = toLocale(formData.get('locale'));
-  await requireCarrier();
+  await requireCarrier(locale);
 
   const supabase = await createClient();
   await supabase.from('driver_pay_profiles').delete().eq('id', str(formData, 'id'));
@@ -215,7 +233,7 @@ export async function deletePayProfileAction(formData: FormData): Promise<void> 
 export async function saveShiftAction(_previous: FormState, formData: FormData): Promise<FormState> {
   const locale = toLocale(formData.get('locale'));
   const t = await getDictionary(locale);
-  const viewer = await requireCarrier();
+  const viewer = await requireCarrier(locale);
 
   const driverId = str(formData, 'driver_id');
   const startedAt = operationsLocalToIso(str(formData, 'started_at'));
@@ -285,7 +303,7 @@ function explainShift(
 
 export async function deleteShiftAction(formData: FormData): Promise<void> {
   const locale = toLocale(formData.get('locale'));
-  await requireCarrier();
+  await requireCarrier(locale);
 
   const supabase = await createClient();
   await supabase.from('driver_shifts').delete().eq('id', str(formData, 'id'));
@@ -302,7 +320,7 @@ const time = (form: FormData, key: string): string | null =>
 export async function saveTesAction(_previous: FormState, formData: FormData): Promise<FormState> {
   const locale = toLocale(formData.get('locale'));
   const t = await getDictionary(locale);
-  const viewer = await requireCarrier();
+  const viewer = await requireCarrier(locale);
 
   const hours = (key: string) => {
     const raw = str(formData, key).replace(',', '.');
@@ -367,7 +385,7 @@ export async function saveTesAction(_previous: FormState, formData: FormData): P
 export async function deleteTesAction(_previous: FormState, formData: FormData): Promise<FormState> {
   const locale = toLocale(formData.get('locale'));
   const t = await getDictionary(locale);
-  await requireCarrier();
+  await requireCarrier(locale);
 
   const supabase = await createClient();
   const { error } = await supabase.from('tes_rule_sets').delete().eq('id', str(formData, 'id'));
@@ -381,7 +399,7 @@ export async function deleteTesAction(_previous: FormState, formData: FormData):
 
 export async function copyTesTemplateAction(formData: FormData): Promise<void> {
   const locale = toLocale(formData.get('locale'));
-  await requireCarrier();
+  await requireCarrier(locale);
 
   const supabase = await createClient();
   await supabase.rpc('copy_tes_template', { p_template_id: str(formData, 'id') });
@@ -406,7 +424,7 @@ export async function createInviteAction(
 ): Promise<InviteState> {
   const locale = toLocale(formData.get('locale'));
   const t = await getDictionary(locale);
-  await requireCarrier();
+  await requireCarrier(locale);
 
   const supabase = await createClient();
   const { data, error } = await supabase.rpc('create_driver_invite', {
@@ -429,7 +447,7 @@ export async function createInviteAction(
  */
 export async function detachLoginAction(formData: FormData): Promise<void> {
   const locale = toLocale(formData.get('locale'));
-  await requireCarrier();
+  await requireCarrier(locale);
 
   const supabase = await createClient();
   const id = str(formData, 'driver_id');
