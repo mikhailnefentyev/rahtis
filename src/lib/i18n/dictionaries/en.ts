@@ -1158,6 +1158,27 @@ export const en = {
     open: 'Open',
   },
 
+  incidents: {
+    title: 'Incident log',
+    subtitle:
+      'Technical errors of the service, grouped. The log holds no personal data. If the same error happens again, a closed entry reopens.',
+    degraded:
+      'An open FATAL entry keeps the service health check (/api/health) at “degraded” until the entry is closed.',
+    empty: 'No open incidents',
+    emptyHint: 'New errors appear here automatically.',
+    open: 'Open incidents',
+    resolved: 'Recently closed',
+    lastSeen: 'Last seen',
+    firstSeen: 'First seen',
+    resolvedAt: 'Closed',
+    severity: 'Level',
+    what: 'Error',
+    where: 'Source and page',
+    count: 'Times',
+    note: 'Note',
+    notePlaceholder: 'Cause or fix (optional)',
+    resolve: 'Close entry',
+  },
   outbox: {
     title: 'Outgoing messages',
     subtitle: 'Every email the platform produces. Messages that never went out are logged too.',

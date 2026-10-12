@@ -211,6 +211,7 @@ function navigation(
         items: [
           { href: `/${locale}/admin/reports`, label: t.periodReport.title, icon: 'reports' },
           { href: `/${locale}/admin/outbox`, label: t.outbox.title, icon: 'outbox' },
+          { href: `/${locale}/admin/incidents`, label: t.incidents.title, icon: 'incidents' },
           { href: `/${locale}/admin/operator`, label: t.operator.tab, icon: 'operator' },
         ],
       },

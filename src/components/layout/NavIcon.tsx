@@ -21,6 +21,7 @@ export type NavIconName =
   | 'training'
   | 'operator'
   | 'outbox'
+  | 'incidents'
   | 'menu'
   | 'bell'
   | 'user'
@@ -121,6 +122,12 @@ const PATHS: Record<NavIconName, React.ReactNode> = {
     <>
       <circle cx="12" cy="12" r="3" />
       <path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.3.9a7 7 0 0 0-2-1.2L14.2 3h-4.4l-.4 2.6a7 7 0 0 0-2 1.2l-2.3-.9-2 3.4 2 1.5a7 7 0 0 0 0 2.4l-2 1.5 2 3.4 2.3-.9a7 7 0 0 0 2 1.2l.4 2.6h4.4l.4-2.6a7 7 0 0 0 2-1.2l2.3.9 2-3.4-2-1.5c.1-.4.1-.8.1-1.2z" />
+    </>
+  ),
+  incidents: (
+    <>
+      <path d="M12 4 3 20h18L12 4Z" />
+      <path d="M12 10v5M12 17.5v.5" />
     </>
   ),
   outbox: (

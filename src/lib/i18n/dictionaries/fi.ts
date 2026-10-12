@@ -1245,6 +1245,27 @@ export const fi = {
     open: 'Avaa',
   },
 
+  incidents: {
+    title: 'Häiriöloki',
+    subtitle:
+      'Palvelun tekniset virheet ryhmiteltyinä. Lokissa ei ole henkilötietoja. Jos sama virhe toistuu, suljettu merkintä avautuu uudelleen.',
+    degraded:
+      'Avoin FATAL-tason merkintä pitää palvelun tilatarkistuksen (/api/health) tilassa ”degraded”, kunnes merkintä suljetaan.',
+    empty: 'Ei avoimia häiriöitä',
+    emptyHint: 'Uudet virheet ilmestyvät tähän automaattisesti.',
+    open: 'Avoimet häiriöt',
+    resolved: 'Viimeksi suljetut',
+    lastSeen: 'Viimeksi',
+    firstSeen: 'Ensimmäisen kerran',
+    resolvedAt: 'Suljettu',
+    severity: 'Taso',
+    what: 'Virhe',
+    where: 'Lähde ja sivu',
+    count: 'Kertoja',
+    note: 'Huomautus',
+    notePlaceholder: 'Syy tai korjaus (valinnainen)',
+    resolve: 'Sulje merkintä',
+  },
   outbox: {
     title: 'Lähtevät viestit',
     subtitle: 'Kaikki palvelun sähköpostit. Lokiin kirjataan myös lähettämättä jääneet.',
