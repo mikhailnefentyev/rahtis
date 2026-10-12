@@ -5,6 +5,7 @@ import { Button, Card, CardBody, Field, Input, InputMono, Mono } from '@/compone
 import { deleteClientAction, saveClientAction, type ClientState } from '@/lib/orders/ownClients';
 import { useI18n } from '@/lib/i18n/provider';
 import type { CarrierClient } from '@/types/db';
+import { useKeepOnError } from '@/lib/forms/keepOnError';
 
 /**
  * Справочник клиентов перевозчика.
@@ -53,6 +54,7 @@ export function OwnClients({ clients }: { clients: CarrierClient[] }) {
 function ClientRow({ client, onEdit }: { client: CarrierClient; onEdit: () => void }) {
   const { t, locale } = useI18n();
   const [state, deleteAction, pending] = useActionState(deleteClientAction, initial);
+  const keepDeleteAction = useKeepOnError(state);
   const [asking, setAsking] = useState(false);
 
   return (
@@ -76,7 +78,7 @@ function ClientRow({ client, onEdit }: { client: CarrierClient; onEdit: () => vo
           </Button>
           {client.orders === 0 &&
             (asking ? (
-              <form action={deleteAction} className="flex items-center gap-2">
+              <form {...keepDeleteAction} action={deleteAction} className="flex items-center gap-2">
                 <input type="hidden" name="locale" value={locale} />
                 <input type="hidden" name="client_id" value={client.id} />
                 <span className="text-xs text-ink-muted">{t.own.clientDeleteConfirm}</span>
@@ -101,6 +103,7 @@ function ClientRow({ client, onEdit }: { client: CarrierClient; onEdit: () => vo
 function ClientForm({ client, onClose }: { client: CarrierClient; onClose: () => void }) {
   const { t, locale } = useI18n();
   const [state, saveAction, pending] = useActionState(saveClientAction, initial);
+  const keepSaveAction = useKeepOnError(state);
   const optional = ` (${t.own.optional})`;
 
   useEffect(() => {
@@ -110,7 +113,7 @@ function ClientForm({ client, onClose }: { client: CarrierClient; onClose: () =>
   return (
     <Card stripe="info">
       <CardBody>
-        <form action={saveAction} className="grid gap-3 sm:grid-cols-3">
+        <form {...keepSaveAction} action={saveAction} className="grid gap-3 sm:grid-cols-3">
           <input type="hidden" name="locale" value={locale} />
           <input type="hidden" name="client_id" value={client.id} />
 

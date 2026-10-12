@@ -4,15 +4,17 @@ import { useActionState } from 'react';
 import { Button, Field, Input } from '@/components/ui';
 import { signInAction, type SignInState } from '@/lib/auth/actions';
 import { useI18n } from '@/lib/i18n/provider';
+import { useKeepOnError } from '@/lib/forms/keepOnError';
 
 const initial: SignInState = { error: null };
 
 export function SignInForm({ next }: { next: string | null }) {
   const { t, locale } = useI18n();
   const [state, formAction, pending] = useActionState(signInAction, initial);
+  const keepFormAction = useKeepOnError(state);
 
   return (
-    <form action={formAction} className="flex flex-col gap-4">
+    <form {...keepFormAction} action={formAction} className="flex flex-col gap-4">
       <input type="hidden" name="locale" value={locale} />
       {next && <input type="hidden" name="next" value={next} />}
 

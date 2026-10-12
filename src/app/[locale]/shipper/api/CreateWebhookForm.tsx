@@ -6,6 +6,7 @@ import { createWebhookAction, type CreateWebhookState } from '@/lib/api/actions'
 import { WEBHOOK_EVENTS } from '@/lib/api/events';
 import type { Locale } from '@/lib/i18n';
 import { useI18n } from '@/lib/i18n/provider';
+import { useKeepOnError } from '@/lib/forms/keepOnError';
 
 const INITIAL: CreateWebhookState = { error: null, secret: null, url: null };
 
@@ -15,11 +16,12 @@ const EVENTS = WEBHOOK_EVENTS;
 export function CreateWebhookForm({ locale }: { locale: Locale }) {
   const { t } = useI18n();
   const [state, action, pending] = useActionState(createWebhookAction, INITIAL);
+  const keepAction = useKeepOnError(state);
   const [copied, setCopied] = useState(false);
 
   return (
     <div className="flex flex-col gap-4">
-      <form action={action} className="flex flex-col gap-3">
+      <form {...keepAction} action={action} className="flex flex-col gap-3">
         <input type="hidden" name="locale" value={locale} />
         <Field label={t.api.hooks.url} hint={t.api.hooks.urlHint}>
           {(props) => (

@@ -17,6 +17,7 @@ import { deleteShiftAction, saveShiftAction, type FormState } from '@/lib/driver
 import { isoToOperationsLocal } from '@/lib/dates';
 import { useI18n } from '@/lib/i18n/provider';
 import type { DriverShift } from '@/types/db';
+import { useKeepOnError } from '@/lib/forms/keepOnError';
 
 type ShiftRow = DriverShift & {
   plate: string | null;
@@ -140,6 +141,7 @@ function ShiftForm({
 }) {
   const { t, locale } = useI18n();
   const [state, formAction, pending] = useActionState(saveShiftAction, initial);
+  const keepFormAction = useKeepOnError(state);
 
   useEffect(() => {
     if (state.done) onClose();
@@ -154,7 +156,7 @@ function ShiftForm({
         <h3 className="mb-4 text-[13px] font-semibold tracking-tight">
           {shift ? t.shifts.edit : t.shifts.add}
         </h3>
-        <form action={formAction} className="grid gap-4 sm:grid-cols-2">
+        <form {...keepFormAction} action={formAction} className="grid gap-4 sm:grid-cols-2">
           <input type="hidden" name="locale" value={locale} />
           <input type="hidden" name="driver_id" value={driverId} />
           {shift && <input type="hidden" name="id" value={shift.id} />}

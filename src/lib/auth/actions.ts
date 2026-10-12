@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 import { recordIncident } from '@/lib/incidents/record';
 import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
 import { cabinetPath, noAccessPath, safeRedirect, signInPath } from './paths';
+import { clientIp, throttleAllowed } from './throttle';
 import { getViewer } from './viewer';
 
 export type SignInState = { error: string | null };
@@ -32,6 +33,21 @@ export async function signInAction(
   if (!email || !password) {
     return { error: t.auth.fillBoth };
   }
+
+  /*
+   * Перебор пароля. Вход идёт с сервера, поэтому Supabase видит один и тот
+   * же адрес для всех посетителей: его собственный лимит по IP не отличает
+   * перебирающего от остальных — либо не срабатывает, либо закрывает вход
+   * всем сразу (прогон 12.10.2026: восемь неверных входов подряд без
+   * задержки). Считаем сами: по паре «адрес почты + адрес посетителя» —
+   * так чужой перебор не запирает владельца учётной записи, — и по
+   * адресу посетителя в целом.
+   */
+  const ip = await clientIp();
+  const allowed =
+    (await throttleAllowed(`signin:${email}:${ip}`, { limit: 8, seconds: 900 })) &&
+    (await throttleAllowed(`signin-ip:${ip}`, { limit: 40, seconds: 900 }));
+  if (!allowed) return { error: t.auth.tooManyAttempts };
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });

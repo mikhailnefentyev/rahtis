@@ -7,6 +7,7 @@ import { useI18n } from '@/lib/i18n/provider';
 import { Badge, type StatusTone } from '@/components/ui';
 import { Constants } from '@/types/database';
 import type { DriverCertificateType } from '@/types/db';
+import { useKeepOnError } from '@/lib/forms/keepOnError';
 
 export type CertificateRow = {
   id: string;
@@ -69,6 +70,7 @@ export function DriverCertificates({
     },
     { error: null, done: false },
   );
+  const keepAction = useKeepOnError(state);
 
   const relative = new Intl.RelativeTimeFormat(t.meta.intl, { numeric: 'auto' });
   const inWords = (days: number) =>
@@ -141,6 +143,7 @@ export function DriverCertificates({
         </button>
       ) : (
         <form
+          {...keepAction}
           action={action}
           className={cn('flex flex-col gap-2.5 rounded-control bg-raised/60', app ? 'p-3' : 'p-2.5')}
         >

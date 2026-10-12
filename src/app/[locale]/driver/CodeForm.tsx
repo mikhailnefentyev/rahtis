@@ -3,6 +3,7 @@
 import { useActionState } from 'react';
 import { acceptCodeAction, type CodeState } from '@/lib/driverApp/actions';
 import { useI18n } from '@/lib/i18n/provider';
+import { useKeepOnError } from '@/lib/forms/keepOnError';
 
 const idle: CodeState = { error: null };
 
@@ -13,9 +14,10 @@ const idle: CodeState = { error: null };
 export function CodeForm() {
   const { t, locale } = useI18n();
   const [state, action, pending] = useActionState(acceptCodeAction, idle);
+  const keepAction = useKeepOnError(state);
 
   return (
-    <form action={action} className="flex w-full flex-col gap-3 text-left">
+    <form {...keepAction} action={action} className="flex w-full flex-col gap-3 text-left">
       <input type="hidden" name="locale" value={locale} />
       <h2 className="text-center text-[17px] font-semibold">{t.driverApp.codeTitle}</h2>
 

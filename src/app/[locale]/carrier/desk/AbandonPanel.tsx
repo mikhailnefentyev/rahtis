@@ -4,6 +4,7 @@ import { useActionState, useState } from 'react';
 import { Button, Field, Input } from '@/components/ui';
 import { abandonOrderAction, type LifecycleState } from '@/lib/orders/lifecycle';
 import { useI18n } from '@/lib/i18n/provider';
+import { useKeepOnError } from '@/lib/forms/keepOnError';
 
 /**
  * Отказ от взятого рейса.
@@ -29,6 +30,7 @@ export function AbandonPanel({ orderId, className }: { orderId: string; classNam
   const { t, locale } = useI18n();
   const [open, setOpen] = useState(false);
   const [state, formAction, pending] = useActionState(abandonOrderAction, initial);
+  const keepFormAction = useKeepOnError(state);
 
   if (!open) {
     return (
@@ -41,7 +43,7 @@ export function AbandonPanel({ orderId, className }: { orderId: string; classNam
   }
 
   return (
-    <form action={formAction} className={className}>
+    <form {...keepFormAction} action={formAction} className={className}>
       <p className="mb-3 text-xs text-ink-muted">{t.lifecycle.abandonHint}</p>
 
       <input type="hidden" name="locale" value={locale} />

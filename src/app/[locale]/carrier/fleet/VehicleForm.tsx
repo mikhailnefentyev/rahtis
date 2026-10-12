@@ -7,6 +7,7 @@ import { Button, Card, CardBody, Field, Input, InputMono, Select } from '@/compo
 import { saveVehicleAction, type VehicleState } from '@/lib/fleet/actions';
 import { useI18n } from '@/lib/i18n/provider';
 import type { Driver, Vehicle, VehicleClass } from '@/types/db';
+import { useKeepOnError } from '@/lib/forms/keepOnError';
 
 const initial: VehicleState = { error: null, done: false };
 
@@ -43,6 +44,7 @@ export function VehicleForm({
 }) {
   const { t, m, locale } = useI18n();
   const [state, formAction, pending] = useActionState(saveVehicleAction, initial);
+  const keepFormAction = useKeepOnError(state);
 
   /*
    * Класс решает, какая половина карточки видна.
@@ -72,7 +74,7 @@ export function VehicleForm({
           {vehicle ? t.fleet.editVehicle : t.fleet.newVehicle}
         </h3>
 
-        <form action={formAction} className="grid gap-4 sm:grid-cols-2">
+        <form {...keepFormAction} action={formAction} className="grid gap-4 sm:grid-cols-2">
           <input type="hidden" name="locale" value={locale} />
           {vehicle && <input type="hidden" name="id" value={vehicle.id} />}
           <input type="hidden" name="current_driver_id" value={currentDriverId ?? ''} />

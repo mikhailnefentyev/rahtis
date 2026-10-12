@@ -5,6 +5,7 @@ import { Button, Field, Input, Mono, Select } from '@/components/ui';
 import { createApiKeyAction, type CreateKeyState } from '@/lib/api/actions';
 import type { Locale } from '@/lib/i18n';
 import { useI18n } from '@/lib/i18n/provider';
+import { useKeepOnError } from '@/lib/forms/keepOnError';
 
 const INITIAL: CreateKeyState = { error: null, key: null, name: null };
 
@@ -15,6 +16,7 @@ const INITIAL: CreateKeyState = { error: null, key: null, name: null };
 export function CreateKeyForm({ locale }: { locale: Locale }) {
   const { t } = useI18n();
   const [state, action, pending] = useActionState(createApiKeyAction, INITIAL);
+  const keepAction = useKeepOnError(state);
   const [copied, setCopied] = useState(false);
 
   async function copy(key: string) {
@@ -28,7 +30,7 @@ export function CreateKeyForm({ locale }: { locale: Locale }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <form action={action} className="flex flex-wrap items-end gap-3">
+      <form {...keepAction} action={action} className="flex flex-wrap items-end gap-3">
         <input type="hidden" name="locale" value={locale} />
         <Field label={t.api.name} hint={t.api.nameHint} className="min-w-56 flex-1">
           {(props) => <Input {...props} name="name" maxLength={60} required placeholder="ERP" />}

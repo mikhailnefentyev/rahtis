@@ -10,6 +10,7 @@ import {
 } from '@/lib/claims/actions';
 import { useI18n } from '@/lib/i18n/provider';
 import type { ClaimKind, ClaimStatus, OrderStop, PartyRole } from '@/types/db';
+import { useKeepOnError } from '@/lib/forms/keepOnError';
 
 const KINDS: ClaimKind[] = ['CARGO_DAMAGE', 'SHORTAGE', 'DOWNTIME', 'DEVIATION', 'OTHER'];
 const ACCEPT = 'application/pdf,image/jpeg,image/png,image/webp';
@@ -28,6 +29,7 @@ export function FileClaim({ orderId, stops }: { orderId: string; stops: OrderSto
   const [state, submit, pending] = useActionState<ClaimState, FormData>(fileClaimAction, {
     error: null,
   });
+  const keepSubmit = useKeepOnError(state);
 
   if (!open) {
     return (
@@ -39,6 +41,7 @@ export function FileClaim({ orderId, stops }: { orderId: string; stops: OrderSto
 
   return (
     <form
+      {...keepSubmit}
       action={submit}
       className="flex flex-col gap-3 rounded-control border border-line bg-sunken p-3"
     >
@@ -178,6 +181,7 @@ export function ClaimModeration({
   const [state, submit, pending] = useActionState<ClaimState, FormData>(setClaimStatusAction, {
     error: null,
   });
+  const keepSubmit = useKeepOnError(state);
 
   const closed = status === 'RESOLVED' || status === 'REJECTED';
   const admin = viewer === 'ADMIN';
@@ -207,7 +211,7 @@ export function ClaimModeration({
     : [{ status: 'RESOLVED', label: t.claims.settle, variant: 'default' }];
 
   return (
-    <form action={submit} className="flex flex-col gap-2">
+    <form {...keepSubmit} action={submit} className="flex flex-col gap-2">
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="claim_id" value={claimId} />
       <Field

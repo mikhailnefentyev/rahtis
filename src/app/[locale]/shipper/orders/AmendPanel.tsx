@@ -13,6 +13,7 @@ import { stopTitle, type HaulKind } from '@/lib/orders/haul';
 import { useI18n } from '@/lib/i18n/provider';
 import type { OrderStop, StopRole } from '@/types/db';
 import { StopFields, type StopDefaults } from './StopFields';
+import { useKeepOnError } from '@/lib/forms/keepOnError';
 
 /**
  * Живая корректировка маршрута в кабинете заказчика (ТЗ §8).
@@ -194,6 +195,7 @@ function StopEditor({
     adding ? addStopAction : amendStopAction,
     initial,
   );
+  const keepFormAction = useKeepOnError(state);
 
   /* Правка записана — форма закрывается, список перерисовывается сервером. */
   useEffect(() => {
@@ -201,7 +203,7 @@ function StopEditor({
   }, [state.saved, onDone]);
 
   return (
-    <form action={formAction} className="mt-3 border-t border-line pt-3">
+    <form {...keepFormAction} action={formAction} className="mt-3 border-t border-line pt-3">
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="order_id" value={orderId} />
       <input type="hidden" name="role" value={role} />
@@ -261,9 +263,10 @@ function StopEditor({
 function RemoveStop({ orderId, stopId }: { orderId: string; stopId: string }) {
   const { t, locale } = useI18n();
   const [state, formAction, pending] = useActionState(removeStopAction, initial);
+  const keepFormAction = useKeepOnError(state);
 
   return (
-    <form action={formAction} className="contents">
+    <form {...keepFormAction} action={formAction} className="contents">
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="order_id" value={orderId} />
       <input type="hidden" name="stop_id" value={stopId} />

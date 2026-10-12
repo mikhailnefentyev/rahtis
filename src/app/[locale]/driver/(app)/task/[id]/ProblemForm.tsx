@@ -3,6 +3,7 @@
 import { useActionState, useState } from 'react';
 import { reportProblemAction, type DriverState } from '@/lib/driverApp/actions';
 import { useI18n } from '@/lib/i18n/provider';
+import { useKeepOnError } from '@/lib/forms/keepOnError';
 
 const idle: DriverState = { error: null, done: false };
 
@@ -14,6 +15,7 @@ export function ProblemForm({ orderId }: { orderId: string }) {
   const { t, locale } = useI18n();
   const [open, setOpen] = useState(false);
   const [state, action, pending] = useActionState(reportProblemAction, idle);
+  const keepAction = useKeepOnError(state);
 
   if (state.done) {
     return <p className="rounded-card bg-ok/10 px-4 py-3 text-[15px] text-ok">{t.driverApp.sent}</p>;
@@ -32,7 +34,7 @@ export function ProblemForm({ orderId }: { orderId: string }) {
   }
 
   return (
-    <form action={action} className="flex flex-col gap-2 rounded-card border border-line bg-surface p-4">
+    <form {...keepAction} action={action} className="flex flex-col gap-2 rounded-card border border-line bg-surface p-4">
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="order_id" value={orderId} />
       <label className="flex flex-col gap-1">

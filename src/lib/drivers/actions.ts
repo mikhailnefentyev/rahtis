@@ -191,6 +191,18 @@ export async function savePayProfileAction(
         : null,
   };
 
+  /*
+   * Ставка своей модели обязательна. Ограничение базы пропускало пустое
+   * значение (проверка с NULL не срабатывает), и «−1» или буквы в поле
+   * сохраняли модель без ставки — «0 € / km» (прогон 12.10.2026).
+   */
+  const filled =
+    (model === 'PER_KM' && row.per_km_cents) ||
+    (model === 'FLAT_HOURLY' && row.hourly_cents) ||
+    (model === 'TRIP_PERCENT' && row.trip_bps) ||
+    (model === 'TES' && row.tes_rule_set_id);
+  if (!filled) return { error: t.validation.positiveNumber, done: false };
+
   const supabase = await createClient();
   const { error } = await supabase.from('driver_pay_profiles').insert(row);
 
@@ -295,6 +307,8 @@ function explainShift(
   /* 23P01 — исключающее ограничение: две смены водителя пересеклись. */
   if (code === '23P01') return t.shifts.overlap;
   if (code === '23514' && message?.includes('driver_shifts_length')) return t.shifts.tooLong;
+  /* Одометр в конце меньше, чем в начале, — это не «проверьте время». */
+  if (code === '23514' && message?.includes('driver_shifts_odometer')) return t.shifts.odometerBack;
   if (code === '23514' || code === '22023') return t.shifts.invalid;
   /* 42501 — политика: смену из приложения руками не правят. */
   if (code === '42501') return t.shifts.appRow;

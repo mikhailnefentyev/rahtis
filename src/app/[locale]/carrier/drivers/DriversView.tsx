@@ -27,6 +27,7 @@ import {
 } from '@/lib/drivers/actions';
 import { useI18n } from '@/lib/i18n/provider';
 import { DRIVER_LANGUAGES, type Driver, type PayModel } from '@/types/db';
+import { useKeepOnError } from '@/lib/forms/keepOnError';
 
 export type DriverRow = {
   driver: Driver;
@@ -298,6 +299,7 @@ function ArchivedRow({ driver }: { driver: Driver }) {
 function DriverForm({ driver, onClose }: { driver: Driver | null; onClose: () => void }) {
   const { t, locale } = useI18n();
   const [state, formAction, pending] = useActionState(saveDriverAction, initial);
+  const keepFormAction = useKeepOnError(state);
   const [languages, setLanguages] = useState<string[]>(driver?.languages ?? ['FI']);
 
   useEffect(() => {
@@ -316,7 +318,7 @@ function DriverForm({ driver, onClose }: { driver: Driver | null; onClose: () =>
           {driver ? driver.full_name : t.drivers.new}
         </h3>
 
-        <form action={formAction} className="grid gap-4 sm:grid-cols-2">
+        <form {...keepFormAction} action={formAction} className="grid gap-4 sm:grid-cols-2">
           <input type="hidden" name="locale" value={locale} />
           {driver && <input type="hidden" name="id" value={driver.id} />}
           {languages.map((code) => (
@@ -423,6 +425,7 @@ const noInvite: InviteState = { error: null, link: null, code: null };
 function InvitePanel({ driver }: { driver: Driver }) {
   const { t, m, locale } = useI18n();
   const [state, action, pending] = useActionState(createInviteAction, noInvite);
+  const keepAction = useKeepOnError(state);
   const [copied, setCopied] = useState(false);
 
   const smsHref = state.link
@@ -432,7 +435,7 @@ function InvitePanel({ driver }: { driver: Driver }) {
   return (
     <div className="mt-3 flex flex-col gap-2">
       <div className="flex flex-wrap gap-2">
-        <form action={action}>
+        <form {...keepAction} action={action}>
           <input type="hidden" name="locale" value={locale} />
           <input type="hidden" name="driver_id" value={driver.id} />
           <Button type="submit" size="sm" disabled={pending}>

@@ -9,6 +9,7 @@ import {
 } from '@/lib/orders/lifecycle';
 import { repricedRateCents } from '@/lib/orders/pricing';
 import { useI18n } from '@/lib/i18n/provider';
+import { useKeepOnError } from '@/lib/forms/keepOnError';
 
 /**
  * Что делать заказчику, когда с заказом что-то не так.
@@ -121,6 +122,7 @@ function RepriceForm({
 }) {
   const { t, m, f, locale } = useI18n();
   const [state, formAction, pending] = useActionState(repriceOrderAction, initial);
+  const keepFormAction = useKeepOnError(state);
 
   /* Открывается на том, что предлагает расчёт, а не на прежнем числе:
      если бы прежнее устраивало, форму бы не открывали. */
@@ -148,7 +150,7 @@ function RepriceForm({
   }, [state.done, onDone]);
 
   return (
-    <form action={formAction} className="mt-3 border-t border-line pt-3">
+    <form {...keepFormAction} action={formAction} className="mt-3 border-t border-line pt-3">
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="order_id" value={orderId} />
 
@@ -217,9 +219,10 @@ function RepriceForm({
 function WithdrawForm({ orderId, onDone }: { orderId: string; onDone: () => void }) {
   const { t, locale } = useI18n();
   const [state, formAction, pending] = useActionState(withdrawOrderAction, initial);
+  const keepFormAction = useKeepOnError(state);
 
   return (
-    <form action={formAction} className="mt-3 border-t border-line pt-3">
+    <form {...keepFormAction} action={formAction} className="mt-3 border-t border-line pt-3">
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="order_id" value={orderId} />
 

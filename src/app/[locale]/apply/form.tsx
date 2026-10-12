@@ -7,6 +7,7 @@ import { isValidBusinessId } from '@/lib/format';
 import { useI18n } from '@/lib/i18n/provider';
 import type { ApplyInvite } from '@/lib/partners/invites';
 import type { CompanyRole } from '@/types/db';
+import { useKeepOnError } from '@/lib/forms/keepOnError';
 
 const initial: ApplyState = { error: null, done: false };
 
@@ -14,6 +15,7 @@ export function ApplyForm({ invite = null }: { invite?: ApplyInvite | null }) {
   const { t, m } = useI18n();
   const { locale } = useI18n();
   const [state, formAction, pending] = useActionState(submitApplicationAction, initial);
+  const keepFormAction = useKeepOnError(state);
 
   const [kind, setKind] = useState<CompanyRole>(invite?.kind ?? 'CARRIER');
   /*
@@ -78,7 +80,7 @@ export function ApplyForm({ invite = null }: { invite?: ApplyInvite | null }) {
           {t.apply.subtitle}
         </p>
 
-        <form action={formAction} className="flex flex-col gap-4">
+        <form {...keepFormAction} action={formAction} className="flex flex-col gap-4">
           <input type="hidden" name="locale" value={locale} />
           <input type="hidden" name="kind" value={kind} />
           <input type="hidden" name="partnership" value={mode} />

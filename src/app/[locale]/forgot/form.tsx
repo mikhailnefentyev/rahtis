@@ -4,6 +4,7 @@ import { useActionState } from 'react';
 import { Button, Field, Input } from '@/components/ui';
 import { requestPasswordReset, type RecoveryState } from '@/lib/auth/recovery';
 import { useI18n } from '@/lib/i18n/provider';
+import { useKeepOnError } from '@/lib/forms/keepOnError';
 
 const initial: RecoveryState = { done: false, error: null };
 
@@ -17,13 +18,14 @@ const initial: RecoveryState = { done: false, error: null };
 export function ForgotForm({ locale }: { locale: string }) {
   const { t } = useI18n();
   const [state, formAction, pending] = useActionState(requestPasswordReset, initial);
+  const keepFormAction = useKeepOnError(state);
 
   if (state.done) {
     return <p className="text-[13px] leading-relaxed text-ink">{t.recovery.sent}</p>;
   }
 
   return (
-    <form action={formAction} className="flex flex-col gap-4">
+    <form {...keepFormAction} action={formAction} className="flex flex-col gap-4">
       <input type="hidden" name="locale" value={locale} />
 
       <Field label={t.company.email} error={state.error ?? undefined} required>

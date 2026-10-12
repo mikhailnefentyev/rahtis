@@ -4,6 +4,7 @@ import { useActionState, useState } from 'react';
 import { Badge, Button, Field, Input } from '@/components/ui';
 import { inviteMemberAction, removeMemberAction, type MemberState } from '@/lib/companies/members';
 import { useI18n } from '@/lib/i18n/provider';
+import { useKeepOnError } from '@/lib/forms/keepOnError';
 
 /**
  * Пользователи компании: главный и его диспетчеры.
@@ -34,6 +35,7 @@ export function MembersPanel({
 }) {
   const { t, f, locale } = useI18n();
   const [state, inviteAction, pending] = useActionState(inviteMemberAction, initial);
+  const keepInviteAction = useKeepOnError(state);
 
   return (
     <div className="flex flex-col gap-4">
@@ -60,6 +62,7 @@ export function MembersPanel({
 
       {canManage ? (
         <form
+          {...keepInviteAction}
           action={inviteAction}
           /* После успеха поля пустеют: следующего диспетчера вводят с чистого листа. */
           key={state.done ? `sent-${members.length}` : 'editing'}
@@ -98,6 +101,7 @@ export function MembersPanel({
 function RemoveMember({ userId }: { userId: string }) {
   const { t, locale } = useI18n();
   const [state, removeAction, pending] = useActionState(removeMemberAction, initial);
+  const keepRemoveAction = useKeepOnError(state);
   const [asking, setAsking] = useState(false);
 
   if (!asking) {
@@ -109,7 +113,7 @@ function RemoveMember({ userId }: { userId: string }) {
   }
 
   return (
-    <form action={removeAction} className="ml-auto flex flex-wrap items-center gap-2">
+    <form {...keepRemoveAction} action={removeAction} className="ml-auto flex flex-wrap items-center gap-2">
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="user_id" value={userId} />
       <span className="text-xs text-ink-muted">{state.error ?? t.members.removeConfirm}</span>

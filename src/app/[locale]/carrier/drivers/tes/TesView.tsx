@@ -10,6 +10,7 @@ import {
 } from '@/lib/drivers/actions';
 import { useI18n } from '@/lib/i18n/provider';
 import type { TesRuleSet } from '@/types/db';
+import { useKeepOnError } from '@/lib/forms/keepOnError';
 
 const initial: FormState = { error: null, done: false };
 
@@ -198,9 +199,10 @@ function RatesTable({ rates }: { rates: WageRate[] }) {
 function DeleteTes({ id }: { id: string }) {
   const { t, locale } = useI18n();
   const [state, action, pending] = useActionState(deleteTesAction, initial);
+  const keepAction = useKeepOnError(state);
 
   return (
-    <form action={action} className="flex flex-col items-end gap-1">
+    <form {...keepAction} action={action} className="flex flex-col items-end gap-1">
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="id" value={id} />
       <Button type="submit" size="sm" variant="danger" disabled={pending}>
@@ -214,6 +216,7 @@ function DeleteTes({ id }: { id: string }) {
 function TesForm({ set, onClose }: { set: TesRuleSet | null; onClose: () => void }) {
   const { t, locale } = useI18n();
   const [state, formAction, pending] = useActionState(saveTesAction, initial);
+  const keepFormAction = useKeepOnError(state);
 
   useEffect(() => {
     if (state.done) onClose();
@@ -227,7 +230,7 @@ function TesForm({ set, onClose }: { set: TesRuleSet | null; onClose: () => void
   return (
     <Card stripe="info">
       <CardBody>
-        <form action={formAction} className="grid gap-4 sm:grid-cols-2">
+        <form {...keepFormAction} action={formAction} className="grid gap-4 sm:grid-cols-2">
           <input type="hidden" name="locale" value={locale} />
           {set && <input type="hidden" name="id" value={set.id} />}
 

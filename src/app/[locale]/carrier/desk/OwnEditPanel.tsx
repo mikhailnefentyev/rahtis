@@ -4,6 +4,7 @@ import { useActionState } from 'react';
 import { Button, Field, Input } from '@/components/ui';
 import { repriceOrderAction, type LifecycleState } from '@/lib/orders/lifecycle';
 import { useI18n } from '@/lib/i18n/provider';
+import { useKeepOnError } from '@/lib/forms/keepOnError';
 
 /**
  * Пробег и цена своего рейса.
@@ -29,9 +30,10 @@ export function OwnEditPanel({
 }) {
   const { t, locale } = useI18n();
   const [state, formAction, pending] = useActionState(repriceOrderAction, initial);
+  const keepFormAction = useKeepOnError(state);
 
   return (
-    <form action={formAction} className={className}>
+    <form {...keepFormAction} action={formAction} className={className}>
       <p className="label-micro mb-2.5">{t.own.editTitle}</p>
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="order_id" value={orderId} />

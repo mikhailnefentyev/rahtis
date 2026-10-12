@@ -22,6 +22,7 @@ import {
 import { saveRequisitesAction, type RequisitesState } from '@/lib/companies/requisites';
 import { useI18n } from '@/lib/i18n/provider';
 import type { Company } from '@/types/db';
+import { useKeepOnError } from '@/lib/forms/keepOnError';
 
 const initial: RequisitesState = { error: null, done: false };
 
@@ -39,6 +40,7 @@ export function RequisitesForm({
 }) {
   const { t, locale } = useI18n();
   const [state, formAction, pending] = useActionState(saveRequisitesAction, initial);
+  const keepFormAction = useKeepOnError(state);
 
   const isCarrier = company.kind === 'CARRIER';
 
@@ -73,7 +75,7 @@ export function RequisitesForm({
   }
 
   return (
-    <form action={formAction} className="flex flex-col gap-4">
+    <form {...keepFormAction} action={formAction} className="flex flex-col gap-4">
       <input type="hidden" name="locale" value={locale} />
 
       {/* ── Юридические данные ── */}

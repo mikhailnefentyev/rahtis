@@ -10,6 +10,7 @@ import {
 } from '@/lib/drivers/actions';
 import { useI18n } from '@/lib/i18n/provider';
 import type { DriverPayProfile, PayModel, TesRuleSet } from '@/types/db';
+import { useKeepOnError } from '@/lib/forms/keepOnError';
 
 const initial: FormState = { error: null, done: false };
 const MODELS: PayModel[] = ['FLAT_HOURLY', 'TES', 'PER_KM', 'TRIP_PERCENT'];
@@ -39,6 +40,7 @@ export function PayProfilePanel({
 }) {
   const { t, m, f, locale } = useI18n();
   const [state, formAction, pending] = useActionState(savePayProfileAction, initial);
+  const keepFormAction = useKeepOnError(state);
   const [model, setModel] = useState<PayModel>(profiles[0]?.model ?? 'FLAT_HOURLY');
   /*
    * Категории водителя без ступени стажа: из «TRUCK_4 · …, 4–8 v» остаётся
@@ -116,7 +118,7 @@ export function PayProfilePanel({
 
       <Card stripe="info">
         <CardBody>
-          <form action={formAction} className="grid gap-4 sm:grid-cols-2">
+          <form {...keepFormAction} action={formAction} className="grid gap-4 sm:grid-cols-2">
             <input type="hidden" name="locale" value={locale} />
             <input type="hidden" name="driver_id" value={driverId} />
 

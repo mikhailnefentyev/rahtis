@@ -11,10 +11,23 @@
  */
 
 const STALE = /ChunkLoadError|Loading chunk|Loading CSS chunk|Failed to fetch dynamically imported module|Importing a module script failed|error loading dynamically imported module/i;
+/*
+ * Та же старая вкладка после выкладки, но без слова «chunk»: модуль из
+ * прежней сборки уже не тот («reading 'call'») или сервер не знает действия
+ * формы из неё. Перезагрузка лечит так же. 6.10.2026 на странице входа
+ * через полсуток после выкладки записан TypeError без подробностей —
+ * по времени это она и была.
+ */
+const STALE_MODULE = /reading 'call'|evaluating '[^']*\.call'|Failed to find Server Action|UnrecognizedActionError/i;
+
+/* Обрыв сети во время запроса: браузеры называют его TypeError. */
+const NETWORK = /Failed to fetch|Load failed|NetworkError when attempting to fetch|network error/i;
+
 const KEY = 'rahtis-stale-reload';
 
 export function isStaleBundle(error: Error): boolean {
-  return error.name === 'ChunkLoadError' || STALE.test(error.message ?? '');
+  const message = error.message ?? '';
+  return error.name === 'ChunkLoadError' || STALE.test(message) || STALE_MODULE.test(message) || error.name === 'UnrecognizedActionError';
 }
 
 /** true — перезагрузка началась, экран ошибки показывать незачем. */
@@ -32,6 +45,14 @@ export function reloadOnce(): boolean {
 
 /** Имя класса ошибки для журнала: только слово, без текста сообщения. */
 export function errorClass(error: Error): string | undefined {
-  const name = isStaleBundle(error) ? 'ChunkLoadError' : error.name;
+  /*
+   * В журнал идёт только слово-класс, без текста ошибки. Чтобы голый
+   * «TypeError» не оставался загадкой, сетевой обрыв получает свой класс.
+   */
+  const name = isStaleBundle(error)
+    ? 'ChunkLoadError'
+    : NETWORK.test(error.message ?? '')
+      ? `${error.name || 'Error'}Network`
+      : error.name;
   return typeof name === 'string' && /^[A-Za-z][A-Za-z0-9]{0,39}$/.test(name) ? name : undefined;
 }

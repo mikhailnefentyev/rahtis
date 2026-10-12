@@ -4,6 +4,7 @@ import { useActionState } from 'react';
 import { Button, Card, CardBody, Field, Input, Select, Textarea } from '@/components/ui';
 import { useI18n } from '@/lib/i18n/provider';
 import { sendNoticeAction, type NoticeState } from '@/lib/support/actions';
+import { useKeepOnError } from '@/lib/forms/keepOnError';
 
 const initial: NoticeState = { error: null, done: false };
 
@@ -17,6 +18,7 @@ export function NoticeForm({
 }) {
   const { t } = useI18n();
   const [state, formAction, pending] = useActionState(sendNoticeAction, initial);
+  const keepFormAction = useKeepOnError(state);
 
   if (companies.length === 0) return null;
 
@@ -28,7 +30,7 @@ export function NoticeForm({
           <p className="mt-1 text-[13px] text-ink-muted">{t.adminMessage.hint}</p>
         </div>
 
-        <form action={formAction} className="flex flex-col gap-3">
+        <form {...keepFormAction} action={formAction} className="flex flex-col gap-3">
           <input type="hidden" name="locale" value={locale} />
 
           <div className="grid gap-3 sm:grid-cols-2">

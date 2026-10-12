@@ -5,6 +5,7 @@ import { Button, Field, Input } from '@/components/ui';
 import { useI18n } from '@/lib/i18n/provider';
 import { saveOperatorProfileAction, type OperatorState } from '@/lib/operator/actions';
 import type { Tables } from '@/types/database';
+import { useKeepOnError } from '@/lib/forms/keepOnError';
 
 type Profile = Tables<'operator_profile'>;
 
@@ -24,6 +25,7 @@ export function OperatorForm({ profile }: { profile: Profile }) {
       saved: false,
     },
   );
+  const keepSave = useKeepOnError(state);
 
   const o = t.operator;
   const field = (name: keyof Profile, label: string, required = false, mono = false) => (
@@ -41,7 +43,7 @@ export function OperatorForm({ profile }: { profile: Profile }) {
   );
 
   return (
-    <form action={save} className="flex flex-col gap-6">
+    <form {...keepSave} action={save} className="flex flex-col gap-6">
       <input type="hidden" name="locale" value={locale} />
 
       <fieldset className="grid gap-3 sm:grid-cols-2">

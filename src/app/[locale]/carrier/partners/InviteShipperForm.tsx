@@ -4,6 +4,7 @@ import { useActionState, useState } from 'react';
 import { Button, Field, Input, InputMono, Select } from '@/components/ui';
 import { useI18n } from '@/lib/i18n/provider';
 import { inviteShipperAction, type InviteShipperState } from '@/lib/partners/actions';
+import { useKeepOnError } from '@/lib/forms/keepOnError';
 
 const initial: InviteShipperState = { error: null, sentTo: null };
 
@@ -11,10 +12,11 @@ const initial: InviteShipperState = { error: null, sentTo: null };
 export function InviteShipperForm() {
   const { t, locale } = useI18n();
   const [state, action, pending] = useActionState(inviteShipperAction, initial);
+  const keepAction = useKeepOnError(state);
   const [kind, setKind] = useState<'SHIPPER' | 'CARRIER'>('SHIPPER');
 
   return (
-    <form action={action} className="flex flex-col gap-3">
+    <form {...keepAction} action={action} className="flex flex-col gap-3">
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="kind" value={kind} />
       {/* Кого зовём: заказчику и перевозчику — разные письма и роль в заявке. */}
