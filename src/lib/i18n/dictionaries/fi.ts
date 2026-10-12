@@ -978,7 +978,7 @@ export const fi = {
     addLoad: '+ Lastaus',
     actionsSection: 'Mitä matkalla tehdään',
     actionsHint: 'Purkuja ja lastauksia voi lisätä haluamasi määrän ja haluamassasi järjestyksessä',
-    noActions: 'Lisää vähintään yksi purku tai lastaus',
+    noActions: 'Ei purkuja eikä lastauksia: tästä tulee siirtoajo — yksikkö noudetaan ja jätetään toiseen paikkaan.',
 
     bookingRef: 'Varausnumero',
     ldm: 'Lavametrit',
@@ -1497,6 +1497,12 @@ export const fi = {
     emailTaken: 'Tällä sähköpostiosoitteella on jo tunnus palvelussa.',
     ownerOnly: 'Käyttäjiä lisää ja poistaa yrityksen pääkäyttäjä.',
     tooMany: 'Käyttäjiä on jo enimmäismäärä. Ota yhteyttä RAHTIS-tukeen.',
+  },
+
+  transfer: {
+    title: 'Siirtoajo',
+    closingHint: 'Siirtoajo päätetään luovutuskuvalla: kuva yksiköstä paikassa, johon se jätettiin. Rahtikirjaa ei tarvita.',
+    photoRequired: 'Ilman luovutuskuvaa siirtoajoa ei voi päättää',
   },
 
   account: {

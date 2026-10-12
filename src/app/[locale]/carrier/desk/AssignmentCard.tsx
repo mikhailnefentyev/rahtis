@@ -19,6 +19,7 @@ import {
 import { orderStatusTone } from '@/components/ui/tone';
 import { cancelOrderAction, confirmOrderAction } from '@/lib/orders/matching';
 import { useI18n } from '@/lib/i18n/provider';
+import { isTransfer } from '@/lib/orders/transfer';
 import { AbandonPanel } from './AbandonPanel';
 import { OrderChat } from '@/components/domain/OrderChat';
 import { ClosingPanel } from './ClosingPanel';
@@ -77,7 +78,7 @@ export function AssignmentCard({
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2.5">
                   <h3 className="text-[15px] font-semibold tracking-tight">
-                    {t.orderType[order.order_type]}
+                    {isTransfer(stops) ? t.transfer.title : t.orderType[order.order_type]}
                   </h3>
                   <Badge tone={orderStatusTone[order.status]}>
                     {t.orderStatus[order.status]}

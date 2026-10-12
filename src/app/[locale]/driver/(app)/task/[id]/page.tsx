@@ -6,6 +6,7 @@ import { getDriverTasks, type DriverStop, type DriverTask } from '@/lib/driverAp
 import { isLocale, type Locale } from '@/lib/i18n';
 import { driverLocaleOf, getDriverI18n } from '@/lib/driverApp/i18n';
 import { OrderChat } from '@/components/domain/OrderChat';
+import { isTransfer } from '@/lib/orders/transfer';
 import { stopTitle } from '@/lib/orders/haul';
 import { Arrive } from './Arrive';
 import { CmrMissing, CmrReminder } from './CmrMissing';
@@ -42,7 +43,8 @@ export default async function DriverTaskPage({
   /* Снимки нужны только на идущем рейсе: там осмотр и сравнение сторон. */
   const photos = running ? await getTripPhotos(task.id) : [];
 
-  const hasCmr = photos.some((p) => p.kind === 'CMR');
+  /* Перегон закрывается фото при сдаче — напоминать о накладной незачем. */
+  const hasCmr = isTransfer(task.stops) || photos.some((p) => p.kind === 'CMR');
   const lastStop = task.stops[task.stops.length - 1];
   const allDone = task.stops.length > 0 && task.stops.every((s) => s.completed_at);
 

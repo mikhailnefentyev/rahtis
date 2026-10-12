@@ -597,7 +597,7 @@ export function OrderForm({
           <p className="-mt-1 mb-3 text-xs text-ink-faint">{t.orderForm.actionsHint}</p>
 
           {extras.length === 0 && (
-            <p className="mb-3 rounded-control border border-warn/35 bg-warn/10 px-3 py-2 text-[13px] text-warn">
+            <p className="mb-3 rounded-control border border-line bg-sunken px-3 py-2 text-[13px] text-ink-muted">
               {t.orderForm.noActions}
             </p>
           )}

@@ -890,7 +890,7 @@ export const en = {
     addLoad: '+ Loading',
     actionsSection: 'What happens on the way',
     actionsHint: 'Add as many loadings and unloadings as you need, in any order',
-    noActions: 'Add at least one loading or unloading',
+    noActions: 'No loadings or unloadings: this becomes a transfer run — the unit is picked up and left at another place.',
 
     bookingRef: 'Booking number',
     ldm: 'Loading metres',
@@ -1401,6 +1401,12 @@ export const en = {
     emailTaken: 'This email address already has an account in the service.',
     ownerOnly: 'Users are added and removed by the company\u2019s main user.',
     tooMany: 'The maximum number of users has been reached. Contact RAHTIS support.',
+  },
+
+  transfer: {
+    title: 'Transfer run',
+    closingHint: 'A transfer run is closed with a handover photo: a picture of the unit at the place where it was left. No waybill is needed.',
+    photoRequired: 'A transfer run cannot be closed without a handover photo',
   },
 
   account: {

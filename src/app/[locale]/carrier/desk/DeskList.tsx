@@ -10,6 +10,7 @@ import { Badge, Button, Card, CardBody, CardDivider, EmptyState, Mono, Plate, Se
 import { MATCHING } from '@/lib/config';
 import { groupTakeAction, takeOrderAction, type MatchingState } from '@/lib/orders/matching';
 import { useI18n } from '@/lib/i18n/provider';
+import { isTransfer } from '@/lib/orders/transfer';
 import type { DeskOrder, DeskStop, Vehicle } from '@/types/db';
 
 const initialTake: MatchingState = { error: null };
@@ -185,7 +186,7 @@ export function DeskList({
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2.5">
                     <h3 className="text-[15px] font-semibold tracking-tight">
-                      {t.orderType[order.order_type]}
+                      {isTransfer(stops) ? t.transfer.title : t.orderType[order.order_type]}
                     </h3>
                     {/*
                       * Единица — сразу после типа рейса и до номера.

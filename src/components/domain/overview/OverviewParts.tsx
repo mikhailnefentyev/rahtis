@@ -2,7 +2,8 @@ import Link from 'next/link';
 import { Bars, Card, CardBody, Mono, Plate } from '@/components/ui';
 import { getI18n, type Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
-import type { OrderStatus } from '@/types/db';
+import { isTransfer } from '@/lib/orders/transfer';
+import type { OrderStatus, StopRole } from '@/types/db';
 import { TiltCard } from './TiltCard';
 
 type Supabase = Awaited<ReturnType<typeof createClient>>;
@@ -15,7 +16,7 @@ type LiveTrip = {
   status: OrderStatus;
   plate: string | null;
   party: string | null;
-  stops: Array<{ city: string; done: boolean; eta: string | null }>;
+  stops: Array<{ city: string; done: boolean; eta: string | null; role: StopRole }>;
 };
 
 /**
@@ -43,7 +44,7 @@ async function liveTrips(supabase: Supabase, role: Role): Promise<LiveTrip[]> {
 
   const { data: stops } = await supabase
     .from('order_stops')
-    .select('order_id, sequence, city, place_name, completed_at, eta_at')
+    .select('order_id, sequence, role, city, place_name, completed_at, eta_at')
     .in(
       'order_id',
       base.map((o) => o.id),
@@ -54,7 +55,7 @@ async function liveTrips(supabase: Supabase, role: Role): Promise<LiveTrip[]> {
     ...o,
     stops: (stops ?? [])
       .filter((s) => s.order_id === o.id)
-      .map((s) => ({ city: s.place_name || s.city || '', done: Boolean(s.completed_at), eta: s.eta_at })),
+      .map((s) => ({ city: s.place_name || s.city || '', done: Boolean(s.completed_at), eta: s.eta_at, role: s.role })),
   }));
 }
 
@@ -80,7 +81,10 @@ export async function OverviewBody({ locale, role }: { locale: Locale; role: Rol
   let cards: Array<{ href: string; count: number; title: string; text: string; tone: 'warn' | 'danger' | 'live' }>;
 
   if (carrier) {
-    const running = trips.filter((o) => o.status === 'IN_PROGRESS' && o.stops.length > 0 && o.stops.every((s) => s.done));
+    /* Перегон закрывается фото при сдаче — в «нет накладной» он не попадает. */
+    const running = trips.filter(
+      (o) => o.status === 'IN_PROGRESS' && o.stops.length > 0 && o.stops.every((s) => s.done) && !isTransfer(o.stops),
+    );
     const { data: cmr } = running.length
       ? await supabase
           .from('order_documents')

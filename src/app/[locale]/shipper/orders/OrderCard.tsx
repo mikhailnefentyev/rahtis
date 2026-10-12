@@ -8,6 +8,7 @@ import { RouteStops } from '@/components/domain/RouteStops';
 import { Badge, Button, Card, CardBody, CardDivider, Mono, Plate } from '@/components/ui';
 import { orderStatusTone } from '@/components/ui/tone';
 import { useI18n } from '@/lib/i18n/provider';
+import { isTransfer } from '@/lib/orders/transfer';
 import { routeEnds } from '@/lib/orders/route';
 import { DocumentList } from '@/components/domain/TripDocuments';
 import type {
@@ -89,7 +90,7 @@ export function OrderCard({
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2.5">
                     <h3 className="text-[15px] font-semibold tracking-tight">
-                      {t.orderType[order.order_type]}
+                      {isTransfer(stops) ? t.transfer.title : t.orderType[order.order_type]}
                     </h3>
                     <Badge tone={orderStatusTone[order.status]}>
                       {t.orderStatus[order.status]}

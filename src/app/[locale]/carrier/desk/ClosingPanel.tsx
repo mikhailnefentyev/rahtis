@@ -6,6 +6,7 @@ import { tripProgress, type TripStop } from '@/lib/orders/progress';
 import { closeOrderAction, uploadTripDocumentAction, type TripState } from '@/lib/orders/trip';
 import { DocumentList } from '@/components/domain/TripDocuments';
 import { useI18n } from '@/lib/i18n/provider';
+import { hasHandoverPhoto, isTransfer } from '@/lib/orders/transfer';
 import type { TripDocument, TripDocumentKind } from '@/types/db';
 
 const initial: TripState = { error: null };
@@ -40,10 +41,17 @@ export function ClosingPanel({
   const { t, locale } = useI18n();
   const [upload, uploadAction, uploading] = useActionState(uploadTripDocumentAction, initial);
   const [close, closeAction, closingNow] = useActionState(closeOrderAction, initial);
-  const [kind, setKind] = useState<TripDocumentKind>('CMR');
+  /*
+   * Перегон (забрать и оставить) закрывается фото при сдаче: накладной у
+   * пустого прицепа обычно нет. Поэтому и тип загрузки по умолчанию —
+   * снимок, а не накладная.
+   */
+  const transfer = isTransfer(stops);
+  const [kind, setKind] = useState<TripDocumentKind>(transfer ? 'UNLOADING_PHOTO' : 'CMR');
 
   const progress = tripProgress(stops);
   const hasCmr = documents.some((d) => d.kind === 'CMR');
+  const canClose = hasCmr || (transfer && hasHandoverPhoto(stops, documents));
 
   const signedOnly = !hasCmr && documents.some((d) => d.subject === 'SIGNATURE');
 
@@ -69,8 +77,8 @@ export function ClosingPanel({
         {closed && <Badge tone="ok">{t.trip.closed}</Badge>}
       </div>
 
-      {!closed && <p className="mb-3 text-xs text-ink-faint">{own ? t.own.closingHint : t.trip.closingHint}</p>}
-      {!closed && signedOnly && <p className="mb-3 text-xs text-warn">{t.trip.signatureNoCmr}</p>}
+      {!closed && <p className="mb-3 text-xs text-ink-faint">{transfer ? t.transfer.closingHint : own ? t.own.closingHint : t.trip.closingHint}</p>}
+      {!closed && signedOnly && !transfer && <p className="mb-3 text-xs text-warn">{t.trip.signatureNoCmr}</p>}
 
       <DocumentList documents={documents} />
 
@@ -117,11 +125,13 @@ export function ClosingPanel({
             <input type="hidden" name="locale" value={locale} />
             <input type="hidden" name="order_id" value={orderId} />
 
-            <Button type="submit" variant="primary" size="sm" disabled={!hasCmr || closingNow}>
+            <Button type="submit" variant="primary" size="sm" disabled={!canClose || closingNow}>
               {closingNow ? t.trip.closing_ : t.trip.close}
             </Button>
 
-            {!hasCmr && <span className="text-xs text-warn">{t.trip.cmrRequired}</span>}
+            {!canClose && (
+              <span className="text-xs text-warn">{transfer ? t.transfer.photoRequired : t.trip.cmrRequired}</span>
+            )}
           </form>
 
           {close.error && (
