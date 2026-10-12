@@ -183,6 +183,17 @@ export function AssignmentCard({
                   haulKind={order.haul_kind}
                   className="mt-4"
                 />
+
+                {/*
+                  * Комментарий заказчика. На столе его нет (условия, п. 6.8:
+                  * до назначения заметки не показываются), поэтому здесь —
+                  * первое место, где его видит диспетчер перевозчика.
+                  */}
+                {order.comment && (
+                  <p className="mt-4 rounded-control border border-line bg-sunken px-3 py-2 text-xs text-ink-muted">
+                    {order.comment}
+                  </p>
+                )}
                 {order.status === 'IN_PROGRESS' && (
                   <TripPanel stops={stops} haulKind={order.haul_kind} />
                 )}
