@@ -28,11 +28,14 @@ export function ClosingPanel({
   stops,
   documents,
   closed,
+  own = false,
 }: {
   orderId: string;
   stops: TripStop[];
   documents: TripDocument[];
   closed: boolean;
+  /** Свой рейс: клиент документов не видит, они остаются у перевозчика. */
+  own?: boolean;
 }) {
   const { t, locale } = useI18n();
   const [upload, uploadAction, uploading] = useActionState(uploadTripDocumentAction, initial);
@@ -66,7 +69,7 @@ export function ClosingPanel({
         {closed && <Badge tone="ok">{t.trip.closed}</Badge>}
       </div>
 
-      {!closed && <p className="mb-3 text-xs text-ink-faint">{t.trip.closingHint}</p>}
+      {!closed && <p className="mb-3 text-xs text-ink-faint">{own ? t.own.closingHint : t.trip.closingHint}</p>}
       {!closed && signedOnly && <p className="mb-3 text-xs text-warn">{t.trip.signatureNoCmr}</p>}
 
       <DocumentList documents={documents} />

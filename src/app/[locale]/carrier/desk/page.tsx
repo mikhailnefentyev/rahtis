@@ -144,6 +144,25 @@ export default async function DeskPage({
     (amendmentsByOrder[row.order_id] ??= []).push(row);
   }
 
+  /*
+   * Свои рейсы перевозчика среди закреплённых: у них другой текст (рейс
+   * завёл он сам, отказ его снимает) и право править. my_assignments этого
+   * не говорит, поэтому сверяемся со справочником клиентов.
+   */
+  const { data: ownClients } = assignedIds.length ? await supabase.rpc('carrier_clients') : { data: [] };
+  const clientNames = new Map((ownClients ?? []).map((c) => [c.id, c.name]));
+  const { data: ownRows } =
+    assignedIds.length && clientNames.size
+      ? await supabase
+          .from('orders')
+          .select('id, shipper_company_id')
+          .in('id', assignedIds)
+          .in('shipper_company_id', [...clientNames.keys()])
+      : { data: [] };
+  const ownByOrder: Record<string, string> = Object.fromEntries(
+    (ownRows ?? []).map((o) => [o.id, clientNames.get(o.shipper_company_id) ?? '']),
+  );
+
   const state = readiness?.[0];
   const canTakeOrders = state?.can_take_orders ?? false;
 
@@ -160,6 +179,7 @@ export default async function DeskPage({
         assignments={assignments ?? []}
         documentsByOrder={documentsByOrder}
         amendmentsByOrder={amendmentsByOrder}
+        ownByOrder={ownByOrder}
       />
 
       {!canTakeOrders ? (

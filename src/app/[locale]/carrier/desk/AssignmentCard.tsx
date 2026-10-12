@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { HaulBadge } from '@/components/domain/HaulBadge';
 import { OrderAmendments } from '@/components/domain/OrderAmendments';
 import { OrderRouteMap } from '@/components/domain/RouteMap';
@@ -22,6 +23,8 @@ import { AbandonPanel } from './AbandonPanel';
 import { OrderChat } from '@/components/domain/OrderChat';
 import { ClosingPanel } from './ClosingPanel';
 import { TripPanel } from './TripPanel';
+import { OwnEditPanel } from './OwnEditPanel';
+import { AmendPanel } from '../../shipper/orders/AmendPanel';
 import type { Database } from '@/types/database';
 import type { OrderAmendment, OrderStop, TripDocument } from '@/types/db';
 
@@ -39,12 +42,18 @@ export function AssignmentCard({
   order,
   documentsByOrder,
   amendmentsByOrder,
+  ownClient,
 }: {
   order: Assignment;
   documentsByOrder: Record<string, TripDocument[]>;
   amendmentsByOrder: Record<string, OrderAmendment[]>;
+  /** Имя клиента, если это свой рейс перевозчика. */
+  ownClient?: string;
 }) {
   const { t, m, f, locale } = useI18n();
+  /* Свой рейс отказом снимается насовсем — поэтому отказ в два шага. */
+  const own = ownClient !== undefined;
+  const [declining, setDeclining] = useState(false);
 
   const stops = (order.stops ?? []) as unknown as OrderStop[];
   const waiting = order.status === 'AWAIT_DRIVER';
@@ -86,12 +95,18 @@ export function AssignmentCard({
                   <span className="font-semibold text-ink">{f.eur(order.rate_cents ?? 0)}</span>{' '}
                   <span className="text-ink-dim">{t.money.addVat}</span>
                 </p>
-                {order.shipper_name && <p className="mt-1 text-xs text-ink-dim">{order.shipper_name}</p>}
+                {own ? (
+                  <p className="mt-1 text-xs text-ink-dim">
+                    {t.own.clientSection}: <span className="font-semibold text-ink-muted">{ownClient}</span>
+                  </p>
+                ) : (
+                  order.shipper_name && <p className="mt-1 text-xs text-ink-dim">{order.shipper_name}</p>
+                )}
 
                 {direct ? (
                   <p className="mt-2 flex flex-wrap items-center gap-2 text-[13px] text-ink">
-                    <Badge tone="info">{t.direct.badge}</Badge>
-                    {t.direct.carrierHint}
+                    <Badge tone="info">{own ? t.own.badge : t.direct.badge}</Badge>
+                    {own ? t.own.carrierHint : t.direct.carrierHint}
                   </p>
                 ) : (
                   waiting && <p className="mt-2 text-[13px] text-warn">{t.matching.chosenYouHint}</p>
@@ -110,13 +125,25 @@ export function AssignmentCard({
                         {t.matching.confirm}
                       </Button>
                     </form>
-                    <form action={cancelOrderAction}>
-                      <input type="hidden" name="locale" value={locale} />
-                      <input type="hidden" name="order_id" value={order.id} />
-                      <Button type="submit" variant="danger" size="sm" className="w-full">
+                    {own && !declining ? (
+                      <Button type="button" variant="danger" size="sm" className="w-full" onClick={() => setDeclining(true)}>
                         {t.matching.decline}
                       </Button>
-                    </form>
+                    ) : (
+                      <form action={cancelOrderAction} className="flex max-w-56 flex-col items-end gap-2">
+                        {own && <p className="text-right text-xs text-ink-muted">{t.own.declineConfirm}</p>}
+                        <input type="hidden" name="locale" value={locale} />
+                        <input type="hidden" name="order_id" value={order.id} />
+                        <Button type="submit" variant="danger" size="sm" className="w-full">
+                          {own ? t.own.declineYes : t.matching.decline}
+                        </Button>
+                        {own && (
+                          <Button type="button" size="sm" className="w-full" onClick={() => setDeclining(false)}>
+                            {t.action.cancel}
+                          </Button>
+                        )}
+                      </form>
+                    )}
                   </>
                 ) : (
                   <Badge tone="live">{t.matching.inProgress}</Badge>
@@ -160,6 +187,23 @@ export function AssignmentCard({
                 )}
 
                 {/*
+                  * Свой рейс правит сам перевозчик: у его клиента входа нет.
+                  * Точки — пока рейс идёт, как у заказчика; пробег и цена —
+                  * до закрытия.
+                  */}
+                {own && order.status === 'IN_PROGRESS' && (
+                  <AmendPanel orderId={order.id} stops={stops} haulKind={order.haul_kind} className="mt-4" />
+                )}
+                {own && (
+                  <OwnEditPanel
+                    orderId={order.id}
+                    distanceKm={order.distance_km}
+                    rateCents={order.rate_cents}
+                    className="mt-4 rounded-control border border-line bg-sunken p-3"
+                  />
+                )}
+
+                {/*
                   * Закрытие появляется, когда пройдены все точки.
                   * Выполненного рейса здесь уже нет — он уходит во
                   * вкладку выполненных вместе с документами.
@@ -170,6 +214,7 @@ export function AssignmentCard({
                     stops={stops}
                     documents={documentsByOrder[order.id] ?? []}
                     closed={false}
+                    own={own}
                   />
                 )}
 

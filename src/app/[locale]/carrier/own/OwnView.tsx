@@ -1,12 +1,14 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Badge, Button, Card, CardBody, EmptyState, Mono } from '@/components/ui';
+import { Badge, Button, buttonClass, Card, CardBody, EmptyState, Mono } from '@/components/ui';
 import { orderStatusTone } from '@/components/ui/tone';
 import { useI18n } from '@/lib/i18n/provider';
 import type { CarrierClient, OrderStatus, OwnVehicle } from '@/types/db';
 import { OrderForm } from '../../shipper/orders/OrderForm';
+import { OwnClients } from './OwnClients';
 
 export type OwnJob = {
   id: string;
@@ -17,6 +19,8 @@ export type OwnJob = {
   plate: string;
   created_at: string;
   track: string | null;
+  /** Где открыть сам рейс; у снятого открывать нечего. */
+  href: string | null;
 };
 
 /**
@@ -30,8 +34,11 @@ export function OwnView({
   clients,
   vehicles,
   startNew = false,
+  blocked = null,
 }: {
   startNew?: boolean;
+  /** Почему рейс сейчас не создать (не приняты новые условия). */
+  blocked?: string | null;
   jobs: OwnJob[];
   clients: CarrierClient[];
   vehicles: OwnVehicle[];
@@ -56,7 +63,9 @@ export function OwnView({
   return (
     <>
       <div className="mb-6">
-        {composing ? (
+        {blocked ? (
+          <p className="rounded-control border border-warn/40 bg-warn/5 px-3 py-2.5 text-[13px] text-ink">{blocked}</p>
+        ) : composing ? (
           <OrderForm
             key={formKey}
             knownVehicles={[]}
@@ -90,18 +99,27 @@ export function OwnView({
                 <span className="text-[13px] font-semibold">{job.client}</span>
                 <span className="text-[13px] text-ink-muted">{job.route}</span>
                 <span className="text-[13px] text-ink-muted">
-                  {job.plate} · {f.date(job.created_at)}
+                  {[job.plate, f.date(job.created_at)].filter(Boolean).join(' · ')}
                 </span>
-                {job.track && (
-                  <Button size="sm" className="ml-auto" title={job.track} onClick={() => copy(job)}>
-                    {copied === job.id ? t.own.copied : t.own.copy}
-                  </Button>
-                )}
+                <div className="ml-auto flex flex-wrap gap-2">
+                  {job.href && (
+                    <Link href={job.href} className={buttonClass({ variant: 'default', size: 'sm' })}>
+                      {t.own.open}
+                    </Link>
+                  )}
+                  {job.track && (
+                    <Button size="sm" title={job.track} onClick={() => copy(job)}>
+                      {copied === job.id ? t.own.copied : t.own.copy}
+                    </Button>
+                  )}
+                </div>
               </CardBody>
             </Card>
           ))}
         </div>
       )}
+
+      <OwnClients clients={clients} />
     </>
   );
 }

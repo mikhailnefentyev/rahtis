@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
+    PostgrestVersion: "14.15"
   }
   graphql_public: {
     Tables: {
@@ -4240,6 +4240,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      carrier_delete_client: {
+        Args: { p_client_id: string }
+        Returns: undefined
+      }
       carrier_drivers_push: {
         Args: never
         Returns: {
@@ -4323,6 +4327,15 @@ export type Database = {
           timed_stops: number
           trips: number
         }[]
+      }
+      carrier_update_client: {
+        Args: {
+          p_business_id: string
+          p_client_id: string
+          p_email: string
+          p_name: string
+        }
+        Returns: undefined
       }
       choose_offer: {
         Args: { p_offer_id: string }

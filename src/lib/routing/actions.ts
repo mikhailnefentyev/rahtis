@@ -146,7 +146,8 @@ export async function computeRouteAction(
   const t = await getDictionary(l);
 
   const viewer = await getViewer();
-  if (viewer.status !== 'ready' || viewer.role !== 'SHIPPER') {
+  /* Перевозчик считает маршрут своего рейса той же формой (прогон 12.10.2026: «Ei pääsyä»). */
+  if (viewer.status !== 'ready' || (viewer.role !== 'SHIPPER' && viewer.role !== 'CARRIER')) {
     return { ok: false, error: await forbidden(l) };
   }
 

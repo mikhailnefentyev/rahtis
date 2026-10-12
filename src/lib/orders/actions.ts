@@ -14,6 +14,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { sendEmail, operatorInbox } from '@/lib/email';
 import { emailLocaleOf } from '@/lib/email/text';
 import { ownTrackEmail } from '@/lib/email/templates/ownTrack';
+import { routeLabel } from '@/lib/orders/routeLabel';
 import { siteUrl } from '@/lib/config';
 
 export type PublishState = { error: string | null; ref: string | null };
@@ -436,14 +437,25 @@ export async function ownOrderAction(_previous: PublishState, formData: FormData
   if (!vehicle) return { error: t.direct.chooseVehicle, ref: null };
 
   const clientId = str(formData, 'client_id');
-  const clientName = str(formData, 'client_name');
+  /* Лишние пробелы внутри имени заводили второго клиента с тем же названием. */
+  const clientName = str(formData, 'client_name').replace(/\s+/g, ' ');
   if (!clientId && clientName.length < 2) return { error: t.own.clientRequired, ref: null };
+
+  const clientEmail = str(formData, 'client_email').toLowerCase();
+  if (clientEmail && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(clientEmail)) {
+    return { error: t.own.clientInvalid, ref: null };
+  }
+
+  /* Забор «вчера» — опечатка в дате: водитель получил бы задание с прошедшим днём. */
+  const pickupDate = form.stops[0]?.scheduled_date;
+  const today = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Helsinki' }).format(new Date());
+  if (pickupDate && pickupDate < today) return { error: t.own.pickupPast, ref: null };
 
   const supabase = await createClient();
   const { data, error } = await supabase.rpc('carrier_create_own_order', {
     p_client: clientId
-      ? { id: clientId, email: str(formData, 'client_email') }
-      : { name: clientName, business_id: str(formData, 'client_business_id'), email: str(formData, 'client_email') },
+      ? { id: clientId, email: clientEmail }
+      : { name: clientName, business_id: str(formData, 'client_business_id'), email: clientEmail },
     p_order: form.order as Json,
     p_stops: form.stops as unknown as Json,
     p_vehicle_id: vehicle,
@@ -467,7 +479,7 @@ async function sendOwnTrack(orderId: string, ref: string, token: string, carrier
     const admin = createAdminClient();
     const [{ data: order }, { data: carrier }, { data: stops }] = await Promise.all([
       admin.from('orders').select('shipper_company_id').eq('id', orderId).single(),
-      admin.from('companies').select('name, language').eq('id', carrierId).single(),
+      admin.from('companies').select('name, language, contact_email').eq('id', carrierId).single(),
       admin.from('order_stops').select('city, place_name').eq('order_id', orderId).order('sequence'),
     ]);
     if (!order || !carrier) return;
@@ -480,7 +492,7 @@ async function sendOwnTrack(orderId: string, ref: string, token: string, carrier
 
     const locale = emailLocaleOf(carrier.language);
     const labels = (stops ?? []).map((s) => s.place_name || s.city).filter(Boolean);
-    const route = labels.length > 1 ? `${labels[0]} - ${labels[labels.length - 1]}` : (labels[0] ?? '');
+    const route = routeLabel(labels as string[], '-');
 
     await sendEmail(
       ownTrackEmail({
@@ -490,6 +502,8 @@ async function sendOwnTrack(orderId: string, ref: string, token: string, carrier
         route,
         link: `${siteUrl()}/${locale}/track/${token}`,
         operatorEmail: operatorInbox(),
+        /* Вопросы — перевозчику: ответ на письмо должен прийти ему, а не оператору. */
+        replyTo: carrier.contact_email || null,
         locale,
       }),
     );

@@ -16,6 +16,7 @@ export function ownTrackEmail(input: {
   route: string;
   link: string;
   operatorEmail: string;
+  replyTo?: string | null;
   locale: EmailLocale;
 }): EmailMessage {
   const t = emailText(input.locale);
@@ -33,6 +34,7 @@ export function ownTrackEmail(input: {
   return {
     template: 'own.track',
     to: input.to,
+    replyTo: input.replyTo ?? null,
     subject: i.subject(input.carrierName, input.ref),
     text: renderText({ heading, blocks, operatorEmail: input.operatorEmail, signature: t.signature, neverAsk: t.neverAsk }),
     html: renderEmail({

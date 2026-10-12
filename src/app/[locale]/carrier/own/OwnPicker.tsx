@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Field, Input, InputMono, Select } from '@/components/ui';
 import type { HaulKind } from '@/lib/orders/haul';
 import { useI18n } from '@/lib/i18n/provider';
@@ -29,6 +29,31 @@ export function OwnPicker({
   const { t } = useI18n();
   const [clientId, setClientId] = useState(clients[0]?.id ?? '');
   const chosen = clients.find((c) => c.id === clientId) ?? null;
+  /*
+   * Поля держит состояние, а не браузер: после отказа сервера React
+   * сбрасывает неуправляемые поля формы, и клиент с машиной пропадали —
+   * форму приходилось дозаполнять заново (прогон 12.10.2026).
+   */
+  const [name, setName] = useState('');
+  const [businessId, setBusinessId] = useState('');
+  const [email, setEmail] = useState(clients[0]?.contact_email ?? '');
+  const [vehicleId, setVehicleId] = useState('');
+
+  /*
+   * Со списками хуже, чем с полями: сброс формы возвращает выпадающий
+   * список к первой строке, хотя состояние помнит выбор. На экране —
+   * первый клиент из справочника, в состоянии — «новый клиент», и рейс
+   * ушёл бы не тому. По событию сброса списки пересоздаются из состояния.
+   */
+  const root = useRef<HTMLDivElement>(null);
+  const [resets, setResets] = useState(0);
+  useEffect(() => {
+    const form = root.current?.closest('form');
+    if (!form) return;
+    const onReset = () => setResets((n) => n + 1);
+    form.addEventListener('reset', onReset);
+    return () => form.removeEventListener('reset', onReset);
+  }, []);
   const unit = haulKind === 'TRAILER' || haulKind === 'CONTAINER';
   const fitting = vehicles.filter(
     (v) => v.available && (unit ? v.vehicle_class === 'TRACTOR' : v.vehicle_class !== 'TRACTOR'),
@@ -36,13 +61,23 @@ export function OwnPicker({
   const optional = ` (${t.own.optional})`;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div ref={root} className="flex flex-col gap-4">
       <fieldset className="grid gap-3 sm:grid-cols-3">
         <legend className="label-micro mb-2">{t.own.clientSection}</legend>
         {clients.length > 0 && (
           <Field label={t.own.clientPick} className="sm:col-span-3">
             {(p) => (
-              <Select {...p} name="client_id" value={clientId} onChange={(e) => setClientId(e.target.value)}>
+              <Select
+                key={resets}
+                {...p}
+                name="client_id"
+                value={clientId}
+                onChange={(e) => {
+                  setClientId(e.target.value);
+                  /* Почта — того клиента, который выбран; у нового поле пустое. */
+                  setEmail(clients.find((c) => c.id === e.target.value)?.contact_email ?? '');
+                }}
+              >
                 {clients.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.name}
@@ -57,21 +92,47 @@ export function OwnPicker({
         {!chosen && (
           <>
             <Field label={t.own.clientName} required>
-              {(p) => <Input {...p} name="client_name" required minLength={2} maxLength={200} autoComplete="organization" />}
+              {(p) => (
+                <Input
+                  {...p}
+                  name="client_name"
+                  required
+                  minLength={2}
+                  maxLength={200}
+                  autoComplete="organization"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              )}
             </Field>
             <Field label={`${t.own.clientBusinessId}${optional}`}>
-              {(p) => <InputMono {...p} name="client_business_id" placeholder="1234567-8" pattern="\d{7}-\d" />}
+              {(p) => (
+                <InputMono
+                  {...p}
+                  name="client_business_id"
+                  placeholder="1234567-8"
+                  pattern="\d{7}-\d"
+                  value={businessId}
+                  onChange={(e) => setBusinessId(e.target.value)}
+                />
+              )}
             </Field>
           </>
         )}
         <Field
-          key={clientId}
           label={`${t.own.clientEmail}${optional}`}
           hint={t.own.clientEmailHint}
           className={chosen ? 'sm:col-span-3' : undefined}
         >
           {(p) => (
-            <Input {...p} name="client_email" type="email" autoComplete="email" defaultValue={chosen?.contact_email ?? ''} />
+            <Input
+              {...p}
+              name="client_email"
+              type="email"
+              autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
           )}
         </Field>
       </fieldset>
@@ -83,7 +144,7 @@ export function OwnPicker({
               {t.own.noVehicles}
             </p>
           ) : (
-            <Select {...p} name="own_vehicle_id" required defaultValue="">
+            <Select key={resets} {...p} name="own_vehicle_id" required value={vehicleId} onChange={(e) => setVehicleId(e.target.value)}>
               <option value="" disabled>
                 —
               </option>

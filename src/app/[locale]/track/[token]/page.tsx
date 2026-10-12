@@ -58,6 +58,10 @@ export default async function TrackPage({ params }: { params: Promise<{ locale: 
       .order('sequence'),
   ]);
 
+  /* Рейс закрывается накладной; клиенту важно, что груз уже доставлен. */
+  const delivered =
+    order.status === 'IN_PROGRESS' && (stops ?? []).length > 0 && (stops ?? []).every((s) => s.completed_at);
+
   const time = (iso: string) => `${f.date(iso)} ${new Date(iso).toLocaleTimeString(t.meta.intl, { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Helsinki' })}`;
 
   return (
@@ -65,7 +69,9 @@ export default async function TrackPage({ params }: { params: Promise<{ locale: 
       <p className="label-micro">{t.track.title}</p>
       <div className="mt-2 flex flex-wrap items-center gap-3">
         <Mono className="text-lg">{order.ref}</Mono>
-        <Badge tone={orderStatusTone[order.status]}>{t.orderStatus[order.status]}</Badge>
+        <Badge tone={delivered ? 'ok' : orderStatusTone[order.status]}>
+          {delivered ? t.track.delivered : t.orderStatus[order.status]}
+        </Badge>
       </div>
       {carrier?.name && (
         <p className="mt-2 text-[13px] text-ink-muted">

@@ -38,10 +38,14 @@ function toLocale(value: FormDataEntryValue | null): Locale {
 
 const str = (form: FormData, key: string): string => String(form.get(key) ?? '').trim();
 
-/** Правит маршрут только заказчик — тот же, кто заказ опубликовал. */
+/**
+ * Правит маршрут заказчик — тот же, кто заказ опубликовал, — и перевозчик
+ * у своего рейса: его клиент входа не имеет. Чей это рейс, решает база
+ * (app.assert_amendable).
+ */
 async function guard(locale: Locale): Promise<string | null> {
   const viewer = await getViewer();
-  if (viewer.status !== 'ready' || viewer.role !== 'SHIPPER') {
+  if (viewer.status !== 'ready' || (viewer.role !== 'SHIPPER' && viewer.role !== 'CARRIER')) {
     return (await getDictionary(locale)).error.forbidden;
   }
   return null;

@@ -43,10 +43,13 @@ export function Assignments({
   assignments,
   documentsByOrder,
   amendmentsByOrder,
+  ownByOrder = {},
 }: {
   assignments: Assignment[];
   documentsByOrder: Record<string, TripDocument[]>;
   amendmentsByOrder: Record<string, OrderAmendment[]>;
+  /** Свои рейсы перевозчика: id рейса → имя клиента. */
+  ownByOrder?: Record<string, string>;
 }) {
   const { t } = useI18n();
   /* Раскрыт один рейс за раз, как и у заказчика. */
@@ -78,6 +81,7 @@ export function Assignments({
         order={order}
         documentsByOrder={documentsByOrder}
         amendmentsByOrder={amendmentsByOrder}
+        ownClient={ownByOrder[order.id]}
       />
     );
   }

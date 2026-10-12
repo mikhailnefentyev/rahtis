@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useCallback, useEffect, useMemo, useState } from 'react';
+import { startTransition, useActionState, useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Badge,
   Button,
@@ -424,7 +424,22 @@ export function OrderForm({
   }
 
   return (
-    <form action={formAction} className="flex flex-col gap-4">
+    <form
+      action={formAction}
+      /*
+       * Отправка — руками, а не через action формы: после действия React
+       * сбрасывает форму, и при отказе сервера пропадало всё, что не держит
+       * состояние, — компания на выгрузке, контакты, время, заметки, выбор
+       * в списках (прогон 12.10.2026). Вызов из перехода форму не трогает;
+       * action остаётся для отправки до загрузки скрипта.
+       */
+      onSubmit={(event) => {
+        event.preventDefault();
+        const data = new FormData(event.currentTarget);
+        startTransition(() => formAction(data));
+      }}
+      className="flex flex-col gap-4"
+    >
       {/*
         * Повтор говорит, что он повтор, и что в нём осталось пустым.
         *

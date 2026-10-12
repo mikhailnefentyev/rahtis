@@ -5,6 +5,7 @@ import { requireRole } from '@/lib/auth/guard';
 import { siteUrl } from '@/lib/config';
 import { operatorInbox } from '@/lib/email';
 import { getI18n, isLocale } from '@/lib/i18n';
+import { routeLabel } from '@/lib/orders/routeLabel';
 import { createClient } from '@/lib/supabase/server';
 import { OwnView, type OwnJob } from './OwnView';
 
@@ -37,11 +38,17 @@ export default async function OwnOrdersPage({
   const viewer = await requireRole(locale, 'CARRIER');
   const [{ t, m }, supabase] = await Promise.all([getI18n(locale), createClient()]);
 
-  const [{ data: access }, { data: clients }, { data: vehicles }] = await Promise.all([
+  const [{ data: access }, { data: clients }, { data: vehicles }, { data: pendingLegal }] = await Promise.all([
     supabase.rpc('own_orders_access'),
     supabase.rpc('carrier_clients'),
     supabase.rpc('carrier_own_vehicles'),
+    /*
+     * Новые версии условий не приняты — рейс не создать (55009). Раньше об
+     * этом говорил отказ после заполненной формы (прогон 12.10.2026).
+     */
+    supabase.rpc('my_pending_legal'),
   ]);
+  const legalPending = (pendingLegal ?? []).length > 0;
 
   const active = viewer.company?.status === 'ACTIVE';
   const names = new Map((clients ?? []).map((c) => [c.id, c.name]));
@@ -84,10 +91,17 @@ export default async function OwnOrdersPage({
       ref: o.ref,
       status: o.status,
       client: names.get(o.shipper_company_id) ?? '',
-      route: labels.length > 1 ? `${labels[0]} → ${labels[labels.length - 1]}` : (labels[0] ?? ''),
+      route: routeLabel(labels),
       plate: plates.get(o.id) ?? '',
       created_at: o.created_at,
       track: o.track_token ? `${site}/${locale}/track/${o.track_token}` : null,
+      /* Сам рейс — на столе (идущие и ждущие) или среди выполненных. */
+      href:
+        o.status === 'AWAIT_DRIVER' || o.status === 'IN_PROGRESS'
+          ? `/${locale}/carrier/desk`
+          : o.status === 'DONE'
+            ? `/${locale}/carrier/done`
+            : null,
     };
   });
 
@@ -104,7 +118,13 @@ export default async function OwnOrdersPage({
           </CardBody>
         </Card>
       ) : (
-        <OwnView jobs={jobs} clients={clients ?? []} vehicles={vehicles ?? []} startNew={startNew} />
+        <OwnView
+          jobs={jobs}
+          clients={clients ?? []}
+          vehicles={vehicles ?? []}
+          startNew={startNew}
+          blocked={legalPending ? t.legal.reacceptNeeded : null}
+        />
       )}
     </main>
   );

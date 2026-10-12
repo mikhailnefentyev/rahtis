@@ -1,12 +1,13 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { acceptTaskAction, declineTaskAction } from '@/lib/driverApp/actions';
+import { acceptTaskAction } from '@/lib/driverApp/actions';
 import { getDriver } from '@/lib/driverApp/session';
 import { getDriverTasks, nextStop, type DriverTask } from '@/lib/driverApp/tasks';
 import { isLocale, type Locale } from '@/lib/i18n';
 import { getDriverI18n } from '@/lib/driverApp/i18n';
 import { stopTitle } from '@/lib/orders/haul';
 import { GaugeIcon } from '../training/icons';
+import { DeclineTask } from './DeclineTask';
 import { PushSetup } from './PushSetup';
 import { ShiftBar } from './ShiftBar';
 import { TaskTabs } from './TaskTabs';
@@ -140,13 +141,15 @@ async function TaskCard({ task, locale }: { task: DriverTask; locale: Locale }) 
                 ✓ {t.driverApp.accept}
               </button>
             </form>
-            <form action={declineTaskAction}>
-              <input type="hidden" name="locale" value={locale} />
-              <input type="hidden" name="order_id" value={task.id} />
-              <button className="h-12 w-full rounded-control border border-line text-[15px] font-semibold text-danger">
-                {t.driverApp.decline}
-              </button>
-            </form>
+            <DeclineTask
+              locale={locale}
+              orderId={task.id}
+              labels={{
+                decline: t.driverApp.decline,
+                confirm: t.driverApp.declineConfirm,
+                yes: t.driverApp.declineYes,
+              }}
+            />
           </>
         ) : (
           <Link
