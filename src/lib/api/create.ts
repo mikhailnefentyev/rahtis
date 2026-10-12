@@ -16,6 +16,7 @@ import { ApiError, type ApiContext } from './handler';
 import { isObj, locationOf, oneOf, sameAddress, streetOf, text, type LatLon } from './input';
 import { getOrder } from './orders';
 import { translateRule } from './rules';
+import { HAUL_MAX_CARGO_KG } from '@/lib/orders/haul';
 
 /**
  * Создание заказа через API.
@@ -150,6 +151,10 @@ async function prepare(body: unknown): Promise<Prepared> {
     if (weight !== undefined && !(Number.isInteger(weight) && (weight as number) > 0)) {
       issues.push({ field: f('cargo_weight_kg'), issue: 'positive integer (kg)' });
     }
+    const maxCargo = haulKind ? HAUL_MAX_CARGO_KG[haulKind] : undefined;
+    if (maxCargo && Number.isInteger(weight) && (weight as number) > maxCargo) {
+      issues.push({ field: f('cargo_weight_kg'), issue: `at most ${maxCargo} kg for haul_kind ${haulKind}` });
+    }
 
     const contact = isObj(s.contact) ? s.contact : {};
     const placeKind = s.place_kind === undefined ? undefined : oneOf(s.place_kind, PLACE_KINDS);
@@ -231,6 +236,10 @@ function explain(error: { code?: string; message?: string }): ApiError {
   if (error.code === '23514') {
     /* Нарушено правило точки: например, вес груза у выгрузки. Имя правила — программисту. */
     const rule = msg.match(/check constraint "([^"]+)"/)?.[1];
+    /* Частые правила — словами; имя правила остаётся в issues. */
+    if (rule === 'order_stops_delivery_has_company') {
+      return new ApiError('unprocessable', 'company_name is required on DELIVERY stops.', [{ field: 'stops', issue: rule }]);
+    }
     return new ApiError(
       'unprocessable',
       `A field is not allowed for this order or stop${rule ? ` (rule: ${rule})` : ''}.`,

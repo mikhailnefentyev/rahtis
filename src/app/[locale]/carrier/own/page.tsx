@@ -5,8 +5,9 @@ import { requireRole } from '@/lib/auth/guard';
 import { siteUrl } from '@/lib/config';
 import { operatorInbox } from '@/lib/email';
 import { getI18n, isLocale } from '@/lib/i18n';
-import { routeLabel } from '@/lib/orders/routeLabel';
+import { routeLabel } from '@/lib/orders/route';
 import { createClient } from '@/lib/supabase/server';
+import type { StopRole } from '@/types/db';
 import { OwnView, type OwnJob } from './OwnView';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
@@ -70,14 +71,15 @@ export default async function OwnOrdersPage({
 
   const orderIds = (orders ?? []).map((o) => o.id);
   const { data: stops } = orderIds.length
-    ? await supabase.from('order_stops').select('order_id, sequence, city, place_name').in('order_id', orderIds).order('sequence')
+    ? await supabase.from('order_stops').select('id, order_id, role, sequence, city').in('order_id', orderIds).order('sequence')
     : { data: [] };
 
-  const route = new Map<string, string[]>();
-  for (const s of stops ?? []) {
+  /* Та же подпись маршрута, что на столе и в выполненных: забор → последняя рабочая точка. */
+  type RouteStop = { id: string; order_id: string; role: StopRole; sequence: number; city: string };
+  const route = new Map<string, RouteStop[]>();
+  for (const s of (stops ?? []) as RouteStop[]) {
     const list = route.get(s.order_id) ?? [];
-    const label = s.place_name || s.city;
-    if (label) list.push(label);
+    list.push(s);
     route.set(s.order_id, list);
   }
   const { data: assignments } = await supabase.rpc('my_assignments');
@@ -85,13 +87,12 @@ export default async function OwnOrdersPage({
   const site = siteUrl();
 
   const jobs: OwnJob[] = (orders ?? []).map((o) => {
-    const labels = route.get(o.id) ?? [];
     return {
       id: o.id,
       ref: o.ref,
       status: o.status,
       client: names.get(o.shipper_company_id) ?? '',
-      route: routeLabel(labels),
+      route: routeLabel(route.get(o.id) ?? []) ?? '',
       plate: plates.get(o.id) ?? '',
       created_at: o.created_at,
       track: o.track_token ? `${site}/${locale}/track/${o.track_token}` : null,

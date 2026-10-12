@@ -147,11 +147,26 @@ export function formatCountdown(msLeft: number): string {
 
 /**
  * Y-tunnus — финский бизнес-ID: семь цифр, дефис, контрольная цифра.
- * Здесь только формат; фактическое существование компании оператор
- * проверяет вручную по реестру PRH/YTJ (ТЗ §3).
+ * Существование компании проверяется отдельно, по реестру PRH/YTJ
+ * (ТЗ §3); здесь — формат и контрольная цифра.
+ *
+ * Контрольная цифра ловит опечатку до того, как заявка уйдёт оператору:
+ * раньше «1234567-1» проходил как верный номер (прогон 12.10.2026), и о
+ * промахе узнавали только из ответа реестра «не найдено». Правило PRH:
+ * цифры умножаются на 7, 9, 10, 5, 8, 4, 2, сумма делится на 11; остаток
+ * 0 даёт цифру 0, остаток 1 не бывает, иначе цифра — 11 минус остаток.
  */
 export const BUSINESS_ID_PATTERN = /^\d{7}-\d$/;
 
+const BUSINESS_ID_WEIGHTS = [7, 9, 10, 5, 8, 4, 2];
+
 export function isValidBusinessId(value: string): boolean {
-  return BUSINESS_ID_PATTERN.test(value.trim());
+  const id = value.trim();
+  if (!BUSINESS_ID_PATTERN.test(id)) return false;
+
+  const sum = BUSINESS_ID_WEIGHTS.reduce((total, weight, index) => total + weight * Number(id[index]), 0);
+  const rest = sum % 11;
+  if (rest === 1) return false;
+
+  return Number(id[8]) === (rest === 0 ? 0 : 11 - rest);
 }

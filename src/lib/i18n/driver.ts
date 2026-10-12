@@ -26,7 +26,7 @@ export {
 /** Сообщения ICU, которые нужны приложению водителя. */
 export type DriverMessageKey = Extract<
   MessageKey,
-  `driverApp.${string}` | `places.${string}` | `training.${string}`
+  `driverApp.${string}` | `places.${string}` | `training.${string}` | `driverEvent.${string}`
 >;
 
 /**
@@ -60,7 +60,12 @@ export type DriverPack = {
 function packOf(dictionary: Dictionary): DriverPack {
   const msg = Object.fromEntries(
     Object.entries(dictionary.msg).filter(
-      ([key]) => key.startsWith('driverApp.') || key.startsWith('places.') || key.startsWith('training.'),
+      ([key]) =>
+        key.startsWith('driverApp.') ||
+        key.startsWith('places.') ||
+        key.startsWith('training.') ||
+        /* Уведомления водителя — на его языке, а не на финском кабинета. */
+        key.startsWith('driverEvent.'),
     ),
   ) as Record<DriverMessageKey, string>;
 

@@ -238,6 +238,22 @@ export async function saveVehicleAction(
   const supabase = await createClient();
   const id = text(formData, 'id');
 
+  /*
+   * Тот же номер второй раз в своём парке. База держит уникальность только
+   * среди допущенных машин, поэтому черновик-дубль сохранялся молча, а
+   * отказ получал уже оператор при допуске (прогон 12.10.2026).
+   */
+  const { data: fleet } = await supabase
+    .from('vehicles')
+    .select('id, plate')
+    .eq('company_id', company.id)
+    .neq('access', 'REJECTED');
+  /* «TST-101» и «TST101» — один номер: сравниваем без дефисов и пробелов. */
+  const bare = (plate: string) => plate.toUpperCase().replace(/[^A-Z0-9ÅÄÖ]/g, '');
+  if ((fleet ?? []).some((v) => v.id !== id && bare(v.plate) === bare(values.plate))) {
+    return { error: t.fleet.plateInOwnFleet, done: false };
+  }
+
   const { data, error } = id
     ? await supabase.from('vehicles').update(values).eq('id', id).select('id').single()
     : await supabase
@@ -249,8 +265,8 @@ export async function saveVehicleAction(
   if (error || !data) {
     /* 23505 — номер уже занят допущенной машиной другой компании. */
     return {
-      /* Текст ошибки базы — по-русски; на экран идёт только общий перевод. */
-      error: t.error.generic,
+      /* Текст ошибки базы — по-русски; на экран идёт только перевод. */
+      error: error?.code === '23505' ? t.fleet.plateTaken : t.error.generic,
       done: false,
     };
   }

@@ -10,6 +10,7 @@ import { Badge, Button, Card, CardBody, CardDivider, EmptyState, Mono, Plate, Se
 import { MATCHING } from '@/lib/config';
 import { groupTakeAction, takeOrderAction, type MatchingState } from '@/lib/orders/matching';
 import { useI18n } from '@/lib/i18n/provider';
+import { carriesUnit } from '@/lib/orders/haul';
 import { isTransfer } from '@/lib/orders/transfer';
 import type { DeskOrder, DeskStop, Vehicle } from '@/types/db';
 
@@ -87,6 +88,11 @@ function TakeButton({
     ? busy.find((b) => b.vehicleId === vehicleId && b.date === pickupDate)
     : undefined;
   const clashPlate = vehicles.find((v) => v.id === vehicleId)?.plate ?? '';
+
+  /* Подходящей машины нет — говорим об этом сразу, а не пустым списком и отказом после отправки. */
+  if (vehicles.length === 0) {
+    return <p className="max-w-52 text-right text-xs text-ink-muted">{t.matching.wrongClass}</p>;
+  }
 
   return (
     <form action={formAction} className="flex flex-col items-end gap-2">
@@ -280,7 +286,14 @@ export function DeskList({
                   ) : (
                     <TakeButton
                       orderId={order.id}
-                      vehicles={vehicles}
+                      /*
+                       * Только машины нужного класса: тягач — под прицеп и контейнер,
+                       * фургон и грузовик — под экспресс. Фургон под прицеп предлагался
+                       * наравне с тягачами, и отказ приходил уже после отправки.
+                       */
+                      vehicles={vehicles.filter((v) =>
+                        carriesUnit(order.haul_kind) ? v.vehicle_class === 'TRACTOR' : v.vehicle_class !== 'TRACTOR',
+                      )}
                       pickupDate={order.pickup_date}
                       busy={busy.filter((b) => b.ref !== order.ref)}
                     />

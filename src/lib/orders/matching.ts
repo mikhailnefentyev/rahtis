@@ -50,6 +50,8 @@ async function explain(locale: Locale, code: string | undefined, message: string
   /* 55006 — стол «напрямую»: берут только перевозчики на подписке. */
   if (code === '55006') return t.direct.subscribersOnly;
   if (code === '55000' && message?.includes('Мест нет')) return t.matching.noSlotsLeft;
+  /* Машина без водителя или с просроченными документами — это не «время вышло». */
+  if (code === '55000' && message?.includes('не допущена')) return t.matching.vehicleNotReady;
   if (code === '55000') return t.matching.tooLate;
 
   return t.matching.failed;

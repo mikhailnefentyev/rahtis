@@ -226,6 +226,15 @@ export const lt = {
   payDisclaimer:
     'Skaičiavimas orientacinis. Galutinį atlygį nustato darbdavys ir darbo arba kolektyvinė sutartis.',
   msg: {
+    /* Уведомления водителя: входящие в приложении и push. */
+    'driverEvent.order.direct': 'Naujas tiesioginis reisas {ref} automobiliui {plate}',
+    'driverEvent.offer.chosen': 'Reisas {ref} automobiliui {plate} — patvirtink per {minutes} min.',
+    'driverEvent.order.released': 'Reisas {ref} nebėra tavo',
+    'driverEvent.order.cancelled': 'Reisas {ref} atšauktas',
+    'driverEvent.certificate.expiring':
+      '{type, select, CODE95 {Profesinė kvalifikacija (kodas 95)} ADR_BASIC {ADR pažymėjimas} ADR_TANK {ADR pažymėjimas (cisternos)} ADR_CLASS1 {ADR pažymėjimas (1 klasė)} ADR_CLASS7 {ADR pažymėjimas (7 klasė)} TYOTURVA {Darbo saugos kortelė} EA1 {Pirmosios pagalbos kortelė EA 1} TIETURVA1 {Tieturva 1} TACHO_CARD {Vairuotojo kortelė} other {Pažymėjimas}} baigiasi {date}',
+    'driverEvent.chat.message': 'Nauja žinutė reise {ref}',
+    'driverEvent.cmr.missing': 'Reisui {ref} trūksta važtaraščio — nuskenuok jį programėlėje.',
     ...trainingLt.msg,
     'driverApp.earnTrips': '{count, plural, one {# reisas} few {# reisai} many {# reiso} other {# reisų}}',
     'driverApp.earnHours': '{hours} h',

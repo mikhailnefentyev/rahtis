@@ -21,7 +21,7 @@ const CLAIM_KINDS = ['CARGO_DAMAGE', 'SHORTAGE', 'DOWNTIME', 'DEVIATION', 'OTHER
 const STATUS_DOC =
   'OPEN — on the offer table, waiting for offers (at most three). REQUESTED — offers have arrived; choose one before deadline_at (15 min). AWAIT_DRIVER — a vehicle is chosen or assigned and waits for the carrier or driver to confirm (15 min after choosing an offer; no deadline after a direct assignment). IN_PROGRESS — confirmed, the trip is under way. DONE — the trip has ended; fees and the waiting surcharge are fixed. CANCELLED — withdrawn. DRAFT — a cabinet draft; API orders are published at once. When a deadline passes, the order returns to OPEN.';
 const ORDER_TYPE_DOC =
-  'TRAILER_SWAP (TRAILER, CONTAINER): PICKUP → at least one DELIVERY / EXTRA_LOAD / EXTRA_UNLOAD → TRAILER_RETURN. ONE_WAY: PICKUP → at least one DELIVERY / EXTRA_LOAD / EXTRA_UNLOAD; for VAN and TRUCK always ONE_WAY with PICKUP → DELIVERY. ROUND_TRIP: like ONE_WAY, the unit comes back — end with TRAILER_RETURN.';
+  'TRAILER_SWAP (TRAILER, CONTAINER): PICKUP → at least one DELIVERY / EXTRA_LOAD / EXTRA_UNLOAD → TRAILER_RETURN; or a transfer run, PICKUP → TRAILER_RETURN with nothing in between (the unit is only moved; closed with a handover photo instead of a waybill). ONE_WAY: PICKUP → at least one DELIVERY / EXTRA_LOAD / EXTRA_UNLOAD; for VAN and TRUCK always ONE_WAY with PICKUP → DELIVERY. ROUND_TRIP: like ONE_WAY, the unit comes back — end with TRAILER_RETURN.';
 const HAUL_DOC =
   'TRAILER — semi-trailer, CONTAINER — container (container_feet required); both need trailer_plate. VAN, TRUCK — express inside the vehicle; ldm and cargo_weight_kg on at least one stop required.';
 const ROLE_DOC =

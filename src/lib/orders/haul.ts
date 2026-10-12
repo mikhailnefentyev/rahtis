@@ -22,6 +22,15 @@ export const HAUL_KINDS = ['TRAILER', 'CONTAINER', 'VAN', 'TRUCK'] as const sati
  * секций формы, обязательность номера единицы и форма рейса. Семь
  * проверок «haul_kind === 'TRAILER' || …» разошлись бы на первой правке.
  */
+/**
+ * Потолок груза у экспресса — полная масса класса машины из названия
+ * («Pakettiauto · enintään 3,5 t», «Kuorma-auto · enintään 26 t»). Груз
+ * тяжелее не поднимет ни одна машина класса, и такой заказ висел бы на
+ * столе без единого отклика (прогон 12.10.2026: фургон с грузом 5 т).
+ * У прицепа и контейнера потолок общий — 76 т, его держит форма точки.
+ */
+export const HAUL_MAX_CARGO_KG: Partial<Record<HaulKind, number>> = { VAN: 3500, TRUCK: 26000 };
+
 export function carriesUnit(haulKind: HaulKind): boolean {
   return haulKind === 'TRAILER' || haulKind === 'CONTAINER';
 }

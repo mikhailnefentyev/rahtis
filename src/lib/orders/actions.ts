@@ -6,7 +6,7 @@ import { getViewer } from '@/lib/auth/viewer';
 import { getDictionary, isLocale, type Dictionary, type Locale, defaultLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import { dispatchPublishedOrder, notifyDirectOrder } from '@/lib/orders/dispatch';
-import { HAUL_KINDS, type HaulKind } from '@/lib/orders/haul';
+import { HAUL_KINDS, HAUL_MAX_CARGO_KG, type HaulKind } from '@/lib/orders/haul';
 import { cityOf, hasCoordinates, tonnesToKg, type FieldReader } from '@/lib/orders/stopFields';
 import type { StopRole } from '@/types/db';
 import type { Json } from '@/types/database';
@@ -14,7 +14,8 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { sendEmail, operatorInbox } from '@/lib/email';
 import { emailLocaleOf } from '@/lib/email/text';
 import { ownTrackEmail } from '@/lib/email/templates/ownTrack';
-import { routeLabel } from '@/lib/orders/routeLabel';
+import { isValidBusinessId } from '@/lib/format';
+import { routeLabel } from '@/lib/orders/route';
 import { siteUrl } from '@/lib/config';
 
 export type PublishState = { error: string | null; ref: string | null };
@@ -309,6 +310,13 @@ function readOrderForm(
     return { error: t.routing.addressRequired };
   }
 
+  /* Груз тяжелее класса машины не возьмёт никто — отказ здесь, а не пустой стол потом. */
+  const kind = haulKind(str(formData, 'haul_kind'));
+  const maxCargo = HAUL_MAX_CARGO_KG[kind];
+  if (maxCargo && stops.some((stop) => Number(stop.cargo_weight_kg ?? 0) > maxCargo)) {
+    return { error: kind === 'VAN' ? t.orderForm.vanTooHeavy : t.orderForm.truckTooHeavy };
+  }
+
   return {
     stops,
     order: {
@@ -446,6 +454,10 @@ export async function ownOrderAction(_previous: PublishState, formData: FormData
     return { error: t.own.clientInvalid, ref: null };
   }
 
+  /* Y-tunnus клиента необязателен, но если указан — с верной контрольной цифрой. */
+  const clientBusinessId = clientId ? '' : str(formData, 'client_business_id');
+  if (clientBusinessId && !isValidBusinessId(clientBusinessId)) return { error: t.own.clientInvalid, ref: null };
+
   /* Забор «вчера» — опечатка в дате: водитель получил бы задание с прошедшим днём. */
   const pickupDate = form.stops[0]?.scheduled_date;
   const today = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Helsinki' }).format(new Date());
@@ -480,7 +492,7 @@ async function sendOwnTrack(orderId: string, ref: string, token: string, carrier
     const [{ data: order }, { data: carrier }, { data: stops }] = await Promise.all([
       admin.from('orders').select('shipper_company_id').eq('id', orderId).single(),
       admin.from('companies').select('name, language, contact_email').eq('id', carrierId).single(),
-      admin.from('order_stops').select('city, place_name').eq('order_id', orderId).order('sequence'),
+      admin.from('order_stops').select('id, role, sequence, city').eq('order_id', orderId).order('sequence'),
     ]);
     if (!order || !carrier) return;
     const { data: client } = await admin
@@ -491,8 +503,7 @@ async function sendOwnTrack(orderId: string, ref: string, token: string, carrier
     if (!client?.contact_email) return;
 
     const locale = emailLocaleOf(carrier.language);
-    const labels = (stops ?? []).map((s) => s.place_name || s.city).filter(Boolean);
-    const route = routeLabel(labels as string[], '-');
+    const route = routeLabel(stops ?? []) ?? '';
 
     await sendEmail(
       ownTrackEmail({

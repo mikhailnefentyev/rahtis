@@ -226,6 +226,15 @@ export const pl = {
   payDisclaimer:
     'Wyliczenie ma charakter orientacyjny. Ostateczne wynagrodzenie ustalają pracodawca oraz umowa o pracę lub układ zbiorowy.',
   msg: {
+    /* Уведомления водителя: входящие в приложении и push. */
+    'driverEvent.order.direct': 'Nowe zlecenie bezpośrednie {ref} dla {plate}',
+    'driverEvent.offer.chosen': 'Zlecenie {ref} dla {plate} — potwierdź w ciągu {minutes} min',
+    'driverEvent.order.released': 'Zlecenie {ref} nie jest już twoje',
+    'driverEvent.order.cancelled': 'Zlecenie {ref} zostało anulowane',
+    'driverEvent.certificate.expiring':
+      '{type, select, CODE95 {Kwalifikacja zawodowa (kod 95)} ADR_BASIC {Zaświadczenie ADR} ADR_TANK {Zaświadczenie ADR (cysterny)} ADR_CLASS1 {Zaświadczenie ADR (klasa 1)} ADR_CLASS7 {Zaświadczenie ADR (klasa 7)} TYOTURVA {Karta bezpieczeństwa pracy} EA1 {Karta pierwszej pomocy EA 1} TIETURVA1 {Tieturva 1} TACHO_CARD {Karta kierowcy} other {Uprawnienie}} wygasa {date}',
+    'driverEvent.chat.message': 'Nowa wiadomość w zleceniu {ref}',
+    'driverEvent.cmr.missing': 'Zlecenie {ref} nie ma listu przewozowego — zeskanuj go w aplikacji.',
     ...trainingPl.msg,
     'driverApp.earnTrips': '{count, plural, one {# kurs} few {# kursy} many {# kursów} other {# kursu}}',
     'driverApp.earnHours': '{hours} h',

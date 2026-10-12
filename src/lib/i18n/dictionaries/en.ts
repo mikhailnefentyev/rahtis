@@ -890,6 +890,8 @@ export const en = {
     addLoad: '+ Loading',
     actionsSection: 'What happens on the way',
     actionsHint: 'Add as many loadings and unloadings as you need, in any order',
+    vanTooHeavy: 'A van takes at most 3.5 tonnes. Choose a truck for a heavier load.',
+    truckTooHeavy: 'A truck takes at most 26 tonnes. Choose a trailer for a heavier load.',
     noActions: 'No loadings or unloadings: this becomes a transfer run — the unit is picked up and left at another place.',
 
     bookingRef: 'Booking number',
@@ -1022,6 +1024,7 @@ export const en = {
     cancelledTrips: 'Cancelled jobs',
     noChassis: 'This vehicle has no chassis for a container of that size.',
     wrongClass: 'This transport needs a different vehicle class or more loading metres.',
+    vehicleNotReady: 'This vehicle cannot take jobs right now: check that it has a driver and that the company documents are valid.',
     noSlotsLeft: 'Slots are full — three trucks have already offered on this order.',
     alreadyTaken: 'You have already made an offer on this order.',
   },
@@ -1801,6 +1804,8 @@ export const en = {
     whyClosedExpired: 'The documents have expired, so the approval is not valid.',
     languagesHint: 'Which languages the driver can work in',
     tooHeavy: 'This job is too heavy for the vehicle. Pick one with enough payload.',
+    plateInOwnFleet: 'This registration number is already in your fleet.',
+    plateTaken: 'This registration number already belongs to an approved vehicle of another company. Contact RAHTIS support.',
   },
 
   documents: {
@@ -3045,7 +3050,7 @@ export const en = {
 
   validation: {
     required: 'Fill in this field',
-    businessId: 'Format: 7 digits, a hyphen and a check digit',
+    businessId: 'Check the business ID: 7 digits, a hyphen and a check digit',
     email: 'Check the email address',
     positiveNumber: 'Enter a number greater than zero',
   },

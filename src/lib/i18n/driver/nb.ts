@@ -226,6 +226,15 @@ export const nb = {
   payDisclaimer:
     'Beregningen er veiledende. Endelig lønn bestemmes av arbeidsgiveren og arbeids- eller tariffavtalen.',
   msg: {
+    /* Уведомления водителя: входящие в приложении и push. */
+    'driverEvent.order.direct': 'Nytt direkteoppdrag {ref} for {plate}',
+    'driverEvent.offer.chosen': 'Oppdrag {ref} for {plate} — bekreft innen {minutes} minutter',
+    'driverEvent.order.released': 'Oppdrag {ref} er ikke lenger ditt',
+    'driverEvent.order.cancelled': 'Oppdrag {ref} er kansellert',
+    'driverEvent.certificate.expiring':
+      '{type, select, CODE95 {Yrkessjåførkompetanse (kode 95)} ADR_BASIC {ADR-bevis} ADR_TANK {ADR-bevis (tank)} ADR_CLASS1 {ADR-bevis (klasse 1)} ADR_CLASS7 {ADR-bevis (klasse 7)} TYOTURVA {Arbeidssikkerhetskort} EA1 {Førstehjelpskort EA 1} TIETURVA1 {Tieturva 1} TACHO_CARD {Sjåførkort} other {Bevis}} utløper {date}',
+    'driverEvent.chat.message': 'Ny melding i oppdrag {ref}',
+    'driverEvent.cmr.missing': 'Oppdrag {ref} mangler fraktbrev — skann det i appen.',
     ...trainingNb.msg,
     'driverApp.earnTrips': '{count, plural, one {# tur} other {# turer}}',
     'driverApp.earnHours': '{hours} t',

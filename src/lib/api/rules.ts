@@ -27,6 +27,7 @@ const RULES: Rule[] = [
   { prefix: 'Укажите регистрационный номер прицепа', field: 'trailer_plate', message: 'trailer_plate (the trailer registration number) is required.' },
   { prefix: 'Укажите адрес доставки', field: 'stops', message: 'The route needs a DELIVERY stop.' },
   { prefix: 'Укажите вес груза', field: 'stops', message: 'cargo_weight_kg must be given on at least one stop; it is used to match the vehicle.' },
+  { prefix: 'Груз тяжелее класса машины', field: 'stops', message: 'cargo_weight_kg exceeds the vehicle class: at most 3500 kg for VAN and 26000 kg for TRUCK.' },
   { prefix: 'Укажите пробег и ставку', field: 'rate.amount', message: 'Distance and rate must both be positive.' },
 
   /* Действия с заказом в пути и после (этап 2 полного цикла). */

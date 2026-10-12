@@ -62,6 +62,7 @@ export default async function AdminPage({
   const [
     { data: pending },
     { data: decided },
+    { data: roster },
     { data: profiles },
     { data: questions },
     { data: pendingVehicles },
@@ -82,6 +83,20 @@ export default async function AdminPage({
       .is('client_of', null)
       .order('updated_at', { ascending: false })
       .limit(20),
+    /*
+     * Все решённые компании — лёгкой выборкой, для счётчиков и списка
+     * адресатов. Раньше и то и другое считалось по двадцати последним
+     * строкам таблицы ниже: при 32 компаниях счётчики показывали 9 и 11
+     * вместо 14 и 18, а компании постарше нельзя было выбрать адресатом
+     * (прогон 12.10.2026).
+     */
+    supabase
+      .from('companies')
+      .select('id, name, kind, status, frozen_at')
+      .neq('status', 'PENDING')
+      .is('client_of', null)
+      .order('name')
+      .limit(5000),
     supabase.from('profiles').select('company_id').not('company_id', 'is', null),
     supabase
       .from('support_messages')
@@ -174,7 +189,8 @@ export default async function AdminPage({
 
   const queue = pending ?? [];
   const history = decided ?? [];
-  const active = history.filter((c) => c.status === 'ACTIVE').length;
+  const all = roster ?? [];
+  const active = all.filter((c) => c.status === 'ACTIVE').length;
 
   return (
     <main className="cab-page cab-page--wide">
@@ -191,13 +207,13 @@ export default async function AdminPage({
         />
         <Stat
           label={t.companyStatus.APPROVED}
-          value={f.number(history.filter((c) => c.status === 'APPROVED').length)}
+          value={f.number(all.filter((c) => c.status === 'APPROVED').length)}
           tone="info"
         />
         <Stat label={t.companyStatus.ACTIVE} value={f.number(active)} tone="ok" />
         <Stat
           label={t.companyStatus.REJECTED}
-          value={f.number(history.filter((c) => c.status === 'REJECTED').length)}
+          value={f.number(all.filter((c) => c.status === 'REJECTED').length)}
           tone="neutral"
         />
       </StatRow>
@@ -355,7 +371,7 @@ export default async function AdminPage({
 
       <NoticeForm
         locale={locale}
-        companies={(decided ?? [])
+        companies={all
           .filter((c) => c.status === 'ACTIVE' && !c.frozen_at)
           .map((c) => ({ id: c.id, name: c.name, kind: c.kind }))}
       />

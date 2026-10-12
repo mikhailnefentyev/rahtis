@@ -163,6 +163,15 @@ export default async function DeskPage({
     (ownRows ?? []).map((o) => [o.id, clientNames.get(o.shipper_company_id) ?? '']),
   );
 
+  /*
+   * Откликаться может только машина, которая выходит на рейсы: допущена и
+   * с водителем. Допущенную машину без водителя стол предлагал наравне с
+   * остальными, а отклик ею отвечал «время вышло» (прогон 12.10.2026).
+   */
+  const { data: ownFleet } = (vehicles ?? []).length ? await supabase.rpc('carrier_own_vehicles') : { data: [] };
+  const ready = new Set((ownFleet ?? []).filter((v) => v.available).map((v) => v.vehicle_id));
+  const deskVehicles = (vehicles ?? []).filter((v) => ready.has(v.id));
+
   const state = readiness?.[0];
   const canTakeOrders = state?.can_take_orders ?? false;
 
@@ -233,7 +242,7 @@ export default async function DeskPage({
             {m('desk.ordersCount', { count: (orders ?? []).length })}
           </p>
 
-          <DeskList orders={orders ?? []} vehicles={vehicles ?? []} busy={busy} waiting={waiting} />
+          <DeskList orders={orders ?? []} vehicles={deskVehicles} busy={busy} waiting={waiting} />
         </>
       )}
     </main>

@@ -93,7 +93,7 @@ const fi: DocsText = {
     ],
   },
   typeRows: {
-    'TRAILER_SWAP (TRAILER, CONTAINER)': 'Perävaunun tai kontin vaihto: PICKUP (yksikön nouto) → vähintään yksi DELIVERY, EXTRA_LOAD tai EXTRA_UNLOAD → TRAILER_RETURN (mihin yksikkö jätetään).',
+    'TRAILER_SWAP (TRAILER, CONTAINER)': 'Perävaunun tai kontin vaihto: PICKUP (yksikön nouto) → vähintään yksi DELIVERY, EXTRA_LOAD tai EXTRA_UNLOAD → TRAILER_RETURN (mihin yksikkö jätetään). Siirtoajo on PICKUP → TRAILER_RETURN ilman välipisteitä: yksikkö vain siirretään, ja keikka päätetään luovutuskuvalla rahtikirjan sijasta.',
     'ONE_WAY (TRAILER, CONTAINER)': 'Yksikkö noudetaan ja viedään perille: PICKUP → vähintään yksi DELIVERY, EXTRA_LOAD tai EXTRA_UNLOAD; TRAILER_RETURN ei pakollinen.',
     'ROUND_TRIP (TRAILER, CONTAINER)': 'Kuten ONE_WAY, mutta yksikkö palaa lähtöpaikkaan — lisää loppuun TRAILER_RETURN.',
     'ONE_WAY (VAN, TRUCK)': 'Pikakuljetus: PICKUP (lastaus) → DELIVERY (purku), välissä EXTRA_LOAD / EXTRA_UNLOAD tarvittaessa. order_type on aina ONE_WAY.',
@@ -269,7 +269,7 @@ const en: DocsText = {
     ],
   },
   typeRows: {
-    'TRAILER_SWAP (TRAILER, CONTAINER)': 'Trailer or container swap: PICKUP (collect the unit) → at least one DELIVERY, EXTRA_LOAD or EXTRA_UNLOAD → TRAILER_RETURN (where the unit is left).',
+    'TRAILER_SWAP (TRAILER, CONTAINER)': 'Trailer or container swap: PICKUP (collect the unit) → at least one DELIVERY, EXTRA_LOAD or EXTRA_UNLOAD → TRAILER_RETURN (where the unit is left). A transfer run is PICKUP → TRAILER_RETURN with nothing in between: the unit is only moved, and the job is closed with a handover photo instead of a waybill.',
     'ONE_WAY (TRAILER, CONTAINER)': 'The unit is collected and delivered: PICKUP → at least one DELIVERY, EXTRA_LOAD or EXTRA_UNLOAD; TRAILER_RETURN optional.',
     'ROUND_TRIP (TRAILER, CONTAINER)': 'Like ONE_WAY, but the unit comes back — end with TRAILER_RETURN.',
     'ONE_WAY (VAN, TRUCK)': 'Express: PICKUP (loading) → DELIVERY (unloading), with EXTRA_LOAD / EXTRA_UNLOAD in between if needed. order_type is always ONE_WAY.',

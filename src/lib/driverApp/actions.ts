@@ -2,7 +2,8 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { isLocale, type Locale, defaultLocale, getDictionary } from '@/lib/i18n';
+import { getDriverI18n } from '@/lib/driverApp/i18n';
+import { isLocale, type Locale, defaultLocale } from '@/lib/i18n';
 import { cancelOrderAction } from '@/lib/orders/matching';
 import { refineEtaAfter } from '@/lib/orders/eta';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -61,7 +62,8 @@ export type CodeState = { error: string | null };
  */
 export async function acceptCodeAction(_previous: CodeState, formData: FormData): Promise<CodeState> {
   const locale = toLocale(formData.get('locale'));
-  const t = await getDictionary(locale);
+  /* Словарь водителя: его язык, а не финский кабинета (отказ по коду выходил по-фински на русском экране). */
+  const { t } = await getDriverI18n(locale);
 
   const admin = createAdminClient();
   const { data, error } = await admin.rpc('driver_invite_lookup', {
@@ -177,7 +179,8 @@ export async function reportProblemAction(
   formData: FormData,
 ): Promise<DriverState> {
   const locale = toLocale(formData.get('locale'));
-  const t = await getDictionary(locale);
+  /* Словарь водителя: его язык, а не финский кабинета (отказ по коду выходил по-фински на русском экране). */
+  const { t } = await getDriverI18n(locale);
   const supabase = await createClient();
 
   const { error } = await supabase.rpc('driver_report_problem', {

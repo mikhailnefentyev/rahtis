@@ -226,6 +226,15 @@ export const lv = {
   payDisclaimer:
     'Aprēķins ir orientējošs. Galīgo samaksu nosaka darba devējs un darba vai koplīgums.',
   msg: {
+    /* Уведомления водителя: входящие в приложении и push. */
+    'driverEvent.order.direct': 'Jauns tiešais reiss {ref} mašīnai {plate}',
+    'driverEvent.offer.chosen': 'Reiss {ref} mašīnai {plate} — apstiprini {minutes} minūšu laikā',
+    'driverEvent.order.released': 'Reiss {ref} vairs nav tavs',
+    'driverEvent.order.cancelled': 'Reiss {ref} ir atcelts',
+    'driverEvent.certificate.expiring':
+      '{type, select, CODE95 {Profesionālā kvalifikācija (kods 95)} ADR_BASIC {ADR apliecība} ADR_TANK {ADR apliecība (cisternas)} ADR_CLASS1 {ADR apliecība (1. klase)} ADR_CLASS7 {ADR apliecība (7. klase)} TYOTURVA {Darba drošības karte} EA1 {Pirmās palīdzības karte EA 1} TIETURVA1 {Tieturva 1} TACHO_CARD {Vadītāja karte} other {Apliecība}} beidzas {date}',
+    'driverEvent.chat.message': 'Jauns ziņojums reisā {ref}',
+    'driverEvent.cmr.missing': 'Reisam {ref} nav pavadzīmes — noskenē to lietotnē.',
     ...trainingLv.msg,
     'driverApp.earnTrips': '{count, plural, zero {# reisu} one {# reiss} other {# reisi}}',
     'driverApp.earnHours': '{hours} h',

@@ -978,6 +978,8 @@ export const fi = {
     addLoad: '+ Lastaus',
     actionsSection: 'Mitä matkalla tehdään',
     actionsHint: 'Purkuja ja lastauksia voi lisätä haluamasi määrän ja haluamassasi järjestyksessä',
+    vanTooHeavy: 'Pakettiautoon mahtuu enintään 3,5 tonnia. Valitse raskaammalle kuormalle kuorma-auto.',
+    truckTooHeavy: 'Kuorma-autoon mahtuu enintään 26 tonnia. Valitse raskaammalle kuormalle perävaunu.',
     noActions: 'Ei purkuja eikä lastauksia: tästä tulee siirtoajo — yksikkö noudetaan ja jätetään toiseen paikkaan.',
 
     bookingRef: 'Varausnumero',
@@ -1111,6 +1113,7 @@ export const fi = {
     wrongClass: 'Tähän kuljetukseen tarvitaan toisen luokan auto tai isompi kuormatila.',
     noSlotsLeft: 'Paikat ovat täynnä: kuljetukseen on jo kolme tarjousta.',
     alreadyTaken: 'Olet jo tehnyt tarjouksen tähän kuljetukseen.',
+    vehicleNotReady: 'Tämä auto ei voi nyt ottaa keikkoja: tarkista, että autolla on kuljettaja ja yrityksen asiakirjat ovat voimassa.',
   },
 
   desk: {
@@ -1914,6 +1917,8 @@ export const fi = {
     whyClosedExpired: 'Asiakirjat ovat vanhentuneet, hyväksyntä ei ole voimassa.',
     languagesHint: 'Millä kielillä kuljettaja pystyy asioimaan',
     tooHeavy: 'Kuljetus on liian raskas tälle ajoneuvolle. Valitse auto, jonka kantavuus riittää.',
+    plateInOwnFleet: 'Tämä rekisterinumero on jo kalustossasi.',
+    plateTaken: 'Tämä rekisterinumero on jo toisen yrityksen hyväksytyllä ajoneuvolla. Ota yhteyttä RAHTIS-tukeen.',
   },
 
   documents: {
@@ -3164,7 +3169,7 @@ export const fi = {
 
   validation: {
     required: 'Täytä tämä kenttä',
-    businessId: 'Muoto: 7 numeroa, väliviiva ja tarkistusnumero',
+    businessId: 'Tarkista Y-tunnus: 7 numeroa, väliviiva ja tarkistusnumero',
     email: 'Tarkista sähköpostiosoite',
     positiveNumber: 'Anna nollaa suurempi luku',
   },

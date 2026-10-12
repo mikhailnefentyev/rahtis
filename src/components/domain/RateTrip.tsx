@@ -1,7 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-import { useActionState } from 'react';
+import { startTransition, useActionState, useState } from 'react';
 import { Button, RateStars, Stars, Textarea } from '@/components/ui';
 import { rateOrderAction, type RatingState } from '@/lib/orders/rating';
 import { useI18n } from '@/lib/i18n/provider';
@@ -52,7 +51,8 @@ export function RateTrip({
     data.set('order_id', orderId);
     data.set('score', String(stars));
     data.set('comment', withComment);
-    rate(data);
+    /* Вне формы действие зовут из перехода: иначе «pending» не обновляется, и React пишет ошибку в консоль. */
+    startTransition(() => rate(data));
   }
 
   return (
