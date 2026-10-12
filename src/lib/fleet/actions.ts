@@ -314,18 +314,36 @@ export async function deleteDraftVehicleAction(formData: FormData): Promise<void
 
 /* ── Решение оператора ──────────────────────────────────────────── */
 
-export async function decideVehicleAction(formData: FormData): Promise<void> {
+export type DecideVehicleState = { error: string | null };
+
+/*
+ * Отказ базы оператор обязан увидеть. Раньше действие молчало: кнопка
+ * «Допущена» у машины с номером, уже допущенным у другой компании, не
+ * делала ничего, и карточка оставалась в очереди без объяснений
+ * (прогон 12.10.2026).
+ */
+export async function decideVehicleAction(
+  _previous: DecideVehicleState,
+  formData: FormData,
+): Promise<DecideVehicleState> {
   const locale = toLocale(formData.get('locale'));
+  const t = await getDictionary(locale);
 
   const viewer = await getViewer();
-  if (viewer.status !== 'ready' || viewer.role !== 'ADMIN') throw new Error('forbidden');
+  if (viewer.status !== 'ready' || viewer.role !== 'ADMIN') return { error: t.error.forbidden };
 
   const supabase = await createClient();
-  await supabase.rpc('decide_vehicle', {
+  const { error } = await supabase.rpc('decide_vehicle', {
     p_vehicle_id: String(formData.get('id') ?? ''),
     p_decision: String(formData.get('decision') ?? '') as 'APPROVED' | 'REJECTED',
     p_note: text(formData, 'reason') ?? undefined,
   });
 
+  if (error) {
+    /* 23505 — номер уже у допущенной машины другой компании. */
+    return { error: error.code === '23505' ? t.moderation.vehiclePlateTaken : t.error.generic };
+  }
+
   revalidatePath(`/${locale}/admin`);
+  return { error: null };
 }

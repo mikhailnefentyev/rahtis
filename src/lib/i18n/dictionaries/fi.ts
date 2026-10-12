@@ -1359,6 +1359,7 @@ export const fi = {
     reasonLabel: 'Hylkäyksen syy',
     reasonPlaceholder: 'Y-tunnusta ei löydy PRH:n rekisteristä',
     vehicleReasonPlaceholder: 'Vakuutus ei kata kansainvälisiä kuljetuksia',
+    vehiclePlateTaken: 'Tämä rekisterinumero on jo toisen yrityksen hyväksytyllä ajoneuvolla. Selvitä omistus ennen hyväksyntää tai hylkää ajoneuvo.',
     reasonRequired: 'Kirjoita syy. Teksti lähtee yritykselle sähköpostilla sellaisenaan',
     inviteSent: 'Kutsu lähetetty',
     inviteFailed: 'Yritys hyväksyttiin, mutta viesti ei lähtenyt',

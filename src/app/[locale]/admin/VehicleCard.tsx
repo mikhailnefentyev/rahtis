@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useActionState, useState, useTransition } from 'react';
 import { Badge, Button, Card, CardBody, Kv, Mono, Plate, Textarea } from '@/components/ui';
 import { documentUrlAction } from '@/lib/fleet/actions';
 import { decideVehicleAction } from '@/lib/fleet/actions';
@@ -35,6 +35,7 @@ export function VehicleCard({
   const [rejecting, setRejecting] = useState(false);
   const [reason, setReason] = useState('');
   const [opening, startOpening] = useTransition();
+  const [decision, decideAction, deciding] = useActionState(decideVehicleAction, { error: null });
 
   function open(path: string) {
     startOpening(async () => {
@@ -118,11 +119,11 @@ export function VehicleCard({
 
           {!rejecting && (
             <div className="flex flex-col gap-2">
-              <form action={decideVehicleAction}>
+              <form action={decideAction}>
                 <input type="hidden" name="locale" value={locale} />
                 <input type="hidden" name="id" value={vehicle.id} />
                 <input type="hidden" name="decision" value="APPROVED" />
-                <Button type="submit" variant="primary" size="sm" className="w-full">
+                <Button type="submit" variant="primary" size="sm" className="w-full" disabled={deciding}>
                   {t.vehicleAccess.APPROVED}
                 </Button>
               </form>
@@ -132,6 +133,12 @@ export function VehicleCard({
             </div>
           )}
         </div>
+
+        {decision.error && (
+          <p role="alert" className="text-[13px] text-danger">
+            {decision.error}
+          </p>
+        )}
 
         {/* Документы компании — то, вместе с чем принимается решение. */}
         <div className="flex flex-wrap gap-2 border-t border-line pt-3">
@@ -162,7 +169,7 @@ export function VehicleCard({
         </div>
 
         {rejecting && (
-          <form action={decideVehicleAction} className="flex flex-col gap-2 border-t border-line pt-3">
+          <form action={decideAction} className="flex flex-col gap-2 border-t border-line pt-3">
             <input type="hidden" name="locale" value={locale} />
             <input type="hidden" name="id" value={vehicle.id} />
             <input type="hidden" name="decision" value="REJECTED" />
@@ -190,7 +197,7 @@ export function VehicleCard({
                 variant="danger"
                 size="sm"
                 className="flex-[2]"
-                disabled={reason.trim().length === 0}
+                disabled={deciding || reason.trim().length === 0}
               >
                 {t.action.reject}
               </Button>

@@ -1266,6 +1266,7 @@ export const en = {
     reasonLabel: 'Reason for rejection',
     reasonPlaceholder: 'The Y-tunnus is not in the PRH register',
     vehicleReasonPlaceholder: 'The insurance does not cover international transport',
+    vehiclePlateTaken: 'This registration number already belongs to an approved vehicle of another company. Clarify the ownership before approving, or reject the vehicle.',
     reasonRequired: 'Write a reason. It is emailed to the company as written',
     inviteSent: 'Invite sent',
     inviteFailed: 'The company was approved, but the message did not go out',

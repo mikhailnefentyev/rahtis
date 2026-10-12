@@ -62,10 +62,10 @@ export function MembersPanel({
 
       {canManage ? (
         <form
-          {...keepInviteAction}
-          action={inviteAction}
           /* После успеха поля пустеют: следующего диспетчера вводят с чистого листа. */
           key={state.done ? `sent-${members.length}` : 'editing'}
+          {...keepInviteAction}
+          action={inviteAction}
           className="grid gap-3 sm:grid-cols-[1fr_1fr_auto] sm:items-end"
         >
           <input type="hidden" name="locale" value={locale} />

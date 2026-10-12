@@ -151,7 +151,7 @@ export function FleetView({
                   {vehicle.access === 'REJECTED' && (
                     <p className="mt-2 text-[13px] text-danger">
                       {t.fleet.rejectedHint}
-                      {vehicle.rejection_reason ? `: ${vehicle.rejection_reason}` : ''}
+                      {vehicle.rejection_reason ? ` ${vehicle.rejection_reason}` : ''}
                     </p>
                   )}
                 </div>

@@ -45,6 +45,14 @@ export function RequisitesForm({
   const isCarrier = company.kind === 'CARRIER';
 
   /*
+   * Компания уже работает: форма только правит реквизиты. Согласие с
+   * условиями дано при активации — требовать галочку заново ради нового
+   * IBAN значило бы писать в журнал согласий лишнюю запись на каждую
+   * правку (прогон 12.10.2026).
+   */
+  const isActive = company.status === 'ACTIVE';
+
+  /*
    * Начальные значения: уже сохранённое, иначе выведенное из Y-tunnus.
    * Форму заполняют один раз и надолго — подставить то, что вычисляется,
    * дешевле, чем заставлять человека переписывать это с бумаги.
@@ -371,52 +379,54 @@ export function RequisitesForm({
         * новой вкладке — заполненную форму нельзя терять ради того,
         * чтобы прочитать условия.
         */}
-      <label className="flex items-start gap-2.5 text-[13px] leading-relaxed">
-        <input
-          type="checkbox"
-          name="accept_legal"
-          required
-          className="mt-0.5 size-4 shrink-0 accent-[var(--color-accent)]"
-        />
-        <span>
-          {t.legal.accept}{' '}
-          <a
-            href={`/${locale}/${locale === 'fi' ? 'kayttoehdot' : 'terms'}`}
-            target="_blank"
-            rel="noopener"
-            className="font-semibold text-accent hover:underline"
-          >
-            {t.legal.TERMS}
-          </a>
-          {/*
-            * Договор стороны — свой у каждого вида компании: заказчику
-            * условия заказчика, перевозчику договор перевозчика (с
-            * 26.09.2026). Список документов в галочке обязан совпадать с
-            * тем, что запишет accept_legal, — иначе человек соглашается с
-            * одним, а в журнал ложится другое. Так и было, пока договор
-            * перевозчика не завели: галочка его не называла, а
-            * accept_legal уже принимал.
-            */}
-          {' · '}
-          <a
-            href={`/${locale}/${isCarrier ? 'carrier' : 'shipper'}/terms`}
-            target="_blank"
-            rel="noopener"
-            className="font-semibold text-accent hover:underline"
-          >
-            {isCarrier ? t.legal.CARRIER_AGREEMENT : t.legal.SHIPPER_AGREEMENT}
-          </a>
-          {' · '}
-          <a
-            href={`/${locale}/${locale === 'fi' ? 'tietosuoja' : 'privacy'}`}
-            target="_blank"
-            rel="noopener"
-            className="font-semibold text-accent hover:underline"
-          >
-            {t.legal.PRIVACY}
-          </a>
-        </span>
-      </label>
+      {!isActive && (
+        <label className="flex items-start gap-2.5 text-[13px] leading-relaxed">
+          <input
+            type="checkbox"
+            name="accept_legal"
+            required
+            className="mt-0.5 size-4 shrink-0 accent-[var(--color-accent)]"
+          />
+          <span>
+            {t.legal.accept}{' '}
+            <a
+              href={`/${locale}/${locale === 'fi' ? 'kayttoehdot' : 'terms'}`}
+              target="_blank"
+              rel="noopener"
+              className="font-semibold text-accent hover:underline"
+            >
+              {t.legal.TERMS}
+            </a>
+            {/*
+              * Договор стороны — свой у каждого вида компании: заказчику
+              * условия заказчика, перевозчику договор перевозчика (с
+              * 26.09.2026). Список документов в галочке обязан совпадать с
+              * тем, что запишет accept_legal, — иначе человек соглашается с
+              * одним, а в журнал ложится другое. Так и было, пока договор
+              * перевозчика не завели: галочка его не называла, а
+              * accept_legal уже принимал.
+              */}
+            {' · '}
+            <a
+              href={`/${locale}/${isCarrier ? 'carrier' : 'shipper'}/terms`}
+              target="_blank"
+              rel="noopener"
+              className="font-semibold text-accent hover:underline"
+            >
+              {isCarrier ? t.legal.CARRIER_AGREEMENT : t.legal.SHIPPER_AGREEMENT}
+            </a>
+            {' · '}
+            <a
+              href={`/${locale}/${locale === 'fi' ? 'tietosuoja' : 'privacy'}`}
+              target="_blank"
+              rel="noopener"
+              className="font-semibold text-accent hover:underline"
+            >
+              {t.legal.PRIVACY}
+            </a>
+          </span>
+        </label>
+      )}
 
       <Button
         type="submit"
@@ -425,7 +435,7 @@ export function RequisitesForm({
         disabled={pending || blocked}
         className="w-full"
       >
-        {pending ? t.requisites.saving : t.requisites.save}
+        {pending ? t.requisites.saving : isActive ? t.action.save : t.requisites.save}
       </Button>
     </form>
   );
