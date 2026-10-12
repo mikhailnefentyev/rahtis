@@ -1479,6 +1479,26 @@ export const fi = {
     backToSignIn: 'Takaisin kirjautumiseen',
   },
 
+  members: {
+    title: 'Käyttäjät',
+    hint: 'Lisää yrityksen ajojärjestelijät omilla tunnuksillaan. Heillä on samat toiminnot kuin sinulla; käyttäjiä lisää ja poistaa vain pääkäyttäjä.',
+    owner: 'Pääkäyttäjä',
+    dispatcher: 'Ajojärjestelijä',
+    you: 'sinä',
+    name: 'Nimi',
+    email: 'Sähköposti',
+    add: 'Kutsu ajojärjestelijä',
+    adding: 'Lähetetään…',
+    invited: 'Kutsu lähetetty. Linkki salasanan asettamiseen on voimassa vuorokauden.',
+    pending: 'Kutsu lähetetty, ei vielä kirjautunut',
+    lastSeen: 'Kirjautunut viimeksi',
+    remove: 'Poista käyttöoikeus',
+    removeConfirm: 'Poistetaanko käyttöoikeus? Kirjautuminen lakkaa heti.',
+    emailTaken: 'Tällä sähköpostiosoitteella on jo tunnus palvelussa.',
+    ownerOnly: 'Käyttäjiä lisää ja poistaa yrityksen pääkäyttäjä.',
+    tooMany: 'Käyttäjiä on jo enimmäismäärä. Ota yhteyttä RAHTIS-tukeen.',
+  },
+
   account: {
     title: 'Omat tiedot',
     passwordTitle: 'Salasanan vaihto',

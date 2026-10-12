@@ -47,6 +47,16 @@ type Texts = {
     note: (operator: string) => string;
   };
 
+  /** Главный пользователь компании приглашает диспетчера. */
+  memberInvite: {
+    subject: (company: string) => string;
+    heading: (company: string) => string;
+    preheader: string;
+    body: (company: string) => string;
+    button: string;
+    note: string;
+  };
+
   /** Перевозчик приглашает своего заказчика. */
   shipperInvite: {
     subject: (carrier: string) => string;
@@ -207,6 +217,19 @@ const fi: Texts = {
   brandTagline: 'Irtoperät ja kontit · Skandinavia',
 
   greeting: 'Hei,',
+
+  memberInvite: {
+    subject: (company) => `RAHTIS · ${company} lisäsi sinut käyttäjäksi`,
+    heading: (company) => `${company} kutsuu sinut RAHTIS-palveluun`,
+    preheader: 'Aseta salasana ja kirjaudu sisään.',
+    body: (company) =>
+      `${company} on lisännyt sinut yrityksen käyttäjäksi RAHTIS-palveluun. ` +
+      'Saat omat henkilökohtaiset tunnukset: aseta salasana alla olevasta linkistä, niin pääset kirjautumaan sisään.',
+    button: 'Aseta salasana',
+    note:
+      'Linkki on kertakäyttöinen ja voimassa vuorokauden. ' +
+      'Jos se ehtii vanhentua, pyydä uusi kutsu yrityksenne pääkäyttäjältä. Jos ette odottaneet tätä viestiä, voitte jättää sen huomiotta.',
+  },
 
   invite: {
     heading: (company) => `${company} on hyväksytty RAHTIS-palveluun`,
@@ -430,6 +453,19 @@ const en: Texts = {
   brandTagline: 'Trailers and containers · Scandinavia',
 
   greeting: 'Hello,',
+
+  memberInvite: {
+    subject: (company) => `RAHTIS · ${company} added you as a user`,
+    heading: (company) => `${company} invites you to RAHTIS`,
+    preheader: 'Set a password and sign in.',
+    body: (company) =>
+      `${company} has added you as a user of the company in RAHTIS. ` +
+      'You get your own personal credentials: set a password from the link below and you can sign in.',
+    button: 'Set a password',
+    note:
+      'The link is single-use and valid for 24 hours. ' +
+      'If it expires, ask your company\u2019s main user for a new invitation. If you were not expecting this message, you can ignore it.',
+  },
 
   invite: {
     heading: (company) => `${company} has been approved for RAHTIS`,

@@ -2810,6 +2810,7 @@ export type Database = {
           created_at: string
           full_name: string | null
           id: string
+          member_kind: string
           phone: string | null
           role: Database["public"]["Enums"]["party_role"]
           updated_at: string
@@ -2819,6 +2820,7 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id: string
+          member_kind?: string
           phone?: string | null
           role: Database["public"]["Enums"]["party_role"]
           updated_at?: string
@@ -2828,6 +2830,7 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
+          member_kind?: string
           phone?: string | null
           role?: Database["public"]["Enums"]["party_role"]
           updated_at?: string
@@ -4465,6 +4468,17 @@ export type Database = {
         Args: { p_body: string; p_claim_id: string }
         Returns: number
       }
+      company_members: {
+        Args: never
+        Returns: {
+          created_at: string
+          email: string
+          full_name: string
+          last_sign_in_at: string
+          member_kind: string
+          user_id: string
+        }[]
+      }
       company_readiness: {
         Args: { p_company_id: string }
         Returns: {
@@ -5531,6 +5545,7 @@ export type Database = {
         }
         Returns: number
       }
+      remove_company_member: { Args: { p_user_id: string }; Returns: string }
       remove_stop: {
         Args: { p_stop_id: string }
         Returns: {

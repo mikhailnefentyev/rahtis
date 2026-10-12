@@ -1383,6 +1383,26 @@ export const en = {
     backToSignIn: 'Back to sign in',
   },
 
+  members: {
+    title: 'Users',
+    hint: 'Add your company\u2019s dispatchers with their own credentials. They have the same functions as you; only the main user adds and removes users.',
+    owner: 'Main user',
+    dispatcher: 'Dispatcher',
+    you: 'you',
+    name: 'Name',
+    email: 'Email',
+    add: 'Invite a dispatcher',
+    adding: 'Sending…',
+    invited: 'Invitation sent. The link for setting a password is valid for 24 hours.',
+    pending: 'Invitation sent, has not signed in yet',
+    lastSeen: 'Last signed in',
+    remove: 'Remove access',
+    removeConfirm: 'Remove this user\u2019s access? Sign-in stops immediately.',
+    emailTaken: 'This email address already has an account in the service.',
+    ownerOnly: 'Users are added and removed by the company\u2019s main user.',
+    tooMany: 'The maximum number of users has been reached. Contact RAHTIS support.',
+  },
+
   account: {
     title: 'Your details',
     passwordTitle: 'Change password',

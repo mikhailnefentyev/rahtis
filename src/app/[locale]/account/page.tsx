@@ -10,7 +10,9 @@ import { getViewer } from '@/lib/auth/viewer';
 import { getI18n, isLocale } from '@/lib/i18n';
 import { lookupAddress } from '@/lib/registry/prh';
 import { RequisitesForm } from '../requisites/form';
+import { createClient } from '@/lib/supabase/server';
 import { ChangePasswordForm } from './form';
+import { MembersPanel } from './MembersPanel';
 
 export async function generateMetadata({
   params,
@@ -58,6 +60,14 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
       ? await lookupAddress(company.business_id)
       : null;
 
+  /*
+   * Люди компании. У оператора компании нет; до миграции функции тоже
+   * нет — тогда раздела просто не видно.
+   */
+  const { data: members } =
+    viewer.status === 'ready' && company ? await (await createClient()).rpc('company_members') : { data: null };
+  const isOwner = viewer.status === 'ready' && viewer.profile.member_kind !== 'DISPATCHER';
+
   const content = (
     <main className="cab-page cab-page--narrow">
       <h1 className="page-title">{t.account.title}</h1>
@@ -68,7 +78,14 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
             <Kv k={t.company.email} v={<Mono>{viewer.email}</Mono>} />
             {viewer.status === 'ready' && (
               <>
-                <Kv k={t.cabinet.yourRole} v={t.role[viewer.role]} />
+                <Kv
+                  k={t.cabinet.yourRole}
+                  v={
+                    viewer.company && !isOwner
+                      ? `${t.role[viewer.role]} · ${t.members.dispatcher}`
+                      : t.role[viewer.role]
+                  }
+                />
                 {viewer.company && <Kv k={t.cabinet.company} v={viewer.company.name} />}
               </>
             )}
@@ -130,6 +147,19 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
                   {t.legal.PRIVACY}
                 </Link>
               </div>
+            </CardBody>
+          </Card>
+        )}
+
+        {viewer.status === 'ready' && company && members && (
+          <Card>
+            <CardBody className="flex flex-col gap-4">
+              <div>
+                <h2 className="text-[15px] font-semibold tracking-tight">{t.members.title}</h2>
+                {isOwner && <p className="mt-1.5 text-[13px] leading-relaxed text-ink-muted">{t.members.hint}</p>}
+              </div>
+
+              <MembersPanel members={members} selfId={viewer.userId} canManage={isOwner} />
             </CardBody>
           </Card>
         )}
