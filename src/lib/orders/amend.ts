@@ -12,6 +12,7 @@ import {
   type FieldReader,
 } from '@/lib/orders/stopFields';
 import { createClient } from '@/lib/supabase/server';
+import { flashFailure } from '@/lib/forms/flash';
 import type { StopRole } from '@/types/db';
 
 /**
@@ -370,9 +371,10 @@ export async function acknowledgeAmendmentsAction(formData: FormData): Promise<v
   if (viewer.status !== 'ready' || viewer.role !== 'CARRIER') return;
 
   const supabase = await createClient();
-  await supabase.rpc('acknowledge_amendments', {
+  const { error } = await supabase.rpc('acknowledge_amendments', {
     p_order_id: str(formData, 'order_id'),
   });
+  await flashFailure(locale, error);
 
   revalidateOrder(locale);
 }

@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import { CabinetShell } from '@/components/layout/CabinetShell';
+import { FlashNotice } from '@/components/layout/FlashNotice';
 import { requireRole } from '@/lib/auth/guard';
 import { isLocale } from '@/lib/i18n';
 
@@ -22,6 +23,7 @@ export default async function AdminLayout({
 
   return (
     <CabinetShell locale={locale} role="ADMIN" company={viewer.company}>
+      <FlashNotice />
       {children}
     </CabinetShell>
   );

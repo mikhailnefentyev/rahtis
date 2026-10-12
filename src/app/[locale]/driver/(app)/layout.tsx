@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import { FlashNotice } from '@/components/layout/FlashNotice';
 import { getDriver } from '@/lib/driverApp/session';
 import { isLocale } from '@/lib/i18n';
 import { DriverNav } from '../DriverNav';
@@ -36,6 +37,7 @@ export default async function DriverAppLayout({
         <ScrollArea>
           <div className="mx-auto w-full max-w-lg px-4 pt-[max(env(safe-area-inset-top),16px)] pb-6">
             <OutboxBanner />
+            <FlashNotice />
             {children}
           </div>
         </ScrollArea>

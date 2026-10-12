@@ -5,6 +5,7 @@ import { revalidateOrder } from '@/lib/orders/revalidate';
 import { getViewer } from '@/lib/auth/viewer';
 import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
+import { flashError } from '@/lib/forms/flash';
 
 export type MatchingState = { error: string | null };
 
@@ -160,7 +161,8 @@ export async function cancelOrderAction(formData: FormData): Promise<void> {
   const published = await wasPublished(orderId);
 
   const supabase = await createClient();
-  const { data } = await supabase.rpc('cancel_order', { p_order_id: orderId });
+  const { data, error } = await supabase.rpc('cancel_order', { p_order_id: orderId });
+  if (error) await flashError(await explain(locale, error.code, error.message));
 
   if (!published && data?.status === 'OPEN') await dispatchPublishedOrder(orderId);
 

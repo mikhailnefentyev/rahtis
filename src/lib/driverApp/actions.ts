@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { getDriverI18n } from '@/lib/driverApp/i18n';
+import { flashError } from '@/lib/forms/flash';
 import { isLocale, type Locale, defaultLocale } from '@/lib/i18n';
 import { cancelOrderAction } from '@/lib/orders/matching';
 import { refineEtaAfter } from '@/lib/orders/eta';
@@ -160,7 +161,8 @@ export async function setDriverLanguageAction(formData: FormData): Promise<void>
 export async function acceptTaskAction(formData: FormData): Promise<void> {
   const locale = toLocale(formData.get('locale'));
   const supabase = await createClient();
-  await supabase.rpc('confirm_order', { p_order_id: str(formData, 'order_id') });
+  const { error } = await supabase.rpc('confirm_order', { p_order_id: str(formData, 'order_id') });
+  if (error) await flashError((await getDriverI18n(locale)).t.driverApp.failed);
   revalidateDriver(locale);
 }
 

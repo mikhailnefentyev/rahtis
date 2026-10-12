@@ -11,6 +11,7 @@ import { requireRole } from '@/lib/auth/guard';
 import { getViewer } from '@/lib/auth/viewer';
 import { isLocale, type Locale, defaultLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
+import { flashFailure } from '@/lib/forms/flash';
 
 /**
  * Постоянная работа: согласие перевозчика и пул машин заказчика.
@@ -32,10 +33,11 @@ export async function setShipperLinkAction(formData: FormData): Promise<void> {
   await requireRole(locale, 'CARRIER');
 
   const supabase = await createClient();
-  await supabase.rpc('set_shipper_link', {
+  const { error } = await supabase.rpc('set_shipper_link', {
     p_shipper_id: String(formData.get('shipper_id') ?? ''),
     p_allow: formData.get('allow') === '1',
   });
+  await flashFailure(locale, error);
 
   revalidatePath(`/${locale}/carrier/partners`);
 }
@@ -49,9 +51,10 @@ export async function poolVehicleAction(formData: FormData): Promise<void> {
   const supabase = await createClient();
   const vehicleId = String(formData.get('vehicle_id') ?? '');
 
-  await supabase.rpc(formData.get('add') === '1' ? 'pool_add_vehicle' : 'pool_remove_vehicle', {
+  const { error } = await supabase.rpc(formData.get('add') === '1' ? 'pool_add_vehicle' : 'pool_remove_vehicle', {
     p_vehicle_id: vehicleId,
   });
+  await flashFailure(locale, error);
 
   revalidatePath(`/${locale}/shipper/vehicles`);
   revalidatePath(`/${locale}/shipper/orders`);

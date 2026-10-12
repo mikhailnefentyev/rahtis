@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { defaultLocale, getDictionary, isLocale, type Locale } from '@/lib/i18n';
 import { DRIVER_LOCALES } from '@/lib/i18n/driverLocale';
 import { createClient } from '@/lib/supabase/server';
+import { flashFailure } from '@/lib/forms/flash';
 import { isTrainingModule } from './modules';
 
 /**
@@ -92,10 +93,11 @@ export async function reviewQuestionAction(formData: FormData): Promise<void> {
   if (!id || !reviewer) return;
 
   const supabase = await createClient();
-  await supabase
+  const { error } = await supabase
     .from('training_questions')
     .update({ reviewed_by: reviewer, reviewed_at: new Date().toISOString() })
     .eq('id', id);
+  await flashFailure(locale, error);
   revalidate(locale);
 }
 
@@ -119,7 +121,8 @@ export async function reviewShownQuestionsAction(formData: FormData): Promise<vo
     .eq('active', true)
     .is('reviewed_at', null);
   if (isTrainingModule(topic)) request = request.eq('module', topic);
-  await request;
+  const { error } = await request;
+  await flashFailure(locale, error);
   revalidate(locale);
 }
 
@@ -129,7 +132,11 @@ export async function unreviewQuestionAction(formData: FormData): Promise<void> 
   if (!id) return;
 
   const supabase = await createClient();
-  await supabase.from('training_questions').update({ reviewed_by: null, reviewed_at: null }).eq('id', id);
+  const { error } = await supabase
+    .from('training_questions')
+    .update({ reviewed_by: null, reviewed_at: null })
+    .eq('id', id);
+  await flashFailure(locale, error);
   revalidate(locale);
 }
 
@@ -139,9 +146,10 @@ export async function setQuestionActiveAction(formData: FormData): Promise<void>
   if (!id) return;
 
   const supabase = await createClient();
-  await supabase
+  const { error } = await supabase
     .from('training_questions')
     .update({ active: str(formData, 'active') === 'true' })
     .eq('id', id);
+  await flashFailure(locale, error);
   revalidate(locale);
 }

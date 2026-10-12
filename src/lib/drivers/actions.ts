@@ -7,6 +7,7 @@ import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n'
 import { siteUrl } from '@/lib/config';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
+import { flashFailure } from '@/lib/forms/flash';
 import type { PayModel } from '@/types/db';
 
 /**
@@ -113,11 +114,12 @@ export async function assignDriverAction(formData: FormData): Promise<void> {
   await requireCarrier(locale);
 
   const supabase = await createClient();
-  await supabase.rpc('assign_vehicle_driver', {
+  const { error } = await supabase.rpc('assign_vehicle_driver', {
     p_vehicle_id: str(formData, 'vehicle_id'),
     /* Пустое значение снимает водителя с машины; тип RPC этого не знает. */
     p_driver_id: (opt(formData, 'driver_id') ?? null) as string,
   });
+  await flashFailure(locale, error);
 
   revalidateDrivers(locale);
 }
@@ -227,7 +229,8 @@ export async function deletePayProfileAction(formData: FormData): Promise<void> 
   await requireCarrier(locale);
 
   const supabase = await createClient();
-  await supabase.from('driver_pay_profiles').delete().eq('id', str(formData, 'id'));
+  const { error } = await supabase.from('driver_pay_profiles').delete().eq('id', str(formData, 'id'));
+  await flashFailure(locale, error);
 
   revalidateDrivers(locale, str(formData, 'driver_id'));
 }
@@ -320,7 +323,8 @@ export async function deleteShiftAction(formData: FormData): Promise<void> {
   await requireCarrier(locale);
 
   const supabase = await createClient();
-  await supabase.from('driver_shifts').delete().eq('id', str(formData, 'id'));
+  const { error } = await supabase.from('driver_shifts').delete().eq('id', str(formData, 'id'));
+  await flashFailure(locale, error);
 
   revalidateDrivers(locale, str(formData, 'driver_id'));
 }
@@ -416,7 +420,8 @@ export async function copyTesTemplateAction(formData: FormData): Promise<void> {
   await requireCarrier(locale);
 
   const supabase = await createClient();
-  await supabase.rpc('copy_tes_template', { p_template_id: str(formData, 'id') });
+  const { error } = await supabase.rpc('copy_tes_template', { p_template_id: str(formData, 'id') });
+  await flashFailure(locale, error);
 
   revalidatePath(`/${locale}/carrier/drivers/tes`);
 }

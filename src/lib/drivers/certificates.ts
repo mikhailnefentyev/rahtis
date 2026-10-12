@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { defaultLocale, getDictionary, isLocale, type Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
+import { flashFailure } from '@/lib/forms/flash';
 import { Constants } from '@/types/database';
 import type { DriverCertificateType } from '@/types/db';
 
@@ -78,6 +79,7 @@ export async function deleteCertificateAction(formData: FormData): Promise<void>
   if (!id) return;
 
   const supabase = await createClient();
-  await supabase.from('driver_certificates').delete().eq('id', id);
+  const { error } = await supabase.from('driver_certificates').delete().eq('id', id);
+  await flashFailure(locale, error);
   revalidate(locale, driverId);
 }

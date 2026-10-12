@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { getViewer } from '@/lib/auth/viewer';
 import { defaultLocale, getDictionary, isLocale, type Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
+import { flashFailure } from '@/lib/forms/flash';
 import { generateKey } from './key';
 import { checkUrl, generateSecret, WEBHOOK_EVENTS } from './webhooks';
 
@@ -102,7 +103,8 @@ export async function deleteWebhookAction(formData: FormData): Promise<void> {
   const id = String(formData.get('id') ?? '');
   if (!/^[0-9a-f-]{36}$/.test(id)) return;
   const supabase = await createClient();
-  await supabase.rpc('api_webhook_delete', { p_id: id });
+  const { error } = await supabase.rpc('api_webhook_delete', { p_id: id });
+  await flashFailure(locale, error);
   revalidatePath(`/${locale}/shipper/api`);
 }
 
@@ -111,7 +113,8 @@ export async function pingWebhookAction(formData: FormData): Promise<void> {
   const id = String(formData.get('id') ?? '');
   if (!/^[0-9a-f-]{36}$/.test(id)) return;
   const supabase = await createClient();
-  await supabase.rpc('api_webhook_ping', { p_id: id });
+  const { error } = await supabase.rpc('api_webhook_ping', { p_id: id });
+  await flashFailure(locale, error);
   revalidatePath(`/${locale}/shipper/api`);
 }
 
@@ -121,6 +124,7 @@ export async function revokeApiKeyAction(formData: FormData): Promise<void> {
   if (!/^[0-9a-f-]{36}$/.test(id)) return;
 
   const supabase = await createClient();
-  await supabase.rpc('api_key_revoke', { p_id: id });
+  const { error } = await supabase.rpc('api_key_revoke', { p_id: id });
+  await flashFailure(locale, error);
   revalidatePath(`/${locale}/shipper/api`);
 }

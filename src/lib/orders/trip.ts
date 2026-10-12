@@ -4,6 +4,7 @@ import { revalidateOrder, revalidateOrderFinished } from '@/lib/orders/revalidat
 import { getViewer } from '@/lib/auth/viewer';
 import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
+import { flashFailure } from '@/lib/forms/flash';
 import { refineEtaAfter } from '@/lib/orders/eta';
 import { operationsLocalToIso } from '@/lib/dates';
 
@@ -154,9 +155,10 @@ export async function uncompleteStopAction(formData: FormData): Promise<void> {
   if (await guard(locale)) return;
 
   const supabase = await createClient();
-  await supabase.rpc('uncomplete_stop', {
+  const { error } = await supabase.rpc('uncomplete_stop', {
     p_stop_id: String(formData.get('stop_id') ?? ''),
   });
+  await flashFailure(locale, error);
 
   revalidateOrder(locale);
 }

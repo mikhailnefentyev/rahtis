@@ -5,6 +5,7 @@ import { requireRole } from '@/lib/auth/guard';
 import { getViewer } from '@/lib/auth/viewer';
 import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
+import { flashFailure } from '@/lib/forms/flash';
 import type { DocumentKind, EuroClass, VehicleClass } from '@/types/db';
 
 const BUCKET = 'company-docs';
@@ -296,7 +297,9 @@ export async function submitVehicleAction(formData: FormData): Promise<void> {
   await requireCarrier(locale);
 
   const supabase = await createClient();
-  await supabase.rpc('submit_vehicle', { p_vehicle_id: String(formData.get('id') ?? '') });
+  const { error } = await supabase.rpc('submit_vehicle', { p_vehicle_id: String(formData.get('id') ?? '') });
+  /* 55000 здесь почти всегда одно: у компании нет действующих лицензии и страховки. */
+  if (error) await flashFailure(locale, error, { '55000': (await getDictionary(locale)).fleet.whyClosedNoDocs });
 
   revalidatePath(`/${locale}/carrier/fleet`);
 }
@@ -307,7 +310,8 @@ export async function deleteDraftVehicleAction(formData: FormData): Promise<void
 
   const supabase = await createClient();
   /* Политика пропустит удаление только черновика — проверка не дублируется. */
-  await supabase.from('vehicles').delete().eq('id', String(formData.get('id') ?? ''));
+  const { error } = await supabase.from('vehicles').delete().eq('id', String(formData.get('id') ?? ''));
+  await flashFailure(locale, error);
 
   revalidatePath(`/${locale}/carrier/fleet`);
 }
