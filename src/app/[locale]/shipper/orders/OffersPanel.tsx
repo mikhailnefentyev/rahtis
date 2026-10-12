@@ -1,5 +1,6 @@
 'use client';
 
+import { useActionState } from 'react';
 import { Badge, Button, Countdown, Kv, Plate, Stars } from '@/components/ui';
 import { APP, MATCHING } from '@/lib/config';
 import { EURO_LABEL } from '@/lib/fleet/labels';
@@ -61,6 +62,7 @@ function VehicleLine({ offer, badge }: { offer: ShipperOffer; badge?: React.Reac
  */
 export function OffersPanel({ order, offers }: { order: ShipperOrder; offers: ShipperOffer[] }) {
   const { t, m, locale } = useI18n();
+  const [chooseState, chooseAction, choosing] = useActionState(chooseOfferAction, { error: null });
 
   const awaiting = order.status === 'AWAIT_DRIVER';
 
@@ -91,6 +93,11 @@ export function OffersPanel({ order, offers }: { order: ShipperOrder; offers: Sh
       {!awaiting && offers.length > 0 && (
         <p className="mb-2.5 text-[13px] text-ink-muted">{t.matching.chooseCarrier}</p>
       )}
+      {chooseState.error && (
+        <p role="alert" className="mb-2.5 text-[13px] text-danger">
+          {chooseState.error}
+        </p>
+      )}
 
       <div className="flex flex-col gap-2">
         {offers.map((offer) => (
@@ -104,10 +111,10 @@ export function OffersPanel({ order, offers }: { order: ShipperOrder; offers: Sh
             />
 
             {!awaiting && (
-              <form action={chooseOfferAction}>
+              <form action={chooseAction}>
                 <input type="hidden" name="locale" value={locale} />
                 <input type="hidden" name="offer_id" value={offer.offer_id} />
-                <Button type="submit" variant="primary" size="sm">
+                <Button type="submit" variant="primary" size="sm" disabled={choosing}>
                   {t.matching.choose}
                 </Button>
               </form>

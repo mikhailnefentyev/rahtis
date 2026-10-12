@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useActionState, useState } from 'react';
 import { HaulBadge } from '@/components/domain/HaulBadge';
 import { OrderAmendments } from '@/components/domain/OrderAmendments';
 import { OrderRouteMap } from '@/components/domain/RouteMap';
@@ -55,6 +55,7 @@ export function AssignmentCard({
   /* Свой рейс отказом снимается насовсем — поэтому отказ в два шага. */
   const own = ownClient !== undefined;
   const [declining, setDeclining] = useState(false);
+  const [confirmState, confirmAction, confirming] = useActionState(confirmOrderAction, { error: null });
 
   const stops = (order.stops ?? []) as unknown as OrderStop[];
   const waiting = order.status === 'AWAIT_DRIVER';
@@ -119,12 +120,17 @@ export function AssignmentCard({
 
                 {waiting ? (
                   <>
-                    <form action={confirmOrderAction}>
+                    <form action={confirmAction} className="flex max-w-56 flex-col items-end gap-2">
                       <input type="hidden" name="locale" value={locale} />
                       <input type="hidden" name="order_id" value={order.id} />
-                      <Button type="submit" variant="primary" size="sm" className="w-full">
+                      <Button type="submit" variant="primary" size="sm" className="w-full" disabled={confirming}>
                         {t.matching.confirm}
                       </Button>
+                      {confirmState.error && (
+                        <p role="alert" className="text-right text-xs text-danger">
+                          {confirmState.error}
+                        </p>
+                      )}
                     </form>
                     {own && !declining ? (
                       <Button type="button" variant="danger" size="sm" className="w-full" onClick={() => setDeclining(true)}>

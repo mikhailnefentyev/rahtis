@@ -106,24 +106,44 @@ export async function groupTakeAction(
   return { error: error ? await explain(locale, error.code, error.message) : null };
 }
 
-/** Выбор заказчиком одного отклика из трёх. */
-export async function chooseOfferAction(formData: FormData): Promise<void> {
+/**
+ * Выбор заказчиком одного отклика из трёх.
+ *
+ * Отказ базы возвращается человеку. Раньше оба действия ниже молчали:
+ * если срок вышел или машина перестала быть допущенной, кнопка просто
+ * ничего не делала (прогон 13.10.2026).
+ */
+export async function chooseOfferAction(
+  _previous: MatchingState,
+  formData: FormData,
+): Promise<MatchingState> {
   const locale = toLocale(formData.get('locale'));
 
   const supabase = await createClient();
-  await supabase.rpc('choose_offer', { p_offer_id: String(formData.get('offer_id') ?? '') });
+  const { error } = await supabase.rpc('choose_offer', {
+    p_offer_id: String(formData.get('offer_id') ?? ''),
+  });
 
   revalidateOrder(locale);
+
+  return { error: error ? await explain(locale, error.code, error.message) : null };
 }
 
 /** Подтверждение работы выбранным перевозчиком. */
-export async function confirmOrderAction(formData: FormData): Promise<void> {
+export async function confirmOrderAction(
+  _previous: MatchingState,
+  formData: FormData,
+): Promise<MatchingState> {
   const locale = toLocale(formData.get('locale'));
 
   const supabase = await createClient();
-  await supabase.rpc('confirm_order', { p_order_id: String(formData.get('order_id') ?? '') });
+  const { error } = await supabase.rpc('confirm_order', {
+    p_order_id: String(formData.get('order_id') ?? ''),
+  });
 
   revalidateOrder(locale);
+
+  return { error: error ? await explain(locale, error.code, error.message) : null };
 }
 
 /**
