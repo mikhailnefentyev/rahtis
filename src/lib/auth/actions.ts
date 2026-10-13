@@ -3,7 +3,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { recordIncident } from '@/lib/incidents/record';
-import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
+import { getDictionary, isLocale, type Dictionary, type Locale, defaultLocale } from '@/lib/i18n';
 import { cabinetPath, noAccessPath, safeRedirect, signInPath } from './paths';
 import { clientIp, throttleAllowed } from './throttle';
 import { getViewer } from './viewer';
@@ -90,6 +90,13 @@ export async function signInAction(
 
 export type SetPasswordState = { error: string | null };
 
+/* Отказ сервиса входа приходит по-английски — пользователю отвечаем из словаря. */
+function passwordRefusal(t: Dictionary, code: string | undefined): string {
+  if (code === 'weak_password') return t.invite.weak;
+  if (code === 'same_password') return t.account.sameAsOld;
+  return t.error.generic;
+}
+
 /**
  * Пароль после приглашения.
  *
@@ -114,7 +121,7 @@ export async function setPasswordAction(
   const supabase = await createClient();
   const { error } = await supabase.auth.updateUser({ password });
 
-  if (error) return { error: error.message };
+  if (error) return { error: passwordRefusal(t, error.code) };
 
   const viewer = await getViewer();
   redirect(
@@ -166,7 +173,7 @@ export async function changePasswordAction(
   if (wrong) return { error: t.account.wrongCurrent, done: false };
 
   const { error } = await supabase.auth.updateUser({ password });
-  if (error) return { error: error.message, done: false };
+  if (error) return { error: passwordRefusal(t, error.code), done: false };
 
   return { error: null, done: true };
 }

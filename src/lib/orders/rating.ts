@@ -37,21 +37,21 @@ export async function rateOrderAction(
     return { error: t.rating.failed, score: null };
   }
 
+  /* База не примет комментарий короче трёх знаков («ok») — скажем об этом словами, а не «обновите страницу». */
+  const comment = String(formData.get('comment') ?? '').trim();
+  if (comment && comment.length < 3) return { error: t.rating.commentShort, score: null };
+
   const supabase = await createClient();
   const { error } = await supabase.rpc('rate_order', {
     p_order_id: String(formData.get('order_id') ?? ''),
     p_score: score,
-    p_comment: String(formData.get('comment') ?? '').trim() || undefined,
+    p_comment: comment || undefined,
   });
 
   if (error) {
-    /*
-     * 55000 приходит с объяснением от той же функции, которая отказала, —
-     * «рейс ещё не закрыт», «перевозчика нет». Общая фраза вместо него
-     * отняла бы у заказчика единственную подсказку.
-     */
+    /* 55000 — рейс ещё не закрыт или перевозчика нет. Текст базы русский, заказчику — из словаря. */
     return {
-      error: error.code === '55000' ? error.message : t.rating.failed,
+      error: error.code === '55000' ? t.rating.notYet : t.rating.failed,
       score: null,
     };
   }
