@@ -41,6 +41,7 @@ export function ScanCapture({
   const [pages, setPages] = useState<Page[]>([]);
   const [editing, setEditing] = useState<{ photo: HTMLCanvasElement; quad: Quad; url: string } | null>(null);
   const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState(false);
 
   /* Ссылки на превью освобождаются при уходе со страницы; удалённые — сразу при удалении. */
   const urls = useRef<string[]>([]);
@@ -50,18 +51,24 @@ export function ScanCapture({
   useEffect(() => () => urls.current.forEach((u) => URL.revokeObjectURL(u)), []);
 
   function shoot() {
+    setFailed(false);
     input.current?.click();
   }
 
   async function onFile(file: File | undefined) {
     if (input.current) input.current.value = '';
     if (!file) return;
+    setFailed(false);
     setBusy(true);
     setOpen(true);
     try {
       const photo = await loadPhoto(file);
       const url = photo.toDataURL('image/jpeg', 0.6);
       setEditing({ photo, quad: detectSheet(photo), url });
+    } catch {
+      /* Файл не открылся как снимок: без этого сканер оставался пустым чёрным экраном без объяснения. */
+      setFailed(true);
+      if (pages.length === 0) setOpen(false);
     } finally {
       setBusy(false);
     }
@@ -126,6 +133,12 @@ export function ScanCapture({
           {done ? t.driverApp.scanAgain : t.driverApp.scanCmr}
         </span>
       </button>
+
+      {failed && (
+        <p role="alert" className="mt-2 text-[14px] text-danger">
+          {t.driverApp.failed}
+        </p>
+      )}
 
       {open && (
         <div className="fixed inset-0 z-50 flex flex-col bg-black text-white" role="dialog" aria-modal>
