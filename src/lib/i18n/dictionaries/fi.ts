@@ -1901,7 +1901,7 @@ export const fi = {
     rating: 'Arvio',
     adr: 'ADR',
     adrHas: 'ADR-lupa',
-    adrHint: 'Onko ajoneuvolla ja kuljettajalla lupa vaarallisiin aineisiin',
+    adrHint: 'Onko ajoneuvolla ja kuljettajalla lupa vaarallisiin aineisiin. Jos lisäät ADR:n hyväksytylle ajoneuvolle, tarkastamme ajoneuvon uudelleen.',
     adrNo: 'Ei ADR-lupaa',
     capacity: 'Kantavuus',
     capacityHint: 'Kaksiakselinen vetoauto ottaa 25 t, kolmiakselinen 32 t.',

@@ -1788,7 +1788,7 @@ export const en = {
     rating: 'Rating',
     adr: 'ADR',
     adrHas: 'ADR permit',
-    adrHint: 'Whether the vehicle and driver are cleared for dangerous goods',
+    adrHint: 'Whether the vehicle and driver are cleared for dangerous goods. Adding ADR to an approved vehicle sends it back for review.',
     adrNo: 'No ADR permit',
     capacity: 'Payload',
     capacityHint: 'A two-axle tractor takes 25 t, a three-axle one 32 t.',
