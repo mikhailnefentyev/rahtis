@@ -835,7 +835,7 @@ export const fi = {
   lifecycle: {
     withdraw: 'Peruuta kuljetus',
     withdrawing: 'Peruutetaan…',
-    withdrawHint: 'Kuljetus poistuu työlistoilta lopullisesti. Tiedot ja historia jäävät.',
+    withdrawHint: 'Kuljetus poistuu työlistoilta lopullisesti. Tiedot ja historia jäävät. Kun ensimmäinen piste on käyty, kuljetusta ei voi enää perua.',
     /*
      * Ensimmäisessä persoonassa, kuten 'Otan kuljetuksen', jonka
      * vastapari tämä on. 'Luovu kuljetuksesta' kuulosti luovuttamiselta
@@ -844,7 +844,7 @@ export const fi = {
     abandon: 'En pysty ajamaan',
     abandoning: 'Ilmoitetaan…',
     abandonHint:
-      'Jos yhtäkään pistettä ei ole vielä käyty, kuljetus palaa tarjolle muille. Jos matka on jo alkanut, se peruuntuu ja ajojärjestely ottaa yhteyttä.',
+      'Jos yhtäkään pistettä ei ole vielä käyty, kuljetus palaa tarjolle muille. Kun ensimmäinen piste on käyty, kuljetusta ei voi enää perua — ota yhteys ajojärjestelyyn.',
     reprice: 'Päivitä matka ja hinta',
     repricing: 'Tallennetaan…',
     repriceHint:
@@ -859,6 +859,7 @@ export const fi = {
     confirm: 'Vahvista',
     cancelled: 'Kuljetus on peruutettu',
     notAllowed: 'Sinulla ei ole oikeutta tähän toimenpiteeseen.',
+    started: 'Kuljetus on jo aloitettu, eikä sitä voi enää perua. Ota yhteys ajojärjestelyyn.',
     noLowering: 'Hintaa ei voi laskea, kun kuljetusliike on jo valittu. Hintaa voi vain korottaa.',
     notFound: 'Kuljetusta ei löytynyt.',
     failed: 'Toimenpide ei mennyt läpi. Päivitä sivu ja yritä uudelleen.',

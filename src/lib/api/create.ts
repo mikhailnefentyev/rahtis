@@ -301,6 +301,7 @@ export async function withdrawOrder(ctx: ApiContext, ref: string, body: unknown)
   if (error) {
     if (error.code === 'P0002') throw new ApiError('not_found', 'Order not found.');
     if (error.code === '55000') throw new ApiError('conflict', error.message.includes('Выполненный') ? 'A completed order cannot be withdrawn.' : 'The order is already withdrawn.');
+    if (error.code === '55012') throw new ApiError('conflict', 'The trip has started (a stop is completed) and can no longer be cancelled; contact the operator.');
     if (error.code === '42501') throw new ApiError('forbidden', 'This key cannot withdraw orders.');
     throw new ApiError('internal', 'The order could not be withdrawn.');
   }

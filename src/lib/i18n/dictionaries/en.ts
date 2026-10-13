@@ -747,7 +747,7 @@ export const en = {
   lifecycle: {
     withdraw: 'Cancel order',
     withdrawing: 'Cancelling…',
-    withdrawHint: 'The order leaves the working lists for good. Its data and history stay.',
+    withdrawHint: 'The order leaves the working lists for good. Its data and history stay. Once the first stop is done the transport can no longer be cancelled.',
     /*
      * First person, matching 'I take this job', which this undoes.
      * The old wording read as giving up; the point is that the truck
@@ -756,7 +756,7 @@ export const en = {
     abandon: 'I cannot run this job',
     abandoning: 'Reporting…',
     abandonHint:
-      'If no stop has been reached yet, the order goes back on the board for someone else. If the run has started, it is cancelled and dispatch will be in touch.',
+      'If no stop has been reached yet, the order goes back on the board for someone else. Once the first stop is done the transport can no longer be cancelled — contact dispatch.',
     reprice: 'Update distance and price',
     repricing: 'Saving…',
     repriceHint:
@@ -771,6 +771,7 @@ export const en = {
     confirm: 'Confirm',
     cancelled: 'This order has been cancelled',
     notAllowed: 'You are not allowed to do this.',
+    started: 'The transport has already started and can no longer be cancelled. Contact dispatch.',
     noLowering: 'The price cannot be lowered once a carrier is assigned. It can only be raised.',
     notFound: 'Order not found.',
     failed: 'That did not go through. Refresh the page and try again.',

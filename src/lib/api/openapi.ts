@@ -202,7 +202,7 @@ export function openApi(serverUrl: string) {
           tags: ['Write'],
           summary: 'Withdraw an order',
           operationId: 'withdrawOrder',
-          description: 'Cancels the order. A completed order cannot be withdrawn.',
+          description: 'Cancels the order. A completed order cannot be withdrawn, and neither can a trip with a completed stop.',
           parameters: [refParam, idempotencyHeader],
           requestBody: {
             required: false,
@@ -212,7 +212,7 @@ export function openApi(serverUrl: string) {
             '200': { description: 'Withdrawn; the updated order.', content: json(ref('Order')) },
             '403': errorResponse('Read-only key.'),
             '404': errorResponse('No order with this number in your company.'),
-            '409': errorResponse('Already withdrawn, completed, or the same Idempotency-Key is still being processed.'),
+            '409': errorResponse('Already withdrawn, completed, started (a stop is completed), or the same Idempotency-Key is still being processed.'),
             ...COMMON_ERRORS,
           },
         },
