@@ -45,6 +45,9 @@ async function explain(locale: Locale, code: string | undefined): Promise<string
   const t = await getDictionary(locale);
   if (code === '42501' || code === 'P0002') return t.error.forbidden;
   if (code === '55000') return t.claims.notAllowed;
+  /* 55016 — у стороны уже есть открытая претензия по рейсу; 55017 — прошло 30 дней после закрытия. */
+  if (code === '55016') return t.claims.oneOpen;
+  if (code === '55017') return t.claims.tooLate;
   if (code === '22023') return t.claims.resolutionHint;
   return t.claims.failed;
 }

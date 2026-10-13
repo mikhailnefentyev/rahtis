@@ -1761,6 +1761,8 @@ export const fi = {
     settleHint: 'Jos sovitte asiasta vastapuolen kanssa, voitte sulkea oman reklamaationne.',
     failed: 'Toiminto ei onnistunut. Yritä uudelleen.',
     notAllowed: 'Tätä toimintoa ei voi tehdä tässä tilassa.',
+    oneOpen: 'Tästä kuljetuksesta on jo avoin reklamaationne. Täydentäkää sitä kommentilla tai liitteellä.',
+    tooLate: 'Reklamaatio on tehtävä 30 päivän kuluessa kuljetuksen päättymisestä.',
     tooShort: 'Kuvaus on liian lyhyt.',
     byEmail: 'Käsittely sähköpostitse',
     notForwarded: 'Reklamaatiota ei ole välitetty vastapuolelle: yhteystietoa ei löytynyt tai lähetys epäonnistui. Välitä se käsin.',

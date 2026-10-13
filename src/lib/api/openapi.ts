@@ -426,7 +426,7 @@ export function openApi(serverUrl: string) {
           tags: ['Write'],
           summary: 'File a claim',
           operationId: 'fileClaim',
-          description: 'For a trip in progress or completed. The other party and the operator are notified by email.',
+          description: 'For a trip in progress or completed (within 30 days after closing). One open claim per company per trip: add comments and attachments to it instead of filing another (409). The other party and the operator are notified by email.',
           parameters: [idempotencyHeader],
           requestBody: { required: true, content: json(ref('ClaimInput')) },
           responses: {

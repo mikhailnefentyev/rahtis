@@ -1658,6 +1658,8 @@ export const en = {
     settleHint: 'If you have agreed with the counterparty, you can close your own claim.',
     failed: 'That did not work. Please try again.',
     notAllowed: 'This action is not available in the current state.',
+    oneOpen: 'You already have an open claim for this transport. Add a comment or an attachment to it.',
+    tooLate: 'A claim must be filed within 30 days after the transport is finished.',
     tooShort: 'The description is too short.',
     byEmail: 'Handled by email',
     notForwarded: 'The claim has not been forwarded to the counterparty: no contact address was found or sending failed. Forward it manually.',
