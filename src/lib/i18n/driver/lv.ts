@@ -231,6 +231,7 @@ export const lv = {
     'driverEvent.offer.chosen': 'Reiss {ref} mašīnai {plate} — apstiprini {minutes} minūšu laikā',
     'driverEvent.order.released': 'Reiss {ref} vairs nav tavs',
     'driverEvent.order.cancelled': 'Reiss {ref} ir atcelts',
+    'driverEvent.order.amended': 'Reisa {ref} maršruts ir mainīts — pārbaudi punktus',
     'driverEvent.certificate.expiring':
       '{type, select, CODE95 {Profesionālā kvalifikācija (kods 95)} ADR_BASIC {ADR apliecība} ADR_TANK {ADR apliecība (cisternas)} ADR_CLASS1 {ADR apliecība (1. klase)} ADR_CLASS7 {ADR apliecība (7. klase)} TYOTURVA {Darba drošības karte} EA1 {Pirmās palīdzības karte EA 1} TIETURVA1 {Tieturva 1} TACHO_CARD {Vadītāja karte} other {Apliecība}} beidzas {date}',
     'driverEvent.chat.message': 'Jauns ziņojums reisā {ref}',

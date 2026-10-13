@@ -3442,6 +3442,7 @@ export const fi = {
     'driverEvent.offer.chosen': 'Keikka {ref} autolle {plate} — vahvista {minutes} minuutissa',
     'driverEvent.order.released': 'Keikka {ref} ei ole enää sinun',
     'driverEvent.order.cancelled': 'Keikka {ref} on peruttu',
+    'driverEvent.order.amended': 'Keikan {ref} reitti muuttui — tarkista pisteet',
     'driverEvent.certificate.expiring':
       '{type, select, CODE95 {Ammattipätevyys} ADR_BASIC {ADR-ajolupa} ADR_TANK {ADR-ajolupa (säiliö)} ADR_CLASS1 {ADR-ajolupa (luokka 1)} ADR_CLASS7 {ADR-ajolupa (luokka 7)} TYOTURVA {Työturvallisuuskortti} EA1 {Ensiapukortti EA 1} TIETURVA1 {Tieturva 1} TACHO_CARD {Kuljettajakortti} other {Pätevyys}} vanhenee {date}',
     'training.lcdDue': 'KERTAUS {count}',

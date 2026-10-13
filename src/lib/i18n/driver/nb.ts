@@ -231,6 +231,7 @@ export const nb = {
     'driverEvent.offer.chosen': 'Oppdrag {ref} for {plate} — bekreft innen {minutes} minutter',
     'driverEvent.order.released': 'Oppdrag {ref} er ikke lenger ditt',
     'driverEvent.order.cancelled': 'Oppdrag {ref} er kansellert',
+    'driverEvent.order.amended': 'Ruten for oppdrag {ref} er endret — sjekk stoppene',
     'driverEvent.certificate.expiring':
       '{type, select, CODE95 {Yrkessjåførkompetanse (kode 95)} ADR_BASIC {ADR-bevis} ADR_TANK {ADR-bevis (tank)} ADR_CLASS1 {ADR-bevis (klasse 1)} ADR_CLASS7 {ADR-bevis (klasse 7)} TYOTURVA {Arbeidssikkerhetskort} EA1 {Førstehjelpskort EA 1} TIETURVA1 {Tieturva 1} TACHO_CARD {Sjåførkort} other {Bevis}} utløper {date}',
     'driverEvent.chat.message': 'Ny melding i oppdrag {ref}',

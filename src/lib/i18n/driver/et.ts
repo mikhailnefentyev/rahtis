@@ -231,6 +231,7 @@ export const et = {
     'driverEvent.offer.chosen': 'Töö {ref} autole {plate} — kinnita {minutes} minuti jooksul',
     'driverEvent.order.released': 'Töö {ref} ei ole enam sinu oma',
     'driverEvent.order.cancelled': 'Töö {ref} on tühistatud',
+    'driverEvent.order.amended': 'Töö {ref} marsruut muutus — kontrolli punkte',
     'driverEvent.certificate.expiring':
       '{type, select, CODE95 {Ametikoolitus (kood 95)} ADR_BASIC {ADR-tunnistus} ADR_TANK {ADR-tunnistus (paak)} ADR_CLASS1 {ADR-tunnistus (klass 1)} ADR_CLASS7 {ADR-tunnistus (klass 7)} TYOTURVA {Tööohutuskaart} EA1 {Esmaabikaart EA 1} TIETURVA1 {Tieturva 1} TACHO_CARD {Juhikaart} other {Tunnistus}} aegub {date}',
     'driverEvent.chat.message': 'Uus sõnum töös {ref}',

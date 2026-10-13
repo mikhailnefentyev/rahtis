@@ -231,6 +231,7 @@ export const ru = {
     'driverEvent.offer.chosen': 'Рейс {ref} на машину {plate} — подтвердите за {minutes} мин',
     'driverEvent.order.released': 'Рейс {ref} больше не ваш',
     'driverEvent.order.cancelled': 'Рейс {ref} отменён',
+    'driverEvent.order.amended': 'Маршрут рейса {ref} изменён — проверьте точки',
     'driverEvent.certificate.expiring':
       '{type, select, CODE95 {Код 95} ADR_BASIC {Свидетельство ADR} ADR_TANK {Свидетельство ADR (цистерны)} ADR_CLASS1 {Свидетельство ADR (класс 1)} ADR_CLASS7 {Свидетельство ADR (класс 7)} TYOTURVA {Карта охраны труда} EA1 {Карта первой помощи EA 1} TIETURVA1 {Tieturva 1} TACHO_CARD {Карта водителя} other {Удостоверение}} истекает {date}',
     'driverEvent.chat.message': 'Новое сообщение по рейсу {ref}',

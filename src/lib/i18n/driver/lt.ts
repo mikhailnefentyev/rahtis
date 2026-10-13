@@ -231,6 +231,7 @@ export const lt = {
     'driverEvent.offer.chosen': 'Reisas {ref} automobiliui {plate} — patvirtink per {minutes} min.',
     'driverEvent.order.released': 'Reisas {ref} nebėra tavo',
     'driverEvent.order.cancelled': 'Reisas {ref} atšauktas',
+    'driverEvent.order.amended': 'Reiso {ref} maršrutas pakeistas — patikrink taškus',
     'driverEvent.certificate.expiring':
       '{type, select, CODE95 {Profesinė kvalifikacija (kodas 95)} ADR_BASIC {ADR pažymėjimas} ADR_TANK {ADR pažymėjimas (cisternos)} ADR_CLASS1 {ADR pažymėjimas (1 klasė)} ADR_CLASS7 {ADR pažymėjimas (7 klasė)} TYOTURVA {Darbo saugos kortelė} EA1 {Pirmosios pagalbos kortelė EA 1} TIETURVA1 {Tieturva 1} TACHO_CARD {Vairuotojo kortelė} other {Pažymėjimas}} baigiasi {date}',
     'driverEvent.chat.message': 'Nauja žinutė reise {ref}',

@@ -231,6 +231,7 @@ export const sv = {
     'driverEvent.offer.chosen': 'Uppdrag {ref} för {plate} — bekräfta inom {minutes} minuter',
     'driverEvent.order.released': 'Uppdrag {ref} är inte längre ditt',
     'driverEvent.order.cancelled': 'Uppdrag {ref} har avbokats',
+    'driverEvent.order.amended': 'Rutten för uppdrag {ref} har ändrats — kontrollera stoppen',
     'driverEvent.certificate.expiring':
       '{type, select, CODE95 {Yrkeskompetens (kod 95)} ADR_BASIC {ADR-intyg} ADR_TANK {ADR-intyg (tank)} ADR_CLASS1 {ADR-intyg (klass 1)} ADR_CLASS7 {ADR-intyg (klass 7)} TYOTURVA {Arbetssäkerhetskort} EA1 {Första hjälpen-kort EA 1} TIETURVA1 {Tieturva 1} TACHO_CARD {Förarkort} other {Behörighet}} går ut {date}',
     'driverEvent.chat.message': 'Nytt meddelande i uppdrag {ref}',

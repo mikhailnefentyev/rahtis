@@ -3302,6 +3302,7 @@ export const en = {
     'driverEvent.offer.chosen': 'Job {ref} for {plate} — confirm within {minutes} minutes',
     'driverEvent.order.released': 'Job {ref} is no longer yours',
     'driverEvent.order.cancelled': 'Job {ref} has been cancelled',
+    'driverEvent.order.amended': 'The route of job {ref} changed — check the stops',
     'driverEvent.certificate.expiring':
       '{type, select, CODE95 {Driver CPC} ADR_BASIC {ADR certificate} ADR_TANK {ADR certificate (tank)} ADR_CLASS1 {ADR certificate (class 1)} ADR_CLASS7 {ADR certificate (class 7)} TYOTURVA {Occupational safety card} EA1 {First aid card EA 1} TIETURVA1 {Tieturva 1} TACHO_CARD {Driver card} other {Qualification}} expires on {date}',
     /* TODO: tarkistettava — trainer messages await review. */

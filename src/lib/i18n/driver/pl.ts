@@ -231,6 +231,7 @@ export const pl = {
     'driverEvent.offer.chosen': 'Zlecenie {ref} dla {plate} — potwierdź w ciągu {minutes} min',
     'driverEvent.order.released': 'Zlecenie {ref} nie jest już twoje',
     'driverEvent.order.cancelled': 'Zlecenie {ref} zostało anulowane',
+    'driverEvent.order.amended': 'Trasa zlecenia {ref} została zmieniona — sprawdź punkty',
     'driverEvent.certificate.expiring':
       '{type, select, CODE95 {Kwalifikacja zawodowa (kod 95)} ADR_BASIC {Zaświadczenie ADR} ADR_TANK {Zaświadczenie ADR (cysterny)} ADR_CLASS1 {Zaświadczenie ADR (klasa 1)} ADR_CLASS7 {Zaświadczenie ADR (klasa 7)} TYOTURVA {Karta bezpieczeństwa pracy} EA1 {Karta pierwszej pomocy EA 1} TIETURVA1 {Tieturva 1} TACHO_CARD {Karta kierowcy} other {Uprawnienie}} wygasa {date}',
     'driverEvent.chat.message': 'Nowa wiadomość w zleceniu {ref}',
