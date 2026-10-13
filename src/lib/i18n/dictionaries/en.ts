@@ -3061,6 +3061,7 @@ export const en = {
     starFirst: 'Give the stars first',
     commentShort: 'A comment needs at least three characters.',
     notYet: 'You can rate the carrier once the transport is finished.',
+    locked: 'A rating can be changed for 14 days after the transport is finished. This rating is now final.',
     failed: 'The rating could not be saved. Refresh the page and try again.',
     company: 'Company rating',
   },

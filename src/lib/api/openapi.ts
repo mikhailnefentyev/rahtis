@@ -391,7 +391,7 @@ export function openApi(serverUrl: string) {
           tags: ['Write'],
           summary: 'Rate the carrier',
           operationId: 'rateOrder',
-          description: 'After the trip is closed. Rating again replaces the previous rating.',
+          description: 'After the trip is closed. Rating again replaces the previous rating for 14 days after closing; after that the rating is final (409).',
           parameters: [refParam, idempotencyHeader],
           requestBody: {
             required: true,

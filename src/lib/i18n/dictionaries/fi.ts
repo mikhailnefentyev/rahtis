@@ -3180,6 +3180,7 @@ export const fi = {
     starFirst: 'Anna ensin tähdet',
     commentShort: 'Kommentissa on oltava vähintään kolme merkkiä.',
     notYet: 'Arvion voi antaa vasta, kun kuljetus on päättynyt.',
+    locked: 'Arviota voi muuttaa 14 päivän ajan kuljetuksen päättymisestä. Tämä arvio on jo lopullinen.',
     failed: 'Arvion tallennus ei onnistunut. Päivitä sivu ja yritä uudelleen.',
     company: 'Yrityksen arvosana',
   },

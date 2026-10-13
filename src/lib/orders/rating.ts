@@ -51,7 +51,8 @@ export async function rateOrderAction(
   if (error) {
     /* 55000 — рейс ещё не закрыт или перевозчика нет. Текст базы русский, заказчику — из словаря. */
     return {
-      error: error.code === '55000' ? t.rating.notYet : t.rating.failed,
+      /* 55015 — оценку меняют 14 дней после закрытия рейса, потом она окончательна. */
+      error: error.code === '55015' ? t.rating.locked : error.code === '55000' ? t.rating.notYet : t.rating.failed,
       score: null,
     };
   }
