@@ -128,6 +128,8 @@ export type DriverSummary = {
 };
 
 const MINUTE = 60_000;
+/** Предел одной смены — как ограничение driver_shifts_length в базе. */
+const MAX_SHIFT_MS = 24 * 60 * MINUTE;
 const DEFAULT_TZ = 'Europe/Helsinki';
 
 /* ── Местное время ──────────────────────────────────────────────── */
@@ -292,7 +294,9 @@ type ShiftSlice = {
  * пятничной смены, остаётся субботой.
  *
  * Незакрытая смена считается до `now`: водитель ещё работает, и справка
- * должна показывать отработанное к этой минуте, а не ноль.
+ * должна показывать отработанное к этой минуте, а не ноль. Но не дольше
+ * суток: смена, открытая третий день, — забытое «завершить», и считать её
+ * до текущей минуты значило бы показать сотни часов работы.
  */
 export function splitShift(
   shift: ShiftInput,
@@ -302,7 +306,7 @@ export function splitShift(
 ): ShiftSlice {
   const clock = localClock(timeZone);
   const start = Date.parse(shift.start);
-  const end = shift.end ? Date.parse(shift.end) : now;
+  const end = shift.end ? Date.parse(shift.end) : Math.min(now, start + MAX_SHIFT_MS);
 
   const breaks = shift.breaks.map((b) => [
     Date.parse(b.start),
