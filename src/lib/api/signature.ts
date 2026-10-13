@@ -46,7 +46,8 @@ export function privateV4(ip: string): boolean {
 export function privateV6(ip: string): boolean {
   const v = ip.toLowerCase();
   if (v === '::1' || v === '::') return true;
-  if (v.startsWith('fc') || v.startsWith('fd') || v.startsWith('fe80')) return true;
+  /* fc00::/7 — частные, fe80::/10 — локальные для канала (fe80…febf, а не только fe80). */
+  if (v.startsWith('fc') || v.startsWith('fd') || /^fe[89ab]/.test(v)) return true;
   /* IPv4 внутри IPv6: парсер URL пишет ::ffff:127.0.0.1 как ::ffff:7f00:1. */
   const dotted = v.match(/^::ffff:(\d+\.\d+\.\d+\.\d+)$/);
   if (dotted) return privateV4(dotted[1]);

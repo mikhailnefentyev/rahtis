@@ -124,7 +124,7 @@ test('адрес вебхука: внутренние сети закрыты', 
   }
   for (const ip of ['8.8.8.8', '172.32.0.1', '195.148.1.1']) assert.equal(privateV4(ip), false, ip);
 
-  for (const ip of ['::1', '::', 'fd00::1', 'fe80::1', '::ffff:10.0.0.1']) assert.ok(privateV6(ip), ip);
+  for (const ip of ['::1', '::', 'fd00::1', 'fe80::1', 'febf::1', '::ffff:10.0.0.1']) assert.ok(privateV6(ip), ip);
   // так парсер URL записывает [::ffff:127.0.0.1] и [::ffff:169.254.169.254]
   const host = (u) => new URL(u).hostname.replace(/^\[|\]$/g, '');
   assert.ok(privateV6(host('https://[::ffff:127.0.0.1]/')));
