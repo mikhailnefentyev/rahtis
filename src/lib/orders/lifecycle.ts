@@ -56,6 +56,8 @@ async function explain(
   if (code === '55011') return t.lifecycle.noLowering;
   /* 55012 — abandon_order, withdraw_order: после первой пройденной точки рейс не отменяется. */
   if (code === '55012') return t.lifecycle.started;
+  /* 55013 — abandon_order: отказ от рейса без причины. */
+  if (code === '55013') return t.lifecycle.reasonNeeded;
   /*
    * Текст ошибки базы — по-русски, для разработчика: на экран финскому
    * пользователю он не идёт (прогон 26.09.2026). Причина остаётся в журнале.
@@ -133,6 +135,10 @@ export async function abandonOrderAction(
   }
 
   const orderId = str(formData, 'order_id');
+  /* Причину читает заказчик, у которого рейс вернулся на стол, — без неё отказ не принимается. */
+  if (str(formData, 'reason').length < 3) {
+    return { error: (await getDictionary(locale)).lifecycle.reasonNeeded, done: false };
+  }
   /* Отказ от прямого назначения — первый выход заказа на стол, см. cancelOrderAction. */
   const published = await wasPublished(orderId);
 

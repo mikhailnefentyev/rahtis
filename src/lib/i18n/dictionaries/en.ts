@@ -771,6 +771,7 @@ export const en = {
     confirm: 'Confirm',
     cancelled: 'This order has been cancelled',
     notAllowed: 'You are not allowed to do this.',
+    reasonNeeded: 'Write the reason. The shipper will see it.',
     started: 'The transport has already started and can no longer be cancelled. Contact dispatch.',
     noLowering: 'The price cannot be lowered once a carrier is assigned. It can only be raised.',
     notFound: 'Order not found.',

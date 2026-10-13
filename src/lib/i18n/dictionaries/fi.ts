@@ -859,6 +859,7 @@ export const fi = {
     confirm: 'Vahvista',
     cancelled: 'Kuljetus on peruutettu',
     notAllowed: 'Sinulla ei ole oikeutta tähän toimenpiteeseen.',
+    reasonNeeded: 'Kirjoita syy. Tilaaja näkee sen.',
     started: 'Kuljetus on jo aloitettu, eikä sitä voi enää perua. Ota yhteys ajojärjestelyyn.',
     noLowering: 'Hintaa ei voi laskea, kun kuljetusliike on jo valittu. Hintaa voi vain korottaa.',
     notFound: 'Kuljetusta ei löytynyt.',

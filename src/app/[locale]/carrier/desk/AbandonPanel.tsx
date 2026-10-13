@@ -49,14 +49,9 @@ export function AbandonPanel({ orderId, className }: { orderId: string; classNam
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="order_id" value={orderId} />
 
-      {/*
-        * Причина не обязательна для базы, но спрашивается всегда: она
-        * уходит в журнал заказа, и заказчик, у которого рейс сорвался,
-        * прочитает именно её. Пустое поле честнее выдуманной причины,
-        * поэтому required здесь нет.
-        */}
-      <Field label={t.lifecycle.reason}>
-        {(p) => <Input {...p} name="reason" placeholder={t.lifecycle.reasonPlaceholder} />}
+      {/* Причина обязательна: она уходит в журнал заказа, и заказчик, у которого рейс вернулся на стол, читает именно её. */}
+      <Field label={t.lifecycle.reason} required>
+        {(p) => <Input {...p} name="reason" required minLength={3} placeholder={t.lifecycle.reasonPlaceholder} />}
       </Field>
 
       {state.error && (
