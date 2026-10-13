@@ -79,6 +79,12 @@ export type PeriodReport = {
   from: string;
   to: string;
   companyName: string | null;
+  /**
+   * Удержание с перевозчика показывается: оператору всегда, перевозчику —
+   * когда в периоде оно есть (рейсы подряда). Без этого его «цена» и
+   * «без налога» расходились на удержание без объяснения.
+   */
+  showsCommission: boolean;
   lines: ReportLine[];
   /**
    * Рейсы по договору перевозчика с клиентом — у участников отдельным
@@ -162,8 +168,9 @@ export async function buildPeriodReport(input: {
 
   const sum = (pick: (l: ReportLine) => number | null) =>
     lines.reduce((acc, l) => acc + (pick(l) ?? 0), 0);
-  /* Процент с перевозчика отменён 22.09.2026 — его колонки видит только оператор, для истории. */
-  const seesFees = input.role === 'ADMIN';
+  /* Удержание с перевозчика — с рейсов подряда: оператор видит всегда, перевозчик — если оно у него было. */
+  const seesFees =
+    input.role === 'ADMIN' || (input.role === 'CARRIER' && lines.some((l) => (l.commission ?? 0) > 0));
   const rates = new Set(lines.map((l) => l.vatBps));
 
   return {
@@ -173,6 +180,7 @@ export async function buildPeriodReport(input: {
       from: input.from,
       to: input.to,
       companyName,
+      showsCommission: seesFees,
       lines,
       own: {
         lines: ownLines,

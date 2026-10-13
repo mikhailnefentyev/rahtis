@@ -30,8 +30,8 @@ const percent = (bps: number | null) => (bps == null ? null : bps / 100);
 
 export function tripColumns(report: PeriodReport, t: Dictionary): Column<ReportLine>[] {
   const p = t.periodReport;
-  /* Процент с перевозчика — история, только оператору. Плата заказчика — заказчику и оператору. */
-  const fees = report.role === 'ADMIN';
+  /* Удержание с перевозчика — оператору и перевозчику, у которого оно было. Плата заказчика — заказчику и оператору. */
+  const fees = report.showsCommission;
   const shipperFee = report.role !== 'CARRIER';
 
   return [
@@ -216,7 +216,10 @@ export function summaryRows(report: PeriodReport, t: Dictionary): Array<[string,
     [p.rowRate, s.rate, 'money'],
   ];
   if (s.fee != null) rows.push([p.rowCommission, s.fee, 'money']);
-  if (report.role === 'ADMIN' && s.payout != null) rows.push([p.rowPayout, s.payout, 'money']);
+  if (report.role === 'CARRIER' && report.showsCommission) {
+    rows.push([p.rowCommission, s.commission ?? 0, 'money']);
+  }
+  if (report.showsCommission && s.payout != null) rows.push([p.rowPayout, s.payout, 'money']);
   if (report.role === 'ADMIN') rows.push([p.rowMargin, (s.fee ?? 0) + (s.commission ?? 0), 'money']);
   rows.push([p.rowVat, s.vat, 'money'], [p.rowGross, s.gross, 'money']);
   rows.push([p.rowClaims, s.claims, 'int'], [p.rowClaimed, s.claimed, 'money']);

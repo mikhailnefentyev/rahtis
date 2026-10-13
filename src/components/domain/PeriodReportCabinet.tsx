@@ -227,7 +227,10 @@ export async function PeriodReportCabinet({
                             {role === 'ADMIN' ? t.periodReport.colShipperFee : t.periodReport.colCommission}
                           </Th>
                         )}
-                        {role === 'ADMIN' && (
+                        {role === 'CARRIER' && report.showsCommission && (
+                          <Th className="text-right">{t.periodReport.colCommission}</Th>
+                        )}
+                        {report.showsCommission && (
                           <Th className="text-right">{t.periodReport.colPayout}</Th>
                         )}
                         <Th className="text-right">{t.periodReport.colVat}</Th>
@@ -261,7 +264,12 @@ export async function PeriodReportCabinet({
                               <Mono>{line.fee != null ? f.eur(line.fee) : '—'}</Mono>
                             </Td>
                           )}
-                          {role === 'ADMIN' && (
+                          {role === 'CARRIER' && report.showsCommission && (
+                            <Td className="text-right">
+                              <Mono>{line.commission != null ? f.eur(line.commission) : '—'}</Mono>
+                            </Td>
+                          )}
+                          {report.showsCommission && (
                             <Td className="text-right">
                               <Mono>{line.payout != null ? f.eur(line.payout) : '—'}</Mono>
                             </Td>
