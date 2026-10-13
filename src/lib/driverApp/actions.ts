@@ -1,9 +1,10 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { getDriverI18n } from '@/lib/driverApp/i18n';
-import { flashError } from '@/lib/forms/flash';
+import { FLASH_COOKIE, flashError } from '@/lib/forms/flash';
 import { isLocale, type Locale, defaultLocale } from '@/lib/i18n';
 import { cancelOrderAction } from '@/lib/orders/matching';
 import { refineEtaAfter } from '@/lib/orders/eta';
@@ -151,7 +152,10 @@ export async function setDriverLanguageAction(formData: FormData): Promise<void>
   const { error } = await supabase.rpc('set_driver_language', {
     p_language: String(formData.get('language') ?? ''),
   });
-  if (error) console.error('Язык приложения не сохранён:', error.message);
+  if (error) {
+    console.error('Язык приложения не сохранён:', error.message);
+    await flashError((await getDriverI18n(locale)).t.driverApp.failed);
+  }
 
   revalidatePath(`/${locale}/driver`, 'layout');
 }
@@ -172,7 +176,11 @@ export async function acceptTaskAction(formData: FormData): Promise<void> {
  */
 export async function declineTaskAction(formData: FormData): Promise<void> {
   const locale = toLocale(formData.get('locale'));
+  const store = await cookies();
+  const before = store.get(FLASH_COOKIE)?.value;
   await cancelOrderAction(formData);
+  /* Общий откат объясняет отказ языком кабинета — водителю повторяем на его языке. */
+  if (store.get(FLASH_COOKIE)?.value !== before) await flashError((await getDriverI18n(locale)).t.driverApp.failed);
   revalidateDriver(locale);
 }
 

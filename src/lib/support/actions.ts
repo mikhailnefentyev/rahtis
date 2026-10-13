@@ -6,6 +6,7 @@ import { operatorInbox, sendEmail } from '@/lib/email';
 import { operatorNoticeEmail, supportEmail } from '@/lib/email/templates/operator';
 import { defaultLocale, getDictionary, isLocale, type Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
+import { flashFailure } from '@/lib/forms/flash';
 
 function toLocale(value: FormDataEntryValue | null): Locale {
   const raw = String(value ?? '');
@@ -155,6 +156,7 @@ export async function handleSupportAction(formData: FormData): Promise<void> {
 
   if (error) {
     console.error('Вопрос не отмечен разобранным:', error.message);
+    await flashFailure(locale, error);
   }
 
   revalidatePath(`/${locale}/admin`);

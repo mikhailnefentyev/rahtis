@@ -2,8 +2,10 @@
 
 import { revalidatePath } from 'next/cache';
 import { defaultLocale, getDictionary, isLocale, type Locale } from '@/lib/i18n';
+import { getDriverI18n } from '@/lib/driverApp/i18n';
+import { getDriver } from '@/lib/driverApp/session';
 import { createClient } from '@/lib/supabase/server';
-import { flashFailure } from '@/lib/forms/flash';
+import { flashError } from '@/lib/forms/flash';
 import { Constants } from '@/types/database';
 import type { DriverCertificateType } from '@/types/db';
 
@@ -30,6 +32,11 @@ function isCertificateType(value: string): value is DriverCertificateType {
   return (Constants.public.Enums.driver_certificate_type as readonly string[]).includes(value);
 }
 
+/* Действия общие для кабинета и приложения: водителю отказ нужен на его языке, а не на финском кабинета. */
+async function dictionaryFor(locale: Locale) {
+  return (await getDriver()) ? (await getDriverI18n(locale)).t : await getDictionary(locale);
+}
+
 function revalidate(locale: Locale, driverId: string) {
   revalidatePath(`/${locale}/driver/profile`);
   revalidatePath(`/${locale}/carrier/drivers/${driverId}`);
@@ -44,7 +51,7 @@ export async function saveCertificateAction(
   formData: FormData,
 ): Promise<CertificateState> {
   const locale = toLocale(formData.get('locale'));
-  const { certificates: t } = await getDictionary(locale);
+  const { certificates: t } = await dictionaryFor(locale);
 
   const driverId = str(formData, 'driver_id');
   const type = str(formData, 'type');
@@ -80,6 +87,6 @@ export async function deleteCertificateAction(formData: FormData): Promise<void>
 
   const supabase = await createClient();
   const { error } = await supabase.from('driver_certificates').delete().eq('id', id);
-  await flashFailure(locale, error);
+  if (error) await flashError((await dictionaryFor(locale)).error.generic);
   revalidate(locale, driverId);
 }

@@ -15,6 +15,7 @@ import {
 } from '@/lib/email/templates/application';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
+import { flashFailure } from '@/lib/forms/flash';
 import { sendInvite } from './invite';
 import { getViewer } from '@/lib/auth/viewer';
 import { isValidBusinessId } from '@/lib/format';
@@ -281,6 +282,8 @@ export async function approveCompanyAction(formData: FormData): Promise<void> {
   });
 
   if (error || !company) {
+    /* Заявку уже разобрали в другой вкладке или база отказала — оператор должен это увидеть. */
+    await flashFailure(locale, error ?? {});
     revalidatePath(`/${locale}/admin`);
     return;
   }
@@ -330,6 +333,7 @@ export async function rejectCompanyAction(formData: FormData): Promise<void> {
     p_decision: 'REJECTED',
     p_note: reason || undefined,
   });
+  await flashFailure(locale, error);
 
   /*
    * Кабинета у заявителя нет, пока заявку не одобрили, — узнать об отказе
@@ -387,6 +391,8 @@ export async function resendInviteAction(formData: FormData): Promise<void> {
     return;
   }
 
+  /* Компании уже нет (удалена в другой вкладке) — письмо не ушло, и оператор должен это знать. */
+  await flashFailure(locale, {});
   revalidatePath(`/${locale}/admin`);
 }
 
@@ -512,6 +518,7 @@ export async function setOwnPartnershipAction(formData: FormData): Promise<void>
   });
 
   if (error) console.error('Формат сотрудничества не изменён:', error.message);
+  await flashFailure(locale, error);
 
   revalidatePath(`/${locale}/carrier`);
 }

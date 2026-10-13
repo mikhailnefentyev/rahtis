@@ -149,6 +149,7 @@ export async function archiveDriverAction(formData: FormData): Promise<void> {
   if (!error && before?.auth_user_id) {
     await createAdminClient().auth.admin.deleteUser(before.auth_user_id);
   }
+  await flashFailure(locale, error);
 
   revalidateDrivers(locale, id);
 }
@@ -470,7 +471,8 @@ export async function detachLoginAction(formData: FormData): Promise<void> {
 
   const supabase = await createClient();
   const id = str(formData, 'driver_id');
-  const { data: userId } = await supabase.rpc('detach_driver_login', { p_driver_id: id });
+  const { data: userId, error } = await supabase.rpc('detach_driver_login', { p_driver_id: id });
+  await flashFailure(locale, error);
 
   if (userId) await createAdminClient().auth.admin.deleteUser(userId);
 
