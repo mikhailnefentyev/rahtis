@@ -825,7 +825,7 @@ export function openApi(serverUrl: string) {
             place_kind: { enum: ['PORT', 'TERMINAL', 'PARKING', 'ADDRESS'] },
             place_name: { type: 'string', maxLength: 120 },
             company_name: { type: 'string', maxLength: 120, description: 'Required on DELIVERY stops.' },
-            scheduled_date: { type: 'string', format: 'date' },
+            scheduled_date: { type: 'string', format: 'date', description: 'The first stop must not be in the past; a later stop must not be dated before an earlier one.' },
             scheduled_time: { type: 'string', pattern: '^([01]\\d|2[0-3]):[0-5]\\d$' },
             cargo_weight_kg: { type: 'integer', exclusiveMinimum: 0, description: 'Where cargo is loaded.' },
             consignee: { type: 'string', maxLength: 200, description: 'Only on EXTRA_LOAD stops: who the extra cargo is for.' },

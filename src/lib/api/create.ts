@@ -13,7 +13,7 @@ import type { AddressSuggestion } from '@/lib/routing/types';
 import { createAdminClient } from '@/lib/supabase/admin';
 import type { Json } from '@/types/database';
 import { ApiError, type ApiContext } from './handler';
-import { isObj, locationOf, oneOf, sameAddress, streetOf, text, type LatLon } from './input';
+import { isCalendarDate, isObj, locationOf, oneOf, sameAddress, streetOf, text, type LatLon } from './input';
 import { getOrder } from './orders';
 import { translateRule } from './rules';
 import { HAUL_MAX_CARGO_KG } from '@/lib/orders/haul';
@@ -143,7 +143,7 @@ async function prepare(body: unknown): Promise<Prepared> {
     if (!city) issues.push({ field: f('city'), issue: 'required' });
 
     const date = text(s.scheduled_date, 10);
-    if (date && !/^\d{4}-\d{2}-\d{2}$/.test(date)) issues.push({ field: f('scheduled_date'), issue: 'YYYY-MM-DD' });
+    if (date && !isCalendarDate(date)) issues.push({ field: f('scheduled_date'), issue: 'YYYY-MM-DD' });
     const time = text(s.scheduled_time, 5);
     if (time && !/^([01]\d|2[0-3]):[0-5]\d$/.test(time)) issues.push({ field: f('scheduled_time'), issue: 'HH:MM' });
 
@@ -184,6 +184,21 @@ async function prepare(body: unknown): Promise<Prepared> {
       geocode_score: score === undefined ? '' : String(score),
     });
   }
+
+  /*
+   * Те же проверки дат, что в форме кабинета: забор не в прошлом и точки
+   * по порядку. API принимал заказ с забором три дня назад и с доставкой
+   * раньше забора (прогон 13.10.2026).
+   */
+  const today = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Helsinki' }).format(new Date());
+  let previous = '';
+  stops.forEach((stop, i) => {
+    const date = String(stop.scheduled_date ?? '');
+    if (!date || !isCalendarDate(date)) return;
+    if (i === 0 && date < today) issues.push({ field: 'stops[0].scheduled_date', issue: 'must not be in the past' });
+    if (previous && date < previous) issues.push({ field: `stops[${i}].scheduled_date`, issue: 'earlier than a previous stop' });
+    previous = date;
+  });
   if (issues.length) throw new ApiError('unprocessable', 'Some stops are invalid.', issues);
 
   /* Маршрут по дорогам для грузовика — как кнопка «Laske» в форме. */

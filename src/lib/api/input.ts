@@ -15,6 +15,13 @@ export const text = (v: unknown, max = 500): string | undefined =>
   typeof v === 'string' && v.trim() ? v.trim().slice(0, max) : undefined;
 
 /** Значение из списка без учёта регистра, в написании списка. */
+/** Дата YYYY-MM-DD, существующая в календаре: «2026-13-45» проходила по форме и роняла вставку в базу. */
+export function isCalendarDate(v: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) return false;
+  const at = new Date(`${v}T00:00:00Z`);
+  return !Number.isNaN(at.getTime()) && at.toISOString().slice(0, 10) === v;
+}
+
 export function oneOf<T extends readonly string[]>(v: unknown, list: T): T[number] | undefined {
   return typeof v === 'string' && (list as readonly string[]).includes(v.toUpperCase()) ? (v.toUpperCase() as T[number]) : undefined;
 }

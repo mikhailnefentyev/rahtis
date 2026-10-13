@@ -12,7 +12,7 @@ import type { Json } from '@/types/database';
 import { claimIdOf, getClaim } from './claims';
 import { geocode, ROLES } from './create';
 import { ApiError, type ApiContext } from './handler';
-import { isObj, locationOf, oneOf, text } from './input';
+import { isCalendarDate, isObj, locationOf, oneOf, text } from './input';
 import { findOrder, getOrder } from './orders';
 import { translateRule } from './rules';
 
@@ -193,7 +193,7 @@ async function stopPatch(body: Record<string, unknown>, cityNow: string | null) 
   }
   if (has('scheduled_date')) {
     const d = body.scheduled_date === null ? '' : (text(body.scheduled_date, 10) ?? '');
-    if (d && !/^\d{4}-\d{2}-\d{2}$/.test(d)) issues.push({ field: 'scheduled_date', issue: 'YYYY-MM-DD' });
+    if (d && !isCalendarDate(d)) issues.push({ field: 'scheduled_date', issue: 'YYYY-MM-DD' });
     patch.scheduled_date = d;
   }
   if (has('scheduled_time')) {
