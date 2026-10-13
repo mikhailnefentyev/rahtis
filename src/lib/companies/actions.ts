@@ -15,7 +15,7 @@ import {
 } from '@/lib/email/templates/application';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
-import { flashFailure } from '@/lib/forms/flash';
+import { flashError, flashFailure } from '@/lib/forms/flash';
 import { sendInvite } from './invite';
 import { getViewer } from '@/lib/auth/viewer';
 import { isValidBusinessId } from '@/lib/format';
@@ -327,11 +327,22 @@ export async function rejectCompanyAction(formData: FormData): Promise<void> {
   const companyId = String(formData.get('company_id') ?? '');
   const reason = String(formData.get('reason') ?? '').trim();
 
+  /*
+   * Без причины отказ не принимается: письмо заявителю уходит только с
+   * ней, и пустой отказ оставил бы его без ответа вовсе. Форма требует
+   * поле сама, здесь — на случай запроса мимо неё.
+   */
+  if (!reason) {
+    await flashError((await getDictionary(locale)).moderation.reasonRequired);
+    revalidatePath(`/${locale}/admin`);
+    return;
+  }
+
   const supabase = await createClient();
   const { error } = await supabase.rpc('moderate_company', {
     p_company_id: companyId,
     p_decision: 'REJECTED',
-    p_note: reason || undefined,
+    p_note: reason,
   });
   await flashFailure(locale, error);
 
