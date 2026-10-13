@@ -247,6 +247,7 @@ export const en = {
     photoPlace: 'Photo location',
     positionAway: 'Marked from a distance',
     undo: 'Undo',
+    undoLate: 'A mark can be undone within 15 minutes. After that, contact dispatch.',
     damageQuestion: 'Damage at this stop',
     damagePlaceholder: 'Dent on the left side of the trailer, curtain torn…',
     noDamage: 'No damage',

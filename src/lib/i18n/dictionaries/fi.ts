@@ -259,6 +259,7 @@ export const fi = {
     photoPlace: 'Kuvauspaikka',
     positionAway: 'Merkitty etäältä',
     undo: 'Peru merkintä',
+    undoLate: 'Merkinnän voi perua 15 minuutin kuluessa. Myöhemmin sen tekee ajojärjestely — ota yhteys.',
     damageQuestion: 'Vauriot tällä pisteellä',
     damagePlaceholder: 'Kolhu perävaunun vasemmassa laidassa, kapelli revennyt…',
     noDamage: 'Ei vaurioita',
