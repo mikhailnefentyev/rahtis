@@ -37,6 +37,7 @@ export function OrderTrouble({
   distanceKm,
   rateCents,
   autoKm,
+  started,
   className,
 }: {
   orderId: string;
@@ -44,6 +45,8 @@ export function OrderTrouble({
   rateCents: number | null;
   /** Что насчитал роутер после правки маршрута. Расхождение и есть повод. */
   autoKm: number | null;
+  /** Первая точка пройдена: снять заказ база уже не даст, остаётся пересчёт. */
+  started: boolean;
   className?: string;
 }) {
   const { t, m, f } = useI18n();
@@ -56,15 +59,19 @@ export function OrderTrouble({
         <Button type="button" size="sm" onClick={() => setOpen(open === 'reprice' ? 'none' : 'reprice')}>
           {t.lifecycle.repriceOpen}
         </Button>
-        <Button
-          type="button"
-          size="sm"
-          variant="danger"
-          onClick={() => setOpen(open === 'withdraw' ? 'none' : 'withdraw')}
-        >
-          {t.lifecycle.withdraw}
-        </Button>
+        {!started && (
+          <Button
+            type="button"
+            size="sm"
+            variant="danger"
+            onClick={() => setOpen(open === 'withdraw' ? 'none' : 'withdraw')}
+          >
+            {t.lifecycle.withdraw}
+          </Button>
+        )}
       </div>
+
+      {started && <p className="mt-3 text-xs text-ink-muted">{t.lifecycle.started}</p>}
 
       {open === 'reprice' && (
         <RepriceForm
@@ -76,7 +83,7 @@ export function OrderTrouble({
         />
       )}
 
-      {open === 'withdraw' && (
+      {open === 'withdraw' && !started && (
         <WithdrawForm orderId={orderId} onDone={() => setOpen('none')} />
       )}
 

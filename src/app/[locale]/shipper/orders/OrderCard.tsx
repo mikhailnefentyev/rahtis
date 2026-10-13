@@ -272,6 +272,7 @@ export function OrderCard({
                   distanceKm={order.distance_km}
                   rateCents={order.rate_cents}
                   autoKm={order.distance_auto_km}
+                  started={stops.some((stop) => stop.completed_at)}
                   className="mt-4 border-t border-line pt-4"
                 />
               )}

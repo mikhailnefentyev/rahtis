@@ -251,9 +251,13 @@ export function AssignmentCard({
               * обязана попадаться раньше. Отказ ищут те, у кого уже
               * что-то случилось, и лишняя прокрутка им не помеха.
               */}
-            {order.status === 'IN_PROGRESS' && (
-              <AbandonPanel orderId={order.id} className="mt-4 border-t border-line pt-4" />
-            )}
+            {order.status === 'IN_PROGRESS' &&
+              (stops.some((stop) => stop.completed_at) ? (
+                /* После первой пройденной точки база отказ не примет — кнопку, которая всегда отвечает «нельзя», не показываем. */
+                <p className="mt-4 border-t border-line pt-4 text-xs text-ink-muted">{t.lifecycle.started}</p>
+              ) : (
+                <AbandonPanel orderId={order.id} className="mt-4 border-t border-line pt-4" />
+              ))}
           </CardBody>
         </Card>
   );
