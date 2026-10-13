@@ -35,6 +35,7 @@ const RULES: Rule[] = [
   { prefix: 'Откат возможен только до начала рейса', field: 'status', message: 'The assignment can only be cancelled before the trip starts.' },
   { prefix: 'Сначала опубликуйте заказ', field: 'status', message: 'The order must be on the desk before it can be assigned.' },
   { prefix: 'Живая корректировка возможна только в идущем рейсе', field: 'status', message: 'The route can only be amended while the trip is in progress.' },
+  { prefix: 'Цену после назначения перевозчика можно только повышать', field: 'rate.amount', message: 'The rate can only be raised once a carrier is assigned.' },
   { prefix: 'Точка уже пройдена', field: 'stop', message: 'This stop is already completed and cannot be changed.' },
   { prefix: 'В идущий рейс добавляется только загрузка или выгрузка', field: 'role', message: 'Only EXTRA_LOAD or EXTRA_UNLOAD stops can be added to a trip in progress.' },
   { prefix: 'Перед забором точку не добавить', field: 'before_sequence', message: 'A stop cannot be added before the pickup; insert it after the pickup.' },

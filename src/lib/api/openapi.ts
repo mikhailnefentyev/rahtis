@@ -365,7 +365,7 @@ export function openApi(serverUrl: string) {
           tags: ['Write'],
           summary: 'Change the rate',
           operationId: 'repriceOrder',
-          description: 'distance_km defaults to the truck route calculated after the latest amendments.',
+          description: 'distance_km defaults to the truck route calculated after the latest amendments. Once a carrier is assigned the rate can only be raised; a lower rate is rejected with 409.',
           parameters: [refParam, idempotencyHeader],
           requestBody: {
             required: true,

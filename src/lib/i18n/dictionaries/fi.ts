@@ -859,6 +859,7 @@ export const fi = {
     confirm: 'Vahvista',
     cancelled: 'Kuljetus on peruutettu',
     notAllowed: 'Sinulla ei ole oikeutta tähän toimenpiteeseen.',
+    noLowering: 'Hintaa ei voi laskea, kun kuljetusliike on jo valittu. Hintaa voi vain korottaa.',
     notFound: 'Kuljetusta ei löytynyt.',
     failed: 'Toimenpide ei mennyt läpi. Päivitä sivu ja yritä uudelleen.',
     fieldStatus: 'Tila',

@@ -771,6 +771,7 @@ export const en = {
     confirm: 'Confirm',
     cancelled: 'This order has been cancelled',
     notAllowed: 'You are not allowed to do this.',
+    noLowering: 'The price cannot be lowered once a carrier is assigned. It can only be raised.',
     notFound: 'Order not found.',
     failed: 'That did not go through. Refresh the page and try again.',
     fieldStatus: 'Status',

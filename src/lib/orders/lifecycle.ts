@@ -52,6 +52,8 @@ async function explain(
 
   if (code === '42501') return t.lifecycle.notAllowed;
   if (code === 'P0002') return t.lifecycle.notFound;
+  /* 55011 — reprice_order: после назначения перевозчика ставку только повышают. */
+  if (code === '55011') return t.lifecycle.noLowering;
   /*
    * Текст ошибки базы — по-русски, для разработчика: на экран финскому
    * пользователю он не идёт (прогон 26.09.2026). Причина остаётся в журнале.
