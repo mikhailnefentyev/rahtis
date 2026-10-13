@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { getViewer } from '@/lib/auth/viewer';
+import { isValidBusinessId } from '@/lib/format';
 import { defaultLocale, getDictionary, isLocale, type Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 
@@ -55,6 +56,13 @@ export async function saveOperatorProfileAction(
   }
   if (!/^\d{7}-\d$/.test(payload.business_id!))
     return { error: t.operator.businessIdShape, saved: false };
+  /*
+   * Эти реквизиты печатаются на счетах. Форма принимала Y-tunnus с неверной
+   * контрольной цифрой и почту без «@» (прогон 13.10.2026) — опечатка ушла
+   * бы каждому заказчику.
+   */
+  if (!isValidBusinessId(payload.business_id!)) return { error: t.validation.businessId, saved: false };
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(payload.email!)) return { error: t.validation.email, saved: false };
 
   const supabase = await createClient();
   const { error } = await supabase.rpc('update_operator_profile', { p: payload });

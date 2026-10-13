@@ -59,7 +59,8 @@ export function AdminDocument({
 
         {document ? (
           <>
-            <span className="truncate text-[13px] text-ink-muted">{document.file_name}</span>
+            {/* Перенос, а не обрезка: длинное имя файла без пробелов растягивало карточку шире экрана телефона. */}
+            <span className="break-all text-[13px] text-ink-muted">{document.file_name}</span>
             <Mono className="text-xs text-ink-dim">
               {document.valid_until
                 ? expired
