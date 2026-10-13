@@ -104,7 +104,18 @@ export async function groupTakeAction(
 
   revalidateOrder(locale);
 
-  return { error: error ? await explain(locale, error.code, error.message) : null };
+  if (!error) return { error: null };
+
+  /*
+   * 55000 здесь — заказ взяла другая машина группы или окно закрылось. Он
+   * тут же уходит со стола вместе с карточкой, и отказ в её состоянии
+   * никто бы не увидел: заказ молча исчезал (прогон 13.10.2026). Поэтому
+   * всплывающим сообщением, которое переживает перерисовку.
+   */
+  await flashError(
+    error.code === '55000' ? (await getDictionary(locale)).direct.groupGone : await explain(locale, error.code, error.message),
+  );
+  return { error: null };
 }
 
 /**

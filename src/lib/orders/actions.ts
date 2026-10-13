@@ -310,6 +310,18 @@ function readOrderForm(
     return { error: t.routing.addressRequired };
   }
 
+  /*
+   * Даты маршрута. Забор «вчера» — опечатка: водитель получил бы задание
+   * с прошедшим днём. Точка раньше предыдущей — тоже: заказ с доставкой
+   * до забора база принимала молча (прогон 13.10.2026).
+   */
+  const today = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Helsinki' }).format(new Date());
+  const dates = stops.map((stop) => stop.scheduled_date).filter((date): date is string => Boolean(date));
+  if (stops[0]?.scheduled_date && stops[0].scheduled_date < today) return { error: t.own.pickupPast };
+  if (dates.some((date, index) => index > 0 && date < dates[index - 1])) {
+    return { error: t.orderForm.datesOutOfOrder };
+  }
+
   /* Груз тяжелее класса машины не возьмёт никто — отказ здесь, а не пустой стол потом. */
   const kind = haulKind(str(formData, 'haul_kind'));
   const maxCargo = HAUL_MAX_CARGO_KG[kind];
@@ -457,11 +469,6 @@ export async function ownOrderAction(_previous: PublishState, formData: FormData
   /* Y-tunnus клиента необязателен, но если указан — с верной контрольной цифрой. */
   const clientBusinessId = clientId ? '' : str(formData, 'client_business_id');
   if (clientBusinessId && !isValidBusinessId(clientBusinessId)) return { error: t.own.clientInvalid, ref: null };
-
-  /* Забор «вчера» — опечатка в дате: водитель получил бы задание с прошедшим днём. */
-  const pickupDate = form.stops[0]?.scheduled_date;
-  const today = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Helsinki' }).format(new Date());
-  if (pickupDate && pickupDate < today) return { error: t.own.pickupPast, ref: null };
 
   const supabase = await createClient();
   const { data, error } = await supabase.rpc('carrier_create_own_order', {
