@@ -1,5 +1,7 @@
 import 'server-only';
 
+import { stopTimeZone } from '@/lib/country';
+import { stopTime } from '@/lib/orders/stopTime';
 import { renderToBuffer } from '@react-pdf/renderer';
 import { COMMISSION_BPS, commissionCents, payoutCents, vatBpsFor, withVat } from '@/lib/config';
 import { operatorInbox } from '@/lib/email';
@@ -106,6 +108,8 @@ type WaitingLine = {
   sequence: number;
   role: string;
   city: string | null;
+  /* Страна точки — с 20261021140000; в снимках закрытых раньше рейсов её нет. */
+  country?: string | null;
   started_at: string;
   completed_at: string;
   minutes: number;
@@ -446,8 +450,8 @@ async function issue(
           .replace('{ref}', order.ref)
           .replace('{stop}', `${w.sequence + 1}. ${w.city ?? ''}`.trim())
           .replace('{operation}', loading ? t.report_.waitingLoading : t.report_.waitingUnloading)
-          .replace('{from}', f.time(w.started_at))
-          .replace('{to}', f.time(w.completed_at))
+          .replace('{from}', f.time(w.started_at, stopTimeZone(w.country)))
+          .replace('{to}', stopTime(f, w.completed_at, w.country))
           .replace('{minutes}', String(w.minutes))
           .replace('{hours}', String(w.hours)),
         amount: f.eur(w.cents),

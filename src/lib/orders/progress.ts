@@ -33,6 +33,8 @@ export type TripStop = {
   /* Оценка прибытия: ставится, когда пройдена предыдущая точка. */
   eta_at?: string | null;
   eta_source?: 'ROUTE' | 'TRAFFIC' | 'CARRIER' | null;
+  /* Страна точки — пояс её времени (src/lib/orders/stopTime). */
+  country?: string | null;
 };
 
 export type TripProgress = {
@@ -106,20 +108,6 @@ export function tripStageKey(progress: TripProgress): TripStageKey {
     default:
       return 'enRoute';
   }
-}
-
-/**
- * Время из оценки прибытия: сегодня — только часы, иначе с датой.
- *
- * Рейс Коувола → Стокгольм через паром прибывает завтра, и «Arvio 07:30»
- * без даты читается как сегодняшнее утро, которое уже прошло.
- */
-export function etaTime(
-  f: { time(value: string): string; date(value: string): string; dateTime(value: string): string },
-  etaAt: string,
-  now: Date = new Date(),
-): string {
-  return f.date(etaAt) === f.date(now.toISOString()) ? f.time(etaAt) : f.dateTime(etaAt);
 }
 
 /** Оценка показывается, пока на точку не приехали: дальше есть факт. */

@@ -3,7 +3,8 @@
 import { Badge, Waypoint, WaypointList } from '@/components/ui';
 import { stopTitle, type HaulKind } from '@/lib/orders/haul';
 import { markAt, markOf } from '@/lib/orders/position';
-import { etaTime, showsEta } from '@/lib/orders/progress';
+import { showsEta } from '@/lib/orders/progress';
+import { scheduledZone, stopEta, stopTime } from '@/lib/orders/stopTime';
 import { useI18n } from '@/lib/i18n/provider';
 import type { DeskStop, OrderStop, PlaceKind, StopRole } from '@/types/db';
 
@@ -34,6 +35,8 @@ type AnyStop = (OrderStop | DeskStop) & {
   completed_accuracy_m?: number | null;
   arrived_lat?: number | null;
   arrived_lon?: number | null;
+  /* Страна точки — от неё пояс её времени (src/lib/orders/stopTime). */
+  country?: string | null;
 };
 
 export function RouteStops({
@@ -85,7 +88,9 @@ export function RouteStops({
   const meta = (stop: AnyStop) => {
     if (!stop.scheduled_date) return undefined;
     const date = f.date(`${stop.scheduled_date}T12:00:00Z`);
-    return stop.scheduled_time ? `${date} ${stop.scheduled_time.slice(0, 5)}` : date;
+    if (!stop.scheduled_time) return date;
+    const zone = scheduledZone(stop.scheduled_date, stop.scheduled_time, stop.country);
+    return `${date} ${stop.scheduled_time.slice(0, 5)}${zone ? ` ${zone}` : ''}`;
   };
 
   /*
@@ -133,7 +138,7 @@ export function RouteStops({
       chips.push(
         <Badge key="eta" tone="info">
           {m('trip.etaAt', {
-            time: etaTime(f, stop.eta_at),
+            time: stopEta(f, stop.eta_at, stop.country),
             source: t.trip.etaSource[stop.eta_source ?? 'ROUTE'],
           })}
         </Badge>,
@@ -143,7 +148,7 @@ export function RouteStops({
     if (stop.arrived_at) {
       chips.push(
         <Badge key="arrived" tone="neutral">
-          {m('trip.arrivedAt', { time: f.time(stop.arrived_at) })}
+          {m('trip.arrivedAt', { time: stopTime(f, stop.arrived_at, stop.country) })}
           {arrivalPlace && arrivalMark(stop)}
         </Badge>,
       );
@@ -151,7 +156,7 @@ export function RouteStops({
     if (stop.completed_at) {
       chips.push(
         <Badge key="done" tone="ok">
-          {m('trip.completedAt', { time: f.time(stop.completed_at) })}
+          {m('trip.completedAt', { time: stopTime(f, stop.completed_at, stop.country) })}
         </Badge>,
       );
     }

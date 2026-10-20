@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { stopDateTime } from '@/lib/orders/stopTime';
 import { notFound } from 'next/navigation';
 import { Badge, Card, CardBody, Mono } from '@/components/ui';
 import { orderStatusTone } from '@/components/ui/tone';
@@ -53,7 +54,7 @@ export default async function TrackPage({ params }: { params: Promise<{ locale: 
       : Promise.resolve({ data: null }),
     admin
       .from('order_stops')
-      .select('id, role, place_name, company_name, city, scheduled_date, scheduled_time, eta_at, arrived_at, completed_at')
+      .select('id, role, place_name, company_name, city, country, scheduled_date, scheduled_time, eta_at, arrived_at, completed_at')
       .eq('order_id', order.id)
       .order('sequence'),
   ]);
@@ -62,7 +63,8 @@ export default async function TrackPage({ params }: { params: Promise<{ locale: 
   const delivered =
     order.status === 'IN_PROGRESS' && (stops ?? []).length > 0 && (stops ?? []).every((s) => s.completed_at);
 
-  const time = (iso: string) => `${f.date(iso)} ${new Date(iso).toLocaleTimeString(t.meta.intl, { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Helsinki' })}`;
+  /* Время точки — по поясу её страны, с «UTC+1», где он не финский. */
+  const time = (iso: string, country: string | null) => stopDateTime(f, iso, country);
 
   return (
     <main className="mx-auto w-full max-w-2xl px-5 py-10">
@@ -92,11 +94,11 @@ export default async function TrackPage({ params }: { params: Promise<{ locale: 
                 </span>
                 <span className="text-xs text-ink-dim">
                   {s.completed_at
-                    ? `${t.track.completed} ${time(s.completed_at)}`
+                    ? `${t.track.completed} ${time(s.completed_at, s.country)}`
                     : s.arrived_at
-                      ? `${t.track.arrived} ${time(s.arrived_at)}`
+                      ? `${t.track.arrived} ${time(s.arrived_at, s.country)}`
                       : s.eta_at
-                        ? `${t.track.eta} ${time(s.eta_at)}`
+                        ? `${t.track.eta} ${time(s.eta_at, s.country)}`
                         : s.scheduled_date
                           ? `${t.track.planned} ${f.date(s.scheduled_date)}${s.scheduled_time ? ` ${s.scheduled_time.slice(0, 5)}` : ''}`
                           : ''}

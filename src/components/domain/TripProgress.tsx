@@ -2,7 +2,6 @@
 
 import { Badge, Mono } from '@/components/ui';
 import {
-  etaTime,
   showsEta,
   stopPlace,
   tripProgress,
@@ -10,6 +9,7 @@ import {
   type TripStop,
 } from '@/lib/orders/progress';
 import { useI18n } from '@/lib/i18n/provider';
+import { stopEta } from '@/lib/orders/stopTime';
 
 /**
  * Этап рейса одной строкой.
@@ -51,7 +51,7 @@ export function TripStage({ stops, className }: { stops: TripStop[]; className?:
               <>
                 {m('trip.enRouteEta', {
                   place: stopPlace(progress.next),
-                  time: etaTime(f, progress.next.eta_at),
+                  time: stopEta(f, progress.next.eta_at, progress.next.country),
                 })}
                 <span className="text-ink-faint">
                   {' · '}

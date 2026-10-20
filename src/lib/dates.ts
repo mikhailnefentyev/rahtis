@@ -81,14 +81,14 @@ export function daysFromToday(days: number, now: Date = new Date()): string {
  * ровно на те часы раньше, на которые водитель опаздывает. Поэтому
  * поправка снимается у самого пояса на ту же дату, а не константой.
  */
-export function operationsInstant(date: string, time: string): number | null {
+export function operationsInstant(date: string, time: string, timeZone: string = APP.timeZone): number | null {
   const clock = time.length === 5 ? `${time}:00` : time;
   const asIfUtc = Date.parse(`${date}T${clock}Z`);
   if (!Number.isFinite(asIfUtc)) return null;
 
   /* Как этот же момент выглядит на стенных часах Хельсинки. */
   const parts = new Intl.DateTimeFormat('en-CA', {
-    timeZone: APP.timeZone,
+    timeZone,
     hour12: false,
     year: 'numeric',
     month: '2-digit',
@@ -116,29 +116,40 @@ export function operationsInstant(date: string, time: string): number | null {
  * где бы ни сидел диспетчер. Смещение уточняется вторым проходом: на
  * границе перехода на летнее время первое приближение ошибается на час.
  */
-export function operationsLocalToIso(local: string): string | null {
+export function operationsLocalToIso(local: string, timeZone: string = APP.timeZone): string | null {
   const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(local.trim());
   if (!match) return null;
 
   const [, y, mo, d, h, mi] = match.map(Number);
   const wall = Date.UTC(y, mo - 1, d, h, mi);
 
-  let guess = wall - offsetMinutesAt(wall) * 60_000;
-  guess = wall - offsetMinutesAt(guess) * 60_000;
+  let guess = wall - offsetMinutesAt(wall, timeZone) * 60_000;
+  guess = wall - offsetMinutesAt(guess, timeZone) * 60_000;
 
   return new Date(guess).toISOString();
 }
 
-/** Обратное: момент времени → значение для поля datetime-local по Хельсинки. */
-export function isoToOperationsLocal(iso: string): string {
+/**
+ * Обратное: момент времени → значение для поля datetime-local по
+ * Хельсинки или по поясу, который передан (поясу точки маршрута).
+ */
+export function isoToOperationsLocal(iso: string, timeZone: string = APP.timeZone): string {
   const ms = Date.parse(iso);
-  return new Date(ms + offsetMinutesAt(ms) * 60_000).toISOString().slice(0, 16);
+  return new Date(ms + offsetMinutesAt(ms, timeZone) * 60_000).toISOString().slice(0, 16);
 }
 
-function offsetMinutesAt(ms: number): number {
+/**
+ * Смещение пояса от UTC в момент времени, в минутах: Варшава зимой — 60,
+ * Хельсинки летом — 180. Нужен пометке «UTC+1» у времени точки.
+ */
+export function zoneOffsetMinutes(value: Date | string | number, timeZone: string): number {
+  return offsetMinutesAt(new Date(value).getTime(), timeZone);
+}
+
+function offsetMinutesAt(ms: number, timeZone: string = APP.timeZone): number {
   const parts = Object.fromEntries(
     new Intl.DateTimeFormat('en-GB', {
-      timeZone: APP.timeZone,
+      timeZone,
       hourCycle: 'h23',
       year: 'numeric',
       month: '2-digit',

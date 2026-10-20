@@ -1,4 +1,5 @@
 import { APP } from './config';
+import { zoneOffsetMinutes } from './dates';
 
 /**
  * Форматирование денег, дат и чисел.
@@ -9,10 +10,16 @@ import { APP } from './config';
  *     решают, показывать ли копейки: ставки в грузоперевозках почти всегда
  *     круглые, и «€480» читается быстрее, чем «€480,00».
  *
- *  2. Время всегда показывается в часовом поясе операций (Europe/Helsinki),
+ *  2. Время показывается в часовом поясе операций (Europe/Helsinki),
  *     независимо от того, где находится пользователь и на каком он языке.
  *     Диспетчер в Хельсинки и водитель в дороге должны видеть одно и то же
  *     время загрузки.
+ *
+ *     Исключение — время точки маршрута (прибытие, окончание работ,
+ *     оценка прибытия): оно по поясу страны точки, как и её плановое
+ *     время, которое записано местным (пакеты стран, 21.10.2026). Там,
+ *     где пояс точки расходится с финским, рядом стоит «UTC+1» —
+ *     stopZone() ниже.
  */
 
 /** Intl-форматтеры дороги в создании — кешируем по ключу. */
@@ -99,40 +106,56 @@ export function createFormat(intlLocale: string) {
       return nf.format(fraction);
     },
 
-    /** Дата: «12.11.2026». */
-    date(value: Date | string | number): string {
-      const df = cached(`date:${intlLocale}`, () =>
+    /** Дата: «12.11.2026». Пояс — операций, если не передан другой. */
+    date(value: Date | string | number, timeZone: string = APP.timeZone): string {
+      const df = cached(`date:${intlLocale}:${timeZone}`, () =>
         new Intl.DateTimeFormat(intlLocale, {
           day: '2-digit',
           month: '2-digit',
           year: 'numeric',
-          timeZone: APP.timeZone,
+          timeZone,
         }),
       );
       return df.format(toDate(value));
     },
 
-    /** Время: «08:00». */
-    time(value: Date | string | number): string {
-      const df = cached(`time:${intlLocale}`, () =>
+    /** Время: «08:00». Пояс — операций, если не передан другой. */
+    time(value: Date | string | number, timeZone: string = APP.timeZone): string {
+      const df = cached(`time:${intlLocale}:${timeZone}`, () =>
         new Intl.DateTimeFormat(intlLocale, {
           hour: '2-digit',
           minute: '2-digit',
           hour12: false,
-          timeZone: APP.timeZone,
+          timeZone,
         }),
       );
       return df.format(toDate(value));
     },
 
     /** Дата и время: «12.11.2026 08:00». */
-    dateTime(value: Date | string | number): string {
-      return `${this.date(value)} ${this.time(value)}`;
+    dateTime(value: Date | string | number, timeZone: string = APP.timeZone): string {
+      return `${this.date(value, timeZone)} ${this.time(value, timeZone)}`;
     },
   };
 }
 
 export type Format = ReturnType<typeof createFormat>;
+
+/**
+ * Пометка пояса у времени точки: «UTC+1», если в этот момент пояс точки
+ * расходится с финским, иначе пусто. Эстония живёт по финскому времени —
+ * у таллинской точки пометки нет; у варшавской зимой «UTC+1».
+ */
+export function stopZone(value: Date | string | number, timeZone: string): string {
+  if (timeZone === APP.timeZone) return '';
+  const at = new Date(value);
+  const minutes = zoneOffsetMinutes(at, timeZone);
+  if (minutes === zoneOffsetMinutes(at, APP.timeZone)) return '';
+  const sign = minutes < 0 ? '-' : '+';
+  const h = Math.floor(Math.abs(minutes) / 60);
+  const m = Math.abs(minutes) % 60;
+  return `UTC${sign}${h}${m ? `:${String(m).padStart(2, '0')}` : ''}`;
+}
 
 /**
  * Обратный отсчёт до дедлайна: «12:41».

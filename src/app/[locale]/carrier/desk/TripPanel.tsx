@@ -2,7 +2,9 @@
 
 import { startTransition, useActionState, useState } from 'react';
 import { Button, Input, Textarea } from '@/components/ui';
-import { etaTime, showsEta, stopPlace, tripProgress, type TripStop } from '@/lib/orders/progress';
+import { showsEta, stopPlace, tripProgress, type TripStop } from '@/lib/orders/progress';
+import { stopEta, stopTime } from '@/lib/orders/stopTime';
+import { stopTimeZone } from '@/lib/country';
 import { stopTitle, type HaulKind } from '@/lib/orders/haul';
 import { askPosition } from '@/lib/orders/position';
 import {
@@ -163,7 +165,7 @@ export function TripPanel({
             <span className="text-xs text-ink-faint">
               {stopPlace(last)}
               {last.completed_at && (
-                <> · {m('trip.completedAt', { time: f.time(last.completed_at) })}</>
+                <> · {m('trip.completedAt', { time: stopTime(f, last.completed_at, last.country) })}</>
               )}
               {/*
                 * Отметилась ли координата — говорится сразу, пока отметку
@@ -209,7 +211,7 @@ function EtaEditor({ stop }: { stop: TripStop & { id: string } }) {
           {t.trip.eta}:{' '}
           {current ? (
             <>
-              <span className="text-ink">{etaTime(f, current.eta_at)}</span>
+              <span className="text-ink">{stopEta(f, current.eta_at, stop.country)}</span>
               <span className="text-ink-faint"> · {t.trip.etaSource[current.eta_source ?? 'ROUTE']}</span>
             </>
           ) : (
@@ -242,7 +244,8 @@ function EtaEditor({ stop }: { stop: TripStop & { id: string } }) {
             name="eta"
             required
             aria-label={t.trip.eta}
-            defaultValue={current ? isoToOperationsLocal(current.eta_at) : ''}
+            /* Поле — по местному времени точки, как и её плановое время; сервер переводит так же. */
+            defaultValue={current ? isoToOperationsLocal(current.eta_at, stopTimeZone(stop.country)) : ''}
             className="w-auto"
           />
           <Button type="submit" size="sm" variant="primary" disabled={pending}>

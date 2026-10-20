@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { stopDateTime, stopTime } from '@/lib/orders/stopTime';
 import { notFound } from 'next/navigation';
 import { cn } from '@/lib/cn';
 import { getTripPhotos, type TripPhoto } from '@/lib/driverApp/photos';
@@ -191,7 +192,7 @@ async function StopItem({
 
         {done && stop.completed_at && (
           <p className="mt-1 text-[15px] font-semibold text-ok">
-            {t.driverApp.stopDone} {f.dateTime(stop.completed_at)}
+            {t.driverApp.stopDone} {stopDateTime(f, stop.completed_at, stop.country)}
           </p>
         )}
 
@@ -263,7 +264,7 @@ async function StopItem({
                   <p className="text-[15px] font-semibold text-ok">
                     ✓{' '}
                     {stop.arrived_at
-                      ? m('driverApp.arrivedAt', { time: f.time(stop.arrived_at) })
+                      ? m('driverApp.arrivedAt', { time: stopTime(f, stop.arrived_at, stop.country) })
                       : t.driverApp.arrive}
                     <StopGate stopId={stop.id} when="arrivedQueued">
                       <QueuedMark />

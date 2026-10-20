@@ -1,5 +1,6 @@
 'use server';
 
+import { stopTimeZone } from '@/lib/country';
 import { revalidateOrder, revalidateOrderFinished } from '@/lib/orders/revalidate';
 import { getViewer } from '@/lib/auth/viewer';
 import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
@@ -117,9 +118,10 @@ export async function completeStopAction(
 /**
  * Перевозчик сам называет время прибытия на следующую точку.
  *
- * Время вводится по Хельсинки — как смены водителей и как всё время на
- * платформе: оценку показывают по Хельсинки, и ввод по поясу устройства
- * дал бы у водителя в Стокгольме цифру на час раньше сказанной.
+ * Время вводится по местному времени точки — так же, как её плановое
+ * время и как оценку показывают (src/lib/orders/stopTime). Не по поясу
+ * устройства: диспетчер в Хельсинки, вводя прибытие в Гданьск, думает
+ * о часах в Гданьске.
  */
 export async function setStopEtaAction(
   _previous: TripState,
@@ -131,12 +133,16 @@ export async function setStopEtaAction(
   if (forbidden) return { error: forbidden };
 
   const t = await getDictionary(locale);
-  const eta = operationsLocalToIso(String(formData.get('eta') ?? ''));
+  const supabase = await createClient();
+  const stopId = String(formData.get('stop_id') ?? '');
+
+  /* Введённое время — местное для точки: пояс берётся по её стране, а не из формы. */
+  const { data: stop } = await supabase.from('order_stops').select('country').eq('id', stopId).maybeSingle();
+  const eta = operationsLocalToIso(String(formData.get('eta') ?? ''), stopTimeZone(stop?.country));
   if (!eta) return { error: t.trip.etaInvalid };
 
-  const supabase = await createClient();
   const { error } = await supabase.rpc('set_stop_eta', {
-    p_stop_id: String(formData.get('stop_id') ?? ''),
+    p_stop_id: stopId,
     p_eta: eta,
     p_source: 'CARRIER',
   });
