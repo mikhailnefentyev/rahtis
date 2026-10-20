@@ -420,7 +420,7 @@ export const pl = {
     ownTitle: 'Obsługuj własnych klientów naszymi narzędziami.',
     own1: 'Aplikacja kierowcy: przewozy, czas pracy, zdjęcia ładunku, list przewozowy i podpis w telefonie.',
     own2: 'Czas pracy i orientacyjne wynagrodzenie według własnych stawek lub tabel układu zbiorowego.',
-    own3: 'Mapa miejsc odpoczynku, myjni i serwisów w Finlandii, Szwecji, Norwegii i Danii.',
+    own3: 'Mapa miejsc odpoczynku, myjni i serwisów w krajach nordyckich, krajach bałtyckich, Polsce i Niemczech.',
     own4: 'Twój klient wysyła zlecenie prosto do Twojego pojazdu albo sam dodajesz przewóz i dajesz go własnemu pojazdowi. Klient może dostać link do śledzenia. Cała cena jest Twoja, a przewóz trafia do Twojego raportu tygodniowego.',
     own5: 'Płacisz 29,90 € miesięcznie za pojazd, który jeździł. Pojazd, który stoi, nic nie kosztuje.',
     own6: 'Tablica ofert jest do dyspozycji, gdy pojazd się zwolni.',
@@ -497,7 +497,7 @@ export const pl = {
 
     ai7: 'Mapa miejsc odpoczynku i serwisów',
     ai7Text:
-      'Ponad 520 miejsc w Finlandii, Szwecji, Norwegii i Danii: paliwo, parkingi, prysznice i warsztaty. Aplikacja pokazuje najbliższe także podczas postoju na przerwę — bezpłatne i strzeżone oznaczone osobno.',
+      'Ponad 3800 miejsc w dziewięciu krajach od Finlandii po Niemcy: paliwo, parkingi, prysznice i warsztaty. Aplikacja pokazuje najbliższe także podczas postoju na przerwę — bezpłatne i strzeżone oznaczone osobno.',
     ai8: 'Kierowca widzi zarobki',
     ai8Text:
       'Po przewozie aplikacja pokazuje, ile wyszło i jak wygląda bieżący miesiąc. Liczby pochodzą z modelu wybranego przez przewoźnika lub z tabel układu zbiorowego.',

@@ -420,7 +420,7 @@ export const lv = {
     ownTitle: 'Vadājiet savus klientus ar mūsu rīkiem.',
     own1: 'Vadītāja lietotne: reisi, darba laiks, kravas foto, pavadzīme un paraksts telefonā.',
     own2: 'Darba laiks un orientējošā alga pēc jūsu likmēm vai darba koplīguma tabulām.',
-    own3: 'Atpūtas, mazgātavu un servisa vietu karte Somijā, Zviedrijā, Norvēģijā un Dānijā.',
+    own3: 'Atpūtas, mazgātavu un servisa vietu karte Ziemeļvalstīs, Baltijā, Polijā un Vācijā.',
     own4: 'Jūsu klients sūta pasūtījumu tieši uz jūsu transportlīdzekli, vai arī jūs pats pievienojat darbu un nododat to savam transportlīdzeklim. Klients var saņemt izsekošanas saiti. Visa cena ir jūsu, un reiss nonāk jūsu nedēļas atskaitē.',
     own5: 'Jūs maksājat €29.90 mēnesī par katru transportlīdzekli, kas brauca. Stāvošs transportlīdzeklis neko nemaksā.',
     own6: 'Piedāvājumu tabula joprojām ir pieejama, kad transportlīdzeklis atbrīvojas.',
@@ -497,7 +497,7 @@ export const lv = {
 
     ai7: 'Atpūtas un servisa vietu karte',
     ai7Text:
-      'Vairāk nekā 520 vietas Somijā, Zviedrijā, Norvēģijā un Dānijā: degviela, stāvvietas, dušas un darbnīcas. Lietotne rāda tuvākās arī tad, kad mašīna stāv pārtraukumā — bezmaksas un apsargātās atzīmētas atsevišķi.',
+      'Vairāk nekā 3800 vietas deviņās valstīs no Somijas līdz Vācijai: degviela, stāvvietas, dušas un darbnīcas. Lietotne rāda tuvākās arī tad, kad mašīna stāv pārtraukumā — bezmaksas un apsargātās atzīmētas atsevišķi.',
     ai8: 'Vadītājs redz ienākumus',
     ai8Text:
       'Pēc reisa lietotne parāda, cik tas sanāca un kāds ir mēneša kopsavilkums. Skaitļi nāk no pārvadātāja izvēlētā modeļa vai no darba koplīguma tabulām.',

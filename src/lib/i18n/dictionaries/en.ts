@@ -476,7 +476,7 @@ export const en = {
     ownTitle: 'Drive your own clients with our tools.',
     own1: 'The driver app: jobs, working time, load photos, the consignment note and the signature on the phone.',
     own2: 'Working time and an indicative wage from your own rates or the collective agreement tables.',
-    own3: 'A map of rest, wash and service places in Finland, Sweden, Norway and Denmark.',
+    own3: 'A map of rest, wash and service places in the Nordics, the Baltics, Poland and Germany.',
     own4: 'Your client sends the order straight to your vehicle, or you add the job yourself and give it to your own vehicle. The client can get a tracking link. The whole price is yours, and the job goes into your weekly report.',
     own5: 'You pay €29.90 a month per vehicle that drove. A vehicle standing still costs nothing.',
     own6: 'The offer table is still there when a vehicle comes free.',
@@ -553,7 +553,7 @@ export const en = {
 
     ai7: 'A map of rest and service places',
     ai7Text:
-      'Over 520 places in Finland, Sweden, Norway and Denmark: fuel, parking, showers and workshops. The app shows the nearest ones also while the truck stands on a break — free and guarded marked separately.',
+      'Over 3,800 places in nine countries from Finland to Germany: fuel, parking, showers and workshops. The app shows the nearest ones also while the truck stands on a break — free and guarded marked separately.',
     ai8: 'The driver sees the earnings',
     ai8Text:
       'After a job the app shows what it came to and where the month now stands. The figures come from the model the carrier chose or from the collective agreement tables.',

@@ -420,7 +420,7 @@ export const de = {
     ownTitle: 'Fahren Sie Ihre eigenen Kunden mit unseren Werkzeugen.',
     own1: 'Die Fahrer-App: Aufträge, Arbeitszeit, Ladungsfotos, Frachtbrief und Unterschrift auf dem Handy.',
     own2: 'Arbeitszeit und Richtlohn nach Ihren eigenen Sätzen oder den Tariftabellen.',
-    own3: 'Eine Karte mit Rast-, Wasch- und Serviceplätzen in Finnland, Schweden, Norwegen und Dänemark.',
+    own3: 'Eine Karte mit Rast-, Wasch- und Serviceplätzen in Skandinavien, dem Baltikum, Polen und Deutschland.',
     own4: 'Ihr Kunde schickt den Auftrag direkt an Ihr Fahrzeug, oder Sie legen den Auftrag selbst an und geben ihn Ihrem eigenen Fahrzeug. Der Kunde kann einen Tracking-Link erhalten. Der ganze Preis gehört Ihnen, und der Auftrag erscheint in Ihrem Wochenbericht.',
     own5: 'Sie zahlen 29,90 € pro Monat je Fahrzeug, das gefahren ist. Ein stehendes Fahrzeug kostet nichts.',
     own6: 'Die Angebotstafel ist trotzdem da, wenn ein Fahrzeug frei wird.',
@@ -497,7 +497,7 @@ export const de = {
 
     ai7: 'Eine Karte mit Rast- und Serviceplätzen',
     ai7Text:
-      'Über 520 Plätze in Finnland, Schweden, Norwegen und Dänemark: Tankstellen, Parkplätze, Duschen und Werkstätten. Die App zeigt die nächstgelegenen auch, während der Lkw in der Pause steht — kostenlose und bewachte gesondert markiert.',
+      'Über 3.800 Plätze in neun Ländern von Finnland bis Deutschland: Tankstellen, Parkplätze, Duschen und Werkstätten. Die App zeigt die nächstgelegenen auch, während der Lkw in der Pause steht — kostenlose und bewachte gesondert markiert.',
     ai8: 'Der Fahrer sieht seinen Verdienst',
     ai8Text:
       'Nach einem Auftrag zeigt die App, was er eingebracht hat und wo der Monat gerade steht. Die Zahlen kommen aus dem vom Transportunternehmen gewählten Modell oder aus den Tariftabellen.',

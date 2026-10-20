@@ -420,7 +420,7 @@ export const et = {
     ownTitle: 'Vea oma kliente meie tööriistadega.',
     own1: 'Juhi rakendus: veod, tööaeg, koorma fotod, veoseleht ja allkiri telefonis.',
     own2: 'Tööaeg ja orienteeruv palk sinu enda määrade või kollektiivlepingu tabelite järgi.',
-    own3: 'Puhke-, pesu- ja teeninduskohtade kaart Soomes, Rootsis, Norras ja Taanis.',
+    own3: 'Puhke-, pesu- ja teeninduskohtade kaart Põhjamaades, Baltikumis, Poolas ja Saksamaal.',
     own4: 'Sinu klient saadab tellimuse otse sinu sõidukile või lisad veo ise ja annad selle oma sõidukile. Klient võib saada jälgimislingi. Kogu hind on sinu ja vedu läheb sinu nädalaaruandesse.',
     own5: 'Maksad 29,90 € kuus iga sõitnud sõiduki eest. Seisev sõiduk ei maksa midagi.',
     own6: 'Pakkumiste tabel on ikka olemas, kui sõiduk vabaneb.',
@@ -497,7 +497,7 @@ export const et = {
 
     ai7: 'Puhke- ja teeninduskohtade kaart',
     ai7Text:
-      'Üle 520 koha Soomes, Rootsis, Norras ja Taanis: kütus, parkimine, dušid ja töökojad. Rakendus näitab lähimaid ka siis, kui auto seisab puhkepausil — tasuta ja valvega kohad on eraldi märgitud.',
+      'Üle 3800 koha üheksas riigis Soomest Saksamaani: kütus, parkimine, dušid ja töökojad. Rakendus näitab lähimaid ka siis, kui auto seisab puhkepausil — tasuta ja valvega kohad on eraldi märgitud.',
     ai8: 'Juht näeb oma teenistust',
     ai8Text:
       'Pärast vedu näitab rakendus, kui palju see tegi ja kus kuu praegu seisab. Arvud tulevad vedaja valitud mudelist või kollektiivlepingu tabelitest.',

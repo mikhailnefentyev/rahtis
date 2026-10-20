@@ -4,6 +4,10 @@ import { isLocale } from '@/lib/i18n';
 import { driverLocaleOf, getDriverI18n } from '@/lib/driverApp/i18n';
 import { createClient } from '@/lib/supabase/server';
 import { PlacesMap, type Place } from './PlacesMap';
+import type { Tables } from '@/types/database';
+
+const PAGE = 1000;
+type PlaceRow = Omit<Tables<'driver_places'>, 'updated_at' | 'created_at'>;
 
 /**
  * Kartta — заправки, стоянки, душ и сервис для водителя.
@@ -25,9 +29,21 @@ export default async function DriverMap({ params }: { params: Promise<{ locale: 
   ]);
   if (!driver) return null;
 
-  const { data } = await supabase
-    .from('driver_places')
-    .select('id, country, kinds, name_fi, name_en, network, address, lat, lon, approx, hours_fi, hours_en, phone, free, secured, sauna, warning, details');
+  /*
+   * Постранично: база отдаёт не больше 1000 строк за запрос, а точек с
+   * Прибалтикой, Польшей и Германией больше — без страниц хвост списка
+   * молча пропадал бы с карты.
+   */
+  const data: PlaceRow[] = [];
+  for (let from = 0; ; from += PAGE) {
+    const { data: page } = await supabase
+      .from('driver_places')
+      .select('id, country, kinds, name_fi, name_en, network, address, lat, lon, approx, hours_fi, hours_en, phone, free, secured, sauna, warning, details')
+      .order('id')
+      .range(from, from + PAGE - 1);
+    data.push(...(page ?? []));
+    if (!page || page.length < PAGE) break;
+  }
 
   /* Точки переведены на финский и английский: финну финский, остальным английский. */
   const fi = driverLocale === 'fi';

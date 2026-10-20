@@ -524,7 +524,7 @@ export const fi = {
     ownTitle: 'Aja omat asiakkaasi meidän työkaluillamme.',
     own1: 'Kuljettajan sovellus: keikat, työaika, kuormakuvat, rahtikirja ja allekirjoitus puhelimessa.',
     own2: 'Työaika ja suuntaa-antava palkka omilla hinnoillasi tai työehtosopimuksen taulukoilla.',
-    own3: 'Kartta tauko-, pesu- ja huoltopaikoista Suomessa, Ruotsissa, Norjassa ja Tanskassa.',
+    own3: 'Kartta tauko-, pesu- ja huoltopaikoista Pohjoismaissa, Baltiassa, Puolassa ja Saksassa.',
     own4: 'Asiakkaasi lähettää tilauksen suoraan autollesi, tai lisäät keikan itse ja annat sen omalle autolle. Asiakas saa halutessaan seurantalinkin. Koko hinta on sinun, ja keikka tulee viikkoraporttiisi.',
     own5: 'Maksat 29,90 € kuukaudessa autosta, joka ajoi. Seisova auto on maksuton.',
     own6: 'Tarjouspöytä on silti käytössäsi, kun auto jää vapaaksi.',
@@ -607,7 +607,7 @@ export const fi = {
      */
     ai7: 'Kartta tauko- ja huoltopaikoista',
     ai7Text:
-      'Yli 520 paikkaa Suomessa, Ruotsissa, Norjassa ja Tanskassa: tankkaus, pysäköinti, suihku ja korjaamo. Sovellus näyttää lähimmät myös silloin, kun auto seisoo tauolla — maksuttomat ja vartioidut erikseen merkittynä.',
+      'Yli 3 800 paikkaa yhdeksässä maassa Suomesta Saksaan: tankkaus, pysäköinti, suihku ja korjaamo. Sovellus näyttää lähimmät myös silloin, kun auto seisoo tauolla — maksuttomat ja vartioidut erikseen merkittynä.',
     ai8: 'Kuljettaja näkee ansionsa',
     ai8Text:
       'Keikan jälkeen sovellus näyttää, paljonko siitä kertyi ja mihin kuukauden summa on noussut. Laskenta tulee kuljetusliikkeen valitsemasta mallista tai työehtosopimuksen taulukoista.',

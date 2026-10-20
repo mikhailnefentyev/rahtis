@@ -420,7 +420,7 @@ export const sv = {
     ownTitle: 'Kör dina egna kunder med våra verktyg.',
     own1: 'Förarappen: uppdrag, arbetstid, lastfoton, fraktsedeln och signaturen i telefonen.',
     own2: 'Arbetstid och vägledande lön utifrån egna taxor eller kollektivavtalets tabeller.',
-    own3: 'En karta över rast-, tvätt- och serviceplatser i Finland, Sverige, Norge och Danmark.',
+    own3: 'En karta över rast-, tvätt- och serviceplatser i Norden, Baltikum, Polen och Tyskland.',
     own4: 'Din kund skickar ordern direkt till ditt fordon, eller så lägger du in uppdraget själv och ger det till ditt eget fordon. Kunden kan få en spårningslänk. Hela priset är ditt, och uppdraget hamnar i din veckorapport.',
     own5: 'Du betalar 29,90 € i månaden per fordon som kört. Ett fordon som står still kostar ingenting.',
     own6: 'Anbudstavlan finns kvar när ett fordon blir ledigt.',
@@ -497,7 +497,7 @@ export const sv = {
 
     ai7: 'En karta över rast- och serviceplatser',
     ai7Text:
-      'Över 520 platser i Finland, Sverige, Norge och Danmark: bränsle, parkering, duschar och verkstäder. Appen visar de närmaste även när bilen står på rast – gratis och bevakade markerade separat.',
+      'Över 3 800 platser i nio länder från Finland till Tyskland: bränsle, parkering, duschar och verkstäder. Appen visar de närmaste även när bilen står på rast – gratis och bevakade markerade separat.',
     ai8: 'Föraren ser intjäningen',
     ai8Text:
       'Efter ett uppdrag visar appen vad det blev och var månaden står just nu. Siffrorna kommer från den modell åkeriet valt eller från kollektivavtalets tabeller.',

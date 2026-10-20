@@ -420,7 +420,7 @@ export const lt = {
     ownTitle: 'Vežkite savus klientus su mūsų įrankiais.',
     own1: 'Vairuotojo programėlė: darbai, darbo laikas, krovinio nuotraukos, važtaraštis ir parašas telefone.',
     own2: 'Darbo laikas ir orientacinis atlyginimas pagal jūsų tarifus arba kolektyvinės sutarties lenteles.',
-    own3: 'Poilsio, plovimo ir serviso vietų žemėlapis Suomijoje, Švedijoje, Norvegijoje ir Danijoje.',
+    own3: 'Poilsio, plovimo ir serviso vietų žemėlapis Šiaurės šalyse, Baltijos šalyse, Lenkijoje ir Vokietijoje.',
     own4: 'Jūsų klientas siunčia užsakymą tiesiai jūsų transporto priemonei arba darbą pridedate patys ir skiriate savo transporto priemonei. Klientas gali gauti sekimo nuorodą. Visa kaina – jūsų, o darbas patenka į jūsų savaitės ataskaitą.',
     own5: 'Mokate 29,90 € per mėnesį už kiekvieną važiavusią transporto priemonę. Stovinti transporto priemonė nieko nekainuoja.',
     own6: 'Pasiūlymų lentelė lieka, kai transporto priemonė atsilaisvina.',
@@ -497,7 +497,7 @@ export const lt = {
 
     ai7: 'Poilsio ir serviso vietų žemėlapis',
     ai7Text:
-      'Daugiau nei 520 vietų Suomijoje, Švedijoje, Norvegijoje ir Danijoje: degalinės, stovėjimo aikštelės, dušai ir dirbtuvės. Programėlė rodo artimiausias ir sunkvežimiui stovint per pertrauką – nemokamos ir saugomos pažymėtos atskirai.',
+      'Daugiau nei 3800 vietų devyniose šalyse nuo Suomijos iki Vokietijos: degalinės, stovėjimo aikštelės, dušai ir dirbtuvės. Programėlė rodo artimiausias ir sunkvežimiui stovint per pertrauką – nemokamos ir saugomos pažymėtos atskirai.',
     ai8: 'Vairuotojas mato uždarbį',
     ai8Text:
       'Po darbo programėlė parodo, kiek jis atnešė ir kur dabar yra mėnesio suma. Skaičiai gaunami pagal vežėjo pasirinktą modelį arba kolektyvinės sutarties lenteles.',
