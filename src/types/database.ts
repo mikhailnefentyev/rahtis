@@ -2852,6 +2852,7 @@ export type Database = {
           business_id: string
           carrier_company_id: string | null
           company_name: string
+          country: string
           created_at: string
           created_by: string | null
           email: string
@@ -2866,6 +2867,7 @@ export type Database = {
           business_id: string
           carrier_company_id?: string | null
           company_name: string
+          country?: string
           created_at?: string
           created_by?: string | null
           email: string
@@ -2880,6 +2882,7 @@ export type Database = {
           business_id?: string
           carrier_company_id?: string | null
           company_name?: string
+          country?: string
           created_at?: string
           created_by?: string | null
           email?: string
@@ -4173,6 +4176,7 @@ export type Database = {
         Returns: {
           business_id: string
           contact_email: string
+          country: string
           id: string
           last_order_at: string
           name: string
@@ -4262,6 +4266,7 @@ export type Database = {
           p_kind: string
           p_name: string
           p_token_hash: string
+          p_country?: string
         }
         Returns: string
       }
@@ -4337,6 +4342,7 @@ export type Database = {
           p_client_id: string
           p_email: string
           p_name: string
+          p_country?: string
         }
         Returns: undefined
       }

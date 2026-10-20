@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { requireRole } from '@/lib/auth/guard';
-import { isValidBusinessId } from '@/lib/format';
+import { checkBusinessId, isCountryCode } from '@/lib/country';
 import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 
@@ -33,15 +33,20 @@ export async function saveClientAction(_previous: ClientState, formData: FormDat
   const name = str(formData, 'name').replace(/\s+/g, ' ');
   if (name.length < 2) return { error: t.own.clientRequired, done: false };
 
-  const businessId = str(formData, 'business_id');
-  if (businessId && !isValidBusinessId(businessId)) return { error: t.own.clientInvalid, done: false };
+  /* Страна клиента — из пакетов стран; номер проверяется по её правилам и хранится нормализованным. */
+  const country = str(formData, 'country').toUpperCase();
+  if (!isCountryCode(country)) return { error: t.own.clientInvalid, done: false };
+  const raw = str(formData, 'business_id');
+  const { normalized: businessId, valid } = checkBusinessId(country, raw);
+  if (raw && !valid) return { error: t.own.clientInvalid, done: false };
 
   const supabase = await createClient();
   const { error } = await supabase.rpc('carrier_update_client', {
     p_client_id: str(formData, 'client_id'),
     p_name: name,
-    p_business_id: businessId,
+    p_business_id: raw ? businessId : '',
     p_email: str(formData, 'email').toLowerCase(),
+    p_country: country,
   });
 
   if (error) {

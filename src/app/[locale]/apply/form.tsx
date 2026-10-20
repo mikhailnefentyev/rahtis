@@ -3,7 +3,7 @@
 import { useActionState, useState } from 'react';
 import { Button, Card, CardBody, Field, Input, InputMono, Select } from '@/components/ui';
 import { submitApplicationAction, type ApplyState } from '@/lib/companies/actions';
-import { checkBusinessId, countryPack, enabledCountries, type CountryCode } from '@/lib/country';
+import { checkBusinessId, countryPack, enabledCountries, isCountryCode, type CountryCode } from '@/lib/country';
 import { useI18n } from '@/lib/i18n/provider';
 import type { ApplyInvite } from '@/lib/partners/invites';
 import type { CompanyRole } from '@/types/db';
@@ -30,7 +30,7 @@ export function ApplyForm({ invite = null }: { invite?: ApplyInvite | null }) {
    * проверка и реестр, с которым сверяет оператор. Финляндия первой:
    * так было до пакетов стран, и приглашения перевозчиков — финские.
    */
-  const [country, setCountry] = useState<CountryCode>('FI');
+  const [country, setCountry] = useState<CountryCode>(isCountryCode(invite?.country) ? invite.country : 'FI');
   const [businessId, setBusinessId] = useState(invite?.businessId ?? '');
   const [vatNumber, setVatNumber] = useState('');
   const [email, setEmail] = useState(invite?.email ?? '');

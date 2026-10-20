@@ -35,7 +35,10 @@ export function OwnView({
   vehicles,
   startNew = false,
   blocked = null,
+  homeCountry = 'FI',
 }: {
+  /** Страна перевозчика — страна нового клиента по умолчанию. */
+  homeCountry?: string;
   startNew?: boolean;
   /** Почему рейс сейчас не создать (не приняты новые условия). */
   blocked?: string | null;
@@ -69,7 +72,7 @@ export function OwnView({
           <OrderForm
             key={formKey}
             knownVehicles={[]}
-            own={{ clients, vehicles }}
+            own={{ clients, vehicles, homeCountry }}
             onNew={() => {
               setFormKey((k) => k + 1);
               router.refresh();

@@ -124,7 +124,7 @@ export function OrderForm({
    * Свой рейс перевозчика: та же форма, но вместо стола — клиент
    * перевозчика и его машина, а цена — только для его отчёта.
    */
-  own?: { clients: CarrierClient[]; vehicles: OwnVehicle[] };
+  own?: { clients: CarrierClient[]; vehicles: OwnVehicle[]; homeCountry?: string };
 }) {
   const { t, m, f, locale } = useI18n();
   const [state, formAction, pending] = useActionState(own ? ownOrderAction : publishOrderAction, initial);
@@ -907,7 +907,7 @@ export function OrderForm({
       <Card>
         <CardBody>
           {own ? (
-            <OwnPicker clients={own.clients} vehicles={own.vehicles} haulKind={haulKind} />
+            <OwnPicker clients={own.clients} vehicles={own.vehicles} haulKind={haulKind} homeCountry={own.homeCountry} />
           ) : (
             <DispatchPicker vehicles={knownVehicles} haulKind={haulKind} onDirectChange={setDirect} />
           )}

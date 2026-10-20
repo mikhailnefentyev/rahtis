@@ -12,6 +12,8 @@ export type ApplyInvite = {
   carrierName: string;
   /** Кого пригласили: заказчика или перевозчика — от этого роль в заявке. */
   kind: 'SHIPPER' | 'CARRIER';
+  /** Страна приглашённой компании — с неё начинается форма заявки. */
+  country: string;
 };
 
 /**
@@ -26,7 +28,7 @@ export async function inviteByToken(token: string): Promise<ApplyInvite | null> 
   const admin = createAdminClient();
   const { data } = await admin
     .from('shipper_invites')
-    .select('company_name, business_id, email, applied_company_id, carrier_company_id, invite_kind')
+    .select('company_name, business_id, email, applied_company_id, carrier_company_id, invite_kind, country')
     .eq('token_hash', createHash('sha256').update(token).digest('hex'))
     .maybeSingle();
   if (!data || data.applied_company_id) return null;
@@ -40,5 +42,6 @@ export async function inviteByToken(token: string): Promise<ApplyInvite | null> 
     email: data.email,
     carrierName: carrier?.name ?? '',
     kind: data.invite_kind === 'CARRIER' ? 'CARRIER' : 'SHIPPER',
+    country: data.country,
   };
 }

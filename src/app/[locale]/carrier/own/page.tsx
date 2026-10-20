@@ -124,6 +124,7 @@ export default async function OwnOrdersPage({
           clients={clients ?? []}
           vehicles={vehicles ?? []}
           startNew={startNew}
+          homeCountry={viewer.company?.country ?? 'FI'}
           blocked={legalPending ? t.legal.reacceptNeeded : null}
         />
       )}

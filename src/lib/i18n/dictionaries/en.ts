@@ -2897,7 +2897,7 @@ export const en = {
     rateLabel: 'Price',
     rateHint: 'VAT 0 %. Shown only in your report.',
     clientRequired: 'Choose a client or type the name of a new one.',
-    clientInvalid: "Check the client's business ID (1234567-8) and email.",
+    clientInvalid: "Check the client's company number and email.",
     subscriptionOnly:
       'Own jobs are part of the subscription: €29.90 a month per vehicle that drove, no percentage. The first month is free.',
     trackLink: 'Tracking link for the client',

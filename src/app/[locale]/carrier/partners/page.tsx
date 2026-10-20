@@ -70,7 +70,7 @@ export default async function PartnersPage({ params }: { params: Promise<{ local
           <CardBody className="flex flex-col gap-3">
             <h2 className="text-[15px] font-semibold tracking-tight">{t.partners.inviteTitle}</h2>
             <p className="max-w-2xl text-[13px] leading-relaxed text-ink-muted">{t.partners.inviteText}</p>
-            <InviteShipperForm />
+            <InviteShipperForm homeCountry={viewer.company?.country ?? 'FI'} />
           </CardBody>
         </Card>
       )}

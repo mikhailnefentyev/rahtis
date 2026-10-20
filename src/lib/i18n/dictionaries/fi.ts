@@ -2858,7 +2858,7 @@ export const fi = {
     inviteLanguage: 'Viestin kieli',
     inviteSend: 'Lähetä kutsu',
     inviteSent: 'Kutsu lähetetty osoitteeseen {email}.',
-    inviteInvalid: 'Tarkista nimi, Y-tunnus ja sähköposti.',
+    inviteInvalid: 'Tarkista nimi, yritystunnus ja sähköposti.',
     inviteTooMany: 'Enintään 20 kutsua vuorokaudessa.',
     inviteFailed: 'Kutsua ei voitu lähettää. Yritä hetken kuluttua uudelleen.',
     invitesTitle: 'Lähetetyt kutsut',
@@ -3003,7 +3003,7 @@ export const fi = {
     rateLabel: 'Hinta',
     rateHint: 'ALV 0 %. Näkyy vain teidän raportissanne.',
     clientRequired: 'Valitse asiakas tai kirjoita uuden asiakkaan nimi.',
-    clientInvalid: 'Tarkista asiakkaan Y-tunnus (1234567-8) ja sähköposti.',
+    clientInvalid: 'Tarkista asiakkaan yritystunnus ja sähköposti.',
     subscriptionOnly:
       'Omat keikat kuuluvat tilaukseen: 29,90 € kuukaudessa ajanutta autoa kohden, ilman prosenttia. Ensimmäinen kuukausi on maksuton.',
     trackLink: 'Seurantalinkki asiakkaalle',

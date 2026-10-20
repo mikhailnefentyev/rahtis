@@ -1,7 +1,9 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { CountrySelect } from '@/components/CountrySelect';
 import { Field, Input, InputMono, Select } from '@/components/ui';
+import { countryPack } from '@/lib/country';
 import type { HaulKind } from '@/lib/orders/haul';
 import { useI18n } from '@/lib/i18n/provider';
 import type { CarrierClient, OwnVehicle } from '@/types/db';
@@ -21,10 +23,13 @@ export function OwnPicker({
   clients,
   vehicles,
   haulKind,
+  homeCountry = 'FI',
 }: {
   clients: CarrierClient[];
   vehicles: OwnVehicle[];
   haulKind: HaulKind;
+  /** Страна перевозчика — с неё начинается выбор страны нового клиента. */
+  homeCountry?: string;
 }) {
   const { t } = useI18n();
   const [clientId, setClientId] = useState(clients[0]?.id ?? '');
@@ -36,6 +41,8 @@ export function OwnPicker({
    */
   const [name, setName] = useState('');
   const [businessId, setBusinessId] = useState('');
+  const [country, setCountry] = useState(homeCountry);
+  const pack = countryPack(country);
   const [email, setEmail] = useState(clients[0]?.contact_email ?? '');
   const [vehicleId, setVehicleId] = useState('');
 
@@ -105,13 +112,23 @@ export function OwnPicker({
                 />
               )}
             </Field>
-            <Field label={`${t.own.clientBusinessId}${optional}`}>
+            <Field label={t.company.country}>
+              {(p) => (
+                <CountrySelect
+                  key={resets}
+                  {...p}
+                  name="client_country"
+                  value={country}
+                  onChange={(e) => setCountry(e.target.value)}
+                />
+              )}
+            </Field>
+            <Field label={`${country === 'FI' ? t.own.clientBusinessId : pack.businessId.label}${optional}`}>
               {(p) => (
                 <InputMono
                   {...p}
                   name="client_business_id"
-                  placeholder="1234567-8"
-                  pattern="\d{7}-\d"
+                  placeholder={pack.businessId.example}
                   value={businessId}
                   onChange={(e) => setBusinessId(e.target.value)}
                 />

@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { siteUrl } from '@/lib/config';
 import { operatorInbox, sendEmail } from '@/lib/email';
 import { shipperInviteEmail } from '@/lib/email/templates/shipperInvite';
-import { isValidBusinessId } from '@/lib/format';
+import { checkBusinessId, isCountryCode } from '@/lib/country';
 import { getDictionary } from '@/lib/i18n';
 import { requireRole } from '@/lib/auth/guard';
 import { getViewer } from '@/lib/auth/viewer';
@@ -82,12 +82,15 @@ export async function inviteShipperAction(
   }
 
   const name = String(formData.get('name') ?? '').trim().slice(0, 200);
-  const businessId = String(formData.get('business_id') ?? '').trim();
+  /* Страна приглашённого — по умолчанию страна перевозчика; номер — по её правилам. */
+  const country = String(formData.get('country') ?? viewer.company.country ?? 'FI').toUpperCase();
+  const business = checkBusinessId(country, String(formData.get('business_id') ?? '').trim());
+  const businessId = business.normalized;
   const email = String(formData.get('email') ?? '').trim().toLowerCase();
   const language = String(formData.get('language') ?? 'fi') === 'en' ? 'en' : 'fi';
   const kind = String(formData.get('kind') ?? 'SHIPPER') === 'CARRIER' ? 'CARRIER' : 'SHIPPER';
 
-  if (!name || !isValidBusinessId(businessId) || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+  if (!name || !isCountryCode(country) || !business.valid || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
     return { error: t.partners.inviteInvalid, sentTo: null };
   }
 
@@ -101,6 +104,7 @@ export async function inviteShipperAction(
     p_business_id: businessId,
     p_email: email,
     p_token_hash: hash,
+    p_country: country,
   });
   if (error) {
     return { error: error.code === '55001' ? t.partners.inviteTooMany : t.partners.inviteFailed, sentTo: null };

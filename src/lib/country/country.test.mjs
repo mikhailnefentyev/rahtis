@@ -78,3 +78,16 @@ test('часовые пояса в базе (app.stop_timezone) совпадаю
     assert.equal(inDb[pack.code], pack.timeZone, pack.code);
   }
 });
+
+test('номер любой страны в виде хранения проходит проверку базы (app.business_id_ok)', async () => {
+  const { readFileSync } = await import('node:fs');
+  const sql = readFileSync(new URL('../../../supabase/migrations/20261021130000_foreign_clients.sql', import.meta.url), 'utf8');
+  const [, fi] = /p_country = 'FI' and p_business_id ~ '([^']+)'/.exec(sql);
+  const [, other] = /p_country <> 'FI' and p_business_id ~ '([^']+)'/.exec(sql);
+  for (const [country, ids] of Object.entries(REAL)) {
+    for (const id of ids) {
+      const { normalized } = checkBusinessId(country, id);
+      assert.match(normalized, new RegExp(country === 'FI' ? fi : other), `${country} ${id} → ${normalized}`);
+    }
+  }
+});

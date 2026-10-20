@@ -1,19 +1,23 @@
 'use client';
 
 import { useActionState, useState } from 'react';
+import { CountrySelect } from '@/components/CountrySelect';
 import { Button, Field, Input, InputMono, Select } from '@/components/ui';
+import { countryPack } from '@/lib/country';
 import { useI18n } from '@/lib/i18n/provider';
 import { inviteShipperAction, type InviteShipperState } from '@/lib/partners/actions';
 import { useKeepOnError } from '@/lib/forms/keepOnError';
 
 const initial: InviteShipperState = { error: null, sentTo: null };
 
-/** Перевозчик приглашает своего клиента: название, Y-tunnus, почта, язык письма. */
-export function InviteShipperForm() {
+/** Перевозчик приглашает своего клиента: название, страна, номер компании, почта, язык письма. */
+export function InviteShipperForm({ homeCountry = 'FI' }: { homeCountry?: string }) {
   const { t, locale } = useI18n();
   const [state, action, pending] = useActionState(inviteShipperAction, initial);
   const keepAction = useKeepOnError(state);
   const [kind, setKind] = useState<'SHIPPER' | 'CARRIER'>('SHIPPER');
+  const [country, setCountry] = useState(homeCountry);
+  const pack = countryPack(country);
 
   return (
     <form {...keepAction} action={action} className="flex flex-col gap-3">
@@ -43,8 +47,11 @@ export function InviteShipperForm() {
         <Field label={t.partners.inviteName} required>
           {(p) => <Input {...p} name="name" required maxLength={200} placeholder="Asiakas Oy" />}
         </Field>
-        <Field label={t.partners.inviteBusinessId} required>
-          {(p) => <InputMono {...p} name="business_id" required placeholder="1234567-8" />}
+        <Field label={t.company.country} required>
+          {(p) => <CountrySelect {...p} name="country" value={country} onChange={(e) => setCountry(e.target.value)} />}
+        </Field>
+        <Field label={country === 'FI' ? t.partners.inviteBusinessId : pack.businessId.label} required>
+          {(p) => <InputMono {...p} name="business_id" required placeholder={pack.businessId.example} />}
         </Field>
         <Field label={t.partners.inviteEmail} required>
           {(p) => <Input {...p} name="email" type="email" required placeholder="ops@asiakas.fi" />}

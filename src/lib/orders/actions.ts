@@ -14,7 +14,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { sendEmail, operatorInbox } from '@/lib/email';
 import { emailLocaleOf } from '@/lib/email/text';
 import { ownTrackEmail } from '@/lib/email/templates/ownTrack';
-import { isValidBusinessId } from '@/lib/format';
+import { checkBusinessId, isCountryCode } from '@/lib/country';
 import { routeLabel } from '@/lib/orders/route';
 import { siteUrl } from '@/lib/config';
 
@@ -466,15 +466,27 @@ export async function ownOrderAction(_previous: PublishState, formData: FormData
     return { error: t.own.clientInvalid, ref: null };
   }
 
-  /* Y-tunnus клиента необязателен, но если указан — с верной контрольной цифрой. */
-  const clientBusinessId = clientId ? '' : str(formData, 'client_business_id');
-  if (clientBusinessId && !isValidBusinessId(clientBusinessId)) return { error: t.own.clientInvalid, ref: null };
+  /*
+   * Номер нового клиента необязателен, но если указан — верный для его
+   * страны (Y-tunnus, NIP, USt-IdNr.…). Страна по умолчанию — страна
+   * перевозчика.
+   */
+  const clientCountry = str(formData, 'client_country').toUpperCase() || viewer.company.country || 'FI';
+  if (!isCountryCode(clientCountry)) return { error: t.own.clientInvalid, ref: null };
+  const rawClientBusinessId = clientId ? '' : str(formData, 'client_business_id');
+  const clientBusinessId = checkBusinessId(clientCountry, rawClientBusinessId);
+  if (rawClientBusinessId && !clientBusinessId.valid) return { error: t.own.clientInvalid, ref: null };
 
   const supabase = await createClient();
   const { data, error } = await supabase.rpc('carrier_create_own_order', {
     p_client: clientId
       ? { id: clientId, email: clientEmail }
-      : { name: clientName, business_id: str(formData, 'client_business_id'), email: clientEmail },
+      : {
+          name: clientName,
+          country: clientCountry,
+          business_id: rawClientBusinessId ? clientBusinessId.normalized : '',
+          email: clientEmail,
+        },
     p_order: form.order as Json,
     p_stops: form.stops as unknown as Json,
     p_vehicle_id: vehicle,

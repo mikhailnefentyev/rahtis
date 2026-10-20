@@ -1,7 +1,9 @@
 'use client';
 
 import { useActionState, useEffect, useState } from 'react';
+import { CountrySelect } from '@/components/CountrySelect';
 import { Button, Card, CardBody, Field, Input, InputMono, Mono } from '@/components/ui';
+import { countryPack } from '@/lib/country';
 import { deleteClientAction, saveClientAction, type ClientState } from '@/lib/orders/ownClients';
 import { useI18n } from '@/lib/i18n/provider';
 import type { CarrierClient } from '@/types/db';
@@ -61,7 +63,12 @@ function ClientRow({ client, onEdit }: { client: CarrierClient; onEdit: () => vo
     <Card>
       <CardBody className="flex flex-wrap items-center gap-x-4 gap-y-2">
         <span className="text-[13px] font-semibold">{client.name}</span>
-        {client.business_id && <Mono className="text-[13px] text-ink-muted">{client.business_id}</Mono>}
+        {client.business_id && (
+          <Mono className="text-[13px] text-ink-muted">
+            {client.country !== 'FI' && `${client.country} `}
+            {client.business_id}
+          </Mono>
+        )}
         {client.contact_email && <span className="text-[13px] text-ink-muted">{client.contact_email}</span>}
         <span className="text-[13px] text-ink-dim">
           {t.own.clientJobs}: {client.orders}
@@ -105,6 +112,8 @@ function ClientForm({ client, onClose }: { client: CarrierClient; onClose: () =>
   const [state, saveAction, pending] = useActionState(saveClientAction, initial);
   const keepSaveAction = useKeepOnError(state);
   const optional = ` (${t.own.optional})`;
+  const [country, setCountry] = useState(client.country || 'FI');
+  const pack = countryPack(country);
 
   useEffect(() => {
     if (state.done) onClose();
@@ -120,13 +129,15 @@ function ClientForm({ client, onClose }: { client: CarrierClient; onClose: () =>
           <Field label={t.own.clientName} required>
             {(p) => <Input {...p} name="name" required minLength={2} maxLength={200} defaultValue={client.name} />}
           </Field>
-          <Field label={`${t.own.clientBusinessId}${optional}`}>
+          <Field label={t.company.country}>
+            {(p) => <CountrySelect {...p} name="country" value={country} onChange={(e) => setCountry(e.target.value)} />}
+          </Field>
+          <Field label={`${country === 'FI' ? t.own.clientBusinessId : pack.businessId.label}${optional}`}>
             {(p) => (
               <InputMono
                 {...p}
                 name="business_id"
-                placeholder="1234567-8"
-                pattern="\d{7}-\d"
+                placeholder={pack.businessId.example}
                 defaultValue={client.business_id ?? ''}
               />
             )}
