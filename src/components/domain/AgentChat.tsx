@@ -1,7 +1,8 @@
 import { Card, CardBody } from '@/components/ui';
-import { getI18n, type Locale } from '@/lib/i18n';
+import { type Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import { AgentChatLive, type ChatMessage } from './AgentChatLive';
+import { getViewerI18n } from '@/lib/i18n/viewer';
 
 /**
  * Окно чата с агентом в кабинете.
@@ -25,7 +26,7 @@ export async function AgentChat({
   /** Без карточки и заголовка — внутри выезжающей панели помощника. */
   bare?: boolean;
 }) {
-  const [{ t }, supabase] = await Promise.all([getI18n(locale), createClient()]);
+  const [{ t }, supabase] = await Promise.all([getViewerI18n(locale), createClient()]);
 
   const { data: conversation } = await supabase
     .from('conversations')

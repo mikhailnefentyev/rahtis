@@ -10,6 +10,7 @@ import {
   type DriverLocale,
 } from '@/lib/i18n/driver';
 import { getDriver } from './session';
+import { stopTimeZone } from '@/lib/country';
 
 /**
  * Язык приложения водителя.
@@ -34,5 +35,7 @@ export const driverLocaleOf = cache(async (locale: Locale): Promise<DriverLocale
 /** Словарь и форматтеры страницы водителя — вместо общего getI18n. */
 export const getDriverI18n = cache(async (locale: Locale): Promise<I18n> => {
   const driverLocale = await driverLocaleOf(locale);
-  return createI18n(locale, await driverDictionary(locale, driverLocale));
+  /* Время — по стране перевозчика водителя, как у диспетчера той же компании. */
+  const driver = await getDriver();
+  return createI18n(locale, await driverDictionary(locale, driverLocale), stopTimeZone(driver?.company_country));
 });

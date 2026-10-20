@@ -139,7 +139,7 @@ function ShiftForm({
   defaultVehicleId: string | null;
   onClose: () => void;
 }) {
-  const { t, locale } = useI18n();
+  const { t, f, locale } = useI18n();
   const [state, formAction, pending] = useActionState(saveShiftAction, initial);
   const keepFormAction = useKeepOnError(state);
 
@@ -147,7 +147,8 @@ function ShiftForm({
     if (state.done) onClose();
   }, [state.done, onClose]);
 
-  const local = (iso: string | null | undefined) => (iso ? isoToOperationsLocal(iso) : '');
+  /* Поля — в поясе компании перевозчика (f.zone), как и список смен; сервер переводит так же. */
+  const local = (iso: string | null | undefined) => (iso ? isoToOperationsLocal(iso, f.zone) : '');
   const firstBreak = shift?.breaks[0] ?? null;
 
   return (

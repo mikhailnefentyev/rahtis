@@ -4,13 +4,14 @@ import { notFound } from 'next/navigation';
 import { Badge, Mono } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
 import { buildDriverReport } from '@/lib/drivers/report';
-import { getI18n, isLocale } from '@/lib/i18n';
+import { isLocale } from '@/lib/i18n';
 import { helsinkiToday } from '@/lib/reports/periods';
 import { createClient } from '@/lib/supabase/server';
 import { DriverCertificates } from '@/components/domain/DriverCertificates';
 import { PayProfilePanel } from './PayProfilePanel';
 import { ShiftsPanel } from './ShiftsPanel';
 import { WorkSummary } from '../WorkSummary';
+import { getViewerI18n } from '@/lib/i18n/viewer';
 
 export async function generateMetadata({
   params,
@@ -19,7 +20,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   if (!isLocale(locale)) return {};
-  const { t } = await getI18n(locale);
+  const { t } = await getViewerI18n(locale);
   return { title: t.drivers.open };
 }
 
@@ -46,7 +47,7 @@ export default async function DriverPage({
   const viewer = await requireRole(locale, 'CARRIER');
   const company = viewer.company!;
 
-  const [{ t, f }, supabase] = await Promise.all([getI18n(locale), createClient()]);
+  const [{ t, f }, supabase] = await Promise.all([getViewerI18n(locale), createClient()]);
   const period = monthRange(monthParam);
 
   const since = new Date(`${period.from}T00:00:00Z`);

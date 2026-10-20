@@ -4,10 +4,11 @@ import { Badge, Button, Card, CardBody, EmptyState, Mono } from '@/components/ui
 import { deleteWebhookAction, pingWebhookAction, revokeApiKeyAction } from '@/lib/api/actions';
 import { requireRole } from '@/lib/auth/guard';
 import { siteUrl } from '@/lib/config';
-import { getI18n, isLocale } from '@/lib/i18n';
+import { isLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import { CreateKeyForm } from './CreateKeyForm';
 import { CreateWebhookForm } from './CreateWebhookForm';
+import { getViewerI18n } from '@/lib/i18n/viewer';
 
 export async function generateMetadata({
   params,
@@ -16,7 +17,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   if (!isLocale(locale)) return {};
-  const { t } = await getI18n(locale);
+  const { t } = await getViewerI18n(locale);
   return { title: t.api.title };
 }
 
@@ -32,7 +33,7 @@ export default async function ApiKeysPage({ params }: { params: Promise<{ locale
   if (!isLocale(locale)) notFound();
 
   await requireRole(locale, 'SHIPPER');
-  const [{ t, f }, supabase] = await Promise.all([getI18n(locale), createClient()]);
+  const [{ t, f }, supabase] = await Promise.all([getViewerI18n(locale), createClient()]);
 
   const { data } = await supabase
     .from('api_keys')

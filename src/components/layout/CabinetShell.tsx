@@ -7,11 +7,12 @@ import { Badge } from '@/components/ui';
 import { companyStatusTone } from '@/components/ui/tone';
 import { signOutAction } from '@/lib/auth/actions';
 import { accountPath, cabinetPath } from '@/lib/auth/paths';
-import { getI18n, type Dictionary, type Locale } from '@/lib/i18n';
+import { type Dictionary, type Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import type { Company, PartyRole } from '@/types/db';
 import { SideNav, TabBar, type NavGroup, type NavItem } from './CabinetNav';
 import { NavIcon } from './NavIcon';
+import { getViewerI18n } from '@/lib/i18n/viewer';
 
 /**
  * Каркас кабинета: боковая панель, строка сверху, содержимое.
@@ -36,7 +37,7 @@ export async function CabinetShell({
   children: React.ReactNode;
 }) {
   const [{ t }, { data: unread }] = await Promise.all([
-    getI18n(locale),
+    getViewerI18n(locale),
     createClient().then((supabase) => supabase.rpc('unread_notifications')),
   ]);
 

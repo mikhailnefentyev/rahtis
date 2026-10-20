@@ -4,10 +4,11 @@ import { notFound } from 'next/navigation';
 import { Card, CardBody, buttonClass } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
 import { accountPath } from '@/lib/auth/paths';
-import { getI18n, isLocale } from '@/lib/i18n';
+import { isLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import type { OrderAmendment, OrderStop, ShipperOffer, TripDocument } from '@/types/db';
 import { OrdersView } from './OrdersView';
+import { getViewerI18n } from '@/lib/i18n/viewer';
 
 export async function generateMetadata({
   params,
@@ -16,7 +17,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   if (!isLocale(locale)) return {};
-  const { t } = await getI18n(locale);
+  const { t } = await getViewerI18n(locale);
   return { title: t.orders.title };
 }
 
@@ -35,7 +36,7 @@ export default async function OrdersPage({
   const viewer = await requireRole(locale, 'SHIPPER');
   const company = viewer.company!;
 
-  const [{ t }, supabase] = await Promise.all([getI18n(locale), createClient()]);
+  const [{ t }, supabase] = await Promise.all([getViewerI18n(locale), createClient()]);
 
   /*
    * Колонки поимённо, а не select('*'): колонки назначения заказчику не

@@ -1,8 +1,9 @@
 import Link from 'next/link';
 import { Card, CardBody, Mono } from '@/components/ui';
-import { getI18n, type Locale } from '@/lib/i18n';
+import { type Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import type { PartyRole } from '@/types/db';
+import { getViewerI18n } from '@/lib/i18n/viewer';
 
 /**
  * Архив документов компании.
@@ -12,7 +13,7 @@ import type { PartyRole } from '@/types/db';
  * пересланная в чат ссылка открыла бы их кому угодно навсегда.
  */
 export async function ReportArchive({ locale, role }: { locale: Locale; role: PartyRole }) {
-  const [{ t, f }, supabase] = await Promise.all([getI18n(locale), createClient()]);
+  const [{ t, f }, supabase] = await Promise.all([getViewerI18n(locale), createClient()]);
 
   const { data: reports } = await supabase
     .from('weekly_reports')

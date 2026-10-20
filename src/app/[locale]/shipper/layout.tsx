@@ -3,6 +3,8 @@ import { CabinetShell } from '@/components/layout/CabinetShell';
 import { FlashNotice } from '@/components/layout/FlashNotice';
 import { requireRole } from '@/lib/auth/guard';
 import { isLocale } from '@/lib/i18n';
+import { TimeZoneProvider } from '@/lib/i18n/provider';
+import { stopTimeZone } from '@/lib/country';
 
 /**
  * Гейт кабинета. requireRole уводит гостя на вход, пользователя без
@@ -22,9 +24,12 @@ export default async function ShipperLayout({
   const viewer = await requireRole(locale, 'SHIPPER');
 
   return (
-    <CabinetShell locale={locale} role="SHIPPER" company={viewer.company}>
-      <FlashNotice />
-      {children}
-    </CabinetShell>
+    /* Время в кабинете — по стране компании (src/lib/i18n/viewer). */
+    <TimeZoneProvider zone={stopTimeZone(viewer.company?.country)}>
+      <CabinetShell locale={locale} role="SHIPPER" company={viewer.company}>
+        <FlashNotice />
+        {children}
+      </CabinetShell>
+    </TimeZoneProvider>
   );
 }

@@ -4,8 +4,9 @@ import { requireRole } from '@/lib/auth/guard';
 import { COMPLETED_WEEKS, vatBpsFor } from '@/lib/config';
 import { weeksAgoMonday } from '@/lib/dates';
 import { CarrierScorecard } from '@/components/domain/CarrierScorecard';
-import { getI18n, type Locale } from '@/lib/i18n';
+import { type Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
+import { getViewerI18n } from '@/lib/i18n/viewer';
 
 /**
  * Вкладка выполненных рейсов — одна на заказчика и перевозчика.
@@ -24,7 +25,7 @@ export async function CompletedCabinet({
 }) {
   const viewer = await requireRole(locale, role);
 
-  const [{ t, m }, supabase] = await Promise.all([getI18n(locale), createClient()]);
+  const [{ t, m }, supabase] = await Promise.all([getViewerI18n(locale), createClient()]);
 
   /* Двенадцать недель: квартал закрытых рейсов покрывает любой спор о счёте. */
   const [{ data: orders }, { data: totals }, { data: rating }] = await Promise.all([

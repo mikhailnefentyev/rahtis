@@ -4,9 +4,10 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { buttonClass } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
-import { getI18n, isLocale } from '@/lib/i18n';
+import { isLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import { DriversView, type DriverRow } from './DriversView';
+import { getViewerI18n } from '@/lib/i18n/viewer';
 
 export async function generateMetadata({
   params,
@@ -15,7 +16,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   if (!isLocale(locale)) return {};
-  const { t } = await getI18n(locale);
+  const { t } = await getViewerI18n(locale);
   return { title: t.drivers.title };
 }
 
@@ -26,7 +27,7 @@ export default async function DriversPage({ params }: { params: Promise<{ locale
   const viewer = await requireRole(locale, 'CARRIER');
   const company = viewer.company!;
 
-  const [{ t }, supabase] = await Promise.all([getI18n(locale), createClient()]);
+  const [{ t }, supabase] = await Promise.all([getViewerI18n(locale), createClient()]);
 
   const [{ data: drivers }, { data: vehicles }, { data: assignments }, { data: profiles }, { data: push }] =
     await Promise.all([

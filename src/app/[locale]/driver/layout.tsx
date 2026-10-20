@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { notFound } from 'next/navigation';
 import { isLocale } from '@/lib/i18n';
 import { getDriverI18n } from '@/lib/driverApp/i18n';
-import { I18nProvider } from '@/lib/i18n/provider';
+import { I18nProvider, TimeZoneProvider } from '@/lib/i18n/provider';
 import { ServiceWorker } from './ServiceWorker';
 
 export async function generateMetadata({
@@ -68,24 +68,27 @@ export default async function DriverShell({
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
 
-  const { t } = await getDriverI18n(locale);
+  const { t, f } = await getDriverI18n(locale);
 
   return (
     <I18nProvider locale={locale} dictionary={t}>
-      <div data-app="driver" className="min-h-dvh overflow-x-clip bg-ground text-ink">
-        {/*
-          * Экран загрузки: тот же, что заставка iPhone, — без белой вспышки
-          * между заставкой и приложением. Приходит с первыми байтами
-          * страницы и гаснет сам (CSS, без ожидания скриптов); при переходах
-          * внутри приложения оболочка не перерисовывается, и его нет.
-          */}
-        <div aria-hidden className="boot-splash">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/splash/mark-dark.png" alt="" width={512} height={521} />
+      {/* Время — по стране перевозчика водителя (getDriverI18n). */}
+      <TimeZoneProvider zone={f.zone}>
+        <div data-app="driver" className="min-h-dvh overflow-x-clip bg-ground text-ink">
+          {/*
+            * Экран загрузки: тот же, что заставка iPhone, — без белой вспышки
+            * между заставкой и приложением. Приходит с первыми байтами
+            * страницы и гаснет сам (CSS, без ожидания скриптов); при переходах
+            * внутри приложения оболочка не перерисовывается, и его нет.
+            */}
+          <div aria-hidden className="boot-splash">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/splash/mark-dark.png" alt="" width={512} height={521} />
+          </div>
+          <ServiceWorker />
+          {children}
         </div>
-        <ServiceWorker />
-        {children}
-      </div>
+      </TimeZoneProvider>
     </I18nProvider>
   );
 }

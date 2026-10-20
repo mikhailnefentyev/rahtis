@@ -9,8 +9,8 @@ import { stopZone, type Format } from '@/lib/format';
  * работ и оценка прибытия показываются в том же поясе, иначе водитель,
  * приехавший к 08:00 минута в минуту, выглядел бы опоздавшим на час.
  *
- * Где пояс точки расходится с финским, к времени добавляется «UTC+1»:
- * диспетчер в Хельсинки должен видеть, что это не его часы. Точка без
+ * Где пояс точки расходится с поясом зрителя (f.zone), к времени
+ * добавляется «UTC+1»: диспетчер должен видеть, что это не его часы. Точка без
  * страны (адрес набран руками) — по финскому, как было до пакетов стран.
  */
 
@@ -21,13 +21,13 @@ const withZone = (text: string, zone: string) => (zone ? `${text} ${zone}` : tex
 /** «08:12» или «08:12 UTC+1». */
 export function stopTime(f: Format, iso: string, country: Country): string {
   const tz = stopTimeZone(country);
-  return withZone(f.time(iso, tz), stopZone(iso, tz));
+  return withZone(f.time(iso, tz), stopZone(iso, tz, f.zone));
 }
 
 /** «21.10.2026 08:12» или с «UTC+1». */
 export function stopDateTime(f: Format, iso: string, country: Country): string {
   const tz = stopTimeZone(country);
-  return withZone(f.dateTime(iso, tz), stopZone(iso, tz));
+  return withZone(f.dateTime(iso, tz), stopZone(iso, tz, f.zone));
 }
 
 /**
@@ -38,7 +38,7 @@ export function stopDateTime(f: Format, iso: string, country: Country): string {
 export function stopEta(f: Format, iso: string, country: Country, now: Date = new Date()): string {
   const tz = stopTimeZone(country);
   const text = f.date(iso, tz) === f.date(now, tz) ? f.time(iso, tz) : f.dateTime(iso, tz);
-  return withZone(text, stopZone(iso, tz));
+  return withZone(text, stopZone(iso, tz, f.zone));
 }
 
 /**
@@ -47,7 +47,7 @@ export function stopEta(f: Format, iso: string, country: Country, now: Date = ne
  * точки: летом Варшава от Хельсинки тоже на час, но в день перевода часов
  * пометка должна быть той, что в этот день.
  */
-export function scheduledZone(date: string, time: string | null | undefined, country: Country): string {
+export function scheduledZone(date: string, time: string | null | undefined, country: Country, viewerZone?: string): string {
   const tz = stopTimeZone(country);
-  return stopZone(`${date}T${(time ?? '12:00').slice(0, 5)}:00Z`, tz);
+  return stopZone(`${date}T${(time ?? '12:00').slice(0, 5)}:00Z`, tz, viewerZone);
 }

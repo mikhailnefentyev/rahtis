@@ -1,8 +1,9 @@
 import { Badge, Card, CardBody } from '@/components/ui';
 import { PresenceMap, type PresencePoint } from '@/components/domain/PresenceMap';
-import { getI18n, type Locale } from '@/lib/i18n';
+import { type Locale } from '@/lib/i18n';
 import { presenceParts } from '@/lib/presence';
 import { createClient } from '@/lib/supabase/server';
+import { getViewerI18n } from '@/lib/i18n/viewer';
 
 /**
  * Где есть транспорт — в кабинете заказчика.
@@ -22,7 +23,7 @@ import { createClient } from '@/lib/supabase/server';
  * базы появилась подсказка адреса».
  */
 export async function CarrierPresence({ locale }: { locale: Locale }) {
-  const [{ t, m }, supabase] = await Promise.all([getI18n(locale), createClient()]);
+  const [{ t, m }, supabase] = await Promise.all([getViewerI18n(locale), createClient()]);
 
   const { data } = await supabase.rpc('carrier_presence');
 

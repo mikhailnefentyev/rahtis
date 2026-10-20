@@ -23,11 +23,12 @@ export type I18n = {
   f: Format;
 };
 
-export function createI18n(locale: Locale, dictionary: Dictionary): I18n {
+/** zone — пояс компании зрителя; без него время по Хельсинки (витрина, письма). */
+export function createI18n(locale: Locale, dictionary: Dictionary, zone?: string): I18n {
   return {
     locale,
     t: dictionary,
     m: createMessages(dictionary.meta.intl, dictionary),
-    f: createFormat(dictionary.meta.intl),
+    f: createFormat(dictionary.meta.intl, zone),
   };
 }

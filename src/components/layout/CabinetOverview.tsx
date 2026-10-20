@@ -11,9 +11,10 @@ import { accountPath } from '@/lib/auth/paths';
 import { setOwnPartnershipAction } from '@/lib/companies/actions';
 import { freeUntil } from '@/lib/config';
 import { todayInHelsinki } from '@/lib/dates';
-import { getI18n, type Locale } from '@/lib/i18n';
+import { type Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import type { Company, PartyRole } from '@/types/db';
+import { getViewerI18n } from '@/lib/i18n/viewer';
 
 /**
  * Первый экран кабинета: кто вы и куда отсюда идти.
@@ -39,7 +40,7 @@ export async function CabinetOverview({
   role: PartyRole;
   company: Company | null;
 }) {
-  const { t, m, f } = await getI18n(locale);
+  const { t, m, f } = await getViewerI18n(locale);
 
   /*
    * Ветка и её цена. Перевозчик узнавал, за что с него берут, только из

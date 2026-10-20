@@ -1,6 +1,7 @@
 import { Stat, StatRow } from '@/components/ui';
-import { getI18n, type Locale } from '@/lib/i18n';
+import { type Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
+import { getViewerI18n } from '@/lib/i18n/viewer';
 
 /**
  * Карточка перевозчика за 12 месяцев — сама компания или оператор.
@@ -10,7 +11,7 @@ import { createClient } from '@/lib/supabase/server';
  * Процент без пяти наблюдений не показывается — вместо него прочерк.
  */
 export async function CarrierScorecard({ locale, companyId }: { locale: Locale; companyId?: string }) {
-  const [{ t, m, f }, supabase] = await Promise.all([getI18n(locale), createClient()]);
+  const [{ t, m, f }, supabase] = await Promise.all([getViewerI18n(locale), createClient()]);
   const { data } = await supabase.rpc('carrier_scorecard', companyId ? { p_company_id: companyId } : {});
   const sc = data?.[0];
   if (!sc) return null;

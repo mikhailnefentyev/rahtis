@@ -3,12 +3,13 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Card, CardBody, buttonClass } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
-import { getI18n, isLocale } from '@/lib/i18n';
+import { isLocale } from '@/lib/i18n';
 import type { SiteWaiting } from '@/lib/orders/waiting';
 import { createClient } from '@/lib/supabase/server';
 import type { OrderAmendment, TripDocument } from '@/types/db';
 import { Assignments } from './Assignments';
 import { DeskList, type DeskBusy } from './DeskList';
+import { getViewerI18n } from '@/lib/i18n/viewer';
 
 export async function generateMetadata({
   params,
@@ -17,7 +18,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   if (!isLocale(locale)) return {};
-  const { t } = await getI18n(locale);
+  const { t } = await getViewerI18n(locale);
   return { title: t.desk.title };
 }
 
@@ -35,7 +36,7 @@ export default async function DeskPage({
   const company = viewer.company!;
 
   const [{ t, m }, supabase, { region }] = await Promise.all([
-    getI18n(locale),
+    getViewerI18n(locale),
     createClient(),
     searchParams,
   ]);

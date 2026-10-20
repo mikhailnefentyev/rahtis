@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { requireRole } from '@/lib/auth/guard';
 import { operationsLocalToIso } from '@/lib/dates';
+import { stopTimeZone } from '@/lib/country';
 import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
 import { siteUrl } from '@/lib/config';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -250,14 +251,15 @@ export async function saveShiftAction(_previous: FormState, formData: FormData):
   const locale = toLocale(formData.get('locale'));
   const t = await getDictionary(locale);
   const viewer = await requireCarrier(locale);
+  /* Время с формы — в поясе компании перевозчика: так его показывает кабинет. */
+  const zone = stopTimeZone(viewer.company?.country);
+  const at = (key: string) => operationsLocalToIso(str(formData, key), zone);
 
   const driverId = str(formData, 'driver_id');
-  const startedAt = operationsLocalToIso(str(formData, 'started_at'));
-  const endedAt = opt(formData, 'ended_at') ? operationsLocalToIso(str(formData, 'ended_at')) : null;
-  const breakStart = opt(formData, 'break_start')
-    ? operationsLocalToIso(str(formData, 'break_start'))
-    : null;
-  const breakEnd = opt(formData, 'break_end') ? operationsLocalToIso(str(formData, 'break_end')) : null;
+  const startedAt = at('started_at');
+  const endedAt = opt(formData, 'ended_at') ? at('ended_at') : null;
+  const breakStart = opt(formData, 'break_start') ? at('break_start') : null;
+  const breakEnd = opt(formData, 'break_end') ? at('break_end') : null;
 
   if (!startedAt || (opt(formData, 'ended_at') && !endedAt)) {
     return { error: t.shifts.invalid, done: false };

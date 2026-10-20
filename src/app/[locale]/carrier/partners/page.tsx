@@ -3,11 +3,12 @@ import { notFound } from 'next/navigation';
 import { Badge, Button, Card, CardBody, EmptyState } from '@/components/ui';
 import type { StatusTone } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
-import { getI18n, isLocale } from '@/lib/i18n';
+import { isLocale } from '@/lib/i18n';
 import { setShipperLinkAction } from '@/lib/partners/actions';
 import { createClient } from '@/lib/supabase/server';
 import { InviteShipperForm } from './InviteShipperForm';
 import type { LinkStatus } from '@/types/db';
+import { getViewerI18n } from '@/lib/i18n/viewer';
 
 export async function generateMetadata({
   params,
@@ -16,7 +17,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   if (!isLocale(locale)) return {};
-  const { t } = await getI18n(locale);
+  const { t } = await getViewerI18n(locale);
   return { title: t.partners.title };
 }
 
@@ -41,7 +42,7 @@ export default async function PartnersPage({ params }: { params: Promise<{ local
    * Aivomaa» — у подписчика это было неправдой.
    */
   const subscriber = viewer.company?.partnership === 'SUBSCRIBER';
-  const [{ t, m, f }, supabase] = await Promise.all([getI18n(locale), createClient()]);
+  const [{ t, m, f }, supabase] = await Promise.all([getViewerI18n(locale), createClient()]);
 
   const [{ data: partners }, { data: invites }] = await Promise.all([
     supabase.rpc('carrier_partners'),

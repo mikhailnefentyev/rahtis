@@ -1,9 +1,10 @@
 import Link from 'next/link';
 import { Badge, Card, CardBody, EmptyState, Mono, Plate, claimStatusTone } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
-import { getI18n, type Locale } from '@/lib/i18n';
+import { type Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import type { ClaimStatus, PartyRole } from '@/types/db';
+import { getViewerI18n } from '@/lib/i18n/viewer';
 
 const STATUSES: ClaimStatus[] = ['OPEN', 'IN_REVIEW', 'RESOLVED', 'REJECTED'];
 
@@ -30,7 +31,7 @@ export async function ClaimsCabinet({
 }) {
   await requireRole(locale, role);
 
-  const [{ t, f }, supabase] = await Promise.all([getI18n(locale), createClient()]);
+  const [{ t, f }, supabase] = await Promise.all([getViewerI18n(locale), createClient()]);
   const filter = STATUSES.find((s) => s === status);
 
   const { data: claims } = await supabase.rpc('my_claims', filter ? { p_status: filter } : {});

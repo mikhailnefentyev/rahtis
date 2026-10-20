@@ -10,15 +10,17 @@ import { zoneOffsetMinutes } from './dates';
  *     решают, показывать ли копейки: ставки в грузоперевозках почти всегда
  *     круглые, и «€480» читается быстрее, чем «€480,00».
  *
- *  2. Время показывается в часовом поясе операций (Europe/Helsinki),
- *     независимо от того, где находится пользователь и на каком он языке.
- *     Диспетчер в Хельсинки и водитель в дороге должны видеть одно и то же
- *     время загрузки.
+ *  2. Время показывается в часовом поясе компании того, кто смотрит:
+ *     польский перевозчик видит сообщения и смены по Варшаве, финский — по
+ *     Хельсинки (21.10.2026). Пояс приходит в createFormat; без него —
+ *     пояс операций (Europe/Helsinki): витрина, письма, оператор.
+ *     Не от устройства: диспетчер и водитель одной компании должны видеть
+ *     одно и то же время, где бы ни стоял телефон.
  *
  *     Исключение — время точки маршрута (прибытие, окончание работ,
  *     оценка прибытия): оно по поясу страны точки, как и её плановое
  *     время, которое записано местным (пакеты стран, 21.10.2026). Там,
- *     где пояс точки расходится с финским, рядом стоит «UTC+1» —
+ *     где пояс точки расходится с поясом зрителя, рядом стоит «UTC+1» —
  *     stopZone() ниже.
  */
 
@@ -41,8 +43,11 @@ function toDate(value: Date | string | number): Date {
  * Создаёт набор форматтеров под конкретную локаль.
  * Тег берётся из словаря: `createFormat(t.meta.intl)`.
  */
-export function createFormat(intlLocale: string) {
+export function createFormat(intlLocale: string, zone: string = APP.timeZone) {
   return {
+    /** Пояс, в котором показывается время: компании зрителя или операций. */
+    zone,
+
     /** Сумма из центов: 48000 → «480 €» (ru-RU) / «480 €» (fi-FI). */
     eur(cents: number): string {
       const whole = cents % 100 === 0;
@@ -107,7 +112,7 @@ export function createFormat(intlLocale: string) {
     },
 
     /** Дата: «12.11.2026». Пояс — операций, если не передан другой. */
-    date(value: Date | string | number, timeZone: string = APP.timeZone): string {
+    date(value: Date | string | number, timeZone: string = zone): string {
       const df = cached(`date:${intlLocale}:${timeZone}`, () =>
         new Intl.DateTimeFormat(intlLocale, {
           day: '2-digit',
@@ -120,7 +125,7 @@ export function createFormat(intlLocale: string) {
     },
 
     /** Время: «08:00». Пояс — операций, если не передан другой. */
-    time(value: Date | string | number, timeZone: string = APP.timeZone): string {
+    time(value: Date | string | number, timeZone: string = zone): string {
       const df = cached(`time:${intlLocale}:${timeZone}`, () =>
         new Intl.DateTimeFormat(intlLocale, {
           hour: '2-digit',
@@ -133,7 +138,7 @@ export function createFormat(intlLocale: string) {
     },
 
     /** Дата и время: «12.11.2026 08:00». */
-    dateTime(value: Date | string | number, timeZone: string = APP.timeZone): string {
+    dateTime(value: Date | string | number, timeZone: string = zone): string {
       return `${this.date(value, timeZone)} ${this.time(value, timeZone)}`;
     },
   };
@@ -143,14 +148,15 @@ export type Format = ReturnType<typeof createFormat>;
 
 /**
  * Пометка пояса у времени точки: «UTC+1», если в этот момент пояс точки
- * расходится с финским, иначе пусто. Эстония живёт по финскому времени —
- * у таллинской точки пометки нет; у варшавской зимой «UTC+1».
+ * расходится с поясом зрителя (по умолчанию финским), иначе пусто.
+ * Финну таллинская точка без пометки, варшавская зимой — «UTC+1»;
+ * польскому перевозчику наоборот: варшавская без пометки, хельсинкская — «UTC+2».
  */
-export function stopZone(value: Date | string | number, timeZone: string): string {
-  if (timeZone === APP.timeZone) return '';
+export function stopZone(value: Date | string | number, timeZone: string, viewerZone: string = APP.timeZone): string {
+  if (timeZone === viewerZone) return '';
   const at = new Date(value);
   const minutes = zoneOffsetMinutes(at, timeZone);
-  if (minutes === zoneOffsetMinutes(at, APP.timeZone)) return '';
+  if (minutes === zoneOffsetMinutes(at, viewerZone)) return '';
   const sign = minutes < 0 ? '-' : '+';
   const h = Math.floor(Math.abs(minutes) / 60);
   const m = Math.abs(minutes) % 60;

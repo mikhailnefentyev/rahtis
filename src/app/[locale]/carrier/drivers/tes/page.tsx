@@ -2,9 +2,10 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { requireRole } from '@/lib/auth/guard';
-import { getI18n, isLocale } from '@/lib/i18n';
+import { isLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import { TesView } from './TesView';
+import { getViewerI18n } from '@/lib/i18n/viewer';
 
 export async function generateMetadata({
   params,
@@ -13,7 +14,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   if (!isLocale(locale)) return {};
-  const { t } = await getI18n(locale);
+  const { t } = await getViewerI18n(locale);
   return { title: t.tes.title };
 }
 
@@ -22,7 +23,7 @@ export default async function TesPage({ params }: { params: Promise<{ locale: st
   if (!isLocale(locale)) notFound();
 
   await requireRole(locale, 'CARRIER');
-  const [{ t }, supabase] = await Promise.all([getI18n(locale), createClient()]);
+  const [{ t }, supabase] = await Promise.all([getViewerI18n(locale), createClient()]);
 
   /* RLS отдаёт свои наборы и шаблоны оператора (company_id is null). */
   const [{ data: sets }, { data: rates }] = await Promise.all([

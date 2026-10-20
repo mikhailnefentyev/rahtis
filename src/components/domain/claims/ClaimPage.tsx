@@ -9,9 +9,10 @@ import { RouteStops } from '@/components/domain/RouteStops';
 import { Badge, Card, CardBody, Kv, Mono, Plate, claimStatusTone } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
 import { operatorInbox } from '@/lib/email';
-import { getI18n, type Locale } from '@/lib/i18n';
+import { type Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import type { ClaimDetail, PartyRole } from '@/types/db';
+import { getViewerI18n } from '@/lib/i18n/viewer';
 
 /*
  * Где случилось: название места, иначе компания, иначе город. Прежде
@@ -43,7 +44,7 @@ export async function ClaimPage({
 }) {
   await requireRole(locale, role);
 
-  const [{ t, m, f }, supabase] = await Promise.all([getI18n(locale), createClient()]);
+  const [{ t, m, f }, supabase] = await Promise.all([getViewerI18n(locale), createClient()]);
 
   if (!/^[0-9a-f-]{36}$/i.test(id)) notFound();
 

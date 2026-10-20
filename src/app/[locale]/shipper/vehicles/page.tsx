@@ -3,11 +3,12 @@ import { notFound } from 'next/navigation';
 import { Badge, Button, Card, CardBody, EmptyState, Mono, Plate } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
 import { EURO_LABEL } from '@/lib/fleet/labels';
-import { getI18n, isLocale, type Locale } from '@/lib/i18n';
+import { isLocale, type Locale } from '@/lib/i18n';
 import { formatIban } from '@/lib/operator/profile';
 import { poolVehicleAction } from '@/lib/partners/actions';
 import { createClient } from '@/lib/supabase/server';
 import type { KnownVehicle } from '@/types/db';
+import { getViewerI18n } from '@/lib/i18n/viewer';
 
 export async function generateMetadata({
   params,
@@ -16,7 +17,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   if (!isLocale(locale)) return {};
-  const { t } = await getI18n(locale);
+  const { t } = await getViewerI18n(locale);
   return { title: t.known.title };
 }
 
@@ -33,7 +34,7 @@ export default async function KnownVehiclesPage({ params }: { params: Promise<{ 
   if (!isLocale(locale)) notFound();
 
   await requireRole(locale, 'SHIPPER');
-  const [{ t }, supabase] = await Promise.all([getI18n(locale), createClient()]);
+  const [{ t }, supabase] = await Promise.all([getViewerI18n(locale), createClient()]);
 
   const { data } = await supabase.rpc('known_vehicles_for_shipper');
   const vehicles = data ?? [];
@@ -66,7 +67,7 @@ async function VehicleList({
   vehicles: KnownVehicle[];
   locale: Locale;
 }) {
-  const { t, m, f } = await getI18n(locale);
+  const { t, m, f } = await getViewerI18n(locale);
 
   return (
     <section>

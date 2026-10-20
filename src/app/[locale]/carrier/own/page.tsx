@@ -4,16 +4,17 @@ import { Card, CardBody } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
 import { siteUrl } from '@/lib/config';
 import { operatorInbox } from '@/lib/email';
-import { getI18n, isLocale } from '@/lib/i18n';
+import { isLocale } from '@/lib/i18n';
 import { routeLabel } from '@/lib/orders/route';
 import { createClient } from '@/lib/supabase/server';
 import type { StopRole } from '@/types/db';
 import { OwnView, type OwnJob } from './OwnView';
+import { getViewerI18n } from '@/lib/i18n/viewer';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
   if (!isLocale(locale)) return {};
-  const { t } = await getI18n(locale);
+  const { t } = await getViewerI18n(locale);
   return { title: t.own.title };
 }
 
@@ -37,7 +38,7 @@ export default async function OwnOrdersPage({
   if (!isLocale(locale)) notFound();
 
   const viewer = await requireRole(locale, 'CARRIER');
-  const [{ t, m }, supabase] = await Promise.all([getI18n(locale), createClient()]);
+  const [{ t, m }, supabase] = await Promise.all([getViewerI18n(locale), createClient()]);
 
   const [{ data: access }, { data: clients }, { data: vehicles }, { data: pendingLegal }] = await Promise.all([
     supabase.rpc('own_orders_access'),

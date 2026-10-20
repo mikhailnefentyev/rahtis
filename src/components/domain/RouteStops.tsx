@@ -89,7 +89,7 @@ export function RouteStops({
     if (!stop.scheduled_date) return undefined;
     const date = f.date(`${stop.scheduled_date}T12:00:00Z`);
     if (!stop.scheduled_time) return date;
-    const zone = scheduledZone(stop.scheduled_date, stop.scheduled_time, stop.country);
+    const zone = scheduledZone(stop.scheduled_date, stop.scheduled_time, stop.country, f.zone);
     return `${date} ${stop.scheduled_time.slice(0, 5)}${zone ? ` ${zone}` : ''}`;
   };
 

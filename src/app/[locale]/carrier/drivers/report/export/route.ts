@@ -5,8 +5,9 @@ import { getViewer } from '@/lib/auth/viewer';
 import { DriverReportPdf } from '@/lib/drivers/DriverReportPdf';
 import { reportColumns, reportCsv, reportRows, reportXlsx } from '@/lib/drivers/exports';
 import { buildDriverReport } from '@/lib/drivers/report';
-import { defaultLocale, getI18n, isLocale } from '@/lib/i18n';
+import { defaultLocale, isLocale } from '@/lib/i18n';
 import { parseRange } from '@/lib/reports/periods';
+import { getViewerI18n } from '@/lib/i18n/viewer';
 
 /**
  * Скачать отчёт по водителям: PDF, XLSX или CSV.
@@ -40,7 +41,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
   const driver = url.searchParams.get('driver');
   const driverId = driver && UUID.test(driver) ? driver : null;
 
-  const { t, f } = await getI18n(locale);
+  const { t, f } = await getViewerI18n(locale);
   const report = await buildDriverReport({ from: range.from, to: range.to, driverId });
 
   const name = `${t.workReport.fileName}-${range.from}_${range.to}`;

@@ -1,9 +1,10 @@
 import Link from 'next/link';
 import { buttonClass, Card, CardBody } from '@/components/ui';
 import { accountPath } from '@/lib/auth/paths';
-import { getI18n, type Locale } from '@/lib/i18n';
+import { type Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import type { Company } from '@/types/db';
+import { getViewerI18n } from '@/lib/i18n/viewer';
 
 /**
  * Путь от одобрения до первой работы — шагами, с тем, что уже сделано.
@@ -28,7 +29,7 @@ type Step = {
 };
 
 export async function OnboardingSteps({ locale, company }: { locale: Locale; company: Company }) {
-  const { t } = await getI18n(locale);
+  const { t } = await getViewerI18n(locale);
   const o = t.onboarding;
   const supabase = await createClient();
   const active = company.status === 'ACTIVE';

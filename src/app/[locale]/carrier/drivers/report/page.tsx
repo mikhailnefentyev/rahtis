@@ -18,10 +18,11 @@ import {
 import { requireRole } from '@/lib/auth/guard';
 import { payableKm } from '@/lib/driverPay';
 import { buildDriverReport } from '@/lib/drivers/report';
-import { getI18n, isLocale } from '@/lib/i18n';
+import { isLocale } from '@/lib/i18n';
 import { QUICK_PERIODS, parseRange, quickRange } from '@/lib/reports/periods';
 import { createClient } from '@/lib/supabase/server';
 import { WorkSummary } from '../WorkSummary';
+import { getViewerI18n } from '@/lib/i18n/viewer';
 
 export async function generateMetadata({
   params,
@@ -30,7 +31,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   if (!isLocale(locale)) return {};
-  const { t } = await getI18n(locale);
+  const { t } = await getViewerI18n(locale);
   return { title: t.workReport.title };
 }
 
@@ -53,7 +54,7 @@ export default async function DriverReportPage({
   if (!isLocale(locale)) notFound();
 
   await requireRole(locale, 'CARRIER');
-  const [{ t, m, f }, supabase] = await Promise.all([getI18n(locale), createClient()]);
+  const [{ t, m, f }, supabase] = await Promise.all([getViewerI18n(locale), createClient()]);
 
   const asked = Boolean(query.from || query.to);
   const range = asked ? parseRange(query.from, query.to) : quickRange('thisMonth');

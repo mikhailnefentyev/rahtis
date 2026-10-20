@@ -7,12 +7,13 @@ import { Badge, Card, CardBody, Kv, Mono } from '@/components/ui';
 import { companyStatusTone } from '@/components/ui/tone';
 import { noAccessPath, signInPath } from '@/lib/auth/paths';
 import { getViewer } from '@/lib/auth/viewer';
-import { getI18n, isLocale } from '@/lib/i18n';
+import { isLocale } from '@/lib/i18n';
 import { lookupAddress } from '@/lib/registry/prh';
 import { RequisitesForm } from '../requisites/form';
 import { createClient } from '@/lib/supabase/server';
 import { ChangePasswordForm } from './form';
 import { MembersPanel } from './MembersPanel';
+import { getViewerI18n } from '@/lib/i18n/viewer';
 
 export async function generateMetadata({
   params,
@@ -21,7 +22,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   if (!isLocale(locale)) return {};
-  const { t } = await getI18n(locale);
+  const { t } = await getViewerI18n(locale);
   return { title: t.account.title };
 }
 
@@ -48,7 +49,7 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
   const viewer = await getViewer();
   if (viewer.status === 'guest') redirect(signInPath(locale, `/${locale}/account`));
 
-  const { t } = await getI18n(locale);
+  const { t } = await getViewerI18n(locale);
 
   /* Отклонённой компании тут править нечего — реквизиты ей не помогут. */
   const company =

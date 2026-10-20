@@ -1,7 +1,8 @@
 import { EmptyState, Table, TableFrame, Td, Th, Tr } from '@/components/ui';
-import { getI18n, type Locale } from '@/lib/i18n';
+import { type Locale } from '@/lib/i18n';
 import { formatWaitMinutes } from '@/lib/orders/waiting';
 import { createClient } from '@/lib/supabase/server';
+import { getViewerI18n } from '@/lib/i18n/viewer';
 
 /**
  * Площадки заказчика и сколько на них обычно стоят.
@@ -11,7 +12,7 @@ import { createClient } from '@/lib/supabase/server';
  * рейсов — площадки в списке нет (shipper_sites_waiting).
  */
 export async function SiteWaitingTable({ locale }: { locale: Locale }) {
-  const [{ t }, supabase] = await Promise.all([getI18n(locale), createClient()]);
+  const [{ t }, supabase] = await Promise.all([getViewerI18n(locale), createClient()]);
   const { data: sites } = await supabase.rpc('shipper_sites_waiting');
 
   return (

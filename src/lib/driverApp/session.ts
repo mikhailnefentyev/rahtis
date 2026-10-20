@@ -19,6 +19,8 @@ export type DriverMe = {
   /** Выбранный язык приложения; NULL — по языку телефона. */
   app_language: string | null;
   company_name: string;
+  /** Страна перевозчика — пояс времени смены и уведомлений. */
+  company_country: string | null;
   vehicle_id: string | null;
   plate: string | null;
   shift: {

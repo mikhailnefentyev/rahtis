@@ -18,12 +18,13 @@ import {
 } from '@/components/ui';
 import { SiteWaitingTable } from '@/components/domain/SiteWaitingTable';
 import { requireRole } from '@/lib/auth/guard';
-import { getI18n, type Locale } from '@/lib/i18n';
+import { type Locale } from '@/lib/i18n';
 import { buildPeriodReport } from '@/lib/reports/period';
 import { summaryRows } from '@/lib/reports/periodExport';
 import { QUICK_PERIODS, parseRange, quickRange } from '@/lib/reports/periods';
 import { createClient } from '@/lib/supabase/server';
 import type { PartyRole } from '@/types/db';
+import { getViewerI18n } from '@/lib/i18n/viewer';
 
 /**
  * Отчёты за период — один раздел на три кабинета.
@@ -46,7 +47,7 @@ export async function PeriodReportCabinet({
   searchParams: { from?: string; to?: string; company?: string };
 }) {
   const viewer = await requireRole(locale, role);
-  const { t, m, f } = await getI18n(locale);
+  const { t, m, f } = await getViewerI18n(locale);
 
   const base = `/${locale}/${role === 'ADMIN' ? 'admin' : role === 'CARRIER' ? 'carrier' : 'shipper'}/reports`;
   const asked = searchParams.from || searchParams.to;

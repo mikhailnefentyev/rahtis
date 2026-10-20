@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { LegalDocument } from '@/components/domain/LegalDocument';
 import { requireRole } from '@/lib/auth/guard';
-import { getI18n, isLocale } from '@/lib/i18n';
+import { isLocale } from '@/lib/i18n';
+import { getViewerI18n } from '@/lib/i18n/viewer';
 
 export async function generateMetadata({
   params,
@@ -11,7 +12,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   if (!isLocale(locale)) return {};
-  const { t } = await getI18n(locale);
+  const { t } = await getViewerI18n(locale);
   /*
    * Ни canonical, ни описания: раздел кабинета, а не страница витрины.
    * robots сюда не пускает — договор стороны не предмет поиска.
@@ -37,7 +38,7 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
   if (!isLocale(locale)) notFound();
 
   await requireRole(locale, 'SHIPPER');
-  const { t } = await getI18n(locale);
+  const { t } = await getViewerI18n(locale);
 
   return (
     <main className="cab-page cab-page--narrow">

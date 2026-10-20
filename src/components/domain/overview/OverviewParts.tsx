@@ -1,10 +1,11 @@
 import Link from 'next/link';
 import { Bars, Card, CardBody, Mono, Plate } from '@/components/ui';
-import { getI18n, type Locale } from '@/lib/i18n';
+import { type Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import { isTransfer } from '@/lib/orders/transfer';
 import type { OrderStatus, StopRole } from '@/types/db';
 import { TiltCard } from './TiltCard';
+import { getViewerI18n } from '@/lib/i18n/viewer';
 
 type Supabase = Awaited<ReturnType<typeof createClient>>;
 type Role = 'CARRIER' | 'SHIPPER';
@@ -60,7 +61,7 @@ async function liveTrips(supabase: Supabase, role: Role): Promise<LiveTrip[]> {
 }
 
 export async function OverviewBody({ locale, role }: { locale: Locale; role: Role }) {
-  const [{ t, m, f }, supabase] = await Promise.all([getI18n(locale), createClient()]);
+  const [{ t, m, f }, supabase] = await Promise.all([getViewerI18n(locale), createClient()]);
   const carrier = role === 'CARRIER';
 
   /*

@@ -2,7 +2,7 @@ import { renderToBuffer } from '@react-pdf/renderer';
 import { redirect } from 'next/navigation';
 import { noAccessPath, signInPath } from '@/lib/auth/paths';
 import { getViewer } from '@/lib/auth/viewer';
-import { defaultLocale, getI18n, isLocale } from '@/lib/i18n';
+import { defaultLocale, isLocale } from '@/lib/i18n';
 import { getOperatorProfile, operatorLines } from '@/lib/operator/profile';
 import { buildPeriodReport } from '@/lib/reports/period';
 import {
@@ -15,6 +15,7 @@ import {
 } from '@/lib/reports/periodExport';
 import { parseRange } from '@/lib/reports/periods';
 import { PeriodReportPdf, type PdfColumn } from '@/lib/reports/PeriodReportPdf';
+import { getViewerI18n } from '@/lib/i18n/viewer';
 
 /**
  * Скачать отчёт за период: PDF, XLSX или CSV.
@@ -54,7 +55,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
   const company = url.searchParams.get('company');
   const companyId = viewer.role === 'ADMIN' && company && UUID.test(company) ? company : null;
 
-  const { t, f } = await getI18n(locale);
+  const { t, f } = await getViewerI18n(locale);
 
   const { report, error } = await buildPeriodReport({
     role: viewer.role,

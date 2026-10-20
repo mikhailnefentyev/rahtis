@@ -6,6 +6,19 @@ import type { Locale } from './config';
 import type { Dictionary } from './dictionaries';
 
 const I18nContext = createContext<I18n | null>(null);
+const ZoneContext = createContext<string | null>(null);
+
+/**
+ * Часовой пояс компании зрителя для клиентских компонентов кабинета.
+ *
+ * Отдельно от I18nProvider: тот стоит в корневой раскладке, где
+ * компании ещё не знают, и узнавать её там значило бы проверять вход на
+ * каждой публичной странице. Пояс ставят раскладки кабинетов — они и так
+ * знают зрителя.
+ */
+export function TimeZoneProvider({ zone, children }: { zone: string; children: React.ReactNode }) {
+  return <ZoneContext.Provider value={zone}>{children}</ZoneContext.Provider>;
+}
 
 /**
  * Отдаёт язык клиентским компонентам.
@@ -43,8 +56,13 @@ export function I18nProvider({
 /** Язык в клиентском компоненте: `const { t, m, f } = useI18n()`. */
 export function useI18n(): I18n {
   const value = useContext(I18nContext);
+  const zone = useContext(ZoneContext);
   if (!value) {
     throw new Error('useI18n called outside I18nProvider — wrap the tree in the locale provider.');
   }
-  return value;
+  /* В кабинете — с поясом компании зрителя; форматтеры кешируются внутри createFormat. */
+  return useMemo(
+    () => (zone && zone !== value.f.zone ? createI18n(value.locale, value.t, zone) : value),
+    [value, zone],
+  );
 }
