@@ -12,6 +12,11 @@ import { SITE_URL } from '@/lib/seo';
  * Переводы — xhtml:link по каждому языку и x-default: финская и английская
  * страницы — переводы друг друга, а у главной x-default — корень сайта.
  *
+ * В Chrome карта выглядит одной строкой: из-за xhtml:link браузер рисует
+ * файл как страницу, а не как дерево XML. Это не ошибка — поисковики
+ * читают XML. Оформление через XSLT пробовали (21.10.2026) и убрали:
+ * Chrome отказывается от XSLT и выводит над такой страницей предупреждение.
+ *
  * lastmod — дата последней настоящей правки страницы, а не момент запроса:
  * правишь витрину или активируешь редакцию документа — поправь дату здесь.
  */
@@ -71,7 +76,6 @@ export function GET() {
     )
     .join('\n');
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
 ${urls}
 </urlset>
