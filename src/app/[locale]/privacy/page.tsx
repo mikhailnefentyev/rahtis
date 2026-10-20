@@ -17,6 +17,7 @@ export async function generateMetadata({
    * язык, иначе поисковик видит восемь страниц вместо двух.
    */
   return pageMetadata({
+    textLocales: ['fi', 'en'],
     locale,
     paths: fiOrEnPath('/tietosuoja', '/privacy'),
     title: t.legal.PRIVACY,

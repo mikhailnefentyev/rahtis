@@ -16,7 +16,8 @@ export async function generateMetadata({
   const { locale } = await params;
   if (!isLocale(locale)) return {};
   const d = DOCS[locale];
-  return pageMetadata({ locale, paths: samePath('/api-docs'), title: d.title, description: d.description });
+  return pageMetadata({
+    textLocales: ['fi', 'en'], locale, paths: samePath('/api-docs'), title: d.title, description: d.description });
 }
 
 /**

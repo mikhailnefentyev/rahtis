@@ -15,16 +15,20 @@ import { SITE_URL } from '@/lib/seo';
  * lastmod — дата последней настоящей правки страницы, а не момент запроса:
  * правишь витрину или активируешь редакцию документа — поправь дату здесь.
  */
-const PAGES: { fi: string; en: string; priority: number; updated: string }[] = [
-  { fi: '', en: '', priority: 1, updated: '2026-10-01' },
-  { fi: '/apply', en: '/apply', priority: 0.8, updated: '2026-09-25' },
-  { fi: '/kayttoehdot', en: '/terms', priority: 0.3, updated: '2026-10-01' },
-  { fi: '/tietosuoja', en: '/privacy', priority: 0.3, updated: '2026-10-08' },
-  { fi: '/api-docs', en: '/api-docs', priority: 0.4, updated: '2026-09-29' },
+/*
+ * docs — страница с текстом только по-фински и по-английски (условия,
+ * политика, API): в карте только эти два языка, как и в её hreflang.
+ */
+const PAGES: { fi: string; en: string; priority: number; updated: string; docs?: true }[] = [
+  { fi: '', en: '', priority: 1, updated: '2026-10-21' },
+  { fi: '/apply', en: '/apply', priority: 0.8, updated: '2026-10-21' },
+  { fi: '/kayttoehdot', en: '/terms', priority: 0.3, updated: '2026-10-01', docs: true },
+  { fi: '/tietosuoja', en: '/privacy', priority: 0.3, updated: '2026-10-08', docs: true },
+  { fi: '/api-docs', en: '/api-docs', priority: 0.4, updated: '2026-09-29', docs: true },
 ];
 
 /* Корень отвечает страницей (x-default главной), а не редиректом. */
-const ROOT_UPDATED = '2026-10-01';
+const ROOT_UPDATED = '2026-10-21';
 
 type Entry = { loc: string; lastmod: string; priority: number; links: Record<string, string> };
 
@@ -36,11 +40,12 @@ function entries(): Entry[] {
   for (const page of PAGES) {
     /* Финский адрес у финского, английский — у остальных языков (как fiOrEnPath). */
     const path = (l: Locale) => (l === 'fi' ? page.fi : page.en);
+    const langs = page.docs ? (['fi', 'en'] as const) : locales;
     const links = {
-      ...Object.fromEntries(locales.map((l) => [l, `${SITE_URL}/${l}${path(l)}`])),
+      ...Object.fromEntries(langs.map((l) => [l, `${SITE_URL}/${l}${path(l)}`])),
       'x-default': page.en === '' ? `${SITE_URL}/` : `${SITE_URL}/en${page.en}`,
     };
-    for (const locale of locales) {
+    for (const locale of langs) {
       list.push({ loc: `${SITE_URL}/${locale}${path(locale)}`, lastmod: page.updated, priority: page.priority, links });
     }
   }
@@ -66,6 +71,7 @@ export function GET() {
     )
     .join('\n');
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
 ${urls}
 </urlset>

@@ -67,18 +67,27 @@ export function pageMetadata(input: {
   canonical?: string;
   /** x-default, если не английская версия: у главной это корень сайта. */
   xDefault?: string;
+  /**
+   * Языки, на которых у страницы свой текст. Условия, политика и
+   * документация API есть только по-фински и по-английски: на остальных
+   * языках страница показывает английский текст, и её canonical — английская
+   * версия, а hreflang называет только настоящие переводы. Иначе поисковик
+   * видит семь копий английского документа.
+   */
+  textLocales?: readonly Locale[];
 }): Metadata {
-  const { locale, paths, title, description, noindex, canonical, xDefault } = input;
+  const { locale, paths, title, description, noindex, canonical, xDefault, textLocales = locales } = input;
 
   const url = (l: Locale) => `${SITE_URL}/${l}${paths[l]}`;
 
-  const languages = Object.fromEntries(locales.map((l) => [l, url(l)]));
+  const languages = Object.fromEntries(textLocales.map((l) => [l, url(l)]));
+  const own = textLocales.includes(locale) ? url(locale) : url('en');
 
   return {
     ...(title ? { title } : {}),
     description,
     alternates: {
-      canonical: canonical ?? url(locale),
+      canonical: canonical ?? own,
       languages: {
         ...languages,
         /*
@@ -90,7 +99,7 @@ export function pageMetadata(input: {
     },
     openGraph: {
       type: 'website',
-      url: canonical ?? url(locale),
+      url: canonical ?? own,
       siteName: 'RAHTIS',
       title,
       description,

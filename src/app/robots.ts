@@ -1,5 +1,13 @@
 import type { MetadataRoute } from 'next';
+import { locales } from '@/lib/i18n/config';
 import { SITE_URL } from '@/lib/seo';
+
+/*
+ * Закрытые разделы — под каждым языком. Список языков берётся из
+ * locales: когда их стало девять, правила для /fi и /en, записанные
+ * руками, оставили /pl/carrier и /de/track открытыми для обхода.
+ */
+const PRIVATE = ['/shipper/', '/carrier/', '/track/', '/admin/', '/account', '/notifications', '/requisites', '/reports/', '/set-password'];
 
 /**
  * Что можно обходить, а что нет.
@@ -18,27 +26,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: [
-        '/api/',
-        '/fi/shipper/',
-        '/en/shipper/',
-        '/fi/carrier/',
-        '/en/carrier/',
-        '/fi/track/',
-        '/en/track/',
-        '/fi/admin/',
-        '/en/admin/',
-        '/fi/account',
-        '/en/account',
-        '/fi/notifications',
-        '/en/notifications',
-        '/fi/requisites',
-        '/en/requisites',
-        '/fi/reports/',
-        '/en/reports/',
-        '/fi/set-password',
-        '/en/set-password',
-      ],
+      disallow: ['/api/', ...locales.flatMap((l) => PRIVATE.map((path) => `/${l}${path}`))],
     },
     sitemap: `${SITE_URL}/sitemap.xml`,
     /*
