@@ -18,13 +18,10 @@ import { createClient } from '@/lib/supabase/server';
 import { flashError, flashFailure } from '@/lib/forms/flash';
 import { sendInvite } from './invite';
 import { getViewer } from '@/lib/auth/viewer';
-import { isValidBusinessId } from '@/lib/format';
-import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
-import { checkRegistry, type RegistryCheck } from '@/lib/registry/prh';
+import { checkBusinessId, countryPack, isCountryCode, registryLink, registryName, vatNumberFor } from '@/lib/country';
+import { getDictionary, getI18n, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
+import { checkCompanyRegistry, type RegistryCheck } from '@/lib/registry';
 import type { CompanyRole } from '@/types/db';
-
-/* Карточка компании на сайте YTJ: там видны и toiminimi, которых нет в открытых данных. */
-const ytjUrl = (businessId: string) => `https://tietopalvelu.ytj.fi/yritys/${businessId}`;
 
 function toLocale(value: FormDataEntryValue | null): Locale {
   const raw = String(value ?? '');
@@ -76,7 +73,9 @@ export async function submitApplicationAction(
 
   const kind = String(formData.get('kind') ?? '') as CompanyRole;
   const name = String(formData.get('name') ?? '').trim();
-  const businessId = String(formData.get('business_id') ?? '').trim();
+  /* Страна — из списка пакетов (src/lib/country); что-то другое — форма подделана. */
+  const country = String(formData.get('country') ?? 'FI').toUpperCase();
+  const rawBusinessId = String(formData.get('business_id') ?? '').trim();
   const email = String(formData.get('email') ?? '')
     .trim()
     .toLowerCase();
@@ -85,7 +84,22 @@ export async function submitApplicationAction(
     return { error: t.apply.failed, done: false };
   }
   if (name.length < 2) return { error: t.validation.required, done: false };
-  if (!isValidBusinessId(businessId)) return { error: t.validation.businessId, done: false };
+  if (!isCountryCode(country) || !countryPack(country).enabled) return { error: t.apply.failed, done: false };
+  const pack = countryPack(country);
+  const { normalized: businessId, valid } = checkBusinessId(country, rawBusinessId);
+  if (!valid) {
+    const { m } = await getI18n(locale);
+    return { error: m('validation.businessIdFor', { label: pack.businessId.label, example: pack.businessId.example }), done: false };
+  }
+  /*
+   * Номер плательщика НДС: где выводится из номера компании (FI, SE, DK,
+   * LV, PL, DE) — выводим, где нет (EE, LT) — обязателен из формы. Он
+   * нужен для обратного начисления НДС в счетах и для сверки с VIES.
+   */
+  const vatNumber = vatNumberFor(country, businessId, String(formData.get('vat_number') ?? ''));
+  if (pack.registry === 'VIES' && (!vatNumber || !/^[A-Z]{2}[A-Z0-9]{2,12}$/.test(vatNumber))) {
+    return { error: t.validation.vatNumber, done: false };
+  }
   if (!/^\S+@\S+\.\S+$/.test(email)) return { error: t.validation.email, done: false };
 
   /*
@@ -104,7 +118,9 @@ export async function submitApplicationAction(
       kind,
       partnership,
       name,
+      country,
       business_id: businessId,
+      vat_number: vatNumber,
       contact_email: email,
       /*
        * Язык переписки — тот, на котором открыта форма. Человек уже
@@ -147,13 +163,15 @@ export async function submitApplicationAction(
    * checkRegistry не бросает; снимок пишется до писем, чтобы оператор,
    * открыв очередь по письму, уже видел то же, что в письме.
    */
-  const registry = await checkRegistry(businessId, name);
+  const registry = await checkCompanyRegistry({ country, businessId, vatNumber, name });
   await admin.from('companies').update({ registry_check: registry }).eq('id', company.id);
 
   await announceApplication({
     companyId: company.id,
     companyName: name,
     businessId,
+    country,
+    vatNumber,
     email,
     kind,
     locale: emailLocaleOf(locale),
@@ -195,6 +213,8 @@ async function announceApplication(input: {
   companyId: string;
   companyName: string;
   businessId: string;
+  country: string;
+  vatNumber: string | null;
   email: string;
   kind: CompanyRole;
   locale: EmailLocale;
@@ -220,7 +240,10 @@ async function announceApplication(input: {
       role: forOperator.role[input.kind],
       queueLink: `${siteUrl()}/${EMAIL_LOCALE}/admin`,
       registry: input.registry,
-      ytjLink: ytjUrl(input.businessId),
+      businessIdLabel: countryPack(input.country).businessId.label,
+      registryName: registryName(input.country),
+      registryLink: registryLink(input.country, input.businessId),
+      vatNumber: input.vatNumber,
     }),
   );
 
@@ -408,7 +431,7 @@ export async function resendInviteAction(formData: FormData): Promise<void> {
 }
 
 /**
- * Перепроверка в реестре PRH из очереди модерации.
+ * Перепроверка в реестре (PRH или VIES — по стране) из очереди модерации.
  *
  * Нужна, когда при подаче реестр не ответил, или компания обещала
  * встать в ennakkoperintärekisteri и говорит, что уже встала. Снимок
@@ -423,12 +446,17 @@ export async function recheckRegistryAction(formData: FormData): Promise<void> {
 
   const { data: company } = await admin
     .from('companies')
-    .select('name, business_id')
+    .select('name, business_id, country, vat_number')
     .eq('id', companyId)
     .single();
 
   if (company) {
-    const registry = await checkRegistry(company.business_id, company.name);
+    const registry = await checkCompanyRegistry({
+      country: company.country,
+      businessId: company.business_id,
+      vatNumber: company.vat_number,
+      name: company.name,
+    });
     await admin.from('companies').update({ registry_check: registry }).eq('id', companyId);
   }
 

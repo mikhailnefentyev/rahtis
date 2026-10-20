@@ -1,9 +1,9 @@
 'use client';
 
 import { useActionState, useState } from 'react';
-import { Button, Card, CardBody, Field, Input, InputMono } from '@/components/ui';
+import { Button, Card, CardBody, Field, Input, InputMono, Select } from '@/components/ui';
 import { submitApplicationAction, type ApplyState } from '@/lib/companies/actions';
-import { isValidBusinessId } from '@/lib/format';
+import { checkBusinessId, countryPack, enabledCountries, type CountryCode } from '@/lib/country';
 import { useI18n } from '@/lib/i18n/provider';
 import type { ApplyInvite } from '@/lib/partners/invites';
 import type { CompanyRole } from '@/types/db';
@@ -25,7 +25,14 @@ export function ApplyForm({ invite = null }: { invite?: ApplyInvite | null }) {
    */
   const [mode, setMode] = useState<'SUBCONTRACTOR' | 'SUBSCRIBER'>('SUBCONTRACTOR');
   const [name, setName] = useState(invite?.name ?? '');
+  /*
+   * Страна компании — от неё номер (Y-tunnus, NIP, USt-IdNr.…), его
+   * проверка и реестр, с которым сверяет оператор. Финляндия первой:
+   * так было до пакетов стран, и приглашения перевозчиков — финские.
+   */
+  const [country, setCountry] = useState<CountryCode>('FI');
   const [businessId, setBusinessId] = useState(invite?.businessId ?? '');
+  const [vatNumber, setVatNumber] = useState('');
   const [email, setEmail] = useState(invite?.email ?? '');
 
   if (state.done) {
@@ -68,9 +75,15 @@ export function ApplyForm({ invite = null }: { invite?: ApplyInvite | null }) {
     );
   }
 
-  /* Формат Y-tunnus показываем до отправки — сервер проверит ещё раз. */
+  /* Номер компании проверяем до отправки — сервер проверит ещё раз. */
+  const pack = countryPack(country);
   const businessIdError =
-    businessId.length > 0 && !isValidBusinessId(businessId) ? t.validation.businessId : undefined;
+    businessId.length > 0 && !checkBusinessId(country, businessId).valid
+      ? m('validation.businessIdFor', { label: pack.businessId.label, example: pack.businessId.example })
+      : undefined;
+  /* Номер плательщика НДС спрашиваем только там, где он не выводится из номера компании (EE, LT). */
+  const askVat = pack.registry === 'VIES' && !pack.vatFromBusinessId;
+  const regionName = new Intl.DisplayNames([locale], { type: 'region' });
 
   return (
     <Card>
@@ -167,18 +180,45 @@ export function ApplyForm({ invite = null }: { invite?: ApplyInvite | null }) {
             )}
           </Field>
 
-          <Field label={t.company.businessId} required error={businessIdError}>
+          <Field label={t.company.country} required>
+            {(p) => (
+              <Select {...p} name="country" value={country} onChange={(e) => setCountry(e.target.value as CountryCode)}>
+                {enabledCountries().map((code) => (
+                  <option key={code} value={code}>
+                    {regionName.of(code) ?? code}
+                  </option>
+                ))}
+              </Select>
+            )}
+          </Field>
+
+          <Field label={pack.businessId.label} required error={businessIdError}>
             {(p) => (
               <InputMono
                 {...p}
                 name="business_id"
                 value={businessId}
                 onChange={(e) => setBusinessId(e.target.value)}
-                placeholder="1234567-8"
+                placeholder={pack.businessId.example}
                 required
               />
             )}
           </Field>
+
+          {askVat && (
+            <Field label={t.company.vatNumber} required hint={t.company.vatNumberHint}>
+              {(p) => (
+                <InputMono
+                  {...p}
+                  name="vat_number"
+                  value={vatNumber}
+                  onChange={(e) => setVatNumber(e.target.value)}
+                  placeholder={`${country}123456789`}
+                  required
+                />
+              )}
+            </Field>
+          )}
 
           <Field label={t.company.email} required hint={t.company.emailHint}>
             {(p) => (

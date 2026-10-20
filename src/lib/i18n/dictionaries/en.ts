@@ -1284,7 +1284,7 @@ export const en = {
     vehicles: 'Vehicles for approval',
     approveAndInvite: 'Approve and send invite',
     invitedBy: 'Invited by',
-    registry: 'PRH check',
+    registry: 'Registry check',
     registryVerdict: {
       OK: 'All matches',
       ATTENTION: 'Needs a look',
@@ -1882,6 +1882,9 @@ export const en = {
     businessId: 'Y-tunnus',
     email: 'Email',
     emailHint: 'This is where we send the credentials',
+    country: 'Country',
+    vatNumber: 'VAT number (EU VAT)',
+    vatNumberHint: 'We check it in the EU VIES register.',
     license: 'Operating licence',
     insurance: 'Insurance (CMR / liability)',
   },
@@ -3100,6 +3103,7 @@ export const en = {
     required: 'Fill in this field',
     businessId: 'Check the business ID: 7 digits, a hyphen and a check digit',
     email: 'Check the email address',
+    vatNumber: 'Check the VAT number',
     positiveNumber: 'Enter a number greater than zero',
   },
 
@@ -3155,8 +3159,9 @@ export const en = {
     'report.weekTotal': 'Week total {amount}',
     'report.notice': '{count, plural, one {# transport} other {# transports}} · {amount}',
 
+    'validation.businessIdFor': 'Check the {label}. Example: {example}',
     'signup.submitted':
-      'We will check {company} (Y-tunnus {businessId}) against the register and send the credentials to {email}.',
+      'We will check {company} ({businessId}) against the register and send the credentials to {email}.',
     'apply.registryOk': 'Y-tunnus found in the register: {name}. The application is waiting for review by our team.',
     'apply.registryOther':
       'The register has “{name}” under this Y-tunnus. If the Y-tunnus is wrong, reply to the confirmation email and we will correct it. The application is waiting for review by our team.',

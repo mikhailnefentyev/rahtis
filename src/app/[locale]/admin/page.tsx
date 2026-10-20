@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { registryLink } from '@/lib/country';
 import { notFound } from 'next/navigation';
 import {
   Badge,
@@ -232,8 +233,8 @@ export default async function AdminPage({
                 key={company.id}
                 company={company}
                 invitedBy={invitedBy.get(company.id) ?? null}
-                /* Реестр PRH/YTJ — оператор сверяет Y-tunnus вручную (ТЗ §3). */
-                ytjUrl={`https://tietopalvelu.ytj.fi/yritys/${company.business_id}`}
+                /* Реестр страны (YTJ, Äriregister…) или VIES — оператор сверяет номер вручную (ТЗ §3). */
+                ytjUrl={registryLink(company.country, company.business_id)}
               />
             ))}
           </div>

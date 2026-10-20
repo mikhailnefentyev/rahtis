@@ -13,7 +13,6 @@ import {
 } from '@/components/ui';
 import {
   deriveFinnishOvt,
-  deriveFinnishVat,
   formatIban,
   isValidBic,
   isValidIban,
@@ -23,6 +22,7 @@ import { saveRequisitesAction, type RequisitesState } from '@/lib/companies/requ
 import { useI18n } from '@/lib/i18n/provider';
 import type { Company } from '@/types/db';
 import { useKeepOnError } from '@/lib/forms/keepOnError';
+import { vatNumberFor } from '@/lib/country';
 
 const initial: RequisitesState = { error: null, done: false };
 
@@ -57,7 +57,12 @@ export function RequisitesForm({
    * Форму заполняют один раз и надолго — подставить то, что вычисляется,
    * дешевле, чем заставлять человека переписывать это с бумаги.
    */
-  const [vat, setVat] = useState(company.vat_number ?? deriveFinnishVat(company.business_id));
+  /*
+   * Номер плательщика НДС — по стране компании: финский FI+Y-tunnus
+   * подставлялся всем, и датский CVR из 8 цифр превращался в «FI…».
+   */
+  const country = company.country ?? 'FI';
+  const [vat, setVat] = useState(company.vat_number ?? vatNumberFor(country, company.business_id, null) ?? '');
   const [iban, setIban] = useState(company.iban ? formatIban(company.iban) : '');
   const [bic, setBic] = useState(company.bic ?? '');
   const [sameAddress, setSameAddress] = useState(!company.billing_street);
@@ -151,7 +156,7 @@ export function RequisitesForm({
                   name="legal_country"
                   required
                   maxLength={2}
-                  defaultValue={company.legal_country ?? 'FI'}
+                  defaultValue={company.legal_country ?? country}
                   placeholder="FI"
                 />
               )}
@@ -272,7 +277,7 @@ export function RequisitesForm({
                           {...p}
                           name="billing_country"
                           maxLength={2}
-                          defaultValue={company.billing_country ?? 'FI'}
+                          defaultValue={company.billing_country ?? country}
                         />
                       )}
                     </Field>
@@ -295,7 +300,7 @@ export function RequisitesForm({
                     <InputMono
                       {...p}
                       name="einvoice_ovt"
-                      defaultValue={company.einvoice_ovt ?? deriveFinnishOvt(company.business_id)}
+                      defaultValue={company.einvoice_ovt ?? (country === 'FI' ? deriveFinnishOvt(company.business_id) : '')}
                     />
                   )}
                 </Field>

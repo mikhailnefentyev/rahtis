@@ -1,3 +1,4 @@
+import { marketedCountries } from '@/lib/country';
 import type { AddressSuggestion } from './types';
 
 /**
@@ -494,6 +495,210 @@ export const PLACES: CuratedPlace[] = [
       'эсбьерг', 'esbjerg', 'dfds', 'zodiakvej', 'immingham', 'havn', 'порт', 'port',
     ],
   },
+  /*
+   * Порты паромных коридоров Финляндии на юг — Прибалтика, Польша,
+   * Германия, и шведские порты этих линий (пакет стран 21.10.2026).
+   * Координаты сверены с OpenStreetMap: у паромного терминала — въезд
+   * к терминалу, у контейнерного — сам терминал, а не офис порта.
+   */
+  {
+    id: 'nynashamn-port',
+    name: 'Nynäshamns hamn · färjeterminal',
+    address: 'Fiskargränd, 149 31 Nynäshamn',
+    city: 'Nynäshamn',
+    country: 'SE',
+    position: { lat: 58.900994, lon: 17.953058 },
+    terms: ['нюнесхамн', 'nynashamn', 'hamn', 'порт', 'port', 'gdansk', 'ventspils', 'stena', 'polferries'],
+  },
+  {
+    id: 'karlshamn-stilleryd',
+    name: 'Karlshamn · Stilleryd (DFDS)',
+    address: 'Stilleryd, 374 93 Karlshamn',
+    city: 'Karlshamn',
+    country: 'SE',
+    position: { lat: 56.173149, lon: 14.819885 },
+    terms: ['карлсхамн', 'karlshamn', 'stilleryd', 'dfds', 'klaipeda', 'hamn', 'порт', 'port'],
+  },
+  {
+    id: 'ystad-port',
+    name: 'Ystads hamn',
+    address: 'Hamngatan, 271 22 Ystad',
+    city: 'Ystad',
+    country: 'SE',
+    position: { lat: 55.428802, lon: 13.821164 },
+    terms: ['истад', 'ystad', 'hamn', 'порт', 'port', 'swinoujscie', 'unity', 'polferries', 'ttline'],
+  },
+  {
+    id: 'tallinn-muuga',
+    name: 'Muuga sadam',
+    address: 'Muuga sadam, 74115 Maardu',
+    city: 'Maardu',
+    country: 'EE',
+    position: { lat: 59.493126, lon: 24.947656 },
+    terms: ['мууга', 'muuga', 'таллин', 'tallinn', 'maardu', 'sadam', 'порт', 'port', 'vuosaari'],
+  },
+  {
+    id: 'tallinn-vanasadam',
+    name: 'Tallinna Vanasadam · D-terminal',
+    address: 'Lootsi 13, 10151 Tallinn',
+    city: 'Tallinn',
+    country: 'EE',
+    position: { lat: 59.44469, lon: 24.76993 },
+    terms: ['таллин', 'tallinn', 'vanasadam', 'lootsi', 'tallink', 'eckero', 'viking', 'sadam', 'порт', 'port'],
+  },
+  {
+    id: 'paldiski-lounasadam',
+    name: 'Paldiski Lõunasadam',
+    address: 'Lõunasadama tee, 76806 Paldiski',
+    city: 'Paldiski',
+    country: 'EE',
+    position: { lat: 59.335083, lon: 24.07829 },
+    terms: ['палдиски', 'paldiski', 'lounasadam', 'sadam', 'порт', 'port', 'kapellskar', 'dfds'],
+  },
+  {
+    id: 'riga-ferry',
+    name: 'Rīgas prāmju terminālis',
+    address: 'Eksporta iela 3A, LV-1010 Rīga',
+    city: 'Rīga',
+    country: 'LV',
+    position: { lat: 56.959292, lon: 24.094579 },
+    terms: ['рига', 'riga', 'eksporta', 'tallink', 'stena', 'osta', 'порт', 'port'],
+  },
+  {
+    id: 'ventspils-ferry',
+    name: 'Ventspils prāmju terminālis',
+    address: 'Prāmju iela, LV-3602 Ventspils',
+    city: 'Ventspils',
+    country: 'LV',
+    position: { lat: 57.398982, lon: 21.571278 },
+    terms: ['вентспилс', 'ventspils', 'stena', 'nynashamn', 'travemunde', 'osta', 'порт', 'port'],
+  },
+  {
+    id: 'liepaja-port',
+    name: 'Liepājas osta',
+    address: 'Liepājas osta, LV-3405 Liepāja',
+    city: 'Liepāja',
+    country: 'LV',
+    position: { lat: 56.52925, lon: 20.998345 },
+    terms: ['лиепая', 'liepaja', 'stena', 'travemunde', 'osta', 'порт', 'port'],
+  },
+  {
+    id: 'klaipeda-dfds',
+    name: 'Klaipėda · Centrinis terminalas (DFDS)',
+    address: 'Perkėlos g. 10, 93264 Klaipėda',
+    city: 'Klaipėda',
+    country: 'LT',
+    position: { lat: 55.660757, lon: 21.146495 },
+    terms: ['клайпеда', 'klaipeda', 'perkelos', 'dfds', 'kiel', 'karlshamn', 'uostas', 'порт', 'port'],
+  },
+  {
+    id: 'gdynia-ferry',
+    name: 'Gdynia · Terminal Promowy (Stena)',
+    address: 'ul. Kwiatkowskiego 60, 81-127 Gdynia',
+    city: 'Gdynia',
+    country: 'PL',
+    position: { lat: 54.546737, lon: 18.502472 },
+    terms: ['гдыня', 'gdynia', 'kwiatkowskiego', 'stena', 'karlskrona', 'promowy', 'port', 'порт'],
+  },
+  {
+    id: 'gdansk-westerplatte',
+    name: 'Gdańsk · Terminal Westerplatte (Polferries)',
+    address: 'ul. Majora Henryka Sucharskiego 2, 80-601 Gdańsk',
+    city: 'Gdańsk',
+    country: 'PL',
+    position: { lat: 54.40357, lon: 18.681103 },
+    terms: ['гданьск', 'gdansk', 'westerplatte', 'polferries', 'nynashamn', 'promowy', 'port', 'порт'],
+  },
+  {
+    id: 'swinoujscie-ferry',
+    name: 'Świnoujście · Terminal Promowy',
+    address: 'ul. Dworcowa 3, 72-600 Świnoujście',
+    city: 'Świnoujście',
+    country: 'PL',
+    position: { lat: 53.90097, lon: 14.257956 },
+    terms: ['свиноуйсце', 'swinoujscie', 'unity', 'polferries', 'ttline', 'ystad', 'trelleborg', 'promowy', 'port', 'порт'],
+  },
+  {
+    id: 'travemunde-skandinavienkai',
+    name: 'Lübeck-Travemünde · Skandinavienkai',
+    address: 'Skandinavienkai, 23570 Lübeck',
+    city: 'Lübeck',
+    country: 'DE',
+    position: { lat: 53.941732, lon: 10.856759 },
+    terms: ['травемюнде', 'любек', 'travemunde', 'lubeck', 'luebeck', 'skandinavienkai', 'finnlines', 'ttline', 'hafen', 'порт', 'port'],
+  },
+  {
+    id: 'rostock-faehrterminal',
+    name: 'Rostock · Fährterminal Überseehafen',
+    address: 'Ost-West-Straße, 18147 Rostock',
+    city: 'Rostock',
+    country: 'DE',
+    position: { lat: 54.146869, lon: 12.099999 },
+    terms: ['росток', 'rostock', 'uberseehafen', 'ueberseehafen', 'ttline', 'stena', 'scandlines', 'hafen', 'порт', 'port'],
+  },
+  {
+    id: 'kiel-ostuferhafen',
+    name: 'Kiel · Ostuferhafen (DFDS)',
+    address: 'Ostuferhafen, 24149 Kiel',
+    city: 'Kiel',
+    country: 'DE',
+    position: { lat: 54.331696, lon: 10.173986 },
+    terms: ['киль', 'kiel', 'ostuferhafen', 'dfds', 'klaipeda', 'hafen', 'порт', 'port'],
+  },
+  {
+    id: 'kiel-norwegenkai',
+    name: 'Kiel · Norwegenkai (Color Line)',
+    address: 'Norwegenkai, 24143 Kiel',
+    city: 'Kiel',
+    country: 'DE',
+    position: { lat: 54.31627, lon: 10.143546 },
+    terms: ['киль', 'kiel', 'norwegenkai', 'colorline', 'color', 'oslo', 'hafen', 'порт', 'port'],
+  },
+  {
+    id: 'kiel-schwedenkai',
+    name: 'Kiel · Schwedenkai (Stena)',
+    address: 'Schwedenkai, 24103 Kiel',
+    city: 'Kiel',
+    country: 'DE',
+    position: { lat: 54.319076, lon: 10.137073 },
+    terms: ['киль', 'kiel', 'schwedenkai', 'stena', 'goteborg', 'hafen', 'порт', 'port'],
+  },
+  {
+    id: 'puttgarden-scandlines',
+    name: 'Puttgarden · Scandlines',
+    address: 'Fährhafen Puttgarden, 23769 Fehmarn',
+    city: 'Fehmarn',
+    country: 'DE',
+    position: { lat: 54.484541, lon: 11.212905 },
+    terms: ['путтгарден', 'puttgarden', 'fehmarn', 'scandlines', 'rodby', 'hafen', 'порт', 'port'],
+  },
+  {
+    id: 'hamburg-ctb',
+    name: 'Hamburg · Container Terminal Burchardkai',
+    address: 'Waltershofer Damm, 21129 Hamburg',
+    city: 'Hamburg',
+    country: 'DE',
+    position: { lat: 53.526977, lon: 9.930001 },
+    terms: ['гамбург', 'hamburg', 'burchardkai', 'ctb', 'hhla', 'контейнер', 'container', 'terminal', 'hafen', 'порт', 'port'],
+  },
+  {
+    id: 'hamburg-cta',
+    name: 'Hamburg · Container Terminal Altenwerder',
+    address: 'Altenwerder, 21129 Hamburg',
+    city: 'Hamburg',
+    country: 'DE',
+    position: { lat: 53.504636, lon: 9.932809 },
+    terms: ['гамбург', 'hamburg', 'altenwerder', 'cta', 'hhla', 'контейнер', 'container', 'terminal', 'hafen', 'порт', 'port'],
+  },
+  {
+    id: 'bremerhaven-eurogate',
+    name: 'Bremerhaven · EUROGATE Container Terminal',
+    address: 'Senator-Borttscheller-Straße 1, 27568 Bremerhaven',
+    city: 'Bremerhaven',
+    country: 'DE',
+    position: { lat: 53.579675, lon: 8.547411 },
+    terms: ['бремерхафен', 'bremerhaven', 'eurogate', 'ntb', 'контейнер', 'container', 'terminal', 'hafen', 'порт', 'port'],
+  },
 ];
 
 /**
@@ -514,6 +719,8 @@ function fold(value: string): string {
     .replace(/ø/g, 'o')
     .replace(/æ/g, 'ae')
     .replace(/ß/g, 'ss')
+    /* Польская ł, как ø, нормализацией не раскладывается: «Białystok» → bialystok. */
+    .replace(/ł/g, 'l')
     .normalize('NFD')
     .replace(/\p{M}/gu, '');
 }
@@ -588,5 +795,10 @@ export function placeCountries(): string[] {
    * соседи по часовой стрелке вокруг Ботнического залива. Алфавит
    * поставил бы Данию во главе полосы, где ей нечего делать.
    */
-  return ['FI', 'SE', 'NO', 'DK'].filter((code) => present.has(code));
+  /*
+   * Только объявленные страны (marketed в src/lib/country): порты
+   * Прибалтики, Польши и Германии находятся в подсказке, но полосу
+   * «откуда возим» не меняют, пока страну не объявили. Порядок — пакетов.
+   */
+  return marketedCountries().filter((code) => present.has(code));
 }

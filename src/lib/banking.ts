@@ -56,18 +56,6 @@ export function isValidVatNumber(value: string): boolean {
 }
 
 /**
- * Выводит финский ALV-номер из Y-tunnus: 1234567-8 → FI12345678.
- *
- * Только подсказка для формы. Жёстко это не проверяется: при групповой
- * НДС-регистрации дочерняя компания использует номер группы, и требование
- * совпадения заблокировало бы законную компанию.
- */
-export function deriveFinnishVat(businessId: string): string {
-  const digits = businessId.replace(/\D/g, '');
-  return digits.length === 8 ? `FI${digits}` : '';
-}
-
-/**
  * OVT-tunnus — адрес получателя электронных счетов.
  * У финских компаний это 0037 + Y-tunnus без дефиса + необязательный суффикс.
  */

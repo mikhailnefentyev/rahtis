@@ -1377,7 +1377,7 @@ export const fi = {
      * PRH-tarkistus hakemuksen jättämishetkellä. Avoin data ei kerro
      * vastuuhenkilöitä eikä toiminimiä, joten tulos on apu, ei päätös.
      */
-    registry: 'PRH-tarkistus',
+    registry: 'Rekisteritarkistus',
     registryVerdict: {
       OK: 'Kaikki täsmää',
       ATTENTION: 'Tarkistettavaa',
@@ -1995,6 +1995,9 @@ export const fi = {
     businessId: 'Y-tunnus',
     email: 'Sähköposti',
     emailHint: 'Tänne lähetämme tunnukset',
+    country: 'Maa',
+    vatNumber: 'ALV-numero (EU VAT)',
+    vatNumberHint: 'Tarkistamme sen EU:n VIES-rekisteristä.',
     license: 'Liikennelupa',
     insurance: 'Vakuutus (CMR / vastuu)',
   },
@@ -3219,6 +3222,7 @@ export const fi = {
     required: 'Täytä tämä kenttä',
     businessId: 'Tarkista Y-tunnus: 7 numeroa, väliviiva ja tarkistusnumero',
     email: 'Tarkista sähköpostiosoite',
+    vatNumber: 'Tarkista ALV-numero',
     positiveNumber: 'Anna nollaa suurempi luku',
   },
 
@@ -3276,8 +3280,9 @@ export const fi = {
     'report.weekTotal': 'Viikko yhteensä {amount}',
     'report.notice': '{count, plural, one {# kuljetus} other {# kuljetusta}} · {amount}',
 
+    'validation.businessIdFor': 'Tarkista {label}. Esimerkki: {example}',
     'signup.submitted':
-      'Tarkistamme yrityksen {company} (Y-tunnus {businessId}) tiedot rekisteristä ja lähetämme tunnukset osoitteeseen {email}.',
+      'Tarkistamme yrityksen {company} ({businessId}) tiedot rekisteristä ja lähetämme tunnukset osoitteeseen {email}.',
     /*
      * Rekisteritarkistuksen tulos hakijalle heti lähetyksen jälkeen. Vain
      * se, löytyikö Y-tunnus ja millä nimellä: huomautukset (ennakkoperintä,

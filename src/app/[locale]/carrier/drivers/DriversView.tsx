@@ -48,7 +48,16 @@ const initial: FormState = { error: null, done: false };
  * свёрнутым списком ниже: они не занимают номер и не садятся на машины,
  * но их часы и рейсы остаются в отчётах.
  */
-export function DriversView({ rows, vehicles }: { rows: DriverRow[]; vehicles: VehicleOption[] }) {
+export function DriversView({
+  rows,
+  vehicles,
+  phonePrefix = '+358',
+}: {
+  rows: DriverRow[];
+  vehicles: VehicleOption[];
+  /** Код страны перевозчика — первые цифры номера нового водителя. */
+  phonePrefix?: string;
+}) {
   const { t, m } = useI18n();
   const [editing, setEditing] = useState<Driver | null | 'new'>(null);
   const [showArchived, setShowArchived] = useState(false);
@@ -74,7 +83,7 @@ export function DriversView({ rows, vehicles }: { rows: DriverRow[]; vehicles: V
 
       {editing !== null && (
         <div className="mb-4">
-          <DriverForm driver={editing === 'new' ? null : editing} onClose={close} />
+          <DriverForm driver={editing === 'new' ? null : editing} onClose={close} phonePrefix={phonePrefix} />
         </div>
       )}
 
@@ -296,7 +305,7 @@ function ArchivedRow({ driver }: { driver: Driver }) {
   );
 }
 
-function DriverForm({ driver, onClose }: { driver: Driver | null; onClose: () => void }) {
+function DriverForm({ driver, onClose, phonePrefix }: { driver: Driver | null; onClose: () => void; phonePrefix: string }) {
   const { t, locale } = useI18n();
   const [state, formAction, pending] = useActionState(saveDriverAction, initial);
   const keepFormAction = useKeepOnError(state);
@@ -344,8 +353,8 @@ function DriverForm({ driver, onClose }: { driver: Driver | null; onClose: () =>
                 name="phone"
                 required
                 inputMode="tel"
-                defaultValue={driver?.phone ?? '+358'}
-                placeholder="+358401112233"
+                defaultValue={driver?.phone ?? phonePrefix}
+                placeholder={`${phonePrefix}401112233`}
               />
             )}
           </Field>

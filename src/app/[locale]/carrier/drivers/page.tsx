@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { countryPack } from '@/lib/country';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { buttonClass } from '@/components/ui';
@@ -93,7 +94,7 @@ export default async function DriversPage({ params }: { params: Promise<{ locale
         {t.drivers.subtitle}
       </p>
 
-      <DriversView rows={rows} vehicles={vehicles ?? []} />
+      <DriversView rows={rows} vehicles={vehicles ?? []} phonePrefix={countryPack(company.country).phonePrefix} />
     </main>
   );
 }

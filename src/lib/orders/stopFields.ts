@@ -117,7 +117,11 @@ export function cityOf(read: FieldReader): string {
   if (fromSuggestion) return fromSuggestion;
 
   const address = read('address');
-  const afterPostcode = /\d{5}\s+([^,]+)$/.exec(address);
+  /*
+   * Индексы стран пакета: 00770 (FI, EE, DE), 411 04 (SE), 0150 (NO, DK),
+   * 81-336 (PL), LV-1010, LT-01100 — см. postcode в src/lib/country.
+   */
+  const afterPostcode = /(?:[A-Z]{2}-)?(?:\d{3} \d{2}|\d{2}-\d{3}|\d{4,5})\s+([^,\d][^,]*)$/.exec(address);
   if (afterPostcode) return afterPostcode[1].trim();
 
   /* Ни индекса, ни подсказки — берём последнюю часть после запятой. */

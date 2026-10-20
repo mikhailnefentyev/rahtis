@@ -1,5 +1,6 @@
 'use client';
 
+import { countryPack, registryName } from '@/lib/country';
 import Link from 'next/link';
 import { useState } from 'react';
 import { Badge, Button, Card, CardBody, Kv, Mono, Textarea } from '@/components/ui';
@@ -15,7 +16,7 @@ import type { Company } from '@/types/db';
 const verdictTone = { OK: 'ok', ATTENTION: 'warn', NOT_FOUND: 'warn', ERROR: 'danger' } as const;
 
 /**
- * Итог сверки с PRH на момент заявки.
+ * Итог сверки с реестром (PRH, VIES — по стране) на момент заявки.
  *
  * Замечания показываются как есть, по-фински: их же оператор получил в
  * письме, и две разные формулировки одного замечания только путают.
@@ -30,7 +31,9 @@ function RegistryBlock({ company }: { company: Company }) {
     <div className="flex flex-col gap-1.5 rounded-control border border-line bg-sunken p-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="label-micro">{t.moderation.registry}</span>
+          <span className="label-micro">
+            {t.moderation.registry} · {registryName(company.country)}
+          </span>
           {r ? (
             <Badge tone={verdictTone[r.verdict]}>{t.moderation.registryVerdict[r.verdict]}</Badge>
           ) : (
@@ -56,10 +59,15 @@ function RegistryBlock({ company }: { company: Company }) {
             k={t.moderation.registryName}
             v={`${r.officialName}${r.form ? ` · ${r.form}` : ''}`}
           />
-          <Kv
-            k={`${t.moderation.registryPrepayment} · ${t.moderation.registryVat} · ${t.moderation.registryEmployer}`}
-            v={`${yes(r.prepayment)} · ${yes(r.vat)} · ${yes(r.employer)}`}
-          />
+          {/* VIES отвечает только про НДС; ennakkoperintä и работодатель — финские реестры. */}
+          {registryName(company.country) === 'PRH' ? (
+            <Kv
+              k={`${t.moderation.registryPrepayment} · ${t.moderation.registryVat} · ${t.moderation.registryEmployer}`}
+              v={`${yes(r.prepayment)} · ${yes(r.vat)} · ${yes(r.employer)}`}
+            />
+          ) : (
+            <Kv k={t.moderation.registryVat} v={yes(r.vat)} />
+          )}
         </div>
       )}
 
@@ -114,8 +122,11 @@ export function ApplicationCard({
               </Badge>
             </div>
             <div className="mt-2 flex flex-col gap-1">
+              {company.country !== 'FI' && (
+                <Kv k={t.company.country} v={new Intl.DisplayNames([locale], { type: 'region' }).of(company.country) ?? company.country} />
+              )}
               <Kv
-                k={t.cabinet.businessId}
+                k={company.country === 'FI' ? t.cabinet.businessId : countryPack(company.country).businessId.label}
                 v={
                   <a
                     href={ytjUrl}
@@ -127,6 +138,9 @@ export function ApplicationCard({
                   </a>
                 }
               />
+              {company.vat_number && company.country !== 'FI' && (
+                <Kv k={t.company.vatNumber} v={<Mono>{company.vat_number}</Mono>} />
+              )}
               <Kv k={t.company.email} v={company.contact_email} />
               {invitedBy && <Kv k={t.moderation.invitedBy} v={invitedBy} />}
               <Kv k={t.moderation.decidedAt} v={<Mono>{f.dateTime(company.created_at)}</Mono>} />

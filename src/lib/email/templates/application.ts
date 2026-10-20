@@ -173,7 +173,12 @@ export function applicationFiledEmail(input: {
   role: string;
   queueLink: string;
   registry: RegistryCheck;
-  ytjLink: string;
+  /** Как номер компании называется в её стране: Y-tunnus, NIP, USt-IdNr.… */
+  businessIdLabel: string;
+  /** PRH для Финляндии, VIES для остального ЕС. */
+  registryName: string;
+  registryLink: string;
+  vatNumber: string | null;
 }): EmailMessage {
   const heading = `Uusi hakemus: ${input.companyName}`;
   const r = input.registry;
@@ -182,31 +187,38 @@ export function applicationFiledEmail(input: {
    * Итог сверки — в теме и первой строкой: по ним видно, можно ли
    * одобрять сразу или нужно разбираться, ещё до открытия письма.
    */
-  const verdict = {
-    OK: 'PRH: kaikki täsmää',
-    ATTENTION: 'PRH: tarkistettavaa',
-    NOT_FOUND: 'PRH: ei avoimessa datassa',
-    ERROR: 'PRH: ei vastausta',
-  }[r.verdict];
+  const verdict = `${input.registryName}: ${{
+    OK: 'kaikki täsmää',
+    ATTENTION: 'tarkistettavaa',
+    NOT_FOUND: input.registryName === 'PRH' ? 'ei avoimessa datassa' : 'ei löydy',
+    ERROR: 'ei vastausta',
+  }[r.verdict]}`;
   const yes = (value: boolean | null) => (value === null ? '–' : value ? 'kyllä' : 'EI');
 
-  const registryRows: Array<[string, string]> = r.officialName
-    ? [
+  /* VIES знает только название и действующий ли номер НДС — остальные строки PRH там пустые. */
+  const registryRows: Array<[string, string]> = !r.officialName
+    ? []
+    : input.registryName !== 'PRH'
+      ? [
+          ['Nimi rekisterissä', r.officialName],
+          ['ALV-numero voimassa', yes(r.vat)],
+        ]
+      : [
         ['Nimi rekisterissä', r.officialName],
         ['Yhtiömuoto', r.form ?? '–'],
         ['Rekisteröity', r.registeredOn ?? '–'],
         ['Ennakkoperintärekisteri', yes(r.prepayment)],
         ['Arvonlisäverorekisteri', yes(r.vat)],
         ['Työnantajarekisteri', yes(r.employer)],
-      ]
-    : [];
+      ];
 
   const blocks: EmailBlock[] = [
     {
       kind: 'facts',
       rows: [
         ['Yritys', input.companyName],
-        ['Y-tunnus', input.businessId],
+        [input.businessIdLabel, input.businessId],
+        ...(input.vatNumber && input.businessIdLabel !== 'Y-tunnus' ? [['ALV-numero', input.vatNumber] as [string, string]] : []),
         ['Rooli', input.role],
         ['Sähköposti', input.applicantEmail],
       ],
@@ -217,8 +229,8 @@ export function applicationFiledEmail(input: {
     {
       kind: 'text',
       value:
-        'Avoin data ei kerro yrityksen vastuuhenkilöitä: se, että hakija edustaa yritystä, tarkistetaan edelleen käsin. Yrityksen kortti YTJ:ssä: ' +
-        input.ytjLink,
+        'Avoin data ei kerro yrityksen vastuuhenkilöitä: se, että hakija edustaa yritystä, tarkistetaan edelleen käsin. Yrityksen tiedot rekisterissä: ' +
+        input.registryLink,
     },
     { kind: 'button', label: 'Avaa tarkastusjono', href: input.queueLink },
   ];

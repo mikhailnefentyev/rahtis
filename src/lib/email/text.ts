@@ -605,7 +605,7 @@ const en: Texts = {
       'A person does the review, so the answer comes during business days. ' +
       `If any of the details are wrong, or you want to ask about the application, reply to this message or write to ${operator}.`,
     fieldCompany: 'Company',
-    fieldBusinessId: 'Y-tunnus',
+    fieldBusinessId: 'Business ID',
     fieldRole: 'Role',
     fieldEmail: 'Email',
   },

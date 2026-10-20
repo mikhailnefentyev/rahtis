@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { enabledCountries } from '@/lib/country';
 import { boundsOf, encodePolyline } from './polyline';
 import type {
   AddressSuggestion,
@@ -36,8 +37,11 @@ const ROUTING = 'https://api.tomtom.com/routing/1';
  * них норвежский терминал не находился вовсе — не «плохо находился», а
  * отсутствовал в выдаче, и адрес пришлось бы набирать руками, то есть
  * без координат, то есть без километража.
+ *
+ * С пакетами стран список берётся из src/lib/country: страна, из которой
+ * принимаются заявки, должна находиться и в подсказке адреса.
  */
-const COUNTRIES = 'FI,SE,NO,DK';
+const COUNTRIES = enabledCountries().join(',');
 
 function key(): string {
   const value = process.env.TOMTOM_KEY;
