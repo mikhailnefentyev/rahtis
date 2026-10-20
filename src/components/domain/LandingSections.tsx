@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { buttonClass, Card, CardBody, Mono } from '@/components/ui';
 import { signInPath } from '@/lib/auth/paths';
 import { APP } from '@/lib/config';
-import { getI18n, type Locale } from '@/lib/i18n';
+import { getI18n, LOCALE_NAMES, locales, type Locale } from '@/lib/i18n';
 import { placeCountries } from '@/lib/routing/places';
 
 /**
@@ -787,13 +787,12 @@ Rahtis-Event: order.stop_arrived`}</code>
             <span>
               © {new Date().getFullYear()} {t.brand.legalEntity} · {l.footerCountry}
             </span>
-            <span className="flex gap-3" aria-label="Language">
-              <Link href="/fi" className={locale === 'fi' ? 'font-semibold text-ink' : 'hover:text-ink'} hrefLang="fi">
-                Suomi
-              </Link>
-              <Link href="/en" className={locale === 'en' ? 'font-semibold text-ink' : 'hover:text-ink'} hrefLang="en">
-                English
-              </Link>
+            <span className="flex flex-wrap gap-x-3 gap-y-1" aria-label="Language">
+              {locales.map((l) => (
+                <Link key={l} href={`/${l}`} lang={l} hrefLang={l} className={locale === l ? 'font-semibold text-ink' : 'hover:text-ink'}>
+                  {LOCALE_NAMES[l]}
+                </Link>
+              ))}
             </span>
           </div>
         </div>

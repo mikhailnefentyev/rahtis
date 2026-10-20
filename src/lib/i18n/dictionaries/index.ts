@@ -28,6 +28,13 @@ export type Dictionary = Widen<typeof fi>;
 const loaders: Record<Locale, () => Promise<Dictionary>> = {
   fi: async () => fi,
   en: () => import('./en').then((m) => m.en),
+  sv: () => import('./sv').then((m) => m.sv),
+  et: () => import('./et').then((m) => m.et),
+  lv: () => import('./lv').then((m) => m.lv),
+  lt: () => import('./lt').then((m) => m.lt),
+  pl: () => import('./pl').then((m) => m.pl),
+  de: () => import('./de').then((m) => m.de),
+  ru: () => import('./ru').then((m) => m.ru),
 };
 
 export async function getDictionary(locale: Locale): Promise<Dictionary> {

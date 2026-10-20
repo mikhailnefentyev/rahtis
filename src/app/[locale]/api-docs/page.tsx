@@ -5,7 +5,7 @@ import { LocaleSwitch } from '@/components/layout/LocaleSwitch';
 import { APP, siteUrl } from '@/lib/config';
 import { getI18n, isLocale } from '@/lib/i18n';
 import { WEBHOOK_EVENTS } from '@/lib/api/events';
-import { pageMetadata } from '@/lib/seo';
+import { samePath, pageMetadata } from '@/lib/seo';
 import { DOCS } from './content';
 
 export async function generateMetadata({
@@ -16,7 +16,7 @@ export async function generateMetadata({
   const { locale } = await params;
   if (!isLocale(locale)) return {};
   const d = DOCS[locale];
-  return pageMetadata({ locale, paths: { fi: '/api-docs', en: '/api-docs' }, title: d.title, description: d.description });
+  return pageMetadata({ locale, paths: samePath('/api-docs'), title: d.title, description: d.description });
 }
 
 /**

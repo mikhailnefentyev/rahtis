@@ -1,4 +1,5 @@
 import { Card, CardBody, Mono } from '@/components/ui';
+import { documentLocale } from '@/lib/i18n/config';
 import { getI18n, type Locale } from '@/lib/i18n';
 import { activeLegalDocument } from '@/lib/legal/read';
 import type { Database } from '@/types/database';
@@ -25,7 +26,8 @@ export async function LegalDocument({ locale, kind }: { locale: Locale; kind: Ki
    */
   const [{ t, m, f }, document] = await Promise.all([
     getI18n(locale),
-    activeLegalDocument(kind, locale),
+    /* Пункты — финские или английские: машинного перевода договора нет. */
+    activeLegalDocument(kind, documentLocale(locale)),
   ]);
 
   if (!document) {

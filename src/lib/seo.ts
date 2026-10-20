@@ -45,6 +45,16 @@ export function samePath(path: string): LocalePaths {
   return Object.fromEntries(locales.map((l) => [l, path])) as LocalePaths;
 }
 
+/** Финский адрес у финского, английский — у остальных языков (условия, политика). */
+export function fiOrEnPath(fi: string, en: string): LocalePaths {
+  return Object.fromEntries(locales.map((l) => [l, l === 'fi' ? fi : en])) as LocalePaths;
+}
+
+/* Код Open Graph: язык_СТРАНА. */
+const OG_LOCALE: Record<Locale, string> = {
+  fi: 'fi_FI', en: 'en_GB', sv: 'sv_SE', et: 'et_EE', lv: 'lv_LV', lt: 'lt_LT', pl: 'pl_PL', de: 'de_DE', ru: 'ru_RU',
+};
+
 export function pageMetadata(input: {
   locale: Locale;
   paths: LocalePaths;
@@ -84,7 +94,7 @@ export function pageMetadata(input: {
       siteName: 'RAHTIS',
       title,
       description,
-      locale: locale === 'fi' ? 'fi_FI' : 'en_GB',
+      locale: OG_LOCALE[locale],
       images: [OG_IMAGE],
     },
     twitter: {

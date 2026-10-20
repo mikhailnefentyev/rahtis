@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { LegalPage } from '@/components/domain/LegalPage';
 import { getI18n, isLocale } from '@/lib/i18n';
-import { pageMetadata } from '@/lib/seo';
+import { fiOrEnPath, pageMetadata } from '@/lib/seo';
 
 export async function generateMetadata({
   params,
@@ -18,7 +18,7 @@ export async function generateMetadata({
    */
   return pageMetadata({
     locale,
-    paths: { fi: '/kayttoehdot', en: '/terms' },
+    paths: fiOrEnPath('/kayttoehdot', '/terms'),
     title: t.legal.TERMS,
     description: t.seo.termsDescription,
   });

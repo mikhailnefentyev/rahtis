@@ -1,7 +1,7 @@
 import 'server-only';
 
 import webpush from 'web-push';
-import { getI18n } from '@/lib/i18n';
+import { getI18n, isLocale } from '@/lib/i18n';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 /**
@@ -53,7 +53,7 @@ export async function sendDriverPush(notificationId: number): Promise<PushResult
   let removed = 0;
 
   for (const sub of subscriptions ?? []) {
-    const { t, m } = await getI18n(sub.locale === 'en' ? 'en' : 'fi');
+    const { t, m } = await getI18n(isLocale(sub.locale) ? sub.locale : 'fi');
 
     let body: string;
     try {

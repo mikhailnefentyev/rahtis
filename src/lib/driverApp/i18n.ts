@@ -27,7 +27,8 @@ export const driverLocaleOf = cache(async (locale: Locale): Promise<DriverLocale
   if (isDriverLocale(driver?.app_language)) return driver.app_language;
 
   const header = (await headers()).get('accept-language');
-  return matchDriverLocale(header) ?? locale;
+  /* Немецкого у приложения водителя нет — тогда английский. */
+  return matchDriverLocale(header) ?? (isDriverLocale(locale) ? locale : 'en');
 });
 
 /** Словарь и форматтеры страницы водителя — вместо общего getI18n. */

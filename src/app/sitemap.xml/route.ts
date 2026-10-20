@@ -1,3 +1,4 @@
+import { locales, type Locale } from '@/lib/i18n/config';
 import { SITE_URL } from '@/lib/seo';
 
 /**
@@ -30,16 +31,17 @@ type Entry = { loc: string; lastmod: string; priority: number; links: Record<str
 const esc = (v: string) => v.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
 function entries(): Entry[] {
-  const home = { fi: `${SITE_URL}/fi`, en: `${SITE_URL}/en`, 'x-default': `${SITE_URL}/` };
+  const home = { ...Object.fromEntries(locales.map((l) => [l, `${SITE_URL}/${l}`])), 'x-default': `${SITE_URL}/` };
   const list: Entry[] = [{ loc: `${SITE_URL}/`, lastmod: ROOT_UPDATED, priority: 1, links: home }];
   for (const page of PAGES) {
+    /* Финский адрес у финского, английский — у остальных языков (как fiOrEnPath). */
+    const path = (l: Locale) => (l === 'fi' ? page.fi : page.en);
     const links = {
-      fi: `${SITE_URL}/fi${page.fi}`,
-      en: `${SITE_URL}/en${page.en}`,
+      ...Object.fromEntries(locales.map((l) => [l, `${SITE_URL}/${l}${path(l)}`])),
       'x-default': page.en === '' ? `${SITE_URL}/` : `${SITE_URL}/en${page.en}`,
     };
-    for (const locale of ['fi', 'en'] as const) {
-      list.push({ loc: `${SITE_URL}/${locale}${page[locale]}`, lastmod: page.updated, priority: page.priority, links });
+    for (const locale of locales) {
+      list.push({ loc: `${SITE_URL}/${locale}${path(locale)}`, lastmod: page.updated, priority: page.priority, links });
     }
   }
   return list;

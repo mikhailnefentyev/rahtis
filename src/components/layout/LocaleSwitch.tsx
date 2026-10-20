@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Suspense } from 'react';
+import { Suspense, useEffect, useRef } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { LOCALE_COOKIE, LOCALE_NAMES, locales, type Locale } from '@/lib/i18n/config';
 
@@ -16,8 +16,10 @@ import { LOCALE_COOKIE, LOCALE_NAMES, locales, type Locale } from '@/lib/i18n/co
  * куку: без неё следующий заход на «/» снова уйдёт по Accept-Language,
  * и выбор пропал бы через одну ссылку.
  *
- * Языков может стать больше двух, поэтому это ряд ссылок, а не тумблер:
- * тумблер пришлось бы переделывать на третьем языке.
+ * Языков девять (пакеты стран, 21.10.2026), и ряд «FI EN SV ET…» в шапке
+ * не помещался на телефоне. Поэтому это выпадающий список: закрытым он
+ * занимает место одной кнопки, открытым — показывает язык его же словом
+ * («Polski», «Deutsch»), а не кодом, который знает не каждый.
  */
 export function LocaleSwitch({ current }: { current: Locale }) {
   /*
@@ -39,28 +41,48 @@ function WithSearch({ current }: { current: Locale }) {
 
 function Switch({ current, search }: { current: Locale; search: URLSearchParams | null }) {
   const pathname = usePathname();
+  const menu = useRef<HTMLDetailsElement>(null);
+
+  /* Открытый список закрывается щелчком мимо него — как любое меню. */
+  useEffect(() => {
+    const close = (event: MouseEvent) => {
+      if (menu.current?.open && !menu.current.contains(event.target as Node)) menu.current.open = false;
+    };
+    document.addEventListener('click', close);
+    return () => document.removeEventListener('click', close);
+  }, []);
 
   return (
-    <nav className="locale-switch" aria-label={LOCALE_NAMES[current]}>
-      {locales.map((locale) => {
-        const active = locale === current;
-        const query = translateQuery(search, locale);
+    <details ref={menu} className="locale-menu">
+      <summary className="locale-switch" aria-label={LOCALE_NAMES[current]}>
+        <span data-on="">{current.toUpperCase()}</span>
+        <span aria-hidden="true" className="locale-caret">▾</span>
+      </summary>
+      <nav className="locale-list" aria-label={LOCALE_NAMES[current]}>
+        {locales.map((locale) => {
+          const active = locale === current;
+          const query = translateQuery(search, locale);
 
-        return (
-          <Link
-            key={locale}
-            href={swapLocale(pathname, locale) + (query ? `?${query}` : '')}
-            hrefLang={locale}
-            data-on={active ? '' : undefined}
-            aria-current={active ? 'true' : undefined}
-            onClick={() => remember(locale)}
-          >
-            {locale.toUpperCase()}
-            <span className="sr-only"> · {LOCALE_NAMES[locale]}</span>
-          </Link>
-        );
-      })}
-    </nav>
+          return (
+            <Link
+              key={locale}
+              href={swapLocale(pathname, locale) + (query ? `?${query}` : '')}
+              hrefLang={locale}
+              lang={locale}
+              data-on={active ? '' : undefined}
+              aria-current={active ? 'true' : undefined}
+              onClick={() => {
+                remember(locale);
+                if (menu.current) menu.current.open = false;
+              }}
+            >
+              <span className="locale-code">{locale.toUpperCase()}</span>
+              {LOCALE_NAMES[locale]}
+            </Link>
+          );
+        })}
+      </nav>
+    </details>
   );
 }
 

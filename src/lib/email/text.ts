@@ -25,9 +25,13 @@
 
 export type EmailLocale = 'fi' | 'en';
 
-/** Язык переписки: всё, кроме известного английского, читается по-фински. */
+/**
+ * Язык переписки: финский — по-фински, любой другой (английский,
+ * шведский, польский…) — по-английски: писем на других языках нет.
+ * Пустой — по-фински, как было до языков интерфейса.
+ */
 export function emailLocaleOf(language: string | null | undefined): EmailLocale {
-  return language === 'en' ? 'en' : 'fi';
+  return !language || language === 'fi' ? 'fi' : 'en';
 }
 
 type Texts = {
