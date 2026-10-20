@@ -25,11 +25,11 @@ export const en = {
 
   brand: {
     name: 'RAHTIS',
-    tagline: 'Transport management and freight exchange · Scandinavia',
+    tagline: 'Transport management and freight exchange · Northern Europe',
     operator: 'RAHTIS',
     /* Юрлицо. Только там, где его требует закон: договоры, счета, отчёты. */
     legalEntity: 'Aivomaa Oy',
-    description: 'Operations platform and freight exchange for carriers: your own fleet, drivers and customers, plus trailer swaps, containers and express transport across Scandinavia.',
+    description: 'Operations platform and freight exchange for carriers: your own fleet, drivers and customers, plus trailer swaps, containers and express transport across Northern Europe.',
   },
 
 
@@ -48,7 +48,7 @@ export const en = {
       'API (REST and webhooks) for the shipper\'s own system',
     ],
     homeDescription:
-      'RAHTIS is a transport management platform and freight exchange for carriers. Run your fleet, drivers, working time and consignment notes in one place, take orders directly from your own customers and fill empty trucks from the offer table. Trailer swaps, containers and express transport in Finland and Scandinavia — shippers publish once and follow the job step by step.',
+      'RAHTIS is a transport management platform and freight exchange for carriers. Run your fleet, drivers, working time and consignment notes in one place, take orders directly from your own customers and fill empty trucks from the offer table. Trailer swaps, containers and express transport in Finland, the Nordics, the Baltics, Poland and Germany — shippers publish once and follow the job step by step.',
     termsDescription:
       'Terms of service for RAHTIS: responsibilities of the parties, how a job runs, payments and settlements, and the term of the agreement.',
     privacyDescription:
@@ -387,7 +387,6 @@ export const en = {
     expressTells: 'Loading metres, weight, two addresses',
     expressExtra: 'Tail lift · Side loading · Refrigeration',
     /* Countries by name, not by code: the strip is read, not decoded. */
-    country: { FI: 'Finland', SE: 'Sweden', NO: 'Norway', DK: 'Denmark' },
     cabinet: 'My account',
 
     cycle1: 'Available',
@@ -568,7 +567,7 @@ export const en = {
     service1: 'Semi-trailer swaps',
     service1Text:
       'A tractor unit collects the trailer from a port or terminal, handles the agreed loading and unloading, and delivers the trailer to the next agreed place.',
-    service1Text2: 'We operate across Scandinavian ports: Finland, Sweden, Norway and Denmark.',
+    service1Text2: 'We operate in Baltic Sea and North Sea ports: Finland, Sweden, Norway, Denmark, Estonia, Latvia, Lithuania, Poland and Germany.',
     /*
      * The second service is containers, not general cargo.
      *
@@ -621,7 +620,7 @@ export const en = {
     footerApi: 'API',
     menuApply: 'Apply',
     footerApiDocs: 'API documentation',
-    footerTagline: 'Haulage platform for trailer swaps, containers and express transport in the ports and terminals of the Nordics.',
+    footerTagline: 'Haulage platform for trailer swaps, containers and express transport in the ports and terminals of Northern Europe.',
     footerService: 'Service',
     footerStart: 'Get started',
     footerDocuments: 'Documents',

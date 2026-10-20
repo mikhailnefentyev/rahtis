@@ -21,11 +21,11 @@ export const fi = {
 
   brand: {
     name: 'RAHTIS',
-    tagline: 'Kuljetusten hallinta ja rahtipörssi · Skandinavia',
+    tagline: 'Kuljetusten hallinta ja rahtipörssi · Pohjois-Eurooppa',
     operator: 'RAHTIS',
     /* Юрлицо. Только там, где его требует закон: договоры, счета, отчёты. */
     legalEntity: 'Aivomaa Oy',
-    description: 'Kuljetusliikkeen työalusta ja rahtipörssi: oma kalusto, kuljettajat ja asiakkaat sekä irtoperät, kontit ja pikakuljetukset Skandinaviassa.',
+    description: 'Kuljetusliikkeen työalusta ja rahtipörssi: oma kalusto, kuljettajat ja asiakkaat sekä irtoperät, kontit ja pikakuljetukset Pohjois-Euroopassa.',
   },
 
 
@@ -55,7 +55,7 @@ export const fi = {
       'Rajapinta (REST ja webhookit) tilaajan järjestelmään',
     ],
     homeDescription:
-      'RAHTIS on kuljetusliikkeen työalusta ja rahtipörssi. Hallitse kalustoa, kuljettajia, työaikaa ja rahtikirjoja yhdessä paikassa, ota tilaukset suoraan omilta asiakkailtasi ja täytä vapaat autot tarjouspöydältä. Irtoperät, kontit ja pikakuljetukset Suomessa ja Skandinaviassa — tilaaja saa tekijän yhdellä julkaisulla ja näkee kuljetuksen vaihe vaiheelta.',
+      'RAHTIS on kuljetusliikkeen työalusta ja rahtipörssi. Hallitse kalustoa, kuljettajia, työaikaa ja rahtikirjoja yhdessä paikassa, ota tilaukset suoraan omilta asiakkailtasi ja täytä vapaat autot tarjouspöydältä. Irtoperät, kontit ja pikakuljetukset Suomessa, Pohjoismaissa, Baltiassa, Puolassa ja Saksassa — tilaaja saa tekijän yhdellä julkaisulla ja näkee kuljetuksen vaihe vaiheelta.',
     termsDescription:
       'RAHTIS-palvelun käyttöehdot: osapuolten vastuut, kuljetuksen kulku, maksut ja tilitykset sekä sopimuksen voimassaolo.',
     privacyDescription:
@@ -426,7 +426,6 @@ export const fi = {
     expressTells: 'Lavametrit, paino, kaksi osoitetta',
     expressExtra: 'Perälautanostin · Sivulastaus · Kylmäkone',
     /* Maat nimillä, ei tunnuksilla: nauha luetaan, ei tulkita. */
-    country: { FI: 'Suomi', SE: 'Ruotsi', NO: 'Norja', DK: 'Tanska' },
 
     /*
      * Neljä vaihetta, jotka kuljetus oikeasti käy läpi. Tekstit ovat samat
@@ -631,7 +630,7 @@ export const fi = {
     service1: 'Irtoperävaunujen kuljetukset',
     service1Text:
       'Veturi noutaa perävaunun satamasta tai terminaalista, hoitaa sovitut lastaukset ja purut ja toimittaa perävaunun seuraavaan sovittuun paikkaan.',
-    service1Text2: 'Toimimme Skandinavian satamissa: Suomi, Ruotsi, Norja ja Tanska.',
+    service1Text2: 'Toimimme Itämeren ja Pohjanmeren satamissa: Suomi, Ruotsi, Norja, Tanska, Viro, Latvia, Liettua, Puola ja Saksa.',
     /*
      * Toinen palvelu on kontit, ei yleinen rahti.
      *
@@ -688,7 +687,7 @@ export const fi = {
     footerApi: 'API',
     menuApply: 'Hae mukaan',
     footerApiDocs: 'API-dokumentaatio',
-    footerTagline: 'Kuljetusalusta irtoperille, konteille ja pikakuljetuksille Pohjoismaiden satamissa ja terminaaleissa.',
+    footerTagline: 'Kuljetusalusta irtoperille, konteille ja pikakuljetuksille Pohjois-Euroopan satamissa ja terminaaleissa.',
     footerService: 'Palvelu',
     footerStart: 'Aloita',
     footerDocuments: 'Asiakirjat',

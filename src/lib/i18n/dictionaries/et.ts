@@ -10,10 +10,10 @@ export const et = {
 
   brand: {
     name: 'RAHTIS',
-    tagline: 'Veokorraldus ja veobörs · Skandinaavia',
+    tagline: 'Veokorraldus ja veobörs · Põhja-Euroopa',
     operator: 'RAHTIS',
     legalEntity: 'Aivomaa Oy',
-    description: 'Tööplatvorm ja veobörs vedajatele: oma autopark, juhid ja kliendid ning lisaks haagiste vahetus, konteinerid ja ekspressveod üle Skandinaavia.',
+    description: 'Tööplatvorm ja veobörs vedajatele: oma autopark, juhid ja kliendid ning lisaks haagiste vahetus, konteinerid ja ekspressveod üle Põhja-Euroopa.',
   },
 
 
@@ -31,7 +31,7 @@ export const et = {
       'API (REST ja webhookid) tellija enda süsteemile',
     ],
     homeDescription:
-      'RAHTIS on veokorralduse platvorm ja veobörs vedajatele. Halda autoparki, juhte, tööaega ja veoselehti ühes kohas, võta tellimusi otse oma klientidelt ja täida tühjad autod pakkumiste tabelist. Haagiste vahetus, konteinerid ja ekspressveod Soomes ja Skandinaavias — tellija avaldab veo ühe korra ja jälgib seda samm-sammult.',
+      'RAHTIS on veokorralduse platvorm ja veobörs vedajatele. Halda autoparki, juhte, tööaega ja veoselehti ühes kohas, võta tellimusi otse oma klientidelt ja täida tühjad autod pakkumiste tabelist. Haagiste vahetus, konteinerid ja ekspressveod Soomes, Põhjamaades, Baltikumis, Poolas ja Saksamaal — tellija avaldab veo ühe korra ja jälgib seda samm-sammult.',
     termsDescription:
       'RAHTISe kasutustingimused: poolte kohustused, veo kulg, maksed ja arveldused ning lepingu kehtivus.',
     privacyDescription:
@@ -344,7 +344,6 @@ export const et = {
     expressFleet: 'Kuni 3,5 t või 26 t',
     expressTells: 'Laadimismeetrid, kaal, kaks aadressi',
     expressExtra: 'Tagaluuk-tõstuk · Külglaadimine · Külmik',
-    country: { FI: 'Soome', SE: 'Rootsi', NO: 'Norra', DK: 'Taani' },
     cabinet: 'Minu konto',
 
     cycle1: 'Saadaval',
@@ -512,7 +511,7 @@ export const et = {
     service1: 'Poolhaagiste vahetus',
     service1Text:
       'Sadulveok võtab haagise sadamast või terminalist, teeb kokkulepitud laadimised ja mahalaadimised ning viib haagise järgmisse kokkulepitud kohta.',
-    service1Text2: 'Tegutseme Skandinaavia sadamates: Soome, Rootsi, Norra ja Taani.',
+    service1Text2: 'Tegutseme Läänemere ja Põhjamere sadamates: Soome, Rootsi, Norra, Taani, Eesti, Läti, Leedu, Poola ja Saksamaa.',
     service2: 'Konteinervedu',
     service2Text:
       'Sadulveok võtab konteineri sadamast või terminalist — tühja või laaditud — ja viib selle kokkulepitud kohta. Tagasiteel naaseb konteiner sadamasse.',
@@ -556,7 +555,7 @@ export const et = {
     footerApi: 'API',
     menuApply: 'Taotle',
     footerApiDocs: 'API dokumentatsioon',
-    footerTagline: 'Veoplatvorm haagiste vahetuseks, konteineriteks ja ekspressvedudeks Põhjamaade sadamates ja terminalides.',
+    footerTagline: 'Veoplatvorm haagiste vahetuseks, konteineriteks ja ekspressvedudeks Põhja-Euroopa sadamates ja terminalides.',
     footerService: 'Teenus',
     footerStart: 'Alusta',
     footerDocuments: 'Dokumendid',

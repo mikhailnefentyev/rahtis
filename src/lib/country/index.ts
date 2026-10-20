@@ -59,7 +59,7 @@ export type CountryPack = {
   postcode: RegExp;
   /** Адреса ищутся в этой стране и компании из неё могут подать заявку. */
   enabled: boolean;
-  /** Страна названа на витрине как зона работы (лендинг, разметка). Новые — когда для них будет интерфейс на их языке. */
+  /** Страна названа на витрине как зона работы (лендинг, разметка). С 21.10.2026 — все страны пакетов: интерфейс есть на их языках. */
   marketed: boolean;
 };
 
@@ -243,7 +243,7 @@ export const COUNTRY_PACKS: Record<CountryCode, CountryPack> = {
     phonePrefix: '+372',
     postcode: /\b\d{5}\b/,
     enabled: true,
-    marketed: false,
+    marketed: true,
   },
   LV: {
     code: 'LV',
@@ -264,7 +264,7 @@ export const COUNTRY_PACKS: Record<CountryCode, CountryPack> = {
     phonePrefix: '+371',
     postcode: /\bLV-?\d{4}\b/i,
     enabled: true,
-    marketed: false,
+    marketed: true,
   },
   LT: {
     code: 'LT',
@@ -285,7 +285,7 @@ export const COUNTRY_PACKS: Record<CountryCode, CountryPack> = {
     phonePrefix: '+370',
     postcode: /\bLT-?\d{5}\b/i,
     enabled: true,
-    marketed: false,
+    marketed: true,
   },
   PL: {
     code: 'PL',
@@ -305,7 +305,7 @@ export const COUNTRY_PACKS: Record<CountryCode, CountryPack> = {
     phonePrefix: '+48',
     postcode: /\b\d{2}-\d{3}\b/,
     enabled: true,
-    marketed: false,
+    marketed: true,
   },
   DE: {
     code: 'DE',
@@ -331,7 +331,7 @@ export const COUNTRY_PACKS: Record<CountryCode, CountryPack> = {
     phonePrefix: '+49',
     postcode: /\b\d{5}\b/,
     enabled: true,
-    marketed: false,
+    marketed: true,
   },
 };
 

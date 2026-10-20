@@ -10,10 +10,10 @@ export const lv = {
 
   brand: {
     name: 'RAHTIS',
-    tagline: 'Transporta vadība un kravu birža · Skandināvija',
+    tagline: 'Transporta vadība un kravu birža · Ziemeļeiropa',
     operator: 'RAHTIS',
     legalEntity: 'Aivomaa Oy',
-    description: 'Darba platforma un kravu birža pārvadātājiem: savs autoparks, vadītāji un klienti, kā arī piekabju maiņa, konteineri un ekspresa pārvadājumi visā Skandināvijā.',
+    description: 'Darba platforma un kravu birža pārvadātājiem: savs autoparks, vadītāji un klienti, kā arī piekabju maiņa, konteineri un ekspresa pārvadājumi visā Ziemeļeiropā.',
   },
 
 
@@ -31,7 +31,7 @@ export const lv = {
       'API (REST un webhooks) pasūtītāja sistēmai',
     ],
     homeDescription:
-      'RAHTIS ir transporta vadības platforma un kravu birža pārvadātājiem. Pārvaldiet autoparku, vadītājus, darba laiku un pavadzīmes vienuviet, saņemiet pasūtījumus tieši no saviem klientiem un aizpildiet tukšās mašīnas no piedāvājumu tabulas. Piekabju maiņa, konteineri un ekspresa pārvadājumi Somijā un Skandināvijā — pasūtītājs publicē vienreiz un seko darbam soli pa solim.',
+      'RAHTIS ir transporta vadības platforma un kravu birža pārvadātājiem. Pārvaldiet autoparku, vadītājus, darba laiku un pavadzīmes vienuviet, saņemiet pasūtījumus tieši no saviem klientiem un aizpildiet tukšās mašīnas no piedāvājumu tabulas. Piekabju maiņa, konteineri un ekspresa pārvadājumi Somijā, Ziemeļvalstīs, Baltijā, Polijā un Vācijā — pasūtītājs publicē vienreiz un seko darbam soli pa solim.',
     termsDescription:
       'RAHTIS lietošanas noteikumi: pušu atbildība, kā noris pārvadājums, maksājumi un norēķini, līguma termiņš.',
     privacyDescription:
@@ -344,7 +344,6 @@ export const lv = {
     expressFleet: 'Līdz 3,5 t vai 26 t',
     expressTells: 'Kravas metri, svars, divas adreses',
     expressExtra: 'Hidrobort · Sānu iekraušana · Refrižerators',
-    country: { FI: 'Somija', SE: 'Zviedrija', NO: 'Norvēģija', DK: 'Dānija' },
     cabinet: 'Mans konts',
 
     cycle1: 'Pieejams',
@@ -512,7 +511,7 @@ export const lv = {
     service1: 'Puspiekabju maiņa',
     service1Text:
       'Vilcējs paņem piekabi ostā vai terminālī, veic norunāto iekraušanu un izkraušanu un nogādā piekabi nākamajā norunātajā vietā.',
-    service1Text2: 'Mēs strādājam Skandināvijas ostās: Somijā, Zviedrijā, Norvēģijā un Dānijā.',
+    service1Text2: 'Mēs strādājam Baltijas jūras un Ziemeļjūras ostās: Somijā, Zviedrijā, Norvēģijā, Dānijā, Igaunijā, Latvijā, Lietuvā, Polijā un Vācijā.',
     service2: 'Konteineru pārvadājumi',
     service2Text:
       'Vilcējs paņem konteineru ostā vai terminālī — tukšu vai pilnu — un nogādā to norunātajā vietā. Atpakaļceļā konteiners atgriežas ostā.',
@@ -556,7 +555,7 @@ export const lv = {
     footerApi: 'API',
     menuApply: 'Pieteikties',
     footerApiDocs: 'API dokumentācija',
-    footerTagline: 'Pārvadājumu platforma piekabju maiņai, konteineriem un ekspresa pārvadājumiem Ziemeļvalstu ostās un termināļos.',
+    footerTagline: 'Pārvadājumu platforma piekabju maiņai, konteineriem un ekspresa pārvadājumiem Ziemeļeiropas ostās un termināļos.',
     footerService: 'Pakalpojums',
     footerStart: 'Sākt darbu',
     footerDocuments: 'Dokumenti',

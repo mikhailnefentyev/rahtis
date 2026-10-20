@@ -88,7 +88,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     taxID: APP.operator.businessId,
     areaServed: placeCountries().map((code) => ({
       '@type': 'Country',
-      name: t.landing.country[code as keyof typeof t.landing.country],
+      name: new Intl.DisplayNames([locale], { type: 'region' }).of(code) ?? code,
     })),
   };
 

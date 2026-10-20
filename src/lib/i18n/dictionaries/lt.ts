@@ -10,10 +10,10 @@ export const lt = {
 
   brand: {
     name: 'RAHTIS',
-    tagline: 'Transporto valdymas ir krovinių birža · Skandinavija',
+    tagline: 'Transporto valdymas ir krovinių birža · Šiaurės Europa',
     operator: 'RAHTIS',
     legalEntity: 'Aivomaa Oy',
-    description: 'Darbo platforma ir krovinių birža vežėjams: jūsų parkas, vairuotojai ir klientai, taip pat priekabų keitimas, konteineriai ir skubūs pervežimai visoje Skandinavijoje.',
+    description: 'Darbo platforma ir krovinių birža vežėjams: jūsų parkas, vairuotojai ir klientai, taip pat priekabų keitimas, konteineriai ir skubūs pervežimai visoje Šiaurės Europoje.',
   },
 
 
@@ -31,7 +31,7 @@ export const lt = {
       'API (REST ir webhook) užsakovo sistemai',
     ],
     homeDescription:
-      'RAHTIS – transporto valdymo platforma ir krovinių birža vežėjams. Valdykite parką, vairuotojus, darbo laiką ir važtaraščius vienoje vietoje, priimkite užsakymus tiesiogiai iš savo klientų ir užpildykite tuščius sunkvežimius iš pasiūlymų lentelės. Priekabų keitimas, konteineriai ir skubūs pervežimai Suomijoje ir Skandinavijoje – užsakovas paskelbia vieną kartą ir seka darbą etapais.',
+      'RAHTIS – transporto valdymo platforma ir krovinių birža vežėjams. Valdykite parką, vairuotojus, darbo laiką ir važtaraščius vienoje vietoje, priimkite užsakymus tiesiogiai iš savo klientų ir užpildykite tuščius sunkvežimius iš pasiūlymų lentelės. Priekabų keitimas, konteineriai ir skubūs pervežimai Suomijoje, Šiaurės šalyse, Baltijos šalyse, Lenkijoje ir Vokietijoje – užsakovas paskelbia vieną kartą ir seka darbą etapais.',
     termsDescription:
       'RAHTIS naudojimo sąlygos: šalių atsakomybė, darbo eiga, mokėjimai ir atsiskaitymai, sutarties galiojimas.',
     privacyDescription:
@@ -344,7 +344,6 @@ export const lt = {
     expressFleet: 'Iki 3,5 t arba 26 t',
     expressTells: 'Krovimo metrai, svoris, du adresai',
     expressExtra: 'Hidraulinis bortas · Šoninis krovimas · Šaldymas',
-    country: { FI: 'Suomija', SE: 'Švedija', NO: 'Norvegija', DK: 'Danija' },
     cabinet: 'Mano paskyra',
 
     cycle1: 'Laisvas',
@@ -512,7 +511,7 @@ export const lt = {
     service1: 'Puspriekabių keitimas',
     service1Text:
       'Vilkikas paima priekabą uoste ar terminale, atlieka sutartus pakrovimus ir iškrovimus ir pristato priekabą į kitą sutartą vietą.',
-    service1Text2: 'Dirbame Skandinavijos uostuose: Suomijoje, Švedijoje, Norvegijoje ir Danijoje.',
+    service1Text2: 'Dirbame Baltijos ir Šiaurės jūrų uostuose: Suomijoje, Švedijoje, Norvegijoje, Danijoje, Estijoje, Latvijoje, Lietuvoje, Lenkijoje ir Vokietijoje.',
     service2: 'Konteinerių pervežimas',
     service2Text:
       'Vilkikas paima konteinerį uoste ar terminale – tuščią arba pakrautą – ir pristato sutartoje vietoje. Atgal konteineris grįžta į uostą.',
@@ -556,7 +555,7 @@ export const lt = {
     footerApi: 'API',
     menuApply: 'Paraiška',
     footerApiDocs: 'API dokumentacija',
-    footerTagline: 'Pervežimų platforma priekabų keitimui, konteineriams ir skubiems pervežimams Šiaurės šalių uostuose ir terminaluose.',
+    footerTagline: 'Pervežimų platforma priekabų keitimui, konteineriams ir skubiems pervežimams Šiaurės Europos uostuose ir terminaluose.',
     footerService: 'Paslauga',
     footerStart: 'Pradžia',
     footerDocuments: 'Dokumentai',

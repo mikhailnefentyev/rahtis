@@ -10,10 +10,10 @@ export const de = {
 
   brand: {
     name: 'RAHTIS',
-    tagline: 'Transportmanagement und Frachtenbörse · Skandinavien',
+    tagline: 'Transportmanagement und Frachtenbörse · Nordeuropa',
     operator: 'RAHTIS',
     legalEntity: 'Aivomaa Oy',
-    description: 'Betriebsplattform und Frachtenbörse für Transportunternehmen: eigener Fuhrpark, Fahrer und Kunden, dazu Trailertausch, Container und Expresstransporte in ganz Skandinavien.',
+    description: 'Betriebsplattform und Frachtenbörse für Transportunternehmen: eigener Fuhrpark, Fahrer und Kunden, dazu Trailertausch, Container und Expresstransporte in ganz Nordeuropa.',
   },
 
 
@@ -31,7 +31,7 @@ export const de = {
       'API (REST und Webhooks) für das eigene System des Auftraggebers',
     ],
     homeDescription:
-      'RAHTIS ist eine Transportmanagement-Plattform und Frachtenbörse für Transportunternehmen. Verwalten Sie Fuhrpark, Fahrer, Arbeitszeit und Frachtbriefe an einem Ort, nehmen Sie Aufträge direkt von Ihren eigenen Kunden an und füllen Sie leere Lkw über die Angebotstafel. Trailertausch, Container und Expresstransporte in Finnland und Skandinavien — Auftraggeber veröffentlichen einmal und verfolgen den Auftrag Schritt für Schritt.',
+      'RAHTIS ist eine Transportmanagement-Plattform und Frachtenbörse für Transportunternehmen. Verwalten Sie Fuhrpark, Fahrer, Arbeitszeit und Frachtbriefe an einem Ort, nehmen Sie Aufträge direkt von Ihren eigenen Kunden an und füllen Sie leere Lkw über die Angebotstafel. Trailertausch, Container und Expresstransporte in Finnland, Skandinavien, dem Baltikum, Polen und Deutschland — Auftraggeber veröffentlichen einmal und verfolgen den Auftrag Schritt für Schritt.',
     termsDescription:
       'Nutzungsbedingungen von RAHTIS: Pflichten der Parteien, Ablauf eines Auftrags, Zahlungen und Abrechnungen sowie Vertragslaufzeit.',
     privacyDescription:
@@ -344,7 +344,6 @@ export const de = {
     expressFleet: 'Bis 3,5 t oder 26 t',
     expressTells: 'Lademeter, Gewicht, zwei Adressen',
     expressExtra: 'Ladebordwand · Seitenbeladung · Kühlung',
-    country: { FI: 'Finnland', SE: 'Schweden', NO: 'Norwegen', DK: 'Dänemark' },
     cabinet: 'Mein Konto',
 
     cycle1: 'Verfügbar',
@@ -512,7 +511,7 @@ export const de = {
     service1: 'Sattelauflieger-Tausch',
     service1Text:
       'Eine Sattelzugmaschine holt den Trailer an einem Hafen oder Terminal ab, erledigt die vereinbarte Be- und Entladung und bringt den Trailer zum nächsten vereinbarten Ort.',
-    service1Text2: 'Wir sind in skandinavischen Häfen tätig: Finnland, Schweden, Norwegen und Dänemark.',
+    service1Text2: 'Wir sind in Häfen an Ostsee und Nordsee tätig: Finnland, Schweden, Norwegen, Dänemark, Estland, Lettland, Litauen, Polen und Deutschland.',
     service2: 'Containertransport',
     service2Text:
       'Die Zugmaschine holt den Container an einem Hafen oder Terminal ab — leer oder beladen — und liefert ihn wie vereinbart. Auf dem Rückweg geht der Container zurück in den Hafen.',
@@ -556,7 +555,7 @@ export const de = {
     footerApi: 'API',
     menuApply: 'Bewerben',
     footerApiDocs: 'API-Dokumentation',
-    footerTagline: 'Transportplattform für Trailertausch, Container und Expresstransporte in den Häfen und Terminals des Nordens.',
+    footerTagline: 'Transportplattform für Trailertausch, Container und Expresstransporte in den Häfen und Terminals Nordeuropas.',
     footerService: 'Service',
     footerStart: 'Loslegen',
     footerDocuments: 'Dokumente',

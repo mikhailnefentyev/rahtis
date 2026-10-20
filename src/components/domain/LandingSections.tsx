@@ -55,7 +55,7 @@ export async function LandingSections({ locale }: { locale: Locale }) {
           {placeCountries().map((code, i) => (
             <span key={code}>
               {i > 0 && <span className="mx-4 hidden text-line-strong sm:inline">·</span>}
-              {l.country[code as keyof typeof l.country].toUpperCase()}
+              {(new Intl.DisplayNames([locale], { type: 'region' }).of(code) ?? code).toUpperCase()}
             </span>
           ))}
         </p>

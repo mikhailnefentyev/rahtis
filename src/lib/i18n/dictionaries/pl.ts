@@ -10,10 +10,10 @@ export const pl = {
 
   brand: {
     name: 'RAHTIS',
-    tagline: 'Zarządzanie transportem i giełda ładunków · Skandynawia',
+    tagline: 'Zarządzanie transportem i giełda ładunków · Europa Północna',
     operator: 'RAHTIS',
     legalEntity: 'Aivomaa Oy',
-    description: 'Platforma operacyjna i giełda ładunków dla przewoźników: własna flota, kierowcy i klienci, a do tego wymiany naczep, kontenery i transport ekspresowy w całej Skandynawii.',
+    description: 'Platforma operacyjna i giełda ładunków dla przewoźników: własna flota, kierowcy i klienci, a do tego wymiany naczep, kontenery i transport ekspresowy w całej Europie Północnej.',
   },
 
 
@@ -31,7 +31,7 @@ export const pl = {
       'API (REST i webhooki) dla systemu zleceniodawcy',
     ],
     homeDescription:
-      'RAHTIS to platforma do zarządzania transportem i giełda ładunków dla przewoźników. Flota, kierowcy, czas pracy i listy przewozowe w jednym miejscu, zlecenia bezpośrednio od własnych klientów, a puste auta zapełnisz z tablicy ofert. Wymiany naczep, kontenery i transport ekspresowy w Finlandii i Skandynawii — zleceniodawca publikuje raz i śledzi przewóz krok po kroku.',
+      'RAHTIS to platforma do zarządzania transportem i giełda ładunków dla przewoźników. Flota, kierowcy, czas pracy i listy przewozowe w jednym miejscu, zlecenia bezpośrednio od własnych klientów, a puste auta zapełnisz z tablicy ofert. Wymiany naczep, kontenery i transport ekspresowy w Finlandii, krajach nordyckich, krajach bałtyckich, Polsce i Niemczech — zleceniodawca publikuje raz i śledzi przewóz krok po kroku.',
     termsDescription:
       'Regulamin RAHTIS: obowiązki stron, przebieg przewozu, płatności i rozliczenia oraz okres obowiązywania umowy.',
     privacyDescription:
@@ -344,7 +344,6 @@ export const pl = {
     expressFleet: 'Do 3,5 t lub 26 t',
     expressTells: 'Metry ładowne, waga, dwa adresy',
     expressExtra: 'Winda · Załadunek boczny · Chłodnia',
-    country: { FI: 'Finlandia', SE: 'Szwecja', NO: 'Norwegia', DK: 'Dania' },
     cabinet: 'Moje konto',
 
     cycle1: 'Dostępne',
@@ -512,7 +511,7 @@ export const pl = {
     service1: 'Wymiany naczep',
     service1Text:
       'Ciągnik odbiera naczepę z portu lub terminalu, obsługuje ustalone załadunki i rozładunki i dostarcza naczepę w kolejne ustalone miejsce.',
-    service1Text2: 'Działamy w portach Skandynawii: Finlandia, Szwecja, Norwegia i Dania.',
+    service1Text2: 'Działamy w portach Bałtyku i Morza Północnego: Finlandia, Szwecja, Norwegia, Dania, Estonia, Łotwa, Litwa, Polska i Niemcy.',
     service2: 'Przewozy kontenerowe',
     service2Text:
       'Ciągnik odbiera kontener z portu lub terminalu — pusty lub pełny — i dostarcza go w ustalone miejsce. W drodze powrotnej kontener wraca do portu.',
@@ -556,7 +555,7 @@ export const pl = {
     footerApi: 'API',
     menuApply: 'Wniosek',
     footerApiDocs: 'Dokumentacja API',
-    footerTagline: 'Platforma przewozowa dla wymian naczep, kontenerów i transportu ekspresowego w portach i terminalach krajów nordyckich.',
+    footerTagline: 'Platforma przewozowa dla wymian naczep, kontenerów i transportu ekspresowego w portach i terminalach Europy Północnej.',
     footerService: 'Usługa',
     footerStart: 'Zacznij',
     footerDocuments: 'Dokumenty',

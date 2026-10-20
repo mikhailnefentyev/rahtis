@@ -218,7 +218,7 @@ type Texts = {
 const fi: Texts = {
   signature: 'Rahtis Team',
   neverAsk: 'Emme koskaan kysy salasanaasi sähköpostitse emmekä puhelimessa.',
-  brandTagline: 'Irtoperät ja kontit · Skandinavia',
+  brandTagline: 'Irtoperät ja kontit · Pohjois-Eurooppa',
 
   greeting: 'Hei,',
 
@@ -454,7 +454,7 @@ const fi: Texts = {
 const en: Texts = {
   signature: 'Rahtis Team',
   neverAsk: 'We never ask for your password by email or over the phone.',
-  brandTagline: 'Trailers and containers · Scandinavia',
+  brandTagline: 'Trailers and containers · Northern Europe',
 
   greeting: 'Hello,',
 

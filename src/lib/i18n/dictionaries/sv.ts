@@ -10,10 +10,10 @@ export const sv = {
 
   brand: {
     name: 'RAHTIS',
-    tagline: 'Transportledning och lastbörs · Skandinavien',
+    tagline: 'Transportledning och lastbörs · Nordeuropa',
     operator: 'RAHTIS',
     legalEntity: 'Aivomaa Oy',
-    description: 'Driftplattform och lastbörs för åkerier: egen flotta, egna förare och kunder, plus trailerbyten, containrar och expresstransporter i hela Skandinavien.',
+    description: 'Driftplattform och lastbörs för åkerier: egen flotta, egna förare och kunder, plus trailerbyten, containrar och expresstransporter i hela Nordeuropa.',
   },
 
 
@@ -31,7 +31,7 @@ export const sv = {
       'API (REST och webhooks) för uppdragsgivarens eget system',
     ],
     homeDescription:
-      'RAHTIS är en plattform för transportledning och en lastbörs för åkerier. Hantera flotta, förare, arbetstid och fraktsedlar på ett ställe, ta emot order direkt från egna kunder och fyll tomma bilar från anbudstavlan. Trailerbyten, containrar och expresstransporter i Finland och Skandinavien – uppdragsgivaren publicerar en gång och följer uppdraget steg för steg.',
+      'RAHTIS är en plattform för transportledning och en lastbörs för åkerier. Hantera flotta, förare, arbetstid och fraktsedlar på ett ställe, ta emot order direkt från egna kunder och fyll tomma bilar från anbudstavlan. Trailerbyten, containrar och expresstransporter i Finland, Norden, Baltikum, Polen och Tyskland – uppdragsgivaren publicerar en gång och följer uppdraget steg för steg.',
     termsDescription:
       'Användarvillkor för RAHTIS: parternas ansvar, hur ett uppdrag genomförs, betalningar och avräkningar samt avtalets giltighetstid.',
     privacyDescription:
@@ -344,7 +344,6 @@ export const sv = {
     expressFleet: 'Upp till 3,5 t eller 26 t',
     expressTells: 'Flakmeter, vikt, två adresser',
     expressExtra: 'Bakgavellyft · Sidlastning · Kyl',
-    country: { FI: 'Finland', SE: 'Sverige', NO: 'Norge', DK: 'Danmark' },
     cabinet: 'Mitt konto',
 
     cycle1: 'Tillgänglig',
@@ -512,7 +511,7 @@ export const sv = {
     service1: 'Byte av semitrailer',
     service1Text:
       'En dragbil hämtar trailern i en hamn eller terminal, sköter avtalad lastning och lossning och levererar trailern till nästa avtalade plats.',
-    service1Text2: 'Vi verkar i skandinaviska hamnar: Finland, Sverige, Norge och Danmark.',
+    service1Text2: 'Vi verkar i hamnar vid Östersjön och Nordsjön: Finland, Sverige, Norge, Danmark, Estland, Lettland, Litauen, Polen och Tyskland.',
     service2: 'Containertransport',
     service2Text:
       'Dragbilen hämtar containern i en hamn eller terminal – tom eller lastad – och levererar den dit det är avtalat. På returen går containern tillbaka till hamnen.',
@@ -556,7 +555,7 @@ export const sv = {
     footerApi: 'API',
     menuApply: 'Ansök',
     footerApiDocs: 'API-dokumentation',
-    footerTagline: 'Transportplattform för trailerbyten, containrar och expresstransporter i Nordens hamnar och terminaler.',
+    footerTagline: 'Transportplattform för trailerbyten, containrar och expresstransporter i Nordeuropas hamnar och terminaler.',
     footerService: 'Tjänsten',
     footerStart: 'Kom igång',
     footerDocuments: 'Dokument',
