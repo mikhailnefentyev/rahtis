@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import { HeroPort } from '@/components/domain/HeroPort';
 import { LandingSections } from '@/components/domain/LandingSections';
 import { SiteHeader } from '@/components/layout/SiteHeader';
-import { APP } from '@/lib/config';
+import { APP, SUBSCRIPTION_UNIT_CENTS } from '@/lib/config';
 import { getI18n, isLocale } from '@/lib/i18n';
 import { placeCountries } from '@/lib/routing/places';
 import { SITE_URL, pageMetadata, samePath } from '@/lib/seo';
@@ -102,6 +102,32 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     publisher: { '@type': 'Organization', name: APP.operator.legalName },
   };
 
+  /*
+   * The product itself: a transport management system and a freight
+   * exchange. Without it, answer engines file RAHTIS under "trailer swap
+   * platform" only — the carrier's own fleet, drivers and customers are
+   * what most carriers come for.
+   */
+  const software = {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: t.brand.name,
+    url: pageUrl,
+    applicationCategory: 'BusinessApplication',
+    applicationSubCategory: locale === 'fi' ? 'Kuljetusten hallintajärjestelmä (TMS) ja rahtipörssi' : 'Transport management system (TMS) and freight exchange',
+    operatingSystem: 'Web, Android, iOS',
+    description: t.seo.homeDescription,
+    featureList: t.seo.features,
+    inLanguage: ['fi', 'en'],
+    offers: {
+      '@type': 'Offer',
+      price: (SUBSCRIPTION_UNIT_CENTS / 100).toFixed(2),
+      priceCurrency: 'EUR',
+      priceSpecification: { '@type': 'UnitPriceSpecification', price: (SUBSCRIPTION_UNIT_CENTS / 100).toFixed(2), priceCurrency: 'EUR', unitText: locale === 'fi' ? 'auto / kuukausi, alv 0 %' : 'vehicle / month, excl. VAT', valueAddedTaxIncluded: false },
+    },
+    provider: { '@type': 'Organization', name: APP.operator.legalName },
+  };
+
   return (
     <>
       <script
@@ -109,7 +135,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         /*
          * Значения свои, из словаря и настроек, чужого текста здесь нет.
          */
-        dangerouslySetInnerHTML={{ __html: JSON.stringify([organisation, website]) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify([organisation, website, software]) }}
       />
 
       <SiteHeader />

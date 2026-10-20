@@ -16,15 +16,38 @@ const euro = (cents: number) => (cents / 100).toFixed(2).replace('.', ',');
 
 const BODY = `# RAHTIS
 
-> RAHTIS (${SITE_URL}) is a Finnish freight platform for trailer swaps, container haulage and express van/truck transport in Finland and Scandinavia (Finland, Sweden, Norway, Denmark). Shippers and freight forwarders publish transport orders; approved carriers take them from an offer table or receive them directly. Carriers also use RAHTIS as their own operations platform: driver app, working time, consignment notes (CMR), trip photos and reports. Operated by ${APP.operator.legalName} (business ID ${APP.operator.businessId}), Helsinki, Finland.
+> RAHTIS (${SITE_URL}) is a Finnish transport management platform and freight exchange for carriers and shippers in Finland and Scandinavia (Finland, Sweden, Norway, Denmark). It is three things in one: (1) an operations platform (TMS) where a transport company runs its own fleet, drivers, working time, consignment notes (CMR) and its own customers; (2) an offer table — a freight exchange (rahtipörssi) — where approved carriers take jobs published by shippers and freight forwarders; (3) direct work between shipper and carrier: orders sent straight to a known vehicle, tracking links and an API. Freight: trailer swaps, container haulage and express van/truck transport. Operated by ${APP.operator.legalName} (business ID ${APP.operator.businessId}), Helsinki, Finland.
 
-## What RAHTIS does
+## Transport management for carriers (TMS)
+
+- Fleet: every vehicle with its equipment (axles, ADR, reefer, tail lift), approved for the service one by one.
+- Drivers: invited by link or code; several dispatchers per company with their own logins.
+- Own trips and own customers: add a job yourself and give it to your own vehicle, or let your customer send orders straight to your vehicle; the customer can get a tracking link. The whole price is the carrier's, no percentage.
+- Driver app (PWA) in 10 languages: stops in order, navigation, arrival and completion marks, load and damage photos, signature, consignment note scanned to PDF; works offline in ports.
+- Working time and an indicative wage from the carrier's own rates or the collective agreement tables; shifts.
+- Map of rest, wash and service places in Finland, Sweden, Norway and Denmark.
+- Weekly report of jobs, earnings and documents; claims handled per trip.
+
+## Freight exchange (offer table)
+
+- A shipper publishes a job once; it reaches suitable approved vehicles in the area at once.
+- Up to three offers; the shipper chooses by price, equipment and ratings. No price auction downwards.
+- If a vehicle cancels or does not confirm in 15 minutes, the job returns to the table and goes to the next suitable vehicles by itself.
+- Carriers see open jobs in their area and can find a return load where the previous trip ends.
+
+## Direct work between shippers and carriers
+
+- Direct orders: a shipper sends a job straight to a known vehicle, or first to a group of its own vehicles and then to the offer table.
+- A carrier can invite its own customers to order through RAHTIS.
+
+## Freight types
 
 - Trailer swaps (perävaunun vaihto / irtoperät) between ports, terminals and customers — e.g. Hanko, Helsinki Vuosaari, Turku, Kotka.
 - Container haulage (20', 40', 45') to and from ports and terminals.
-- Express transport by van or truck.
-- Offer table: an order reaches suitable approved vehicles at once; up to three offers, the shipper picks one.
-- Direct orders: a shipper sends a job straight to a known vehicle, or first to a group of its own vehicles and then to the offer table.
+- Express transport by van or truck (up to 3.5 t or 26 t; tail lift, side loading, reefer).
+
+## For everyone on a trip
+
 - Live trip status: arrivals, completed stops, estimated arrival, delay and waiting-time alerts, photos and CMR in one place.
 - Messages per trip between shipper, carrier and driver, with automatic translation (10 languages).
 - Driver app (PWA) in 10 languages: Finnish, English, Swedish, Norwegian, Danish, Estonian, Latvian, Lithuanian, Polish, Russian.
@@ -40,8 +63,8 @@ const BODY = `# RAHTIS
 
 ## Who it is for
 
-- Shippers, freight forwarders and logistics operators that need trailer swaps, container moves or express transport in the Nordics.
-- Transport companies (carriers) of any size, from one truck upwards, that want work from the offer table or a platform for their own clients.
+- Transport companies (carriers) of any size, from one truck upwards, that want one system for their fleet, drivers and own customers — and work from the offer table when a vehicle is free.
+- Shippers, freight forwarders and logistics operators that need trailer swaps, container moves or express transport in the Nordics, from the exchange or directly from their own carriers.
 
 ## Links
 
@@ -55,7 +78,7 @@ const BODY = `# RAHTIS
 
 ## Suomeksi
 
-RAHTIS on suomalainen kuljetusalusta irtoperien vaihtoihin, konttikuljetuksiin ja pikakuljetuksiin Suomessa ja Skandinaviassa. Tilaajat julkaisevat kuljetuksia, hyväksytyt kuljetusliikkeet ottavat ne tarjouspöydältä tai saavat suorana tilauksena. Kuljetusliikkeille RAHTIS on myös oma työalusta: kuljettajan sovellus, työaika, rahtikirjat, kuvat ja raportit. Ylläpitäjä ${APP.operator.legalName} (Y-tunnus ${APP.operator.businessId}).
+RAHTIS on suomalainen kuljetusten hallintajärjestelmä ja rahtipörssi Suomessa ja Skandinaviassa. Kuljetusliike hallitsee samassa paikassa kalustoa, kuljettajia, työaikaa, rahtikirjoja ja omia asiakkaitaan (suorat tilaukset, seurantalinkki asiakkaalle, ei prosenttia omista keikoista). Tarjouspöydältä eli rahtipörssistä hyväksytyt kuljetusliikkeet ottavat tilaajien ja huolitsijoiden julkaisemia kuljetuksia. Rahti: irtoperien vaihdot, konttikuljetukset ja pikakuljetukset. Ylläpitäjä ${APP.operator.legalName} (Y-tunnus ${APP.operator.businessId}).
 `;
 
 export function GET() {

@@ -21,11 +21,11 @@ export const fi = {
 
   brand: {
     name: 'RAHTIS',
-    tagline: 'Irtoperät ja kontit · Skandinavia',
+    tagline: 'Kuljetusten hallinta ja rahtipörssi · Skandinavia',
     operator: 'RAHTIS',
     /* Юрлицо. Только там, где его требует закон: договоры, счета, отчёты. */
     legalEntity: 'Aivomaa Oy',
-    description: 'Irtoperien ja konttien kuljetusalusta Skandinavian satamissa.',
+    description: 'Kuljetusliikkeen työalusta ja rahtipörssi: oma kalusto, kuljettajat ja asiakkaat sekä irtoperät, kontit ja pikakuljetukset Skandinaviassa.',
   },
 
 
@@ -41,9 +41,21 @@ export const fi = {
    * сайте занимало слово, которое никто не ищет.
    */
   seo: {
-    homeTitle: 'Kuljetusalusta ja tarjouspöytä: irtoperät, kontit ja pikakuljetukset',
+    homeTitle: 'Kuljetusten hallinta ja rahtipörssi: irtoperät, kontit ja pikakuljetukset',
+    /* What the platform does, as a list for the schema.org card (answer engines read it). */
+    features: [
+      'Kaluston ja kuljettajien hallinta',
+      'Omat asiakkaat ja suorat tilaukset, seurantalinkki asiakkaalle',
+      'Rahtipörssi (tarjouspöytä) irtoperille, konteille ja pikakuljetuksille',
+      'Kuljettajan sovellus 10 kielellä, toimii ilman verkkoa',
+      'Työaika ja suuntaa-antava palkka',
+      'Sähköinen rahtikirja, kuvat ja allekirjoitus',
+      'Kuljetuksen seuranta vaihe vaiheelta, myöhästymis- ja seisontahälytykset',
+      'Viikkoraportti ja reklamaatiot keikoittain',
+      'Rajapinta (REST ja webhookit) tilaajan järjestelmään',
+    ],
     homeDescription:
-      'RAHTIS välittää irtoperien vaihdot, konttikuljetukset ja pikakuljetukset hyväksytyille kuljetusliikkeille Suomessa ja Skandinaviassa — ja toimii alustana kuljetusliikkeelle, joka ajaa omia asiakkaitaan: kuljettajan sovellus, työaika, rahtikirjat ja raportit. Tilaus tavoittaa sopivat autot heti, kuljetus näkyy vaihe vaiheelta ja asiakirjat syntyvät samaan paikkaan.',
+      'RAHTIS on kuljetusliikkeen työalusta ja rahtipörssi. Hallitse kalustoa, kuljettajia, työaikaa ja rahtikirjoja yhdessä paikassa, ota tilaukset suoraan omilta asiakkailtasi ja täytä vapaat autot tarjouspöydältä. Irtoperät, kontit ja pikakuljetukset Suomessa ja Skandinaviassa — tilaaja saa tekijän yhdellä julkaisulla ja näkee kuljetuksen vaihe vaiheelta.',
     termsDescription:
       'RAHTIS-palvelun käyttöehdot: osapuolten vastuut, kuljetuksen kulku, maksut ja tilitykset sekä sopimuksen voimassaolo.',
     privacyDescription:
@@ -345,14 +357,14 @@ export const fi = {
      * 'Kuorma' eikä 'paketti': pikakuljetus ei ole postipaketti vaan
      * enintään 26 tonnia auton kyydissä. Sama sana on kabinetissakin.
      */
-    eyebrow: 'Irtoperät, kontit ja pikakuljetukset · Skandinavia',
+    eyebrow: 'Kuljetusten hallinta · rahtipörssi · suorat tilaukset',
     /* Irtoperä, ei perävaunu: sama sana kuin kärjessä ja palvelussa. */
     titleA: 'Irtoperä, kontti, kuorma.',
     titleB: 'Jokainen lähtee ajallaan.',
     titleC: 'Turhat puhelut jäävät pois.',
-    lede: 'Julkaise tilaus, ja sopivat kuljetusliikkeet saavat sen heti. Kuljetus näkyy vaihe vaiheelta, kuvat ja asiakirjat samassa paikassa.',
+    lede: 'Kuljetusliike hallitsee kalustoa, kuljettajia ja omia asiakkaitaan samassa paikassa ja täyttää vapaat autot tarjouspöydältä. Tilaaja julkaisee kuljetuksen kerran ja näkee sen vaihe vaiheelta, kuvat ja asiakirjat mukana.',
     /* Kolme asiaa, joiden takia palveluun tullaan. */
-    highlight1: 'Muutos ei pysäytä kuljetusta',
+    highlight1: 'Kalusto, kuljettajat ja asiakkaat yhdessä',
     highlight2: 'Emme kilpailuta hintaa alaspäin',
     highlight3: 'Asiakirjat ja tilitykset sähköisesti',
     asShipper: 'Huolitsijalle tai operaattorille',
@@ -434,7 +446,7 @@ export const fi = {
     helpEyebrow: 'Mitä RAHTIS tekee',
     helpTitle: 'Pidämme rahdin liikkeessä ja autot ajossa',
     helpLede:
-      'RAHTIS on kaksi asiaa samassa: tarjouspöytä, jolta kuljetusliike saa työtä ja tilaaja tekijän, sekä alusta, jolla kuljetusliike ajaa omat asiakkaansa. Emme korvaa huolitsijaa, ajojärjestelyä tai kuljetusliikettä — poistamme etsimisen, soittelun, saman asian selvittämisen moneen kertaan ja hajallaan olevat asiakirjat.',
+      'RAHTIS on kolme asiaa samassa: kuljetusliikkeen työalusta oman kaluston, kuljettajien ja asiakkaiden hallintaan, tarjouspöytä eli rahtipörssi, jolta kuljetusliike saa työtä ja tilaaja tekijän, sekä suora yhteys tilaajan ja kuljetusliikkeen välillä. Emme korvaa huolitsijaa, ajojärjestelyä tai kuljetusliikettä — poistamme etsimisen, soittelun, saman asian selvittämisen moneen kertaan ja hajallaan olevat asiakirjat.',
     helpCargo: 'Huolitsijalle ja operaattorille',
     helpCargoTitle: 'Tilaus liikkeelle nopeasti',
     helpCargoText:

@@ -25,18 +25,30 @@ export const en = {
 
   brand: {
     name: 'RAHTIS',
-    tagline: 'Trailers and containers · Scandinavia',
+    tagline: 'Transport management and freight exchange · Scandinavia',
     operator: 'RAHTIS',
     /* Юрлицо. Только там, где его требует закон: договоры, счета, отчёты. */
     legalEntity: 'Aivomaa Oy',
-    description: 'Trailer swap and container haulage platform across Scandinavian ports.',
+    description: 'Operations platform and freight exchange for carriers: your own fleet, drivers and customers, plus trailer swaps, containers and express transport across Scandinavia.',
   },
 
 
   seo: {
-    homeTitle: 'Haulage platform and offer table: trailer swaps, containers, express',
+    homeTitle: 'Transport management and freight exchange: trailer swaps, containers, express',
+    /* What the platform does, as a list for the schema.org card (answer engines read it). */
+    features: [
+      'Fleet and driver management',
+      'Own customers and direct orders, tracking link for the customer',
+      'Freight exchange (offer table) for trailer swaps, containers and express transport',
+      'Driver app in 10 languages, works offline',
+      'Working time and indicative wage',
+      'Electronic consignment note (CMR), photos and signature',
+      'Step-by-step trip tracking with delay and waiting-time alerts',
+      'Weekly report and claims per trip',
+      'API (REST and webhooks) for the shipper\'s own system',
+    ],
     homeDescription:
-      'RAHTIS routes trailer swaps and container haulage to approved carriers across the ports of Finland, Sweden, Norway and Denmark — and serves as the platform for a carrier running its own clients: the driver app, working time, consignment notes and reports. An order reaches the trucks in the area at once, the job is visible stop by stop, and the documents end up in one place.',
+      'RAHTIS is a transport management platform and freight exchange for carriers. Run your fleet, drivers, working time and consignment notes in one place, take orders directly from your own customers and fill empty trucks from the offer table. Trailer swaps, containers and express transport in Finland and Scandinavia — shippers publish once and follow the job step by step.',
     termsDescription:
       'Terms of service for RAHTIS: responsibilities of the parties, how a job runs, payments and settlements, and the term of the agreement.',
     privacyDescription:
@@ -320,7 +332,7 @@ export const en = {
      * containers — and does them across Scandinavian ports. A narrow
      * promise that holds beats a wide one with nothing behind it.
      */
-    eyebrow: 'Trailer swaps, containers and express · Scandinavia',
+    eyebrow: 'Transport management · freight exchange · direct orders',
     /*
      * First line lists, second promises, third gives the benefit.
      *
@@ -335,9 +347,9 @@ export const en = {
     titleA: 'Trailer, container, load.',
     titleB: 'Each one leaves on time.',
     titleC: 'The phone stops ringing.',
-    lede: 'Publish an order and suitable carriers get it at once. The job shows step by step, with photos and documents in one place.',
+    lede: 'Carriers run their fleet, drivers and own customers in one place and fill empty trucks from the offer table. Shippers publish a job once and follow it step by step, with photos and documents attached.',
     /* The three things people come here for. */
-    highlight1: 'A change does not stop the load',
+    highlight1: 'Fleet, drivers and customers in one place',
     highlight2: 'We do not auction the price down',
     highlight3: 'Documents and settlements electronically',
     asShipper: 'For forwarders and operators',
@@ -390,7 +402,7 @@ export const en = {
     helpEyebrow: 'What RAHTIS does',
     helpTitle: 'We keep freight moving and trucks working',
     helpLede:
-      'RAHTIS is two things at once: an offer table where a carrier finds work and a shipper finds a performer, and a platform a carrier uses to run its own clients. We do not replace a freight forwarder, a dispatcher or a carrier — we remove the searching, the phone calls, explaining the same thing several times and documents scattered around.',
+      'RAHTIS is three things in one: an operations platform for carriers to run their own fleet, drivers and customers; an offer table — a freight exchange — where carriers find work and shippers find a carrier; and a direct line between shipper and carrier. We do not replace the forwarder, the dispatcher or the carrier — we remove the searching, the phone calls, the same question asked many times and the scattered documents.',
     helpCargo: 'For forwarders and operators',
     helpCargoTitle: 'Orders move quickly',
     helpCargoText:
