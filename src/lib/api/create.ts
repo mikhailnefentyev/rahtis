@@ -96,7 +96,8 @@ async function prepare(body: unknown): Promise<Prepared> {
   const contract = body.contract === undefined ? 'RAHTIS' : body.contract;
   if (contract !== 'RAHTIS' && contract !== 'DIRECT') issues.push({ field: 'contract', issue: 'one of RAHTIS, DIRECT' });
 
-  const trailerPlate = text(body.trailer_plate, 20)?.toUpperCase();
+  /* Без пробелов, как в форме: база хранит номер слитно (orders_trailer_plate_format). */
+  const trailerPlate = text(body.trailer_plate, 20)?.toUpperCase().replace(/\s+/g, '');
   if (haulKind === 'CONTAINER' && trailerPlate && !isValidContainerNumber(trailerPlate)) {
     issues.push({ field: 'trailer_plate', issue: 'not a valid ISO 6346 container number' });
   }

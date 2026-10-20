@@ -119,6 +119,12 @@ export async function submitApplicationAction(
       partnership,
       name,
       country,
+      /*
+       * Страна юридического адреса — та же, что у компании. У колонки
+       * в базе значение по умолчанию 'FI', и польская компания получала
+       * в реквизитах финский адрес (прогон 21.10.2026).
+       */
+      legal_country: country,
       business_id: businessId,
       vat_number: vatNumber,
       contact_email: email,

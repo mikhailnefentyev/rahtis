@@ -348,7 +348,12 @@ function readOrderForm(
       ldm: str(formData, 'ldm').replace(',', '.'),
       shipper_ref: str(formData, 'shipper_ref'),
       trailer: str(formData, 'trailer'),
-      trailer_plate: str(formData, 'trailer_plate').toUpperCase(),
+      /*
+       * Без пробелов — как номер машины во флоте: польский «GD 9E2E9» и
+       * немецкий «HH-AB 1234» пишут с пробелом, а база (orders_trailer_plate_format)
+       * его не принимает, и рейс падал с «проверьте поля» (прогон 21.10.2026).
+       */
+      trailer_plate: str(formData, 'trailer_plate').toUpperCase().replace(/\s+/g, ''),
       distance_km: String(distance),
       rate_cents: String(rateCents),
       comment: str(formData, 'comment'),
