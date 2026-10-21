@@ -497,7 +497,7 @@ export const lt = {
 
     ai7: 'Poilsio ir serviso vietų žemėlapis',
     ai7Text:
-      'Daugiau nei 3800 vietų devyniose šalyse nuo Suomijos iki Vokietijos: degalinės, stovėjimo aikštelės, dušai ir dirbtuvės. Programėlė rodo artimiausias ir sunkvežimiui stovint per pertrauką – nemokamos ir saugomos pažymėtos atskirai.',
+      'Daugiau nei 4800 vietų devyniose šalyse nuo Suomijos iki Vokietijos: degalinės, stovėjimo aikštelės, dušai ir dirbtuvės. Programėlė rodo artimiausias ir sunkvežimiui stovint per pertrauką – nemokamos ir saugomos pažymėtos atskirai.',
     ai8: 'Vairuotojas mato uždarbį',
     ai8Text:
       'Po darbo programėlė parodo, kiek jis atnešė ir kur dabar yra mėnesio suma. Skaičiai gaunami pagal vežėjo pasirinktą modelį arba kolektyvinės sutarties lenteles.',
@@ -1826,7 +1826,7 @@ export const lt = {
     locateHint: 'Leiskite nustatyti vietą, kad matytumėte artimiausias vietas ir atstumą iki jų.',
     noMap: 'Žemėlapis nepasiekiamas. Naudokite savo vietą, kad matytumėte artimiausias vietas.',
     source:
-      'Šiaurės šalių vietos surinktos 2026-09-22 iš tinklų svetainių, institucijų ir vairuotojų atsiliepimų; Baltijos šalių, Lenkijos ir Vokietijos vietos iš ES sunkvežimių stovėjimo aikštelių duomenų rinkinio (2026-10-21), paslaugos netikrintos. Kainos ir taisyklės gali keistis – svarbius dalykus patvirtinkite telefonu.',
+      'Šiaurės šalių vietos surinktos 2026-09-22 iš tinklų svetainių, institucijų ir vairuotojų atsiliepimų; Baltijos šalių, Lenkijos ir Vokietijos vietos bei dalis Suomijos ir Danijos vietų iš ES sunkvežimių stovėjimo aikštelių duomenų rinkinio (2026-10-21), paslaugos netikrintos. Kainos ir taisyklės gali keistis – svarbius dalykus patvirtinkite telefonu.',
     detail: {
       price: 'Kaina',
       security: 'Apsauga',

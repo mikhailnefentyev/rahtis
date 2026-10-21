@@ -497,7 +497,7 @@ export const de = {
 
     ai7: 'Eine Karte mit Rast- und Serviceplätzen',
     ai7Text:
-      'Über 3.800 Plätze in neun Ländern von Finnland bis Deutschland: Tankstellen, Parkplätze, Duschen und Werkstätten. Die App zeigt die nächstgelegenen auch, während der Lkw in der Pause steht — kostenlose und bewachte gesondert markiert.',
+      'Über 4.800 Plätze in neun Ländern von Finnland bis Deutschland: Tankstellen, Parkplätze, Duschen und Werkstätten. Die App zeigt die nächstgelegenen auch, während der Lkw in der Pause steht — kostenlose und bewachte gesondert markiert.',
     ai8: 'Der Fahrer sieht seinen Verdienst',
     ai8Text:
       'Nach einem Auftrag zeigt die App, was er eingebracht hat und wo der Monat gerade steht. Die Zahlen kommen aus dem vom Transportunternehmen gewählten Modell oder aus den Tariftabellen.',
@@ -1826,7 +1826,7 @@ export const de = {
     locateHint: 'Erlauben Sie den Standortzugriff, um die nächstgelegenen Plätze und ihre Entfernung zu sehen.',
     noMap: 'Die Karte ist nicht verfügbar. Nutzen Sie Ihren Standort, um die nächstgelegenen Plätze zu sehen.',
     source:
-      'Orte in Skandinavien am 22.09.2026 aus Websites der Ketten, Behörden und Fahrerbewertungen zusammengestellt; Orte im Baltikum, in Polen und Deutschland aus dem EU-Datensatz für Lkw-Parkplätze (21.10.2026), Ausstattung nicht geprüft. Preise und Regeln können sich ändern – Wichtiges telefonisch bestätigen.',
+      'Orte in Skandinavien am 22.09.2026 aus Websites der Ketten, Behörden und Fahrerbewertungen zusammengestellt; Orte im Baltikum, in Polen und Deutschland sowie ein Teil in Finnland und Dänemark aus dem EU-Datensatz für Lkw-Parkplätze (21.10.2026), Ausstattung nicht geprüft. Preise und Regeln können sich ändern – Wichtiges telefonisch bestätigen.',
     detail: {
       price: 'Preis',
       security: 'Sicherheit',

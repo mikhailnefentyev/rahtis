@@ -497,7 +497,7 @@ export const sv = {
 
     ai7: 'En karta över rast- och serviceplatser',
     ai7Text:
-      'Över 3 800 platser i nio länder från Finland till Tyskland: bränsle, parkering, duschar och verkstäder. Appen visar de närmaste även när bilen står på rast – gratis och bevakade markerade separat.',
+      'Över 4 800 platser i nio länder från Finland till Tyskland: bränsle, parkering, duschar och verkstäder. Appen visar de närmaste även när bilen står på rast – gratis och bevakade markerade separat.',
     ai8: 'Föraren ser intjäningen',
     ai8Text:
       'Efter ett uppdrag visar appen vad det blev och var månaden står just nu. Siffrorna kommer från den modell åkeriet valt eller från kollektivavtalets tabeller.',
@@ -1826,7 +1826,7 @@ export const sv = {
     locateHint: 'Tillåt positionering för att se de närmaste platserna och avståndet till dem.',
     noMap: 'Kartan är inte tillgänglig. Använd din position för att se de närmaste platserna.',
     source:
-      'Platser i Norden sammanställda 22 sep 2026 från kedjornas webbplatser, myndigheter och förarrecensioner; platser i Baltikum, Polen och Tyskland från EU:s dataset över lastbilsparkeringar (21 okt 2026), tjänster ej kontrollerade. Priser och regler kan ändras – bekräfta viktiga saker per telefon.',
+      'Platser i Norden sammanställda 22 sep 2026 från kedjornas webbplatser, myndigheter och förarrecensioner; platser i Baltikum, Polen och Tyskland samt en del i Finland och Danmark från EU:s dataset över lastbilsparkeringar (21 okt 2026), tjänster ej kontrollerade. Priser och regler kan ändras – bekräfta viktiga saker per telefon.',
     detail: {
       price: 'Pris',
       security: 'Säkerhet',

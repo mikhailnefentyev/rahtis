@@ -497,7 +497,7 @@ export const et = {
 
     ai7: 'Puhke- ja teeninduskohtade kaart',
     ai7Text:
-      'Üle 3800 koha üheksas riigis Soomest Saksamaani: kütus, parkimine, dušid ja töökojad. Rakendus näitab lähimaid ka siis, kui auto seisab puhkepausil — tasuta ja valvega kohad on eraldi märgitud.',
+      'Üle 4800 koha üheksas riigis Soomest Saksamaani: kütus, parkimine, dušid ja töökojad. Rakendus näitab lähimaid ka siis, kui auto seisab puhkepausil — tasuta ja valvega kohad on eraldi märgitud.',
     ai8: 'Juht näeb oma teenistust',
     ai8Text:
       'Pärast vedu näitab rakendus, kui palju see tegi ja kus kuu praegu seisab. Arvud tulevad vedaja valitud mudelist või kollektiivlepingu tabelitest.',
@@ -1826,7 +1826,7 @@ export const et = {
     locateHint: 'Luba asukoht, et näha lähimaid kohti ja nende kaugust.',
     noMap: 'Kaart pole saadaval. Kasuta oma asukohta, et näha lähimaid kohti.',
     source:
-      'Põhjamaade kohad on koondatud 22.09.2026 kettide veebilehtedelt, ametiasutustelt ja juhtide arvustustest; Baltikumi, Poola ja Saksamaa kohad ELi veokiparklate andmestikust (21.10.2026), teenuseid pole kontrollitud. Hinnad ja reeglid võivad muutuda – kinnita olulised asjad telefoni teel.',
+      'Põhjamaade kohad on koondatud 22.09.2026 kettide veebilehtedelt, ametiasutustelt ja juhtide arvustustest; Baltikumi, Poola ja Saksamaa kohad ning osa Soome ja Taani kohtadest ELi veokiparklate andmestikust (21.10.2026), teenuseid pole kontrollitud. Hinnad ja reeglid võivad muutuda – kinnita olulised asjad telefoni teel.',
     detail: {
       price: 'Hind',
       security: 'Turvalisus',

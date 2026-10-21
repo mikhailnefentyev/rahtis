@@ -25,7 +25,7 @@ const BODY = `# RAHTIS
 - Own trips and own customers: add a job yourself and give it to your own vehicle, or let your customer send orders straight to your vehicle; the customer can get a tracking link. The whole price is the carrier's, no percentage.
 - Driver app (PWA) in 10 languages: stops in order, navigation, arrival and completion marks, load and damage photos, signature, consignment note scanned to PDF; works offline in ports.
 - Working time and an indicative wage from the carrier's own rates or the collective agreement tables; shifts.
-- Map of over 3,800 rest, wash, fuel and service places for truck drivers in nine countries: Finland, Sweden, Norway, Denmark, Estonia, Latvia, Lithuania, Poland and Germany.
+- Map of over 4,800 rest, wash, fuel and service places for truck drivers in nine countries: Finland, Sweden, Norway, Denmark, Estonia, Latvia, Lithuania, Poland and Germany.
 - Weekly report of jobs, earnings and documents; claims handled per trip.
 
 ## Freight exchange (offer table)

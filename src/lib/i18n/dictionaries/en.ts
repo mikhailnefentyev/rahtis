@@ -553,7 +553,7 @@ export const en = {
 
     ai7: 'A map of rest and service places',
     ai7Text:
-      'Over 3,800 places in nine countries from Finland to Germany: fuel, parking, showers and workshops. The app shows the nearest ones also while the truck stands on a break — free and guarded marked separately.',
+      'Over 4,800 places in nine countries from Finland to Germany: fuel, parking, showers and workshops. The app shows the nearest ones also while the truck stands on a break — free and guarded marked separately.',
     ai8: 'The driver sees the earnings',
     ai8Text:
       'After a job the app shows what it came to and where the month now stands. The figures come from the model the carrier chose or from the collective agreement tables.',
@@ -1975,7 +1975,7 @@ export const en = {
     locateHint: 'Allow location to see the nearest places and their distance.',
     noMap: 'The map is not available. Use your location to see the nearest places.',
     source:
-      'Nordic places compiled on 22 Sep 2026 from chain websites, authorities and driver reviews; Baltic, Polish and German places from the EU truck parking dataset (21 Oct 2026), facilities not verified. Prices and rules may change – confirm important things by phone.',
+      'Nordic places compiled on 22 Sep 2026 from chain websites, authorities and driver reviews; Baltic, Polish and German places and some Finnish and Danish ones from the EU truck parking dataset (21 Oct 2026), facilities not verified. Prices and rules may change – confirm important things by phone.',
     detail: {
       price: 'Price',
       security: 'Security',

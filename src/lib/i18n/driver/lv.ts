@@ -187,7 +187,7 @@ export const lv = {
     locateHint: 'Atļauj atrašanās vietu, un redzēsi tuvākās vietas ar attālumu.',
     noMap: 'Karte nav pieejama. Tuvākās vietas var redzēt pēc atrašanās vietas.',
     source:
-      'Ziemeļvalstu vietas apkopotas 2026. gada 22. septembrī no tīklu vietnēm, iestādēm un vadītāju atsauksmēm; Baltijas, Polijas un Vācijas vietas no ES kravas auto stāvvietu datu kopas (21.10.2026), pakalpojumi nav pārbaudīti. Cenas un noteikumi var mainīties – svarīgo apstipriniet pa tālruni.',
+      'Ziemeļvalstu vietas apkopotas 2026. gada 22. septembrī no tīklu vietnēm, iestādēm un vadītāju atsauksmēm; Baltijas, Polijas un Vācijas vietas, kā arī daļa Somijas un Dānijas vietu no ES kravas auto stāvvietu datu kopas (21.10.2026), pakalpojumi nav pārbaudīti. Cenas un noteikumi var mainīties – svarīgo apstipriniet pa tālruni.',
     detail: {
       price: 'Cena',
       security: 'Apsardze',

@@ -497,7 +497,7 @@ export const pl = {
 
     ai7: 'Mapa miejsc odpoczynku i serwisów',
     ai7Text:
-      'Ponad 3800 miejsc w dziewięciu krajach od Finlandii po Niemcy: paliwo, parkingi, prysznice i warsztaty. Aplikacja pokazuje najbliższe także podczas postoju na przerwę — bezpłatne i strzeżone oznaczone osobno.',
+      'Ponad 4800 miejsc w dziewięciu krajach od Finlandii po Niemcy: paliwo, parkingi, prysznice i warsztaty. Aplikacja pokazuje najbliższe także podczas postoju na przerwę — bezpłatne i strzeżone oznaczone osobno.',
     ai8: 'Kierowca widzi zarobki',
     ai8Text:
       'Po przewozie aplikacja pokazuje, ile wyszło i jak wygląda bieżący miesiąc. Liczby pochodzą z modelu wybranego przez przewoźnika lub z tabel układu zbiorowego.',
@@ -1825,7 +1825,7 @@ export const pl = {
     locateHint: 'Zezwól na lokalizację, aby zobaczyć najbliższe miejsca i odległość do nich.',
     noMap: 'Mapa jest niedostępna. Użyj swojej lokalizacji, aby zobaczyć najbliższe miejsca.',
     source:
-      'Miejsca w krajach nordyckich zestawione 22.09.2026 na podstawie stron sieci, urzędów i opinii kierowców; miejsca w krajach bałtyckich, Polsce i Niemczech z unijnego zbioru parkingów dla ciężarówek (21.10.2026), usługi niesprawdzone. Ceny i zasady mogą się zmienić – ważne rzeczy potwierdź telefonicznie.',
+      'Miejsca w krajach nordyckich zestawione 22.09.2026 na podstawie stron sieci, urzędów i opinii kierowców; miejsca w krajach bałtyckich, Polsce i Niemczech oraz część miejsc w Finlandii i Danii z unijnego zbioru parkingów dla ciężarówek (21.10.2026), usługi niesprawdzone. Ceny i zasady mogą się zmienić – ważne rzeczy potwierdź telefonicznie.',
     detail: {
       price: 'Cena',
       security: 'Bezpieczeństwo',

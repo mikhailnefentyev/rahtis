@@ -497,7 +497,7 @@ export const lv = {
 
     ai7: 'Atpūtas un servisa vietu karte',
     ai7Text:
-      'Vairāk nekā 3800 vietas deviņās valstīs no Somijas līdz Vācijai: degviela, stāvvietas, dušas un darbnīcas. Lietotne rāda tuvākās arī tad, kad mašīna stāv pārtraukumā — bezmaksas un apsargātās atzīmētas atsevišķi.',
+      'Vairāk nekā 4800 vietas deviņās valstīs no Somijas līdz Vācijai: degviela, stāvvietas, dušas un darbnīcas. Lietotne rāda tuvākās arī tad, kad mašīna stāv pārtraukumā — bezmaksas un apsargātās atzīmētas atsevišķi.',
     ai8: 'Vadītājs redz ienākumus',
     ai8Text:
       'Pēc reisa lietotne parāda, cik tas sanāca un kāds ir mēneša kopsavilkums. Skaitļi nāk no pārvadātāja izvēlētā modeļa vai no darba koplīguma tabulām.',
@@ -1826,7 +1826,7 @@ export const lv = {
     locateHint: 'Atļaujiet atrašanās vietu, lai redzētu tuvākās vietas un attālumu līdz tām.',
     noMap: 'Karte nav pieejama. Izmantojiet savu atrašanās vietu, lai redzētu tuvākās vietas.',
     source:
-      'Ziemeļvalstu vietas apkopotas 2026. gada 22. septembrī no tīklu vietnēm, iestādēm un vadītāju atsauksmēm; Baltijas, Polijas un Vācijas vietas no ES kravas auto stāvvietu datu kopas (21.10.2026), pakalpojumi nav pārbaudīti. Cenas un noteikumi var mainīties – svarīgo apstipriniet pa tālruni.',
+      'Ziemeļvalstu vietas apkopotas 2026. gada 22. septembrī no tīklu vietnēm, iestādēm un vadītāju atsauksmēm; Baltijas, Polijas un Vācijas vietas, kā arī daļa Somijas un Dānijas vietu no ES kravas auto stāvvietu datu kopas (21.10.2026), pakalpojumi nav pārbaudīti. Cenas un noteikumi var mainīties – svarīgo apstipriniet pa tālruni.',
     detail: {
       price: 'Cena',
       security: 'Drošība',

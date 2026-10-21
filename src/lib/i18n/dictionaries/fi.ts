@@ -607,7 +607,7 @@ export const fi = {
      */
     ai7: 'Kartta tauko- ja huoltopaikoista',
     ai7Text:
-      'Yli 3 800 paikkaa yhdeksässä maassa Suomesta Saksaan: tankkaus, pysäköinti, suihku ja korjaamo. Sovellus näyttää lähimmät myös silloin, kun auto seisoo tauolla — maksuttomat ja vartioidut erikseen merkittynä.',
+      'Yli 4 800 paikkaa yhdeksässä maassa Suomesta Saksaan: tankkaus, pysäköinti, suihku ja korjaamo. Sovellus näyttää lähimmät myös silloin, kun auto seisoo tauolla — maksuttomat ja vartioidut erikseen merkittynä.',
     ai8: 'Kuljettaja näkee ansionsa',
     ai8Text:
       'Keikan jälkeen sovellus näyttää, paljonko siitä kertyi ja mihin kuukauden summa on noussut. Laskenta tulee kuljetusliikkeen valitsemasta mallista tai työehtosopimuksen taulukoista.',
@@ -2088,7 +2088,7 @@ export const fi = {
     locateHint: 'Salli sijainti, niin näet lähimmät paikat etäisyyksineen.',
     noMap: 'Kartta ei ole käytettävissä. Lähimmät paikat näet sijainnin avulla.',
     source:
-      'Pohjoismaiden paikat on koottu 22.9.2026 ketjujen sivuilta, viranomaisilta ja kuljettajien arvioista; Baltian, Puolan ja Saksan paikat EU:n rekkapysäköintiaineistosta (21.10.2026), palveluja ei ole tarkistettu. Hinnat ja käytännöt voivat muuttua – varmista tärkeät asiat puhelimella.',
+      'Pohjoismaiden paikat on koottu 22.9.2026 ketjujen sivuilta, viranomaisilta ja kuljettajien arvioista; Baltian, Puolan ja Saksan paikat sekä osa Suomen ja Tanskan paikoista EU:n rekkapysäköintiaineistosta (21.10.2026), palveluja ei ole tarkistettu. Hinnat ja käytännöt voivat muuttua – varmista tärkeät asiat puhelimella.',
     detail: {
       price: 'Hinta',
       security: 'Turvallisuus',

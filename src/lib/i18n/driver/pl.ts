@@ -187,7 +187,7 @@ export const pl = {
     locateHint: 'Zezwól na lokalizację, a zobaczysz najbliższe miejsca wraz z odległością.',
     noMap: 'Mapa jest niedostępna. Najbliższe miejsca zobaczysz dzięki lokalizacji.',
     source:
-      'Miejsca w krajach nordyckich zestawione 22.09.2026 na podstawie stron sieci, urzędów i opinii kierowców; miejsca w krajach bałtyckich, Polsce i Niemczech z unijnego zbioru parkingów dla ciężarówek (21.10.2026), usługi niesprawdzone. Ceny i zasady mogą się zmienić – ważne rzeczy potwierdź telefonicznie.',
+      'Miejsca w krajach nordyckich zestawione 22.09.2026 na podstawie stron sieci, urzędów i opinii kierowców; miejsca w krajach bałtyckich, Polsce i Niemczech oraz część miejsc w Finlandii i Danii z unijnego zbioru parkingów dla ciężarówek (21.10.2026), usługi niesprawdzone. Ceny i zasady mogą się zmienić – ważne rzeczy potwierdź telefonicznie.',
     detail: {
       price: 'Cena',
       security: 'Ochrona',
