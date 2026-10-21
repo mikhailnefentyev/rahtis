@@ -5,9 +5,10 @@ import { useActionState, useEffect, useState } from 'react';
 import { AddressInput } from '@/components/domain/AddressInput';
 import { Button, Card, CardBody, Field, Input, InputMono, Select } from '@/components/ui';
 import { saveVehicleAction, type VehicleState } from '@/lib/fleet/actions';
-import { useI18n } from '@/lib/i18n/provider';
+import { useCompanyCountry, useI18n } from '@/lib/i18n/provider';
 import type { Driver, Vehicle, VehicleClass } from '@/types/db';
 import { useKeepOnError } from '@/lib/forms/keepOnError';
+import { countryPack } from '@/lib/country';
 
 const initial: VehicleState = { error: null, done: false };
 
@@ -43,6 +44,8 @@ export function VehicleForm({
   onClose: () => void;
 }) {
   const { t, m, locale } = useI18n();
+  /* Примеры в полях — страны перевозчика: «GD 12345» и «Gdynia» польскому, а не «HKO-441» и «Helsinki». */
+  const sample = countryPack(useCompanyCountry()).sample;
   const [state, formAction, pending] = useActionState(saveVehicleAction, initial);
   const keepFormAction = useKeepOnError(state);
 
@@ -101,7 +104,7 @@ export function VehicleForm({
                 name="plate"
                 required
                 defaultValue={vehicle?.plate ?? ''}
-                placeholder="HKO-441"
+                placeholder={sample.plate}
                 className="uppercase"
               />
             )}
@@ -360,7 +363,7 @@ export function VehicleForm({
                       }
                     : null
                 }
-                placeholder="Helsinki"
+                placeholder={sample.city}
               />
             )}
           </Field>

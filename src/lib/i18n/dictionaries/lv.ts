@@ -1798,6 +1798,12 @@ export const lv = {
     detach: 'Izrakstīt no telefona',
   },
 
+  mapHelp: {
+    windows: 'Lai tuvinātu karti, turiet Ctrl un ritiniet',
+    mac: 'Lai tuvinātu karti, turiet ⌘ un ritiniet',
+    mobile: 'Lai pārvietotu karti, izmantojiet divus pirkstus',
+  },
+
   places: {
     kind: {
       FUEL: 'Degviela',
@@ -1820,7 +1826,7 @@ export const lv = {
     locateHint: 'Atļaujiet atrašanās vietu, lai redzētu tuvākās vietas un attālumu līdz tām.',
     noMap: 'Karte nav pieejama. Izmantojiet savu atrašanās vietu, lai redzētu tuvākās vietas.',
     source:
-      'Apkopots 2026. gada 22. septembrī no tīklu vietnēm, iestādēm un vadītāju atsauksmēm. Cenas un noteikumi var mainīties – svarīgo pārbaudiet pa telefonu.',
+      'Ziemeļvalstu vietas apkopotas 2026. gada 22. septembrī no tīklu vietnēm, iestādēm un vadītāju atsauksmēm; Baltijas, Polijas un Vācijas vietas no ES kravas auto stāvvietu datu kopas (21.10.2026), pakalpojumi nav pārbaudīti. Cenas un noteikumi var mainīties – svarīgo apstipriniet pa tālruni.',
     detail: {
       price: 'Cena',
       security: 'Drošība',

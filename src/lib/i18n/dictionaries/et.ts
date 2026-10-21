@@ -1798,6 +1798,12 @@ export const et = {
     detach: 'Logi telefonist välja',
   },
 
+  mapHelp: {
+    windows: 'Kaardi suumimiseks hoia all Ctrl ja keri',
+    mac: 'Kaardi suumimiseks hoia all ⌘ ja keri',
+    mobile: 'Kaardi liigutamiseks kasuta kahte sõrme',
+  },
+
   places: {
     kind: {
       FUEL: 'Kütus',
@@ -1820,7 +1826,7 @@ export const et = {
     locateHint: 'Luba asukoht, et näha lähimaid kohti ja nende kaugust.',
     noMap: 'Kaart pole saadaval. Kasuta oma asukohta, et näha lähimaid kohti.',
     source:
-      'Koostatud 22.09.2026 kettide veebilehtede, ametiasutuste ja juhtide arvustuste põhjal. Hinnad ja reeglid võivad muutuda – kontrolli olulist telefoni teel.',
+      'Põhjamaade kohad on koondatud 22.09.2026 kettide veebilehtedelt, ametiasutustelt ja juhtide arvustustest; Baltikumi, Poola ja Saksamaa kohad ELi veokiparklate andmestikust (21.10.2026), teenuseid pole kontrollitud. Hinnad ja reeglid võivad muutuda – kinnita olulised asjad telefoni teel.',
     detail: {
       price: 'Hind',
       security: 'Turvalisus',

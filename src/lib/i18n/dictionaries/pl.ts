@@ -1797,6 +1797,12 @@ export const pl = {
     detach: 'Wyloguj z telefonu',
   },
 
+  mapHelp: {
+    windows: 'Aby powiększyć mapę, przytrzymaj Ctrl i przewiń',
+    mac: 'Aby powiększyć mapę, przytrzymaj ⌘ i przewiń',
+    mobile: 'Przesuwaj mapę dwoma palcami',
+  },
+
   places: {
     kind: {
       FUEL: 'Paliwo',
@@ -1819,7 +1825,7 @@ export const pl = {
     locateHint: 'Zezwól na lokalizację, aby zobaczyć najbliższe miejsca i odległość do nich.',
     noMap: 'Mapa jest niedostępna. Użyj swojej lokalizacji, aby zobaczyć najbliższe miejsca.',
     source:
-      'Zestawione 22.09.2026 na podstawie stron sieci, urzędów i opinii kierowców. Ceny i zasady mogą się zmienić – ważne rzeczy potwierdź telefonicznie.',
+      'Miejsca w krajach nordyckich zestawione 22.09.2026 na podstawie stron sieci, urzędów i opinii kierowców; miejsca w krajach bałtyckich, Polsce i Niemczech z unijnego zbioru parkingów dla ciężarówek (21.10.2026), usługi niesprawdzone. Ceny i zasady mogą się zmienić – ważne rzeczy potwierdź telefonicznie.',
     detail: {
       price: 'Cena',
       security: 'Bezpieczeństwo',

@@ -1798,6 +1798,12 @@ export const lt = {
     detach: 'Atjungti nuo telefono',
   },
 
+  mapHelp: {
+    windows: 'Norėdami keisti mastelį, laikykite Ctrl ir slinkite',
+    mac: 'Norėdami keisti mastelį, laikykite ⌘ ir slinkite',
+    mobile: 'Žemėlapį stumdykite dviem pirštais',
+  },
+
   places: {
     kind: {
       FUEL: 'Degalai',
@@ -1820,7 +1826,7 @@ export const lt = {
     locateHint: 'Leiskite nustatyti vietą, kad matytumėte artimiausias vietas ir atstumą iki jų.',
     noMap: 'Žemėlapis nepasiekiamas. Naudokite savo vietą, kad matytumėte artimiausias vietas.',
     source:
-      'Sudaryta 2026-09-22 pagal tinklų svetaines, institucijas ir vairuotojų atsiliepimus. Kainos ir taisyklės gali keistis – svarbius dalykus patikslinkite telefonu.',
+      'Šiaurės šalių vietos surinktos 2026-09-22 iš tinklų svetainių, institucijų ir vairuotojų atsiliepimų; Baltijos šalių, Lenkijos ir Vokietijos vietos iš ES sunkvežimių stovėjimo aikštelių duomenų rinkinio (2026-10-21), paslaugos netikrintos. Kainos ir taisyklės gali keistis – svarbius dalykus patvirtinkite telefonu.',
     detail: {
       price: 'Kaina',
       security: 'Apsauga',

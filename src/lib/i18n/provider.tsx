@@ -7,6 +7,7 @@ import type { Dictionary } from './dictionaries';
 
 const I18nContext = createContext<I18n | null>(null);
 const ZoneContext = createContext<string | null>(null);
+const CountryContext = createContext<string | null>(null);
 
 /**
  * Часовой пояс компании зрителя для клиентских компонентов кабинета.
@@ -16,8 +17,26 @@ const ZoneContext = createContext<string | null>(null);
  * каждой публичной странице. Пояс ставят раскладки кабинетов — они и так
  * знают зрителя.
  */
-export function TimeZoneProvider({ zone, children }: { zone: string; children: React.ReactNode }) {
-  return <ZoneContext.Provider value={zone}>{children}</ZoneContext.Provider>;
+export function TimeZoneProvider({
+  zone,
+  country = null,
+  children,
+}: {
+  zone: string;
+  /** Страна компании зрителя — для примеров в формах и значений по умолчанию. */
+  country?: string | null;
+  children: React.ReactNode;
+}) {
+  return (
+    <ZoneContext.Provider value={zone}>
+      <CountryContext.Provider value={country}>{children}</CountryContext.Provider>
+    </ZoneContext.Provider>
+  );
+}
+
+/** Страна компании зрителя в кабинете; вне кабинета — null. */
+export function useCompanyCountry(): string | null {
+  return useContext(CountryContext);
 }
 
 /**

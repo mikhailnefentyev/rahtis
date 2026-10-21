@@ -61,6 +61,14 @@ export type CountryPack = {
   enabled: boolean;
   /** Страна названа на витрине как зона работы (лендинг, разметка). С 21.10.2026 — все страны пакетов: интерфейс есть на их языках. */
   marketed: boolean;
+  /** Язык приложения водителя по умолчанию для перевозчика из этой страны (код из DRIVER_LOCALES, заглавными). */
+  driverLanguage: string;
+  /**
+   * Примеры в подсказках форм: номер машины, город, адрес, место, имя.
+   * Польский диспетчер видел «HKO-441», «Helsinki» и «Antti Nieminen» —
+   * пример должен выглядеть как то, что он сам впишет (прогон 21.10.2026).
+   */
+  sample: { plate: string; city: string; address: string; place: string; person: string; email: string };
 };
 
 const digits = (s: string) => s.replace(/\D/g, '');
@@ -159,6 +167,8 @@ export const COUNTRY_PACKS: Record<CountryCode, CountryPack> = {
     postcode: /\b\d{5}\b/,
     enabled: true,
     marketed: true,
+    driverLanguage: 'FI',
+    sample: { plate: 'HKO-441', city: 'Helsinki', address: 'Satamakatu 1, 10900 Hanko', place: 'Hanko Port, Terminal 2', person: 'Antti Nieminen', email: 'antti@esimerkki.fi' },
   },
   SE: {
     code: 'SE',
@@ -182,6 +192,8 @@ export const COUNTRY_PACKS: Record<CountryCode, CountryPack> = {
     postcode: /\b\d{3}\s?\d{2}\b/,
     enabled: true,
     marketed: true,
+    driverLanguage: 'SV',
+    sample: { plate: 'ABC 123', city: 'Göteborg', address: 'Skandiahamnen, 418 34 Göteborg', place: 'Göteborgs hamn, Skandiaterminalen', person: 'Erik Lindqvist', email: 'erik@exempel.se' },
   },
   NO: {
     code: 'NO',
@@ -203,6 +215,8 @@ export const COUNTRY_PACKS: Record<CountryCode, CountryPack> = {
     postcode: /\b\d{4}\b/,
     enabled: true,
     marketed: true,
+    driverLanguage: 'NO',
+    sample: { plate: 'EL 12345', city: 'Oslo', address: 'Sydhavna, 0194 Oslo', place: 'Oslo havn, Sydhavna', person: 'Ola Nordmann', email: 'ola@eksempel.no' },
   },
   DK: {
     code: 'DK',
@@ -223,6 +237,8 @@ export const COUNTRY_PACKS: Record<CountryCode, CountryPack> = {
     postcode: /\b\d{4}\b/,
     enabled: true,
     marketed: true,
+    driverLanguage: 'DA',
+    sample: { plate: 'AB 12 345', city: 'Aarhus', address: 'Hveensvej 1, 8000 Aarhus', place: 'Aarhus Havn, Containerterminal', person: 'Lars Jensen', email: 'lars@eksempel.dk' },
   },
   EE: {
     code: 'EE',
@@ -244,6 +260,8 @@ export const COUNTRY_PACKS: Record<CountryCode, CountryPack> = {
     postcode: /\b\d{5}\b/,
     enabled: true,
     marketed: true,
+    driverLanguage: 'ET',
+    sample: { plate: '123 ABC', city: 'Tallinn', address: 'Lootsi 13, 10151 Tallinn', place: 'Tallinna Vanasadam, D-terminal', person: 'Jaan Tamm', email: 'jaan@naide.ee' },
   },
   LV: {
     code: 'LV',
@@ -265,6 +283,8 @@ export const COUNTRY_PACKS: Record<CountryCode, CountryPack> = {
     postcode: /\bLV-?\d{4}\b/i,
     enabled: true,
     marketed: true,
+    driverLanguage: 'LV',
+    sample: { plate: 'AB-1234', city: 'Rīga', address: 'Eksporta iela 3A, LV-1010 Rīga', place: 'Rīgas prāmju terminālis', person: 'Jānis Bērziņš', email: 'janis@piemers.lv' },
   },
   LT: {
     code: 'LT',
@@ -286,6 +306,8 @@ export const COUNTRY_PACKS: Record<CountryCode, CountryPack> = {
     postcode: /\bLT-?\d{5}\b/i,
     enabled: true,
     marketed: true,
+    driverLanguage: 'LT',
+    sample: { plate: 'ABC 123', city: 'Klaipėda', address: 'Perkėlos g. 10, 93264 Klaipėda', place: 'Klaipėda, Centrinis terminalas', person: 'Jonas Kazlauskas', email: 'jonas@pavyzdys.lt' },
   },
   PL: {
     code: 'PL',
@@ -306,6 +328,8 @@ export const COUNTRY_PACKS: Record<CountryCode, CountryPack> = {
     postcode: /\b\d{2}-\d{3}\b/,
     enabled: true,
     marketed: true,
+    driverLanguage: 'PL',
+    sample: { plate: 'GD 12345', city: 'Gdynia', address: 'ul. Kwiatkowskiego 60, 81-127 Gdynia', place: 'Gdynia, Terminal Promowy', person: 'Jan Kowalski', email: 'jan@przyklad.pl' },
   },
   DE: {
     code: 'DE',
@@ -332,6 +356,8 @@ export const COUNTRY_PACKS: Record<CountryCode, CountryPack> = {
     postcode: /\b\d{5}\b/,
     enabled: true,
     marketed: true,
+    driverLanguage: 'DE',
+    sample: { plate: 'HH-AB 1234', city: 'Hamburg', address: 'Waltershofer Damm, 21129 Hamburg', place: 'Hamburg, Burchardkai', person: 'Max Mustermann', email: 'max@beispiel.de' },
   },
 };
 

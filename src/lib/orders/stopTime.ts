@@ -51,3 +51,13 @@ export function scheduledZone(date: string, time: string | null | undefined, cou
   const tz = stopTimeZone(country);
   return stopZone(`${date}T${(time ?? '12:00').slice(0, 5)}:00Z`, tz, viewerZone);
 }
+
+/**
+ * Адрес точки с городом — без повтора. Подсказка адреса уже содержит
+ * город («Waltershofer Damm, 21129 Hamburg»), и приписка «, Hamburg»
+ * давала «Hamburg, Hamburg» в приложении водителя (прогон 21.10.2026).
+ */
+export function addressWithCity(address: string, city: string | null | undefined): string {
+  if (!city) return address;
+  return address.toLowerCase().includes(city.toLowerCase()) ? address : `${address}, ${city}`;
+}

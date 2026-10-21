@@ -508,7 +508,7 @@ export const PLACES: CuratedPlace[] = [
     city: 'Nynäshamn',
     country: 'SE',
     position: { lat: 58.900994, lon: 17.953058 },
-    terms: ['нюнесхамн', 'nynashamn', 'hamn', 'порт', 'port', 'gdansk', 'ventspils', 'stena', 'polferries'],
+    terms: ['нюнесхамн', 'nynashamn', 'hamn', 'порт', 'port', 'gdansk', 'ventspils', 'stena', 'polferries', 'terminal', 'terminaali', 'satama', 'ferry', 'prom'],
   },
   {
     id: 'karlshamn-stilleryd',
@@ -517,7 +517,7 @@ export const PLACES: CuratedPlace[] = [
     city: 'Karlshamn',
     country: 'SE',
     position: { lat: 56.173149, lon: 14.819885 },
-    terms: ['карлсхамн', 'karlshamn', 'stilleryd', 'dfds', 'klaipeda', 'hamn', 'порт', 'port'],
+    terms: ['карлсхамн', 'karlshamn', 'stilleryd', 'dfds', 'klaipeda', 'hamn', 'порт', 'port', 'terminal', 'terminaali', 'satama', 'ferry', 'prom'],
   },
   {
     id: 'ystad-port',
@@ -526,7 +526,7 @@ export const PLACES: CuratedPlace[] = [
     city: 'Ystad',
     country: 'SE',
     position: { lat: 55.428802, lon: 13.821164 },
-    terms: ['истад', 'ystad', 'hamn', 'порт', 'port', 'swinoujscie', 'unity', 'polferries', 'ttline'],
+    terms: ['истад', 'ystad', 'hamn', 'порт', 'port', 'swinoujscie', 'unity', 'polferries', 'ttline', 'terminal', 'terminaali', 'satama', 'ferry', 'prom'],
   },
   {
     id: 'tallinn-muuga',
@@ -535,7 +535,7 @@ export const PLACES: CuratedPlace[] = [
     city: 'Maardu',
     country: 'EE',
     position: { lat: 59.493126, lon: 24.947656 },
-    terms: ['мууга', 'muuga', 'таллин', 'tallinn', 'maardu', 'sadam', 'порт', 'port', 'vuosaari'],
+    terms: ['мууга', 'muuga', 'таллин', 'tallinn', 'maardu', 'sadam', 'порт', 'port', 'vuosaari', 'terminal', 'terminaali', 'satama', 'ferry', 'prom'],
   },
   {
     id: 'tallinn-vanasadam',
@@ -544,7 +544,7 @@ export const PLACES: CuratedPlace[] = [
     city: 'Tallinn',
     country: 'EE',
     position: { lat: 59.44469, lon: 24.76993 },
-    terms: ['таллин', 'tallinn', 'vanasadam', 'lootsi', 'tallink', 'eckero', 'viking', 'sadam', 'порт', 'port'],
+    terms: ['таллин', 'tallinn', 'vanasadam', 'lootsi', 'tallink', 'eckero', 'viking', 'sadam', 'порт', 'port', 'terminal', 'terminaali', 'satama', 'ferry', 'prom'],
   },
   {
     id: 'paldiski-lounasadam',
@@ -553,7 +553,7 @@ export const PLACES: CuratedPlace[] = [
     city: 'Paldiski',
     country: 'EE',
     position: { lat: 59.335083, lon: 24.07829 },
-    terms: ['палдиски', 'paldiski', 'lounasadam', 'sadam', 'порт', 'port', 'kapellskar', 'dfds'],
+    terms: ['палдиски', 'paldiski', 'lounasadam', 'sadam', 'порт', 'port', 'kapellskar', 'dfds', 'terminal', 'terminaali', 'satama', 'ferry', 'prom'],
   },
   {
     id: 'riga-ferry',
@@ -562,7 +562,7 @@ export const PLACES: CuratedPlace[] = [
     city: 'Rīga',
     country: 'LV',
     position: { lat: 56.959292, lon: 24.094579 },
-    terms: ['рига', 'riga', 'eksporta', 'tallink', 'stena', 'osta', 'порт', 'port'],
+    terms: ['рига', 'riga', 'eksporta', 'tallink', 'stena', 'osta', 'порт', 'port', 'terminal', 'terminaali', 'satama', 'ferry', 'prom'],
   },
   {
     id: 'ventspils-ferry',
@@ -571,7 +571,7 @@ export const PLACES: CuratedPlace[] = [
     city: 'Ventspils',
     country: 'LV',
     position: { lat: 57.398982, lon: 21.571278 },
-    terms: ['вентспилс', 'ventspils', 'stena', 'nynashamn', 'travemunde', 'osta', 'порт', 'port'],
+    terms: ['вентспилс', 'ventspils', 'stena', 'nynashamn', 'travemunde', 'osta', 'порт', 'port', 'terminal', 'terminaali', 'satama', 'ferry', 'prom'],
   },
   {
     id: 'liepaja-port',
@@ -580,7 +580,7 @@ export const PLACES: CuratedPlace[] = [
     city: 'Liepāja',
     country: 'LV',
     position: { lat: 56.52925, lon: 20.998345 },
-    terms: ['лиепая', 'liepaja', 'stena', 'travemunde', 'osta', 'порт', 'port'],
+    terms: ['лиепая', 'liepaja', 'stena', 'travemunde', 'osta', 'порт', 'port', 'terminal', 'terminaali', 'satama', 'ferry', 'prom'],
   },
   {
     id: 'klaipeda-dfds',
@@ -589,7 +589,7 @@ export const PLACES: CuratedPlace[] = [
     city: 'Klaipėda',
     country: 'LT',
     position: { lat: 55.660757, lon: 21.146495 },
-    terms: ['клайпеда', 'klaipeda', 'perkelos', 'dfds', 'kiel', 'karlshamn', 'uostas', 'порт', 'port'],
+    terms: ['клайпеда', 'klaipeda', 'perkelos', 'dfds', 'kiel', 'karlshamn', 'uostas', 'порт', 'port', 'terminal', 'terminaali', 'satama', 'ferry', 'prom'],
   },
   {
     id: 'gdynia-ferry',
@@ -598,7 +598,7 @@ export const PLACES: CuratedPlace[] = [
     city: 'Gdynia',
     country: 'PL',
     position: { lat: 54.546737, lon: 18.502472 },
-    terms: ['гдыня', 'gdynia', 'kwiatkowskiego', 'stena', 'karlskrona', 'promowy', 'port', 'порт'],
+    terms: ['гдыня', 'gdynia', 'kwiatkowskiego', 'stena', 'karlskrona', 'promowy', 'port', 'порт', 'terminal', 'terminaali', 'satama', 'ferry', 'prom'],
   },
   {
     id: 'gdansk-westerplatte',
@@ -607,7 +607,7 @@ export const PLACES: CuratedPlace[] = [
     city: 'Gdańsk',
     country: 'PL',
     position: { lat: 54.40357, lon: 18.681103 },
-    terms: ['гданьск', 'gdansk', 'westerplatte', 'polferries', 'nynashamn', 'promowy', 'port', 'порт'],
+    terms: ['гданьск', 'gdansk', 'westerplatte', 'polferries', 'nynashamn', 'promowy', 'port', 'порт', 'terminal', 'terminaali', 'satama', 'ferry', 'prom'],
   },
   {
     id: 'swinoujscie-ferry',
@@ -616,7 +616,7 @@ export const PLACES: CuratedPlace[] = [
     city: 'Świnoujście',
     country: 'PL',
     position: { lat: 53.90097, lon: 14.257956 },
-    terms: ['свиноуйсце', 'swinoujscie', 'unity', 'polferries', 'ttline', 'ystad', 'trelleborg', 'promowy', 'port', 'порт'],
+    terms: ['свиноуйсце', 'swinoujscie', 'unity', 'polferries', 'ttline', 'ystad', 'trelleborg', 'promowy', 'port', 'порт', 'terminal', 'terminaali', 'satama', 'ferry', 'prom'],
   },
   {
     id: 'travemunde-skandinavienkai',
@@ -625,7 +625,7 @@ export const PLACES: CuratedPlace[] = [
     city: 'Lübeck',
     country: 'DE',
     position: { lat: 53.941732, lon: 10.856759 },
-    terms: ['травемюнде', 'любек', 'travemunde', 'lubeck', 'luebeck', 'skandinavienkai', 'finnlines', 'ttline', 'hafen', 'порт', 'port'],
+    terms: ['травемюнде', 'любек', 'travemunde', 'lubeck', 'luebeck', 'skandinavienkai', 'finnlines', 'ttline', 'hafen', 'порт', 'port', 'terminal', 'terminaali', 'satama', 'ferry', 'prom'],
   },
   {
     id: 'rostock-faehrterminal',
@@ -634,7 +634,7 @@ export const PLACES: CuratedPlace[] = [
     city: 'Rostock',
     country: 'DE',
     position: { lat: 54.146869, lon: 12.099999 },
-    terms: ['росток', 'rostock', 'uberseehafen', 'ueberseehafen', 'ttline', 'stena', 'scandlines', 'hafen', 'порт', 'port'],
+    terms: ['росток', 'rostock', 'uberseehafen', 'ueberseehafen', 'ttline', 'stena', 'scandlines', 'hafen', 'порт', 'port', 'terminal', 'terminaali', 'satama', 'ferry', 'prom'],
   },
   {
     id: 'kiel-ostuferhafen',
@@ -643,7 +643,7 @@ export const PLACES: CuratedPlace[] = [
     city: 'Kiel',
     country: 'DE',
     position: { lat: 54.331696, lon: 10.173986 },
-    terms: ['киль', 'kiel', 'ostuferhafen', 'dfds', 'klaipeda', 'hafen', 'порт', 'port'],
+    terms: ['киль', 'kiel', 'ostuferhafen', 'dfds', 'klaipeda', 'hafen', 'порт', 'port', 'terminal', 'terminaali', 'satama', 'ferry', 'prom'],
   },
   {
     id: 'kiel-norwegenkai',
@@ -652,7 +652,7 @@ export const PLACES: CuratedPlace[] = [
     city: 'Kiel',
     country: 'DE',
     position: { lat: 54.31627, lon: 10.143546 },
-    terms: ['киль', 'kiel', 'norwegenkai', 'colorline', 'color', 'oslo', 'hafen', 'порт', 'port'],
+    terms: ['киль', 'kiel', 'norwegenkai', 'colorline', 'color', 'oslo', 'hafen', 'порт', 'port', 'terminal', 'terminaali', 'satama', 'ferry', 'prom'],
   },
   {
     id: 'kiel-schwedenkai',
@@ -661,7 +661,7 @@ export const PLACES: CuratedPlace[] = [
     city: 'Kiel',
     country: 'DE',
     position: { lat: 54.319076, lon: 10.137073 },
-    terms: ['киль', 'kiel', 'schwedenkai', 'stena', 'goteborg', 'hafen', 'порт', 'port'],
+    terms: ['киль', 'kiel', 'schwedenkai', 'stena', 'goteborg', 'hafen', 'порт', 'port', 'terminal', 'terminaali', 'satama', 'ferry', 'prom'],
   },
   {
     id: 'puttgarden-scandlines',
@@ -670,7 +670,7 @@ export const PLACES: CuratedPlace[] = [
     city: 'Fehmarn',
     country: 'DE',
     position: { lat: 54.484541, lon: 11.212905 },
-    terms: ['путтгарден', 'puttgarden', 'fehmarn', 'scandlines', 'rodby', 'hafen', 'порт', 'port'],
+    terms: ['путтгарден', 'puttgarden', 'fehmarn', 'scandlines', 'rodby', 'hafen', 'порт', 'port', 'terminal', 'terminaali', 'satama', 'ferry', 'prom'],
   },
   {
     id: 'hamburg-ctb',
@@ -679,7 +679,7 @@ export const PLACES: CuratedPlace[] = [
     city: 'Hamburg',
     country: 'DE',
     position: { lat: 53.526977, lon: 9.930001 },
-    terms: ['гамбург', 'hamburg', 'burchardkai', 'ctb', 'hhla', 'контейнер', 'container', 'terminal', 'hafen', 'порт', 'port'],
+    terms: ['гамбург', 'hamburg', 'burchardkai', 'ctb', 'hhla', 'контейнер', 'container', 'terminal', 'hafen', 'порт', 'port', 'terminaali', 'satama', 'ferry', 'prom'],
   },
   {
     id: 'hamburg-cta',
@@ -688,7 +688,7 @@ export const PLACES: CuratedPlace[] = [
     city: 'Hamburg',
     country: 'DE',
     position: { lat: 53.504636, lon: 9.932809 },
-    terms: ['гамбург', 'hamburg', 'altenwerder', 'cta', 'hhla', 'контейнер', 'container', 'terminal', 'hafen', 'порт', 'port'],
+    terms: ['гамбург', 'hamburg', 'altenwerder', 'cta', 'hhla', 'контейнер', 'container', 'terminal', 'hafen', 'порт', 'port', 'terminaali', 'satama', 'ferry', 'prom'],
   },
   {
     id: 'bremerhaven-eurogate',
@@ -697,7 +697,7 @@ export const PLACES: CuratedPlace[] = [
     city: 'Bremerhaven',
     country: 'DE',
     position: { lat: 53.579675, lon: 8.547411 },
-    terms: ['бремерхафен', 'bremerhaven', 'eurogate', 'ntb', 'контейнер', 'container', 'terminal', 'hafen', 'порт', 'port'],
+    terms: ['бремерхафен', 'bremerhaven', 'eurogate', 'ntb', 'контейнер', 'container', 'terminal', 'hafen', 'порт', 'port', 'terminaali', 'satama', 'ferry', 'prom'],
   },
 ];
 

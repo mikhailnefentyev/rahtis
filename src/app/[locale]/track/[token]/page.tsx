@@ -4,6 +4,8 @@ import { notFound } from 'next/navigation';
 import { Badge, Card, CardBody, Mono } from '@/components/ui';
 import { orderStatusTone } from '@/components/ui/tone';
 import { getI18n, isLocale } from '@/lib/i18n';
+import { stopTimeZone } from '@/lib/country';
+import { createFormat } from '@/lib/format';
 import { stopTitle } from '@/lib/orders/haul';
 import { createAdminClient } from '@/lib/supabase/admin';
 
@@ -34,7 +36,7 @@ export default async function TrackPage({ params }: { params: Promise<{ locale: 
   const { data: order } = valid
     ? await admin
         .from('orders')
-        .select('id, ref, status, haul_kind, trailer_plate, assigned_company_id, updated_at')
+        .select('id, ref, status, haul_kind, trailer_plate, assigned_company_id, shipper_company_id, updated_at')
         .eq('track_token', token)
         .maybeSingle()
     : { data: null };
@@ -48,7 +50,7 @@ export default async function TrackPage({ params }: { params: Promise<{ locale: 
     );
   }
 
-  const [{ data: carrier }, { data: stops }] = await Promise.all([
+  const [{ data: carrier }, { data: stops }, { data: shipper }] = await Promise.all([
     order.assigned_company_id
       ? admin.from('companies').select('name').eq('id', order.assigned_company_id).single()
       : Promise.resolve({ data: null }),
@@ -57,14 +59,21 @@ export default async function TrackPage({ params }: { params: Promise<{ locale: 
       .select('id, role, place_name, company_name, city, country, scheduled_date, scheduled_time, eta_at, arrived_at, completed_at')
       .eq('order_id', order.id)
       .order('sequence'),
+    admin.from('companies').select('country').eq('id', order.shipper_company_id).maybeSingle(),
   ]);
 
   /* Рейс закрывается накладной; клиенту важно, что груз уже доставлен. */
   const delivered =
     order.status === 'IN_PROGRESS' && (stops ?? []).length > 0 && (stops ?? []).every((s) => s.completed_at);
 
-  /* Время точки — по поясу её страны, с «UTC+1», где он не финский. */
-  const time = (iso: string, country: string | null) => stopDateTime(f, iso, country);
+  /*
+   * Время точки — по поясу её страны, с «UTC+1», где он расходится с
+   * поясом клиента. Страница открывается без входа, но адресована клиенту
+   * рейса: польскому клиенту польские и немецкие точки без пометок, а не
+   * с «UTC+2» относительно Хельсинки (прогон 21.10.2026).
+   */
+  const fz = createFormat(t.meta.intl, stopTimeZone(shipper?.country));
+  const time = (iso: string, country: string | null) => stopDateTime(fz, iso, country);
 
   return (
     <main className="mx-auto w-full max-w-2xl px-5 py-10">
@@ -109,7 +118,8 @@ export default async function TrackPage({ params }: { params: Promise<{ locale: 
         </CardBody>
       </Card>
 
-      {carrier?.name && <p className="mt-6 text-xs text-ink-dim">{m('track.questions', { carrier: carrier.name })}</p>}
+      {carrier?.name && <p className="mt-6 text-xs text-ink-dim">{/* «Sp. z o.o.» кончается точкой — вторую ставит само предложение. */}
+          {m('track.questions', { carrier: carrier.name.replace(/\.$/, '') })}</p>}
     </main>
   );
 }

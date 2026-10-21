@@ -1947,6 +1947,12 @@ export const en = {
     detach: 'Sign out from the phone',
   },
 
+  mapHelp: {
+    windows: 'Use Ctrl + scroll to zoom the map',
+    mac: 'Use ⌘ + scroll to zoom the map',
+    mobile: 'Use two fingers to move the map',
+  },
+
   places: {
     kind: {
       FUEL: 'Fuel',
@@ -1969,7 +1975,7 @@ export const en = {
     locateHint: 'Allow location to see the nearest places and their distance.',
     noMap: 'The map is not available. Use your location to see the nearest places.',
     source:
-      'Compiled on 22 Sep 2026 from chain websites, authorities and driver reviews. Prices and rules may change – confirm anything important by phone.',
+      'Nordic places compiled on 22 Sep 2026 from chain websites, authorities and driver reviews; Baltic, Polish and German places from the EU truck parking dataset (21 Oct 2026), facilities not verified. Prices and rules may change – confirm important things by phone.',
     detail: {
       price: 'Price',
       security: 'Security',

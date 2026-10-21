@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { addressWithCity } from '@/lib/orders/stopTime';
 import { notFound } from 'next/navigation';
 import { acceptTaskAction } from '@/lib/driverApp/actions';
 import { getDriver } from '@/lib/driverApp/session';
@@ -118,7 +119,7 @@ async function TaskCard({ task, locale }: { task: DriverTask; locale: Locale }) 
             </p>
             <p className="text-[17px] font-semibold">{stop.place_name ?? stop.company_name ?? stop.city}</p>
             <p className="text-[15px] text-ink-muted">
-              {stop.address}, {stop.city}
+              {addressWithCity(stop.address, stop.city)}
             </p>
             {stop.scheduled_date && (
               <p className="mt-0.5 text-[15px] text-ink-muted">

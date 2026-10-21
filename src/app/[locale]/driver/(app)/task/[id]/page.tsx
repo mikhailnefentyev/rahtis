@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { stopDateTime, stopTime } from '@/lib/orders/stopTime';
+import { addressWithCity, stopDateTime, stopTime } from '@/lib/orders/stopTime';
 import { notFound } from 'next/navigation';
 import { cn } from '@/lib/cn';
 import { getTripPhotos, type TripPhoto } from '@/lib/driverApp/photos';
@@ -156,7 +156,7 @@ async function StopItem({
   const destination =
     stop.lat != null && stop.lon != null
       ? `${stop.lat},${stop.lon}`
-      : encodeURIComponent(`${stop.address}, ${stop.city}`);
+      : encodeURIComponent(addressWithCity(stop.address, stop.city));
 
   return (
     <li className="flex gap-3">
@@ -180,7 +180,7 @@ async function StopItem({
         <p className="label-micro">{stopTitle(t, stop.role, task.haul_kind)}</p>
         <p className="text-[17px] font-semibold">{stop.place_name ?? stop.company_name ?? stop.city}</p>
         <p className="text-[15px]">
-          {stop.address}, {stop.city}
+          {addressWithCity(stop.address, stop.city)}
         </p>
 
         {stop.scheduled_date && (

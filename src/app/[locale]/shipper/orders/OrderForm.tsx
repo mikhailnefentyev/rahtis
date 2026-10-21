@@ -20,7 +20,8 @@ import { ownOrderAction, publishOrderAction, type PublishState } from '@/lib/ord
 import { priceGuideAction, type PriceGuide } from '@/lib/orders/priceGuide';
 import { stopTitle, type HaulKind } from '@/lib/orders/haul';
 import { computeRouteAction, type RouteState } from '@/lib/routing/actions';
-import { useI18n } from '@/lib/i18n/provider';
+import { useCompanyCountry, useI18n } from '@/lib/i18n/provider';
+import { countryPack } from '@/lib/country';
 import { StopFields, type StopDefaults } from './StopFields';
 import type { CarrierClient, KnownVehicle, OrderStop, OwnVehicle, ShipperOrder, StopRole } from '@/types/db';
 import { DispatchPicker } from './DirectPanel';
@@ -127,6 +128,8 @@ export function OrderForm({
   own?: { clients: CarrierClient[]; vehicles: OwnVehicle[]; homeCountry?: string };
 }) {
   const { t, m, f, locale } = useI18n();
+  /* Примеры адресов — страны компании: польскому перевозчику не «Satamakatu 1, Hanko». */
+  const sample = countryPack(useCompanyCountry()).sample;
   const [state, formAction, pending] = useActionState(own ? ownOrderAction : publishOrderAction, initial);
 
   /*
@@ -554,8 +557,8 @@ export function OrderForm({
             defaults={stopDefaults(originPickup)}
             defaultChosen={stopChosen(originPickup)}
             requireDate
-            addressPlaceholder={express ? 'Teollisuustie 4, 01500 Vantaa' : 'Satamakatu 1, 10900 Hanko'}
-            placeNamePlaceholder={express ? 'Varasto 3' : 'Hanko Port, Terminal 2'}
+            addressPlaceholder={sample.address}
+            placeNamePlaceholder={sample.place}
             onChosen={onChosen('pickup')}
           />
         </CardBody>
@@ -577,7 +580,7 @@ export function OrderForm({
               requireDate
               defaults={stopDefaults(originDelivery)}
               defaultChosen={stopChosen(originDelivery)}
-              addressPlaceholder="Hämeentie 12, 00530 Helsinki"
+              addressPlaceholder={sample.address}
               onChosen={onChosen('delivery')}
             />
           </CardBody>
@@ -675,8 +678,8 @@ export function OrderForm({
             haulKind={haulKind}
             defaults={stopDefaults(originReturn)}
             defaultChosen={stopChosen(originReturn)}
-            addressPlaceholder="Satamakatu 1, 10900 Hanko"
-            placeNamePlaceholder="Hanko Port, Terminal 2"
+            addressPlaceholder={sample.address}
+            placeNamePlaceholder={sample.place}
             onChosen={onChosen('ret')}
           />
         </CardBody>

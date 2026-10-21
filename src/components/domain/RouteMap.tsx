@@ -105,6 +105,11 @@ export function RouteMap({
   className?: string;
 }) {
   const { t } = useI18n();
+  /* Тексты подсказки карты — без пересоздания карты при смене языка. */
+  const mapHelp = useRef(t.mapHelp);
+  useEffect(() => {
+    mapHelp.current = t.mapHelp;
+  }, [t.mapHelp]);
   const container = useRef<HTMLDivElement>(null);
   const [failed, setFailed] = useState(false);
 
@@ -194,6 +199,12 @@ export function RouteMap({
           /* Карта показывает маршрут, а не изучает местность. */
           attributionControl: { compact: true },
           cooperativeGestures: true,
+          /* Подсказка «Ctrl + колесо» — на языке страницы, а не английская по умолчанию. */
+          locale: {
+            'CooperativeGesturesHandler.WindowsHelpText': mapHelp.current.windows,
+            'CooperativeGesturesHandler.MacHelpText': mapHelp.current.mac,
+            'CooperativeGesturesHandler.MobileHelpText': mapHelp.current.mobile,
+          },
         });
 
         map = instance;

@@ -312,15 +312,30 @@ function csvValue(kind: Kind, value: string | number | null): string {
 }
 
 /**
- * CSV — только рейсы, одна таблица. Импорт учётной системы ждёт один
- * набор строк одной формы; claims идут колонкой при рейсе, а целиком —
- * листом в XLSX.
+ * CSV — рейсы одной таблицей. Импорт учётной системы ждёт один набор
+ * строк одной формы; claims идут колонкой при рейсе, а целиком — листом
+ * в XLSX.
+ *
+ * Свои рейсы перевозчика (свои клиенты, прямые заказы) — тоже здесь.
+ * Без них CSV перевозчика на абонементе, который возит только своих
+ * клиентов, был пустым — один заголовок (прогон 21.10.2026). Если
+ * рейсов через платформу нет, CSV — это таблица своих рейсов; если есть
+ * и те и другие, свои идут вторым блоком после пустой строки и строки
+ * с названием, как отдельный лист в XLSX.
  */
 export function periodCsv(report: PeriodReport, t: Dictionary): string {
-  const columns = tripColumns(report, t);
-  const lines = [
+  const table = <T,>(columns: Column<T>[], rows: T[]) => [
     columns.map((c) => csvValue('text', c.header)).join(';'),
-    ...report.lines.map((row) => columns.map((c) => csvValue(c.kind, c.get(row))).join(';')),
+    ...rows.map((row) => columns.map((c) => csvValue(c.kind, c.get(row))).join(';')),
   ];
+  const trips = table(tripColumns(report, t), report.lines);
+  const own = table(ownColumns(report, t), report.own.lines);
+
+  const lines =
+    report.own.lines.length === 0
+      ? trips
+      : report.lines.length === 0
+        ? own
+        : [...trips, '', csvValue('text', t.report_.ownTitle), ...own];
   return `﻿${lines.join('\r\n')}\r\n`;
 }

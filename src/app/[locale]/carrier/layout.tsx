@@ -25,7 +25,7 @@ export default async function CarrierLayout({
 
   return (
     /* Время в кабинете — по стране компании (src/lib/i18n/viewer). */
-    <TimeZoneProvider zone={stopTimeZone(viewer.company?.country)}>
+    <TimeZoneProvider zone={stopTimeZone(viewer.company?.country)} country={viewer.company?.country ?? null}>
       <CabinetShell locale={locale} role="CARRIER" company={viewer.company}>
         <FlashNotice />
         {children}

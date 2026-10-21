@@ -25,7 +25,8 @@ import {
   type FormState,
   type InviteState,
 } from '@/lib/drivers/actions';
-import { useI18n } from '@/lib/i18n/provider';
+import { useCompanyCountry, useI18n } from '@/lib/i18n/provider';
+import { countryPack } from '@/lib/country';
 import { DRIVER_LANGUAGES, type Driver, type PayModel } from '@/types/db';
 import { useKeepOnError } from '@/lib/forms/keepOnError';
 
@@ -307,9 +308,14 @@ function ArchivedRow({ driver }: { driver: Driver }) {
 
 function DriverForm({ driver, onClose, phonePrefix }: { driver: Driver | null; onClose: () => void; phonePrefix: string }) {
   const { t, locale } = useI18n();
+  /*
+   * Язык нового водителя и примеры в полях — по стране перевозчика:
+   * польскому перевозчику водитель по умолчанию польский, а не финский.
+   */
+  const pack = countryPack(useCompanyCountry());
   const [state, formAction, pending] = useActionState(saveDriverAction, initial);
   const keepFormAction = useKeepOnError(state);
-  const [languages, setLanguages] = useState<string[]>(driver?.languages ?? ['FI']);
+  const [languages, setLanguages] = useState<string[]>(driver?.languages ?? [pack.driverLanguage]);
 
   useEffect(() => {
     if (state.done) onClose();
@@ -341,7 +347,7 @@ function DriverForm({ driver, onClose, phonePrefix }: { driver: Driver | null; o
                 name="full_name"
                 required
                 defaultValue={driver?.full_name ?? ''}
-                placeholder="Antti Nieminen"
+                placeholder={pack.sample.person}
               />
             )}
           </Field>
@@ -367,7 +373,7 @@ function DriverForm({ driver, onClose, phonePrefix }: { driver: Driver | null; o
                 name="email"
                 autoComplete="off"
                 defaultValue={driver?.email ?? ''}
-                placeholder="antti@esimerkki.fi"
+                placeholder={pack.sample.email}
               />
             )}
           </Field>

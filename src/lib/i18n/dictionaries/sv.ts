@@ -1798,6 +1798,12 @@ export const sv = {
     detach: 'Logga ut från telefonen',
   },
 
+  mapHelp: {
+    windows: 'Håll ned Ctrl och scrolla för att zooma kartan',
+    mac: 'Håll ned ⌘ och scrolla för att zooma kartan',
+    mobile: 'Använd två fingrar för att flytta kartan',
+  },
+
   places: {
     kind: {
       FUEL: 'Bränsle',
@@ -1820,7 +1826,7 @@ export const sv = {
     locateHint: 'Tillåt positionering för att se de närmaste platserna och avståndet till dem.',
     noMap: 'Kartan är inte tillgänglig. Använd din position för att se de närmaste platserna.',
     source:
-      'Sammanställt 22 sep 2026 från kedjornas webbplatser, myndigheter och förarrecensioner. Priser och regler kan ändras – bekräfta viktiga saker per telefon.',
+      'Platser i Norden sammanställda 22 sep 2026 från kedjornas webbplatser, myndigheter och förarrecensioner; platser i Baltikum, Polen och Tyskland från EU:s dataset över lastbilsparkeringar (21 okt 2026), tjänster ej kontrollerade. Priser och regler kan ändras – bekräfta viktiga saker per telefon.',
     detail: {
       price: 'Pris',
       security: 'Säkerhet',

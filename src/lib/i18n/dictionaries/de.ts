@@ -1798,6 +1798,12 @@ export const de = {
     detach: 'Vom Handy abmelden',
   },
 
+  mapHelp: {
+    windows: 'Zum Zoomen Strg gedrückt halten und scrollen',
+    mac: 'Zum Zoomen ⌘ gedrückt halten und scrollen',
+    mobile: 'Karte mit zwei Fingern bewegen',
+  },
+
   places: {
     kind: {
       FUEL: 'Tanken',
@@ -1820,7 +1826,7 @@ export const de = {
     locateHint: 'Erlauben Sie den Standortzugriff, um die nächstgelegenen Plätze und ihre Entfernung zu sehen.',
     noMap: 'Die Karte ist nicht verfügbar. Nutzen Sie Ihren Standort, um die nächstgelegenen Plätze zu sehen.',
     source:
-      'Zusammengestellt am 22.09.2026 aus Websites der Ketten, Behördenangaben und Fahrerbewertungen. Preise und Regeln können sich ändern – Wichtiges telefonisch bestätigen.',
+      'Orte in Skandinavien am 22.09.2026 aus Websites der Ketten, Behörden und Fahrerbewertungen zusammengestellt; Orte im Baltikum, in Polen und Deutschland aus dem EU-Datensatz für Lkw-Parkplätze (21.10.2026), Ausstattung nicht geprüft. Preise und Regeln können sich ändern – Wichtiges telefonisch bestätigen.',
     detail: {
       price: 'Preis',
       security: 'Sicherheit',

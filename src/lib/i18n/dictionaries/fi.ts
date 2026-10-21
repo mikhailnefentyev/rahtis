@@ -2060,6 +2060,12 @@ export const fi = {
     detach: 'Kirjaa ulos puhelimesta',
   },
 
+  mapHelp: {
+    windows: 'Zoomaa karttaa pitämällä Ctrl-näppäintä pohjassa ja vierittämällä',
+    mac: 'Zoomaa karttaa pitämällä ⌘-näppäintä pohjassa ja vierittämällä',
+    mobile: 'Liikuta karttaa kahdella sormella',
+  },
+
   places: {
     kind: {
       FUEL: 'Tankkaus',
@@ -2082,7 +2088,7 @@ export const fi = {
     locateHint: 'Salli sijainti, niin näet lähimmät paikat etäisyyksineen.',
     noMap: 'Kartta ei ole käytettävissä. Lähimmät paikat näet sijainnin avulla.',
     source:
-      'Tiedot on koottu 22.9.2026 ketjujen sivuilta, viranomaisilta ja kuljettajien arvioista. Hinnat ja käytännöt voivat muuttua – varmista tärkeät asiat puhelimella.',
+      'Pohjoismaiden paikat on koottu 22.9.2026 ketjujen sivuilta, viranomaisilta ja kuljettajien arvioista; Baltian, Puolan ja Saksan paikat EU:n rekkapysäköintiaineistosta (21.10.2026), palveluja ei ole tarkistettu. Hinnat ja käytännöt voivat muuttua – varmista tärkeät asiat puhelimella.',
     detail: {
       price: 'Hinta',
       security: 'Turvallisuus',
