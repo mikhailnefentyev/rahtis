@@ -2088,7 +2088,7 @@ export const fi = {
     locateHint: 'Salli sijainti, niin näet lähimmät paikat etäisyyksineen.',
     noMap: 'Kartta ei ole käytettävissä. Lähimmät paikat näet sijainnin avulla.',
     source:
-      'Pohjoismaiden paikat on koottu 22.9.2026 ketjujen sivuilta, viranomaisilta ja kuljettajien arvioista; Baltian, Puolan ja Saksan paikat sekä osa Suomen ja Tanskan paikoista EU:n rekkapysäköintiaineistosta (21.10.2026), palveluja ei ole tarkistettu. Hinnat ja käytännöt voivat muuttua – varmista tärkeät asiat puhelimella.',
+      'Pohjoismaiden paikat on koottu 22.9.2026 ketjujen sivuilta, viranomaisilta ja kuljettajien arvioista; Baltian, Puolan ja Saksan paikat EU:n rekkapysäköintiaineistosta (21.10.2026), palveluja ei ole tarkistettu. Hinnat ja käytännöt voivat muuttua – varmista tärkeät asiat puhelimella.',
     detail: {
       price: 'Hinta',
       security: 'Turvallisuus',

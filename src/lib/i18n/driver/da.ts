@@ -187,7 +187,7 @@ export const da = {
     locateHint: 'Tillad position, så ser du de nærmeste steder med afstand.',
     noMap: 'Kortet er ikke tilgængeligt. Du ser de nærmeste steder ved hjælp af positionen.',
     source:
-      'Steder i Norden samlet 22.09.2026 fra kædernes hjemmesider, myndigheder og chaufføranmeldelser; steder i Baltikum, Polen og Tyskland samt en del i Finland og Danmark fra EU’s datasæt for lastbilparkering (21.10.2026), faciliteter ikke kontrolleret. Priser og regler kan ændre sig – bekræft vigtige ting telefonisk.',
+      'Steder i Norden samlet 22.09.2026 fra kædernes hjemmesider, myndigheder og chaufføranmeldelser; steder i Baltikum, Polen og Tyskland fra EU’s datasæt for lastbilparkering (21.10.2026), faciliteter ikke kontrolleret. Priser og regler kan ændre sig – bekræft vigtige ting telefonisk.',
     detail: {
       price: 'Pris',
       security: 'Sikkerhed',

@@ -1975,7 +1975,7 @@ export const en = {
     locateHint: 'Allow location to see the nearest places and their distance.',
     noMap: 'The map is not available. Use your location to see the nearest places.',
     source:
-      'Nordic places compiled on 22 Sep 2026 from chain websites, authorities and driver reviews; Baltic, Polish and German places and some Finnish and Danish ones from the EU truck parking dataset (21 Oct 2026), facilities not verified. Prices and rules may change – confirm important things by phone.',
+      'Nordic places compiled on 22 Sep 2026 from chain websites, authorities and driver reviews; Baltic, Polish and German places from the EU truck parking dataset (21 Oct 2026), facilities not verified. Prices and rules may change – confirm important things by phone.',
     detail: {
       price: 'Price',
       security: 'Security',

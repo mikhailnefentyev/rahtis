@@ -1826,7 +1826,7 @@ export const sv = {
     locateHint: 'Tillåt positionering för att se de närmaste platserna och avståndet till dem.',
     noMap: 'Kartan är inte tillgänglig. Använd din position för att se de närmaste platserna.',
     source:
-      'Platser i Norden sammanställda 22 sep 2026 från kedjornas webbplatser, myndigheter och förarrecensioner; platser i Baltikum, Polen och Tyskland samt en del i Finland och Danmark från EU:s dataset över lastbilsparkeringar (21 okt 2026), tjänster ej kontrollerade. Priser och regler kan ändras – bekräfta viktiga saker per telefon.',
+      'Platser i Norden sammanställda 22 sep 2026 från kedjornas webbplatser, myndigheter och förarrecensioner; platser i Baltikum, Polen och Tyskland från EU:s dataset över lastbilsparkeringar (21 okt 2026), tjänster ej kontrollerade. Priser och regler kan ändras – bekräfta viktiga saker per telefon.',
     detail: {
       price: 'Pris',
       security: 'Säkerhet',
