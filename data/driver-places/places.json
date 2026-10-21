@@ -15805,6 +15805,34 @@
    ]
   },
   {
+   "id": "de-tp-1513",
+   "country": "DE",
+   "kinds": [
+    "PARKING"
+   ],
+   "name_fi": "Levähdysalue · Erkrath",
+   "name_en": "Rest area · Erkrath",
+   "network": null,
+   "address": "Erkrath, 2 km",
+   "lat": 51.2371,
+   "lon": 6.91,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": null,
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus korkea. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset. Confidence high. Facilities (shower, security, price) not verified."
+    }
+   ]
+  },
+  {
    "id": "de-tp-1516",
    "country": "DE",
    "kinds": [
@@ -17960,6 +17988,35 @@
      "k": "notes",
      "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus korkea. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
      "en": "Source: EU truck parking dataset. Confidence high. Facilities (shower, security, price) not verified."
+    }
+   ]
+  },
+  {
+   "id": "de-tp-1618",
+   "country": "DE",
+   "kinds": [
+    "FUEL",
+    "PARKING"
+   ],
+   "name_fi": "Tankkaus ja rekkaparkki · Moorfleet",
+   "name_en": "Fuel and truck parking · Moorfleet",
+   "network": null,
+   "address": "Moorfleet",
+   "lat": 53.5049,
+   "lon": 10.09,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": null,
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus keskitaso. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset. Confidence medium. Facilities (shower, security, price) not verified."
     }
    ]
   },
@@ -21742,6 +21799,34 @@
    ]
   },
   {
+   "id": "de-tp-1837",
+   "country": "DE",
+   "kinds": [
+    "PARKING"
+   ],
+   "name_fi": "Levähdysalue · Seesen",
+   "name_en": "Rest area · Seesen",
+   "network": null,
+   "address": "Seesen, 5 km",
+   "lat": 51.8641,
+   "lon": 10.12,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": null,
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus korkea. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset. Confidence high. Facilities (shower, security, price) not verified."
+    }
+   ]
+  },
+  {
    "id": "de-tp-1838",
    "country": "DE",
    "kinds": [
@@ -22006,6 +22091,34 @@
    "address": "Hamminkeln, 3 km",
    "lat": 51.7538,
    "lon": 6.567,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": null,
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus korkea. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset. Confidence high. Facilities (shower, security, price) not verified."
+    }
+   ]
+  },
+  {
+   "id": "de-tp-1860",
+   "country": "DE",
+   "kinds": [
+    "PARKING"
+   ],
+   "name_fi": "Rekkaparkki · Paderborn",
+   "name_en": "Truck parking · Paderborn",
+   "network": null,
+   "address": "Paderborn, 5 km",
+   "lat": 51.749,
+   "lon": 8.7,
    "approx": false,
    "hours_fi": null,
    "hours_en": null,
@@ -27954,6 +28067,34 @@
    ]
   },
   {
+   "id": "de-tp-2223",
+   "country": "DE",
+   "kinds": [
+    "PARKING"
+   ],
+   "name_fi": "Levähdysalue · Kürnach",
+   "name_en": "Rest area · Kürnach",
+   "network": null,
+   "address": "Kürnach, 2 km",
+   "lat": 49.8307,
+   "lon": 10.04,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": null,
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus korkea. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset. Confidence high. Facilities (shower, security, price) not verified."
+    }
+   ]
+  },
+  {
    "id": "de-tp-2224",
    "country": "DE",
    "kinds": [
@@ -31854,6 +31995,34 @@
    ]
   },
   {
+   "id": "de-tp-2407",
+   "country": "DE",
+   "kinds": [
+    "PARKING"
+   ],
+   "name_fi": "Levähdysalue · Sülzbach",
+   "name_en": "Rest area · Sülzbach",
+   "network": null,
+   "address": "Sülzbach, 3 km",
+   "lat": 49.1623,
+   "lon": 9.37,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": null,
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus korkea. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset. Confidence high. Facilities (shower, security, price) not verified."
+    }
+   ]
+  },
+  {
    "id": "de-tp-2408",
    "country": "DE",
    "kinds": [
@@ -32483,6 +32652,34 @@
    "address": "Freyung, 1 km",
    "lat": 48.8104,
    "lon": 13.5307,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": null,
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus korkea. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset. Confidence high. Facilities (shower, security, price) not verified."
+    }
+   ]
+  },
+  {
+   "id": "de-tp-2456",
+   "country": "DE",
+   "kinds": [
+    "PARKING"
+   ],
+   "name_fi": "Levähdysalue · Iffezheim",
+   "name_en": "Rest area · Iffezheim",
+   "network": null,
+   "address": "Iffezheim, 3 km",
+   "lat": 48.8089,
+   "lon": 8.18,
    "approx": false,
    "hours_fi": null,
    "hours_en": null,
@@ -33746,6 +33943,62 @@
    "address": "Vöhringen, 3 km",
    "lat": 48.3006,
    "lon": 10.1083,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": null,
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus korkea. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset. Confidence high. Facilities (shower, security, price) not verified."
+    }
+   ]
+  },
+  {
+   "id": "de-tp-2543",
+   "country": "DE",
+   "kinds": [
+    "PARKING"
+   ],
+   "name_fi": "Levähdysalue · Trochtelfingen",
+   "name_en": "Rest area · Trochtelfingen",
+   "network": null,
+   "address": "Trochtelfingen, 1 km",
+   "lat": 48.2978,
+   "lon": 9.24,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": null,
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus korkea. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset. Confidence high. Facilities (shower, security, price) not verified."
+    }
+   ]
+  },
+  {
+   "id": "de-tp-2544",
+   "country": "DE",
+   "kinds": [
+    "PARKING"
+   ],
+   "name_fi": "Levähdysalue · Burladingen",
+   "name_en": "Rest area · Burladingen",
+   "network": null,
+   "address": "Burladingen, 2 km",
+   "lat": 48.2929,
+   "lon": 9.09,
    "approx": false,
    "hours_fi": null,
    "hours_en": null,
@@ -40623,6 +40876,34 @@
    ]
   },
   {
+   "id": "de-tp-2922",
+   "country": "DE",
+   "kinds": [
+    "PARKING"
+   ],
+   "name_fi": "Levähdysalue · Kirchseelte",
+   "name_en": "Rest area · Kirchseelte",
+   "network": null,
+   "address": "Kirchseelte, 2 km",
+   "lat": 52.9431,
+   "lon": 8.71,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": null,
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus korkea. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset. Confidence high. Facilities (shower, security, price) not verified."
+    }
+   ]
+  },
+  {
    "id": "de-tp-2924",
    "country": "DE",
    "kinds": [
@@ -41477,6 +41758,34 @@
    "address": "Auf der Horst, 4 km",
    "lat": 52.422,
    "lon": 9.551,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": null,
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus korkea. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset. Confidence high. Facilities (shower, security, price) not verified."
+    }
+   ]
+  },
+  {
+   "id": "de-tp-2998",
+   "country": "DE",
+   "kinds": [
+    "PARKING"
+   ],
+   "name_fi": "Rekkaparkki · Vahrenheide",
+   "name_en": "Truck parking · Vahrenheide",
+   "network": null,
+   "address": "Vahrenheide",
+   "lat": 52.4199,
+   "lon": 9.74,
    "approx": false,
    "hours_fi": null,
    "hours_en": null,
@@ -42399,6 +42708,34 @@
    ]
   },
   {
+   "id": "de-tp-3103",
+   "country": "DE",
+   "kinds": [
+    "PARKING"
+   ],
+   "name_fi": "Rekkaparkki · Stadtoldendorf",
+   "name_en": "Truck parking · Stadtoldendorf",
+   "network": null,
+   "address": "Stadtoldendorf, 1 km",
+   "lat": 51.8926,
+   "lon": 9.63,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": null,
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus korkea. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset. Confidence high. Facilities (shower, security, price) not verified."
+    }
+   ]
+  },
+  {
    "id": "de-tp-3104",
    "country": "DE",
    "kinds": [
@@ -42637,6 +42974,34 @@
    "address": "Bardowick, 2 km",
    "lat": 53.2751,
    "lon": 10.402,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": null,
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus korkea. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset. Confidence high. Facilities (shower, security, price) not verified."
+    }
+   ]
+  },
+  {
+   "id": "de-tp-3129",
+   "country": "DE",
+   "kinds": [
+    "PARKING"
+   ],
+   "name_fi": "Levähdysalue · Kalefeld",
+   "name_en": "Rest area · Kalefeld",
+   "network": null,
+   "address": "Kalefeld, 4 km",
+   "lat": 51.8047,
+   "lon": 10.09,
    "approx": false,
    "hours_fi": null,
    "hours_en": null,
@@ -43370,6 +43735,34 @@
    "address": "Wallhausen, 2 km",
    "lat": 51.4588,
    "lon": 11.243,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": null,
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus korkea. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset. Confidence high. Facilities (shower, security, price) not verified."
+    }
+   ]
+  },
+  {
+   "id": "de-tp-3230",
+   "country": "DE",
+   "kinds": [
+    "PARKING"
+   ],
+   "name_fi": "Levähdysalue · Algermissen",
+   "name_en": "Rest area · Algermissen",
+   "network": null,
+   "address": "Algermissen, 3 km",
+   "lat": 52.2387,
+   "lon": 9.93,
    "approx": false,
    "hours_fi": null,
    "hours_en": null,
@@ -44493,6 +44886,34 @@
    "address": "Olpe, 3 km",
    "lat": 51.0029,
    "lon": 7.8351,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": null,
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus korkea. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset. Confidence high. Facilities (shower, security, price) not verified."
+    }
+   ]
+  },
+  {
+   "id": "de-tp-3377",
+   "country": "DE",
+   "kinds": [
+    "PARKING"
+   ],
+   "name_fi": "Rekkaparkki · Wilthen",
+   "name_en": "Truck parking · Wilthen",
+   "network": null,
+   "address": "Wilthen",
+   "lat": 51.0977,
+   "lon": 14.4,
    "approx": false,
    "hours_fi": null,
    "hours_en": null,
@@ -50359,6 +50780,34 @@
    ]
   },
   {
+   "id": "de-tp-3921",
+   "country": "DE",
+   "kinds": [
+    "PARKING"
+   ],
+   "name_fi": "Levähdysalue · Offingen",
+   "name_en": "Rest area · Offingen",
+   "network": null,
+   "address": "Offingen, 4 km",
+   "lat": 48.4982,
+   "lon": 10.31,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": null,
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus korkea. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset. Confidence high. Facilities (shower, security, price) not verified."
+    }
+   ]
+  },
+  {
    "id": "de-tp-3922",
    "country": "DE",
    "kinds": [
@@ -50623,6 +51072,34 @@
    "address": "Gessertshausen, 2 km",
    "lat": 48.3379,
    "lon": 10.7518,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": null,
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus korkea. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset. Confidence high. Facilities (shower, security, price) not verified."
+    }
+   ]
+  },
+  {
+   "id": "de-tp-3954",
+   "country": "DE",
+   "kinds": [
+    "PARKING"
+   ],
+   "name_fi": "Rekkaparkki · Neufahrn bei Freising",
+   "name_en": "Truck parking · Neufahrn bei Freising",
+   "network": null,
+   "address": "Neufahrn bei Freising, 2 km",
+   "lat": 48.3283,
+   "lon": 11.69,
    "approx": false,
    "hours_fi": null,
    "hours_en": null,
@@ -54776,6 +55253,35 @@
    ]
   },
   {
+   "id": "de-tp-4222",
+   "country": "DE",
+   "kinds": [
+    "FUEL",
+    "PARKING"
+   ],
+   "name_fi": "Tankkaus ja rekkaparkki · Metzingen",
+   "name_en": "Fuel and truck parking · Metzingen",
+   "network": null,
+   "address": "Metzingen",
+   "lat": 48.5323,
+   "lon": 9.29,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": null,
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus korkea. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset. Confidence high. Facilities (shower, security, price) not verified."
+    }
+   ]
+  },
+  {
    "id": "de-tp-4223",
    "country": "DE",
    "kinds": [
@@ -55282,6 +55788,34 @@
      "k": "notes",
      "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus korkea. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
      "en": "Source: EU truck parking dataset. Confidence high. Facilities (shower, security, price) not verified."
+    }
+   ]
+  },
+  {
+   "id": "de-tp-4255",
+   "country": "DE",
+   "kinds": [
+    "PARKING"
+   ],
+   "name_fi": "Rekkaparkki · Fehmarn",
+   "name_en": "Truck parking · Fehmarn",
+   "network": null,
+   "address": "Fehmarn, 4 km",
+   "lat": 54.425,
+   "lon": 11.13,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": null,
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus keskitaso. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset. Confidence medium. Facilities (shower, security, price) not verified."
     }
    ]
   },
@@ -59355,6 +59889,34 @@
    ]
   },
   {
+   "id": "de-tp-4517",
+   "country": "DE",
+   "kinds": [
+    "PARKING"
+   ],
+   "name_fi": "Levähdysalue · Ascheberg",
+   "name_en": "Rest area · Ascheberg",
+   "network": null,
+   "address": "Ascheberg, 2 km",
+   "lat": 51.7738,
+   "lon": 7.64,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": null,
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus korkea. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset. Confidence high. Facilities (shower, security, price) not verified."
+    }
+   ]
+  },
+  {
    "id": "de-tp-4519",
    "country": "DE",
    "kinds": [
@@ -62595,6 +63157,34 @@
    ]
   },
   {
+   "id": "de-tp-4766",
+   "country": "DE",
+   "kinds": [
+    "PARKING"
+   ],
+   "name_fi": "Rekkaparkki · Hinterweidenthal",
+   "name_en": "Truck parking · Hinterweidenthal",
+   "network": null,
+   "address": "Hinterweidenthal, 1 km",
+   "lat": 49.2016,
+   "lon": 7.77,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": null,
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus korkea. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset. Confidence high. Facilities (shower, security, price) not verified."
+    }
+   ]
+  },
+  {
    "id": "de-tp-4767",
    "country": "DE",
    "kinds": [
@@ -63726,6 +64316,34 @@
    ]
   },
   {
+   "id": "de-tp-4832",
+   "country": "DE",
+   "kinds": [
+    "PARKING"
+   ],
+   "name_fi": "Levähdysalue · Ispringen",
+   "name_en": "Rest area · Ispringen",
+   "network": null,
+   "address": "Ispringen, 2 km",
+   "lat": 48.909,
+   "lon": 8.69,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": null,
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus korkea. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset. Confidence high. Facilities (shower, security, price) not verified."
+    }
+   ]
+  },
+  {
    "id": "de-tp-4834",
    "country": "DE",
    "kinds": [
@@ -64238,15 +64856,15 @@
     "FUEL",
     "PARKING"
    ],
-   "name_fi": "Rekkapysäkki · Walheim - Hahn",
-   "name_en": "Truck stop · Walheim - Hahn",
-   "network": null,
+   "name_fi": "TotalEnergies · Walheim - Hahn",
+   "name_en": "TotalEnergies · Walheim - Hahn",
+   "network": "TotalEnergies",
    "address": "Walheim - Hahn, 4 km",
    "lat": 50.7177,
    "lon": 6.1193,
    "approx": false,
-   "hours_fi": null,
-   "hours_en": null,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
    "phone": null,
    "free": false,
    "secured": false,
@@ -64254,9 +64872,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "Tankkaus (54 m), rekkadiesel (raskaan kaluston pistooli), AdBlue",
+     "en": "Fuel (54 m), HGV diesel pump, AdBlue"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus korkea. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence high. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus korkea. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence high. Price and security not verified."
     }
    ]
   },
@@ -66303,6 +66926,34 @@
    ]
   },
   {
+   "id": "de-tp-5003",
+   "country": "DE",
+   "kinds": [
+    "PARKING"
+   ],
+   "name_fi": "Levähdysalue · Haren",
+   "name_en": "Rest area · Haren",
+   "network": null,
+   "address": "Haren, 5 km",
+   "lat": 52.7876,
+   "lon": 7.17,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": null,
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus korkea. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset. Confidence high. Facilities (shower, security, price) not verified."
+    }
+   ]
+  },
+  {
    "id": "de-tp-5007",
    "country": "DE",
    "kinds": [
@@ -68158,6 +68809,34 @@
    "address": "Sankt Katharinen, 4 km",
    "lat": 50.6155,
    "lon": 7.4184,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": null,
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus korkea. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset. Confidence high. Facilities (shower, security, price) not verified."
+    }
+   ]
+  },
+  {
+   "id": "de-tp-5140",
+   "country": "DE",
+   "kinds": [
+    "PARKING"
+   ],
+   "name_fi": "Levähdysalue · Petersberg",
+   "name_en": "Rest area · Petersberg",
+   "network": null,
+   "address": "Petersberg, 6 km",
+   "lat": 50.6061,
+   "lon": 9.68,
    "approx": false,
    "hours_fi": null,
    "hours_en": null,
@@ -70212,6 +70891,34 @@
    ]
   },
   {
+   "id": "de-tp-5282",
+   "country": "DE",
+   "kinds": [
+    "PARKING"
+   ],
+   "name_fi": "Levähdysalue · Breitnau",
+   "name_en": "Rest area · Breitnau",
+   "network": null,
+   "address": "Breitnau, 2 km",
+   "lat": 47.9142,
+   "lon": 8.08,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": null,
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus korkea. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset. Confidence high. Facilities (shower, security, price) not verified."
+    }
+   ]
+  },
+  {
    "id": "de-tp-5284",
    "country": "DE",
    "kinds": [
@@ -71178,6 +71885,35 @@
    ]
   },
   {
+   "id": "de-tp-5327",
+   "country": "DE",
+   "kinds": [
+    "FUEL",
+    "PARKING"
+   ],
+   "name_fi": "Rekkapysäkki · Lampertheim",
+   "name_en": "Truck stop · Lampertheim",
+   "network": null,
+   "address": "Lampertheim, 6 km",
+   "lat": 49.5501,
+   "lon": 8.45,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": null,
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus korkea. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset. Confidence high. Facilities (shower, security, price) not verified."
+    }
+   ]
+  },
+  {
    "id": "de-tp-5328",
    "country": "DE",
    "kinds": [
@@ -71274,6 +72010,35 @@
    "address": "Merklingen, 3 km",
    "lat": 48.5275,
    "lon": 9.7188,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": null,
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus korkea. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset. Confidence high. Facilities (shower, security, price) not verified."
+    }
+   ]
+  },
+  {
+   "id": "de-tp-5334",
+   "country": "DE",
+   "kinds": [
+    "FUEL",
+    "PARKING"
+   ],
+   "name_fi": "Rekkapysäkki · Röfingen",
+   "name_en": "Truck stop · Röfingen",
+   "network": null,
+   "address": "Röfingen, 1 km",
+   "lat": 48.4114,
+   "lon": 10.44,
    "approx": false,
    "hours_fi": null,
    "hours_en": null,
@@ -77979,6 +78744,34 @@
    ]
   },
   {
+   "id": "de-tp-5778",
+   "country": "DE",
+   "kinds": [
+    "PARKING"
+   ],
+   "name_fi": "Levähdysalue · Zusmarshausen",
+   "name_en": "Rest area · Zusmarshausen",
+   "network": null,
+   "address": "Zusmarshausen, 3 km",
+   "lat": 48.4097,
+   "lon": 10.64,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": null,
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus korkea. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset. Confidence high. Facilities (shower, security, price) not verified."
+    }
+   ]
+  },
+  {
    "id": "de-tp-5779",
    "country": "DE",
    "kinds": [
@@ -78347,6 +79140,34 @@
    ]
   },
   {
+   "id": "de-tp-5810",
+   "country": "DE",
+   "kinds": [
+    "PARKING"
+   ],
+   "name_fi": "Levähdysalue · Blumberg",
+   "name_en": "Rest area · Blumberg",
+   "network": null,
+   "address": "Blumberg, 4 km",
+   "lat": 47.8156,
+   "lon": 8.58,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": null,
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus korkea. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset. Confidence high. Facilities (shower, security, price) not verified."
+    }
+   ]
+  },
+  {
    "id": "de-tp-5811",
    "country": "DE",
    "kinds": [
@@ -78658,7 +79479,8 @@
    "id": "ee-tp-6288",
    "country": "EE",
    "kinds": [
-    "PARKING"
+    "PARKING",
+    "SHOWER"
    ],
    "name_fi": "Rekkaparkki · Tallinn",
    "name_en": "Truck parking · Tallinn",
@@ -78676,9 +79498,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "Suihku (113 m)",
+     "en": "Shower (113 m)"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus keskitaso. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence medium. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus keskitaso. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence medium. Price and security not verified."
     }
    ]
   },
@@ -78689,15 +79516,15 @@
     "FUEL",
     "PARKING"
    ],
-   "name_fi": "Rekkapysäkki · Haljala",
-   "name_en": "Truck stop · Haljala",
-   "network": null,
+   "name_fi": "Neste · Haljala",
+   "name_en": "Neste · Haljala",
+   "network": "Neste",
    "address": "Haljala",
    "lat": 59.4256,
    "lon": 26.2688,
    "approx": false,
-   "hours_fi": null,
-   "hours_en": null,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
    "phone": null,
    "free": false,
    "secured": false,
@@ -78705,9 +79532,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "Tankkaus (88 m), rekkadiesel (raskaan kaluston pistooli), AdBlue",
+     "en": "Fuel (88 m), HGV diesel pump, AdBlue"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus korkea. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence high. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus korkea. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence high. Price and security not verified."
     }
    ]
   },
@@ -78718,15 +79550,15 @@
     "FUEL",
     "PARKING"
    ],
-   "name_fi": "Tankkaus ja rekkaparkki · Sillamäe",
-   "name_en": "Fuel and truck parking · Sillamäe",
-   "network": null,
+   "name_fi": "Neste · Sillamäe",
+   "name_en": "Neste · Sillamäe",
+   "network": "Neste",
    "address": "Sillamäe",
    "lat": 59.3915,
    "lon": 27.7764,
    "approx": false,
-   "hours_fi": null,
-   "hours_en": null,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
    "phone": null,
    "free": false,
    "secured": false,
@@ -78734,9 +79566,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "Tankkaus (78 m), rekkadiesel (raskaan kaluston pistooli), AdBlue",
+     "en": "Fuel (78 m), HGV diesel pump, AdBlue"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus keskitaso. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence medium. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus keskitaso. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence medium. Price and security not verified."
     }
    ]
   },
@@ -78747,9 +79584,9 @@
     "FUEL",
     "PARKING"
    ],
-   "name_fi": "Tankkaus ja rekkaparkki · Rakvere",
-   "name_en": "Fuel and truck parking · Rakvere",
-   "network": null,
+   "name_fi": "Circle K · Rakvere",
+   "name_en": "Circle K · Rakvere",
+   "network": "Circle K",
    "address": "Rakvere, 2 km",
    "lat": 59.3655,
    "lon": 26.3379,
@@ -78763,9 +79600,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "Tankkaus (61 m)",
+     "en": "Fuel (61 m)"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus keskitaso. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence medium. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus keskitaso. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence medium. Price and security not verified."
     }
    ]
   },
@@ -78776,15 +79618,15 @@
     "FUEL",
     "PARKING"
    ],
-   "name_fi": "Tankkaus ja rekkaparkki · Jüri",
-   "name_en": "Fuel and truck parking · Jüri",
-   "network": null,
+   "name_fi": "Terminal Oil · Jüri",
+   "name_en": "Terminal Oil · Jüri",
+   "network": "Terminal Oil",
    "address": "Jüri, 2 km",
    "lat": 59.3605,
    "lon": 24.8699,
    "approx": false,
-   "hours_fi": null,
-   "hours_en": null,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
    "phone": null,
    "free": false,
    "secured": false,
@@ -78792,9 +79634,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "Tankkaus, diesel, AdBlue",
+     "en": "Fuel, diesel, AdBlue"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus keskitaso. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence medium. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus keskitaso. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence medium. Price and security not verified."
     }
    ]
   },
@@ -78839,8 +79686,8 @@
    "lat": 59.0785,
    "lon": 25.3377,
    "approx": false,
-   "hours_fi": null,
-   "hours_en": null,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
    "phone": null,
    "free": false,
    "secured": false,
@@ -78849,8 +79696,8 @@
    "details": [
     {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus keskitaso. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence medium. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus keskitaso. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence medium. Price and security not verified."
     }
    ]
   },
@@ -78867,8 +79714,8 @@
    "lat": 59.063,
    "lon": 25.3764,
    "approx": false,
-   "hours_fi": null,
-   "hours_en": null,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
    "phone": null,
    "free": false,
    "secured": false,
@@ -78876,9 +79723,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "7 rekkapaikkaa",
+     "en": "7 truck spaces"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus korkea. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence high. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus korkea. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence high. Price and security not verified."
     }
    ]
   },
@@ -78889,15 +79741,15 @@
     "FUEL",
     "PARKING"
    ],
-   "name_fi": "Tankkaus ja rekkaparkki · Haapsalu",
-   "name_en": "Fuel and truck parking · Haapsalu",
-   "network": null,
+   "name_fi": "Neste · Haapsalu",
+   "name_en": "Neste · Haapsalu",
+   "network": "Neste",
    "address": "Haapsalu, 2 km",
    "lat": 58.9257,
    "lon": 23.5473,
    "approx": false,
-   "hours_fi": null,
-   "hours_en": null,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
    "phone": null,
    "free": false,
    "secured": false,
@@ -78905,9 +79757,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "Tankkaus (83 m), rekkadiesel (raskaan kaluston pistooli)",
+     "en": "Fuel (83 m), HGV diesel pump"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus keskitaso. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence medium. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus keskitaso. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence medium. Price and security not verified."
     }
    ]
   },
@@ -78918,15 +79775,15 @@
     "FUEL",
     "PARKING"
    ],
-   "name_fi": "Tankkaus ja rekkaparkki · Jõgeva",
-   "name_en": "Fuel and truck parking · Jõgeva",
-   "network": null,
+   "name_fi": "Alexela · Jõgeva",
+   "name_en": "Alexela · Jõgeva",
+   "network": "Alexela",
    "address": "Jõgeva, 2 km",
    "lat": 58.7443,
    "lon": 26.3629,
    "approx": false,
-   "hours_fi": null,
-   "hours_en": null,
+   "hours_fi": "06:00-24:00",
+   "hours_en": "06:00-24:00",
    "phone": null,
    "free": false,
    "secured": false,
@@ -78934,9 +79791,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "Tankkaus, diesel, AdBlue",
+     "en": "Fuel, diesel, AdBlue"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus keskitaso. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence medium. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus keskitaso. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence medium. Price and security not verified."
     }
    ]
   },
@@ -78953,8 +79815,8 @@
    "lat": 58.5851,
    "lon": 26.588,
    "approx": false,
-   "hours_fi": null,
-   "hours_en": null,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
    "phone": null,
    "free": false,
    "secured": false,
@@ -78963,8 +79825,8 @@
    "details": [
     {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus korkea. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence high. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus korkea. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence high. Price and security not verified."
     }
    ]
   },
@@ -78972,17 +79834,18 @@
    "id": "ee-tp-6299",
    "country": "EE",
    "kinds": [
+    "FUEL",
     "PARKING"
    ],
-   "name_fi": "Rekkaparkki · Liiva",
-   "name_en": "Truck parking · Liiva",
-   "network": null,
+   "name_fi": "Jetoil · Liiva",
+   "name_en": "Jetoil · Liiva",
+   "network": "Jetoil",
    "address": "Liiva, 16 km",
    "lat": 58.5734,
    "lon": 23.5118,
    "approx": false,
-   "hours_fi": null,
-   "hours_en": null,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
    "phone": null,
    "free": false,
    "secured": false,
@@ -78990,9 +79853,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "Tankkaus (243 m), diesel",
+     "en": "Fuel (243 m), diesel"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus keskitaso. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence medium. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus keskitaso. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence medium. Price and security not verified."
     }
    ]
   },
@@ -79000,17 +79868,18 @@
    "id": "ee-tp-6300",
    "country": "EE",
    "kinds": [
+    "FUEL",
     "PARKING"
    ],
-   "name_fi": "Rekkapysäkki · Sauga",
-   "name_en": "Truck stop · Sauga",
-   "network": null,
+   "name_fi": "Nurme tankla · Sauga",
+   "name_en": "Nurme tankla · Sauga",
+   "network": "Nurme tankla",
    "address": "Sauga, 2 km",
    "lat": 58.4489,
    "lon": 24.5018,
    "approx": false,
-   "hours_fi": null,
-   "hours_en": null,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
    "phone": null,
    "free": false,
    "secured": false,
@@ -79018,9 +79887,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "Tankkaus (88 m)",
+     "en": "Fuel (88 m)"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus keskitaso. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence medium. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus keskitaso. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence medium. Price and security not verified."
     }
    ]
   },
@@ -79087,15 +79961,15 @@
     "FUEL",
     "PARKING"
    ],
-   "name_fi": "Tankkaus ja rekkaparkki · Uulu",
-   "name_en": "Fuel and truck parking · Uulu",
-   "network": null,
+   "name_fi": "Circle K · Uulu",
+   "name_en": "Circle K · Uulu",
+   "network": "Circle K",
    "address": "Uulu, 24 km",
    "lat": 58.0746,
    "lon": 24.5128,
    "approx": false,
-   "hours_fi": null,
-   "hours_en": null,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
    "phone": null,
    "free": false,
    "secured": false,
@@ -79103,9 +79977,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "Tankkaus, rekkadiesel (raskaan kaluston pistooli), AdBlue",
+     "en": "Fuel, HGV diesel pump, AdBlue"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus keskitaso. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence medium. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus keskitaso. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence medium. Price and security not verified."
     }
    ]
   },
@@ -79144,9 +80023,9 @@
     "FUEL",
     "PARKING"
    ],
-   "name_fi": "Tankkaus ja rekkaparkki · Kunda",
-   "name_en": "Fuel and truck parking · Kunda",
-   "network": null,
+   "name_fi": "Olerex · Kunda",
+   "name_en": "Olerex · Kunda",
+   "network": "Olerex",
    "address": "Kunda",
    "lat": 59.4957,
    "lon": 26.5167,
@@ -79160,9 +80039,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "Tankkaus, diesel, AdBlue",
+     "en": "Fuel, diesel, AdBlue"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus keskitaso. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence medium. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus keskitaso. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence medium. Price and security not verified."
     }
    ]
   },
@@ -79173,15 +80057,15 @@
     "FUEL",
     "PARKING"
    ],
-   "name_fi": "Tankkaus ja rekkaparkki · Kiviõli",
-   "name_en": "Fuel and truck parking · Kiviõli",
-   "network": null,
+   "name_fi": "Olerex · Kiviõli",
+   "name_en": "Olerex · Kiviõli",
+   "network": "Olerex",
    "address": "Kiviõli, 1 km",
    "lat": 59.3646,
    "lon": 26.9681,
    "approx": false,
-   "hours_fi": null,
-   "hours_en": null,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
    "phone": null,
    "free": false,
    "secured": false,
@@ -79189,9 +80073,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "Tankkaus, diesel, AdBlue",
+     "en": "Fuel, diesel, AdBlue"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus keskitaso. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence medium. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus keskitaso. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence medium. Price and security not verified."
     }
    ]
   },
@@ -79230,15 +80119,15 @@
     "FUEL",
     "PARKING"
    ],
-   "name_fi": "Tankkaus ja rekkaparkki · Rapla",
-   "name_en": "Fuel and truck parking · Rapla",
-   "network": null,
+   "name_fi": "Olerex · Rapla",
+   "name_en": "Olerex · Rapla",
+   "network": "Olerex",
    "address": "Rapla, 1 km",
    "lat": 58.9945,
    "lon": 24.7971,
    "approx": false,
-   "hours_fi": null,
-   "hours_en": null,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
    "phone": null,
    "free": false,
    "secured": false,
@@ -79246,9 +80135,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "Tankkaus, diesel",
+     "en": "Fuel, diesel"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus keskitaso. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence medium. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus keskitaso. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence medium. Price and security not verified."
     }
    ]
   },
@@ -79315,15 +80209,15 @@
     "FUEL",
     "PARKING"
    ],
-   "name_fi": "Tankkaus ja rekkaparkki · Lihula",
-   "name_en": "Fuel and truck parking · Lihula",
-   "network": null,
+   "name_fi": "Olerex · Lihula",
+   "name_en": "Olerex · Lihula",
+   "network": "Olerex",
    "address": "Lihula, 2 km",
    "lat": 58.685,
    "lon": 23.8094,
    "approx": false,
-   "hours_fi": null,
-   "hours_en": null,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
    "phone": null,
    "free": false,
    "secured": false,
@@ -79331,9 +80225,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "Tankkaus, rekkadiesel (raskaan kaluston pistooli)",
+     "en": "Fuel, HGV diesel pump"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus keskitaso. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence medium. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus keskitaso. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence medium. Price and security not verified."
     }
    ]
   },
@@ -79400,15 +80299,15 @@
     "FUEL",
     "PARKING"
    ],
-   "name_fi": "Tankkaus ja rekkaparkki · Pärnu-Jaagupi",
-   "name_en": "Fuel and truck parking · Pärnu-Jaagupi",
-   "network": null,
+   "name_fi": "Alexela · Pärnu-Jaagupi",
+   "name_en": "Alexela · Pärnu-Jaagupi",
+   "network": "Alexela",
    "address": "Pärnu-Jaagupi, 2 km",
    "lat": 58.5956,
    "lon": 24.5101,
    "approx": false,
-   "hours_fi": null,
-   "hours_en": null,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
    "phone": null,
    "free": false,
    "secured": false,
@@ -79416,9 +80315,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "Tankkaus, diesel, AdBlue",
+     "en": "Fuel, diesel, AdBlue"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus keskitaso. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence medium. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus keskitaso. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence medium. Price and security not verified."
     }
    ]
   },
@@ -79429,9 +80333,9 @@
     "FUEL",
     "PARKING"
    ],
-   "name_fi": "Tankkaus ja rekkaparkki · Liiva",
-   "name_en": "Fuel and truck parking · Liiva",
-   "network": null,
+   "name_fi": "Alexela · Liiva",
+   "name_en": "Alexela · Liiva",
+   "network": "Alexela",
    "address": "Liiva, 16 km",
    "lat": 58.5877,
    "lon": 23.5278,
@@ -79445,9 +80349,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "Tankkaus",
+     "en": "Fuel"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus keskitaso. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence medium. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus keskitaso. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence medium. Price and security not verified."
     }
    ]
   },
@@ -79540,17 +80449,18 @@
    "country": "EE",
    "kinds": [
     "FUEL",
-    "PARKING"
+    "PARKING",
+    "SHOWER"
    ],
-   "name_fi": "Tankkaus ja rekkaparkki · Kõrveküla",
-   "name_en": "Fuel and truck parking · Kõrveküla",
-   "network": null,
+   "name_fi": "Terminal Oil · Kõrveküla",
+   "name_en": "Terminal Oil · Kõrveküla",
+   "network": "Terminal Oil",
    "address": "Kõrveküla, 3 km",
    "lat": 58.4076,
    "lon": 26.748,
    "approx": false,
-   "hours_fi": null,
-   "hours_en": null,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
    "phone": null,
    "free": false,
    "secured": false,
@@ -79558,9 +80468,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "Tankkaus (102 m), diesel, AdBlue, suihku (102 m)",
+     "en": "Fuel (102 m), diesel, AdBlue, shower (102 m)"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus keskitaso. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence medium. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus keskitaso. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence medium. Price and security not verified."
     }
    ]
   },
@@ -79568,17 +80483,18 @@
    "id": "ee-tp-6320",
    "country": "EE",
    "kinds": [
+    "FUEL",
     "PARKING"
    ],
-   "name_fi": "Rekkaparkki · Pärnu",
-   "name_en": "Truck parking · Pärnu",
-   "network": null,
+   "name_fi": "Alexela · Pärnu",
+   "name_en": "Alexela · Pärnu",
+   "network": "Alexela",
    "address": "Pärnu, 3 km",
    "lat": 58.3712,
    "lon": 24.5466,
    "approx": false,
-   "hours_fi": null,
-   "hours_en": null,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
    "phone": null,
    "free": false,
    "secured": false,
@@ -79586,9 +80502,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "Tankkaus (79 m), rekkadiesel (raskaan kaluston pistooli), AdBlue",
+     "en": "Fuel (79 m), HGV diesel pump, AdBlue"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus keskitaso. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence medium. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus keskitaso. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence medium. Price and security not verified."
     }
    ]
   },
@@ -79655,15 +80576,15 @@
     "FUEL",
     "PARKING"
    ],
-   "name_fi": "Tankkaus ja rekkaparkki · Võru",
-   "name_en": "Fuel and truck parking · Võru",
-   "network": null,
+   "name_fi": "Olerex · Võru",
+   "name_en": "Olerex · Võru",
+   "network": "Olerex",
    "address": "Võru, 4 km",
    "lat": 57.8584,
    "lon": 26.9756,
    "approx": false,
-   "hours_fi": null,
-   "hours_en": null,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
    "phone": null,
    "free": false,
    "secured": false,
@@ -79671,9 +80592,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "Tankkaus, diesel",
+     "en": "Fuel, diesel"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus keskitaso. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence medium. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus keskitaso. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence medium. Price and security not verified."
     }
    ]
   },
@@ -79699,9 +80625,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "90 rekkapaikkaa",
+     "en": "90 truck spaces"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus keskitaso. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence medium. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus keskitaso. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence medium. Price and security not verified."
     }
    ]
   },
@@ -79712,15 +80643,15 @@
     "FUEL",
     "PARKING"
    ],
-   "name_fi": "Tankkaus ja rekkaparkki · Tallinn",
-   "name_en": "Fuel and truck parking · Tallinn",
-   "network": null,
+   "name_fi": "Circle K · Tallinn",
+   "name_en": "Circle K · Tallinn",
+   "network": "Circle K",
    "address": "Tallinn",
    "lat": 59.4445,
    "lon": 24.7523,
    "approx": false,
-   "hours_fi": null,
-   "hours_en": null,
+   "hours_fi": "PH,Mo-Su 00:00-24:00",
+   "hours_en": "PH,Mo-Su 00:00-24:00",
    "phone": null,
    "free": false,
    "secured": false,
@@ -79728,9 +80659,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "Tankkaus",
+     "en": "Fuel"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus korkea. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence high. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus korkea. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence high. Price and security not verified."
     }
    ]
   },
@@ -79741,9 +80677,9 @@
     "FUEL",
     "PARKING"
    ],
-   "name_fi": "Tankkaus ja rekkaparkki · Soinaste",
-   "name_en": "Fuel and truck parking · Soinaste",
-   "network": null,
+   "name_fi": "Neste · Soinaste",
+   "name_en": "Neste · Soinaste",
+   "network": "Neste",
    "address": "Soinaste, 3 km",
    "lat": 58.3615,
    "lon": 26.6756,
@@ -79757,9 +80693,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "Tankkaus, rekkadiesel (raskaan kaluston pistooli), AdBlue",
+     "en": "Fuel, HGV diesel pump, AdBlue"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus keskitaso. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence medium. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus keskitaso. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence medium. Price and security not verified."
     }
    ]
   },
@@ -79768,17 +80709,18 @@
    "country": "EE",
    "kinds": [
     "FUEL",
-    "PARKING"
+    "PARKING",
+    "SHOWER"
    ],
-   "name_fi": "Tankkaus ja rekkaparkki · Märjamaa",
-   "name_en": "Fuel and truck parking · Märjamaa",
-   "network": null,
+   "name_fi": "Circle K · Märjamaa",
+   "name_en": "Circle K · Märjamaa",
+   "network": "Circle K",
    "address": "Märjamaa, 2 km",
    "lat": 58.9214,
    "lon": 24.4576,
    "approx": false,
-   "hours_fi": null,
-   "hours_en": null,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
    "phone": null,
    "free": false,
    "secured": false,
@@ -79786,9 +80728,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "Tankkaus, diesel, AdBlue, suihku (36 m)",
+     "en": "Fuel, diesel, AdBlue, shower (36 m)"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus keskitaso. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence medium. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus keskitaso. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence medium. Price and security not verified."
     }
    ]
   },
@@ -79799,15 +80746,15 @@
     "FUEL",
     "PARKING"
    ],
-   "name_fi": "Tankkaus ja rekkaparkki · Rakvere",
-   "name_en": "Fuel and truck parking · Rakvere",
-   "network": null,
+   "name_fi": "Alexela · Rakvere",
+   "name_en": "Alexela · Rakvere",
+   "network": "Alexela",
    "address": "Rakvere, 2 km",
    "lat": 59.3567,
    "lon": 26.3905,
    "approx": false,
-   "hours_fi": null,
-   "hours_en": null,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
    "phone": null,
    "free": false,
    "secured": false,
@@ -79815,9 +80762,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "Tankkaus (204 m), diesel",
+     "en": "Fuel (204 m), diesel"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus keskitaso. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence medium. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus keskitaso. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence medium. Price and security not verified."
     }
    ]
   },
@@ -79909,17 +80861,18 @@
    "id": "ee-tp-6332",
    "country": "EE",
    "kinds": [
+    "FUEL",
     "PARKING"
    ],
-   "name_fi": "Rekkaparkki · Pärnu",
-   "name_en": "Truck parking · Pärnu",
-   "network": null,
+   "name_fi": "Circle K · Pärnu",
+   "name_en": "Circle K · Pärnu",
+   "network": "Circle K",
    "address": "Pärnu, 4 km",
    "lat": 58.3722,
    "lon": 24.5519,
    "approx": false,
-   "hours_fi": null,
-   "hours_en": null,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
    "phone": null,
    "free": false,
    "secured": false,
@@ -79927,9 +80880,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "Tankkaus (165 m), rekkadiesel (raskaan kaluston pistooli), AdBlue",
+     "en": "Fuel (165 m), HGV diesel pump, AdBlue"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus keskitaso. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence medium. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus keskitaso. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence medium. Price and security not verified."
     }
    ]
   },
@@ -79940,15 +80898,15 @@
     "FUEL",
     "PARKING"
    ],
-   "name_fi": "Tankkaus ja rekkaparkki · Soinaste",
-   "name_en": "Fuel and truck parking · Soinaste",
-   "network": null,
+   "name_fi": "Olerex · Soinaste",
+   "name_en": "Olerex · Soinaste",
+   "network": "Olerex",
    "address": "Soinaste, 4 km",
    "lat": 58.3564,
    "lon": 26.6208,
    "approx": false,
-   "hours_fi": null,
-   "hours_en": null,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
    "phone": null,
    "free": false,
    "secured": false,
@@ -79956,9 +80914,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "Tankkaus",
+     "en": "Fuel"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus keskitaso. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence medium. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus keskitaso. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence medium. Price and security not verified."
     }
    ]
   },
@@ -79966,17 +80929,18 @@
    "id": "ee-tp-6334",
    "country": "EE",
    "kinds": [
+    "FUEL",
     "PARKING"
    ],
-   "name_fi": "Rekkaparkki · Kilingi-Nõmme",
-   "name_en": "Truck parking · Kilingi-Nõmme",
-   "network": null,
+   "name_fi": "Olerex · Kilingi-Nõmme",
+   "name_en": "Olerex · Kilingi-Nõmme",
+   "network": "Olerex",
    "address": "Kilingi-Nõmme, 2 km",
    "lat": 58.158,
    "lon": 24.9928,
    "approx": false,
-   "hours_fi": null,
-   "hours_en": null,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
    "phone": null,
    "free": false,
    "secured": false,
@@ -79984,9 +80948,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "Tankkaus, diesel",
+     "en": "Fuel, diesel"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus korkea. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence high. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus korkea. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence high. Price and security not verified."
     }
    ]
   },
@@ -80025,15 +80994,15 @@
     "FUEL",
     "PARKING"
    ],
-   "name_fi": "Tankkaus ja rekkaparkki · Linaküla",
-   "name_en": "Fuel and truck parking · Linaküla",
-   "network": null,
+   "name_fi": "Terminal Oil · Linaküla",
+   "name_en": "Terminal Oil · Linaküla",
+   "network": "Terminal Oil",
    "address": "Linaküla, 38 km",
    "lat": 57.8777,
    "lon": 24.385,
    "approx": false,
-   "hours_fi": null,
-   "hours_en": null,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
    "phone": null,
    "free": false,
    "secured": false,
@@ -80041,9 +81010,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "Tankkaus (77 m), diesel, AdBlue",
+     "en": "Fuel (77 m), diesel, AdBlue"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus keskitaso. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence medium. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus keskitaso. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence medium. Price and security not verified."
     }
    ]
   },
@@ -80054,15 +81028,15 @@
     "FUEL",
     "PARKING"
    ],
-   "name_fi": "Tankkaus ja rekkaparkki · Kesklinn",
-   "name_en": "Fuel and truck parking · Kesklinn",
-   "network": null,
+   "name_fi": "Circle K · Kesklinn",
+   "name_en": "Circle K · Kesklinn",
+   "network": "Circle K",
    "address": "Kesklinn, 2 km",
    "lat": 59.4228,
    "lon": 24.7863,
    "approx": false,
-   "hours_fi": null,
-   "hours_en": null,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
    "phone": null,
    "free": false,
    "secured": false,
@@ -80070,9 +81044,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "Tankkaus, rekkadiesel (raskaan kaluston pistooli)",
+     "en": "Fuel, HGV diesel pump"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus keskitaso. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence medium. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus keskitaso. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence medium. Price and security not verified."
     }
    ]
   },
@@ -80083,15 +81062,15 @@
     "FUEL",
     "PARKING"
    ],
-   "name_fi": "Tankkaus ja rekkaparkki · Keila",
-   "name_en": "Fuel and truck parking · Keila",
-   "network": null,
+   "name_fi": "Circle K · Keila",
+   "name_en": "Circle K · Keila",
+   "network": "Circle K",
    "address": "Keila, 2 km",
    "lat": 59.311,
    "lon": 24.4374,
    "approx": false,
-   "hours_fi": null,
-   "hours_en": null,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
    "phone": null,
    "free": false,
    "secured": false,
@@ -80099,9 +81078,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "Tankkaus, rekkadiesel (raskaan kaluston pistooli), AdBlue",
+     "en": "Fuel, HGV diesel pump, AdBlue"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus keskitaso. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence medium. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus keskitaso. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence medium. Price and security not verified."
     }
    ]
   },
@@ -80112,15 +81096,15 @@
     "FUEL",
     "PARKING"
    ],
-   "name_fi": "Tankkaus ja rekkaparkki · Paide",
-   "name_en": "Fuel and truck parking · Paide",
-   "network": null,
+   "name_fi": "Olerex · Paide",
+   "name_en": "Olerex · Paide",
+   "network": "Olerex",
    "address": "Paide, 2 km",
    "lat": 58.8947,
    "lon": 25.5714,
    "approx": false,
-   "hours_fi": null,
-   "hours_en": null,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
    "phone": null,
    "free": false,
    "secured": false,
@@ -80128,9 +81112,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "Tankkaus, diesel, AdBlue",
+     "en": "Fuel, diesel, AdBlue"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus korkea. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence high. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus korkea. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence high. Price and security not verified."
     }
    ]
   },
@@ -80138,11 +81127,12 @@
    "id": "ee-tp-6340",
    "country": "EE",
    "kinds": [
+    "FUEL",
     "PARKING"
    ],
-   "name_fi": "Rekkaparkki · Türi",
-   "name_en": "Truck parking · Türi",
-   "network": null,
+   "name_fi": "Alexela · Türi",
+   "name_en": "Alexela · Türi",
+   "network": "Alexela",
    "address": "Türi",
    "lat": 58.8026,
    "lon": 25.4285,
@@ -80156,9 +81146,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "Tankkaus (138 m)",
+     "en": "Fuel (138 m)"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus keskitaso. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence medium. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus keskitaso. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence medium. Price and security not verified."
     }
    ]
   },
@@ -80169,9 +81164,9 @@
     "FUEL",
     "PARKING"
    ],
-   "name_fi": "Tankkaus ja rekkaparkki · Sauga",
-   "name_en": "Fuel and truck parking · Sauga",
-   "network": null,
+   "name_fi": "Olerex · Sauga",
+   "name_en": "Olerex · Sauga",
+   "network": "Olerex",
    "address": "Sauga, 2 km",
    "lat": 58.4093,
    "lon": 24.4937,
@@ -80185,9 +81180,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "Tankkaus (50 m), rekkadiesel (raskaan kaluston pistooli)",
+     "en": "Fuel (50 m), HGV diesel pump"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus korkea. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence high. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus korkea. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence high. Price and security not verified."
     }
    ]
   },
@@ -80198,9 +81198,9 @@
     "FUEL",
     "PARKING"
    ],
-   "name_fi": "Tankkaus ja rekkaparkki · Soinaste",
-   "name_en": "Fuel and truck parking · Soinaste",
-   "network": null,
+   "name_fi": "Alexela · Soinaste",
+   "name_en": "Alexela · Soinaste",
+   "network": "Alexela",
    "address": "Soinaste, 2 km",
    "lat": 58.3571,
    "lon": 26.6796,
@@ -80214,9 +81214,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "Tankkaus (65 m), rekkadiesel (raskaan kaluston pistooli), AdBlue",
+     "en": "Fuel (65 m), HGV diesel pump, AdBlue"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus keskitaso. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence medium. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus keskitaso. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence medium. Price and security not verified."
     }
    ]
   },
@@ -80227,15 +81232,15 @@
     "FUEL",
     "PARKING"
    ],
-   "name_fi": "Tankkaus ja rekkaparkki · Viimsi",
-   "name_en": "Fuel and truck parking · Viimsi",
-   "network": null,
+   "name_fi": "Circle K · Viimsi",
+   "name_en": "Circle K · Viimsi",
+   "network": "Circle K",
    "address": "Viimsi, 1 km",
    "lat": 59.4985,
    "lon": 24.8287,
    "approx": false,
-   "hours_fi": null,
-   "hours_en": null,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
    "phone": null,
    "free": false,
    "secured": false,
@@ -80243,9 +81248,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "Tankkaus, diesel",
+     "en": "Fuel, diesel"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus keskitaso. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence medium. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus keskitaso. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence medium. Price and security not verified."
     }
    ]
   },
@@ -80256,15 +81266,15 @@
     "FUEL",
     "PARKING"
    ],
-   "name_fi": "Tankkaus ja rekkaparkki · Jõhvi",
-   "name_en": "Fuel and truck parking · Jõhvi",
-   "network": null,
+   "name_fi": "Circle K · Jõhvi",
+   "name_en": "Circle K · Jõhvi",
+   "network": "Circle K",
    "address": "Jõhvi, 2 km",
    "lat": 59.3677,
    "lon": 27.3934,
    "approx": false,
-   "hours_fi": null,
-   "hours_en": null,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
    "phone": null,
    "free": false,
    "secured": false,
@@ -80272,9 +81282,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "Tankkaus, diesel",
+     "en": "Fuel, diesel"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus keskitaso. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence medium. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus keskitaso. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence medium. Price and security not verified."
     }
    ]
   },
@@ -80282,17 +81297,18 @@
    "id": "ee-tp-6345",
    "country": "EE",
    "kinds": [
+    "FUEL",
     "PARKING"
    ],
-   "name_fi": "Rekkapysäkki · Põltsamaa",
-   "name_en": "Truck stop · Põltsamaa",
-   "network": null,
+   "name_fi": "Alexela · Põltsamaa",
+   "name_en": "Alexela · Põltsamaa",
+   "network": "Alexela",
    "address": "Põltsamaa, 16 km",
    "lat": 58.7456,
    "lon": 25.7677,
    "approx": false,
-   "hours_fi": null,
-   "hours_en": null,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
    "phone": null,
    "free": false,
    "secured": false,
@@ -80300,9 +81316,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "Tankkaus",
+     "en": "Fuel"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus korkea. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence high. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus korkea. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence high. Price and security not verified."
     }
    ]
   },
@@ -80313,15 +81334,15 @@
     "FUEL",
     "PARKING"
    ],
-   "name_fi": "Tankkaus ja rekkaparkki · Tartu",
-   "name_en": "Fuel and truck parking · Tartu",
-   "network": null,
+   "name_fi": "Neste · Tartu",
+   "name_en": "Neste · Tartu",
+   "network": "Neste",
    "address": "Tartu, 3 km",
    "lat": 58.3763,
    "lon": 26.6775,
    "approx": false,
-   "hours_fi": null,
-   "hours_en": null,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
    "phone": null,
    "free": false,
    "secured": false,
@@ -80329,9 +81350,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "Tankkaus (142 m), diesel, AdBlue",
+     "en": "Fuel (142 m), diesel, AdBlue"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus keskitaso. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence medium. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus keskitaso. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence medium. Price and security not verified."
     }
    ]
   },
@@ -80342,15 +81368,15 @@
     "FUEL",
     "PARKING"
    ],
-   "name_fi": "Tankkaus ja rekkaparkki · Pärnu",
-   "name_en": "Fuel and truck parking · Pärnu",
-   "network": null,
+   "name_fi": "Neste · Pärnu",
+   "name_en": "Neste · Pärnu",
+   "network": "Neste",
    "address": "Pärnu, 4 km",
    "lat": 58.3634,
    "lon": 24.5611,
    "approx": false,
-   "hours_fi": null,
-   "hours_en": null,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
    "phone": null,
    "free": false,
    "secured": false,
@@ -80358,9 +81384,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "Tankkaus, diesel, AdBlue",
+     "en": "Fuel, diesel, AdBlue"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus keskitaso. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence medium. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus keskitaso. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence medium. Price and security not verified."
     }
    ]
   },
@@ -80371,15 +81402,15 @@
     "FUEL",
     "PARKING"
    ],
-   "name_fi": "Tankkaus ja rekkaparkki · Viljandi",
-   "name_en": "Fuel and truck parking · Viljandi",
-   "network": null,
+   "name_fi": "Terminal Oil · Viljandi",
+   "name_en": "Terminal Oil · Viljandi",
+   "network": "Terminal Oil",
    "address": "Viljandi, 17 km",
    "lat": 58.3267,
    "lon": 25.3071,
    "approx": false,
-   "hours_fi": null,
-   "hours_en": null,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
    "phone": null,
    "free": false,
    "secured": false,
@@ -80387,9 +81418,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "Tankkaus, diesel",
+     "en": "Fuel, diesel"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus keskitaso. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence medium. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus keskitaso. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence medium. Price and security not verified."
     }
    ]
   },
@@ -80400,15 +81436,15 @@
     "FUEL",
     "PARKING"
    ],
-   "name_fi": "Tankkaus ja rekkaparkki · Uulu",
-   "name_en": "Fuel and truck parking · Uulu",
-   "network": null,
+   "name_fi": "Terminal Oil · Uulu",
+   "name_en": "Terminal Oil · Uulu",
+   "network": "Terminal Oil",
    "address": "Uulu, 1 km",
    "lat": 58.2757,
    "lon": 24.5781,
    "approx": false,
-   "hours_fi": null,
-   "hours_en": null,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
    "phone": null,
    "free": false,
    "secured": false,
@@ -80416,9 +81452,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "Tankkaus, diesel, AdBlue",
+     "en": "Fuel, diesel, AdBlue"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus keskitaso. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence medium. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus keskitaso. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence medium. Price and security not verified."
     }
    ]
   },
@@ -80429,15 +81470,15 @@
     "FUEL",
     "PARKING"
    ],
-   "name_fi": "Tankkaus ja rekkaparkki · Valga",
-   "name_en": "Fuel and truck parking · Valga",
-   "network": null,
+   "name_fi": "Olerex · Valga",
+   "name_en": "Olerex · Valga",
+   "network": "Olerex",
    "address": "Valga, 1 km",
    "lat": 57.7901,
    "lon": 26.0496,
    "approx": false,
-   "hours_fi": null,
-   "hours_en": null,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
    "phone": null,
    "free": false,
    "secured": false,
@@ -80445,9 +81486,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "Tankkaus, diesel",
+     "en": "Fuel, diesel"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus keskitaso. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence medium. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus keskitaso. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence medium. Price and security not verified."
     }
    ]
   },
@@ -80458,15 +81504,15 @@
     "FUEL",
     "PARKING"
    ],
-   "name_fi": "Tankkaus ja rekkaparkki · Lasnamäe",
-   "name_en": "Fuel and truck parking · Lasnamäe",
-   "network": null,
+   "name_fi": "Circle K · Lasnamäe",
+   "name_en": "Circle K · Lasnamäe",
+   "network": "Circle K",
    "address": "Lasnamäe, 1 km",
    "lat": 59.4292,
    "lon": 24.8379,
    "approx": false,
-   "hours_fi": null,
-   "hours_en": null,
+   "hours_fi": "24/7",
+   "hours_en": "24/7",
    "phone": null,
    "free": false,
    "secured": false,
@@ -80474,9 +81520,14 @@
    "warning": false,
    "details": [
     {
+     "k": "facilities",
+     "fi": "Tankkaus, diesel, AdBlue",
+     "en": "Fuel, diesel, AdBlue"
+    },
+    {
      "k": "notes",
-     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus korkea. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
-     "en": "Source: EU truck parking dataset. Confidence high. Facilities (shower, security, price) not verified."
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto, palvelut OpenStreetMapista (10/2026). Luotettavuus korkea. Hintaa ja vartiointia ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset, facilities from OpenStreetMap (10/2026). Confidence high. Price and security not verified."
     }
    ]
   },
@@ -92138,6 +93189,35 @@
    ]
   },
   {
+   "id": "pl-tp-15839",
+   "country": "PL",
+   "kinds": [
+    "FUEL",
+    "PARKING"
+   ],
+   "name_fi": "Tankkaus ja rekkaparkki · Włocławek",
+   "name_en": "Fuel and truck parking · Włocławek",
+   "network": null,
+   "address": "Włocławek",
+   "lat": 52.6551,
+   "lon": 19.06,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": null,
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus korkea. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset. Confidence high. Facilities (shower, security, price) not verified."
+    }
+   ]
+  },
+  {
    "id": "pl-tp-15840",
    "country": "PL",
    "kinds": [
@@ -102867,6 +103947,35 @@
    ]
   },
   {
+   "id": "pl-tp-17021",
+   "country": "PL",
+   "kinds": [
+    "FUEL",
+    "PARKING"
+   ],
+   "name_fi": "Rekkapysäkki · Jelenia Góra",
+   "name_en": "Truck stop · Jelenia Góra",
+   "network": null,
+   "address": "Jelenia Góra, 2 km",
+   "lat": 50.9098,
+   "lon": 15.7,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": null,
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus korkea. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset. Confidence high. Facilities (shower, security, price) not verified."
+    }
+   ]
+  },
+  {
    "id": "pl-tp-17025",
    "country": "PL",
    "kinds": [
@@ -106153,6 +107262,35 @@
      "k": "notes",
      "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus korkea. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
      "en": "Source: EU truck parking dataset. Confidence high. Facilities (shower, security, price) not verified."
+    }
+   ]
+  },
+  {
+   "id": "pl-tp-17296",
+   "country": "PL",
+   "kinds": [
+    "FUEL",
+    "PARKING"
+   ],
+   "name_fi": "Tankkaus ja rekkaparkki · Torzym",
+   "name_en": "Fuel and truck parking · Torzym",
+   "network": null,
+   "address": "Torzym, 3 km",
+   "lat": 52.3173,
+   "lon": 15.04,
+   "approx": false,
+   "hours_fi": null,
+   "hours_en": null,
+   "phone": null,
+   "free": false,
+   "secured": false,
+   "sauna": false,
+   "warning": false,
+   "details": [
+    {
+     "k": "notes",
+     "fi": "Lähde: EU:n rekkapysäköintiaineisto. Luotettavuus keskitaso. Palveluita (suihku, vartiointi, hinta) ei ole tarkistettu.",
+     "en": "Source: EU truck parking dataset. Confidence medium. Facilities (shower, security, price) not verified."
     }
    ]
   },
