@@ -1,5 +1,5 @@
 import { analytics } from '@heycatch/sdk';
-import { cleanUrl, isPublicPath } from '@/lib/analytics/public';
+import { isPublicPath, scrubProperties } from '@/lib/analytics/public';
 
 /*
  * Аналитика HeyCatch (24.10.2026).
@@ -9,8 +9,9 @@ import { cleanUrl, isPublicPath } from '@/lib/analytics/public';
  * в браузер. Согласие включает AnalyticsConsent (optInCapturing).
  *
  * Даже после согласия события уходят только с открытых страниц:
- * beforeSend отбрасывает всё из кабинетов и вычищает из адресов
- * строку запроса (код приглашения).
+ * beforeSend отбрасывает всё из кабинетов, а в остальном вычищает все
+ * адреса: строку запроса (код приглашения) и пути закрытых страниц
+ * (код ссылки отслеживания в «откуда пришёл»).
  */
 analytics.init({
   projectKey: 'hck_pk_uxM3NqYDFHlLmduLaQ-BOX_oJ8TDrpMR',
@@ -19,10 +20,7 @@ analytics.init({
   cookieExpirationDays: 365,
   beforeSend: (event) => {
     if (!event || typeof window === 'undefined' || !isPublicPath(window.location.pathname)) return null;
-    const p = event.properties;
-    for (const key of ['$current_url', '$referrer', '$initial_referrer', '$initial_current_url']) {
-      if (key in p) p[key] = cleanUrl(p[key]);
-    }
+    event.properties = scrubProperties(event.properties) as Record<string, unknown>;
     return event;
   },
 });

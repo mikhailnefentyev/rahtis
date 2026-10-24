@@ -16,13 +16,17 @@ export function isPublicPath(pathname: string): boolean {
 }
 
 /**
- * Адрес без строки запроса, кроме utm-меток: в ссылке заявки лежит код
- * приглашения (?invite=…), он не должен попасть к стороннему сервису.
+ * Адрес, который можно отдать: открытая страница без строки запроса
+ * (кроме utm-меток) — в ссылке заявки лежит код приглашения. Адрес
+ * закрытой страницы своего сайта (кабинет, ссылка отслеживания с кодом
+ * в пути) сворачивается до корня сайта: он приходит как «откуда пришёл»,
+ * когда человек из кабинета или со ссылки отслеживания открывает витрину.
  */
-export function cleanUrl(value: unknown): unknown {
-  if (typeof value !== 'string') return value;
+export function cleanUrl(value: string): string {
   try {
     const url = new URL(value);
+    const own = /(^|\.)rahtis\.eu$/.test(url.hostname) || url.hostname === 'localhost';
+    if (own && !isPublicPath(url.pathname)) return `${url.origin}/`;
     for (const key of [...url.searchParams.keys()]) {
       if (!key.startsWith('utm_')) url.searchParams.delete(key);
     }
@@ -31,4 +35,26 @@ export function cleanUrl(value: unknown): unknown {
   } catch {
     return value;
   }
+}
+
+/**
+ * Пройти все свойства события (вместе с вложенными $set, $set_once) и
+ * вычистить всё, похожее на адрес: полные адреса — cleanUrl, пути
+ * закрытых страниц ($prev_pageview_pathname и т. п.) — до «/».
+ */
+export function scrubProperties(value: unknown, depth = 0): unknown {
+  if (depth > 4) return value;
+  if (typeof value === 'string') {
+    if (/^https?:\/\//i.test(value)) return cleanUrl(value);
+    if (value.startsWith('/') && !value.startsWith('//')) {
+      const path = value.split(/[?#]/)[0];
+      return isPublicPath(path) ? path : '/';
+    }
+    return value;
+  }
+  if (Array.isArray(value)) return value.map((item) => scrubProperties(item, depth + 1));
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, scrubProperties(v, depth + 1)]));
+  }
+  return value;
 }
