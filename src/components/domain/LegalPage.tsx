@@ -5,6 +5,7 @@ import { LegalDocument } from '@/components/domain/LegalDocument';
 import { APP } from '@/lib/config';
 import { getI18n, isLocale } from '@/lib/i18n';
 import type { Database } from '@/types/database';
+import { OrganisationLd } from '@/components/layout/OrganisationLd';
 
 type Kind = Database['public']['Enums']['legal_kind'];
 
@@ -27,6 +28,7 @@ export async function LegalPage({ locale: raw, kind }: { locale: string; kind: K
 
   return (
     <main className="mx-auto w-full max-w-3xl px-5 py-10">
+      <OrganisationLd />
       <nav className="mb-8 flex items-center justify-between gap-4">
         <Link href={`/${locale}`} className="text-[13px] text-ink-muted hover:text-ink">
           ← {t.brand.name}

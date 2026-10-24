@@ -18,7 +18,12 @@ export const pl = {
 
 
   seo: {
-    homeTitle: 'Zarządzanie transportem i giełda ładunków: wymiany naczep, kontenery, ekspres',
+    homeTitle: 'Giełda ładunków i TMS: wymiany naczep, kontenery',
+    /* Описание для выдачи поиска: до 160 знаков, иначе обрезается. Длинное homeDescription — для разметки. */
+    homeMeta: 'Giełda ładunków i zarządzanie transportem dla przewoźników: flota, kierowcy, CMR i zlecenia bezpośrednie. Wymiany naczep i kontenery w 9 krajach.',
+    applyTitle: 'Dołącz jako przewoźnik lub zleceniodawca',
+    termsTitle: 'Regulamin dla przewoźników i zleceniodawców',
+    privacyTitle: 'Polityka prywatności: dane osobowe',
     features: [
       'Zarządzanie flotą i kierowcami',
       'Własni klienci i zlecenia bezpośrednie, link do śledzenia dla klienta',

@@ -115,3 +115,10 @@ export function pageMetadata(input: {
     ...(noindex ? { robots: { index: false, follow: true } } : {}),
   };
 }
+
+/**
+ * Профили компании для schema.org sameAs: по ним машины сверяют, что
+ * RAHTIS и Aivomaa Oy — одно лицо. Пока только запись в торговом реестре;
+ * появятся LinkedIn и т. п. — добавить сюда.
+ */
+export const ORG_SAME_AS = ['https://tietopalvelu.ytj.fi/yritys/3592993-6'];

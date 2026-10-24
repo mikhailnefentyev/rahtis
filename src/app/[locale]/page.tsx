@@ -7,7 +7,7 @@ import { SiteHeader } from '@/components/layout/SiteHeader';
 import { APP, SUBSCRIPTION_UNIT_CENTS } from '@/lib/config';
 import { getI18n, isLocale } from '@/lib/i18n';
 import { placeCountries } from '@/lib/routing/places';
-import { SITE_URL, pageMetadata, samePath } from '@/lib/seo';
+import { ORG_SAME_AS, SITE_URL, pageMetadata, samePath } from '@/lib/seo';
 
 /**
  * Главная страница.
@@ -36,7 +36,7 @@ export async function generateMetadata({
     locale,
     paths: samePath(''),
     title: t.seo.homeTitle,
-    description: t.seo.homeDescription,
+    description: t.seo.homeMeta,
     canonical: root ? `${SITE_URL}/` : undefined,
     xDefault: `${SITE_URL}/`,
   });
@@ -86,6 +86,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     description: t.seo.homeDescription,
     email: APP.operator.email,
     taxID: APP.operator.businessId,
+    sameAs: ORG_SAME_AS,
     areaServed: placeCountries().map((code) => ({
       '@type': 'Country',
       name: new Intl.DisplayNames([locale], { type: 'region' }).of(code) ?? code,

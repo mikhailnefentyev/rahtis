@@ -20,7 +20,7 @@ export async function generateMetadata({
     textLocales: ['fi', 'en'],
     locale,
     paths: fiOrEnPath('/tietosuoja', '/privacy'),
-    title: t.legal.PRIVACY,
+    title: t.seo.privacyTitle,
     description: t.seo.privacyDescription,
   });
 }

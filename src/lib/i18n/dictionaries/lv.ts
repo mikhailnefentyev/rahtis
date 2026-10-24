@@ -18,7 +18,12 @@ export const lv = {
 
 
   seo: {
-    homeTitle: 'Transporta vadība un kravu birža: piekabju maiņa, konteineri, ekspress',
+    homeTitle: 'Kravu birža un TMS: piekabju maiņa un konteineri',
+    /* Описание для выдачи поиска: до 160 знаков, иначе обрезается. Длинное homeDescription — для разметки. */
+    homeMeta: 'Kravu birža un transporta vadība pārvadātājiem: auto, vadītāji, CMR un tiešie pasūtījumi. Piekabju maiņa, konteineri un ekspress 9 valstīs.',
+    applyTitle: 'Pievienojies kā pārvadātājs vai pasūtītājs',
+    termsTitle: 'Lietošanas noteikumi pārvadātājiem un pasūtītājiem',
+    privacyTitle: 'Privātuma paziņojums: personas datu apstrāde',
     features: [
       'Autoparka un vadītāju pārvaldība',
       'Savi klienti un tiešie pasūtījumi, izsekošanas saite klientam',

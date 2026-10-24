@@ -18,7 +18,12 @@ export const et = {
 
 
   seo: {
-    homeTitle: 'Veokorraldus ja veobörs: haagiste vahetus, konteinerid, ekspress',
+    homeTitle: 'Veobörs ja TMS: haagiste vahetus ja konteinerid',
+    /* Описание для выдачи поиска: до 160 знаков, иначе обрезается. Длинное homeDescription — для разметки. */
+    homeMeta: 'Veobörs ja veokorraldus vedajatele: sõidukid, juhid, veoselehed ja otsetellimused. Haagiste vahetus, konteinerid ja ekspressveod 9 riigis.',
+    applyTitle: 'Liitu vedaja või tellijana',
+    termsTitle: 'Kasutustingimused vedajatele ja tellijatele',
+    privacyTitle: 'Privaatsusteade: kuidas isikuandmeid töödeldakse',
     features: [
       'Autopargi ja juhtide haldus',
       'Omad kliendid ja otsetellimused, jälgimislink kliendile',

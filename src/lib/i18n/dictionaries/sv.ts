@@ -18,7 +18,12 @@ export const sv = {
 
 
   seo: {
-    homeTitle: 'Transportledning och lastbörs: trailerbyten, containrar, express',
+    homeTitle: 'Lastbörs och TMS: trailerbyten, containrar, express',
+    /* Описание для выдачи поиска: до 160 знаков, иначе обрезается. Длинное homeDescription — для разметки. */
+    homeMeta: 'Lastbörs och transportledning för åkerier: fordon, förare, fraktsedlar och direkta order. Trailerbyten, containrar och express i 9 länder.',
+    applyTitle: 'Anslut som åkeri eller transportköpare',
+    termsTitle: 'Användarvillkor för åkerier och transportköpare',
+    privacyTitle: 'Integritetspolicy: hur personuppgifter behandlas',
     features: [
       'Hantering av flotta och förare',
       'Egna kunder och direktorder, spårningslänk till kunden',

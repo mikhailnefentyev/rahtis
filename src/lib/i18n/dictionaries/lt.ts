@@ -18,7 +18,12 @@ export const lt = {
 
 
   seo: {
-    homeTitle: 'Transporto valdymas ir krovinių birža: priekabų keitimas, konteineriai, skubūs pervežimai',
+    homeTitle: 'Krovinių birža ir TMS: priekabos ir konteineriai',
+    /* Описание для выдачи поиска: до 160 знаков, иначе обрезается. Длинное homeDescription — для разметки. */
+    homeMeta: 'Krovinių birža ir transporto valdymas vežėjams: transportas, vairuotojai, CMR ir tiesioginiai užsakymai. Priekabų keitimas ir konteineriai.',
+    applyTitle: 'Prisijunkite kaip vežėjas arba užsakovas',
+    termsTitle: 'Naudojimo sąlygos vežėjams ir užsakovams',
+    privacyTitle: 'Privatumo pranešimas: asmens duomenų tvarkymas',
     features: [
       'Transporto parko ir vairuotojų valdymas',
       'Savi klientai ir tiesioginiai užsakymai, sekimo nuoroda klientui',

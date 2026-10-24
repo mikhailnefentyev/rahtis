@@ -11,6 +11,8 @@ type Section = { title: string; paragraphs: string[] };
 type DocsText = {
   title: string;
   description: string;
+  /** Заголовок вкладки и выдачи: 30–60 знаков вместе с « · RAHTIS». */
+  seoTitle: string;
   intro: string;
   openapi: string;
   cabinet: string;
@@ -47,7 +49,8 @@ type DocsText = {
 
 const fi: DocsText = {
   title: 'API-dokumentaatio',
-  description: 'RAHTIS-rajapinta tilaajille: tilausten luku ja luonti omasta järjestelmästä sekä tapahtumailmoitukset (webhook).',
+  description: 'RAHTIS-rajapinta rahdinantajille: tilausten luku ja luonti omasta ERP- tai TMS-järjestelmästä sekä tapahtumailmoitukset (webhook). Maksuton.',
+  seoTitle: 'Rajapinta (API) rahdinantajille',
   intro:
     'Rajapinnalla tilaaja hoitaa tilauksen koko elinkaaren omasta toiminnanohjauksestaan: luo tilauksen, valitsee tarjouksen tai määrää tutun auton, seuraa ajoa saapumisineen, kuittauksineen ja kuvineen, muuttaa reittiä ajon aikana, arvioi kuljetusliikkeen, hoitaa reklamaatiot ja saa ilmoituksen omaan osoitteeseensa, kun jotain muuttuu. Vastaukset ja virhekoodit ovat englanniksi, jotta ohjelma voi haarautua niiden mukaan.',
   openapi: 'Koneluettava kuvaus (OpenAPI 3.1) Postmaniin, Insomniaan tai asiakasgeneraattoriin:',
@@ -223,7 +226,8 @@ const fi: DocsText = {
 
 const en: DocsText = {
   title: 'API documentation',
-  description: 'RAHTIS API for shippers: read and create orders from your own system and receive webhooks.',
+  description: 'RAHTIS API for shippers: read and create transport orders from your own ERP or TMS and receive status webhooks. REST, free of charge.',
+  seoTitle: 'API for shippers: orders from your ERP or TMS',
   intro:
     'The API runs the whole life of an order from your own ERP or TMS: create the order, choose an offer or assign a known vehicle, follow the trip with arrivals, stop confirmations and photos, amend the route in progress, rate the carrier, handle claims, and get a notification at your own URL whenever something changes. Responses and error codes are in English so your program can branch on them.',
   openapi: 'Machine-readable description (OpenAPI 3.1) for Postman, Insomnia or a client generator:',

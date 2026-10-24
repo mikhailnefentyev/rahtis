@@ -9,6 +9,7 @@ import { getI18n, isLocale } from '@/lib/i18n';
 import { pageMetadata, samePath } from '@/lib/seo';
 import { inviteByToken } from '@/lib/partners/invites';
 import { ApplyForm } from './form';
+import { OrganisationLd } from '@/components/layout/OrganisationLd';
 
 export async function generateMetadata({
   params,
@@ -21,7 +22,7 @@ export async function generateMetadata({
   return pageMetadata({
     locale,
     paths: samePath('/apply'),
-    title: t.apply.title,
+    title: t.seo.applyTitle,
     description: t.seo.applyDescription,
   });
 }
@@ -41,6 +42,7 @@ export default async function ApplyPage({
 
   return (
     <main className="relative flex flex-1 items-center justify-center px-5 py-12">
+      <OrganisationLd />
       <div className="absolute top-5 right-5">
         <LocaleSwitch current={locale} />
       </div>

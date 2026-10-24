@@ -34,7 +34,12 @@ export const en = {
 
 
   seo: {
-    homeTitle: 'Transport management and freight exchange: trailer swaps, containers, express',
+    homeTitle: 'Freight exchange and TMS: trailer swaps, containers',
+    /* Описание для выдачи поиска: до 160 знаков, иначе обрезается. Длинное homeDescription — для разметки. */
+    homeMeta: 'Freight exchange and transport management for carriers: fleet, drivers, CMR and direct orders. Trailer swaps, containers and express in 9 countries.',
+    applyTitle: 'Join as a carrier or shipper',
+    termsTitle: 'Terms of service for carriers and shippers',
+    privacyTitle: 'Privacy notice: how personal data is handled',
     /* What the platform does, as a list for the schema.org card (answer engines read it). */
     features: [
       'Fleet and driver management',

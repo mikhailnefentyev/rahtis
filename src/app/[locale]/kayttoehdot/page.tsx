@@ -20,7 +20,7 @@ export async function generateMetadata({
     textLocales: ['fi', 'en'],
     locale,
     paths: fiOrEnPath('/kayttoehdot', '/terms'),
-    title: t.legal.TERMS,
+    title: t.seo.termsTitle,
     description: t.seo.termsDescription,
   });
 }

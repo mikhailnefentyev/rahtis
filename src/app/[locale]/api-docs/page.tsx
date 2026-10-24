@@ -7,6 +7,7 @@ import { getI18n, isLocale } from '@/lib/i18n';
 import { WEBHOOK_EVENTS } from '@/lib/api/events';
 import { samePath, pageMetadata } from '@/lib/seo';
 import { DOCS } from './content';
+import { OrganisationLd } from '@/components/layout/OrganisationLd';
 
 export async function generateMetadata({
   params,
@@ -17,7 +18,7 @@ export async function generateMetadata({
   if (!isLocale(locale)) return {};
   const d = DOCS[locale];
   return pageMetadata({
-    textLocales: ['fi', 'en'], locale, paths: samePath('/api-docs'), title: d.title, description: d.description });
+    textLocales: ['fi', 'en'], locale, paths: samePath('/api-docs'), title: d.seoTitle, description: d.description });
 }
 
 /**
@@ -148,6 +149,7 @@ def verify(header: str, raw_body: bytes, secret: str) -> bool:
 
   return (
     <main className="mx-auto w-full max-w-3xl px-5 py-10">
+      <OrganisationLd />
       <nav className="mb-8 flex items-center justify-between gap-4">
         <Link href={`/${locale}`} className="text-[13px] text-ink-muted hover:text-ink">
           ← {t.brand.name}

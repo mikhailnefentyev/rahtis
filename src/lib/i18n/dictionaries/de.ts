@@ -18,7 +18,12 @@ export const de = {
 
 
   seo: {
-    homeTitle: 'Transportmanagement und Frachtenbörse: Trailertausch, Container, Express',
+    homeTitle: 'Frachtenbörse und TMS: Trailertausch und Container',
+    /* Описание для выдачи поиска: до 160 знаков, иначе обрезается. Длинное homeDescription — для разметки. */
+    homeMeta: 'Frachtenbörse und Transportmanagement für Frachtführer: Fuhrpark, Fahrer, CMR und Direktaufträge. Trailertausch, Container und Express in 9 Ländern.',
+    applyTitle: 'Als Frachtführer oder Verlader registrieren',
+    termsTitle: 'Nutzungsbedingungen für Frachtführer und Verlader',
+    privacyTitle: 'Datenschutzhinweise: Umgang mit Personendaten',
     features: [
       'Fuhrpark- und Fahrerverwaltung',
       'Eigene Kunden und Direktaufträge, Tracking-Link für den Kunden',
@@ -38,7 +43,7 @@ export const de = {
       'Wie RAHTIS personenbezogene Daten verarbeitet: was erhoben wird, wofür es genutzt wird, wie lange es gespeichert wird und welche Rechte die betroffene Person hat.',
     signinDescription: 'Bei RAHTIS als Auftraggeber oder als Transportunternehmen anmelden.',
     applyDescription:
-      'Bei RAHTIS bewerben. Wir prüfen die Unternehmenskennung und die Firmendaten anhand der Register, bei Transportunternehmen zusätzlich die Güterkraftverkehrslizenz und die Versicherung.',
+      'Bei RAHTIS registrieren. Wir prüfen Firmendaten in den Registern, bei Frachtführern auch Lizenz und Versicherung.',
     forgotDescription: 'Vergessenes RAHTIS-Passwort zurücksetzen.',
   },
 

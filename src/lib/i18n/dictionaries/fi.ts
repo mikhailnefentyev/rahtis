@@ -41,7 +41,12 @@ export const fi = {
    * сайте занимало слово, которое никто не ищет.
    */
   seo: {
-    homeTitle: 'Kuljetusten hallinta ja rahtipörssi: irtoperät, kontit ja pikakuljetukset',
+    homeTitle: 'Rahtipörssi ja TMS: irtoperät ja kontit',
+    /* Описание для выдачи поиска: до 160 знаков, иначе обрезается. Длинное homeDescription — для разметки. */
+    homeMeta: 'Rahtipörssi ja kuljetusten hallinta kuljetusliikkeille: kalusto, kuljettajat, rahtikirjat ja suorat tilaukset. Irtoperät, kontit ja pikakuljetukset.',
+    applyTitle: 'Liity kuljetusliikkeenä tai rahdinantajana',
+    termsTitle: 'Käyttöehdot kuljetusliikkeille ja rahdinantajille',
+    privacyTitle: 'Tietosuojaseloste: henkilötietojen käsittely',
     /* What the platform does, as a list for the schema.org card (answer engines read it). */
     features: [
       'Kaluston ja kuljettajien hallinta',
