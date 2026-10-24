@@ -17,6 +17,16 @@ export const lv = {
   },
 
 
+  /* Витрина: ссылка на блог и вопрос про аналитику (только открытые страницы). */
+  site: {
+    blog: 'Blogs',
+    consentText: 'Vai drīkstam izmantot analītiku vietnes uzlabošanai? Mēs reģistrējam skatītās lapas un klikšķus, nekad vārdu vai e-pastu.',
+    consentYes: 'Atļaut',
+    consentNo: 'Nē, paldies',
+    consentSettings: 'Analītikas iestatījumi',
+    consentPrivacy: 'Privātuma paziņojums',
+  },
+
   seo: {
     homeTitle: 'Kravu birža un TMS: piekabju maiņa un konteineri',
     /* Описание для выдачи поиска: до 160 знаков, иначе обрезается. Длинное homeDescription — для разметки. */

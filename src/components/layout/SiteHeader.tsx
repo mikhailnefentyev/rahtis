@@ -33,7 +33,8 @@ const HEAD_HEIGHT = 68;
  * `invert` вместе с ними перекрасил бы голубой акцент у S — то
  * единственное, чем марка отличается от набранного текста.
  */
-export function SiteHeader() {
+/** showBlog — есть ли статьи в блоге: пока их нет, ссылки в меню нет. */
+export function SiteHeader({ showBlog = false }: { showBlog?: boolean }) {
   const { t, locale } = useI18n();
   const [solid, setSolid] = useState(false);
 
@@ -97,6 +98,7 @@ export function SiteHeader() {
     { href: '#steps', label: t.landing.menuSteps },
     { href: '#assistant', label: t.landing.menuAssistant },
     { href: '#api', label: t.landing.footerApi },
+    ...(showBlog ? [{ href: '/blog', label: t.site.blog }] : []),
   ];
 
   const home = `/${locale}`;

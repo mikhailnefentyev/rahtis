@@ -5,6 +5,7 @@ import { APP } from '@/lib/config';
 import { SITE_URL } from '@/lib/seo';
 import { getDictionary, isLocale, locales } from '@/lib/i18n';
 import { I18nProvider } from '@/lib/i18n/provider';
+import { AnalyticsConsent } from '@/components/layout/AnalyticsConsent';
 import { TRANSLATE_GUARD } from '@/lib/translate-guard';
 import '../globals.css';
 
@@ -107,6 +108,7 @@ export default async function LocaleLayout({
       <body className="flex min-h-full flex-col">
         <I18nProvider locale={locale} dictionary={dictionary}>
           {children}
+          <AnalyticsConsent />
         </I18nProvider>
       </body>
     </html>

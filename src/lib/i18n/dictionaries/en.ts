@@ -33,6 +33,16 @@ export const en = {
   },
 
 
+  /* Витрина: ссылка на блог и вопрос про аналитику (только открытые страницы). */
+  site: {
+    blog: 'Blog',
+    consentText: 'May we use analytics to improve this site? We record pages viewed and clicks, never your name or email.',
+    consentYes: 'Allow',
+    consentNo: 'No thanks',
+    consentSettings: 'Analytics settings',
+    consentPrivacy: 'Privacy notice',
+  },
+
   seo: {
     homeTitle: 'Freight exchange and TMS: trailer swaps, containers',
     /* Описание для выдачи поиска: до 160 знаков, иначе обрезается. Длинное homeDescription — для разметки. */

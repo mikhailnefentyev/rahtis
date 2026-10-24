@@ -17,6 +17,16 @@ export const pl = {
   },
 
 
+  /* Витрина: ссылка на блог и вопрос про аналитику (только открытые страницы). */
+  site: {
+    blog: 'Blog',
+    consentText: 'Czy możemy używać analityki do ulepszania strony? Rejestrujemy odwiedzone strony i kliknięcia, nigdy imienia ani e-maila.',
+    consentYes: 'Zezwól',
+    consentNo: 'Nie, dziękuję',
+    consentSettings: 'Ustawienia analityki',
+    consentPrivacy: 'Polityka prywatności',
+  },
+
   seo: {
     homeTitle: 'Giełda ładunków i TMS: wymiany naczep, kontenery',
     /* Описание для выдачи поиска: до 160 знаков, иначе обрезается. Длинное homeDescription — для разметки. */

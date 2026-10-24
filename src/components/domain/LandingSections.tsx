@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { Registered } from '@/components/layout/Registered';
+import { ConsentSettingsLink } from '@/components/layout/AnalyticsConsent';
 import Link from 'next/link';
 import { buttonClass, Card, CardBody, Mono } from '@/components/ui';
 import { signInPath } from '@/lib/auth/paths';
@@ -18,7 +19,7 @@ import { placeCountries } from '@/lib/routing/places';
  * Серверный компонент: ничего интерактивного здесь нет, а значит нечего
  * и отправлять в браузер.
  */
-export async function LandingSections({ locale }: { locale: Locale }) {
+export async function LandingSections({ locale, showBlog = false }: { locale: Locale; showBlog?: boolean }) {
   const { t } = await getI18n(locale);
   const l = t.landing;
 
@@ -750,6 +751,7 @@ Rahtis-Event: order.stop_arrived`}</code>
                 { href: `/${locale}/apply`, label: l.applyCarrier },
                 { href: signInPath(locale), label: l.menuSignIn },
                 { href: `/${locale}/api-docs`, label: l.footerApiDocs },
+                ...(showBlog ? [{ href: '/blog', label: t.site.blog }] : []),
               ],
             },
             {
@@ -785,7 +787,8 @@ Rahtis-Event: order.stop_arrived`}</code>
         <div className="border-t border-line">
           <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-5 text-[12px] text-ink-faint">
             <span>
-              © {new Date().getFullYear()} {t.brand.legalEntity} · {l.footerCountry}
+              © {new Date().getFullYear()} {t.brand.legalEntity} · {l.footerCountry} ·{' '}
+              <ConsentSettingsLink className="hover:text-ink" />
             </span>
             <span className="flex flex-wrap gap-x-3 gap-y-1" aria-label="Language">
               {locales.map((l) => (

@@ -17,6 +17,16 @@ export const de = {
   },
 
 
+  /* Витрина: ссылка на блог и вопрос про аналитику (только открытые страницы). */
+  site: {
+    blog: 'Blog',
+    consentText: 'Dürfen wir Analysen nutzen, um die Website zu verbessern? Wir erfassen aufgerufene Seiten und Klicks, nie Namen oder E-Mail.',
+    consentYes: 'Erlauben',
+    consentNo: 'Nein, danke',
+    consentSettings: 'Analyse-Einstellungen',
+    consentPrivacy: 'Datenschutzhinweise',
+  },
+
   seo: {
     homeTitle: 'Frachtenbörse und TMS: Trailertausch und Container',
     /* Описание для выдачи поиска: до 160 знаков, иначе обрезается. Длинное homeDescription — для разметки. */

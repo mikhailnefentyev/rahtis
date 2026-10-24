@@ -17,6 +17,16 @@ export const lt = {
   },
 
 
+  /* Витрина: ссылка на блог и вопрос про аналитику (только открытые страницы). */
+  site: {
+    blog: 'Tinklaraštis',
+    consentText: 'Ar galime naudoti analitiką svetainei tobulinti? Fiksuojame peržiūrėtus puslapius ir paspaudimus, bet ne vardą ar el. paštą.',
+    consentYes: 'Leisti',
+    consentNo: 'Ne, ačiū',
+    consentSettings: 'Analitikos nustatymai',
+    consentPrivacy: 'Privatumo pranešimas',
+  },
+
   seo: {
     homeTitle: 'Krovinių birža ir TMS: priekabos ir konteineriai',
     /* Описание для выдачи поиска: до 160 знаков, иначе обрезается. Длинное homeDescription — для разметки. */

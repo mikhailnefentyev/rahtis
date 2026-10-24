@@ -1,5 +1,6 @@
 import { locales, type Locale } from '@/lib/i18n/config';
 import { SITE_URL } from '@/lib/seo';
+import { listArticles } from '@/lib/blog/heycatch';
 
 /**
  * Карта сайта: только то, что имеет смысл открывать из поиска.
@@ -57,10 +58,29 @@ function entries(): Entry[] {
   return list;
 }
 
-export const dynamic = 'force-static';
+/*
+ * Блог (статьи HeyCatch) — по адресу /blog без языка и без переводов;
+ * lastmod — updated статьи. Карта пересобирается раз в 5 минут, как и
+ * сам блог, чтобы новая статья попала в неё без выкладки.
+ */
+async function blogEntries(): Promise<Entry[]> {
+  const articles = await listArticles();
+  const newest = articles.map((a) => a.updated || a.published).sort().at(-1) ?? ROOT_UPDATED;
+  return [
+    { loc: `${SITE_URL}/blog`, lastmod: newest.slice(0, 10), priority: 0.6, links: {} },
+    ...articles.map((a) => ({
+      loc: `${SITE_URL}/blog/${encodeURIComponent(a.slug)}`,
+      lastmod: (a.updated || a.published).slice(0, 10),
+      priority: 0.5,
+      links: {},
+    })),
+  ];
+}
 
-export function GET() {
-  const urls = entries()
+export const revalidate = 300;
+
+export async function GET() {
+  const urls = [...entries(), ...(await blogEntries())]
     .map((e) =>
       [
         '  <url>',

@@ -17,6 +17,16 @@ export const sv = {
   },
 
 
+  /* Витрина: ссылка на блог и вопрос про аналитику (только открытые страницы). */
+  site: {
+    blog: 'Blogg',
+    consentText: 'Får vi använda analys för att förbättra webbplatsen? Vi registrerar visade sidor och klick, aldrig namn eller e-post.',
+    consentYes: 'Tillåt',
+    consentNo: 'Nej tack',
+    consentSettings: 'Analysinställningar',
+    consentPrivacy: 'Integritetspolicy',
+  },
+
   seo: {
     homeTitle: 'Lastbörs och TMS: trailerbyten, containrar, express',
     /* Описание для выдачи поиска: до 160 знаков, иначе обрезается. Длинное homeDescription — для разметки. */

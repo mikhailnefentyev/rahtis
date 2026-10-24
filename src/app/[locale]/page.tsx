@@ -7,6 +7,7 @@ import { SiteHeader } from '@/components/layout/SiteHeader';
 import { APP, SUBSCRIPTION_UNIT_CENTS } from '@/lib/config';
 import { getI18n, isLocale } from '@/lib/i18n';
 import { placeCountries } from '@/lib/routing/places';
+import { hasArticles } from '@/lib/blog/heycatch';
 import { ORG_SAME_AS, SITE_URL, pageMetadata, samePath } from '@/lib/seo';
 
 /**
@@ -62,6 +63,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const { t } = await getI18n(locale);
   const root = locale === 'en' && (await headers()).get('x-rahtis-root') === '1';
   const pageUrl = root ? `${SITE_URL}/` : `${SITE_URL}/${locale}`;
+  const showBlog = await hasArticles();
 
   /*
    * Карточка организации для машин.
@@ -139,7 +141,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         dangerouslySetInnerHTML={{ __html: JSON.stringify([organisation, website, software]) }}
       />
 
-      <SiteHeader />
+      <SiteHeader showBlog={showBlog} />
 
       <main>
         <HeroPort locale={locale} />
@@ -155,7 +157,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           */}
         <div id="hero-end" aria-hidden="true" />
 
-        <LandingSections locale={locale} />
+        <LandingSections locale={locale} showBlog={showBlog} />
       </main>
     </>
   );

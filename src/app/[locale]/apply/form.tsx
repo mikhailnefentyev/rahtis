@@ -1,6 +1,7 @@
 'use client';
 
-import { useActionState, useState } from 'react';
+import { useActionState, useEffect, useState } from 'react';
+import { analytics } from '@heycatch/sdk';
 import { Button, Card, CardBody, Field, Input, InputMono, Select } from '@/components/ui';
 import { submitApplicationAction, type ApplyState } from '@/lib/companies/actions';
 import { checkBusinessId, countryPack, enabledCountries, isCountryCode, type CountryCode } from '@/lib/country';
@@ -34,6 +35,12 @@ export function ApplyForm({ invite = null }: { invite?: ApplyInvite | null }) {
   const [businessId, setBusinessId] = useState(invite?.businessId ?? '');
   const [vatNumber, setVatNumber] = useState('');
   const [email, setEmail] = useState(invite?.email ?? '');
+
+  /* Итог для аналитики: только тип и страна, без названия и почты. Без согласия — ничего не уходит. */
+  useEffect(() => {
+    if (state.done) analytics.trackEvent('application_submitted', { kind, mode: kind === 'CARRIER' ? mode : null, country });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- одно событие на отправку
+  }, [state.done]);
 
   if (state.done) {
     /*

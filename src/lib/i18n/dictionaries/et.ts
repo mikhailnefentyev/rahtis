@@ -17,6 +17,16 @@ export const et = {
   },
 
 
+  /* Витрина: ссылка на блог и вопрос про аналитику (только открытые страницы). */
+  site: {
+    blog: 'Blogi',
+    consentText: 'Kas võime kasutada analüütikat saidi parendamiseks? Salvestame vaadatud lehed ja klikid, mitte nime ega e-posti.',
+    consentYes: 'Luba',
+    consentNo: 'Ei, aitäh',
+    consentSettings: 'Analüütika seaded',
+    consentPrivacy: 'Privaatsusteade',
+  },
+
   seo: {
     homeTitle: 'Veobörs ja TMS: haagiste vahetus ja konteinerid',
     /* Описание для выдачи поиска: до 160 знаков, иначе обрезается. Длинное homeDescription — для разметки. */

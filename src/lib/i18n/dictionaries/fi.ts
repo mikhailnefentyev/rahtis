@@ -40,6 +40,16 @@ export const fi = {
    * Заголовок главной раньше был просто «RAHTIS»: самое дорогое поле на
    * сайте занимало слово, которое никто не ищет.
    */
+  /* Витрина: ссылка на блог и вопрос про аналитику (только открытые страницы). */
+  site: {
+    blog: 'Blogi',
+    consentText: 'Saammeko käyttää analytiikkaa sivuston kehittämiseen? Keräämme katsotut sivut ja klikkaukset, emme nimeä emmekä sähköpostia.',
+    consentYes: 'Salli',
+    consentNo: 'Ei kiitos',
+    consentSettings: 'Analytiikka-asetukset',
+    consentPrivacy: 'Tietosuojaseloste',
+  },
+
   seo: {
     homeTitle: 'Rahtipörssi ja TMS: irtoperät ja kontit',
     /* Описание для выдачи поиска: до 160 знаков, иначе обрезается. Длинное homeDescription — для разметки. */

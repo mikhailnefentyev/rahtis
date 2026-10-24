@@ -44,6 +44,21 @@ const nextConfig: NextConfig = {
    * MapLibre и Next требуют выверенного списка, и ошибка в нём ломает
    * приложение водителя в кабине.
    */
+  /*
+   * Короткие ссылки HeyCatch (24.10.2026): /a … /z, /0 … /9 ведут на
+   * главную с меткой канала — так считается, сколько людей пришло с
+   * конкретного поста. Своих маршрутов из одного символа у сайта нет.
+   */
+  async redirects() {
+    return [
+      {
+        source: '/:l([a-z0-9])',
+        destination: '/?utm_source=heycatch&utm_campaign=:l',
+        permanent: false,
+      },
+    ];
+  },
+
   async headers() {
     return [
       {

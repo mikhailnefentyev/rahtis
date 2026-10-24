@@ -42,6 +42,22 @@ export async function proxy(request: NextRequest) {
    * приходят без языка, — корень отдаёт английскую витрину с ответом
    * 200 и своим canonical (x-default). Метку x-rahtis-root читает главная.
    */
+  /*
+   * Блог — по адресу /blog без языка (24.10.2026): так его проверяет
+   * HeyCatch и так ведёт читателей на статьи. Внутри это /en/blog;
+   * языковые варианты (/fi/blog) уводятся на единственный адрес.
+   */
+  if (first === 'blog') {
+    const url = request.nextUrl.clone();
+    url.pathname = `/en${pathname}`;
+    return NextResponse.rewrite(url);
+  }
+  if (isLocale(first) && second === 'blog') {
+    const url = request.nextUrl.clone();
+    url.pathname = pathname.slice(first.length + 1);
+    return NextResponse.redirect(url, 308);
+  }
+
   if (pathname === '/' && !preferredLocale(request)) {
     const url = request.nextUrl.clone();
     url.pathname = '/en';

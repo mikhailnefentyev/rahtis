@@ -19,6 +19,7 @@
     "test": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test \"src/**/*.test.mjs\""
   },
   "dependencies": {
+    "@heycatch/sdk": "^0.8.3",
     "@react-pdf/renderer": "^4.8.1",
     "@supabase/ssr": "^0.12.4",
     "@supabase/supabase-js": "^2.112.3",
@@ -28,6 +29,7 @@
     "next": "16.3.7",
     "react": "19.2.8",
     "react-dom": "19.2.8",
+    "sanitize-html": "^2.18.1",
     "server-only": "^0.0.1",
     "tailwind-merge": "^3.6.0",
     "web-push": "^3.6.7",
@@ -38,6 +40,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/sanitize-html": "^2.16.2",
     "@types/web-push": "^3.6.4",
     "eslint": "^9",
     "eslint-config-next": "16.3.7",
