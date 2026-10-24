@@ -120,6 +120,7 @@ export function pageMetadata(input: {
 export const SOCIAL_PROFILES = [
   { name: 'Facebook', url: 'https://www.facebook.com/rahtiseu' },
   { name: 'Reddit', url: 'https://www.reddit.com/user/RAHTIS/' },
+  { name: 'TikTok', url: 'https://www.tiktok.com/@rahtis.eu' },
 ] as const;
 
 /**
