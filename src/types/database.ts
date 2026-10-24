@@ -2185,6 +2185,7 @@ export type Database = {
           author_role: string
           author_user_id: string | null
           body: string
+          carrier_company_id: string | null
           created_at: string
           id: number
           order_id: string
@@ -2198,6 +2199,7 @@ export type Database = {
           author_role: string
           author_user_id?: string | null
           body: string
+          carrier_company_id?: string | null
           created_at?: string
           id?: never
           order_id: string
@@ -2211,6 +2213,7 @@ export type Database = {
           author_role?: string
           author_user_id?: string | null
           body?: string
+          carrier_company_id?: string | null
           created_at?: string
           id?: never
           order_id?: string
@@ -2224,6 +2227,13 @@ export type Database = {
             columns: ["author_driver_id"]
             isOneToOne: false
             referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_messages_carrier_company_id_fkey"
+            columns: ["carrier_company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
             referencedColumns: ["id"]
           },
           {
@@ -2704,13 +2714,13 @@ export type Database = {
           business_id: string | null
           company_name: string
           country: string
-          locale: string
           created_at: string
           email: string
           error: string | null
           id: string
           invite_id: string | null
           kind: string
+          locale: string
           note: string | null
           priority: number
           sent_at: string | null
@@ -2723,13 +2733,13 @@ export type Database = {
           business_id?: string | null
           company_name: string
           country?: string
-          locale?: string
           created_at?: string
           email: string
           error?: string | null
           id?: string
           invite_id?: string | null
           kind: string
+          locale?: string
           note?: string | null
           priority?: number
           sent_at?: string | null
@@ -2742,13 +2752,13 @@ export type Database = {
           business_id?: string | null
           company_name?: string
           country?: string
-          locale?: string
           created_at?: string
           email?: string
           error?: string | null
           id?: string
           invite_id?: string | null
           kind?: string
+          locale?: string
           note?: string | null
           priority?: number
           sent_at?: string | null
@@ -4268,11 +4278,11 @@ export type Database = {
       carrier_invite_company: {
         Args: {
           p_business_id: string
+          p_country?: string
           p_email: string
           p_kind: string
           p_name: string
           p_token_hash: string
-          p_country?: string
         }
         Returns: string
       }
@@ -4346,9 +4356,9 @@ export type Database = {
         Args: {
           p_business_id: string
           p_client_id: string
+          p_country?: string
           p_email: string
           p_name: string
-          p_country?: string
         }
         Returns: undefined
       }
