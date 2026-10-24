@@ -116,9 +116,15 @@ export function pageMetadata(input: {
   };
 }
 
+/** Страницы компании в соцсетях: значки в подвале и sameAs в разметке. */
+export const SOCIAL_PROFILES = [
+  { name: 'Facebook', url: 'https://www.facebook.com/rahtiseu' },
+  { name: 'Reddit', url: 'https://www.reddit.com/user/RAHTIS/' },
+] as const;
+
 /**
  * Профили компании для schema.org sameAs: по ним машины сверяют, что
- * RAHTIS и Aivomaa Oy — одно лицо. Пока только запись в торговом реестре;
- * появятся LinkedIn и т. п. — добавить сюда.
+ * RAHTIS и Aivomaa Oy — одно лицо. Запись в торговом реестре и страницы
+ * в соцсетях; появится LinkedIn и т. п. — добавить в SOCIAL_PROFILES.
  */
-export const ORG_SAME_AS = ['https://tietopalvelu.ytj.fi/yritys/3592993-6'];
+export const ORG_SAME_AS = ['https://tietopalvelu.ytj.fi/yritys/3592993-6', ...SOCIAL_PROFILES.map((p) => p.url)];

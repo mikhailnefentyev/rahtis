@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import { Registered } from '@/components/layout/Registered';
 import { ConsentSettingsLink } from '@/components/layout/AnalyticsConsent';
+import { SocialLinks } from '@/components/layout/SocialLinks';
 import Link from 'next/link';
 import { buttonClass, Card, CardBody, Mono } from '@/components/ui';
 import { signInPath } from '@/lib/auth/paths';
@@ -790,6 +791,7 @@ Rahtis-Event: order.stop_arrived`}</code>
               © {new Date().getFullYear()} {t.brand.legalEntity} · {l.footerCountry} ·{' '}
               <ConsentSettingsLink className="hover:text-ink" />
             </span>
+            <SocialLinks />
             <span className="flex flex-wrap gap-x-3 gap-y-1" aria-label="Language">
               {locales.map((l) => (
                 <Link key={l} href={`/${l}`} lang={l} hrefLang={l} className={locale === l ? 'font-semibold text-ink' : 'hover:text-ink'}>
