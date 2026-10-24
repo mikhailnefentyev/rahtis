@@ -5,6 +5,7 @@ import { APP } from '@/lib/config';
 import { SITE_URL } from '@/lib/seo';
 import { getDictionary, isLocale, locales } from '@/lib/i18n';
 import { I18nProvider } from '@/lib/i18n/provider';
+import { TRANSLATE_GUARD } from '@/lib/translate-guard';
 import '../globals.css';
 
 /**
@@ -99,6 +100,10 @@ export default async function LocaleLayout({
       lang={dictionary.meta.htmlLang}
       className={`${sans.variable} ${mono.variable} ${display.variable} h-full antialiased`}
     >
+      <head>
+        {/* До React: автопереводчик браузера не роняет страницу (см. translate-guard). */}
+        <script dangerouslySetInnerHTML={{ __html: TRANSLATE_GUARD }} />
+      </head>
       <body className="flex min-h-full flex-col">
         <I18nProvider locale={locale} dictionary={dictionary}>
           {children}
