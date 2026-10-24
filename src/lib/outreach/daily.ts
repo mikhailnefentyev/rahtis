@@ -29,7 +29,7 @@ export async function sendDailyOutreach(): Promise<OutreachResult> {
     /* С запасом: пропущенные не должны съедать дневную норму. */
     const { data: queue, error } = await admin
       .from('outreach_targets')
-      .select('id, company_name, business_id, email')
+      .select('id, company_name, business_id, email, locale')
       .eq('kind', kind)
       .eq('status', 'QUEUED')
       .eq('approved', true)
@@ -51,6 +51,8 @@ export async function sendDailyOutreach(): Promise<OutreachResult> {
         continue;
       }
 
+      /* Язык письма и заявки — из строки; финский, если не указан. */
+      const locale = target.locale === 'en' ? 'en' : 'fi';
       const token = randomBytes(32).toString('hex');
       const { data: invite, error: inviteError } = await admin
         .from('shipper_invites')
@@ -76,9 +78,9 @@ export async function sendDailyOutreach(): Promise<OutreachResult> {
         operatorInviteEmail({
           to: target.email,
           kind,
-          link: `${siteUrl()}/fi/apply?invite=${token}`,
+          link: `${siteUrl()}/${locale}/apply?invite=${token}`,
           operatorEmail: operatorInbox(),
-          locale: 'fi',
+          locale,
         }),
       );
 

@@ -2703,6 +2703,8 @@ export type Database = {
           approved: boolean
           business_id: string | null
           company_name: string
+          country: string
+          locale: string
           created_at: string
           email: string
           error: string | null
@@ -2720,6 +2722,8 @@ export type Database = {
           approved?: boolean
           business_id?: string | null
           company_name: string
+          country?: string
+          locale?: string
           created_at?: string
           email: string
           error?: string | null
@@ -2737,6 +2741,8 @@ export type Database = {
           approved?: boolean
           business_id?: string | null
           company_name?: string
+          country?: string
+          locale?: string
           created_at?: string
           email?: string
           error?: string | null
