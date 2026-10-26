@@ -23,6 +23,7 @@ import { isTransfer } from '@/lib/orders/transfer';
 import { AbandonPanel } from './AbandonPanel';
 import { OrderChat } from '@/components/domain/OrderChat';
 import { ClosingPanel } from './ClosingPanel';
+import { WasteLink } from '@/components/domain/WasteLink';
 import { TripPanel } from './TripPanel';
 import { OwnEditPanel } from './OwnEditPanel';
 import { AmendPanel } from '../../shipper/orders/AmendPanel';
@@ -235,6 +236,8 @@ export function AssignmentCard({
                     own={own}
                   />
                 )}
+
+                <WasteLink orderId={order.id} className="mt-3 inline-block" />
 
                 <p className="mt-3 text-xs text-ink-dim">{t.matching.contactsNow}</p>
 

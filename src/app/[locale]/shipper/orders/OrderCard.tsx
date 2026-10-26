@@ -11,6 +11,7 @@ import { useI18n } from '@/lib/i18n/provider';
 import { isTransfer } from '@/lib/orders/transfer';
 import { routeEnds } from '@/lib/orders/route';
 import { DocumentList } from '@/components/domain/TripDocuments';
+import { WasteLink } from '@/components/domain/WasteLink';
 import type {
   KnownVehicle,
   OrderAmendment,
@@ -213,6 +214,9 @@ export function OrderCard({
               {order.status === 'IN_PROGRESS' && assigned && (
                 <AssignedCarrier offer={assigned} direct={directCarrier} />
               )}
+
+              {/* Отходы и Приложение VII — у любого заказа, кроме черновика. */}
+              {order.status !== 'DRAFT' && <WasteLink orderId={order.id} className="mt-3 inline-block" />}
 
               {stops.length > 0 && (
                 <>

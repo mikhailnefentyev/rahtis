@@ -2596,6 +2596,80 @@ export type Database = {
           },
         ]
       }
+      order_waste: {
+        Row: {
+          basel_code: string | null
+          consignee_address: string | null
+          consignee_contact: string | null
+          consignee_name: string | null
+          contract_ref: string | null
+          created_at: string
+          description: string | null
+          diwass_number: string | null
+          ewc_code: string | null
+          facility_address: string | null
+          facility_name: string | null
+          order_id: string
+          procedure: string
+          producer_address: string | null
+          producer_name: string | null
+          quantity_kg: number | null
+          recovery_code: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          basel_code?: string | null
+          consignee_address?: string | null
+          consignee_contact?: string | null
+          consignee_name?: string | null
+          contract_ref?: string | null
+          created_at?: string
+          description?: string | null
+          diwass_number?: string | null
+          ewc_code?: string | null
+          facility_address?: string | null
+          facility_name?: string | null
+          order_id: string
+          procedure?: string
+          producer_address?: string | null
+          producer_name?: string | null
+          quantity_kg?: number | null
+          recovery_code?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          basel_code?: string | null
+          consignee_address?: string | null
+          consignee_contact?: string | null
+          consignee_name?: string | null
+          contract_ref?: string | null
+          created_at?: string
+          description?: string | null
+          diwass_number?: string | null
+          ewc_code?: string | null
+          facility_address?: string | null
+          facility_name?: string | null
+          order_id?: string
+          procedure?: string
+          producer_address?: string | null
+          producer_name?: string | null
+          quantity_kg?: number | null
+          recovery_code?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_waste_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: true
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orders: {
         Row: {
           assigned_company_id: string | null
