@@ -26,15 +26,16 @@ import { listArticles } from '@/lib/blog/heycatch';
  * политика, API): в карте только эти два языка, как и в её hreflang.
  */
 const PAGES: { fi: string; en: string; priority: number; updated: string; docs?: true }[] = [
-  { fi: '', en: '', priority: 1, updated: '2026-10-21' },
+  { fi: '', en: '', priority: 1, updated: '2026-10-26' },
   { fi: '/apply', en: '/apply', priority: 0.8, updated: '2026-10-21' },
+  { fi: '/maansiirto', en: '/earthworks', priority: 0.8, updated: '2026-10-26' },
   { fi: '/kayttoehdot', en: '/terms', priority: 0.3, updated: '2026-10-01', docs: true },
   { fi: '/tietosuoja', en: '/privacy', priority: 0.3, updated: '2026-10-08', docs: true },
   { fi: '/api-docs', en: '/api-docs', priority: 0.4, updated: '2026-09-29', docs: true },
 ];
 
 /* Корень отвечает страницей (x-default главной), а не редиректом. */
-const ROOT_UPDATED = '2026-10-21';
+const ROOT_UPDATED = '2026-10-26';
 
 type Entry = { loc: string; lastmod: string; priority: number; links: Record<string, string> };
 

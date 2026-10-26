@@ -240,6 +240,7 @@ export const sv = {
       'Hantering av flotta och förare',
       'Egna kunder och direktorder, spårningslänk till kunden',
       'Lastbörs (anbudstavla) för trailerbyten, containrar och expresstransporter',
+      'Markarbeten och tippbilar: vägda lass, transportdokument, timmar och fakturor från arbetsplatsen',
       'Förarapp på 10 språk, fungerar offline',
       'Arbetstid och vägledande lön',
       'Elektronisk fraktsedel (CMR), foton och signatur',
@@ -248,7 +249,7 @@ export const sv = {
       'API (REST och webhooks) för uppdragsgivarens eget system',
     ],
     homeDescription:
-      'RAHTIS är en plattform för transportledning och en lastbörs för åkerier. Hantera flotta, förare, arbetstid och fraktsedlar på ett ställe, ta emot order direkt från egna kunder och fyll tomma bilar från anbudstavlan. Trailerbyten, containrar och expresstransporter i Finland, Norden, Baltikum, Polen och Tyskland – uppdragsgivaren publicerar en gång och följer uppdraget steg för steg.',
+      'RAHTIS är en plattform för transportledning och en lastbörs för åkerier. Hantera flotta, förare, arbetstid och fraktsedlar på ett ställe, ta emot order direkt från egna kunder och fyll tomma bilar från anbudstavlan. Trailerbyten, containrar och expresstransporter i Finland, Norden, Baltikum, Polen och Tyskland – uppdragsgivaren publicerar en gång och följer uppdraget steg för steg. För markarbeten: tippbilarnas lass, vägning, timmar och fakturor från arbetsplatsen.',
     termsDescription:
       'Användarvillkor för RAHTIS: parternas ansvar, hur ett uppdrag genomförs, betalningar och avräkningar samt avtalets giltighetstid.',
     privacyDescription:

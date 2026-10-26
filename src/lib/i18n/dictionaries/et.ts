@@ -240,6 +240,7 @@ export const et = {
       'Autopargi ja juhtide haldus',
       'Omad kliendid ja otsetellimused, jälgimislink kliendile',
       'Veobörs haagisevahetusteks, konteineriteks ja ekspressvedudeks',
+      'Pinnasetööd ja kallurid: kaalutud koormad, saatedokumendid, tunnid ja arved objektilt',
       'Juhi rakendus 10 keeles, töötab ka ilma võrguta',
       'Tööaeg ja orienteeruv palk',
       'Elektrooniline veoseleht (CMR), fotod ja allkiri',
@@ -248,7 +249,7 @@ export const et = {
       'API (REST ja webhookid) tellija oma süsteemi jaoks',
     ],
     homeDescription:
-      'RAHTIS on veokorralduse platvorm ja veobörs vedajatele. Halda autoparki, juhte, tööaega ja veoselehti ühes kohas, võta tellimusi otse oma klientidelt ja leia vabadele autodele tööd veobörsilt. Haagisevahetused, konteinerid ja ekspressveod Soomes, Põhjamaades, Baltikumis, Poolas ja Saksamaal — tellija leiab vedaja ühe avaldusega ja näeb veo kulgu samm-sammult.',
+      'RAHTIS on veokorralduse platvorm ja veobörs vedajatele. Halda autoparki, juhte, tööaega ja veoselehti ühes kohas, võta tellimusi otse oma klientidelt ja leia vabadele autodele tööd veobörsilt. Haagisevahetused, konteinerid ja ekspressveod Soomes, Põhjamaades, Baltikumis, Poolas ja Saksamaal — tellija leiab vedaja ühe avaldusega ja näeb veo kulgu samm-sammult. Pinnasetöödeks: kallurite koormad, kaalumised, tunnid ja arved objektilt.',
     termsDescription:
       'RAHTISe kasutustingimused: poolte vastutus, veo kulg, maksed ja arveldused ning lepingu kehtivus.',
     privacyDescription:

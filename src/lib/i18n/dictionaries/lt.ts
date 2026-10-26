@@ -240,6 +240,7 @@ export const lt = {
       'Transporto parko ir vairuotojų valdymas',
       'Savi klientai ir tiesioginiai užsakymai, sekimo nuoroda klientui',
       'Krovinių birža priekaboms, konteineriams ir skubiems pervežimams',
+      'Žemės darbai ir savivarčiai: pasverti kroviniai, atliekų lydraščiai, valandos ir sąskaitos iš objekto',
       'Vairuotojo programėlė 10 kalbų, veikia ir be ryšio',
       'Darbo laikas ir orientacinis atlyginimas',
       'Elektroninis važtaraštis (CMR), nuotraukos ir parašas',
@@ -248,7 +249,7 @@ export const lt = {
       'API (REST ir webhook) užsakovo sistemai',
     ],
     homeDescription:
-      'RAHTIS – transporto valdymo platforma ir krovinių birža vežėjams. Valdykite transportą, vairuotojus, darbo laiką ir važtaraščius vienoje vietoje, priimkite užsakymus tiesiai iš savo klientų, o laisvus sunkvežimius užpildykite kroviniais iš biržos. Priekabos, konteineriai ir skubūs pervežimai Suomijoje, Šiaurės šalyse, Baltijos šalyse, Lenkijoje ir Vokietijoje – užsakovas vienu skelbimu randa vežėją ir mato pervežimą etapais.',
+      'RAHTIS – transporto valdymo platforma ir krovinių birža vežėjams. Valdykite transportą, vairuotojus, darbo laiką ir važtaraščius vienoje vietoje, priimkite užsakymus tiesiai iš savo klientų, o laisvus sunkvežimius užpildykite kroviniais iš biržos. Priekabos, konteineriai ir skubūs pervežimai Suomijoje, Šiaurės šalyse, Baltijos šalyse, Lenkijoje ir Vokietijoje – užsakovas vienu skelbimu randa vežėją ir mato pervežimą etapais. Žemės darbams: savivarčių kroviniai, svėrimai, valandos ir sąskaitos iš objekto.',
     termsDescription:
       'RAHTIS naudojimo sąlygos: šalių atsakomybė, pervežimo eiga, mokėjimai ir atsiskaitymai, sutarties galiojimas.',
     privacyDescription:

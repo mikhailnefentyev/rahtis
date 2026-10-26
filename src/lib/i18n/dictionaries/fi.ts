@@ -264,6 +264,7 @@ export const fi = {
       'Kaluston ja kuljettajien hallinta',
       'Omat asiakkaat ja suorat tilaukset, seurantalinkki asiakkaalle',
       'Rahtipörssi (tarjouspöytä) irtoperille, konteille ja pikakuljetuksille',
+      'Maansiirto ja kippiautot: kuormat punnituksineen, siirtoasiakirjat, tunnit ja laskut työmaalta',
       'Kuljettajan sovellus 10 kielellä, toimii ilman verkkoa',
       'Työaika ja suuntaa-antava palkka',
       'Sähköinen rahtikirja, kuvat ja allekirjoitus',
@@ -272,7 +273,7 @@ export const fi = {
       'Rajapinta (REST ja webhookit) tilaajan järjestelmään',
     ],
     homeDescription:
-      'RAHTIS on kuljetusliikkeen työalusta ja rahtipörssi. Hallitse kalustoa, kuljettajia, työaikaa ja rahtikirjoja yhdessä paikassa, ota tilaukset suoraan omilta asiakkailtasi ja täytä vapaat autot tarjouspöydältä. Irtoperät, kontit ja pikakuljetukset Suomessa, Pohjoismaissa, Baltiassa, Puolassa ja Saksassa — tilaaja saa tekijän yhdellä julkaisulla ja näkee kuljetuksen vaihe vaiheelta.',
+      'RAHTIS on kuljetusliikkeen työalusta ja rahtipörssi. Hallitse kalustoa, kuljettajia, työaikaa ja rahtikirjoja yhdessä paikassa, ota tilaukset suoraan omilta asiakkailtasi ja täytä vapaat autot tarjouspöydältä. Irtoperät, kontit ja pikakuljetukset Suomessa, Pohjoismaissa, Baltiassa, Puolassa ja Saksassa — tilaaja saa tekijän yhdellä julkaisulla ja näkee kuljetuksen vaihe vaiheelta. Maansiirtoon kippiautoilla: kuormat, punnitukset, tunnit ja laskut työmaalta.',
     termsDescription:
       'RAHTIS-palvelun käyttöehdot: osapuolten vastuut, kuljetuksen kulku, maksut ja tilitykset sekä sopimuksen voimassaolo.',
     privacyDescription:

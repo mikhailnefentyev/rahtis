@@ -16,7 +16,7 @@ const euro = (cents: number) => (cents / 100).toFixed(2).replace('.', ',');
 
 const BODY = `# RAHTIS
 
-> RAHTIS (${SITE_URL}) is a Finnish transport management platform and freight exchange for carriers and shippers in Northern Europe: Finland, Sweden, Norway, Denmark, Estonia, Latvia, Lithuania, Poland and Germany. It is three things in one: (1) an operations platform (TMS) where a transport company runs its own fleet, drivers, working time, consignment notes (CMR) and its own customers; (2) an offer table — a freight exchange (rahtipörssi) — where approved carriers take jobs published by shippers and freight forwarders; (3) direct work between shipper and carrier: orders sent straight to a known vehicle, tracking links and an API. Freight: trailer swaps, container haulage and express van/truck transport. Operated by ${APP.operator.legalName} (business ID ${APP.operator.businessId}), Helsinki, Finland.
+> RAHTIS (${SITE_URL}) is a Finnish transport management platform and freight exchange for carriers and shippers in Northern Europe: Finland, Sweden, Norway, Denmark, Estonia, Latvia, Lithuania, Poland and Germany. It is three things in one: (1) an operations platform (TMS) where a transport company runs its own fleet, drivers, working time, consignment notes (CMR) and its own customers; (2) an offer table — a freight exchange (rahtipörssi) — where approved carriers take jobs published by shippers and freight forwarders; (3) direct work between shipper and carrier: orders sent straight to a known vehicle, tracking links and an API. Freight: trailer swaps, container haulage and express van/truck transport; for earthworks carriers, a worksite module for dump trucks (loads, weighings, hours, foreman approval, invoices). Operated by ${APP.operator.legalName} (business ID ${APP.operator.businessId}), Helsinki, Finland.
 
 ## Transport management for carriers (TMS)
 
@@ -39,6 +39,18 @@ const BODY = `# RAHTIS
 
 - Direct orders: a shipper sends a job straight to a known vehicle, or first to a group of its own vehicles and then to the offer table.
 - A carrier can invite its own customers to order through RAHTIS.
+
+## Earthworks and dump trucks (worksites)
+
+Page: ${SITE_URL}/en/earthworks (suomeksi: ${SITE_URL}/fi/maansiirto)
+
+- For carriers running dump trucks (kippiautot) on construction and earthworks sites in Finland and the Nordics.
+- The driver marks arrival on site in the app; every load is logged with material, receiving site or weighbridge, gross, tare, net and weigh ticket number; overload warning by the combination's legal maximum weight (Finland 76 t, and national rules for Sweden, Norway, Denmark, Estonia, Latvia, Lithuania, Poland, Germany).
+- Hours: arrival to the last unload + 30 minutes (buffer set per site) — the way Finnish dump-truck drivers log their day.
+- The customer's foreman approves each day from a link without logging in; prices are not shown to the foreman. The carrier can also approve the day itself.
+- Waste transfer document (siirtoasiakirja) under the Finnish Waste Act section 121 for each load, with EWC waste codes; contaminated soil and construction waste are flagged for the transfer document register.
+- Invoices to the customer in the carrier's own name (business ID, bank account, own number series, Finnish reference number, VAT): at the press of a button, weekly or every other week. Pricing per hour, per load or per tonne.
+- Same price as the rest of RAHTIS: ${euro(SUBSCRIPTION_UNIT_CENTS)} € (excl. VAT) per vehicle per month, no percentage.
 
 ## Freight types
 
@@ -70,6 +82,7 @@ const BODY = `# RAHTIS
 ## Links
 
 - Home (English): ${SITE_URL}/en
+- Earthworks and dump trucks: ${SITE_URL}/en/earthworks · Maansiirto: ${SITE_URL}/fi/maansiirto
 - Etusivu (suomi): ${SITE_URL}/fi
 - Apply / Hae mukaan: ${SITE_URL}/en/apply
 - API documentation: ${SITE_URL}/en/api-docs
@@ -79,7 +92,7 @@ const BODY = `# RAHTIS
 
 ## Suomeksi
 
-RAHTIS on suomalainen kuljetusten hallintajärjestelmä ja rahtipörssi Pohjois-Euroopassa: Suomi, Ruotsi, Norja, Tanska, Viro, Latvia, Liettua, Puola ja Saksa. Kuljetusliike hallitsee samassa paikassa kalustoa, kuljettajia, työaikaa, rahtikirjoja ja omia asiakkaitaan (suorat tilaukset, seurantalinkki asiakkaalle, ei prosenttia omista keikoista). Tarjouspöydältä eli rahtipörssistä hyväksytyt kuljetusliikkeet ottavat tilaajien ja huolitsijoiden julkaisemia kuljetuksia. Rahti: irtoperien vaihdot, konttikuljetukset ja pikakuljetukset. Ylläpitäjä ${APP.operator.legalName} (Y-tunnus ${APP.operator.businessId}).
+RAHTIS on suomalainen kuljetusten hallintajärjestelmä ja rahtipörssi Pohjois-Euroopassa: Suomi, Ruotsi, Norja, Tanska, Viro, Latvia, Liettua, Puola ja Saksa. Kuljetusliike hallitsee samassa paikassa kalustoa, kuljettajia, työaikaa, rahtikirjoja ja omia asiakkaitaan (suorat tilaukset, seurantalinkki asiakkaalle, ei prosenttia omista keikoista). Tarjouspöydältä eli rahtipörssistä hyväksytyt kuljetusliikkeet ottavat tilaajien ja huolitsijoiden julkaisemia kuljetuksia. Rahti: irtoperien vaihdot, konttikuljetukset ja pikakuljetukset. Maansiirto ja kippiautot (${SITE_URL}/fi/maansiirto): kuormat punnituksineen, siirtoasiakirjat, tunnit viimeiseen purkuun + 30 min, työnjohtajan hyväksyntä linkistä ja laskut asiakkaalle kuljetusliikkeen nimissä. Ylläpitäjä ${APP.operator.legalName} (Y-tunnus ${APP.operator.businessId}).
 `;
 
 export function GET() {

@@ -240,6 +240,7 @@ export const de = {
       'Fuhrpark- und Fahrerverwaltung',
       'Eigene Kunden und Direktaufträge, Tracking-Link für den Kunden',
       'Frachtenbörse für Trailertausch, Container und Expressfahrten',
+      'Erdbau und Kipper: gewogene Ladungen, Begleitscheine, Stunden und Rechnungen von der Baustelle',
       'Fahrer-App in 10 Sprachen, funktioniert offline',
       'Arbeitszeit und voraussichtlicher Lohn',
       'Elektronischer Frachtbrief, Fotos und Unterschrift',
@@ -248,7 +249,7 @@ export const de = {
       'Schnittstelle (REST und Webhooks) zum System des Auftraggebers',
     ],
     homeDescription:
-      'RAHTIS ist die Arbeitsplattform und Frachtenbörse für Transportunternehmen. Verwalten Sie Fuhrpark, Fahrer, Arbeitszeit und Frachtbriefe an einem Ort, nehmen Sie Aufträge direkt von Ihren eigenen Kunden an und füllen Sie freie Lkw über die Frachtenbörse. Trailertausch, Container und Expressfahrten in Finnland, den nordischen Ländern, dem Baltikum, Polen und Deutschland — der Auftraggeber findet mit einer einzigen Veröffentlichung einen Fahrer und sieht den Transport Schritt für Schritt.',
+      'RAHTIS ist die Arbeitsplattform und Frachtenbörse für Transportunternehmen. Verwalten Sie Fuhrpark, Fahrer, Arbeitszeit und Frachtbriefe an einem Ort, nehmen Sie Aufträge direkt von Ihren eigenen Kunden an und füllen Sie freie Lkw über die Frachtenbörse. Trailertausch, Container und Expressfahrten in Finnland, den nordischen Ländern, dem Baltikum, Polen und Deutschland — der Auftraggeber findet mit einer einzigen Veröffentlichung einen Fahrer und sieht den Transport Schritt für Schritt. Für den Erdbau: Kipperladungen, Wiegungen, Stunden und Rechnungen von der Baustelle.',
     termsDescription:
       'Nutzungsbedingungen von RAHTIS: Pflichten der Parteien, Ablauf eines Auftrags, Zahlungen und Abrechnungen sowie Vertragslaufzeit.',
     privacyDescription:

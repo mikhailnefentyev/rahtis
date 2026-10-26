@@ -240,6 +240,7 @@ export const pl = {
       'Zarządzanie flotą i kierowcami',
       'Własni klienci i zlecenia bezpośrednie, link do śledzenia dla klienta',
       'Giełda ładunków (tablica ofert) dla wymian naczep, kontenerów i transportu ekspresowego',
+      'Roboty ziemne i wywrotki: ważone kursy, karty przekazania odpadów, godziny i faktury z budowy',
       'Aplikacja kierowcy w 10 językach, działa offline',
       'Czas pracy i orientacyjne wynagrodzenie',
       'Elektroniczny list przewozowy (CMR), zdjęcia i podpis',
@@ -248,7 +249,7 @@ export const pl = {
       'API (REST i webhooki) dla systemu zleceniodawcy',
     ],
     homeDescription:
-      'RAHTIS to platforma do zarządzania transportem i giełda ładunków dla przewoźników. Flota, kierowcy, czas pracy i listy przewozowe w jednym miejscu, zlecenia prosto od własnych klientów, a wolne auta zapełnisz z giełdy. Wymiany naczep, kontenery i transport ekspresowy w Finlandii, Skandynawii, krajach bałtyckich, Polsce i Niemczech — zleceniodawca publikuje zlecenie raz i śledzi przewóz krok po kroku.',
+      'RAHTIS to platforma do zarządzania transportem i giełda ładunków dla przewoźników. Flota, kierowcy, czas pracy i listy przewozowe w jednym miejscu, zlecenia prosto od własnych klientów, a wolne auta zapełnisz z giełdy. Wymiany naczep, kontenery i transport ekspresowy w Finlandii, Skandynawii, krajach bałtyckich, Polsce i Niemczech — zleceniodawca publikuje zlecenie raz i śledzi przewóz krok po kroku. Do robót ziemnych: kursy wywrotek, ważenia, godziny i faktury z budowy.',
     termsDescription:
       'Regulamin RAHTIS: obowiązki stron, przebieg przewozu, płatności i rozliczenia oraz okres obowiązywania umowy.',
     privacyDescription:

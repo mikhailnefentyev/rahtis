@@ -240,6 +240,7 @@ export const lv = {
       'Autoparka un vadītāju pārvaldība',
       'Savi klienti un tiešie pasūtījumi, izsekošanas saite klientam',
       'Kravu birža (piedāvājumu tabula) piekabju maiņai, konteineriem un ekspresa pārvadājumiem',
+      'Zemes darbi un pašizgāzēji: svērtās kravas, atkritumu pavadzīmes, stundas un rēķini no objekta',
       'Vadītāja lietotne 10 valodās, darbojas bez interneta',
       'Darba laiks un orientējošā alga',
       'Elektroniskā pavadzīme (CMR), foto un paraksts',
@@ -248,7 +249,7 @@ export const lv = {
       'API (REST un webhooks) pasūtītāja sistēmai',
     ],
     homeDescription:
-      'RAHTIS ir transporta vadības platforma un kravu birža pārvadātājiem. Pārvaldiet autoparku, vadītājus, darba laiku un pavadzīmes vienuviet, saņemiet pasūtījumus tieši no saviem klientiem un noslogojiet brīvās mašīnas ar reisiem no biržas. Piekabju maiņa, konteineri un ekspresa pārvadājumi Somijā, Ziemeļvalstīs, Baltijā, Polijā un Vācijā — pasūtītājs vienā publikācijā atrod izpildītāju un redz pārvadājumu soli pa solim.',
+      'RAHTIS ir transporta vadības platforma un kravu birža pārvadātājiem. Pārvaldiet autoparku, vadītājus, darba laiku un pavadzīmes vienuviet, saņemiet pasūtījumus tieši no saviem klientiem un noslogojiet brīvās mašīnas ar reisiem no biržas. Piekabju maiņa, konteineri un ekspresa pārvadājumi Somijā, Ziemeļvalstīs, Baltijā, Polijā un Vācijā — pasūtītājs vienā publikācijā atrod izpildītāju un redz pārvadājumu soli pa solim. Zemes darbiem: pašizgāzēju kravas, svēršana, stundas un rēķini no objekta.',
     termsDescription:
       'RAHTIS lietošanas noteikumi: pušu atbildība, kā noris pārvadājums, maksājumi un norēķini, līguma termiņš.',
     privacyDescription:

@@ -8,6 +8,7 @@ import { signInPath } from '@/lib/auth/paths';
 import { APP } from '@/lib/config';
 import { getI18n, LOCALE_NAMES, locales, type Locale } from '@/lib/i18n';
 import { placeCountries } from '@/lib/routing/places';
+import { EARTHWORKS, earthworksPath } from '@/lib/landing/earthworks';
 
 /**
  * Всё, что лежит на главной ниже первого экрана.
@@ -23,6 +24,7 @@ import { placeCountries } from '@/lib/routing/places';
 export async function LandingSections({ locale, showBlog = false }: { locale: Locale; showBlog?: boolean }) {
   const { t } = await getI18n(locale);
   const l = t.landing;
+  const ew = EARTHWORKS[locale];
 
   return (
     <>
@@ -149,6 +151,25 @@ export async function LandingSections({ locale, showBlog = false }: { locale: Lo
               </Card>
             ))}
           </div>
+
+          {/*
+            * Третье направление — самосвалы на объектах. Не третья
+            * карточка: это не груз с биржи, а работа перевозчика у своего
+            * клиента, и рассказ о ней живёт на своей странице.
+            */}
+          <Link
+            href={earthworksPath(locale)}
+            className="group mt-4 flex flex-col gap-3 rounded-card border border-line bg-surface p-5 transition-colors hover:border-accent-line sm:flex-row sm:items-center sm:justify-between"
+          >
+            <span className="min-w-0">
+              <span className="label-micro" data-accent>
+                {ew.teaserEyebrow}
+              </span>
+              <span className="mt-1.5 block text-[18px] leading-snug font-semibold tracking-tight">{ew.teaserTitle}</span>
+              <span className="mt-1 block max-w-[70ch] text-[15px] text-ink-muted">{ew.teaserText}</span>
+            </span>
+            <span className="shrink-0 text-[15px] font-semibold text-accent group-hover:underline">{ew.teaserCta} →</span>
+          </Link>
         </div>
       </section>
 
@@ -752,6 +773,7 @@ Rahtis-Event: order.stop_arrived`}</code>
                 { href: `/${locale}/apply`, label: l.applyCarrier },
                 { href: signInPath(locale), label: l.menuSignIn },
                 { href: `/${locale}/api-docs`, label: l.footerApiDocs },
+                { href: earthworksPath(locale), label: ew.footerLink },
                 ...(showBlog ? [{ href: '/blog', label: t.site.blog }] : []),
               ],
             },

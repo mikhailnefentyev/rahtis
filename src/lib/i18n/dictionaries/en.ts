@@ -257,6 +257,7 @@ export const en = {
       'Fleet and driver management',
       'Own customers and direct orders, tracking link for the customer',
       'Freight exchange (load board) for trailer swaps, containers and express transport',
+      'Earthworks and dump trucks: weighed loads, waste transfer documents, hours and invoices from the worksite',
       'Driver app in 10 languages, works offline',
       'Working time and estimated pay',
       'Electronic consignment note (CMR), photos and signature',
@@ -265,7 +266,7 @@ export const en = {
       'API (REST and webhooks) for the shipper\'s own system',
     ],
     homeDescription:
-      'RAHTIS is a transport management platform and freight exchange for carriers. Run your fleet, drivers, working time and CMR notes in one place, take orders directly from your own customers and fill empty trucks from the load board. Trailer swaps, containers and express transport in Finland, the Nordics, the Baltics, Poland and Germany — shippers publish once and follow the job step by step.',
+      'RAHTIS is a transport management platform and freight exchange for carriers. Run your fleet, drivers, working time and CMR notes in one place, take orders directly from your own customers and fill empty trucks from the load board. Trailer swaps, containers and express transport in Finland, the Nordics, the Baltics, Poland and Germany — shippers publish once and follow the job step by step. For earthworks: dump-truck loads, weighings, hours and invoices from the worksite.',
     termsDescription:
       'Terms of service for RAHTIS: responsibilities of the parties, how a job runs, payments and payouts, and the term of the agreement.',
     privacyDescription:

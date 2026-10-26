@@ -26,6 +26,8 @@ type Day = {
   buffer_minutes: number;
   trailer_id: string | null;
   approved_at: string | null;
+  /* День уже в счёте: новых рейсов база не примет — формы нет. Старая база поля не отдаёт. */
+  invoiced?: boolean;
   loads: Load[];
 };
 
@@ -252,6 +254,7 @@ function JobCard({
           )}
           {job.day?.approved_at && <p className="mt-1 text-[13px] text-ok">{t.siteWork.approved}</p>}
 
+          {!job.day?.invoiced && (
           <div className="mt-4 flex flex-col gap-3 border-t border-line pt-4">
             <h3 className="text-[15px] font-semibold">{t.siteWork.newLoad}</h3>
             <label className="flex flex-col gap-1 text-[13px]">
@@ -308,6 +311,7 @@ function JobCard({
               {t.siteWork.saveLoad}
             </button>
           </div>
+          )}
 
           {loads.length > 0 && (
             <ul className="mt-4 flex flex-col divide-y divide-line border-t border-line text-[14px]">
