@@ -117,6 +117,9 @@ export const pl = {
   },
   /* Объекты перевозчика и страница прораба. */
   waste: {
+    registrationsTitle: 'Rejestracje przewoźnika odpadów',
+    registrationsHint: 'Numery rejestrowe i zezwoleń w krajach, w których przewozicie odpady. Numer drukuje się na dokumentach odpadów. Zostaw puste, jeśli tam nie wozicie odpadów.',
+    registrationsSaved: 'Rejestracje zapisane',
     link: 'Odpady (załącznik VII)',
     title: 'Przemieszczanie odpadów',
     lede: 'Oznacz ładunek jako odpady, jeśli to tektura, folia, puszki albo uszkodzone palety. Odpady przewożone przez granicę wymagają dokumentu z załącznika VII do unijnego rozporządzenia w sprawie przemieszczania odpadów, który jedzie razem z CMR.',

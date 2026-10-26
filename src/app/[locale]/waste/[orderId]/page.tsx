@@ -7,6 +7,7 @@ import { getViewerI18n } from '@/lib/i18n/viewer';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { DIWASS_MANDATORY_FROM, ewcLabel, nationalSystem } from '@/lib/waste/shipment';
+import { parseRegistrations, registrationLine } from '@/lib/waste/registrations';
 import { PrintButton } from '../../carrier/sites/[id]/load/[loadId]/PrintButton';
 import { WasteForm } from './WasteForm';
 
@@ -64,7 +65,7 @@ export default async function WastePage({ params }: { params: Promise<{ locale: 
   const admin = createAdminClient();
   const ids = [order.shipper_company_id, order.assigned_company_id].filter((x): x is string => Boolean(x));
   const [{ data: companies }, { data: vehicle }] = await Promise.all([
-    admin.from('companies').select('id, name, legal_name, business_id, legal_street, legal_postal_code, legal_city, legal_country, contact_email, country').in('id', ids),
+    admin.from('companies').select('id, name, legal_name, business_id, legal_street, legal_postal_code, legal_city, legal_country, contact_email, country, waste_registrations').in('id', ids),
     order.assigned_vehicle_id ? admin.from('vehicles').select('plate').eq('id', order.assigned_vehicle_id).maybeSingle() : Promise.resolve({ data: null }),
   ]);
   const shipper = companies?.find((c) => c.id === order.shipper_company_id) ?? null;
@@ -173,6 +174,10 @@ export default async function WastePage({ params }: { params: Promise<{ locale: 
                 <>
                   {party(carrier)}
                   <span className="block">
+                    {[...new Set(countries)].map((c) => {
+                      const line = carrier ? registrationLine(parseRegistrations(carrier.waste_registrations), c) : null;
+                      return line ? <span key={c} className="block font-mono text-[12px]">{c} · {line}</span> : null;
+                    })}
                     Means of transport: R (road)
                     {vehicle?.plate && <span className="font-mono"> · {vehicle.plate}</span>}
                     {order.trailer_plate && <span className="font-mono"> + {order.trailer_plate}</span>}

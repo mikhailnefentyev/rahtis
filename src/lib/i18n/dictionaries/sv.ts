@@ -117,6 +117,9 @@ export const sv = {
   },
   /* Объекты перевозчика и страница прораба. */
   waste: {
+    registrationsTitle: 'Registreringar för avfallstransport',
+    registrationsHint: 'Registrerings- och tillståndsnummer för de länder där ni transporterar avfall. Numret skrivs ut på avfallsdokumenten. Lämna tomt där ni inte kör avfall.',
+    registrationsSaved: 'Registreringarna sparade',
     link: 'Avfall (bilaga VII)',
     title: 'Avfallstransport',
     lede: 'Markera lasten som avfall om det gäller kartong, plastfilm, burkar eller trasiga pallar. Avfall som går över gränsen kräver ett dokument enligt bilaga VII till EU:s förordning om transport av avfall, och det följer med fraktsedeln (CMR).',

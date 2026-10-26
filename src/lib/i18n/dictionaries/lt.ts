@@ -117,6 +117,9 @@ export const lt = {
   },
   /* Объекты перевозчика и страница прораба. */
   waste: {
+    registrationsTitle: 'Atliekų vežėjo registracijos',
+    registrationsHint: 'Registracijos ir leidimų numeriai šalyse, kuriose vežate atliekas. Numeris spausdinamas atliekų dokumentuose. Palikite tuščią, jei ten atliekų nevežate.',
+    registrationsSaved: 'Registracijos išsaugotos',
     link: 'Atliekos (VII priedas)',
     title: 'Atliekų vežimas',
     lede: 'Pažymėkite krovinį kaip atliekas, jei tai kartonas, plėvelė, skardinės ar sulūžę padėklai. Per sieną vežamoms atliekoms reikia ES atliekų vežimo reglamento VII priedo dokumento, kuris keliauja kartu su CMR.',

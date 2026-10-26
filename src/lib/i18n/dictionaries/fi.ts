@@ -140,6 +140,9 @@ export const fi = {
   },
   /* Объекты перевозчика и страница прораба. */
   waste: {
+    registrationsTitle: 'Jätteenkuljettajan rekisteröinnit',
+    registrationsHint: 'Rekisteröinti- ja lupanumerot maittain, joissa kuljetatte jätettä. Numero tulostuu jäteasiakirjoihin. Jätä tyhjäksi, jos ette kuljeta jätettä siinä maassa.',
+    registrationsSaved: 'Rekisteröinnit tallennettu',
     link: 'Jäte (liite VII)',
     title: 'Jätekuljetus',
     lede: 'Merkitse, jos kuorma on jätettä: pahvi, kalvo, tölkit, rikkinäiset lavat. Rajan yli kuljetettavasta jätteestä tarvitaan EU:n jätteensiirtoasetuksen liite VII, joka kulkee CMR:n mukana.',

@@ -5,6 +5,7 @@ import { getViewer } from '@/lib/auth/viewer';
 import { getDictionary, isLocale, defaultLocale, type Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import { isWasteProcedure, normalizeEwc, RECOVERY_CODES } from './shipment';
+import { REGISTRATION_COUNTRIES } from './registrations';
 
 export type WasteState = { error: string | null; saved: boolean };
 
@@ -61,5 +62,31 @@ export async function saveOrderWasteAction(_previous: WasteState, formData: Form
   if (error) return { error: t.waste.noAccess, saved: false };
 
   revalidatePath(`/${locale}/waste/${orderId}`);
+  return { error: null, saved: true };
+}
+
+export type RegistrationsState = { error: string | null; saved: boolean };
+
+/**
+ * Номера регистраций перевозчика отходов — правит сама компания
+ * (grant update (waste_registrations), RLS компании на companies).
+ */
+export async function saveWasteRegistrationsAction(_previous: RegistrationsState, formData: FormData): Promise<RegistrationsState> {
+  const raw = String(formData.get('locale') ?? '');
+  const locale: Locale = isLocale(raw) ? raw : defaultLocale;
+  const t = await getDictionary(locale);
+  const viewer = await getViewer();
+  if (viewer.status !== 'ready' || !viewer.company) return { error: t.waste.noAccess, saved: false };
+
+  const regs: Record<string, string> = {};
+  for (const c of REGISTRATION_COUNTRIES) {
+    const value = String(formData.get(`reg_${c}`) ?? '').trim().slice(0, 80);
+    if (value) regs[c] = value;
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.from('companies').update({ waste_registrations: regs }).eq('id', viewer.company.id);
+  if (error) return { error: t.waste.noAccess, saved: false };
+  revalidatePath(`/${locale}/account`);
   return { error: null, saved: true };
 }

@@ -13,6 +13,8 @@ import { RequisitesForm } from '../requisites/form';
 import { createClient } from '@/lib/supabase/server';
 import { ChangePasswordForm } from './form';
 import { MembersPanel } from './MembersPanel';
+import { WasteRegistrationsForm } from './WasteRegistrationsForm';
+import { parseRegistrations } from '@/lib/waste/registrations';
 import { getViewerI18n } from '@/lib/i18n/viewer';
 
 export async function generateMetadata({
@@ -112,6 +114,11 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
 
             <RequisitesForm company={company} prefill={prefill} />
           </section>
+        )}
+
+        {/* Регистрации перевозчика отходов — только у перевозчика, печатаются в документах на отходы. */}
+        {company && company.kind === 'CARRIER' && company.status === 'ACTIVE' && (
+          <WasteRegistrationsForm registrations={parseRegistrations(company.waste_registrations)} />
         )}
 
         {/*

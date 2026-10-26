@@ -117,6 +117,9 @@ export const et = {
   },
   /* Объекты перевозчика и страница прораба. */
   waste: {
+    registrationsTitle: 'Jäätmeveo registreeringud',
+    registrationsHint: 'Registreerimis- ja loanumbrid riikides, kus veate jäätmeid. Number trükitakse jäätmedokumentidele. Jätke tühjaks, kui selles riigis jäätmeid ei vea.',
+    registrationsSaved: 'Registreeringud salvestatud',
     link: 'Jäätmed (VII lisa)',
     title: 'Jäätmeveos',
     lede: 'Märgi koorem jäätmeteks, kui see on papp, kile, purgid või katkised alused. Piiri ületavate jäätmete jaoks on vaja ELi jäätmesaadetiste määruse VII lisa dokumenti, mis liigub koos CMR-iga.',

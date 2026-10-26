@@ -5,6 +5,7 @@ import { requireRole } from '@/lib/auth/guard';
 import { getDictionary, isLocale } from '@/lib/i18n';
 import { getViewerI18n } from '@/lib/i18n/viewer';
 import { isSiteCountry, LABELS_EN, wasteDocFor } from '@/lib/sites/wasteDocs';
+import { parseRegistrations, registrationLine } from '@/lib/waste/registrations';
 import { material, wasteCodeLabel } from '@/lib/sites/work';
 import { createClient } from '@/lib/supabase/server';
 import { PrintButton } from './PrintButton';
@@ -121,6 +122,9 @@ export default async function TransferDocumentPage({ params }: { params: Promise
                   <span className="block text-ink-muted">
                     {company.legal_street}, {company.legal_postal_code} {company.legal_city}
                   </span>
+                )}
+                {registrationLine(parseRegistrations(company.waste_registrations), country) && (
+                  <span className="block font-mono text-[12px]">{registrationLine(parseRegistrations(company.waste_registrations), country)}</span>
                 )}
                 <span className="block text-ink-muted">
                   {driver?.full_name ?? '—'}

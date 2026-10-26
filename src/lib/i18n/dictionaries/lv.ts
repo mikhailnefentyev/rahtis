@@ -117,6 +117,9 @@ export const lv = {
   },
   /* Объекты перевозчика и страница прораба. */
   waste: {
+    registrationsTitle: 'Atkritumu pārvadātāja reģistrācijas',
+    registrationsHint: 'Reģistrācijas un atļauju numuri valstīs, kur pārvadājat atkritumus. Numurs tiek drukāts atkritumu dokumentos. Atstājiet tukšu, ja tur atkritumus nevedat.',
+    registrationsSaved: 'Reģistrācijas saglabātas',
     link: 'Atkritumi (VII pielikums)',
     title: 'Atkritumu pārvadājums',
     lede: 'Atzīmējiet kravu kā atkritumus, ja tas ir kartons, plēve, bundžas vai salauztas paletes. Atkritumiem, kas šķērso robežu, vajadzīgs ES Atkritumu sūtījumu regulas VII pielikuma dokuments, kas ceļo kopā ar CMR.',

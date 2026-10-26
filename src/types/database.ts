@@ -743,6 +743,7 @@ export type Database = {
           status: Database["public"]["Enums"]["company_status"]
           updated_at: string
           vat_number: string | null
+          waste_registrations: Json
         }
         Insert: {
           activated_at?: string | null
@@ -786,6 +787,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["company_status"]
           updated_at?: string
           vat_number?: string | null
+          waste_registrations?: Json
         }
         Update: {
           activated_at?: string | null
@@ -829,6 +831,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["company_status"]
           updated_at?: string
           vat_number?: string | null
+          waste_registrations?: Json
         }
         Relationships: [
           {

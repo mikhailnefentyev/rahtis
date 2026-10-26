@@ -117,6 +117,9 @@ export const de = {
   },
   /* Объекты перевозчика и страница прораба. */
   waste: {
+    registrationsTitle: 'Registrierungen als Abfallbeförderer',
+    registrationsHint: 'Registrierungs- und Genehmigungsnummern für die Länder, in denen Sie Abfall befördern. Die Nummer steht auf den Abfalldokumenten. Leer lassen, wo Sie keinen Abfall fahren.',
+    registrationsSaved: 'Registrierungen gespeichert',
     link: 'Abfall (Anhang VII)',
     title: 'Abfallverbringung',
     lede: 'Markieren Sie die Ladung als Abfall, wenn es sich um Pappe, Folie, Dosen oder kaputte Paletten handelt. Für Abfall über die Grenze ist das Anhang-VII-Dokument nach der EU-Abfallverbringungsverordnung nötig; es fährt zusammen mit dem CMR mit.',

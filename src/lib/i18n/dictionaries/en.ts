@@ -133,6 +133,9 @@ export const en = {
   },
   /* Объекты перевозчика и страница прораба. */
   waste: {
+    registrationsTitle: 'Waste carrier registrations',
+    registrationsHint: 'Registration and permit numbers for the countries where you carry waste. The number is printed on waste documents. Leave empty where you do not carry waste.',
+    registrationsSaved: 'Registrations saved',
     link: 'Waste (Annex VII)',
     title: 'Waste shipment',
     lede: 'Mark the load as waste if it is cardboard, film, cans or broken pallets. Waste crossing a border needs the Annex VII document of the EU Waste Shipment Regulation, carried with the CMR.',
