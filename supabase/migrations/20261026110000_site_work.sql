@@ -20,6 +20,16 @@
 -- поэтому очередь без связи не задваивает рейсы.
 -- ═══════════════════════════════════════════════════════════════════
 
+/*
+ * Первая попытка применить эту миграцию (26.10.2026) оборвалась на
+ * функции и оставила пустые таблицы и тип. Убираем остатки, чтобы
+ * миграция прошла целиком; на чистой базе это ничего не делает.
+ */
+drop table if exists public.site_days cascade;
+drop table if exists public.site_jobs cascade;
+drop table if exists public.scale_sites cascade;
+drop type if exists public.site_pricing;
+
 create type public.site_pricing as enum ('HOUR', 'LOAD', 'TONNE');
 
 -- ── Весы и пункты приёмки ─────────────────────────────────────────
