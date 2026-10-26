@@ -127,9 +127,6 @@ export function SiteJobForm({
               </Select>
             )}
           </Field>
-          <Field label={t.siteInvoice.customerVatId} hint={t.siteInvoice.customerVatHint}>
-            {(p) => <InputMono {...p} name="customer_vat_id" defaultValue={job?.customer_vat_id ?? ''} placeholder="FI12345678" />}
-          </Field>
           <Field label={t.siteInvoice.schedule} hint={t.siteInvoice.scheduleHint}>
             {(p) => (
               <Select {...p} name="invoice_schedule" defaultValue={job?.invoice_schedule ?? 'BIWEEKLY'}>

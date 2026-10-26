@@ -51,7 +51,6 @@ export async function saveSiteJobAction(_previous: SiteJobState, formData: FormD
     customer_postal_code: text(formData, 'customer_postal_code'),
     customer_city: text(formData, 'customer_city'),
     customer_country: /^[A-Z]{2}$/.test(String(formData.get('customer_country') ?? '')) ? String(formData.get('customer_country')) : 'FI',
-    customer_vat_id: text(formData, 'customer_vat_id'),
     invoice_schedule: ['MANUAL', 'WEEKLY', 'BIWEEKLY'].includes(String(formData.get('invoice_schedule'))) ? String(formData.get('invoice_schedule')) : 'BIWEEKLY',
     payment_term_days: Math.min(90, Math.max(0, Number.parseInt(String(formData.get('payment_term_days') ?? '14'), 10) || 14)),
     pricing,
