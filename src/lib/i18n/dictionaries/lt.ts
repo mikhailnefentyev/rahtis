@@ -211,7 +211,7 @@ export const lt = {
     customerCity: 'Miestas',
     customerCountry: 'Šalis',
     customerVatId: 'Kliento PVM kodas',
-    customerVatHint: 'Užsienio klientui: sąskaita be PVM, atvirkštinis apmokestinimas.',
+    customerVatHint: 'Neprivaloma, rodoma sąskaitoje. Sąskaitoje visada taikomas įprastas vežėjo šalies PVM.',
     invoices: 'Sąskaitos',
     sendNow: 'Siųsti sąskaitą dabar',
     sendNowHint: 'Įtraukia visas patvirtintas dar neapmokestintas dienas.',

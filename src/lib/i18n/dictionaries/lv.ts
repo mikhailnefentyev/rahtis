@@ -211,7 +211,7 @@ export const lv = {
     customerCity: 'Pilsēta',
     customerCountry: 'Valsts',
     customerVatId: 'Klienta PVN numurs',
-    customerVatHint: 'Ārvalstu klientam: rēķins bez PVN, apgrieztā maksāšana.',
+    customerVatHint: 'Neobligāti, redzams rēķinā. Rēķinā vienmēr ir pārvadātāja valsts parastā PVN likme.',
     invoices: 'Rēķini',
     sendNow: 'Sūtīt rēķinu tagad',
     sendNowHint: 'Iekļauj visas apstiprinātās dienas, kas vēl nav rēķinā.',

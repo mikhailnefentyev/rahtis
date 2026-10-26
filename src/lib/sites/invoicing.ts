@@ -1,12 +1,11 @@
 import 'server-only';
 
 import { renderToBuffer } from '@react-pdf/renderer';
-import { vatBpsFor } from '@/lib/config';
 import { todayInHelsinki } from '@/lib/dates';
 import { sendEmail } from '@/lib/email';
 import { createFormat } from '@/lib/format';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { finnishReference, invoiceLines, invoiceTotals, type InvoiceDay } from './invoice';
+import { finnishReference, invoiceLines, invoiceTotals, standardVatBps, type InvoiceDay } from './invoice';
 import { SiteInvoicePdf } from './SiteInvoicePdf';
 import { dayMinutes } from './work';
 
@@ -14,7 +13,7 @@ const BUCKET = 'reports';
 
 export type SiteInvoiceResult =
   | { status: 'SENT' | 'CREATED'; invoiceId: string; number: string }
-  | { status: 'NOTHING' | 'BUSY' | 'NO_IBAN' | 'NO_CUSTOMER_EMAIL' | 'NO_CUSTOMER_ADDRESS' | 'NOT_FOUND' };
+  | { status: 'NOTHING' | 'BUSY' | 'NO_VAT_RATE' | 'NO_IBAN' | 'NO_CUSTOMER_EMAIL' | 'NO_CUSTOMER_ADDRESS' | 'NOT_FOUND' };
 
 const addDays = (iso: string, days: number) => {
   const d = new Date(`${iso}T12:00:00Z`);
@@ -49,6 +48,9 @@ export async function createSiteInvoice(jobId: string, upTo: string): Promise<Si
     .maybeSingle();
   if (!seller) return { status: 'NOT_FOUND' };
   if (!seller.iban) return { status: 'NO_IBAN' };
+  /* НДС — обычный, по стране перевозчика (FI 25,5 %, SE 25 %…): заказы между странами не бывают. */
+  const vatBps = standardVatBps(seller.country);
+  if (vatBps === null) return { status: 'NO_VAT_RATE' };
   if (!job.customer_email) return { status: 'NO_CUSTOMER_EMAIL' };
   if (!job.customer_street || !job.customer_city) return { status: 'NO_CUSTOMER_ADDRESS' };
 
@@ -85,12 +87,12 @@ export async function createSiteInvoice(jobId: string, upTo: string): Promise<Si
   });
 
   const lines = invoiceLines(job.pricing, job.rate_cents, invoiceDays);
-  const totals = invoiceTotals(lines, vatBpsFor(job.customer_country));
+  const totals = invoiceTotals(lines, vatBps);
   const issuedOn = todayInHelsinki();
   const dueOn = addDays(issuedOn, job.payment_term_days);
 
   const sellerAddress = [seller.legal_street, [seller.legal_postal_code, seller.legal_city].filter(Boolean).join(' ')].filter(Boolean).join(', ');
-  const customerAddress = [job.customer_street, [job.customer_postal_code, job.customer_city].filter(Boolean).join(' '), job.customer_country !== 'FI' ? job.customer_country : null]
+  const customerAddress = [job.customer_street, [job.customer_postal_code, job.customer_city].filter(Boolean).join(' '), job.customer_country !== seller.country ? job.customer_country : null]
     .filter(Boolean)
     .join(', ');
   const replyTo = seller.billing_email || seller.contact_email;
@@ -169,10 +171,9 @@ export async function createSiteInvoice(jobId: string, upTo: string): Promise<Si
         amount: f.eur(l.amountCents),
       })),
       net: f.eur(totals.netCents),
-      vatLabel: `ALV / VAT ${(totals.vatBps / 100).toLocaleString('fi-FI', { maximumFractionDigits: 1 })} %`,
+      vatLabel: `${seller.country === 'FI' ? 'ALV / VAT' : 'VAT'} ${(totals.vatBps / 100).toLocaleString('fi-FI', { maximumFractionDigits: 1 })} %`,
       vat: f.eur(totals.vatCents),
       total: f.eur(totals.totalCents),
-      reverseCharge: totals.reverseCharge,
       note: 'Päivät ja kuormat on hyväksytty työmaalla. Erittely kuormista ja punnituksista toimitetaan pyydettäessä. / Days and loads have been approved at the site.',
     }),
   );

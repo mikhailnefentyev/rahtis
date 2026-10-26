@@ -69,17 +69,34 @@ export function invoiceLines(pricing: Pricing, rateCents: number, days: readonly
   });
 }
 
-export type InvoiceTotals = { netCents: number; vatBps: number; vatCents: number; totalCents: number; reverseCharge: boolean };
+export type InvoiceTotals = { netCents: number; vatBps: number; vatCents: number; totalCents: number };
 
 /**
- * Итог и ALV. Ставку даёт vatBpsFor(страна клиента): финскому — 25,5 %,
- * клиенту из другой страны — 0 % с обратным начислением (налог считает покупатель, счёт обязан
- * сказать это словами).
+ * Общая ставка НДС страны перевозчика, в базисных пунктах. Перевозчик и
+ * клиент на объекте из одной страны (финская фирма — финской), поэтому
+ * счёт всегда с обычным НДС продавца, без обратного начисления.
  */
+export const STANDARD_VAT_BPS: Readonly<Record<string, number>> = {
+  FI: 2550,
+  SE: 2500,
+  NO: 2500,
+  DK: 2500,
+  EE: 2400,
+  LV: 2100,
+  LT: 2100,
+  PL: 2300,
+  DE: 1900,
+};
+
+export function standardVatBps(country: string | null | undefined): number | null {
+  return country ? (STANDARD_VAT_BPS[country] ?? null) : null;
+}
+
+/** Итог: сумма строк и НДС по ставке страны перевозчика. */
 export function invoiceTotals(lines: readonly InvoiceLine[], vatBps: number): InvoiceTotals {
   const netCents = lines.reduce((sum, l) => sum + l.amountCents, 0);
   const vatCents = Math.round((netCents * vatBps) / 10_000);
-  return { netCents, vatBps, vatCents, totalCents: netCents + vatCents, reverseCharge: vatBps === 0 };
+  return { netCents, vatBps, vatCents, totalCents: netCents + vatCents };
 }
 
 /**

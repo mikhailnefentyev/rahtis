@@ -25,7 +25,6 @@ export type SiteInvoicePdfInput = {
   vatLabel: string;
   vat: string;
   total: string;
-  reverseCharge: boolean;
   note: string;
 };
 
@@ -132,12 +131,6 @@ export function SiteInvoicePdf(input: SiteInvoicePdfInput) {
             <Text style={s.bold}>{ansi(input.total)}</Text>
           </View>
         </View>
-
-        {input.reverseCharge ? (
-          <Text style={[s.small, { marginTop: 8 }]}>
-            {ansi('Käännetty verovelvollisuus / Reverse charge, Directive 2006/112/EC art. 196.')}
-          </Text>
-        ) : null}
 
         <View style={s.pay}>
           {field('Tilinumero (IBAN)', 'Bank account', input.seller.iban)}

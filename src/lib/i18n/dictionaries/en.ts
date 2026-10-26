@@ -227,7 +227,7 @@ export const en = {
     customerCity: 'City',
     customerCountry: 'Country',
     customerVatId: 'Customer VAT number',
-    customerVatHint: 'For a foreign customer: invoice without VAT, reverse charge.',
+    customerVatHint: 'Optional, shown on the invoice. The invoice always carries the standard VAT of the carrier’s country.',
     invoices: 'Invoices',
     sendNow: 'Send invoice now',
     sendNowHint: 'Invoices all approved days not yet invoiced.',

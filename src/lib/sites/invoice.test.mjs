@@ -3,7 +3,7 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { finnishReference, invoiceDue, invoiceLines, invoiceTotals, isoWeek } from './invoice.ts';
+import { finnishReference, invoiceDue, invoiceLines, invoiceTotals, isoWeek, standardVatBps } from './invoice.ts';
 
 test('viitenumero: контрольная цифра по весам 7-3-1', () => {
   // Известные примеры: 1232 (основа 123), 12345672 (основа 1234567).
@@ -27,15 +27,17 @@ test('строки: часы, рейсы, тонны', () => {
   assert.equal(t[0].amountCents, 103_075);
 });
 
-test('ALV: Финляндия 25,5 %, иностранный клиент — обратное начисление', () => {
+test('НДС: ставка страны перевозчика, без обратного начисления', () => {
   const lines = invoiceLines('HOUR', 10000, days);
-  const fi = invoiceTotals(lines, 2550);
+  const fi = invoiceTotals(lines, standardVatBps('FI'));
   assert.equal(fi.netCents, 177_500);
   assert.equal(fi.vatCents, 45_263);
   assert.equal(fi.totalCents, 222_763);
-  const se = invoiceTotals(lines, 0);
-  assert.equal(se.vatCents, 0);
-  assert.equal(se.reverseCharge, true);
+  assert.equal(invoiceTotals(lines, standardVatBps('SE')).vatCents, 44_375);
+  assert.equal(standardVatBps('EE'), 2400);
+  assert.equal(standardVatBps('DE'), 1900);
+  assert.equal(standardVatBps('US'), null);
+  assert.equal(standardVatBps(null), null);
 });
 
 test('расписание: еженедельно и по чётным неделям', () => {

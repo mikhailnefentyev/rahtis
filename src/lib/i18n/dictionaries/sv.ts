@@ -211,7 +211,7 @@ export const sv = {
     customerCity: 'Postort',
     customerCountry: 'Land',
     customerVatId: 'Kundens momsnummer',
-    customerVatHint: 'För utländsk kund: faktura utan moms, omvänd skattskyldighet.',
+    customerVatHint: 'Valfritt, visas på fakturan. Fakturan har alltid transportföretagets lands vanliga moms.',
     invoices: 'Fakturor',
     sendNow: 'Skicka faktura nu',
     sendNowHint: 'Fakturerar alla godkända dagar som inte fakturerats.',

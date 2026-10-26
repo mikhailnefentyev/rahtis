@@ -211,7 +211,7 @@ export const ru = {
     customerCity: 'Город',
     customerCountry: 'Страна',
     customerVatId: 'ALV-номер клиента',
-    customerVatHint: 'Иностранному клиенту — счёт без ALV, обратное начисление.',
+    customerVatHint: 'Необязательно, печатается в счёте. Счёт всегда с обычным НДС страны перевозчика.',
     invoices: 'Счета',
     sendNow: 'Отправить счёт сейчас',
     sendNowHint: 'Все подтверждённые дни, ещё не попавшие в счёт.',

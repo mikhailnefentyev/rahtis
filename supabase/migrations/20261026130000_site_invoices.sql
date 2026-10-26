@@ -21,7 +21,7 @@ alter table public.site_jobs
   add column customer_city text,
   add column customer_country text not null default 'FI'
     constraint site_jobs_customer_country check (customer_country ~ '^[A-Z]{2}$'),
-  /* ALV-номер клиента: для иностранного клиента — обратное начисление. */
+  /* ALV-номер клиента — только для печати в счёте; НДС всегда по стране перевозчика. */
   add column customer_vat_id text;
 
 create table public.carrier_invoices (

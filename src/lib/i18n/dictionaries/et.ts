@@ -211,7 +211,7 @@ export const et = {
     customerCity: 'Linn',
     customerCountry: 'Riik',
     customerVatId: 'Kliendi KMKR number',
-    customerVatHint: 'Välisklient: arve ilma käibemaksuta, pöördmaksustamine.',
+    customerVatHint: 'Valikuline, kuvatakse arvel. Arvel on alati vedaja riigi tavaline käibemaks.',
     invoices: 'Arved',
     sendNow: 'Saada arve kohe',
     sendNowHint: 'Arveldab kõik kinnitatud päevad, mis pole veel arvel.',

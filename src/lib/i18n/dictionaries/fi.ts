@@ -234,7 +234,7 @@ export const fi = {
     customerCity: 'Postitoimipaikka',
     customerCountry: 'Maa',
     customerVatId: 'Asiakkaan ALV-numero',
-    customerVatHint: 'Ulkomaiselle asiakkaalle: lasku ilman ALV:tä, käännetty verovelvollisuus.',
+    customerVatHint: 'Valinnainen, näkyy laskulla. Lasku tehdään aina kuljetusliikkeen maan tavallisella ALV:llä.',
     invoices: 'Laskut',
     sendNow: 'Lähetä lasku nyt',
     sendNowHint: 'Laskuttaa kaikki hyväksytyt päivät, joita ei ole vielä laskutettu.',

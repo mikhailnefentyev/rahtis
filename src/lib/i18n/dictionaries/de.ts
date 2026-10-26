@@ -211,7 +211,7 @@ export const de = {
     customerCity: 'Ort',
     customerCountry: 'Land',
     customerVatId: 'USt-IdNr. des Kunden',
-    customerVatHint: 'Für ausländische Kunden: Rechnung ohne MwSt., Reverse Charge.',
+    customerVatHint: 'Optional, steht auf der Rechnung. Die Rechnung trägt immer die normale MwSt. des Landes des Frachtführers.',
     invoices: 'Rechnungen',
     sendNow: 'Rechnung jetzt senden',
     sendNowHint: 'Berechnet alle bestätigten, noch nicht berechneten Tage.',

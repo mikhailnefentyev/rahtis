@@ -211,7 +211,7 @@ export const pl = {
     customerCity: 'Miejscowość',
     customerCountry: 'Kraj',
     customerVatId: 'NIP/VAT klienta',
-    customerVatHint: 'Dla klienta zagranicznego: faktura bez VAT, odwrotne obciążenie.',
+    customerVatHint: 'Opcjonalnie, widoczne na fakturze. Faktura zawsze z podstawową stawką VAT kraju przewoźnika.',
     invoices: 'Faktury',
     sendNow: 'Wyślij fakturę teraz',
     sendNowHint: 'Fakturuje wszystkie zatwierdzone, jeszcze niezafakturowane dni.',
