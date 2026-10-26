@@ -54,12 +54,15 @@ const s = StyleSheet.create({
 });
 
 export function SiteInvoicePdf(input: SiteInvoicePdfInput) {
-  const field = (fi: string, en: string, value: string) => (
-    <View style={s.col}>
+  /* stacked — поле в столбике: без flex, иначе высота делится поровну и строки наезжают. */
+  const field = (fi: string, en: string, value: string, stacked = false) => (
+    <View style={stacked ? { marginBottom: 6 } : s.col}>
       <Text style={s.label}>{ansi(`${fi} / ${en}`)}</Text>
       <Text>{ansi(value)}</Text>
     </View>
   );
+  /* IBAN группами по четыре — так его читают и перепечатывают в банке. */
+  const iban = input.seller.iban.replace(/\s/g, '').replace(/(.{4})(?=.)/g, '$1 ');
 
   return (
     <Document title={ansi(`Lasku ${input.number}`)} author={ansi(input.seller.name)}>
@@ -87,9 +90,9 @@ export function SiteInvoicePdf(input: SiteInvoicePdfInput) {
             {input.customer.vatId ? <Text>{ansi(`ALV ${input.customer.vatId}`)}</Text> : null}
           </View>
           <View style={s.col}>
-            {field('Laskun numero', 'Invoice no.', input.number)}
-            {field('Päiväys', 'Date', input.issuedOn)}
-            {field('Eräpäivä', 'Due date', input.dueOn)}
+            {field('Laskun numero', 'Invoice no.', input.number, true)}
+            {field('Laskun päivämäärä', 'Invoice date', input.issuedOn, true)}
+            {field('Eräpäivä', 'Due date', input.dueOn, true)}
           </View>
         </View>
 
@@ -119,7 +122,7 @@ export function SiteInvoicePdf(input: SiteInvoicePdfInput) {
 
         <View style={s.totals}>
           <View style={s.totalRow}>
-            <Text>{ansi('Veroton yhteensä / Net')}</Text>
+            <Text>{ansi('Veroton yhteensä / Total excl. VAT')}</Text>
             <Text>{ansi(input.net)}</Text>
           </View>
           <View style={s.totalRow}>
@@ -127,22 +130,22 @@ export function SiteInvoicePdf(input: SiteInvoicePdfInput) {
             <Text>{ansi(input.vat)}</Text>
           </View>
           <View style={s.totalRow}>
-            <Text style={s.bold}>{ansi('Maksettava / Total')}</Text>
+            <Text style={s.bold}>{ansi('Maksettava yhteensä / Total due')}</Text>
             <Text style={s.bold}>{ansi(input.total)}</Text>
           </View>
         </View>
 
         <View style={s.pay}>
-          {field('Tilinumero (IBAN)', 'Bank account', input.seller.iban)}
+          {field('Tilinumero (IBAN)', 'Bank account', iban)}
           {field('Viitenumero', 'Reference', input.reference)}
-          {field('Eräpäivä', 'Due', input.dueOn)}
-          {field('Summa', 'Amount', input.total)}
+          {field('Eräpäivä', 'Due date', input.dueOn)}
+          {field('Maksettava', 'Amount due', input.total)}
         </View>
 
         <Text style={[s.small, { marginTop: 14 }]}>{ansi(input.note)}</Text>
 
         <Text style={s.footer} fixed>
-          {ansi(`${input.seller.name} · Y-tunnus ${input.seller.businessId} · Lasku laadittu RAHTIS-palvelussa`)}
+          {ansi(`${input.seller.name} · Y-tunnus ${input.seller.businessId} · Lasku on laadittu RAHTIS-palvelussa`)}
         </Text>
       </Page>
     </Document>

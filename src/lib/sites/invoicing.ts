@@ -174,7 +174,7 @@ export async function createSiteInvoice(jobId: string, upTo: string): Promise<Si
       vatLabel: `${seller.country === 'FI' ? 'ALV / VAT' : 'VAT'} ${(totals.vatBps / 100).toLocaleString('fi-FI', { maximumFractionDigits: 1 })} %`,
       vat: f.eur(totals.vatCents),
       total: f.eur(totals.totalCents),
-      note: 'Päivät ja kuormat on hyväksytty työmaalla. Erittely kuormista ja punnituksista toimitetaan pyydettäessä. / Days and loads have been approved at the site.',
+      note: 'Päivät ja kuormat on hyväksytty työmaalla. Kuormien ja punnitusten erittely toimitetaan pyynnöstä. / Days and loads have been approved at the site. A breakdown of loads and weighings is available on request.',
     }),
   );
 
@@ -186,14 +186,14 @@ export async function createSiteInvoice(jobId: string, upTo: string): Promise<Si
   const text = [
     `Hei,`,
     ``,
-    `liitteenä ${sellerName}:n lasku ${number} työmaalta ${job.name}.`,
-    `Summa ${f.eur(totals.totalCents)}, eräpäivä ${fiDate(dueOn)}.`,
-    `Tilinumero ${seller.iban}, viitenumero ${reference}.`,
+    `liitteenä lasku ${number}, työmaa ${job.name}. Laskuttaja: ${sellerName}.`,
+    `Maksettava ${f.eur(totals.totalCents)}, eräpäivä ${fiDate(dueOn)}.`,
+    `Tilinumero (IBAN) ${seller.iban}, viitenumero ${reference}.`,
     ``,
-    `Kysymykset laskusta: vastaa tähän viestiin (${replyTo}).`,
+    `Jos laskusta on kysyttävää, vastatkaa tähän viestiin (${replyTo}).`,
     ``,
     `—`,
-    `Attached is invoice ${number} from ${sellerName} for the worksite ${job.name}: ${f.eur(totals.totalCents)}, due ${fiDate(dueOn)}, IBAN ${seller.iban}, reference ${reference}.`,
+    `Attached is invoice ${number} from ${sellerName} for worksite ${job.name}. Amount due ${f.eur(totals.totalCents)}, due date ${fiDate(dueOn)}, IBAN ${seller.iban}, reference ${reference}. Questions about the invoice? Just reply to this email.`,
   ].join('\n');
 
   const mail = await sendEmail({

@@ -157,6 +157,8 @@ function JobCard({
   /* Предел массы сегодняшней сцепки — для предупреждения о перегрузе. */
   const limitKg = useMemo(() => {
     if (!state.vehicle) return null;
+    /* Тягач без полуприцепа груз не возит: предел «18 т» дал бы ложный перегруз на каждом рейсе. */
+    if (state.vehicle.vehicle_class === 'TRACTOR' && !dayTrailer) return null;
     const country = isMassCountry(state.country) ? state.country : 'FI';
     return combinationMass(
       country,

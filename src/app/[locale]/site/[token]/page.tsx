@@ -5,7 +5,7 @@ import { dayEnd, dayMinutes, hoursLabel } from '@/lib/sites/work';
 import { createClient } from '@/lib/supabase/server';
 import { ApproveDay } from './ApproveDay';
 
-export const metadata: Metadata = { title: 'RAHTIS', robots: { index: false, follow: false } };
+export const metadata: Metadata = { title: { absolute: 'RAHTIS' }, robots: { index: false, follow: false } };
 
 type ForemanView = {
   job: { name: string; address: string | null; customer_name: string; carrier: string; pricing: string; material_code: string };

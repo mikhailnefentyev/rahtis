@@ -31,7 +31,10 @@ export function Invoices({ jobId, schedule, invoices }: { jobId: string; schedul
   return (
     <section className="mb-8">
       <h2 className="mb-3 border-b border-line pb-2 text-[13px] font-semibold tracking-tight text-ink-faint">
-        {s.invoices} · {s.schedules[schedule as keyof typeof s.schedules] ?? schedule}
+        {s.invoices}
+        <span className="ml-2 font-normal">
+          · {s.schedule}: {(s.schedules[schedule as keyof typeof s.schedules] ?? schedule).toLocaleLowerCase(locale)}
+        </span>
       </h2>
       <form action={action} className="mb-3 flex flex-wrap items-center gap-3">
         <input type="hidden" name="locale" value={locale} />

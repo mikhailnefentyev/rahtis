@@ -67,8 +67,14 @@ export function ShiftBar({ shift: serverShift }: { shift: Shift }) {
 
   const onBreak = Boolean(shift?.break_started_at);
 
+  /*
+   * Забытая смена: дольше суток. Счётчик «719 h» водителю ничего не
+   * говорит — вместо него просьба закончить день (база закроет на 24 ч).
+   */
+  const stale = shift !== null && now !== null && now - Date.parse(shift.started_at) > 24 * 3600_000;
+
   const worked = (() => {
-    if (!shift || now == null) return null;
+    if (!shift || now == null || stale) return null;
     const ongoingBreak = shift.break_started_at ? now - Date.parse(shift.break_started_at) : 0;
     const minutes = Math.max(
       0,
@@ -109,7 +115,8 @@ export function ShiftBar({ shift: serverShift }: { shift: Shift }) {
         </span>
         {worked && <span className="font-mono text-lg font-bold tracking-tight">{worked}</span>}
       </div>
-      {shift && shift.break_minutes > 0 && (
+      {stale && <p className="mt-1 text-[14px] leading-snug text-danger">{t.driverApp.shiftStale}</p>}
+      {shift && !stale && shift.break_minutes > 0 && (
         <p className="mt-0.5 text-[13px] text-ink-muted">
           {m('driverApp.breakTotal', { minutes: shift.break_minutes })}
         </p>

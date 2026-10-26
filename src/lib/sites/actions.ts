@@ -160,9 +160,9 @@ export async function sendSiteInvoiceNowAction(_previous: SendInvoiceState, form
     const s = t.siteInvoice;
     switch (result.status) {
       case 'SENT':
-        return { message: `${s.resultSent} ${result.number}`, ok: true };
+        return { message: `${result.number}: ${s.resultSent}`, ok: true };
       case 'CREATED':
-        return { message: `${s.resultCreated} ${result.number}`, ok: false };
+        return { message: `${result.number}: ${s.resultCreated}`, ok: false };
       case 'NO_IBAN':
         return { message: s.resultNoIban, ok: false };
       case 'NO_CUSTOMER_EMAIL':

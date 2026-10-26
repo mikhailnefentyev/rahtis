@@ -18,8 +18,10 @@ test('конец дня — последняя выгрузка + 30 минут'
   assert.equal(hoursLabel(585), '9:45');
 });
 
-test('нажатое «закончил» важнее расчёта; без рейсов дня нет конца', () => {
+test('«закончил» позже запаса продлевает день, раньше — не съедает запас; без рейсов дня нет конца', () => {
   assert.equal(dayEnd({ ...day, endedAt: '2026-10-26T15:00:00.000Z' }), '2026-10-26T15:00:00.000Z');
+  assert.equal(dayEnd({ ...day, endedAt: '2026-10-26T13:46:00.000Z' }), '2026-10-26T14:15:00.000Z');
+  assert.equal(dayEnd({ ...day, unloads: [], endedAt: '2026-10-26T12:00:00.000Z' }), '2026-10-26T12:00:00.000Z');
   assert.equal(dayEnd({ ...day, unloads: [] }), null);
   assert.equal(dayMinutes({ ...day, unloads: [] }), null);
 });

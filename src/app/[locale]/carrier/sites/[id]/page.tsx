@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { Badge, Button, Card, CardBody, EmptyState } from '@/components/ui';
+import { Badge, Button, Card, CardBody } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
 import { siteUrl } from '@/lib/config';
 import { combinationMass, isMassCountry } from '@/lib/fleet/mass';
@@ -133,7 +133,7 @@ export default async function SiteJobPage({ params }: { params: Promise<{ locale
 
       <h2 className="mb-3 border-b border-line pb-2 text-[13px] font-semibold tracking-tight text-ink-faint">{s.days}</h2>
       {rows.length === 0 ? (
-        <EmptyState title={s.days} description={s.noDays} />
+        <p className="text-[13px] text-ink-muted">{s.noDays}</p>
       ) : (
         <div className="flex flex-col gap-4">
           {rows.map((r) => (
@@ -196,7 +196,7 @@ export default async function SiteJobPage({ params }: { params: Promise<{ locale
                               <td className="py-1 pr-3">{l.scale_site_id ? siteName.get(l.scale_site_id) ?? '—' : '—'}</td>
                               <td className="py-1 pr-3 font-mono">
                                 {l.gross_kg ? tonnes(l.gross_kg) : '—'}
-                                {over > 0 && <span className="ml-1 text-danger">({s.overload} {over} kg)</span>}
+                                {over > 0 && <span className="ml-1 text-danger">{s.overload} +{tonnes(over)} t</span>}
                               </td>
                               <td className="py-1 pr-3 font-mono">{l.tare_kg ? tonnes(l.tare_kg) : '—'}</td>
                               <td className="py-1 pr-3 font-mono font-semibold">{l.net_kg != null ? tonnes(l.net_kg) : '—'}</td>

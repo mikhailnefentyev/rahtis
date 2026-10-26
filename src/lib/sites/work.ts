@@ -51,14 +51,17 @@ export type DayTimes = {
 };
 
 /**
- * Конец рабочего дня: нажатое «закончил» или последняя выгрузка + запас.
+ * Конец рабочего дня: последняя выгрузка + запас (обычно 30 мин) — так
+ * финские водители и пишут вечернее время. Нажатое «закончил» его не
+ * укорачивает: водитель, нажавший сразу после выгрузки, не теряет запас;
+ * нажал позже (работал на объекте без рейсов) — считается нажатие.
  * Без рейсов и без нажатия дня ещё нет конца — null.
  */
 export function dayEnd(day: DayTimes): string | null {
-  if (day.endedAt) return day.endedAt;
-  if (day.unloads.length === 0) return null;
-  const last = day.unloads.reduce((a, b) => (a > b ? a : b));
-  return new Date(new Date(last).getTime() + day.bufferMinutes * 60_000).toISOString();
+  const last = day.unloads.length ? day.unloads.reduce((a, b) => (a > b ? a : b)) : null;
+  const byUnload = last ? new Date(new Date(last).getTime() + day.bufferMinutes * 60_000).toISOString() : null;
+  if (day.endedAt && byUnload) return new Date(day.endedAt) > new Date(byUnload) ? day.endedAt : byUnload;
+  return day.endedAt ?? byUnload;
 }
 
 /** Часы дня в минутах; null — день ещё не закончен. */
