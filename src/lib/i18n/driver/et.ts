@@ -193,6 +193,7 @@ export const et = {
     end: 'Lõpetasin päeva',
     ended: 'Päev lõpetatud',
     addSite: 'Lisa vastuvõtukoht siia',
+    addSiteHint: 'Uut kohta näeb ainult sinu ettevõte, kuni RAHTIS selle üle vaatab.',
     siteName: 'Koha nimi',
     saveSite: 'Salvesta koht',
     approved: 'Töödejuhataja kinnitas',

@@ -193,6 +193,7 @@ export const pl = {
     end: 'Skończyłem dzień',
     ended: 'Dzień zakończony',
     addSite: 'Dodaj tu miejsce przyjęcia',
+    addSiteHint: 'Nowe miejsce widzi tylko Twoja firma, dopóki RAHTIS go nie sprawdzi.',
     siteName: 'Nazwa miejsca',
     saveSite: 'Zapisz miejsce',
     approved: 'Zatwierdzone przez kierownika budowy',

@@ -193,6 +193,7 @@ export const sv = {
     end: 'Jag avslutade dagen',
     ended: 'Dagen avslutad',
     addSite: 'Lägg till mottagning här',
+    addSiteHint: 'En ny plats syns bara för ditt företag tills RAHTIS har granskat den.',
     siteName: 'Platsens namn',
     saveSite: 'Spara plats',
     approved: 'Godkänd av arbetsledaren',

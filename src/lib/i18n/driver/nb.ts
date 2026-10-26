@@ -193,6 +193,7 @@ export const nb = {
     end: 'Jeg avsluttet dagen',
     ended: 'Dagen avsluttet',
     addSite: 'Legg til mottak her',
+    addSiteHint: 'Et nytt sted er bare synlig for din bedrift til RAHTIS har gått gjennom det.',
     siteName: 'Stedets navn',
     saveSite: 'Lagre sted',
     approved: 'Godkjent av anleggslederen',

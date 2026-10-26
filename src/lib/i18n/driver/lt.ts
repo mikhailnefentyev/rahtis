@@ -193,6 +193,7 @@ export const lt = {
     end: 'Baigiau dieną',
     ended: 'Diena baigta',
     addSite: 'Pridėti priėmimo vietą čia',
+    addSiteHint: 'Naują vietą mato tik jūsų įmonė, kol RAHTIS jos nepatikrins.',
     siteName: 'Vietos pavadinimas',
     saveSite: 'Išsaugoti vietą',
     approved: 'Darbų vadovas patvirtino',

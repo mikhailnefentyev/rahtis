@@ -96,6 +96,7 @@ export const de = {
     end: 'Tag beendet',
     ended: 'Tag beendet',
     addSite: 'Annahmestelle hier hinzufügen',
+    addSiteHint: 'Eine neue Stelle sieht nur Ihr Unternehmen, bis RAHTIS sie geprüft hat.',
     siteName: 'Name der Stelle',
     saveSite: 'Stelle speichern',
     approved: 'Vom Bauleiter bestätigt',
@@ -116,6 +117,8 @@ export const de = {
   },
   /* Объекты перевозчика и страница прораба. */
   sites: {
+    approveSelf: 'Tag selbst bestätigen',
+    approveSelfHint: 'Anhand der Entladedaten des Fahrers. Wird als Bestätigung des Transportunternehmens angezeigt.',
     nav: 'Baustellen',
     title: 'Baustellen',
     lede: 'Baustellen, die Sie mit Kipper oder Kassettenfahrzeug anfahren: der Fahrer erfasst Ankunft und Fuhren in der App, die Stunden laufen von der Ankunft bis zur letzten Entladung + Puffer, der Bauleiter bestätigt die Tage per Link.',
@@ -182,6 +185,20 @@ export const de = {
     registryNote: 'Wird an das SIIRTO-Register gemeldet',
     registryNo: 'Keine SIIRTO-Meldung (unbelasteter Boden)',
     pricingOptions: { HOUR: 'Stundenweise', LOAD: 'Pro Fuhre', TONNE: 'Pro Tonne' },
+  },
+  /* Админка: проверка пунктов приёмки, добавленных водителями. */
+  scaleSites: {
+    nav: 'Annahmestellen',
+    title: 'Waagen und Annahmestellen',
+    lede: 'Von Fahrern hinzugefügte Stellen sieht nur ihr eigenes Unternehmen, bis Sie sie freigeben. Freigegebene Stellen und mScales-Waagen sehen alle.',
+    pending: 'Wartet auf Prüfung',
+    approvedList: 'Freigegeben',
+    approve: 'Für alle freigeben',
+    reject: 'Ablehnen',
+    empty: 'Nichts zu prüfen.',
+    addedBy: 'Hinzugefügt von',
+    map: 'Karte',
+    rejected: 'Abgelehnt',
   },
   seo: {
     homeTitle: 'Frachtenbörse und TMS: Trailertausch und Container',

@@ -224,6 +224,7 @@ function navigation(
         items: [
           { href: `/${locale}/admin/legal`, label: t.legal.manage, icon: 'legal' },
           { href: `/${locale}/admin/training`, label: t.adminTraining.nav, icon: 'training' },
+          { href: `/${locale}/admin/scale-sites`, label: t.scaleSites.nav, icon: 'sites' },
         ],
       },
     ],

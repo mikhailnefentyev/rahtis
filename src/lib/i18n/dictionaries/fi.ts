@@ -119,6 +119,7 @@ export const fi = {
     end: 'Lopetin päivän',
     ended: 'Päivä päätetty',
     addSite: 'Lisää vastaanottopaikka tähän',
+    addSiteHint: 'Uusi paikka näkyy vain yrityksellesi, kunnes RAHTIS tarkistaa sen.',
     siteName: 'Paikan nimi',
     saveSite: 'Tallenna paikka',
     approved: 'Työnjohtaja hyväksyi',
@@ -139,6 +140,8 @@ export const fi = {
   },
   /* Объекты перевозчика и страница прораба. */
   sites: {
+    approveSelf: 'Hyväksy päivä itse',
+    approveSelfHint: 'Kuljettajan purkutietojen perusteella. Näkyy merkinnällä ”kuljetusliike”.',
     nav: 'Kohteet',
     title: 'Kohteet',
     lede: 'Työmaat, joille ajat kippiä tai kasettia: kuljettaja kirjaa saapumisen ja kuormat sovelluksessa, tunnit lasketaan saapumisesta viimeiseen purkuun + varaaika, työnjohtaja hyväksyy päivät linkistä.',
@@ -205,6 +208,20 @@ export const fi = {
     registryNote: 'Tiedot toimitetaan SIIRTO-rekisteriin',
     registryNo: 'Ei SIIRTO-rekisteriin (pilaantumaton maa-aines)',
     pricingOptions: { HOUR: 'Tuntityö', LOAD: 'Kuormalta', TONNE: 'Tonnilta' },
+  },
+  /* Админка: проверка пунктов приёмки, добавленных водителями. */
+  scaleSites: {
+    nav: 'Vastaanottopaikat',
+    title: 'Vaa\'at ja vastaanottopaikat',
+    lede: 'Kuljettajien lisäämät paikat näkyvät vain heidän yrityksilleen, kunnes hyväksyt ne. Hyväksytyt ja mScales-vaa\'at näkyvät kaikille.',
+    pending: 'Odottaa tarkistusta',
+    approvedList: 'Hyväksytyt',
+    approve: 'Hyväksy kaikille',
+    reject: 'Hylkää',
+    empty: 'Ei tarkistettavia paikkoja.',
+    addedBy: 'Lisäsi',
+    map: 'Kartta',
+    rejected: 'Hylätty',
   },
   seo: {
     homeTitle: 'Rahtipörssi ja TMS: irtoperät ja kontit',

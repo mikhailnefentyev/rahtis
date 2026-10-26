@@ -96,6 +96,7 @@ export const lt = {
     end: 'Baigiau dieną',
     ended: 'Diena baigta',
     addSite: 'Pridėti priėmimo vietą čia',
+    addSiteHint: 'Naują vietą mato tik jūsų įmonė, kol RAHTIS jos nepatikrins.',
     siteName: 'Vietos pavadinimas',
     saveSite: 'Išsaugoti vietą',
     approved: 'Darbų vadovas patvirtino',
@@ -116,6 +117,8 @@ export const lt = {
   },
   /* Объекты перевозчика и страница прораба. */
   sites: {
+    approveSelf: 'Patvirtinti dieną patiems',
+    approveSelfHint: 'Pagal vairuotojo iškrovimo duomenis. Rodoma kaip vežėjo patvirtinimas.',
     nav: 'Objektai',
     title: 'Objektai',
     lede: 'Statybvietės, į kurias važiuojate savivarčiu ar kasetiniu sunkvežimiu: vairuotojas programėlėje pažymi atvykimą ir krovinius, valandos skaičiuojamos nuo atvykimo iki paskutinio iškrovimo + atsarga, darbų vadovas patvirtina dienas per nuorodą.',
@@ -182,6 +185,20 @@ export const lt = {
     registryNote: 'Teikiama SIIRTO registrui',
     registryNo: 'SIIRTO neteikiama (neužterštas gruntas)',
     pricingOptions: { HOUR: 'Valandinis', LOAD: 'Už krovinį', TONNE: 'Už toną' },
+  },
+  /* Админка: проверка пунктов приёмки, добавленных водителями. */
+  scaleSites: {
+    nav: 'Priėmimo vietos',
+    title: 'Svarstyklės ir priėmimo vietos',
+    lede: 'Vairuotojų pridėtas vietas mato tik jų įmonė, kol jūs jas patvirtinsite. Patvirtintas vietas ir mScales svarstykles mato visi.',
+    pending: 'Laukia patikros',
+    approvedList: 'Patvirtintos',
+    approve: 'Patvirtinti visiems',
+    reject: 'Atmesti',
+    empty: 'Nėra ką tikrinti.',
+    addedBy: 'Pridėjo',
+    map: 'Žemėlapis',
+    rejected: 'Atmesta',
   },
   seo: {
     homeTitle: 'Krovinių birža ir TMS: priekabos ir konteineriai',

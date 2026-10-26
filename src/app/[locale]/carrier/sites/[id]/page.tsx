@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { Badge, Card, CardBody, EmptyState } from '@/components/ui';
+import { Badge, Button, Card, CardBody, EmptyState } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
 import { siteUrl } from '@/lib/config';
 import { combinationMass, isMassCountry } from '@/lib/fleet/mass';
@@ -9,6 +9,7 @@ import { isLocale } from '@/lib/i18n';
 import { getViewerI18n } from '@/lib/i18n/viewer';
 import { dayEnd, dayMinutes, hoursLabel, siteAmountCents } from '@/lib/sites/work';
 import { createClient } from '@/lib/supabase/server';
+import { carrierApproveDayAction } from '@/lib/sites/actions';
 import { JobControls } from './JobControls';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; id: string }> }): Promise<Metadata> {
@@ -150,6 +151,16 @@ export default async function SiteJobPage({ params }: { params: Promise<{ locale
                   <span className="font-mono">{r.loads.length}</span> · {s.colTonnes} <span className="font-mono">{tonnes(r.netKg)}</span>
                 </p>
                 {r.day.approval_note && <p className="text-[13px] text-ink-muted">“{r.day.approval_note}”</p>}
+                {!r.day.approved_at && (
+                  <form action={carrierApproveDayAction} className="flex flex-wrap items-center gap-3">
+                    <input type="hidden" name="locale" value={locale} />
+                    <input type="hidden" name="day_id" value={r.day.id} />
+                    <Button type="submit" size="sm">
+                      {s.approveSelf}
+                    </Button>
+                    <span className="text-xs text-ink-dim">{s.approveSelfHint}</span>
+                  </form>
+                )}
                 {r.loads.length > 0 && (
                   <div className="overflow-x-auto">
                     <table className="w-full min-w-[620px] text-[13px]">

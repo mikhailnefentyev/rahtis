@@ -193,6 +193,7 @@ export const lv = {
     end: 'Pabeidzu dienu',
     ended: 'Diena pabeigta',
     addSite: 'Pievienot pieņemšanas vietu šeit',
+    addSiteHint: 'Jauno vietu redz tikai jūsu uzņēmums, līdz RAHTIS to pārbauda.',
     siteName: 'Vietas nosaukums',
     saveSite: 'Saglabāt vietu',
     approved: 'Darbu vadītājs apstiprināja',

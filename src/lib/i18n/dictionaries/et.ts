@@ -96,6 +96,7 @@ export const et = {
     end: 'Lõpetasin päeva',
     ended: 'Päev lõpetatud',
     addSite: 'Lisa vastuvõtukoht siia',
+    addSiteHint: 'Uut kohta näeb ainult sinu ettevõte, kuni RAHTIS selle üle vaatab.',
     siteName: 'Koha nimi',
     saveSite: 'Salvesta koht',
     approved: 'Töödejuhataja kinnitas',
@@ -116,6 +117,8 @@ export const et = {
   },
   /* Объекты перевозчика и страница прораба. */
   sites: {
+    approveSelf: 'Kinnita päev ise',
+    approveSelfHint: 'Juhi mahalaadimisandmete põhjal. Näidatakse vedaja kinnitusena.',
     nav: 'Objektid',
     title: 'Objektid',
     lede: 'Tööobjektid, kuhu veate kalluri või kassettautoga: juht märgib rakenduses saabumise ja koormad, tunnid arvestatakse saabumisest viimase mahalaadimiseni + varu ning töödejuhataja kinnitab päevad lingi kaudu.',
@@ -182,6 +185,20 @@ export const et = {
     registryNote: 'Esitatakse SIIRTO registrisse',
     registryNo: 'SIIRTO-sse ei esitata (saastamata pinnas)',
     pricingOptions: { HOUR: 'Tunnitöö', LOAD: 'Koormalt', TONNE: 'Tonnilt' },
+  },
+  /* Админка: проверка пунктов приёмки, добавленных водителями. */
+  scaleSites: {
+    nav: 'Vastuvõtukohad',
+    title: 'Kaalud ja vastuvõtukohad',
+    lede: 'Juhtide lisatud kohti näeb ainult nende ettevõte, kuni sa need kinnitad. Kinnitatud kohti ja mScalesi kaale näevad kõik.',
+    pending: 'Ootab kontrolli',
+    approvedList: 'Kinnitatud',
+    approve: 'Kinnita kõigile',
+    reject: 'Lükka tagasi',
+    empty: 'Kontrollimiseks pole midagi.',
+    addedBy: 'Lisas',
+    map: 'Kaart',
+    rejected: 'Tagasi lükatud',
   },
   seo: {
     homeTitle: 'Veobörs ja TMS: haagiste vahetus ja konteinerid',

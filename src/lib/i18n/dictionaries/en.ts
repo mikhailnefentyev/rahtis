@@ -112,6 +112,7 @@ export const en = {
     end: 'I finished the day',
     ended: 'Day finished',
     addSite: 'Add a receiving site here',
+    addSiteHint: 'A new site is visible only to your company until RAHTIS reviews it.',
     siteName: 'Site name',
     saveSite: 'Save site',
     approved: 'Approved by the site manager',
@@ -132,6 +133,8 @@ export const en = {
   },
   /* Объекты перевозчика и страница прораба. */
   sites: {
+    approveSelf: 'Approve day yourself',
+    approveSelfHint: 'Based on the driver\'s unloading data. Shown as approved by the carrier.',
     nav: 'Sites',
     title: 'Sites',
     lede: 'Worksites you haul to with a tipper or cassette truck: the driver logs arrival and loads in the app, hours run from arrival to the last unloading + buffer, and the site manager approves the days from a link.',
@@ -198,6 +201,20 @@ export const en = {
     registryNote: 'Reported to the SIIRTO register',
     registryNo: 'Not reported to SIIRTO (uncontaminated soil)',
     pricingOptions: { HOUR: 'Hourly', LOAD: 'Per load', TONNE: 'Per tonne' },
+  },
+  /* Админка: проверка пунктов приёмки, добавленных водителями. */
+  scaleSites: {
+    nav: 'Receiving sites',
+    title: 'Scales and receiving sites',
+    lede: 'Sites added by drivers are visible only to their own company until you approve them. Approved sites and mScales scales are visible to everyone.',
+    pending: 'Awaiting review',
+    approvedList: 'Approved',
+    approve: 'Approve for everyone',
+    reject: 'Reject',
+    empty: 'Nothing to review.',
+    addedBy: 'Added by',
+    map: 'Map',
+    rejected: 'Rejected',
   },
   seo: {
     homeTitle: 'Freight exchange and TMS: trailer swaps, containers',

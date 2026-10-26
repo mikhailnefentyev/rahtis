@@ -96,6 +96,7 @@ export const pl = {
     end: 'Skończyłem dzień',
     ended: 'Dzień zakończony',
     addSite: 'Dodaj tu miejsce przyjęcia',
+    addSiteHint: 'Nowe miejsce widzi tylko Twoja firma, dopóki RAHTIS go nie sprawdzi.',
     siteName: 'Nazwa miejsca',
     saveSite: 'Zapisz miejsce',
     approved: 'Zatwierdzone przez kierownika budowy',
@@ -116,6 +117,8 @@ export const pl = {
   },
   /* Объекты перевозчика и страница прораба. */
   sites: {
+    approveSelf: 'Zatwierdź dzień samodzielnie',
+    approveSelfHint: 'Na podstawie danych kierowcy o rozładunkach. Widoczne jako zatwierdzenie przewoźnika.',
     nav: 'Budowy',
     title: 'Budowy',
     lede: 'Budowy, na które jeździsz wywrotką lub autem z kasetą: kierowca rejestruje w aplikacji przyjazd i kursy, godziny liczą się od przyjazdu do ostatniego rozładunku + zapas, a kierownik budowy zatwierdza dni przez link.',
@@ -182,6 +185,20 @@ export const pl = {
     registryNote: 'Zgłaszane do rejestru SIIRTO',
     registryNo: 'Nie zgłaszane do SIIRTO (gleba niezanieczyszczona)',
     pricingOptions: { HOUR: 'Godzinowe', LOAD: 'Od kursu', TONNE: 'Od tony' },
+  },
+  /* Админка: проверка пунктов приёмки, добавленных водителями. */
+  scaleSites: {
+    nav: 'Miejsca przyjęcia',
+    title: 'Wagi i miejsca przyjęcia',
+    lede: 'Miejsca dodane przez kierowców widzi tylko ich firma, dopóki ich nie zatwierdzisz. Zatwierdzone miejsca i wagi mScales widzą wszyscy.',
+    pending: 'Czeka na sprawdzenie',
+    approvedList: 'Zatwierdzone',
+    approve: 'Zatwierdź dla wszystkich',
+    reject: 'Odrzuć',
+    empty: 'Nic do sprawdzenia.',
+    addedBy: 'Dodał',
+    map: 'Mapa',
+    rejected: 'Odrzucone',
   },
   seo: {
     homeTitle: 'Giełda ładunków i TMS: wymiany naczep, kontenery',

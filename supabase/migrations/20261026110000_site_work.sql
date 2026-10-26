@@ -38,6 +38,13 @@ create table public.scale_sites (
   /* Весы подключены к mScales: позже взвешивание придёт само. */
   mscales boolean not null default false,
   created_by_company uuid references public.companies (id) on delete set null,
+  /*
+   * В общий список пункт попадает только после проверки оператором
+   * (approved_at) или из списка весов mScales. Пункт, добавленный
+   * водителем, до проверки видит лишь его компания.
+   */
+  approved_at timestamptz,
+  rejected_at timestamptz,
   created_at timestamptz not null default now(),
   constraint scale_sites_position check ((lat is null) = (lon is null))
 );
@@ -48,14 +55,14 @@ comment on table public.scale_sites is
 alter table public.scale_sites enable row level security;
 
 /*
- * Общие — только пункты оператора (created_by_company пусто). Пункт,
- * добавленный водителем, видит лишь его компания: чужая компания не может
- * засорить или подделать общий справочник. Пишут в таблицу только оператор
- * и функция водителя (driver_site_action, ADD_SITE).
+ * Общие — пункты, проверенные оператором, и весы mScales (approved_at).
+ * Пункт, добавленный водителем, до проверки видит лишь его компания:
+ * чужая компания не может засорить или подделать общий справочник.
+ * Пишут в таблицу только оператор и функция водителя (ADD_SITE).
  */
 create policy scale_sites_select
   on public.scale_sites for select to authenticated
-  using (created_by_company is null or created_by_company = (select app.current_company_id()));
+  using (approved_at is not null or created_by_company = (select app.current_company_id()));
 
 create policy scale_sites_admin
   on public.scale_sites for all to authenticated
@@ -274,7 +281,7 @@ begin
       select jsonb_agg(jsonb_build_object('id', s.id, 'name', s.name, 'city', s.city, 'lat', s.lat, 'lon', s.lon, 'kind', s.kind)
                        order by s.name)
       from public.scale_sites s
-      where s.created_by_company is null or s.created_by_company = v_driver.company_id
+      where s.approved_at is not null or s.created_by_company = v_driver.company_id
     ), '[]'::jsonb)
   );
 end;
@@ -375,7 +382,7 @@ begin
       coalesce(nullif(p_data ->> 'material_code', ''), v_job.material_code),
       (select id from public.scale_sites
        where id = nullif(p_data ->> 'scale_site_id', '')::uuid
-         and (created_by_company is null or created_by_company = v_job.company_id)),
+         and (approved_at is not null or created_by_company = v_job.company_id)),
       nullif(p_data ->> 'gross_kg', '')::integer,
       nullif(p_data ->> 'tare_kg', '')::integer,
       greatest(v_at, v_day.arrived_at),
@@ -481,12 +488,51 @@ $$;
 revoke all on function public.site_foreman_approve(uuid, uuid, text, text) from public;
 grant execute on function public.site_foreman_approve(uuid, uuid, text, text) to anon, authenticated;
 
+-- ── Подтверждение дня перевозчиком ──────────────────────────────────
+
+/*
+ * Вместо прораба день может подтвердить сам перевозчик — по данным
+ * водителя о выгрузках. В отметке видно, кто подтвердил: «<имя>
+ * (kuljetusliike)», чтобы заказчик отличал это от подтверждения прораба.
+ */
+create or replace function public.carrier_site_approve_day(p_day_id uuid)
+returns void
+language plpgsql
+security definer
+set search_path = ''
+as $
+declare
+  v_company uuid := (select app.current_company_id());
+  v_name text;
+begin
+  if v_company is null then
+    raise exception 'Нет компании.' using errcode = '42501';
+  end if;
+
+  select coalesce(nullif(btrim(full_name), ''), 'RAHTIS') into v_name
+  from public.profiles where id = (select auth.uid());
+
+  update public.site_days
+  set approved_at = now(),
+      approved_by = left(v_name, 100) || ' (kuljetusliike)',
+      approval_note = null
+  where id = p_day_id and company_id = v_company and approved_at is null;
+
+  if not found then
+    raise exception 'День не найден или уже подтверждён.' using errcode = 'P0002';
+  end if;
+end;
+$;
+
+revoke all on function public.carrier_site_approve_day(uuid) from public, anon;
+grant execute on function public.carrier_site_approve_day(uuid) to authenticated;
+
 -- ── Стартовый справочник (открытые источники, 26.10.2026) ───────────
 
-insert into public.scale_sites (name, address, city, country, lat, lon, kind, accepts) values
-  ('HSY Ämmässuo ekoteollisuuskeskus', null, 'Espoo', 'FI', null, null, 'RECEIVING', 'Maa-ainekset ympäristöluvan mukaan; ei pilaantumatonta savea tai silttiä'),
-  ('NCC Loviisa Vanhakylä', null, 'Loviisa', 'FI', null, null, 'PIT', 'Puhtaat maat, kirjallinen ilmoitus etukäteen'),
-  ('NCC Mäntsälä Ohkola', null, 'Mäntsälä', 'FI', null, null, 'PIT', 'Puhtaat maat, kirjallinen ilmoitus etukäteen'),
-  ('NCC Pornainen', null, 'Pornainen', 'FI', null, null, 'PIT', 'Puhtaat maat, kirjallinen ilmoitus etukäteen'),
-  ('NCC Porvoo Tolkkinen', null, 'Porvoo', 'FI', null, null, 'PIT', 'Puhtaat maat, kirjallinen ilmoitus etukäteen'),
-  ('Kiertokapula Karanoja', null, 'Hämeenlinna', 'FI', null, null, 'RECEIVING', 'Puhtaat maat');
+insert into public.scale_sites (name, address, city, country, lat, lon, kind, accepts, approved_at) values
+  ('HSY Ämmässuo ekoteollisuuskeskus', null, 'Espoo', 'FI', null, null, 'RECEIVING', 'Maa-ainekset ympäristöluvan mukaan; ei pilaantumatonta savea tai silttiä', now()),
+  ('NCC Loviisa Vanhakylä', null, 'Loviisa', 'FI', null, null, 'PIT', 'Puhtaat maat, kirjallinen ilmoitus etukäteen', now()),
+  ('NCC Mäntsälä Ohkola', null, 'Mäntsälä', 'FI', null, null, 'PIT', 'Puhtaat maat, kirjallinen ilmoitus etukäteen', now()),
+  ('NCC Pornainen', null, 'Pornainen', 'FI', null, null, 'PIT', 'Puhtaat maat, kirjallinen ilmoitus etukäteen', now()),
+  ('NCC Porvoo Tolkkinen', null, 'Porvoo', 'FI', null, null, 'PIT', 'Puhtaat maat, kirjallinen ilmoitus etukäteen', now()),
+  ('Kiertokapula Karanoja', null, 'Hämeenlinna', 'FI', null, null, 'RECEIVING', 'Puhtaat maat', now());

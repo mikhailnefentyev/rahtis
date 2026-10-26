@@ -343,9 +343,12 @@ function AddSite({ position, enqueue }: { position: { lat: number; lon: number }
 
   if (!open) {
     return (
-      <button type="button" className="text-left text-[14px] text-accent underline" onClick={() => setOpen(true)}>
-        {t.siteWork.addSite}
-      </button>
+      <div className="flex flex-col gap-1">
+        <button type="button" className="text-left text-[14px] text-accent underline" onClick={() => setOpen(true)}>
+          {t.siteWork.addSite}
+        </button>
+        <p className="text-[12px] text-ink-dim">{t.siteWork.addSiteHint}</p>
+      </div>
     );
   }
 

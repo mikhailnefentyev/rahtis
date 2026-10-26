@@ -3334,6 +3334,7 @@ export type Database = {
       scale_sites: {
         Row: {
           accepts: string | null
+          approved_at: string | null
           address: string | null
           city: string | null
           country: string
@@ -3345,9 +3346,11 @@ export type Database = {
           lon: number | null
           mscales: boolean
           name: string
+          rejected_at: string | null
         }
         Insert: {
           accepts?: string | null
+          approved_at?: string | null
           address?: string | null
           city?: string | null
           country?: string
@@ -3359,9 +3362,11 @@ export type Database = {
           lon?: number | null
           mscales?: boolean
           name: string
+          rejected_at: string | null
         }
         Update: {
           accepts?: string | null
+          approved_at?: string | null
           address?: string | null
           city?: string | null
           country?: string
@@ -3373,6 +3378,7 @@ export type Database = {
           lon?: number | null
           mscales?: boolean
           name?: string
+          rejected_at?: string | null
         }
         Relationships: []
       }
@@ -5212,6 +5218,7 @@ export type Database = {
         Args: { p_order_id: string; p_text: string }
         Returns: undefined
       }
+      carrier_site_approve_day: { Args: { p_day_id: string }; Returns: undefined }
       driver_site_action: {
         Args: {
           p_action: string

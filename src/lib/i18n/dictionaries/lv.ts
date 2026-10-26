@@ -96,6 +96,7 @@ export const lv = {
     end: 'Pabeidzu dienu',
     ended: 'Diena pabeigta',
     addSite: 'Pievienot pieņemšanas vietu šeit',
+    addSiteHint: 'Jauno vietu redz tikai jūsu uzņēmums, līdz RAHTIS to pārbauda.',
     siteName: 'Vietas nosaukums',
     saveSite: 'Saglabāt vietu',
     approved: 'Darbu vadītājs apstiprināja',
@@ -116,6 +117,8 @@ export const lv = {
   },
   /* Объекты перевозчика и страница прораба. */
   sites: {
+    approveSelf: 'Apstiprināt dienu pašam',
+    approveSelfHint: 'Pēc vadītāja izkraušanas datiem. Redzams kā pārvadātāja apstiprinājums.',
     nav: 'Objekti',
     title: 'Objekti',
     lede: 'Būvlaukumi, uz kuriem braucat ar pašizgāzēju vai kasešu auto: vadītājs lietotnē atzīmē ierašanos un kravas, stundas skaita no ierašanās līdz pēdējai izkraušanai + rezerve, darbu vadītājs apstiprina dienas ar saiti.',
@@ -182,6 +185,20 @@ export const lv = {
     registryNote: 'Tiek ziņots SIIRTO reģistram',
     registryNo: 'SIIRTO netiek ziņots (nepiesārņota grunts)',
     pricingOptions: { HOUR: 'Par stundu', LOAD: 'Par kravu', TONNE: 'Par tonnu' },
+  },
+  /* Админка: проверка пунктов приёмки, добавленных водителями. */
+  scaleSites: {
+    nav: 'Pieņemšanas vietas',
+    title: 'Svari un pieņemšanas vietas',
+    lede: 'Vadītāju pievienotās vietas redz tikai viņu uzņēmums, līdz jūs tās apstiprināt. Apstiprinātās vietas un mScales svarus redz visi.',
+    pending: 'Gaida pārbaudi',
+    approvedList: 'Apstiprinātās',
+    approve: 'Apstiprināt visiem',
+    reject: 'Noraidīt',
+    empty: 'Nav ko pārbaudīt.',
+    addedBy: 'Pievienoja',
+    map: 'Karte',
+    rejected: 'Noraidīts',
   },
   seo: {
     homeTitle: 'Kravu birža un TMS: piekabju maiņa un konteineri',

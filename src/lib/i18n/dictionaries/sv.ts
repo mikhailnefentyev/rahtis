@@ -96,6 +96,7 @@ export const sv = {
     end: 'Jag avslutade dagen',
     ended: 'Dagen avslutad',
     addSite: 'Lägg till mottagning här',
+    addSiteHint: 'En ny plats syns bara för ditt företag tills RAHTIS har granskat den.',
     siteName: 'Platsens namn',
     saveSite: 'Spara plats',
     approved: 'Godkänd av arbetsledaren',
@@ -116,6 +117,8 @@ export const sv = {
   },
   /* Объекты перевозчика и страница прораба. */
   sites: {
+    approveSelf: 'Godkänn dagen själv',
+    approveSelfHint: 'Utifrån förarens lossningsdata. Visas som godkänd av åkeriet.',
     nav: 'Objekt',
     title: 'Objekt',
     lede: 'Arbetsplatser du kör till med tipp- eller kassettbil: föraren registrerar ankomst och lass i appen, timmarna räknas från ankomst till sista lossning + marginal och arbetsledaren godkänner dagarna via en länk.',
@@ -182,6 +185,20 @@ export const sv = {
     registryNote: 'Rapporteras till SIIRTO-registret',
     registryNo: 'Rapporteras inte till SIIRTO (icke förorenad jord)',
     pricingOptions: { HOUR: 'Per timme', LOAD: 'Per lass', TONNE: 'Per ton' },
+  },
+  /* Админка: проверка пунктов приёмки, добавленных водителями. */
+  scaleSites: {
+    nav: 'Mottagningsplatser',
+    title: 'Vågar och mottagningsplatser',
+    lede: 'Platser som förare lagt till syns bara för deras eget företag tills du godkänner dem. Godkända platser och mScales-vågar syns för alla.',
+    pending: 'Väntar på granskning',
+    approvedList: 'Godkända',
+    approve: 'Godkänn för alla',
+    reject: 'Avvisa',
+    empty: 'Inget att granska.',
+    addedBy: 'Tillagd av',
+    map: 'Karta',
+    rejected: 'Avvisad',
   },
   seo: {
     homeTitle: 'Lastbörs och TMS: trailerbyten, containrar, express',

@@ -193,6 +193,7 @@ export const da = {
     end: 'Jeg har afsluttet dagen',
     ended: 'Dagen afsluttet',
     addSite: 'Tilføj modtagested her',
+    addSiteHint: 'Et nyt sted er kun synligt for din virksomhed, indtil RAHTIS har gennemgået det.',
     siteName: 'Stedets navn',
     saveSite: 'Gem sted',
     approved: 'Godkendt af byggelederen',

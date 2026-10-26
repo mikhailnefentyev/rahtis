@@ -98,3 +98,30 @@ export async function foremanApproveAction(_previous: ForemanState, formData: Fo
   revalidatePath(`/${locale}/site/${token}`);
   return { error: null, done: true };
 }
+
+/** Перевозчик подтверждает день сам — по данным водителя о выгрузках. */
+export async function carrierApproveDayAction(formData: FormData): Promise<void> {
+  const locale = toLocale(formData.get('locale'));
+  await requireRole(locale, 'CARRIER');
+  const supabase = await createClient();
+  const { error } = await supabase.rpc('carrier_site_approve_day', { p_day_id: String(formData.get('day_id') ?? '') });
+  if (error) await flashFailure(locale, error);
+  revalidatePath(`/${locale}/carrier/sites`, 'layout');
+}
+
+/**
+ * Оператор решает о пункте приёмки, который добавил водитель: одобрить —
+ * пункт виден всем; отклонить — остаётся только у компании водителя.
+ */
+export async function decideScaleSiteAction(formData: FormData): Promise<void> {
+  const locale = toLocale(formData.get('locale'));
+  await requireRole(locale, 'ADMIN');
+  const approve = formData.get('decision') === 'APPROVE';
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from('scale_sites')
+    .update(approve ? { approved_at: new Date().toISOString(), rejected_at: null } : { rejected_at: new Date().toISOString(), approved_at: null })
+    .eq('id', String(formData.get('id') ?? ''));
+  if (error) await flashFailure(locale, error);
+  revalidatePath(`/${locale}/admin/scale-sites`);
+}
