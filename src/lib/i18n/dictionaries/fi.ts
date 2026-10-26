@@ -95,13 +95,13 @@ export const fi = {
   siteWork: {
     tab: 'Kohde',
     title: 'Työmaa',
-    noJobs: 'Ei avoimia kohteita. Kuljetusliike lisää kohteen kabinetissa.',
+    noJobs: 'Ei avoimia kohteita. Kuljetusliike lisää kohteet omilla sivuillaan.',
     arrive: 'Saavuin kohteelle',
     trailerToday: 'Perävaunu tänään',
     noTrailer: 'Ei perävaunua',
     arrivedAt: 'Saavuit',
     newLoad: 'Uusi kuorma',
-    material: 'Kuorma',
+    material: 'Materiaali',
     scale: 'Vaaka / vastaanottopaikka',
     scaleNone: 'Ei punnitusta',
     nearest: 'lähin',
@@ -155,8 +155,8 @@ export const fi = {
     pricing: 'Hinnoittelu',
     rate: 'Hinta (€, alv 0 %)',
     rateHint: 'Tunnilta, kuormalta tai tonnilta valinnan mukaan.',
-    material: 'Kuorma oletuksena',
-    receivingSite: 'Vastaanottopaikka oletuksena',
+    material: 'Oletusmateriaali',
+    receivingSite: 'Oletusvastaanottopaikka',
     receivingNone: '—',
     buffer: 'Varaaika päivän loppuun (min)',
     bufferHint: 'Päivä päättyy viimeiseen purkuun + tämä aika. Yleensä 30 min.',
@@ -185,7 +185,7 @@ export const fi = {
     notApproved: 'odottaa',
     loads: 'Kuormat',
     colTime: 'Aika',
-    colMaterial: 'Kuorma',
+    colMaterial: 'Materiaali',
     colScale: 'Vaaka',
     colGross: 'Brutto',
     colTare: 'Tara',
@@ -250,7 +250,7 @@ export const fi = {
     resultCreated: 'Lasku luotiin, mutta sähköposti ei lähtenyt. Lataa PDF ja lähetä se itse.',
     invoiced: 'Laskutettu',
     due: 'Eräpäivä',
-    schedules: { MANUAL: 'Kun painan Lähetä', WEEKLY: 'Joka viikko (ma)', BIWEEKLY: 'Joka toinen viikko (ma)' },
+    schedules: { MANUAL: 'Kun painan Lähetä-nappia', WEEKLY: 'Joka viikko (ma)', BIWEEKLY: 'Joka toinen viikko (ma)' },
   },
   seo: {
     homeTitle: 'Rahtipörssi ja TMS: irtoperät ja kontit',
@@ -381,7 +381,7 @@ export const fi = {
     nav: 'Käyttöönotto',
     title: 'Käyttöönotto',
     subtitle:
-      'Hyväksytyt yritykset, jotka eivät vielä ole ensimmäisessä työssä. Muistutukset lähtevät itse 2., 5. ja 10. päivänä vaiheessa; sen jälkeen auttaa puhelu. Pisimpään odottaneet ensin.',
+      'Hyväksytyt yritykset, joilla ei vielä ole ensimmäistä keikkaa. Muistutus lähtee automaattisesti, kun yritys on ollut samassa vaiheessa 2, 5 ja 10 päivää; sen jälkeen auttaa puhelu. Pisimpään odottaneet ensin.',
     empty: 'Kaikki hyväksytyt yritykset ovat käytössä',
     emptyHint: 'Kukaan ei ole jäänyt matkalle.',
     company: 'Yritys',
@@ -405,8 +405,8 @@ export const fi = {
     progress: '{done}/{total} valmiina',
     waiting: 'odottaa tarkastusta',
     activate: 'Yritystiedot ja ehdot',
-    activateText: 'Osoite haetaan valmiiksi YTJ:stä, kun se on siellä saatavilla. Lisää tilinumero ja hyväksy ehdot — noin 2 minuuttia.',
-    activateTextShipper: 'Osoite haetaan valmiiksi YTJ:stä, kun se on siellä saatavilla. Tarkista laskutustiedot ja hyväksy ehdot — noin 2 minuuttia.',
+    activateText: 'Haemme osoitteen valmiiksi YTJ:stä, jos se löytyy sieltä. Lisää tilinumero ja hyväksy ehdot — noin 2 minuuttia.',
+    activateTextShipper: 'Haemme osoitteen valmiiksi YTJ:stä, jos se löytyy sieltä. Tarkista laskutustiedot ja hyväksy ehdot — noin 2 minuuttia.',
     activateAction: 'Täytä',
     docs: 'Liikennelupa ja vakuutus',
     docsText: 'Lataa voimassa oleva liikennelupa ja liikennevakuutus. Kuva tai PDF riittää.',
@@ -438,13 +438,13 @@ export const fi = {
     partnershipSub: 'Alusta kuukausimaksulla',
     partnershipCon: 'Alihankinta',
     partnershipSubText:
-      '29,90 € (ilman alv:tä) kuukaudessa jokaisesta autosta, joka ajoi kuukauden aikana. Omista asiakkaista, suorista tilauksista ja pöydän suorista sopimuksista ei peritä prosenttia, ja niistä saat viikkoraportin. Muista tarjouspöydän keikoista 3 %.',
+      '29,90 € (ilman alv:tä) kuukaudessa jokaisesta autosta, joka on ajanut kuukauden aikana. Omista asiakkaista, suorista tilauksista ja tarjouspöydän suorista sopimuksista ei mene prosenttia, ja ne tulevat viikkoraporttiin. Muista tarjouspöydän keikoista palvelumaksu 3 %.',
     partnershipConText:
-      '3 % jokaisen keikan hinnasta, vähennetään tilityksestä. Laskut asiakkaille, rahtikirjat ja reklamaatiot hoidamme me; kuukausimaksua ei peritä.',
+      'Palvelumaksu 3 % keikan hinnasta, vähennetään tilityksestä. Hintaan kuuluvat asiakaslaskutus, rahtikirjat ja reklamaatioiden hoito. Ei kuukausimaksua.',
     partnershipSwitch: 'Vaihda: {mode}',
-    partnershipNow: 'Vaihto alihankintaan tulee voimaan heti. Se koskee vasta tämän jälkeen vahvistettuja keikkoja.',
-    partnershipNextMonth: 'Paluu kuukausimaksuun tulee voimaan seuraavan kuukauden alusta: alihankintana otettu työ ajetaan loppuun samoilla ehdoilla.',
-    partnershipPending: 'Vaihto tapaan {mode} on tilattu {date} alkaen.',
+    partnershipNow: 'Vaihto alihankintaan tulee voimaan heti ja koskee tästä eteenpäin vahvistettuja keikkoja.',
+    partnershipNextMonth: 'Paluu kuukausimaksuun tulee voimaan seuraavan kuukauden alusta. Jo otetut alihankintakeikat ajetaan loppuun samoilla ehdoilla.',
+    partnershipPending: 'Tulossa: {mode} {date} alkaen.',
     partnershipCancel: 'Peru vaihto',
     partnershipAfter: 'Vaihto koskee uusia keikkoja. Jo valmistuneiden keikkojen maksut eivät muutu.',
     freeUntil: 'Maksuton {date} asti',
@@ -621,7 +621,7 @@ export const fi = {
     unitBranch: 'Vetoauto',
     unitBranchTitle: 'Yksikkö haetaan ja jätetään',
     unitBranchText:
-      'Vetoauto hakee irtoperän tai kontin sovitusta paikasta, hoitaa matkan pisteet ja jättää sen perille. Kuljettaja löytää oikean yksikön numerosta, alusta oikean auton yksikön mitoista.',
+      'Vetoauto hakee irtoperän tai kontin sovitusta paikasta, hoitaa matkan pisteet ja jättää sen perille. Kuljettaja tunnistaa yksikön numerosta, ja RAHTIS löytää sopivan auton yksikön mittojen perusteella.',
     /*
      * Kolme riviä avain–arvo, molemmissa korteissa samat avaimet.
      *
@@ -718,7 +718,7 @@ export const fi = {
     shipper4:
       'Jos reitti, aikataulu tai muu tieto muuttuu kesken keikan, päivitys menee suoraan kuljetusliikkeelle ja kuljettajalle.',
     shipper6: 'Viikkoraportista näet keikat, summat, asiakirjat ja palautteet.',
-    shipper7: 'Integraatio omaan järjestelmään (ERP/TMS) rajapinnan kautta: avaimen luot itse kabinetissa, ja käyttö on maksutonta.',
+    shipper7: 'Integraatio omaan järjestelmään (ERP/TMS) rajapinnan kautta: avaimen luot itse omilla sivuillasi, ja käyttö on maksutonta.',
     shipper5:
       'Jos auto peruu tai ei vahvista, keikka palaa tarjolle itsestään ja välittyy seuraaville sopiville autoille saman tien.',
     carrier2:
@@ -728,7 +728,7 @@ export const fi = {
     carrier3: 'Voit löytää paluukeikan alueelta, jossa edellinen kuljetus päättyy.',
     carrier4: 'Jokainen auto hyväksytään palveluun erikseen.',
     carrier5:
-      'Laskun asiakkaalle, rahtikirjat ja reklamaatiot hoidamme me. Maksat 3 % keikan hinnasta, kuukausimaksua ei ole.',
+      'Hintaan kuuluvat asiakaslaskutus, rahtikirjat ja reklamaatioiden hoito. Palvelumaksu 3 % keikan hinnasta, ei kuukausimaksua.',
     carrier6: 'Viikkoraportista näet ajetut keikat, ansiot ja tulevat tilitykset.',
     carrier7:
       'Kuljettajan sovellus kuuluu mukaan: keikat, työaika, kuormakuvat, rahtikirja, paikkakartta ja kuljettajan oma kieli.',
@@ -762,21 +762,21 @@ export const fi = {
       'Keikkaa ei merkitä valmiiksi ennen kuin tarvittavat asiakirjat on lisätty. Rahtikirja ja kuvat toimitetaan tilaajalle samalla, kun kuljetus valmistuu.',
 
     faultsEyebrow: 'Kun suunnitelma muuttuu',
-    faultsTitle: 'Poikkeustilanteet kuuluvat logistiikkaan. Siksi myös niille on oma toimintamalli.',
+    faultsTitle: 'Poikkeuksia sattuu aina. Niihinkin on valmis toimintatapa.',
     faultsLede:
       'Jos aikataulu muuttuu, kuljettaja peruu tai noudossa havaitaan vaurio, tieto ei jää puheluiden tai yksittäisten viestien varaan. Tapahtuma kirjataan suoraan keikalle ja näkyy kaikille osapuolille.',
     fault1: 'Kuljettaja ei vahvista keikkaa 15 minuutissa',
     fault1Text:
-      'Keikka vapautuu automaattisesti takaisin tarjolle ja välitetään seuraaville sopiville autoille. Se ei jää odottamaan vahvistusta määräämättömäksi ajaksi.',
+      'Keikka palaa automaattisesti tarjolle ja lähtee seuraaville sopiville autoille. Se ei jää roikkumaan vahvistusta odottamaan.',
     fault2: 'Satama muutti aikaikkunaa tai varasto sulkeutui',
     fault2Text:
       'Tilaaja päivittää tiedon suoraan keikalle. Muutos tallentuu tapahtumahistoriaan ja näkyy heti kuljetusliikkeelle ja kuljettajalle.',
     fault3: 'Noudossa havaittiin vaurio yksikössä tai kuormassa',
     fault3Text:
-      'Vaurio kirjataan kyseiselle noutopisteelle kuvan ja kellonajan kanssa. Näin tapahtumasta jää selkeä dokumentointi.',
+      'Vaurio kirjataan sille noutopisteelle kuvan ja kellonajan kanssa. Näin tapahtumasta jää selvä jälki.',
     fault4: 'Kuljetus perutaan ennen aloitusta',
     fault4Text:
-      'Peruutettu keikka palautuu automaattisesti tarjolle ja siitä lähtee tieto sopiville kuljetusliikkeille.',
+      'Peruttu keikka palaa automaattisesti tarjolle, ja sopivat kuljetusliikkeet saavat siitä tiedon.',
 
     aiEyebrow: 'Kuljettajan sovellus',
     aiTitle: 'Keikka kulkee kuljettajan puhelimessa',
@@ -811,7 +811,7 @@ export const fi = {
       'Lastauksessa ja purussa sovellus ottaa allekirjoituksen ja skannaa rahtikirjan PDF:ksi. Kuljetusliike sulkee keikan ilman erillistä latausta.',
     ai5: 'Toimii ilman verkkoa',
     ai5Text:
-      'Merkinnät ja kuvat odottavat puhelimessa ja lähtevät, kun yhteys palaa. Aikana säilyy kuittaushetki, ei lähetyshetki.',
+      'Merkinnät ja kuvat odottavat puhelimessa ja lähtevät, kun yhteys palaa. Ajaksi jää kuittaushetki, ei lähetyshetki.',
     ai6: 'Ilmoitukset puhelimeen',
     ai6Text:
       'Uusi keikka, suora tilaus tai peruutus tulee ilmoituksena, vaikka sovellus olisi kiinni.',
@@ -846,7 +846,7 @@ export const fi = {
     serviceLive: 'Toiminnassa',
     service1: 'Irtoperävaunujen kuljetukset',
     service1Text:
-      'Veturi noutaa perävaunun satamasta tai terminaalista, hoitaa sovitut lastaukset ja purut ja toimittaa perävaunun seuraavaan sovittuun paikkaan.',
+      'Vetoauto noutaa perävaunun satamasta tai terminaalista, hoitaa sovitut lastaukset ja purut ja toimittaa perävaunun seuraavaan sovittuun paikkaan.',
     service1Text2: 'Toimimme Itämeren ja Pohjanmeren satamissa: Suomi, Ruotsi, Norja, Tanska, Viro, Latvia, Liettua, Puola ja Saksa.',
     /*
      * Toinen palvelu on kontit, ei yleinen rahti.
@@ -858,7 +858,7 @@ export const fi = {
      */
     service2: 'Konttikuljetukset',
     service2Text:
-      'Veturi noutaa kontin satamasta tai terminaalista — tyhjänä tai kuormattuna — ja toimittaa sen sovittuun paikkaan. Paluumatkalla kontti palautetaan satamaan.',
+      'Vetoauto noutaa kontin satamasta tai terminaalista — tyhjänä tai kuormattuna — ja toimittaa sen sovittuun paikkaan. Paluumatkalla kontti palautetaan satamaan.',
     service2Text2:
       'Koko ilmoitetaan jaloissa: 20, 30, 40 tai 45. Keikan näkevät vain ne ajoneuvot, joiden alusta ottaa juuri sen kokoisen kontin.',
 
@@ -885,7 +885,7 @@ export const fi = {
     apiFreeEyebrow: 'Maksuton',
     apiFreeTitle: 'Ei kuukausimaksua, ei kutsuhintaa',
     apiFreeText:
-      'Rajapinnan käyttö ei maksa mitään. Maksat vain kuljetuksista kuten kabinetissa: palvelumaksu 5 % (vähintään 15 € keikalta yhdessä kuljetusliikkeen maksun kanssa); suora sopimus kuukausimaksua käyttävän kuljetusliikkeen kanssa on maksuton.',
+      'Rajapinnan käyttö ei maksa mitään. Maksat vain kuljetuksista, samoin kuin palvelussa muutenkin: palvelumaksu 5 % (vähintään 15 € keikalta yhdessä kuljetusliikkeen maksun kanssa); suora sopimus kuukausimaksua käyttävän kuljetusliikkeen kanssa on maksuton.',
     apiFastEyebrow: 'Nopea',
     apiFastTitle: 'Tilaus sekunneissa, muutos minuutissa',
     apiFastText:
@@ -897,9 +897,9 @@ export const fi = {
     apiSafeEyebrow: 'Turvallinen',
     apiSafeTitle: 'Allekirjoitetut ilmoitukset',
     apiSafeText:
-      'Jokainen webhook on allekirjoitettu, epäonnistunut toimitus uusitaan automaattisesti, ja avaimen voi perua kabinetista heti.',
+      'Jokainen webhook on allekirjoitettu, epäonnistunut toimitus uusitaan automaattisesti, ja avaimen voi perua omilta sivuilta heti.',
     apiExampleLabel: 'Näin se toimii',
-    apiExampleNote: 'Avain luodaan kabinetissa välilehdellä API. OpenAPI-kuvaus toimii suoraan Postmanissa ja asiakasgeneraattoreissa.',
+    apiExampleNote: 'Avaimen luot omilla sivuillasi API-välilehdellä. OpenAPI-kuvaus toimii suoraan Postmanissa ja asiakasgeneraattoreissa.',
     apiDocs: 'Lue API-dokumentaatio',
     footerApi: 'API',
     menuApply: 'Hae mukaan',
@@ -1222,7 +1222,7 @@ export const fi = {
     expressCargoSection: 'Mitä kuljetetaan',
     expressCommentPlaceholder: 'Mitat, pakkaus, nostotapa, lämpötila…',
     cargoWeight: 'Paino, t',
-    cargoWeightHint: 'Enintään 76 tonnia eli HCT-yhdistelmän suurin sallittu massa',
+    cargoWeightHint: 'Kuorman paino. Yhdistelmän kokonaismassa saa Suomessa olla enintään 76 tonnia',
     cargoWeightHintVan: 'Kuorman paino. Pakettiauton kantavuus on yleensä 1–1,5 tonnia',
     cargoWeightHintTruck: 'Kuorman paino. Kuorma-auton kantavuus on yleensä enintään 15 tonnia',
     consignee: 'Kuorman vastaanottaja',
@@ -1315,7 +1315,7 @@ export const fi = {
   matching: {
     take: 'Otan kuljetuksen',
     taking: 'Lähetetään…',
-    taken: 'Tarjous vastaanotettu',
+    taken: 'Tarjous lähetetty',
     noSlots: 'Paikat täynnä',
     slots: 'Paikkoja varattu',
     chooseVehicle: 'Millä autolla ajat',
@@ -1336,12 +1336,12 @@ export const fi = {
     noAssignments: 'Ei kuljetuksia',
     noAssignmentsHint: 'Ota kuljetus, niin se siirtyy tänne.',
     chosenYou: 'Tilaaja valitsi sinut',
-    chosenYouHint: 'Vahvista 15 minuutin kuluessa, muuten kuljetus vapautuu takaisin avoimeksi.',
+    chosenYouHint: 'Vahvista 15 minuutissa, muuten kuljetus palaa tarjolle.',
     inProgress: 'Kuljetus ajossa',
     assignedCarrier: 'Kuljetuksen ajaa',
     contactsNow: 'Vastaanottajan yhteystiedot ovat nyt näkyvissä.',
     failed: 'Toiminto ei onnistunut. Päivitä sivu ja yritä uudelleen.',
-    tooLate: 'Aika loppui, kuljetus vapautui takaisin avoimeksi.',
+    tooLate: 'Aika loppui, ja kuljetus palasi tarjolle.',
     cancelledTrips: 'Peruutetut kuljetukset',
     noChassis: 'Tällä ajoneuvolla ei ole alustaa tämän kokoiselle kontille.',
     wrongClass: 'Tähän kuljetukseen tarvitaan toisen luokan auto tai isompi kuormatila.',
@@ -1402,7 +1402,7 @@ export const fi = {
     trendRevenue: 'Meidän osuutemme',
     trendHint: 'Viikot maanantaista sunnuntaihin, summat ilman alv:tä. Osuus on kuljetusliikkeen 3 % ja tilaajan 5 % (vähintään 15 € yhteensä); suorat sopimukset ja kuukausimaksut eivät ole mukana.',
     subsTitle: 'Kuukausimaksut',
-    subsLede: 'Kuukausimaksu peritään kuukausimaksullisilta kuljetusliikkeiltä ajaneista autoista. Ensin se vähennetään tilityksestä; kattamaton osa laskutetaan.',
+    subsLede: 'Kuukausimaksu peritään ajaneista autoista niiltä kuljetusliikkeiltä, jotka käyttävät kuukausimaksua. Maksu vähennetään ensin tilityksestä, ja loput laskutetaan.',
     subsColMonth: 'Kuukausi',
     subsColVehicles: 'Autoja',
     subsColTotal: 'Sis. ALV',
@@ -1580,8 +1580,8 @@ export const fi = {
     partnership: 'Kuljetusliikkeen tapa',
     partnershipSub: 'Kuukausimaksu',
     partnershipCon: 'Alihankinta',
-    partnershipSubHint: '29,90 € kuukaudessa ajanutta autoa kohden. Omista asiakkaista, suorista tilauksista ja pöydän suorista sopimuksista ei prosenttia, niistä viikkoraportti; muista pöydän keikoista 3 %.',
-    partnershipConHint: '3 % jokaisesta keikasta. Laskut asiakkaille, rahtikirjat ja reklamaatiot hoidamme me; kuukausimaksua ei peritä.',
+    partnershipSubHint: '29,90 € kuukaudessa ajanutta autoa kohden. Omista asiakkaista, suorista tilauksista ja tarjouspöydän suorista sopimuksista ei prosenttia, ne tulevat viikkoraporttiin; muista tarjouspöydän keikoista 3 %.',
+    partnershipConHint: 'Palvelumaksu 3 % jokaisesta keikasta. Hintaan kuuluvat asiakaslaskutus, rahtikirjat ja reklamaatioiden hoito. Ei kuukausimaksua.',
     partnershipSwitch: 'Vaihda tavaksi {mode}',
     testHint: 'Testiyrityksen keikat eivät mene laskuihin eivätkä tilityksiin.',
     queue: 'Tarkastusjono',
@@ -1646,11 +1646,11 @@ export const fi = {
     howTitle: 'Miten haluat käyttää palvelua?',
     howSub: 'Alusta kuukausimaksulla',
     howSubText:
-      'Ajat omia asiakkaitasi ja käytät sovellusta, työaikaa, karttaa ja tarjouspöytää. 29,90 € kuukaudessa jokaisesta autosta, joka ajoi kuukauden aikana. Keikoista saat viikkoraportin.',
+      'Ajat omia asiakkaitasi ja käytät sovellusta, työaikaa, karttaa ja tarjouspöytää. 29,90 € kuukaudessa jokaisesta autosta, joka on ajanut kuukauden aikana. Keikat tulevat viikkoraporttiin.',
     howCon: 'Alihankinta',
     howConText:
-      'Me hankimme työn, laskutamme asiakkaan, hoidamme rahtikirjat ja reklamaatiot. 3 % keikan hinnasta, ei kuukausimaksua.',
-    howNote: 'Voit vaihtaa tapaa myöhemmin. Tarjouspöydältä otettu keikka ajetaan aina alihankintana.',
+      'Saat keikkoja tarjouspöydältä. Hintaan kuuluvat asiakaslaskutus, rahtikirjat ja reklamaatioiden hoito. Palvelumaksu 3 % keikan hinnasta, ei kuukausimaksua.',
+    howNote: 'Voit vaihtaa tapaa myöhemmin. Tarjouspöydän keikoista menee 3 % palvelumaksu, paitsi suorista sopimuksista.',
     iAmCarrier: 'Kuljetusliike',
     iAmShipper: 'Tilaaja',
     submit: 'Lähetä hakemus',
@@ -1660,9 +1660,9 @@ export const fi = {
     shipperNote: 'Hyväksynnän jälkeen: kirjautuminen, yritystiedot, kuljetusten julkaisu.',
     sentTitle: 'Hakemus lähetetty',
     duplicate: 'Tällä Y-tunnuksella on jo hakemus vireillä tai hyväksytty.',
-    invitedBy: '{carrier} kutsui teidät. Tiedot on täytetty valmiiksi — tarkistakaa ne ja lähettäkää hakemus. Hyväksynnän jälkeen voitte lähettää suoria tilauksia heidän autoilleen.',
-    invitedByCarrier: '{carrier} kutsui kuljetusliikkeenne. Tiedot on täytetty valmiiksi — tarkistakaa ne ja lähettäkää hakemus.',
-    invitedByRahtis: 'Tiedot on täytetty kutsun perusteella — tarkistakaa ne ja lähettäkää hakemus.',
+    invitedBy: '{carrier} kutsui sinut. Tiedot on täytetty valmiiksi — tarkista ne ja lähetä hakemus. Hyväksynnän jälkeen voit lähettää suoria tilauksia heidän autoilleen.',
+    invitedByCarrier: '{carrier} kutsui kuljetusliikkeesi. Tiedot on täytetty valmiiksi — tarkista ne ja lähetä hakemus.',
+    invitedByRahtis: 'Tiedot on täytetty kutsun perusteella — tarkista ne ja lähetä hakemus.',
     tooMany: 'Liian monta hakemusta lyhyessä ajassa. Yritä tunnin kuluttua tai kirjoita osoitteeseen admin@rahtis.eu.',
     failed: 'Lähetys ei onnistunut. Yritä uudelleen.',
     /* Toiminimi ei ole avoimessa datassa, tai rekisteri ei vastannut — ei virhe. */
@@ -1843,7 +1843,7 @@ export const fi = {
     subNet: 'Kuukausimaksu ilman alv:tä',
     subPayable: 'Maksettava',
     payable: 'Maksetaan kuljetusliikkeelle',
-    waitingTitle: 'Odotusaika, sisältyy riveihin (45 € alv 0 % / alkava tunti, kun 1 tunnin ylitys on vähintään 15 min)',
+    waitingTitle: 'Odotusaika, sisältyy riveihin (45 €, alv 0 %, alkavalta tunnilta, kun maksuton tunti ylittyy vähintään 15 min)',
     waitingLine: '{ref} · {stop} · {operation} {from}–{to} ({minutes} min) · {hours} h',
     waitingLoading: 'lastaus',
     waitingUnloading: 'purku',
@@ -1893,7 +1893,7 @@ export const fi = {
     customer: 'Asiakas',
     payer: 'Maksaja',
     payee: 'Saaja',
-    vatNumber: 'ALV-tunniste',
+    vatNumber: 'ALV-numero',
     reference: 'Viite',
   },
 
@@ -1909,7 +1909,7 @@ export const fi = {
     company: 'Yritys',
     legalName: 'Virallinen nimi',
     businessId: 'Y-tunnus',
-    vatNumber: 'ALV-tunniste',
+    vatNumber: 'ALV-numero',
     email: 'Sähköposti',
     phone: 'Puhelin',
     website: 'Verkkosivu',
@@ -1937,7 +1937,7 @@ export const fi = {
       'Vauriot, vajaukset, odotusajat ja poikkeamat kuljetuksittain. RAHTIS käsittelee jokaisen reklamaation ja välittää osapuolten välillä.',
     subtitleAdmin: 'Kaikki reklamaatiot. Avoimet ja käsittelyssä olevat ensin.',
     directDeal:
-      'Tämä on suora kuljetus kuukausimaksua käyttävän kuljetusliikkeen kanssa: kuljetussopimus on osapuolten välinen, ja reklamaatiot sovitaan suoraan toisen osapuolen kanssa. Kuljetuksen asiakirjat ja kuvat ovat molempien käytettävissä.',
+      'Tämä on suora kuljetus kuukausimaksua käyttävän kuljetusliikkeen kanssa: ei palvelumaksua, ja keikka tulee viikkoraporttiin. Reklamaatiot sovitaan suoraan tilaajan ja kuljetusliikkeen kesken. Kuljetuksen asiakirjat ja kuvat näkyvät molemmille.',
     none: 'Ei reklamaatioita',
     noneHint: 'Reklamaation voi tehdä valmiin tai käynnissä olevan kuljetuksen kortista.',
     all: 'Kaikki',
@@ -1956,7 +1956,7 @@ export const fi = {
     cancel: 'Peruuta',
     amountClaimed: 'Vaadittu summa',
     filedBy: 'Tekijä',
-    mine: 'Te',
+    mine: 'Sinä',
     against: 'Vastapuoli',
     trip: 'Kuljetus',
     evidence: 'Todisteet kuljetuksesta',
@@ -1986,10 +1986,10 @@ export const fi = {
     reject: 'Hylkää',
     reopen: 'Palauta käsittelyyn',
     settle: 'Merkitse sovituksi',
-    settleHint: 'Jos sovitte asiasta vastapuolen kanssa, voitte sulkea oman reklamaationne.',
+    settleHint: 'Jos sovit asian vastapuolen kanssa, voit sulkea oman reklamaatiosi.',
     failed: 'Toiminto ei onnistunut. Yritä uudelleen.',
     notAllowed: 'Tätä toimintoa ei voi tehdä tässä tilassa.',
-    oneOpen: 'Tästä kuljetuksesta on jo avoin reklamaationne. Täydentäkää sitä kommentilla tai liitteellä.',
+    oneOpen: 'Sinulla on tästä kuljetuksesta jo avoin reklamaatio. Täydennä sitä viestillä tai liitteellä.',
     tooLate: 'Reklamaatio on tehtävä 30 päivän kuluessa kuljetuksen päättymisestä.',
     tooShort: 'Kuvaus on liian lyhyt.',
     byEmail: 'Käsittely sähköpostitse',
@@ -2030,12 +2030,12 @@ export const fi = {
    */
   siteWaiting: {
     title: 'Paikkojen odotusajat',
-    text: 'Kuinka kauan autot tavallisesti odottavat lastaus- ja purkupaikoillanne: saapumisesta, mutta aikaisintaan sovitusta ajasta, siihen kun piste on kuitattu. Luvut lasketaan kaikista palvelun keikoista paikalla viimeisen 12 kuukauden ajalta; paikka näkyy, kun keikkoja on vähintään kolme.',
+    text: 'Kuinka kauan autot tavallisesti odottavat lastaus- ja purkupaikoillasi: saapumisesta, mutta aikaisintaan sovitusta ajasta, siihen kun piste on kuitattu. Luvut lasketaan kaikista palvelun keikoista paikalla viimeisen 12 kuukauden ajalta; paikka näkyy, kun keikkoja on vähintään kolme.',
     caption: 'Pisimmät odotukset ensin',
     colPlace: 'Paikka',
     colMedian: 'Tavallinen odotus',
     colOverHour: 'Yli tunnin',
-    colTrips: 'Teidän / kaikki keikat',
+    colTrips: 'Omat / kaikki keikat',
     empty: 'Paikoista ei ole vielä tarpeeksi keikkoja.',
   },
 
@@ -2337,6 +2337,7 @@ export const fi = {
     onBreak: 'Tauolla',
     shiftOff: 'Päivä ei ole käynnissä',
     working: 'Työaika',
+    shiftStale: 'Päivä on jäänyt auki yli vuorokaudeksi. Lopeta se – aika kirjataan 24 tunnin kohdalle, ja kuljetusliike korjaa sen tarvittaessa.',
     accept: 'Hyväksy tehtävä',
     decline: 'Kieltäydy',
     awaitHint: 'Vahvista tehtävä, kun voit ajaa sen.',
@@ -2387,7 +2388,7 @@ export const fi = {
     inboxEmpty: 'Ei viestejä.',
     markRead: 'Merkitse luetuksi',
     failed: 'Toiminto epäonnistui. Yritä uudelleen.',
-    arrive: 'Saapui',
+    arrive: 'Saavuin',
     inspection: 'Tarkastus ja kuvat',
     inspectionHint: 'Kuvaa jokainen puoli. Jos näet uuden vaurion, merkitse se ennen kuvaamista.',
     angle: {
@@ -2633,7 +2634,7 @@ export const fi = {
           task: 'Kaksi 7 tonnin kelaa. Sijoita ne niin, ettei mikään akseli ylikuormitu.',
         },
       },
-      front: 'Etuseinä',
+      front: 'Etulaita',
       steer: 'Ohjaava akseli',
       drive: 'Vetävä akseli',
       bogie: 'Perävaunun teli',
@@ -2644,10 +2645,10 @@ export const fi = {
       unloadHint: 'Napauta täyttä paikkaa: rivi puretaan. Napauta uudelleen: rivi palaa.',
       slot: 'Paikka',
       check: 'Tarkista kuorma',
-      reset: 'Alusta',
+      reset: 'Aloita alusta',
       newHint: 'Seuraa vetävän akselin palkkia, kun siirrät kuormaa eteen ja taakse.',
       model:
-        'Yksinkertaistettu harjoituslaskelma: vivun tasapaino ilman dynaamisia kuormia ja pyöräkohtaista jakoa. Todellisen ajoneuvon rajat ovat rekisteriotteessa.',
+        'Yksinkertaistettu harjoituslaskelma: vivun tasapaino ilman dynaamisia kuormia ja pyöräkohtaista jakoa. Todellisen ajoneuvon rajat ovat rekisteröintitodistuksessa.',
     },
     inspect: {
       title: 'Löydä viat',
@@ -2765,7 +2766,7 @@ export const fi = {
         goggles: 'Silmiensuojaimet',
         mask: 'Pakonaamari',
         shovel: 'Lapio',
-        drainSeal: 'Viemärin tukkeja',
+        drainSeal: 'Viemärikaivon peite',
         container: 'Keräysastia',
         instructions: 'Kirjalliset turvallisuusohjeet',
         towRope: 'Hinausköysi',
@@ -2820,7 +2821,7 @@ export const fi = {
         { t: 'Numerot', d: '2 kaasu, 3 syttyvä neste, 4 syttyvä kiinteä, 5 hapettava, 6 myrkyllinen, 7 radioaktiivinen, 8 syövyttävä, 9 vaarallinen reaktio.' },
         { t: 'Tupla ja X', d: 'Tuplattu numero: vaara voimistunut. X: reagoi vaarallisesti veden kanssa — ei vettä.' },
         { t: 'Perusvarusteet', d: 'Pyöräkiila, kaksi varoitusmerkkiä, silmänhuuhde (ei luokat 1 ja 2), huomioliivi, valaisin, käsineet, silmiensuojaimet.' },
-        { t: 'Lisävarusteet', d: 'Pakonaamari: 2.3 ja 6.1. Lapio, viemärin tukkeja ja keräysastia: 3, 4.1, 4.3, 8, 9.' },
+        { t: 'Lisävarusteet', d: 'Pakonaamari: 2.3 ja 6.1. Lapio, viemärikaivon peite ja keräysastia: 3, 4.1, 4.3, 8, 9.' },
         { t: 'Sammuttimet', d: 'Ohjaamoon vähintään 2 kg. Yhteensä: enintään 3,5 t — 4 kg, enintään 7,5 t — 8 kg, yli 7,5 t — 12 kg.' },
       ],
       tyoturva: [
@@ -2855,7 +2856,7 @@ export const fi = {
     title: 'Pätevyydet ja kortit',
     hint: 'Merkitse voimassaolon päättymispäivä. Muistutamme 6, 3 ja 1 kuukautta ennen. Päivämäärät näkyvät myös kuljetusliikkeellesi.',
     carrierHint:
-      'Kuljettaja voi merkitä päivämäärät myös itse sovelluksessa. Muistutus tulee kuljettajalle ja teille 6, 3 ja 1 kuukautta ennen päättymistä.',
+      'Kuljettaja voi merkitä päivämäärät myös itse sovelluksessa. Muistutus tulee kuljettajalle ja sinulle 6, 3 ja 1 kuukautta ennen päättymistä.',
     types: {
       CODE95: 'Ammattipätevyys (koodi 95)',
       ADR_BASIC: 'ADR-ajolupa, perus',
@@ -3080,7 +3081,7 @@ export const fi = {
     inviteLanguage: 'Viestin kieli',
     inviteSend: 'Lähetä kutsu',
     inviteSent: 'Kutsu lähetetty osoitteeseen {email}.',
-    inviteInvalid: 'Tarkista nimi, yritystunnus ja sähköposti.',
+    inviteInvalid: 'Tarkista nimi, Y-tunnus ja sähköposti.',
     inviteTooMany: 'Enintään 20 kutsua vuorokaudessa.',
     inviteFailed: 'Kutsua ei voitu lähettää. Yritä hetken kuluttua uudelleen.',
     invitesTitle: 'Lähetetyt kutsut',
@@ -3095,7 +3096,7 @@ export const fi = {
     revoke: 'Peru lupa',
     none: 'Ei vielä ajettuja kuljetuksia',
     anonymitySubscriber:
-      'Asiakas, jolle olet sallinut suorat tilaukset, näkee yrityksesi nimen, y-tunnuksen ja tilinumeron sekä kuljettajan yhteystiedot, ja sinä näet hänen nimensä. Tarjouspöydän muissa keikoissa asiakkaat näkyvät koodilla.',
+      'Asiakas, jolle olet sallinut suorat tilaukset, näkee yrityksesi nimen, Y-tunnuksen ja tilinumeron sekä kuljettajan yhteystiedot, ja sinä näet hänen nimensä. Tarjouspöydän muissa keikoissa asiakkaat näkyvät koodilla.',
     anonymity:
       'Asiakkaat näkyvät koodilla, ei nimellä. Tilaaja näkee autosi rekisterinumeron, arvosanan sekä kuljettajan nimen, puhelinnumeron ja sähköpostin yhteydenpitoa varten, mutta ei yrityksesi nimeä.',
   },
@@ -3176,18 +3177,18 @@ export const fi = {
         'Jokainen ilmoitus on allekirjoitettu otsakkeella Rahtis-Signature: t=<aika>,v1=<HMAC-SHA256>. Tarkista allekirjoitus ja hylkää yli viisi minuuttia vanhat. Epäonnistunut toimitus yritetään uudelleen vuorokauden ajan.',
     },
     tooMany: 'Yrityksellä on jo kymmenen voimassa olevaa avainta. Poista tarpeeton ensin.',
-    needActive: 'Avaimen voi luoda, kun yrityksen tili on aktiivinen.',
+    needActive: 'Avaimen voi luoda, kun yritys on otettu käyttöön.',
     createFailed: 'Avaimen luonti epäonnistui. Yritä uudelleen.',
     nav: 'API',
   },
 
   known: {
-    directBilling: 'Laskuttaa sinua suoraan',
-    directBillingHint: 'Suora sopimus kuljetusliikkeen kanssa: palvelumaksua ei ole, ja keikka tulee viikkoraporttiinne.',
+    directBilling: 'Suora sopimus',
+    directBillingHint: 'Ei palvelumaksua, keikka tulee viikkoraporttiisi.',
     carrierAccount: 'Tilinumero',
     title: 'Omat autot',
     subtitle:
-      'Autot, jotka ovat ajaneet kuljetuksianne ja joiden kuljetusliike on sallinut suorat tilaukset. Suora tilaus menee autolle ohi yhteisen pöydän.',
+      'Autot, jotka ovat ajaneet kuljetuksiasi ja joiden kuljetusliike on sallinut suorat tilaukset. Suora tilaus menee autolle ohi yhteisen pöydän.',
     pool: 'Vakioautot',
     others: 'Muut tutut autot',
     addPool: 'Lisää vakioautoihin',
@@ -3199,13 +3200,13 @@ export const fi = {
     unavailable: 'Ei nyt käytettävissä',
     none: 'Ei vielä tuttuja autoja',
     noneHint:
-      'Auto tulee tänne, kun se on ajanut kuljetuksenne ja sen kuljetusliike sallii suorat tilaukset.',
+      'Auto tulee tänne, kun se on ajanut kuljetuksesi ja sen kuljetusliike sallii suorat tilaukset.',
   },
 
   own: {
     title: 'Omat keikat',
     subtitle:
-      'Oman asiakkaanne kuljetus suoraan omalle autollenne: kuljettaja saa sen sovellukseen, ja keikka tulee viikkoraporttiin. Ei prosenttia.',
+      'Oman asiakkaasi kuljetus suoraan omalle autollesi: kuljettaja saa sen sovellukseen, ja keikka tulee viikkoraporttiin. Ei prosenttia.',
     newJob: 'Uusi oma keikka',
     clientSection: 'Asiakas',
     clientPick: 'Valitse asiakas',
@@ -3223,11 +3224,11 @@ export const fi = {
     sending: 'Lähetetään…',
     sent: 'Lähetetty kuljettajalle',
     rateLabel: 'Hinta',
-    rateHint: 'ALV 0 %. Näkyy vain teidän raportissanne.',
+    rateHint: 'ALV 0 %. Näkyy vain omassa raportissasi.',
     clientRequired: 'Valitse asiakas tai kirjoita uuden asiakkaan nimi.',
     clientInvalid: 'Tarkista asiakkaan yritystunnus ja sähköposti.',
     subscriptionOnly:
-      'Omat keikat kuuluvat tilaukseen: 29,90 € kuukaudessa ajanutta autoa kohden, ilman prosenttia. Ensimmäinen kuukausi on maksuton.',
+      'Omat keikat kuuluvat kuukausimaksuun: 29,90 € kuukaudessa ajanutta autoa kohden, ilman prosenttia. Ensimmäinen kuukausi on maksuton.',
     trackLink: 'Seurantalinkki asiakkaalle',
     badge: 'Oma keikka',
     clients: 'Asiakkaat',
@@ -3238,10 +3239,10 @@ export const fi = {
     clientDuplicate: 'Samanniminen tai saman Y-tunnuksen asiakas on jo olemassa.',
     clientHasJobs: 'Asiakkaalla on keikkoja, joten sitä ei voi poistaa.',
     carrierHint:
-      'Oma keikkanne odottaa kuljettajan vahvistusta. Määräaikaa ei ole. Kieltäytyminen peruu keikan — sitä ei siirretä yhteiselle pöydälle.',
+      'Oma keikkasi odottaa kuljettajan vahvistusta. Määräaikaa ei ole. Kieltäytyminen peruu keikan — sitä ei siirretä yhteiselle pöydälle.',
     declineConfirm: 'Perutaanko oma keikka? Perumista ei voi kumota.',
     declineYes: 'Kyllä, peru keikka',
-    closingHint: 'Liitä rahtikirja ja kuvat. Ne jäävät keikan asiakirjoihin ja raporttiinne.',
+    closingHint: 'Liitä rahtikirja ja kuvat. Ne jäävät keikan asiakirjoihin ja raporttiisi.',
     open: 'Avaa',
     pickupPast: 'Noutopäivä on jo mennyt. Tarkista päivämäärä.',
     editTitle: 'Matka ja hinta',
@@ -3281,7 +3282,7 @@ export const fi = {
     sendDirect: 'Lähetä omalle autolle',
     badge: 'Suora tilaus',
     carrierHint:
-      'Tilaaja lähetti kuljetuksen suoraan autollenne. Määräaikaa ei ole — vahvista tai kieltäydy. Kieltäytyminen siirtää kuljetuksen yhteiselle pöydälle.',
+      'Tilaaja lähetti kuljetuksen suoraan autollesi. Määräaikaa ei ole — vahvista tai kieltäydy. Kieltäytyminen siirtää kuljetuksen yhteiselle pöydälle.',
     shipperHint:
       'Kuljetus odottaa auton vahvistusta ilman määräaikaa. Voit siirtää sen yhteiselle pöydälle milloin tahansa.',
     notKnown: 'Auto ei ole enää tuttujen joukossa.',
@@ -3322,7 +3323,7 @@ export const fi = {
      * myös suomalaiselle asiakkaalle.
      */
     addVat: 'ilman alv:tä',
-    vatByCountry: 'Summat ilman alv:ta. Kanta määräytyy vastapuolen maan mukaan.',
+    vatByCountry: 'Summat ilman alv:tä. Kanta määräytyy vastapuolen maan mukaan.',
     calcNote:
       'Summat ilman alv:tä. Suomalaiselle yritykselle lisätään 25,5 %, muun maan yritykselle sovelletaan käännettyä verovelvollisuutta.',
 
@@ -3398,7 +3399,7 @@ export const fi = {
     trips: 'Keikat',
     onTime: 'Ajallaan',
     docs: 'Rahtikirja ladattu',
-    abandoned: 'Luovutetut keikat',
+    abandoned: 'Keikoista luovuttu',
     claims: 'Reklamaatiot',
     directAccept: 'Suorat tilaukset hyväksytty',
     note: 'Luvut lasketaan automaattisesti valmiista keikoista. Ajallaan = saapuminen enintään 15 min sovitun ajan jälkeen. Prosentti näytetään, kun havaintoja on vähintään viisi. Tilaaja näkee tarjouksissa keikkojen määrän ja ajallaan-osuuden ilman yrityksen nimeä.',
@@ -3472,7 +3473,7 @@ export const fi = {
     'legal.confirmFirst': 'Otetaanko versio {n} käyttöön?',
     'overview.greeting': 'Hei, {name}',
     'overview.dateLine': '{date} · viikko {week}',
-    'own.subscriptionContact': 'Tilauksen saa käyttöön kirjoittamalla osoitteeseen {email}.',
+    'own.subscriptionContact': 'Kuukausimaksullisen palvelun saat käyttöön kirjoittamalla osoitteeseen {email}.',
     'track.questions': 'Kysymykset kuljetuksesta: {carrier}.',
     'order.offersCounter':
       '{count, plural, one {# tarjous} other {# tarjousta}} / {max} — valitse kuljetusliike',
@@ -3601,7 +3602,7 @@ export const fi = {
     'event.order.published': 'Uusi kuljetus {ref} · {from} → {to}',
     'event.offer.received': 'Uusi tarjous kuljetukseen {ref}',
     'event.offer.chosen': 'Sinut valittiin kuljetukseen {ref} — vahvista {minutes} minuutissa',
-    'event.order.released': 'Kuljetus {ref} vapautui takaisin avoimeksi',
+    'event.order.released': 'Kuljetus {ref} palasi tarjolle',
     'event.order.cancelled': 'Kuljetus {ref} on peruutettu — katso muutosloki',
     'event.order.amended': 'Kuljetuksen {ref} reitti muuttui',
     'event.trip.stop.done': 'Kuljetus {ref}: {place} merkitty tehdyksi ({done}/{total})',
@@ -3648,16 +3649,16 @@ export const fi = {
     'noOffers.title': '{count, plural, one {# kuljetus} other {# kuljetusta}} ilman tarjouksia yli 30 min',
     'noOffers.open': 'pöydällä {minutes} min',
     'direct.groupWaiting': 'Tarjottu {count, plural, one {# omalle autolle} other {# omalle autolle}} klo {time} asti. Sen jälkeen kuljetus siirtyy yhteiselle pöydälle.',
-    'direct.groupBadge': 'Suora tilaus autoillenne · klo {time} asti',
+    'direct.groupBadge': 'Suora tilaus omille autoillesi · klo {time} asti',
     'event.group.released': 'Kukaan omista autoista ei ottanut kuljetusta {ref} — se on nyt yhteisellä pöydällä',
     'event.trip.late': 'Kuljetus {ref}: auto on myöhässä pisteestä {city} noin {minutes} min',
     'event.trip.waiting': 'Kuljetus {ref}: maksuton odotustunti pisteessä {city} päättyi{charged, select, yes { — odotuslisä {euros} € alkavalta tunnilta 15 minuutin kuluttua} other {}}',
     'event.invite.carrier_approved': 'Kutsumasi kuljetusliike {carrier} on hyväksytty RAHTIKSEEN.',
-    'event.invite.approved': 'Kutsumanne asiakas {shipper} on hyväksytty. Se voi nyt lähettää suoria tilauksia autoillenne.',
+    'event.invite.approved': 'Kutsumasi asiakas {shipper} on hyväksytty. Se voi nyt lähettää suoria tilauksia autoillesi.',
     'event.link.offer': 'Ajoit ensimmäisen kuljetuksen tilaajalle {shipper}. Sallitaanko suorat tilaukset?',
     'drivers.count': '{count, plural, =0 {Ei kuljettajia} one {# kuljettaja} other {# kuljettajaa}}',
     'drivers.onVehicle': 'Autolla {plate}',
-    'known.tripsCount': '{count, plural, one {# keikka} other {# keikkaa}} kanssanne',
+    'known.tripsCount': '{count, plural, one {# keikka} other {# keikkaa}} kanssasi',
     'partners.tripsCount': '{count, plural, one {# keikka} other {# keikkaa}}',
     'pay.modelSince': '{model} {date} alkaen',
     'driverApp.earnTrips': '{count, plural, one {# keikka} other {# keikkaa}}',

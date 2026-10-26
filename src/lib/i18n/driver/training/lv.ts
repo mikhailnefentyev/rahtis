@@ -4,7 +4,7 @@ import type { TrainingPack } from './index';
 export const lv = {
   training: {
     title: 'Apmācība',
-    entryHint: 'Tahogrāfs, krava, ADR, apskate un cits – pa dažām minūtēm.',
+    entryHint: 'Tahogrāfs, krava, ADR, apskate un citas tēmas — pa dažām minūtēm.',
     modeLabel: 'Līmenis',
     modePro: 'Pieredzējis',
     modeNew: 'Iesācējs',
@@ -29,7 +29,7 @@ export const lv = {
       tyoturva: {
         name: 'Darba drošība',
         lcd: 'DROŠĪBA',
-        intro: 'Droši darbi iekraušanas vietā, ostā un ap transportlīdzekli.',
+        intro: 'Drošs darbs iekraušanas vietā, ostā un ap auto.',
       },
       ensiapu: {
         name: 'Pirmā palīdzība',
@@ -47,7 +47,7 @@ export const lv = {
     trainTitle: 'Treniņš 3 minūtēs',
     trainHint: 'To, ko zini, jautās retāk. Kļūdas atgriezīsies drīz.',
     start: 'Sākt',
-    startAnyway: 'Atkārtot tik un tā',
+    startAnyway: 'Tomēr atkārtot',
     reset: 'Atiestatīt progresu',
     resetConfirm: 'Atiestatīt progresu šajā tēmā?',
     resetYes: 'Atiestatīt',
@@ -64,7 +64,7 @@ export const lv = {
     oneMore: 'Vēl viens raunds',
     toPractice: 'Uz praksi',
     empty: 'Jautājumus vēl pārbauda instruktors. Ieskaties vēlāk.',
-    guest: 'Tu neesi pieteicies: progress tiek saglabāts tikai šajā tālrunī.',
+    guest: 'Tu neesi pieteicies: progress saglabājas tikai šajā tālrunī.',
     signIn: 'Pieteikties',
     privacy: 'Tavu progresu redzi tikai tu. Pārvadātājs tavas atbildes neredz.',
     notOfficial: 'Treniņš neaizstāj kvalifikācijas apmācību (kods 95).',
@@ -117,7 +117,7 @@ export const lv = {
       sideways: 'Siksnas uz sāniem',
       backward: 'Siksnas atpakaļ',
       headboard: 'tur borts',
-      model: 'Vienkāršots mācību aprēķins pēc EN 12195-1 principa, bez drošības koeficientiem un borta izturības pārbaudes. Reālai kravai izmanto apmācības tabulas un metodiku.',
+      model: 'Vienkāršots mācību aprēķins pēc EN 12195-1 principa, bez drošības koeficientiem un borta izturības pārbaudes. Reālai kravai izmanto tabulas un metodiku no savas apmācības.',
       dirs: { forward: 'uz priekšu', sideways: 'uz sāniem', backward: 'atpakaļ' },
     },
     axles: {
@@ -150,7 +150,7 @@ export const lv = {
       check: 'Pārbaudīt kravu',
       reset: 'No sākuma',
       newHint: 'Vēro dzenošās ass joslu, kad pārvieto kravu uz priekšu un atpakaļ.',
-      model: 'Vienkāršots mācību aprēķins: sviras līdzsvars bez dinamiskām slodzēm un sadalījuma pa riteņiem. Reālās robežas ir reģistrācijas apliecībā.',
+      model: 'Vienkāršots mācību aprēķins: sviras līdzsvars bez dinamiskām slodzēm un sadalījuma pa riteņiem. Reālās robežas ir auto reģistrācijas apliecībā.',
     },
     inspect: {
       title: 'Atrodi bojājumus',
@@ -163,11 +163,11 @@ export const lv = {
       falseAlarm: 'Kārtībā, lai gan atzīmēji',
       stop: 'Braukt nedrīkst',
       fix: 'Jānovērš drīz',
-      newHint: 'Apej transportlīdzekli vienmēr vienā secībā: kabīne, kreisā puse, aizmugure, labā puse, sakabe.',
+      newHint: 'Apej auto vienmēr vienā secībā: kabīne, kreisā puse, aizmugure, labā puse, sakabe.',
       defects: {
         tread: { name: 'Nodilusi riepa', why: 'Protektora nav: saķere samazinās un bremzēšanas ceļš pagarinās.' },
         bulge: {
-          name: 'Izciļņa riepas sānos',
+          name: 'Pūslis riepas sānā',
           why: 'Bojāts karkass: riepa var pārsprāgt braucot. Nomaini pirms izbraukšanas.',
         },
         wheelNut: {
@@ -176,12 +176,12 @@ export const lv = {
         },
         airHose: { name: 'Atvienota gaisa šļūtene', why: 'Bremžu gaiss nenonāk piekabē: piekabe nebremzē pareizi.' },
         fifthWheel: {
-          name: 'Sakabes slēdzene vaļā',
+          name: 'Seglu sakabes slēdzene vaļā',
           why: 'Piekabe var atvienoties braucot. Pēc sakabināšanas vienmēr pārbaudi slēdzeni un drošinātāju.',
         },
         oilLeak: {
           name: 'Eļļas noplūde',
-          why: 'Peļķe zem transportlīdzekļa: noplūde var būt no dzinēja vai bremžu sistēmas. Noskaidro pirms izbraukšanas.',
+          why: 'Peļķe zem auto: noplūde var būt no dzinēja vai bremžu sistēmas. Noskaidro pirms izbraukšanas.',
         },
         rearLight: {
           name: 'Salūzis aizmugures lukturis',
@@ -201,7 +201,7 @@ export const lv = {
       title: 'ADR prakse',
       modePlate: 'Nolasi plāksni',
       modeKit: 'Savāc aprīkojumu',
-      plateTask: 'Ko pārvadā šis transportlīdzeklis?',
+      plateTask: 'Ko ved šis auto?',
       hazardLabel: 'Bīstamības numurs',
       unLabel: 'ANO numurs',
       meaning: 'Numurs nozīmē',
@@ -250,7 +250,7 @@ export const lv = {
         goggles: 'Acu aizsargs',
         mask: 'Evakuācijas maska',
         shovel: 'Lāpsta',
-        drainSeal: 'Notekas aizsegs',
+        drainSeal: 'Kanalizācijas akas aizsegs',
         container: 'Savākšanas tvertne',
         instructions: 'Rakstiskās instrukcijas',
         towRope: 'Vilkšanas trose',
@@ -259,7 +259,7 @@ export const lv = {
         fireBlanket: 'Ugunsdzēšanas pārklājs',
       },
       check: 'Pārbaudīt aprīkojumu',
-      model: 'Aprīkojums savākts saskaņā ar ADR 8.1.4 un 8.1.5. Vielas un transportlīdzekļa prasības vienmēr pārbauda rakstiskajās instrukcijās un pārvadājuma dokumentos.',
+      model: 'Aprīkojums savākts saskaņā ar ADR 8.1.4 un 8.1.5. Vielas un auto prasības vienmēr pārbauda rakstiskajās instrukcijās un pārvadājuma dokumentos.',
       newHint: 'Sāc ar pamataprīkojumu, kas ir katrai transporta vienībai, tad pievieno kravas klases prasīto.',
     },
     rules: {
@@ -297,7 +297,7 @@ export const lv = {
         },
         {
           t: 'Atbildība',
-          d: 'Vadītājs atbild, lai transportlīdzeklis nebūtu pārslogots. Šaubu gadījumā nosver.',
+          d: 'Vadītājs atbild, lai auto nebūtu pārslogots. Ja šaubies — nosver.',
         },
       ],
       tech: [
@@ -305,7 +305,7 @@ export const lv = {
           t: 'Riepas',
           d: 'Protektors, bojājumi, izciļņi un spiediens. Nodilušu vai bojātu riepu neatstāj lietošanā.',
         },
-        { t: 'Riteņi', d: 'Uzgriežņu indikatori vienā līnijā, ap uzgriežņiem nav rūsas strīpu.' },
+        { t: 'Riteņi', d: 'Uzgriežņu indikatori vienā līnijā, ap uzgriežņiem nav rūsas svītru.' },
         { t: 'Gaismas', d: 'Visi lukturi, atstarotāji un gabarītgaismas veseli un tīri.' },
         {
           t: 'Bremzes un gaiss',
@@ -331,7 +331,7 @@ export const lv = {
           t: 'Pamataprīkojums',
           d: 'Ķīlis, divas zīmes, acu skalošana (ne klasēm 1 un 2), veste, lukturis, cimdi, acu aizsargs.',
         },
-        { t: 'Papildus', d: 'Maska: 2.3 un 6.1. Lāpsta, notekas aizsegs un tvertne: 3, 4.1, 4.3, 8, 9.' },
+        { t: 'Papildus', d: 'Maska: 2.3 un 6.1. Lāpsta, akas aizsegs un tvertne: 3, 4.1, 4.3, 8, 9.' },
         {
           t: 'Ugunsdzēšamie',
           d: 'Kabīnē vismaz 2 kg. Kopā: līdz 3,5 t — 4 kg, līdz 7,5 t — 8 kg, virs 7,5 t — 12 kg.',
@@ -344,17 +344,17 @@ export const lv = {
         { t: 'Kritieni', d: 'Trīs atbalsta punkti, kāpjot kabīnē vai kravas nodalījumā. Nelec.' },
         {
           t: 'Tehnika zonā',
-          d: 'Iekrāvēji un konteineru pārvadātāji: acu kontakts ar vadītāju, pirms ej to ceļā.',
+          d: 'Iekrāvēji un konteineru portālceltņi: acu kontakts ar vadītāju, pirms ej to ceļā.',
         },
         {
           t: 'Ziņošana',
-          d: 'Ziņo par bīstamām situācijām un gandrīz notikušiem negadījumiem. Tā novērš nākamo traumu.',
+          d: 'Ziņo par bīstamām situācijām un gandrīz notikušiem negadījumiem. Tā var novērst nākamo traumu.',
         },
       ],
       ensiapu: [
         {
           t: 'Ārkārtas numurs',
-          d: '112. Pastāsti, kas un kur notika, atbildi uz jautājumiem. Nepārtrauc zvanu bez atļaujas.',
+          d: '112. Pastāsti, kas un kur notika, atbildi uz jautājumiem. Nenoliec klausuli, kamēr tev to nesaka.',
         },
         { t: 'Secība', d: 'Nodrošini vietu, novērtē, izsauc palīdzību, sniedz pirmo palīdzību.' },
         { t: 'Atdzīvināšana', d: 'Neelpo normāli: 30 kompresijas un 2 ieelpas, 100–120 minūtē.' },
@@ -403,7 +403,7 @@ export const lv = {
     'training.lcdDue': 'ATKĀRTOT {count}',
     'training.counts': 'Atkārtot: {due} · jauni: {fresh}',
     'training.progress': 'Jautājums {n} no {total}',
-    'training.score': 'Pareizi {right} no {total}. Zināšanu svaigums {fresh}%.',
+    'training.score': 'Pareizi {right} no {total}. Zināšanu svaigums {fresh} %.',
     'training.shift.continuous': 'Aptuveni {at} pēc maiņas sākuma nepārtraukta braukšana pārsniedza {limit} bez noteiktā pārtraukuma.',
     'training.shift.split': 'Šis pārtraukums tiek ieskaitīts tikai kā pirmā daļa. Pēc tā vajag vēl vismaz {second} pārtraukumu: secība ir vispirms {first}, tad {second}.',
     'training.shift.driveMismatch': 'Braukšana plānā: {planned}, uzdevumā vajag {required}.',
@@ -425,7 +425,7 @@ export const lv = {
     'training.axles.overTotal': 'Pilnā masa {load} t pārsniedz robežu {limit} t.',
     'training.axles.unplaced': 'Vēl jāiekrauj: {count}.',
     'training.axles.unloadLeft': 'Vēl jāizkrauj: {count}.',
-    'training.axles.driveLight': 'Uz dzenošās ass ir tikai {share}% no pilnās masas (vismaz {min}%): kalnā un uz ledus pietrūks saķeres.',
+    'training.axles.driveLight': 'Uz dzenošās ass ir tikai {share} % no pilnās masas (vismaz {min} %): kalnā un uz ledus pietrūks saķeres.',
     'training.axles.ok': 'Pārslodzes nav. Pilnā masa {total} t.',
     'training.inspect.score': 'Atrasti bojājumi: {found} no {total}.',
     'training.inspect.missedStop': 'Palaists garām bojājums, ar kuru braukt nedrīkst.',

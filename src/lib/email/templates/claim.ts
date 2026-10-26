@@ -22,7 +22,7 @@ const TEXT = {
       CARGO_DAMAGE: 'Lastin tai perävaunun vaurio',
       SHORTAGE: 'Vajaus',
       DOWNTIME: 'Odotusaika',
-      DEVIATION: 'Poikkeama reitistä tai ajasta',
+      DEVIATION: 'Poikkeama reitissä tai aikataulussa',
       OTHER: 'Muu',
     } satisfies Record<ClaimKind, string>,
     status: {
@@ -39,10 +39,10 @@ const TEXT = {
     } satisfies Record<ClaimEventKind, (ref: string) => string>,
     lead: {
       CREATED:
-        'Kuljetuksesta on tehty reklamaatio. RAHTIS käsittelee sen ja välittää osapuolten välillä.',
+        'Kuljetuksesta on tehty reklamaatio. RAHTIS käsittelee sen ja hoitaa viestit osapuolten välillä.',
       COMMENT:
-        'Reklamaatioon on tullut uusi viesti. Viestin voi lukea ja siihen voi vastata omilla sivuilla.',
-      ATTACHMENT: 'Reklamaatioon on liitetty uusi tiedosto.',
+        'Reklamaatioon on tullut uusi viesti. Voitte lukea sen ja vastata siihen RAHTIKSESSA.',
+      ATTACHMENT: 'Reklamaatioon on lisätty uusi tiedosto.',
       STATUS: 'Reklamaation tila on muuttunut.',
     } satisfies Record<ClaimEventKind, string>,
     claim: 'Reklamaatio',
@@ -52,15 +52,15 @@ const TEXT = {
     resolution: 'Ratkaisu',
     button: 'Avaa reklamaatio',
     operatorLead: 'Uusi reklamaatio odottaa käsittelyä.',
-    filedBy: 'Tekijä',
+    filedBy: 'Reklamaation tekijä',
     party: { SHIPPER: 'Tilaaja', CARRIER: 'Kuljetusliike', ADMIN: 'RAHTIS' },
   },
   en: {
     kind: {
       CARGO_DAMAGE: 'Cargo or trailer damage',
       SHORTAGE: 'Shortage',
-      DOWNTIME: 'Downtime',
-      DEVIATION: 'Route or time deviation',
+      DOWNTIME: 'Waiting time',
+      DEVIATION: 'Route or schedule deviation',
       OTHER: 'Other',
     } satisfies Record<ClaimKind, string>,
     status: {
@@ -77,8 +77,8 @@ const TEXT = {
     } satisfies Record<ClaimEventKind, (ref: string) => string>,
     lead: {
       CREATED:
-        'A claim has been filed on a trip. RAHTIS reviews it and mediates between the parties.',
-      COMMENT: 'There is a new message in the claim. You can read and answer it in your account.',
+        'A claim has been filed for a trip. RAHTIS handles it and passes messages between the parties.',
+      COMMENT: 'There’s a new message in the claim. You can read it and reply in RAHTIS.',
       ATTACHMENT: 'A new file has been attached to the claim.',
       STATUS: 'The status of the claim has changed.',
     } satisfies Record<ClaimEventKind, string>,
@@ -175,9 +175,9 @@ const MIRROR = {
     heading: (order: string) => `Reklamaatio kuljetuksesta ${order}`,
     lead: {
       SHIPPER: (order: string) =>
-        `Aivomaa Oy välittää teille kuljetusta ${order} koskevan reklamaation. Tilaaja on esittänyt sen Aivomaa Oy:lle sopimuskumppaninaan, ja Aivomaa Oy käsittelee asian kanssanne.`,
+        `Välitämme teille reklamaation, joka koskee kuljetusta ${order}. Tilaaja on tehnyt sen meille, Aivomaa Oy:lle, ja käsittelemme asian kanssanne.`,
       CARRIER: (order: string) =>
-        `Aivomaa Oy välittää teille kuljetusta ${order} koskevan reklamaation. Kuljetuksen suorittaja on esittänyt sen Aivomaa Oy:lle, ja Aivomaa Oy käsittelee asian kanssanne.`,
+        `Välitämme teille reklamaation, joka koskee kuljetusta ${order}. Kuljetuksen ajanut kuljetusliike on tehnyt sen meille, Aivomaa Oy:lle, ja käsittelemme asian kanssanne.`,
     },
     description: 'Kuvaus',
     route: 'Reitti',
@@ -186,19 +186,19 @@ const MIRROR = {
     place: 'Missä tapahtui',
     amount: 'Vaadittu summa (veroton)',
     files: 'Liitteet',
-    filesAttached: (n: number) => `${n} kpl, liitteenä`,
+    filesAttached: (n: number) => `${n} kpl liitteenä`,
     reply: (operator: string, ref: string) =>
-      `Vastatkaa suoraan tähän viestiin: vastaus tulee RAHTIS-operaattorille osoitteeseen ${operator}. Asian käsittely jatkuu sähköpostitse — säilyttäkää otsikossa reklamaation numero ${ref}. Reklamaation tilan ja ratkaisun näette myös palvelussa.`,
-    button: 'Avaa reklamaatio palvelussa',
+      `Vastatkaa suoraan tähän viestiin – vastaus menee RAHTIKSEN asiakaspalveluun (${operator}). Hoidamme asian sähköpostitse, joten pitäkää reklamaation numero ${ref} viestin otsikossa. Reklamaation tilan ja ratkaisun näette myös RAHTIKSESSA.`,
+    button: 'Avaa reklamaatio',
   },
   en: {
     subject: (ref: string, order: string) => `RAHTIS · claim ${ref} · trip ${order}`,
     heading: (order: string) => `Claim on trip ${order}`,
     lead: {
       SHIPPER: (order: string) =>
-        `Aivomaa Oy forwards to you a claim concerning trip ${order}. The shipper has presented it to Aivomaa Oy as its contracting party, and Aivomaa Oy handles the matter with you.`,
+        `We are forwarding you a claim about trip ${order}. The shipper filed it with us, Aivomaa Oy, and we will handle it with you.`,
       CARRIER: (order: string) =>
-        `Aivomaa Oy forwards to you a claim concerning trip ${order}. The performing carrier has presented it to Aivomaa Oy, and Aivomaa Oy handles the matter with you.`,
+        `We are forwarding you a claim about trip ${order}. The carrier who ran the trip filed it with us, Aivomaa Oy, and we will handle it with you.`,
     },
     description: 'Description',
     route: 'Route',
@@ -207,10 +207,10 @@ const MIRROR = {
     place: 'Where it happened',
     amount: 'Amount claimed (excl. VAT)',
     files: 'Attachments',
-    filesAttached: (n: number) => `${n}, attached`,
+    filesAttached: (n: number) => `${n} attached`,
     reply: (operator: string, ref: string) =>
-      `Reply directly to this email: your answer goes to the RAHTIS operator at ${operator}. The matter continues by email — please keep the claim number ${ref} in the subject. You can also see the claim's status and resolution in the service.`,
-    button: 'Open the claim in the service',
+      `Just reply to this email – your reply goes to RAHTIS support (${operator}). We’ll handle this by email, so please keep claim number ${ref} in the subject line. You can also follow the claim’s status and resolution in RAHTIS.`,
+    button: 'Open claim',
   },
 } as const;
 

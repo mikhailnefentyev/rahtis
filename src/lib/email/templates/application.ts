@@ -189,9 +189,9 @@ export function applicationFiledEmail(input: {
    */
   const verdict = `${input.registryName}: ${{
     OK: 'kaikki täsmää',
-    ATTENTION: 'tarkistettavaa',
-    NOT_FOUND: input.registryName === 'PRH' ? 'ei avoimessa datassa' : 'ei löydy',
-    ERROR: 'ei vastausta',
+    ATTENTION: 'vaatii tarkistusta',
+    NOT_FOUND: input.registryName === 'PRH' ? 'ei löydy avoimesta datasta' : 'ei löydy',
+    ERROR: 'ei vastannut',
   }[r.verdict]}`;
   const yes = (value: boolean | null) => (value === null ? '–' : value ? 'kyllä' : 'EI');
 
@@ -229,10 +229,10 @@ export function applicationFiledEmail(input: {
     {
       kind: 'text',
       value:
-        'Avoin data ei kerro yrityksen vastuuhenkilöitä: se, että hakija edustaa yritystä, tarkistetaan edelleen käsin. Yrityksen tiedot rekisterissä: ' +
+        'Avoimesta datasta ei näe yrityksen vastuuhenkilöitä, joten tarkista itse, että hakija todella edustaa yritystä. Yritys rekisterissä: ' +
         input.registryLink,
     },
-    { kind: 'button', label: 'Avaa tarkastusjono', href: input.queueLink },
+    { kind: 'button', label: 'Avaa hakemusjono', href: input.queueLink },
   ];
 
   return {

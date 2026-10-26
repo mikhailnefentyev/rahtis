@@ -62,7 +62,7 @@ export function supportEmail(input: {
       rows: [
         ['Yritys', input.companyName],
         ['Rooli', input.role],
-        ['Osoite', input.fromEmail],
+        ['Sähköposti', input.fromEmail],
       ],
     },
     { kind: 'text', value: input.body },

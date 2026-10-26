@@ -216,52 +216,52 @@ type Texts = {
 };
 
 const fi: Texts = {
-  signature: 'Rahtis Team',
-  neverAsk: 'Emme koskaan kysy salasanaasi sähköpostitse emmekä puhelimessa.',
+  signature: 'RAHTIS-tiimi',
+  neverAsk: 'Emme koskaan kysy salasanaanne sähköpostitse emmekä puhelimitse.',
   brandTagline: 'Irtoperät ja kontit · Pohjois-Eurooppa',
 
   greeting: 'Hei,',
 
   memberInvite: {
-    subject: (company) => `RAHTIS · ${company} lisäsi sinut käyttäjäksi`,
-    heading: (company) => `${company} kutsuu sinut RAHTIS-palveluun`,
-    preheader: 'Aseta salasana ja kirjaudu sisään.',
+    subject: (company) => `RAHTIS · ${company} lisäsi teidät käyttäjäksi`,
+    heading: (company) => `${company} kutsuu teidät RAHTIS-palveluun`,
+    preheader: 'Asettakaa salasana ja kirjautukaa sisään.',
     body: (company) =>
-      `${company} on lisännyt sinut yrityksen käyttäjäksi RAHTIS-palveluun. ` +
-      'Saat omat henkilökohtaiset tunnukset: aseta salasana alla olevasta linkistä, niin pääset kirjautumaan sisään.',
+      `${company} on lisännyt teidät yrityksen käyttäjäksi RAHTIS-palveluun. ` +
+      'Saatte omat henkilökohtaiset tunnukset: asettakaa salasana alla olevasta linkistä, niin pääsette kirjautumaan sisään.',
     button: 'Aseta salasana',
     note:
       'Linkki on kertakäyttöinen ja voimassa vuorokauden. ' +
-      'Jos se ehtii vanhentua, pyydä uusi kutsu yrityksenne pääkäyttäjältä. Jos ette odottaneet tätä viestiä, voitte jättää sen huomiotta.',
+      'Jos se ehtii vanhentua, pyytäkää uusi kutsu yrityksenne pääkäyttäjältä. Jos ette odottaneet tätä viestiä, voitte jättää sen huomiotta.',
   },
 
   invite: {
     heading: (company) => `${company} on hyväksytty RAHTIS-palveluun`,
     subject: (company) => `RAHTIS · tunnukset yritykselle ${company}`,
-    preheader: 'Aseta salasana ja kirjaudu sisään.',
+    preheader: 'Asettakaa salasana ja kirjautukaa sisään.',
     body:
-      'Yrityksenne tiedot on tarkistettu ja pääsy palveluun on avattu. ' +
-      'Aseta salasana alla olevasta linkistä, niin pääset kirjautumaan sisään.',
+      'Olemme tarkistaneet yrityksenne tiedot ja avanneet teille pääsyn palveluun. ' +
+      'Asettakaa salasana alla olevasta linkistä, niin pääsette kirjautumaan sisään.',
     button: 'Aseta salasana',
     note: (operator) =>
       'Linkki on kertakäyttöinen ja voimassa vuorokauden. ' +
-      `Jos se ehtii vanhentua, pyydä uusi osoitteesta ${operator}.`,
+      `Jos se ehtii vanhentua, pyytäkää uusi osoitteesta ${operator}.`,
   },
 
   shipperInvite: {
     subject: (carrier) => `${carrier} kutsuu teidät RAHTIS-palveluun`,
     heading: (carrier) => `${carrier} kutsuu teidät RAHTIKSEEN`,
-    preheader: 'Tilatkaa kuljetukset suoraan tutulta kuljetusliikkeeltä yhdessä paikassa.',
+    preheader: 'Tilatkaa kuljetukset suoraan tutulta kuljetusliikkeeltä, kaikki yhdessä paikassa.',
     body: (carrier) =>
       `Kuljetusliikkeenne ${carrier} käyttää RAHTIS-palvelua ja kutsuu teidät tilaamaan kuljetukset sen kautta.`,
     points: [
       'Suora tilaus tutulle autolle muutamalla napautuksella.',
-      'Seuraatte ajoa: saapumiset, kuittaukset, kuvat ja rahtikirjat samassa paikassa.',
-      'Tarvittaessa sama tilaus tarjouspöydälle muille kuljetusliikkeille.',
+      'Seuraatte kuljetusta: saapumiset, kuittaukset, kuvat ja rahtikirjat samassa paikassa.',
+      'Tarvittaessa saman tilauksen voi laittaa tarjouspöydälle muille kuljetusliikkeille.',
     ],
     button: 'Hae mukaan — tiedot on täytetty valmiiksi',
     note: (operator) =>
-      `Hakemus tarkistetaan ennen tunnusten lähettämistä. Jos ette odottaneet tätä viestiä, voitte jättää sen huomiotta tai kirjoittaa osoitteeseen ${operator}.`,
+      `Tarkistamme hakemuksen ennen kuin lähetämme tunnukset. Jos ette odottaneet tätä viestiä, voitte jättää sen huomiotta tai kirjoittaa osoitteeseen ${operator}.`,
   },
 
   carrierInvite: {
@@ -272,18 +272,18 @@ const fi: Texts = {
     points: [
       'Keikkoja tarjouspöydältä: perävaunujen vaihdot, kontit ja pikakuljetukset satamissa ja koko Suomessa.',
       'Kuljettajan sovellus kymmenellä kielellä: saapumiset, kuvat ja rahtikirjat ilman paperia.',
-      'Omat asiakkaat samaan paikkaan: 29,90 € kuukaudessa ajanutta autoa kohden, ensimmäinen kuukausi maksutta.',
+      'Omat asiakkaat samaan paikkaan: 29,90 € kuukaudessa jokaisesta ajossa olleesta autosta, ensimmäinen kuukausi maksutta.',
     ],
     button: 'Hae mukaan — tiedot on täytetty valmiiksi',
     note: (operator) =>
-      `Hakemus tarkistetaan ennen tunnusten lähettämistä. Jos ette odottaneet tätä viestiä, voitte jättää sen huomiotta tai kirjoittaa osoitteeseen ${operator}.`,
+      `Tarkistamme hakemuksen ennen kuin lähetämme tunnukset. Jos ette odottaneet tätä viestiä, voitte jättää sen huomiotta tai kirjoittaa osoitteeseen ${operator}.`,
   },
 
   ownTrack: {
     subject: (carrier, ref) => `${carrier} · kuljetus ${ref}`,
-    heading: (carrier) => `${carrier} on ottanut kuljetuksenne`,
-    preheader: 'Seuraa kuljetuksen etenemistä ja rahtikirjaa yhdestä linkistä.',
-    body: (carrier) => `${carrier} hoitaa kuljetuksenne ja jakaa sen etenemisen teille RAHTIS-palvelun kautta.`,
+    heading: (carrier) => `${carrier} hoitaa kuljetuksenne`,
+    preheader: 'Kuljetuksen eteneminen ja rahtikirja samasta linkistä.',
+    body: (carrier) => `${carrier} hoitaa kuljetuksenne. Näette sen etenemisen RAHTIS-palvelussa.`,
     route: (route) => `Reitti: ${route}`,
     button: 'Seuraa kuljetusta',
     note: (carrier) =>
@@ -293,13 +293,13 @@ const fi: Texts = {
   operatorInvite: {
     SHIPPER: {
       subject: 'RAHTIS — rahtipörssi ja suorat tilaukset omille kuljetusliikkeillenne, ensimmäinen kuukausi maksutta',
-      heading: 'Perävaunu, kontti, kuorma: julkaistaan kerran, seurataan vaihe vaiheelta',
-      preheader: 'Kuljetus kerran alueen tarkastetuille kuljetusliikkeille tai suoraan tutulle autolle — tarjoukset, eteneminen, kuvat ja rahtikirja yhdessä näkymässä.',
-      body: 'RAHTIS on kuljetusten hallintajärjestelmä ja rahtipörssi Pohjoismaissa, Baltiassa, Puolassa ja Saksassa. Julkaisette kuljetuksen kerran: se menee suoraan alueen hyväksytyille kuljetusliikkeille, tai lähetätte sen tutulle autolle. Perävaunujen vaihdot, kontit sekä pakettiauto- ja kuorma-autokuljetukset.',
+      heading: 'Perävaunu, kontti tai kuorma: julkaisette kerran ja seuraatte joka vaihetta',
+      preheader: 'Yksi julkaisu alueen hyväksytyille kuljetusliikkeille tai suoraan tutulle autolle — tarjoukset, eteneminen, kuvat ja rahtikirja yhdessä näkymässä.',
+      body: 'RAHTIS on kuljetusten hallintajärjestelmä ja rahtipörssi, joka toimii Pohjoismaissa, Baltiassa, Puolassa ja Saksassa. Julkaisette kuljetuksen kerran, ja se menee suoraan alueen hyväksytyille kuljetusliikkeille — tai lähetätte sen suoraan tutulle autolle. Perävaunujen vaihdot, kontit sekä pakettiauto- ja kuorma-autokuljetukset.',
       points: [
-        'Enintään kolme tarjousta samaan näkymään — valitsette hinnan, kaluston ja arvioiden perusteella. Hintaa ei huutokaupata alas.',
-        'Jos auto peruu tai ei vahvista, kuljetus palaa pöydälle itsestään ja menee heti seuraaville sopiville autoille.',
-        'Muutokset menevät suoraan kuljetusliikkeelle ja kuljettajalle; kuvat ja rahtikirja tulevat, kun keikka päättyy.',
+        'Enintään kolme tarjousta samassa näkymässä — valitsette hinnan, kaluston ja arvioiden perusteella. Hintaa ei huutokaupata alas.',
+        'Jos auto peruu tai ei vahvista, kuljetus palaa tarjouspöydälle automaattisesti ja menee heti seuraaville sopiville autoille.',
+        'Muutokset menevät suoraan kuljetusliikkeelle ja kuljettajalle; kuvat ja rahtikirja tulevat, kun kuljetus on perillä.',
         'Viikkoraportti ja maksuton rajapinta (API) omaan ERP- tai TMS-järjestelmäänne.',
         'Ensimmäinen kuukausi maksutta.',
       ],
@@ -308,72 +308,72 @@ const fi: Texts = {
     CARRIER: {
       subject: 'RAHTIS — kuljetusten hallinta ja rahtipörssi kuljetusliikkeelle, ensimmäinen kuukausi maksutta',
       heading: 'Kalusto hallintaan, vapaat autot ajoon',
-      preheader: 'Kalusto, kuljettajat ja omat asiakkaat yhdessä paikassa — ja keikkoja tarjouspöydältä, kun auto on vapaa.',
-      body: 'RAHTIS on kuljetusten hallintajärjestelmä ja rahtipörssi Pohjoismaissa, Baltiassa, Puolassa ja Saksassa. Hallitsette kalustoa, kuljettajia ja omia asiakkaitanne samassa paikassa ja saatte keikkoja tarjouspöydältä, kun auto on vapaa: perävaunujen vaihdot, kontit sekä pakettiauto- ja kuorma-autokuljetukset.',
+      preheader: 'Kalusto, kuljettajat ja omat asiakkaat yhdessä paikassa — ja keikkoja tarjouspöydältä, kun auto on vapaana.',
+      body: 'RAHTIS on kuljetusten hallintajärjestelmä ja rahtipörssi, joka toimii Pohjoismaissa, Baltiassa, Puolassa ja Saksassa. Hallitsette kalustoa, kuljettajia ja omia asiakkaitanne samassa paikassa ja saatte keikkoja tarjouspöydältä, kun auto on vapaana: perävaunujen vaihdot, kontit sekä pakettiauto- ja kuorma-autokuljetukset.',
       points: [
-        'Omat asiakkaat ja omat keikat: asiakas tilaa suoraan autollenne ja saa seurantalinkin. 29,90 € kuukaudessa ajanutta autoa kohden, ei prosenttia.',
+        'Omat asiakkaat ja omat keikat: asiakas tilaa suoraan autollenne ja saa seurantalinkin. 29,90 € kuukaudessa jokaisesta ajossa olleesta autosta, ei prosenttia.',
         'Kuljettajan sovellus kymmenellä kielellä: saapumiset, kuvat, työaika ja rahtikirja skannattuna PDF:ksi.',
-        'Keikkoja tarjouspöydältä satamista ja koko toiminta-alueelta. Alihankintana 3 % keikan hinnasta, ei kuukausimaksua.',
+        'Keikkoja tarjouspöydältä satamista ja koko toiminta-alueelta. Alihankintakeikoista 3 % keikan hinnasta, ei kuukausimaksua.',
       ],
       button: 'Hae mukaan',
     },
     note: (operator) =>
-      `Lähetimme tämän viestin yrityksenne julkiseen osoitteeseen. Jos ette halua viestejä meiltä, vastatkaa tähän viestiin, niin emme lähetä enempää. Kysymykset: ${operator}.`,
+      `Lähetimme tämän viestin yrityksenne julkiseen sähköpostiosoitteeseen. Jos ette halua viestejä meiltä, vastatkaa tähän viestiin, niin emme lähetä enempää. Kysymykset: ${operator}.`,
   },
 
   onboarding: {
     subject: {
       ACTIVATE: (company) => `RAHTIS · ${company}: kaksi minuuttia käyttöönottoon`,
-      SETUP: (company) => `RAHTIS · ${company}: lisää auto, niin tarjouspöytä aukeaa`,
+      SETUP: (company) => `RAHTIS · ${company}: lisätkää auto, niin tarjouspöytä aukeaa`,
       FIRST_ORDER: (company) => `RAHTIS · ${company}: ensimmäinen kuljetus`,
     },
     heading: {
       ACTIVATE: 'Yrityksenne on hyväksytty — viimeistellään käyttöönotto',
       SETUP: 'Tarjouspöytä on vielä kiinni',
-      FIRST_ORDER: 'Valmis ensimmäiseen kuljetukseen',
+      FIRST_ORDER: 'Valmiina ensimmäiseen kuljetukseen',
     },
     body: {
       ACTIVATE:
-        'Osoite haetaan valmiiksi kaupparekisteristä, kun se löytyy sieltä. Lisää tilinumero, tarkista tiedot ja hyväksy ehdot — sen jälkeen voitte ladata luvat ja lisätä autot.',
+        'Haemme osoitteen valmiiksi kaupparekisteristä, jos se löytyy sieltä. Lisätkää tilinumero, tarkistakaa tiedot ja hyväksykää ehdot — sen jälkeen voitte ladata luvat ja lisätä autot.',
       SETUP:
-        'Avoimet kuljetukset näkyvät, kun liikennelupa ja vakuutus on ladattu, vähintään yksi auto on hyväksytty ja autolla on kuljettaja. Kabinetin etusivu näyttää, mikä vaihe puuttuu.',
+        'Avoimet kuljetukset näkyvät, kun liikennelupa ja vakuutus on ladattu, vähintään yksi auto on hyväksytty ja autolla on kuljettaja. Omien sivujen etusivulta näette, mikä vaihe vielä puuttuu.',
       FIRST_ORDER:
-        'Julkaise kuljetus tarjouspöydälle tai lähetä se suoraan tutulle autolle. Näette etenemisen, kuvat ja rahtikirjan samassa paikassa.',
+        'Julkaiskaa kuljetus tarjouspöydälle tai lähettäkää se suoraan tutulle autolle. Näette etenemisen, kuvat ja rahtikirjan samassa paikassa.',
     },
     button: {
       ACTIVATE: 'Viimeistele käyttöönotto',
-      SETUP: 'Avaa kabinetti',
+      SETUP: 'Avaa omat sivut',
       FIRST_ORDER: 'Uusi tilaus',
     },
-    help: (operator) => `Jos jokin on epäselvää, vastaa tähän viestiin tai kirjoita osoitteeseen ${operator} — autamme mielellämme.`,
+    help: (operator) => `Jos jokin on epäselvää, vastatkaa tähän viestiin tai kirjoittakaa osoitteeseen ${operator} — autamme mielellämme.`,
   },
 
   recovery: {
     heading: 'Salasanan palautus',
     subject: 'RAHTIS · salasanan palautus',
-    preheader: 'Aseta uusi salasana vuorokauden sisällä.',
-    body: 'Pyysit uutta salasanaa RAHTIS-tunnuksellesi. Aseta se alla olevasta linkistä.',
+    preheader: 'Asettakaa uusi salasana vuorokauden sisällä.',
+    body: 'Pyysitte uutta salasanaa RAHTIS-tunnuksellenne. Asettakaa se alla olevasta linkistä.',
     button: 'Aseta uusi salasana',
     note:
       'Linkki on kertakäyttöinen ja voimassa vuorokauden. ' +
-      'Jos et pyytänyt uutta salasanaa, voit jättää viestin huomiotta — ' +
-      'salasanasi ei muutu ennen kuin linkkiä käytetään.',
+      'Jos ette pyytäneet uutta salasanaa, voitte jättää viestin huomiotta — ' +
+      'salasananne ei muutu, ellei linkkiä käytetä.',
   },
 
   application: {
     heading: 'Hakemuksenne on vastaanotettu',
     subject: (company) => `RAHTIS · hakemus vastaanotettu — ${company}`,
-    preheader: 'Hakemus on kirjattu ja siirtynyt tarkastukseen.',
+    preheader: 'Hakemus on kirjattu ja odottaa tarkistusta.',
     thanks:
-      'Kiitos hakemuksesta. Se on kirjattu ja siirtynyt tarkastukseen: ' +
+      'Kiitos hakemuksesta. Se on kirjattu ja odottaa tarkistusta: ' +
       'käymme yrityksenne tiedot läpi PRH:n ja YTJ:n rekistereistä.',
     next:
       'Kun hakemus on hyväksytty, lähetämme tähän samaan osoitteeseen linkin, ' +
-      'jolla asetat salasanan ja pääset kirjautumaan sisään. Sitä ennen ' +
+      'jolla asetatte salasanan ja pääsette kirjautumaan sisään. Sitä ennen ' +
       'palveluun ei pääse kirjautumaan.',
     note: (operator) =>
-      'Tarkastuksen tekee ihminen, joten vastaus tulee arkipäivien aikana. ' +
-      `Jos jokin tiedoista on väärin tai haluat kysyä hakemuksesta, vastaa tähän viestiin tai kirjoita osoitteeseen ${operator}.`,
+      'Hakemuksen tarkistaa ihminen, joten vastaus tulee arkipäivisin. ' +
+      `Jos jokin tiedoista on väärin tai haluatte kysyä hakemuksesta, vastatkaa tähän viestiin tai kirjoittakaa osoitteeseen ${operator}.`,
     fieldCompany: 'Yritys',
     fieldBusinessId: 'Y-tunnus',
     fieldRole: 'Rooli',
@@ -385,16 +385,16 @@ const fi: Texts = {
     subject: (company) => `RAHTIS · päätös hakemuksesta — ${company}`,
     preheader: 'Hakemuksenne on käsitelty.',
     note: (operator) =>
-      `Jos haluat kysyä päätöksestä, vastaa tähän viestiin tai kirjoita osoitteeseen ${operator}.`,
+      `Jos haluatte kysyä päätöksestä, vastatkaa tähän viestiin tai kirjoittakaa osoitteeseen ${operator}.`,
   },
 
   dispatch: {
     subject: (ref, from, to) => `RAHTIS · uusi kuljetus ${ref} · ${from} → ${to}`,
     heading: (from, to) => `Uusi kuljetus: ${from} → ${to}`,
-    preheader: (ref) => `Kuljetus ${ref} on avoimena tarjouspöydällä.`,
-    lead: 'Kuljetus on avoinna tarjouspöydällä. Ensimmäiset kolme tarjousta pääsevät mukaan.',
+    preheader: (ref) => `Kuljetus ${ref} on avoinna tarjouspöydällä.`,
+    lead: 'Kuljetus on avoinna tarjouspöydällä. Kolme ensimmäistä tarjousta pääsee mukaan.',
     button: 'Avaa tarjouspöytä',
-    note: 'Saat tämän viestin, koska yritykselläsi on hyväksytty auto palvelussa.',
+    note: 'Saatte tämän viestin, koska yrityksellänne on palvelussa hyväksytty auto.',
     fieldOrder: 'Kuljetus',
     fieldPickup: 'Nouto',
     fieldRoute: 'Reitti',
@@ -408,18 +408,18 @@ const fi: Texts = {
     heading: (plate) => `Suora tilaus autolle ${plate}`,
     preheader: (shipper) => `${shipper} lähetti kuljetuksen suoraan autollenne.`,
     lead: (shipper) =>
-      `${shipper} lähetti kuljetuksen suoraan autollenne ohi yhteisen pöydän. Määräaikaa ei ole: kuljetus odottaa, kunnes te tai kuljettaja vahvistatte sen. Jos kieltäydytte, kuljetus siirtyy yhteiselle pöydälle.`,
+      `${shipper} lähetti kuljetuksen suoraan autollenne, ohi tarjouspöydän. Määräaikaa ei ole: kuljetus odottaa, kunnes te tai kuljettaja vahvistatte sen. Jos kieltäydytte, kuljetus siirtyy tarjouspöydälle.`,
     button: 'Vahvista tai kieltäydy',
-    note: 'Saat tämän viestin, koska olet sallinut tälle tilaajalle suorat tilaukset. Luvan voi perua Asiakkaat-sivulla.',
+    note: 'Saatte tämän viestin, koska olette sallineet tälle tilaajalle suorat tilaukset. Luvan voi perua Asiakkaat-sivulla.',
   },
 
   certificate: {
     subject: (driver, type) => `${driver}: ${type} vanhenee pian`,
-    heading: (driver) => `Kuljettajan ${driver} pätevyys vanhenee`,
+    heading: (driver) => `Kuljettajan ${driver} pätevyys on vanhenemassa`,
     preheader: (type, date) => `${type} on voimassa ${date} asti.`,
-    lead: (driver, type, date) => `Kuljettajan ${driver} ${type} on voimassa ${date} asti. Varmista uusiminen ajoissa, jotta kuljettaja voi jatkaa keikkoja.`,
-    button: 'Avaa kuljettajan kortti',
-    note: 'Kun pätevyys on uusittu, päivitä uusi päättymispäivä kuljettajan korttiin tai pyydä kuljettajaa tekemään se sovelluksessa.',
+    lead: (driver, type, date) => `Kuljettajan ${driver} ${type} on voimassa ${date} asti. Huolehtikaa, että se uusitaan ajoissa, jotta kuljettaja voi jatkaa ajoja.`,
+    button: 'Avaa kuljettajan tiedot',
+    note: 'Kun pätevyys on uusittu, päivittäkää uusi päättymispäivä kuljettajan tietoihin tai pyytäkää kuljettajaa tekemään se sovelluksessa.',
   },
 
   billing: {
@@ -433,8 +433,8 @@ const fi: Texts = {
     settledHeading: (ref) => `Tilitys kuljetuksesta ${ref}`,
     settledLead: (vat) =>
       vat
-        ? `Kuljetuksesta on maksettu tilitys. Maksaja on Aivomaa Oy (RAHTIS); summaan sisältyy arvonlisävero ${vat}.`
-        : 'Kuljetuksesta on maksettu tilitys. Maksaja on Aivomaa Oy (RAHTIS). Käännetty verovelvollisuus: summa on alv 0 %.',
+        ? `Kuljetuksen tilitys on maksettu. Maksaja on Aivomaa Oy (RAHTIS); summaan sisältyy arvonlisävero ${vat}.`
+        : 'Kuljetuksen tilitys on maksettu. Maksaja on Aivomaa Oy (RAHTIS). Käännetty verovelvollisuus: summa on ALV 0 %.',
     preheader: (amount) => `Summa ${amount}.`,
     fieldOrder: 'Kuljetus',
     fieldAmount: 'Veroton summa',
@@ -446,14 +446,14 @@ const fi: Texts = {
     fieldBusinessId: 'Y-tunnus',
     fieldVatNumber: 'ALV-tunniste',
     fieldAddress: 'Osoite',
-    fieldAccount: 'Tili',
-    fieldReference: 'Viite',
+    fieldAccount: 'Tilinumero',
+    fieldReference: 'Viitenumero',
     questions: (operator) => `Kysymykset: ${operator}`,
   },
 };
 
 const en: Texts = {
-  signature: 'Rahtis Team',
+  signature: 'The RAHTIS team',
   neverAsk: 'We never ask for your password by email or over the phone.',
   brandTagline: 'Trailers and containers · Northern Europe',
 
@@ -464,22 +464,22 @@ const en: Texts = {
     heading: (company) => `${company} invites you to RAHTIS`,
     preheader: 'Set a password and sign in.',
     body: (company) =>
-      `${company} has added you as a user of the company in RAHTIS. ` +
-      'You get your own personal credentials: set a password from the link below and you can sign in.',
-    button: 'Set a password',
+      `${company} has added you as a user of its RAHTIS account. ` +
+      'You get your own personal login: set a password using the link below, and then you can sign in.',
+    button: 'Set password',
     note:
-      'The link is single-use and valid for 24 hours. ' +
-      'If it expires, ask your company\u2019s main user for a new invitation. If you were not expecting this message, you can ignore it.',
+      'The link works once and is valid for 24 hours. ' +
+      'If it expires, ask your company’s main user for a new invitation. If you weren’t expecting this email, you can ignore it.',
   },
 
   invite: {
     heading: (company) => `${company} has been approved for RAHTIS`,
-    subject: (company) => `RAHTIS · credentials for ${company}`,
+    subject: (company) => `RAHTIS · login for ${company}`,
     preheader: 'Set a password and sign in.',
     body:
-      'We have checked your company details and opened access to the service. ' +
-      'Set a password from the link below and you can sign in.',
-    button: 'Set a password',
+      'We have checked your company details and opened your access to the service. ' +
+      'Set a password using the link below, and then you can sign in.',
+    button: 'Set password',
     note: (operator) =>
       'The link works once and is valid for 24 hours. ' +
       `If it expires, ask for a new one at ${operator}.`,
@@ -488,128 +488,128 @@ const en: Texts = {
   shipperInvite: {
     subject: (carrier) => `${carrier} invites you to RAHTIS`,
     heading: (carrier) => `${carrier} invites you to RAHTIS`,
-    preheader: 'Order transports directly from a carrier you know, all in one place.',
-    body: (carrier) => `Your carrier ${carrier} uses RAHTIS and invites you to order your transports through it.`,
+    preheader: 'Book transport directly with a carrier you know, all in one place.',
+    body: (carrier) => `Your carrier ${carrier} uses RAHTIS and invites you to book your transport through it.`,
     points: [
-      'A direct order to a known vehicle in a few taps.',
-      'Follow the trip: arrivals, confirmations, photos and consignment notes in one place.',
-      'When needed, the same order can go to the load board for other carriers.',
+      'Book a truck you know directly in a few taps.',
+      'Follow each shipment: arrivals, sign-offs, photos and consignment notes in one place.',
+      'If needed, send the same order to the load board for other carriers.',
     ],
-    button: 'Apply — the details are already filled in',
+    button: 'Apply — your details are already filled in',
     note: (operator) =>
-      `The application is checked before credentials are sent. If you did not expect this message, you can ignore it or write to ${operator}.`,
+      `We check each application before sending a login. If you weren’t expecting this email, you can ignore it or write to ${operator}.`,
   },
 
   carrierInvite: {
-    subject: (carrier) => `${carrier} invites your transport company to RAHTIS`,
+    subject: (carrier) => `${carrier} invites your haulage company to RAHTIS`,
     heading: (carrier) => `${carrier} invites you to RAHTIS`,
-    preheader: 'Fleet, drivers and your own customers in one place — and jobs from the offer table.',
-    body: (carrier) => `${carrier} uses RAHTIS and invites your transport company to join.`,
+    preheader: 'Fleet, drivers and your own customers in one place — plus jobs from the load board.',
+    body: (carrier) => `${carrier} uses RAHTIS and invites your haulage company to join.`,
     points: [
-      'Jobs from the offer table: trailer swaps, containers and express transport in ports and across Finland.',
-      'A driver app in ten languages: arrivals, photos and consignment notes without paper.',
-      'Your own clients in the same place: €29.90 a month per vehicle that drove, first month free.',
+      'Jobs from the load board: trailer swaps, containers and express runs in ports and across Finland.',
+      'A driver app in ten languages: arrivals, photos and consignment notes, no paper.',
+      'Your own customers in the same place: €29.90 a month for each truck that was on the road, first month free.',
     ],
-    button: 'Apply — the details are already filled in',
+    button: 'Apply — your details are already filled in',
     note: (operator) =>
-      `The application is checked before credentials are sent. If you did not expect this message, you can ignore it or write to ${operator}.`,
+      `We check each application before sending a login. If you weren’t expecting this email, you can ignore it or write to ${operator}.`,
   },
 
   ownTrack: {
-    subject: (carrier, ref) => `${carrier} · transport ${ref}`,
-    heading: (carrier) => `${carrier} has taken your transport`,
-    preheader: 'Follow the transport and its consignment note from one link.',
-    body: (carrier) => `${carrier} is handling your transport and shares its progress with you through RAHTIS.`,
+    subject: (carrier, ref) => `${carrier} · shipment ${ref}`,
+    heading: (carrier) => `${carrier} is handling your shipment`,
+    preheader: 'Shipment progress and consignment note in one link.',
+    body: (carrier) => `${carrier} is handling your shipment. You can follow its progress in RAHTIS.`,
     route: (route) => `Route: ${route}`,
-    button: 'Follow the transport',
+    button: 'Track shipment',
     note: (carrier) =>
-      `The link works without an account. Questions about the transport: ${carrier}. If you did not expect this message, you can ignore it.`,
+      `The link works without an account. Questions about the shipment: ${carrier}. If you weren’t expecting this email, you can ignore it.`,
   },
 
   operatorInvite: {
     SHIPPER: {
       subject: 'RAHTIS — freight exchange and direct orders to your own carriers, first month free',
-      heading: 'Trailer, container, load: published once, followed step by step',
-      preheader: 'One job to the approved carriers in the area or straight to a truck you know — offers, progress, photos and CMR in one view.',
-      body: 'RAHTIS is a transport management system and freight exchange for the Nordics, the Baltics, Poland and Germany. You publish a job once: it goes straight to approved carriers in the area, or you send it to a truck you know. Trailer swaps, containers, and van and truck loads.',
+      heading: 'Trailer, container or load: post it once, follow every step',
+      preheader: 'One posting to approved carriers in the area, or straight to a truck you know — offers, progress, photos and consignment note in one view.',
+      body: 'RAHTIS is a transport management system and freight exchange covering the Nordics, the Baltics, Poland and Germany. You post a job once and it goes straight to approved carriers in the area — or you send it directly to a truck you know. Trailer swaps, containers, and van and truck loads.',
       points: [
-        'Up to three offers in the same view — you pick on price, equipment and ratings. We do not auction the price down.',
-        'If a truck cancels or does not confirm, the job returns to the board on its own and reaches the next suitable trucks right away.',
-        'Changes go straight to the carrier and the driver; photos and the CMR note arrive as the job closes.',
+        'Up to three offers in one view — you choose on price, equipment and ratings. No auctions driving the price down.',
+        'If a truck cancels or doesn’t confirm, the job goes back on the load board automatically and reaches the next suitable trucks straight away.',
+        'Changes go straight to the carrier and the driver; photos and the consignment note arrive when the delivery is done.',
         'A weekly report and a free API for your own ERP or TMS.',
         'First month free.',
       ],
       button: 'Apply',
     },
     CARRIER: {
-      subject: 'RAHTIS — transport management and a freight exchange for your transport company, first month free',
-      heading: 'Your fleet under control, free trucks back on the road',
-      preheader: 'Fleet, drivers and your own customers in one place — and jobs from the offer table when a truck is free.',
-      body: 'RAHTIS is a transport management system and freight exchange for the Nordics, the Baltics, Poland and Germany. You run your fleet, drivers and own customers in one place and take jobs from the offer table when a truck is free: trailer swaps, containers, and van and truck loads.',
+      subject: 'RAHTIS — transport management and freight exchange for haulage companies, first month free',
+      heading: 'Your fleet under control, idle trucks back on the road',
+      preheader: 'Fleet, drivers and your own customers in one place — plus jobs from the load board when a truck is free.',
+      body: 'RAHTIS is a transport management system and freight exchange covering the Nordics, the Baltics, Poland and Germany. You manage your fleet, drivers and customers in one place and pick up jobs from the load board when a truck is free: trailer swaps, containers, and van and truck loads.',
       points: [
-        'Your own customers and own jobs: a customer orders straight to your truck and gets a tracking link. €29.90 a month per vehicle that drove, no percentage.',
-        'A driver app in ten languages: arrivals, photos, working time and the consignment note scanned to PDF.',
-        'Jobs from the offer table, from ports and across the whole operating area. As a subcontractor you pay 3 % of the job price, with no monthly fee.',
+        'Your own customers and your own jobs: the customer books your truck directly and gets a tracking link. €29.90 a month for each truck that was on the road, no percentage.',
+        'A driver app in ten languages: arrivals, photos, working hours and the consignment note scanned to PDF.',
+        'Jobs from the load board, from ports and across your whole operating area. Subcontracted jobs cost 3% of the job price, with no monthly fee.',
       ],
       button: 'Apply',
     },
     note: (operator) =>
-      `We sent this message to your company's public address. If you do not want messages from us, reply to this message and we will not send more. Questions: ${operator}.`,
+      `We sent this email to your company’s public email address. If you don’t want to hear from us, reply to this email and we won’t write again. Questions: ${operator}.`,
   },
 
   onboarding: {
     subject: {
       ACTIVATE: (company) => `RAHTIS · ${company}: two minutes to get started`,
-      SETUP: (company) => `RAHTIS · ${company}: add a vehicle to open the load board`,
-      FIRST_ORDER: (company) => `RAHTIS · ${company}: your first transport`,
+      SETUP: (company) => `RAHTIS · ${company}: add a truck to open the load board`,
+      FIRST_ORDER: (company) => `RAHTIS · ${company}: your first transport order`,
     },
     heading: {
-      ACTIVATE: 'Your company is approved — let us finish the setup',
+      ACTIVATE: 'Your company is approved — let’s finish the setup',
       SETUP: 'The load board is still closed',
-      FIRST_ORDER: 'Ready for your first transport',
+      FIRST_ORDER: 'Ready for your first transport order',
     },
     body: {
       ACTIVATE:
-        'The address is filled in from the trade register when it is found there. Add your account number, check the details and accept the terms — after that you can upload licences and add vehicles.',
+        'We fill in your address from the trade register if it’s listed there. Add your bank account number, check the details and accept the terms — then you can upload your licences and add your trucks.',
       SETUP:
-        'Open transports become visible once the operating licence and insurance are uploaded, at least one vehicle is approved and the vehicle has a driver. The cabinet home page shows which step is missing.',
+        'Open jobs become visible once your operator licence and insurance are uploaded, at least one truck is approved and that truck has a driver. The home page of your account shows which step is still missing.',
       FIRST_ORDER:
-        'Publish a transport on the load board or send it directly to a known vehicle. You see the progress, photos and consignment note in one place.',
+        'Post a transport on the load board or send it directly to a truck you know. You see the progress, photos and consignment note in one place.',
     },
     button: {
       ACTIVATE: 'Finish setup',
-      SETUP: 'Open the cabinet',
+      SETUP: 'Open my account',
       FIRST_ORDER: 'New order',
     },
-    help: (operator) => `If anything is unclear, reply to this message or write to ${operator} — we are happy to help.`,
+    help: (operator) => `If anything is unclear, reply to this email or write to ${operator} — we’re happy to help.`,
   },
 
   recovery: {
     heading: 'Password reset',
     subject: 'RAHTIS · password reset',
     preheader: 'Set a new password within 24 hours.',
-    body: 'You asked for a new password for your RAHTIS account. Set it from the link below.',
-    button: 'Set a new password',
+    body: 'You asked for a new password for your RAHTIS account. Set it using the link below.',
+    button: 'Set new password',
     note:
       'The link works once and is valid for 24 hours. ' +
-      'If you did not ask for a new password, you can ignore this message — ' +
-      'your password does not change until the link is used.',
+      'If you didn’t ask for a new password, you can ignore this email — ' +
+      'your password won’t change unless the link is used.',
   },
 
   application: {
     heading: 'We have received your application',
     subject: (company) => `RAHTIS · application received — ${company}`,
-    preheader: 'The application is logged and under review.',
+    preheader: 'Your application is logged and waiting for review.',
     thanks:
-      'Thank you for your application. It has been logged and is now under review: ' +
-      'we check company details against the Finnish PRH and YTJ registers.',
+      'Thank you for your application. It has been logged and is waiting for review: ' +
+      'we check your company details against the Finnish PRH and YTJ registers.',
     next:
-      'Once the application is approved we will send a link to this same address, ' +
-      'where you set a password and can sign in. Until then the service cannot be ' +
-      'signed into.',
+      'Once the application is approved, we will send a link to this same address ' +
+      'where you can set a password and sign in. Until then, you ' +
+      'can’t sign in to the service.',
     note: (operator) =>
-      'A person does the review, so the answer comes during business days. ' +
-      `If any of the details are wrong, or you want to ask about the application, reply to this message or write to ${operator}.`,
+      'A person reviews every application, so we reply on business days. ' +
+      `If any of the details are wrong, or you have a question about the application, reply to this email or write to ${operator}.`,
     fieldCompany: 'Company',
     fieldBusinessId: 'Business ID',
     fieldRole: 'Role',
@@ -619,19 +619,19 @@ const en: Texts = {
   rejected: {
     heading: 'Decision on your application',
     subject: (company) => `RAHTIS · decision on your application — ${company}`,
-    preheader: 'Your application has been processed.',
+    preheader: 'Your application has been reviewed.',
     note: (operator) =>
-      `If you have questions about the decision, reply to this message or write to ${operator}.`,
+      `If you have questions about the decision, reply to this email or write to ${operator}.`,
   },
 
   dispatch: {
-    subject: (ref, from, to) => `RAHTIS · new transport ${ref} · ${from} → ${to}`,
-    heading: (from, to) => `New transport: ${from} → ${to}`,
-    preheader: (ref) => `Transport ${ref} is open on the load board.`,
-    lead: 'This transport is open on the load board. The first three offers get in.',
-    button: 'Open the load board',
-    note: 'You are getting this because your company has an approved vehicle on the platform.',
-    fieldOrder: 'Transport',
+    subject: (ref, from, to) => `RAHTIS · new job ${ref} · ${from} → ${to}`,
+    heading: (from, to) => `New job: ${from} → ${to}`,
+    preheader: (ref) => `Job ${ref} is open on the load board.`,
+    lead: 'This job is open on the load board. The first three offers get through.',
+    button: 'Open load board',
+    note: 'You’re getting this email because your company has an approved truck on RAHTIS.',
+    fieldOrder: 'Job',
     fieldPickup: 'Pickup',
     fieldRoute: 'Route',
     fieldUnit: 'Unit',
@@ -642,37 +642,37 @@ const en: Texts = {
   direct: {
     subject: (ref, plate) => `RAHTIS · direct order ${ref} for ${plate}`,
     heading: (plate) => `Direct order for ${plate}`,
-    preheader: (shipper) => `${shipper} sent a transport straight to your vehicle.`,
+    preheader: (shipper) => `${shipper} sent a job straight to your truck.`,
     lead: (shipper) =>
-      `${shipper} sent this transport straight to your vehicle, bypassing the load board. There is no deadline: it waits until you or the driver confirm it. If you decline, it goes to the load board.`,
+      `${shipper} sent this job straight to your truck, bypassing the load board. There is no deadline: it waits until you or the driver confirm it. If you decline, it goes to the load board.`,
     button: 'Confirm or decline',
-    note: 'You are getting this because you allowed this shipper to send you direct orders. You can withdraw that on the Customers page.',
+    note: 'You’re getting this email because you allowed this shipper to send you direct orders. You can turn that off on the Customers page.',
   },
 
   certificate: {
     subject: (driver, type) => `${driver}: ${type} expires soon`,
-    heading: (driver) => `A qualification of ${driver} is expiring`,
+    heading: (driver) => `A qualification of ${driver} is about to expire`,
     preheader: (type, date) => `${type} is valid until ${date}.`,
-    lead: (driver, type, date) => `The ${type} of ${driver} is valid until ${date}. Make sure it is renewed in time so the driver can keep taking jobs.`,
-    button: 'Open the driver card',
-    note: 'Once it is renewed, update the new expiry date on the driver card, or ask the driver to do it in the app.',
+    lead: (driver, type, date) => `${driver}’s ${type} is valid until ${date}. Make sure it is renewed in time so the driver can keep driving.`,
+    button: 'Open driver details',
+    note: 'Once it is renewed, update the new expiry date in the driver’s details, or ask the driver to do it in the app.',
   },
 
   billing: {
-    invoicedSubject: (ref) => `RAHTIS · invoice for transport ${ref}`,
-    invoicedHeading: (ref) => `Invoice for transport ${ref}`,
+    invoicedSubject: (ref) => `RAHTIS · invoice for order ${ref}`,
+    invoicedHeading: (ref) => `Invoice for order ${ref}`,
     invoicedLead: (vat) =>
       vat
-        ? `An invoice for this transport has been sent. The seller is Aivomaa Oy (RAHTIS); VAT ${vat} is added to the amount.`
-        : 'An invoice for this transport has been sent. The seller is Aivomaa Oy (RAHTIS). Reverse charge: the buyer accounts for the tax in their own country.',
-    settledSubject: (ref) => `RAHTIS · payout for transport ${ref}`,
-    settledHeading: (ref) => `Payout for transport ${ref}`,
+        ? `An invoice for this order has been sent. The seller is Aivomaa Oy (RAHTIS); VAT ${vat} is added to the amount.`
+        : 'An invoice for this order has been sent. The seller is Aivomaa Oy (RAHTIS). Reverse charge: the buyer accounts for the VAT in their own country.',
+    settledSubject: (ref) => `RAHTIS · payout for order ${ref}`,
+    settledHeading: (ref) => `Payout for order ${ref}`,
     settledLead: (vat) =>
       vat
-        ? `The payout for this transport has been paid. The payer is Aivomaa Oy (RAHTIS); the amount includes VAT ${vat}.`
-        : 'The payout for this transport has been paid. The payer is Aivomaa Oy (RAHTIS). Reverse charge: the amount is at VAT 0%.',
+        ? `The payout for this order has been paid. The payer is Aivomaa Oy (RAHTIS); the amount includes VAT ${vat}.`
+        : 'The payout for this order has been paid. The payer is Aivomaa Oy (RAHTIS). Reverse charge: the amount is at 0% VAT.',
     preheader: (amount) => `Amount ${amount}.`,
-    fieldOrder: 'Transport',
+    fieldOrder: 'Order',
     fieldAmount: 'Net amount',
     fieldVat: (rate) => `VAT ${rate}`,
     fieldTotal: 'Total',
@@ -680,10 +680,10 @@ const en: Texts = {
     fieldSeller: 'Seller',
     fieldPayer: 'Payer',
     fieldBusinessId: 'Business ID',
-    fieldVatNumber: 'VAT no.',
+    fieldVatNumber: 'VAT number',
     fieldAddress: 'Address',
-    fieldAccount: 'Account',
-    fieldReference: 'Reference',
+    fieldAccount: 'Account number',
+    fieldReference: 'Reference number',
     questions: (operator) => `Questions: ${operator}`,
   },
 };
