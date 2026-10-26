@@ -1551,6 +1551,8 @@ export const en = {
   },
 
   apply: {
+    ytjHint: 'For a Finnish company, the name is filled in from YTJ',
+    ytjFound: 'Name filled in from YTJ',
     title: 'Application',
     subtitle:
       'There’s no open sign-up. We check every company against the register and send the login details to the address you give.',
@@ -1580,6 +1582,7 @@ export const en = {
   },
 
   requisites: {
+    ytjRefresh: 'Get name and address from YTJ',
     title: 'Company details',
     subtitleShipper: 'We need these for invoicing. Once saved, the company goes live.',
     subtitleCarrier: 'We need these for payouts. Once saved, the company goes live.',

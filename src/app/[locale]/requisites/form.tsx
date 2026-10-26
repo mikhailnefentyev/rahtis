@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useState } from 'react';
+import { useActionState, useState, useTransition } from 'react';
 import {
   Button,
   Card,
@@ -18,7 +18,7 @@ import {
   isValidIban,
   isValidVatNumber,
 } from '@/lib/banking';
-import { saveRequisitesAction, type RequisitesState } from '@/lib/companies/requisites';
+import { registryCompanyAction, saveRequisitesAction, type RequisitesState } from '@/lib/companies/requisites';
 import { useI18n } from '@/lib/i18n/provider';
 import type { Company } from '@/types/db';
 import { useKeepOnError } from '@/lib/forms/keepOnError';
@@ -36,7 +36,7 @@ export function RequisitesForm({
    * место, где одобренные перевозчики останавливались: из девяти ни один
    * не дошёл дальше неё (29.09.2026). Остаются IBAN и согласие.
    */
-  prefill?: { street: string; postalCode: string; city: string } | null;
+  prefill?: { name?: string; street: string; postalCode: string; city: string } | null;
 }) {
   const { t, locale } = useI18n();
   const [state, formAction, pending] = useActionState(saveRequisitesAction, initial);
@@ -66,6 +66,33 @@ export function RequisitesForm({
   const [iban, setIban] = useState(company.iban ? formatIban(company.iban) : '');
   const [bic, setBic] = useState(company.bic ?? '');
   const [sameAddress, setSameAddress] = useState(!company.billing_street);
+  const [ytj, setYtj] = useState<'idle' | 'found' | 'missing'>('idle');
+  const [looking, startLookup] = useTransition();
+  const canAskYtj = country === 'FI' && Boolean(company.business_id);
+
+  /* Кнопка «из YTJ»: нажата явно, поэтому название и адрес перезаписываются. */
+  function fillFromYtj() {
+    const form = keepFormAction.ref.current;
+    if (!form) return;
+    startLookup(async () => {
+      const result = await registryCompanyAction();
+      if (!result) return setYtj('idle');
+      if (!result.found) return setYtj('missing');
+      const values: Record<string, string> = {
+        legal_name: result.name,
+        legal_street: result.street,
+        legal_postal_code: result.postalCode,
+        legal_city: result.city,
+      };
+      for (const [key, value] of Object.entries(values)) {
+        const input = form.elements.namedItem(key) as HTMLInputElement | null;
+        if (input && value) input.value = value;
+      }
+      const countryInput = form.elements.namedItem('legal_country') as HTMLInputElement | null;
+      if (countryInput) countryInput.value = 'FI';
+      setYtj('found');
+    });
+  }
 
   const vatError = vat.trim() && !isValidVatNumber(vat) ? t.requisites.vatInvalid : undefined;
   const ibanError = iban.trim() && !isValidIban(iban) ? t.requisites.ibanInvalid : undefined;
@@ -95,6 +122,16 @@ export function RequisitesForm({
       <Card>
         <CardBody>
           <SectionTitle>{t.requisites.legalSection}</SectionTitle>
+          {canAskYtj && (
+            <div className="-mt-1 mb-4 flex flex-wrap items-center gap-3">
+              <Button type="button" size="sm" onClick={fillFromYtj} disabled={looking}>
+                {t.requisites.ytjRefresh}
+              </Button>
+              <span className={ytj === 'missing' ? 'text-[12px] text-warn' : 'text-[12px] text-ink-dim'} aria-live="polite">
+                {looking ? t.sites.ytjLoading : ytj === 'found' ? t.sites.ytjFound : ytj === 'missing' ? t.sites.ytjMissing : ''}
+              </span>
+            </div>
+          )}
 
           <div className="grid gap-4 sm:grid-cols-2">
             <Field
@@ -108,7 +145,7 @@ export function RequisitesForm({
                   {...p}
                   name="legal_name"
                   required
-                  defaultValue={company.legal_name ?? company.name}
+                  defaultValue={company.legal_name ?? prefill?.name ?? company.name}
                 />
               )}
             </Field>

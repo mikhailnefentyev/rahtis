@@ -1416,6 +1416,8 @@ export const et = {
   },
 
   apply: {
+    ytjHint: 'Soome ettevõtte nimi võetakse YTJ-st',
+    ytjFound: 'Nimi võeti YTJ-st',
     title: 'Taotlus',
     subtitle:
       'Vaba registreerumist pole. Kontrollime iga ettevõtte andmed registrist ja saadame konto andmed sinu antud aadressile.',
@@ -1445,6 +1447,7 @@ export const et = {
   },
 
   requisites: {
+    ytjRefresh: 'Võta nimi ja aadress YTJ-st',
     title: 'Ettevõtte andmed',
     subtitleShipper: 'Vajame neid arveldamiseks. Pärast salvestamist on ettevõte kasutusel.',
     subtitleCarrier: 'Vajame neid väljamakseteks. Pärast salvestamist on ettevõte kasutusel.',

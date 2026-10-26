@@ -8,7 +8,7 @@ import { companyStatusTone } from '@/components/ui/tone';
 import { noAccessPath, signInPath } from '@/lib/auth/paths';
 import { getViewer } from '@/lib/auth/viewer';
 import { isLocale } from '@/lib/i18n';
-import { lookupAddress } from '@/lib/registry/prh';
+import { lookupCompany } from '@/lib/registry/prh';
 import { RequisitesForm } from '../requisites/form';
 import { createClient } from '@/lib/supabase/server';
 import { ChangePasswordForm } from './form';
@@ -55,11 +55,12 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
   const company =
     viewer.status === 'ready' && viewer.company?.status !== 'REJECTED' ? viewer.company : null;
 
-  /* Своего адреса ещё нет — подставляем из реестра PRH (финская компания). */
-  const prefill =
-    company && !company.legal_street && company.business_id && (company.country ?? 'FI') === 'FI'
-      ? await lookupAddress(company.business_id)
+  /* Своего названия или адреса ещё нет — подставляем из реестра PRH (финская компания). */
+  const registry =
+    company && (!company.legal_street || !company.legal_name) && company.business_id && (company.country ?? 'FI') === 'FI'
+      ? await lookupCompany(company.business_id)
       : null;
+  const prefill = registry ? { name: registry.name, ...(registry.address ?? { street: '', postalCode: '', city: '' }) } : null;
 
   /*
    * Люди компании. У оператора компании нет; до миграции функции тоже

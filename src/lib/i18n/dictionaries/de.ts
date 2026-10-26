@@ -1416,6 +1416,8 @@ export const de = {
   },
 
   apply: {
+    ytjHint: 'Bei finnischen Firmen wird der Name aus YTJ übernommen',
+    ytjFound: 'Name aus YTJ übernommen',
     title: 'Bewerbung',
     subtitle:
       'Eine freie Registrierung gibt es nicht. Wir prüfen jedes Unternehmen im Register und schicken die Zugangsdaten an die angegebene Adresse.',
@@ -1445,6 +1447,7 @@ export const de = {
   },
 
   requisites: {
+    ytjRefresh: 'Name und Adresse aus YTJ holen',
     title: 'Firmendaten',
     subtitleShipper: 'Die brauchen wir für die Rechnungen. Nach dem Speichern ist Ihr Unternehmen aktiv.',
     subtitleCarrier: 'Die brauchen wir für die Abrechnungen. Nach dem Speichern ist Ihr Unternehmen aktiv.',

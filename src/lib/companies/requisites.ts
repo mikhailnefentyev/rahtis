@@ -12,8 +12,34 @@ import {
 } from '@/lib/banking';
 import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
+import { lookupCompany } from '@/lib/registry/prh';
 
 export type RequisitesState = { error: string | null; done: boolean };
+
+export type RegistryCompanyResult =
+  | { found: true; name: string; street: string; postalCode: string; city: string }
+  | { found: false };
+
+/**
+ * Название и адрес своей компании из PRH/YTJ — кнопка в карточке. Номер
+ * берётся из компании вошедшего, а не из запроса: чужие номера через это
+ * действие не проверить. NULL — компания не финская.
+ */
+export async function registryCompanyAction(): Promise<RegistryCompanyResult | null> {
+  const viewer = await getViewer();
+  if (viewer.status !== 'ready' || !viewer.company) return null;
+  const company = viewer.company;
+  if ((company.country ?? 'FI') !== 'FI' || !company.business_id) return null;
+  const found = await lookupCompany(company.business_id);
+  if (!found) return { found: false };
+  return {
+    found: true,
+    name: found.name,
+    street: found.address?.street ?? '',
+    postalCode: found.address?.postalCode ?? '',
+    city: found.address?.city ?? '',
+  };
+}
 
 const text = (form: FormData, key: string): string | null => {
   const value = String(form.get(key) ?? '').trim();

@@ -1416,6 +1416,8 @@ export const lt = {
   },
 
   apply: {
+    ytjHint: 'Suomijos įmonės pavadinimas paimamas iš YTJ',
+    ytjFound: 'Pavadinimas paimtas iš YTJ',
     title: 'Paraiška',
     subtitle:
       'Laisvos registracijos nėra. Kiekvienos įmonės duomenis tikriname registre, o prieigą siunčiame jūsų nurodytu el. paštu.',
@@ -1445,6 +1447,7 @@ export const lt = {
   },
 
   requisites: {
+    ytjRefresh: 'Paimti pavadinimą ir adresą iš YTJ',
     title: 'Įmonės duomenys',
     subtitleShipper: 'Jų reikia sąskaitoms išrašyti. Išsaugojus įmonės paskyra aktyvuojama.',
     subtitleCarrier: 'Jų reikia išmokoms. Išsaugojus įmonės paskyra aktyvuojama.',

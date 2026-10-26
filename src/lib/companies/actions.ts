@@ -21,6 +21,7 @@ import { getViewer } from '@/lib/auth/viewer';
 import { checkBusinessId, countryPack, isCountryCode, registryLink, registryName, vatNumberFor } from '@/lib/country';
 import { getDictionary, getI18n, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
 import { checkCompanyRegistry, type RegistryCheck } from '@/lib/registry';
+import { lookupCompany } from '@/lib/registry/prh';
 import type { CompanyRole } from '@/types/db';
 
 function toLocale(value: FormDataEntryValue | null): Locale {
@@ -45,6 +46,20 @@ export type ApplyRegistry = {
 };
 
 export type ApplyState = { error: string | null; done: boolean; registry?: ApplyRegistry };
+
+/**
+ * Название финской компании по Y-tunnus для формы заявки — из открытых
+ * данных PRH/YTJ. Форма публичная, поэтому ограничение частоты по адресу:
+ * 30 запросов в час хватает на опечатки, но не на перебор реестра.
+ * NULL — номер не похож на Y-tunnus или лимит исчерпан; запрос не делается.
+ */
+export async function lookupApplicantAction(raw: string): Promise<{ found: true; businessId: string; name: string } | { found: false } | null> {
+  const { normalized, valid } = checkBusinessId('FI', String(raw ?? ''));
+  if (!valid) return null;
+  if (!(await throttleAllowed(`ytj:${await clientIp()}`, { limit: 30, seconds: 3600 }))) return null;
+  const company = await lookupCompany(normalized);
+  return company ? { found: true, businessId: normalized, name: company.name } : { found: false };
+}
 
 /**
  * Приём заявки на регистрацию.

@@ -1645,6 +1645,8 @@ export const fi = {
   },
 
   apply: {
+    ytjHint: 'Suomalaisen yrityksen nimi haetaan YTJ:stä',
+    ytjFound: 'Nimi haettu YTJ:stä',
     title: 'Hakemus',
     subtitle:
       'Avointa rekisteröitymistä ei ole. Tarkistamme jokaisen yrityksen tiedot rekisteristä ja lähetämme tunnukset antamaasi osoitteeseen.',
@@ -1675,6 +1677,7 @@ export const fi = {
   },
 
   requisites: {
+    ytjRefresh: 'Hae nimi ja osoite YTJ:stä',
     title: 'Yritystiedot',
     subtitleShipper: 'Tarvitsemme nämä laskutusta varten. Tallennuksen jälkeen yritys on käytössä.',
     subtitleCarrier: 'Tarvitsemme nämä tilityksiä varten. Tallennuksen jälkeen yritys on käytössä.',

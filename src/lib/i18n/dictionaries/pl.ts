@@ -1415,6 +1415,8 @@ export const pl = {
   },
 
   apply: {
+    ytjHint: 'Dla fińskiej firmy nazwa pobiera się z YTJ',
+    ytjFound: 'Nazwa pobrana z YTJ',
     title: 'Wniosek',
     subtitle:
       'Nie ma otwartej rejestracji. Każdą firmę sprawdzamy w rejestrze i wysyłamy dane logowania na podany adres.',
@@ -1444,6 +1446,7 @@ export const pl = {
   },
 
   requisites: {
+    ytjRefresh: 'Pobierz nazwę i adres z YTJ',
     title: 'Dane firmy',
     subtitleShipper: 'Potrzebujemy ich do fakturowania. Po zapisaniu firma zostaje aktywowana.',
     subtitleCarrier: 'Potrzebujemy ich do rozliczeń. Po zapisaniu firma zostaje aktywowana.',

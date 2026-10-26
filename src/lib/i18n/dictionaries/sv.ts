@@ -1416,6 +1416,8 @@ export const sv = {
   },
 
   apply: {
+    ytjHint: 'För ett finskt företag hämtas namnet från YTJ',
+    ytjFound: 'Namnet hämtat från YTJ',
     title: 'Ansökan',
     subtitle:
       'Det finns ingen öppen registrering. Vi kontrollerar varje företag mot registret och skickar inloggningsuppgifterna till den adress du anger.',
@@ -1445,6 +1447,7 @@ export const sv = {
   },
 
   requisites: {
+    ytjRefresh: 'Hämta namn och adress från YTJ',
     title: 'Företagsuppgifter',
     subtitleShipper: 'Vi behöver dem för faktureringen. När de är sparade blir företaget aktivt.',
     subtitleCarrier: 'Vi behöver dem för avräkningarna. När de är sparade blir företaget aktivt.',

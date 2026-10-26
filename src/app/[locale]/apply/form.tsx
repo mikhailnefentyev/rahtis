@@ -1,9 +1,9 @@
 'use client';
 
-import { useActionState, useEffect, useState } from 'react';
+import { useActionState, useEffect, useRef, useState, useTransition } from 'react';
 import { analytics } from '@heycatch/sdk';
 import { Button, Card, CardBody, Field, Input, InputMono, Select } from '@/components/ui';
-import { submitApplicationAction, type ApplyState } from '@/lib/companies/actions';
+import { lookupApplicantAction, submitApplicationAction, type ApplyState } from '@/lib/companies/actions';
 import { checkBusinessId, countryPack, enabledCountries, isCountryCode, type CountryCode } from '@/lib/country';
 import { useI18n } from '@/lib/i18n/provider';
 import type { ApplyInvite } from '@/lib/partners/invites';
@@ -35,6 +35,32 @@ export function ApplyForm({ invite = null }: { invite?: ApplyInvite | null }) {
   const [businessId, setBusinessId] = useState(invite?.businessId ?? '');
   const [vatNumber, setVatNumber] = useState('');
   const [email, setEmail] = useState(invite?.email ?? '');
+
+  /*
+   * Название по Y-tunnus из YTJ. Подставляется, если поле пустое или в нём
+   * то, что раньше подставили сами: набранное руками не затираем.
+   */
+  const [ytj, setYtj] = useState<'idle' | 'found' | 'missing'>('idle');
+  const [looking, startLookup] = useTransition();
+  const asked = useRef(invite?.businessId ?? '');
+  const filledName = useRef('');
+  function lookupName(raw: string) {
+    const value = raw.trim();
+    if (value === asked.current) return;
+    asked.current = value;
+    if (country !== 'FI' || !/^\d{7}-?\d$/.test(value)) return setYtj('idle');
+    startLookup(async () => {
+      const result = await lookupApplicantAction(value);
+      if (!result) return setYtj('idle');
+      if (!result.found) return setYtj('missing');
+      setName((current) => (current.trim() === '' || current === filledName.current ? result.name : current));
+      filledName.current = result.name;
+      setBusinessId(result.businessId);
+      asked.current = result.businessId;
+      setYtj('found');
+    });
+  }
+  const ytjHint = looking ? t.sites.ytjLoading : ytj === 'found' ? t.apply.ytjFound : ytj === 'missing' ? t.sites.ytjMissing : t.apply.ytjHint;
 
   /* Итог для аналитики: только тип и страна, без названия и почты. Без согласия — ничего не уходит. */
   useEffect(() => {
@@ -174,19 +200,6 @@ export function ApplyForm({ invite = null }: { invite?: ApplyInvite | null }) {
             </div>
           )}
 
-          <Field label={t.company.name} required>
-            {(p) => (
-              <Input
-                {...p}
-                name="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Nieminen Kuljetus Oy"
-                required
-              />
-            )}
-          </Field>
-
           <Field label={t.company.country} required>
             {(p) => (
               <Select {...p} name="country" value={country} onChange={(e) => setCountry(e.target.value as CountryCode)}>
@@ -199,14 +212,36 @@ export function ApplyForm({ invite = null }: { invite?: ApplyInvite | null }) {
             )}
           </Field>
 
-          <Field label={pack.businessId.label} required error={businessIdError}>
+          <Field label={pack.businessId.label} required error={businessIdError} hint={country === 'FI' ? ytjHint : undefined}>
             {(p) => (
               <InputMono
                 {...p}
                 name="business_id"
                 value={businessId}
-                onChange={(e) => setBusinessId(e.target.value)}
+                onChange={(e) => {
+                  setBusinessId(e.target.value);
+                  if (/^\d{7}-\d$/.test(e.target.value.trim())) lookupName(e.target.value);
+                }}
+                onBlur={(e) => lookupName(e.currentTarget.value)}
                 placeholder={pack.businessId.example}
+                required
+              />
+            )}
+          </Field>
+
+          {/*
+            * Название после номера: у финской компании оно подставляется
+            * из YTJ по Y-tunnus, и вводить его первым значило бы печатать
+            * то, что форма знает сама.
+            */}
+          <Field label={t.company.name} required>
+            {(p) => (
+              <Input
+                {...p}
+                name="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Nieminen Kuljetus Oy"
                 required
               />
             )}

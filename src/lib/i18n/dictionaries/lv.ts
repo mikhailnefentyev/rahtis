@@ -1416,6 +1416,8 @@ export const lv = {
   },
 
   apply: {
+    ytjHint: 'Somijas uzņēmuma nosaukums tiek ņemts no YTJ',
+    ytjFound: 'Nosaukums ņemts no YTJ',
     title: 'Pieteikums',
     subtitle:
       'Brīvas reģistrācijas nav. Mēs pārbaudām katra uzņēmuma datus reģistrā un nosūtām piekļuves datus uz jūsu norādīto adresi.',
@@ -1445,6 +1447,7 @@ export const lv = {
   },
 
   requisites: {
+    ytjRefresh: 'Ņemt nosaukumu un adresi no YTJ',
     title: 'Uzņēmuma rekvizīti',
     subtitleShipper: 'Tie vajadzīgi rēķiniem. Pēc saglabāšanas uzņēmums ir aktīvs.',
     subtitleCarrier: 'Tie vajadzīgi norēķiniem. Pēc saglabāšanas uzņēmums ir aktīvs.',
