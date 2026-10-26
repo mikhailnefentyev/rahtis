@@ -101,3 +101,23 @@ test('адрес из реестра для автозаполнения акт�
   assert.equal(addressOf([{ addresses: [{ type: 2, postOfficeBox: '12', postCode: '00100' }] }]), null);
   assert.equal(addressOf([{ addresses: [{ type: 2, street: 'Asema-aukio', buildingNumber: '2', postCode: '04400', postOffices: [office('JÄRVENPÄÄ', '1')] }] }]).city, 'Järvenpää');
 });
+
+test('название и адрес для автозаполнения клиента по Y-tunnus', async () => {
+  const { companyOf } = await import('./prh.ts');
+  const company = {
+    names: [
+      { name: 'Vanha Nimi Oy', type: '1', endDate: '2024-01-01' },
+      { name: 'Kaivuu Oy', type: '3', endDate: null },
+      { name: 'Maarakennus Virtanen Oy', type: '1', endDate: null },
+    ],
+    addresses: [{ type: 2, street: 'Teollisuustie', buildingNumber: '4', postCode: '01510', postOffices: [{ city: 'VANTAA', languageCode: '1' }] }],
+  };
+  assert.deepEqual(companyOf([company]), {
+    name: 'Maarakennus Virtanen Oy',
+    address: { street: 'Teollisuustie 4', postalCode: '01510', city: 'Vantaa' },
+  });
+  // без адреса — только название; нет компании — null
+  assert.deepEqual(companyOf([{ names: company.names }]), { name: 'Maarakennus Virtanen Oy', address: null });
+  assert.equal(companyOf([]), null);
+  assert.equal(companyOf([{ names: [{ name: 'Lopetettu Oy', type: '1', endDate: '2020-01-01' }] }]), null);
+});

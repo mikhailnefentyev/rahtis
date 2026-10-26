@@ -7,6 +7,8 @@ import { createClient } from '@/lib/supabase/server';
 import { flashFailure } from '@/lib/forms/flash';
 import type { SitePricing } from '@/types/db';
 import { isMaterialCode } from './work';
+import { checkBusinessId } from '@/lib/country';
+import { lookupCompany } from '@/lib/registry/prh';
 
 function toLocale(value: FormDataEntryValue | null): Locale {
   const raw = String(value ?? '');
@@ -21,6 +23,32 @@ const text = (form: FormData, key: string): string | null => {
 const PRICING: readonly SitePricing[] = ['HOUR', 'LOAD', 'TONNE'];
 
 export type SiteJobState = { error: string | null; done: boolean; id?: string };
+
+export type CustomerLookup =
+  | { found: true; businessId: string; name: string; street: string; postalCode: string; city: string }
+  | { found: false };
+
+/**
+ * Клиент по Y-tunnus из открытых данных PRH/YTJ — для автозаполнения формы
+ * объекта. Только для перевозчика: это не открытый прокси к реестру.
+ * NULL — номер не похож на Y-tunnus, запрос не нужен.
+ */
+export async function lookupCustomerAction(localeRaw: string, raw: string): Promise<CustomerLookup | null> {
+  const locale = isLocale(localeRaw) ? localeRaw : defaultLocale;
+  await requireRole(locale, 'CARRIER');
+  const { normalized, valid } = checkBusinessId('FI', raw);
+  if (!valid) return null;
+  const company = await lookupCompany(normalized);
+  if (!company) return { found: false };
+  return {
+    found: true,
+    businessId: normalized,
+    name: company.name,
+    street: company.address?.street ?? '',
+    postalCode: company.address?.postalCode ?? '',
+    city: company.address?.city ?? '',
+  };
+}
 
 /** Объект клиента: создать или поправить. Пишет перевозчик своей компании (RLS). */
 export async function saveSiteJobAction(_previous: SiteJobState, formData: FormData): Promise<SiteJobState> {

@@ -1,14 +1,17 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useActionState, useEffect } from 'react';
+import { useActionState, useEffect, useRef, useState, useTransition } from 'react';
 import { Button, Card, CardBody, Field, Input, InputMono, Select } from '@/components/ui';
-import { saveSiteJobAction, type SiteJobState } from '@/lib/sites/actions';
+import { lookupCustomerAction, saveSiteJobAction, type SiteJobState } from '@/lib/sites/actions';
 import { MATERIALS } from '@/lib/sites/work';
 import { useI18n } from '@/lib/i18n/provider';
 import type { ScaleSite, SiteJob } from '@/types/db';
 
 const initial: SiteJobState = { error: null, done: false };
+
+/* Поля клиента, которые подставляются из YTJ. */
+const YTJ_FIELDS = ['customer_name', 'customer_street', 'customer_postal_code', 'customer_city'] as const;
 
 /** Объект: клиент, адрес, оплата, груз и пункт приёмки по умолчанию, запас к концу дня. */
 export function SiteJobForm({
@@ -24,6 +27,45 @@ export function SiteJobForm({
   const router = useRouter();
   const [state, action, pending] = useActionState(saveSiteJobAction, initial);
   const s = t.sites;
+  const formRef = useRef<HTMLFormElement>(null);
+  /* Что подставили из YTJ: такое поле можно перезаписать при смене номера, введённое руками — нет. */
+  const filled = useRef<Partial<Record<(typeof YTJ_FIELDS)[number], string>>>({});
+  const asked = useRef(job?.customer_business_id ?? '');
+  const [ytj, setYtj] = useState<'idle' | 'found' | 'missing'>('idle');
+  const [looking, startLookup] = useTransition();
+
+  /* Y-tunnus введён — название и адрес клиента из открытых данных PRH/YTJ (только для FI). */
+  function lookup(raw: string) {
+    const form = formRef.current;
+    const value = raw.trim();
+    if (!form || value === asked.current) return;
+    asked.current = value;
+    const country = (form.elements.namedItem('customer_country') as HTMLSelectElement | null)?.value ?? 'FI';
+    if (country !== 'FI' || !/^\d{7}-?\d$/.test(value)) {
+      setYtj('idle');
+      return;
+    }
+    startLookup(async () => {
+      const result = await lookupCustomerAction(locale, value);
+      if (!result) return setYtj('idle');
+      if (!result.found) return setYtj('missing');
+      const values = { customer_name: result.name, customer_street: result.street, customer_postal_code: result.postalCode, customer_city: result.city };
+      for (const key of YTJ_FIELDS) {
+        const input = form.elements.namedItem(key) as HTMLInputElement | null;
+        const next = values[key];
+        if (!input || !next) continue;
+        if (input.value.trim() === '' || input.value === filled.current[key]) {
+          input.value = next;
+          filled.current[key] = next;
+        }
+      }
+      const id = form.elements.namedItem('customer_business_id') as HTMLInputElement | null;
+      if (id) id.value = result.businessId;
+      asked.current = result.businessId;
+      setYtj('found');
+    });
+  }
+  const ytjHint = looking ? s.ytjLoading : ytj === 'found' ? s.ytjFound : ytj === 'missing' ? s.ytjMissing : s.ytjHint;
 
   useEffect(() => {
     if (!state.done) return;
@@ -34,7 +76,7 @@ export function SiteJobForm({
   return (
     <Card>
       <CardBody>
-        <form action={action} className="grid gap-4 sm:grid-cols-2">
+        <form ref={formRef} action={action} className="grid gap-4 sm:grid-cols-2">
           <input type="hidden" name="locale" value={locale} />
           {job && <input type="hidden" name="id" value={job.id} />}
 
@@ -47,8 +89,19 @@ export function SiteJobForm({
           <Field label={s.customer} required>
             {(p) => <Input {...p} name="customer_name" required defaultValue={job?.customer_name ?? ''} />}
           </Field>
-          <Field label={s.customerBusinessId}>
-            {(p) => <InputMono {...p} name="customer_business_id" defaultValue={job?.customer_business_id ?? ''} placeholder="1234567-8" />}
+          <Field label={s.customerBusinessId} hint={ytjHint}>
+            {(p) => (
+              <InputMono
+                {...p}
+                name="customer_business_id"
+                defaultValue={job?.customer_business_id ?? ''}
+                placeholder="1234567-8"
+                onBlur={(e) => lookup(e.currentTarget.value)}
+                onChange={(e) => {
+                  if (/^\d{7}-\d$/.test(e.currentTarget.value.trim())) lookup(e.currentTarget.value);
+                }}
+              />
+            )}
           </Field>
           <Field label={s.customerEmail} className="sm:col-span-2">
             {(p) => <Input {...p} type="email" name="customer_email" defaultValue={job?.customer_email ?? ''} />}

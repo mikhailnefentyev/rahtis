@@ -214,22 +214,45 @@ export function evaluate(appliedName: string, companies: unknown[], now = new Da
   };
 }
 
+/** Название и адрес из реестра — для автозаполнения клиента по Y-tunnus. */
+export type RegistryCompany = { name: string; address: RegistryAddress | null };
+
+/** Действующее официальное название (тип 1) и адрес. NULL — компании нет в ответе. */
+export function companyOf(companies: unknown[]): RegistryCompany | null {
+  const company = companies[0] as Company | undefined;
+  const current = (company?.names ?? []).filter((n) => !n.endDate && n.name);
+  const name = current.find((n) => n.type === '1')?.name ?? current[0]?.name;
+  return name ? { name, address: addressOf(companies) } : null;
+}
+
+/* Список компаний из PRH; NULL — реестр не ответил. */
+async function fetchCompanies(businessId: string, timeoutMs: number): Promise<unknown[] | null> {
+  try {
+    const response = await fetch(`${API}?businessId=${encodeURIComponent(businessId)}`, {
+      signal: AbortSignal.timeout(timeoutMs),
+      headers: { accept: 'application/json' },
+    });
+    if (!response.ok) return null;
+    const data = (await response.json()) as { companies?: unknown[] };
+    return data.companies ?? [];
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Адрес из PRH для формы активации. Никогда не бросает: реестр недоступен
  * или компании нет в открытых данных — форма просто остаётся пустой.
  */
 export async function lookupAddress(businessId: string): Promise<RegistryAddress | null> {
-  try {
-    const response = await fetch(`${API}?businessId=${encodeURIComponent(businessId)}`, {
-      signal: AbortSignal.timeout(4000),
-      headers: { accept: 'application/json' },
-    });
-    if (!response.ok) return null;
-    const data = (await response.json()) as { companies?: unknown[] };
-    return addressOf(data.companies ?? []);
-  } catch {
-    return null;
-  }
+  const companies = await fetchCompanies(businessId, 4000);
+  return companies ? addressOf(companies) : null;
+}
+
+/** Название и адрес по Y-tunnus. Никогда не бросает; NULL — не нашлось или реестр молчит. */
+export async function lookupCompany(businessId: string): Promise<RegistryCompany | null> {
+  const companies = await fetchCompanies(businessId, 4000);
+  return companies ? companyOf(companies) : null;
 }
 
 /**
