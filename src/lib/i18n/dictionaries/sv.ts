@@ -1010,8 +1010,8 @@ export const sv = {
     actionsSection: 'Vad som händer på vägen',
     actionsHint: 'Lägg till så många lastningar och lossningar som behövs, i valfri ordning',
     datesOutOfOrder: 'Ruttens datum är i fel ordning: ett senare stopp har ett tidigare datum än det föregående. Kontrollera datumen.',
-    vanTooHeavy: 'En skåpbil tar högst 3,5 ton. Välj lastbil för en tyngre last.',
-    truckTooHeavy: 'En lastbil tar högst 26 ton. Välj trailer för en tyngre last.',
+    vanTooHeavy: 'En skåpbil tar högst 1,5 ton. Välj lastbil för en tyngre last.',
+    truckTooHeavy: 'En lastbil tar högst 15 ton. Välj trailer för en tyngre last.',
     noActions: 'Ingen lastning eller lossning: det blir en ren förflyttning – enheten hämtas och lämnas på en annan plats.',
 
     bookingRef: 'Bokningsnummer',

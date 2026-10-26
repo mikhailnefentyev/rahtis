@@ -1125,8 +1125,8 @@ export const en = {
     actionsSection: 'What happens on the way',
     actionsHint: 'Add as many loadings and unloadings as you need, in any order',
     datesOutOfOrder: 'The route dates are out of order: a later stop is dated before the previous one. Check the dates.',
-    vanTooHeavy: 'A van takes at most 3.5 tonnes. Choose a truck for a heavier load.',
-    truckTooHeavy: 'A truck takes at most 26 tonnes. Choose a trailer for a heavier load.',
+    vanTooHeavy: 'A van takes at most 1.5 tonnes. Choose a truck for a heavier load.',
+    truckTooHeavy: 'A truck takes at most 15 tonnes. Choose a trailer for a heavier load.',
     noActions: 'No loadings or unloadings: this is a repositioning run — the unit is picked up and dropped somewhere else.',
 
     bookingRef: 'Booking number',

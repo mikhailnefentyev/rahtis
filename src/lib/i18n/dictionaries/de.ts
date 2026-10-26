@@ -1010,8 +1010,8 @@ export const de = {
     actionsSection: 'Was unterwegs passiert',
     actionsHint: 'Fügen Sie beliebig viele Be- und Entladungen in beliebiger Reihenfolge hinzu',
     datesOutOfOrder: 'Die Daten der Route stimmen nicht: Eine spätere Station liegt vor der vorherigen. Prüfen Sie die Daten.',
-    vanTooHeavy: 'In einen Transporter passen höchstens 3,5 Tonnen. Nehmen Sie für schwerere Ladung einen Lkw.',
-    truckTooHeavy: 'In einen Lkw passen höchstens 26 Tonnen. Nehmen Sie für schwerere Ladung einen Trailer.',
+    vanTooHeavy: 'In einen Transporter passen höchstens 1,5 Tonnen. Nehmen Sie für schwerere Ladung einen Lkw.',
+    truckTooHeavy: 'In einen Lkw passen höchstens 15 Tonnen. Nehmen Sie für schwerere Ladung einen Trailer.',
     noActions: 'Keine Be- oder Entladungen: Das wird eine Überführungsfahrt — die Einheit wird abgeholt und an einem anderen Ort abgestellt.',
 
     bookingRef: 'Buchungsnummer',

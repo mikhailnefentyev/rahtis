@@ -56,7 +56,7 @@ Page: ${SITE_URL}/en/earthworks (suomeksi: ${SITE_URL}/fi/maansiirto)
 
 - Trailer swaps (perävaunun vaihto / irtoperät) between ports, terminals and customers — e.g. Hanko, Helsinki Vuosaari, Turku, Kotka.
 - Container haulage (20', 40', 45') to and from ports and terminals.
-- Express transport by van or truck (up to 3.5 t or 26 t; tail lift, side loading, reefer).
+- Express transport by van or truck (van up to 1.5 t of cargo, truck up to 15 t; tail lift, side loading, reefer).
 
 ## For everyone on a trip
 

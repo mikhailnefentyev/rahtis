@@ -1213,8 +1213,8 @@ export const fi = {
     actionsSection: 'Mitä matkalla tehdään',
     actionsHint: 'Purkuja ja lastauksia voi lisätä haluamasi määrän ja haluamassasi järjestyksessä',
     datesOutOfOrder: 'Reitin päivämäärät eivät ole järjestyksessä: myöhempi piste on aiemmin kuin edellinen. Tarkista päivät.',
-    vanTooHeavy: 'Pakettiautoon mahtuu enintään 3,5 tonnia. Valitse raskaammalle kuormalle kuorma-auto.',
-    truckTooHeavy: 'Kuorma-autoon mahtuu enintään 26 tonnia. Valitse raskaammalle kuormalle perävaunu.',
+    vanTooHeavy: 'Pakettiautoon mahtuu enintään 1,5 tonnia. Valitse raskaammalle kuormalle kuorma-auto.',
+    truckTooHeavy: 'Kuorma-autoon mahtuu enintään 15 tonnia. Valitse raskaammalle kuormalle perävaunu.',
     noActions: 'Ei purkuja eikä lastauksia: tästä tulee siirtoajo — yksikkö noudetaan ja jätetään toiseen paikkaan.',
 
     bookingRef: 'Varausnumero',

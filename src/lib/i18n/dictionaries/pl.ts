@@ -1009,8 +1009,8 @@ export const pl = {
     actionsSection: 'Co dzieje się po drodze',
     actionsHint: 'Dodaj tyle załadunków i rozładunków, ile trzeba, w dowolnej kolejności',
     datesOutOfOrder: 'Daty trasy są w złej kolejności: późniejszy punkt ma datę wcześniejszą niż poprzedni. Sprawdź daty.',
-    vanTooHeavy: 'Bus zabiera najwyżej 3,5 tony. Na cięższy ładunek wybierz ciężarówkę.',
-    truckTooHeavy: 'Ciężarówka zabiera najwyżej 26 ton. Na cięższy ładunek wybierz naczepę.',
+    vanTooHeavy: 'Bus zabiera najwyżej 1,5 tony. Na cięższy ładunek wybierz ciężarówkę.',
+    truckTooHeavy: 'Ciężarówka zabiera najwyżej 15 ton. Na cięższy ładunek wybierz naczepę.',
     noActions: 'Brak załadunków i rozładunków: to będzie przestawienie — naczepę lub kontener odbierasz i zostawiasz w innym miejscu.',
 
     bookingRef: 'Numer awizacji',

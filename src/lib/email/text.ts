@@ -427,14 +427,14 @@ const fi: Texts = {
     invoicedHeading: (ref) => `Lasku kuljetuksesta ${ref}`,
     invoicedLead: (vat) =>
       vat
-        ? `Kuljetuksesta on lähetetty lasku. Laskuttaja on Aivomaa Oy (RAHTIS); summaan lisätään arvonlisävero ${vat}.`
-        : 'Kuljetuksesta on lähetetty lasku. Laskuttaja on Aivomaa Oy (RAHTIS). Käännetty verovelvollisuus: ostaja tilittää veron omassa maassaan.',
+        ? `Kuljetuksesta on lähetetty lasku. Summaan lisätään arvonlisävero ${vat}.`
+        : 'Kuljetuksesta on lähetetty lasku. Käännetty verovelvollisuus: ostaja tilittää veron omassa maassaan.',
     settledSubject: (ref) => `RAHTIS · tilitys kuljetuksesta ${ref}`,
     settledHeading: (ref) => `Tilitys kuljetuksesta ${ref}`,
     settledLead: (vat) =>
       vat
-        ? `Kuljetuksen tilitys on maksettu. Maksaja on Aivomaa Oy (RAHTIS); summaan sisältyy arvonlisävero ${vat}.`
-        : 'Kuljetuksen tilitys on maksettu. Maksaja on Aivomaa Oy (RAHTIS). Käännetty verovelvollisuus: summa on ALV 0 %.',
+        ? `Kuljetuksen tilitys on maksettu. Summaan sisältyy arvonlisävero ${vat}.`
+        : 'Kuljetuksen tilitys on maksettu. Käännetty verovelvollisuus: summa on ALV 0 %.',
     preheader: (amount) => `Summa ${amount}.`,
     fieldOrder: 'Kuljetus',
     fieldAmount: 'Veroton summa',
@@ -663,14 +663,14 @@ const en: Texts = {
     invoicedHeading: (ref) => `Invoice for order ${ref}`,
     invoicedLead: (vat) =>
       vat
-        ? `An invoice for this order has been sent. The seller is Aivomaa Oy (RAHTIS); VAT ${vat} is added to the amount.`
-        : 'An invoice for this order has been sent. The seller is Aivomaa Oy (RAHTIS). Reverse charge: the buyer accounts for the VAT in their own country.',
+        ? `An invoice for this order has been sent. VAT ${vat} is added to the amount.`
+        : 'An invoice for this order has been sent. Reverse charge: the buyer accounts for the VAT in their own country.',
     settledSubject: (ref) => `RAHTIS · payout for order ${ref}`,
     settledHeading: (ref) => `Payout for order ${ref}`,
     settledLead: (vat) =>
       vat
-        ? `The payout for this order has been paid. The payer is Aivomaa Oy (RAHTIS); the amount includes VAT ${vat}.`
-        : 'The payout for this order has been paid. The payer is Aivomaa Oy (RAHTIS). Reverse charge: the amount is at 0% VAT.',
+        ? `The payout for this order has been paid. The amount includes VAT ${vat}.`
+        : 'The payout for this order has been paid. Reverse charge: the amount is at 0% VAT.',
     preheader: (amount) => `Amount ${amount}.`,
     fieldOrder: 'Order',
     fieldAmount: 'Net amount',

@@ -1010,8 +1010,8 @@ export const lt = {
     actionsSection: 'Kas daroma pakeliui',
     actionsHint: 'Pakrovimų ir iškrovimų galite pridėti kiek norite ir bet kokia tvarka',
     datesOutOfOrder: 'Maršruto datos ne iš eilės: vėlesnio taško data ankstesnė nei prieš jį esančio. Patikrinkite datas.',
-    vanTooHeavy: 'Į furgoną telpa ne daugiau kaip 3,5 tonos. Sunkesniam kroviniui rinkitės sunkvežimį.',
-    truckTooHeavy: 'Į sunkvežimį telpa ne daugiau kaip 26 tonos. Sunkesniam kroviniui rinkitės priekabą.',
+    vanTooHeavy: 'Į furgoną telpa ne daugiau kaip 1,5 tonos. Sunkesniam kroviniui rinkitės sunkvežimį.',
+    truckTooHeavy: 'Į sunkvežimį telpa ne daugiau kaip 15 tonų. Sunkesniam kroviniui rinkitės priekabą.',
     noActions: 'Nėra nei pakrovimų, nei iškrovimų: tai bus perstatymo reisas – priekaba ar konteineris paimamas ir paliekamas kitoje vietoje.',
 
     bookingRef: 'Rezervacijos numeris',

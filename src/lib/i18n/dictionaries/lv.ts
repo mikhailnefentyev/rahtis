@@ -1010,8 +1010,8 @@ export const lv = {
     actionsSection: 'Kas notiek pa ceļam',
     actionsHint: 'Iekraušanas un izkraušanas varat pievienot cik vajag un jebkurā secībā',
     datesOutOfOrder: 'Maršruta datumi nav pēc kārtas: vēlākam punktam datums ir agrāks nekā iepriekšējam. Pārbaudiet datumus.',
-    vanTooHeavy: 'Busiņā var iekraut ne vairāk kā 3,5 tonnas. Smagākai kravai izvēlieties kravas auto.',
-    truckTooHeavy: 'Kravas auto var iekraut ne vairāk kā 26 tonnas. Smagākai kravai izvēlieties piekabi.',
+    vanTooHeavy: 'Busiņā var iekraut ne vairāk kā 1,5 tonnas. Smagākai kravai izvēlieties kravas auto.',
+    truckTooHeavy: 'Kravas auto var iekraut ne vairāk kā 15 tonnas. Smagākai kravai izvēlieties piekabi.',
     noActions: 'Nav ne iekraušanas, ne izkraušanas: tā būs vienības pārvešana — to paņem un atstāj citā vietā.',
 
     bookingRef: 'Rezervācijas numurs',

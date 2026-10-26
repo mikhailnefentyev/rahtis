@@ -1010,8 +1010,8 @@ export const et = {
     actionsSection: 'Mis teel toimub',
     actionsHint: 'Lisa nii palju laadimisi ja mahalaadimisi kui vaja, sobivas järjekorras',
     datesOutOfOrder: 'Marsruudi kuupäevad on vales järjekorras: hilisem peatus on varem kui eelmine. Kontrolli kuupäevi.',
-    vanTooHeavy: 'Kaubikusse mahub kõige rohkem 3,5 tonni. Raskema koorma jaoks vali veoauto.',
-    truckTooHeavy: 'Veoautosse mahub kõige rohkem 26 tonni. Raskema koorma jaoks vali haagis.',
+    vanTooHeavy: 'Kaubikusse mahub kõige rohkem 1,5 tonni. Raskema koorma jaoks vali veoauto.',
+    truckTooHeavy: 'Veoautosse mahub kõige rohkem 15 tonni. Raskema koorma jaoks vali haagis.',
     noActions: 'Laadimisi ega mahalaadimisi pole: see on ümberpaigutussõit — üksus võetakse peale ja jäetakse teise kohta.',
 
     bookingRef: 'Broneeringu number',
