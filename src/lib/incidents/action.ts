@@ -34,9 +34,18 @@ export async function reportRenderFailure(input: { digest?: string; path?: strin
    */
   const name = typeof input.name === 'string' && /^[A-Za-z][A-Za-z0-9]{0,39}$/.test(input.name) ? input.name : null;
 
+  /*
+   * Старая сборка после выкладки (ChunkLoadError) и обрыв сети (…Network) —
+   * не поломка кода: первое лечит перезагрузка, второе — связь. Они идут
+   * в журнал как WARN, а не FATAL: открытый FATAL держит /api/health в
+   * «degraded», и выкладка поднимала бы тревогу (26.10.2026 —
+   * ChunkLoadError на /fi/carrier/sites сразу после выкладки).
+   */
+  const benign = name === 'ChunkLoadError' || (name !== null && name.endsWith('Network'));
+
   await recordIncident({
     source: 'render',
-    severity: 'FATAL',
+    severity: benign ? 'WARN' : 'FATAL',
     path: typeof input.path === 'string' ? input.path : null,
     error: Object.assign(new Error(digest ? `digest ${digest}` : 'отрисовка прервана'), {
       name: name ?? 'RenderError',
