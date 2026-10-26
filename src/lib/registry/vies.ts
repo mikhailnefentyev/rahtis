@@ -14,22 +14,49 @@
  * видит ERROR.
  */
 import { matchName, type RegistryCheck } from './prh';
-import { base, evaluateVies, type ViesResponse } from './viesVerdict';
+import { base, evaluateVies, isTransientViesError, type ViesResponse } from './viesVerdict';
 
 const API = 'https://ec.europa.eu/taxation_customs/vies/rest-api/ms';
 
-/** Запрос в VIES по номеру вида «EE100366327». */
+async function ask(country: string, number: string): Promise<ViesResponse> {
+  const response = await fetch(`${API}/${encodeURIComponent(country)}/vat/${encodeURIComponent(number)}`, {
+    signal: AbortSignal.timeout(10000),
+    headers: { accept: 'application/json' },
+    cache: 'no-store',
+  });
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  return (await response.json()) as ViesResponse;
+}
+
+/**
+ * Запрос в VIES по номеру вида «EE100366327».
+ *
+ * Сервисы стран у VIES то и дело заняты (MS_MAX_CONCURRENT_REQ,
+ * MS_UNAVAILABLE) — второй запрос через пару секунд обычно проходит.
+ * Причина отказа пишется в лог и в замечание: раньше она терялась, и
+ * в админке оставалось одно «VIES ei vastannut».
+ */
 export async function checkVies(vatNumber: string, appliedName: string): Promise<RegistryCheck> {
   const country = vatNumber.slice(0, 2);
   const number = vatNumber.slice(2);
-  try {
-    const response = await fetch(`${API}/${encodeURIComponent(country)}/vat/${encodeURIComponent(number)}`, {
-      signal: AbortSignal.timeout(10000),
-      headers: { accept: 'application/json' },
-    });
-    if (!response.ok) throw new Error(`VIES ${response.status}`);
-    return evaluateVies(appliedName, vatNumber, (await response.json()) as ViesResponse, matchName);
-  } catch {
-    return { ...base(), verdict: 'ERROR', issues: [`VIES ei vastannut. Tarkista ALV-numero ${vatNumber} VIES-palvelusta.`] };
+  let reason = '';
+  for (let attempt = 0; attempt < 2; attempt++) {
+    if (attempt > 0) await new Promise((resolve) => setTimeout(resolve, 2000));
+    try {
+      const r = await ask(country, number);
+      if (isTransientViesError(r) && attempt === 0) {
+        reason = r.userError ?? '';
+        continue;
+      }
+      return evaluateVies(appliedName, vatNumber, r, matchName);
+    } catch (error) {
+      reason = error instanceof Error ? error.message : String(error);
+    }
   }
+  console.error(`vies ${vatNumber}: ${reason}`);
+  return {
+    ...base(),
+    verdict: 'ERROR',
+    issues: [`VIES ei vastannut${reason ? ` (${reason})` : ''}. Tarkista ALV-numero ${vatNumber} VIES-palvelusta.`],
+  };
 }

@@ -25,6 +25,8 @@ export type RegistryKind =
   | 'PRH'
   /** VIES — общий реестр плательщиков НДС ЕС: действует ли номер, название и адрес (не во всех странах). */
   | 'VIES'
+  /** Норвежский Enhetsregisteret (Brønnøysund): открытый API — название, MVA, банкротство, ликвидация. */
+  | 'BRREG'
   /** Автоматической проверки нет — оператор смотрит реестр страны сам. */
   | 'MANUAL';
 
@@ -207,9 +209,9 @@ export const COUNTRY_PACKS: Record<CountryCode, CountryPack> = {
       isValid: validNoOrgnr,
       normalize: (raw) => digits(raw),
     },
-    /* Норвегия не в ЕС: в VIES её нет, номер MVA — справочно. */
+    /* Норвегия не в ЕС: в VIES её нет — сверка по открытому Enhetsregisteret. */
     vatFromBusinessId: null,
-    registry: 'MANUAL',
+    registry: 'BRREG',
     registryUrl: (id) => `https://virksomhet.brreg.no/oppslag/enheter/${encodeURIComponent(id)}`,
     phonePrefix: '+47',
     postcode: /\b\d{4}\b/,
@@ -399,7 +401,7 @@ export function registryLink(country: string, businessId: string): string {
 /** Название реестра, с которым сверялась заявка, — в письме и карточке оператора. */
 export function registryName(country: string): string {
   const pack = countryPack(country);
-  return pack.registry === 'PRH' ? 'PRH' : pack.registry === 'VIES' ? 'VIES' : 'Rekisteri';
+  return pack.registry === 'PRH' ? 'PRH' : pack.registry === 'VIES' ? 'VIES' : pack.registry === 'BRREG' ? 'Brønnøysund' : 'Rekisteri';
 }
 
 /** Номер плательщика НДС: из номера компании, если выводится, иначе введённый; в виде «XX…» без пробелов. */

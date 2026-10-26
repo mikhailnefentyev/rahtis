@@ -41,3 +41,26 @@ test('сервис страны недоступен — ERROR, а не «не �
   const r = evaluateVies('Firma Sp. z o.o.', 'PL5260250995', { isValid: false, userError: 'MS_UNAVAILABLE' });
   assert.equal(r.verdict, 'ERROR');
 });
+
+test('формы компаний других стран не делают название «чужим» (прогон 26.10.2026)', () => {
+  const same = [
+    ['ORLEN S.A.', 'ORLEN SPÓŁKA AKCYJNA', 'PL7740001454'],
+    ['Latvenergo AS', 'Akciju sabiedrība "Latvenergo"', 'LV40003032949'],
+    ['Volvo AB', 'Aktiebolaget Volvo', 'SE556012579001'],
+    ['A.P. Møller - Mærsk A/S', 'A.P. MØLLER - MÆRSK A/S', 'DK22756214'],
+    ['Eesti Energia AS', 'Eesti Energia AS (Representative of VAT Group)', 'EE100366327'],
+    ['Baltic Cargo UAB', 'UAB "BALTIC CARGO"', 'LT100000000000'],
+    ['Trans-Pol Sp. z o.o.', 'TRANS-POL SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ', 'PL5260250995'],
+    ['Põhja Vedu OÜ', 'OSAÜHING PÕHJA VEDU', 'EE100000001'],
+  ];
+  for (const [applied, registered, vat] of same) {
+    const r = evaluateVies(applied, vat, { isValid: true, userError: 'VALID', name: registered });
+    assert.equal(r.nameMatch, 'EXACT', `${applied} ~ ${registered}`);
+    assert.equal(r.verdict, 'OK');
+  }
+});
+
+test('неверный формат номера — NOT_FOUND, а не «реестр молчит»', () => {
+  const r = evaluateVies('Firma', 'PL123', { isValid: false, userError: 'INVALID_INPUT' });
+  assert.equal(r.verdict, 'NOT_FOUND');
+});

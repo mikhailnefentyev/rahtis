@@ -9,6 +9,7 @@
 import { countryPack, vatNumberFor } from '@/lib/country';
 import { checkRegistry as checkPrh, type RegistryCheck } from './prh';
 import { checkVies } from './vies';
+import { checkBrreg } from './brreg';
 
 export type { RegistryCheck } from './prh';
 
@@ -32,6 +33,7 @@ function manual(issue: string): RegistryCheck {
 export async function checkCompanyRegistry(input: { country: string; businessId: string; vatNumber: string | null; name: string }): Promise<RegistryCheck> {
   const pack = countryPack(input.country);
   if (pack.registry === 'PRH') return checkPrh(input.businessId, input.name);
+  if (pack.registry === 'BRREG') return checkBrreg(input.businessId, input.name);
   if (pack.registry === 'VIES') {
     const vat = input.vatNumber ?? vatNumberFor(pack.code, input.businessId, null);
     if (!vat) return manual(`ALV-numero puuttuu (${pack.code}). Pyydä se hakijalta ja tarkista VIES-palvelusta.`);

@@ -113,17 +113,50 @@ type Company = {
 
 const fi = (texts?: Text[]) => texts?.find((d) => d.languageCode === '1')?.description ?? null;
 
+/*
+ * Формы компаний во всех странах сервиса — полные и сокращённые. VIES
+ * отдаёт название так, как оно стоит в реестре страны: «ORLEN SPÓŁKA
+ * AKCYJNA», «Akciju sabiedrība "Latvenergo"», «Aktiebolaget Volvo», а
+ * заявитель пишет «ORLEN S.A.» или «Latvenergo AS». Пока здесь были одни
+ * финские формы, такие пары выходили «другой компанией», и заявитель
+ * видел, что в реестре кто-то другой (прогон 26.10.2026).
+ *
+ * Фразы — после замены знаков на пробелы: «sp. z o.o.» → «sp z o o».
+ */
+const FORM_PHRASES = [
+  'spółka z ograniczoną odpowiedzialnością', 'spolka z ograniczona odpowiedzialnoscia', 'spółka akcyjna', 'spolka akcyjna',
+  'spółka komandytowa', 'spółka jawna', 'sp z o o', 'sp k', 'sp j',
+  'sabiedrība ar ierobežotu atbildību', 'akciju sabiedrība',
+  'uždaroji akcinė bendrovė', 'akcinė bendrovė', 'mažoji bendrija', 'individuali įmonė',
+  'gesellschaft mit beschränkter haftung', 'aktiengesellschaft', 'co kg',
+  'as oy', 'asunto oy', 'a s', 's a',
+  'representative of vat group',
+];
+const FORM_WORDS = new Set([
+  // FI, SE
+  'oy', 'oyj', 'ab', 'abp', 'ky', 'ay', 'tmi', 'osk', 'ry', 'aktiebolag', 'aktiebolaget', 'hb', 'kb',
+  // NO, DK
+  'as', 'asa', 'aps', 'aksjeselskap', 'aktieselskab', 'anpartsselskab', 'ivs', 'enk',
+  // EE, LV, LT
+  'oü', 'ou', 'aktsiaselts', 'osaühing', 'fie', 'sia', 'uab', 'mb', 'vši',
+  // PL, DE
+  'sa', 'gmbh', 'ag', 'kg', 'ug', 'ohg', 'gbr', 'mbh',
+  // общие
+  'ltd', 'limited', 'plc', 'inc', 'llc',
+]);
+
 /**
- * Название без формы и знаков: «Aivomaa Oy» и «AIVOMAA OY.» — одно и то же.
- * Буквы ä, ö, å сохраняются: «Mäkelä» и «Makela» — разные фамилии.
+ * Название без формы и знаков: «Aivomaa Oy» и «AIVOMAA OY.» — одно и то же,
+ * «ORLEN S.A.» и «ORLEN SPÓŁKA AKCYJNA» — тоже. Буквы ä, ö, å, ł
+ * сохраняются: «Mäkelä» и «Makela» — разные фамилии.
  */
 export function normalizeName(value: string): string {
-  return value
-    .toLowerCase()
-    .replace(/[.,'"’&()/-]+/g, ' ')
-    .replace(/\b(oy|oyj|ab|abp|ky|ay|tmi|osk|ry|ltd|as oy)\b/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
+  let s = ` ${value.toLowerCase().replace(/[.,'"’‘“”„«»&()/\\-]+/g, ' ').replace(/\s+/g, ' ')} `;
+  for (const phrase of FORM_PHRASES) s = s.split(` ${phrase} `).join(' ');
+  return s
+    .split(' ')
+    .filter((word) => word && !FORM_WORDS.has(word))
+    .join(' ');
 }
 
 export function matchName(applied: string, registered: string[]): NameMatch {

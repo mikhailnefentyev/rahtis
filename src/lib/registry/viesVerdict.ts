@@ -33,9 +33,14 @@ export function base(): Omit<RegistryCheck, 'verdict' | 'issues'> {
   };
 }
 
+/** Ответ — временный отказ сервиса страны, а не ответ про номер: стоит спросить ещё раз. */
+export function isTransientViesError(r: ViesResponse): boolean {
+  return r.isValid !== true && Boolean(r.userError) && r.userError !== 'INVALID' && r.userError !== 'VALID' && r.userError !== 'INVALID_INPUT';
+}
+
 /** Ответ VIES → вердикт для оператора. */
 export function evaluateVies(appliedName: string, vatNumber: string, r: ViesResponse, match: MatchName): RegistryCheck {
-  if (r.isValid !== true && r.userError && r.userError !== 'INVALID' && r.userError !== 'VALID') {
+  if (isTransientViesError(r)) {
     return { ...base(), verdict: 'ERROR', issues: [`VIES ei vastannut (${r.userError}). Tarkista ALV-numero ${vatNumber} VIES-palvelusta.`] };
   }
   if (r.isValid !== true) {
