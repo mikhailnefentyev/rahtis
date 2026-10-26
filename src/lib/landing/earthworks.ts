@@ -109,7 +109,7 @@ const fi: EarthworksCopy = {
 const en: EarthworksCopy = {
   metaTitle: 'Earthworks and dump trucks: loads, hours and invoices',
   metaDescription:
-    'Worksite app for dump trucks: weighed loads, waste transfer documents, hours (last unload + 30 min), foreman approval by link and invoices to your customer.',
+    'Worksite app for dump trucks: weighed loads, Finnish waste transfer documents, hours (last unload + 30 min), foreman approval by link and invoices to your customer.',
   eyebrow: 'Earthworks and dump trucks',
   title: 'Worksite loads, hours and invoices in one place',
   lede:
@@ -127,7 +127,7 @@ const en: EarthworksCopy = {
   featuresTitle: 'What you get',
   features: [
     { title: 'Loads and weighings', text: 'Gross, tare, net and weigh ticket for every load. Weighbridges and receiving sites come from a list, and a driver can add a new one from the site.' },
-    { title: 'Waste transfer document', text: 'The transfer document required by the Finnish Waste Act (section 121) is made from the load: waste code, producer, carrier and receiver, ready to print.' },
+    { title: 'Finnish waste transfer document', text: 'For sites in Finland, the transfer document (siirtoasiakirja) required by the Finnish Waste Act (section 121) is made from the load: waste code, producer, carrier and receiver, ready to print.' },
     { title: 'Hours without paper', text: 'Arrival in the morning, last unload + 30 min in the evening. No handwritten timesheets and no guessing afterwards.' },
     { title: 'Axle weights and overload', text: 'Truck, trailer and the maximum combination weight by country (Finland 76 t, Sweden, Norway, Denmark, Estonia, Germany…). Overload warning right at the weighbridge.' },
     { title: 'Invoicing in your own name', text: 'Invoices with your business ID, bank account and your own number series. By the hour, per load or per tonne. Sent at a button press, weekly or every other week.' },
@@ -140,7 +140,7 @@ const en: EarthworksCopy = {
     { q: 'Does the foreman need a login?', a: 'No. The foreman gets the site link, sees the days, loads and hours there and approves the day with their name. Prices are not shown.' },
     { q: 'How are hours counted?', a: 'The day starts when the driver marks arrival on site and ends at the last unload + buffer (30 min by default). If the driver ends the day later, the later time counts.' },
     { q: 'Whose name is on the invoice?', a: 'The carrier’s: business ID, bank account, invoice number and reference are your company’s. RAHTIS builds the invoice from approved days and emails it to the customer as a PDF.' },
-    { q: 'Do I get a waste transfer document?', a: 'Yes. Every load has a transfer document under the Finnish Waste Act, with waste codes. Contaminated soil and construction waste are flagged for reporting to the transfer document register.' },
+    { q: 'Do I get a waste transfer document?', a: 'Yes, for sites in Finland. Every load gets a siirtoasiakirja under the Finnish Waste Act, with waste codes. Contaminated soil and construction waste are flagged for reporting to the transfer document register. For sites outside Finland, national requirements and state e-systems are being added country by country — not available yet.' },
     { q: 'Does the app work in a pit with no signal?', a: 'Yes. Entries are saved on the phone and sent when the connection returns. The time is when the driver tapped, not when it was sent.' },
     { q: 'What does it cost?', a: '€29.90 (excl. VAT) per truck per month, only for trucks that drove. The first month is free.' },
   ],
@@ -148,7 +148,7 @@ const en: EarthworksCopy = {
   finalText: 'Add a site, invite a driver and send the foreman the link. The first month is free.',
   teaserEyebrow: 'New: earthworks',
   teaserTitle: 'Dump trucks on site: loads, hours and invoices',
-  teaserText: 'Weighed loads, waste transfer documents, hours to the last unload + 30 min and foreman approval by link. Invoice to the customer in your company’s name.',
+  teaserText: 'Weighed loads, Finnish waste transfer documents, hours to the last unload + 30 min and foreman approval by link. Invoice to the customer in your company’s name.',
   teaserCta: 'Read more',
   footerLink: 'Earthworks and dump trucks',
   serviceTitle: 'Earthworks and dump trucks',
@@ -157,7 +157,7 @@ const en: EarthworksCopy = {
   serviceType: 'Worksite app for earthworks haulage',
   features_ld: [
     'Loads and weighings (gross, tare, net, weigh ticket)',
-    'Waste transfer document (Finnish Waste Act)',
+    'Finnish waste transfer document (siirtoasiakirja) for sites in Finland',
     'Hours: arrival to last unload + 30 min',
     'Foreman approval by link',
     'Invoices to the customer in the carrier’s name',
@@ -168,7 +168,7 @@ const en: EarthworksCopy = {
 const sv: EarthworksCopy = {
   metaTitle: 'Masstransporter och tippbilar: lass, timmar, fakturor',
   metaDescription:
-    'Arbetsplatsapp för tippbilar: vägda lass, transportdokument för avfall, timmar (sista tömning + 30 min), arbetsledarens godkännande och fakturor.',
+    'Arbetsplatsapp för tippbilar: vägda lass, finska transportdokument för avfall, timmar (sista tömning + 30 min), arbetsledarens godkännande och fakturor.',
   eyebrow: 'Masstransporter och tippbilar',
   title: 'Arbetsplatsens lass, timmar och fakturor på ett ställe',
   lede:
@@ -186,7 +186,7 @@ const sv: EarthworksCopy = {
   featuresTitle: 'Det här får du',
   features: [
     { title: 'Lass och vägningar', text: 'Brutto, tara, netto och vägsedel för varje lass. Vågar och mottagningsplatser väljs ur en lista, och en ny plats kan läggas till direkt från arbetsplatsen.' },
-    { title: 'Transportdokument för avfall', text: 'Transportdokumentet (siirtoasiakirja) enligt 121 § i finska avfallslagen skapas från lasset: avfallskod, producent, transportör och mottagare, klart att skriva ut.' },
+    { title: 'Finskt transportdokument för avfall', text: 'För arbetsplatser i Finland: transportdokumentet (siirtoasiakirja) enligt 121 § i finska avfallslagen skapas från lasset: avfallskod, producent, transportör och mottagare, klart att skriva ut.' },
     { title: 'Timmar utan lappar', text: 'Ankomst på morgonen, sista tömning + 30 min på kvällen. Inga handskrivna tidlappar och ingen gissning i efterhand.' },
     { title: 'Axeltryck och överlast', text: 'Bil, släp och ekipagets högsta tillåtna bruttovikt per land (Finland 76 t, Sverige, Norge, Danmark, Estland, Tyskland…). Varning för överlast redan vid vågen.' },
     { title: 'Fakturering i eget namn', text: 'Fakturor med ditt företags FO-nummer (Y-tunnus), kontonummer och egen nummerserie. Per timme, per lass eller per ton. Skickas med en knapptryckning, varje vecka eller varannan vecka.' },
@@ -199,7 +199,7 @@ const sv: EarthworksCopy = {
     { q: 'Behöver arbetsledaren ett konto?', a: 'Nej. Arbetsledaren får arbetsplatsens länk, ser dagar, lass och timmar där och godkänner dagen med sitt namn. Priserna ser arbetsledaren inte.' },
     { q: 'Hur räknas timmarna?', a: 'Dagen börjar när föraren registrerar ankomst till arbetsplatsen och slutar vid sista tömningen + marginal (30 min som standard). Om föraren avslutar dagen senare räknas avslutet.' },
     { q: 'I vems namn går fakturan?', a: 'Åkeriets: FO-nummer (Y-tunnus), kontonummer, fakturanummer och referensnummer är ditt företags. RAHTIS gör fakturan av godkända dagar och skickar den till kunden som PDF.' },
-    { q: 'Får jag transportdokument för avfall?', a: 'Ja. För varje lass får du ett transportdokument enligt avfallslagen, med avfallskoder. Förorenad jord och byggavfall markeras för anmälan till registret över transportdokument.' },
+    { q: 'Får jag transportdokument för avfall?', a: 'Ja, på arbetsplatser i Finland. För varje lass får du ett siirtoasiakirja enligt finska avfallslagen, med avfallskoder. Förorenad jord och byggavfall markeras för anmälan till registret över transportdokument. Utanför Finland gäller nationella krav, i Sverige till exempel Naturvårdsverkets avfallsregister – det stöds inte ännu, vi lägger till land för land.' },
     { q: 'Fungerar appen i en grop utan täckning?', a: 'Ja. Uppgifterna sparas i mobilen och skickas när anslutningen är tillbaka. Tiden är när föraren tryckte, inte när det skickades.' },
     { q: 'Vad kostar det?', a: '29,90 € (exkl. moms) per bil och månad, bara för bilar som har kört. Första månaden är gratis.' },
   ],
@@ -207,7 +207,7 @@ const sv: EarthworksCopy = {
   finalText: 'Lägg till en arbetsplats, bjud in en förare och skicka länken till arbetsledaren. Första månaden är gratis.',
   teaserEyebrow: 'Nytt: masstransporter',
   teaserTitle: 'Tippbilar på arbetsplatsen: lass, timmar och fakturor',
-  teaserText: 'Vägda lass, transportdokument för avfall, timmar till sista tömningen + 30 min och arbetsledarens godkännande via länk. Faktura till kunden i ditt företags namn.',
+  teaserText: 'Vägda lass, finska transportdokument för avfall, timmar till sista tömningen + 30 min och arbetsledarens godkännande via länk. Faktura till kunden i ditt företags namn.',
   teaserCta: 'Läs mer',
   footerLink: 'Masstransporter och tippbilar',
   serviceTitle: 'Markarbeten och tippbilar',
@@ -216,7 +216,7 @@ const sv: EarthworksCopy = {
   serviceType: 'Arbetsplatsapp för masstransporter',
   features_ld: [
     'Lass och vägningar (brutto, tara, netto, vägsedel)',
-    'Transportdokument för avfall enligt finska avfallslagen',
+    'Finskt transportdokument för avfall (siirtoasiakirja) för arbetsplatser i Finland',
     'Timmar: ankomst – sista tömning + 30 min',
     'Arbetsledarens godkännande via länk',
     'Fakturor till kunden i åkeriets namn',
@@ -227,7 +227,7 @@ const sv: EarthworksCopy = {
 const et: EarthworksCopy = {
   metaTitle: 'Pinnasetööd ja kallurid: koormad, tunnid ja arved',
   metaDescription:
-    'Kallurite objektirakendus: kaalutud koormad, jäätmeveo saatelehed, tunnid (viimane mahalaadimine + 30 min), töödejuhataja kinnitus ja arved kliendile.',
+    'Kallurite objektirakendus: kaalutud koormad, Soome jäätmeveo saatelehed, tunnid (viimane mahalaadimine + 30 min), töödejuhataja kinnitus ja arved kliendile.',
   eyebrow: 'Pinnasetööd ja kallurid',
   title: 'Objekti koormad, tunnid ja arved ühes kohas',
   lede:
@@ -245,7 +245,7 @@ const et: EarthworksCopy = {
   featuresTitle: 'Mida sa saad',
   features: [
     { title: 'Koormad ja kaalumised', text: 'Bruto, taara, neto ja kaalutõend igast koormast. Kaalud ja vastuvõtukohad valitakse nimekirjast, uue koha saab lisada otse objektilt.' },
-    { title: 'Jäätmeveo saateleht', text: 'Soome jäätmeseaduse § 121 kohane saateleht (siirtoasiakirja) tekib koormast: jäätmekood, jäätmetekitaja, vedaja ja vastuvõtja, valmis välja printimiseks.' },
+    { title: 'Soome jäätmeveo saateleht', text: 'Soomes asuvatel objektidel: Soome jäätmeseaduse § 121 kohane saateleht (siirtoasiakirja) tekib koormast: jäätmekood, jäätmetekitaja, vedaja ja vastuvõtja, valmis välja printimiseks.' },
     { title: 'Tunnid ilma paberita', text: 'Saabumine hommikul, viimane mahalaadimine + 30 min õhtul. Ei mingeid käsitsi täidetud tunnilehti ega tagantjärele oletamist.' },
     { title: 'Teljekoormused ja ülekoormus', text: 'Auto, haagis ja autorongi suurim lubatud täismass riigiti (Soome 76 t, Rootsi, Norra, Taani, Eesti, Saksamaa…). Ülekoormuse hoiatus juba kaalul.' },
     { title: 'Arved oma nimel', text: 'Arved sinu firma registrikoodi (Y-tunnus), arvelduskonto ja oma numbriseeriaga. Tunnitöö, koorma või tonni järgi. Lähevad teele nupuvajutusega, iga nädal või üle nädala.' },
@@ -258,7 +258,7 @@ const et: EarthworksCopy = {
     { q: 'Kas töödejuhataja vajab kasutajakontot?', a: 'Ei. Töödejuhataja saab objekti lingi, näeb sealt päevi, koormaid ja tunde ning kinnitab päeva oma nimega. Hindu ta ei näe.' },
     { q: 'Kuidas tunde arvestatakse?', a: 'Päev algab, kui juht märgib saabumise objektile, ja lõpeb viimase mahalaadimise + varuajaga (vaikimisi 30 min). Kui juht lõpetab päeva hiljem, arvestatakse lõpetamise aega.' },
     { q: 'Kelle nimel arve läheb?', a: 'Vedaja nimel: Y-tunnus, arvelduskonto, arve number ja viitenumber on sinu firma omad. RAHTIS koostab arve kinnitatud päevadest ja saadab selle kliendile PDF-ina.' },
-    { q: 'Kas jäätmeveo saatelehe saab?', a: 'Jah. Iga koorma kohta saab jäätmeseaduse kohase saatelehe koos jäätmekoodidega. Saastunud pinnas ja ehitusjäätmed märgitakse saatelehtede registrisse teatamiseks.' },
+    { q: 'Kas jäätmeveo saatelehe saab?', a: 'Jah, Soomes asuvatel objektidel. Iga koorma kohta saab Soome jäätmeseaduse kohase saatelehe (siirtoasiakirja) koos jäätmekoodidega. Saastunud pinnas ja ehitusjäätmed märgitakse saatelehtede registrisse teatamiseks. Eestis kehtib JVIS-i elektrooniline saateleht – seda me veel ei toeta, teiste riikide nõudeid lisame järk-järgult.' },
     { q: 'Kas rakendus töötab kaevikus ilma levita?', a: 'Töötab. Kanded salvestuvad telefoni ja lähevad teele, kui ühendus taastub. Arvesse läheb vajutamise, mitte saatmise hetk.' },
     { q: 'Mis see maksab?', a: '29,90 € (km-ta) auto kohta kuus, ainult sõitnud autode eest. Esimene kuu on tasuta.' },
   ],
@@ -266,7 +266,7 @@ const et: EarthworksCopy = {
   finalText: 'Lisa objekt, kutsu juht ja saada töödejuhatajale link. Esimene kuu on tasuta.',
   teaserEyebrow: 'Uus: pinnasetööd',
   teaserTitle: 'Kallurid objektil: koormad, tunnid ja arved',
-  teaserText: 'Kaalutud koormad, jäätmeveo saatelehed, tunnid viimase mahalaadimiseni + 30 min ja töödejuhataja kinnitus lingi kaudu. Arve kliendile sinu firma nimel.',
+  teaserText: 'Kaalutud koormad, Soome jäätmeveo saatelehed, tunnid viimase mahalaadimiseni + 30 min ja töödejuhataja kinnitus lingi kaudu. Arve kliendile sinu firma nimel.',
   teaserCta: 'Loe edasi',
   footerLink: 'Pinnasetööd ja kallurid',
   serviceTitle: 'Pinnasetööd ja kallurid',
@@ -275,7 +275,7 @@ const et: EarthworksCopy = {
   serviceType: 'Pinnaseveo objektirakendus',
   features_ld: [
     'Koormad ja kaalumised (bruto, taara, neto, kaalutõend)',
-    'Jäätmeseaduse kohane jäätmeveo saateleht',
+    'Soome jäätmeveo saateleht (siirtoasiakirja) Soome objektidele',
     'Tunnid: saabumine – viimane mahalaadimine + 30 min',
     'Töödejuhataja kinnitus lingi kaudu',
     'Arved kliendile vedaja nimel',
@@ -286,7 +286,7 @@ const et: EarthworksCopy = {
 const lv: EarthworksCopy = {
   metaTitle: 'Zemes darbi un pašizgāzēji: kravas, stundas, rēķini',
   metaDescription:
-    'Lietotne pašizgāzējiem objektā: svērtas kravas, atkritumu pavadzīmes, stundas (pēdējā izkraušana + 30 min), darbu vadītāja apstiprinājums un rēķini.',
+    'Lietotne pašizgāzējiem objektā: svērtas kravas, Somijas atkritumu pavadzīmes, stundas (pēdējā izkraušana + 30 min), darbu vadītāja apstiprinājums un rēķini.',
   eyebrow: 'Zemes darbi un pašizgāzēji',
   title: 'Objekta kravas, stundas un rēķini vienuviet',
   lede:
@@ -304,7 +304,7 @@ const lv: EarthworksCopy = {
   featuresTitle: 'Ko jūs iegūstat',
   features: [
     { title: 'Kravas un svēršanas', text: 'Bruto, tara, neto un svēršanas kvīts par katru kravu. Svarus un pieņemšanas vietas izvēlas no saraksta, jaunu vietu var pievienot tieši no objekta.' },
-    { title: 'Atkritumu pārvadājuma pavadzīme', text: 'Somijas Atkritumu likuma 121. pantam atbilstoša pavadzīme (siirtoasiakirja) veidojas no kravas: atkritumu kods, radītājs, pārvadātājs un saņēmējs, gatava drukāšanai.' },
+    { title: 'Somijas atkritumu pārvadājuma pavadzīme', text: 'Objektiem Somijā: Somijas Atkritumu likuma 121. pantam atbilstoša pavadzīme (siirtoasiakirja) veidojas no kravas: atkritumu kods, radītājs, pārvadātājs un saņēmējs, gatava drukāšanai.' },
     { title: 'Stundas bez papīriem', text: 'Ierašanās no rīta, pēdējā izkraušana + 30 min vakarā. Nekādu ar roku rakstītu stundu lapu un minēšanas pēc tam.' },
     { title: 'Ass slodzes un pārslodze', text: 'Auto, piekabe un sastāva maksimālā pieļaujamā masa pa valstīm (Somija 76 t, Zviedrija, Norvēģija, Dānija, Igaunija, Vācija…). Brīdinājums par pārslodzi jau pie svariem.' },
     { title: 'Rēķini savā vārdā', text: 'Rēķini ar jūsu uzņēmuma reģistrācijas numuru (Y-tunnus), bankas kontu un savu numerāciju. Par stundām, par kravu vai par tonnu. Aiziet ar vienu pogu, katru nedēļu vai reizi divās nedēļās.' },
@@ -317,7 +317,7 @@ const lv: EarthworksCopy = {
     { q: 'Vai darbu vadītājam vajag kontu?', a: 'Nē. Darbu vadītājs saņem objekta saiti, tur redz dienas, kravas un stundas un apstiprina dienu ar savu vārdu. Cenas viņš neredz.' },
     { q: 'Kā tiek skaitītas stundas?', a: 'Diena sākas, kad vadītājs atzīmē ierašanos objektā, un beidzas ar pēdējo izkraušanu + rezerves laiku (pēc noklusējuma 30 min). Ja vadītājs dienu noslēdz vēlāk, skaitās noslēgšanas laiks.' },
     { q: 'Kura vārdā aiziet rēķins?', a: 'Pārvadātāja: Y-tunnus, bankas konts, rēķina numurs un atsauces numurs ir jūsu uzņēmuma. RAHTIS sagatavo rēķinu no apstiprinātajām dienām un nosūta to klientam PDF formātā.' },
-    { q: 'Vai var saņemt atkritumu pavadzīmi?', a: 'Jā. Par katru kravu var saņemt Atkritumu likumam atbilstošu pavadzīmi ar atkritumu kodiem. Piesārņota grunts un būvniecības atkritumi tiek atzīmēti paziņošanai pavadzīmju reģistrā.' },
+    { q: 'Vai var saņemt atkritumu pavadzīmi?', a: 'Jā, objektiem Somijā. Par katru kravu var saņemt Somijas Atkritumu likumam atbilstošu pavadzīmi (siirtoasiakirja) ar atkritumu kodiem. Piesārņota grunts un būvniecības atkritumi tiek atzīmēti paziņošanai pavadzīmju reģistrā. Latvijā pavadzīmes kārto valsts informācijas sistēmā „Atkritumi” – to vēl neatbalstām, citu valstu prasības pievienojam pakāpeniski.' },
     { q: 'Vai lietotne strādā būvbedrē bez pārklājuma?', a: 'Strādā. Ieraksti saglabājas telefonā un aiziet, kad savienojums atjaunojas. Laiks ir pogas nospiešanas brīdis, nevis nosūtīšanas.' },
     { q: 'Cik tas maksā?', a: '29,90 € (bez PVN) par auto mēnesī, tikai par auto, kas brauca. Pirmais mēnesis ir bez maksas.' },
   ],
@@ -325,7 +325,7 @@ const lv: EarthworksCopy = {
   finalText: 'Pievienojiet objektu, uzaiciniet vadītāju un nosūtiet darbu vadītājam saiti. Pirmais mēnesis ir bez maksas.',
   teaserEyebrow: 'Jaunums: zemes darbi',
   teaserTitle: 'Pašizgāzēji objektā: kravas, stundas un rēķini',
-  teaserText: 'Svērtas kravas, atkritumu pavadzīmes, stundas līdz pēdējai izkraušanai + 30 min un darbu vadītāja apstiprinājums caur saiti. Rēķins klientam jūsu uzņēmuma vārdā.',
+  teaserText: 'Svērtas kravas, Somijas atkritumu pavadzīmes, stundas līdz pēdējai izkraušanai + 30 min un darbu vadītāja apstiprinājums caur saiti. Rēķins klientam jūsu uzņēmuma vārdā.',
   teaserCta: 'Lasīt vairāk',
   footerLink: 'Zemes darbi un pašizgāzēji',
   serviceTitle: 'Zemes darbi un pašizgāzēji',
@@ -334,7 +334,7 @@ const lv: EarthworksCopy = {
   serviceType: 'Objekta lietotne zemes darbu pārvadājumiem',
   features_ld: [
     'Kravas un svēršanas (bruto, tara, neto, svēršanas kvīts)',
-    'Atkritumu likumam atbilstoša pavadzīme',
+    'Somijas atkritumu pavadzīme (siirtoasiakirja) objektiem Somijā',
     'Stundas: ierašanās – pēdējā izkraušana + 30 min',
     'Darbu vadītāja apstiprinājums caur saiti',
     'Rēķini klientam pārvadātāja vārdā',
@@ -345,7 +345,7 @@ const lv: EarthworksCopy = {
 const lt: EarthworksCopy = {
   metaTitle: 'Žemės darbai ir savivarčiai: kroviniai, valandos, sąskaitos',
   metaDescription:
-    'Programėlė savivarčiams objekte: pasverti kroviniai, atliekų lydraščiai, valandos (paskutinis iškrovimas + 30 min), darbų vadovo patvirtinimas ir sąskaitos.',
+    'Programėlė savivarčiams objekte: pasverti kroviniai, Suomijos atliekų lydraščiai, valandos (paskutinis iškrovimas + 30 min), darbų vadovo patvirtinimas ir sąskaitos.',
   eyebrow: 'Žemės darbai ir savivarčiai',
   title: 'Objekto kroviniai, valandos ir sąskaitos vienoje vietoje',
   lede:
@@ -363,7 +363,7 @@ const lt: EarthworksCopy = {
   featuresTitle: 'Ką gaunate',
   features: [
     { title: 'Kroviniai ir svėrimai', text: 'Bruto, tara, neto ir svėrimo kvitas kiekvienam kroviniui. Svarstyklės ir priėmimo vietos pasirenkamos iš sąrašo, naują vietą galima pridėti tiesiai iš objekto.' },
-    { title: 'Atliekų vežimo lydraštis', text: 'Suomijos atliekų įstatymo 121 straipsnį atitinkantis lydraštis (siirtoasiakirja) sudaromas iš krovinio: atliekų kodas, atliekų darytojas, vežėjas ir gavėjas, paruošta spausdinti.' },
+    { title: 'Suomijos atliekų vežimo lydraštis', text: 'Objektams Suomijoje: Suomijos atliekų įstatymo 121 straipsnį atitinkantis lydraštis (siirtoasiakirja) sudaromas iš krovinio: atliekų kodas, atliekų darytojas, vežėjas ir gavėjas, paruošta spausdinti.' },
     { title: 'Valandos be popierių', text: 'Atvykimas ryte, paskutinis iškrovimas + 30 min vakare. Jokių ranka pildomų darbo laiko lapų ir jokio spėliojimo vėliau.' },
     { title: 'Ašių apkrovos ir perkrova', text: 'Sunkvežimis, priekaba ir didžiausia leidžiama junginio masė pagal šalį (Suomija 76 t, Švedija, Norvegija, Danija, Estija, Vokietija…). Įspėjimas apie perkrovą jau prie svarstyklių.' },
     { title: 'Sąskaitos savo vardu', text: 'Sąskaitos su jūsų įmonės kodu (Y-tunnus), banko sąskaita ir savo numeracija. Už valandas, už krovinį ar už toną. Išsiunčiama vienu mygtuku, kas savaitę arba kas dvi savaites.' },
@@ -376,7 +376,7 @@ const lt: EarthworksCopy = {
     { q: 'Ar darbų vadovui reikia paskyros?', a: 'Ne. Darbų vadovas gauna objekto nuorodą, mato joje dienas, krovinius ir valandas ir patvirtina dieną savo vardu. Kainų jis nemato.' },
     { q: 'Kaip skaičiuojamos valandos?', a: 'Diena prasideda, kai vairuotojas pažymi atvykimą į objektą, ir baigiasi paskutiniu iškrovimu + atsargos laiku (numatytasis 30 min). Jei vairuotojas dieną baigia vėliau, skaičiuojamas pabaigos laikas.' },
     { q: 'Kieno vardu siunčiama sąskaita?', a: 'Vežėjo: Y-tunnus, banko sąskaita, sąskaitos numeris ir įmokos kodas yra jūsų įmonės. RAHTIS parengia sąskaitą iš patvirtintų dienų ir išsiunčia ją klientui PDF formatu.' },
-    { q: 'Ar galima gauti atliekų lydraštį?', a: 'Taip. Kiekvienam kroviniui galima gauti atliekų įstatymą atitinkantį lydraštį su atliekų kodais. Užterštas gruntas ir statybinės atliekos pažymimi, kad apie juos būtų pranešta lydraščių registrui.' },
+    { q: 'Ar galima gauti atliekų lydraštį?', a: 'Taip, objektams Suomijoje. Kiekvienam kroviniui galima gauti Suomijos atliekų įstatymą atitinkantį lydraštį (siirtoasiakirja) su atliekų kodais. Užterštas gruntas ir statybinės atliekos pažymimi, kad apie juos būtų pranešta lydraščių registrui. Lietuvoje lydraščiai pildomi GPAIS – to dar nepalaikome, kitų šalių reikalavimus pridedame palaipsniui.' },
     { q: 'Ar programėlė veikia duobėje be ryšio?', a: 'Veikia. Įrašai išsaugomi telefone ir išsiunčiami, kai ryšys grįžta. Laikas – tai paspaudimo, o ne išsiuntimo momentas.' },
     { q: 'Kiek tai kainuoja?', a: '29,90 € (be PVM) už sunkvežimį per mėnesį, tik už važiavusius. Pirmas mėnuo nemokamas.' },
   ],
@@ -384,7 +384,7 @@ const lt: EarthworksCopy = {
   finalText: 'Pridėkite objektą, pakvieskite vairuotoją ir nusiųskite darbų vadovui nuorodą. Pirmas mėnuo nemokamas.',
   teaserEyebrow: 'Nauja: žemės darbai',
   teaserTitle: 'Savivarčiai objekte: kroviniai, valandos ir sąskaitos',
-  teaserText: 'Pasverti kroviniai, atliekų lydraščiai, valandos iki paskutinio iškrovimo + 30 min ir darbų vadovo patvirtinimas per nuorodą. Sąskaita klientui jūsų įmonės vardu.',
+  teaserText: 'Pasverti kroviniai, Suomijos atliekų lydraščiai, valandos iki paskutinio iškrovimo + 30 min ir darbų vadovo patvirtinimas per nuorodą. Sąskaita klientui jūsų įmonės vardu.',
   teaserCta: 'Skaityti daugiau',
   footerLink: 'Žemės darbai ir savivarčiai',
   serviceTitle: 'Žemės darbai ir savivarčiai',
@@ -393,7 +393,7 @@ const lt: EarthworksCopy = {
   serviceType: 'Objekto programėlė žemės darbų pervežimams',
   features_ld: [
     'Kroviniai ir svėrimai (bruto, tara, neto, svėrimo kvitas)',
-    'Atliekų įstatymą atitinkantis lydraštis',
+    'Suomijos atliekų lydraštis (siirtoasiakirja) objektams Suomijoje',
     'Valandos: atvykimas – paskutinis iškrovimas + 30 min',
     'Darbų vadovo patvirtinimas per nuorodą',
     'Sąskaitos klientui vežėjo vardu',
@@ -404,7 +404,7 @@ const lt: EarthworksCopy = {
 const pl: EarthworksCopy = {
   metaTitle: 'Roboty ziemne i wywrotki: kursy, godziny i faktury',
   metaDescription:
-    'Aplikacja dla wywrotek na budowie: kursy z ważeniem, dokumenty przekazania odpadów, godziny (ostatni rozładunek + 30 min), akceptacja kierownika i faktury.',
+    'Aplikacja dla wywrotek na budowie: kursy z ważeniem, fińskie dokumenty przewozu odpadów, godziny (ostatni rozładunek + 30 min), akceptacja kierownika i faktury.',
   eyebrow: 'Roboty ziemne i wywrotki',
   title: 'Kursy, godziny i faktury z budowy w jednym miejscu',
   lede:
@@ -422,7 +422,7 @@ const pl: EarthworksCopy = {
   featuresTitle: 'Co dostajesz',
   features: [
     { title: 'Kursy i ważenia', text: 'Brutto, tara, netto i kwit wagowy z każdego kursu. Wagi i miejsca przyjęcia wybiera się z listy, a nowe miejsce można dodać prosto z budowy.' },
-    { title: 'Dokument przekazania odpadów', text: 'Dokument przekazania odpadów (siirtoasiakirja) zgodny z § 121 fińskiej ustawy o odpadach powstaje z kursu: kod odpadu, wytwórca, przewoźnik i odbiorca, gotowy do druku.' },
+    { title: 'Fiński dokument przewozu odpadów', text: 'Dla budów w Finlandii: dokument przewozu odpadów (siirtoasiakirja) zgodny z § 121 fińskiej ustawy o odpadach powstaje z kursu: kod odpadu, wytwórca, przewoźnik i odbiorca, gotowy do druku.' },
     { title: 'Godziny bez karteczek', text: 'Przyjazd rano, ostatni rozładunek + 30 min wieczorem. Żadnych ręcznie pisanych kart pracy ani zgadywania po fakcie.' },
     { title: 'Naciski osi i przeładowanie', text: 'Auto, przyczepa i dopuszczalna masa całkowita zestawu według kraju (Finlandia 76 t, Szwecja, Norwegia, Dania, Estonia, Niemcy…). Ostrzeżenie o przeładowaniu już na wadze.' },
     { title: 'Faktury we własnym imieniu', text: 'Faktury z numerem identyfikacyjnym Twojej firmy (Y-tunnus), numerem konta i własną numeracją. Za godziny, za kurs albo za tonę. Wysyłka jednym przyciskiem, co tydzień albo co dwa tygodnie.' },
@@ -435,7 +435,7 @@ const pl: EarthworksCopy = {
     { q: 'Czy kierownik robót potrzebuje konta?', a: 'Nie. Kierownik robót dostaje link do budowy, widzi w nim dni, kursy i godziny i zatwierdza dzień swoim nazwiskiem. Cen nie widzi.' },
     { q: 'Jak liczone są godziny?', a: 'Dzień zaczyna się, gdy kierowca zaznaczy przyjazd na budowę, a kończy ostatnim rozładunkiem + zapasem (domyślnie 30 min). Jeśli kierowca zakończy dzień później, liczy się zakończenie.' },
     { q: 'W czyim imieniu idzie faktura?', a: 'Firmy przewozowej: Y-tunnus, numer konta, numer faktury i numer referencyjny należą do Twojej firmy. RAHTIS przygotowuje fakturę z zatwierdzonych dni i wysyła ją klientowi w PDF.' },
-    { q: 'Czy dostanę dokument przekazania odpadów?', a: 'Tak. Do każdego kursu można pobrać dokument przekazania odpadów zgodny z ustawą o odpadach, z kodami odpadów. Zanieczyszczona ziemia i odpady budowlane są oznaczane do zgłoszenia w rejestrze dokumentów przekazania.' },
+    { q: 'Czy dostanę dokument przewozu odpadów?', a: 'Tak, dla budów w Finlandii. Do każdego kursu można pobrać fiński dokument przewozu odpadów (siirtoasiakirja) zgodny z fińską ustawą o odpadach, z kodami odpadów. Zanieczyszczona ziemia i odpady budowlane są oznaczane do zgłoszenia w fińskim rejestrze. W Polsce obowiązuje BDO i KPO – tego jeszcze nie obsługujemy, wymagania kolejnych krajów dodajemy stopniowo.' },
     { q: 'Czy aplikacja działa w wykopie bez zasięgu?', a: 'Tak. Wpisy zapisują się w telefonie i wysyłają, gdy połączenie wróci. Liczy się chwila naciśnięcia, a nie wysłania.' },
     { q: 'Ile to kosztuje?', a: '29,90 € netto za auto miesięcznie, tylko za auta, które jeździły. Pierwszy miesiąc jest darmowy.' },
   ],
@@ -443,7 +443,7 @@ const pl: EarthworksCopy = {
   finalText: 'Dodaj budowę, zaproś kierowcę i wyślij kierownikowi robót link. Pierwszy miesiąc jest darmowy.',
   teaserEyebrow: 'Nowość: roboty ziemne',
   teaserTitle: 'Wywrotki na budowie: kursy, godziny i faktury',
-  teaserText: 'Kursy z ważeniem, dokumenty przekazania odpadów, godziny do ostatniego rozładunku + 30 min i akceptacja kierownika robót przez link. Faktura do klienta w imieniu Twojej firmy.',
+  teaserText: 'Kursy z ważeniem, fińskie dokumenty przewozu odpadów, godziny do ostatniego rozładunku + 30 min i akceptacja kierownika robót przez link. Faktura do klienta w imieniu Twojej firmy.',
   teaserCta: 'Czytaj więcej',
   footerLink: 'Roboty ziemne i wywrotki',
   serviceTitle: 'Roboty ziemne i wywrotki',
@@ -452,7 +452,7 @@ const pl: EarthworksCopy = {
   serviceType: 'Aplikacja budowlana do przewozu ziemi',
   features_ld: [
     'Kursy i ważenia (brutto, tara, netto, kwit wagowy)',
-    'Dokument przekazania odpadów zgodny z ustawą o odpadach',
+    'Fiński dokument przewozu odpadów (siirtoasiakirja) dla budów w Finlandii',
     'Godziny: przyjazd – ostatni rozładunek + 30 min',
     'Akceptacja kierownika robót przez link',
     'Faktury do klienta w imieniu przewoźnika',
@@ -463,7 +463,7 @@ const pl: EarthworksCopy = {
 const de: EarthworksCopy = {
   metaTitle: 'Erdbau und Kipper: Fuhren, Stunden und Rechnungen',
   metaDescription:
-    'Baustellen-App für Kipper: gewogene Fuhren, Abfall-Begleitscheine, Stunden (letzte Entladung + 30 Min.), Freigabe durch den Bauleiter und Rechnungen.',
+    'Baustellen-App für Kipper: gewogene Fuhren, finnische Abfall-Transportdokumente, Stunden (letzte Entladung + 30 Min.), Freigabe durch den Bauleiter und Rechnungen.',
   eyebrow: 'Erdbau und Kipper',
   title: 'Fuhren, Stunden und Rechnungen der Baustelle an einem Ort',
   lede:
@@ -481,7 +481,7 @@ const de: EarthworksCopy = {
   featuresTitle: 'Was Sie bekommen',
   features: [
     { title: 'Fuhren und Wiegungen', text: 'Brutto, Tara, Netto und Wiegeschein zu jeder Fuhre. Waagen und Annahmestellen werden aus einer Liste gewählt, eine neue Stelle lässt sich direkt auf der Baustelle anlegen.' },
-    { title: 'Abfall-Begleitschein', text: 'Der Begleitschein (siirtoasiakirja) nach § 121 des finnischen Abfallgesetzes entsteht direkt aus der Fuhre: Abfallschlüssel, Erzeuger, Beförderer und Empfänger, fertig zum Ausdrucken.' },
+    { title: 'Finnisches Abfall-Transportdokument', text: 'Für Baustellen in Finnland: Das Transportdokument (siirtoasiakirja) nach § 121 des finnischen Abfallgesetzes entsteht direkt aus der Fuhre: Abfallschlüssel, Erzeuger, Beförderer und Empfänger, fertig zum Ausdrucken.' },
     { title: 'Stunden ohne Zettel', text: 'Ankunft am Morgen, letzte Entladung + 30 Min. am Abend. Keine handgeschriebenen Stundenzettel und kein Raten im Nachhinein.' },
     { title: 'Achslasten und Überladung', text: 'Lkw, Anhänger und zulässiges Gesamtgewicht des Zuges je Land (Finnland 76 t, Schweden, Norwegen, Dänemark, Estland, Deutschland…). Warnung bei Überladung schon an der Waage.' },
     { title: 'Rechnungen im eigenen Namen', text: 'Rechnungen mit der Unternehmenskennung Ihrer Firma (Y-tunnus), Ihrer Bankverbindung und eigenem Nummernkreis. Nach Stunden, pro Fuhre oder pro Tonne. Versand per Knopfdruck, wöchentlich oder alle zwei Wochen.' },
@@ -494,7 +494,7 @@ const de: EarthworksCopy = {
     { q: 'Braucht der Bauleiter Zugangsdaten?', a: 'Nein. Der Bauleiter bekommt den Link zur Baustelle, sieht dort Tage, Fuhren und Stunden und gibt den Tag mit seinem Namen frei. Preise sieht er nicht.' },
     { q: 'Wie werden die Stunden berechnet?', a: 'Der Tag beginnt, wenn der Fahrer die Ankunft auf der Baustelle meldet, und endet mit der letzten Entladung + Puffer (standardmäßig 30 Min.). Beendet der Fahrer den Tag später, zählt das spätere Ende.' },
     { q: 'In wessen Namen geht die Rechnung raus?', a: 'Im Namen des Fuhrunternehmens: Y-tunnus, Bankverbindung, Rechnungsnummer und Referenznummer gehören Ihrem Unternehmen. RAHTIS erstellt die Rechnung aus den freigegebenen Tagen und schickt sie dem Kunden als PDF.' },
-    { q: 'Bekomme ich einen Abfall-Begleitschein?', a: 'Ja. Zu jeder Fuhre gibt es einen Begleitschein nach dem Abfallgesetz, mit Abfallschlüsseln. Belasteter Boden und Bauabfälle werden für die Meldung an das Begleitscheinregister markiert.' },
+    { q: 'Bekomme ich ein Abfall-Transportdokument?', a: 'Ja, für Baustellen in Finnland. Zu jeder Fuhre gibt es ein Transportdokument (siirtoasiakirja) nach dem finnischen Abfallgesetz, mit Abfallschlüsseln. Belasteter Boden und Bauabfälle werden für die Meldung an das finnische Register markiert. In Deutschland gelten eANV und der Lieferschein nach ErsatzbaustoffV – das unterstützen wir noch nicht, weitere Länder folgen nach und nach.' },
     { q: 'Funktioniert die App in der Grube ohne Netz?', a: 'Ja. Die Einträge werden auf dem Handy gespeichert und gesendet, sobald die Verbindung zurück ist. Es zählt der Moment des Tippens, nicht des Sendens.' },
     { q: 'Was kostet das?', a: '29,90 € (zzgl. MwSt.) pro Lkw und Monat, nur für Lkw, die gefahren sind. Der erste Monat ist kostenlos.' },
   ],
@@ -502,7 +502,7 @@ const de: EarthworksCopy = {
   finalText: 'Legen Sie eine Baustelle an, laden Sie einen Fahrer ein und schicken Sie dem Bauleiter den Link. Der erste Monat ist kostenlos.',
   teaserEyebrow: 'Neu: Erdbau',
   teaserTitle: 'Kipper auf der Baustelle: Fuhren, Stunden und Rechnungen',
-  teaserText: 'Gewogene Fuhren, Abfall-Begleitscheine, Stunden bis zur letzten Entladung + 30 Min. und Freigabe durch den Bauleiter per Link. Rechnung an den Kunden im Namen Ihres Unternehmens.',
+  teaserText: 'Gewogene Fuhren, finnische Abfall-Transportdokumente, Stunden bis zur letzten Entladung + 30 Min. und Freigabe durch den Bauleiter per Link. Rechnung an den Kunden im Namen Ihres Unternehmens.',
   teaserCta: 'Mehr erfahren',
   footerLink: 'Erdbau und Kipper',
   serviceTitle: 'Erdbau und Kipper',
@@ -511,7 +511,7 @@ const de: EarthworksCopy = {
   serviceType: 'Baustellen-App für Erdbautransporte',
   features_ld: [
     'Fuhren und Wiegungen (Brutto, Tara, Netto, Wiegeschein)',
-    'Abfall-Begleitschein nach dem finnischen Abfallgesetz',
+    'Finnisches Abfall-Transportdokument (siirtoasiakirja) für Baustellen in Finnland',
     'Stunden: Ankunft bis letzte Entladung + 30 Min.',
     'Freigabe durch den Bauleiter per Link',
     'Rechnungen an den Kunden im Namen des Fuhrunternehmens',
@@ -522,7 +522,7 @@ const de: EarthworksCopy = {
 const ru: EarthworksCopy = {
   metaTitle: 'Земляные работы и самосвалы: рейсы, часы и счета',
   metaDescription:
-    'Приложение для самосвалов: рейсы со взвешиванием, документы на перевозку отходов, часы (последняя выгрузка + 30 мин), подтверждение прораба и счета.',
+    'Приложение для самосвалов: рейсы со взвешиванием, финские документы на перевозку отходов, часы (последняя выгрузка + 30 мин), подтверждение прораба и счета.',
   eyebrow: 'Земляные работы и самосвалы',
   title: 'Рейсы, часы и счета по объекту в одном месте',
   lede:
@@ -540,7 +540,7 @@ const ru: EarthworksCopy = {
   featuresTitle: 'Что вы получаете',
   features: [
     { title: 'Рейсы и взвешивания', text: 'Брутто, тара, нетто и весовой талон по каждому рейсу. Весы и места приёмки выбираются из списка, новое место можно добавить прямо с объекта.' },
-    { title: 'Документ на перевозку отходов', text: 'Сопроводительный документ (siirtoasiakirja) по § 121 финского Закона об отходах формируется из рейса: код отходов, производитель, перевозчик и получатель — сразу на печать.' },
+    { title: 'Финский документ на перевозку отходов', text: 'Для объектов в Финляндии: сопроводительный документ (siirtoasiakirja) по § 121 финского Закона об отходах формируется из рейса: код отходов, производитель, перевозчик и получатель — сразу на печать.' },
     { title: 'Часы без бумажек', text: 'Прибытие утром, последняя выгрузка + 30 мин вечером. Никаких рукописных табелей и догадок задним числом.' },
     { title: 'Осевые нагрузки и перегруз', text: 'Машина, прицеп и максимальная разрешённая масса автопоезда по странам (Финляндия 76 т, Швеция, Норвегия, Дания, Эстония, Германия…). Предупреждение о перегрузе уже на весах.' },
     { title: 'Счета от своего имени', text: 'Счета с Y-tunnus вашей компании, её банковским счётом и собственной нумерацией. Почасово, за рейс или за тонну. Отправка одной кнопкой, раз в неделю или раз в две недели.' },
@@ -553,7 +553,7 @@ const ru: EarthworksCopy = {
     { q: 'Нужен ли прорабу логин?', a: 'Нет. Прораб получает ссылку на объект, видит там дни, рейсы и часы и подтверждает день своим именем. Цен он не видит.' },
     { q: 'Как считаются часы?', a: 'День начинается, когда водитель отмечает прибытие на объект, и заканчивается последней выгрузкой + запас (по умолчанию 30 мин). Если водитель закрывает день позже, считается время закрытия.' },
     { q: 'От чьего имени уходит счёт?', a: 'От имени перевозчика: Y-tunnus, банковский счёт, номер счёта и ссылочный номер — вашей компании. RAHTIS составляет счёт по подтверждённым дням и отправляет его заказчику в PDF.' },
-    { q: 'Можно ли получить документ на перевозку отходов?', a: 'Да. По каждому рейсу можно получить документ по Закону об отходах с кодами отходов. Загрязнённый грунт и строительные отходы помечаются для подачи в реестр сопроводительных документов.' },
+    { q: 'Можно ли получить документ на перевозку отходов?', a: 'Да, для объектов в Финляндии. По каждому рейсу можно получить siirtoasiakirja по финскому Закону об отходах с кодами отходов. Загрязнённый грунт и строительные отходы помечаются для подачи в финский реестр сопроводительных документов. В других странах — свои национальные системы, их пока нет, подключаем по очереди.' },
     { q: 'Работает ли приложение в котловане без связи?', a: 'Работает. Записи сохраняются в телефоне и уходят, когда связь появится. Время — это момент нажатия, а не отправки.' },
     { q: 'Сколько это стоит?', a: '29,90 € (без НДС) за машину в месяц, только за машины, которые работали. Первый месяц бесплатно.' },
   ],
@@ -561,7 +561,7 @@ const ru: EarthworksCopy = {
   finalText: 'Добавьте объект, пригласите водителя и отправьте прорабу ссылку. Первый месяц бесплатно.',
   teaserEyebrow: 'Новое: земляные работы',
   teaserTitle: 'Самосвалы на объекте: рейсы, часы и счета',
-  teaserText: 'Рейсы со взвешиванием, документы на перевозку отходов, часы до последней выгрузки + 30 мин и подтверждение прораба по ссылке. Счёт заказчику от имени вашей компании.',
+  teaserText: 'Рейсы со взвешиванием, финские документы на перевозку отходов, часы до последней выгрузки + 30 мин и подтверждение прораба по ссылке. Счёт заказчику от имени вашей компании.',
   teaserCta: 'Подробнее',
   footerLink: 'Земляные работы и самосвалы',
   serviceTitle: 'Земляные работы и самосвалы',
@@ -570,7 +570,7 @@ const ru: EarthworksCopy = {
   serviceType: 'Приложение для перевозок на земляных работах',
   features_ld: [
     'Рейсы и взвешивания (брутто, тара, нетто, весовой талон)',
-    'Документ на перевозку отходов по финскому Закону об отходах',
+    'Финский документ на перевозку отходов (siirtoasiakirja) для объектов в Финляндии',
     'Часы: прибытие — последняя выгрузка + 30 мин',
     'Подтверждение прораба по ссылке',
     'Счета заказчику от имени перевозчика',

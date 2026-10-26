@@ -48,7 +48,7 @@ Page: ${SITE_URL}/en/earthworks (suomeksi: ${SITE_URL}/fi/maansiirto)
 - The driver marks arrival on site in the app; every load is logged with material, receiving site or weighbridge, gross, tare, net and weigh ticket number; overload warning by the combination's legal maximum weight (Finland 76 t, and national rules for Sweden, Norway, Denmark, Estonia, Latvia, Lithuania, Poland, Germany).
 - Hours: arrival to the last unload + 30 minutes (buffer set per site) — the way Finnish dump-truck drivers log their day.
 - The customer's foreman approves each day from a link without logging in; prices are not shown to the foreman. The carrier can also approve the day itself.
-- Waste transfer document (siirtoasiakirja) under the Finnish Waste Act section 121 for each load, with EWC waste codes; contaminated soil and construction waste are flagged for the transfer document register.
+- For worksites in Finland: waste transfer document (siirtoasiakirja) under the Finnish Waste Act section 121 for each load, with EWC waste codes; contaminated soil and construction waste are flagged for the Finnish SIIRTO register. National waste-transport systems of other countries (e.g. BDO/KPO in Poland, eANV in Germany, GPAIS in Lithuania, JVIS in Estonia) are not supported yet.
 - Invoices to the customer in the carrier's own name (business ID, bank account, own number series, Finnish reference number, VAT): at the press of a button, weekly or every other week. Pricing per hour, per load or per tonne.
 - Same price as the rest of RAHTIS: ${euro(SUBSCRIPTION_UNIT_CENTS)} € (excl. VAT) per vehicle per month, no percentage.
 
