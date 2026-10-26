@@ -21,7 +21,7 @@ const verdictTone = { OK: 'ok', ATTENTION: 'warn', NOT_FOUND: 'warn', ERROR: 'da
  * Замечания показываются как есть, по-фински: их же оператор получил в
  * письме, и две разные формулировки одного замечания только путают.
  */
-function RegistryBlock({ company }: { company: Company }) {
+export function RegistryBlock({ company }: { company: Company }) {
   const { t, locale, f } = useI18n();
   const r = company.registry_check as RegistryCheck | null;
   const yes = (value: boolean | null) =>

@@ -481,7 +481,8 @@ export async function recheckRegistryAction(formData: FormData): Promise<void> {
     await admin.from('companies').update({ registry_check: registry }).eq('id', companyId);
   }
 
-  revalidatePath(`/${locale}/admin`);
+  /* layout — чтобы обновилась и карточка компании /admin/company/[id]. */
+  revalidatePath(`/${locale}/admin`, 'layout');
 }
 
 /**

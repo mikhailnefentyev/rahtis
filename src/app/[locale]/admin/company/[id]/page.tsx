@@ -19,6 +19,7 @@ import { CarrierScorecard } from '@/components/domain/CarrierScorecard';
 import { createClient } from '@/lib/supabase/server';
 import type { CompanyDocument, DocumentKind } from '@/types/db';
 import { AdminDocument } from './AdminDocument';
+import { RegistryBlock } from '../../ApplicationCard';
 
 /**
  * Карточка компании глазами оператора.
@@ -267,6 +268,15 @@ export default async function AdminCompanyPage({
           </div>
         </section>
       )}
+
+      {/*
+        * Сверка с реестром и после одобрения: правила сверки меняются
+        * (26.10.2026 — формы компаний других стран, Норвегия), и
+        * перепроверить уже работающую компанию должно быть где.
+        */}
+      <section className="mt-8">
+        <RegistryBlock company={company} />
+      </section>
 
       <section className="mt-8">
         <h2 className="label-micro mb-3">{t.requisites.title}</h2>
