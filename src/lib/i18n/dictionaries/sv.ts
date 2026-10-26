@@ -724,7 +724,7 @@ export const sv = {
       'Appen talar telefonens språk: finska, engelska, estniska, ryska, svenska, lettiska, litauiska, polska, norska och danska. Språket kan också väljas i profilen.',
 
     servicesEyebrow: 'Tjänsten växer i etapper',
-    servicesTitle: 'Vi började med trailerbyten – containrar och express är också i drift',
+    servicesTitle: 'Vi började med trailerbyten – containrar, express och markarbeten är också i drift',
     serviceLive: 'I drift',
     service1: 'Trailerbyten',
     service1Text:

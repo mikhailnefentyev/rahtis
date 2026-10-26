@@ -724,7 +724,7 @@ export const et = {
       'Rakendus räägib telefoni keelt: soome, inglise, eesti, vene, rootsi, läti, leedu, poola, norra ja taani. Keele saab valida ka profiilis.',
 
     servicesEyebrow: 'Teenus kasvab etappide kaupa',
-    servicesTitle: 'Alustasime haagisevahetustest — nüüd lisaks konteinerid ja ekspressveod',
+    servicesTitle: 'Alustasime haagisevahetustest — nüüd lisaks konteinerid, ekspressveod ja pinnasetööd',
     serviceLive: 'Töös',
     service1: 'Haagisevahetused',
     service1Text:

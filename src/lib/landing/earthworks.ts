@@ -38,6 +38,10 @@ export type EarthworksCopy = {
   teaserText: string;
   teaserCta: string;
   footerLink: string;
+  /** Карточка в блоке «как растёт сервис» на главной. */
+  serviceTitle: string;
+  serviceText: string;
+  serviceText2: string;
   /** Для разметки schema.org. */
   serviceType: string;
   features_ld: string[];
@@ -88,6 +92,9 @@ const fi: EarthworksCopy = {
   teaserText: 'Kuormat punnituksineen, siirtoasiakirjat, tunnit viimeiseen purkuun + 30 min ja työnjohtajan hyväksyntä linkistä. Lasku asiakkaalle yrityksesi nimissä.',
   teaserCta: 'Lue lisää',
   footerLink: 'Maansiirto ja kippiautot',
+  serviceTitle: 'Maansiirto ja kippiautot',
+  serviceText: 'Kippiauto ajaa työmaalla koko päivän: kuski kirjaa saapumisen ja jokaisen kuorman punnituksineen ja purkupaikkoineen. Tunnit lasketaan viimeiseen purkuun + 30 minuuttia.',
+  serviceText2: 'Työnjohtaja hyväksyy päivän linkistä ilman tunnuksia, ja lasku lähtee asiakkaalle kuljetusliikkeen omissa nimissä.',
   serviceType: 'Maansiirtokuljetusten työmaasovellus',
   features_ld: [
     'Kuormat ja punnitukset (brutto, tara, netto, punnituslippu)',
@@ -144,6 +151,9 @@ const en: EarthworksCopy = {
   teaserText: 'Weighed loads, waste transfer documents, hours to the last unload + 30 min and foreman approval by link. Invoice to the customer in your company’s name.',
   teaserCta: 'Read more',
   footerLink: 'Earthworks and dump trucks',
+  serviceTitle: 'Earthworks and dump trucks',
+  serviceText: 'A dump truck works a full day on site: the driver logs arrival and every load with its weighing and unloading site. Hours run to the last unload + 30 minutes.',
+  serviceText2: 'The foreman approves the day from a link without logging in, and the invoice goes to the customer in the carrier\'s own name.',
   serviceType: 'Worksite app for earthworks haulage',
   features_ld: [
     'Loads and weighings (gross, tare, net, weigh ticket)',
@@ -200,6 +210,9 @@ const sv: EarthworksCopy = {
   teaserText: 'Vägda lass, transportdokument för avfall, timmar till sista tömningen + 30 min och arbetsledarens godkännande via länk. Faktura till kunden i ditt företags namn.',
   teaserCta: 'Läs mer',
   footerLink: 'Masstransporter och tippbilar',
+  serviceTitle: 'Markarbeten och tippbilar',
+  serviceText: 'Tippbilen kör en hel dag på arbetsplatsen: föraren registrerar ankomst och varje lass med vägning och tippställe. Timmarna räknas till sista tömningen + 30 minuter.',
+  serviceText2: 'Arbetsledaren godkänner dagen via en länk utan inloggning, och fakturan går till kunden i åkeriets eget namn.',
   serviceType: 'Arbetsplatsapp för masstransporter',
   features_ld: [
     'Lass och vägningar (brutto, tara, netto, vägsedel)',
@@ -256,6 +269,9 @@ const et: EarthworksCopy = {
   teaserText: 'Kaalutud koormad, jäätmeveo saatelehed, tunnid viimase mahalaadimiseni + 30 min ja töödejuhataja kinnitus lingi kaudu. Arve kliendile sinu firma nimel.',
   teaserCta: 'Loe edasi',
   footerLink: 'Pinnasetööd ja kallurid',
+  serviceTitle: 'Pinnasetööd ja kallurid',
+  serviceText: 'Kallur töötab objektil terve päeva: juht märgib saabumise ning iga koorma koos kaalumise ja mahalaadimiskohaga. Tunnid arvestatakse viimase mahalaadimiseni + 30 minutit.',
+  serviceText2: 'Töödejuhataja kinnitab päeva lingi kaudu ilma sisse logimata ja arve läheb kliendile veofirma enda nimel.',
   serviceType: 'Pinnaseveo objektirakendus',
   features_ld: [
     'Koormad ja kaalumised (bruto, taara, neto, kaalutõend)',
@@ -312,6 +328,9 @@ const lv: EarthworksCopy = {
   teaserText: 'Svērtas kravas, atkritumu pavadzīmes, stundas līdz pēdējai izkraušanai + 30 min un darbu vadītāja apstiprinājums caur saiti. Rēķins klientam jūsu uzņēmuma vārdā.',
   teaserCta: 'Lasīt vairāk',
   footerLink: 'Zemes darbi un pašizgāzēji',
+  serviceTitle: 'Zemes darbi un pašizgāzēji',
+  serviceText: 'Pašizgāzējs visu dienu strādā objektā: vadītājs atzīmē ierašanos un katru kravu ar svēršanu un izkraušanas vietu. Stundas skaita līdz pēdējai izkraušanai + 30 minūtes.',
+  serviceText2: 'Darbu vadītājs apstiprina dienu caur saiti bez pieteikšanās, un rēķins klientam aiziet pārvadātāja vārdā.',
   serviceType: 'Objekta lietotne zemes darbu pārvadājumiem',
   features_ld: [
     'Kravas un svēršanas (bruto, tara, neto, svēršanas kvīts)',
@@ -368,6 +387,9 @@ const lt: EarthworksCopy = {
   teaserText: 'Pasverti kroviniai, atliekų lydraščiai, valandos iki paskutinio iškrovimo + 30 min ir darbų vadovo patvirtinimas per nuorodą. Sąskaita klientui jūsų įmonės vardu.',
   teaserCta: 'Skaityti daugiau',
   footerLink: 'Žemės darbai ir savivarčiai',
+  serviceTitle: 'Žemės darbai ir savivarčiai',
+  serviceText: 'Savivartis visą dieną dirba objekte: vairuotojas pažymi atvykimą ir kiekvieną krovinį su svėrimu bei iškrovimo vieta. Valandos skaičiuojamos iki paskutinio iškrovimo + 30 minučių.',
+  serviceText2: 'Darbų vadovas patvirtina dieną per nuorodą be prisijungimo, o sąskaita klientui siunčiama vežėjo vardu.',
   serviceType: 'Objekto programėlė žemės darbų pervežimams',
   features_ld: [
     'Kroviniai ir svėrimai (bruto, tara, neto, svėrimo kvitas)',
@@ -424,6 +446,9 @@ const pl: EarthworksCopy = {
   teaserText: 'Kursy z ważeniem, dokumenty przekazania odpadów, godziny do ostatniego rozładunku + 30 min i akceptacja kierownika robót przez link. Faktura do klienta w imieniu Twojej firmy.',
   teaserCta: 'Czytaj więcej',
   footerLink: 'Roboty ziemne i wywrotki',
+  serviceTitle: 'Roboty ziemne i wywrotki',
+  serviceText: 'Wywrotka pracuje na budowie cały dzień: kierowca zaznacza przyjazd i każdy kurs z ważeniem i miejscem wysypu. Godziny liczą się do ostatniego wysypu + 30 minut.',
+  serviceText2: 'Kierownik robót zatwierdza dzień z linku bez logowania, a faktura idzie do klienta w imieniu przewoźnika.',
   serviceType: 'Aplikacja budowlana do przewozu ziemi',
   features_ld: [
     'Kursy i ważenia (brutto, tara, netto, kwit wagowy)',
@@ -480,6 +505,9 @@ const de: EarthworksCopy = {
   teaserText: 'Gewogene Fuhren, Abfall-Begleitscheine, Stunden bis zur letzten Entladung + 30 Min. und Freigabe durch den Bauleiter per Link. Rechnung an den Kunden im Namen Ihres Unternehmens.',
   teaserCta: 'Mehr erfahren',
   footerLink: 'Erdbau und Kipper',
+  serviceTitle: 'Erdbau und Kipper',
+  serviceText: 'Der Kipper fährt den ganzen Tag auf der Baustelle: Der Fahrer erfasst die Ankunft und jede Ladung mit Wiegung und Abladestelle. Die Stunden laufen bis zur letzten Entladung + 30 Minuten.',
+  serviceText2: 'Der Bauleiter bestätigt den Tag per Link ohne Anmeldung, und die Rechnung geht im eigenen Namen des Transportunternehmens an den Kunden.',
   serviceType: 'Baustellen-App für Erdbautransporte',
   features_ld: [
     'Fuhren und Wiegungen (Brutto, Tara, Netto, Wiegeschein)',
@@ -536,6 +564,9 @@ const ru: EarthworksCopy = {
   teaserText: 'Рейсы со взвешиванием, документы на перевозку отходов, часы до последней выгрузки + 30 мин и подтверждение прораба по ссылке. Счёт заказчику от имени вашей компании.',
   teaserCta: 'Подробнее',
   footerLink: 'Земляные работы и самосвалы',
+  serviceTitle: 'Земляные работы и самосвалы',
+  serviceText: 'Самосвал весь день работает на объекте: водитель отмечает приезд и каждый рейс со взвешиванием и местом выгрузки. Часы считаются до последней выгрузки + 30 минут.',
+  serviceText2: 'Прораб подтверждает день по ссылке без входа в систему, а счёт уходит заказчику от имени перевозчика.',
   serviceType: 'Приложение для перевозок на земляных работах',
   features_ld: [
     'Рейсы и взвешивания (брутто, тара, нетто, весовой талон)',

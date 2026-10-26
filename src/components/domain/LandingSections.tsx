@@ -629,6 +629,29 @@ export async function LandingSections({ locale, showBlog = false }: { locale: Lo
               <p className="text-[16px] text-ink-muted">{l.service3Text2}</p>
             </CardBody>
           </Card>
+
+          {/*
+            * Самосвалы — пятая ветка, на всю ширину под четырьмя, чтобы
+            * не свисать одной в ряду. Ведёт на свою страницу.
+            */}
+          <Card className="md:col-span-2">
+            <CardBody className="flex flex-col gap-3 p-6">
+              <span className="self-start rounded-pill border border-accent-line bg-accent-wash px-2.5 py-1 text-[11px] font-semibold text-accent">
+                {l.serviceLive}
+              </span>
+              <h3 className="text-[20px] font-semibold tracking-tight">
+                {ew.serviceTitle} <Mono className="text-[0.72em] text-ink-faint">kippi</Mono>
+              </h3>
+              <p className="text-[16px] text-ink-muted">{ew.serviceText}</p>
+              <p className="text-[16px] text-ink-muted">{ew.serviceText2}</p>
+              <Link
+                href={earthworksPath(locale)}
+                className="self-start text-[15px] font-semibold text-accent hover:underline"
+              >
+                {ew.teaserCta} →
+              </Link>
+            </CardBody>
+          </Card>
         </div>
       </section>
 

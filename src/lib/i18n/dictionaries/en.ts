@@ -780,7 +780,7 @@ export const en = {
       'The app uses the phone’s language: Finnish, English, Estonian, Russian, Swedish, Latvian, Lithuanian, Polish, Norwegian and Danish. You can also pick the language in your profile.',
 
     servicesEyebrow: 'The service grows in stages',
-    servicesTitle: 'We started with trailer swaps — containers and express are live too',
+    servicesTitle: 'We started with trailer swaps — containers, express and earthworks are live too',
     serviceLive: 'Live',
     service1: 'Semi-trailer swaps',
     service1Text:

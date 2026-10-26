@@ -724,7 +724,7 @@ export const pl = {
       'Aplikacja mówi językiem telefonu: fińskim, angielskim, estońskim, rosyjskim, szwedzkim, łotewskim, litewskim, polskim, norweskim i duńskim. Język można też wybrać w profilu.',
 
     servicesEyebrow: 'Usługa rośnie etapami',
-    servicesTitle: 'Zaczęliśmy od wymian naczep — kontenery i ekspres też już działają',
+    servicesTitle: 'Zaczęliśmy od wymian naczep — kontenery, ekspres i roboty ziemne też już działają',
     serviceLive: 'Działa',
     service1: 'Wymiany naczep',
     service1Text:

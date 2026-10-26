@@ -724,7 +724,7 @@ export const lv = {
       'Lietotne runā telefona valodā: somu, angļu, igauņu, krievu, zviedru, latviešu, lietuviešu, poļu, norvēģu un dāņu. Valodu var izvēlēties arī profilā.',
 
     servicesEyebrow: 'Pakalpojums aug pa posmiem',
-    servicesTitle: 'Sākām ar piekabju maiņu — tagad arī konteineri un ekspresa pārvadājumi',
+    servicesTitle: 'Sākām ar piekabju maiņu — tagad arī konteineri, ekspresa pārvadājumi un zemes darbi',
     serviceLive: 'Darbojas',
     service1: 'Piekabju maiņa',
     service1Text:

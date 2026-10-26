@@ -843,7 +843,7 @@ export const fi = {
      * mitään ei ole tapahtunut. Mennyt aikamuoto todistaa sen, mitä osio
      * lupaa: laajeneminen on tapahtunut kerran, joten se tapahtuu taas.
      */
-    servicesTitle: 'Aloitimme irtoperistä — nyt mukana kontit ja pikakuljetukset',
+    servicesTitle: 'Aloitimme irtoperistä — nyt mukana kontit, pikakuljetukset ja maansiirto',
     serviceLive: 'Toiminnassa',
     service1: 'Irtoperävaunujen kuljetukset',
     service1Text:

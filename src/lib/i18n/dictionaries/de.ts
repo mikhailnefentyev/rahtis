@@ -724,7 +724,7 @@ export const de = {
       'Die App spricht die Sprache des Handys: Finnisch, Englisch, Estnisch, Russisch, Schwedisch, Lettisch, Litauisch, Polnisch, Norwegisch und Dänisch. Die Sprache lässt sich auch im Profil selbst wählen.',
 
     servicesEyebrow: 'Der Service wächst in Etappen',
-    servicesTitle: 'Angefangen haben wir mit Trailern — jetzt sind auch Container und Expressfahrten dabei',
+    servicesTitle: 'Angefangen haben wir mit Trailern — jetzt sind auch Container, Expressfahrten und Erdbau dabei',
     serviceLive: 'In Betrieb',
     service1: 'Trailertransporte',
     service1Text:

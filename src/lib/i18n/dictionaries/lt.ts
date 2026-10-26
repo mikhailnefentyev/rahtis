@@ -724,7 +724,7 @@ export const lt = {
       'Programėlė kalba telefono kalba: suomių, anglų, estų, rusų, švedų, latvių, lietuvių, lenkų, norvegų ir danų. Kalbą galima pasirinkti ir profilyje.',
 
     servicesEyebrow: 'Paslauga auga etapais',
-    servicesTitle: 'Pradėjome nuo priekabų – dabar ir konteineriai, ir skubūs pervežimai',
+    servicesTitle: 'Pradėjome nuo priekabų – dabar ir konteineriai, skubūs pervežimai bei žemės darbai',
     serviceLive: 'Veikia',
     service1: 'Puspriekabių pervežimai',
     service1Text:
