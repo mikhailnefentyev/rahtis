@@ -3331,12 +3331,57 @@ export type Database = {
           },
         ]
       }
+      trailers: {
+        Row: {
+          axles: number
+          body_type: Database["public"]["Enums"]["body_type"] | null
+          company_id: string
+          created_at: string
+          gross_max_kg: number | null
+          id: string
+          kind: Database["public"]["Enums"]["trailer_kind"]
+          plate: string
+          tare_kg: number | null
+          twin_wheels: boolean
+          updated_at: string
+        }
+        Insert: {
+          axles: number
+          body_type?: Database["public"]["Enums"]["body_type"] | null
+          company_id: string
+          created_at?: string
+          gross_max_kg?: number | null
+          id?: string
+          kind: Database["public"]["Enums"]["trailer_kind"]
+          plate: string
+          tare_kg?: number | null
+          twin_wheels?: boolean
+          updated_at?: string
+        }
+        Update: {
+          axles?: number
+          body_type?: Database["public"]["Enums"]["body_type"] | null
+          company_id?: string
+          created_at?: string
+          gross_max_kg?: number | null
+          id?: string
+          kind?: Database["public"]["Enums"]["trailer_kind"]
+          plate?: string
+          tare_kg?: number | null
+          twin_wheels?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       vehicles: {
         Row: {
           access: Database["public"]["Enums"]["vehicle_access"]
           adr: boolean
           approved_at: string | null
           axles: number
+          body_type: Database["public"]["Enums"]["body_type"] | null
+          gross_max_kg: number | null
+          tare_kg: number | null
           base_city: string
           base_country: string | null
           base_lat: number | null
@@ -3369,6 +3414,9 @@ export type Database = {
           adr?: boolean
           approved_at?: string | null
           axles: number
+          body_type: Database["public"]["Enums"]["body_type"] | null
+          gross_max_kg: number | null
+          tare_kg: number | null
           base_city: string
           base_country?: string | null
           base_lat?: number | null
@@ -3401,6 +3449,9 @@ export type Database = {
           adr?: boolean
           approved_at?: string | null
           axles?: number
+          body_type?: Database["public"]["Enums"]["body_type"] | null
+          gross_max_kg?: number | null
+          tare_kg?: number | null
           base_city?: string
           base_country?: string | null
           base_lat?: number | null
@@ -6269,6 +6320,16 @@ export type Database = {
       }
     }
     Enums: {
+      body_type:
+        | "TIPPER"
+        | "CASSETTE"
+        | "FLATBED"
+        | "CONTAINER"
+        | "CURTAIN"
+        | "BOX"
+        | "TANK"
+        | "OTHER"
+      trailer_kind: "SEMI" | "FULL" | "CENTER_AXLE"
       amendment_kind:
         | "STOP_ADDED"
         | "STOP_CHANGED"
@@ -6498,6 +6559,8 @@ export const Constants = {
   },
   public: {
     Enums: {
+      body_type: ["TIPPER", "CASSETTE", "FLATBED", "CONTAINER", "CURTAIN", "BOX", "TANK", "OTHER"],
+      trailer_kind: ["SEMI", "FULL", "CENTER_AXLE"],
       amendment_kind: [
         "STOP_ADDED",
         "STOP_CHANGED",

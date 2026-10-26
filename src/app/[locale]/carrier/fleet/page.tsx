@@ -10,6 +10,7 @@ import { createClient } from '@/lib/supabase/server';
 import type { CompanyDocument } from '@/types/db';
 import { DocumentCard } from './DocumentCard';
 import { FleetView } from './FleetView';
+import { TrailersMass } from './TrailersMass';
 import { getViewerI18n } from '@/lib/i18n/viewer';
 
 export async function generateMetadata({
@@ -40,6 +41,7 @@ export default async function FleetPage({ params }: { params: Promise<{ locale: 
     { data: readiness },
     { data: drivers },
     { data: assignments },
+    { data: trailers },
   ] = await Promise.all([
     supabase
       .from('vehicles')
@@ -60,6 +62,7 @@ export default async function FleetPage({ params }: { params: Promise<{ locale: 
       .eq('status', 'ACTIVE')
       .order('full_name'),
     supabase.from('vehicle_drivers').select('vehicle_id, driver_id, during'),
+    supabase.from('trailers').select('*').eq('company_id', company.id).order('created_at', { ascending: true }),
   ]);
 
   /*
@@ -157,6 +160,8 @@ export default async function FleetPage({ params }: { params: Promise<{ locale: 
         documentsOk={state?.documents_ok ?? false}
         today={new Date().toISOString().slice(0, 10)}
       />
+
+      <TrailersMass vehicles={vehicles ?? []} trailers={trailers ?? []} />
     </main>
   );
 }

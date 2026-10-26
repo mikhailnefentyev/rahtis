@@ -6,7 +6,7 @@ import { getViewer } from '@/lib/auth/viewer';
 import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import { flashFailure } from '@/lib/forms/flash';
-import type { DocumentKind, EuroClass, VehicleClass } from '@/types/db';
+import type { BodyType, DocumentKind, EuroClass, TrailerKind, VehicleClass } from '@/types/db';
 
 const BUCKET = 'company-docs';
 
@@ -147,9 +147,30 @@ function num(formData: FormData, key: string): number | null {
   return Number.isFinite(value) && value > 0 ? value : null;
 }
 
+const BODY_TYPES: readonly BodyType[] = ['TIPPER', 'CASSETTE', 'FLATBED', 'CONTAINER', 'CURTAIN', 'BOX', 'TANK', 'OTHER'];
+const TRAILER_KINDS: readonly TrailerKind[] = ['SEMI', 'FULL', 'CENTER_AXLE'];
+
+const bodyType = (formData: FormData): BodyType | null => {
+  const raw = String(formData.get('body_type') ?? '');
+  return (BODY_TYPES as readonly string[]).includes(raw) ? (raw as BodyType) : null;
+};
+
+/** Целые килограммы или null: пусто, мусор и ноль равны «не указано». */
+const kg = (formData: FormData, key: string): number | null => {
+  const value = num(formData, key);
+  return value === null ? null : Math.round(value);
+};
+
 function readVehicleForm(formData: FormData) {
   const vehicleClass = String(formData.get('vehicle_class') ?? 'TRACTOR') as VehicleClass;
   const express = vehicleClass !== 'TRACTOR';
+  /*
+   * Грузовику (nuppi) оси теперь нужны: от них зависит разрешённая масса
+   * самосвала и кассетной сцепки (src/lib/fleet/mass.ts). У фургона — по-прежнему
+   * двойка-заглушка. Смена осей у допущенной машины возвращает её на проверку
+   * (триггер базы), поэтому поле берётся только когда его прислали.
+   */
+  const truckAxles = vehicleClass === 'TRUCK' ? Number(formData.get('axles') ?? 0) : 0;
 
   return {
     plate: String(formData.get('plate') ?? '')
@@ -163,7 +184,10 @@ function readVehicleForm(formData: FormData) {
      * машине, а как значение, которым никто не пользуется:
      * app.vehicle_capacity_kg читает у неё payload_kg.
      */
-    axles: express ? 2 : Number(formData.get('axles') ?? 0),
+    axles: vehicleClass === 'TRUCK' && truckAxles >= 2 && truckAxles <= 5 ? truckAxles : express ? 2 : Number(formData.get('axles') ?? 0),
+    body_type: vehicleClass === 'TRACTOR' ? null : bodyType(formData),
+    gross_max_kg: kg(formData, 'gross_max_kg'),
+    tare_kg: kg(formData, 'tare_kg'),
     adr: formData.get('adr') === '1',
     vehicle_class: vehicleClass,
     /*
@@ -350,4 +374,58 @@ export async function decideVehicleAction(
 
   revalidatePath(`/${locale}/admin`);
   return { error: null };
+}
+
+/* ── Прицепы ─────────────────────────────────────────────────────── */
+
+export type TrailerState = { error: string | null; done: boolean };
+
+/**
+ * Прицеп или полуприцеп: оси, кузов, масса по техпаспорту, тара и отметка
+ * «сдвоенные колёса». Допуска оператора у прицепа нет — на стол выходит машина.
+ */
+export async function saveTrailerAction(_previous: TrailerState, formData: FormData): Promise<TrailerState> {
+  const locale = toLocale(formData.get('locale'));
+  const t = await getDictionary(locale);
+  const viewer = await requireCarrier(locale);
+  const company = viewer.company!;
+
+  const kind = String(formData.get('kind') ?? '');
+  const axles = Number(formData.get('axles') ?? 0);
+  const plate = String(formData.get('plate') ?? '').trim().toUpperCase().replace(/s+/g, '');
+  if (!(TRAILER_KINDS as readonly string[]).includes(kind) || !(axles >= 1 && axles <= 6) || !/^[A-ZÅÄÖ0-9-]{2,12}$/.test(plate)) {
+    return { error: t.validation.required, done: false };
+  }
+
+  const values = {
+    plate,
+    kind: kind as TrailerKind,
+    axles,
+    body_type: bodyType(formData),
+    gross_max_kg: kg(formData, 'gross_max_kg'),
+    tare_kg: kg(formData, 'tare_kg'),
+    twin_wheels: formData.get('twin_wheels') === '1',
+  };
+
+  const supabase = await createClient();
+  const id = text(formData, 'id');
+  const { error } = id
+    ? await supabase.from('trailers').update(values).eq('id', id)
+    : await supabase.from('trailers').insert({ ...values, company_id: company.id });
+
+  if (error) {
+    return { error: error.code === '23505' ? t.mass.plateTaken : error.code === '23514' ? t.validation.required : t.error.generic, done: false };
+  }
+
+  revalidatePath(`/${locale}/carrier/fleet`);
+  return { error: null, done: true };
+}
+
+export async function deleteTrailerAction(formData: FormData): Promise<void> {
+  const locale = toLocale(formData.get('locale'));
+  await requireCarrier(locale);
+  const supabase = await createClient();
+  const { error } = await supabase.from('trailers').delete().eq('id', String(formData.get('id') ?? ''));
+  if (error) await flashFailure(locale, error);
+  revalidatePath(`/${locale}/carrier/fleet`);
 }

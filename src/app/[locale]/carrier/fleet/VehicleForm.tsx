@@ -6,11 +6,13 @@ import { AddressInput } from '@/components/domain/AddressInput';
 import { Button, Card, CardBody, Field, Input, InputMono, Select } from '@/components/ui';
 import { saveVehicleAction, type VehicleState } from '@/lib/fleet/actions';
 import { useCompanyCountry, useI18n } from '@/lib/i18n/provider';
-import type { Driver, Vehicle, VehicleClass } from '@/types/db';
+import type { BodyType, Driver, Vehicle, VehicleClass } from '@/types/db';
 import { useKeepOnError } from '@/lib/forms/keepOnError';
 import { countryPack } from '@/lib/country';
 
 const initial: VehicleState = { error: null, done: false };
+
+const BODY_TYPES: BodyType[] = ['TIPPER', 'CASSETTE', 'FLATBED', 'CONTAINER', 'CURTAIN', 'BOX', 'TANK', 'OTHER'];
 
 /**
  * Карточка авто: создание и правка.
@@ -164,6 +166,53 @@ export function VehicleForm({
                 </Select>
               )}
             </Field>
+          )}
+
+          {/*
+            * Самосвал, кассета, борт: тип кузова и оси грузовика. От осей
+            * считается разрешённая масса сцепки (src/lib/fleet/mass.ts).
+            */}
+          {vehicleClass === 'TRUCK' && (
+            <>
+              <Field label={t.mass.body}>
+                {(p) => (
+                  <Select {...p} name="body_type" defaultValue={vehicle?.body_type ?? ''}>
+                    <option value="">{t.mass.bodyNone}</option>
+                    {BODY_TYPES.map((b) => (
+                      <option key={b} value={b}>
+                        {t.mass.bodies[b]}
+                      </option>
+                    ))}
+                  </Select>
+                )}
+              </Field>
+              <Field label={t.vehicle.axles} hint={t.mass.truckAxlesHint}>
+                {(p) => (
+                  <Select {...p} name="axles" defaultValue={String(vehicle?.axles ?? 2)}>
+                    {[2, 3, 4, 5].map((n) => (
+                      <option key={n} value={n}>
+                        {n}
+                      </option>
+                    ))}
+                  </Select>
+                )}
+              </Field>
+            </>
+          )}
+
+          {vehicleClass !== 'VAN' && (
+            <>
+              <Field label={t.mass.grossMax} hint={t.mass.grossMaxHint}>
+                {(p) => (
+                  <InputMono {...p} name="gross_max_kg" inputMode="numeric" defaultValue={vehicle?.gross_max_kg ?? ''} placeholder="42000" />
+                )}
+              </Field>
+              <Field label={t.mass.tareKg} hint={t.mass.tareHint}>
+                {(p) => (
+                  <InputMono {...p} name="tare_kg" inputMode="numeric" defaultValue={vehicle?.tare_kg ?? ''} placeholder="15000" />
+                )}
+              </Field>
+            </>
           )}
 
           {/*

@@ -18,6 +18,9 @@ export type Company = Tables<'companies'>;
 export type Profile = Tables<'profiles'>;
 export type CompanyEvent = Tables<'company_events'>;
 export type Vehicle = Tables<'vehicles'>;
+export type Trailer = Tables<'trailers'>;
+export type BodyType = Database['public']['Enums']['body_type'];
+export type TrailerKind = Database['public']['Enums']['trailer_kind'];
 export type CompanyDocument = Tables<'company_documents'>;
 
 export type OrderType = Database['public']['Enums']['order_type'];
