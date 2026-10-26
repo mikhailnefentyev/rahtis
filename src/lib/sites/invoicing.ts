@@ -14,7 +14,7 @@ const BUCKET = 'reports';
 
 export type SiteInvoiceResult =
   | { status: 'SENT' | 'CREATED'; invoiceId: string; number: string }
-  | { status: 'NOTHING' | 'NO_IBAN' | 'NO_CUSTOMER_EMAIL' | 'NO_CUSTOMER_ADDRESS' | 'NOT_FOUND' };
+  | { status: 'NOTHING' | 'BUSY' | 'NO_IBAN' | 'NO_CUSTOMER_EMAIL' | 'NO_CUSTOMER_ADDRESS' | 'NOT_FOUND' };
 
 const addDays = (iso: string, days: number) => {
   const d = new Date(`${iso}T12:00:00Z`);
@@ -89,13 +89,6 @@ export async function createSiteInvoice(jobId: string, upTo: string): Promise<Si
   const issuedOn = todayInHelsinki();
   const dueOn = addDays(issuedOn, job.payment_term_days);
 
-  const { data: number, error: numberError } = await admin.rpc('next_carrier_invoice_number', {
-    p_company_id: job.company_id,
-    p_year: Number(issuedOn.slice(0, 4)),
-  });
-  if (numberError || !number) throw new Error(`номер счёта: ${numberError?.message}`);
-  const reference = finnishReference(number);
-
   const sellerAddress = [seller.legal_street, [seller.legal_postal_code, seller.legal_city].filter(Boolean).join(' ')].filter(Boolean).join(', ');
   const customerAddress = [job.customer_street, [job.customer_postal_code, job.customer_city].filter(Boolean).join(' '), job.customer_country !== 'FI' ? job.customer_country : null]
     .filter(Boolean)
@@ -107,8 +100,9 @@ export async function createSiteInvoice(jobId: string, upTo: string): Promise<Si
     .insert({
       company_id: job.company_id,
       job_id: job.id,
-      number,
-      reference,
+      /* Временный номер: настоящий выдаётся, только когда дни закреплены за этим счётом. */
+      number: `DRAFT-${crypto.randomUUID()}`,
+      reference: '',
       issued_on: issuedOn,
       due_on: dueOn,
       period_from: invoiceDays[0].day,
@@ -125,8 +119,35 @@ export async function createSiteInvoice(jobId: string, upTo: string): Promise<Si
     .single();
   if (error || !invoice) throw new Error(`счёт: ${error?.message}`);
 
-  /* Дни закрепляются за счётом; чужие (уже выставленные параллельно) не трогаются. */
-  await admin.from('site_days').update({ invoice_id: invoice.id }).in('id', dayIds).is('invoice_id', null);
+  /*
+   * Дни закрепляются за счётом одной командой: «где invoice_id пусто».
+   * Если параллельно (вторая кнопка, задание понедельника) часть дней уже
+   * забрал другой счёт, этот отменяется целиком — без номера и письма,
+   * поэтому в серии не остаётся пропусков, а день не попадает в два счёта.
+   */
+  const { data: claimed } = await admin
+    .from('site_days')
+    .update({ invoice_id: invoice.id })
+    .in('id', dayIds)
+    .is('invoice_id', null)
+    .select('id');
+  if ((claimed ?? []).length !== dayIds.length) {
+    await admin.from('site_days').update({ invoice_id: null }).eq('invoice_id', invoice.id);
+    await admin.from('carrier_invoices').delete().eq('id', invoice.id);
+    return { status: 'BUSY' };
+  }
+
+  const { data: number, error: numberError } = await admin.rpc('next_carrier_invoice_number', {
+    p_company_id: job.company_id,
+    p_year: Number(issuedOn.slice(0, 4)),
+  });
+  if (numberError || !number) {
+    await admin.from('site_days').update({ invoice_id: null }).eq('invoice_id', invoice.id);
+    await admin.from('carrier_invoices').delete().eq('id', invoice.id);
+    throw new Error(`номер счёта: ${numberError?.message}`);
+  }
+  const reference = finnishReference(number);
+  await admin.from('carrier_invoices').update({ number, reference }).eq('id', invoice.id);
 
   const unit = { h: 'h', kuorma: 'kuorma', t: 't' } as const;
   const buffer = await renderToBuffer(

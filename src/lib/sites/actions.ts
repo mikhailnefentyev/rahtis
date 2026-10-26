@@ -171,6 +171,7 @@ export async function sendSiteInvoiceNowAction(_previous: SendInvoiceState, form
       case 'NO_CUSTOMER_ADDRESS':
         return { message: s.resultNoAddress, ok: false };
       case 'NOTHING':
+      case 'BUSY':
         return { message: s.resultNothing, ok: false };
       default:
         return { message: t.error.generic, ok: false };
