@@ -521,6 +521,75 @@ export type Database = {
           },
         ]
       }
+      carrier_invoices: {
+        Row: {
+          company_id: string
+          created_at: string
+          customer: Json
+          due_on: string
+          file_path: string | null
+          id: string
+          issued_on: string
+          job_id: string | null
+          lines: Json
+          net_cents: number
+          number: string
+          period_from: string
+          period_to: string
+          reference: string
+          seller: Json
+          sent_at: string | null
+          sent_to: string | null
+          total_cents: number
+          vat_bps: number
+          vat_cents: number
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          customer: Json
+          due_on: string
+          file_path?: string | null
+          id?: string
+          issued_on: string
+          job_id?: string | null
+          lines: Json
+          net_cents: number
+          number: string
+          period_from: string
+          period_to: string
+          reference: string
+          seller: Json
+          sent_at?: string | null
+          sent_to?: string | null
+          total_cents: number
+          vat_bps: number
+          vat_cents: number
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          customer?: Json
+          due_on?: string
+          file_path?: string | null
+          id?: string
+          issued_on?: string
+          job_id?: string | null
+          lines?: Json
+          net_cents?: number
+          number?: string
+          period_from?: string
+          period_to?: string
+          reference?: string
+          seller?: Json
+          sent_at?: string | null
+          sent_to?: string | null
+          total_cents?: number
+          vat_bps?: number
+          vat_cents?: number
+        }
+        Relationships: []
+      }
       claims: {
         Row: {
           against_company_id: string
@@ -3398,6 +3467,7 @@ export type Database = {
           job_id: string
           trailer_id: string | null
           vehicle_id: string | null
+          invoice_id: string | null
         }
         Insert: {
           approval_note?: string | null
@@ -3414,6 +3484,7 @@ export type Database = {
           job_id: string
           trailer_id?: string | null
           vehicle_id?: string | null
+          invoice_id?: string | null
         }
         Update: {
           approval_note?: string | null
@@ -3430,6 +3501,7 @@ export type Database = {
           job_id?: string
           trailer_id?: string | null
           vehicle_id?: string | null
+          invoice_id?: string | null
         }
         Relationships: []
       }
@@ -3453,6 +3525,13 @@ export type Database = {
           receiving_site_id: string | null
           status: string
           updated_at: string
+          customer_city: string | null
+          customer_country: string
+          customer_postal_code: string | null
+          customer_street: string | null
+          customer_vat_id: string | null
+          invoice_schedule: string
+          payment_term_days: number
         }
         Insert: {
           address?: string | null
@@ -3473,6 +3552,13 @@ export type Database = {
           receiving_site_id?: string | null
           status?: string
           updated_at?: string
+          customer_city?: string | null
+          customer_country?: string
+          customer_postal_code?: string | null
+          customer_street?: string | null
+          customer_vat_id?: string | null
+          invoice_schedule?: string
+          payment_term_days?: number
         }
         Update: {
           address?: string | null
@@ -3493,6 +3579,13 @@ export type Database = {
           receiving_site_id?: string | null
           status?: string
           updated_at?: string
+          customer_city?: string | null
+          customer_country?: string
+          customer_postal_code?: string | null
+          customer_street?: string | null
+          customer_vat_id?: string | null
+          invoice_schedule?: string
+          payment_term_days?: number
         }
         Relationships: []
       }
@@ -6217,6 +6310,7 @@ export type Database = {
         Args: { p_body: string; p_subject: string }
         Returns: number
       }
+      next_carrier_invoice_number: { Args: { p_company_id: string; p_year: number }; Returns: string }
       site_foreman_approve: {
         Args: { p_day_id: string; p_name: string; p_note?: string; p_token: string }
         Returns: undefined

@@ -47,6 +47,13 @@ export async function saveSiteJobAction(_previous: SiteJobState, formData: FormD
     customer_name: customer,
     customer_business_id: text(formData, 'customer_business_id'),
     customer_email: text(formData, 'customer_email'),
+    customer_street: text(formData, 'customer_street'),
+    customer_postal_code: text(formData, 'customer_postal_code'),
+    customer_city: text(formData, 'customer_city'),
+    customer_country: /^[A-Z]{2}$/.test(String(formData.get('customer_country') ?? '')) ? String(formData.get('customer_country')) : 'FI',
+    customer_vat_id: text(formData, 'customer_vat_id'),
+    invoice_schedule: ['MANUAL', 'WEEKLY', 'BIWEEKLY'].includes(String(formData.get('invoice_schedule'))) ? String(formData.get('invoice_schedule')) : 'BIWEEKLY',
+    payment_term_days: Math.min(90, Math.max(0, Number.parseInt(String(formData.get('payment_term_days') ?? '14'), 10) || 14)),
     pricing,
     rate_cents: Math.round(rate * 100),
     material_code: material,
@@ -124,4 +131,68 @@ export async function decideScaleSiteAction(formData: FormData): Promise<void> {
     .eq('id', String(formData.get('id') ?? ''));
   if (error) await flashFailure(locale, error);
   revalidatePath(`/${locale}/admin/scale-sites`);
+}
+
+export type SendInvoiceState = { message: string | null; ok: boolean };
+
+/**
+ * «Отправить счёт сейчас»: все подтверждённые и ещё не выставленные дни
+ * объекта. Объект сначала читается под RLS — чужой объект не найдётся, и
+ * секретным ключом дальше работает только проверенный.
+ */
+export async function sendSiteInvoiceNowAction(_previous: SendInvoiceState, formData: FormData): Promise<SendInvoiceState> {
+  const locale = toLocale(formData.get('locale'));
+  const t = await getDictionary(locale);
+  const viewer = await requireRole(locale, 'CARRIER');
+  const supabase = await createClient();
+  const { data: job } = await supabase
+    .from('site_jobs')
+    .select('id')
+    .eq('id', String(formData.get('job_id') ?? ''))
+    .eq('company_id', viewer.company!.id)
+    .maybeSingle();
+  if (!job) return { message: t.error.generic, ok: false };
+
+  const { createSiteInvoice } = await import('./invoicing');
+  const { todayInHelsinki } = await import('@/lib/dates');
+  try {
+    const result = await createSiteInvoice(job.id, todayInHelsinki());
+    revalidatePath(`/${locale}/carrier/sites/${job.id}`);
+    const s = t.siteInvoice;
+    switch (result.status) {
+      case 'SENT':
+        return { message: `${s.resultSent} ${result.number}`, ok: true };
+      case 'CREATED':
+        return { message: `${s.resultCreated} ${result.number}`, ok: false };
+      case 'NO_IBAN':
+        return { message: s.resultNoIban, ok: false };
+      case 'NO_CUSTOMER_EMAIL':
+        return { message: s.resultNoEmail, ok: false };
+      case 'NO_CUSTOMER_ADDRESS':
+        return { message: s.resultNoAddress, ok: false };
+      case 'NOTHING':
+        return { message: s.resultNothing, ok: false };
+      default:
+        return { message: t.error.generic, ok: false };
+    }
+  } catch (cause) {
+    console.error('счёт по объекту:', cause);
+    return { message: t.error.generic, ok: false };
+  }
+}
+
+/** Ссылка на PDF счёта на пять минут — только своему перевозчику. */
+export async function siteInvoicePdfUrlAction(invoiceId: string): Promise<string | null> {
+  const viewer = await requireRole(defaultLocale, 'CARRIER');
+  const supabase = await createClient();
+  const { data: invoice } = await supabase
+    .from('carrier_invoices')
+    .select('file_path')
+    .eq('id', invoiceId)
+    .eq('company_id', viewer.company!.id)
+    .maybeSingle();
+  if (!invoice?.file_path) return null;
+  const { createAdminClient } = await import('@/lib/supabase/admin');
+  const { data } = await createAdminClient().storage.from('reports').createSignedUrl(invoice.file_path, 300);
+  return data?.signedUrl ?? null;
 }

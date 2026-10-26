@@ -104,6 +104,47 @@ export function SiteJobForm({
             {(p) => <InputMono {...p} name="buffer_minutes" inputMode="numeric" defaultValue={String(job?.buffer_minutes ?? 30)} />}
           </Field>
 
+          <p className="mt-2 border-t border-line pt-4 text-[13px] font-semibold sm:col-span-2">{t.siteInvoice.billingTitle}</p>
+          <Field label={t.siteInvoice.customerStreet}>
+            {(p) => <Input {...p} name="customer_street" defaultValue={job?.customer_street ?? ''} />}
+          </Field>
+          <div className="grid grid-cols-[1fr_2fr] gap-3">
+            <Field label={t.siteInvoice.customerPostal}>
+              {(p) => <InputMono {...p} name="customer_postal_code" defaultValue={job?.customer_postal_code ?? ''} />}
+            </Field>
+            <Field label={t.siteInvoice.customerCity}>
+              {(p) => <Input {...p} name="customer_city" defaultValue={job?.customer_city ?? ''} />}
+            </Field>
+          </div>
+          <Field label={t.siteInvoice.customerCountry}>
+            {(p) => (
+              <Select {...p} name="customer_country" defaultValue={job?.customer_country ?? 'FI'}>
+                {['FI', 'SE', 'NO', 'DK', 'EE', 'LV', 'LT', 'PL', 'DE'].map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </Select>
+            )}
+          </Field>
+          <Field label={t.siteInvoice.customerVatId} hint={t.siteInvoice.customerVatHint}>
+            {(p) => <InputMono {...p} name="customer_vat_id" defaultValue={job?.customer_vat_id ?? ''} placeholder="FI12345678" />}
+          </Field>
+          <Field label={t.siteInvoice.schedule} hint={t.siteInvoice.scheduleHint}>
+            {(p) => (
+              <Select {...p} name="invoice_schedule" defaultValue={job?.invoice_schedule ?? 'BIWEEKLY'}>
+                {(['MANUAL', 'WEEKLY', 'BIWEEKLY'] as const).map((k) => (
+                  <option key={k} value={k}>
+                    {t.siteInvoice.schedules[k]}
+                  </option>
+                ))}
+              </Select>
+            )}
+          </Field>
+          <Field label={t.siteInvoice.paymentTerm}>
+            {(p) => <InputMono {...p} name="payment_term_days" inputMode="numeric" defaultValue={String(job?.payment_term_days ?? 14)} />}
+          </Field>
+
           {state.error && <p className="text-[13px] text-danger sm:col-span-2">{state.error}</p>}
 
           <div className="flex gap-2 sm:col-span-2">

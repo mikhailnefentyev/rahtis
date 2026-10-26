@@ -11,6 +11,7 @@ import { dayEnd, dayMinutes, hoursLabel, siteAmountCents } from '@/lib/sites/wor
 import { createClient } from '@/lib/supabase/server';
 import { carrierApproveDayAction } from '@/lib/sites/actions';
 import { JobControls } from './JobControls';
+import { Invoices } from './Invoices';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; id: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -38,13 +39,14 @@ export default async function SiteJobPage({ params }: { params: Promise<{ locale
   const { data: job } = await supabase.from('site_jobs').select('*').eq('id', id).eq('company_id', company.id).maybeSingle();
   if (!job) notFound();
 
-  const [{ data: days }, { data: loads }, { data: scaleSites }, { data: drivers }, { data: vehicles }, { data: trailers }] = await Promise.all([
+  const [{ data: days }, { data: loads }, { data: scaleSites }, { data: drivers }, { data: vehicles }, { data: trailers }, { data: invoices }] = await Promise.all([
     supabase.from('site_days').select('*').eq('job_id', job.id).order('day', { ascending: false }),
     supabase.from('site_loads').select('*').eq('job_id', job.id).order('unloaded_at', { ascending: true }),
     supabase.from('scale_sites').select('id, name, city').order('name'),
     supabase.from('drivers').select('id, full_name').eq('company_id', company.id),
     supabase.from('vehicles').select('id, plate, vehicle_class, axles, gross_max_kg').eq('company_id', company.id),
     supabase.from('trailers').select('id, plate, kind, axles, twin_wheels, gross_max_kg').eq('company_id', company.id),
+    supabase.from('carrier_invoices').select('id, number, issued_on, due_on, total_cents, sent_at, sent_to').eq('job_id', id).order('issued_on', { ascending: false }),
   ]);
 
   const driverName = new Map((drivers ?? []).map((d) => [d.id, d.full_name]));
@@ -106,6 +108,12 @@ export default async function SiteJobPage({ params }: { params: Promise<{ locale
 
       <JobControls job={job} scaleSites={scaleSites ?? []} foremanUrl={`${siteUrl()}/${locale}/site/${job.foreman_token}`} />
 
+      <Invoices
+        jobId={job.id}
+        schedule={job.invoice_schedule}
+        invoices={(invoices ?? []).map((inv) => ({ ...inv, total: f.eur(inv.total_cents) }))}
+      />
+
       <Card className="mb-8">
         <CardBody className="flex flex-wrap gap-x-8 gap-y-2 text-[13px]">
           <span>
@@ -136,7 +144,9 @@ export default async function SiteJobPage({ params }: { params: Promise<{ locale
                     {f.date(`${r.day.day}T12:00:00Z`)} · {driverName.get(r.day.driver_id) ?? '—'}
                     {r.plate && <span className="font-mono font-normal text-ink-muted"> · {r.plate}</span>}
                   </span>
-                  {r.day.approved_at ? (
+                  {r.day.invoice_id ? (
+                    <Badge tone="info">{t.siteInvoice.invoiced}</Badge>
+                  ) : r.day.approved_at ? (
                     <Badge tone="ok">
                       {s.approvedBy} {r.day.approved_by}
                     </Badge>
