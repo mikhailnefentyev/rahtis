@@ -165,7 +165,7 @@ create or replace function app.site_day_reset_approval()
 returns trigger
 language plpgsql
 set search_path = ''
-as $
+as $$
 begin
   if old.approved_at is not null
      and (new.ended_at is distinct from old.ended_at or new.buffer_minutes is distinct from old.buffer_minutes) then
@@ -175,7 +175,7 @@ begin
   end if;
   return new;
 end;
-$;
+$$;
 
 create trigger site_days_reset_approval
   before update on public.site_days
@@ -500,7 +500,7 @@ returns void
 language plpgsql
 security definer
 set search_path = ''
-as $
+as $$
 declare
   v_company uuid := (select app.current_company_id());
   v_name text;
@@ -522,7 +522,7 @@ begin
     raise exception 'День не найден или уже подтверждён.' using errcode = 'P0002';
   end if;
 end;
-$;
+$$;
 
 revoke all on function public.carrier_site_approve_day(uuid) from public, anon;
 grant execute on function public.carrier_site_approve_day(uuid) to authenticated;

@@ -74,7 +74,7 @@ create or replace function app.site_day_locked_after_invoice()
 returns trigger
 language plpgsql
 set search_path = ''
-as $
+as $$
 begin
   if old.invoice_id is not null and new.invoice_id is not distinct from old.invoice_id and (
        new.ended_at is distinct from old.ended_at
@@ -85,7 +85,7 @@ begin
   end if;
   return new;
 end;
-$;
+$$;
 
 create trigger site_days_locked_after_invoice
   before update on public.site_days
@@ -95,14 +95,14 @@ create or replace function app.site_load_day_not_invoiced()
 returns trigger
 language plpgsql
 set search_path = ''
-as $
+as $$
 begin
   if exists (select 1 from public.site_days where id = new.day_id and invoice_id is not null) then
     raise exception 'День уже в счёте.' using errcode = '55000';
   end if;
   return new;
 end;
-$;
+$$;
 
 create trigger site_loads_day_not_invoiced
   before insert on public.site_loads
