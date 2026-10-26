@@ -321,6 +321,90 @@ export type Database = {
           },
         ]
       }
+      carrier_invoices: {
+        Row: {
+          company_id: string
+          created_at: string
+          customer: Json
+          due_on: string
+          file_path: string | null
+          id: string
+          issued_on: string
+          job_id: string | null
+          lines: Json
+          net_cents: number
+          number: string
+          period_from: string
+          period_to: string
+          reference: string
+          seller: Json
+          sent_at: string | null
+          sent_to: string | null
+          total_cents: number
+          vat_bps: number
+          vat_cents: number
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          customer: Json
+          due_on: string
+          file_path?: string | null
+          id?: string
+          issued_on: string
+          job_id?: string | null
+          lines: Json
+          net_cents: number
+          number: string
+          period_from: string
+          period_to: string
+          reference: string
+          seller: Json
+          sent_at?: string | null
+          sent_to?: string | null
+          total_cents: number
+          vat_bps: number
+          vat_cents: number
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          customer?: Json
+          due_on?: string
+          file_path?: string | null
+          id?: string
+          issued_on?: string
+          job_id?: string | null
+          lines?: Json
+          net_cents?: number
+          number?: string
+          period_from?: string
+          period_to?: string
+          reference?: string
+          seller?: Json
+          sent_at?: string | null
+          sent_to?: string | null
+          total_cents?: number
+          vat_bps?: number
+          vat_cents?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "carrier_invoices_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "carrier_invoices_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "site_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       carrier_shipper_links: {
         Row: {
           carrier_company_id: string
@@ -520,75 +604,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      carrier_invoices: {
-        Row: {
-          company_id: string
-          created_at: string
-          customer: Json
-          due_on: string
-          file_path: string | null
-          id: string
-          issued_on: string
-          job_id: string | null
-          lines: Json
-          net_cents: number
-          number: string
-          period_from: string
-          period_to: string
-          reference: string
-          seller: Json
-          sent_at: string | null
-          sent_to: string | null
-          total_cents: number
-          vat_bps: number
-          vat_cents: number
-        }
-        Insert: {
-          company_id: string
-          created_at?: string
-          customer: Json
-          due_on: string
-          file_path?: string | null
-          id?: string
-          issued_on: string
-          job_id?: string | null
-          lines: Json
-          net_cents: number
-          number: string
-          period_from: string
-          period_to: string
-          reference: string
-          seller: Json
-          sent_at?: string | null
-          sent_to?: string | null
-          total_cents: number
-          vat_bps: number
-          vat_cents: number
-        }
-        Update: {
-          company_id?: string
-          created_at?: string
-          customer?: Json
-          due_on?: string
-          file_path?: string | null
-          id?: string
-          issued_on?: string
-          job_id?: string | null
-          lines?: Json
-          net_cents?: number
-          number?: string
-          period_from?: string
-          period_to?: string
-          reference?: string
-          seller?: Json
-          sent_at?: string | null
-          sent_to?: string | null
-          total_cents?: number
-          vat_bps?: number
-          vat_cents?: number
-        }
-        Relationships: []
       }
       claims: {
         Row: {
@@ -2930,6 +2945,65 @@ export type Database = {
           },
         ]
       }
+      scale_sites: {
+        Row: {
+          accepts: string | null
+          address: string | null
+          approved_at: string | null
+          city: string | null
+          country: string
+          created_at: string
+          created_by_company: string | null
+          id: string
+          kind: string
+          lat: number | null
+          lon: number | null
+          mscales: boolean
+          name: string
+          rejected_at: string | null
+        }
+        Insert: {
+          accepts?: string | null
+          address?: string | null
+          approved_at?: string | null
+          city?: string | null
+          country?: string
+          created_at?: string
+          created_by_company?: string | null
+          id?: string
+          kind?: string
+          lat?: number | null
+          lon?: number | null
+          mscales?: boolean
+          name: string
+          rejected_at?: string | null
+        }
+        Update: {
+          accepts?: string | null
+          address?: string | null
+          approved_at?: string | null
+          city?: string | null
+          country?: string
+          created_at?: string
+          created_by_company?: string | null
+          id?: string
+          kind?: string
+          lat?: number | null
+          lon?: number | null
+          mscales?: boolean
+          name?: string
+          rejected_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scale_sites_created_by_company_fkey"
+            columns: ["created_by_company"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shipper_invites: {
         Row: {
           applied_at: string | null
@@ -3025,6 +3099,279 @@ export type Database = {
             columns: ["vehicle_id"]
             isOneToOne: false
             referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      site_days: {
+        Row: {
+          approval_note: string | null
+          approved_at: string | null
+          approved_by: string | null
+          arrived_at: string
+          buffer_minutes: number
+          company_id: string
+          created_at: string
+          day: string
+          driver_id: string
+          ended_at: string | null
+          id: string
+          invoice_id: string | null
+          job_id: string
+          trailer_id: string | null
+          vehicle_id: string | null
+        }
+        Insert: {
+          approval_note?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          arrived_at: string
+          buffer_minutes?: number
+          company_id: string
+          created_at?: string
+          day: string
+          driver_id: string
+          ended_at?: string | null
+          id?: string
+          invoice_id?: string | null
+          job_id: string
+          trailer_id?: string | null
+          vehicle_id?: string | null
+        }
+        Update: {
+          approval_note?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          arrived_at?: string
+          buffer_minutes?: number
+          company_id?: string
+          created_at?: string
+          day?: string
+          driver_id?: string
+          ended_at?: string | null
+          id?: string
+          invoice_id?: string | null
+          job_id?: string
+          trailer_id?: string | null
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_days_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_days_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_days_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "carrier_invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_days_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "site_jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_days_trailer_id_fkey"
+            columns: ["trailer_id"]
+            isOneToOne: false
+            referencedRelation: "trailers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_days_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      site_jobs: {
+        Row: {
+          address: string | null
+          buffer_minutes: number
+          company_id: string
+          created_at: string
+          customer_business_id: string | null
+          customer_city: string | null
+          customer_country: string
+          customer_email: string | null
+          customer_name: string
+          customer_postal_code: string | null
+          customer_street: string | null
+          customer_vat_id: string | null
+          foreman_token: string
+          id: string
+          invoice_schedule: string
+          lat: number | null
+          lon: number | null
+          material_code: string
+          name: string
+          payment_term_days: number
+          pricing: Database["public"]["Enums"]["site_pricing"]
+          rate_cents: number
+          receiving_site_id: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          buffer_minutes?: number
+          company_id: string
+          created_at?: string
+          customer_business_id?: string | null
+          customer_city?: string | null
+          customer_country?: string
+          customer_email?: string | null
+          customer_name: string
+          customer_postal_code?: string | null
+          customer_street?: string | null
+          customer_vat_id?: string | null
+          foreman_token?: string
+          id?: string
+          invoice_schedule?: string
+          lat?: number | null
+          lon?: number | null
+          material_code?: string
+          name: string
+          payment_term_days?: number
+          pricing?: Database["public"]["Enums"]["site_pricing"]
+          rate_cents?: number
+          receiving_site_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          buffer_minutes?: number
+          company_id?: string
+          created_at?: string
+          customer_business_id?: string | null
+          customer_city?: string | null
+          customer_country?: string
+          customer_email?: string | null
+          customer_name?: string
+          customer_postal_code?: string | null
+          customer_street?: string | null
+          customer_vat_id?: string | null
+          foreman_token?: string
+          id?: string
+          invoice_schedule?: string
+          lat?: number | null
+          lon?: number | null
+          material_code?: string
+          name?: string
+          payment_term_days?: number
+          pricing?: Database["public"]["Enums"]["site_pricing"]
+          rate_cents?: number
+          receiving_site_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_jobs_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_jobs_receiving_site_id_fkey"
+            columns: ["receiving_site_id"]
+            isOneToOne: false
+            referencedRelation: "scale_sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      site_loads: {
+        Row: {
+          company_id: string
+          created_at: string
+          day_id: string
+          event_id: string | null
+          gross_kg: number | null
+          id: string
+          job_id: string
+          material_code: string
+          net_kg: number | null
+          scale_site_id: string | null
+          tare_kg: number | null
+          ticket_no: string | null
+          unloaded_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          day_id: string
+          event_id?: string | null
+          gross_kg?: number | null
+          id?: string
+          job_id: string
+          material_code: string
+          net_kg?: number | null
+          scale_site_id?: string | null
+          tare_kg?: number | null
+          ticket_no?: string | null
+          unloaded_at: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          day_id?: string
+          event_id?: string | null
+          gross_kg?: number | null
+          id?: string
+          job_id?: string
+          material_code?: string
+          net_kg?: number | null
+          scale_site_id?: string | null
+          tare_kg?: number | null
+          ticket_no?: string | null
+          unloaded_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_loads_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_loads_day_id_fkey"
+            columns: ["day_id"]
+            isOneToOne: false
+            referencedRelation: "site_days"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_loads_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "site_jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_loads_scale_site_id_fkey"
+            columns: ["scale_site_id"]
+            isOneToOne: false
+            referencedRelation: "scale_sites"
             referencedColumns: ["id"]
           },
         ]
@@ -3225,6 +3572,56 @@ export type Database = {
           },
         ]
       }
+      trailers: {
+        Row: {
+          axles: number
+          body_type: Database["public"]["Enums"]["body_type"] | null
+          company_id: string
+          created_at: string
+          gross_max_kg: number | null
+          id: string
+          kind: Database["public"]["Enums"]["trailer_kind"]
+          plate: string
+          tare_kg: number | null
+          twin_wheels: boolean
+          updated_at: string
+        }
+        Insert: {
+          axles: number
+          body_type?: Database["public"]["Enums"]["body_type"] | null
+          company_id: string
+          created_at?: string
+          gross_max_kg?: number | null
+          id?: string
+          kind: Database["public"]["Enums"]["trailer_kind"]
+          plate: string
+          tare_kg?: number | null
+          twin_wheels?: boolean
+          updated_at?: string
+        }
+        Update: {
+          axles?: number
+          body_type?: Database["public"]["Enums"]["body_type"] | null
+          company_id?: string
+          created_at?: string
+          gross_max_kg?: number | null
+          id?: string
+          kind?: Database["public"]["Enums"]["trailer_kind"]
+          plate?: string
+          tare_kg?: number | null
+          twin_wheels?: boolean
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trailers_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       training_progress: {
         Row: {
           box: number
@@ -3400,304 +3797,24 @@ export type Database = {
           },
         ]
       }
-      scale_sites: {
-        Row: {
-          accepts: string | null
-          approved_at: string | null
-          address: string | null
-          city: string | null
-          country: string
-          created_at: string
-          created_by_company: string | null
-          id: string
-          kind: string
-          lat: number | null
-          lon: number | null
-          mscales: boolean
-          name: string
-          rejected_at: string | null
-        }
-        Insert: {
-          accepts?: string | null
-          approved_at?: string | null
-          address?: string | null
-          city?: string | null
-          country?: string
-          created_at?: string
-          created_by_company?: string | null
-          id?: string
-          kind?: string
-          lat?: number | null
-          lon?: number | null
-          mscales?: boolean
-          name: string
-          rejected_at: string | null
-        }
-        Update: {
-          accepts?: string | null
-          approved_at?: string | null
-          address?: string | null
-          city?: string | null
-          country?: string
-          created_at?: string
-          created_by_company?: string | null
-          id?: string
-          kind?: string
-          lat?: number | null
-          lon?: number | null
-          mscales?: boolean
-          name?: string
-          rejected_at?: string | null
-        }
-        Relationships: []
-      }
-      site_days: {
-        Row: {
-          approval_note: string | null
-          approved_at: string | null
-          approved_by: string | null
-          arrived_at: string
-          buffer_minutes: number
-          company_id: string
-          created_at: string
-          day: string
-          driver_id: string
-          ended_at: string | null
-          id: string
-          job_id: string
-          trailer_id: string | null
-          vehicle_id: string | null
-          invoice_id: string | null
-        }
-        Insert: {
-          approval_note?: string | null
-          approved_at?: string | null
-          approved_by?: string | null
-          arrived_at: string
-          buffer_minutes?: number
-          company_id: string
-          created_at?: string
-          day: string
-          driver_id: string
-          ended_at?: string | null
-          id?: string
-          job_id: string
-          trailer_id?: string | null
-          vehicle_id?: string | null
-          invoice_id?: string | null
-        }
-        Update: {
-          approval_note?: string | null
-          approved_at?: string | null
-          approved_by?: string | null
-          arrived_at?: string
-          buffer_minutes?: number
-          company_id?: string
-          created_at?: string
-          day?: string
-          driver_id?: string
-          ended_at?: string | null
-          id?: string
-          job_id?: string
-          trailer_id?: string | null
-          vehicle_id?: string | null
-          invoice_id?: string | null
-        }
-        Relationships: []
-      }
-      site_jobs: {
-        Row: {
-          address: string | null
-          buffer_minutes: number
-          company_id: string
-          created_at: string
-          customer_business_id: string | null
-          customer_email: string | null
-          customer_name: string
-          foreman_token: string
-          id: string
-          lat: number | null
-          lon: number | null
-          material_code: string
-          name: string
-          pricing: Database["public"]["Enums"]["site_pricing"]
-          rate_cents: number
-          receiving_site_id: string | null
-          status: string
-          updated_at: string
-          customer_city: string | null
-          customer_country: string
-          customer_postal_code: string | null
-          customer_street: string | null
-          customer_vat_id: string | null
-          invoice_schedule: string
-          payment_term_days: number
-        }
-        Insert: {
-          address?: string | null
-          buffer_minutes?: number
-          company_id: string
-          created_at?: string
-          customer_business_id?: string | null
-          customer_email?: string | null
-          customer_name: string
-          foreman_token?: string
-          id?: string
-          lat?: number | null
-          lon?: number | null
-          material_code?: string
-          name: string
-          pricing?: Database["public"]["Enums"]["site_pricing"]
-          rate_cents?: number
-          receiving_site_id?: string | null
-          status?: string
-          updated_at?: string
-          customer_city?: string | null
-          customer_country?: string
-          customer_postal_code?: string | null
-          customer_street?: string | null
-          customer_vat_id?: string | null
-          invoice_schedule?: string
-          payment_term_days?: number
-        }
-        Update: {
-          address?: string | null
-          buffer_minutes?: number
-          company_id?: string
-          created_at?: string
-          customer_business_id?: string | null
-          customer_email?: string | null
-          customer_name?: string
-          foreman_token?: string
-          id?: string
-          lat?: number | null
-          lon?: number | null
-          material_code?: string
-          name?: string
-          pricing?: Database["public"]["Enums"]["site_pricing"]
-          rate_cents?: number
-          receiving_site_id?: string | null
-          status?: string
-          updated_at?: string
-          customer_city?: string | null
-          customer_country?: string
-          customer_postal_code?: string | null
-          customer_street?: string | null
-          customer_vat_id?: string | null
-          invoice_schedule?: string
-          payment_term_days?: number
-        }
-        Relationships: []
-      }
-      site_loads: {
-        Row: {
-          company_id: string
-          created_at: string
-          day_id: string
-          event_id: string | null
-          gross_kg: number | null
-          id: string
-          job_id: string
-          material_code: string
-          net_kg: number | null
-          scale_site_id: string | null
-          tare_kg: number | null
-          ticket_no: string | null
-          unloaded_at: string
-        }
-        Insert: {
-          company_id: string
-          created_at?: string
-          day_id: string
-          event_id?: string | null
-          gross_kg?: number | null
-          id?: string
-          job_id: string
-          material_code: string
-          net_kg?: number | null
-          scale_site_id?: string | null
-          tare_kg?: number | null
-          ticket_no?: string | null
-          unloaded_at: string
-        }
-        Update: {
-          company_id?: string
-          created_at?: string
-          day_id?: string
-          event_id?: string | null
-          gross_kg?: number | null
-          id?: string
-          job_id?: string
-          material_code?: string
-          net_kg?: number | null
-          scale_site_id?: string | null
-          tare_kg?: number | null
-          ticket_no?: string | null
-          unloaded_at?: string
-        }
-        Relationships: []
-      }
-      trailers: {
-        Row: {
-          axles: number
-          body_type: Database["public"]["Enums"]["body_type"] | null
-          company_id: string
-          created_at: string
-          gross_max_kg: number | null
-          id: string
-          kind: Database["public"]["Enums"]["trailer_kind"]
-          plate: string
-          tare_kg: number | null
-          twin_wheels: boolean
-          updated_at: string
-        }
-        Insert: {
-          axles: number
-          body_type?: Database["public"]["Enums"]["body_type"] | null
-          company_id: string
-          created_at?: string
-          gross_max_kg?: number | null
-          id?: string
-          kind: Database["public"]["Enums"]["trailer_kind"]
-          plate: string
-          tare_kg?: number | null
-          twin_wheels?: boolean
-          updated_at?: string
-        }
-        Update: {
-          axles?: number
-          body_type?: Database["public"]["Enums"]["body_type"] | null
-          company_id?: string
-          created_at?: string
-          gross_max_kg?: number | null
-          id?: string
-          kind?: Database["public"]["Enums"]["trailer_kind"]
-          plate?: string
-          tare_kg?: number | null
-          twin_wheels?: boolean
-          updated_at?: string
-        }
-        Relationships: []
-      }
       vehicles: {
         Row: {
           access: Database["public"]["Enums"]["vehicle_access"]
           adr: boolean
           approved_at: string | null
           axles: number
-          body_type: Database["public"]["Enums"]["body_type"] | null
-          gross_max_kg: number | null
-          tare_kg: number | null
           base_city: string
           base_country: string | null
           base_lat: number | null
           base_lon: number | null
+          body_type: Database["public"]["Enums"]["body_type"] | null
           company_id: string
           company_kind: Database["public"]["Enums"]["party_role"]
           container_feet: number[]
           created_at: string
           driver_name: string | null
           euro_class: Database["public"]["Enums"]["euro_class"]
+          gross_max_kg: number | null
           id: string
           languages: string[]
           ldm: number | null
@@ -3711,6 +3828,7 @@ export type Database = {
           side_loading: boolean
           submitted_at: string | null
           tail_lift: boolean
+          tare_kg: number | null
           updated_at: string
           vehicle_class: Database["public"]["Enums"]["vehicle_class"]
           whatsapp: string | null
@@ -3720,19 +3838,18 @@ export type Database = {
           adr?: boolean
           approved_at?: string | null
           axles: number
-          body_type: Database["public"]["Enums"]["body_type"] | null
-          gross_max_kg: number | null
-          tare_kg: number | null
           base_city: string
           base_country?: string | null
           base_lat?: number | null
           base_lon?: number | null
+          body_type?: Database["public"]["Enums"]["body_type"] | null
           company_id: string
           company_kind?: Database["public"]["Enums"]["party_role"]
           container_feet?: number[]
           created_at?: string
           driver_name?: string | null
           euro_class: Database["public"]["Enums"]["euro_class"]
+          gross_max_kg?: number | null
           id?: string
           languages?: string[]
           ldm?: number | null
@@ -3746,6 +3863,7 @@ export type Database = {
           side_loading?: boolean
           submitted_at?: string | null
           tail_lift?: boolean
+          tare_kg?: number | null
           updated_at?: string
           vehicle_class?: Database["public"]["Enums"]["vehicle_class"]
           whatsapp?: string | null
@@ -3755,19 +3873,18 @@ export type Database = {
           adr?: boolean
           approved_at?: string | null
           axles?: number
-          body_type?: Database["public"]["Enums"]["body_type"] | null
-          gross_max_kg?: number | null
-          tare_kg?: number | null
           base_city?: string
           base_country?: string | null
           base_lat?: number | null
           base_lon?: number | null
+          body_type?: Database["public"]["Enums"]["body_type"] | null
           company_id?: string
           company_kind?: Database["public"]["Enums"]["party_role"]
           container_feet?: number[]
           created_at?: string
           driver_name?: string | null
           euro_class?: Database["public"]["Enums"]["euro_class"]
+          gross_max_kg?: number | null
           id?: string
           languages?: string[]
           ldm?: number | null
@@ -3781,6 +3898,7 @@ export type Database = {
           side_loading?: boolean
           submitted_at?: string | null
           tail_lift?: boolean
+          tare_kg?: number | null
           updated_at?: string
           vehicle_class?: Database["public"]["Enums"]["vehicle_class"]
           whatsapp?: string | null
@@ -4709,6 +4827,10 @@ export type Database = {
           trips: number
         }[]
       }
+      carrier_site_approve_day: {
+        Args: { p_day_id: string }
+        Returns: undefined
+      }
       carrier_update_client: {
         Args: {
           p_business_id: string
@@ -5097,12 +5219,14 @@ export type Database = {
           base_country: string | null
           base_lat: number | null
           base_lon: number | null
+          body_type: Database["public"]["Enums"]["body_type"] | null
           company_id: string
           company_kind: Database["public"]["Enums"]["party_role"]
           container_feet: number[]
           created_at: string
           driver_name: string | null
           euro_class: Database["public"]["Enums"]["euro_class"]
+          gross_max_kg: number | null
           id: string
           languages: string[]
           ldm: number | null
@@ -5116,6 +5240,7 @@ export type Database = {
           side_loading: boolean
           submitted_at: string | null
           tail_lift: boolean
+          tare_kg: number | null
           updated_at: string
           vehicle_class: Database["public"]["Enums"]["vehicle_class"]
           whatsapp: string | null
@@ -5311,7 +5436,16 @@ export type Database = {
         Args: { p_order_id: string; p_text: string }
         Returns: undefined
       }
-      carrier_site_approve_day: { Args: { p_day_id: string }; Returns: undefined }
+      driver_shift_action: {
+        Args: {
+          p_action: string
+          p_at?: string
+          p_event_id?: string
+          p_lat?: number
+          p_lon?: number
+        }
+        Returns: undefined
+      }
       driver_site_action: {
         Args: {
           p_action: string
@@ -5323,16 +5457,6 @@ export type Database = {
         Returns: undefined
       }
       driver_site_state: { Args: never; Returns: Json }
-      driver_shift_action: {
-        Args: {
-          p_action: string
-          p_at?: string
-          p_event_id?: string
-          p_lat?: number
-          p_lon?: number
-        }
-        Returns: undefined
-      }
       driver_tasks: {
         Args: never
         Returns: {
@@ -5716,6 +5840,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      next_carrier_invoice_number: {
+        Args: { p_company_id: string; p_year: number }
+        Returns: string
       }
       notify_company: {
         Args: {
@@ -6238,6 +6366,16 @@ export type Database = {
           samples: number
         }[]
       }
+      site_foreman_approve: {
+        Args: {
+          p_day_id: string
+          p_name: string
+          p_note?: string
+          p_token: string
+        }
+        Returns: undefined
+      }
+      site_foreman_view: { Args: { p_token: string }; Returns: Json }
       stop_waiting_typical: {
         Args: { p_stop_ids: string[] }
         Returns: {
@@ -6310,12 +6448,6 @@ export type Database = {
         Args: { p_body: string; p_subject: string }
         Returns: number
       }
-      next_carrier_invoice_number: { Args: { p_company_id: string; p_year: number }; Returns: string }
-      site_foreman_approve: {
-        Args: { p_day_id: string; p_name: string; p_note?: string; p_token: string }
-        Returns: undefined
-      }
-      site_foreman_view: { Args: { p_token: string }; Returns: Json }
       submit_vehicle: {
         Args: { p_vehicle_id: string }
         Returns: {
@@ -6327,12 +6459,14 @@ export type Database = {
           base_country: string | null
           base_lat: number | null
           base_lon: number | null
+          body_type: Database["public"]["Enums"]["body_type"] | null
           company_id: string
           company_kind: Database["public"]["Enums"]["party_role"]
           container_feet: number[]
           created_at: string
           driver_name: string | null
           euro_class: Database["public"]["Enums"]["euro_class"]
+          gross_max_kg: number | null
           id: string
           languages: string[]
           ldm: number | null
@@ -6346,6 +6480,7 @@ export type Database = {
           side_loading: boolean
           submitted_at: string | null
           tail_lift: boolean
+          tare_kg: number | null
           updated_at: string
           vehicle_class: Database["public"]["Enums"]["vehicle_class"]
           whatsapp: string | null
@@ -6644,17 +6779,6 @@ export type Database = {
       }
     }
     Enums: {
-      site_pricing: "HOUR" | "LOAD" | "TONNE"
-      body_type:
-        | "TIPPER"
-        | "CASSETTE"
-        | "FLATBED"
-        | "CONTAINER"
-        | "CURTAIN"
-        | "BOX"
-        | "TANK"
-        | "OTHER"
-      trailer_kind: "SEMI" | "FULL" | "CENTER_AXLE"
       amendment_kind:
         | "STOP_ADDED"
         | "STOP_CHANGED"
@@ -6664,6 +6788,15 @@ export type Database = {
         | "ORDER_RELEASED"
       api_scope: "READ" | "WRITE"
       billing_status: "PENDING" | "INVOICED" | "PAID" | "SETTLED"
+      body_type:
+        | "TIPPER"
+        | "CASSETTE"
+        | "FLATBED"
+        | "CONTAINER"
+        | "CURTAIN"
+        | "BOX"
+        | "TANK"
+        | "OTHER"
       chat_audience: "DRIVER" | "CARRIER" | "SHIPPER" | "ADMIN"
       chat_channel: "WEB" | "WHATSAPP"
       chat_sender: "USER" | "AGENT" | "OPERATOR"
@@ -6738,6 +6871,7 @@ export type Database = {
       place_kind: "PORT" | "TERMINAL" | "PARKING" | "ADDRESS"
       report_kind: "WEEK" | "PERIOD" | "SUBSCRIPTION"
       shift_source: "APP" | "MANUAL"
+      site_pricing: "HOUR" | "LOAD" | "TONNE"
       stop_role:
         | "PICKUP"
         | "DELIVERY"
@@ -6745,6 +6879,7 @@ export type Database = {
         | "EXTRA_UNLOAD"
         | "CONTINUATION"
         | "TRAILER_RETURN"
+      trailer_kind: "SEMI" | "FULL" | "CENTER_AXLE"
       trip_document_kind:
         | "CMR"
         | "LOADING_PHOTO"
@@ -6884,9 +7019,6 @@ export const Constants = {
   },
   public: {
     Enums: {
-      site_pricing: ["HOUR", "LOAD", "TONNE"],
-      body_type: ["TIPPER", "CASSETTE", "FLATBED", "CONTAINER", "CURTAIN", "BOX", "TANK", "OTHER"],
-      trailer_kind: ["SEMI", "FULL", "CENTER_AXLE"],
       amendment_kind: [
         "STOP_ADDED",
         "STOP_CHANGED",
@@ -6897,6 +7029,16 @@ export const Constants = {
       ],
       api_scope: ["READ", "WRITE"],
       billing_status: ["PENDING", "INVOICED", "PAID", "SETTLED"],
+      body_type: [
+        "TIPPER",
+        "CASSETTE",
+        "FLATBED",
+        "CONTAINER",
+        "CURTAIN",
+        "BOX",
+        "TANK",
+        "OTHER",
+      ],
       chat_audience: ["DRIVER", "CARRIER", "SHIPPER", "ADMIN"],
       chat_channel: ["WEB", "WHATSAPP"],
       chat_sender: ["USER", "AGENT", "OPERATOR"],
@@ -6977,6 +7119,7 @@ export const Constants = {
       place_kind: ["PORT", "TERMINAL", "PARKING", "ADDRESS"],
       report_kind: ["WEEK", "PERIOD", "SUBSCRIPTION"],
       shift_source: ["APP", "MANUAL"],
+      site_pricing: ["HOUR", "LOAD", "TONNE"],
       stop_role: [
         "PICKUP",
         "DELIVERY",
@@ -6985,6 +7128,7 @@ export const Constants = {
         "CONTINUATION",
         "TRAILER_RETURN",
       ],
+      trailer_kind: ["SEMI", "FULL", "CENTER_AXLE"],
       trip_document_kind: [
         "CMR",
         "LOADING_PHOTO",
