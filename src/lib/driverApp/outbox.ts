@@ -10,7 +10,8 @@
  * OutboxProvider.
  */
 
-export type OutboxKind = 'SHIFT' | 'ARRIVE' | 'COMPLETE' | 'UPLOAD';
+/** SITE — работа на объекте: прибытие, рейс, конец дня, новый пункт приёмки. */
+export type OutboxKind = 'SHIFT' | 'ARRIVE' | 'COMPLETE' | 'UPLOAD' | 'SITE';
 
 export type OutboxEvent = {
   /** Идентификатор действия: по нему сервер отличает повтор от нового. */

@@ -21,6 +21,11 @@ export type Vehicle = Tables<'vehicles'>;
 export type Trailer = Tables<'trailers'>;
 export type BodyType = Database['public']['Enums']['body_type'];
 export type TrailerKind = Database['public']['Enums']['trailer_kind'];
+export type ScaleSite = Tables<'scale_sites'>;
+export type SiteJob = Tables<'site_jobs'>;
+export type SiteDay = Tables<'site_days'>;
+export type SiteLoad = Tables<'site_loads'>;
+export type SitePricing = Database['public']['Enums']['site_pricing'];
 export type CompanyDocument = Tables<'company_documents'>;
 
 export type OrderType = Database['public']['Enums']['order_type'];

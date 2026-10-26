@@ -10,6 +10,7 @@ import { cancelOrderAction } from '@/lib/orders/matching';
 import { refineEtaAfter } from '@/lib/orders/eta';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
+import type { Json } from '@/types/database';
 
 /**
  * Действия приложения водителя.
@@ -288,6 +289,24 @@ export async function applyDriverEventAction(formData: FormData): Promise<EventR
       result = outcome(error);
       /* Отметка из очереди старше четверти часа пересчёт пропустит сама. */
       if (!error) await refineEtaAfter(supabase, str(formData, 'stop_id'));
+      break;
+    }
+    case 'SITE': {
+      /* Поля рейса — JSON в одном поле: их набор у ARRIVE, LOAD и ADD_SITE разный. */
+      let data: Record<string, unknown> = {};
+      try {
+        data = JSON.parse(str(formData, 'data') || '{}');
+      } catch {
+        data = {};
+      }
+      const { error } = await supabase.rpc('driver_site_action', {
+        p_action: str(formData, 'action'),
+        p_job_id: str(formData, 'job_id') || undefined,
+        p_data: data as Json,
+        p_at: at,
+        p_event_id: eventId,
+      });
+      result = outcome(error);
       break;
     }
     case 'UPLOAD':

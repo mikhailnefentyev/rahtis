@@ -157,7 +157,10 @@ function navigation(
     const done: NavItem = { href: `/${locale}/carrier/done`, label: t.done.titleCarrier, short: t.nav.doneShort, icon: 'done' };
     return {
       groups: [
-        { label: t.nav.groupWork, items: [overview, desk, own, done] },
+        {
+          label: t.nav.groupWork,
+          items: [overview, desk, own, { href: `/${locale}/carrier/sites`, label: t.sites.nav, icon: 'sites' }, done],
+        },
         {
           label: t.nav.groupCompany,
           items: [

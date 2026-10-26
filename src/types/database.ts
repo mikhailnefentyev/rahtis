@@ -3331,6 +3331,213 @@ export type Database = {
           },
         ]
       }
+      scale_sites: {
+        Row: {
+          accepts: string | null
+          address: string | null
+          city: string | null
+          country: string
+          created_at: string
+          created_by_company: string | null
+          id: string
+          kind: string
+          lat: number | null
+          lon: number | null
+          mscales: boolean
+          name: string
+        }
+        Insert: {
+          accepts?: string | null
+          address?: string | null
+          city?: string | null
+          country?: string
+          created_at?: string
+          created_by_company?: string | null
+          id?: string
+          kind?: string
+          lat?: number | null
+          lon?: number | null
+          mscales?: boolean
+          name: string
+        }
+        Update: {
+          accepts?: string | null
+          address?: string | null
+          city?: string | null
+          country?: string
+          created_at?: string
+          created_by_company?: string | null
+          id?: string
+          kind?: string
+          lat?: number | null
+          lon?: number | null
+          mscales?: boolean
+          name?: string
+        }
+        Relationships: []
+      }
+      site_days: {
+        Row: {
+          approval_note: string | null
+          approved_at: string | null
+          approved_by: string | null
+          arrived_at: string
+          buffer_minutes: number
+          company_id: string
+          created_at: string
+          day: string
+          driver_id: string
+          ended_at: string | null
+          id: string
+          job_id: string
+          trailer_id: string | null
+          vehicle_id: string | null
+        }
+        Insert: {
+          approval_note?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          arrived_at: string
+          buffer_minutes?: number
+          company_id: string
+          created_at?: string
+          day: string
+          driver_id: string
+          ended_at?: string | null
+          id?: string
+          job_id: string
+          trailer_id?: string | null
+          vehicle_id?: string | null
+        }
+        Update: {
+          approval_note?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          arrived_at?: string
+          buffer_minutes?: number
+          company_id?: string
+          created_at?: string
+          day?: string
+          driver_id?: string
+          ended_at?: string | null
+          id?: string
+          job_id?: string
+          trailer_id?: string | null
+          vehicle_id?: string | null
+        }
+        Relationships: []
+      }
+      site_jobs: {
+        Row: {
+          address: string | null
+          buffer_minutes: number
+          company_id: string
+          created_at: string
+          customer_business_id: string | null
+          customer_email: string | null
+          customer_name: string
+          foreman_token: string
+          id: string
+          lat: number | null
+          lon: number | null
+          material_code: string
+          name: string
+          pricing: Database["public"]["Enums"]["site_pricing"]
+          rate_cents: number
+          receiving_site_id: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          buffer_minutes?: number
+          company_id: string
+          created_at?: string
+          customer_business_id?: string | null
+          customer_email?: string | null
+          customer_name: string
+          foreman_token?: string
+          id?: string
+          lat?: number | null
+          lon?: number | null
+          material_code?: string
+          name: string
+          pricing?: Database["public"]["Enums"]["site_pricing"]
+          rate_cents?: number
+          receiving_site_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          buffer_minutes?: number
+          company_id?: string
+          created_at?: string
+          customer_business_id?: string | null
+          customer_email?: string | null
+          customer_name?: string
+          foreman_token?: string
+          id?: string
+          lat?: number | null
+          lon?: number | null
+          material_code?: string
+          name?: string
+          pricing?: Database["public"]["Enums"]["site_pricing"]
+          rate_cents?: number
+          receiving_site_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      site_loads: {
+        Row: {
+          company_id: string
+          created_at: string
+          day_id: string
+          event_id: string | null
+          gross_kg: number | null
+          id: string
+          job_id: string
+          material_code: string
+          net_kg: number | null
+          scale_site_id: string | null
+          tare_kg: number | null
+          ticket_no: string | null
+          unloaded_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          day_id: string
+          event_id?: string | null
+          gross_kg?: number | null
+          id?: string
+          job_id: string
+          material_code: string
+          net_kg?: number | null
+          scale_site_id?: string | null
+          tare_kg?: number | null
+          ticket_no?: string | null
+          unloaded_at: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          day_id?: string
+          event_id?: string | null
+          gross_kg?: number | null
+          id?: string
+          job_id?: string
+          material_code?: string
+          net_kg?: number | null
+          scale_site_id?: string | null
+          tare_kg?: number | null
+          ticket_no?: string | null
+          unloaded_at?: string
+        }
+        Relationships: []
+      }
       trailers: {
         Row: {
           axles: number
@@ -5005,6 +5212,17 @@ export type Database = {
         Args: { p_order_id: string; p_text: string }
         Returns: undefined
       }
+      driver_site_action: {
+        Args: {
+          p_action: string
+          p_at?: string
+          p_data?: Json
+          p_event_id?: string
+          p_job_id?: string
+        }
+        Returns: undefined
+      }
+      driver_site_state: { Args: never; Returns: Json }
       driver_shift_action: {
         Args: {
           p_action: string
@@ -5992,6 +6210,11 @@ export type Database = {
         Args: { p_body: string; p_subject: string }
         Returns: number
       }
+      site_foreman_approve: {
+        Args: { p_day_id: string; p_name: string; p_note?: string; p_token: string }
+        Returns: undefined
+      }
+      site_foreman_view: { Args: { p_token: string }; Returns: Json }
       submit_vehicle: {
         Args: { p_vehicle_id: string }
         Returns: {
@@ -6320,6 +6543,7 @@ export type Database = {
       }
     }
     Enums: {
+      site_pricing: "HOUR" | "LOAD" | "TONNE"
       body_type:
         | "TIPPER"
         | "CASSETTE"
@@ -6559,6 +6783,7 @@ export const Constants = {
   },
   public: {
     Enums: {
+      site_pricing: ["HOUR", "LOAD", "TONNE"],
       body_type: ["TIPPER", "CASSETTE", "FLATBED", "CONTAINER", "CURTAIN", "BOX", "TANK", "OTHER"],
       trailer_kind: ["SEMI", "FULL", "CENTER_AXLE"],
       amendment_kind: [

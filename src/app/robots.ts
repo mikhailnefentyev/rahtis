@@ -7,7 +7,7 @@ import { SITE_URL } from '@/lib/seo';
  * locales: когда их стало девять, правила для /fi и /en, записанные
  * руками, оставили /pl/carrier и /de/track открытыми для обхода.
  */
-const PRIVATE = ['/shipper/', '/carrier/', '/track/', '/admin/', '/account', '/notifications', '/requisites', '/reports/', '/set-password'];
+const PRIVATE = ['/shipper/', '/carrier/', '/track/', '/site/', '/admin/', '/account', '/notifications', '/requisites', '/reports/', '/set-password'];
 
 /**
  * Что можно обходить, а что нет.

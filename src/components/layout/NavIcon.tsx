@@ -6,6 +6,7 @@ export type NavIconName =
   | 'home'
   | 'desk'
   | 'own'
+  | 'sites'
   | 'done'
   | 'fleet'
   | 'drivers'
@@ -43,6 +44,15 @@ const PATHS: Record<NavIconName, React.ReactNode> = {
   own: (
     <>
       <path d="M3 7h11v9H3zM14 10h4l3 3v3h-7" />
+      <circle cx="7" cy="18" r="2" />
+      <circle cx="17" cy="18" r="2" />
+    </>
+  ),
+  /* Самосвал: наклонённый кузов и колёса. */
+  sites: (
+    <>
+      <path d="M3 15V9l9-3 2 6H3" />
+      <path d="M14 12h4l3 3v1H3v-1" />
       <circle cx="7" cy="18" r="2" />
       <circle cx="17" cy="18" r="2" />
     </>

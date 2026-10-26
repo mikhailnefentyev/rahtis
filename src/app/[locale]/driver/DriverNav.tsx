@@ -31,6 +31,7 @@ export function DriverNav({ unread }: { unread: number }) {
       icon: TasksIcon,
       active: pathname === base || pathname.startsWith(`${base}/task`),
     },
+    { href: `${base}/site`, label: t.siteWork.tab, icon: SiteIcon, active: pathname.startsWith(`${base}/site`) },
     { href: `${base}/earnings`, label: t.driverApp.nav.earnings, icon: EarningsIcon, active: pathname.startsWith(`${base}/earnings`) },
     { href: `${base}/map`, label: t.driverApp.nav.map, icon: MapIcon, active: pathname.startsWith(`${base}/map`) },
     {
@@ -160,6 +161,18 @@ function EarningsIcon() {
 }
 
 /** Карта: метка места. */
+/* Самосвал — работа на объекте. */
+function SiteIcon() {
+  return (
+    <svg {...base}>
+      <path d="M3 15V9l9-3 2 6H3" />
+      <path d="M14 12h4l3 3v1H3v-1" />
+      <circle cx="7" cy="18" r="2" />
+      <circle cx="17" cy="18" r="2" />
+    </svg>
+  );
+}
+
 function MapIcon() {
   return (
     <svg {...base}>

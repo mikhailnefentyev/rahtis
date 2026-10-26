@@ -42,6 +42,8 @@ export type DriverPack = {
   /** Тренажёр и сроки сертификатов — экраны водителя, на его языке. */
   training: Dictionary['training'];
   certificates: Dictionary['certificates'];
+  /** Работа на объекте: самосвалы, весы, часы. */
+  siteWork: Dictionary['siteWork'];
   stopKind: Dictionary['stopKind'];
   /*
    * Забор и возврат зависят от того, что везут: общий stopKind называет их
@@ -75,6 +77,7 @@ function packOf(dictionary: Dictionary): DriverPack {
     places: dictionary.places,
     training: dictionary.training,
     certificates: dictionary.certificates,
+    siteWork: dictionary.siteWork,
     stopKind: dictionary.stopKind,
     haulStops: {
       CONTAINER: { pickup: dictionary.haul.CONTAINER.stopPickup, return: dictionary.haul.CONTAINER.stopReturn },
@@ -133,6 +136,7 @@ export async function driverDictionary(
     places: pack.places,
     training: pack.training,
     certificates: pack.certificates,
+    siteWork: pack.siteWork,
     stopKind: pack.stopKind,
     /*
      * Забор и возврат по виду перевозки: страницы водителя зовут тот же
