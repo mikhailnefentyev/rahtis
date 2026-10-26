@@ -150,6 +150,8 @@ export const fi = {
     namePh: 'Kalasatama, kortteli 5',
     address: 'Osoite',
     customer: 'Asiakas (jätteen haltija)',
+    siteCountry: 'Kohteen maa',
+    siteCountryHint: 'Kuorman asiakirja tehdään tämän maan sääntöjen mukaan',
     customerBusinessId: 'Asiakkaan Y-tunnus',
     ytjHint: 'Suomalaisen yrityksen nimi ja osoite haetaan YTJ:stä',
     ytjLoading: 'Haetaan YTJ:stä…',

@@ -127,6 +127,8 @@ export const de = {
     namePh: 'Kalasatama, Block 5',
     address: 'Adresse',
     customer: 'Kunde (Abfallbesitzer)',
+    siteCountry: 'Land der Baustelle',
+    siteCountryHint: 'Das Dokument zur Fuhre richtet sich nach den Regeln dieses Landes',
     customerBusinessId: 'Y-tunnus des Kunden',
     ytjHint: 'Bei finnischen Firmen werden Name und Adresse aus YTJ übernommen',
     ytjLoading: 'Suche in YTJ…',

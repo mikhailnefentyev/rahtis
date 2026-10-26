@@ -12,19 +12,21 @@
  * (siirtoasiakirja, jätelaki 121 §). Буквенные — товарный материал, не
  * отход. registry — подаётся ли документ в реестр SIIRTO: да для
  * загрязнённого грунта и строительных отходов, нет для чистого грунта.
+ * hazardous — опасный отход (в перечне со звёздочкой): в других странах
+ * от него зависит, нужна ли госсистема (eANV, Avfallsregistret…).
  */
 export const MATERIALS = [
-  { code: '170504', waste: true, registry: false },
-  { code: '170506', waste: true, registry: false },
-  { code: '170503', waste: true, registry: true },
-  { code: '170107', waste: true, registry: true },
-  { code: '170302', waste: true, registry: true },
-  { code: '170904', waste: true, registry: true },
-  { code: 'SORA', waste: false, registry: false },
-  { code: 'MURSKE', waste: false, registry: false },
-  { code: 'HIEKKA', waste: false, registry: false },
-  { code: 'MULTA', waste: false, registry: false },
-  { code: 'LOUHE', waste: false, registry: false },
+  { code: '170504', waste: true, hazardous: false, registry: false },
+  { code: '170506', waste: true, hazardous: false, registry: false },
+  { code: '170503', waste: true, hazardous: true, registry: true },
+  { code: '170107', waste: true, hazardous: false, registry: true },
+  { code: '170302', waste: true, hazardous: false, registry: true },
+  { code: '170904', waste: true, hazardous: false, registry: true },
+  { code: 'SORA', waste: false, hazardous: false, registry: false },
+  { code: 'MURSKE', waste: false, hazardous: false, registry: false },
+  { code: 'HIEKKA', waste: false, hazardous: false, registry: false },
+  { code: 'MULTA', waste: false, hazardous: false, registry: false },
+  { code: 'LOUHE', waste: false, hazardous: false, registry: false },
 ] as const;
 
 export type MaterialCode = (typeof MATERIALS)[number]['code'];
@@ -37,9 +39,10 @@ export function material(code: string) {
   return MATERIALS.find((m) => m.code === code) ?? null;
 }
 
-/** «17 05 04» — как код пишут в документах. */
+/** «17 05 04», опасный — «17 05 03*»: как код пишут в документах. */
 export function wasteCodeLabel(code: string): string {
-  return /^\d{6}$/.test(code) ? `${code.slice(0, 2)} ${code.slice(2, 4)} ${code.slice(4)}` : code;
+  if (!/^\d{6}$/.test(code)) return code;
+  return `${code.slice(0, 2)} ${code.slice(2, 4)} ${code.slice(4)}${material(code)?.hazardous ? '*' : ''}`;
 }
 
 export type DayTimes = {

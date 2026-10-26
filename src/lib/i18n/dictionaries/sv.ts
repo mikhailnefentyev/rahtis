@@ -127,6 +127,8 @@ export const sv = {
     namePh: 'Fiskehamnen, kvarter 5',
     address: 'Adress',
     customer: 'Kund (avfallsinnehavare)',
+    siteCountry: 'Arbetsplatsens land',
+    siteCountryHint: 'Dokumentet för lasset följer detta lands regler',
     customerBusinessId: 'Kundens FO-nummer',
     ytjHint: 'För ett finskt företag hämtas namn och adress från YTJ',
     ytjLoading: 'Söker i YTJ…',

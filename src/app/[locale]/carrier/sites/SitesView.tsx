@@ -7,7 +7,16 @@ import { useI18n } from '@/lib/i18n/provider';
 import type { ScaleSite, SiteJob } from '@/types/db';
 import { SiteJobForm } from './SiteJobForm';
 
-export function SitesView({ jobs, scaleSites }: { jobs: SiteJob[]; scaleSites: Pick<ScaleSite, 'id' | 'name' | 'city'>[] }) {
+export function SitesView({
+  jobs,
+  scaleSites,
+  defaultCountry,
+}: {
+  jobs: SiteJob[];
+  scaleSites: Pick<ScaleSite, 'id' | 'name' | 'city'>[];
+  /** Страна нового объекта по умолчанию — страна компании перевозчика. */
+  defaultCountry: string;
+}) {
   const { t, locale } = useI18n();
   const [adding, setAdding] = useState(false);
   const s = t.sites;
@@ -23,7 +32,7 @@ export function SitesView({ jobs, scaleSites }: { jobs: SiteJob[]; scaleSites: P
       </div>
       {adding && (
         <div className="mb-4">
-          <SiteJobForm job={null} scaleSites={scaleSites} onClose={() => setAdding(false)} />
+          <SiteJobForm job={null} scaleSites={scaleSites} defaultCountry={defaultCountry} onClose={() => setAdding(false)} />
         </div>
       )}
       {jobs.length === 0 && !adding ? (

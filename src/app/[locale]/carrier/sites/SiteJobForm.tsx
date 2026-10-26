@@ -5,6 +5,7 @@ import { useActionState, useEffect, useRef, useState, useTransition } from 'reac
 import { Button, Card, CardBody, Field, Input, InputMono, Select } from '@/components/ui';
 import { lookupCustomerAction, saveSiteJobAction, type SiteJobState } from '@/lib/sites/actions';
 import { MATERIALS } from '@/lib/sites/work';
+import { SITE_COUNTRIES } from '@/lib/sites/wasteDocs';
 import { useI18n } from '@/lib/i18n/provider';
 import type { ScaleSite, SiteJob } from '@/types/db';
 
@@ -17,16 +18,20 @@ const YTJ_FIELDS = ['customer_name', 'customer_street', 'customer_postal_code', 
 export function SiteJobForm({
   job,
   scaleSites,
+  defaultCountry,
   onClose,
 }: {
   job: SiteJob | null;
   scaleSites: Pick<ScaleSite, 'id' | 'name' | 'city'>[];
+  /** Страна нового объекта, если не выбрана: страна компании перевозчика. */
+  defaultCountry?: string;
   onClose?: () => void;
 }) {
   const { t, locale } = useI18n();
   const router = useRouter();
   const [state, action, pending] = useActionState(saveSiteJobAction, initial);
   const s = t.sites;
+  const regionName = new Intl.DisplayNames([locale], { type: 'region' });
   const formRef = useRef<HTMLFormElement>(null);
   /* Что подставили из YTJ: такое поле можно перезаписать при смене номера, введённое руками — нет. */
   const filled = useRef<Partial<Record<(typeof YTJ_FIELDS)[number], string>>>({});
@@ -85,6 +90,17 @@ export function SiteJobForm({
           </Field>
           <Field label={s.address}>
             {(p) => <Input {...p} name="address" defaultValue={job?.address ?? ''} />}
+          </Field>
+          <Field label={s.siteCountry} hint={s.siteCountryHint}>
+            {(p) => (
+              <Select {...p} name="country" defaultValue={job?.country ?? defaultCountry ?? 'FI'}>
+                {SITE_COUNTRIES.map((c) => (
+                  <option key={c} value={c}>
+                    {regionName.of(c) ?? c}
+                  </option>
+                ))}
+              </Select>
+            )}
           </Field>
           <Field label={s.customer} required>
             {(p) => <Input {...p} name="customer_name" required defaultValue={job?.customer_name ?? ''} />}

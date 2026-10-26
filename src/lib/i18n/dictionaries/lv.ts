@@ -127,6 +127,8 @@ export const lv = {
     namePh: 'Kalasatama, kvartāls 5',
     address: 'Adrese',
     customer: 'Klients (atkritumu valdītājs)',
+    siteCountry: 'Objekta valsts',
+    siteCountryHint: 'Kravas dokumentu sagatavo pēc šīs valsts noteikumiem',
     customerBusinessId: 'Klienta reģ. nr.',
     ytjHint: 'Somijas uzņēmuma nosaukums un adrese tiek ņemti no YTJ',
     ytjLoading: 'Meklē YTJ…',

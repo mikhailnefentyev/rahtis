@@ -127,6 +127,8 @@ export const pl = {
     namePh: 'Kalasatama, kwartał 5',
     address: 'Adres',
     customer: 'Klient (posiadacz odpadów)',
+    siteCountry: 'Kraj budowy',
+    siteCountryHint: 'Dokument kursu powstaje według przepisów tego kraju',
     customerBusinessId: 'Y-tunnus klienta',
     ytjHint: 'Dla fińskiej firmy nazwa i adres pobierają się z YTJ',
     ytjLoading: 'Szukam w YTJ…',

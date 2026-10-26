@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { requireRole } from '@/lib/auth/guard';
 import { getDictionary, isLocale } from '@/lib/i18n';
 import { getViewerI18n } from '@/lib/i18n/viewer';
+import { isSiteCountry, LABELS_EN, wasteDocFor } from '@/lib/sites/wasteDocs';
 import { material, wasteCodeLabel } from '@/lib/sites/work';
 import { createClient } from '@/lib/supabase/server';
 import { PrintButton } from './PrintButton';
@@ -11,11 +12,16 @@ import { PrintButton } from './PrintButton';
 export const metadata: Metadata = { title: 'Siirtoasiakirja' };
 
 /**
- * Siirtoasiakirja — документ на перевозку отходов по jätelaki 646/2011,
- * 121 §: владелец (заказчик), перевозчик, получатель, время, место начала
- * и конца, код и название отхода по перечню, количество и подтверждения
- * сторон. Документ по-фински с английскими подписями: так его читают
- * пункт приёмки и контролёр.
+ * Документ на перевозку груза с объекта — по стране объекта (wasteDocs.ts).
+ *
+ * В Финляндии это siirtoasiakirja (jätelaki 646/2011, 121 §), в Дании —
+ * følgeseddel, в Германии для обычного грунта — весовая накладная. Где
+ * закон требует госсистему (BDO, GPAIS, APUS, PISTRIK, eANV для опасных),
+ * страница прямо говорит, что эта распечатка документ не заменяет, и
+ * даёт данные рейса для ввода.
+ *
+ * Подписи — на языке страны объекта с английской строкой под каждой:
+ * так документ читают пункт приёмки и контролёр.
  *
  * Подтверждения: владелец — подтверждение дня прорабом, перевозчик —
  * отметка водителя о выгрузке, получатель — талон взвешивания.
@@ -26,7 +32,7 @@ export default async function TransferDocumentPage({ params }: { params: Promise
 
   const viewer = await requireRole(locale, 'CARRIER');
   const company = viewer.company!;
-  const [{ t, f }, fi, supabase] = await Promise.all([getViewerI18n(locale), getDictionary('fi'), createClient()]);
+  const [{ t, f }, supabase] = await Promise.all([getViewerI18n(locale), createClient()]);
 
   const { data: load } = await supabase.from('site_loads').select('*').eq('id', loadId).eq('job_id', id).maybeSingle();
   if (!load) notFound();
@@ -36,6 +42,11 @@ export default async function TransferDocumentPage({ params }: { params: Promise
   ]);
   if (!job || !day) notFound();
 
+  const country = isSiteCountry(job.country) ? job.country : 'FI';
+  /* Название груза — на языке страны объекта, где есть словарь; иначе по-английски. */
+  const docLocale = isLocale(country.toLowerCase()) ? country.toLowerCase() : 'en';
+  const [docDict, enDict] = await Promise.all([getDictionary(docLocale as Parameters<typeof getDictionary>[0]), getDictionary('en')]);
+
   const [{ data: driver }, { data: vehicle }, { data: trailer }, { data: receiver }] = await Promise.all([
     supabase.from('drivers').select('full_name').eq('id', day.driver_id).maybeSingle(),
     day.vehicle_id ? supabase.from('vehicles').select('plate').eq('id', day.vehicle_id).maybeSingle() : Promise.resolve({ data: null }),
@@ -44,14 +55,20 @@ export default async function TransferDocumentPage({ params }: { params: Promise
   ]);
 
   const kind = material(load.material_code);
-  const materialFi = fi.siteWork.materials[load.material_code as keyof typeof fi.siteWork.materials] ?? load.material_code;
+  const doc = wasteDocFor(country, kind?.hazardous ?? false, day.day);
+  const L = doc.labels;
+  const E = LABELS_EN;
+  const code = load.material_code as keyof typeof docDict.siteWork.materials;
+  const materialName = docDict.siteWork.materials[code] ?? load.material_code;
+  const materialEn = enDict.siteWork.materials[code] ?? load.material_code;
   const number = `${day.day.replaceAll('-', '')}-${load.id.slice(0, 8).toUpperCase()}`;
+  const kg = (value: number) => value.toLocaleString('fi-FI');
 
-  const row = (labelFi: string, labelEn: string, value: React.ReactNode) => (
+  const row = (labelLocal: string, labelEn: string, value: React.ReactNode) => (
     <tr className="border-t border-line align-top">
       <th className="w-[38%] py-2 pr-4 text-left text-[12px] font-medium text-ink-muted">
-        {labelFi}
-        <span className="block text-[11px] font-normal text-ink-dim">{labelEn}</span>
+        {labelLocal}
+        {labelLocal !== labelEn && <span className="block text-[11px] font-normal text-ink-dim">{labelEn}</span>}
       </th>
       <td className="py-2 text-[13px]">{value}</td>
     </tr>
@@ -69,25 +86,42 @@ export default async function TransferDocumentPage({ params }: { params: Promise
       <article className="rounded-card border border-line bg-surface p-6 print:border-0 print:p-0">
         <header className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
           <h1 className="text-xl font-bold tracking-tight">
-            Siirtoasiakirja <span className="text-[13px] font-normal text-ink-muted">· Waste transfer document</span>
+            {doc.title} <span className="text-[13px] font-normal text-ink-muted">· {doc.titleEn}</span>
           </h1>
           <span className="font-mono text-[13px]">Nro {number}</span>
         </header>
-        <p className="mb-4 text-[12px] text-ink-muted">Jätelaki 646/2011, 121 § · RAHTIS</p>
+        <p className="mb-4 text-[12px] text-ink-muted">
+          {doc.law} · {country} · RAHTIS
+        </p>
+
+        {doc.state && (
+          <div className="mb-4 rounded-control border border-warn/40 bg-warn/10 px-3 py-2.5 text-[13px] leading-relaxed">
+            <p className="font-semibold text-warn">{doc.state.local}</p>
+            <p className="mt-1 text-ink-muted">{doc.state.en}</p>
+            <a href={doc.state.url} target="_blank" rel="noreferrer" className="mt-1.5 inline-block font-semibold text-accent hover:underline print:hidden">
+              {doc.state.name} →
+            </a>
+          </div>
+        )}
 
         <table className="w-full">
           <tbody>
-            {row('Jätteen haltija (tuottaja)', 'Waste holder', (
+            {row(L.holder, E.holder, (
               <>
                 {job.customer_name}
                 {job.customer_business_id && <span className="font-mono"> · {job.customer_business_id}</span>}
                 {job.customer_email && <span className="block text-ink-muted">{job.customer_email}</span>}
               </>
             ))}
-            {row('Kuljettaja', 'Carrier', (
+            {row(L.carrier, E.carrier, (
               <>
-                {company.name}
+                {company.legal_name ?? company.name}
                 {company.business_id && <span className="font-mono"> · {company.business_id}</span>}
+                {company.legal_street && (
+                  <span className="block text-ink-muted">
+                    {company.legal_street}, {company.legal_postal_code} {company.legal_city}
+                  </span>
+                )}
                 <span className="block text-ink-muted">
                   {driver?.full_name ?? '—'}
                   {vehicle?.plate && <span className="font-mono"> · {vehicle.plate}</span>}
@@ -95,38 +129,45 @@ export default async function TransferDocumentPage({ params }: { params: Promise
                 </span>
               </>
             ))}
-            {row('Vastaanottaja', 'Receiver', receiver ? `${receiver.name}${receiver.city ? `, ${receiver.city}` : ''}` : '—')}
-            {row('Siirron ajankohta', 'Date and time of transfer', (
+            {row(L.receiver, E.receiver, receiver ? `${receiver.name}${receiver.city ? `, ${receiver.city}` : ''}` : '—')}
+            {row(L.time, E.time, (
               <>
                 {f.date(`${day.day}T12:00:00Z`)} · {f.time(day.arrived_at)} – {f.time(load.unloaded_at)}
               </>
             ))}
-            {row('Siirron alkamispaikka', 'Place of departure', `${job.name}${job.address ? `, ${job.address}` : ''}`)}
-            {row('Siirron päättymispaikka', 'Place of destination', receiver ? `${receiver.name}${receiver.address ? `, ${receiver.address}` : ''}${receiver.city ? `, ${receiver.city}` : ''}` : '—')}
-            {row('Jätteen nimike (jäteluettelo)', 'Waste code and name', (
+            {row(L.from, E.from, `${job.name}${job.address ? `, ${job.address}` : ''}`)}
+            {row(L.to, E.to, receiver ? `${receiver.name}${receiver.address ? `, ${receiver.address}` : ''}${receiver.city ? `, ${receiver.city}` : ''}` : '—')}
+            {row(L.waste, E.waste, (
               <>
-                <span className="font-mono">{wasteCodeLabel(load.material_code)}</span> {materialFi}
+                <span className="font-mono">{wasteCodeLabel(load.material_code)}</span> {materialName}
+                {materialName !== materialEn && <span className="block text-ink-muted">{materialEn}</span>}
               </>
             ))}
-            {row('Määrä', 'Quantity', (
+            {row(L.quantity, E.quantity, (
               <>
-                {load.net_kg != null ? <span className="font-mono font-semibold">{load.net_kg.toLocaleString('fi-FI')} kg</span> : '—'}
+                {load.net_kg != null ? <span className="font-mono font-semibold">{kg(load.net_kg)} kg</span> : '—'}
                 {load.gross_kg != null && load.tare_kg != null && (
                   <span className="block text-ink-muted">
-                    brutto {load.gross_kg.toLocaleString('fi-FI')} kg · tara {load.tare_kg.toLocaleString('fi-FI')} kg
+                    brutto {kg(load.gross_kg)} kg · tara {kg(load.tare_kg)} kg
                   </span>
                 )}
               </>
             ))}
-            {row('Haltijan vahvistus', 'Holder confirmation', day.approved_at ? `${day.approved_by} · ${f.dateTime(day.approved_at)}` : 'Odottaa työnjohtajan vahvistusta')}
-            {row('Kuljettajan vahvistus', 'Carrier confirmation', `${driver?.full_name ?? '—'} · ${f.dateTime(load.unloaded_at)}`)}
-            {row('Vastaanottajan vahvistus', 'Receiver confirmation', load.ticket_no ? `Punnituslippu ${load.ticket_no}` : '—')}
+            {row(L.holderOk, E.holderOk, day.approved_at ? `${day.approved_by} · ${f.dateTime(day.approved_at)}` : `${L.pending}`)}
+            {row(L.carrierOk, E.carrierOk, `${driver?.full_name ?? '—'} · ${f.dateTime(load.unloaded_at)}`)}
+            {row(L.receiverOk, E.receiverOk, load.ticket_no ? `${L.ticket} ${load.ticket_no}` : '—')}
           </tbody>
         </table>
 
-        <p className="mt-4 text-[12px] text-ink-muted">
-          {kind?.registry ? t.sites.registryNote : t.sites.registryNo}
-        </p>
+        {doc.note && (
+          <div className="mt-4 text-[12px] leading-relaxed">
+            <p>{doc.note.local}</p>
+            <p className="text-ink-muted">{doc.note.en}</p>
+          </div>
+        )}
+        {country === 'FI' && (
+          <p className="mt-4 text-[12px] text-ink-muted">{kind?.registry ? t.sites.registryNote : t.sites.registryNo}</p>
+        )}
       </article>
     </main>
   );

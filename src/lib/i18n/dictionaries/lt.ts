@@ -127,6 +127,8 @@ export const lt = {
     namePh: 'Kalasatama, 5 kvartalas',
     address: 'Adresas',
     customer: 'Klientas (atliekų turėtojas)',
+    siteCountry: 'Objekto šalis',
+    siteCountryHint: 'Krovinio dokumentas sudaromas pagal šios šalies taisykles',
     customerBusinessId: 'Kliento įmonės kodas',
     ytjHint: 'Suomijos įmonės pavadinimas ir adresas paimami iš YTJ',
     ytjLoading: 'Ieškoma YTJ…',

@@ -143,6 +143,8 @@ export const en = {
     namePh: 'Kalasatama, block 5',
     address: 'Address',
     customer: 'Customer (waste holder)',
+    siteCountry: 'Site country',
+    siteCountryHint: 'The load document follows the rules of this country',
     customerBusinessId: 'Customer business ID',
     ytjHint: 'For a Finnish company, the name and address are filled in from YTJ',
     ytjLoading: 'Looking up YTJ…',

@@ -127,6 +127,8 @@ export const ru = {
     namePh: 'Каласатама, квартал 5',
     address: 'Адрес',
     customer: 'Клиент (владелец отходов)',
+    siteCountry: 'Страна объекта',
+    siteCountryHint: 'Документ на рейс оформляется по правилам этой страны',
     customerBusinessId: 'Y-tunnus клиента',
     ytjHint: 'Название и адрес финской компании подставятся из YTJ',
     ytjLoading: 'Ищу в YTJ…',

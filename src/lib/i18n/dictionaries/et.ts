@@ -127,6 +127,8 @@ export const et = {
     namePh: 'Kalasatama, kvartal 5',
     address: 'Aadress',
     customer: 'Klient (jäätmevaldaja)',
+    siteCountry: 'Objekti riik',
+    siteCountryHint: 'Koorma dokument koostatakse selle riigi reeglite järgi',
     customerBusinessId: 'Kliendi Y-tunnus (registrikood)',
     ytjHint: 'Soome ettevõtte nimi ja aadress võetakse YTJ-st',
     ytjLoading: 'Otsin YTJ-st…',

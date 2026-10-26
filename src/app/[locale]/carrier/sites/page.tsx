@@ -35,7 +35,7 @@ export default async function SitesPage({ params }: { params: Promise<{ locale: 
     <main className="cab-page">
       <h1 className="page-title">{t.sites.title}</h1>
       <p className="mt-2 mb-6 max-w-2xl text-[13px] leading-relaxed text-ink-muted">{t.sites.lede}</p>
-      <SitesView jobs={jobs ?? []} scaleSites={scaleSites ?? []} />
+      <SitesView jobs={jobs ?? []} scaleSites={scaleSites ?? []} defaultCountry={viewer.company!.country ?? 'FI'} />
     </main>
   );
 }

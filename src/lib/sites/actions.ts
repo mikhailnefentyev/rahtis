@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/server';
 import { flashFailure } from '@/lib/forms/flash';
 import type { SitePricing } from '@/types/db';
 import { isMaterialCode } from './work';
+import { isSiteCountry } from './wasteDocs';
 import { checkBusinessId } from '@/lib/country';
 import { lookupCompany } from '@/lib/registry/prh';
 
@@ -72,6 +73,8 @@ export async function saveSiteJobAction(_previous: SiteJobState, formData: FormD
   const values = {
     name,
     address: text(formData, 'address'),
+    /* Страна объекта — от неё документ на рейс (wasteDocs.ts). */
+    country: isSiteCountry(formData.get('country')) ? String(formData.get('country')) : 'FI',
     customer_name: customer,
     customer_business_id: text(formData, 'customer_business_id'),
     customer_email: text(formData, 'customer_email'),

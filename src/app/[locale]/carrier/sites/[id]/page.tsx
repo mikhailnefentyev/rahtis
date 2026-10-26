@@ -7,7 +7,8 @@ import { siteUrl } from '@/lib/config';
 import { combinationMass, isMassCountry } from '@/lib/fleet/mass';
 import { isLocale } from '@/lib/i18n';
 import { getViewerI18n } from '@/lib/i18n/viewer';
-import { dayEnd, dayMinutes, hoursLabel, siteAmountCents } from '@/lib/sites/work';
+import { dayEnd, dayMinutes, hoursLabel, material, siteAmountCents } from '@/lib/sites/work';
+import { isSiteCountry, wasteDocFor } from '@/lib/sites/wasteDocs';
 import { createClient } from '@/lib/supabase/server';
 import { carrierApproveDayAction } from '@/lib/sites/actions';
 import { JobControls } from './JobControls';
@@ -204,7 +205,12 @@ export default async function SiteJobPage({ params }: { params: Promise<{ locale
                               <td className="py-1">
                                 {/^\d{6}$/.test(l.material_code) && (
                                   <Link className="text-accent underline" href={`/${locale}/carrier/sites/${job.id}/load/${l.id}`}>
-                                    {s.transferDoc}
+                                    {/* Название документа по стране объекта: Siirtoasiakirja, Følgeseddel, KPO… */}
+                                    {wasteDocFor(
+                                      isSiteCountry(job.country) ? job.country : 'FI',
+                                      material(l.material_code)?.hazardous ?? false,
+                                      l.unloaded_at.slice(0, 10),
+                                    ).title}
                                   </Link>
                                 )}
                               </td>

@@ -3205,6 +3205,7 @@ export type Database = {
           address: string | null
           buffer_minutes: number
           company_id: string
+          country: string
           created_at: string
           customer_business_id: string | null
           customer_city: string | null
@@ -3232,6 +3233,7 @@ export type Database = {
           address?: string | null
           buffer_minutes?: number
           company_id: string
+          country?: string
           created_at?: string
           customer_business_id?: string | null
           customer_city?: string | null
@@ -3259,6 +3261,7 @@ export type Database = {
           address?: string | null
           buffer_minutes?: number
           company_id?: string
+          country?: string
           created_at?: string
           customer_business_id?: string | null
           customer_city?: string | null
