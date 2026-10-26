@@ -47,19 +47,21 @@ comment on table public.scale_sites is
 
 alter table public.scale_sites enable row level security;
 
+/*
+ * Общие — только пункты оператора (created_by_company пусто). Пункт,
+ * добавленный водителем, видит лишь его компания: чужая компания не может
+ * засорить или подделать общий справочник. Пишут в таблицу только оператор
+ * и функция водителя (driver_site_action, ADD_SITE).
+ */
 create policy scale_sites_select
-  on public.scale_sites for select to authenticated using (true);
-
-create policy scale_sites_insert_company
-  on public.scale_sites for insert to authenticated
-  with check (created_by_company = (select app.current_company_id()));
+  on public.scale_sites for select to authenticated
+  using (created_by_company is null or created_by_company = (select app.current_company_id()));
 
 create policy scale_sites_admin
   on public.scale_sites for all to authenticated
   using ((select app.is_admin())) with check ((select app.is_admin()));
 
-grant select, insert on public.scale_sites to authenticated;
-grant update, delete on public.scale_sites to authenticated;
+grant select, insert, update, delete on public.scale_sites to authenticated;
 
 -- ── Объекты ───────────────────────────────────────────────────────
 
@@ -146,6 +148,31 @@ create policy site_days_admin
 
 grant select on public.site_days to authenticated;
 grant update (ended_at, buffer_minutes) on public.site_days to authenticated;
+
+/*
+ * Правка конца дня или запаса после подтверждения снимает подтверждение:
+ * прораб подтверждал другие часы. Само подтверждение (site_foreman_approve)
+ * эти поля не трогает и под правило не попадает.
+ */
+create or replace function app.site_day_reset_approval()
+returns trigger
+language plpgsql
+set search_path = ''
+as $
+begin
+  if old.approved_at is not null
+     and (new.ended_at is distinct from old.ended_at or new.buffer_minutes is distinct from old.buffer_minutes) then
+    new.approved_at := null;
+    new.approved_by := null;
+    new.approval_note := null;
+  end if;
+  return new;
+end;
+$;
+
+create trigger site_days_reset_approval
+  before update on public.site_days
+  for each row execute function app.site_day_reset_approval();
 
 -- ── Рейсы ─────────────────────────────────────────────────────────
 
@@ -247,6 +274,7 @@ begin
       select jsonb_agg(jsonb_build_object('id', s.id, 'name', s.name, 'city', s.city, 'lat', s.lat, 'lon', s.lon, 'kind', s.kind)
                        order by s.name)
       from public.scale_sites s
+      where s.created_by_company is null or s.created_by_company = v_driver.company_id
     ), '[]'::jsonb)
   );
 end;
@@ -345,7 +373,9 @@ begin
     values (
       v_day.id, v_job.id, v_job.company_id,
       coalesce(nullif(p_data ->> 'material_code', ''), v_job.material_code),
-      (select id from public.scale_sites where id = nullif(p_data ->> 'scale_site_id', '')::uuid),
+      (select id from public.scale_sites
+       where id = nullif(p_data ->> 'scale_site_id', '')::uuid
+         and (created_by_company is null or created_by_company = v_job.company_id)),
       nullif(p_data ->> 'gross_kg', '')::integer,
       nullif(p_data ->> 'tare_kg', '')::integer,
       greatest(v_at, v_day.arrived_at),
@@ -353,16 +383,21 @@ begin
       p_event_id
     )
     on conflict do nothing;
-    /* Новый рейс после «закончил» — день продолжается. */
-    if v_day.ended_at is not null and v_day.ended_at < v_at then
-      update public.site_days set ended_at = null where id = v_day.id;
-    end if;
+    /*
+     * Новый рейс после «закончил» — день продолжается. И в любом случае
+     * подтверждение прораба снимается: он подтверждал другой день.
+     */
+    update public.site_days
+    set ended_at = case when ended_at is not null and ended_at < v_at then null else ended_at end,
+        approved_at = null, approved_by = null, approval_note = null
+    where id = v_day.id;
     return;
   end if;
 
   if p_action = 'END' then
     update public.site_days
-    set ended_at = greatest(v_at, arrived_at + interval '1 minute')
+    set ended_at = greatest(v_at, arrived_at + interval '1 minute'),
+        approved_at = null, approved_by = null, approval_note = null
     where id = v_day.id;
     return;
   end if;
@@ -434,7 +469,8 @@ begin
       approved_by = left(btrim(p_name), 120),
       approval_note = nullif(left(btrim(coalesce(p_note, '')), 500), '')
   from public.site_jobs j
-  where d.id = p_day_id and d.job_id = j.id and j.foreman_token = p_token;
+  where d.id = p_day_id and d.job_id = j.id and j.foreman_token = p_token
+    and j.status = 'ACTIVE' and d.approved_at is null;
 
   if not found then
     raise exception 'День не найден.' using errcode = 'P0002';
