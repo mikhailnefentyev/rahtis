@@ -188,8 +188,8 @@ export const pl = {
     note: 'Uwaga (opcjonalnie)',
     approvedBy: 'Zatwierdzone przez',
     notFound: 'Nie znaleziono linku.',
-    registryNote: 'Zgłaszane do rejestru SIIRTO',
-    registryNo: 'Nie zgłaszane do SIIRTO (gleba niezanieczyszczona)',
+    registryNote: 'Dane trzeba przekazać do rejestru SIIRTO w ciągu 3 miesięcy. RAHTIS jeszcze tego nie robi – użyj siirtorekisteri.fi.',
+    registryNo: 'Ziemia niezanieczyszczona: dokument przewozu nie jest wymagany (§ 121 fińskiej ustawy o odpadach).',
     pricingOptions: { HOUR: 'Godzinowe', LOAD: 'Od kursu', TONNE: 'Od tony' },
   },
   /* Админка: проверка пунктов приёмки, добавленных водителями. */

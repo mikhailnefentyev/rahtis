@@ -188,8 +188,8 @@ export const sv = {
     note: 'Anmärkning (valfritt)',
     approvedBy: 'Godkänd av',
     notFound: 'Länken hittades inte.',
-    registryNote: 'Rapporteras till SIIRTO-registret',
-    registryNo: 'Rapporteras inte till SIIRTO (icke förorenad jord)',
+    registryNote: 'Uppgifterna ska föras in i SIIRTO-registret inom 3 månader. RAHTIS gör det inte ännu – använd siirtorekisteri.fi.',
+    registryNo: 'Icke förorenad jord: transportdokument krävs inte enligt 121 § i finska avfallslagen.',
     pricingOptions: { HOUR: 'Per timme', LOAD: 'Per lass', TONNE: 'Per ton' },
   },
   /* Админка: проверка пунктов приёмки, добавленных водителями. */

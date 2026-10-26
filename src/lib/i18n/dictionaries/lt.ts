@@ -188,8 +188,8 @@ export const lt = {
     note: 'Pastaba (neprivaloma)',
     approvedBy: 'Patvirtino',
     notFound: 'Nuoroda nerasta.',
-    registryNote: 'Duomenys teikiami SIIRTO registrui',
-    registryNo: 'SIIRTO registrui neteikiama (neužterštas gruntas)',
+    registryNote: 'Duomenis per 3 mėnesius reikia pateikti SIIRTO registrui. RAHTIS to dar nedaro – naudokite siirtorekisteri.fi.',
+    registryNo: 'Neužterštas gruntas: pagal Suomijos atliekų įstatymo 121 str. lydraštis nereikalingas.',
     pricingOptions: { HOUR: 'Už valandą', LOAD: 'Už krovinį', TONNE: 'Už toną' },
   },
   /* Админка: проверка пунктов приёмки, добавленных водителями. */

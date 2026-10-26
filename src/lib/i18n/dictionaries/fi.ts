@@ -211,8 +211,8 @@ export const fi = {
     note: 'Huomautus (valinnainen)',
     approvedBy: 'Hyväksyi',
     notFound: 'Linkkiä ei löytynyt.',
-    registryNote: 'Tiedot toimitetaan SIIRTO-rekisteriin',
-    registryNo: 'Ei SIIRTO-rekisteriin (pilaantumaton maa-aines)',
+    registryNote: 'Tiedot on vietävä SIIRTO-rekisteriin viimeistään 3 kk kuluessa. RAHTIS ei vielä vie niitä – tee se siirtorekisteri.fi-palvelussa.',
+    registryNo: 'Pilaantumaton maa-aines: siirtoasiakirjaa ei jätelain 121 §:n mukaan vaadita.',
     pricingOptions: { HOUR: 'Tuntityö', LOAD: 'Kuormalta', TONNE: 'Tonnilta' },
   },
   /* Админка: проверка пунктов приёмки, добавленных водителями. */

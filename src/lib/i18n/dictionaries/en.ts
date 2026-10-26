@@ -204,8 +204,8 @@ export const en = {
     note: 'Note (optional)',
     approvedBy: 'Approved by',
     notFound: 'Link not found.',
-    registryNote: 'Reported to the SIIRTO register',
-    registryNo: 'Not reported to SIIRTO (uncontaminated soil)',
+    registryNote: 'The data must be reported to the SIIRTO register within 3 months. RAHTIS does not report it yet – use siirtorekisteri.fi.',
+    registryNo: 'Uncontaminated soil: no transfer document is required under section 121 of the Finnish Waste Act.',
     pricingOptions: { HOUR: 'Hourly', LOAD: 'Per load', TONNE: 'Per tonne' },
   },
   /* Админка: проверка пунктов приёмки, добавленных водителями. */

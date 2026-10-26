@@ -188,8 +188,8 @@ export const et = {
     note: 'Märkus (vabatahtlik)',
     approvedBy: 'Kinnitas',
     notFound: 'Linki ei leitud.',
-    registryNote: 'Andmed esitatakse SIIRTO registrisse',
-    registryNo: 'SIIRTO registrisse ei esitata (saastamata pinnas)',
+    registryNote: 'Andmed tuleb esitada SIIRTO registrisse 3 kuu jooksul. RAHTIS seda veel ei tee – kasutage siirtorekisteri.fi.',
+    registryNo: 'Saastamata pinnas: Soome jäätmeseaduse § 121 järgi saatelehte ei nõuta.',
     pricingOptions: { HOUR: 'Tunnitöö', LOAD: 'Koormalt', TONNE: 'Tonnilt' },
   },
   /* Админка: проверка пунктов приёмки, добавленных водителями. */

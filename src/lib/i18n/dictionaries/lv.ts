@@ -188,8 +188,8 @@ export const lv = {
     note: 'Piezīme (neobligāti)',
     approvedBy: 'Apstiprināja',
     notFound: 'Saite nav atrasta.',
-    registryNote: 'Dati aiziet uz SIIRTO reģistru',
-    registryNo: 'Uz SIIRTO reģistru nesūta (nepiesārņota grunts)',
+    registryNote: 'Dati 3 mēnešu laikā jāiesniedz SIIRTO reģistrā. RAHTIS to vēl nedara – izmantojiet siirtorekisteri.fi.',
+    registryNo: 'Nepiesārņota grunts: pēc Somijas Atkritumu likuma 121. panta pavadzīme nav vajadzīga.',
     pricingOptions: { HOUR: 'Par stundu', LOAD: 'Par kravu', TONNE: 'Par tonnu' },
   },
   /* Админка: проверка пунктов приёмки, добавленных водителями. */

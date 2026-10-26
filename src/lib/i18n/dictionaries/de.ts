@@ -188,8 +188,8 @@ export const de = {
     note: 'Anmerkung (optional)',
     approvedBy: 'Bestätigt von',
     notFound: 'Link nicht gefunden.',
-    registryNote: 'Daten gehen an das SIIRTO-Register',
-    registryNo: 'Nicht ins SIIRTO-Register (unbelasteter Boden)',
+    registryNote: 'Die Daten sind binnen 3 Monaten an das SIIRTO-Register zu melden. RAHTIS meldet noch nicht – bitte siirtorekisteri.fi nutzen.',
+    registryNo: 'Unbelasteter Boden: nach § 121 des finnischen Abfallgesetzes ist kein Transportdokument nötig.',
     pricingOptions: { HOUR: 'Stundenweise', LOAD: 'Pro Fuhre', TONNE: 'Pro Tonne' },
   },
   /* Админка: проверка пунктов приёмки, добавленных водителями. */
