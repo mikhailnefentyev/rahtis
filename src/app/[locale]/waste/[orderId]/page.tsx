@@ -35,16 +35,22 @@ export default async function WastePage({ params }: { params: Promise<{ locale: 
   const [{ t, f }, supabase] = await Promise.all([getViewerI18n(locale), createClient()]);
   const w = t.waste;
 
-  const { data: order } = await supabase
-    .from('orders')
-    .select('id, ref, shipper_company_id, assigned_company_id, assigned_vehicle_id, trailer_plate, status')
-    .eq('id', orderId)
-    .maybeSingle();
   /*
-   * Заказ по RLS видят не только стороны: открытый заказ — перевозчики
-   * на бирже. Реквизиты сторон ниже читаются ключом сервиса, поэтому
-   * пускаем только заказчика, назначенного перевозчика и оператора.
+   * Сначала — видит ли зритель заказ вообще (RLS). Колонки назначения на
+   * заказах закрыты пользователю грантами по колонкам, поэтому их, точки
+   * маршрута и реквизиты сторон читаем ключом сервиса — но только после
+   * проверки, что зритель сторона заказа: открытый заказ по RLS видят и
+   * перевозчики на бирже, им реквизиты заказчика не положены.
    */
+  const { data: visible } = await supabase.from('orders').select('id').eq('id', orderId).maybeSingle();
+  const admin = createAdminClient();
+  const { data: order } = visible
+    ? await admin
+        .from('orders')
+        .select('id, ref, shipper_company_id, assigned_company_id, assigned_vehicle_id, trailer_plate, status')
+        .eq('id', orderId)
+        .maybeSingle()
+    : { data: null };
   const companyId = viewer.company?.id ?? null;
   const isParty =
     viewer.role === 'ADMIN' ||
@@ -58,11 +64,10 @@ export default async function WastePage({ params }: { params: Promise<{ locale: 
   }
 
   const [{ data: stops }, { data: waste }] = await Promise.all([
-    supabase.from('order_stops').select('role, sequence, country, company_name, address, city, scheduled_date').eq('order_id', orderId).order('sequence'),
+    admin.from('order_stops').select('role, sequence, country, company_name, address, city, scheduled_date').eq('order_id', orderId).order('sequence'),
     supabase.from('order_waste').select('*').eq('order_id', orderId).maybeSingle(),
   ]);
 
-  const admin = createAdminClient();
   const ids = [order.shipper_company_id, order.assigned_company_id].filter((x): x is string => Boolean(x));
   const [{ data: companies }, { data: vehicle }] = await Promise.all([
     admin.from('companies').select('id, name, legal_name, business_id, legal_street, legal_postal_code, legal_city, legal_country, contact_email, country, waste_registrations').in('id', ids),
@@ -94,6 +99,10 @@ export default async function WastePage({ params }: { params: Promise<{ locale: 
     ) : (
       '—'
     );
+
+  /* Адрес точки: город не повторяем, если он уже в строке адреса. */
+  const place = (s: { address: string; city: string }) =>
+    s.city && !s.address.toLowerCase().includes(s.city.toLowerCase()) ? `${s.address}, ${s.city}` : s.address;
 
   const box = (n: string, label: string, value: React.ReactNode) => (
     <tr className="border-t border-line align-top">
@@ -187,16 +196,14 @@ export default async function WastePage({ params }: { params: Promise<{ locale: 
               ))}
               {box('6', 'Waste generator / site of generation', (
                 <>
-                  {waste.producer_name ?? '—'}
-                  <span className="block">{waste.producer_address ?? (first ? `${first.company_name ?? ''} ${first.address}, ${first.city}`.trim() : '')}</span>
+                  {waste.producer_name ?? first?.company_name ?? '—'}
+                  <span className="block">{waste.producer_address ?? (first ? place(first) : '')}</span>
                 </>
               ))}
               {box('7', 'Recovery facility', (
                 <>
-                  {waste.facility_name ?? '—'}
-                  {(waste.facility_address ?? last) && (
-                    <span className="block">{waste.facility_address ?? (last ? `${last.address}, ${last.city}` : '')}</span>
-                  )}
+                  {waste.facility_name ?? last?.company_name ?? '—'}
+                  {(waste.facility_address ?? last) && <span className="block">{waste.facility_address ?? (last ? place(last) : '')}</span>}
                 </>
               ))}
               {box('8', 'Recovery operation', waste.recovery_code ?? '—')}
