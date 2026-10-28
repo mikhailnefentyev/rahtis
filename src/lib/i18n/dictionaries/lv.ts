@@ -42,7 +42,7 @@ export const lv = {
     invalid: 'Šādu sastāvu nevar salikt: puspiekabe — vilcējam, piekabe — kravas auto vai nuppi, furgonam piekabes nav.',
     legal: 'Likums atļauj',
     payload: 'Kravnesība',
-    kinds: { TRACTOR_SOLO: 'Vilcējs (piekabju maiņa)', SEMI: 'Puspiekabes sastāvs', PUOLIKAS: 'Puolikas (vilcējs + pašizgāzēja puspiekabe)', NUPPI: 'Nuppi', KASETTI: 'Kasete (nuppi + piekabe)', TRUCK: 'Kravas auto', TRUCK_TRAILER: 'Kravas auto + piekabe', VAN: 'Furgons' },
+    kinds: { TRACTOR_SOLO: 'Vilcējs (piekabju maiņa)', SEMI: 'Puspiekabes sastāvs', PUOLIKAS: 'Puolikas (vilcējs + pašizgāzēja puspiekabe)', NUPPI: 'Nuppi', KASETTI: 'Kasete (nuppi + pašizgāzēja piekabe)', TRUCK: 'Kravas auto', TRUCK_TRAILER: 'TPV (piekabes sastāvs)', VAN: 'Furgons' },
   },
 
   /* Прицепы, сцепки и разрешённая масса (src/lib/fleet/mass.ts). */
@@ -1080,7 +1080,7 @@ export const lv = {
   tipper: {
     hint: 'Zemes darbus mēra tonnās un kubikmetros, maksā par stundu, reisu vai tonnu. Cena ir aplēse: galīgo summu aprēķina no vadītāja ierakstiem (ierašanās, reisi ar svariem, dienas beigas).',
     config: 'Transports',
-    configs: { TRUCK: 'Nuppi (pašizgāzējs) 3–5 asis', CASSETTE: 'Kasete: nuppi + piekabe 3–5 asis', SEMI: 'Vilcējs + pašizgāzēja puspiekabe' },
+    configs: { TRUCK: 'Nuppi (pašizgāzējs) 3–5 asis', CASSETTE: 'Kasete: nuppi + pašizgāzēja piekabe 3–5 asis (kaste tiek pārcelta uz auto izgāšanai)', SEMI: 'Vilcējs + pašizgāzēja puspiekabe' },
     volume: 'Apjoms, m³',
     pricing: 'Cenas veids',
     unitRate: { HOUR: 'Stundas likme, € (bez PVN)', LOAD: 'Cena par reisu, € (bez PVN)', TONNE: 'Cena par tonnu, € (bez PVN)' },

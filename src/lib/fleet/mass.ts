@@ -288,7 +288,8 @@ export type ComboSummary = {
 /**
  * Какая это сцепка (пользователь 28.10.2026): тягач один — под перецепку;
  * тягач + самосвальный полуприцеп — puolikas; нуппи один — нуппи, с
- * прицепом — кассета; грузовик с прицепом и без; фургон.
+ * самосвальным прицепом — кассета; нуппи или грузовик с другим прицепом —
+ * TPV (täysperävaunuyhdistelmä); фургон.
  * null — так не собрать: полуприцеп только к тягачу, прицеп — к грузовику
  * или нуппи, к фургону — ничего.
  */
@@ -300,7 +301,15 @@ export function comboKind(vehicleClass: ComboVehicle['vehicleClass'], trailer: {
     return trailer.bodyType === 'TIPPER' ? 'PUOLIKAS' : 'SEMI';
   }
   if (trailer?.kind === 'SEMI') return null;
-  if (vehicleClass === 'TIPPER') return trailer ? 'KASETTI' : 'NUPPI';
+  /*
+   * Кассета — только самосвальная (пользователь 28.10.2026): нуппи стягивает
+   * на себя кузов с прицепа, выгружает и возвращает. Нуппи с любым другим
+   * прицепом (трал, тент…) — TPV, täysperävaunuyhdistelmä, как у грузовика.
+   */
+  if (vehicleClass === 'TIPPER') {
+    if (!trailer) return 'NUPPI';
+    return trailer.bodyType === 'TIPPER' || trailer.bodyType === 'CASSETTE' ? 'KASETTI' : 'TRUCK_TRAILER';
+  }
   return trailer ? 'TRUCK_TRAILER' : 'TRUCK';
 }
 

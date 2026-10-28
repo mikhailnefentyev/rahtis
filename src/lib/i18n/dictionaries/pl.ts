@@ -42,7 +42,7 @@ export const pl = {
     invalid: 'Takiego zestawu nie da się złożyć: naczepa — do ciągnika, przyczepa — do ciężarówki lub nuppi, bus bez przyczepy.',
     legal: 'Dopuszcza prawo',
     payload: 'Ładowność',
-    kinds: { TRACTOR_SOLO: 'Ciągnik (wymiana naczep)', SEMI: 'Zestaw z naczepą', PUOLIKAS: 'Puolikas (ciągnik + naczepa wywrotka)', NUPPI: 'Nuppi', KASETTI: 'Kaseta (nuppi + przyczepa)', TRUCK: 'Ciężarówka', TRUCK_TRAILER: 'Ciężarówka + przyczepa', VAN: 'Bus' },
+    kinds: { TRACTOR_SOLO: 'Ciągnik (wymiana naczep)', SEMI: 'Zestaw z naczepą', PUOLIKAS: 'Puolikas (ciągnik + naczepa wywrotka)', NUPPI: 'Nuppi', KASETTI: 'Kaseta (nuppi + przyczepa wywrotka)', TRUCK: 'Ciężarówka', TRUCK_TRAILER: 'TPV (zestaw z przyczepą)', VAN: 'Bus' },
   },
 
   /* Прицепы, сцепки и разрешённая масса (src/lib/fleet/mass.ts). */
@@ -1080,7 +1080,7 @@ export const pl = {
   tipper: {
     hint: 'Roboty ziemne mierzy się w tonach i metrach sześciennych, płaci za godzinę, kurs lub tonę. Cena jest szacunkowa: ostateczna kwota wynika z zapisów kierowcy (przyjazd, kursy z ważeniem, koniec dnia).',
     config: 'Pojazd',
-    configs: { TRUCK: 'Nuppi (wywrotka) 3–5 osi', CASSETTE: 'Kaseta: nuppi + przyczepa 3–5 osi', SEMI: 'Ciągnik + naczepa wywrotka' },
+    configs: { TRUCK: 'Nuppi (wywrotka) 3–5 osi', CASSETTE: 'Kaseta: nuppi + przyczepa wywrotka 3–5 osi (skrzynia przenoszona na pojazd do wyładunku)', SEMI: 'Ciągnik + naczepa wywrotka' },
     volume: 'Objętość, m³',
     pricing: 'Rozliczenie',
     unitRate: { HOUR: 'Stawka godzinowa, € (netto)', LOAD: 'Cena za kurs, € (netto)', TONNE: 'Cena za tonę, € (netto)' },

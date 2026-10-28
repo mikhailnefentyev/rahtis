@@ -42,7 +42,7 @@ export const sv = {
     invalid: 'Det här ekipaget går inte att bygga: påhängsvagn till dragbil, släp till lastbil eller nuppi, skåpbil utan släp.',
     legal: 'Laglig gräns',
     payload: 'Lastförmåga',
-    kinds: { TRACTOR_SOLO: 'Dragbil (trailerbyte)', SEMI: 'Påhängsekipage', PUOLIKAS: 'Puolikas (dragbil + tipptrailer)', NUPPI: 'Nuppi', KASETTI: 'Kassett (nuppi + släp)', TRUCK: 'Lastbil', TRUCK_TRAILER: 'Lastbil + släp', VAN: 'Skåpbil' },
+    kinds: { TRACTOR_SOLO: 'Dragbil (trailerbyte)', SEMI: 'Påhängsekipage', PUOLIKAS: 'Puolikas (dragbil + tipptrailer)', NUPPI: 'Nuppi', KASETTI: 'Kassett (nuppi + tippsläp)', TRUCK: 'Lastbil', TRUCK_TRAILER: 'TPV (släpvagnsekipage)', VAN: 'Skåpbil' },
   },
 
   /* Прицепы, сцепки и разрешённая масса (src/lib/fleet/mass.ts). */
@@ -1080,7 +1080,7 @@ export const sv = {
   tipper: {
     hint: 'Schakt mäts i ton och kubikmeter och betalas per timme, lass eller ton. Priset är en uppskattning: slutsumman räknas från förarens registreringar (ankomst, lass med vikter, dagens slut).',
     config: 'Fordon',
-    configs: { TRUCK: 'Nuppi (tippbil) 3–5 axlar', CASSETTE: 'Kassett: nuppi + släp 3–5 axlar', SEMI: 'Dragbil + tipptrailer' },
+    configs: { TRUCK: 'Nuppi (tippbil) 3–5 axlar', CASSETTE: 'Kassett: nuppi + tippsläp 3–5 axlar (flaket flyttas till bilen för tippning)', SEMI: 'Dragbil + tipptrailer' },
     volume: 'Volym, m³',
     pricing: 'Prissättning',
     unitRate: { HOUR: 'Timpris, € (exkl. moms)', LOAD: 'Pris per lass, € (exkl. moms)', TONNE: 'Pris per ton, € (exkl. moms)' },

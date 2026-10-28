@@ -65,7 +65,7 @@ export const fi = {
     invalid: 'Tätä yhdistelmää ei voi muodostaa: puoliperävaunu vetoautoon, perävaunu kuorma-autoon tai nuppiin, pakettiautoon ei perävaunua.',
     legal: 'Laki sallii',
     payload: 'Kantavuus',
-    kinds: { TRACTOR_SOLO: 'Vetoauto (perävaunun vaihto)', SEMI: 'Puoliperävaunuyhdistelmä', PUOLIKAS: 'Puolikas (vetoauto + kippipuoliperävaunu)', NUPPI: 'Nuppi', KASETTI: 'Kasetti (nuppi + perävaunu)', TRUCK: 'Kuorma-auto', TRUCK_TRAILER: 'Kuorma-auto + perävaunu', VAN: 'Pakettiauto' },
+    kinds: { TRACTOR_SOLO: 'Vetoauto (perävaunun vaihto)', SEMI: 'Puoliperävaunuyhdistelmä', PUOLIKAS: 'Puolikas (vetoauto + kippipuoliperävaunu)', NUPPI: 'Nuppi', KASETTI: 'Kasetti (nuppi + kippiperävaunu)', TRUCK: 'Kuorma-auto', TRUCK_TRAILER: 'TPV (täysperävaunuyhdistelmä)', VAN: 'Pakettiauto' },
   },
 
   /* Прицепы, сцепки и разрешённая масса (src/lib/fleet/mass.ts). */
@@ -1260,7 +1260,7 @@ export const fi = {
   tipper: {
     hint: 'Maansiirto mitataan tonneina ja kuutioina, hinta tunneilta, kuormilta tai tonneilta. Hinta on arvio: lopullinen summa lasketaan kuljettajan kirjauksista (saapuminen, kuormat punnituksineen, päivän päättyminen).',
     config: 'Kalusto',
-    configs: { TRUCK: 'Nuppiauto 3–5 akselia', CASSETTE: 'Kasetti: nuppi + perävaunu 3–5 akselia', SEMI: 'Vetoauto + kippipuoliperävaunu' },
+    configs: { TRUCK: 'Nuppiauto 3–5 akselia', CASSETTE: 'Kasetti: nuppi + kippiperävaunu 3–5 akselia (lava siirretään autolle purkuun)', SEMI: 'Vetoauto + kippipuoliperävaunu' },
     volume: 'Määrä, m³',
     pricing: 'Hinnoittelu',
     unitRate: { HOUR: 'Tuntihinta, € (alv 0)', LOAD: 'Hinta / kuorma, € (alv 0)', TONNE: 'Hinta / tonni, € (alv 0)' },

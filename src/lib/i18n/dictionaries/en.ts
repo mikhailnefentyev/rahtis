@@ -58,7 +58,7 @@ export const en = {
     invalid: 'This combination cannot be built: a semi-trailer goes with a tractor, a trailer with a truck or nuppi, a van takes no trailer.',
     legal: 'Legal limit',
     payload: 'Payload',
-    kinds: { TRACTOR_SOLO: 'Tractor (trailer swap)', SEMI: 'Semi-trailer combination', PUOLIKAS: 'Puolikas (tractor + tipper semi-trailer)', NUPPI: 'Nuppi', KASETTI: 'Cassette (nuppi + trailer)', TRUCK: 'Truck', TRUCK_TRAILER: 'Truck + trailer', VAN: 'Van' },
+    kinds: { TRACTOR_SOLO: 'Tractor (trailer swap)', SEMI: 'Semi-trailer combination', PUOLIKAS: 'Puolikas (tractor + tipper semi-trailer)', NUPPI: 'Nuppi', KASETTI: 'Cassette (nuppi + tipper trailer)', TRUCK: 'Truck', TRUCK_TRAILER: 'TPV (full-trailer combination)', VAN: 'Van' },
   },
 
   /* Прицепы, сцепки и разрешённая масса (src/lib/fleet/mass.ts). */
@@ -1177,7 +1177,7 @@ export const en = {
   tipper: {
     hint: 'Earthworks are measured in tonnes and cubic metres and paid per hour, load or tonne. The price is an estimate: the final amount comes from the driver records (arrival, loads with weights, end of day).',
     config: 'Vehicle',
-    configs: { TRUCK: 'Nuppi tipper truck, 3–5 axles', CASSETTE: 'Cassette: nuppi + trailer, 3–5 axles', SEMI: 'Tractor + tipper semi-trailer' },
+    configs: { TRUCK: 'Nuppi tipper truck, 3–5 axles', CASSETTE: 'Cassette: nuppi + tipper trailer, 3–5 axles (the body is moved onto the truck to tip)', SEMI: 'Tractor + tipper semi-trailer' },
     volume: 'Volume, m³',
     pricing: 'Pricing',
     unitRate: { HOUR: 'Hourly rate, € (excl. VAT)', LOAD: 'Rate per load, € (excl. VAT)', TONNE: 'Rate per tonne, € (excl. VAT)' },

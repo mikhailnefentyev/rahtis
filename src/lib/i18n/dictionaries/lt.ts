@@ -42,7 +42,7 @@ export const lt = {
     invalid: 'Tokio junginio sudaryti negalima: puspriekabė — vilkikui, priekaba — sunkvežimiui arba nuppi, furgonui priekabos nėra.',
     legal: 'Leidžia įstatymas',
     payload: 'Keliamoji galia',
-    kinds: { TRACTOR_SOLO: 'Vilkikas (priekabų keitimas)', SEMI: 'Puspriekabės junginys', PUOLIKAS: 'Puolikas (vilkikas + savivartė puspriekabė)', NUPPI: 'Nuppi', KASETTI: 'Kasetė (nuppi + priekaba)', TRUCK: 'Sunkvežimis', TRUCK_TRAILER: 'Sunkvežimis + priekaba', VAN: 'Furgonas' },
+    kinds: { TRACTOR_SOLO: 'Vilkikas (priekabų keitimas)', SEMI: 'Puspriekabės junginys', PUOLIKAS: 'Puolikas (vilkikas + savivartė puspriekabė)', NUPPI: 'Nuppi', KASETTI: 'Kasetė (nuppi + savivartė priekaba)', TRUCK: 'Sunkvežimis', TRUCK_TRAILER: 'TPV (junginys su priekaba)', VAN: 'Furgonas' },
   },
 
   /* Прицепы, сцепки и разрешённая масса (src/lib/fleet/mass.ts). */
@@ -1080,7 +1080,7 @@ export const lt = {
   tipper: {
     hint: 'Žemės darbai matuojami tonomis ir kubiniais metrais, mokama už valandą, reisą arba toną. Kaina yra preliminari: galutinė suma apskaičiuojama pagal vairuotojo įrašus (atvykimas, reisai su svoriais, dienos pabaiga).',
     config: 'Transportas',
-    configs: { TRUCK: 'Nuppi (savivartis) 3–5 ašys', CASSETTE: 'Kasetė: nuppi + priekaba 3–5 ašys', SEMI: 'Vilkikas + savivartė puspriekabė' },
+    configs: { TRUCK: 'Nuppi (savivartis) 3–5 ašys', CASSETTE: 'Kasetė: nuppi + savivartė priekaba 3–5 ašys (kėbulas perkeliamas ant automobilio iškrovimui)', SEMI: 'Vilkikas + savivartė puspriekabė' },
     volume: 'Tūris, m³',
     pricing: 'Kainodara',
     unitRate: { HOUR: 'Valandinis įkainis, € (be PVM)', LOAD: 'Kaina už reisą, € (be PVM)', TONNE: 'Kaina už toną, € (be PVM)' },

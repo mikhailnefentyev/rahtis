@@ -42,7 +42,7 @@ export const de = {
     invalid: 'Diese Kombination geht nicht: Auflieger an die Zugmaschine, Anhänger an Lkw oder Nuppi, Transporter ohne Anhänger.',
     legal: 'Gesetzlich erlaubt',
     payload: 'Nutzlast',
-    kinds: { TRACTOR_SOLO: 'Zugmaschine (Trailertausch)', SEMI: 'Sattelzug', PUOLIKAS: 'Puolikas (Zugmaschine + Kippauflieger)', NUPPI: 'Nuppi', KASETTI: 'Kassette (Nuppi + Anhänger)', TRUCK: 'Lkw', TRUCK_TRAILER: 'Lkw + Anhänger', VAN: 'Transporter' },
+    kinds: { TRACTOR_SOLO: 'Zugmaschine (Trailertausch)', SEMI: 'Sattelzug', PUOLIKAS: 'Puolikas (Zugmaschine + Kippauflieger)', NUPPI: 'Nuppi', KASETTI: 'Kassette (Nuppi + Kippanhänger)', TRUCK: 'Lkw', TRUCK_TRAILER: 'TPV (Anhängerzug)', VAN: 'Transporter' },
   },
 
   /* Прицепы, сцепки и разрешённая масса (src/lib/fleet/mass.ts). */
@@ -1080,7 +1080,7 @@ export const de = {
   tipper: {
     hint: 'Erdbau wird in Tonnen und Kubikmetern gemessen und pro Stunde, Fuhre oder Tonne bezahlt. Der Preis ist eine Schätzung: Der Endbetrag ergibt sich aus den Eintragungen des Fahrers (Ankunft, Fuhren mit Gewichten, Tagesende).',
     config: 'Fahrzeug',
-    configs: { TRUCK: 'Nuppi (Kipper-Lkw) 3–5 Achsen', CASSETTE: 'Kassette: Nuppi + Anhänger 3–5 Achsen', SEMI: 'Sattelzugmaschine + Kippauflieger' },
+    configs: { TRUCK: 'Nuppi (Kipper-Lkw) 3–5 Achsen', CASSETTE: 'Kassette: Nuppi + Kippanhänger 3–5 Achsen (die Mulde wird zum Kippen auf den Lkw gezogen)', SEMI: 'Sattelzugmaschine + Kippauflieger' },
     volume: 'Menge, m³',
     pricing: 'Abrechnung',
     unitRate: { HOUR: 'Stundensatz, € (netto)', LOAD: 'Preis je Fuhre, € (netto)', TONNE: 'Preis je Tonne, € (netto)' },

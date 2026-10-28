@@ -42,7 +42,7 @@ export const et = {
     invalid: 'Sellist autorongi ei saa kokku panna: poolhaagis käib sadulveokiga, haagis veoki või nuppiga, kaubikule haagist ei käi.',
     legal: 'Seadus lubab',
     payload: 'Kandevõime',
-    kinds: { TRACTOR_SOLO: 'Sadulveok (haagise vahetus)', SEMI: 'Poolhaagisega autorong', PUOLIKAS: 'Puolikas (sadulveok + kallurpoolhaagis)', NUPPI: 'Nuppi', KASETTI: 'Kassett (nuppi + haagis)', TRUCK: 'Veok', TRUCK_TRAILER: 'Veok + haagis', VAN: 'Kaubik' },
+    kinds: { TRACTOR_SOLO: 'Sadulveok (haagise vahetus)', SEMI: 'Poolhaagisega autorong', PUOLIKAS: 'Puolikas (sadulveok + kallurpoolhaagis)', NUPPI: 'Nuppi', KASETTI: 'Kassett (nuppi + kallurhaagis)', TRUCK: 'Veok', TRUCK_TRAILER: 'TPV (täishaagisega autorong)', VAN: 'Kaubik' },
   },
 
   /* Прицепы, сцепки и разрешённая масса (src/lib/fleet/mass.ts). */
@@ -1080,7 +1080,7 @@ export const et = {
   tipper: {
     hint: 'Pinnasetööd mõõdetakse tonnides ja kuupmeetrites ning tasutakse tunni, koorma või tonni järgi. Hind on hinnang: lõppsumma arvutatakse juhi kannete põhjal (saabumine, kaalutud koormad, päeva lõpp).',
     config: 'Sõiduk',
-    configs: { TRUCK: 'Nuppi (kallur) 3–5 telge', CASSETTE: 'Kassett: nuppi + haagis 3–5 telge', SEMI: 'Sadulveok + kallurpoolhaagis' },
+    configs: { TRUCK: 'Nuppi (kallur) 3–5 telge', CASSETTE: 'Kassett: nuppi + kallurhaagis 3–5 telge (kast tõstetakse tühjendamiseks autole)', SEMI: 'Sadulveok + kallurpoolhaagis' },
     volume: 'Maht, m³',
     pricing: 'Hinnastamine',
     unitRate: { HOUR: 'Tunnihind, € (km-ta)', LOAD: 'Hind koorma kohta, € (km-ta)', TONNE: 'Hind tonni kohta, € (km-ta)' },

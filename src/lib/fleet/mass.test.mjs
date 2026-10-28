@@ -106,7 +106,9 @@ test('конструктор: виды сцепок и что собрать н�
   assert.equal(comboKind('TRACTOR', { kind: 'SEMI', bodyType: 'CURTAIN' }), 'SEMI');
   assert.equal(comboKind('TRACTOR', { kind: 'FULL' }), null);
   assert.equal(comboKind('TIPPER', null), 'NUPPI');
-  assert.equal(comboKind('TIPPER', { kind: 'FULL', bodyType: 'LOWBED' }), 'KASETTI');
+  /* Кассета — только с самосвальным прицепом; нуппи + трал — TPV. */
+  assert.equal(comboKind('TIPPER', { kind: 'FULL', bodyType: 'TIPPER' }), 'KASETTI');
+  assert.equal(comboKind('TIPPER', { kind: 'FULL', bodyType: 'LOWBED' }), 'TRUCK_TRAILER');
   assert.equal(comboKind('TRUCK', { kind: 'FULL', bodyType: 'CURTAIN' }), 'TRUCK_TRAILER');
   assert.equal(comboKind('TRUCK', { kind: 'SEMI' }), null);
   assert.equal(comboKind('VAN', { kind: 'FULL' }), null);
