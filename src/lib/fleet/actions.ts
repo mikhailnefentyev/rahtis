@@ -175,6 +175,16 @@ const volume = (formData: FormData): number | null => {
   return value === null || value < 1 || value > 99 ? null : Math.round(value * 10) / 10;
 };
 
+/** Способ загрузки: сверху, сбоку, сзади. */
+const loadingOf = (formData: FormData): string[] =>
+  [...new Set(formData.getAll('loading').map(String))].filter((s) => s === 'TOP' || s === 'SIDE' || s === 'REAR');
+
+/** Внутренний размер, м: пусто или вне 0,3 м…max — null (ограничения базы). */
+const dim = (formData: FormData, key: string, max: number): number | null => {
+  const value = num(formData, key);
+  return value === null || value < 0.3 || value > max ? null : Math.round(value * 100) / 100;
+};
+
 /* У машины половина до сцепки не длиннее 15 м (ограничение базы). */
 const vehicleMetres = (formData: FormData): number | null => {
   const value = metres(formData, 'coupling_distance_m');
@@ -217,7 +227,7 @@ function readVehicleForm(formData: FormData) {
       vehicleClass === 'TRACTOR'
         ? null
         : tipper
-          ? ((['TIPPER', 'CASSETTE'] as const).find((b) => b === bodyType(formData)) ?? 'TIPPER')
+          ? 'TIPPER'
           : bodyType(formData) === 'TIPPER' || bodyType(formData) === 'CASSETTE'
             ? null
             : bodyType(formData),
@@ -225,6 +235,11 @@ function readVehicleForm(formData: FormData) {
     tare_kg: kg(formData, 'tare_kg'),
     /* Фургону расстояние до сцепки не нужно: прицепов у него нет. */
     coupling_distance_m: vehicleClass === 'VAN' ? null : vehicleMetres(formData),
+    /* Загрузка и внутренние размеры — у кузова для грузов (фургон, грузовик). */
+    loading: express ? loadingOf(formData) : [],
+    inner_length_m: express ? dim(formData, 'inner_length_m', 20) : null,
+    inner_width_m: express ? dim(formData, 'inner_width_m', 3) : null,
+    inner_height_m: express ? dim(formData, 'inner_height_m', 4.5) : null,
     /* Объём кузова — только у самосвала: у грузоперевозок погрузочные метры. */
     body_volume_m3: tipper ? volume(formData) : null,
     adr: formData.get('adr') === '1',
@@ -449,8 +464,25 @@ export async function saveTrailerAction(_previous: TrailerState, formData: FormD
     twin_wheels: formData.get('twin_wheels') === '1',
     length_m: metres(formData, 'length_m'),
     /* Метры и пометки фуры — только у полуприцепа; у остальных прицепов пусто. */
-    ldm: kind === 'SEMI' ? (num(formData, 'ldm') !== null && num(formData, 'ldm')! <= 20 ? Math.round(num(formData, 'ldm')! * 10) / 10 : 13.6) : null,
-    semi_features: kind === 'SEMI' ? formData.getAll('semi_features').map(String).filter(isSemiFeature) : [],
+    ldm: num(formData, 'ldm') !== null && num(formData, 'ldm')! <= 20 ? Math.round(num(formData, 'ldm')! * 10) / 10 : kind === 'SEMI' ? 13.6 : null,
+    payload_kg: kg(formData, 'payload_kg'),
+    loading: loadingOf(formData),
+    inner_length_m: dim(formData, 'inner_length_m', 20),
+    inner_width_m: dim(formData, 'inner_width_m', 3),
+    inner_height_m: dim(formData, 'inner_height_m', 4.5),
+    /*
+     * Пометки фуры: MEGA и поднимающаяся крыша — галочками, боковая и
+     * верхняя загрузка — из способа загрузки (подбор заказов SEMI сверяет
+     * semi_features, app.company_has_semi).
+     */
+    semi_features:
+      kind === 'SEMI'
+        ? [
+            ...formData.getAll('semi_features').map(String).filter((f) => f === 'MEGA' || f === 'LIFTING_ROOF'),
+            ...(loadingOf(formData).includes('SIDE') ? ['SIDE_LOADING'] : []),
+            ...(loadingOf(formData).includes('TOP') ? ['TOP_LOADING'] : []),
+          ].filter(isSemiFeature)
+        : [],
     body_volume_m3: volume(formData),
     coupling_distance_m: metres(formData, 'coupling_distance_m'),
   };
@@ -475,5 +507,105 @@ export async function deleteTrailerAction(formData: FormData): Promise<void> {
   const supabase = await createClient();
   const { error } = await supabase.from('trailers').delete().eq('id', String(formData.get('id') ?? ''));
   if (error) await flashFailure(locale, error);
+  revalidatePath(`/${locale}/carrier/fleet`);
+}
+
+/* ── Конструктор сцепок ─────────────────────────────────────────── */
+
+export type ComboState = { error: string | null; done: boolean };
+
+/**
+ * Сохранить сцепку: машина + прицеп (или без). Что сцепка везёт, считает
+ * сервер по mass.ts в стране компании — не браузер: по этим числам потом
+ * подбираются заказы (этап B, docs/fleet-constructor/PLAN.md).
+ */
+export async function saveComboAction(_previous: ComboState, formData: FormData): Promise<ComboState> {
+  const locale = toLocale(formData.get('locale'));
+  const t = await getDictionary(locale);
+  const viewer = await requireCarrier(locale);
+  const company = viewer.company!;
+  const supabase = await createClient();
+
+  const vehicleId = text(formData, 'vehicle_id');
+  const trailerId = text(formData, 'trailer_id');
+  if (!vehicleId) return { error: t.validation.required, done: false };
+
+  const [{ data: vehicle }, { data: trailer }] = await Promise.all([
+    supabase.from('vehicles').select('*').eq('id', vehicleId).eq('company_id', company.id).maybeSingle(),
+    trailerId
+      ? supabase.from('trailers').select('*').eq('id', trailerId).eq('company_id', company.id).maybeSingle()
+      : Promise.resolve({ data: null }),
+  ]);
+  if (!vehicle || (trailerId && !trailer)) return { error: t.error.generic, done: false };
+
+  const { comboSummary, isMassCountry } = await import('./mass');
+  const country = isMassCountry(company.country) ? company.country : 'FI';
+  const summary = comboSummary(
+    country,
+    {
+      vehicleClass: vehicle.vehicle_class,
+      axles: vehicle.axles,
+      bodyType: vehicle.body_type,
+      grossMaxKg: vehicle.gross_max_kg,
+      tareKg: vehicle.tare_kg,
+      couplingM: vehicle.coupling_distance_m,
+      payloadKg: vehicle.payload_kg,
+      ldm: vehicle.ldm,
+      volumeM3: vehicle.body_volume_m3,
+      loading: vehicle.loading,
+    },
+    trailer
+      ? {
+          kind: trailer.kind,
+          axles: trailer.axles,
+          twinWheels: trailer.twin_wheels,
+          bodyType: trailer.body_type,
+          grossMaxKg: trailer.gross_max_kg,
+          tareKg: trailer.tare_kg,
+          couplingM: trailer.coupling_distance_m,
+          payloadKg: trailer.payload_kg,
+          ldm: trailer.ldm,
+          volumeM3: trailer.body_volume_m3,
+          loading: trailer.loading,
+          semiFeatures: trailer.semi_features,
+        }
+      : null,
+  );
+  if (!summary) return { error: t.combos.invalid, done: false };
+
+  const values = {
+    company_id: company.id,
+    vehicle_id: vehicle.id,
+    trailer_id: trailer?.id ?? null,
+    kind: summary.kind,
+    name: `${vehicle.plate}${trailer ? ` + ${trailer.plate}` : ''}`,
+    country,
+    axles: summary.axles,
+    legal_kg: summary.legalKg,
+    payload_kg: summary.payloadKg,
+    ldm: summary.ldm,
+    volume_m3: summary.volumeM3,
+    bodies: summary.bodies,
+    loading: summary.loading,
+    semi_features: summary.semiFeatures,
+  };
+
+  /* Та же пара второй раз — пересчёт (размеры могли поменяться), а не дубль. */
+  const id = text(formData, 'id');
+  const { error } = id
+    ? await supabase.from('vehicle_combos').update(values).eq('id', id)
+    : await supabase.from('vehicle_combos').upsert(values, { onConflict: 'vehicle_id,trailer_id' });
+  if (error) return { error: error.code === '22023' ? t.combos.invalid : t.error.generic, done: false };
+
+  revalidatePath(`/${locale}/carrier/fleet`);
+  return { error: null, done: true };
+}
+
+export async function deleteComboAction(formData: FormData): Promise<void> {
+  const locale = toLocale(formData.get('locale'));
+  await requireCarrier(locale);
+  const supabase = await createClient();
+  const { error } = await supabase.from('vehicle_combos').delete().eq('id', String(formData.get('id') ?? ''));
+  await flashFailure(locale, error);
   revalidatePath(`/${locale}/carrier/fleet`);
 }

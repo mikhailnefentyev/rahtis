@@ -50,6 +50,24 @@ export const fi = {
     consentPrivacy: 'Tietosuojaseloste',
   },
 
+  /* Конструктор сцепок (src/app/[locale]/carrier/fleet/CombosView.tsx). */
+  combos: {
+    title: 'Yhdistelmät',
+    lede: 'Kokoa yhdistelmät omista autoista ja perävaunuista: vetoauto yksin perävaunun vaihtoon, vetoauto + kippipuoliperävaunu, nuppi + lavetti, kuorma-auto + kapelli… Lakisääteinen massa (SKAL), kantavuus, lavametrit ja tilavuus lasketaan automaattisesti. Tarjouksen yhdistelmä valitaan, kun otat tilauksen.',
+    add: 'Uusi yhdistelmä',
+    motor: 'Auto',
+    trailer: 'Perävaunu',
+    none: 'Ilman perävaunua',
+    save: 'Tallenna yhdistelmä',
+    delete: 'Poista',
+    recalc: 'Päivitä laskelma',
+    empty: 'Ei vielä yhdistelmiä. Lisää autot ja perävaunut, sitten kokoa yhdistelmä.',
+    invalid: 'Tätä yhdistelmää ei voi muodostaa: puoliperävaunu vetoautoon, perävaunu kuorma-autoon tai nuppiin, pakettiautoon ei perävaunua.',
+    legal: 'Laki sallii',
+    payload: 'Kantavuus',
+    kinds: { TRACTOR_SOLO: 'Vetoauto (perävaunun vaihto)', SEMI: 'Puoliperävaunuyhdistelmä', PUOLIKAS: 'Puolikas (vetoauto + kippipuoliperävaunu)', NUPPI: 'Nuppi', KASETTI: 'Kasetti (nuppi + perävaunu)', TRUCK: 'Kuorma-auto', TRUCK_TRAILER: 'Kuorma-auto + perävaunu', VAN: 'Pakettiauto' },
+  },
+
   /* Прицепы, сцепки и разрешённая масса (src/lib/fleet/mass.ts). */
   mass: {
     title: 'Yhdistelmät ja massat',
@@ -80,6 +98,13 @@ export const fi = {
     grossMaxHint: 'Rekisteröintitodistuksesta. Rajaa yhdistelmän massan ylhäältä.',
     tareKg: 'Tyhjäpaino (kg)',
     tareHint: 'Jatkossa tämä otetaan lähtöpunnituksesta automaattisesti.',
+    loadingLabel: 'Lastaus',
+    loading: { TOP: 'Ylhäältä', SIDE: 'Sivulta', REAR: 'Takaa' },
+    payloadKg: 'Kantavuus (kg)',
+    payloadHint: 'Mitä kori itse kantaa rekisteröintitodistuksen mukaan.',
+    innerLength: 'Sisäpituus (m)',
+    innerWidth: 'Sisäleveys (m)',
+    innerHeight: 'Sisäkorkeus (m)',
     volumeM3: 'Kuormatila (m³)',
     volumeHint: 'Lavan tilavuus kuutioina. Maa-aineksissa tilavuus voi rajata kuorman ennen massaa.',
     couplingShort: 'kytkentä–taka-akseli',
@@ -97,7 +122,7 @@ export const fi = {
     plateTaken: 'Tällä rekisterinumerolla on jo perävaunu.',
     roadClasses: { BK1: 'BK1 (64 t)', BK4: 'BK4 (74 t)', NET50: 'Muu tieverkko (50 t)', NET60: 'Moduuliverkko (60 t)', STANDARD: 'Tavallinen', EMS: 'Moduuliyhdistelmä (60 t)' },
     kinds: { SEMI: 'Puoliperävaunu', FULL: 'Täysperävaunu', CENTER_AXLE: 'Keskiakseliperävaunu' },
-    bodies: { TIPPER: 'Kippi', CASSETTE: 'Kasetti', FLATBED: 'Lava', CONTAINER: 'Konttialusta', CURTAIN: 'Kapelli', BOX: 'Umpikori', TANK: 'Säiliö', OTHER: 'Muu' },
+    bodies: { TIPPER: 'Kippi', CASSETTE: 'Kasetti', FLATBED: 'Lava', CONTAINER: 'Konttialusta', CURTAIN: 'Kapelli', BOX: 'Umpikori', TANK: 'Säiliö', OTHER: 'Muu', REEFER: 'Kylmäkone', ISOTHERM: 'Isotermi', LOWBED: 'Lavetti' },
     problems: { SEMI_NEEDS_TRACTOR: 'Puoliperävaunu tarvitsee vetoauton.', TRAILER_NEEDS_TRUCK: 'Täysperävaunu kytketään kuorma-autoon.', TOO_MANY_TRAILERS: 'Enintään kaksi perävaunua.' },
   },
 
@@ -1261,7 +1286,7 @@ export const fi = {
     TRACTOR: 'Vetoauto',
     VAN: 'Pakettiauto · enintään 3,5 t',
     TRUCK: 'Kuorma-auto · enintään 26 t',
-    TIPPER: 'Nuppiauto (kippi / kasetti) · 3–5 akselia',
+    TIPPER: 'Nuppi (kippiauto) · 3–5 akselia',
   },
 
   amendKind: {

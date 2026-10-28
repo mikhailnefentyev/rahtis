@@ -11,6 +11,7 @@ import type { CompanyDocument } from '@/types/db';
 import { DocumentCard } from './DocumentCard';
 import { FleetView } from './FleetView';
 import { TrailersMass } from './TrailersMass';
+import { CombosView } from './CombosView';
 import { getViewerI18n } from '@/lib/i18n/viewer';
 
 export async function generateMetadata({
@@ -42,6 +43,7 @@ export default async function FleetPage({ params }: { params: Promise<{ locale: 
     { data: drivers },
     { data: assignments },
     { data: trailers },
+    { data: combos },
   ] = await Promise.all([
     supabase
       .from('vehicles')
@@ -63,6 +65,7 @@ export default async function FleetPage({ params }: { params: Promise<{ locale: 
       .order('full_name'),
     supabase.from('vehicle_drivers').select('vehicle_id, driver_id, during'),
     supabase.from('trailers').select('*').eq('company_id', company.id).order('created_at', { ascending: true }),
+    supabase.from('vehicle_combos').select('*').eq('company_id', company.id).order('created_at', { ascending: true }),
   ]);
 
   /*
@@ -162,6 +165,9 @@ export default async function FleetPage({ params }: { params: Promise<{ locale: 
       />
 
       <TrailersMass vehicles={vehicles ?? []} trailers={trailers ?? []} />
+
+      {/* Конструктор: перевозчик сам собирает сцепки из своих машин и прицепов. */}
+      <CombosView vehicles={vehicles ?? []} trailers={trailers ?? []} combos={combos ?? []} />
     </main>
   );
 }

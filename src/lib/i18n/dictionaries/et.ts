@@ -27,6 +27,24 @@ export const et = {
     consentPrivacy: 'Privaatsusteade',
   },
 
+  /* Конструктор сцепок (src/app/[locale]/carrier/fleet/CombosView.tsx). */
+  combos: {
+    title: 'Autorongid',
+    lede: 'Pane autorongid kokku oma autodest ja haagistest: sadulveok üksi haagiste vahetuseks, sadulveok + kallurpoolhaagis, nuppi + tral, veok + kardinhaagis… Seaduslik mass (SKAL), kandevõime, laadimismeetrid ja maht arvutatakse automaatselt. Autorongi valid tellimuse võtmisel.',
+    add: 'Uus autorong',
+    motor: 'Auto',
+    trailer: 'Haagis',
+    none: 'Haagiseta',
+    save: 'Salvesta autorong',
+    delete: 'Kustuta',
+    recalc: 'Arvuta uuesti',
+    empty: 'Autoronge veel pole. Lisa autod ja haagised ning pane siis autorong kokku.',
+    invalid: 'Sellist autorongi ei saa kokku panna: poolhaagis käib sadulveokiga, haagis veoki või nuppiga, kaubikule haagist ei käi.',
+    legal: 'Seadus lubab',
+    payload: 'Kandevõime',
+    kinds: { TRACTOR_SOLO: 'Sadulveok (haagise vahetus)', SEMI: 'Poolhaagisega autorong', PUOLIKAS: 'Puolikas (sadulveok + kallurpoolhaagis)', NUPPI: 'Nuppi', KASETTI: 'Kassett (nuppi + haagis)', TRUCK: 'Veok', TRUCK_TRAILER: 'Veok + haagis', VAN: 'Kaubik' },
+  },
+
   /* Прицепы, сцепки и разрешённая масса (src/lib/fleet/mass.ts). */
   mass: {
     title: 'Autorongid ja massid',
@@ -57,6 +75,13 @@ export const et = {
     grossMaxHint: 'Registreerimistunnistusest. See on autorongi massi ülempiir.',
     tareKg: 'Tühimass (kg)',
     tareHint: 'Edaspidi võetakse see automaatselt väljumiskaalumisest.',
+    loadingLabel: 'Laadimine',
+    loading: { TOP: 'Pealt', SIDE: 'Küljelt', REAR: 'Tagant' },
+    payloadKg: 'Kandevõime (kg)',
+    payloadHint: 'Mida kere ise kannab registreerimistunnistuse järgi.',
+    innerLength: 'Sisepikkus (m)',
+    innerWidth: 'Sisemine laius (m)',
+    innerHeight: 'Sisekõrgus (m)',
     volumeM3: 'Kasti maht (m³)',
     volumeHint: 'Kasti maht kuupmeetrites. Kerge pinnase puhul võib maht piirata koormat enne massi.',
     couplingShort: 'haakeseade–viimane sild',
@@ -74,7 +99,7 @@ export const et = {
     plateTaken: 'Selle numbriga haagis on juba olemas.',
     roadClasses: { BK1: 'BK1 (64 t)', BK4: 'BK4 (74 t)', NET50: 'Muud teed (50 t)', NET60: 'Moodulvõrk (60 t)', STANDARD: 'Tavaline', EMS: 'Moodulrong (60 t)' },
     kinds: { SEMI: 'Poolhaagis', FULL: 'Täishaagis', CENTER_AXLE: 'Kesktelghaagis' },
-    bodies: { TIPPER: 'Kallur', CASSETTE: 'Kassett', FLATBED: 'Platvorm', CONTAINER: 'Konteinerišassii', CURTAIN: 'Kardin', BOX: 'Furgoon', TANK: 'Paak', OTHER: 'Muu' },
+    bodies: { TIPPER: 'Kallur', CASSETTE: 'Kassett', FLATBED: 'Platvorm', CONTAINER: 'Konteinerišassii', CURTAIN: 'Kardin', BOX: 'Furgoon', TANK: 'Paak', OTHER: 'Muu', REEFER: 'Külmik', ISOTHERM: 'Isoterm', LOWBED: 'Madelplatvorm (tral)' },
     problems: { SEMI_NEEDS_TRACTOR: 'Poolhaagis vajab sadulveokit.', TRAILER_NEEDS_TRUCK: 'Täishaagis haagitakse veoauto taha.', TOO_MANY_TRAILERS: 'Kõige rohkem kaks haagist.' },
   },
 
@@ -1076,7 +1101,7 @@ export const et = {
     TRACTOR: 'Sadulveok',
     VAN: 'Kaubik · kuni 3,5 t',
     TRUCK: 'Veoauto · kuni 26 t',
-    TIPPER: 'Nuppi (kallur / kassett) · 3–5 telge',
+    TIPPER: 'Nuppi (kallur) · 3–5 telge',
   },
 
   amendKind: {

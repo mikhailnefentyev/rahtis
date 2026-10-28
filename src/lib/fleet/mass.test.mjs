@@ -98,3 +98,44 @@ test('тягач + полуприцеп: груз ограничивает по�
   assert.equal(r.payloadKg, 31_500);
   assert.equal(r.spreadM, 11.8);
 });
+
+test('конструктор: виды сцепок и что собрать нельзя', async () => {
+  const { comboKind } = await import('./mass.ts');
+  assert.equal(comboKind('TRACTOR', null), 'TRACTOR_SOLO');
+  assert.equal(comboKind('TRACTOR', { kind: 'SEMI', bodyType: 'TIPPER' }), 'PUOLIKAS');
+  assert.equal(comboKind('TRACTOR', { kind: 'SEMI', bodyType: 'CURTAIN' }), 'SEMI');
+  assert.equal(comboKind('TRACTOR', { kind: 'FULL' }), null);
+  assert.equal(comboKind('TIPPER', null), 'NUPPI');
+  assert.equal(comboKind('TIPPER', { kind: 'FULL', bodyType: 'LOWBED' }), 'KASETTI');
+  assert.equal(comboKind('TRUCK', { kind: 'FULL', bodyType: 'CURTAIN' }), 'TRUCK_TRAILER');
+  assert.equal(comboKind('TRUCK', { kind: 'SEMI' }), null);
+  assert.equal(comboKind('VAN', { kind: 'FULL' }), null);
+});
+
+test('конструктор: грузовик 3 оси + тент — метры, объём и груз складываются, закон ограничивает', async () => {
+  const { comboSummary } = await import('./mass.ts');
+  const s = comboSummary(
+    'FI',
+    { vehicleClass: 'TRUCK', axles: 3, bodyType: 'CURTAIN', grossMaxKg: 26000, tareKg: 11000, payloadKg: 15000, ldm: 7.2, volumeM3: 45, loading: ['SIDE', 'REAR'] },
+    { kind: 'FULL', axles: 3, twinWheels: true, bodyType: 'CURTAIN', grossMaxKg: 24000, tareKg: 6000, payloadKg: 18000, ldm: 8.2, volumeM3: 55, loading: ['SIDE', 'TOP'] },
+  );
+  assert.equal(s.kind, 'TRUCK_TRAILER');
+  assert.equal(s.axles, 6);
+  assert.equal(s.ldm, 15.4);
+  assert.equal(s.volumeM3, 100);
+  /* закон 53 т − тара 17 т = 36 т, заявлено 33 т → 33 т */
+  assert.equal(s.payloadKg, 33000);
+  assert.deepEqual(s.loading.sort(), ['REAR', 'SIDE', 'TOP']);
+});
+
+test('конструктор: тягач + самосвальный полуприцеп — puolikas, груз по полуприцепу', async () => {
+  const { comboSummary } = await import('./mass.ts');
+  const s = comboSummary(
+    'FI',
+    { vehicleClass: 'TRACTOR', axles: 3, grossMaxKg: 26000, tareKg: 8500 },
+    { kind: 'SEMI', axles: 3, twinWheels: false, bodyType: 'TIPPER', grossMaxKg: 39000, tareKg: 7500, payloadKg: 31000 },
+  );
+  assert.equal(s.kind, 'PUOLIKAS');
+  assert.equal(s.payloadKg, 31000);
+  assert.deepEqual(s.bodies, ['TIPPER']);
+});

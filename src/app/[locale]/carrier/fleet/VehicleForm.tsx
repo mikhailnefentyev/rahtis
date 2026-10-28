@@ -12,9 +12,8 @@ import { countryPack } from '@/lib/country';
 
 const initial: VehicleState = { error: null, done: false };
 
-/* Кузова разные (пользователь 28.10.2026): грузовик для грузоперевозок — борт, тент, фургон…; самосвал — самосвальный или кассетный. */
-const CARGO_BODIES: BodyType[] = ['CURTAIN', 'BOX', 'FLATBED', 'CONTAINER', 'TANK', 'OTHER'];
-const TIPPER_BODIES: BodyType[] = ['TIPPER', 'CASSETTE'];
+/* Кузова разные (пользователь 28.10.2026): у грузовика — тент, фургон, реф, изотерм, борт, трал…; нуппи — всегда самосвал. */
+const CARGO_BODIES: BodyType[] = ['CURTAIN', 'BOX', 'REEFER', 'ISOTHERM', 'FLATBED', 'LOWBED', 'CONTAINER', 'TANK', 'OTHER'];
 
 /**
  * Карточка авто: создание и правка.
@@ -215,22 +214,8 @@ export function VehicleForm({
             */}
           {vehicleClass === 'TIPPER' && (
             <>
-              <Field label={t.mass.body} required>
-                {(p) => (
-                  <Select
-                    {...p}
-                    name="body_type"
-                    required
-                    defaultValue={vehicle?.body_type && TIPPER_BODIES.includes(vehicle.body_type) ? vehicle.body_type : 'TIPPER'}
-                  >
-                    {TIPPER_BODIES.map((b) => (
-                      <option key={b} value={b}>
-                        {t.mass.bodies[b]}
-                      </option>
-                    ))}
-                  </Select>
-                )}
-              </Field>
+              {/* Нуппи — грузовик-самосвал: кузов один; кассета — это сцепка «нуппи + прицеп» в конструкторе. */}
+              <input type="hidden" name="body_type" value="TIPPER" />
               <Field label={t.mass.volumeM3} hint={t.mass.volumeHint}>
                 {(p) => (
                   <InputMono {...p} name="body_volume_m3" inputMode="decimal" defaultValue={vehicle?.body_volume_m3 ?? ''} placeholder="18" />
@@ -283,6 +268,32 @@ export function VehicleForm({
             * карточка означала бы машину, которой не достаётся ни один
             * заказ, и понять почему было бы неоткуда.
             */}
+          {express && (
+            <>
+              <Field label={t.mass.innerLength}>
+                {(p) => <InputMono {...p} name="inner_length_m" inputMode="decimal" defaultValue={vehicle?.inner_length_m ?? ''} placeholder="7,2" />}
+              </Field>
+              <Field label={t.mass.innerWidth}>
+                {(p) => <InputMono {...p} name="inner_width_m" inputMode="decimal" defaultValue={vehicle?.inner_width_m ?? ''} placeholder="2,48" />}
+              </Field>
+              <Field label={t.mass.innerHeight}>
+                {(p) => <InputMono {...p} name="inner_height_m" inputMode="decimal" defaultValue={vehicle?.inner_height_m ?? ''} placeholder="2,6" />}
+              </Field>
+              <Field label={t.mass.loadingLabel}>
+                {() => (
+                  <div className="flex flex-wrap gap-x-5 gap-y-2">
+                    {(['TOP', 'SIDE', 'REAR'] as const).map((side) => (
+                      <label key={side} className="flex items-center gap-2 text-[13px]">
+                        <input type="checkbox" name="loading" value={side} defaultChecked={(vehicle?.loading ?? []).includes(side)} />
+                        {t.mass.loading[side]}
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </Field>
+            </>
+          )}
+
           {express && (
             <>
               <Field label={t.vehicle.payload} hint={t.vehicle.payloadHint} required>

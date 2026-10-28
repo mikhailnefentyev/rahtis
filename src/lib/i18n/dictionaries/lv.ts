@@ -27,6 +27,24 @@ export const lv = {
     consentPrivacy: 'Privātuma paziņojums',
   },
 
+  /* Конструктор сцепок (src/app/[locale]/carrier/fleet/CombosView.tsx). */
+  combos: {
+    title: 'Sastāvi',
+    lede: 'Salieciet sastāvus no savām automašīnām un piekabēm: vilcējs viens piekabju maiņai, vilcējs + pašizgāzēja puspiekabe, nuppi + trals, kravas auto + tenta piekabe… Likumā atļautā masa (SKAL), kravnesība, kravas metri un tilpums tiek aprēķināti automātiski. Sastāvu izvēlaties, ņemot pasūtījumu.',
+    add: 'Jauns sastāvs',
+    motor: 'Automašīna',
+    trailer: 'Piekabe',
+    none: 'Bez piekabes',
+    save: 'Saglabāt sastāvu',
+    delete: 'Dzēst',
+    recalc: 'Pārrēķināt',
+    empty: 'Sastāvu vēl nav. Pievienojiet automašīnas un piekabes, tad salieciet sastāvu.',
+    invalid: 'Šādu sastāvu nevar salikt: puspiekabe — vilcējam, piekabe — kravas auto vai nuppi, furgonam piekabes nav.',
+    legal: 'Likums atļauj',
+    payload: 'Kravnesība',
+    kinds: { TRACTOR_SOLO: 'Vilcējs (piekabju maiņa)', SEMI: 'Puspiekabes sastāvs', PUOLIKAS: 'Puolikas (vilcējs + pašizgāzēja puspiekabe)', NUPPI: 'Nuppi', KASETTI: 'Kasete (nuppi + piekabe)', TRUCK: 'Kravas auto', TRUCK_TRAILER: 'Kravas auto + piekabe', VAN: 'Furgons' },
+  },
+
   /* Прицепы, сцепки и разрешённая масса (src/lib/fleet/mass.ts). */
   mass: {
     title: 'Sastāvi un masas',
@@ -57,6 +75,13 @@ export const lv = {
     grossMaxHint: 'No reģistrācijas apliecības. Sastāva masa nevar būt lielāka.',
     tareKg: 'Pašmasa (kg)',
     tareHint: 'Turpmāk to automātiski ņems no svēršanas pirms izbraukšanas.',
+    loadingLabel: 'Iekraušana',
+    loading: { TOP: 'No augšas', SIDE: 'No sāniem', REAR: 'No aizmugures' },
+    payloadKg: 'Kravnesība (kg)',
+    payloadHint: 'Ko kravas kaste pati var vest pēc reģistrācijas apliecības.',
+    innerLength: 'Iekšējais garums (m)',
+    innerWidth: 'Iekšējais platums (m)',
+    innerHeight: 'Iekšējais augstums (m)',
     volumeM3: 'Kravas kastes tilpums (m³)',
     volumeHint: 'Kastes tilpums kubikmetros. Vieglai gruntij tilpums var ierobežot kravu ātrāk nekā masa.',
     couplingShort: 'sakabe–pēdējā ass',
@@ -74,7 +99,7 @@ export const lv = {
     plateTaken: 'Piekabe ar šo numuru jau ir.',
     roadClasses: { BK1: 'BK1 (64 t)', BK4: 'BK4 (74 t)', NET50: 'Citi ceļi (50 t)', NET60: 'Moduļu tīkls (60 t)', STANDARD: 'Parasts', EMS: 'Moduļu sastāvs (60 t)' },
     kinds: { SEMI: 'Puspiekabe', FULL: 'Piekabe', CENTER_AXLE: 'Centrālās ass piekabe' },
-    bodies: { TIPPER: 'Pašizgāzējs', CASSETTE: 'Kasete', FLATBED: 'Platforma', CONTAINER: 'Konteineru šasija', CURTAIN: 'Tents', BOX: 'Furgons', TANK: 'Cisterna', OTHER: 'Cits' },
+    bodies: { TIPPER: 'Pašizgāzējs', CASSETTE: 'Kasete', FLATBED: 'Platforma', CONTAINER: 'Konteineru šasija', CURTAIN: 'Tents', BOX: 'Furgons', TANK: 'Cisterna', OTHER: 'Cits', REEFER: 'Refrižerators', ISOTHERM: 'Izoterms', LOWBED: 'Zemā platforma (trals)' },
     problems: { SEMI_NEEDS_TRACTOR: 'Puspiekabei vajag vilcēju.', TRAILER_NEEDS_TRUCK: 'Piekabi sakabina ar kravas auto.', TOO_MANY_TRAILERS: 'Ne vairāk kā divas piekabes.' },
   },
 
@@ -1076,7 +1101,7 @@ export const lv = {
     TRACTOR: 'Vilcējs',
     VAN: 'Busiņš · līdz 3,5 t',
     TRUCK: 'Kravas auto · līdz 26 t',
-    TIPPER: 'Nuppi (pašizgāzējs / kasete) · 3–5 asis',
+    TIPPER: 'Nuppi (pašizgāzējs) · 3–5 asis',
   },
 
   amendKind: {

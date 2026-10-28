@@ -27,6 +27,24 @@ export const de = {
     consentPrivacy: 'Datenschutzhinweise',
   },
 
+  /* Конструктор сцепок (src/app/[locale]/carrier/fleet/CombosView.tsx). */
+  combos: {
+    title: 'Kombinationen',
+    lede: 'Stellen Sie Kombinationen aus eigenen Fahrzeugen und Anhängern zusammen: Sattelzugmaschine allein für Trailertausch, Zugmaschine + Kippauflieger, Nuppi + Tieflader, Lkw + Planenanhänger… Gesetzliche Masse (SKAL), Nutzlast, Lademeter und Volumen werden automatisch berechnet. Die Kombination wählen Sie bei der Auftragsannahme.',
+    add: 'Neue Kombination',
+    motor: 'Fahrzeug',
+    trailer: 'Anhänger',
+    none: 'Ohne Anhänger',
+    save: 'Kombination speichern',
+    delete: 'Löschen',
+    recalc: 'Neu berechnen',
+    empty: 'Noch keine Kombinationen. Fahrzeuge und Anhänger anlegen, dann eine Kombination zusammenstellen.',
+    invalid: 'Diese Kombination geht nicht: Auflieger an die Zugmaschine, Anhänger an Lkw oder Nuppi, Transporter ohne Anhänger.',
+    legal: 'Gesetzlich erlaubt',
+    payload: 'Nutzlast',
+    kinds: { TRACTOR_SOLO: 'Zugmaschine (Trailertausch)', SEMI: 'Sattelzug', PUOLIKAS: 'Puolikas (Zugmaschine + Kippauflieger)', NUPPI: 'Nuppi', KASETTI: 'Kassette (Nuppi + Anhänger)', TRUCK: 'Lkw', TRUCK_TRAILER: 'Lkw + Anhänger', VAN: 'Transporter' },
+  },
+
   /* Прицепы, сцепки и разрешённая масса (src/lib/fleet/mass.ts). */
   mass: {
     title: 'Kombinationen und Gewichte',
@@ -57,6 +75,13 @@ export const de = {
     grossMaxHint: 'Aus der Zulassungsbescheinigung. Das ist die Obergrenze für das Gewicht der Kombination.',
     tareKg: 'Leergewicht (kg)',
     tareHint: 'Später wird der Wert automatisch aus der Abfahrtsverwiegung übernommen.',
+    loadingLabel: 'Beladung',
+    loading: { TOP: 'Von oben', SIDE: 'Von der Seite', REAR: 'Von hinten' },
+    payloadKg: 'Nutzlast (kg)',
+    payloadHint: 'Was der Aufbau selbst laut Zulassungsbescheinigung trägt.',
+    innerLength: 'Innenlänge (m)',
+    innerWidth: 'Innenbreite (m)',
+    innerHeight: 'Innenhöhe (m)',
     volumeM3: 'Mulden-/Aufbauvolumen (m³)',
     volumeHint: 'Volumen des Aufbaus in Kubikmetern. Bei leichtem Boden begrenzt das Volumen die Ladung oft vor der Masse.',
     couplingShort: 'Kupplung–letzte Achse',
@@ -74,7 +99,7 @@ export const de = {
     plateTaken: 'Es gibt schon einen Anhänger mit diesem Kennzeichen.',
     roadClasses: { BK1: 'BK1 (64 t)', BK4: 'BK4 (74 t)', NET50: 'Übrige Straßen (50 t)', NET60: 'Modulnetz (60 t)', STANDARD: 'Standard', EMS: 'Modulkombination (60 t)' },
     kinds: { SEMI: 'Sattelauflieger', FULL: 'Deichselanhänger', CENTER_AXLE: 'Zentralachsanhänger' },
-    bodies: { TIPPER: 'Kipper', CASSETTE: 'Kassette', FLATBED: 'Pritsche', CONTAINER: 'Containerchassis', CURTAIN: 'Plane', BOX: 'Koffer', TANK: 'Tank', OTHER: 'Sonstiges' },
+    bodies: { TIPPER: 'Kipper', CASSETTE: 'Kassette', FLATBED: 'Pritsche', CONTAINER: 'Containerchassis', CURTAIN: 'Plane', BOX: 'Koffer', TANK: 'Tank', OTHER: 'Sonstiges', REEFER: 'Kühlkoffer', ISOTHERM: 'Isotherm', LOWBED: 'Tieflader' },
     problems: { SEMI_NEEDS_TRACTOR: 'Ein Auflieger braucht eine Sattelzugmaschine.', TRAILER_NEEDS_TRUCK: 'Ein Deichselanhänger kommt hinter einen Lkw.', TOO_MANY_TRAILERS: 'Höchstens zwei Anhänger.' },
   },
 
@@ -1076,7 +1101,7 @@ export const de = {
     TRACTOR: 'Sattelzugmaschine',
     VAN: 'Transporter · bis 3,5 t',
     TRUCK: 'Lkw · bis 26 t',
-    TIPPER: 'Nuppi (Kipper / Kassette) · 3–5 Achsen',
+    TIPPER: 'Nuppi (Kipper-Lkw) · 3–5 Achsen',
   },
 
   amendKind: {

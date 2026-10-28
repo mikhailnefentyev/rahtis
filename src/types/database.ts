@@ -3877,9 +3877,14 @@ export type Database = {
           created_at: string
           gross_max_kg: number | null
           id: string
+          inner_height_m: number | null
+          inner_length_m: number | null
+          inner_width_m: number | null
           kind: Database["public"]["Enums"]["trailer_kind"]
           ldm: number | null
           length_m: number | null
+          loading: string[]
+          payload_kg: number | null
           plate: string
           semi_features: string[]
           tare_kg: number | null
@@ -3895,9 +3900,14 @@ export type Database = {
           created_at?: string
           gross_max_kg?: number | null
           id?: string
+          inner_height_m?: number | null
+          inner_length_m?: number | null
+          inner_width_m?: number | null
           kind: Database["public"]["Enums"]["trailer_kind"]
           ldm?: number | null
           length_m?: number | null
+          loading?: string[]
+          payload_kg?: number | null
           plate: string
           semi_features?: string[]
           tare_kg?: number | null
@@ -3913,9 +3923,14 @@ export type Database = {
           created_at?: string
           gross_max_kg?: number | null
           id?: string
+          inner_height_m?: number | null
+          inner_length_m?: number | null
+          inner_width_m?: number | null
           kind?: Database["public"]["Enums"]["trailer_kind"]
           ldm?: number | null
           length_m?: number | null
+          loading?: string[]
+          payload_kg?: number | null
           plate?: string
           semi_features?: string[]
           tare_kg?: number | null
@@ -4027,6 +4042,88 @@ export type Database = {
         }
         Relationships: []
       }
+      vehicle_combos: {
+        Row: {
+          axles: number
+          bodies: string[]
+          company_id: string
+          country: string
+          created_at: string
+          id: string
+          kind: string
+          ldm: number | null
+          legal_kg: number
+          loading: string[]
+          name: string
+          payload_kg: number | null
+          semi_features: string[]
+          trailer_id: string | null
+          updated_at: string
+          vehicle_id: string
+          volume_m3: number | null
+        }
+        Insert: {
+          axles: number
+          bodies?: string[]
+          company_id: string
+          country?: string
+          created_at?: string
+          id?: string
+          kind: string
+          ldm?: number | null
+          legal_kg: number
+          loading?: string[]
+          name: string
+          payload_kg?: number | null
+          semi_features?: string[]
+          trailer_id?: string | null
+          updated_at?: string
+          vehicle_id: string
+          volume_m3?: number | null
+        }
+        Update: {
+          axles?: number
+          bodies?: string[]
+          company_id?: string
+          country?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          ldm?: number | null
+          legal_kg?: number
+          loading?: string[]
+          name?: string
+          payload_kg?: number | null
+          semi_features?: string[]
+          trailer_id?: string | null
+          updated_at?: string
+          vehicle_id?: string
+          volume_m3?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_combos_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_combos_trailer_id_fkey"
+            columns: ["trailer_id"]
+            isOneToOne: false
+            referencedRelation: "trailers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_combos_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vehicle_drivers: {
         Row: {
           assigned_by: string | null
@@ -4128,8 +4225,12 @@ export type Database = {
           euro_class: Database["public"]["Enums"]["euro_class"]
           gross_max_kg: number | null
           id: string
+          inner_height_m: number | null
+          inner_length_m: number | null
+          inner_width_m: number | null
           languages: string[]
           ldm: number | null
+          loading: string[]
           make: string
           payload_kg: number | null
           plate: string
@@ -4165,8 +4266,12 @@ export type Database = {
           euro_class: Database["public"]["Enums"]["euro_class"]
           gross_max_kg?: number | null
           id?: string
+          inner_height_m?: number | null
+          inner_length_m?: number | null
+          inner_width_m?: number | null
           languages?: string[]
           ldm?: number | null
+          loading?: string[]
           make: string
           payload_kg?: number | null
           plate: string
@@ -4202,8 +4307,12 @@ export type Database = {
           euro_class?: Database["public"]["Enums"]["euro_class"]
           gross_max_kg?: number | null
           id?: string
+          inner_height_m?: number | null
+          inner_length_m?: number | null
+          inner_width_m?: number | null
           languages?: string[]
           ldm?: number | null
+          loading?: string[]
           make?: string
           payload_kg?: number | null
           plate?: string
@@ -5600,8 +5709,12 @@ export type Database = {
           euro_class: Database["public"]["Enums"]["euro_class"]
           gross_max_kg: number | null
           id: string
+          inner_height_m: number | null
+          inner_length_m: number | null
+          inner_width_m: number | null
           languages: string[]
           ldm: number | null
+          loading: string[]
           make: string
           payload_kg: number | null
           plate: string
@@ -6892,8 +7005,12 @@ export type Database = {
           euro_class: Database["public"]["Enums"]["euro_class"]
           gross_max_kg: number | null
           id: string
+          inner_height_m: number | null
+          inner_length_m: number | null
+          inner_width_m: number | null
           languages: string[]
           ldm: number | null
+          loading: string[]
           make: string
           payload_kg: number | null
           plate: string
@@ -7237,6 +7354,9 @@ export type Database = {
         | "BOX"
         | "TANK"
         | "OTHER"
+        | "REEFER"
+        | "ISOTHERM"
+        | "LOWBED"
       chat_audience: "DRIVER" | "CARRIER" | "SHIPPER" | "ADMIN"
       chat_channel: "WEB" | "WHATSAPP"
       chat_sender: "USER" | "AGENT" | "OPERATOR"
@@ -7478,6 +7598,9 @@ export const Constants = {
         "BOX",
         "TANK",
         "OTHER",
+        "REEFER",
+        "ISOTHERM",
+        "LOWBED",
       ],
       chat_audience: ["DRIVER", "CARRIER", "SHIPPER", "ADMIN"],
       chat_channel: ["WEB", "WHATSAPP"],

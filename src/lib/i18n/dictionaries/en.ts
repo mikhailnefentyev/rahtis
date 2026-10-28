@@ -43,6 +43,24 @@ export const en = {
     consentPrivacy: 'Privacy notice',
   },
 
+  /* Конструктор сцепок (src/app/[locale]/carrier/fleet/CombosView.tsx). */
+  combos: {
+    title: 'Combinations',
+    lede: 'Build combinations from your own vehicles and trailers: a tractor alone for trailer swaps, tractor + tipper semi-trailer, nuppi + low-bed, truck + curtain trailer… Legal mass (SKAL), payload, loading metres and volume are calculated automatically. You choose the combination when you take an order.',
+    add: 'New combination',
+    motor: 'Vehicle',
+    trailer: 'Trailer',
+    none: 'Without trailer',
+    save: 'Save combination',
+    delete: 'Delete',
+    recalc: 'Recalculate',
+    empty: 'No combinations yet. Add vehicles and trailers, then build a combination.',
+    invalid: 'This combination cannot be built: a semi-trailer goes with a tractor, a trailer with a truck or nuppi, a van takes no trailer.',
+    legal: 'Legal limit',
+    payload: 'Payload',
+    kinds: { TRACTOR_SOLO: 'Tractor (trailer swap)', SEMI: 'Semi-trailer combination', PUOLIKAS: 'Puolikas (tractor + tipper semi-trailer)', NUPPI: 'Nuppi', KASETTI: 'Cassette (nuppi + trailer)', TRUCK: 'Truck', TRUCK_TRAILER: 'Truck + trailer', VAN: 'Van' },
+  },
+
   /* Прицепы, сцепки и разрешённая масса (src/lib/fleet/mass.ts). */
   mass: {
     title: 'Combinations and weights',
@@ -73,6 +91,13 @@ export const en = {
     grossMaxHint: 'From the registration certificate. Caps the combination weight.',
     tareKg: 'Empty weight (kg)',
     tareHint: 'Soon this will come automatically from the outbound weighing.',
+    loadingLabel: 'Loading',
+    loading: { TOP: 'From the top', SIDE: 'From the side', REAR: 'From the rear' },
+    payloadKg: 'Payload (kg)',
+    payloadHint: 'What the body itself carries according to the registration certificate.',
+    innerLength: 'Inner length (m)',
+    innerWidth: 'Inner width (m)',
+    innerHeight: 'Inner height (m)',
     volumeM3: 'Body volume (m³)',
     volumeHint: 'Volume of the body in cubic metres. With light soil the volume can limit the load before the mass does.',
     couplingShort: 'coupling–last axle',
@@ -90,7 +115,7 @@ export const en = {
     plateTaken: 'A trailer with this registration already exists.',
     roadClasses: { BK1: 'BK1 (64 t)', BK4: 'BK4 (74 t)', NET50: 'Other roads (50 t)', NET60: 'Modular network (60 t)', STANDARD: 'Standard', EMS: 'Modular combination (60 t)' },
     kinds: { SEMI: 'Semi-trailer', FULL: 'Full trailer', CENTER_AXLE: 'Centre-axle trailer' },
-    bodies: { TIPPER: 'Tipper', CASSETTE: 'Cassette', FLATBED: 'Flatbed', CONTAINER: 'Container chassis', CURTAIN: 'Curtainsider', BOX: 'Box', TANK: 'Tank', OTHER: 'Other' },
+    bodies: { TIPPER: 'Tipper', CASSETTE: 'Cassette', FLATBED: 'Flatbed', CONTAINER: 'Container chassis', CURTAIN: 'Curtainsider', BOX: 'Box', TANK: 'Tank', OTHER: 'Other', REEFER: 'Reefer', ISOTHERM: 'Isotherm', LOWBED: 'Low-bed' },
     problems: { SEMI_NEEDS_TRACTOR: 'A semi-trailer needs a tractor unit.', TRAILER_NEEDS_TRUCK: 'A full trailer goes behind a truck.', TOO_MANY_TRAILERS: 'Two trailers at most.' },
   },
 
@@ -1173,7 +1198,7 @@ export const en = {
     TRACTOR: 'Tractor unit',
     VAN: 'Van · up to 3.5 t',
     TRUCK: 'Truck · up to 26 t',
-    TIPPER: 'Nuppi tipper truck (tipper / cassette) · 3–5 axles',
+    TIPPER: 'Nuppi (tipper truck) · 3–5 axles',
   },
 
   amendKind: {

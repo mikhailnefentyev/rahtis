@@ -1,24 +1,16 @@
 'use client';
 
-import { useActionState, useEffect, useMemo, useState } from 'react';
+import { useActionState, useEffect, useState } from 'react';
 import { Badge, Button, Card, CardBody, EmptyState, Field, InputMono, Plate, Select } from '@/components/ui';
 import { deleteTrailerAction, saveTrailerAction, type TrailerState } from '@/lib/fleet/actions';
-import {
-  MASS_COUNTRIES,
-  ROAD_CLASSES,
-  combinationMass,
-  combinationProblem,
-  isMassCountry,
-  type MassCountry,
-  type MotorUnit,
-  type RoadClass,
-  type TrailerUnit,
-} from '@/lib/fleet/mass';
-import { useCompanyCountry, useI18n } from '@/lib/i18n/provider';
-import { SEMI_FEATURES, isSemiFeature } from '@/lib/orders/haul';
+import { useI18n } from '@/lib/i18n/provider';
+import { isSemiFeature } from '@/lib/orders/haul';
 import type { BodyType, Trailer, TrailerKind, Vehicle } from '@/types/db';
 
-const BODY_TYPES: BodyType[] = ['TIPPER', 'CASSETTE', 'FLATBED', 'CONTAINER', 'CURTAIN', 'BOX', 'TANK', 'OTHER'];
+/* Кузова полуприцепов и прицепов (пользователь 28.10.2026): самосвал, тент, изотерм, реф, трал — и прежние. */
+const BODY_TYPES: BodyType[] = ['TIPPER', 'CURTAIN', 'ISOTHERM', 'REEFER', 'LOWBED', 'BOX', 'FLATBED', 'CONTAINER', 'TANK', 'OTHER'];
+/* Загрузка сверху, сбоку, сзади — у кузовов для грузов. */
+const LOADING_BODIES: readonly string[] = ['CURTAIN', 'ISOTHERM', 'REEFER', 'BOX'];
 const KINDS: TrailerKind[] = ['FULL', 'SEMI', 'CENTER_AXLE'];
 const initial: TrailerState = { error: null, done: false };
 
@@ -26,65 +18,13 @@ const tonnes = (kg: number) => `${(kg / 1000).toLocaleString('fi-FI', { maximumF
 const metres = (m: number) => `${Number(m).toLocaleString('fi-FI', { maximumFractionDigits: 2 })} m`;
 
 /**
- * Прицепы перевозчика и сцепки с разрешённой массой.
- *
- * Сцепки не хранятся — их собирает смена. Здесь перевозчик видит, что
- * даёт каждая пара «машина + прицеп» в выбранной стране: предел по
- * закону, по техпаспорту, тару и грузоподъёмность.
+ * Прицепы и полуприцепы перевозчика: вид, кузов (самосвал, тент, изотерм,
+ * реф, трал…), загрузка, грузоподъёмность и размеры. Сцепки из них
+ * собираются в конструкторе ниже (CombosView).
  */
-export function TrailersMass({ vehicles, trailers }: { vehicles: Vehicle[]; trailers: Trailer[] }) {
+export function TrailersMass({ trailers }: { vehicles?: Vehicle[]; trailers: Trailer[] }) {
   const { t } = useI18n();
-  const companyCountry = useCompanyCountry();
   const [editing, setEditing] = useState<Trailer | 'new' | null>(null);
-  const [country, setCountry] = useState<MassCountry>(isMassCountry(companyCountry) ? companyCountry : 'FI');
-  const [roadClass, setRoadClass] = useState<RoadClass | ''>('');
-
-  const classes = ROAD_CLASSES[country];
-  const effectiveClass = classes?.includes(roadClass as RoadClass) ? (roadClass as RoadClass) : classes?.[0];
-
-  const rows = useMemo(() => {
-    const motors = vehicles.filter((v) => v.vehicle_class !== 'VAN' && v.access !== 'REJECTED');
-    const list: { key: string; motor: Vehicle; trailer: Trailer | null }[] = [];
-    for (const motor of motors) {
-      /* Тягач без полуприцепа груз не возит — строки «без прицепа» у него нет (было «28 т» у трёхосного). */
-      if (motor.vehicle_class !== 'TRACTOR') list.push({ key: motor.id, motor, trailer: null });
-      for (const trailer of trailers) {
-        const m: MotorUnit = { kind: motor.vehicle_class === 'TRACTOR' ? 'TRACTOR' : 'TRUCK', axles: motor.axles };
-        const tr: TrailerUnit = { kind: trailer.kind, axles: trailer.axles, twinWheels: trailer.twin_wheels };
-        if (!combinationProblem(m, [tr])) list.push({ key: `${motor.id}-${trailer.id}`, motor, trailer });
-      }
-    }
-    return list.map((row) => {
-      const motor: MotorUnit = {
-        kind: row.motor.vehicle_class === 'TRACTOR' ? 'TRACTOR' : 'TRUCK',
-        axles: row.motor.axles,
-        grossMaxKg: row.motor.gross_max_kg,
-        tareKg: row.motor.tare_kg,
-        couplingM: row.motor.coupling_distance_m,
-      };
-      const trailerUnits: TrailerUnit[] = row.trailer
-        ? [
-            {
-              kind: row.trailer.kind,
-              axles: row.trailer.axles,
-              twinWheels: row.trailer.twin_wheels,
-              grossMaxKg: row.trailer.gross_max_kg,
-              tareKg: row.trailer.tare_kg,
-              couplingM: row.trailer.coupling_distance_m,
-            },
-          ]
-        : [];
-      return { ...row, mass: combinationMass(country, motor, trailerUnits, { roadClass: effectiveClass }) };
-    });
-  }, [vehicles, trailers, country, effectiveClass]);
-
-  const regionName = (code: string) => {
-    try {
-      return new Intl.DisplayNames([t.meta.intl], { type: 'region' }).of(code) ?? code;
-    } catch {
-      return code;
-    }
-  };
 
   return (
     <section className="mt-10">
@@ -145,85 +85,6 @@ export function TrailersMass({ vehicles, trailers }: { vehicles: Vehicle[]; trai
         </div>
       )}
 
-      <h2 className="mt-10 mb-2 border-b border-line pb-2 text-[13px] font-semibold tracking-tight text-ink-faint">{t.mass.title}</h2>
-      <p className="mb-4 max-w-2xl text-[13px] leading-relaxed text-ink-muted">{t.mass.lede}</p>
-
-      <div className="mb-4 flex flex-wrap items-end gap-3">
-        <Field label={t.mass.country}>
-          {(p) => (
-            <Select {...p} value={country} onChange={(e) => setCountry(e.target.value as MassCountry)}>
-              {MASS_COUNTRIES.map((c) => (
-                <option key={c} value={c}>
-                  {regionName(c)}
-                </option>
-              ))}
-            </Select>
-          )}
-        </Field>
-        {classes && (
-          <Field label={t.mass.roadClass}>
-            {(p) => (
-              <Select {...p} value={effectiveClass} onChange={(e) => setRoadClass(e.target.value as RoadClass)}>
-                {classes.map((c) => (
-                  <option key={c} value={c}>
-                    {t.mass.roadClasses[c]}
-                  </option>
-                ))}
-              </Select>
-            )}
-          </Field>
-        )}
-      </div>
-
-      {rows.length === 0 ? (
-        <EmptyState title={t.mass.title} description={t.mass.noCombos} />
-      ) : (
-        <div className="overflow-x-auto rounded-lg border border-line">
-          <table className="w-full min-w-[640px] text-[13px]">
-            <thead className="bg-sunken text-left text-xs text-ink-faint">
-              <tr>
-                <th className="px-3 py-2 font-medium">{t.mass.title}</th>
-                <th className="px-3 py-2 font-medium">{t.mass.axles}</th>
-                <th className="px-3 py-2 font-medium">{t.mass.limit}</th>
-                <th className="px-3 py-2 font-medium">{t.mass.tare}</th>
-                <th className="px-3 py-2 font-medium">{t.mass.payload}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map(({ key, motor, trailer, mass }) => (
-                <tr key={key} className="border-t border-line align-top">
-                  <td className="px-3 py-2">
-                    <span className="font-mono">{motor.plate}</span>
-                    {trailer ? <span className="font-mono"> + {trailer.plate}</span> : <span className="text-ink-dim"> · {t.mass.solo}</span>}
-                    {motor.body_type && <span className="ml-1 text-ink-dim">· {t.mass.bodies[motor.body_type]}</span>}
-                  </td>
-                  <td className="px-3 py-2">
-                    {mass.totalAxles}
-                    {mass.spreadM !== null && <span className="block text-xs text-ink-dim">{t.mass.spread} {metres(mass.spreadM)}</span>}
-                  </td>
-                  <td className="px-3 py-2">
-                    <span className="font-semibold">{tonnes(mass.limitKg)}</span>
-                    {mass.technicalKg !== null && mass.technicalKg < mass.legalKg && (
-                      <span className="block text-xs text-ink-dim">
-                        {t.mass.legal} {tonnes(mass.legalKg)}, {t.mass.technicalCap} {tonnes(mass.technicalKg)}
-                      </span>
-                    )}
-                    {mass.basis === 'upper' && <span className="block text-xs text-ink-dim">{t.mass.upper}</span>}
-                  </td>
-                  <td className="px-3 py-2">{mass.tareKg !== null ? tonnes(mass.tareKg) : '—'}</td>
-                  <td className="px-3 py-2">
-                    {mass.payloadKg !== null ? (
-                      <span className="font-semibold">{tonnes(mass.payloadKg)}</span>
-                    ) : (
-                      <span className="text-xs text-ink-dim">{t.mass.noTare}</span>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
     </section>
   );
 }
@@ -245,6 +106,7 @@ function TrailerForm({ trailer, onClose }: { trailer: Trailer | null; onClose: (
   const { t, locale } = useI18n();
   /* Пометки фуры (метры, MEGA, загрузка) — только у полуприцепа: по ним подбираются экспресс-заказы SEMI. */
   const [kind, setKind] = useState<TrailerKind>(trailer?.kind ?? 'FULL');
+  const [body, setBody] = useState<string>(trailer?.body_type ?? '');
   const [state, formAction, pending] = useActionState(saveTrailerAction, initial);
 
   useEffect(() => {
@@ -285,7 +147,7 @@ function TrailerForm({ trailer, onClose }: { trailer: Trailer | null; onClose: (
           </Field>
           <Field label={t.mass.body}>
             {(p) => (
-              <Select {...p} name="body_type" defaultValue={trailer?.body_type ?? ''}>
+              <Select {...p} name="body_type" value={body} onChange={(e) => setBody(e.target.value)}>
                 <option value="">{t.mass.bodyNone}</option>
                 {BODY_TYPES.map((b) => (
                   <option key={b} value={b}>
@@ -312,15 +174,41 @@ function TrailerForm({ trailer, onClose }: { trailer: Trailer | null; onClose: (
               <InputMono {...p} name="coupling_distance_m" inputMode="decimal" defaultValue={trailer?.coupling_distance_m ?? ''} placeholder="8,2" />
             )}
           </Field>
+          <Field label={t.mass.payloadKg} hint={t.mass.payloadHint}>
+            {(p) => <InputMono {...p} name="payload_kg" inputMode="numeric" defaultValue={trailer?.payload_kg ?? ''} placeholder="30000" />}
+          </Field>
+          <Field label={t.semi.trailerLdm}>
+            {(p) => <InputMono {...p} name="ldm" inputMode="decimal" defaultValue={trailer?.ldm ?? (kind === 'SEMI' ? 13.6 : '')} placeholder={kind === 'SEMI' ? '13,6' : '7,7'} />}
+          </Field>
+          <Field label={t.mass.innerLength}>
+            {(p) => <InputMono {...p} name="inner_length_m" inputMode="decimal" defaultValue={trailer?.inner_length_m ?? ''} placeholder="13,6" />}
+          </Field>
+          <Field label={t.mass.innerWidth}>
+            {(p) => <InputMono {...p} name="inner_width_m" inputMode="decimal" defaultValue={trailer?.inner_width_m ?? ''} placeholder="2,48" />}
+          </Field>
+          <Field label={t.mass.innerHeight}>
+            {(p) => <InputMono {...p} name="inner_height_m" inputMode="decimal" defaultValue={trailer?.inner_height_m ?? ''} placeholder="2,7" />}
+          </Field>
+          {LOADING_BODIES.includes(body) && (
+            <Field label={t.mass.loadingLabel} className="sm:col-span-2">
+              {() => (
+                  <div className="flex flex-wrap gap-x-5 gap-y-2">
+                    {(['TOP', 'SIDE', 'REAR'] as const).map((side) => (
+                      <label key={side} className="flex items-center gap-2 text-[13px]">
+                        <input type="checkbox" name="loading" value={side} defaultChecked={(trailer?.loading ?? []).includes(side)} />
+                        {t.mass.loading[side]}
+                      </label>
+                    ))}
+                  </div>
+              )}
+            </Field>
+          )}
           {kind === 'SEMI' && (
             <>
-              <Field label={t.semi.trailerLdm}>
-                {(p) => <InputMono {...p} name="ldm" inputMode="decimal" defaultValue={trailer?.ldm ?? 13.6} placeholder="13,6" />}
-              </Field>
               <Field label={t.semi.trailerTitle} className="sm:col-span-2">
                 {() => (
                   <div className="flex flex-wrap gap-x-5 gap-y-2">
-                    {SEMI_FEATURES.map((feature) => (
+                    {(['MEGA', 'LIFTING_ROOF'] as const).map((feature) => (
                       <label key={feature} className="flex items-center gap-2 text-[13px]">
                         <input
                           type="checkbox"

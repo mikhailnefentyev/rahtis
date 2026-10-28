@@ -27,6 +27,24 @@ export const pl = {
     consentPrivacy: 'Polityka prywatności',
   },
 
+  /* Конструктор сцепок (src/app/[locale]/carrier/fleet/CombosView.tsx). */
+  combos: {
+    title: 'Zestawy',
+    lede: 'Złóż zestawy z własnych pojazdów i przyczep: ciągnik sam do wymiany naczep, ciągnik + naczepa wywrotka, nuppi + niskopodwoziowa, ciężarówka + przyczepa plandeka… Masa dopuszczalna (SKAL), ładowność, metry ładunkowe i objętość liczą się automatycznie. Zestaw wybierasz, przyjmując zlecenie.',
+    add: 'Nowy zestaw',
+    motor: 'Pojazd',
+    trailer: 'Przyczepa',
+    none: 'Bez przyczepy',
+    save: 'Zapisz zestaw',
+    delete: 'Usuń',
+    recalc: 'Przelicz',
+    empty: 'Brak zestawów. Dodaj pojazdy i przyczepy, a potem złóż zestaw.',
+    invalid: 'Takiego zestawu nie da się złożyć: naczepa — do ciągnika, przyczepa — do ciężarówki lub nuppi, bus bez przyczepy.',
+    legal: 'Dopuszcza prawo',
+    payload: 'Ładowność',
+    kinds: { TRACTOR_SOLO: 'Ciągnik (wymiana naczep)', SEMI: 'Zestaw z naczepą', PUOLIKAS: 'Puolikas (ciągnik + naczepa wywrotka)', NUPPI: 'Nuppi', KASETTI: 'Kaseta (nuppi + przyczepa)', TRUCK: 'Ciężarówka', TRUCK_TRAILER: 'Ciężarówka + przyczepa', VAN: 'Bus' },
+  },
+
   /* Прицепы, сцепки и разрешённая масса (src/lib/fleet/mass.ts). */
   mass: {
     title: 'Zestawy i masy',
@@ -57,6 +75,13 @@ export const pl = {
     grossMaxHint: 'Z dowodu rejestracyjnego. Ogranicza masę zestawu od góry.',
     tareKg: 'Masa własna (kg)',
     tareHint: 'Wkrótce będzie pobierana automatycznie z ważenia przy wyjeździe.',
+    loadingLabel: 'Załadunek',
+    loading: { TOP: 'Od góry', SIDE: 'Z boku', REAR: 'Od tyłu' },
+    payloadKg: 'Ładowność (kg)',
+    payloadHint: 'Ile przewozi sama zabudowa według dowodu rejestracyjnego.',
+    innerLength: 'Długość wewnętrzna (m)',
+    innerWidth: 'Szerokość wewnętrzna (m)',
+    innerHeight: 'Wysokość wewnętrzna (m)',
     volumeM3: 'Objętość skrzyni (m³)',
     volumeHint: 'Objętość skrzyni w metrach sześciennych. Przy lekkim gruncie objętość może ograniczyć ładunek wcześniej niż masa.',
     couplingShort: 'sprzęg–ostatnia oś',
@@ -74,7 +99,7 @@ export const pl = {
     plateTaken: 'Przyczepa o tym numerze już istnieje.',
     roadClasses: { BK1: 'BK1 (64 t)', BK4: 'BK4 (74 t)', NET50: 'Pozostałe drogi (50 t)', NET60: 'Sieć modułowa (60 t)', STANDARD: 'Standardowa', EMS: 'Zestaw modułowy (60 t)' },
     kinds: { SEMI: 'Naczepa', FULL: 'Przyczepa', CENTER_AXLE: 'Przyczepa z osią centralną' },
-    bodies: { TIPPER: 'Wywrotka', CASSETTE: 'Kaseta', FLATBED: 'Platforma', CONTAINER: 'Podwozie kontenerowe', CURTAIN: 'Firanka', BOX: 'Furgon', TANK: 'Cysterna', OTHER: 'Inna' },
+    bodies: { TIPPER: 'Wywrotka', CASSETTE: 'Kaseta', FLATBED: 'Platforma', CONTAINER: 'Podwozie kontenerowe', CURTAIN: 'Firanka', BOX: 'Furgon', TANK: 'Cysterna', OTHER: 'Inna', REEFER: 'Chłodnia', ISOTHERM: 'Izoterma', LOWBED: 'Niskopodwoziowa (tral)' },
     problems: { SEMI_NEEDS_TRACTOR: 'Naczepa wymaga ciągnika siodłowego.', TRAILER_NEEDS_TRUCK: 'Przyczepę podpina się pod ciężarówkę.', TOO_MANY_TRAILERS: 'Najwyżej dwie przyczepy.' },
   },
 
@@ -1076,7 +1101,7 @@ export const pl = {
     TRACTOR: 'Ciągnik siodłowy',
     VAN: 'Bus · do 3,5 t',
     TRUCK: 'Ciężarówka · do 26 t',
-    TIPPER: 'Nuppi (wywrotka / kaseta) · 3–5 osi',
+    TIPPER: 'Nuppi (wywrotka) · 3–5 osi',
   },
 
   amendKind: {

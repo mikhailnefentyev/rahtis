@@ -237,3 +237,121 @@ export function overloadKg(grossKg: number, limitKg: number): number {
 export function isMassCountry(value: unknown): value is MassCountry {
   return typeof value === 'string' && (MASS_COUNTRIES as readonly string[]).includes(value);
 }
+
+/* ── Конструктор сцепок ─────────────────────────────────────────── */
+
+/** Вид сохранённой сцепки (как в базе, vehicle_combos_kind). */
+export type ComboKind = 'TRACTOR_SOLO' | 'SEMI' | 'PUOLIKAS' | 'NUPPI' | 'KASETTI' | 'TRUCK' | 'TRUCK_TRAILER' | 'VAN';
+
+export type ComboVehicle = {
+  vehicleClass: 'TRACTOR' | 'VAN' | 'TRUCK' | 'TIPPER';
+  axles: number;
+  bodyType?: string | null;
+  grossMaxKg?: number | null;
+  tareKg?: number | null;
+  couplingM?: number | null;
+  payloadKg?: number | null;
+  ldm?: number | null;
+  volumeM3?: number | null;
+  loading?: readonly string[];
+};
+
+export type ComboTrailer = {
+  kind: TrailerUnit['kind'];
+  axles: number;
+  twinWheels: boolean;
+  bodyType?: string | null;
+  grossMaxKg?: number | null;
+  tareKg?: number | null;
+  couplingM?: number | null;
+  payloadKg?: number | null;
+  ldm?: number | null;
+  volumeM3?: number | null;
+  loading?: readonly string[];
+  semiFeatures?: readonly string[];
+};
+
+export type ComboSummary = {
+  kind: ComboKind;
+  axles: number;
+  legalKg: number;
+  basis: 'exact' | 'upper';
+  /** Сколько груза: меньшее из закона (минус тара) и заявленной грузоподъёмности кузовов. */
+  payloadKg: number | null;
+  ldm: number | null;
+  volumeM3: number | null;
+  bodies: string[];
+  loading: string[];
+  semiFeatures: string[];
+};
+
+/**
+ * Какая это сцепка (пользователь 28.10.2026): тягач один — под перецепку;
+ * тягач + самосвальный полуприцеп — puolikas; нуппи один — нуппи, с
+ * прицепом — кассета; грузовик с прицепом и без; фургон.
+ * null — так не собрать: полуприцеп только к тягачу, прицеп — к грузовику
+ * или нуппи, к фургону — ничего.
+ */
+export function comboKind(vehicleClass: ComboVehicle['vehicleClass'], trailer: { kind: string; bodyType?: string | null } | null): ComboKind | null {
+  if (vehicleClass === 'VAN') return trailer ? null : 'VAN';
+  if (vehicleClass === 'TRACTOR') {
+    if (!trailer) return 'TRACTOR_SOLO';
+    if (trailer.kind !== 'SEMI') return null;
+    return trailer.bodyType === 'TIPPER' ? 'PUOLIKAS' : 'SEMI';
+  }
+  if (trailer?.kind === 'SEMI') return null;
+  if (vehicleClass === 'TIPPER') return trailer ? 'KASETTI' : 'NUPPI';
+  return trailer ? 'TRUCK_TRAILER' : 'TRUCK';
+}
+
+const sumOrNull = (values: (number | null | undefined)[]): number | null => {
+  const known = values.filter((v): v is number => typeof v === 'number' && v > 0);
+  return known.length ? Math.round(known.reduce((a, b) => a + b, 0) * 10) / 10 : null;
+};
+
+/** Что везёт сцепка: закон по стране (SKAL для FI), груз, метры, объём, кузова, загрузка. */
+export function comboSummary(country: MassCountry, vehicle: ComboVehicle, trailer: ComboTrailer | null): ComboSummary | null {
+  const kind = comboKind(vehicle.vehicleClass, trailer);
+  if (!kind) return null;
+
+  const motor: MotorUnit = {
+    kind: vehicle.vehicleClass === 'TRACTOR' ? 'TRACTOR' : 'TRUCK',
+    axles: vehicle.axles,
+    grossMaxKg: vehicle.grossMaxKg,
+    tareKg: vehicle.tareKg,
+    couplingM: vehicle.couplingM,
+  };
+  const units: TrailerUnit[] = trailer
+    ? [{ kind: trailer.kind, axles: trailer.axles, twinWheels: trailer.twinWheels, grossMaxKg: trailer.grossMaxKg, tareKg: trailer.tareKg, couplingM: trailer.couplingM }]
+    : [];
+  const mass = combinationMass(country, motor, units);
+
+  /* Заявленный груз кузовов: у тягача своего кузова нет — считается только полуприцеп. */
+  const declared =
+    kind === 'TRACTOR_SOLO'
+      ? null
+      : vehicle.vehicleClass === 'TRACTOR'
+        ? (trailer?.payloadKg ?? null)
+        : trailer
+          ? vehicle.payloadKg && trailer.payloadKg
+            ? vehicle.payloadKg + trailer.payloadKg
+            : null
+          : (vehicle.payloadKg ?? null);
+  const candidates = [kind === 'TRACTOR_SOLO' ? null : mass.payloadKg, declared].filter((v): v is number => v !== null && v > 0);
+
+  const bodies = [vehicle.vehicleClass === 'TRACTOR' ? null : vehicle.bodyType, trailer?.bodyType].filter((b): b is string => Boolean(b));
+  const loading = [...new Set([...(vehicle.loading ?? []), ...(trailer?.loading ?? [])])];
+
+  return {
+    kind,
+    axles: mass.totalAxles,
+    legalKg: mass.legalKg,
+    basis: mass.basis,
+    payloadKg: candidates.length ? Math.min(...candidates) : null,
+    ldm: kind === 'TRACTOR_SOLO' ? null : sumOrNull([vehicle.vehicleClass === 'TRACTOR' ? null : vehicle.ldm, trailer?.ldm]),
+    volumeM3: kind === 'TRACTOR_SOLO' ? null : sumOrNull([vehicle.vehicleClass === 'TRACTOR' ? null : vehicle.volumeM3, trailer?.volumeM3]),
+    bodies: [...new Set(bodies)],
+    loading,
+    semiFeatures: [...(trailer?.semiFeatures ?? [])],
+  };
+}

@@ -27,6 +27,24 @@ export const sv = {
     consentPrivacy: 'Integritetspolicy',
   },
 
+  /* Конструктор сцепок (src/app/[locale]/carrier/fleet/CombosView.tsx). */
+  combos: {
+    title: 'Ekipage',
+    lede: 'Bygg ekipage av egna fordon och släp: dragbil ensam för trailerbyten, dragbil + tipptrailer, nuppi + lågbädd, lastbil + kapellsläp… Laglig vikt (SKAL), lastförmåga, flakmeter och volym räknas automatiskt. Ekipaget väljs när du tar en beställning.',
+    add: 'Nytt ekipage',
+    motor: 'Fordon',
+    trailer: 'Släp',
+    none: 'Utan släp',
+    save: 'Spara ekipaget',
+    delete: 'Ta bort',
+    recalc: 'Räkna om',
+    empty: 'Inga ekipage ännu. Lägg till fordon och släp och bygg sedan ett ekipage.',
+    invalid: 'Det här ekipaget går inte att bygga: påhängsvagn till dragbil, släp till lastbil eller nuppi, skåpbil utan släp.',
+    legal: 'Laglig gräns',
+    payload: 'Lastförmåga',
+    kinds: { TRACTOR_SOLO: 'Dragbil (trailerbyte)', SEMI: 'Påhängsekipage', PUOLIKAS: 'Puolikas (dragbil + tipptrailer)', NUPPI: 'Nuppi', KASETTI: 'Kassett (nuppi + släp)', TRUCK: 'Lastbil', TRUCK_TRAILER: 'Lastbil + släp', VAN: 'Skåpbil' },
+  },
+
   /* Прицепы, сцепки и разрешённая масса (src/lib/fleet/mass.ts). */
   mass: {
     title: 'Fordonståg och vikter',
@@ -57,6 +75,13 @@ export const sv = {
     grossMaxHint: 'Från registreringsbeviset. Sätter taket för fordonstågets vikt.',
     tareKg: 'Tjänstevikt (kg)',
     tareHint: 'Framöver hämtas den automatiskt från tomvägningen.',
+    loadingLabel: 'Lastning',
+    loading: { TOP: 'Uppifrån', SIDE: 'Från sidan', REAR: 'Bakifrån' },
+    payloadKg: 'Lastförmåga (kg)',
+    payloadHint: 'Vad flaket själv bär enligt registreringsbeviset.',
+    innerLength: 'Invändig längd (m)',
+    innerWidth: 'Invändig bredd (m)',
+    innerHeight: 'Invändig höjd (m)',
     volumeM3: 'Flakvolym (m³)',
     volumeHint: 'Flakets volym i kubikmeter. Med lätta massor kan volymen begränsa lasten före vikten.',
     couplingShort: 'koppling–sista axel',
@@ -74,7 +99,7 @@ export const sv = {
     plateTaken: 'Ett släp med detta registreringsnummer finns redan.',
     roadClasses: { BK1: 'BK1 (64 t)', BK4: 'BK4 (74 t)', NET50: 'Övriga vägar (50 t)', NET60: 'Modulnät (60 t)', STANDARD: 'Standard', EMS: 'Modulekipage (60 t)' },
     kinds: { SEMI: 'Påhängsvagn', FULL: 'Släpvagn', CENTER_AXLE: 'Centralaxelsläp' },
-    bodies: { TIPPER: 'Tipp', CASSETTE: 'Kassett', FLATBED: 'Flak', CONTAINER: 'Containerchassi', CURTAIN: 'Kapell', BOX: 'Skåp', TANK: 'Tank', OTHER: 'Annat' },
+    bodies: { TIPPER: 'Tipp', CASSETTE: 'Kassett', FLATBED: 'Flak', CONTAINER: 'Containerchassi', CURTAIN: 'Kapell', BOX: 'Skåp', TANK: 'Tank', OTHER: 'Annat', REEFER: 'Kyl', ISOTHERM: 'Isoterm', LOWBED: 'Lågbädd' },
     problems: { SEMI_NEEDS_TRACTOR: 'En påhängsvagn behöver en dragbil.', TRAILER_NEEDS_TRUCK: 'En släpvagn kopplas till en lastbil.', TOO_MANY_TRAILERS: 'Högst två släp.' },
   },
 
@@ -1076,7 +1101,7 @@ export const sv = {
     TRACTOR: 'Dragbil',
     VAN: 'Skåpbil · upp till 3,5 t',
     TRUCK: 'Lastbil · upp till 26 t',
-    TIPPER: 'Nuppi (tipp / kassett) · 3–5 axlar',
+    TIPPER: 'Nuppi (tippbil) · 3–5 axlar',
   },
 
   amendKind: {

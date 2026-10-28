@@ -27,6 +27,24 @@ export const lt = {
     consentPrivacy: 'Privatumo politika',
   },
 
+  /* Конструктор сцепок (src/app/[locale]/carrier/fleet/CombosView.tsx). */
+  combos: {
+    title: 'Junginiai',
+    lede: 'Sudarykite junginius iš savo automobilių ir priekabų: vilkikas vienas priekabų keitimui, vilkikas + savivartė puspriekabė, nuppi + tralas, sunkvežimis + tentinė priekaba… Leistina masė (SKAL), keliamoji galia, krovimo metrai ir tūris apskaičiuojami automatiškai. Junginį pasirenkate imdami užsakymą.',
+    add: 'Naujas junginys',
+    motor: 'Automobilis',
+    trailer: 'Priekaba',
+    none: 'Be priekabos',
+    save: 'Išsaugoti junginį',
+    delete: 'Ištrinti',
+    recalc: 'Perskaičiuoti',
+    empty: 'Junginių dar nėra. Pridėkite automobilius ir priekabas, tada sudarykite junginį.',
+    invalid: 'Tokio junginio sudaryti negalima: puspriekabė — vilkikui, priekaba — sunkvežimiui arba nuppi, furgonui priekabos nėra.',
+    legal: 'Leidžia įstatymas',
+    payload: 'Keliamoji galia',
+    kinds: { TRACTOR_SOLO: 'Vilkikas (priekabų keitimas)', SEMI: 'Puspriekabės junginys', PUOLIKAS: 'Puolikas (vilkikas + savivartė puspriekabė)', NUPPI: 'Nuppi', KASETTI: 'Kasetė (nuppi + priekaba)', TRUCK: 'Sunkvežimis', TRUCK_TRAILER: 'Sunkvežimis + priekaba', VAN: 'Furgonas' },
+  },
+
   /* Прицепы, сцепки и разрешённая масса (src/lib/fleet/mass.ts). */
   mass: {
     title: 'Junginiai ir masės',
@@ -57,6 +75,13 @@ export const lt = {
     grossMaxHint: 'Iš registracijos liudijimo. Riboja junginio masę iš viršaus.',
     tareKg: 'Nuosava masė (kg)',
     tareHint: 'Vėliau ji bus automatiškai imama iš svėrimo išvažiuojant.',
+    loadingLabel: 'Pakrovimas',
+    loading: { TOP: 'Iš viršaus', SIDE: 'Iš šono', REAR: 'Iš galo' },
+    payloadKg: 'Keliamoji galia (kg)',
+    payloadHint: 'Ką kėbulas pats veža pagal registracijos liudijimą.',
+    innerLength: 'Vidinis ilgis (m)',
+    innerWidth: 'Vidinis plotis (m)',
+    innerHeight: 'Vidinis aukštis (m)',
     volumeM3: 'Kėbulo tūris (m³)',
     volumeHint: 'Kėbulo tūris kubiniais metrais. Lengvam gruntui tūris gali riboti krovinį anksčiau nei masė.',
     couplingShort: 'sukabinimas–paskutinė ašis',
@@ -74,7 +99,7 @@ export const lt = {
     plateTaken: 'Priekaba su šiuo numeriu jau yra.',
     roadClasses: { BK1: 'BK1 (64 t)', BK4: 'BK4 (74 t)', NET50: 'Kiti keliai (50 t)', NET60: 'Modulinis tinklas (60 t)', STANDARD: 'Įprastas', EMS: 'Modulinis junginys (60 t)' },
     kinds: { SEMI: 'Puspriekabė', FULL: 'Priekaba', CENTER_AXLE: 'Centrinės ašies priekaba' },
-    bodies: { TIPPER: 'Savivartis', CASSETTE: 'Kasetė', FLATBED: 'Bortinė platforma', CONTAINER: 'Konteinerių platforma', CURTAIN: 'Tentas', BOX: 'Furgonas', TANK: 'Cisterna', OTHER: 'Kita' },
+    bodies: { TIPPER: 'Savivartis', CASSETTE: 'Kasetė', FLATBED: 'Bortinė platforma', CONTAINER: 'Konteinerių platforma', CURTAIN: 'Tentas', BOX: 'Furgonas', TANK: 'Cisterna', OTHER: 'Kita', REEFER: 'Refrižeratorius', ISOTHERM: 'Izoterminis', LOWBED: 'Žemaplatformė (tralas)' },
     problems: { SEMI_NEEDS_TRACTOR: 'Puspriekabei reikia vilkiko.', TRAILER_NEEDS_TRUCK: 'Priekaba kabinama prie sunkvežimio, ne prie vilkiko.', TOO_MANY_TRAILERS: 'Ne daugiau kaip dvi priekabos.' },
   },
 
@@ -1076,7 +1101,7 @@ export const lt = {
     TRACTOR: 'Vilkikas',
     VAN: 'Furgonas · iki 3,5 t',
     TRUCK: 'Sunkvežimis · iki 26 t',
-    TIPPER: 'Nuppi (savivartis / kasetė) · 3–5 ašys',
+    TIPPER: 'Nuppi (savivartis) · 3–5 ašys',
   },
 
   amendKind: {
