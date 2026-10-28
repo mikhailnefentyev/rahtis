@@ -162,13 +162,14 @@ export default async function DeskPage({
       : { data: [] };
   /* Прицеп рейса (конструктор сцепок) и прицепы компании — выбрать или сменить в карточке. */
   const [{ data: tripRows }, { data: companyTrailers }] = await Promise.all([
+    /* Колонка прицепа рейса закрыта (заказчику назначение не видно) — своё перевозчик берёт функцией. */
     assignedIds.length
-      ? supabase.from('orders').select('id, assigned_trailer_id, assigned_vehicle_id').in('id', assignedIds)
-      : Promise.resolve({ data: [] as { id: string; assigned_trailer_id: string | null; assigned_vehicle_id: string | null }[] }),
+      ? supabase.rpc('carrier_trip_trailers', { p_order_ids: assignedIds })
+      : Promise.resolve({ data: [] as { order_id: string; trailer_id: string | null }[] }),
     supabase.from('trailers').select('id, plate, kind, body_type, axles').eq('company_id', company.id).order('plate'),
   ]);
   const tripTrailers: Record<string, string | null> = Object.fromEntries(
-    (tripRows ?? []).map((o) => [o.id, o.assigned_trailer_id]),
+    (tripRows ?? []).map((o) => [o.order_id, o.trailer_id]),
   );
 
   const ownByOrder: Record<string, string> = Object.fromEntries(

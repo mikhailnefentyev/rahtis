@@ -5266,6 +5266,13 @@ export type Database = {
         }
         Returns: string
       }
+      carrier_trip_trailers: {
+        Args: { p_order_ids: string[] }
+        Returns: {
+          order_id: string
+          trailer_id: string
+        }[]
+      }
       carrier_own_vehicles: {
         Args: never
         Returns: {

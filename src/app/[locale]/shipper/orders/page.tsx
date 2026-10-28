@@ -46,7 +46,7 @@ export default async function OrdersPage({
   const { data: orders } = await supabase
     .from('orders')
     .select(
-      'id,ref,shipper_ref,order_type,haul_kind,container_feet,ldm,semi_features,tipper_config,site_pricing,site_rate_cents,planned_qty,material_code,planned_volume_m3,required_body,required_loading,assigned_trailer_id,trailer,trailer_plate,distance_km,rate_cents,comment,status,published_at,deadline_at,created_at,distance_source,distance_auto_km,route_geometry,route_bounds,dispatch_mode,contract_party,group_until,group_released_at,group_vehicle_ids,desk_contract',
+      'id,ref,shipper_ref,order_type,haul_kind,container_feet,ldm,semi_features,tipper_config,site_pricing,site_rate_cents,planned_qty,material_code,planned_volume_m3,required_body,required_loading,trailer,trailer_plate,distance_km,rate_cents,comment,status,published_at,deadline_at,created_at,distance_source,distance_auto_km,route_geometry,route_bounds,dispatch_mode,contract_party,group_until,group_released_at,group_vehicle_ids,desk_contract',
     )
     .eq('shipper_company_id', company.id)
     /*
