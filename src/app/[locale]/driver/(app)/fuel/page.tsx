@@ -26,8 +26,9 @@ export default async function DriverFuel({ params }: { params: Promise<{ locale:
 
   return (
     <main className="flex flex-col gap-4 pb-6">
-      <Link href={`/${locale}/driver`} className="text-[15px] font-semibold text-accent">
-        ‹ {t.driverApp.tasks}
+      {/* Назад — как на экране рейса: вложенные экраны «Заданий» выглядят одинаково. */}
+      <Link href={`/${locale}/driver`} className="flex h-12 items-center text-[16px] font-semibold text-accent">
+        ← {t.driverApp.back}
       </Link>
       <h1 className="text-2xl font-semibold tracking-tight">{t.fuelDriver.title}</h1>
       {state?.vehicle ? (

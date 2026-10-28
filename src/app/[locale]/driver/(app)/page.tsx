@@ -56,45 +56,18 @@ export default async function DriverHome({
       {/* Без уведомлений прямой заказ водитель увидит, только открыв приложение. */}
       <PushSetup compact />
 
-      {/*
-        Тренажёр — первым блоком: при пустом списке заданий он иначе висел
-        посреди экрана под «заданий нет». Одна строка, не больше карточки
-        смены: задания и смена остаются главным на экране.
-      */}
-      <Link
-        href={`/${locale}/driver/training`}
-        className="flex min-h-16 items-center gap-3 rounded-card border border-line bg-surface px-4 py-3"
-      >
-        <span className="flex size-11 shrink-0 items-center justify-center rounded-control bg-accent-wash text-accent">
-          <GaugeIcon />
-        </span>
-        <span className="min-w-0 flex-1">
-          <span className="block text-[16px] font-semibold">{t.training.title}</span>
-          <span className="block text-[14px] leading-snug text-ink-muted">{t.training.entryHint}</span>
-        </span>
-        <span aria-hidden className="text-xl text-accent">
-          ›
-        </span>
-      </Link>
-
+      {/* Порядок — как идёт день: смена, быстрые действия, работа. */}
       <ShiftBar shift={driver.shift} />
 
-      {/* Заправка — у колонки, одной кнопкой с главного экрана (как в LogiApp). Нижнее меню уже полное. */}
-      <Link
-        href={`/${locale}/driver/fuel`}
-        className="flex min-h-16 items-center gap-3 rounded-card border border-line bg-surface px-4 py-3"
-      >
-        <span className="flex size-11 shrink-0 items-center justify-center rounded-control bg-accent-wash text-accent">
-          <FuelIcon />
-        </span>
-        <span className="min-w-0 flex-1">
-          <span className="block text-[16px] font-semibold">{t.fuelDriver.entry}</span>
-          <span className="block text-[14px] leading-snug text-ink-muted">{t.fuelDriver.entryHint}</span>
-        </span>
-        <span aria-hidden className="text-xl text-accent">
-          ›
-        </span>
-      </Link>
+      {/*
+        Быстрые действия — плитками в один ряд, не выше карточки смены:
+        заправка — у колонки одной кнопкой, тренажёр — в свободную минуту.
+        Задания и смена остаются главным на экране.
+      */}
+      <div className="grid grid-cols-2 gap-3">
+        <QuickTile href={`/${locale}/driver/fuel`} icon={<FuelIcon />} label={t.fuelDriver.entry} />
+        <QuickTile href={`/${locale}/driver/training`} icon={<GaugeIcon />} label={t.training.title} />
+      </div>
 
       <TaskTabs showDone={showDone} />
 
@@ -226,6 +199,19 @@ async function SiteJobCard({ job, locale }: { job: SiteState['jobs'][number]; lo
         </Link>
       </div>
     </article>
+  );
+}
+
+/** Плитка быстрого действия: значок и подпись, во всю высоту под палец. */
+function QuickTile({ href, icon, label }: { href: string; icon: React.ReactNode; label: string }) {
+  return (
+    <Link
+      href={href}
+      className="flex min-h-20 flex-col items-start justify-between gap-2 rounded-card border border-line bg-surface px-4 py-3"
+    >
+      <span className="flex size-10 items-center justify-center rounded-control bg-accent-wash text-accent">{icon}</span>
+      <span className="text-[16px] leading-tight font-semibold">{label}</span>
+    </Link>
   );
 }
 
