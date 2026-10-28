@@ -5266,13 +5266,6 @@ export type Database = {
         }
         Returns: string
       }
-      carrier_trip_trailers: {
-        Args: { p_order_ids: string[] }
-        Returns: {
-          order_id: string
-          trailer_id: string
-        }[]
-      }
       carrier_own_vehicles: {
         Args: never
         Returns: {
@@ -5402,6 +5395,13 @@ export type Database = {
       carrier_site_approve_day: {
         Args: { p_day_id: string }
         Returns: undefined
+      }
+      carrier_trip_trailers: {
+        Args: { p_order_ids: string[] }
+        Returns: {
+          order_id: string
+          trailer_id: string
+        }[]
       }
       carrier_update_client: {
         Args: {
