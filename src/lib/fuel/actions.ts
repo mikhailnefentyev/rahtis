@@ -33,6 +33,17 @@ function toLocale(value: FormDataEntryValue | null): Locale {
 
 const str = (form: FormData, key: string) => String(form.get(key) ?? '').trim();
 
+/**
+ * Топливо входит в подписку (как свои рейсы). Страница закрыта, но
+ * действия зовутся и напрямую — проверяем в каждом, до любой работы и
+ * до вызова OpenAI. База проверяет то же самое (app.own_orders_allowed).
+ */
+async function hasAccess(): Promise<boolean> {
+  const supabase = await createClient();
+  const { data } = await supabase.rpc('own_orders_access');
+  return data === true;
+}
+
 function revalidateFuel(locale: Locale) {
   revalidatePath(`/${locale}/carrier/fuel`, 'layout');
 }
@@ -49,6 +60,7 @@ export async function uploadFuelReportAction(_previous: FuelUploadState, formDat
   const t = await getDictionary(locale);
   const viewer = await requireRole(locale, 'CARRIER');
   const company = viewer.company!;
+  if (!(await hasAccess())) return { error: t.fuel.locked };
 
   const file = formData.get('file');
   const csvByName = file instanceof File && /\.(csv|txt)$/i.test(file.name);
@@ -123,6 +135,10 @@ export async function uploadFuelReportAction(_previous: FuelUploadState, formDat
 export async function confirmFuelImportAction(formData: FormData): Promise<void> {
   const locale = toLocale(formData.get('locale'));
   const viewer = await requireRole(locale, 'CARRIER');
+  if (!(await hasAccess())) {
+    await flashError((await getDictionary(locale)).fuel.locked);
+    redirect(`/${locale}/carrier/fuel`);
+  }
   const supabase = await createClient();
   const id = str(formData, 'import_id');
 
@@ -198,6 +214,7 @@ export async function addFuelEntryAction(_previous: FuelEntryState, formData: Fo
   const t = await getDictionary(locale);
   const viewer = await requireRole(locale, 'CARRIER');
   const company = viewer.company!;
+  if (!(await hasAccess())) return { error: t.fuel.locked, done: false };
 
   const product = str(formData, 'product');
   const quantity = parseNumber(str(formData, 'quantity'));

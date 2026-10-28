@@ -426,6 +426,7 @@ async function addFuel(formData: FormData): Promise<EventResult> {
   const supabase = await createClient();
   const file = formData.get('file');
   let receipt: string | null = null;
+  let created = false;
 
   if (file instanceof File && file.size > 0) {
     if (file.size > 10 * 1024 * 1024 || !PHOTO_TYPES.includes(file.type)) return { status: 'rejected' };
@@ -436,10 +437,20 @@ async function addFuel(formData: FormData): Promise<EventResult> {
 
     const ext = file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
     receipt = `${company}/receipts/${eventId}.${ext}`;
+    /*
+     * Без перезаписи: повтор того же действия с другим файлом не должен
+     * подменить уже сохранённый чек. Файл уже есть — это повтор из
+     * очереди (первая попытка положила его и не дождалась ответа базы).
+     */
     const { error: uploadError } = await createAdminClient()
       .storage.from('fuel-docs')
-      .upload(receipt, file, { contentType: file.type, upsert: true });
-    if (uploadError) return { status: 'retry' };
+      .upload(receipt, file, { contentType: file.type, upsert: false });
+    if (uploadError) {
+      const exists = /exists|duplicate/i.test(uploadError.message) || (uploadError as { statusCode?: string }).statusCode === '409';
+      if (!exists) return { status: 'retry' };
+    } else {
+      created = true;
+    }
   }
 
   const { error } = await supabase.rpc('driver_fuel_add', {
@@ -449,7 +460,8 @@ async function addFuel(formData: FormData): Promise<EventResult> {
   });
 
   const result = outcome(error);
-  if (result.status === 'rejected' && receipt) await createAdminClient().storage.from('fuel-docs').remove([receipt]);
+  /* Убираем только файл, который положил этот запрос: чужой (прежний) чек не трогаем. */
+  if (result.status === 'rejected' && receipt && created) await createAdminClient().storage.from('fuel-docs').remove([receipt]);
   return result;
 }
 
