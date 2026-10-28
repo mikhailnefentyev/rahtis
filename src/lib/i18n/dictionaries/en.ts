@@ -73,6 +73,8 @@ export const en = {
     grossMaxHint: 'From the registration certificate. Caps the combination weight.',
     tareKg: 'Empty weight (kg)',
     tareHint: 'Soon this will come automatically from the outbound weighing.',
+    volumeM3: 'Body volume (m³)',
+    volumeHint: 'Volume of the body in cubic metres. With light soil the volume can limit the load before the mass does.',
     couplingShort: 'coupling–last axle',
     spread: 'axle spread',
     lengthM: 'Length (m)',
@@ -1098,6 +1100,13 @@ export const en = {
       dropSection: 'Where the cargo is delivered',
       unitState: 'Cargo',
     },
+    SEMI: {
+      stopPickup: 'Cargo pickup',
+      stopReturn: 'Delivery',
+      pickupSection: 'Where the cargo is picked up',
+      dropSection: 'Where the cargo is delivered',
+      unitState: 'Cargo',
+    },
   },
 
   presence: {
@@ -1106,17 +1115,30 @@ export const en = {
     mapLabel: 'Map of cities with vehicles',
   },
 
+  /* Полный полуприцеп в экспресс-доставке (PPV-yhdistelmä, src/lib/orders/haul.ts). */
+  semi: {
+    title: 'Semi-trailer',
+    standard: 'Standard',
+    hint: 'Full semi-trailer, 13.6 loading metres, up to 30 t. Pick what the load needs: a MEGA trailer or a special way of loading.',
+    trailerTitle: 'Equipment (semi-trailer)',
+    tooHeavy: 'A semi-trailer combination takes at most 30,000 kg.',
+    trailerLdm: 'Loading metres',
+    features: { MEGA: 'MEGA', SIDE_LOADING: 'Side loading', TOP_LOADING: 'Top loading', LIFTING_ROOF: 'Lifting roof' },
+  },
+
   haulKind: {
     TRAILER: 'Semi-trailer',
     CONTAINER: 'Container',
     VAN: 'Van',
     TRUCK: 'Truck',
+    SEMI: 'Semi-trailer combination 13.6 m',
   },
 
   vehicleClass: {
     TRACTOR: 'Tractor unit',
     VAN: 'Van · up to 3.5 t',
     TRUCK: 'Truck · up to 26 t',
+    TIPPER: 'Tipper / cassette truck · 3–5 axles',
   },
 
   amendKind: {
@@ -2185,6 +2207,7 @@ export const en = {
     adrNo: 'No ADR permit',
     capacity: 'Payload',
     capacityHint: 'A two-axle tractor takes 25 t, a three-axle one 32 t.',
+    tipperAxlesHint: 'Mass by axles (Finland): 3 axles 28 t, 4 – 35 t, 5 – 42 t. A cassette truck with a trailer takes more – add the trailer under Trailers.',
     containerFeet: 'Container chassis',
     containerFeetHint:
       'Which container lengths this rig can take. Leave empty if it doesn’t haul containers.',

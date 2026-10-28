@@ -23,7 +23,7 @@ const STATUS_DOC =
 const ORDER_TYPE_DOC =
   'TRAILER_SWAP (TRAILER, CONTAINER): PICKUP → at least one DELIVERY / EXTRA_LOAD / EXTRA_UNLOAD → TRAILER_RETURN; or a transfer run, PICKUP → TRAILER_RETURN with nothing in between (the unit is only moved; closed with a handover photo instead of a waybill). ONE_WAY: PICKUP → at least one DELIVERY / EXTRA_LOAD / EXTRA_UNLOAD; for VAN and TRUCK always ONE_WAY with PICKUP → DELIVERY. ROUND_TRIP: like ONE_WAY, the unit comes back — end with TRAILER_RETURN.';
 const HAUL_DOC =
-  'TRAILER — semi-trailer, CONTAINER — container (container_feet required); both need trailer_plate. VAN, TRUCK — express inside the vehicle; ldm and cargo_weight_kg on at least one stop required.';
+  'TRAILER — semi-trailer, CONTAINER — container (container_feet required); both need trailer_plate. VAN, TRUCK — express inside the vehicle; SEMI — full semi-trailer 13.6 m up to 30 t (carrier tractor + own semi-trailer; optional semi_features: MEGA, SIDE_LOADING, TOP_LOADING, LIFTING_ROOF). For VAN, TRUCK, SEMI ldm and cargo_weight_kg on at least one stop are required.';
 const ROLE_DOC =
   'PICKUP — collect the unit or load the goods, always first. DELIVERY — unloading at the consignee (company_name required). EXTRA_LOAD — extra loading on the way (consignee: whom it is for). EXTRA_UNLOAD — extra unloading on the way. TRAILER_RETURN — where the unit is left (trailer_loaded: empty or loaded).';
 const CLAIM_DOC =
@@ -570,7 +570,7 @@ export function openApi(serverUrl: string) {
             shipper_ref: nullable('string', { description: 'Your own reference.' }),
             status: { enum: STATUS, description: STATUS_DOC },
             order_type: { enum: ['TRAILER_SWAP', 'ROUND_TRIP', 'ONE_WAY'], description: ORDER_TYPE_DOC },
-            haul_kind: { enum: ['TRAILER', 'CONTAINER', 'VAN', 'TRUCK'], description: HAUL_DOC },
+            haul_kind: { enum: ['TRAILER', 'CONTAINER', 'VAN', 'TRUCK', 'SEMI'], description: HAUL_DOC },
             container_feet: nullable('integer'),
             ldm: nullable('number'),
             trailer: nullable('string'),
@@ -774,7 +774,7 @@ export function openApi(serverUrl: string) {
           required: ['order_type', 'rate', 'stops'],
           properties: {
             order_type: { enum: ['TRAILER_SWAP', 'ROUND_TRIP', 'ONE_WAY'], description: ORDER_TYPE_DOC },
-            haul_kind: { enum: ['TRAILER', 'CONTAINER', 'VAN', 'TRUCK'], default: 'TRAILER', description: HAUL_DOC },
+            haul_kind: { enum: ['TRAILER', 'CONTAINER', 'VAN', 'TRUCK', 'SEMI'], default: 'TRAILER', description: HAUL_DOC },
             rate: {
               type: 'object',
               required: ['amount'],
@@ -940,7 +940,7 @@ export function openApi(serverUrl: string) {
             id: { type: 'string', format: 'uuid', description: 'Use as vehicle_id in POST /orders/{ref}/assign.' },
             plate: { type: 'string' },
             make: nullable('string'),
-            vehicle_class: { enum: ['TRACTOR', 'VAN', 'TRUCK'] },
+            vehicle_class: { enum: ['TRACTOR', 'VAN', 'TRUCK', 'TIPPER'] },
             euro_class: nullable('string'),
             axles: nullable('integer'),
             payload_kg: nullable('integer'),

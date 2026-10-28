@@ -15,6 +15,7 @@ import {
   type TrailerUnit,
 } from '@/lib/fleet/mass';
 import { useCompanyCountry, useI18n } from '@/lib/i18n/provider';
+import { SEMI_FEATURES, isSemiFeature } from '@/lib/orders/haul';
 import type { BodyType, Trailer, TrailerKind, Vehicle } from '@/types/db';
 
 const BODY_TYPES: BodyType[] = ['TIPPER', 'CASSETTE', 'FLATBED', 'CONTAINER', 'CURTAIN', 'BOX', 'TANK', 'OTHER'];
@@ -115,8 +116,17 @@ export function TrailersMass({ vehicles, trailers }: { vehicles: Vehicle[]; trai
                   <span className="text-ink-muted">· {trailer.axles} {t.mass.axles.toLowerCase()}</span>
                   {trailer.body_type && <Badge tone="neutral">{t.mass.bodies[trailer.body_type]}</Badge>}
                   {trailer.twin_wheels && <Badge tone="info">{t.mass.twinWheels}</Badge>}
+                  {trailer.kind === 'SEMI' &&
+                    (trailer.semi_features ?? []).map((feature) =>
+                      isSemiFeature(feature) ? (
+                        <Badge key={feature} tone="neutral">
+                          {t.semi.features[feature]}
+                        </Badge>
+                      ) : null,
+                    )}
                   {trailer.tare_kg && <span className="text-ink-dim">· {t.mass.tare} {tonnes(trailer.tare_kg)}</span>}
                   {trailer.length_m && <span className="text-ink-dim">· {metres(trailer.length_m)}</span>}
+                  {trailer.body_volume_m3 && <span className="text-ink-dim">· {Number(trailer.body_volume_m3).toLocaleString('fi-FI')} m³</span>}
                   {trailer.coupling_distance_m && (
                     <span className="text-ink-dim">
                       · {t.mass.couplingShort} {metres(trailer.coupling_distance_m)}
@@ -233,6 +243,8 @@ function DeleteTrailer({ id }: { id: string }) {
 
 function TrailerForm({ trailer, onClose }: { trailer: Trailer | null; onClose: () => void }) {
   const { t, locale } = useI18n();
+  /* Пометки фуры (метры, MEGA, загрузка) — только у полуприцепа: по ним подбираются экспресс-заказы SEMI. */
+  const [kind, setKind] = useState<TrailerKind>(trailer?.kind ?? 'FULL');
   const [state, formAction, pending] = useActionState(saveTrailerAction, initial);
 
   useEffect(() => {
@@ -251,7 +263,7 @@ function TrailerForm({ trailer, onClose }: { trailer: Trailer | null; onClose: (
           </Field>
           <Field label={t.mass.trailerKind} required>
             {(p) => (
-              <Select {...p} name="kind" required defaultValue={trailer?.kind ?? 'FULL'}>
+              <Select {...p} name="kind" required value={kind} onChange={(e) => setKind(e.target.value as TrailerKind)}>
                 {KINDS.map((k) => (
                   <option key={k} value={k}>
                     {t.mass.kinds[k]}
@@ -289,6 +301,9 @@ function TrailerForm({ trailer, onClose }: { trailer: Trailer | null; onClose: (
           <Field label={t.mass.tareKg} hint={t.mass.tareHint}>
             {(p) => <InputMono {...p} name="tare_kg" inputMode="numeric" defaultValue={trailer?.tare_kg ?? ''} placeholder="9000" />}
           </Field>
+          <Field label={t.mass.volumeM3} hint={t.mass.volumeHint}>
+            {(p) => <InputMono {...p} name="body_volume_m3" inputMode="decimal" defaultValue={trailer?.body_volume_m3 ?? ''} placeholder="24" />}
+          </Field>
           <Field label={t.mass.lengthM} hint={t.mass.lengthHint}>
             {(p) => <InputMono {...p} name="length_m" inputMode="decimal" defaultValue={trailer?.length_m ?? ''} placeholder="13,6" />}
           </Field>
@@ -297,6 +312,30 @@ function TrailerForm({ trailer, onClose }: { trailer: Trailer | null; onClose: (
               <InputMono {...p} name="coupling_distance_m" inputMode="decimal" defaultValue={trailer?.coupling_distance_m ?? ''} placeholder="8,2" />
             )}
           </Field>
+          {kind === 'SEMI' && (
+            <>
+              <Field label={t.semi.trailerLdm}>
+                {(p) => <InputMono {...p} name="ldm" inputMode="decimal" defaultValue={trailer?.ldm ?? 13.6} placeholder="13,6" />}
+              </Field>
+              <Field label={t.semi.trailerTitle} className="sm:col-span-2">
+                {() => (
+                  <div className="flex flex-wrap gap-x-5 gap-y-2">
+                    {SEMI_FEATURES.map((feature) => (
+                      <label key={feature} className="flex items-center gap-2 text-[13px]">
+                        <input
+                          type="checkbox"
+                          name="semi_features"
+                          value={feature}
+                          defaultChecked={trailer?.semi_features?.includes(feature) ?? false}
+                        />
+                        {t.semi.features[feature]}
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </Field>
+            </>
+          )}
           <Field label={t.mass.twinWheels} hint={t.mass.twinWheelsHint} className="sm:col-span-2">
             {() => (
               <label className="flex items-center gap-2 text-[13px]">

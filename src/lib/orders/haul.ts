@@ -12,7 +12,25 @@ export type HaulKind = Database['public']['Enums']['haul_kind'];
  * список выписан руками, а рядом стоит `satisfies` — он и уронит сборку,
  * если в базе появится пятая единица, а здесь нет.
  */
-export const HAUL_KINDS = ['TRAILER', 'CONTAINER', 'VAN', 'TRUCK'] as const satisfies readonly HaulKind[];
+export const HAUL_KINDS = ['TRAILER', 'CONTAINER', 'VAN', 'TRUCK', 'SEMI'] as const satisfies readonly HaulKind[];
+
+/**
+ * Полный полуприцеп (PPV-yhdistelmä) в экспресс-доставке: 13,6 м, до 30 т.
+ * Пометки — те же, что в базе (orders_semi_features, trailers_semi_features).
+ * Пусто — обычный полуприцеп.
+ */
+export const SEMI_FEATURES = ['MEGA', 'SIDE_LOADING', 'TOP_LOADING', 'LIFTING_ROOF'] as const;
+export type SemiFeature = (typeof SEMI_FEATURES)[number];
+export const SEMI_LDM = 13.6;
+
+export function isSemiFeature(value: unknown): value is SemiFeature {
+  return typeof value === 'string' && (SEMI_FEATURES as readonly string[]).includes(value);
+}
+
+/** Какой машиной возят: тягач — перецеп, контейнер и полный полуприцеп; фургон и грузовик — свой экспресс. */
+export function haulNeedsTractor(haulKind: HaulKind): boolean {
+  return haulKind === 'TRAILER' || haulKind === 'CONTAINER' || haulKind === 'SEMI';
+}
 
 /**
  * Есть ли у рейса единица, которую забирают и возвращают.
@@ -29,7 +47,7 @@ export const HAUL_KINDS = ['TRAILER', 'CONTAINER', 'VAN', 'TRUCK'] as const sati
  * без единого отклика (прогон 12.10.2026: фургон с грузом 5 т).
  * У прицепа и контейнера потолок общий — 76 т, его держит форма точки.
  */
-export const HAUL_MAX_CARGO_KG: Partial<Record<HaulKind, number>> = { VAN: 1500, TRUCK: 15000 };
+export const HAUL_MAX_CARGO_KG: Partial<Record<HaulKind, number>> = { VAN: 1500, TRUCK: 15000, SEMI: 30000 };
 
 export function carriesUnit(haulKind: HaulKind): boolean {
   return haulKind === 'TRAILER' || haulKind === 'CONTAINER';

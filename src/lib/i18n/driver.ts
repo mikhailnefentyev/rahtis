@@ -152,6 +152,7 @@ export async function driverDictionary(
       CONTAINER: { ...base.haul.CONTAINER, stopPickup: pack.haulStops.CONTAINER.pickup, stopReturn: pack.haulStops.CONTAINER.return },
       VAN: { ...base.haul.VAN, stopPickup: pack.haulStops.CARGO.pickup, stopReturn: pack.haulStops.CARGO.return },
       TRUCK: { ...base.haul.TRUCK, stopPickup: pack.haulStops.CARGO.pickup, stopReturn: pack.haulStops.CARGO.return },
+      SEMI: { ...base.haul.SEMI, stopPickup: pack.haulStops.CARGO.pickup, stopReturn: pack.haulStops.CARGO.return },
     },
     orderStatus: pack.orderStatus,
     haulKind: pack.haulKind,

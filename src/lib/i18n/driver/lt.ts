@@ -300,6 +300,7 @@ export const lt = {
     CONTAINER: 'Konteineris',
     VAN: 'Furgonas',
     TRUCK: 'Sunkvežimis',
+    SEMI: 'Puspriekabės junginys 13,6 m',
   },
   payDisclaimer:
     'Skaičiavimas orientacinis. Galutinį atlygį nustato darbdavys ir darbo arba kolektyvinė sutartis.',

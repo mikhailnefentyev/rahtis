@@ -57,6 +57,8 @@ export const de = {
     grossMaxHint: 'Aus der Zulassungsbescheinigung. Das ist die Obergrenze für das Gewicht der Kombination.',
     tareKg: 'Leergewicht (kg)',
     tareHint: 'Später wird der Wert automatisch aus der Abfahrtsverwiegung übernommen.',
+    volumeM3: 'Mulden-/Aufbauvolumen (m³)',
+    volumeHint: 'Volumen des Aufbaus in Kubikmetern. Bei leichtem Boden begrenzt das Volumen die Ladung oft vor der Masse.',
     couplingShort: 'Kupplung–letzte Achse',
     spread: 'Abstand der äußeren Achsen',
     lengthM: 'Länge (m)',
@@ -1001,6 +1003,13 @@ export const de = {
       dropSection: 'Wo die Ladung zugestellt wird',
       unitState: 'Ladung',
     },
+    SEMI: {
+      stopPickup: 'Ladungsabholung',
+      stopReturn: 'Zustellung',
+      pickupSection: 'Wo die Ladung abgeholt wird',
+      dropSection: 'Wo die Ladung zugestellt wird',
+      unitState: 'Ladung',
+    },
   },
 
   presence: {
@@ -1009,17 +1018,30 @@ export const de = {
     mapLabel: 'Karte der Städte mit Fahrzeugen',
   },
 
+  /* Полный полуприцеп в экспресс-доставке (PPV-yhdistelmä, src/lib/orders/haul.ts). */
+  semi: {
+    title: 'Sattelauflieger',
+    standard: 'Standard',
+    hint: 'Kompletter Sattelauflieger, 13,6 Lademeter, bis 30 t. Wählen Sie, was die Ladung braucht: MEGA-Auflieger oder eine besondere Beladung.',
+    trailerTitle: 'Ausstattung (Sattelauflieger)',
+    tooHeavy: 'Ein Sattelzug lädt höchstens 30.000 kg.',
+    trailerLdm: 'Lademeter',
+    features: { MEGA: 'MEGA', SIDE_LOADING: 'Seitenbeladung', TOP_LOADING: 'Beladung von oben', LIFTING_ROOF: 'Hubdach' },
+  },
+
   haulKind: {
     TRAILER: 'Trailer',
     CONTAINER: 'Container',
     VAN: 'Transporter',
     TRUCK: 'Lkw',
+    SEMI: 'Sattelzug 13,6 m',
   },
 
   vehicleClass: {
     TRACTOR: 'Sattelzugmaschine',
     VAN: 'Transporter · bis 3,5 t',
     TRUCK: 'Lkw · bis 26 t',
+    TIPPER: 'Kipper / Kassettenfahrzeug · 3–5 Achsen',
   },
 
   amendKind: {
@@ -2036,6 +2058,7 @@ export const de = {
     adrNo: 'Keine ADR-Zulassung',
     capacity: 'Nutzlast',
     capacityHint: 'Eine 2-achsige Zugmaschine nimmt 25 t, eine 3-achsige 32 t.',
+    tipperAxlesHint: 'Masse nach Achsen (Finnland): 3 Achsen 28 t, 4 – 35 t, 5 – 42 t. Ein Kassettenfahrzeug mit Anhänger lädt mehr – Anhänger unter Anhänger hinzufügen.',
     containerFeet: 'Container-Chassis',
     containerFeetHint:
       'Welche Containerlängen diese Kombination aufnimmt. Leer heißt: Das Fahrzeug fährt keine Container.',

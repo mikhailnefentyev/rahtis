@@ -90,7 +90,7 @@ async function VehicleList({
                 </div>
                 <p className="mt-1.5 text-[13px] text-ink">
                   {t.vehicleClass[v.vehicle_class]} · {v.make} · {EURO_LABEL[v.euro_class]}
-                  {v.vehicle_class === 'TRACTOR'
+                  {v.vehicle_class === 'TRACTOR' || v.vehicle_class === 'TIPPER'
                     ? ` · ${m('vehicle.axlesCount', { count: v.axles })}`
                     : ` · ${v.payload_kg} kg · ${String(v.ldm).replace('.', ',')} ldm`}
                 </p>

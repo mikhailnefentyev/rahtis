@@ -300,6 +300,7 @@ export const pl = {
     CONTAINER: 'Kontener',
     VAN: 'Bus',
     TRUCK: 'Ciężarówka',
+    SEMI: 'Zestaw z naczepą 13,6 m',
   },
   payDisclaimer:
     'Wyliczenie ma charakter orientacyjny. Ostateczne wynagrodzenie ustalają pracodawca oraz umowa o pracę lub układ zbiorowy.',

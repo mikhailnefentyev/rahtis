@@ -16,7 +16,7 @@ import { ApiError, type ApiContext } from './handler';
 import { isCalendarDate, isObj, locationOf, oneOf, sameAddress, streetOf, text, type LatLon } from './input';
 import { getOrder } from './orders';
 import { translateRule } from './rules';
-import { HAUL_MAX_CARGO_KG } from '@/lib/orders/haul';
+import { HAUL_MAX_CARGO_KG, isSemiFeature } from '@/lib/orders/haul';
 
 /**
  * Создание заказа через API.
@@ -31,7 +31,7 @@ import { HAUL_MAX_CARGO_KG } from '@/lib/orders/haul';
  */
 
 const ORDER_TYPES = ['TRAILER_SWAP', 'ROUND_TRIP', 'ONE_WAY'] as const;
-const HAUL_KINDS = ['TRAILER', 'CONTAINER', 'VAN', 'TRUCK'] as const;
+const HAUL_KINDS = ['TRAILER', 'CONTAINER', 'VAN', 'TRUCK', 'SEMI'] as const;
 export const ROLES = ['PICKUP', 'DELIVERY', 'EXTRA_LOAD', 'EXTRA_UNLOAD', 'TRAILER_RETURN'] as const;
 const PLACE_KINDS = ['PORT', 'TERMINAL', 'PARKING', 'ADDRESS'] as const;
 
@@ -226,6 +226,7 @@ async function prepare(body: unknown): Promise<Prepared> {
       haul_kind: haulKind,
       container_feet: body.container_feet === undefined ? '' : String(body.container_feet),
       ldm: body.ldm === undefined ? '' : String(body.ldm),
+      semi_features: haulKind === 'SEMI' && Array.isArray(body.semi_features) ? body.semi_features.filter(isSemiFeature) : [],
       shipper_ref: text(body.shipper_ref, 100) ?? '',
       trailer: text(body.trailer, 120) ?? '',
       trailer_plate: trailerPlate ?? '',

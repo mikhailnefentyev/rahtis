@@ -300,6 +300,7 @@ export const sv = {
     CONTAINER: 'Container',
     VAN: 'Skåpbil',
     TRUCK: 'Lastbil',
+    SEMI: 'Påhängsekipage 13,6 m',
   },
   payDisclaimer:
     'Beräkningen är vägledande. Den slutliga lönen bestäms av arbetsgivaren och anställnings- eller kollektivavtalet.',

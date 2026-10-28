@@ -300,6 +300,7 @@ export const et = {
     CONTAINER: 'Konteiner',
     VAN: 'Kaubik',
     TRUCK: 'Veoauto',
+    SEMI: 'Poolhaagisega autorong 13,6 m',
   },
   payDisclaimer:
     'Kalkulaator annab ligikaudse summa. Lõpliku palga määravad tööandja ning töö- või kollektiivleping.',

@@ -57,6 +57,8 @@ export const et = {
     grossMaxHint: 'Registreerimistunnistusest. See on autorongi massi ülempiir.',
     tareKg: 'Tühimass (kg)',
     tareHint: 'Edaspidi võetakse see automaatselt väljumiskaalumisest.',
+    volumeM3: 'Kasti maht (m³)',
+    volumeHint: 'Kasti maht kuupmeetrites. Kerge pinnase puhul võib maht piirata koormat enne massi.',
     couplingShort: 'haakeseade–viimane sild',
     spread: 'äärmiste telgede vahe',
     lengthM: 'Pikkus (m)',
@@ -1001,6 +1003,13 @@ export const et = {
       dropSection: 'Kuhu kaup viiakse',
       unitState: 'Kaup',
     },
+    SEMI: {
+      stopPickup: 'Kauba pealevõtt',
+      stopReturn: 'Üleandmine',
+      pickupSection: 'Kust kaup võetakse',
+      dropSection: 'Kuhu kaup viiakse',
+      unitState: 'Kaup',
+    },
   },
 
   presence: {
@@ -1009,17 +1018,30 @@ export const et = {
     mapLabel: 'Kaart linnadest, kus on tehnikat',
   },
 
+  /* Полный полуприцеп в экспресс-доставке (PPV-yhdistelmä, src/lib/orders/haul.ts). */
+  semi: {
+    title: 'Poolhaagis',
+    standard: 'Tavaline',
+    hint: 'Täis poolhaagis, 13,6 laadimismeetrit, kuni 30 t. Vali, mida koorem vajab: MEGA-haagis või eriline laadimisviis.',
+    trailerTitle: 'Varustus (poolhaagis)',
+    tooHeavy: 'Poolhaagisega autorong võtab kuni 30 000 kg.',
+    trailerLdm: 'Laadimismeetrid',
+    features: { MEGA: 'MEGA', SIDE_LOADING: 'Külglaadimine', TOP_LOADING: 'Pealtlaadimine', LIFTING_ROOF: 'Tõstetav katus' },
+  },
+
   haulKind: {
     TRAILER: 'Haagis',
     CONTAINER: 'Konteiner',
     VAN: 'Kaubik',
     TRUCK: 'Veoauto',
+    SEMI: 'Poolhaagisega autorong 13,6 m',
   },
 
   vehicleClass: {
     TRACTOR: 'Sadulveok',
     VAN: 'Kaubik · kuni 3,5 t',
     TRUCK: 'Veoauto · kuni 26 t',
+    TIPPER: 'Kallur / kassettauto · 3–5 telge',
   },
 
   amendKind: {
@@ -2036,6 +2058,7 @@ export const et = {
     adrNo: 'ADR-luba pole',
     capacity: 'Kandevõime',
     capacityHint: 'Kaheteljeline sadulveok võtab 25 t, kolmeteljeline 32 t.',
+    tipperAxlesHint: 'Mass telgede järgi (Soome): 3 telge 28 t, 4 – 35 t, 5 – 42 t. Kassettauto haagisega võtab rohkem – lisa haagis jaotises Haagised.',
     containerFeet: 'Konteinerišassii',
     containerFeetHint:
       'Milliseid konteineripikkusi see autorong võtab. Tühi tähendab, et auto konteinereid ei vea.',

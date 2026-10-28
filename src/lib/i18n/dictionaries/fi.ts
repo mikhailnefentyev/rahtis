@@ -80,6 +80,8 @@ export const fi = {
     grossMaxHint: 'Rekisteröintitodistuksesta. Rajaa yhdistelmän massan ylhäältä.',
     tareKg: 'Tyhjäpaino (kg)',
     tareHint: 'Jatkossa tämä otetaan lähtöpunnituksesta automaattisesti.',
+    volumeM3: 'Kuormatila (m³)',
+    volumeHint: 'Lavan tilavuus kuutioina. Maa-aineksissa tilavuus voi rajata kuorman ennen massaa.',
     couplingShort: 'kytkentä–taka-akseli',
     spread: 'akseliväli',
     lengthM: 'Pituus (m)',
@@ -1177,6 +1179,13 @@ export const fi = {
       dropSection: 'Mihin kuorma toimitetaan',
       unitState: 'Kuorma',
     },
+    SEMI: {
+      stopPickup: 'Kuorman nouto',
+      stopReturn: 'Toimitus',
+      pickupSection: 'Mistä kuorma noudetaan',
+      dropSection: 'Mihin kuorma toimitetaan',
+      unitState: 'Kuorma',
+    },
   },
 
   /*
@@ -1189,11 +1198,23 @@ export const fi = {
     mapLabel: 'Kartta kaupungeista, joissa on kalustoa',
   },
 
+  /* Полный полуприцеп в экспресс-доставке (PPV-yhdistelmä, src/lib/orders/haul.ts). */
+  semi: {
+    title: 'Puoliperävaunu',
+    standard: 'Tavallinen',
+    hint: 'Täysi puoliperävaunu, 13,6 lavametriä, enintään 30 t. Valitse, jos kuorma vaatii MEGA-perävaunun tai erityisen lastaustavan.',
+    trailerTitle: 'Varustus (puoliperävaunu)',
+    tooHeavy: 'Puoliperävaunuyhdistelmä vie enintään 30 000 kg.',
+    trailerLdm: 'Lavametrit',
+    features: { MEGA: 'MEGA', SIDE_LOADING: 'Sivulastaus', TOP_LOADING: 'Lastaus katon kautta', LIFTING_ROOF: 'Nostokatto' },
+  },
+
   haulKind: {
     TRAILER: 'Perävaunu',
     CONTAINER: 'Kontti',
     VAN: 'Pakettiauto',
     TRUCK: 'Kuorma-auto',
+    SEMI: 'Puoliperävaunuyhdistelmä 13,6 m',
   },
 
   /*
@@ -1205,6 +1226,7 @@ export const fi = {
     TRACTOR: 'Vetoauto',
     VAN: 'Pakettiauto · enintään 3,5 t',
     TRUCK: 'Kuorma-auto · enintään 26 t',
+    TIPPER: 'Kippiauto / kasettiauto · 3–5 akselia',
   },
 
   amendKind: {
@@ -2298,6 +2320,7 @@ export const fi = {
     adrNo: 'Ei ADR-lupaa',
     capacity: 'Kantavuus',
     capacityHint: 'Kaksiakselinen vetoauto ottaa 25 t, kolmiakselinen 32 t.',
+    tipperAxlesHint: 'Massa akseleista: 3 akselia 28 t, 4 – 35 t, 5 – 42 t. Kasettiauto perävaunun kanssa saa enemmän – lisää perävaunu kohdassa Perävaunut.',
     containerFeet: 'Konttialusta',
     containerFeetHint:
       'Mitkä konttipituudet tämä yhdistelmä ottaa. Tyhjä tarkoittaa, ettei ajoneuvo vedä kontteja.',

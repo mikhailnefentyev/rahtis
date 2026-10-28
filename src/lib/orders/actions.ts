@@ -6,7 +6,7 @@ import { getViewer } from '@/lib/auth/viewer';
 import { getDictionary, isLocale, type Dictionary, type Locale, defaultLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import { dispatchPublishedOrder, notifyDirectOrder } from '@/lib/orders/dispatch';
-import { HAUL_KINDS, HAUL_MAX_CARGO_KG, type HaulKind } from '@/lib/orders/haul';
+import { HAUL_KINDS, HAUL_MAX_CARGO_KG, type HaulKind, isSemiFeature } from '@/lib/orders/haul';
 import { cityOf, hasCoordinates, tonnesToKg, type FieldReader } from '@/lib/orders/stopFields';
 import type { StopRole } from '@/types/db';
 import type { Json } from '@/types/database';
@@ -326,7 +326,7 @@ function readOrderForm(
   const kind = haulKind(str(formData, 'haul_kind'));
   const maxCargo = HAUL_MAX_CARGO_KG[kind];
   if (maxCargo && stops.some((stop) => Number(stop.cargo_weight_kg ?? 0) > maxCargo)) {
-    return { error: kind === 'VAN' ? t.orderForm.vanTooHeavy : t.orderForm.truckTooHeavy };
+    return { error: kind === 'VAN' ? t.orderForm.vanTooHeavy : kind === 'SEMI' ? t.semi.tooHeavy : t.orderForm.truckTooHeavy };
   }
 
   return {
@@ -346,6 +346,8 @@ function readOrderForm(
       haul_kind: haulKind(str(formData, 'haul_kind')),
       container_feet: str(formData, 'container_feet'),
       ldm: str(formData, 'ldm').replace(',', '.'),
+      /* Пометки полуприцепа — только у фуры; база берёт их только у SEMI и сверяет со списком. */
+      semi_features: kind === 'SEMI' ? formData.getAll('semi_features').filter(isSemiFeature) : [],
       shipper_ref: str(formData, 'shipper_ref'),
       trailer: str(formData, 'trailer'),
       /*

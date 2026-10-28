@@ -93,7 +93,9 @@ export function FleetView({
                     {vehicle.make} ·{' '}
                     {vehicle.vehicle_class === 'TRACTOR'
                       ? m('vehicle.axlesCount', { count: vehicle.axles })
-                      : `${vehicle.payload_kg} kg · ${String(vehicle.ldm).replace('.', ',')} ldm`}
+                      : vehicle.vehicle_class === 'TIPPER'
+                        ? `${vehicle.body_type ? t.mass.bodies[vehicle.body_type] : ''} · ${m('vehicle.axlesCount', { count: vehicle.axles })}${vehicle.body_volume_m3 ? ` · ${Number(vehicle.body_volume_m3).toLocaleString('fi-FI')} m³` : ''}`
+                        : `${vehicle.payload_kg} kg · ${String(vehicle.ldm).replace('.', ',')} ldm`}
                     {vehicle.container_feet.length > 0 &&
                       ` · ${t.vehicle.containerFeet}: ${vehicle.container_feet
                         .slice()
@@ -109,7 +111,7 @@ export function FleetView({
                     * машина везёт как прежде, — но обещать холод с
                     * недействительной бумагой нельзя.
                     */}
-                  {vehicle.vehicle_class !== 'TRACTOR' &&
+                  {(vehicle.vehicle_class === 'VAN' || vehicle.vehicle_class === 'TRUCK') &&
                     (vehicle.tail_lift || vehicle.side_loading || vehicle.reefer) && (
                       <p className="mt-1 flex flex-wrap items-center gap-2 text-xs">
                         {vehicle.tail_lift && <Badge tone="neutral">{t.vehicle.tailLift}</Badge>}

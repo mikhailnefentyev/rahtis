@@ -57,6 +57,8 @@ export const lt = {
     grossMaxHint: 'Iš registracijos liudijimo. Riboja junginio masę iš viršaus.',
     tareKg: 'Nuosava masė (kg)',
     tareHint: 'Vėliau ji bus automatiškai imama iš svėrimo išvažiuojant.',
+    volumeM3: 'Kėbulo tūris (m³)',
+    volumeHint: 'Kėbulo tūris kubiniais metrais. Lengvam gruntui tūris gali riboti krovinį anksčiau nei masė.',
     couplingShort: 'sukabinimas–paskutinė ašis',
     spread: 'kraštinių ašių atstumas',
     lengthM: 'Ilgis (m)',
@@ -1001,6 +1003,13 @@ export const lt = {
       dropSection: 'Kur pristatomas krovinys',
       unitState: 'Krovinys',
     },
+    SEMI: {
+      stopPickup: 'Krovinio paėmimas',
+      stopReturn: 'Pristatymas',
+      pickupSection: 'Kur paimamas krovinys',
+      dropSection: 'Kur pristatomas krovinys',
+      unitState: 'Krovinys',
+    },
   },
 
   presence: {
@@ -1009,17 +1018,30 @@ export const lt = {
     mapLabel: 'Miestų su transporto priemonėmis žemėlapis',
   },
 
+  /* Полный полуприцеп в экспресс-доставке (PPV-yhdistelmä, src/lib/orders/haul.ts). */
+  semi: {
+    title: 'Puspriekabė',
+    standard: 'Įprasta',
+    hint: 'Pilna puspriekabė, 13,6 krovimo metro, iki 30 t. Pasirinkite, ko reikia kroviniui: MEGA puspriekabės ar ypatingo pakrovimo būdo.',
+    trailerTitle: 'Įranga (puspriekabė)',
+    tooHeavy: 'Puspriekabės junginys veža iki 30 000 kg.',
+    trailerLdm: 'Krovimo metrai',
+    features: { MEGA: 'MEGA', SIDE_LOADING: 'Šoninis pakrovimas', TOP_LOADING: 'Pakrovimas iš viršaus', LIFTING_ROOF: 'Keliamas stogas' },
+  },
+
   haulKind: {
     TRAILER: 'Puspriekabė',
     CONTAINER: 'Konteineris',
     VAN: 'Furgonas',
     TRUCK: 'Sunkvežimis',
+    SEMI: 'Puspriekabės junginys 13,6 m',
   },
 
   vehicleClass: {
     TRACTOR: 'Vilkikas',
     VAN: 'Furgonas · iki 3,5 t',
     TRUCK: 'Sunkvežimis · iki 26 t',
+    TIPPER: 'Savivartis / kasetinis · 3–5 ašys',
   },
 
   amendKind: {
@@ -2036,6 +2058,7 @@ export const lt = {
     adrNo: 'Nėra ADR leidimo',
     capacity: 'Keliamoji galia',
     capacityHint: 'Dviašis vilkikas tempia 25 t, triašis – 32 t.',
+    tipperAxlesHint: 'Masė pagal ašis (Suomija): 3 ašys 28 t, 4 – 35 t, 5 – 42 t. Kasetinis su priekaba veža daugiau – pridėkite priekabą skiltyje Priekabos.',
     containerFeet: 'Konteinerių važiuoklė',
     containerFeetHint:
       'Kokio ilgio konteinerius gali vežti šis junginys. Tuščia – ši mašina konteinerių neveža.',

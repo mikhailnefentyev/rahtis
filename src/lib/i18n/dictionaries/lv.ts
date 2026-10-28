@@ -57,6 +57,8 @@ export const lv = {
     grossMaxHint: 'No reģistrācijas apliecības. Sastāva masa nevar būt lielāka.',
     tareKg: 'Pašmasa (kg)',
     tareHint: 'Turpmāk to automātiski ņems no svēršanas pirms izbraukšanas.',
+    volumeM3: 'Kravas kastes tilpums (m³)',
+    volumeHint: 'Kastes tilpums kubikmetros. Vieglai gruntij tilpums var ierobežot kravu ātrāk nekā masa.',
     couplingShort: 'sakabe–pēdējā ass',
     spread: 'galējo asu attālums',
     lengthM: 'Garums (m)',
@@ -1001,6 +1003,13 @@ export const lv = {
       dropSection: 'Kur piegādā kravu',
       unitState: 'Krava',
     },
+    SEMI: {
+      stopPickup: 'Kravas paņemšana',
+      stopReturn: 'Piegāde',
+      pickupSection: 'No kurienes paņem kravu',
+      dropSection: 'Kur piegādā kravu',
+      unitState: 'Krava',
+    },
   },
 
   presence: {
@@ -1009,17 +1018,30 @@ export const lv = {
     mapLabel: 'Pilsētu karte, kur ir tehnika',
   },
 
+  /* Полный полуприцеп в экспресс-доставке (PPV-yhdistelmä, src/lib/orders/haul.ts). */
+  semi: {
+    title: 'Puspiekabe',
+    standard: 'Parasta',
+    hint: 'Pilna puspiekabe, 13,6 kravas metri, līdz 30 t. Izvēlieties, kas vajadzīgs kravai: MEGA piekabe vai īpašs iekraušanas veids.',
+    trailerTitle: 'Aprīkojums (puspiekabe)',
+    tooHeavy: 'Puspiekabes sastāvs pārvadā līdz 30 000 kg.',
+    trailerLdm: 'Kravas metri',
+    features: { MEGA: 'MEGA', SIDE_LOADING: 'Sānu iekraušana', TOP_LOADING: 'Iekraušana no augšas', LIFTING_ROOF: 'Paceļams jumts' },
+  },
+
   haulKind: {
     TRAILER: 'Piekabe',
     CONTAINER: 'Konteiners',
     VAN: 'Busiņš',
     TRUCK: 'Kravas auto',
+    SEMI: 'Puspiekabes sastāvs 13,6 m',
   },
 
   vehicleClass: {
     TRACTOR: 'Vilcējs',
     VAN: 'Busiņš · līdz 3,5 t',
     TRUCK: 'Kravas auto · līdz 26 t',
+    TIPPER: 'Pašizgāzējs / kasešu auto · 3–5 asis',
   },
 
   amendKind: {
@@ -2036,6 +2058,7 @@ export const lv = {
     adrNo: 'Nav ADR atļaujas',
     capacity: 'Kravnesība',
     capacityHint: 'Divasu vilcējs velk 25 t, trīsasu — 32 t.',
+    tipperAxlesHint: 'Masa pēc asīm (Somija): 3 asis 28 t, 4 – 35 t, 5 – 42 t. Kasešu auto ar piekabi var vairāk – pievienojiet piekabi sadaļā Piekabes.',
     containerFeet: 'Konteineru šasija',
     containerFeetHint:
       'Kāda garuma konteinerus šis sastāvs var paņemt. Tukšs nozīmē, ka auto konteinerus nevelk.',

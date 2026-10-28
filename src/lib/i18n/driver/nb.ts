@@ -300,6 +300,7 @@ export const nb = {
     CONTAINER: 'Container',
     VAN: 'Varebil',
     TRUCK: 'Lastebil',
+    SEMI: 'Semitrailer 13,6 m',
   },
   payDisclaimer:
     'Beregningen er veiledende. Endelig lønn bestemmes av arbeidsgiveren og arbeids- eller tariffavtalen.',

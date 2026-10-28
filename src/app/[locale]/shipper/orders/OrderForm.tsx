@@ -18,7 +18,7 @@ import type { ChosenAddress } from '@/components/domain/AddressInput';
 import { isValidContainerNumber } from '@/lib/containerNumber';
 import { ownOrderAction, publishOrderAction, type PublishState } from '@/lib/orders/actions';
 import { priceGuideAction, type PriceGuide } from '@/lib/orders/priceGuide';
-import { stopTitle, type HaulKind } from '@/lib/orders/haul';
+import { SEMI_LDM, isSemiFeature, stopTitle, type HaulKind, type SemiFeature } from '@/lib/orders/haul';
 import { computeRouteAction, type RouteState } from '@/lib/routing/actions';
 import { useCompanyCountry, useI18n } from '@/lib/i18n/provider';
 import { countryPack } from '@/lib/country';
@@ -179,7 +179,12 @@ export function OrderForm({
    * так же ясно, иначе на следующей единице придётся искать по файлу
    * семь разных условий.
    */
-  const express = haulKind === 'VAN' || haulKind === 'TRUCK';
+  const express = haulKind === 'VAN' || haulKind === 'TRUCK' || haulKind === 'SEMI';
+  /* Фура: полный полуприцеп 13,6 м — метры по умолчанию полные, пометки к полуприцепу. */
+  const semi = haulKind === 'SEMI';
+  const [semiFeatures, setSemiFeatures] = useState<SemiFeature[]>(
+    (origin?.semi_features ?? []).filter(isSemiFeature),
+  );
 
   const [feet, setFeet] = useState(origin?.container_feet ? String(origin.container_feet) : '40');
   const [ldm, setLdm] = useState(origin?.ldm ? String(origin.ldm).replace('.', ',') : '');
@@ -512,12 +517,17 @@ export function OrderForm({
                 {...p}
                 name="haul_kind"
                 value={haulKind}
-                onChange={(e) => setHaulKind(e.target.value as HaulKind)}
+                onChange={(e) => {
+                  const next = e.target.value as HaulKind;
+                  setHaulKind(next);
+                  if (next === 'SEMI' && !ldm) setLdm(String(SEMI_LDM).replace('.', ','));
+                }}
               >
                 <option value="TRAILER">{t.haulKind.TRAILER}</option>
                 <option value="CONTAINER">{t.haulKind.CONTAINER}</option>
                 <option value="VAN">{t.vehicleClass.VAN}</option>
                 <option value="TRUCK">{t.vehicleClass.TRUCK}</option>
+                <option value="SEMI">{t.haulKind.SEMI}</option>
               </Select>
             )}
           </Field>
@@ -720,11 +730,54 @@ export function OrderForm({
                     inputMode="decimal"
                     value={ldm}
                     onChange={(e) => setLdm(e.target.value)}
-                    placeholder="1,2"
+                    placeholder={semi ? '13,6' : '1,2'}
                   />
                 )}
               </Field>
-            ) : (
+            ) : null}
+            {semi && (
+              <div className="flex flex-col gap-2 sm:col-span-4">
+                <p className="label-micro">{t.semi.title}</p>
+                <p className="text-xs text-ink-faint">{t.semi.hint}</p>
+                <div className="flex flex-wrap gap-x-5 gap-y-2">
+                  {(['STANDARD', 'MEGA'] as const).map((kind) => (
+                    <label key={kind} className="flex items-center gap-2 text-[13px]">
+                      <input
+                        type="radio"
+                        name="semi_type"
+                        checked={kind === 'MEGA' ? semiFeatures.includes('MEGA') : !semiFeatures.includes('MEGA')}
+                        onChange={() =>
+                          setSemiFeatures((current) =>
+                            kind === 'MEGA' ? [...current.filter((x) => x !== 'MEGA'), 'MEGA'] : current.filter((x) => x !== 'MEGA'),
+                          )
+                        }
+                        className="size-4 accent-[var(--color-accent)]"
+                      />
+                      {kind === 'MEGA' ? t.semi.features.MEGA : t.semi.standard}
+                    </label>
+                  ))}
+                  {(['SIDE_LOADING', 'TOP_LOADING', 'LIFTING_ROOF'] as const).map((feature) => (
+                    <label key={feature} className="flex items-center gap-2 text-[13px]">
+                      <input
+                        type="checkbox"
+                        checked={semiFeatures.includes(feature)}
+                        onChange={(e) =>
+                          setSemiFeatures((current) =>
+                            e.target.checked ? [...current, feature] : current.filter((x) => x !== feature),
+                          )
+                        }
+                        className="size-4 accent-[var(--color-accent)]"
+                      />
+                      {t.semi.features[feature]}
+                    </label>
+                  ))}
+                </div>
+                {semiFeatures.map((feature) => (
+                  <input key={feature} type="hidden" name="semi_features" value={feature} />
+                ))}
+              </div>
+            )}
+            {!express && (
             <>
             {/*
               * Номер прицепа стоит первым в блоке и обязателен: прицепы

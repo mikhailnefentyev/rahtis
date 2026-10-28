@@ -300,6 +300,7 @@ export const lv = {
     CONTAINER: 'Konteiners',
     VAN: 'Furgons',
     TRUCK: 'Kravas auto',
+    SEMI: 'Puspiekabes sastāvs 13,6 m',
   },
   payDisclaimer:
     'Aprēķins ir orientējošs. Galīgo samaksu nosaka darba devējs un darba vai koplīgums.',

@@ -10,7 +10,7 @@ import { Badge, Button, Card, CardBody, CardDivider, EmptyState, Mono, Plate, Se
 import { MATCHING } from '@/lib/config';
 import { groupTakeAction, takeOrderAction, type MatchingState } from '@/lib/orders/matching';
 import { useI18n } from '@/lib/i18n/provider';
-import { carriesUnit } from '@/lib/orders/haul';
+import { haulNeedsTractor } from '@/lib/orders/haul';
 import { isTransfer } from '@/lib/orders/transfer';
 import type { DeskOrder, DeskStop, Vehicle } from '@/types/db';
 
@@ -292,7 +292,7 @@ export function DeskList({
                        * наравне с тягачами, и отказ приходил уже после отправки.
                        */
                       vehicles={vehicles.filter((v) =>
-                        carriesUnit(order.haul_kind) ? v.vehicle_class === 'TRACTOR' : v.vehicle_class !== 'TRACTOR',
+                        haulNeedsTractor(order.haul_kind) ? v.vehicle_class === 'TRACTOR' : v.vehicle_class === 'VAN' || v.vehicle_class === 'TRUCK',
                       )}
                       pickupDate={order.pickup_date}
                       busy={busy.filter((b) => b.ref !== order.ref)}

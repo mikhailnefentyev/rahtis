@@ -1,5 +1,7 @@
 'use server';
 
+import { isSemiFeature } from '@/lib/orders/haul';
+
 import { revalidatePath } from 'next/cache';
 import { requireRole } from '@/lib/auth/guard';
 import { getViewer } from '@/lib/auth/viewer';
@@ -167,6 +169,12 @@ const metres = (formData: FormData, key: string): number | null => {
   return value === null || value < 1 || value > 25 ? null : Math.round(value * 100) / 100;
 };
 
+/** Кубометры кузова с одним знаком; вне 1–99 м³ — null. */
+const volume = (formData: FormData): number | null => {
+  const value = num(formData, 'body_volume_m3');
+  return value === null || value < 1 || value > 99 ? null : Math.round(value * 10) / 10;
+};
+
 /* У машины половина до сцепки не длиннее 15 м (ограничение базы). */
 const vehicleMetres = (formData: FormData): number | null => {
   const value = metres(formData, 'coupling_distance_m');
@@ -175,14 +183,15 @@ const vehicleMetres = (formData: FormData): number | null => {
 
 function readVehicleForm(formData: FormData) {
   const vehicleClass = String(formData.get('vehicle_class') ?? 'TRACTOR') as VehicleClass;
-  const express = vehicleClass !== 'TRACTOR';
+  const express = vehicleClass === 'VAN' || vehicleClass === 'TRUCK';
   /*
    * Грузовику (nuppi) оси теперь нужны: от них зависит разрешённая масса
    * самосвала и кассетной сцепки (src/lib/fleet/mass.ts). У фургона — по-прежнему
    * двойка-заглушка. Смена осей у допущенной машины возвращает её на проверку
    * (триггер базы), поэтому поле берётся только когда его прислали.
    */
-  const truckAxles = vehicleClass === 'TRUCK' ? Number(formData.get('axles') ?? 0) : 0;
+  const truckAxles = vehicleClass === 'TRUCK' || vehicleClass === 'TIPPER' ? Number(formData.get('axles') ?? 0) : 0;
+  const tipper = vehicleClass === 'TIPPER';
 
   return {
     plate: String(formData.get('plate') ?? '')
@@ -196,12 +205,28 @@ function readVehicleForm(formData: FormData) {
      * машине, а как значение, которым никто не пользуется:
      * app.vehicle_capacity_kg читает у неё payload_kg.
      */
-    axles: vehicleClass === 'TRUCK' && truckAxles >= 2 && truckAxles <= 5 ? truckAxles : express ? 2 : Number(formData.get('axles') ?? 0),
-    body_type: vehicleClass === 'TRACTOR' ? null : bodyType(formData),
+    axles: tipper
+      ? truckAxles
+      : vehicleClass === 'TRUCK' && truckAxles >= 2 && truckAxles <= 5
+        ? truckAxles
+        : express
+          ? 2
+          : Number(formData.get('axles') ?? 0),
+    /* Самосвал — только самосвальный или кассетный кузов, грузовик — только кузова для грузоперевозок (ограничения базы). */
+    body_type:
+      vehicleClass === 'TRACTOR'
+        ? null
+        : tipper
+          ? ((['TIPPER', 'CASSETTE'] as const).find((b) => b === bodyType(formData)) ?? 'TIPPER')
+          : bodyType(formData) === 'TIPPER' || bodyType(formData) === 'CASSETTE'
+            ? null
+            : bodyType(formData),
     gross_max_kg: kg(formData, 'gross_max_kg'),
     tare_kg: kg(formData, 'tare_kg'),
     /* Фургону расстояние до сцепки не нужно: прицепов у него нет. */
     coupling_distance_m: vehicleClass === 'VAN' ? null : vehicleMetres(formData),
+    /* Объём кузова — только у самосвала: у грузоперевозок погрузочные метры. */
+    body_volume_m3: tipper ? volume(formData) : null,
     adr: formData.get('adr') === '1',
     vehicle_class: vehicleClass,
     /*
@@ -222,7 +247,7 @@ function readVehicleForm(formData: FormData) {
      * и сороковку, но не тридцатку, а платформа под 45 футов не всегда
      * имеет замки под 20 — одно число здесь врёт в обе стороны.
      */
-    container_feet: express
+    container_feet: vehicleClass !== 'TRACTOR'
       ? []
       : formData
           .getAll('container_feet')
@@ -266,7 +291,10 @@ export async function saveVehicleAction(
    * машина под заказ. Без них ограничение базы откажет кодом, из которого
    * человеку ничего не ясно, поэтому спрашиваем здесь.
    */
-  if (values.vehicle_class !== 'TRACTOR' && (!values.payload_kg || !values.ldm)) {
+  if (values.vehicle_class === 'TIPPER' && !(values.axles >= 3 && values.axles <= 5)) {
+    return { error: t.validation.required, done: false };
+  }
+  if ((values.vehicle_class === 'VAN' || values.vehicle_class === 'TRUCK') && (!values.payload_kg || !values.ldm)) {
     return { error: t.validation.required, done: false };
   }
 
@@ -420,6 +448,10 @@ export async function saveTrailerAction(_previous: TrailerState, formData: FormD
     tare_kg: kg(formData, 'tare_kg'),
     twin_wheels: formData.get('twin_wheels') === '1',
     length_m: metres(formData, 'length_m'),
+    /* Метры и пометки фуры — только у полуприцепа; у остальных прицепов пусто. */
+    ldm: kind === 'SEMI' ? (num(formData, 'ldm') !== null && num(formData, 'ldm')! <= 20 ? Math.round(num(formData, 'ldm')! * 10) / 10 : 13.6) : null,
+    semi_features: kind === 'SEMI' ? formData.getAll('semi_features').map(String).filter(isSemiFeature) : [],
+    body_volume_m3: volume(formData),
     coupling_distance_m: metres(formData, 'coupling_distance_m'),
   };
 

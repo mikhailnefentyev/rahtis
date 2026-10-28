@@ -30,7 +30,7 @@ export function VehicleCard({
   const { t, m, f, locale } = useI18n();
 
   /* У фургона и грузовика проверяют кузов и оснащение, а не оси и шасси. */
-  const express = vehicle.vehicle_class !== 'TRACTOR';
+  const express = vehicle.vehicle_class === 'VAN' || vehicle.vehicle_class === 'TRUCK';
 
   const [rejecting, setRejecting] = useState(false);
   const [reason, setReason] = useState('');

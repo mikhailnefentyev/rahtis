@@ -57,6 +57,8 @@ export const pl = {
     grossMaxHint: 'Z dowodu rejestracyjnego. Ogranicza masę zestawu od góry.',
     tareKg: 'Masa własna (kg)',
     tareHint: 'Wkrótce będzie pobierana automatycznie z ważenia przy wyjeździe.',
+    volumeM3: 'Objętość skrzyni (m³)',
+    volumeHint: 'Objętość skrzyni w metrach sześciennych. Przy lekkim gruncie objętość może ograniczyć ładunek wcześniej niż masa.',
     couplingShort: 'sprzęg–ostatnia oś',
     spread: 'rozstaw skrajnych osi',
     lengthM: 'Długość (m)',
@@ -1001,6 +1003,13 @@ export const pl = {
       dropSection: 'Gdzie dostarczyć ładunek',
       unitState: 'Ładunek',
     },
+    SEMI: {
+      stopPickup: 'Odbiór ładunku',
+      stopReturn: 'Dostawa',
+      pickupSection: 'Gdzie odebrać ładunek',
+      dropSection: 'Gdzie dostarczyć ładunek',
+      unitState: 'Ładunek',
+    },
   },
 
   presence: {
@@ -1009,17 +1018,30 @@ export const pl = {
     mapLabel: 'Mapa miast z pojazdami',
   },
 
+  /* Полный полуприцеп в экспресс-доставке (PPV-yhdistelmä, src/lib/orders/haul.ts). */
+  semi: {
+    title: 'Naczepa',
+    standard: 'Standardowa',
+    hint: 'Pełna naczepa, 13,6 metra ładunkowego, do 30 t. Wybierz, czego wymaga ładunek: naczepy MEGA lub szczególnego sposobu załadunku.',
+    trailerTitle: 'Wyposażenie (naczepa)',
+    tooHeavy: 'Zestaw z naczepą zabiera do 30 000 kg.',
+    trailerLdm: 'Metry ładunkowe',
+    features: { MEGA: 'MEGA', SIDE_LOADING: 'Załadunek boczny', TOP_LOADING: 'Załadunek od góry', LIFTING_ROOF: 'Podnoszony dach' },
+  },
+
   haulKind: {
     TRAILER: 'Naczepa',
     CONTAINER: 'Kontener',
     VAN: 'Bus',
     TRUCK: 'Ciężarówka',
+    SEMI: 'Zestaw z naczepą 13,6 m',
   },
 
   vehicleClass: {
     TRACTOR: 'Ciągnik siodłowy',
     VAN: 'Bus · do 3,5 t',
     TRUCK: 'Ciężarówka · do 26 t',
+    TIPPER: 'Wywrotka / pojazd kasetowy · 3–5 osi',
   },
 
   amendKind: {
@@ -2035,6 +2057,7 @@ export const pl = {
     adrNo: 'Brak uprawnień ADR',
     capacity: 'Ładowność',
     capacityHint: 'Ciągnik dwuosiowy bierze 25 t, trzyosiowy 32 t.',
+    tipperAxlesHint: 'Masa według osi (Finlandia): 3 osie 28 t, 4 – 35 t, 5 – 42 t. Pojazd kasetowy z przyczepą zabierze więcej – dodaj przyczepę w sekcji Przyczepy.',
     containerFeet: 'Podwozie kontenerowe',
     containerFeetHint:
       'Jakie długości kontenerów przyjmie ten zestaw. Puste pole: pojazd nie wozi kontenerów.',

@@ -300,6 +300,7 @@ export const da = {
     CONTAINER: 'Container',
     VAN: 'Varevogn',
     TRUCK: 'Lastbil',
+    SEMI: 'Sættevognstog 13,6 m',
   },
   payDisclaimer:
     'Beregningen er vejledende. Den endelige løn fastsættes af arbejdsgiveren og ansættelses- eller overenskomstaftalen.',

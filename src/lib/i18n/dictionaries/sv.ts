@@ -57,6 +57,8 @@ export const sv = {
     grossMaxHint: 'Från registreringsbeviset. Sätter taket för fordonstågets vikt.',
     tareKg: 'Tjänstevikt (kg)',
     tareHint: 'Framöver hämtas den automatiskt från tomvägningen.',
+    volumeM3: 'Flakvolym (m³)',
+    volumeHint: 'Flakets volym i kubikmeter. Med lätta massor kan volymen begränsa lasten före vikten.',
     couplingShort: 'koppling–sista axel',
     spread: 'axelavstånd',
     lengthM: 'Längd (m)',
@@ -1001,6 +1003,13 @@ export const sv = {
       dropSection: 'Var godset levereras',
       unitState: 'Gods',
     },
+    SEMI: {
+      stopPickup: 'Hämtning av gods',
+      stopReturn: 'Leverans',
+      pickupSection: 'Var godset hämtas',
+      dropSection: 'Var godset levereras',
+      unitState: 'Gods',
+    },
   },
 
   presence: {
@@ -1009,17 +1018,30 @@ export const sv = {
     mapLabel: 'Karta över orter med fordon',
   },
 
+  /* Полный полуприцеп в экспресс-доставке (PPV-yhdistelmä, src/lib/orders/haul.ts). */
+  semi: {
+    title: 'Påhängsvagn',
+    standard: 'Standard',
+    hint: 'Hel påhängsvagn, 13,6 flakmeter, högst 30 t. Välj vad lasten kräver: MEGA-trailer eller ett särskilt lastningssätt.',
+    trailerTitle: 'Utrustning (påhängsvagn)',
+    tooHeavy: 'Ett påhängsekipage tar högst 30 000 kg.',
+    trailerLdm: 'Flakmeter',
+    features: { MEGA: 'MEGA', SIDE_LOADING: 'Sidolastning', TOP_LOADING: 'Topplastning', LIFTING_ROOF: 'Lyftbart tak' },
+  },
+
   haulKind: {
     TRAILER: 'Trailer',
     CONTAINER: 'Container',
     VAN: 'Skåpbil',
     TRUCK: 'Lastbil',
+    SEMI: 'Påhängsekipage 13,6 m',
   },
 
   vehicleClass: {
     TRACTOR: 'Dragbil',
     VAN: 'Skåpbil · upp till 3,5 t',
     TRUCK: 'Lastbil · upp till 26 t',
+    TIPPER: 'Tippbil / kassettbil · 3–5 axlar',
   },
 
   amendKind: {
@@ -2036,6 +2058,7 @@ export const sv = {
     adrNo: 'Inget ADR-tillstånd',
     capacity: 'Lastförmåga',
     capacityHint: 'En tvåaxlig dragbil tar 25 t, en treaxlig 32 t.',
+    tipperAxlesHint: 'Vikt efter axlar (Finland): 3 axlar 28 t, 4 – 35 t, 5 – 42 t. En kassettbil med släp tar mer – lägg till släpet under Släpvagnar.',
     containerFeet: 'Containerchassi',
     containerFeetHint:
       'Vilka containerlängder ekipaget kan ta. Tomt betyder att det inte kör containrar.',

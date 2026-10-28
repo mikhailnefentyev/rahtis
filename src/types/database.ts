@@ -2894,6 +2894,7 @@ export type Database = {
           route_computed_at: string | null
           route_fingerprint: string | null
           route_geometry: string | null
+          semi_features: string[]
           settled_at: string | null
           shipper_company_id: string
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
@@ -2944,6 +2945,7 @@ export type Database = {
           route_computed_at?: string | null
           route_fingerprint?: string | null
           route_geometry?: string | null
+          semi_features?: string[]
           settled_at?: string | null
           shipper_company_id: string
           shipper_company_kind?: Database["public"]["Enums"]["party_role"]
@@ -2994,6 +2996,7 @@ export type Database = {
           route_computed_at?: string | null
           route_fingerprint?: string | null
           route_geometry?: string | null
+          semi_features?: string[]
           settled_at?: string | null
           shipper_company_id?: string
           shipper_company_kind?: Database["public"]["Enums"]["party_role"]
@@ -3840,14 +3843,17 @@ export type Database = {
         Row: {
           axles: number
           body_type: Database["public"]["Enums"]["body_type"] | null
+          body_volume_m3: number | null
           company_id: string
           coupling_distance_m: number | null
           created_at: string
           gross_max_kg: number | null
           id: string
           kind: Database["public"]["Enums"]["trailer_kind"]
+          ldm: number | null
           length_m: number | null
           plate: string
+          semi_features: string[]
           tare_kg: number | null
           twin_wheels: boolean
           updated_at: string
@@ -3855,14 +3861,17 @@ export type Database = {
         Insert: {
           axles: number
           body_type?: Database["public"]["Enums"]["body_type"] | null
+          body_volume_m3?: number | null
           company_id: string
           coupling_distance_m?: number | null
           created_at?: string
           gross_max_kg?: number | null
           id?: string
           kind: Database["public"]["Enums"]["trailer_kind"]
+          ldm?: number | null
           length_m?: number | null
           plate: string
+          semi_features?: string[]
           tare_kg?: number | null
           twin_wheels?: boolean
           updated_at?: string
@@ -3870,14 +3879,17 @@ export type Database = {
         Update: {
           axles?: number
           body_type?: Database["public"]["Enums"]["body_type"] | null
+          body_volume_m3?: number | null
           company_id?: string
           coupling_distance_m?: number | null
           created_at?: string
           gross_max_kg?: number | null
           id?: string
           kind?: Database["public"]["Enums"]["trailer_kind"]
+          ldm?: number | null
           length_m?: number | null
           plate?: string
+          semi_features?: string[]
           tare_kg?: number | null
           twin_wheels?: boolean
           updated_at?: string
@@ -4078,6 +4090,7 @@ export type Database = {
           base_lat: number | null
           base_lon: number | null
           body_type: Database["public"]["Enums"]["body_type"] | null
+          body_volume_m3: number | null
           company_id: string
           company_kind: Database["public"]["Enums"]["party_role"]
           container_feet: number[]
@@ -4114,6 +4127,7 @@ export type Database = {
           base_lat?: number | null
           base_lon?: number | null
           body_type?: Database["public"]["Enums"]["body_type"] | null
+          body_volume_m3?: number | null
           company_id: string
           company_kind?: Database["public"]["Enums"]["party_role"]
           container_feet?: number[]
@@ -4150,6 +4164,7 @@ export type Database = {
           base_lat?: number | null
           base_lon?: number | null
           body_type?: Database["public"]["Enums"]["body_type"] | null
+          body_volume_m3?: number | null
           company_id?: string
           company_kind?: Database["public"]["Enums"]["party_role"]
           container_feet?: number[]
@@ -4338,6 +4353,7 @@ export type Database = {
           route_computed_at: string | null
           route_fingerprint: string | null
           route_geometry: string | null
+          semi_features: string[]
           settled_at: string | null
           shipper_company_id: string
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
@@ -4915,6 +4931,7 @@ export type Database = {
           route_computed_at: string | null
           route_fingerprint: string | null
           route_geometry: string | null
+          semi_features: string[]
           settled_at: string | null
           shipper_company_id: string
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
@@ -4991,6 +5008,7 @@ export type Database = {
           route_computed_at: string | null
           route_fingerprint: string | null
           route_geometry: string | null
+          semi_features: string[]
           settled_at: string | null
           shipper_company_id: string
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
@@ -5157,6 +5175,7 @@ export type Database = {
           route_computed_at: string | null
           route_fingerprint: string | null
           route_geometry: string | null
+          semi_features: string[]
           settled_at: string | null
           shipper_company_id: string
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
@@ -5222,6 +5241,7 @@ export type Database = {
           route_computed_at: string | null
           route_fingerprint: string | null
           route_geometry: string | null
+          semi_features: string[]
           settled_at: string | null
           shipper_company_id: string
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
@@ -5394,6 +5414,7 @@ export type Database = {
           route_computed_at: string | null
           route_fingerprint: string | null
           route_geometry: string | null
+          semi_features: string[]
           settled_at: string | null
           shipper_company_id: string
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
@@ -5461,6 +5482,7 @@ export type Database = {
           route_computed_at: string | null
           route_fingerprint: string | null
           route_geometry: string | null
+          semi_features: string[]
           settled_at: string | null
           shipper_company_id: string
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
@@ -5498,6 +5520,7 @@ export type Database = {
           base_lat: number | null
           base_lon: number | null
           body_type: Database["public"]["Enums"]["body_type"] | null
+          body_volume_m3: number | null
           company_id: string
           company_kind: Database["public"]["Enums"]["party_role"]
           container_feet: number[]
@@ -5613,6 +5636,7 @@ export type Database = {
           route_computed_at: string | null
           route_fingerprint: string | null
           route_geometry: string | null
+          semi_features: string[]
           settled_at: string | null
           shipper_company_id: string
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
@@ -5926,6 +5950,7 @@ export type Database = {
           route_computed_at: string | null
           route_fingerprint: string | null
           route_geometry: string | null
+          semi_features: string[]
           settled_at: string | null
           shipper_company_id: string
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
@@ -6415,6 +6440,7 @@ export type Database = {
           route_computed_at: string | null
           route_fingerprint: string | null
           route_geometry: string | null
+          semi_features: string[]
           settled_at: string | null
           shipper_company_id: string
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
@@ -6503,6 +6529,7 @@ export type Database = {
           route_computed_at: string | null
           route_fingerprint: string | null
           route_geometry: string | null
+          semi_features: string[]
           settled_at: string | null
           shipper_company_id: string
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
@@ -6717,6 +6744,7 @@ export type Database = {
           route_computed_at: string | null
           route_fingerprint: string | null
           route_geometry: string | null
+          semi_features: string[]
           settled_at: string | null
           shipper_company_id: string
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
@@ -6754,6 +6782,7 @@ export type Database = {
           base_lat: number | null
           base_lon: number | null
           body_type: Database["public"]["Enums"]["body_type"] | null
+          body_volume_m3: number | null
           company_id: string
           company_kind: Database["public"]["Enums"]["party_role"]
           container_feet: number[]
@@ -6847,6 +6876,7 @@ export type Database = {
           route_computed_at: string | null
           route_fingerprint: string | null
           route_geometry: string | null
+          semi_features: string[]
           settled_at: string | null
           shipper_company_id: string
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
@@ -7052,6 +7082,7 @@ export type Database = {
           route_computed_at: string | null
           route_fingerprint: string | null
           route_geometry: string | null
+          semi_features: string[]
           settled_at: string | null
           shipper_company_id: string
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
@@ -7124,8 +7155,8 @@ export type Database = {
       email_status: "PENDING" | "SENT" | "FAILED" | "SKIPPED"
       eta_source: "ROUTE" | "TRAFFIC" | "CARRIER"
       euro_class: "EURO_4" | "EURO_5" | "EURO_6"
-      haul_branch: "UNIT" | "EXPRESS"
-      haul_kind: "TRAILER" | "CONTAINER" | "VAN" | "TRUCK"
+      haul_branch: "UNIT" | "EXPRESS" | "TIPPER"
+      haul_kind: "TRAILER" | "CONTAINER" | "VAN" | "TRUCK" | "SEMI"
       incident_severity: "WARN" | "ERROR" | "FATAL"
       incident_status: "OPEN" | "ACKED" | "RESOLVED"
       invoice_kind: "TRANSPORT" | "SUBSCRIPTION"
@@ -7184,7 +7215,7 @@ export type Database = {
       trip_document_source: "CABINET" | "DRIVER_APP"
       trip_phase: "PICKUP" | "DELIVERY"
       vehicle_access: "DRAFT" | "PENDING" | "APPROVED" | "REJECTED"
-      vehicle_class: "TRACTOR" | "VAN" | "TRUCK"
+      vehicle_class: "TRACTOR" | "VAN" | "TRUCK" | "TIPPER"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -7368,8 +7399,8 @@ export const Constants = {
       email_status: ["PENDING", "SENT", "FAILED", "SKIPPED"],
       eta_source: ["ROUTE", "TRAFFIC", "CARRIER"],
       euro_class: ["EURO_4", "EURO_5", "EURO_6"],
-      haul_branch: ["UNIT", "EXPRESS"],
-      haul_kind: ["TRAILER", "CONTAINER", "VAN", "TRUCK"],
+      haul_branch: ["UNIT", "EXPRESS", "TIPPER"],
+      haul_kind: ["TRAILER", "CONTAINER", "VAN", "TRUCK", "SEMI"],
       incident_severity: ["WARN", "ERROR", "FATAL"],
       incident_status: ["OPEN", "ACKED", "RESOLVED"],
       invoice_kind: ["TRANSPORT", "SUBSCRIPTION"],
@@ -7434,7 +7465,7 @@ export const Constants = {
       trip_document_source: ["CABINET", "DRIVER_APP"],
       trip_phase: ["PICKUP", "DELIVERY"],
       vehicle_access: ["DRAFT", "PENDING", "APPROVED", "REJECTED"],
-      vehicle_class: ["TRACTOR", "VAN", "TRUCK"],
+      vehicle_class: ["TRACTOR", "VAN", "TRUCK", "TIPPER"],
     },
   },
 } as const

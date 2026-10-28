@@ -12,7 +12,9 @@ import { countryPack } from '@/lib/country';
 
 const initial: VehicleState = { error: null, done: false };
 
-const BODY_TYPES: BodyType[] = ['TIPPER', 'CASSETTE', 'FLATBED', 'CONTAINER', 'CURTAIN', 'BOX', 'TANK', 'OTHER'];
+/* Кузова разные (пользователь 28.10.2026): грузовик для грузоперевозок — борт, тент, фургон…; самосвал — самосвальный или кассетный. */
+const CARGO_BODIES: BodyType[] = ['CURTAIN', 'BOX', 'FLATBED', 'CONTAINER', 'TANK', 'OTHER'];
+const TIPPER_BODIES: BodyType[] = ['TIPPER', 'CASSETTE'];
 
 /**
  * Карточка авто: создание и правка.
@@ -62,7 +64,8 @@ export function VehicleForm({
   const [vehicleClass, setVehicleClass] = useState<VehicleClass>(
     vehicle?.vehicle_class ?? 'TRACTOR',
   );
-  const express = vehicleClass !== 'TRACTOR';
+  /* Экспресс — фургон и грузовик для грузоперевозок: у них погрузочные метры. У тягача и самосвала груз считается по осям. */
+  const express = vehicleClass === 'VAN' || vehicleClass === 'TRUCK';
 
   /* Дату техосмотра спрашиваем только там, где заявлен холодильник. */
   const [reefer, setReefer] = useState(vehicle?.reefer ?? false);
@@ -95,6 +98,7 @@ export function VehicleForm({
                 <option value="TRACTOR">{t.vehicleClass.TRACTOR}</option>
                 <option value="VAN">{t.vehicleClass.VAN}</option>
                 <option value="TRUCK">{t.vehicleClass.TRUCK}</option>
+                <option value="TIPPER">{t.vehicleClass.TIPPER}</option>
               </Select>
             )}
           </Field>
@@ -154,7 +158,7 @@ export function VehicleForm({
             * У фургона и грузовика вопроса нет: правило «две оси — 25
             * тонн» написано про седельный тягач и к кузову неприменимо.
             */}
-          {!express && (
+          {vehicleClass === 'TRACTOR' && (
             <Field label={t.vehicle.axles} hint={t.vehicle.capacityHint} required>
               {(p) => (
                 <Select {...p} name="axles" required defaultValue={String(vehicle?.axles ?? 3)}>
@@ -176,9 +180,13 @@ export function VehicleForm({
             <>
               <Field label={t.mass.body}>
                 {(p) => (
-                  <Select {...p} name="body_type" defaultValue={vehicle?.body_type ?? ''}>
+                  <Select
+                    {...p}
+                    name="body_type"
+                    defaultValue={vehicle?.body_type && CARGO_BODIES.includes(vehicle.body_type) ? vehicle.body_type : ''}
+                  >
                     <option value="">{t.mass.bodyNone}</option>
-                    {BODY_TYPES.map((b) => (
+                    {CARGO_BODIES.map((b) => (
                       <option key={b} value={b}>
                         {t.mass.bodies[b]}
                       </option>
@@ -190,6 +198,48 @@ export function VehicleForm({
                 {(p) => (
                   <Select {...p} name="axles" defaultValue={String(vehicle?.axles ?? 2)}>
                     {[2, 3, 4, 5].map((n) => (
+                      <option key={n} value={n}>
+                        {n}
+                      </option>
+                    ))}
+                  </Select>
+                )}
+              </Field>
+            </>
+          )}
+
+          {/*
+            * Самосвал: кузов самосвальный или кассетный (кассетник ходит с
+            * прицепом 3–5 осей — прицепы ниже, в «Перевозку и массы»), оси
+            * 3–5. Груз — от массы сцепки по осям, без погрузочных метров.
+            */}
+          {vehicleClass === 'TIPPER' && (
+            <>
+              <Field label={t.mass.body} required>
+                {(p) => (
+                  <Select
+                    {...p}
+                    name="body_type"
+                    required
+                    defaultValue={vehicle?.body_type && TIPPER_BODIES.includes(vehicle.body_type) ? vehicle.body_type : 'TIPPER'}
+                  >
+                    {TIPPER_BODIES.map((b) => (
+                      <option key={b} value={b}>
+                        {t.mass.bodies[b]}
+                      </option>
+                    ))}
+                  </Select>
+                )}
+              </Field>
+              <Field label={t.mass.volumeM3} hint={t.mass.volumeHint}>
+                {(p) => (
+                  <InputMono {...p} name="body_volume_m3" inputMode="decimal" defaultValue={vehicle?.body_volume_m3 ?? ''} placeholder="18" />
+                )}
+              </Field>
+              <Field label={t.vehicle.axles} hint={t.vehicle.tipperAxlesHint} required>
+                {(p) => (
+                  <Select {...p} name="axles" required defaultValue={String(vehicle && vehicle.axles >= 3 ? vehicle.axles : 4)}>
+                    {[3, 4, 5].map((n) => (
                       <option key={n} value={n}>
                         {n}
                       </option>
@@ -342,7 +392,7 @@ export function VehicleForm({
             * редкость. Пусто означает, что машина контейнеры не возит, и
             * это умолчание для всего существующего парка.
             */}
-          {!express && (
+          {vehicleClass === 'TRACTOR' && (
           <Field label={t.vehicle.containerFeet} hint={t.vehicle.containerFeetHint}>
             {() => (
               <div className="flex flex-wrap gap-3">
