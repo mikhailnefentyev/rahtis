@@ -3841,10 +3841,12 @@ export type Database = {
           axles: number
           body_type: Database["public"]["Enums"]["body_type"] | null
           company_id: string
+          coupling_distance_m: number | null
           created_at: string
           gross_max_kg: number | null
           id: string
           kind: Database["public"]["Enums"]["trailer_kind"]
+          length_m: number | null
           plate: string
           tare_kg: number | null
           twin_wheels: boolean
@@ -3854,10 +3856,12 @@ export type Database = {
           axles: number
           body_type?: Database["public"]["Enums"]["body_type"] | null
           company_id: string
+          coupling_distance_m?: number | null
           created_at?: string
           gross_max_kg?: number | null
           id?: string
           kind: Database["public"]["Enums"]["trailer_kind"]
+          length_m?: number | null
           plate: string
           tare_kg?: number | null
           twin_wheels?: boolean
@@ -3867,10 +3871,12 @@ export type Database = {
           axles?: number
           body_type?: Database["public"]["Enums"]["body_type"] | null
           company_id?: string
+          coupling_distance_m?: number | null
           created_at?: string
           gross_max_kg?: number | null
           id?: string
           kind?: Database["public"]["Enums"]["trailer_kind"]
+          length_m?: number | null
           plate?: string
           tare_kg?: number | null
           twin_wheels?: boolean
@@ -4075,6 +4081,7 @@ export type Database = {
           company_id: string
           company_kind: Database["public"]["Enums"]["party_role"]
           container_feet: number[]
+          coupling_distance_m: number | null
           created_at: string
           driver_name: string | null
           euro_class: Database["public"]["Enums"]["euro_class"]
@@ -4110,6 +4117,7 @@ export type Database = {
           company_id: string
           company_kind?: Database["public"]["Enums"]["party_role"]
           container_feet?: number[]
+          coupling_distance_m?: number | null
           created_at?: string
           driver_name?: string | null
           euro_class: Database["public"]["Enums"]["euro_class"]
@@ -4145,6 +4153,7 @@ export type Database = {
           company_id?: string
           company_kind?: Database["public"]["Enums"]["party_role"]
           container_feet?: number[]
+          coupling_distance_m?: number | null
           created_at?: string
           driver_name?: string | null
           euro_class?: Database["public"]["Enums"]["euro_class"]
@@ -5492,6 +5501,7 @@ export type Database = {
           company_id: string
           company_kind: Database["public"]["Enums"]["party_role"]
           container_feet: number[]
+          coupling_distance_m: number | null
           created_at: string
           driver_name: string | null
           euro_class: Database["public"]["Enums"]["euro_class"]
@@ -6747,6 +6757,7 @@ export type Database = {
           company_id: string
           company_kind: Database["public"]["Enums"]["party_role"]
           container_feet: number[]
+          coupling_distance_m: number | null
           created_at: string
           driver_name: string | null
           euro_class: Database["public"]["Enums"]["euro_class"]

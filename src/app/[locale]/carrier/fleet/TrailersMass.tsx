@@ -22,6 +22,7 @@ const KINDS: TrailerKind[] = ['FULL', 'SEMI', 'CENTER_AXLE'];
 const initial: TrailerState = { error: null, done: false };
 
 const tonnes = (kg: number) => `${(kg / 1000).toLocaleString('fi-FI', { maximumFractionDigits: 1 })} t`;
+const metres = (m: number) => `${Number(m).toLocaleString('fi-FI', { maximumFractionDigits: 2 })} m`;
 
 /**
  * Прицепы перевозчика и сцепки с разрешённой массой.
@@ -44,7 +45,8 @@ export function TrailersMass({ vehicles, trailers }: { vehicles: Vehicle[]; trai
     const motors = vehicles.filter((v) => v.vehicle_class !== 'VAN' && v.access !== 'REJECTED');
     const list: { key: string; motor: Vehicle; trailer: Trailer | null }[] = [];
     for (const motor of motors) {
-      list.push({ key: motor.id, motor, trailer: null });
+      /* Тягач без полуприцепа груз не возит — строки «без прицепа» у него нет (было «28 т» у трёхосного). */
+      if (motor.vehicle_class !== 'TRACTOR') list.push({ key: motor.id, motor, trailer: null });
       for (const trailer of trailers) {
         const m: MotorUnit = { kind: motor.vehicle_class === 'TRACTOR' ? 'TRACTOR' : 'TRUCK', axles: motor.axles };
         const tr: TrailerUnit = { kind: trailer.kind, axles: trailer.axles, twinWheels: trailer.twin_wheels };
@@ -57,9 +59,19 @@ export function TrailersMass({ vehicles, trailers }: { vehicles: Vehicle[]; trai
         axles: row.motor.axles,
         grossMaxKg: row.motor.gross_max_kg,
         tareKg: row.motor.tare_kg,
+        couplingM: row.motor.coupling_distance_m,
       };
       const trailerUnits: TrailerUnit[] = row.trailer
-        ? [{ kind: row.trailer.kind, axles: row.trailer.axles, twinWheels: row.trailer.twin_wheels, grossMaxKg: row.trailer.gross_max_kg, tareKg: row.trailer.tare_kg }]
+        ? [
+            {
+              kind: row.trailer.kind,
+              axles: row.trailer.axles,
+              twinWheels: row.trailer.twin_wheels,
+              grossMaxKg: row.trailer.gross_max_kg,
+              tareKg: row.trailer.tare_kg,
+              couplingM: row.trailer.coupling_distance_m,
+            },
+          ]
         : [];
       return { ...row, mass: combinationMass(country, motor, trailerUnits, { roadClass: effectiveClass }) };
     });
@@ -104,6 +116,12 @@ export function TrailersMass({ vehicles, trailers }: { vehicles: Vehicle[]; trai
                   {trailer.body_type && <Badge tone="neutral">{t.mass.bodies[trailer.body_type]}</Badge>}
                   {trailer.twin_wheels && <Badge tone="info">{t.mass.twinWheels}</Badge>}
                   {trailer.tare_kg && <span className="text-ink-dim">· {t.mass.tare} {tonnes(trailer.tare_kg)}</span>}
+                  {trailer.length_m && <span className="text-ink-dim">· {metres(trailer.length_m)}</span>}
+                  {trailer.coupling_distance_m && (
+                    <span className="text-ink-dim">
+                      · {t.mass.couplingShort} {metres(trailer.coupling_distance_m)}
+                    </span>
+                  )}
                 </div>
                 <div className="flex gap-2">
                   <Button size="sm" onClick={() => setEditing(trailer)}>
@@ -169,7 +187,10 @@ export function TrailersMass({ vehicles, trailers }: { vehicles: Vehicle[]; trai
                     {trailer ? <span className="font-mono"> + {trailer.plate}</span> : <span className="text-ink-dim"> · {t.mass.solo}</span>}
                     {motor.body_type && <span className="ml-1 text-ink-dim">· {t.mass.bodies[motor.body_type]}</span>}
                   </td>
-                  <td className="px-3 py-2">{mass.totalAxles}</td>
+                  <td className="px-3 py-2">
+                    {mass.totalAxles}
+                    {mass.spreadM !== null && <span className="block text-xs text-ink-dim">{t.mass.spread} {metres(mass.spreadM)}</span>}
+                  </td>
                   <td className="px-3 py-2">
                     <span className="font-semibold">{tonnes(mass.limitKg)}</span>
                     {mass.technicalKg !== null && mass.technicalKg < mass.legalKg && (
@@ -267,6 +288,14 @@ function TrailerForm({ trailer, onClose }: { trailer: Trailer | null; onClose: (
           </Field>
           <Field label={t.mass.tareKg} hint={t.mass.tareHint}>
             {(p) => <InputMono {...p} name="tare_kg" inputMode="numeric" defaultValue={trailer?.tare_kg ?? ''} placeholder="9000" />}
+          </Field>
+          <Field label={t.mass.lengthM} hint={t.mass.lengthHint}>
+            {(p) => <InputMono {...p} name="length_m" inputMode="decimal" defaultValue={trailer?.length_m ?? ''} placeholder="13,6" />}
+          </Field>
+          <Field label={t.mass.couplingTrailer} hint={t.mass.couplingTrailerHint}>
+            {(p) => (
+              <InputMono {...p} name="coupling_distance_m" inputMode="decimal" defaultValue={trailer?.coupling_distance_m ?? ''} placeholder="8,2" />
+            )}
           </Field>
           <Field label={t.mass.twinWheels} hint={t.mass.twinWheelsHint} className="sm:col-span-2">
             {() => (

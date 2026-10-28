@@ -161,6 +161,18 @@ const kg = (formData: FormData, key: string): number | null => {
   return value === null ? null : Math.round(value);
 };
 
+/** Метры с двумя знаками («8,2» и «8.2»); пусто или вне 1–25 м — null, ограничение базы не сработает на опечатке. */
+const metres = (formData: FormData, key: string): number | null => {
+  const value = num(formData, key);
+  return value === null || value < 1 || value > 25 ? null : Math.round(value * 100) / 100;
+};
+
+/* У машины половина до сцепки не длиннее 15 м (ограничение базы). */
+const vehicleMetres = (formData: FormData): number | null => {
+  const value = metres(formData, 'coupling_distance_m');
+  return value !== null && value <= 15 ? value : null;
+};
+
 function readVehicleForm(formData: FormData) {
   const vehicleClass = String(formData.get('vehicle_class') ?? 'TRACTOR') as VehicleClass;
   const express = vehicleClass !== 'TRACTOR';
@@ -188,6 +200,8 @@ function readVehicleForm(formData: FormData) {
     body_type: vehicleClass === 'TRACTOR' ? null : bodyType(formData),
     gross_max_kg: kg(formData, 'gross_max_kg'),
     tare_kg: kg(formData, 'tare_kg'),
+    /* Фургону расстояние до сцепки не нужно: прицепов у него нет. */
+    coupling_distance_m: vehicleClass === 'VAN' ? null : vehicleMetres(formData),
     adr: formData.get('adr') === '1',
     vehicle_class: vehicleClass,
     /*
@@ -405,6 +419,8 @@ export async function saveTrailerAction(_previous: TrailerState, formData: FormD
     gross_max_kg: kg(formData, 'gross_max_kg'),
     tare_kg: kg(formData, 'tare_kg'),
     twin_wheels: formData.get('twin_wheels') === '1',
+    length_m: metres(formData, 'length_m'),
+    coupling_distance_m: metres(formData, 'coupling_distance_m'),
   };
 
   const supabase = await createClient();

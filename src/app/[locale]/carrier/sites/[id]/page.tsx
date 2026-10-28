@@ -45,8 +45,8 @@ export default async function SiteJobPage({ params }: { params: Promise<{ locale
     supabase.from('site_loads').select('*').eq('job_id', job.id).order('unloaded_at', { ascending: true }),
     supabase.from('scale_sites').select('id, name, city').order('name'),
     supabase.from('drivers').select('id, full_name').eq('company_id', company.id),
-    supabase.from('vehicles').select('id, plate, vehicle_class, axles, gross_max_kg').eq('company_id', company.id),
-    supabase.from('trailers').select('id, plate, kind, axles, twin_wheels, gross_max_kg').eq('company_id', company.id),
+    supabase.from('vehicles').select('id, plate, vehicle_class, axles, gross_max_kg, tare_kg, coupling_distance_m').eq('company_id', company.id),
+    supabase.from('trailers').select('id, plate, kind, axles, twin_wheels, gross_max_kg, tare_kg, coupling_distance_m').eq('company_id', company.id),
     supabase.from('carrier_invoices').select('id, number, issued_on, due_on, total_cents, sent_at, sent_to').eq('job_id', id).order('issued_on', { ascending: false }),
   ]);
 
@@ -71,8 +71,25 @@ export default async function SiteJobPage({ params }: { params: Promise<{ locale
     const limitKg = vehicle
       ? combinationMass(
           country,
-          { kind: vehicle.vehicle_class === 'TRACTOR' ? 'TRACTOR' : 'TRUCK', axles: vehicle.axles, grossMaxKg: vehicle.gross_max_kg },
-          trailer ? [{ kind: trailer.kind, axles: trailer.axles, twinWheels: trailer.twin_wheels, grossMaxKg: trailer.gross_max_kg }] : [],
+          {
+            kind: vehicle.vehicle_class === 'TRACTOR' ? 'TRACTOR' : 'TRUCK',
+            axles: vehicle.axles,
+            grossMaxKg: vehicle.gross_max_kg,
+            tareKg: vehicle.tare_kg,
+            couplingM: vehicle.coupling_distance_m,
+          },
+          trailer
+            ? [
+                {
+                  kind: trailer.kind,
+                  axles: trailer.axles,
+                  twinWheels: trailer.twin_wheels,
+                  grossMaxKg: trailer.gross_max_kg,
+                  tareKg: trailer.tare_kg,
+                  couplingM: trailer.coupling_distance_m,
+                },
+              ]
+            : [],
         ).limitKg
       : null;
     return {

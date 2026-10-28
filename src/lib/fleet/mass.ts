@@ -6,9 +6,22 @@
  * полуприцеп» в Германии — до 40 т. Отсюда грузоподъёмность (разрешённая
  * масса минус тара) и предупреждение о перегрузе на весах.
  *
- * Правила — по числу осей. Там, где закон считает ещё и расстояние между
- * крайними осями (Швеция, Норвегия, Дания) или класс дороги, результат —
- * верхняя граница (basis 'upper'), и интерфейс говорит это словами.
+ * Правила — по числу осей. В Финляндии сцепка тяжелее 44 т ограничена ещё
+ * расстоянием между крайними осями (20 т + 320 кг на каждые 0,10 м сверх
+ * 1,80 м, asetus 1257/1992, 23 §), а сцепка с полуприцепом — суммой
+ * тягача и осевой тележки полуприцепа (таблица Traficom с 21.1.2019:
+ * 3+3 — 28 + 24 = 52 т от 11,8 м, 3+4 — 58 т от 13,68 м, 3+5 — 64 т от
+ * 15,55 м). Расстояние известно, если у машины и прицепа заполнены
+ * половины до сцепного устройства. Где расстояние не известно, закон
+ * считает его иначе (Швеция, Норвегия, Дания) или предел зависит от
+ * дороги, результат — верхняя граница (basis 'upper'), и интерфейс
+ * говорит это словами.
+ *
+ * Грузоподъёмность сцепки с полуприцепом ограничивает сам полуприцеп:
+ * его масса по техпаспорту уже включает нагрузку на седло, поэтому
+ * техпредел сцепки — тара тягача плюс масса полуприцепа, а не сумма двух
+ * техпаспортов (пользователь 28.10.2026: трёхосный тягач берёт
+ * полуприцеп с грузом 30–31 т).
  *
  * Источники (проверено 26.10.2026):
  *   FI — таблица SKAL «Mitat ja massat» (skal.fi/kuljetusala/ajoneuvosaadokset/mitat-ja-massat),
@@ -38,6 +51,8 @@ export type MotorUnit = {
   axles: number;
   grossMaxKg?: number | null;
   tareKg?: number | null;
+  /** От передней оси до седла или сцепного устройства, м. */
+  couplingM?: number | null;
 };
 
 export type TrailerUnit = {
@@ -47,6 +62,8 @@ export type TrailerUnit = {
   twinWheels: boolean;
   grossMaxKg?: number | null;
   tareKg?: number | null;
+  /** От шкворня или петли дышла до последней оси, м. */
+  couplingM?: number | null;
 };
 
 export type CombinationProblem = 'SEMI_NEEDS_TRACTOR' | 'TRAILER_NEEDS_TRUCK' | 'TOO_MANY_TRAILERS';
@@ -65,11 +82,33 @@ export type MassResult = {
   /** exact — по осям и закону; upper — верхняя граница, зависит от расстояния между осями или дороги. */
   basis: 'exact' | 'upper';
   totalAxles: number;
+  /** Расстояние между крайними осями сцепки, м; null — не заполнены размеры. */
+  spreadM: number | null;
 };
 
 const EU_RIGID: Record<number, number> = { 2: 18_000, 3: 26_000, 4: 32_000 };
 const FI_RIGID: Record<number, number> = { 2: 18_000, 3: 28_000, 4: 35_000, 5: 42_000 };
 const FI_COMBINATION: Record<number, number> = { 4: 36_000, 5: 44_000, 6: 53_000, 7: 60_000, 8: 64_000, 9: 69_000, 10: 74_000 };
+
+/* Осевая тележка полуприцепа в Финляндии: 2 оси 20 т, 3 — 24 т (27 т на сдвоенных колёсах), 4 — 30 т, 5+ — 36 т. */
+function finnishSemiGroup(axles: number, twin: boolean): number {
+  if (axles <= 1) return 10_000;
+  if (axles === 2) return 20_000;
+  if (axles === 3) return twin ? 27_000 : 24_000;
+  if (axles === 4) return 30_000;
+  return 36_000;
+}
+
+/** Предел по расстоянию между крайними осями: 20 т + 320 кг за каждые 0,10 м сверх 1,80 м (правило для сцепок тяжелее 44 т). */
+export function finnishSpreadKg(spreadM: number): number {
+  return Math.max(44_000, Math.floor((20_000 + 3_200 * (spreadM - 1.8)) / 10) * 10);
+}
+
+/** Расстояние между крайними осями сцепки из двух половин до сцепного устройства. */
+export function combinationSpreadM(motor: MotorUnit, trailers: readonly TrailerUnit[]): number | null {
+  if (trailers.length !== 1 || !motor.couplingM || !trailers[0].couplingM) return null;
+  return Math.round((motor.couplingM + trailers[0].couplingM) * 100) / 100;
+}
 
 function rigid(table: Record<number, number>, axles: number): number {
   const keys = Object.keys(table).map(Number);
@@ -119,7 +158,15 @@ export function legalMassKg(
       if (solo) return { kg: rigid(FI_RIGID, motor.axles), basis: motor.axles >= 3 && motor.axles <= 4 ? 'upper' : 'exact' };
       const twin = trailers.every((t) => t.twinWheels);
       const centerOnly = trailers.length === 1 && trailers[0].kind === 'CENTER_AXLE';
-      return { kg: finnishCombination(totalAxles, twin, centerOnly), basis: 'exact' };
+      let kg = finnishCombination(totalAxles, twin, centerOnly);
+      /* Полуприцеп: тягач по своим осям плюс тележка полуприцепа. */
+      if (trailers.length === 1 && trailers[0].kind === 'SEMI') {
+        kg = Math.min(kg, rigid(FI_RIGID, motor.axles) + finnishSemiGroup(trailers[0].axles, trailers[0].twinWheels));
+      }
+      if (kg <= 44_000) return { kg, basis: 'exact' };
+      const spread = combinationSpreadM(motor, trailers);
+      if (spread === null) return { kg, basis: 'upper' };
+      return { kg: Math.min(kg, finnishSpreadKg(spread)), basis: 'exact' };
     }
     case 'SE': {
       if (solo) return { kg: rigid(EU_RIGID, motor.axles), basis: 'upper' };
@@ -154,7 +201,19 @@ export function combinationMass(
   const legal = legalMassKg(country, motor, trailers, options);
   const parts = [motor, ...trailers];
 
-  const technicalKg = parts.every((p) => p.grossMaxKg) ? parts.reduce((s, p) => s + (p.grossMaxKg ?? 0), 0) : null;
+  /*
+   * Техпредел. Полуприцеп опирается на седло, и его масса по техпаспорту
+   * уже включает эту нагрузку: сцепка = тара тягача + масса полуприцепа.
+   * Прицеп на своих осях — сумма техпаспортов.
+   */
+  const semi = trailers.length === 1 && trailers[0].kind === 'SEMI' ? trailers[0] : null;
+  const technicalKg = semi
+    ? semi.grossMaxKg && motor.tareKg
+      ? motor.tareKg + semi.grossMaxKg
+      : null
+    : parts.every((p) => p.grossMaxKg)
+      ? parts.reduce((s, p) => s + (p.grossMaxKg ?? 0), 0)
+      : null;
   const tareKg = parts.every((p) => p.tareKg) ? parts.reduce((s, p) => s + (p.tareKg ?? 0), 0) : null;
   const limitKg = technicalKg ? Math.min(legal.kg, technicalKg) : legal.kg;
 
@@ -166,6 +225,7 @@ export function combinationMass(
     payloadKg: tareKg !== null ? Math.max(0, limitKg - tareKg) : null,
     basis: legal.basis,
     totalAxles: parts.reduce((s, p) => s + p.axles, 0),
+    spreadM: combinationSpreadM(motor, trailers),
   };
 }
 

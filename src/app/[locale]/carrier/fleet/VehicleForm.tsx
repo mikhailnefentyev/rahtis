@@ -212,6 +212,17 @@ export function VehicleForm({
                   <InputMono {...p} name="tare_kg" inputMode="numeric" defaultValue={vehicle?.tare_kg ?? ''} placeholder="15000" />
                 )}
               </Field>
+              <Field label={t.mass.couplingVehicle} hint={t.mass.couplingVehicleHint}>
+                {(p) => (
+                  <InputMono
+                    {...p}
+                    name="coupling_distance_m"
+                    inputMode="decimal"
+                    defaultValue={vehicle?.coupling_distance_m ?? ''}
+                    placeholder={vehicleClass === 'TRACTOR' ? '3,6' : '7,5'}
+                  />
+                )}
+              </Field>
             </>
           )}
 

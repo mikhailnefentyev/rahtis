@@ -22,8 +22,8 @@ test('FI: одиночные nuppi 4 и 5 осей — 35 и 42 т', () => {
   assert.equal(legalMassKg('FI', nuppi5, []).kg, 42_000);
 });
 
-test('FI: тягач 3 + полуприцеп 3 = 6 осей — 53 т; 4+4 со сдвоенными — 68 т', () => {
-  assert.equal(legalMassKg('FI', tractor3, [semi3]).kg, 53_000);
+test('FI: тягач 3 + полуприцеп 3 — 28 + 24 = 52 т (таблица Traficom 2019); 4+4 со сдвоенными — 68 т', () => {
+  assert.equal(legalMassKg('FI', tractor3, [semi3]).kg, 52_000);
   assert.equal(legalMassKg('FI', nuppi4, [cassette4]).kg, 68_000);
 });
 
@@ -67,4 +67,34 @@ test('сцепка собирается по правилам, перегруз 
   assert.equal(combinationProblem(nuppi5, [cassette4]), null);
   assert.equal(overloadKg(77_250, 76_000), 1_250);
   assert.equal(overloadKg(70_000, 76_000), 0);
+});
+
+test('FI: полуприцепы по таблице Traficom 2019 — 2+3 42 т, 3+2 44 т, 3+4 58 т, 3+5 64 т', () => {
+  assert.equal(legalMassKg('FI', tractor2, [semi3]).kg, 42_000);
+  assert.equal(legalMassKg('FI', tractor3, [{ kind: 'SEMI', axles: 2, twinWheels: false }]).kg, 44_000);
+  assert.equal(legalMassKg('FI', tractor3, [{ kind: 'SEMI', axles: 4, twinWheels: false }]).kg, 58_000);
+  assert.equal(legalMassKg('FI', tractor3, [{ kind: 'SEMI', axles: 5, twinWheels: false }]).kg, 64_000);
+});
+
+test('FI: расстояние между крайними осями — 52 т от 11,8 м, меньше — меньше; без размеров — верхняя граница', () => {
+  const tractor = { ...tractor3, couplingM: 3.6 };
+  assert.deepEqual(legalMassKg('FI', tractor, [{ ...semi3, couplingM: 8.2 }]), { kg: 52_000, basis: 'exact' });
+  /* 3,6 + 7,0 = 10,6 м → 20 + 3,2 × 8,8 = 48,16 т */
+  assert.deepEqual(legalMassKg('FI', tractor, [{ ...semi3, couplingM: 7.0 }]), { kg: 48_160, basis: 'exact' });
+  assert.deepEqual(legalMassKg('FI', tractor3, [semi3]), { kg: 52_000, basis: 'upper' });
+  /* 76 т — от 19,3 м */
+  assert.equal(legalMassKg('FI', { ...nuppi5, couplingM: 9.0 }, [{ ...cassette4, couplingM: 10.3 }]).kg, 76_000);
+  assert.equal(legalMassKg('FI', { ...nuppi5, couplingM: 9.0 }, [{ ...cassette4, couplingM: 9.0 }]).kg, 71_840);
+});
+
+test('тягач + полуприцеп: груз ограничивает полуприцеп — 31,5 т, а не сумма техпаспортов', () => {
+  const r = combinationMass(
+    'FI',
+    { ...tractor3, grossMaxKg: 26_000, tareKg: 8_500, couplingM: 3.6 },
+    [{ ...semi3, grossMaxKg: 39_000, tareKg: 7_500, couplingM: 8.2 }],
+  );
+  assert.equal(r.legalKg, 52_000);
+  assert.equal(r.technicalKg, 47_500);
+  assert.equal(r.payloadKg, 31_500);
+  assert.equal(r.spreadM, 11.8);
 });
