@@ -531,7 +531,8 @@ export async function saveComboAction(_previous: ComboState, formData: FormData)
   if (!vehicleId) return { error: t.validation.required, done: false };
 
   const [{ data: vehicle }, { data: trailer }] = await Promise.all([
-    supabase.from('vehicles').select('*').eq('id', vehicleId).eq('company_id', company.id).maybeSingle(),
+    /* Отклонённая оператором машина в сцепку не идёт (база проверит то же на этапе B). */
+    supabase.from('vehicles').select('*').eq('id', vehicleId).eq('company_id', company.id).neq('access', 'REJECTED').maybeSingle(),
     trailerId
       ? supabase.from('trailers').select('*').eq('id', trailerId).eq('company_id', company.id).maybeSingle()
       : Promise.resolve({ data: null }),
