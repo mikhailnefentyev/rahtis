@@ -66,17 +66,26 @@ export type DeskBusy = { vehicleId: string; ref: string; date: string; time: str
 function TakeButton({
   orderId,
   vehicles,
+  combos = [],
   pickupDate,
   busy,
 }: {
   orderId: string;
   vehicles: Vehicle[];
+  /** Сцепки из конструктора, подходящие заказу по виду; точную проверку делает база. */
+  combos?: DeskCombo[];
   pickupDate: string | null;
   busy: DeskBusy[];
 }) {
   const { t, m, f, locale } = useI18n();
   const [state, formAction, pending] = useActionState(takeOrderAction, initialTake);
-  const [vehicleId, setVehicleId] = useState(vehicles[0]?.id ?? '');
+  /* Сначала сцепки (с прицепом рейса), потом машины без сцепки — как раньше. */
+  const choices = [
+    ...combos.map((c) => ({ value: `c:${c.id}`, vehicleId: c.vehicle_id, label: c.name })),
+    ...vehicles.map((v) => ({ value: v.id, vehicleId: v.id, label: v.plate })),
+  ];
+  const [choice, setChoice] = useState(choices[0]?.value ?? '');
+  const vehicleId = choices.find((c) => c.value === choice)?.vehicleId ?? '';
 
   /*
    * Предупреждение, а не запрет (решение пользователя от 26.09.2026): два
@@ -90,7 +99,7 @@ function TakeButton({
   const clashPlate = vehicles.find((v) => v.id === vehicleId)?.plate ?? '';
 
   /* Подходящей машины нет — говорим об этом сразу, а не пустым списком и отказом после отправки. */
-  if (vehicles.length === 0) {
+  if (choices.length === 0) {
     return <p className="max-w-52 text-right text-xs text-ink-muted">{t.matching.wrongClass}</p>;
   }
 
@@ -99,21 +108,15 @@ function TakeButton({
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="order_id" value={orderId} />
 
-      {vehicles.length === 1 ? (
-        <input type="hidden" name="vehicle_id" value={vehicles[0]!.id} />
+      {choices.length === 1 ? (
+        <input type="hidden" name="vehicle_id" value={choices[0]!.value} />
       ) : (
         <label className="flex flex-col items-end gap-1">
-          <span className="label-micro">{t.matching.chooseVehicle}</span>
-          <Select
-            name="vehicle_id"
-            required
-            className="w-44"
-            value={vehicleId}
-            onChange={(e) => setVehicleId(e.target.value)}
-          >
-            {vehicles.map((vehicle) => (
-              <option key={vehicle.id} value={vehicle.id}>
-                {vehicle.plate}
+          <span className="label-micro">{combos.length ? t.matching.chooseCombo : t.matching.chooseVehicle}</span>
+          <Select name="vehicle_id" required className="w-56" value={choice} onChange={(e) => setChoice(e.target.value)}>
+            {choices.map((c) => (
+              <option key={c.value} value={c.value}>
+                {c.label}
               </option>
             ))}
           </Select>
@@ -153,11 +156,14 @@ function TakeButton({
 export function DeskList({
   orders,
   vehicles,
+  combos = [],
   busy = [],
   waiting = {},
 }: {
   orders: DeskOrder[];
   vehicles: Vehicle[];
+  /** Сохранённые сцепки перевозчика (конструктор в автопарке). */
+  combos?: DeskCombo[];
   busy?: DeskBusy[];
   /** Простой на площадках по id точки — где набралась статистика. */
   waiting?: Record<string, SiteWaiting>;
@@ -201,6 +207,8 @@ export function DeskList({
                       * везти, дальше читать незачем.
                       */}
                     <HaulBadge haulKind={order.haul_kind} containerFeet={order.container_feet} ldm={order.ldm} />
+                    {/* Требования заказа: кузов, загрузка, пометки фуры. */}
+                    <RequirementBadges requirements={order.requirements} />
                     <Mono className="text-xs text-ink-dim">{order.ref}</Mono>
                     {/* Номер прицепа — по нему водитель находит железо на площадке. */}
                     {order.trailer_plate && <Plate>{order.trailer_plate}</Plate>}
@@ -294,6 +302,7 @@ export function DeskList({
                       vehicles={vehicles.filter((v) =>
                         vehicleClassFits(order.haul_kind, v.vehicle_class),
                       )}
+                      combos={combos.filter((c) => COMBO_KINDS_FOR[order.haul_kind]?.includes(c.kind))}
                       pickupDate={order.pickup_date}
                       busy={busy.filter((b) => b.ref !== order.ref)}
                     />
@@ -350,5 +359,40 @@ export function DeskList({
         );
       })}
     </div>
+  );
+}
+
+export type DeskCombo = { id: string; vehicle_id: string; kind: string; name: string };
+
+/* Какие сцепки вообще подходят виду заказа (грубо; размеры, кузов, загрузку и вес проверяет база — take_order_combo). */
+const COMBO_KINDS_FOR: Partial<Record<string, readonly string[]>> = {
+  TRAILER: ['TRACTOR_SOLO'],
+  CONTAINER: ['TRACTOR_SOLO'],
+  VAN: ['VAN', 'TRUCK', 'TRUCK_TRAILER'],
+  TRUCK: ['TRUCK', 'TRUCK_TRAILER'],
+  SEMI: ['SEMI'],
+  TIPPER: ['NUPPI', 'KASETTI', 'PUOLIKAS'],
+};
+
+/** Кузов, загрузка и пометки фуры у заказа — бейджами рядом с видом перевозки. */
+function RequirementBadges({ requirements }: { requirements: unknown }) {
+  const { t } = useI18n();
+  const r = (requirements ?? {}) as { body?: string | null; loading?: string[] | null; semi?: string[] | null };
+  const semi = (r.semi ?? []).filter((x) => x === 'MEGA' || x === 'LIFTING_ROOF');
+  if (!r.body && !(r.loading ?? []).length && !semi.length) return null;
+  return (
+    <>
+      {r.body && <Badge tone="info">{t.mass.bodies[r.body as keyof typeof t.mass.bodies] ?? r.body}</Badge>}
+      {(r.loading ?? []).map((l) => (
+        <Badge key={l} tone="neutral">
+          {t.mass.loading[l as keyof typeof t.mass.loading] ?? l}
+        </Badge>
+      ))}
+      {semi.map((x) => (
+        <Badge key={x} tone="neutral">
+          {t.semi.features[x as 'MEGA' | 'LIFTING_ROOF']}
+        </Badge>
+      ))}
+    </>
   );
 }

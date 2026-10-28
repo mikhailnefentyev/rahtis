@@ -2519,29 +2519,35 @@ export type Database = {
       order_offers: {
         Row: {
           carrier_company_id: string
+          combo_id: string | null
           created_at: string
           created_by: string | null
           id: string
           order_id: string
           origin: Database["public"]["Enums"]["offer_origin"]
+          trailer_id: string | null
           vehicle_id: string
         }
         Insert: {
           carrier_company_id: string
+          combo_id?: string | null
           created_at?: string
           created_by?: string | null
           id?: string
           order_id: string
           origin?: Database["public"]["Enums"]["offer_origin"]
+          trailer_id?: string | null
           vehicle_id: string
         }
         Update: {
           carrier_company_id?: string
+          combo_id?: string | null
           created_at?: string
           created_by?: string | null
           id?: string
           order_id?: string
           origin?: Database["public"]["Enums"]["offer_origin"]
+          trailer_id?: string | null
           vehicle_id?: string
         }
         Relationships: [
@@ -2553,10 +2559,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "order_offers_combo_id_fkey"
+            columns: ["combo_id"]
+            isOneToOne: false
+            referencedRelation: "vehicle_combos"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "order_offers_order_id_fkey"
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_offers_trailer_id_fkey"
+            columns: ["trailer_id"]
+            isOneToOne: false
+            referencedRelation: "trailers"
             referencedColumns: ["id"]
           },
           {
@@ -2893,6 +2913,8 @@ export type Database = {
           published_at: string | null
           rate_cents: number | null
           ref: string
+          required_body: string | null
+          required_loading: string[]
           route_bounds: Json | null
           route_computed_at: string | null
           route_fingerprint: string | null
@@ -2950,6 +2972,8 @@ export type Database = {
           published_at?: string | null
           rate_cents?: number | null
           ref?: string
+          required_body?: string | null
+          required_loading?: string[]
           route_bounds?: Json | null
           route_computed_at?: string | null
           route_fingerprint?: string | null
@@ -3007,6 +3031,8 @@ export type Database = {
           published_at?: string | null
           rate_cents?: number | null
           ref?: string
+          required_body?: string | null
+          required_loading?: string[]
           route_bounds?: Json | null
           route_computed_at?: string | null
           route_fingerprint?: string | null
@@ -4489,6 +4515,8 @@ export type Database = {
           published_at: string | null
           rate_cents: number | null
           ref: string
+          required_body: string | null
+          required_loading: string[]
           route_bounds: Json | null
           route_computed_at: string | null
           route_fingerprint: string | null
@@ -5073,6 +5101,8 @@ export type Database = {
           published_at: string | null
           rate_cents: number | null
           ref: string
+          required_body: string | null
+          required_loading: string[]
           route_bounds: Json | null
           route_computed_at: string | null
           route_fingerprint: string | null
@@ -5156,6 +5186,8 @@ export type Database = {
           published_at: string | null
           rate_cents: number | null
           ref: string
+          required_body: string | null
+          required_loading: string[]
           route_bounds: Json | null
           route_computed_at: string | null
           route_fingerprint: string | null
@@ -5329,6 +5361,8 @@ export type Database = {
           published_at: string | null
           rate_cents: number | null
           ref: string
+          required_body: string | null
+          required_loading: string[]
           route_bounds: Json | null
           route_computed_at: string | null
           route_fingerprint: string | null
@@ -5401,6 +5435,8 @@ export type Database = {
           published_at: string | null
           rate_cents: number | null
           ref: string
+          required_body: string | null
+          required_loading: string[]
           route_bounds: Json | null
           route_computed_at: string | null
           route_fingerprint: string | null
@@ -5580,6 +5616,8 @@ export type Database = {
           published_at: string | null
           rate_cents: number | null
           ref: string
+          required_body: string | null
+          required_loading: string[]
           route_bounds: Json | null
           route_computed_at: string | null
           route_fingerprint: string | null
@@ -5654,6 +5692,8 @@ export type Database = {
           published_at: string | null
           rate_cents: number | null
           ref: string
+          required_body: string | null
+          required_loading: string[]
           route_bounds: Json | null
           route_computed_at: string | null
           route_fingerprint: string | null
@@ -5764,6 +5804,7 @@ export type Database = {
           published_at: string
           rate_cents: number
           ref: string
+          requirements: Json
           route_bounds: Json
           route_geometry: string
           shipper_name: string
@@ -5818,6 +5859,8 @@ export type Database = {
           published_at: string | null
           rate_cents: number | null
           ref: string
+          required_body: string | null
+          required_loading: string[]
           route_bounds: Json | null
           route_computed_at: string | null
           route_fingerprint: string | null
@@ -6138,6 +6181,8 @@ export type Database = {
           published_at: string | null
           rate_cents: number | null
           ref: string
+          required_body: string | null
+          required_loading: string[]
           route_bounds: Json | null
           route_computed_at: string | null
           route_fingerprint: string | null
@@ -6634,6 +6679,8 @@ export type Database = {
           published_at: string | null
           rate_cents: number | null
           ref: string
+          required_body: string | null
+          required_loading: string[]
           route_bounds: Json | null
           route_computed_at: string | null
           route_fingerprint: string | null
@@ -6729,6 +6776,8 @@ export type Database = {
           published_at: string | null
           rate_cents: number | null
           ref: string
+          required_body: string | null
+          required_loading: string[]
           route_bounds: Json | null
           route_computed_at: string | null
           route_fingerprint: string | null
@@ -6950,6 +6999,8 @@ export type Database = {
           published_at: string | null
           rate_cents: number | null
           ref: string
+          required_body: string | null
+          required_loading: string[]
           route_bounds: Json | null
           route_computed_at: string | null
           route_fingerprint: string | null
@@ -7092,6 +7143,76 @@ export type Database = {
           published_at: string | null
           rate_cents: number | null
           ref: string
+          required_body: string | null
+          required_loading: string[]
+          route_bounds: Json | null
+          route_computed_at: string | null
+          route_fingerprint: string | null
+          route_geometry: string | null
+          semi_features: string[]
+          settled_at: string | null
+          shipper_company_id: string
+          shipper_company_kind: Database["public"]["Enums"]["party_role"]
+          shipper_fee_bps: number | null
+          shipper_ref: string | null
+          site_pricing: Database["public"]["Enums"]["site_pricing"] | null
+          site_rate_cents: number | null
+          status: Database["public"]["Enums"]["order_status"]
+          terms_document_id: string | null
+          tipper_config: string | null
+          track_token: string | null
+          trailer: string | null
+          trailer_plate: string | null
+          updated_at: string
+          waiting: Json
+          waiting_cents: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      take_order_combo: {
+        Args: { p_combo_id: string; p_order_id: string }
+        Returns: {
+          assigned_company_id: string | null
+          assigned_driver_id: string | null
+          assigned_vehicle_id: string | null
+          billing: Database["public"]["Enums"]["billing_status"]
+          chosen_offer_id: string | null
+          closed_at: string | null
+          comment: string | null
+          commission_bps: number | null
+          container_feet: number | null
+          contract_party: Database["public"]["Enums"]["contract_party"]
+          created_at: string
+          created_by: string | null
+          deadline_at: string | null
+          desk_contract: Database["public"]["Enums"]["contract_party"]
+          dispatch_mode: Database["public"]["Enums"]["dispatch_mode"]
+          distance_auto_km: number | null
+          distance_km: number | null
+          distance_source: Database["public"]["Enums"]["distance_source"]
+          group_released_at: string | null
+          group_until: string | null
+          group_vehicle_ids: string[] | null
+          haul_kind: Database["public"]["Enums"]["haul_kind"]
+          id: string
+          invoice_ref: string | null
+          invoiced_at: string | null
+          ldm: number | null
+          material_code: string | null
+          order_type: Database["public"]["Enums"]["order_type"]
+          paid_at: string | null
+          planned_qty: number | null
+          planned_volume_m3: number | null
+          published_at: string | null
+          rate_cents: number | null
+          ref: string
+          required_body: string | null
+          required_loading: string[]
           route_bounds: Json | null
           route_computed_at: string | null
           route_fingerprint: string | null
@@ -7305,6 +7426,8 @@ export type Database = {
           published_at: string | null
           rate_cents: number | null
           ref: string
+          required_body: string | null
+          required_loading: string[]
           route_bounds: Json | null
           route_computed_at: string | null
           route_fingerprint: string | null

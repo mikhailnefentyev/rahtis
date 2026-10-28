@@ -1220,6 +1220,8 @@ export const lv = {
   },
 
   orderForm: {
+    requiredBody: 'Virsbūve',
+    anyBody: 'Jebkura',
     feeHint: 'Pakalpojuma maksa 5 % (vismaz 15 € par reisu kopā ar pārvadātāja maksu). Tiešais līgums ar pārvadātāju, kas izmanto ikmēneša maksu, ir bez maksas.',
     title: 'Jauns pasūtījums',
     subtitle: 'Aizpildiet visu maršrutu un publicējiet. Pārvadātāji to redz uzreiz.',
@@ -1338,6 +1340,7 @@ export const lv = {
   },
 
   matching: {
+    chooseCombo: 'Sastāvs',
     take: 'Ņemu reisu',
     taking: 'Sūta…',
     taken: 'Piedāvājums nosūtīts',

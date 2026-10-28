@@ -1423,6 +1423,8 @@ export const fi = {
   },
 
   orderForm: {
+    requiredBody: 'Kori',
+    anyBody: 'Mikä tahansa',
     feeHint: 'Palvelumaksu 5 % (vähintään 15 € keikalta yhdessä kuljetusliikkeen maksun kanssa). Suora sopimus kuukausimaksua käyttävän kuljetusliikkeen kanssa on maksuton.',
     title: 'Uusi kuljetus',
     subtitle: 'Täytä reitti kokonaan ja julkaise. Kuljetus näkyy kuljetusliikkeille heti.',
@@ -1555,6 +1557,7 @@ export const fi = {
   },
 
   matching: {
+    chooseCombo: 'Yhdistelmä',
     take: 'Otan kuljetuksen',
     taking: 'Lähetetään…',
     taken: 'Tarjous lähetetty',

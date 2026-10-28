@@ -1220,6 +1220,8 @@ export const et = {
   },
 
   orderForm: {
+    requiredBody: 'Kere',
+    anyBody: 'Ükskõik milline',
     feeHint: 'Teenustasu 5 % (koos vedaja tasuga vähemalt 15 € veo kohta). Otseleping kuutasuga vedajaga on tasuta.',
     title: 'Uus vedu',
     subtitle: 'Täida kogu marsruut ja avalda. Vedajad näevad vedu kohe.',
@@ -1338,6 +1340,7 @@ export const et = {
   },
 
   matching: {
+    chooseCombo: 'Autorong',
     take: 'Võtan veo',
     taking: 'Saadan…',
     taken: 'Pakkumine saadetud',

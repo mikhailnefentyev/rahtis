@@ -591,11 +591,22 @@ export async function saveComboAction(_previous: ComboState, formData: FormData)
     semi_features: summary.semiFeatures,
   };
 
-  /* Та же пара второй раз — пересчёт (размеры могли поменяться), а не дубль. */
+  /*
+   * Пишет сервер служебным ключом: из браузера сцепку не записать, иначе
+   * расчётные поля (предел, груз, метры) можно было бы вписать любыми, а
+   * по ним идёт подбор заказов. Машина и прицеп выше уже проверены как
+   * свои — под сессией перевозчика. Та же пара второй раз — пересчёт.
+   */
+  const { createAdminClient } = await import('@/lib/supabase/admin');
+  const admin = createAdminClient();
   const id = text(formData, 'id');
+  if (id) {
+    const { data: own } = await supabase.from('vehicle_combos').select('id').eq('id', id).eq('company_id', company.id).maybeSingle();
+    if (!own) return { error: t.error.generic, done: false };
+  }
   const { error } = id
-    ? await supabase.from('vehicle_combos').update(values).eq('id', id)
-    : await supabase.from('vehicle_combos').upsert(values, { onConflict: 'vehicle_id,trailer_id' });
+    ? await admin.from('vehicle_combos').update(values).eq('id', id).eq('company_id', company.id)
+    : await admin.from('vehicle_combos').upsert(values, { onConflict: 'vehicle_id,trailer_id' });
   if (error) return { error: error.code === '22023' ? t.combos.invalid : t.error.generic, done: false };
 
   revalidatePath(`/${locale}/carrier/fleet`);

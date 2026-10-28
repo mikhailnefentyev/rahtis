@@ -1219,6 +1219,8 @@ export const pl = {
   },
 
   orderForm: {
+    requiredBody: 'Zabudowa',
+    anyBody: 'Dowolna',
     feeHint: 'Opłata serwisowa 5 % (co najmniej 15 € za przewóz łącznie z opłatą przewoźnika). Bezpośrednia umowa z przewoźnikiem w abonamencie jest bezpłatna.',
     title: 'Nowe zlecenie',
     subtitle: 'Uzupełnij całą trasę i opublikuj. Przewoźnicy od razu zobaczą zlecenie.',
@@ -1337,6 +1339,7 @@ export const pl = {
   },
 
   matching: {
+    chooseCombo: 'Zestaw',
     take: 'Biorę to zlecenie',
     taking: 'Wysyłanie…',
     taken: 'Oferta wysłana',

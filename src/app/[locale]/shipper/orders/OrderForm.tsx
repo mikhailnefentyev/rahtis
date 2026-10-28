@@ -826,6 +826,40 @@ export function OrderForm({
                 </Field>
               </div>
             )}
+            {express && !tipper && (
+              <div className="flex flex-col gap-3 sm:col-span-4 sm:flex-row sm:items-end sm:gap-6">
+                <Field label={t.orderForm.requiredBody}>
+                  {(p) => (
+                    <Select {...p} name="required_body" defaultValue={origin?.required_body ?? ''}>
+                      <option value="">{t.orderForm.anyBody}</option>
+                      {(['CURTAIN', 'BOX', 'REEFER', 'ISOTHERM', 'FLATBED', 'LOWBED', 'TANK', 'CONTAINER'] as const).map((b) => (
+                        <option key={b} value={b}>
+                          {t.mass.bodies[b]}
+                        </option>
+                      ))}
+                    </Select>
+                  )}
+                </Field>
+                <Field label={t.mass.loadingLabel}>
+                  {() => (
+                    <div className="flex flex-wrap gap-x-5 gap-y-2 pb-2">
+                      {(['TOP', 'SIDE', 'REAR'] as const).map((side) => (
+                        <label key={side} className="flex items-center gap-2 text-[13px]">
+                          <input
+                            type="checkbox"
+                            name="required_loading"
+                            value={side}
+                            defaultChecked={(origin?.required_loading ?? []).includes(side)}
+                            className="size-4 accent-[var(--color-accent)]"
+                          />
+                          {t.mass.loading[side]}
+                        </label>
+                      ))}
+                    </div>
+                  )}
+                </Field>
+              </div>
+            )}
             {semi && (
               <div className="flex flex-col gap-2 sm:col-span-4">
                 <p className="label-micro">{t.semi.title}</p>

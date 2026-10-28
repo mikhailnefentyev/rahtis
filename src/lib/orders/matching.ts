@@ -71,10 +71,17 @@ export async function takeOrderAction(
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.rpc('take_order', {
-    p_order_id: String(formData.get('order_id') ?? ''),
-    p_vehicle_id: String(formData.get('vehicle_id') ?? ''),
-  });
+  /* Выбор «c:<id>» — сцепка из конструктора, иначе машина как раньше. */
+  const choice = String(formData.get('vehicle_id') ?? '');
+  const { error } = choice.startsWith('c:')
+    ? await supabase.rpc('take_order_combo', {
+        p_order_id: String(formData.get('order_id') ?? ''),
+        p_combo_id: choice.slice(2),
+      })
+    : await supabase.rpc('take_order', {
+        p_order_id: String(formData.get('order_id') ?? ''),
+        p_vehicle_id: choice,
+      });
 
   revalidateOrder(locale);
 

@@ -1220,6 +1220,8 @@ export const de = {
   },
 
   orderForm: {
+    requiredBody: 'Aufbau',
+    anyBody: 'Beliebig',
     feeHint: 'Servicegebühr 5 % (mindestens 15 € pro Auftrag zusammen mit der Gebühr des Transportunternehmens). Ein Direktvertrag mit einem Transportunternehmen im Monatsmodell ist kostenlos.',
     title: 'Neuer Auftrag',
     subtitle: 'Füllen Sie die ganze Route aus und veröffentlichen Sie den Auftrag. Transportunternehmen sehen ihn sofort.',
@@ -1338,6 +1340,7 @@ export const de = {
   },
 
   matching: {
+    chooseCombo: 'Kombination',
     take: 'Auftrag übernehmen',
     taking: 'Wird gesendet…',
     taken: 'Angebot eingegangen',

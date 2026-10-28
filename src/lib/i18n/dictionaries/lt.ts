@@ -1220,6 +1220,8 @@ export const lt = {
   },
 
   orderForm: {
+    requiredBody: 'Kėbulas',
+    anyBody: 'Bet koks',
     feeHint: 'Paslaugos mokestis 5 % (ne mažiau kaip 15 € už reisą kartu su vežėjo mokesčiu). Tiesioginė sutartis su vežėju, mokančiu mėnesinį mokestį, nemokama.',
     title: 'Naujas pervežimas',
     subtitle: 'Užpildykite visą maršrutą ir paskelbkite. Vežėjai jį pamatys iš karto.',
@@ -1338,6 +1340,7 @@ export const lt = {
   },
 
   matching: {
+    chooseCombo: 'Junginys',
     take: 'Imu pervežimą',
     taking: 'Siunčiama…',
     taken: 'Pasiūlymas išsiųstas',

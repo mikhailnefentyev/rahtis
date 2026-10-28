@@ -1335,6 +1335,8 @@ export const en = {
   },
 
   orderForm: {
+    requiredBody: 'Body',
+    anyBody: 'Any',
     feeHint: 'Service fee 5% (at least €15 per job together with the carrier fee). A direct contract with a carrier on the monthly plan is free.',
     title: 'New order',
     subtitle: 'Fill in the whole route and publish. Carriers see it immediately.',
@@ -1468,6 +1470,7 @@ export const en = {
   },
 
   matching: {
+    chooseCombo: 'Combination',
     take: 'Take this job',
     taking: 'Sending…',
     taken: 'Offer received',

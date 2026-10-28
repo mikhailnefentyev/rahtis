@@ -1220,6 +1220,8 @@ export const sv = {
   },
 
   orderForm: {
+    requiredBody: 'Påbyggnad',
+    anyBody: 'Vilken som helst',
     feeHint: 'Serviceavgift 5 % (minst 15 € per uppdrag tillsammans med åkeriets avgift). Ett direktavtal med ett åkeri på månadsplanen är gratis.',
     title: 'Ny order',
     subtitle: 'Fyll i hela rutten och publicera. Åkerierna ser den direkt.',
@@ -1338,6 +1340,7 @@ export const sv = {
   },
 
   matching: {
+    chooseCombo: 'Ekipage',
     take: 'Ta uppdraget',
     taking: 'Skickar…',
     taken: 'Anbud skickat',

@@ -172,6 +172,13 @@ export default async function DeskPage({
   const { data: ownFleet } = (vehicles ?? []).length ? await supabase.rpc('carrier_own_vehicles') : { data: [] };
   const ready = new Set((ownFleet ?? []).filter((v) => v.available).map((v) => v.vehicle_id));
   const deskVehicles = (vehicles ?? []).filter((v) => ready.has(v.id));
+  /* Сцепки из конструктора — только с машинами, которые выходят на рейсы. */
+  const { data: comboRows } = await supabase
+    .from('vehicle_combos')
+    .select('id, vehicle_id, kind, name')
+    .eq('company_id', company.id)
+    .order('created_at', { ascending: true });
+  const deskCombos = (comboRows ?? []).filter((c) => ready.has(c.vehicle_id));
 
   const state = readiness?.[0];
   const canTakeOrders = state?.can_take_orders ?? false;
@@ -243,7 +250,7 @@ export default async function DeskPage({
             {m('desk.ordersCount', { count: (orders ?? []).length })}
           </p>
 
-          <DeskList orders={orders ?? []} vehicles={deskVehicles} busy={busy} waiting={waiting} />
+          <DeskList orders={orders ?? []} vehicles={deskVehicles} combos={deskCombos} busy={busy} waiting={waiting} />
         </>
       )}
     </main>

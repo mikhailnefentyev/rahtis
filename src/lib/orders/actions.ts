@@ -348,6 +348,12 @@ function readOrderForm(
       ldm: str(formData, 'ldm').replace(',', '.'),
       /* Пометки полуприцепа — только у фуры; база берёт их только у SEMI и сверяет со списком. */
       semi_features: kind === 'SEMI' ? formData.getAll('semi_features').filter(isSemiFeature) : [],
+      /* Нужный кузов и загрузка — у экспресса (фургон, грузовик, фура); база берёт их только там. */
+      required_body: kind === 'VAN' || kind === 'TRUCK' || kind === 'SEMI' ? str(formData, 'required_body') : '',
+      required_loading:
+        kind === 'VAN' || kind === 'TRUCK' || kind === 'SEMI'
+          ? [...new Set(formData.getAll('required_loading').map(String))].filter((x) => x === 'TOP' || x === 'SIDE' || x === 'REAR')
+          : [],
       /*
        * Стройка: чем возить, как платят и ориентир. Цену заказа база
        * считает сама (ставка × ориентир), итог — по факту при закрытии.
