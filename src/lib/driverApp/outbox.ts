@@ -10,8 +10,8 @@
  * OutboxProvider.
  */
 
-/** SITE — работа на объекте: прибытие, рейс, конец дня, новый пункт приёмки. */
-export type OutboxKind = 'SHIFT' | 'ARRIVE' | 'COMPLETE' | 'UPLOAD' | 'SITE';
+/** SITE — работа на объекте: прибытие, рейс, конец дня, новый пункт приёмки. FUEL — заправка (с фото чека). */
+export type OutboxKind = 'SHIFT' | 'ARRIVE' | 'COMPLETE' | 'UPLOAD' | 'SITE' | 'FUEL';
 
 export type OutboxEvent = {
   /** Идентификатор действия: по нему сервер отличает повтор от нового. */
@@ -19,7 +19,7 @@ export type OutboxEvent = {
   kind: OutboxKind;
   /** Поля формы для серверного действия. */
   fields: Record<string, string>;
-  /** Файл снимка или подписи — у UPLOAD. */
+  /** Файл снимка или подписи — у UPLOAD; фото чека — у FUEL. */
   blob?: Blob;
   /** Момент нажатия. В учёт идёт он, а не время отправки. */
   pressedAt: string;

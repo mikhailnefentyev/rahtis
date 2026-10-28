@@ -12,6 +12,8 @@ import { DeclineTask } from './DeclineTask';
 import { PushSetup } from './PushSetup';
 import { ShiftBar } from './ShiftBar';
 import { TaskTabs } from './TaskTabs';
+import { createClient } from '@/lib/supabase/server';
+import type { SiteState } from './site/SiteScreen';
 
 /**
  * Главный экран водителя: смена и задания.
@@ -29,11 +31,19 @@ export default async function DriverHome({
   const [{ locale }, { tab }] = await Promise.all([params, searchParams]);
   if (!isLocale(locale)) notFound();
 
-  const [driver, tasks, { t }] = await Promise.all([getDriver(), getDriverTasks(), getDriverI18n(locale)]);
+  const supabase = await createClient();
+  const [driver, tasks, { t }, { data: siteData }] = await Promise.all([
+    getDriver(),
+    getDriverTasks(),
+    getDriverI18n(locale),
+    supabase.rpc('driver_site_state'),
+  ]);
   if (!driver) return null;
 
   const showDone = tab === 'done';
   const visible = tasks.filter((task) => (showDone ? task.status === 'DONE' : task.status !== 'DONE'));
+  /* Работа на объекте — такое же задание, как рейс: открытые объекты компании в общем списке. */
+  const siteJobs = showDone ? [] : ((siteData as unknown as SiteState | null)?.jobs ?? []);
 
   return (
     <main className="flex flex-col gap-4">
@@ -69,13 +79,34 @@ export default async function DriverHome({
 
       <ShiftBar shift={driver.shift} />
 
+      {/* Заправка — у колонки, одной кнопкой с главного экрана (как в LogiApp). Нижнее меню уже полное. */}
+      <Link
+        href={`/${locale}/driver/fuel`}
+        className="flex min-h-16 items-center gap-3 rounded-card border border-line bg-surface px-4 py-3"
+      >
+        <span className="flex size-11 shrink-0 items-center justify-center rounded-control bg-accent-wash text-accent">
+          <FuelIcon />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-[16px] font-semibold">{t.fuelDriver.entry}</span>
+          <span className="block text-[14px] leading-snug text-ink-muted">{t.fuelDriver.entryHint}</span>
+        </span>
+        <span aria-hidden className="text-xl text-accent">
+          ›
+        </span>
+      </Link>
 
       <TaskTabs showDone={showDone} />
 
-      {visible.length === 0 ? (
+      {visible.length === 0 && siteJobs.length === 0 ? (
         <p className="py-12 text-center text-[17px] text-ink-muted">{t.driverApp.noTasks}</p>
       ) : (
         <ul className="flex flex-col gap-3">
+          {siteJobs.map((job) => (
+            <li key={job.id}>
+              <SiteJobCard job={job} locale={locale} />
+            </li>
+          ))}
           {visible.map((task) => (
             <li key={task.id}>
               <TaskCard task={task} locale={locale} />
@@ -162,5 +193,50 @@ async function TaskCard({ task, locale }: { task: DriverTask; locale: Locale }) 
         )}
       </div>
     </article>
+  );
+}
+
+/** Объект на главном экране: где, для кого и сколько рейсов сегодня. Работа — на экране объекта. */
+async function SiteJobCard({ job, locale }: { job: SiteState['jobs'][number]; locale: Locale }) {
+  const { t, f } = await getDriverI18n(locale);
+  const day = job.day;
+
+  return (
+    <article className="overflow-hidden rounded-card border border-line bg-surface">
+      <div className="flex items-center justify-between gap-3 bg-ink px-4 py-3 text-surface">
+        <span className="min-w-0 truncate text-[17px] font-bold tracking-tight">{job.name}</span>
+        <span className="shrink-0 text-sm">{t.siteWork.title}</span>
+      </div>
+      <div className="flex flex-col gap-3 px-4 py-4">
+        <div>
+          <p className="text-[17px] font-semibold">{job.customer_name}</p>
+          {job.address && <p className="text-[15px] text-ink-muted">{job.address}</p>}
+          {day && (
+            <p className="mt-1 text-[15px]">
+              {t.siteWork.arrivedAt} <span className="font-mono font-semibold">{f.time(day.arrived_at)}</span> ·{' '}
+              {t.siteWork.loadsToday}: <span className="font-semibold">{day.loads.length}</span>
+            </p>
+          )}
+        </div>
+        <Link
+          href={`/${locale}/driver/site?job=${job.id}`}
+          className="flex h-14 items-center justify-center rounded-control bg-accent text-[17px] font-semibold text-accent-ink"
+        >
+          {day ? t.driverApp.open : t.siteWork.arrive}
+        </Link>
+      </div>
+    </article>
+  );
+}
+
+/** Заправка: колонка с пистолетом. */
+function FuelIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden className="size-6">
+      <path d="M4 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16" />
+      <path d="M3 21h12" />
+      <path d="M7 8h4" />
+      <path d="M14 10h2a2 2 0 0 1 2 2v5a1.5 1.5 0 0 0 3 0V8l-3-3" />
+    </svg>
   );
 }

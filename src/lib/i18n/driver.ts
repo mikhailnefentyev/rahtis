@@ -44,6 +44,8 @@ export type DriverPack = {
   certificates: Dictionary['certificates'];
   /** Работа на объекте: самосвалы, весы, часы. */
   siteWork: Dictionary['siteWork'];
+  /** Заправка: одометр, литры, AdBlue, чек. */
+  fuelDriver: Dictionary['fuelDriver'];
   stopKind: Dictionary['stopKind'];
   /*
    * Забор и возврат зависят от того, что везут: общий stopKind называет их
@@ -78,6 +80,7 @@ function packOf(dictionary: Dictionary): DriverPack {
     training: dictionary.training,
     certificates: dictionary.certificates,
     siteWork: dictionary.siteWork,
+    fuelDriver: dictionary.fuelDriver,
     stopKind: dictionary.stopKind,
     haulStops: {
       CONTAINER: { pickup: dictionary.haul.CONTAINER.stopPickup, return: dictionary.haul.CONTAINER.stopReturn },
@@ -137,6 +140,7 @@ export async function driverDictionary(
     training: pack.training,
     certificates: pack.certificates,
     siteWork: pack.siteWork,
+    fuelDriver: pack.fuelDriver,
     stopKind: pack.stopKind,
     /*
      * Забор и возврат по виду перевозки: страницы водителя зовут тот же

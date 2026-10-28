@@ -1,0 +1,232 @@
+{
+  "name": "RAHTIS — отчёт о топливе",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "rahtis-fuel-report",
+        "responseMode": "responseNode",
+        "options": {
+          "rawBody": true
+        }
+      },
+      "name": "Отчёт о топливе",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -800,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Проверка подписи RAHTIS на входящем отчёте о топливе.\n//\n// Платформа подписывает исходящий запрос тем же секретом, которым мы\n// подписываем обратные: HMAC-SHA256 на AGENT_WEBHOOK_SECRET от строки\n// `${timestamp}.${body}`, заголовок x-rahtis-signature вида sha256=<hex>.\n//\n// Без проверки вебхук открыт: кто узнал адрес, тот будет гонять\n// OpenAI за наш счёт.\n\nconst crypto = require('crypto');\n\n// Секрет для подписи.\n//\n// $env в узлах Code на n8n Cloud закрыт наглухо: с версии 2.0\n// N8N_BLOCK_ENV_ACCESS_IN_NODE по умолчанию true, и на облаке этот\n// переключатель недоступен. Поэтому секрет берётся из переменных n8n\n// ($vars — планы Pro и Enterprise Cloud).\n//\n// Если у вас Starter, где переменных нет, впишите значение в SECRET\n// ниже. Оно останется видимым каждому, у кого есть доступ в n8n, —\n// это плата за отсутствие хранилища секретов на этом тарифе.\nlet SECRET = '';\ntry { if (typeof $vars !== 'undefined' && $vars.AGENT_WEBHOOK_SECRET) SECRET = $vars.AGENT_WEBHOOK_SECRET; } catch (e) {}\nif (!SECRET) throw new Error('AGENT_WEBHOOK_SECRET не задан: создайте переменную в n8n или впишите значение в SECRET.');\nconst secret = SECRET;\n\n// Сырое тело подписи. n8n отдаёт его по-разному: строкой, буфером,\n// разобранным объектом, а при rawBody иногда двоичным вложением. Подпись\n// считается от БАЙТОВ, которые прислала платформа, поэтому читаем все\n// формы, а разбор JSON оставляем на потом.\nfunction rawBody() {\n  try {\n    const bin = $input.item.binary;\n    if (bin && bin.data && bin.data.data) return Buffer.from(bin.data.data, 'base64').toString('utf8');\n  } catch (e) {}\n  const b = $json.body;\n  if (typeof b === 'string') return b;\n  if (Buffer.isBuffer(b)) return b.toString('utf8');\n  if (b && b.type === 'Buffer' && Array.isArray(b.data)) return Buffer.from(b.data).toString('utf8');\n  return JSON.stringify(b || {});\n}\nconst raw = rawBody();\nconst ts = $json.headers['x-rahtis-timestamp'] || '';\nconst given = $json.headers['x-rahtis-signature'] || '';\n\n// Окно 300 секунд: перехваченный запрос нельзя повторить назавтра.\nconst age = Math.abs(Math.floor(Date.now() / 1000) - Number(ts));\nconst fresh = Number.isFinite(age) && age <= 300;\n\nconst expected = 'sha256=' + crypto.createHmac('sha256', secret).update(ts + '.' + raw).digest('hex');\nconst a = Buffer.from(expected);\nconst b = Buffer.from(given);\nconst signed = a.length === b.length && crypto.timingSafeEqual(a, b);\n\nlet p = {};\ntry { p = JSON.parse(raw); } catch (e) { try { p = (typeof $json.body === 'object' && $json.body) || {}; } catch (e2) { p = {}; } }\n\nconst isPdf = p.mime === 'application/pdf';\nconst data = typeof p.data_base64 === 'string' ? p.data_base64 : '';\nconst text = typeof p.text === 'string' ? p.text.slice(0, 200000) : '';\nreturn [{\n  json: {\n    ok: signed && fresh && (isPdf ? data.length > 0 : text.length > 0),\n    why: signed ? (fresh ? null : 'stale') : 'signature',\n    is_pdf: isPdf,\n    data_base64: isPdf ? data : '',\n    text: isPdf ? '' : text,\n    file_name: typeof p.file_name === 'string' ? p.file_name.slice(0, 120) : 'report',\n    plates: Array.isArray(p.plates) ? p.plates.filter((x) => typeof x === 'string').slice(0, 300) : [],\n    country: typeof p.country === 'string' ? p.country.slice(0, 2) : 'FI',\n  },\n}];\n"
+      },
+      "name": "Проверить подпись RAHTIS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -580,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.ok }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "name": "Подпись верна?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -360,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Запрос к OpenAI: строки заправок из месячного отчёта заправщика.\n// PDF уходит файлом, CSV — текстом. Ответ — строго по схеме, чтобы сайт\n// мог проверить каждое поле и показать строки перевозчику на проверку.\nconst PRODUCTS = ['DIESEL', 'HVO', 'ADBLUE', 'PETROL', 'LNG', 'LBG', 'CNG', 'CBG', 'OTHER'];\nconst system = [\n  'You read monthly fuel card reports of a transport company (Neste, St1, Shell, Teboil, ABC, Circle K, DKV, UTA and others).',\n  'Return every refuelling transaction as one row. Skip totals, subtotals, fees, shop items, car wash, oil and anything that is not fuel or AdBlue.',\n  'date: YYYY-MM-DD. time: HH:MM in 24h, or null if the report has no time.',\n  'plate: the vehicle registration as written in the report, or null. card: the fuel card number without spaces, or null.',\n  'station: station name and town, short. odometer: the odometer / mileage entered at the pump in km, or null.',\n  'product: DIESEL for diesel (also \"DI\", \"Diesel\", \"Neste Pro Diesel\", \"V-Power Diesel\"); HVO for renewable diesel (HVO100, \"Neste MY Renewable Diesel\", \"uusiutuva diesel\"); ADBLUE for AdBlue/DEF; PETROL for petrol (95E10, 98E5, bensiini); LNG, LBG (bio-LNG), CNG, CBG (bio-CNG, biokaasu) for gas; OTHER only for other fuels.',\n  'quantity: litres, or kilograms for gas, as a number with a dot as the decimal separator.',\n  'amount_gross: the amount paid INCLUDING VAT in euros. If the report shows only the amount without VAT, add the VAT shown in the report. If the currency is not EUR, use null.',\n  'supplier: the fuel company that issued the report, or null.',\n  'Known vehicle plates of this company: ' + ($json.plates.join(', ') || 'none') + '. Country: ' + $json.country + '.',\n  'Never invent rows or values. If a value is not in the report, use null.',\n].join(' ');\n\nconst schema = {\n  type: 'object',\n  additionalProperties: false,\n  required: ['supplier', 'rows'],\n  properties: {\n    supplier: { type: ['string', 'null'] },\n    rows: {\n      type: 'array',\n      items: {\n        type: 'object',\n        additionalProperties: false,\n        required: ['date', 'time', 'plate', 'card', 'station', 'product', 'quantity', 'amount_gross', 'odometer'],\n        properties: {\n          date: { type: 'string' },\n          time: { type: ['string', 'null'] },\n          plate: { type: ['string', 'null'] },\n          card: { type: ['string', 'null'] },\n          station: { type: ['string', 'null'] },\n          product: { type: 'string', enum: PRODUCTS },\n          quantity: { type: 'number' },\n          amount_gross: { type: ['number', 'null'] },\n          odometer: { type: ['number', 'null'] },\n        },\n      },\n    },\n  },\n};\n\nconst user = $json.is_pdf\n  ? [\n      { type: 'file', file: { filename: $json.file_name.endsWith('.pdf') ? $json.file_name : $json.file_name + '.pdf', file_data: 'data:application/pdf;base64,' + $json.data_base64 } },\n      { type: 'text', text: 'Extract the refuelling rows from this report.' },\n    ]\n  : 'Extract the refuelling rows from this CSV export:\\n\\n' + $json.text;\n\nreturn [{ json: { payload: JSON.stringify({\n  // gpt-4.1 и 4o отключают 14.01.2027; у gpt-6-luna нет temperature, усилие — low (отчёт длинный, таймаут 100 с).\n  model: 'gpt-6-luna',\n  reasoning_effort: 'low',\n  response_format: { type: 'json_schema', json_schema: { name: 'fuel_report', strict: true, schema } },\n  messages: [ { role: 'system', content: system }, { role: 'user', content: user } ],\n}) } }];"
+      },
+      "name": "Собрать запрос",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -140,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.parse($json.payload) }}",
+        "options": {
+          "timeout": 100000,
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "name": "OpenAI: прочитать отчёт",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        80,
+        220
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Ответ OpenAI → то, что ждёт сайт. Поля сайт проверит сам (src/lib/fuel/fuel.ts).\nlet out = { ok: false, supplier: null, rows: [] };\ntry {\n  const data = JSON.parse($json.choices[0].message.content);\n  out = { ok: Array.isArray(data.rows), supplier: typeof data.supplier === 'string' ? data.supplier.slice(0, 60) : null, rows: Array.isArray(data.rows) ? data.rows.slice(0, 1000) : [] };\n} catch (e) {\n  out = { ok: false, supplier: null, rows: [], detail: ($json.error && $json.error.message) || 'parse' };\n}\nreturn [{ json: out }];"
+      },
+      "name": "Разобрать ответ",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        300,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { ok: false, supplier: null, rows: [], detail: $json.why || 'bad request' } }];"
+      },
+      "name": "Отказано",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -140,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"ok\": $json.ok === true, \"supplier\": $json.supplier || null, \"rows\": $json.rows || [], \"detail\": $json.detail || null } }}",
+        "options": {}
+      },
+      "name": "Ответ платформе",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        520,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Отчёт о топливе": {
+      "main": [
+        [
+          {
+            "node": "Проверить подпись RAHTIS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Проверить подпись RAHTIS": {
+      "main": [
+        [
+          {
+            "node": "Подпись верна?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Подпись верна?": {
+      "main": [
+        [
+          {
+            "node": "Собрать запрос",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Отказано",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Собрать запрос": {
+      "main": [
+        [
+          {
+            "node": "OpenAI: прочитать отчёт",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI: прочитать отчёт": {
+      "main": [
+        [
+          {
+            "node": "Разобрать ответ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Разобрать ответ": {
+      "main": [
+        [
+          {
+            "node": "Ответ платформе",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Отказано": {
+      "main": [
+        [
+          {
+            "node": "Ответ платформе",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

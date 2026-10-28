@@ -58,3 +58,49 @@ export async function purgeExpiredTripPhotos(): Promise<PhotoRetentionResult> {
 
   return result;
 }
+
+/**
+ * Заправки и месячные отчёты старше 24 месяцев (политика 8.4): сначала
+ * фото чеков и файлы отчётов в fuel-docs, потом строки. Тот же порядок и
+ * те же пределы, что у фото рейсов.
+ */
+export async function purgeExpiredFuel(): Promise<PhotoRetentionResult> {
+  const admin = createAdminClient();
+  const result: PhotoRetentionResult = { candidates: 0, removed: 0, errors: [] };
+
+  for (let round = 0; round < MAX_ROUNDS; round += 1) {
+    const { data: rows, error } = await admin.rpc('retention_fuel_candidates', { p_limit: BATCH });
+    if (error) {
+      result.errors.push(error.message);
+      break;
+    }
+    if (!rows || rows.length === 0) break;
+    result.candidates += rows.length;
+
+    /* Одно фото чека на несколько строк заправки (дизель + AdBlue): путь удаляется один раз. */
+    const paths = [...new Set(rows.map((row) => row.storage_path).filter((path): path is string => Boolean(path)))];
+    if (paths.length > 0) {
+      const { error: storageError } = await admin.storage.from('fuel-docs').remove(paths);
+      if (storageError) {
+        result.errors.push(storageError.message);
+        break;
+      }
+    }
+
+    const entries = rows.filter((row) => row.kind === 'ENTRY').map((row) => row.id);
+    const imports = rows.filter((row) => row.kind === 'IMPORT').map((row) => row.id);
+    const [{ error: entriesError }, { error: importsError }] = await Promise.all([
+      entries.length ? admin.from('fuel_entries').delete().in('id', entries) : Promise.resolve({ error: null }),
+      imports.length ? admin.from('fuel_imports').delete().in('id', imports) : Promise.resolve({ error: null }),
+    ]);
+    if (entriesError || importsError) {
+      result.errors.push((entriesError ?? importsError)!.message);
+      break;
+    }
+    result.removed += rows.length;
+
+    if (rows.length < BATCH) break;
+  }
+
+  return result;
+}

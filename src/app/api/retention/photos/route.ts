@@ -1,8 +1,8 @@
 import { bearerMatches } from '@/lib/auth/bearer';
-import { purgeExpiredTripPhotos } from '@/lib/retention/photos';
+import { purgeExpiredFuel, purgeExpiredTripPhotos } from '@/lib/retention/photos';
 
 /**
- * Удаление фото рейсов старше срока хранения.
+ * Удаление фото рейсов, заправок и отчётов топлива старше срока хранения.
  *
  * Зовёт база раз в день (app.run_photo_retention через pg_net), а не
  * браузер. Защита — общий секрет планировщика REPORTS_CRON_SECRET, как у
@@ -23,5 +23,8 @@ export async function POST(request: Request) {
   }
 
   const result = await purgeExpiredTripPhotos();
-  return Response.json(result, { status: result.errors.length > 0 ? 207 : 200 });
+  /* Заправки и отчёты топлива — тем же запуском: тоже файлы в хранилище и тоже 24 месяца. */
+  const fuel = await purgeExpiredFuel();
+  const failed = result.errors.length > 0 || fuel.errors.length > 0;
+  return Response.json({ ...result, fuel }, { status: failed ? 207 : 200 });
 }

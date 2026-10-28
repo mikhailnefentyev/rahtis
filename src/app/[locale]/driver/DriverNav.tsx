@@ -9,7 +9,9 @@ import { useI18n } from '@/lib/i18n/provider';
 /**
  * Нижняя навигация приложения водителя.
  *
- * Пять пунктов: задания, заработок, карта, сообщения, профиль. Пустых
+ * Пять пунктов: задания, заработок, карта, сообщения, профиль. Работа
+ * на объекте — тоже задание и живёт в «Заданиях», а не отдельной вкладкой
+ * (решение пользователя 28.10.2026). Пустых
  * вкладок нет — они учат водителя не нажимать на них. Цели — во
  * всю высоту полосы, под большой палец и перчатку.
  *
@@ -29,9 +31,12 @@ export function DriverNav({ unread }: { unread: number }) {
       href: base,
       label: t.driverApp.nav.tasks,
       icon: TasksIcon,
-      active: pathname === base || pathname.startsWith(`${base}/task`),
+      active:
+        pathname === base ||
+        pathname.startsWith(`${base}/task`) ||
+        pathname.startsWith(`${base}/site`) ||
+        pathname.startsWith(`${base}/fuel`),
     },
-    { href: `${base}/site`, label: t.siteWork.tab, icon: SiteIcon, active: pathname.startsWith(`${base}/site`) },
     { href: `${base}/earnings`, label: t.driverApp.nav.earnings, icon: EarningsIcon, active: pathname.startsWith(`${base}/earnings`) },
     { href: `${base}/map`, label: t.driverApp.nav.map, icon: MapIcon, active: pathname.startsWith(`${base}/map`) },
     {
@@ -161,18 +166,6 @@ function EarningsIcon() {
 }
 
 /** Карта: метка места. */
-/* Самосвал — работа на объекте. */
-function SiteIcon() {
-  return (
-    <svg {...base}>
-      <path d="M3 15V9l9-3 2 6H3" />
-      <path d="M14 12h4l3 3v1H3v-1" />
-      <circle cx="7" cy="18" r="2" />
-      <circle cx="17" cy="18" r="2" />
-    </svg>
-  );
-}
-
 function MapIcon() {
   return (
     <svg {...base}>

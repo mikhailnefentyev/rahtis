@@ -166,6 +166,7 @@ function navigation(
           items: [
             { href: `/${locale}/carrier/fleet`, label: t.fleet.title, icon: 'fleet' },
             { href: `/${locale}/carrier/drivers`, label: t.drivers.title, icon: 'drivers' },
+            { href: `/${locale}/carrier/fuel`, label: t.fuel.nav, icon: 'fuel' },
             { href: `/${locale}/carrier/partners`, label: t.partners.title, icon: 'clients' },
           ],
         },

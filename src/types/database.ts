@@ -1626,6 +1626,190 @@ export type Database = {
           },
         ]
       }
+      fuel_cards: {
+        Row: {
+          card_ref: string
+          company_id: string
+          updated_at: string
+          vehicle_id: string
+        }
+        Insert: {
+          card_ref: string
+          company_id: string
+          updated_at?: string
+          vehicle_id: string
+        }
+        Update: {
+          card_ref?: string
+          company_id?: string
+          updated_at?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fuel_cards_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fuel_cards_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fuel_entries: {
+        Row: {
+          amount_cents: number | null
+          card_ref: string | null
+          company_id: string
+          created_at: string
+          driver_id: string | null
+          event_id: string | null
+          filled_at: string
+          full_tank: boolean
+          id: string
+          import_id: string | null
+          odometer_km: number | null
+          product: string
+          quantity: number
+          receipt_path: string | null
+          source: string
+          station: string | null
+          unit: string | null
+          vehicle_id: string
+        }
+        Insert: {
+          amount_cents?: number | null
+          card_ref?: string | null
+          company_id: string
+          created_at?: string
+          driver_id?: string | null
+          event_id?: string | null
+          filled_at: string
+          full_tank?: boolean
+          id?: string
+          import_id?: string | null
+          odometer_km?: number | null
+          product: string
+          quantity: number
+          receipt_path?: string | null
+          source: string
+          station?: string | null
+          unit?: string | null
+          vehicle_id: string
+        }
+        Update: {
+          amount_cents?: number | null
+          card_ref?: string | null
+          company_id?: string
+          created_at?: string
+          driver_id?: string | null
+          event_id?: string | null
+          filled_at?: string
+          full_tank?: boolean
+          id?: string
+          import_id?: string | null
+          odometer_km?: number | null
+          product?: string
+          quantity?: number
+          receipt_path?: string | null
+          source?: string
+          station?: string | null
+          unit?: string | null
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fuel_entries_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fuel_entries_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fuel_entries_import_id_fkey"
+            columns: ["import_id"]
+            isOneToOne: false
+            referencedRelation: "fuel_imports"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fuel_entries_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fuel_imports: {
+        Row: {
+          company_id: string
+          confirmed_at: string | null
+          created_at: string
+          created_by: string | null
+          error: string | null
+          file_name: string
+          file_path: string
+          id: string
+          inserted: number | null
+          merged: number | null
+          rows: Json
+          status: string
+          supplier: string | null
+        }
+        Insert: {
+          company_id: string
+          confirmed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          error?: string | null
+          file_name: string
+          file_path: string
+          id?: string
+          inserted?: number | null
+          merged?: number | null
+          rows?: Json
+          status?: string
+          supplier?: string | null
+        }
+        Update: {
+          company_id?: string
+          confirmed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          error?: string | null
+          file_name?: string
+          file_path?: string
+          id?: string
+          inserted?: number | null
+          merged?: number | null
+          rows?: Json
+          status?: string
+          supplier?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fuel_imports_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       incidents: {
         Row: {
           fingerprint: string
@@ -4212,6 +4396,7 @@ export type Database = {
           status: Database["public"]["Enums"]["company_status"]
           updated_at: string
           vat_number: string | null
+          waste_registrations: Json
         }
         SetofOptions: {
           from: "*"
@@ -4829,6 +5014,10 @@ export type Database = {
           driver_id: string
           last_sent_at: string
         }[]
+      }
+      carrier_fuel_import_confirm: {
+        Args: { p_import_id: string; p_rows: Json }
+        Returns: Json
       }
       carrier_invite_company: {
         Args: {
@@ -5469,6 +5658,11 @@ export type Database = {
         Returns: undefined
       }
       driver_earnings: { Args: { p_from: string; p_to: string }; Returns: Json }
+      driver_fuel_add: {
+        Args: { p_at?: string; p_data: Json; p_event_id?: string }
+        Returns: undefined
+      }
+      driver_fuel_state: { Args: never; Returns: Json }
       driver_invite_lookup: {
         Args: { p_code?: string; p_phone?: string; p_token?: string }
         Returns: {
@@ -5675,6 +5869,7 @@ export type Database = {
           status: Database["public"]["Enums"]["company_status"]
           updated_at: string
           vat_number: string | null
+          waste_registrations: Json
         }
         SetofOptions: {
           from: "*"
@@ -5842,6 +6037,7 @@ export type Database = {
           status: Database["public"]["Enums"]["company_status"]
           updated_at: string
           vat_number: string | null
+          waste_registrations: Json
         }
         SetofOptions: {
           from: "*"
@@ -6231,6 +6427,14 @@ export type Database = {
         }
       }
       restore_driver: { Args: { p_driver_id: string }; Returns: undefined }
+      retention_fuel_candidates: {
+        Args: { p_limit?: number }
+        Returns: {
+          id: string
+          kind: string
+          storage_path: string
+        }[]
+      }
       retention_photo_candidates: {
         Args: { p_limit?: number }
         Returns: {
@@ -6747,6 +6951,7 @@ export type Database = {
           status: Database["public"]["Enums"]["company_status"]
           updated_at: string
           vat_number: string | null
+          waste_registrations: Json
         }
         SetofOptions: {
           from: "*"

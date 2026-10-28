@@ -231,7 +231,8 @@ export async function markReadAction(formData: FormData): Promise<void> {
 export type EventResult = { status: 'ok' | 'rejected' | 'retry' };
 
 /* Коды, при которых повтор ничего не изменит. */
-const FINAL = new Set(['55000', '42501', '22023', 'P0002', '23514', '23P01']);
+/* 22P02 — число не разобралось (кривое поле с телефона): повтор пришлёт то же самое. */
+const FINAL = new Set(['55000', '42501', '22023', 'P0002', '23514', '23P01', '22P02']);
 
 const outcome = (error: { code?: string } | null): EventResult => ({
   status: !error ? 'ok' : error.code && FINAL.has(error.code) ? 'rejected' : 'retry',
@@ -311,6 +312,9 @@ export async function applyDriverEventAction(formData: FormData): Promise<EventR
     }
     case 'UPLOAD':
       result = await uploadPhoto(formData);
+      break;
+    case 'FUEL':
+      result = await addFuel(formData);
       break;
     default:
       result = { status: 'rejected' };
@@ -398,6 +402,55 @@ async function uploadPhoto(formData: FormData): Promise<EventResult> {
   }
 
   return { status: 'ok' };
+}
+
+/**
+ * Заправка водителя: строки (топливо, AdBlue), одометр, сумма, фото чека.
+ *
+ * Фото кладётся служебным ключом в папку компании водителя — компанию
+ * называет база по его сессии (driver_fuel_state), а не телефон. Имя
+ * файла — идентификатор действия: повтор из очереди кладёт тот же файл
+ * по тому же пути. База отказала по существу — файл убирается.
+ */
+async function addFuel(formData: FormData): Promise<EventResult> {
+  const eventId = str(formData, 'event_id');
+  if (!/^[0-9a-f-]{36}$/i.test(eventId)) return { status: 'rejected' };
+
+  let data: Record<string, unknown> = {};
+  try {
+    data = JSON.parse(str(formData, 'data') || '{}');
+  } catch {
+    return { status: 'rejected' };
+  }
+
+  const supabase = await createClient();
+  const file = formData.get('file');
+  let receipt: string | null = null;
+
+  if (file instanceof File && file.size > 0) {
+    if (file.size > 10 * 1024 * 1024 || !PHOTO_TYPES.includes(file.type)) return { status: 'rejected' };
+    const { data: state, error: stateError } = await supabase.rpc('driver_fuel_state');
+    if (stateError) return outcome(stateError);
+    const company = (state as { company_id?: string } | null)?.company_id;
+    if (!company) return { status: 'rejected' };
+
+    const ext = file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
+    receipt = `${company}/receipts/${eventId}.${ext}`;
+    const { error: uploadError } = await createAdminClient()
+      .storage.from('fuel-docs')
+      .upload(receipt, file, { contentType: file.type, upsert: true });
+    if (uploadError) return { status: 'retry' };
+  }
+
+  const { error } = await supabase.rpc('driver_fuel_add', {
+    p_data: { ...data, receipt_path: receipt } as Json,
+    p_at: str(formData, 'pressed_at') || undefined,
+    p_event_id: eventId,
+  });
+
+  const result = outcome(error);
+  if (result.status === 'rejected' && receipt) await createAdminClient().storage.from('fuel-docs').remove([receipt]);
+  return result;
 }
 
 /* ── Push-уведомления ───────────────────────────────────────────── */
