@@ -52,6 +52,8 @@ export default async function OwnOrdersPage({
   ]);
   const legalPending = (pendingLegal ?? []).length > 0;
 
+  /* Прицепы компании — собрать сцепку рейса прямо в форме. */
+  const { data: ownTrailers } = await supabase.from('trailers').select('id, plate, kind, body_type').eq('company_id', viewer.company!.id).order('plate');
   const active = viewer.company?.status === 'ACTIVE';
   const names = new Map((clients ?? []).map((c) => [c.id, c.name]));
   const ids = [...names.keys()];
@@ -121,6 +123,7 @@ export default async function OwnOrdersPage({
         </Card>
       ) : (
         <OwnView
+          trailers={ownTrailers ?? []}
           jobs={jobs}
           clients={clients ?? []}
           vehicles={vehicles ?? []}

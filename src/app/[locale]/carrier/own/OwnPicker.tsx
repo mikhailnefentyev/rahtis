@@ -22,11 +22,14 @@ import type { CarrierClient, OwnVehicle } from '@/types/db';
 export function OwnPicker({
   clients,
   vehicles,
+  trailers = [],
   haulKind,
   homeCountry = 'FI',
 }: {
   clients: CarrierClient[];
   vehicles: OwnVehicle[];
+  /** Прицепы компании — сразу собрать сцепку рейса (конструктор). */
+  trailers?: { id: string; plate: string; kind: string; body_type: string | null }[];
   haulKind: HaulKind;
   /** Страна перевозчика — с неё начинается выбор страны нового клиента. */
   homeCountry?: string;
@@ -173,6 +176,29 @@ export function OwnPicker({
           )
         }
       </Field>
+      {/* Прицеп рейса — сразу: машина + прицеп = сцепка (полуприцеп к тягачу, прицеп к грузовику или нуппи). */}
+      {(() => {
+        const vclass = fitting.find((v) => v.vehicle_id === vehicleId)?.vehicle_class;
+        const list = trailers.filter((tr) =>
+          vclass === 'TRACTOR' ? tr.kind === 'SEMI' : vclass === 'TRUCK' || vclass === 'TIPPER' ? tr.kind !== 'SEMI' : false,
+        );
+        if (haulKind === 'TRAILER' || haulKind === 'CONTAINER' || list.length === 0) return null;
+        return (
+          <Field label={t.combos.tripTrailer}>
+            {(p) => (
+              <Select key={`${resets}-${vehicleId}`} {...p} name="own_trailer_id" defaultValue="">
+                <option value="">{t.combos.none}</option>
+                {list.map((tr) => (
+                  <option key={tr.id} value={tr.id}>
+                    {tr.plate}
+                    {tr.body_type ? ` · ${t.mass.bodies[tr.body_type as keyof typeof t.mass.bodies]}` : ''}
+                  </option>
+                ))}
+              </Select>
+            )}
+          </Field>
+        );
+      })()}
     </div>
   );
 }

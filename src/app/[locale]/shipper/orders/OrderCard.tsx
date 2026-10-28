@@ -39,6 +39,7 @@ import { OrderTrouble } from './OrderTrouble';
  */
 export function OrderCard({
   order,
+  tripTrailer = null,
   stops,
   offers,
   amendments,
@@ -46,6 +47,8 @@ export function OrderCard({
   documents,
   onRepeat,
 }: {
+  /** Номер прицепа назначенного рейса. */
+  tripTrailer?: string | null;
   /** Снимки и документы идущего рейса. */
   documents: TripDocument[];
   order: ShipperOrder;
@@ -214,6 +217,12 @@ export function OrderCard({
               {/* Рейс идёт — выбирать не из чего, важно кто везёт. */}
               {order.status === 'IN_PROGRESS' && assigned && (
                 <AssignedCarrier offer={assigned} direct={directCarrier} />
+              )}
+              {/* Прицеп рейса перевозчика — рядом с машиной, как номер на воротах. */}
+              {tripTrailer && (order.status === 'IN_PROGRESS' || order.status === 'AWAIT_DRIVER') && (
+                <p className="mt-2 text-[13px]">
+                  {t.combos.tripTrailer}: <Plate>{tripTrailer}</Plate>
+                </p>
               )}
 
               {/* Отходы и Приложение VII — у любого заказа, кроме черновика. */}

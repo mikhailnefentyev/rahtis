@@ -1,5 +1,7 @@
 'use server';
 
+import { flashError } from '@/lib/forms/flash';
+
 import { isValidContainerNumber } from '@/lib/containerNumber';
 import { revalidatePath } from 'next/cache';
 import { getViewer } from '@/lib/auth/viewer';
@@ -523,6 +525,13 @@ export async function ownOrderAction(_previous: PublishState, formData: FormData
     if (error?.code === '55010') return { error: t.own.subscriptionOnly, ref: null };
     if (error?.code === '22023' && error.message.includes('клиент')) return { error: t.own.clientInvalid, ref: null };
     return { error: explainPublish(t, error?.code, error?.message), ref: null };
+  }
+
+  /* Прицеп рейса из формы — та же проверка, что в карточке рейса (carrier_set_trip_trailer). */
+  const trailerId = str(formData, 'own_trailer_id');
+  if (trailerId) {
+    const { error: trailerError } = await supabase.rpc('carrier_set_trip_trailer', { p_order_id: data.id, p_trailer_id: trailerId });
+    if (trailerError) await flashError(trailerError.code === '55003' ? t.matching.wrongClass : t.error.generic);
   }
 
   if (data.track_token) await sendOwnTrack(data.id, data.ref, data.track_token, viewer.company.id);

@@ -33,6 +33,7 @@ export function OwnView({
   jobs,
   clients,
   vehicles,
+  trailers = [],
   startNew = false,
   blocked = null,
   homeCountry = 'FI',
@@ -45,6 +46,7 @@ export function OwnView({
   jobs: OwnJob[];
   clients: CarrierClient[];
   vehicles: OwnVehicle[];
+  trailers?: { id: string; plate: string; kind: string; body_type: string | null }[];
 }) {
   const { t, f } = useI18n();
   const router = useRouter();
@@ -72,7 +74,7 @@ export function OwnView({
           <OrderForm
             key={formKey}
             knownVehicles={[]}
-            own={{ clients, vehicles, homeCountry }}
+            own={{ clients, vehicles, trailers, homeCountry }}
             onNew={() => {
               setFormKey((k) => k + 1);
               router.refresh();

@@ -7213,6 +7213,15 @@ export type Database = {
           vat_bps: number
         }[]
       }
+      shipper_trip_trailers: {
+        Args: { p_order_ids: string[] }
+        Returns: {
+          body_type: Database["public"]["Enums"]["body_type"]
+          kind: Database["public"]["Enums"]["trailer_kind"]
+          order_id: string
+          plate: string
+        }[]
+      }
       take_order: {
         Args: { p_order_id: string; p_vehicle_id: string }
         Returns: {

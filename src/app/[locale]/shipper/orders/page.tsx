@@ -90,7 +90,7 @@ export default async function OrdersPage({
    * последовательных похода стоили почти треть секунды ожидания на ровном
    * месте. Запросов столько же, ожидание одно.
    */
-  const [{ data: stops }, { data: offers }, { data: amendmentRows }, { data: known }, { data: tripDocs }] =
+  const [{ data: stops }, { data: offers }, { data: amendmentRows }, { data: known }, { data: tripTrailerRows }, { data: tripDocs }] =
     await Promise.all([
     orderIds.length
       ? supabase.from('order_stops').select('*').in('order_id', orderIds).order('sequence')
@@ -103,6 +103,10 @@ export default async function OrdersPage({
       : Promise.resolve({ data: [] as OrderAmendment[] }),
     /* Знакомые машины — для прямого назначения в форме и со стола. */
     supabase.rpc('known_vehicles_for_shipper'),
+    /* Прицеп назначенного рейса (как номер машины) — функцией: колонка закрыта. */
+    withCarrierIds.length
+      ? supabase.rpc('shipper_trip_trailers', { p_order_ids: withCarrierIds })
+      : Promise.resolve({ data: [] as { order_id: string; plate: string }[] }),
     /*
      * Снимки и документы идущего рейса: водитель шлёт их из приложения
      * по ходу, и заказчик видит состояние единицы при взятии сразу, а не
@@ -177,6 +181,7 @@ export default async function OrdersPage({
           orders={orders ?? []}
           stopsByOrder={stopsByOrder}
           offersByOrder={offersByOrder}
+          tripTrailerByOrder={Object.fromEntries((tripTrailerRows ?? []).map((r) => [r.order_id, r.plate]))}
           amendmentsByOrder={amendmentsByOrder}
           knownVehicles={known ?? []}
           documentsByOrder={documentsByOrder}

@@ -135,7 +135,7 @@ export function OrderForm({
    * Свой рейс перевозчика: та же форма, но вместо стола — клиент
    * перевозчика и его машина, а цена — только для его отчёта.
    */
-  own?: { clients: CarrierClient[]; vehicles: OwnVehicle[]; homeCountry?: string };
+  own?: { clients: CarrierClient[]; vehicles: OwnVehicle[]; trailers?: { id: string; plate: string; kind: string; body_type: string | null }[]; homeCountry?: string };
 }) {
   const { t, m, f, locale } = useI18n();
   /* Примеры адресов — страны компании: польскому перевозчику не «Satamakatu 1, Hanko». */
@@ -1090,7 +1090,7 @@ export function OrderForm({
       <Card>
         <CardBody>
           {own ? (
-            <OwnPicker clients={own.clients} vehicles={own.vehicles} haulKind={haulKind} homeCountry={own.homeCountry} />
+            <OwnPicker clients={own.clients} vehicles={own.vehicles} trailers={own.trailers} haulKind={haulKind} homeCountry={own.homeCountry} />
           ) : (
             <DispatchPicker vehicles={knownVehicles} haulKind={haulKind} onDirectChange={setDirect} />
           )}

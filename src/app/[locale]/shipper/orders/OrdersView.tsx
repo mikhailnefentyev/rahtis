@@ -110,6 +110,7 @@ export function OrdersView({
   orders,
   stopsByOrder,
   offersByOrder,
+  tripTrailerByOrder = {},
   amendmentsByOrder,
   knownVehicles,
   documentsByOrder,
@@ -122,6 +123,8 @@ export function OrdersView({
   documentsByOrder: Record<string, TripDocument[]>;
   stopsByOrder: Record<string, OrderStop[]>;
   offersByOrder: Record<string, ShipperOffer[]>;
+  /** Номер прицепа назначенного рейса (конструктор сцепок). */
+  tripTrailerByOrder?: Record<string, string>;
   amendmentsByOrder: Record<string, OrderAmendment[]>;
 }) {
   const { t, m } = useI18n();
@@ -246,6 +249,7 @@ export function OrdersView({
         order={order}
         stops={stopsByOrder[order.id] ?? []}
         offers={offersByOrder[order.id] ?? []}
+        tripTrailer={tripTrailerByOrder[order.id] ?? null}
         amendments={amendmentsByOrder[order.id] ?? []}
         knownVehicles={knownVehicles}
         documents={documentsByOrder[order.id] ?? []}
