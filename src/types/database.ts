@@ -1810,6 +1810,132 @@ export type Database = {
           },
         ]
       }
+      gps_connections: {
+        Row: {
+          account_name: string | null
+          api_host: string
+          company_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          label: string | null
+          last_error: string | null
+          last_sync_at: string | null
+          provider: string
+          secret_id: string
+          status: string
+          unit_count: number
+        }
+        Insert: {
+          account_name?: string | null
+          api_host: string
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          label?: string | null
+          last_error?: string | null
+          last_sync_at?: string | null
+          provider?: string
+          secret_id: string
+          status?: string
+          unit_count?: number
+        }
+        Update: {
+          account_name?: string | null
+          api_host?: string
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          label?: string | null
+          last_error?: string | null
+          last_sync_at?: string | null
+          provider?: string
+          secret_id?: string
+          status?: string
+          unit_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gps_connections_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gps_units: {
+        Row: {
+          company_id: string
+          connection_id: string
+          course: number | null
+          external_id: string
+          id: string
+          lat: number | null
+          lon: number | null
+          name: string
+          plate: string | null
+          position_at: string | null
+          speed_kmh: number | null
+          updated_at: string
+          vehicle_id: string | null
+        }
+        Insert: {
+          company_id: string
+          connection_id: string
+          course?: number | null
+          external_id: string
+          id?: string
+          lat?: number | null
+          lon?: number | null
+          name: string
+          plate?: string | null
+          position_at?: string | null
+          speed_kmh?: number | null
+          updated_at?: string
+          vehicle_id?: string | null
+        }
+        Update: {
+          company_id?: string
+          connection_id?: string
+          course?: number | null
+          external_id?: string
+          id?: string
+          lat?: number | null
+          lon?: number | null
+          name?: string
+          plate?: string | null
+          position_at?: string | null
+          speed_kmh?: number | null
+          updated_at?: string
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gps_units_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gps_units_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: false
+            referencedRelation: "gps_connections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gps_units_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       incidents: {
         Row: {
           fingerprint: string
@@ -5246,6 +5372,10 @@ export type Database = {
         Args: { p_import_id: string; p_rows: Json }
         Returns: Json
       }
+      carrier_gps_map_unit: {
+        Args: { p_unit_id: string; p_vehicle_id: string }
+        Returns: undefined
+      }
       carrier_invite_company: {
         Args: {
           p_business_id: string
@@ -6247,6 +6377,22 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      gps_connection_create: {
+        Args: {
+          p_account_name: string
+          p_api_host: string
+          p_company_id: string
+          p_label: string
+          p_token: string
+          p_user_id: string
+        }
+        Returns: string
+      }
+      gps_connection_delete: {
+        Args: { p_company_id: string; p_id: string }
+        Returns: undefined
+      }
+      gps_connection_token: { Args: { p_id: string }; Returns: string }
       group_take_order: {
         Args: { p_order_id: string; p_vehicle_id: string }
         Returns: {
