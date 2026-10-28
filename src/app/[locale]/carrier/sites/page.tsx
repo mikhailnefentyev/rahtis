@@ -26,6 +26,8 @@ export default async function SitesPage({ params }: { params: Promise<{ locale: 
       .from('site_jobs')
       .select('*')
       .eq('company_id', viewer.company!.id)
+      /* Объекты под самосвальные заказы живут в рейсах, а не здесь. */
+      .is('order_id', null)
       .order('status', { ascending: true })
       .order('created_at', { ascending: false }),
     supabase.from('scale_sites').select('id, name, city').order('name'),

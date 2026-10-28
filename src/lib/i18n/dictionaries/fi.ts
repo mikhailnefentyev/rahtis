@@ -1186,6 +1186,13 @@ export const fi = {
       dropSection: 'Mihin kuorma toimitetaan',
       unitState: 'Kuorma',
     },
+    TIPPER: {
+      stopPickup: 'Kuorman nouto',
+      stopReturn: 'Toimitus',
+      pickupSection: 'Mistä kuorma noudetaan',
+      dropSection: 'Mihin kuorma toimitetaan',
+      unitState: 'Kuorma',
+    },
   },
 
   /*
@@ -1209,12 +1216,40 @@ export const fi = {
     features: { MEGA: 'MEGA', SIDE_LOADING: 'Sivulastaus', TOP_LOADING: 'Lastaus katon kautta', LIFTING_ROOF: 'Nostokatto' },
   },
 
+  /* Закрытие самосвального заказа (src/app/[locale]/carrier/desk/TipperClosingPanel.tsx). */
+  tipperClose: {
+    title: 'Kohteen toteuma',
+    days: 'Päiviä',
+    hours: 'Tunnit',
+    loads: 'Kuormia',
+    tonnes: 'Tonnia (netto)',
+    amount: 'Summa toteuman mukaan',
+    hint: 'Kuljettaja kirjaa saapumisen, kuormat ja päivän päättymisen sovelluksessa (Kohde). Kun suljet ajon, tämä summa tulee tilauksen hinnaksi.',
+    notArrived: 'Kuljettaja ei ole vielä kirjannut saapumista kohteelle.',
+    dayOpen: 'Päivä on kesken: ei kuormia eikä päivän päättymistä.',
+    noWeights: 'Hinnoittelu on tonneittain, mutta kuormilta puuttuvat punnitukset.',
+    close: 'Sulje ajo',
+  },
+
+  /* Стройка: самосвальный заказ (haul_kind TIPPER, src/lib/orders/haul.ts). */
+  tipper: {
+    hint: 'Maansiirto mitataan tonneina ja kuutioina, hinta tunneilta, kuormilta tai tonneilta. Hinta on arvio: lopullinen summa lasketaan kuljettajan kirjauksista (saapuminen, kuormat punnituksineen, päivän päättyminen).',
+    config: 'Kalusto',
+    configs: { TRUCK: 'Nuppiauto 3–5 akselia', CASSETTE: 'Kasetti: nuppi + perävaunu 3–5 akselia', SEMI: 'Vetoauto + kippipuoliperävaunu' },
+    volume: 'Määrä, m³',
+    pricing: 'Hinnoittelu',
+    unitRate: { HOUR: 'Tuntihinta, € (alv 0)', LOAD: 'Hinta / kuorma, € (alv 0)', TONNE: 'Hinta / tonni, € (alv 0)' },
+    planned: { HOUR: 'Arvio, tuntia', LOAD: 'Arvio, kuormia', TONNE: 'Arvio, tonnia' },
+    plannedHint: 'Arvio näkyy hintana. Lopullinen hinta tulee toteutuneesta.',
+  },
+
   haulKind: {
     TRAILER: 'Perävaunu',
     CONTAINER: 'Kontti',
     VAN: 'Pakettiauto',
     TRUCK: 'Kuorma-auto',
     SEMI: 'Puoliperävaunuyhdistelmä 13,6 m',
+    TIPPER: 'Maansiirto (kippi)',
   },
 
   /*
@@ -1226,7 +1261,7 @@ export const fi = {
     TRACTOR: 'Vetoauto',
     VAN: 'Pakettiauto · enintään 3,5 t',
     TRUCK: 'Kuorma-auto · enintään 26 t',
-    TIPPER: 'Kippiauto / kasettiauto · 3–5 akselia',
+    TIPPER: 'Nuppiauto (kippi / kasetti) · 3–5 akselia',
   },
 
   amendKind: {

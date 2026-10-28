@@ -31,7 +31,7 @@ import { HAUL_MAX_CARGO_KG, isSemiFeature } from '@/lib/orders/haul';
  */
 
 const ORDER_TYPES = ['TRAILER_SWAP', 'ROUND_TRIP', 'ONE_WAY'] as const;
-const HAUL_KINDS = ['TRAILER', 'CONTAINER', 'VAN', 'TRUCK', 'SEMI'] as const;
+const HAUL_KINDS = ['TRAILER', 'CONTAINER', 'VAN', 'TRUCK', 'SEMI', 'TIPPER'] as const;
 export const ROLES = ['PICKUP', 'DELIVERY', 'EXTRA_LOAD', 'EXTRA_UNLOAD', 'TRAILER_RETURN'] as const;
 const PLACE_KINDS = ['PORT', 'TERMINAL', 'PARKING', 'ADDRESS'] as const;
 
@@ -227,6 +227,16 @@ async function prepare(body: unknown): Promise<Prepared> {
       container_feet: body.container_feet === undefined ? '' : String(body.container_feet),
       ldm: body.ldm === undefined ? '' : String(body.ldm),
       semi_features: haulKind === 'SEMI' && Array.isArray(body.semi_features) ? body.semi_features.filter(isSemiFeature) : [],
+      ...(haulKind === 'TIPPER'
+        ? {
+            tipper_config: typeof body.tipper_config === 'string' ? body.tipper_config : '',
+            site_pricing: typeof body.site_pricing === 'string' ? body.site_pricing : '',
+            site_rate_cents: body.site_rate_cents === undefined ? '' : String(body.site_rate_cents),
+            planned_qty: body.planned_qty === undefined ? '' : String(body.planned_qty),
+            material_code: typeof body.material_code === 'string' ? body.material_code : '',
+            planned_volume_m3: body.planned_volume_m3 === undefined ? '' : String(body.planned_volume_m3),
+          }
+        : {}),
       shipper_ref: text(body.shipper_ref, 100) ?? '',
       trailer: text(body.trailer, 120) ?? '',
       trailer_plate: trailerPlate ?? '',

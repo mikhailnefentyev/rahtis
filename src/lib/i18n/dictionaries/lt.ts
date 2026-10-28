@@ -1010,6 +1010,13 @@ export const lt = {
       dropSection: 'Kur pristatomas krovinys',
       unitState: 'Krovinys',
     },
+    TIPPER: {
+      stopPickup: 'Krovinio paėmimas',
+      stopReturn: 'Pristatymas',
+      pickupSection: 'Kur paimamas krovinys',
+      dropSection: 'Kur pristatomas krovinys',
+      unitState: 'Krovinys',
+    },
   },
 
   presence: {
@@ -1029,19 +1036,47 @@ export const lt = {
     features: { MEGA: 'MEGA', SIDE_LOADING: 'Šoninis pakrovimas', TOP_LOADING: 'Pakrovimas iš viršaus', LIFTING_ROOF: 'Keliamas stogas' },
   },
 
+  /* Закрытие самосвального заказа (src/app/[locale]/carrier/desk/TipperClosingPanel.tsx). */
+  tipperClose: {
+    title: 'Atlikti darbai objekte',
+    days: 'Dienos',
+    hours: 'Valandos',
+    loads: 'Reisai',
+    tonnes: 'Tonos (neto)',
+    amount: 'Suma pagal atliktą darbą',
+    hint: 'Vairuotojas programėlėje (Objektas) pažymi atvykimą, reisus ir dienos pabaigą. Uždarius reisą, ši suma tampa užsakymo kaina.',
+    notArrived: 'Vairuotojas dar nepažymėjo atvykimo į objektą.',
+    dayOpen: 'Diena nebaigta: nėra reisų ir dienos pabaigos.',
+    noWeights: 'Kaina už toną, bet reisai neturi svorių.',
+    close: 'Uždaryti reisą',
+  },
+
+  /* Стройка: самосвальный заказ (haul_kind TIPPER, src/lib/orders/haul.ts). */
+  tipper: {
+    hint: 'Žemės darbai matuojami tonomis ir kubiniais metrais, mokama už valandą, reisą arba toną. Kaina yra preliminari: galutinė suma apskaičiuojama pagal vairuotojo įrašus (atvykimas, reisai su svoriais, dienos pabaiga).',
+    config: 'Transportas',
+    configs: { TRUCK: 'Nuppi (savivartis) 3–5 ašys', CASSETTE: 'Kasetė: nuppi + priekaba 3–5 ašys', SEMI: 'Vilkikas + savivartė puspriekabė' },
+    volume: 'Tūris, m³',
+    pricing: 'Kainodara',
+    unitRate: { HOUR: 'Valandinis įkainis, € (be PVM)', LOAD: 'Kaina už reisą, € (be PVM)', TONNE: 'Kaina už toną, € (be PVM)' },
+    planned: { HOUR: 'Įvertis, valandos', LOAD: 'Įvertis, reisai', TONNE: 'Įvertis, tonos' },
+    plannedHint: 'Įvertis rodomas kaip kaina. Galutinė kaina skaičiuojama pagal atliktą darbą.',
+  },
+
   haulKind: {
     TRAILER: 'Puspriekabė',
     CONTAINER: 'Konteineris',
     VAN: 'Furgonas',
     TRUCK: 'Sunkvežimis',
     SEMI: 'Puspriekabės junginys 13,6 m',
+    TIPPER: 'Žemės darbai (savivartis)',
   },
 
   vehicleClass: {
     TRACTOR: 'Vilkikas',
     VAN: 'Furgonas · iki 3,5 t',
     TRUCK: 'Sunkvežimis · iki 26 t',
-    TIPPER: 'Savivartis / kasetinis · 3–5 ašys',
+    TIPPER: 'Nuppi (savivartis / kasetė) · 3–5 ašys',
   },
 
   amendKind: {

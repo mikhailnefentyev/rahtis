@@ -301,6 +301,7 @@ export const et = {
     VAN: 'Kaubik',
     TRUCK: 'Veoauto',
     SEMI: 'Poolhaagisega autorong 13,6 m',
+    TIPPER: 'Pinnasetööd (kallur)',
   },
   payDisclaimer:
     'Kalkulaator annab ligikaudse summa. Lõpliku palga määravad tööandja ning töö- või kollektiivleping.',

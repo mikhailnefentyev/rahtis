@@ -18,9 +18,9 @@ export default async function DriverSite({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ job?: string }>;
+  searchParams: Promise<{ job?: string; order?: string }>;
 }) {
-  const [{ locale }, { job }] = await Promise.all([params, searchParams]);
+  const [{ locale }, { job, order }] = await Promise.all([params, searchParams]);
   if (!isLocale(locale)) notFound();
 
   const [driver, { t }] = await Promise.all([getDriver(), getDriverI18n(locale)]);
@@ -30,7 +30,7 @@ export default async function DriverSite({
   const { data } = await supabase.rpc('driver_site_state');
   const all = data as unknown as SiteState | null;
   /* Из «Заданий» открыт один объект — показываем его; без выбора — все. */
-  const picked = all?.jobs.filter((j) => j.id === job) ?? [];
+  const picked = all?.jobs.filter((j) => (order ? j.order_id === order : j.id === job)) ?? [];
   const state = all && picked.length > 0 ? { ...all, jobs: picked } : all;
 
   return (

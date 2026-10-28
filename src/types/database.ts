@@ -2885,8 +2885,11 @@ export type Database = {
           invoice_ref: string | null
           invoiced_at: string | null
           ldm: number | null
+          material_code: string | null
           order_type: Database["public"]["Enums"]["order_type"]
           paid_at: string | null
+          planned_qty: number | null
+          planned_volume_m3: number | null
           published_at: string | null
           rate_cents: number | null
           ref: string
@@ -2900,8 +2903,11 @@ export type Database = {
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
           shipper_fee_bps: number | null
           shipper_ref: string | null
+          site_pricing: Database["public"]["Enums"]["site_pricing"] | null
+          site_rate_cents: number | null
           status: Database["public"]["Enums"]["order_status"]
           terms_document_id: string | null
+          tipper_config: string | null
           track_token: string | null
           trailer: string | null
           trailer_plate: string | null
@@ -2936,8 +2942,11 @@ export type Database = {
           invoice_ref?: string | null
           invoiced_at?: string | null
           ldm?: number | null
+          material_code?: string | null
           order_type: Database["public"]["Enums"]["order_type"]
           paid_at?: string | null
+          planned_qty?: number | null
+          planned_volume_m3?: number | null
           published_at?: string | null
           rate_cents?: number | null
           ref?: string
@@ -2951,8 +2960,11 @@ export type Database = {
           shipper_company_kind?: Database["public"]["Enums"]["party_role"]
           shipper_fee_bps?: number | null
           shipper_ref?: string | null
+          site_pricing?: Database["public"]["Enums"]["site_pricing"] | null
+          site_rate_cents?: number | null
           status?: Database["public"]["Enums"]["order_status"]
           terms_document_id?: string | null
+          tipper_config?: string | null
           track_token?: string | null
           trailer?: string | null
           trailer_plate?: string | null
@@ -2987,8 +2999,11 @@ export type Database = {
           invoice_ref?: string | null
           invoiced_at?: string | null
           ldm?: number | null
+          material_code?: string | null
           order_type?: Database["public"]["Enums"]["order_type"]
           paid_at?: string | null
+          planned_qty?: number | null
+          planned_volume_m3?: number | null
           published_at?: string | null
           rate_cents?: number | null
           ref?: string
@@ -3002,8 +3017,11 @@ export type Database = {
           shipper_company_kind?: Database["public"]["Enums"]["party_role"]
           shipper_fee_bps?: number | null
           shipper_ref?: string | null
+          site_pricing?: Database["public"]["Enums"]["site_pricing"] | null
+          site_rate_cents?: number | null
           status?: Database["public"]["Enums"]["order_status"]
           terms_document_id?: string | null
+          tipper_config?: string | null
           track_token?: string | null
           trailer?: string | null
           trailer_plate?: string | null
@@ -3486,6 +3504,7 @@ export type Database = {
           lon: number | null
           material_code: string
           name: string
+          order_id: string | null
           payment_term_days: number
           pricing: Database["public"]["Enums"]["site_pricing"]
           rate_cents: number
@@ -3514,6 +3533,7 @@ export type Database = {
           lon?: number | null
           material_code?: string
           name: string
+          order_id?: string | null
           payment_term_days?: number
           pricing?: Database["public"]["Enums"]["site_pricing"]
           rate_cents?: number
@@ -3542,6 +3562,7 @@ export type Database = {
           lon?: number | null
           material_code?: string
           name?: string
+          order_id?: string | null
           payment_term_days?: number
           pricing?: Database["public"]["Enums"]["site_pricing"]
           rate_cents?: number
@@ -3555,6 +3576,13 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_jobs_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
             referencedColumns: ["id"]
           },
           {
@@ -4344,8 +4372,11 @@ export type Database = {
           invoice_ref: string | null
           invoiced_at: string | null
           ldm: number | null
+          material_code: string | null
           order_type: Database["public"]["Enums"]["order_type"]
           paid_at: string | null
+          planned_qty: number | null
+          planned_volume_m3: number | null
           published_at: string | null
           rate_cents: number | null
           ref: string
@@ -4359,8 +4390,11 @@ export type Database = {
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
           shipper_fee_bps: number | null
           shipper_ref: string | null
+          site_pricing: Database["public"]["Enums"]["site_pricing"] | null
+          site_rate_cents: number | null
           status: Database["public"]["Enums"]["order_status"]
           terms_document_id: string | null
+          tipper_config: string | null
           track_token: string | null
           trailer: string | null
           trailer_plate: string | null
@@ -4922,8 +4956,11 @@ export type Database = {
           invoice_ref: string | null
           invoiced_at: string | null
           ldm: number | null
+          material_code: string | null
           order_type: Database["public"]["Enums"]["order_type"]
           paid_at: string | null
+          planned_qty: number | null
+          planned_volume_m3: number | null
           published_at: string | null
           rate_cents: number | null
           ref: string
@@ -4937,8 +4974,11 @@ export type Database = {
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
           shipper_fee_bps: number | null
           shipper_ref: string | null
+          site_pricing: Database["public"]["Enums"]["site_pricing"] | null
+          site_rate_cents: number | null
           status: Database["public"]["Enums"]["order_status"]
           terms_document_id: string | null
+          tipper_config: string | null
           track_token: string | null
           trailer: string | null
           trailer_plate: string | null
@@ -4999,8 +5039,11 @@ export type Database = {
           invoice_ref: string | null
           invoiced_at: string | null
           ldm: number | null
+          material_code: string | null
           order_type: Database["public"]["Enums"]["order_type"]
           paid_at: string | null
+          planned_qty: number | null
+          planned_volume_m3: number | null
           published_at: string | null
           rate_cents: number | null
           ref: string
@@ -5014,8 +5057,11 @@ export type Database = {
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
           shipper_fee_bps: number | null
           shipper_ref: string | null
+          site_pricing: Database["public"]["Enums"]["site_pricing"] | null
+          site_rate_cents: number | null
           status: Database["public"]["Enums"]["order_status"]
           terms_document_id: string | null
+          tipper_config: string | null
           track_token: string | null
           trailer: string | null
           trailer_plate: string | null
@@ -5166,8 +5212,11 @@ export type Database = {
           invoice_ref: string | null
           invoiced_at: string | null
           ldm: number | null
+          material_code: string | null
           order_type: Database["public"]["Enums"]["order_type"]
           paid_at: string | null
+          planned_qty: number | null
+          planned_volume_m3: number | null
           published_at: string | null
           rate_cents: number | null
           ref: string
@@ -5181,8 +5230,11 @@ export type Database = {
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
           shipper_fee_bps: number | null
           shipper_ref: string | null
+          site_pricing: Database["public"]["Enums"]["site_pricing"] | null
+          site_rate_cents: number | null
           status: Database["public"]["Enums"]["order_status"]
           terms_document_id: string | null
+          tipper_config: string | null
           track_token: string | null
           trailer: string | null
           trailer_plate: string | null
@@ -5232,8 +5284,11 @@ export type Database = {
           invoice_ref: string | null
           invoiced_at: string | null
           ldm: number | null
+          material_code: string | null
           order_type: Database["public"]["Enums"]["order_type"]
           paid_at: string | null
+          planned_qty: number | null
+          planned_volume_m3: number | null
           published_at: string | null
           rate_cents: number | null
           ref: string
@@ -5247,8 +5302,11 @@ export type Database = {
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
           shipper_fee_bps: number | null
           shipper_ref: string | null
+          site_pricing: Database["public"]["Enums"]["site_pricing"] | null
+          site_rate_cents: number | null
           status: Database["public"]["Enums"]["order_status"]
           terms_document_id: string | null
+          tipper_config: string | null
           track_token: string | null
           trailer: string | null
           trailer_plate: string | null
@@ -5405,8 +5463,11 @@ export type Database = {
           invoice_ref: string | null
           invoiced_at: string | null
           ldm: number | null
+          material_code: string | null
           order_type: Database["public"]["Enums"]["order_type"]
           paid_at: string | null
+          planned_qty: number | null
+          planned_volume_m3: number | null
           published_at: string | null
           rate_cents: number | null
           ref: string
@@ -5420,8 +5481,11 @@ export type Database = {
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
           shipper_fee_bps: number | null
           shipper_ref: string | null
+          site_pricing: Database["public"]["Enums"]["site_pricing"] | null
+          site_rate_cents: number | null
           status: Database["public"]["Enums"]["order_status"]
           terms_document_id: string | null
+          tipper_config: string | null
           track_token: string | null
           trailer: string | null
           trailer_plate: string | null
@@ -5473,8 +5537,11 @@ export type Database = {
           invoice_ref: string | null
           invoiced_at: string | null
           ldm: number | null
+          material_code: string | null
           order_type: Database["public"]["Enums"]["order_type"]
           paid_at: string | null
+          planned_qty: number | null
+          planned_volume_m3: number | null
           published_at: string | null
           rate_cents: number | null
           ref: string
@@ -5488,8 +5555,11 @@ export type Database = {
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
           shipper_fee_bps: number | null
           shipper_ref: string | null
+          site_pricing: Database["public"]["Enums"]["site_pricing"] | null
+          site_rate_cents: number | null
           status: Database["public"]["Enums"]["order_status"]
           terms_document_id: string | null
+          tipper_config: string | null
           track_token: string | null
           trailer: string | null
           trailer_plate: string | null
@@ -5627,8 +5697,11 @@ export type Database = {
           invoice_ref: string | null
           invoiced_at: string | null
           ldm: number | null
+          material_code: string | null
           order_type: Database["public"]["Enums"]["order_type"]
           paid_at: string | null
+          planned_qty: number | null
+          planned_volume_m3: number | null
           published_at: string | null
           rate_cents: number | null
           ref: string
@@ -5642,8 +5715,11 @@ export type Database = {
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
           shipper_fee_bps: number | null
           shipper_ref: string | null
+          site_pricing: Database["public"]["Enums"]["site_pricing"] | null
+          site_rate_cents: number | null
           status: Database["public"]["Enums"]["order_status"]
           terms_document_id: string | null
+          tipper_config: string | null
           track_token: string | null
           trailer: string | null
           trailer_plate: string | null
@@ -5941,8 +6017,11 @@ export type Database = {
           invoice_ref: string | null
           invoiced_at: string | null
           ldm: number | null
+          material_code: string | null
           order_type: Database["public"]["Enums"]["order_type"]
           paid_at: string | null
+          planned_qty: number | null
+          planned_volume_m3: number | null
           published_at: string | null
           rate_cents: number | null
           ref: string
@@ -5956,8 +6035,11 @@ export type Database = {
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
           shipper_fee_bps: number | null
           shipper_ref: string | null
+          site_pricing: Database["public"]["Enums"]["site_pricing"] | null
+          site_rate_cents: number | null
           status: Database["public"]["Enums"]["order_status"]
           terms_document_id: string | null
+          tipper_config: string | null
           track_token: string | null
           trailer: string | null
           trailer_plate: string | null
@@ -6431,8 +6513,11 @@ export type Database = {
           invoice_ref: string | null
           invoiced_at: string | null
           ldm: number | null
+          material_code: string | null
           order_type: Database["public"]["Enums"]["order_type"]
           paid_at: string | null
+          planned_qty: number | null
+          planned_volume_m3: number | null
           published_at: string | null
           rate_cents: number | null
           ref: string
@@ -6446,8 +6531,11 @@ export type Database = {
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
           shipper_fee_bps: number | null
           shipper_ref: string | null
+          site_pricing: Database["public"]["Enums"]["site_pricing"] | null
+          site_rate_cents: number | null
           status: Database["public"]["Enums"]["order_status"]
           terms_document_id: string | null
+          tipper_config: string | null
           track_token: string | null
           trailer: string | null
           trailer_plate: string | null
@@ -6520,8 +6608,11 @@ export type Database = {
           invoice_ref: string | null
           invoiced_at: string | null
           ldm: number | null
+          material_code: string | null
           order_type: Database["public"]["Enums"]["order_type"]
           paid_at: string | null
+          planned_qty: number | null
+          planned_volume_m3: number | null
           published_at: string | null
           rate_cents: number | null
           ref: string
@@ -6535,8 +6626,11 @@ export type Database = {
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
           shipper_fee_bps: number | null
           shipper_ref: string | null
+          site_pricing: Database["public"]["Enums"]["site_pricing"] | null
+          site_rate_cents: number | null
           status: Database["public"]["Enums"]["order_status"]
           terms_document_id: string | null
+          tipper_config: string | null
           track_token: string | null
           trailer: string | null
           trailer_plate: string | null
@@ -6735,8 +6829,11 @@ export type Database = {
           invoice_ref: string | null
           invoiced_at: string | null
           ldm: number | null
+          material_code: string | null
           order_type: Database["public"]["Enums"]["order_type"]
           paid_at: string | null
+          planned_qty: number | null
+          planned_volume_m3: number | null
           published_at: string | null
           rate_cents: number | null
           ref: string
@@ -6750,8 +6847,11 @@ export type Database = {
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
           shipper_fee_bps: number | null
           shipper_ref: string | null
+          site_pricing: Database["public"]["Enums"]["site_pricing"] | null
+          site_rate_cents: number | null
           status: Database["public"]["Enums"]["order_status"]
           terms_document_id: string | null
+          tipper_config: string | null
           track_token: string | null
           trailer: string | null
           trailer_plate: string | null
@@ -6867,8 +6967,11 @@ export type Database = {
           invoice_ref: string | null
           invoiced_at: string | null
           ldm: number | null
+          material_code: string | null
           order_type: Database["public"]["Enums"]["order_type"]
           paid_at: string | null
+          planned_qty: number | null
+          planned_volume_m3: number | null
           published_at: string | null
           rate_cents: number | null
           ref: string
@@ -6882,8 +6985,11 @@ export type Database = {
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
           shipper_fee_bps: number | null
           shipper_ref: string | null
+          site_pricing: Database["public"]["Enums"]["site_pricing"] | null
+          site_rate_cents: number | null
           status: Database["public"]["Enums"]["order_status"]
           terms_document_id: string | null
+          tipper_config: string | null
           track_token: string | null
           trailer: string | null
           trailer_plate: string | null
@@ -6898,6 +7004,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      tipper_order_summary: { Args: { p_order_id: string }; Returns: Json }
       training_sync: { Args: { p_cards: Json }; Returns: number }
       uncomplete_stop: {
         Args: { p_stop_id: string }
@@ -7073,8 +7180,11 @@ export type Database = {
           invoice_ref: string | null
           invoiced_at: string | null
           ldm: number | null
+          material_code: string | null
           order_type: Database["public"]["Enums"]["order_type"]
           paid_at: string | null
+          planned_qty: number | null
+          planned_volume_m3: number | null
           published_at: string | null
           rate_cents: number | null
           ref: string
@@ -7088,8 +7198,11 @@ export type Database = {
           shipper_company_kind: Database["public"]["Enums"]["party_role"]
           shipper_fee_bps: number | null
           shipper_ref: string | null
+          site_pricing: Database["public"]["Enums"]["site_pricing"] | null
+          site_rate_cents: number | null
           status: Database["public"]["Enums"]["order_status"]
           terms_document_id: string | null
+          tipper_config: string | null
           track_token: string | null
           trailer: string | null
           trailer_plate: string | null
@@ -7156,7 +7269,7 @@ export type Database = {
       eta_source: "ROUTE" | "TRAFFIC" | "CARRIER"
       euro_class: "EURO_4" | "EURO_5" | "EURO_6"
       haul_branch: "UNIT" | "EXPRESS" | "TIPPER"
-      haul_kind: "TRAILER" | "CONTAINER" | "VAN" | "TRUCK" | "SEMI"
+      haul_kind: "TRAILER" | "CONTAINER" | "VAN" | "TRUCK" | "SEMI" | "TIPPER"
       incident_severity: "WARN" | "ERROR" | "FATAL"
       incident_status: "OPEN" | "ACKED" | "RESOLVED"
       invoice_kind: "TRANSPORT" | "SUBSCRIPTION"
@@ -7400,7 +7513,7 @@ export const Constants = {
       eta_source: ["ROUTE", "TRAFFIC", "CARRIER"],
       euro_class: ["EURO_4", "EURO_5", "EURO_6"],
       haul_branch: ["UNIT", "EXPRESS", "TIPPER"],
-      haul_kind: ["TRAILER", "CONTAINER", "VAN", "TRUCK", "SEMI"],
+      haul_kind: ["TRAILER", "CONTAINER", "VAN", "TRUCK", "SEMI", "TIPPER"],
       incident_severity: ["WARN", "ERROR", "FATAL"],
       incident_status: ["OPEN", "ACKED", "RESOLVED"],
       invoice_kind: ["TRANSPORT", "SUBSCRIPTION"],

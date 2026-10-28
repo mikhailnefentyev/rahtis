@@ -33,6 +33,8 @@ type Day = {
 
 type Job = {
   id: string;
+  /** Объект заведён под самосвальный заказ платформы. */
+  order_id?: string | null;
   name: string;
   address: string | null;
   customer_name: string;

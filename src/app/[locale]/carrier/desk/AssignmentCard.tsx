@@ -23,6 +23,7 @@ import { isTransfer } from '@/lib/orders/transfer';
 import { AbandonPanel } from './AbandonPanel';
 import { OrderChat } from '@/components/domain/OrderChat';
 import { ClosingPanel } from './ClosingPanel';
+import { TipperClosingPanel } from './TipperClosingPanel';
 import { WasteLink } from '@/components/domain/WasteLink';
 import { TripPanel } from './TripPanel';
 import { OwnEditPanel } from './OwnEditPanel';
@@ -201,7 +202,8 @@ export function AssignmentCard({
                     {order.comment}
                   </p>
                 )}
-                {order.status === 'IN_PROGRESS' && (
+                {/* Стройка ведётся экраном объекта у водителя — точки здесь не отмечаются. */}
+                {order.status === 'IN_PROGRESS' && order.haul_kind !== 'TIPPER' && (
                   <TripPanel stops={stops} haulKind={order.haul_kind} />
                 )}
 
@@ -227,7 +229,8 @@ export function AssignmentCard({
                   * Выполненного рейса здесь уже нет — он уходит во
                   * вкладку выполненных вместе с документами.
                   */}
-                {order.status === 'IN_PROGRESS' && (
+                {order.status === 'IN_PROGRESS' && order.haul_kind === 'TIPPER' && <TipperClosingPanel orderId={order.id} />}
+                {order.status === 'IN_PROGRESS' && order.haul_kind !== 'TIPPER' && (
                   <ClosingPanel
                     orderId={order.id}
                     stops={stops}

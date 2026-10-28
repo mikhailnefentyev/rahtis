@@ -301,6 +301,7 @@ export const nb = {
     VAN: 'Varebil',
     TRUCK: 'Lastebil',
     SEMI: 'Semitrailer 13,6 m',
+    TIPPER: 'Masseflytting (tipp)',
   },
   payDisclaimer:
     'Beregningen er veiledende. Endelig lønn bestemmes av arbeidsgiveren og arbeids- eller tariffavtalen.',

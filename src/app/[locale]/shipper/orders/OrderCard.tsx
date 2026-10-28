@@ -12,6 +12,7 @@ import { isTransfer } from '@/lib/orders/transfer';
 import { routeEnds } from '@/lib/orders/route';
 import { DocumentList } from '@/components/domain/TripDocuments';
 import { WasteLink } from '@/components/domain/WasteLink';
+import { TipperSummary } from '@/components/domain/TipperSummary';
 import type {
   KnownVehicle,
   OrderAmendment,
@@ -216,6 +217,10 @@ export function OrderCard({
               )}
 
               {/* Отходы и Приложение VII — у любого заказа, кроме черновика. */}
+              {/* Стройка: что наработано и сколько это по ставке — из этого итоговая цена. */}
+              {order.haul_kind === 'TIPPER' && (order.status === 'IN_PROGRESS' || order.status === 'DONE') && (
+                <TipperSummary orderId={order.id} className="mt-3 rounded-control border border-line bg-sunken p-3" />
+              )}
               {order.status !== 'DRAFT' && <WasteLink orderId={order.id} className="mt-3 inline-block" />}
 
               {stops.length > 0 && (

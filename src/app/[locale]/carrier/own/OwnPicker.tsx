@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { CountrySelect } from '@/components/CountrySelect';
 import { Field, Input, InputMono, Select } from '@/components/ui';
 import { countryPack } from '@/lib/country';
-import { haulNeedsTractor, type HaulKind } from '@/lib/orders/haul';
+import { vehicleClassFits, type HaulKind } from '@/lib/orders/haul';
 import { useI18n } from '@/lib/i18n/provider';
 import type { CarrierClient, OwnVehicle } from '@/types/db';
 
@@ -62,10 +62,7 @@ export function OwnPicker({
     return () => form.removeEventListener('reset', onReset);
   }, []);
   /* Тягач — перецеп, контейнер и полный полуприцеп (фура); фургон и грузовик — свой экспресс. */
-  const unit = haulNeedsTractor(haulKind);
-  const fitting = vehicles.filter(
-    (v) => v.available && (unit ? v.vehicle_class === 'TRACTOR' : v.vehicle_class === 'VAN' || v.vehicle_class === 'TRUCK'),
-  );
+  const fitting = vehicles.filter((v) => v.available && vehicleClassFits(haulKind, v.vehicle_class));
   const optional = ` (${t.own.optional})`;
 
   return (

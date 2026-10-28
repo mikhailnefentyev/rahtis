@@ -1010,6 +1010,13 @@ export const sv = {
       dropSection: 'Var godset levereras',
       unitState: 'Gods',
     },
+    TIPPER: {
+      stopPickup: 'Hämtning av gods',
+      stopReturn: 'Leverans',
+      pickupSection: 'Var godset hämtas',
+      dropSection: 'Var godset levereras',
+      unitState: 'Gods',
+    },
   },
 
   presence: {
@@ -1029,19 +1036,47 @@ export const sv = {
     features: { MEGA: 'MEGA', SIDE_LOADING: 'Sidolastning', TOP_LOADING: 'Topplastning', LIFTING_ROOF: 'Lyftbart tak' },
   },
 
+  /* Закрытие самосвального заказа (src/app/[locale]/carrier/desk/TipperClosingPanel.tsx). */
+  tipperClose: {
+    title: 'Utfört arbete',
+    days: 'Dagar',
+    hours: 'Timmar',
+    loads: 'Lass',
+    tonnes: 'Ton (netto)',
+    amount: 'Summa enligt utfört',
+    hint: 'Föraren registrerar ankomst, lass och dagens slut i appen (Objekt). När du stänger körningen blir denna summa beställningens pris.',
+    notArrived: 'Föraren har inte registrerat ankomst till objektet ännu.',
+    dayOpen: 'Dagen pågår: inga lass och inget dagslut.',
+    noWeights: 'Priset är per ton, men lassen saknar vikter.',
+    close: 'Stäng körningen',
+  },
+
+  /* Стройка: самосвальный заказ (haul_kind TIPPER, src/lib/orders/haul.ts). */
+  tipper: {
+    hint: 'Schakt mäts i ton och kubikmeter och betalas per timme, lass eller ton. Priset är en uppskattning: slutsumman räknas från förarens registreringar (ankomst, lass med vikter, dagens slut).',
+    config: 'Fordon',
+    configs: { TRUCK: 'Nuppi (tippbil) 3–5 axlar', CASSETTE: 'Kassett: nuppi + släp 3–5 axlar', SEMI: 'Dragbil + tipptrailer' },
+    volume: 'Volym, m³',
+    pricing: 'Prissättning',
+    unitRate: { HOUR: 'Timpris, € (exkl. moms)', LOAD: 'Pris per lass, € (exkl. moms)', TONNE: 'Pris per ton, € (exkl. moms)' },
+    planned: { HOUR: 'Uppskattning, timmar', LOAD: 'Uppskattning, lass', TONNE: 'Uppskattning, ton' },
+    plannedHint: 'Uppskattningen visas som pris. Slutpriset räknas på utfört arbete.',
+  },
+
   haulKind: {
     TRAILER: 'Trailer',
     CONTAINER: 'Container',
     VAN: 'Skåpbil',
     TRUCK: 'Lastbil',
     SEMI: 'Påhängsekipage 13,6 m',
+    TIPPER: 'Schakt (tipp)',
   },
 
   vehicleClass: {
     TRACTOR: 'Dragbil',
     VAN: 'Skåpbil · upp till 3,5 t',
     TRUCK: 'Lastbil · upp till 26 t',
-    TIPPER: 'Tippbil / kassettbil · 3–5 axlar',
+    TIPPER: 'Nuppi (tipp / kassett) · 3–5 axlar',
   },
 
   amendKind: {

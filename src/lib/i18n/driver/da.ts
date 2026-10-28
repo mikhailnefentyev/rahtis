@@ -301,6 +301,7 @@ export const da = {
     VAN: 'Varevogn',
     TRUCK: 'Lastbil',
     SEMI: 'Sættevognstog 13,6 m',
+    TIPPER: 'Jordarbejde (tip)',
   },
   payDisclaimer:
     'Beregningen er vejledende. Den endelige løn fastsættes af arbejdsgiveren og ansættelses- eller overenskomstaftalen.',

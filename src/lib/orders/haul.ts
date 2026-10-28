@@ -12,7 +12,24 @@ export type HaulKind = Database['public']['Enums']['haul_kind'];
  * список выписан руками, а рядом стоит `satisfies` — он и уронит сборку,
  * если в базе появится пятая единица, а здесь нет.
  */
-export const HAUL_KINDS = ['TRAILER', 'CONTAINER', 'VAN', 'TRUCK', 'SEMI'] as const satisfies readonly HaulKind[];
+export const HAUL_KINDS = ['TRAILER', 'CONTAINER', 'VAN', 'TRUCK', 'SEMI', 'TIPPER'] as const satisfies readonly HaulKind[];
+
+/**
+ * Стройка (TIPPER): самосвальная работа в тоннах и кубах, цена по часам,
+ * рейсам или тоннам. Конфигурации — как в базе (orders_tipper_config):
+ * самосвал, кассетник с прицепом, тягач с самосвальным полуприцепом.
+ */
+export const TIPPER_CONFIGS = ['TRUCK', 'CASSETTE', 'SEMI'] as const;
+export type TipperConfig = (typeof TIPPER_CONFIGS)[number];
+export const SITE_PRICINGS = ['HOUR', 'LOAD', 'TONNE'] as const;
+export type SitePricingKind = (typeof SITE_PRICINGS)[number];
+
+export function isTipperConfig(value: unknown): value is TipperConfig {
+  return typeof value === 'string' && (TIPPER_CONFIGS as readonly string[]).includes(value);
+}
+export function isSitePricing(value: unknown): value is SitePricingKind {
+  return typeof value === 'string' && (SITE_PRICINGS as readonly string[]).includes(value);
+}
 
 /**
  * Полный полуприцеп (PPV-yhdistelmä) в экспресс-доставке: 13,6 м, до 30 т.
@@ -25,6 +42,16 @@ export const SEMI_LDM = 13.6;
 
 export function isSemiFeature(value: unknown): value is SemiFeature {
   return typeof value === 'string' && (SEMI_FEATURES as readonly string[]).includes(value);
+}
+
+/**
+ * Подходит ли класс машины виду заказа — грубый фильтр списков машин.
+ * Размер, пометки и конфигурацию проверяет база при отклике.
+ */
+export function vehicleClassFits(haulKind: HaulKind, vehicleClass: string): boolean {
+  if (haulKind === 'TIPPER') return vehicleClass === 'TIPPER' || vehicleClass === 'TRACTOR';
+  if (haulNeedsTractor(haulKind)) return vehicleClass === 'TRACTOR';
+  return vehicleClass === 'VAN' || vehicleClass === 'TRUCK';
 }
 
 /** Какой машиной возят: тягач — перецеп, контейнер и полный полуприцеп; фургон и грузовик — свой экспресс. */

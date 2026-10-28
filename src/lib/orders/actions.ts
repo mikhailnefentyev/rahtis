@@ -6,7 +6,7 @@ import { getViewer } from '@/lib/auth/viewer';
 import { getDictionary, isLocale, type Dictionary, type Locale, defaultLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import { dispatchPublishedOrder, notifyDirectOrder } from '@/lib/orders/dispatch';
-import { HAUL_KINDS, HAUL_MAX_CARGO_KG, type HaulKind, isSemiFeature } from '@/lib/orders/haul';
+import { HAUL_KINDS, HAUL_MAX_CARGO_KG, type HaulKind, isSemiFeature, isSitePricing, isTipperConfig } from '@/lib/orders/haul';
 import { cityOf, hasCoordinates, tonnesToKg, type FieldReader } from '@/lib/orders/stopFields';
 import type { StopRole } from '@/types/db';
 import type { Json } from '@/types/database';
@@ -348,6 +348,20 @@ function readOrderForm(
       ldm: str(formData, 'ldm').replace(',', '.'),
       /* Пометки полуприцепа — только у фуры; база берёт их только у SEMI и сверяет со списком. */
       semi_features: kind === 'SEMI' ? formData.getAll('semi_features').filter(isSemiFeature) : [],
+      /*
+       * Стройка: чем возить, как платят и ориентир. Цену заказа база
+       * считает сама (ставка × ориентир), итог — по факту при закрытии.
+       */
+      ...(kind === 'TIPPER'
+        ? {
+            tipper_config: isTipperConfig(str(formData, 'tipper_config')) ? str(formData, 'tipper_config') : '',
+            site_pricing: isSitePricing(str(formData, 'site_pricing')) ? str(formData, 'site_pricing') : '',
+            site_rate_cents: String(toCents(str(formData, 'site_rate')) ?? ''),
+            planned_qty: str(formData, 'planned_qty').replace(',', '.'),
+            material_code: str(formData, 'material_code'),
+            planned_volume_m3: str(formData, 'planned_volume_m3').replace(',', '.'),
+          }
+        : {}),
       shipper_ref: str(formData, 'shipper_ref'),
       trailer: str(formData, 'trailer'),
       /*

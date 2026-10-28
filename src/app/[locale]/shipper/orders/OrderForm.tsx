@@ -18,7 +18,17 @@ import type { ChosenAddress } from '@/components/domain/AddressInput';
 import { isValidContainerNumber } from '@/lib/containerNumber';
 import { ownOrderAction, publishOrderAction, type PublishState } from '@/lib/orders/actions';
 import { priceGuideAction, type PriceGuide } from '@/lib/orders/priceGuide';
-import { SEMI_LDM, isSemiFeature, stopTitle, type HaulKind, type SemiFeature } from '@/lib/orders/haul';
+import {
+  SEMI_LDM,
+  SITE_PRICINGS,
+  TIPPER_CONFIGS,
+  isSemiFeature,
+  stopTitle,
+  type HaulKind,
+  type SemiFeature,
+  type SitePricingKind,
+} from '@/lib/orders/haul';
+import { MATERIALS } from '@/lib/sites/work';
 import { computeRouteAction, type RouteState } from '@/lib/routing/actions';
 import { useCompanyCountry, useI18n } from '@/lib/i18n/provider';
 import { countryPack } from '@/lib/country';
@@ -179,9 +189,15 @@ export function OrderForm({
    * так же ясно, иначе на следующей единице придётся искать по файлу
    * семь разных условий.
    */
-  const express = haulKind === 'VAN' || haulKind === 'TRUCK' || haulKind === 'SEMI';
+  const express = haulKind === 'VAN' || haulKind === 'TRUCK' || haulKind === 'SEMI' || haulKind === 'TIPPER';
   /* Фура: полный полуприцеп 13,6 м — метры по умолчанию полные, пометки к полуприцепу. */
   const semi = haulKind === 'SEMI';
+  /* Стройка: груз едет в машине (точки как у экспресса), но меряется тоннами и кубами, а платят по часам, рейсам или тоннам. */
+  const tipper = haulKind === 'TIPPER';
+  const [tipperConfig, setTipperConfig] = useState<string>(origin?.tipper_config ?? 'TRUCK');
+  const [sitePricing, setSitePricing] = useState<string>(origin?.site_pricing ?? 'HOUR');
+  const [siteRate, setSiteRate] = useState(origin?.site_rate_cents ? String(origin.site_rate_cents / 100).replace('.', ',') : '');
+  const [plannedQty, setPlannedQty] = useState(origin?.planned_qty ? String(origin.planned_qty).replace('.', ',') : '');
   const [semiFeatures, setSemiFeatures] = useState<SemiFeature[]>(
     (origin?.semi_features ?? []).filter(isSemiFeature),
   );
@@ -528,6 +544,7 @@ export function OrderForm({
                 <option value="VAN">{t.vehicleClass.VAN}</option>
                 <option value="TRUCK">{t.vehicleClass.TRUCK}</option>
                 <option value="SEMI">{t.haulKind.SEMI}</option>
+                <option value="TIPPER">{t.haulKind.TIPPER}</option>
               </Select>
             )}
           </Field>
@@ -562,7 +579,7 @@ export function OrderForm({
             showTrailerState={!express}
             requireCompany={express}
             showContact={express}
-            requireWeight={express}
+            requireWeight={express && !tipper}
             haulKind={haulKind}
             defaults={stopDefaults(originPickup)}
             defaultChosen={stopChosen(originPickup)}
@@ -715,7 +732,7 @@ export function OrderForm({
               * колонки под неё требовали бы точности, которой у
               * заказчика в момент публикации нет.
               */}
-            {express ? (
+            {express && !tipper ? (
               <Field
                 label={t.orderForm.ldm}
                 hint={t.orderForm.ldmHint}
@@ -735,6 +752,80 @@ export function OrderForm({
                 )}
               </Field>
             ) : null}
+            {tipper && (
+              <div className="grid gap-4 sm:col-span-4 sm:grid-cols-3">
+                <p className="text-xs text-ink-faint sm:col-span-3">{t.tipper.hint}</p>
+                <Field label={t.tipper.config} required>
+                  {(p) => (
+                    <Select {...p} name="tipper_config" value={tipperConfig} onChange={(e) => setTipperConfig(e.target.value)}>
+                      {TIPPER_CONFIGS.map((c) => (
+                        <option key={c} value={c}>
+                          {t.tipper.configs[c]}
+                        </option>
+                      ))}
+                    </Select>
+                  )}
+                </Field>
+                <Field label={t.siteWork.material} required>
+                  {(p) => (
+                    <Select {...p} name="material_code" defaultValue={origin?.material_code ?? '170504'}>
+                      {MATERIALS.map((mat) => (
+                        <option key={mat.code} value={mat.code}>
+                          {t.siteWork.materials[mat.code]}
+                        </option>
+                      ))}
+                    </Select>
+                  )}
+                </Field>
+                <Field label={t.tipper.volume}>
+                  {(p) => (
+                    <InputMono {...p} name="planned_volume_m3" inputMode="decimal" defaultValue={origin?.planned_volume_m3 ?? ''} placeholder="120" />
+                  )}
+                </Field>
+                <Field label={t.tipper.pricing} required>
+                  {(p) => (
+                    <Select {...p} name="site_pricing" value={sitePricing} onChange={(e) => setSitePricing(e.target.value)}>
+                      {SITE_PRICINGS.map((c) => (
+                        <option key={c} value={c}>
+                          {t.sites.pricingOptions[c]}
+                        </option>
+                      ))}
+                    </Select>
+                  )}
+                </Field>
+                <Field label={t.tipper.unitRate[sitePricing as SitePricingKind]} required>
+                  {(p) => (
+                    <InputMono
+                      {...p}
+                      name="site_rate"
+                      required
+                      inputMode="decimal"
+                      value={siteRate}
+                      onChange={(e) => {
+                        setSiteRate(e.target.value);
+                        setRate(tipperEstimate(e.target.value, plannedQty));
+                      }}
+                      placeholder={sitePricing === 'HOUR' ? '95' : sitePricing === 'LOAD' ? '160' : '9'}
+                    />
+                  )}
+                </Field>
+                <Field label={t.tipper.planned[sitePricing as SitePricingKind]} hint={t.tipper.plannedHint}>
+                  {(p) => (
+                    <InputMono
+                      {...p}
+                      name="planned_qty"
+                      inputMode="decimal"
+                      value={plannedQty}
+                      onChange={(e) => {
+                        setPlannedQty(e.target.value);
+                        setRate(tipperEstimate(siteRate, e.target.value));
+                      }}
+                      placeholder={sitePricing === 'HOUR' ? '8' : sitePricing === 'LOAD' ? '10' : '250'}
+                    />
+                  )}
+                </Field>
+              </div>
+            )}
             {semi && (
               <div className="flex flex-col gap-2 sm:col-span-4">
                 <p className="label-micro">{t.semi.title}</p>
@@ -922,6 +1013,8 @@ export function OrderForm({
                   required
                   inputMode="decimal"
                   value={rate}
+                  /* У стройки цена — ориентир: ставка × ориентир; итог считается по факту. */
+                  readOnly={tipper}
                   onChange={(e) => setRate(e.target.value)}
                   placeholder="480"
                 />
@@ -1011,4 +1104,13 @@ export function OrderForm({
       </div>
     </form>
   );
+}
+
+/** Ориентир цены стройки в евро для поля «ставка»: ставка × ориентир (пусто — одна единица). */
+function tipperEstimate(rate: string, qty: string): string {
+  const r = Number.parseFloat(rate.replace(/\s/g, '').replace(',', '.'));
+  const q = Number.parseFloat(qty.replace(/\s/g, '').replace(',', '.'));
+  if (!Number.isFinite(r) || r <= 0) return '';
+  const total = Math.round(r * (Number.isFinite(q) && q > 0 ? q : 1) * 100) / 100;
+  return String(total).replace('.', ',');
 }

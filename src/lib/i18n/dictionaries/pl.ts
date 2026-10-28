@@ -1010,6 +1010,13 @@ export const pl = {
       dropSection: 'Gdzie dostarczyć ładunek',
       unitState: 'Ładunek',
     },
+    TIPPER: {
+      stopPickup: 'Odbiór ładunku',
+      stopReturn: 'Dostawa',
+      pickupSection: 'Gdzie odebrać ładunek',
+      dropSection: 'Gdzie dostarczyć ładunek',
+      unitState: 'Ładunek',
+    },
   },
 
   presence: {
@@ -1029,19 +1036,47 @@ export const pl = {
     features: { MEGA: 'MEGA', SIDE_LOADING: 'Załadunek boczny', TOP_LOADING: 'Załadunek od góry', LIFTING_ROOF: 'Podnoszony dach' },
   },
 
+  /* Закрытие самосвального заказа (src/app/[locale]/carrier/desk/TipperClosingPanel.tsx). */
+  tipperClose: {
+    title: 'Wykonane na budowie',
+    days: 'Dni',
+    hours: 'Godziny',
+    loads: 'Kursy',
+    tonnes: 'Tony (netto)',
+    amount: 'Kwota według wykonania',
+    hint: 'Kierowca zapisuje w aplikacji (Budowa) przyjazd, kursy i koniec dnia. Po zamknięciu kursu ta kwota staje się ceną zlecenia.',
+    notArrived: 'Kierowca nie zapisał jeszcze przyjazdu na budowę.',
+    dayOpen: 'Dzień trwa: brak kursów i końca dnia.',
+    noWeights: 'Rozliczenie za tonę, ale kursy nie mają ważeń.',
+    close: 'Zamknij kurs',
+  },
+
+  /* Стройка: самосвальный заказ (haul_kind TIPPER, src/lib/orders/haul.ts). */
+  tipper: {
+    hint: 'Roboty ziemne mierzy się w tonach i metrach sześciennych, płaci za godzinę, kurs lub tonę. Cena jest szacunkowa: ostateczna kwota wynika z zapisów kierowcy (przyjazd, kursy z ważeniem, koniec dnia).',
+    config: 'Pojazd',
+    configs: { TRUCK: 'Nuppi (wywrotka) 3–5 osi', CASSETTE: 'Kaseta: nuppi + przyczepa 3–5 osi', SEMI: 'Ciągnik + naczepa wywrotka' },
+    volume: 'Objętość, m³',
+    pricing: 'Rozliczenie',
+    unitRate: { HOUR: 'Stawka godzinowa, € (netto)', LOAD: 'Cena za kurs, € (netto)', TONNE: 'Cena za tonę, € (netto)' },
+    planned: { HOUR: 'Szacunek, godziny', LOAD: 'Szacunek, kursy', TONNE: 'Szacunek, tony' },
+    plannedHint: 'Szacunek jest pokazywany jako cena. Ostateczna cena wynika z wykonanej pracy.',
+  },
+
   haulKind: {
     TRAILER: 'Naczepa',
     CONTAINER: 'Kontener',
     VAN: 'Bus',
     TRUCK: 'Ciężarówka',
     SEMI: 'Zestaw z naczepą 13,6 m',
+    TIPPER: 'Roboty ziemne (wywrotka)',
   },
 
   vehicleClass: {
     TRACTOR: 'Ciągnik siodłowy',
     VAN: 'Bus · do 3,5 t',
     TRUCK: 'Ciężarówka · do 26 t',
-    TIPPER: 'Wywrotka / pojazd kasetowy · 3–5 osi',
+    TIPPER: 'Nuppi (wywrotka / kaseta) · 3–5 osi',
   },
 
   amendKind: {

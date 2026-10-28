@@ -5,7 +5,7 @@ import { Badge, Button, Field, Select } from '@/components/ui';
 import { cn } from '@/lib/cn';
 import { useI18n } from '@/lib/i18n/provider';
 import { cancelOrderAction, directAssignAction, type DirectState } from '@/lib/orders/matching';
-import { haulNeedsTractor, type HaulKind } from '@/lib/orders/haul';
+import { vehicleClassFits, type HaulKind } from '@/lib/orders/haul';
 import type { KnownVehicle } from '@/types/db';
 
 /**
@@ -24,9 +24,8 @@ import type { KnownVehicle } from '@/types/db';
  * скажет словами; здесь отсекается лишь то, что заведомо не возьмёт.
  */
 export function fittingVehicles(vehicles: KnownVehicle[], haulKind: HaulKind): KnownVehicle[] {
-  const unit = haulNeedsTractor(haulKind);
   return vehicles
-    .filter((v) => (unit ? v.vehicle_class === 'TRACTOR' : v.vehicle_class === 'VAN' || v.vehicle_class === 'TRUCK'))
+    .filter((v) => vehicleClassFits(haulKind, v.vehicle_class))
     .filter((v) => v.available)
     .sort((a, b) => Number(b.in_pool) - Number(a.in_pool));
 }

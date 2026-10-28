@@ -1010,6 +1010,13 @@ export const lv = {
       dropSection: 'Kur piegādā kravu',
       unitState: 'Krava',
     },
+    TIPPER: {
+      stopPickup: 'Kravas paņemšana',
+      stopReturn: 'Piegāde',
+      pickupSection: 'No kurienes paņem kravu',
+      dropSection: 'Kur piegādā kravu',
+      unitState: 'Krava',
+    },
   },
 
   presence: {
@@ -1029,19 +1036,47 @@ export const lv = {
     features: { MEGA: 'MEGA', SIDE_LOADING: 'Sānu iekraušana', TOP_LOADING: 'Iekraušana no augšas', LIFTING_ROOF: 'Paceļams jumts' },
   },
 
+  /* Закрытие самосвального заказа (src/app/[locale]/carrier/desk/TipperClosingPanel.tsx). */
+  tipperClose: {
+    title: 'Objektā paveiktais',
+    days: 'Dienas',
+    hours: 'Stundas',
+    loads: 'Reisi',
+    tonnes: 'Tonnas (neto)',
+    amount: 'Summa pēc paveiktā',
+    hint: 'Vadītājs lietotnē (Objekts) atzīmē ierašanos, reisus un dienas beigas. Kad aizverat braucienu, šī summa kļūst par pasūtījuma cenu.',
+    notArrived: 'Vadītājs vēl nav atzīmējis ierašanos objektā.',
+    dayOpen: 'Diena nav pabeigta: nav reisu un nav dienas beigu.',
+    noWeights: 'Cena ir par tonnu, bet reisiem nav svaru.',
+    close: 'Aizvērt braucienu',
+  },
+
+  /* Стройка: самосвальный заказ (haul_kind TIPPER, src/lib/orders/haul.ts). */
+  tipper: {
+    hint: 'Zemes darbus mēra tonnās un kubikmetros, maksā par stundu, reisu vai tonnu. Cena ir aplēse: galīgo summu aprēķina no vadītāja ierakstiem (ierašanās, reisi ar svariem, dienas beigas).',
+    config: 'Transports',
+    configs: { TRUCK: 'Nuppi (pašizgāzējs) 3–5 asis', CASSETTE: 'Kasete: nuppi + piekabe 3–5 asis', SEMI: 'Vilcējs + pašizgāzēja puspiekabe' },
+    volume: 'Apjoms, m³',
+    pricing: 'Cenas veids',
+    unitRate: { HOUR: 'Stundas likme, € (bez PVN)', LOAD: 'Cena par reisu, € (bez PVN)', TONNE: 'Cena par tonnu, € (bez PVN)' },
+    planned: { HOUR: 'Aplēse, stundas', LOAD: 'Aplēse, reisi', TONNE: 'Aplēse, tonnas' },
+    plannedHint: 'Aplēse tiek rādīta kā cena. Galīgā cena izriet no paveiktā darba.',
+  },
+
   haulKind: {
     TRAILER: 'Piekabe',
     CONTAINER: 'Konteiners',
     VAN: 'Busiņš',
     TRUCK: 'Kravas auto',
     SEMI: 'Puspiekabes sastāvs 13,6 m',
+    TIPPER: 'Zemes darbi (pašizgāzējs)',
   },
 
   vehicleClass: {
     TRACTOR: 'Vilcējs',
     VAN: 'Busiņš · līdz 3,5 t',
     TRUCK: 'Kravas auto · līdz 26 t',
-    TIPPER: 'Pašizgāzējs / kasešu auto · 3–5 asis',
+    TIPPER: 'Nuppi (pašizgāzējs / kasete) · 3–5 asis',
   },
 
   amendKind: {

@@ -1010,6 +1010,13 @@ export const de = {
       dropSection: 'Wo die Ladung zugestellt wird',
       unitState: 'Ladung',
     },
+    TIPPER: {
+      stopPickup: 'Ladungsabholung',
+      stopReturn: 'Zustellung',
+      pickupSection: 'Wo die Ladung abgeholt wird',
+      dropSection: 'Wo die Ladung zugestellt wird',
+      unitState: 'Ladung',
+    },
   },
 
   presence: {
@@ -1029,19 +1036,47 @@ export const de = {
     features: { MEGA: 'MEGA', SIDE_LOADING: 'Seitenbeladung', TOP_LOADING: 'Beladung von oben', LIFTING_ROOF: 'Hubdach' },
   },
 
+  /* Закрытие самосвального заказа (src/app/[locale]/carrier/desk/TipperClosingPanel.tsx). */
+  tipperClose: {
+    title: 'Geleistet auf der Baustelle',
+    days: 'Tage',
+    hours: 'Stunden',
+    loads: 'Fuhren',
+    tonnes: 'Tonnen (netto)',
+    amount: 'Betrag nach Leistung',
+    hint: 'Der Fahrer erfasst Ankunft, Fuhren und Tagesende in der App (Baustelle). Wenn Sie die Fahrt abschließen, wird dieser Betrag zum Auftragspreis.',
+    notArrived: 'Der Fahrer hat die Ankunft auf der Baustelle noch nicht erfasst.',
+    dayOpen: 'Der Tag läuft noch: keine Fuhren und kein Tagesende.',
+    noWeights: 'Abrechnung je Tonne, aber den Fuhren fehlen die Gewichte.',
+    close: 'Fahrt abschließen',
+  },
+
+  /* Стройка: самосвальный заказ (haul_kind TIPPER, src/lib/orders/haul.ts). */
+  tipper: {
+    hint: 'Erdbau wird in Tonnen und Kubikmetern gemessen und pro Stunde, Fuhre oder Tonne bezahlt. Der Preis ist eine Schätzung: Der Endbetrag ergibt sich aus den Eintragungen des Fahrers (Ankunft, Fuhren mit Gewichten, Tagesende).',
+    config: 'Fahrzeug',
+    configs: { TRUCK: 'Nuppi (Kipper-Lkw) 3–5 Achsen', CASSETTE: 'Kassette: Nuppi + Anhänger 3–5 Achsen', SEMI: 'Sattelzugmaschine + Kippauflieger' },
+    volume: 'Menge, m³',
+    pricing: 'Abrechnung',
+    unitRate: { HOUR: 'Stundensatz, € (netto)', LOAD: 'Preis je Fuhre, € (netto)', TONNE: 'Preis je Tonne, € (netto)' },
+    planned: { HOUR: 'Schätzung, Stunden', LOAD: 'Schätzung, Fuhren', TONNE: 'Schätzung, Tonnen' },
+    plannedHint: 'Die Schätzung wird als Preis angezeigt. Der Endpreis ergibt sich aus der tatsächlichen Arbeit.',
+  },
+
   haulKind: {
     TRAILER: 'Trailer',
     CONTAINER: 'Container',
     VAN: 'Transporter',
     TRUCK: 'Lkw',
     SEMI: 'Sattelzug 13,6 m',
+    TIPPER: 'Erdbau (Kipper)',
   },
 
   vehicleClass: {
     TRACTOR: 'Sattelzugmaschine',
     VAN: 'Transporter · bis 3,5 t',
     TRUCK: 'Lkw · bis 26 t',
-    TIPPER: 'Kipper / Kassettenfahrzeug · 3–5 Achsen',
+    TIPPER: 'Nuppi (Kipper / Kassette) · 3–5 Achsen',
   },
 
   amendKind: {

@@ -43,7 +43,8 @@ export default async function DriverHome({
   const showDone = tab === 'done';
   const visible = tasks.filter((task) => (showDone ? task.status === 'DONE' : task.status !== 'DONE'));
   /* Работа на объекте — такое же задание, как рейс: открытые объекты компании в общем списке. */
-  const siteJobs = showDone ? [] : ((siteData as unknown as SiteState | null)?.jobs ?? []);
+  /* Объект под самосвальный заказ показывается карточкой заказа, а не второй раз объектом. */
+  const siteJobs = showDone ? [] : ((siteData as unknown as SiteState | null)?.jobs ?? []).filter((job) => !job.order_id);
 
   return (
     <main className="flex flex-col gap-4">
@@ -158,7 +159,8 @@ async function TaskCard({ task, locale }: { task: DriverTask; locale: Locale }) 
           </>
         ) : (
           <Link
-            href={`/${locale}/driver/task/${task.id}`}
+            /* Стройка идёт экраном объекта: прибытие, рейсы с весами, конец дня. */
+            href={task.haul_kind === 'TIPPER' ? `/${locale}/driver/site?order=${task.id}` : `/${locale}/driver/task/${task.id}`}
             className="flex h-14 items-center justify-center rounded-control bg-accent text-[17px] font-semibold text-accent-ink"
           >
             {t.driverApp.open}

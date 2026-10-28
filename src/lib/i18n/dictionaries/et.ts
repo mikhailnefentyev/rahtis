@@ -1010,6 +1010,13 @@ export const et = {
       dropSection: 'Kuhu kaup viiakse',
       unitState: 'Kaup',
     },
+    TIPPER: {
+      stopPickup: 'Kauba pealevõtt',
+      stopReturn: 'Üleandmine',
+      pickupSection: 'Kust kaup võetakse',
+      dropSection: 'Kuhu kaup viiakse',
+      unitState: 'Kaup',
+    },
   },
 
   presence: {
@@ -1029,19 +1036,47 @@ export const et = {
     features: { MEGA: 'MEGA', SIDE_LOADING: 'Külglaadimine', TOP_LOADING: 'Pealtlaadimine', LIFTING_ROOF: 'Tõstetav katus' },
   },
 
+  /* Закрытие самосвального заказа (src/app/[locale]/carrier/desk/TipperClosingPanel.tsx). */
+  tipperClose: {
+    title: 'Objektil tehtud töö',
+    days: 'Päevi',
+    hours: 'Tunnid',
+    loads: 'Koormaid',
+    tonnes: 'Tonni (neto)',
+    amount: 'Summa tegeliku töö järgi',
+    hint: 'Juht märgib rakenduses (Objekt) saabumise, koormad ja päeva lõpu. Kui sulged sõidu, saab sellest summast tellimuse hind.',
+    notArrived: 'Juht pole veel objektile saabumist märkinud.',
+    dayOpen: 'Päev on pooleli: koormaid ega päeva lõppu pole.',
+    noWeights: 'Hind on tonni järgi, kuid koormatel puuduvad kaalud.',
+    close: 'Sulge sõit',
+  },
+
+  /* Стройка: самосвальный заказ (haul_kind TIPPER, src/lib/orders/haul.ts). */
+  tipper: {
+    hint: 'Pinnasetööd mõõdetakse tonnides ja kuupmeetrites ning tasutakse tunni, koorma või tonni järgi. Hind on hinnang: lõppsumma arvutatakse juhi kannete põhjal (saabumine, kaalutud koormad, päeva lõpp).',
+    config: 'Sõiduk',
+    configs: { TRUCK: 'Nuppi (kallur) 3–5 telge', CASSETTE: 'Kassett: nuppi + haagis 3–5 telge', SEMI: 'Sadulveok + kallurpoolhaagis' },
+    volume: 'Maht, m³',
+    pricing: 'Hinnastamine',
+    unitRate: { HOUR: 'Tunnihind, € (km-ta)', LOAD: 'Hind koorma kohta, € (km-ta)', TONNE: 'Hind tonni kohta, € (km-ta)' },
+    planned: { HOUR: 'Hinnang, tundi', LOAD: 'Hinnang, koormat', TONNE: 'Hinnang, tonni' },
+    plannedHint: 'Hinnang kuvatakse hinnana. Lõpphind tuleb tegelikust tööst.',
+  },
+
   haulKind: {
     TRAILER: 'Haagis',
     CONTAINER: 'Konteiner',
     VAN: 'Kaubik',
     TRUCK: 'Veoauto',
     SEMI: 'Poolhaagisega autorong 13,6 m',
+    TIPPER: 'Pinnasetööd (kallur)',
   },
 
   vehicleClass: {
     TRACTOR: 'Sadulveok',
     VAN: 'Kaubik · kuni 3,5 t',
     TRUCK: 'Veoauto · kuni 26 t',
-    TIPPER: 'Kallur / kassettauto · 3–5 telge',
+    TIPPER: 'Nuppi (kallur / kassett) · 3–5 telge',
   },
 
   amendKind: {

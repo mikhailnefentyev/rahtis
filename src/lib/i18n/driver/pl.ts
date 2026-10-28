@@ -301,6 +301,7 @@ export const pl = {
     VAN: 'Bus',
     TRUCK: 'Ciężarówka',
     SEMI: 'Zestaw z naczepą 13,6 m',
+    TIPPER: 'Roboty ziemne (wywrotka)',
   },
   payDisclaimer:
     'Wyliczenie ma charakter orientacyjny. Ostateczne wynagrodzenie ustalają pracodawca oraz umowa o pracę lub układ zbiorowy.',

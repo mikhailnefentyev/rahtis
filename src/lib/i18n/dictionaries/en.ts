@@ -1107,6 +1107,13 @@ export const en = {
       dropSection: 'Where the cargo is delivered',
       unitState: 'Cargo',
     },
+    TIPPER: {
+      stopPickup: 'Cargo pickup',
+      stopReturn: 'Delivery',
+      pickupSection: 'Where the cargo is picked up',
+      dropSection: 'Where the cargo is delivered',
+      unitState: 'Cargo',
+    },
   },
 
   presence: {
@@ -1126,19 +1133,47 @@ export const en = {
     features: { MEGA: 'MEGA', SIDE_LOADING: 'Side loading', TOP_LOADING: 'Top loading', LIFTING_ROOF: 'Lifting roof' },
   },
 
+  /* Закрытие самосвального заказа (src/app/[locale]/carrier/desk/TipperClosingPanel.tsx). */
+  tipperClose: {
+    title: 'Work done on site',
+    days: 'Days',
+    hours: 'Hours',
+    loads: 'Loads',
+    tonnes: 'Tonnes (net)',
+    amount: 'Amount from the actual work',
+    hint: 'The driver records arrival, loads and the end of the day in the app (Site). When you close the trip, this amount becomes the order price.',
+    notArrived: 'The driver has not recorded arrival at the site yet.',
+    dayOpen: 'The day is open: no loads and no end of day.',
+    noWeights: 'Pricing is per tonne, but the loads have no weights.',
+    close: 'Close trip',
+  },
+
+  /* Стройка: самосвальный заказ (haul_kind TIPPER, src/lib/orders/haul.ts). */
+  tipper: {
+    hint: 'Earthworks are measured in tonnes and cubic metres and paid per hour, load or tonne. The price is an estimate: the final amount comes from the driver records (arrival, loads with weights, end of day).',
+    config: 'Vehicle',
+    configs: { TRUCK: 'Nuppi tipper truck, 3–5 axles', CASSETTE: 'Cassette: nuppi + trailer, 3–5 axles', SEMI: 'Tractor + tipper semi-trailer' },
+    volume: 'Volume, m³',
+    pricing: 'Pricing',
+    unitRate: { HOUR: 'Hourly rate, € (excl. VAT)', LOAD: 'Rate per load, € (excl. VAT)', TONNE: 'Rate per tonne, € (excl. VAT)' },
+    planned: { HOUR: 'Estimate, hours', LOAD: 'Estimate, loads', TONNE: 'Estimate, tonnes' },
+    plannedHint: 'The estimate is shown as the price. The final price comes from the actual work.',
+  },
+
   haulKind: {
     TRAILER: 'Semi-trailer',
     CONTAINER: 'Container',
     VAN: 'Van',
     TRUCK: 'Truck',
     SEMI: 'Semi-trailer combination 13.6 m',
+    TIPPER: 'Earthworks (tipper)',
   },
 
   vehicleClass: {
     TRACTOR: 'Tractor unit',
     VAN: 'Van · up to 3.5 t',
     TRUCK: 'Truck · up to 26 t',
-    TIPPER: 'Tipper / cassette truck · 3–5 axles',
+    TIPPER: 'Nuppi tipper truck (tipper / cassette) · 3–5 axles',
   },
 
   amendKind: {
