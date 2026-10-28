@@ -29,6 +29,8 @@ export const lt = {
 
   /* Конструктор сцепок (src/app/[locale]/carrier/fleet/CombosView.tsx). */
   combos: {
+    tripTrailer: 'Reiso priekaba',
+    setTrailer: 'Išsaugoti priekabą',
     title: 'Junginiai',
     lede: 'Sudarykite junginius iš savo automobilių ir priekabų: vilkikas vienas priekabų keitimui, vilkikas + savivartė puspriekabė, nuppi + tralas, sunkvežimis + tentinė priekaba… Leistina masė (SKAL), keliamoji galia, krovimo metrai ir tūris apskaičiuojami automatiškai. Junginį pasirenkate imdami užsakymą.',
     add: 'Naujas junginys',

@@ -29,6 +29,8 @@ export const sv = {
 
   /* Конструктор сцепок (src/app/[locale]/carrier/fleet/CombosView.tsx). */
   combos: {
+    tripTrailer: 'Körningens släp',
+    setTrailer: 'Spara släp',
     title: 'Ekipage',
     lede: 'Bygg ekipage av egna fordon och släp: dragbil ensam för trailerbyten, dragbil + tipptrailer, nuppi + lågbädd, lastbil + kapellsläp… Laglig vikt (SKAL), lastförmåga, flakmeter och volym räknas automatiskt. Ekipaget väljs när du tar en beställning.',
     add: 'Nytt ekipage',

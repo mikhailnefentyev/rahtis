@@ -52,6 +52,8 @@ export const fi = {
 
   /* Конструктор сцепок (src/app/[locale]/carrier/fleet/CombosView.tsx). */
   combos: {
+    tripTrailer: 'Ajon perävaunu',
+    setTrailer: 'Tallenna perävaunu',
     title: 'Yhdistelmät',
     lede: 'Kokoa yhdistelmät omista autoista ja perävaunuista: vetoauto yksin perävaunun vaihtoon, vetoauto + kippipuoliperävaunu, nuppi + lavetti, kuorma-auto + kapelli… Lakisääteinen massa (SKAL), kantavuus, lavametrit ja tilavuus lasketaan automaattisesti. Tarjouksen yhdistelmä valitaan, kun otat tilauksen.',
     add: 'Uusi yhdistelmä',

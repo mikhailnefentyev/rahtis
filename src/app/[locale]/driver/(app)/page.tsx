@@ -38,6 +38,9 @@ export default async function DriverHome({
     getDriverI18n(locale),
     supabase.rpc('driver_site_state'),
   ]);
+  /* Прицеп рейса перевозчика (конструктор сцепок) — водитель видит, что цеплять. */
+  const { data: tripTrailerRows } = await supabase.rpc('driver_trip_trailers');
+  const ownTrailer = new Map((tripTrailerRows ?? []).map((r) => [r.order_id, r.plate]));
   if (!driver) return null;
 
   const showDone = tab === 'done';
@@ -83,7 +86,7 @@ export default async function DriverHome({
           ))}
           {visible.map((task) => (
             <li key={task.id}>
-              <TaskCard task={task} locale={locale} />
+              <TaskCard task={task} locale={locale} ownTrailer={ownTrailer.get(task.id) ?? null} />
             </li>
           ))}
         </ul>
@@ -93,10 +96,11 @@ export default async function DriverHome({
   );
 }
 
-async function TaskCard({ task, locale }: { task: DriverTask; locale: Locale }) {
+async function TaskCard({ task, locale, ownTrailer = null }: { task: DriverTask; locale: Locale; ownTrailer?: string | null }) {
   const { t, f } = await getDriverI18n(locale);
   const stop = nextStop(task) ?? task.stops[0];
-  const unit = task.trailer_plate ?? (task.container_feet ? `${task.container_feet} ft` : null);
+  /* Единица заказчика (перецеп, контейнер) или свой прицеп рейса. */
+  const unit = task.trailer_plate ?? ownTrailer ?? (task.container_feet ? `${task.container_feet} ft` : null);
 
   return (
     <article className="overflow-hidden rounded-card border border-line bg-surface">

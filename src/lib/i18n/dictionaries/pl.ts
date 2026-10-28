@@ -29,6 +29,8 @@ export const pl = {
 
   /* Конструктор сцепок (src/app/[locale]/carrier/fleet/CombosView.tsx). */
   combos: {
+    tripTrailer: 'Przyczepa kursu',
+    setTrailer: 'Zapisz przyczepę',
     title: 'Zestawy',
     lede: 'Złóż zestawy z własnych pojazdów i przyczep: ciągnik sam do wymiany naczep, ciągnik + naczepa wywrotka, nuppi + niskopodwoziowa, ciężarówka + przyczepa plandeka… Masa dopuszczalna (SKAL), ładowność, metry ładunkowe i objętość liczą się automatycznie. Zestaw wybierasz, przyjmując zlecenie.',
     add: 'Nowy zestaw',

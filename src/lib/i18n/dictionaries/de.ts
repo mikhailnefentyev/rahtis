@@ -29,6 +29,8 @@ export const de = {
 
   /* Конструктор сцепок (src/app/[locale]/carrier/fleet/CombosView.tsx). */
   combos: {
+    tripTrailer: 'Anhänger der Fahrt',
+    setTrailer: 'Anhänger speichern',
     title: 'Kombinationen',
     lede: 'Stellen Sie Kombinationen aus eigenen Fahrzeugen und Anhängern zusammen: Sattelzugmaschine allein für Trailertausch, Zugmaschine + Kippauflieger, Nuppi + Tieflader, Lkw + Planenanhänger… Gesetzliche Masse (SKAL), Nutzlast, Lademeter und Volumen werden automatisch berechnet. Die Kombination wählen Sie bei der Auftragsannahme.',
     add: 'Neue Kombination',

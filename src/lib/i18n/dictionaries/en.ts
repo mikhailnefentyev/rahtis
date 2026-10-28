@@ -45,6 +45,8 @@ export const en = {
 
   /* Конструктор сцепок (src/app/[locale]/carrier/fleet/CombosView.tsx). */
   combos: {
+    tripTrailer: 'Trip trailer',
+    setTrailer: 'Save trailer',
     title: 'Combinations',
     lede: 'Build combinations from your own vehicles and trailers: a tractor alone for trailer swaps, tractor + tipper semi-trailer, nuppi + low-bed, truck + curtain trailer… Legal mass (SKAL), payload, loading metres and volume are calculated automatically. You choose the combination when you take an order.',
     add: 'New combination',

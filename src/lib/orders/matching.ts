@@ -239,3 +239,23 @@ export async function directAssignAction(
   revalidateOrder(locale);
   return { error: null, done: true };
 }
+
+/**
+ * Прицеп своего рейса (этап B конструктора): поставить, сменить или снять.
+ * Подходит ли прицеп машине и кузову заказа, решает база (carrier_set_trip_trailer).
+ */
+export async function setTripTrailerAction(_previous: MatchingState, formData: FormData): Promise<MatchingState> {
+  const locale = toLocale(formData.get('locale'));
+  const viewer = await getViewer();
+  if (viewer.status !== 'ready' || viewer.role !== 'CARRIER') {
+    return { error: (await getDictionary(locale)).error.forbidden };
+  }
+  const supabase = await createClient();
+  const trailer = String(formData.get('trailer_id') ?? '');
+  const { error } = await supabase.rpc('carrier_set_trip_trailer', {
+    p_order_id: String(formData.get('order_id') ?? ''),
+    p_trailer_id: (trailer || null) as string,
+  });
+  revalidateOrder(locale);
+  return { error: error ? await explain(locale, error.code, error.message) : null };
+}

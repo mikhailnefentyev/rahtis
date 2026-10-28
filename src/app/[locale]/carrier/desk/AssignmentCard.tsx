@@ -17,7 +17,7 @@ import {
   Plate,
 } from '@/components/ui';
 import { orderStatusTone } from '@/components/ui/tone';
-import { cancelOrderAction, confirmOrderAction } from '@/lib/orders/matching';
+import { cancelOrderAction, confirmOrderAction, setTripTrailerAction } from '@/lib/orders/matching';
 import { useI18n } from '@/lib/i18n/provider';
 import { isTransfer } from '@/lib/orders/transfer';
 import { AbandonPanel } from './AbandonPanel';
@@ -41,12 +41,19 @@ type Assignment = Database['public']['Functions']['my_assignments']['Returns'][n
  * каждого рейса — при двадцати закреплённых единицах на странице
  * оказывалось двадцать карт, и найти среди них нужную было нельзя.
  */
+export type TripTrailerOption = { id: string; plate: string; kind: string; body_type: string | null; axles: number };
+
 export function AssignmentCard({
   order,
   documentsByOrder,
   amendmentsByOrder,
   ownClient,
+  tripTrailerId = null,
+  trailers = [],
 }: {
+  /** Прицеп рейса перевозчика (конструктор сцепок) и прицепы компании для выбора. */
+  tripTrailerId?: string | null;
+  trailers?: TripTrailerOption[];
   order: Assignment;
   documentsByOrder: Record<string, TripDocument[]>;
   amendmentsByOrder: Record<string, OrderAmendment[]>;
@@ -91,6 +98,7 @@ export function AssignmentCard({
                   {/* Номер прицепа — по нему водитель находит железо на площадке. */}
                   {order.trailer_plate && <Plate>{order.trailer_plate}</Plate>}
                   {order.vehicle_plate && <Plate>{order.vehicle_plate}</Plate>}
+                  {tripTrailerId && <Plate>+ {trailers.find((tr) => tr.id === tripTrailerId)?.plate ?? '…'}</Plate>}
                 </div>
 
                 <p className="mt-1.5 text-[13px] text-ink-muted">
@@ -229,6 +237,10 @@ export function AssignmentCard({
                   * Выполненного рейса здесь уже нет — он уходит во
                   * вкладку выполненных вместе с документами.
                   */}
+                {/* Прицеп рейса: у отклика сцепкой — уже стоит; в своём и прямом рейсе — выбрать здесь. */}
+                {(order.status === 'IN_PROGRESS' || order.status === 'AWAIT_DRIVER') && order.haul_kind !== 'TRAILER' && order.haul_kind !== 'CONTAINER' && trailers.length > 0 && (
+                  <TripTrailerPicker orderId={order.id} current={tripTrailerId} trailers={trailers} />
+                )}
                 {order.status === 'IN_PROGRESS' && order.haul_kind === 'TIPPER' && <TipperClosingPanel orderId={order.id} />}
                 {order.status === 'IN_PROGRESS' && order.haul_kind !== 'TIPPER' && (
                   <ClosingPanel
@@ -266,5 +278,33 @@ export function AssignmentCard({
               ))}
           </CardBody>
         </Card>
+  );
+}
+
+/** Выбор прицепа рейса; подходит ли он машине и кузову заказа — решает база. */
+function TripTrailerPicker({ orderId, current, trailers }: { orderId: string; current: string | null; trailers: TripTrailerOption[] }) {
+  const { t, locale } = useI18n();
+  const [state, action, pending] = useActionState(setTripTrailerAction, { error: null });
+  return (
+    <form action={action} className="mt-4 flex flex-wrap items-end gap-2 rounded-control border border-line bg-sunken p-3">
+      <input type="hidden" name="locale" value={locale} />
+      <input type="hidden" name="order_id" value={orderId} />
+      <label className="flex flex-col gap-1 text-[13px]">
+        <span className="label-micro">{t.combos.tripTrailer}</span>
+        <select name="trailer_id" defaultValue={current ?? ''} className="h-9 rounded-control border border-line bg-surface px-2 text-[13px]">
+          <option value="">{t.combos.none}</option>
+          {trailers.map((tr) => (
+            <option key={tr.id} value={tr.id}>
+              {tr.plate} · {t.mass.kinds[tr.kind as keyof typeof t.mass.kinds]}
+              {tr.body_type ? ` · ${t.mass.bodies[tr.body_type as keyof typeof t.mass.bodies]}` : ''}
+            </option>
+          ))}
+        </select>
+      </label>
+      <button type="submit" disabled={pending} className="h-9 rounded-control border border-line bg-surface px-3 text-[13px] font-semibold">
+        {t.combos.setTrailer}
+      </button>
+      {state.error && <p className="w-full text-xs text-danger">{state.error}</p>}
+    </form>
   );
 }

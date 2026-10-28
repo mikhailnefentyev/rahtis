@@ -6,7 +6,7 @@ import { Badge, Card, CardBody, Mono, Plate } from '@/components/ui';
 import { orderStatusTone } from '@/components/ui/tone';
 import { useI18n } from '@/lib/i18n/provider';
 import { cityOfStop, routeEnds } from '@/lib/orders/route';
-import { AssignmentCard } from './AssignmentCard';
+import { AssignmentCard, type TripTrailerOption } from './AssignmentCard';
 import type { Database } from '@/types/database';
 import type { OrderAmendment, OrderStop, TripDocument } from '@/types/db';
 
@@ -44,7 +44,12 @@ export function Assignments({
   documentsByOrder,
   amendmentsByOrder,
   ownByOrder = {},
+  tripTrailers = {},
+  trailers = [],
 }: {
+  /** Прицеп рейса: id рейса → id прицепа. */
+  tripTrailers?: Record<string, string | null>;
+  trailers?: TripTrailerOption[];
   assignments: Assignment[];
   documentsByOrder: Record<string, TripDocument[]>;
   amendmentsByOrder: Record<string, OrderAmendment[]>;
@@ -78,6 +83,8 @@ export function Assignments({
   function card(order: Assignment) {
     return (
       <AssignmentCard
+        tripTrailerId={tripTrailers[order.id] ?? null}
+        trailers={trailers}
         order={order}
         documentsByOrder={documentsByOrder}
         amendmentsByOrder={amendmentsByOrder}

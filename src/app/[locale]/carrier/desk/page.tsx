@@ -160,6 +160,17 @@ export default async function DeskPage({
           .in('id', assignedIds)
           .in('shipper_company_id', [...clientNames.keys()])
       : { data: [] };
+  /* Прицеп рейса (конструктор сцепок) и прицепы компании — выбрать или сменить в карточке. */
+  const [{ data: tripRows }, { data: companyTrailers }] = await Promise.all([
+    assignedIds.length
+      ? supabase.from('orders').select('id, assigned_trailer_id, assigned_vehicle_id').in('id', assignedIds)
+      : Promise.resolve({ data: [] as { id: string; assigned_trailer_id: string | null; assigned_vehicle_id: string | null }[] }),
+    supabase.from('trailers').select('id, plate, kind, body_type, axles').eq('company_id', company.id).order('plate'),
+  ]);
+  const tripTrailers: Record<string, string | null> = Object.fromEntries(
+    (tripRows ?? []).map((o) => [o.id, o.assigned_trailer_id]),
+  );
+
   const ownByOrder: Record<string, string> = Object.fromEntries(
     (ownRows ?? []).map((o) => [o.id, clientNames.get(o.shipper_company_id) ?? '']),
   );
@@ -194,6 +205,8 @@ export default async function DeskPage({
       {/* Закреплённые рейсы важнее стола: они требуют действия и горят по срокам. */}
       <Assignments
         assignments={assignments ?? []}
+        tripTrailers={tripTrailers}
+        trailers={companyTrailers ?? []}
         documentsByOrder={documentsByOrder}
         amendmentsByOrder={amendmentsByOrder}
         ownByOrder={ownByOrder}

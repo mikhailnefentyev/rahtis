@@ -29,6 +29,8 @@ export const et = {
 
   /* Конструктор сцепок (src/app/[locale]/carrier/fleet/CombosView.tsx). */
   combos: {
+    tripTrailer: 'Sõidu haagis',
+    setTrailer: 'Salvesta haagis',
     title: 'Autorongid',
     lede: 'Pane autorongid kokku oma autodest ja haagistest: sadulveok üksi haagiste vahetuseks, sadulveok + kallurpoolhaagis, nuppi + tral, veok + kardinhaagis… Seaduslik mass (SKAL), kandevõime, laadimismeetrid ja maht arvutatakse automaatselt. Autorongi valid tellimuse võtmisel.',
     add: 'Uus autorong',

@@ -29,6 +29,8 @@ export const lv = {
 
   /* Конструктор сцепок (src/app/[locale]/carrier/fleet/CombosView.tsx). */
   combos: {
+    tripTrailer: 'Brauciena piekabe',
+    setTrailer: 'Saglabāt piekabi',
     title: 'Sastāvi',
     lede: 'Salieciet sastāvus no savām automašīnām un piekabēm: vilcējs viens piekabju maiņai, vilcējs + pašizgāzēja puspiekabe, nuppi + trals, kravas auto + tenta piekabe… Likumā atļautā masa (SKAL), kravnesība, kravas metri un tilpums tiek aprēķināti automātiski. Sastāvu izvēlaties, ņemot pasūtījumu.',
     add: 'Jauns sastāvs',
