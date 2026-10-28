@@ -7049,6 +7049,15 @@ export type Database = {
           samples: number
         }[]
       }
+      shipper_trip_trailers: {
+        Args: { p_order_ids: string[] }
+        Returns: {
+          body_type: Database["public"]["Enums"]["body_type"]
+          kind: Database["public"]["Enums"]["trailer_kind"]
+          order_id: string
+          plate: string
+        }[]
+      }
       site_foreman_approve: {
         Args: {
           p_day_id: string
@@ -7211,15 +7220,6 @@ export type Database = {
           partnership: Database["public"]["Enums"]["partnership_mode"]
           unit_cents: number
           vat_bps: number
-        }[]
-      }
-      shipper_trip_trailers: {
-        Args: { p_order_ids: string[] }
-        Returns: {
-          body_type: Database["public"]["Enums"]["body_type"]
-          kind: Database["public"]["Enums"]["trailer_kind"]
-          order_id: string
-          plate: string
         }[]
       }
       take_order: {
