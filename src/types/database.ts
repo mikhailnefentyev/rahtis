@@ -289,6 +289,57 @@ export type Database = {
         }
         Relationships: []
       }
+      carrier_annual_plans: {
+        Row: {
+          cancelled_at: string | null
+          company_id: string
+          created_at: string
+          created_by: string | null
+          ends_on: string
+          fee_id: string | null
+          id: string
+          starts_on: string
+          vehicles: number
+        }
+        Insert: {
+          cancelled_at?: string | null
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          ends_on: string
+          fee_id?: string | null
+          id?: string
+          starts_on: string
+          vehicles: number
+        }
+        Update: {
+          cancelled_at?: string | null
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          ends_on?: string
+          fee_id?: string | null
+          id?: string
+          starts_on?: string
+          vehicles?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "carrier_annual_plans_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "carrier_annual_plans_fee_id_fkey"
+            columns: ["fee_id"]
+            isOneToOne: false
+            referencedRelation: "carrier_subscription_fees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       carrier_fee_deductions: {
         Row: {
           amount_cents: number
@@ -458,6 +509,7 @@ export type Database = {
           gross_cents: number
           id: string
           invoice_id: string | null
+          kind: string
           month: string
           net_cents: number
           paid_at: string | null
@@ -471,6 +523,7 @@ export type Database = {
           gross_cents: number
           id?: string
           invoice_id?: string | null
+          kind?: string
           month: string
           net_cents: number
           paid_at?: string | null
@@ -484,6 +537,7 @@ export type Database = {
           gross_cents?: number
           id?: string
           invoice_id?: string | null
+          kind?: string
           month?: string
           net_cents?: number
           paid_at?: string | null
@@ -5329,6 +5383,7 @@ export type Database = {
         Returns: {
           active_vehicles: number
           amount_cents: number
+          kind: string
           month: string
           unit_cents: number
           vat_bps: number
@@ -5472,6 +5527,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      carrier_annual_plan_create: {
+        Args: { p_vehicles: number }
+        Returns: string
       }
       carrier_clients: {
         Args: never

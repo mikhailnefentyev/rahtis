@@ -536,7 +536,8 @@ async function issue(
     for (const row of fees ?? []) {
       deducted += row.amount_cents;
       deductions.push({
-        label: t.report_.feeLine
+        /* Год вперёд — своей строкой; месяц — машины сверх года по лесенке, средняя цена за машину. */
+        label: (row.kind === 'ANNUAL' ? t.report_.feeLineAnnual : t.report_.feeLine)
           .replace('{month}', `${Number(row.month.slice(5, 7))}/${row.month.slice(0, 4)}`)
           .replace('{count}', String(row.active_vehicles))
           .replace('{unit}', f.eur(row.unit_cents))
@@ -808,7 +809,7 @@ async function issueSubscriptionInvoices(
   const { data: fees, error } = await admin
     .from('carrier_subscription_fees')
     .select(
-      'id, month, active_vehicles, unit_cents, net_cents, vat_bps, gross_cents, carrier_company_id, invoices(number)',
+      'id, month, kind, active_vehicles, unit_cents, net_cents, vat_bps, gross_cents, carrier_company_id, invoices(number)',
     )
     .eq('month', month)
     .not('invoice_id', 'is', null);
@@ -854,7 +855,7 @@ async function issueSubscriptionInvoices(
       const ids = { businessId: 'Y-tunnus', vatNumber: t.report_.vatNumber };
 
       const monthLabel = `${Number(fee.month.slice(5, 7))}/${fee.month.slice(0, 4)}`;
-      const description = t.report_.feeLine
+      const description = (fee.kind === 'ANNUAL' ? t.report_.feeLineAnnual : t.report_.feeLine)
         .replace('{month}', monthLabel)
         .replace('{count}', String(fee.active_vehicles))
         .replace('{unit}', f.eur(fee.unit_cents))

@@ -154,6 +154,41 @@ export function withVat(cents: number, bps: number): number {
 export const SUBSCRIPTION_UNIT_CENTS = 2990;
 
 /**
+ * Абонемент лесенкой с 30.10.2026: каждая ступень платит свою цену за
+ * машину — 1–9 по 29,90 €, 10–19 по 27,90 €, 20–49 по 25,90 €, 50–99 по
+ * 23,90 €. От 100 машин цена по запросу (ON_REQUEST_FROM); пока не
+ * договорились — считается как 50–99. Копия app.subscription_ladder_cents: менять оба места.
+ */
+export const SUBSCRIPTION_LADDER: readonly { from: number; to: number | null; cents: number }[] = [
+  { from: 1, to: 9, cents: 2990 },
+  { from: 10, to: 19, cents: 2790 },
+  { from: 20, to: 49, cents: 2590 },
+  { from: 50, to: null, cents: 2390 },
+];
+
+/** Год вперёд: скидка 10 % (app.annual_discount_bps). */
+export const ANNUAL_DISCOUNT_BPS = 1000;
+
+/** С этой машины цена по запросу; год вперёд в кабинете — до ON_REQUEST_FROM − 1 машин. */
+export const ON_REQUEST_FROM = 100;
+
+/** Сумма месяца за n активных машин без ALV, лесенкой. */
+export function subscriptionLadderCents(vehicles: number): number {
+  let sum = 0;
+  for (const step of SUBSCRIPTION_LADDER) {
+    if (vehicles < step.from) break;
+    const top = step.to == null ? vehicles : Math.min(vehicles, step.to);
+    sum += (top - step.from + 1) * step.cents;
+  }
+  return sum;
+}
+
+/** Год вперёд за n машин без ALV: 12 месяцев лесенки минус 10 %. */
+export function annualPlanCents(vehicles: number): number {
+  return Math.round((subscriptionLadderCents(vehicles) * 12 * (10_000 - ANNUAL_DISCOUNT_BPS)) / 10_000);
+}
+
+/**
  * Плата заказчика за рейс подряда (Aivomaa — сторона договора): 5 %
  * сверху цены, с 1.10.2026. Прямые рейсы подписчика и стол «напрямую» —
  * без платы.

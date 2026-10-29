@@ -272,7 +272,7 @@ const fi: Texts = {
     points: [
       'Keikkoja tarjouspöydältä: perävaunujen vaihdot, kontit ja pikakuljetukset satamissa ja koko Suomessa.',
       'Kuljettajan sovellus kymmenellä kielellä: saapumiset, kuvat ja rahtikirjat ilman paperia.',
-      'Omat asiakkaat samaan paikkaan: 29,90 € kuukaudessa jokaisesta ajossa olleesta autosta, ensimmäinen kuukausi maksutta.',
+      'Omat asiakkaat samaan paikkaan: alk. 29,90 € kuukaudessa jokaisesta ajossa olleesta autosta, ensimmäinen kuukausi maksutta.',
     ],
     button: 'Hae mukaan — tiedot on täytetty valmiiksi',
     note: (operator) =>
@@ -311,7 +311,7 @@ const fi: Texts = {
       preheader: 'Kalusto, kuljettajat ja omat asiakkaat yhdessä paikassa — ja keikkoja tarjouspöydältä, kun auto on vapaana.',
       body: 'RAHTIS on kuljetusten hallintajärjestelmä ja rahtipörssi, joka toimii Pohjoismaissa, Baltiassa, Puolassa ja Saksassa. Hallitsette kalustoa, kuljettajia ja omia asiakkaitanne samassa paikassa ja saatte keikkoja tarjouspöydältä, kun auto on vapaana: perävaunujen vaihdot, kontit sekä pakettiauto- ja kuorma-autokuljetukset.',
       points: [
-        'Omat asiakkaat ja omat keikat: asiakas tilaa suoraan autollenne ja saa seurantalinkin. 29,90 € kuukaudessa jokaisesta ajossa olleesta autosta, ei prosenttia.',
+        'Omat asiakkaat ja omat keikat: asiakas tilaa suoraan autollenne ja saa seurantalinkin. Alk. 29,90 € kuukaudessa jokaisesta ajossa olleesta autosta, ei prosenttia.',
         'Kuljettajan sovellus kymmenellä kielellä: saapumiset, kuvat, työaika ja rahtikirja skannattuna PDF:ksi.',
         'Keikkoja tarjouspöydältä satamista ja koko toiminta-alueelta. Alihankintakeikoista 3 % keikan hinnasta, ei kuukausimaksua.',
       ],
@@ -508,7 +508,7 @@ const en: Texts = {
     points: [
       'Jobs from the load board: trailer swaps, containers and express runs in ports and across Finland.',
       'A driver app in ten languages: arrivals, photos and consignment notes, no paper.',
-      'Your own customers in the same place: €29.90 a month for each truck that was on the road, first month free.',
+      'Your own customers in the same place: from €29.90 a month for each truck that was on the road, first month free.',
     ],
     button: 'Apply — your details are already filled in',
     note: (operator) =>
@@ -547,7 +547,7 @@ const en: Texts = {
       preheader: 'Fleet, drivers and your own customers in one place — plus jobs from the load board when a truck is free.',
       body: 'RAHTIS is a transport management system and freight exchange covering the Nordics, the Baltics, Poland and Germany. You manage your fleet, drivers and customers in one place and pick up jobs from the load board when a truck is free: trailer swaps, containers, and van and truck loads.',
       points: [
-        'Your own customers and your own jobs: the customer books your truck directly and gets a tracking link. €29.90 a month for each truck that was on the road, no percentage.',
+        'Your own customers and your own jobs: the customer books your truck directly and gets a tracking link. From €29.90 a month for each truck that was on the road, no percentage.',
         'A driver app in ten languages: arrivals, photos, working hours and the consignment note scanned to PDF.',
         'Jobs from the load board, from ports and across your whole operating area. Subcontracted jobs cost 3% of the job price, with no monthly fee.',
       ],

@@ -18,7 +18,7 @@
  *    месяц;
  *  · журнал — разовые расходы месяца;
  *  · RAHTIS — абонемент за машину, если компания на подписке и машина в
- *    месяце работала.
+ *    месяце работала: лесенкой, на машину — средняя цена месяца.
  *
  * Всё без ALV, в центах. Это оценка для решений, а не бухгалтерия.
  *
@@ -53,8 +53,12 @@ export type EconomicsInput = {
   journal: { vehicleId: string; month: string; cents: number }[];
   finance: Map<string, VehicleFinance>;
   employerCostBps: number;
-  /** Абонемент за машину в месяц, если компания на подписке; null — не на подписке. */
-  subscriptionUnitCents: number | null;
+  /**
+   * Абонемент за работавшую машину по месяцам, если компания на подписке
+   * (лесенка: средняя цена месяца по числу работавших машин); null — не на
+   * подписке. Число — та же цена на все месяцы.
+   */
+  subscriptionUnitCents: number | Record<string, number> | null;
 };
 
 export type MonthEconomics = {
@@ -172,7 +176,8 @@ export function vehicleEconomics(input: EconomicsInput): { vehicles: VehicleEcon
       Object.assign(m.costs, fixedCosts(finance, month));
       m.costs.journal = journal.get(k) ?? 0;
       const worked = (r?.platform ?? 0) + (r?.own ?? 0) + (r?.site ?? 0) > 0;
-      m.costs.rahtis = input.subscriptionUnitCents != null && worked ? input.subscriptionUnitCents : 0;
+      const unit = input.subscriptionUnitCents;
+      m.costs.rahtis = unit != null && worked ? (typeof unit === 'number' ? unit : (unit[month] ?? 0)) : 0;
       return finish(m);
     });
 

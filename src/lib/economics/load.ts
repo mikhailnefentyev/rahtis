@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { payoutCents, COMMISSION_BPS, SUBSCRIPTION_UNIT_CENTS } from '@/lib/config';
+import { payoutCents, COMMISSION_BPS, subscriptionLadderCents } from '@/lib/config';
 import { buildDriverReport } from '@/lib/drivers/report';
 import { invoiceLines, type InvoiceDay } from '@/lib/sites/invoice';
 import { dayMinutes } from '@/lib/sites/work';
@@ -19,6 +19,23 @@ type Supabase = Awaited<ReturnType<typeof createClient>>;
 const zone = 'Europe/Helsinki';
 const dateFormat = new Intl.DateTimeFormat('en-CA', { timeZone: zone, year: 'numeric', month: '2-digit', day: '2-digit' });
 const localDate = (iso: string) => dateFormat.format(new Date(iso));
+
+/* Абонемент лесенкой: средняя цена за машину месяца по числу машин, у которых был доход. */
+function ladderUnits(revenue: EconomicsInput['revenue'], months: string[]): Record<string, number> {
+  const worked = new Map<string, Set<string>>();
+  for (const r of revenue) {
+    if (r.cents <= 0) continue;
+    const set = worked.get(r.month) ?? new Set<string>();
+    set.add(r.vehicleId);
+    worked.set(r.month, set);
+  }
+  const out: Record<string, number> = {};
+  for (const m of months) {
+    const n = worked.get(m)?.size ?? 0;
+    if (n > 0) out[m] = Math.round(subscriptionLadderCents(n) / n);
+  }
+  return out;
+}
 
 export function monthRange(last: string, count: number): string[] {
   const [y, m] = last.split('-').map(Number);
@@ -173,7 +190,7 @@ export async function loadEconomics(supabase: Supabase, company: { id: string; p
     journal: (costs ?? []).map((c) => ({ vehicleId: c.vehicle_id, month: c.spent_on.slice(0, 7), cents: c.amount_cents })),
     finance: financeMap,
     employerCostBps,
-    subscriptionUnitCents: company.partnership === 'SUBSCRIBER' ? SUBSCRIPTION_UNIT_CENTS : null,
+    subscriptionUnitCents: company.partnership === 'SUBSCRIBER' ? ladderUnits(revenue, months) : null,
   });
 
   return {

@@ -102,3 +102,4 @@ test('суммы из формы', async () => {
   assert.equal(centsToInput(1_250_050), '12500.50');
   assert.equal(centsToInput(8_500_000), '85000');
 });
+
