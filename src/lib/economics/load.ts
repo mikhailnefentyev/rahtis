@@ -69,7 +69,7 @@ export async function loadEconomics(supabase: Supabase, company: { id: string; p
         .lt('filled_at', untilIso)
         .limit(10000),
       supabase.from('vehicle_finance').select('*').eq('company_id', company.id),
-      supabase.from('vehicle_costs').select('id, vehicle_id, spent_on, category, amount_cents, note').eq('company_id', company.id).gte('spent_on', from).lte('spent_on', to).order('spent_on', { ascending: false }),
+      supabase.from('vehicle_costs').select('id, vehicle_id, spent_on, category, amount_cents, note, supplier').eq('company_id', company.id).gte('spent_on', from).lte('spent_on', to).order('spent_on', { ascending: false }),
       supabase.from('company_economics').select('employer_cost_bps').eq('company_id', company.id).maybeSingle(),
       supabase.from('site_jobs').select('id, pricing, rate_cents').eq('company_id', company.id),
     ]);

@@ -158,7 +158,7 @@ export default async function VehicleEconomicsPage({
                     <Td mono>{f.date(`${c.spent_on}T12:00:00Z`)}</Td>
                     <Td>{s.categories[c.category as keyof typeof s.categories] ?? c.category}</Td>
                     <Td numeric>{f.eur(c.amount_cents)}</Td>
-                    <Td className="whitespace-normal">{c.note ?? ''}</Td>
+                    <Td className="whitespace-normal">{[c.supplier, c.note].filter(Boolean).join(' · ')}</Td>
                     <Td>
                       <form action={deleteVehicleCostAction}>
                         <input type="hidden" name="locale" value={locale} />

@@ -80,21 +80,26 @@ export async function addVehicleCostAction(_prev: CostState, formData: FormData)
   const spentOn = date(str(formData, 'spent_on'));
   if (!spentOn) return { error: t.errDate, done: false };
   const category = str(formData, 'category');
-  if (!['REPAIR', 'TYRES', 'TOLLS', 'PARKING', 'WASH', 'FINE', 'OTHER'].includes(category)) return { error: t.errGeneric, done: false };
+  if (!['REPAIR', 'PARTS', 'TYRES', 'TOLLS', 'PARKING', 'WASH', 'FINE', 'OTHER'].includes(category)) return { error: t.errGeneric, done: false };
+  const vehicleId = str(formData, 'vehicle_id');
+  if (!vehicleId) return { error: t.errVehicle, done: false };
 
   const supabase = await createClient();
   const { error } = await supabase.from('vehicle_costs').insert({
     company_id: viewer.company!.id,
-    vehicle_id: str(formData, 'vehicle_id'),
+    vehicle_id: vehicleId,
     spent_on: spentOn,
     category,
     amount_cents: amount,
     note: str(formData, 'note').slice(0, 200) || null,
+    /* Покупка из «Запчастей» — у кого куплено. */
+    supplier: str(formData, 'supplier').slice(0, 120) || null,
     created_by: viewer.userId,
   });
-  if (error) return { error: t.errGeneric, done: false };
+  if (error) return { error: error.code === '42501' ? t.locked : t.errGeneric, done: false };
 
   revalidatePath(`/${locale}/carrier/economics`, 'layout');
+  revalidatePath(`/${locale}/carrier/parts`);
   return { error: null, done: true };
 }
 

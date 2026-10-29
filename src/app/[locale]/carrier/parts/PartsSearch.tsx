@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import { Badge, Button, Card, CardBody, Field, Input, Select, Tabs, Textarea } from '@/components/ui';
 import { useI18n } from '@/lib/i18n/provider';
+import { PurchaseForm } from './PurchaseForm';
 import {
   BREAKDOWN,
   PARTS_COUNTRIES,
@@ -29,10 +30,15 @@ export function PartsSearch({
   vehicles,
   company,
   country: home,
+  canRecord,
+  today,
 }: {
   vehicles: Vehicle[];
   company: string;
   country: PartsCountry;
+  /** Подписка: покупку можно записать в журнал расходов машины. */
+  canRecord: boolean;
+  today: string;
 }) {
   const { t, locale } = useI18n();
   const s = t.parts;
@@ -198,6 +204,17 @@ export function PartsSearch({
               </li>
             ))}
           </ul>
+
+          {canRecord && (
+            <PurchaseForm
+              vehicles={vehicles}
+              vehicleId={vehicleId}
+              suppliers={sources.filter((src) => src.kind !== 'WEB').map((src) => src.name)}
+              query={submitted}
+              tyres={mode === 'TYRES'}
+              today={today}
+            />
+          )}
 
           <Card>
             <CardBody>

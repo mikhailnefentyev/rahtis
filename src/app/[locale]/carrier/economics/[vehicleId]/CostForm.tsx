@@ -7,7 +7,7 @@ import { useI18n } from '@/lib/i18n/provider';
 
 const initial: CostState = { error: null, done: false };
 
-const CATEGORIES = ['REPAIR', 'TYRES', 'TOLLS', 'PARKING', 'WASH', 'FINE', 'OTHER'] as const;
+const CATEGORIES = ['REPAIR', 'PARTS', 'TYRES', 'TOLLS', 'PARKING', 'WASH', 'FINE', 'OTHER'] as const;
 
 /** Разовый расход машины: дата, вид, сумма без ALV, пометка. */
 export function CostForm({ vehicleId, today }: { vehicleId: string; today: string }) {

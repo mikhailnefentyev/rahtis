@@ -4376,6 +4376,7 @@ export type Database = {
           id: string
           note: string | null
           spent_on: string
+          supplier: string | null
           vehicle_id: string
         }
         Insert: {
@@ -4387,6 +4388,7 @@ export type Database = {
           id?: string
           note?: string | null
           spent_on: string
+          supplier?: string | null
           vehicle_id: string
         }
         Update: {
@@ -4398,6 +4400,7 @@ export type Database = {
           id?: string
           note?: string | null
           spent_on?: string
+          supplier?: string | null
           vehicle_id?: string
         }
         Relationships: [
