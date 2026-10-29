@@ -19,6 +19,8 @@ export type ProviderInfo = {
   defaultHost: string;
   placeholder: string;
   docs: string;
+  /** Как входит перевозчик: ключ, логин с паролем и ключом (Webfleet) или вход у провайдера (ABAX, OAuth). */
+  auth: 'KEY' | 'CREDENTIALS' | 'OAUTH';
 };
 
 export const PROVIDER_CATALOG: Record<GpsProvider, ProviderInfo> = {
@@ -31,6 +33,7 @@ export const PROVIDER_CATALOG: Record<GpsProvider, ProviderInfo> = {
     defaultHost: 'hst-api.wialon.com',
     placeholder: 'https://hosting.wialon.com/locator/index.html?t=…',
     docs: 'https://help.wialon.com/en/wialon-hosting/user-guide/monitoring-system/locator',
+    auth: 'KEY',
   },
   MAPON: {
     id: 'MAPON',
@@ -41,6 +44,7 @@ export const PROVIDER_CATALOG: Record<GpsProvider, ProviderInfo> = {
     defaultHost: 'mapon.com',
     placeholder: 'a1b2c3d4e5f6…',
     docs: 'https://help.mapon.com/en/articles/174904-how-to-create-api-key',
+    auth: 'KEY',
   },
   NAVIREC: {
     id: 'NAVIREC',
@@ -51,6 +55,7 @@ export const PROVIDER_CATALOG: Record<GpsProvider, ProviderInfo> = {
     defaultHost: 'api.navirec.com',
     placeholder: 'navirec_live_…',
     docs: 'https://api.navirec.com/schema/',
+    auth: 'KEY',
   },
   RUPTELA: {
     id: 'RUPTELA',
@@ -61,6 +66,7 @@ export const PROVIDER_CATALOG: Record<GpsProvider, ProviderInfo> = {
     defaultHost: 'api.fm-track.com',
     placeholder: '…',
     docs: 'https://api.fm-track.com/swagger.json',
+    auth: 'KEY',
   },
   NAVIXY: {
     id: 'NAVIXY',
@@ -71,6 +77,7 @@ export const PROVIDER_CATALOG: Record<GpsProvider, ProviderInfo> = {
     defaultHost: 'api.eu.navixy.com',
     placeholder: 'abcdef0123456789…',
     docs: 'https://www.navixy.com/docs/navixy-api/user-api/backend-api/resources/tracking/tracker',
+    auth: 'KEY',
   },
   SAMSARA: {
     id: 'SAMSARA',
@@ -81,5 +88,28 @@ export const PROVIDER_CATALOG: Record<GpsProvider, ProviderInfo> = {
     defaultHost: 'api.samsara.com',
     placeholder: 'samsara_api_…',
     docs: 'https://developers.samsara.com/docs/authentication',
+    auth: 'KEY',
+  },
+  WEBFLEET: {
+    id: 'WEBFLEET',
+    name: 'Webfleet',
+    markets: 'DE, PL, FI, SE, NO, DK',
+    keyPath: 'My Account → API key request; the user needs the WEBFLEET.connect right (Account → Users → Rights)',
+    customHost: false,
+    defaultHost: 'csv.webfleet.com',
+    placeholder: '00000000-0000-0000-0000-000000000000',
+    docs: 'https://www.webfleet.com/en_ie/fleet-management/integration/resources/',
+    auth: 'CREDENTIALS',
+  },
+  ABAX: {
+    id: 'ABAX',
+    name: 'ABAX',
+    markets: 'NO, SE, DK, FI, PL',
+    keyPath: 'Sign in to ABAX as an administrator and approve RAHTIS',
+    customHost: false,
+    defaultHost: 'api.abax.cloud',
+    placeholder: '',
+    docs: 'https://developers.abax.cloud/getting-started',
+    auth: 'OAUTH',
   },
 };

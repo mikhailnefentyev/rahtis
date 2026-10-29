@@ -14,12 +14,13 @@ const initial: GpsConnectState = { error: null, done: false };
  * кабинета. Для Wialon — прежние шаги со ссылкой Locator, для остальных —
  * где в кабинете создаётся ключ и ссылка на инструкцию провайдера.
  */
-export function ConnectGps({ startOpen }: { startOpen: boolean }) {
+export function ConnectGps({ startOpen, abaxReady }: { startOpen: boolean; abaxReady: boolean }) {
   const { t, locale } = useI18n();
   const s = t.gps;
   const [open, setOpen] = useState(startOpen);
   const [provider, setProvider] = useState<GpsProvider>('WIALON');
   const [advanced, setAdvanced] = useState(false);
+  const [abaxOwn, setAbaxOwn] = useState(false);
   const [state, action, pending] = useActionState(connectGpsAction, initial);
   const info = PROVIDER_CATALOG[provider];
 
@@ -62,6 +63,8 @@ export function ConnectGps({ startOpen }: { startOpen: boolean }) {
                   <li>{s.step1}</li>
                   <li>{s.step2}</li>
                 </>
+              ) : provider === 'ABAX' ? (
+                <li>{s.abaxHint}</li>
               ) : (
                 <>
                   <li>
@@ -71,15 +74,55 @@ export function ConnectGps({ startOpen }: { startOpen: boolean }) {
                   <li>{s.genericStep2}</li>
                 </>
               )}
-              <li>{s.step3}</li>
+              {provider !== 'ABAX' && <li>{s.step3}</li>}
             </ol>
             <a href={info.docs} target="_blank" rel="noopener noreferrer" className="self-start text-[12px] text-accent">
               {s.providerDocs.replace('{provider}', info.name)} ↗
             </a>
 
-            <Field label={provider === 'WIALON' ? s.keyLabel : s.genericKeyLabel} required>
-              {(p) => <InputMono {...p} name="key" required autoComplete="off" spellCheck={false} placeholder={info.placeholder} />}
-            </Field>
+            {provider === 'WEBFLEET' && (
+              <div className="grid gap-3 sm:grid-cols-3">
+                <Field label={s.accountLabel} required>
+                  {(p) => <Input {...p} name="account" required autoComplete="off" maxLength={100} />}
+                </Field>
+                <Field label={s.usernameLabel} required>
+                  {(p) => <Input {...p} name="username" required autoComplete="off" maxLength={100} />}
+                </Field>
+                <Field label={s.passwordLabel} required>
+                  {(p) => <Input {...p} name="password" type="password" required autoComplete="new-password" maxLength={200} />}
+                </Field>
+              </div>
+            )}
+
+            {provider === 'ABAX' ? (
+              <>
+                {abaxReady ? (
+                  <a href={`/api/gps/abax/start?locale=${locale}`} className="self-start rounded-control bg-accent px-4 py-2 text-[13px] font-semibold text-accent-ink">
+                    {s.abaxConnect} ↗
+                  </a>
+                ) : (
+                  <p className="text-[12px] leading-relaxed text-ink-muted">{s.abaxUnavailable}</p>
+                )}
+                {abaxOwn || !abaxReady ? (
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <Field label={s.clientIdLabel} required>
+                      {(p) => <InputMono {...p} name="client_id" required autoComplete="off" spellCheck={false} maxLength={200} />}
+                    </Field>
+                    <Field label={s.clientSecretLabel} required>
+                      {(p) => <InputMono {...p} name="client_secret" type="password" required autoComplete="new-password" spellCheck={false} maxLength={400} />}
+                    </Field>
+                  </div>
+                ) : (
+                  <button type="button" className="self-start text-[12px] text-ink-muted underline" onClick={() => setAbaxOwn(true)}>
+                    {s.abaxOwnToggle}
+                  </button>
+                )}
+              </>
+            ) : (
+              <Field label={provider === 'WIALON' ? s.keyLabel : provider === 'WEBFLEET' ? s.apiKeyLabel : s.genericKeyLabel} required>
+                {(p) => <InputMono {...p} name="key" required autoComplete="off" spellCheck={false} placeholder={info.placeholder} />}
+              </Field>
+            )}
             <Field label={s.labelLabel}>{(p) => <Input {...p} name="label" maxLength={80} />}</Field>
             {info.customHost &&
               (advanced ? (
@@ -95,7 +138,7 @@ export function ConnectGps({ startOpen }: { startOpen: boolean }) {
             {state.error && <p className="text-xs text-danger">{state.error}</p>}
             {state.done && <p className="text-xs text-ok">{s.connected}</p>}
             <div className="flex gap-2">
-              <Button type="submit" variant="primary" disabled={pending}>
+              <Button type="submit" variant={provider === 'ABAX' && abaxReady && !abaxOwn ? 'default' : 'primary'} disabled={pending || (provider === 'ABAX' && abaxReady && !abaxOwn)}>
                 {pending ? s.checking : s.connect}
               </Button>
               {!startOpen && (

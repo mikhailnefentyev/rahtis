@@ -13,7 +13,7 @@ import { GPS_PROVIDERS, type GpsProvider } from './types';
 
 /**
  * GPS в кабинете перевозчика: подключить провайдера (Wialon, Mapon, Navirec,
- * Ruptela, Navixy, Samsara), обновить, отключить,
+ * Ruptela, Navixy, Samsara, Webfleet, ABAX по своим client id), обновить, отключить,
  * привязать машину. Входит в подписку — та же проверка, что у топлива.
  */
 
@@ -44,9 +44,17 @@ export async function connectGpsAction(_prev: GpsConnectState, formData: FormDat
   const provider = providerRaw as GpsProvider;
   const spec = providerSpec(provider);
 
+  /* Webfleet входит четырьмя полями, ABAX вручную — своими client id и secret: собираем их в один секрет. */
+  const raw =
+    provider === 'WEBFLEET'
+      ? JSON.stringify({ account: str(formData, 'account'), username: str(formData, 'username'), password: String(formData.get('password') ?? ''), apikey: str(formData, 'key') })
+      : provider === 'ABAX'
+        ? JSON.stringify({ cid: str(formData, 'client_id'), cs: str(formData, 'client_secret') })
+        : str(formData, 'key');
+
   let input;
   try {
-    input = spec.parse(str(formData, 'key'), spec.customHost ? str(formData, 'server') : '');
+    input = spec.parse(raw, spec.customHost ? str(formData, 'server') : '');
   } catch {
     return { error: t.errInput, done: false };
   }

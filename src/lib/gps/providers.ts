@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { GpsError, cleanHost, getJson, httpsCall } from './http';
+import { ABAX_API, abaxAccess } from './abax';
 import { PROVIDER_CATALOG, type ProviderInfo } from './catalog';
 import { fetchWialonUnits, parseWialonInput } from './wialon';
 import {
@@ -472,6 +473,152 @@ const samsara: ProviderSpec = {
   },
 };
 
+/* ── Webfleet (WEBFLEET.connect) ──────────────────────────────── */
+
+const WEBFLEET_HOST = 'csv.webfleet.com';
+
+type WebfleetCreds = { account: string; username: string; password: string; apikey: string };
+
+/* Ошибки: 1106 — неверный аккаунт, пользователь или пароль; 1143 — неверный API-ключ; 45 — нет прав; 8014 — у пользователя нет права WEBFLEET.connect. */
+const WEBFLEET_KEY_ERRORS = [45, 1101, 1105, 1106, 1143, 8014];
+
+async function webfleetCall(creds: WebfleetCreds, action: string): Promise<Record<string, unknown>[]> {
+  const q = new URLSearchParams({
+    account: creds.account,
+    username: creds.username,
+    password: creds.password,
+    apikey: creds.apikey,
+    lang: 'en',
+    action,
+    outputformat: 'json',
+    useISO8601: 'true',
+    useUTF8: 'true',
+  });
+  const { data } = await getJson<unknown>(WEBFLEET_HOST, `/extern?${q}`);
+  const err = obj(data);
+  if (typeof err.errorCode === 'number') {
+    /* 63 — данных нет: пустой список, не ошибка. */
+    if (err.errorCode === 63) return [];
+    throw new GpsError(WEBFLEET_KEY_ERRORS.includes(err.errorCode) ? 'KEY' : 'UNREACHABLE', `webfleet ${err.errorCode}`);
+  }
+  return list(data);
+}
+
+const webfleet: ProviderSpec = {
+  ...PROVIDER_CATALOG.WEBFLEET,
+  parse(raw) {
+    let creds: Partial<WebfleetCreds>;
+    try {
+      creds = JSON.parse(raw) as Partial<WebfleetCreds>;
+    } catch {
+      throw new GpsError('INPUT', 'webfleet');
+    }
+    const clean = (v: unknown, max: number) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
+    const c = { account: clean(creds.account, 100), username: clean(creds.username, 100), password: clean(creds.password, 200), apikey: clean(creds.apikey, 100) };
+    if (!c.account || !c.username || !c.password || c.apikey.length < 8) throw new GpsError('INPUT', 'webfleet');
+    return { token: JSON.stringify(c), hosts: [WEBFLEET_HOST] };
+  },
+  async fetch({ token }) {
+    const creds = JSON.parse(token) as WebfleetCreds;
+    /* Отчёт по объектам — 6 запросов в минуту, по машинам — 10: раз в минуту по одному укладываемся. */
+    const objects = await webfleetCall(creds, 'showObjectReportExtern');
+    const vehicles = await webfleetCall(creds, 'showVehicleReportExtern').catch(() => []);
+    const byNo = new Map(vehicles.map((v) => [String(v.objectno ?? ''), v]));
+
+    const units: GpsUnit[] = objects
+      .filter((o) => !o.deleted)
+      .map((o) => {
+        const id = String(o.objectno ?? o.objectuid ?? '');
+        const v = byNo.get(id) ?? {};
+        const lat = num(o.latitude_mdeg);
+        const lon = num(o.longitude_mdeg);
+        const point = lat != null && lon != null ? coord(lat / 1e6, lon / 1e6) : null;
+        const speedKmh = int(o.speed);
+        const ignition = o.ignition == null ? null : Number(o.ignition) === 1;
+        const standstill = o.standstill == null ? null : Number(o.standstill) === 1;
+        const meters = num(o.odometer_long);
+        const hundreds = num(o.odometer);
+        const perMill = num(o.fuellevel);
+        const ml = num(o.fuellevel_milliliters);
+        const seconds = num(o.engine_operation_time);
+        return {
+          externalId: id,
+          name: text(o.objectname, 200) ?? id,
+          plate: text(v.licenseplatenumber, 32),
+          lat: point?.lat ?? null,
+          lon: point?.lon ?? null,
+          speedKmh,
+          course: int(o.course),
+          positionAt: iso(o.pos_time),
+          odometerKm: meters != null ? Math.round(meters / 1000) : hundreds != null ? Math.round(hundreds / 10) : null,
+          engineHours: seconds != null ? Math.round((seconds / 3600) * 10) / 10 : null,
+          ignition,
+          fuelLevelPct: perMill != null ? pct(perMill / 10) : null,
+          fuelLevelL: ml != null ? Math.round(ml / 100) / 10 : null,
+          tankL: positive(v.fueltanksize),
+          state: standstill === false ? 'MOVING' : standstill === true ? (ignition === false ? 'PARKED' : 'STOPPED') : stateFromSpeed(speedKmh, ignition),
+          driver: text(o.drivername, 120),
+          address: text(o.postext, 200),
+        };
+      });
+
+    return { host: WEBFLEET_HOST, account: creds.account, units };
+  },
+};
+
+/* ── ABAX (OAuth; Норвегия, Швеция, Дания, Финляндия) ─────────── */
+
+const abax: ProviderSpec = {
+  ...PROVIDER_CATALOG.ABAX,
+  /* Запасной путь — свои client id и secret перевозчика (Client Credentials). */
+  parse(raw) {
+    let c: { cid?: string; cs?: string };
+    try {
+      c = JSON.parse(raw) as { cid?: string; cs?: string };
+    } catch {
+      throw new GpsError('INPUT', 'abax');
+    }
+    const cid = String(c.cid ?? '').trim();
+    const cs = String(c.cs ?? '').trim();
+    if (cid.length < 8 || cs.length < 8 || cid.length > 200 || cs.length > 400) throw new GpsError('INPUT', 'abax');
+    return { token: JSON.stringify({ cid, cs }), hosts: [ABAX_API] };
+  },
+  async fetch({ token }) {
+    const { access, newSecret } = await abaxAccess(token);
+    const items: Record<string, unknown>[] = [];
+    for (let page = 1; page <= 5; page += 1) {
+      const { data } = await getJson<{ items?: unknown; page_size?: number }>(ABAX_API, `/v1/vehicles?page=${page}&page_size=1500`, {
+        headers: { authorization: `Bearer ${access}` },
+      });
+      const batch = list(data.items);
+      items.push(...batch);
+      if (batch.length < (data.page_size ?? 1500)) break;
+    }
+
+    const units: GpsUnit[] = items.map((v) => {
+      const loc = obj(v.location);
+      const point = coord(loc.latitude, loc.longitude);
+      const speedKmh = int(loc.speed);
+      const moving = typeof loc.in_movement === 'boolean' ? loc.in_movement : null;
+      const id = String(v.id ?? '');
+      return {
+        externalId: id,
+        name: text(v.alias, 200) ?? text(obj(v.license_plate).number, 200) ?? id,
+        plate: text(obj(v.license_plate).number, 32),
+        lat: point?.lat ?? null,
+        lon: point?.lon ?? null,
+        speedKmh,
+        course: int(loc.course),
+        positionAt: iso(loc.timestamp),
+        state: moving === true ? 'MOVING' : moving === false ? 'STOPPED' : stateFromSpeed(speedKmh, null),
+        driver: text(obj(v.driver).name, 120),
+      };
+    });
+
+    return { host: ABAX_API, account: null, units, newToken: newSecret };
+  },
+};
+
 export const PROVIDERS: Record<GpsProvider, ProviderSpec> = {
   WIALON: wialon,
   MAPON: mapon,
@@ -479,6 +626,8 @@ export const PROVIDERS: Record<GpsProvider, ProviderSpec> = {
   RUPTELA: ruptela,
   NAVIXY: navixy,
   SAMSARA: samsara,
+  WEBFLEET: webfleet,
+  ABAX: abax,
 };
 
 export function providerSpec(id: string | null | undefined): ProviderSpec {

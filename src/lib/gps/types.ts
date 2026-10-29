@@ -7,7 +7,7 @@
  * Без зависимостей: модуль читают тесты (node --test).
  */
 
-export const GPS_PROVIDERS = ['WIALON', 'MAPON', 'NAVIREC', 'RUPTELA', 'NAVIXY', 'SAMSARA'] as const;
+export const GPS_PROVIDERS = ['WIALON', 'MAPON', 'NAVIREC', 'RUPTELA', 'NAVIXY', 'SAMSARA', 'WEBFLEET', 'ABAX'] as const;
 export type GpsProvider = (typeof GPS_PROVIDERS)[number];
 
 export type GpsState = 'MOVING' | 'STOPPED' | 'PARKED' | 'OFFLINE';
@@ -45,6 +45,8 @@ export type GpsFetch = {
   refuels?: GpsRefuel[];
   /** Что запомнить к следующему разу (последняя забранная заправка и т. п.). */
   cursor?: string | null;
+  /** Новый секрет подключения: ABAX меняет refresh token при каждом обновлении. */
+  newToken?: string | null;
 };
 
 /* ── Общие помощники разбора ──────────────────────────────────── */

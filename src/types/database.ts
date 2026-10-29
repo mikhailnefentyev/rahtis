@@ -6448,6 +6448,10 @@ export type Database = {
         Args: { p_company_id: string; p_id: string }
         Returns: undefined
       }
+      gps_connection_set_token: {
+        Args: { p_id: string; p_token: string }
+        Returns: undefined
+      }
       gps_connection_token: { Args: { p_id: string }; Returns: string }
       group_take_order: {
         Args: { p_order_id: string; p_vehicle_id: string }

@@ -7,6 +7,7 @@ import { GPS_REFRESH_MS, syncGpsConnection } from '@/lib/gps/sync';
 import { isLocale } from '@/lib/i18n';
 import { getViewerI18n } from '@/lib/i18n/viewer';
 import { createClient } from '@/lib/supabase/server';
+import { abaxApp } from '@/lib/gps/abax';
 import { PROVIDER_CATALOG } from '@/lib/gps/catalog';
 import type { GpsProvider } from '@/lib/gps/types';
 import { ConnectGps } from './ConnectGps';
@@ -39,8 +40,14 @@ function requestTime(): number {
  * подключение) и дальше раз в минуту, пока страница открыта. Хранится
  * только последняя точка — истории перемещений нет (PRIVACY 2.18).
  */
-export default async function GpsPage({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = await params;
+export default async function GpsPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<{ abax?: string }>;
+}) {
+  const [{ locale }, query] = await Promise.all([params, searchParams]);
   if (!isLocale(locale)) notFound();
 
   const viewer = await requireRole(locale, 'CARRIER');
@@ -135,6 +142,12 @@ export default async function GpsPage({ params }: { params: Promise<{ locale: st
         )}
       </div>
 
+      {query.abax && query.abax in s.abaxResult && (
+        <p className={`mt-4 text-[13px] ${query.abax === 'connected' ? 'text-ok' : 'text-danger'}`}>
+          {s.abaxResult[query.abax as keyof typeof s.abaxResult]}
+        </p>
+      )}
+
       {hasConnections && (
         <section className="mt-6">
           {points.length > 0 ? (
@@ -223,7 +236,7 @@ export default async function GpsPage({ params }: { params: Promise<{ locale: st
             </CardBody>
           </Card>
         ))}
-        <ConnectGps startOpen={!hasConnections} />
+        <ConnectGps startOpen={!hasConnections} abaxReady={abaxApp() != null} />
       </section>
     </main>
   );

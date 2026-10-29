@@ -37,6 +37,8 @@ export async function syncGpsConnection(connectionId: string, companyId: string)
   const hosts = [...new Set([conn.api_host, spec.defaultHost])];
   try {
     const result = await fetchWithHosts(spec, { token, hosts }, conn.account_ref, conn.sync_cursor);
+    /* ABAX сменил refresh token — сохраняем новый, иначе следующее обновление не войдёт. */
+    if (result.newToken) await admin.rpc('gps_connection_set_token', { p_id: conn.id, p_token: result.newToken });
     const detected = await storeUnits(conn.id, companyId, result.units);
     await sendRefuels(conn.id, [...(result.refuels ?? []), ...(spec.refuelEvents ? [] : detected)]);
     await admin

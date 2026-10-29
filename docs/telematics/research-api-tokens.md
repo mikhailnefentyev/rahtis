@@ -17,11 +17,20 @@
 
 Заправки, которые провайдер сам не отдаёт (Wialon, Navirec, Navixy, Samsara), ищем по скачку уровня между обновлениями: не меньше 30 л или 15 % бака, машина не едет. Они уходят в «Топливо» (`telematics_fuel_add`) только у машин, привязанных к автопарку.
 
+## Webfleet и ABAX (добавлены 29.10.2026)
+
+| Провайдер | Вход | Что берём | Проверено |
+|---|---|---|---|
+| Webfleet | аккаунт, пользователь, пароль и API-ключ (ключ — My Account → API key request; пользователю — право WEBFLEET.connect) | `showObjectReportExtern` (6 запросов в минуту): точка (`latitude_mdeg` / 1e6), скорость, курс, время, адрес `postext`, пробег `odometer_long` (м), зажигание, `standstill`, уровень топлива (‰ или мл), моточасы (с), водитель; из `showVehicleReportExtern` — госномер и объём бака | неверные данные → ошибка 1143 «API key is invalid» |
+| ABAX | OAuth: кнопка «Войти в ABAX и разрешить» (Authorization Code, refresh token в Vault, ABAX меняет его при каждом обновлении). Запасной путь — свои client ID и secret перевозчика, если ABAX включил ему Client Credentials | `/v1/vehicles`: госномер, название, точка, скорость, курс, «едет или нет», время, водитель | неверный client → `invalid_client` |
+
+Источники: справочник WEBFLEET.connect 1.57.0 (media.webfleet.com/…/webfleet.connect-doc-1.57.0); пример ABAX github.com/abax-as/abax-api-samples и спецификация на developers.abax.cloud.
+
+**Чтобы заработала кнопка ABAX:** зарегистрировать приложение RAHTIS на developers.abax.cloud (Authorization Code, область `openid abax_profile open_api open_api.vehicles offline_access`, адрес возврата `https://www.rahtis.eu/api/gps/abax/callback`) и задать в Vercel `ABAX_CLIENT_ID` и `ABAX_CLIENT_SECRET`. До этого показывается только запасной путь со своими client ID и secret.
+
 ## Не сделано — нужен договор или другой вход
 
-- **Webfleet** (№ 1 в Германии): ключ — по заявке клиента в My Account, плюс пользователь с правом WEBFLEET.connect; вход логином, паролем и ключом.
 - **Geotab**: вход логином, паролем и базой (можно служебный пользователь клиента).
-- **ABAX** (лидер в Скандинавии): OAuth-приложение, которое регистрируем мы; клиент нажимает «Подключить ABAX».
 - **rFMS** Scania, Volvo, DAF, MAN: клиентские данные доступа, но платная подписка производителя.
 - **Frotcom**: вход логином и паролем, ключ живёт 20 минут.
 - **Vehco, Ecofleet/Fleet Complete, YellowFox, Spedion, idem, TX-Connect, Linqo, Framelogic, GBox, Positrex**: публичной документации нет — только через переговоры.
