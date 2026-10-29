@@ -1828,6 +1828,7 @@ export type Database = {
       gps_connections: {
         Row: {
           account_name: string | null
+          account_ref: string | null
           api_host: string
           company_id: string
           created_at: string
@@ -1839,10 +1840,12 @@ export type Database = {
           provider: string
           secret_id: string
           status: string
+          sync_cursor: string | null
           unit_count: number
         }
         Insert: {
           account_name?: string | null
+          account_ref?: string | null
           api_host: string
           company_id: string
           created_at?: string
@@ -1854,10 +1857,12 @@ export type Database = {
           provider?: string
           secret_id: string
           status?: string
+          sync_cursor?: string | null
           unit_count?: number
         }
         Update: {
           account_name?: string | null
+          account_ref?: string | null
           api_host?: string
           company_id?: string
           created_at?: string
@@ -1869,6 +1874,7 @@ export type Database = {
           provider?: string
           secret_id?: string
           status?: string
+          sync_cursor?: string | null
           unit_count?: number
         }
         Relationships: [
@@ -1883,47 +1889,80 @@ export type Database = {
       }
       gps_units: {
         Row: {
+          address: string | null
           company_id: string
           connection_id: string
           course: number | null
+          driver: string | null
+          engine_hours: number | null
           external_id: string
+          fuel_level_l: number | null
+          fuel_level_pct: number | null
+          fuel_used_l: number | null
           id: string
+          ignition: boolean | null
           lat: number | null
           lon: number | null
           name: string
+          odometer_km: number | null
           plate: string | null
           position_at: string | null
           speed_kmh: number | null
+          state: string | null
+          state_since: string | null
+          tank_l: number | null
           updated_at: string
           vehicle_id: string | null
         }
         Insert: {
+          address?: string | null
           company_id: string
           connection_id: string
           course?: number | null
+          driver?: string | null
+          engine_hours?: number | null
           external_id: string
+          fuel_level_l?: number | null
+          fuel_level_pct?: number | null
+          fuel_used_l?: number | null
           id?: string
+          ignition?: boolean | null
           lat?: number | null
           lon?: number | null
           name: string
+          odometer_km?: number | null
           plate?: string | null
           position_at?: string | null
           speed_kmh?: number | null
+          state?: string | null
+          state_since?: string | null
+          tank_l?: number | null
           updated_at?: string
           vehicle_id?: string | null
         }
         Update: {
+          address?: string | null
           company_id?: string
           connection_id?: string
           course?: number | null
+          driver?: string | null
+          engine_hours?: number | null
           external_id?: string
+          fuel_level_l?: number | null
+          fuel_level_pct?: number | null
+          fuel_used_l?: number | null
           id?: string
+          ignition?: boolean | null
           lat?: number | null
           lon?: number | null
           name?: string
+          odometer_km?: number | null
           plate?: string | null
           position_at?: string | null
           speed_kmh?: number | null
+          state?: string | null
+          state_since?: string | null
+          tank_l?: number | null
           updated_at?: string
           vehicle_id?: string | null
         }
@@ -6395,9 +6434,11 @@ export type Database = {
       gps_connection_create: {
         Args: {
           p_account_name: string
+          p_account_ref?: string
           p_api_host: string
           p_company_id: string
           p_label: string
+          p_provider: string
           p_token: string
           p_user_id: string
         }

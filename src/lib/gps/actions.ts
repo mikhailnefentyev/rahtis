@@ -7,10 +7,13 @@ import { defaultLocale, getDictionary, isLocale, type Locale } from '@/lib/i18n'
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { syncGpsConnection } from './sync';
-import { fetchWialonUnits, parseWialonInput, WialonError } from './wialon';
+import { GpsError } from './http';
+import { fetchWithHosts, providerSpec } from './providers';
+import { GPS_PROVIDERS, type GpsProvider } from './types';
 
 /**
- * GPS в кабинете перевозчика: подключить Wialon, обновить, отключить,
+ * GPS в кабинете перевозчика: подключить провайдера (Wialon, Mapon, Navirec,
+ * Ruptela, Navixy, Samsara), обновить, отключить,
  * привязать машину. Входит в подписку — та же проверка, что у топлива.
  */
 
@@ -30,15 +33,20 @@ async function carrier(locale: Locale) {
 
 export type GpsConnectState = { error: string | null; done: boolean };
 
-export async function connectWialonAction(_prev: GpsConnectState, formData: FormData): Promise<GpsConnectState> {
+export async function connectGpsAction(_prev: GpsConnectState, formData: FormData): Promise<GpsConnectState> {
   const locale = toLocale(formData.get('locale'));
   const t = (await getDictionary(locale)).gps;
   const { viewer, allowed } = await carrier(locale);
   if (!allowed) return { error: t.locked, done: false };
 
+  const providerRaw = str(formData, 'provider') || 'WIALON';
+  if (!(GPS_PROVIDERS as readonly string[]).includes(providerRaw)) return { error: t.errInput, done: false };
+  const provider = providerRaw as GpsProvider;
+  const spec = providerSpec(provider);
+
   let input;
   try {
-    input = parseWialonInput(str(formData, 'key'), str(formData, 'server'));
+    input = spec.parse(str(formData, 'key'), spec.customHost ? str(formData, 'server') : '');
   } catch {
     return { error: t.errInput, done: false };
   }
@@ -46,9 +54,9 @@ export async function connectWialonAction(_prev: GpsConnectState, formData: Form
   /* Сначала проверяем ключ: в базу попадает только работающий. */
   let checked;
   try {
-    checked = await fetchWialonUnits(input.token, input.hosts);
+    checked = await fetchWithHosts(spec, input, null, null);
   } catch (e) {
-    const kind = e instanceof WialonError ? e.kind : 'UNREACHABLE';
+    const kind = e instanceof GpsError ? e.kind : 'UNREACHABLE';
     return { error: kind === 'KEY' ? t.errKey : kind === 'INPUT' ? t.errInput : t.errUnreachable, done: false };
   }
 
@@ -62,10 +70,12 @@ export async function connectWialonAction(_prev: GpsConnectState, formData: Form
   const { data: id, error } = await admin.rpc('gps_connection_create', {
     p_company_id: viewer.company!.id,
     p_user_id: viewer.userId,
+    p_provider: provider,
     p_api_host: checked.host,
     p_token: input.token,
     p_label: str(formData, 'label').slice(0, 80),
     p_account_name: checked.account ?? '',
+    p_account_ref: checked.accountRef ?? '',
   });
   if (error || !id) return { error: t.errGeneric, done: false };
 

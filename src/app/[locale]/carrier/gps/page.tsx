@@ -7,7 +7,9 @@ import { GPS_REFRESH_MS, syncGpsConnection } from '@/lib/gps/sync';
 import { isLocale } from '@/lib/i18n';
 import { getViewerI18n } from '@/lib/i18n/viewer';
 import { createClient } from '@/lib/supabase/server';
-import { ConnectWialon } from './ConnectWialon';
+import { PROVIDER_CATALOG } from '@/lib/gps/catalog';
+import type { GpsProvider } from '@/lib/gps/types';
+import { ConnectGps } from './ConnectGps';
 import { FleetMap, type FleetPoint } from './FleetMap';
 import { UnitVehicleSelect } from './UnitVehicleSelect';
 
@@ -29,7 +31,9 @@ function requestTime(): number {
 }
 
 /**
- * GPS-seuranta: парк перевозчика на карте из его собственного Wialon.
+ * GPS-seuranta: парк перевозчика на карте из его собственной системы
+ * слежения (Wialon, Mapon, Navirec, Ruptela, Navixy, Samsara): точка,
+ * состояние «едет / стоит» и с какого времени, топливо, пробег, водитель.
  *
  * Точки обновляются при открытии страницы (не чаще раза в минуту на
  * подключение) и дальше раз в минуту, пока страница открыта. Хранится
@@ -68,12 +72,12 @@ export default async function GpsPage({ params }: { params: Promise<{ locale: st
   const [{ data: connections }, { data: units }, { data: vehicles }] = await Promise.all([
     supabase
       .from('gps_connections')
-      .select('id, label, api_host, status, account_name, last_sync_at, last_error, unit_count')
+      .select('id, provider, label, api_host, status, account_name, last_sync_at, last_error, unit_count')
       .eq('company_id', company.id)
       .order('created_at'),
     supabase
       .from('gps_units')
-      .select('id, connection_id, name, plate, vehicle_id, lat, lon, speed_kmh, position_at')
+      .select('id, connection_id, name, plate, vehicle_id, lat, lon, speed_kmh, position_at, odometer_km, engine_hours, ignition, fuel_level_pct, fuel_level_l, tank_l, state, state_since, driver, address')
       .eq('company_id', company.id)
       .order('name'),
     supabase.from('vehicles').select('id, plate').eq('company_id', company.id).order('plate'),
@@ -91,6 +95,14 @@ export default async function GpsPage({ params }: { params: Promise<{ locale: st
     };
   });
 
+  const stateText = (r: (typeof rows)[number]) =>
+    r.state ? `${s.states[r.state as keyof typeof s.states] ?? r.state}${r.state_since ? ` · ${s.since.replace('{time}', f.dateTime(r.state_since))}` : ''}` : null;
+  const fuelText = (r: (typeof rows)[number]) => {
+    if (r.fuel_level_l != null) return `${f.decimal(Number(r.fuel_level_l))} l${r.tank_l ? ` / ${f.number(Number(r.tank_l))} l` : ''}`;
+    if (r.fuel_level_pct != null) return `${f.decimal(Number(r.fuel_level_pct))} %`;
+    return null;
+  };
+
   const points: FleetPoint[] = rows
     .filter((r) => r.lat != null && r.lon != null)
     .map((r) => ({
@@ -99,7 +111,9 @@ export default async function GpsPage({ params }: { params: Promise<{ locale: st
       lat: r.lat!,
       lon: r.lon!,
       fresh: r.fresh,
-      detail: [r.at ? f.dateTime(r.at) : null, r.speed_kmh != null ? `${r.speed_kmh} km/h` : null].filter(Boolean).join(' · '),
+      detail: [r.at ? f.dateTime(r.at) : null, r.speed_kmh != null ? `${r.speed_kmh} km/h` : null, stateText(r), fuelText(r)]
+        .filter(Boolean)
+        .join(' · '),
     }));
 
   const hasConnections = (connections ?? []).length > 0;
@@ -142,7 +156,10 @@ export default async function GpsPage({ params }: { params: Promise<{ locale: st
                 <Th>{s.colUnit}</Th>
                 <Th>{s.colVehicle}</Th>
                 <Th>{s.colSeen}</Th>
-                <Th numeric>km/h</Th>
+                <Th>{s.colState}</Th>
+                <Th numeric>{s.colFuel}</Th>
+                <Th numeric>{s.colOdometer}</Th>
+                <Th>{s.colDriver}</Th>
               </Tr>
             </thead>
             <tbody>
@@ -162,7 +179,17 @@ export default async function GpsPage({ params }: { params: Promise<{ locale: st
                       <span className="text-ink-muted">{s.noSignal}</span>
                     )}
                   </Td>
-                  <Td numeric>{r.speed_kmh ?? '—'}</Td>
+                  <Td className="whitespace-normal">
+                    {stateText(r) ?? '—'}
+                    {r.speed_kmh != null && r.speed_kmh > 0 && <span className="block text-[11px] text-ink-dim">{r.speed_kmh} km/h</span>}
+                    {r.address && <span className="block max-w-[220px] text-[11px] text-ink-dim">{r.address}</span>}
+                  </Td>
+                  <Td numeric>{fuelText(r) ?? '—'}</Td>
+                  <Td numeric>
+                    {r.odometer_km != null ? `${f.number(r.odometer_km)} km` : '—'}
+                    {r.engine_hours != null && <span className="block text-[11px] text-ink-dim">{f.decimal(Number(r.engine_hours))} h</span>}
+                  </Td>
+                  <Td className="whitespace-normal">{r.driver ?? '—'}</Td>
                 </Tr>
               ))}
             </tbody>
@@ -177,7 +204,7 @@ export default async function GpsPage({ params }: { params: Promise<{ locale: st
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="text-[13px]">
                   <p className="font-semibold">
-                    Wialon · {c.label || c.account_name || c.api_host}
+                    {PROVIDER_CATALOG[c.provider as GpsProvider]?.name ?? c.provider} · {c.label || c.account_name || c.api_host}
                   </p>
                   <p className="mt-1 text-ink-muted">
                     {c.api_host} · {s.unitsCount.replace('{n}', String(c.unit_count))}
@@ -196,7 +223,7 @@ export default async function GpsPage({ params }: { params: Promise<{ locale: st
             </CardBody>
           </Card>
         ))}
-        <ConnectWialon startOpen={!hasConnections} />
+        <ConnectGps startOpen={!hasConnections} />
       </section>
     </main>
   );
