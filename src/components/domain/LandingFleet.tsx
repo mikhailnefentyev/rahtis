@@ -22,20 +22,20 @@ type Combo = {
 };
 
 /* Самая длинная сцепка на снимках (TPV): от неё считается ширина остальных, чтобы масштаб был общий. */
-const WIDEST = 1384;
+const WIDEST = 1105;
 const HEIGHT = 264;
 
 /*
  * Оси — как на снимках; точный предел в кабинете считается по своим машинам.
- * Kasetti и TPV собраны из снимков PPV и puolikas (30.10.2026), остальные
- * четыре — снимки пользователя.
+ * Все шесть — снимки пользователя (29–30.10.2026), приведены к одному
+ * масштабу по высоте кабины и к одной линии земли.
  */
 const COMBOS: readonly Combo[] = [
   { key: 'Ppv', motor: { kind: 'TRACTOR', axles: 2 }, trailer: { kind: 'SEMI', axles: 3, twinWheels: false }, image: { src: '/media/combos/ppv.webp', width: 986 } },
   { key: 'Puolikas', motor: { kind: 'TRACTOR', axles: 3 }, trailer: { kind: 'SEMI', axles: 3, twinWheels: true }, image: { src: '/media/combos/puolikas.webp', width: 988 } },
   { key: 'Tral', motor: { kind: 'TRACTOR', axles: 3 }, trailer: { kind: 'SEMI', axles: 4, twinWheels: false }, image: { src: '/media/combos/tral.webp', width: 993 } },
-  { key: 'Kasetti', motor: { kind: 'TRUCK', axles: 4 }, trailer: { kind: 'FULL', axles: 5, twinWheels: true }, image: { src: '/media/combos/kasetti.webp', width: 1346 } },
-  { key: 'Tpv', motor: { kind: 'TRUCK', axles: 3 }, trailer: { kind: 'FULL', axles: 4, twinWheels: true }, image: { src: '/media/combos/tpv.webp', width: 1384 } },
+  { key: 'Kasetti', motor: { kind: 'TRUCK', axles: 5 }, trailer: { kind: 'FULL', axles: 4, twinWheels: true }, image: { src: '/media/combos/kasettiyhdistelma.webp', width: 1041 } },
+  { key: 'Tpv', motor: { kind: 'TRUCK', axles: 3 }, trailer: { kind: 'FULL', axles: 5, twinWheels: true }, image: { src: '/media/combos/taysperavaunuyhdistelma.webp', width: 1105 } },
   { key: 'Kontti', motor: { kind: 'TRACTOR', axles: 2 }, trailer: { kind: 'SEMI', axles: 3, twinWheels: false }, image: { src: '/media/combos/kontti.webp', width: 1002 } },
 ];
 
