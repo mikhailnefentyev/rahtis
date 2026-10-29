@@ -1312,7 +1312,7 @@ export const en = {
     toolParts: "Parts and tyres",
     toolPartsText: "Parts, tyre and breakdown suppliers in nine countries. A purchase goes straight into the vehicle's profitability.",
     toolDrivers: "Drivers and working time",
-    toolDriversText: "Shifts and breaks from the driver app. Estimated pay under four pay schemes, which the driver can also see in the app:",
+    toolDriversText: "Shifts and breaks from the driver app. Estimated pay under four pay schemes, which the driver can also see in the app.",
     toolDriversTes: "basic hours plus overtime, evening, night and Sunday premiums",
     toolSites: "Worksites and tippers",
     toolSitesText: "Runs with weights, hours on site and sign-off by the site manager via a link. The invoice goes to the customer in your company's name.",

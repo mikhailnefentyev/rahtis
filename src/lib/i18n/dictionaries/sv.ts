@@ -1241,7 +1241,7 @@ export const sv = {
     toolParts: "Reservdelar och däck",
     toolPartsText: "Leverantörer av reservdelar, däck och bärgning i nio länder. Ett köp syns direkt i fordonets lönsamhet.",
     toolDrivers: "Förare och arbetstid",
-    toolDriversText: "Arbetspass och raster från förarappen. Uppskattad lön enligt fyra modeller, och föraren ser den själv i appen:",
+    toolDriversText: "Arbetspass och raster från förarappen. Uppskattad lön enligt fyra modeller, och föraren ser den själv i appen.",
     toolDriversTes: "timlön + övertids- och OB-tillägg för kväll, natt och söndag",
     toolSites: "Arbetsplatser och tippbilar",
     toolSitesText: "Körningar med vikter, timmar på plats och arbetsledarens godkännande via länk. Fakturan går till kunden i ditt företags namn.",

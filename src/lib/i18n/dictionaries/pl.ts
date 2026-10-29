@@ -1241,7 +1241,7 @@ export const pl = {
     toolParts: "Części i opony",
     toolPartsText: "Dostawcy części, opon i pomocy drogowej w dziewięciu krajach. Każdy zakup od razu wlicza się w rentowność pojazdu.",
     toolDrivers: "Kierowcy i czas pracy",
-    toolDriversText: "Zmiany i przerwy z aplikacji kierowcy. Szacunkowe wynagrodzenie liczone na cztery sposoby — kierowca widzi je w swojej aplikacji:",
+    toolDriversText: "Zmiany i przerwy z aplikacji kierowcy. Szacunkowe wynagrodzenie liczone na cztery sposoby — kierowca widzi je w swojej aplikacji.",
     toolDriversTes: "godziny + dodatki za nadgodziny, pracę wieczorną, nocną i niedzielną",
     toolSites: "Budowy i wywrotki",
     toolSitesText: "Kursy z ważeniem, godziny na budowie i potwierdzenie kierownika budowy przez link. Faktura dla klienta w imieniu Twojej firmy.",

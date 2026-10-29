@@ -1241,7 +1241,7 @@ export const et = {
     toolParts: "Varuosad ja rehvid",
     toolPartsText: "Varuosade, rehvide ja puksiirabi tarnijad üheksas riigis. Ost kajastub kohe auto tasuvuses.",
     toolDrivers: "Juhid ja tööaeg",
-    toolDriversText: "Vahetused ja puhkepausid juhirakendusest. Hinnanguline palk nelja skeemi järgi – juht näeb seda ka ise rakenduses:",
+    toolDriversText: "Vahetused ja puhkepausid juhirakendusest. Hinnanguline palk nelja skeemi järgi – juht näeb seda ka ise rakenduses.",
     toolDriversTes: "tunnid + ületunni-, õhtu-, öö- ja pühapäevalisad",
     toolSites: "Objektid ja kallurid",
     toolSitesText: "Veod koos kaalumisega, tunnid objektil ja töödejuhataja kinnitus lingiga. Arve läheb kliendile teie ettevõtte nimel.",

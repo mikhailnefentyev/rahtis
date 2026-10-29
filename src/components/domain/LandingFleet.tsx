@@ -47,17 +47,7 @@ export async function LandingFleet({ locale }: { locale: Locale }) {
   });
   const finland = new Intl.DisplayNames([locale], { type: 'region' }).of('FI') ?? 'FI';
 
-  /* Примеры к четырём схемам оплаты водителя — названия те же, что в кабинете (t.payModel). */
-  const money = new Intl.NumberFormat(t.meta.intl, { style: 'currency', currency: 'EUR', maximumFractionDigits: 2 });
-  const num = new Intl.NumberFormat(t.meta.intl, { maximumFractionDigits: 2 });
-  const payExamples: [string, string][] = [
-    [t.payModel.PER_KM, `${num.format(1200)} km × ${money.format(0.12)} = ${money.format(144)}`],
-    [t.payModel.TRIP_PERCENT, `${money.format(1450)} × 25 % = ${money.format(362.5)}`],
-    [t.payModel.FLAT_HOURLY, `${num.format(9.5)} h × ${money.format(18)} = ${money.format(171)}`],
-    [t.payModel.TES, l.toolDriversTes],
-  ];
-
-  const tools: { title: string; text: string; spec: string; examples?: [string, string][] }[] = [
+  const tools: { title: string; text: string; spec: string }[] = [
     { title: l.toolFuel, text: l.toolFuelText, spec: 'PDF · CSV' },
     { title: l.toolGps, text: l.toolGpsText, spec: '8 × API' },
     { title: l.toolEcon, text: l.toolEconText, spec: 'PDF · CSV' },
@@ -66,7 +56,7 @@ export async function LandingFleet({ locale }: { locale: Locale }) {
       text: l.toolPartsText,
       spec: 'FI SE NO DK EE LV LT PL DE',
     },
-    { title: l.toolDrivers, text: l.toolDriversText, spec: '', examples: payExamples },
+    { title: l.toolDrivers, text: l.toolDriversText, spec: 'km · % · h · TES' },
     { title: l.toolSites, text: l.toolSitesText, spec: 't · m³ · h' },
   ];
 
@@ -133,16 +123,6 @@ export async function LandingFleet({ locale }: { locale: Locale }) {
             <div key={tool.title} className="flex flex-col bg-surface p-5">
               <h3 className="text-[17px] leading-snug font-semibold tracking-tight">{tool.title}</h3>
               <p className="mt-1.5 text-[15px] text-ink-muted">{tool.text}</p>
-              {tool.examples && (
-                <dl className="mt-3 grid gap-2">
-                  {tool.examples.map(([name, calc]) => (
-                    <div key={name} className="border-t border-line pt-2">
-                      <dt className="label-micro">{name}</dt>
-                      <dd className="mt-0.5 font-mono text-[13px] leading-snug text-ink">{calc}</dd>
-                    </div>
-                  ))}
-                </dl>
-              )}
               <Mono className="mt-auto pt-3 text-[12px] tracking-[0.08em] text-ink-faint">{tool.spec}</Mono>
             </div>
           ))}

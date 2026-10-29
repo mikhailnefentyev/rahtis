@@ -1241,7 +1241,7 @@ export const lv = {
     toolParts: "Rezerves daļas un riepas",
     toolPartsText: "Rezerves daļu, riepu un palīdzības uz ceļa piegādātāji deviņās valstīs. Pirkumi uzreiz tiek iekļauti automašīnas rentabilitātes aprēķinā.",
     toolDrivers: "Vadītāji un darba laiks",
-    toolDriversText: "Maiņas un pārtraukumi no vadītāja lietotnes. Aptuvenā alga pēc četrām shēmām – vadītājs to redz arī pats savā lietotnē:",
+    toolDriversText: "Maiņas un pārtraukumi no vadītāja lietotnes. Aptuvenā alga pēc četrām shēmām – vadītājs to redz arī pats savā lietotnē.",
     toolDriversTes: "stundas + virsstundu, vakara, nakts un svētdienas piemaksas",
     toolSites: "Objekti un pašizgāzēji",
     toolSitesText: "Reisi ar svēršanu, stundas objektā un darbu vadītāja apstiprinājums ar saiti. Rēķins pasūtītājam – jūsu uzņēmuma vārdā.",

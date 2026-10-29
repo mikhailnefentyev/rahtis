@@ -1241,7 +1241,7 @@ export const de = {
     toolParts: "Ersatzteile und Reifen",
     toolPartsText: "Lieferanten für Ersatzteile, Reifen und Pannenhilfe in neun Ländern. Ein Einkauf fließt direkt in die Rentabilität des Fahrzeugs.",
     toolDrivers: "Fahrer und Arbeitszeit",
-    toolDriversText: "Schichten und Pausen aus der Fahrer-App. Der voraussichtliche Lohn wird nach vier Modellen berechnet, und der Fahrer sieht ihn selbst in der App:",
+    toolDriversText: "Schichten und Pausen aus der Fahrer-App. Der voraussichtliche Lohn wird nach vier Modellen berechnet, und der Fahrer sieht ihn selbst in der App.",
     toolDriversTes: "Stunden + Überstunden-, Abend-, Nacht- und Sonntagszuschläge",
     toolSites: "Baustellen und Kipper",
     toolSitesText: "Fahrten mit Wiegedaten, Stunden auf der Baustelle und Freigabe durch den Bauleiter per Link. Die Rechnung geht im Namen Ihres Unternehmens an den Kunden.",

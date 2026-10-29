@@ -1380,7 +1380,7 @@ export const fi = {
     toolParts: "Varaosat ja renkaat",
     toolPartsText: "Varaosien, renkaiden ja tiepalvelun toimittajat yhdeksässä maassa. Ostos menee suoraan auton kannattavuuteen.",
     toolDrivers: "Kuljettajat ja työaika",
-    toolDriversText: "Vuorot ja tauot kuljettajasovelluksesta. Palkka-arvio neljällä tavalla, ja kuljettaja näkee sen itse sovelluksessa:",
+    toolDriversText: "Vuorot ja tauot kuljettajasovelluksesta. Palkka-arvio neljällä tavalla, ja kuljettaja näkee sen itse sovelluksessa.",
     toolDriversTes: "tunnit + ylityö-, ilta-, yö- ja sunnuntailisät",
     toolSites: "Työmaat ja kippiautot",
     toolSitesText: "Kuormat punnituksineen, tunnit työmaalla ja vastaavan työnjohtajan hyväksyntä linkillä. Lasku asiakkaalle yrityksesi nimissä.",

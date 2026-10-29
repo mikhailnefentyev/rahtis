@@ -1241,7 +1241,7 @@ export const lt = {
     toolParts: "Atsarginės dalys ir padangos",
     toolPartsText: "Atsarginių dalių, padangų ir techninės pagalbos kelyje tiekėjai devyniose šalyse. Pirkimo išlaidos iškart įtraukiamos į transporto priemonės pelningumą.",
     toolDrivers: "Vairuotojai ir darbo laikas",
-    toolDriversText: "Pamainos ir pertraukos – iš vairuotojo programėlės. Apytikslis darbo užmokestis skaičiuojamas keturiais būdais, o vairuotojas jį mato ir pats programėlėje:",
+    toolDriversText: "Pamainos ir pertraukos – iš vairuotojo programėlės. Apytikslis darbo užmokestis skaičiuojamas keturiais būdais, o vairuotojas jį mato ir pats programėlėje.",
     toolDriversTes: "valandinis užmokestis + priemokos už viršvalandžius, vakaro, nakties ir sekmadienio darbą",
     toolSites: "Objektai ir savivarčiai",
     toolSitesText: "Reisai su svėrimu, valandos objekte ir darbų vadovo patvirtinimas per nuorodą. Sąskaita užsakovui – jūsų įmonės vardu.",
