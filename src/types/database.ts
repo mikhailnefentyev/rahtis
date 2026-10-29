@@ -1676,10 +1676,15 @@ export type Database = {
           import_id: string | null
           odometer_km: number | null
           product: string
+          qty_driver: number | null
+          qty_report: number | null
+          qty_telematics: number | null
           quantity: number
           receipt_path: string | null
           source: string
           station: string | null
+          telematics_km: number | null
+          telematics_ref: string | null
           unit: string | null
           vehicle_id: string
         }
@@ -1696,10 +1701,15 @@ export type Database = {
           import_id?: string | null
           odometer_km?: number | null
           product: string
+          qty_driver?: number | null
+          qty_report?: number | null
+          qty_telematics?: number | null
           quantity: number
           receipt_path?: string | null
           source: string
           station?: string | null
+          telematics_km?: number | null
+          telematics_ref?: string | null
           unit?: string | null
           vehicle_id: string
         }
@@ -1716,10 +1726,15 @@ export type Database = {
           import_id?: string | null
           odometer_km?: number | null
           product?: string
+          qty_driver?: number | null
+          qty_report?: number | null
+          qty_telematics?: number | null
           quantity?: number
           receipt_path?: string | null
           source?: string
           station?: string | null
+          telematics_km?: number | null
+          telematics_ref?: string | null
           unit?: string | null
           vehicle_id?: string
         }
@@ -7505,6 +7520,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      telematics_fuel_add: {
+        Args: { p_events: Json; p_vehicle: string }
+        Returns: Json
       }
       tipper_order_summary: { Args: { p_order_id: string }; Returns: Json }
       training_sync: { Args: { p_cards: Json }; Returns: number }

@@ -4,12 +4,25 @@ import { notFound } from 'next/navigation';
 import { Badge, Bars, Card, CardBody, EmptyState, Stat, StatRow, Table, TableFrame, Td, Th, Tr } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
 import { deleteFuelEntryAction } from '@/lib/fuel/actions';
-import { fuelStats, monthOf, monthsBack, type FuelRow, type MonthStat } from '@/lib/fuel/fuel';
+import {
+  FUEL_SOURCES,
+  SPREAD_NOTICE,
+  dayOf,
+  fuelStats,
+  monthOf,
+  monthsBack,
+  sourceQty,
+  sourceSeries,
+  sourceSpread,
+  type FuelRow,
+  type MonthStat,
+} from '@/lib/fuel/fuel';
 import { isLocale } from '@/lib/i18n';
 import { getViewerI18n } from '@/lib/i18n/viewer';
 import { createClient } from '@/lib/supabase/server';
 import { FuelEntryForm } from './FuelEntryForm';
 import { FuelUpload } from './FuelUpload';
+import { SourceLines } from './SourceLines';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -26,8 +39,9 @@ const MONTHS = 12;
 /**
  * Топливо перевозчика: расход машин, траты, заправки и месячные отчёты.
  *
- * Строки — водитель (приложение), отчёт заправщика (загрузка) и ручной
- * ввод. Расход — методом полного бака (src/lib/fuel/stats.ts) за
+ * Строки — водитель (приложение), отчёт заправщика (загрузка), спутник
+ * (система GPS перевозчика) и ручной ввод. Одна заправка — одна строка, но
+ * объём каждого источника свой: график «по источникам» ставит их рядом. Расход — методом полного бака (src/lib/fuel/stats.ts) за
  * двенадцать месяцев: интервал, начатый в прошлом месяце, закрывается в
  * этом, поэтому месяц без предыдущего посчитался бы неверно.
  *
@@ -38,7 +52,7 @@ export default async function FuelPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ month?: string; imported?: string }>;
+  searchParams: Promise<{ month?: string; imported?: string; vehicle?: string }>;
 }) {
   const [{ locale }, query] = await Promise.all([params, searchParams]);
   if (!isLocale(locale)) notFound();
@@ -72,7 +86,7 @@ export default async function FuelPage({
   const [{ data: entries }, { data: vehicles }, { data: drivers }, { data: imports }] = await Promise.all([
     supabase
       .from('fuel_entries')
-      .select('id, vehicle_id, driver_id, filled_at, product, quantity, unit, amount_cents, odometer_km, full_tank, station, source, receipt_path')
+      .select('id, vehicle_id, driver_id, filled_at, product, quantity, unit, amount_cents, odometer_km, full_tank, station, source, receipt_path, qty_report, qty_driver, qty_telematics')
       .eq('company_id', company.id)
       .gte('filled_at', since)
       .lt('filled_at', untilNext)
@@ -88,7 +102,13 @@ export default async function FuelPage({
       .limit(8),
   ]);
 
-  const rows = (entries ?? []).map((e) => ({ ...e, quantity: Number(e.quantity) }));
+  const rows = (entries ?? []).map((e) => ({
+    ...e,
+    quantity: Number(e.quantity),
+    qty_report: e.qty_report == null ? null : Number(e.qty_report),
+    qty_driver: e.qty_driver == null ? null : Number(e.qty_driver),
+    qty_telematics: e.qty_telematics == null ? null : Number(e.qty_telematics),
+  }));
   const stats = fuelStats(rows as FuelRow[]);
   const plates = new Map((vehicles ?? []).map((v) => [v.id, v.plate]));
   const driverNames = new Map((drivers ?? []).map((d) => [d.id, d.full_name]));
@@ -108,6 +128,15 @@ export default async function FuelPage({
     .filter((v): v is { id: string; plate: string; stat: MonthStat } => Boolean(v.stat))
     .sort((a, b) => a.plate.localeCompare(b.plate));
 
+  /* Три линии: весь парк или одна машина (только своя — чужой id просто ничего не покажет). */
+  const vehicle = (vehicles ?? []).some((v) => v.id === query.vehicle) ? query.vehicle! : null;
+  const series = sourceSeries(
+    vehicle ? rows.filter((row) => row.vehicle_id === vehicle) : rows,
+    month,
+    month === current ? dayOf(new Date().toISOString()) : undefined,
+  );
+  const monthHref = (m: string) => `${base}?month=${m}${vehicle ? `&vehicle=${vehicle}` : ''}`;
+
   const fleetL100 = months.map((m) => fleetByMonth.get(m)?.l100 ?? 0);
   const fleetSpend = months.map((m) => fleetByMonth.get(m)?.amountCents ?? 0);
 
@@ -119,12 +148,12 @@ export default async function FuelPage({
       {query.imported && <p className="mb-4 text-[13px] text-ok">{s.importedNote}</p>}
 
       <div className="mb-4 flex flex-wrap items-center gap-3">
-        <Link href={`${base}?month=${prev}`} className="text-[13px] text-accent" aria-label={s.prevMonth}>
+        <Link href={monthHref(prev)} className="text-[13px] text-accent" aria-label={s.prevMonth}>
           ‹ {label(prev)}
         </Link>
         <h2 className="text-[15px] font-semibold capitalize">{monthLong.format(new Date(`${month}-15T00:00:00Z`))}</h2>
         {month < current && (
-          <Link href={`${base}?month=${nextMonth(month)}`} className="text-[13px] text-accent" aria-label={s.nextMonth}>
+          <Link href={monthHref(nextMonth(month))} className="text-[13px] text-accent" aria-label={s.nextMonth}>
             {label(nextMonth(month))} ›
           </Link>
         )}
@@ -170,6 +199,24 @@ export default async function FuelPage({
         </div>
       )}
       <p className="mt-2 text-[12px] text-ink-dim">{s.trendHint}</p>
+
+      {rows.length > 0 && (
+        <Card className="mt-4">
+          <CardBody>
+            <SourceLines
+              days={series.days}
+              unit={series.unit}
+              lines={series.lines}
+              intl={t.meta.intl}
+              labels={{ ...s.sourceLine, title: s.sourcesTitle, noData: s.sourcesNoData, fleet: s.sourcesFleet, vehicle: s.colVehicle }}
+              vehicles={vehicles ?? []}
+              vehicle={vehicle}
+              baseHref={`${base}?month=${month}`}
+            />
+          </CardBody>
+        </Card>
+      )}
+      {rows.length > 0 && <p className="mt-2 text-[12px] text-ink-dim">{s.sourcesHint}</p>}
 
       {vehicleStats.length > 0 && (
         <TableFrame caption={s.byVehicle} className="mt-6">
@@ -283,7 +330,7 @@ export default async function FuelPage({
                     </Td>
                     <Td>{row.station ?? ''}</Td>
                     <Td>
-                      {s.source[row.source as keyof typeof s.source]}
+                      <SourceCell row={row} labels={s.sourceLine} manual={s.source.MANUAL} diff={s.sourcesDiff} f={f} />
                       {row.receipt_path && (
                         <>
                           {' · '}
@@ -311,6 +358,40 @@ export default async function FuelPage({
       )}
       <p className="mt-2 text-[12px] text-ink-dim">{s.driverHint}</p>
     </main>
+  );
+}
+
+/** Источники заправки с их объёмами; расхождение больше 2 % — отметкой. */
+function SourceCell({
+  row,
+  labels,
+  manual,
+  diff,
+  f,
+}: {
+  row: { qty_report: number | null; qty_driver: number | null; qty_telematics: number | null };
+  labels: Record<(typeof FUEL_SOURCES)[number], string>;
+  manual: string;
+  diff: string;
+  f: { decimal: (n: number) => string };
+}) {
+  const parts = FUEL_SOURCES.flatMap((source) => {
+    const qty = sourceQty(row, source);
+    return qty == null ? [] : [`${labels[source]} ${f.decimal(qty)}`];
+  });
+  const spread = sourceSpread(row);
+  if (parts.length === 0) return <>{manual}</>;
+  return (
+    <>
+      {parts.join(' · ')}
+      {spread != null && spread > SPREAD_NOTICE && (
+        <span className="ml-2">
+          <Badge tone="warn">
+            {diff} {Math.round(spread * 100)} %
+          </Badge>
+        </span>
+      )}
+    </>
   );
 }
 

@@ -1289,6 +1289,36 @@
 /* Ноль — не пропуск, а тонкая линия: месяц простоя должен быть виден. */
 .pulse-bars__bar[data-zero] { background: var(--color-line-strong); border-radius: 0; }
 
+/* Три линии топлива (карточка «по источникам»): первые три слота проверенной
+   палитры, все пары различимы и при дальтонизме. Бирюзовый ниже 3:1 к белому —
+   поэтому у линий подписи справа, а значения в подсказке и таблице. */
+.source-lines {
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --series-3: #1baf7a;
+}
+.source-lines svg { display: block; overflow: visible; }
+.source-lines__axis {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  fill: var(--color-ink-dim);
+}
+.source-lines__end { font-size: 11px; fill: var(--color-ink-muted); }
+.source-lines__tip {
+  position: absolute;
+  min-width: 150px;
+  padding: 8px 10px;
+  border: 1px solid var(--color-line);
+  border-radius: 4px;
+  background: var(--color-surface);
+  box-shadow: 0 2px 8px rgb(12 22 38 / 0.08);
+  pointer-events: none;
+  font-size: 12px;
+}
+.source-lines__tip-day { margin-bottom: 4px; color: var(--color-ink-dim); font-size: 11px; }
+.source-lines__tip-row { display: flex; align-items: center; gap: 6px; color: var(--color-ink-muted); }
+.source-lines__tip-row strong { color: var(--color-ink); font-family: var(--font-mono); font-weight: 600; }
+
 .pulse-bars__label {
   text-align: center;
   font-family: var(--font-geist-mono), ui-monospace, monospace;

@@ -304,6 +304,104 @@ export function monthsBack(last: string, n: number): string[] {
   return out;
 }
 
+/* ── Три источника: отчёт, водитель, спутник ───────────────────── */
+
+/**
+ * Одна заправка может прийти из трёх мест, и у каждого свой объём:
+ * отчёт заправщика (по нему платят), водитель в приложении и система GPS
+ * перевозчика. График «по источникам» ставит их рядом нарастающим итогом
+ * за месяц: линии расходятся — значит, где-то заправка есть у одного
+ * источника и нет у другого или объёмы не сходятся.
+ *
+ * Считается одна группа топлива: жидкое (л), а если его в месяце нет — газ
+ * (кг). AdBlue и «прочее» в линии не входят.
+ */
+
+export const FUEL_SOURCES = ['IMPORT', 'DRIVER', 'TELEMATICS'] as const;
+
+export type FuelSource = (typeof FUEL_SOURCES)[number];
+
+export type SourceRow = {
+  filled_at: string;
+  product: string;
+  qty_report: number | null;
+  qty_driver: number | null;
+  qty_telematics: number | null;
+};
+
+export type SourceSeries = {
+  /** YYYY-MM-DD по Хельсинки, с первого дня месяца до последнего (или до сегодня). */
+  days: string[];
+  unit: 'l' | 'kg';
+  /** Нарастающий итог по дням; null — у источника в месяце ничего нет. */
+  lines: Record<FuelSource, number[] | null>;
+};
+
+const dayFormat = new Intl.DateTimeFormat('en-CA', { timeZone: ZONE, year: 'numeric', month: '2-digit', day: '2-digit' });
+
+export function dayOf(iso: string): string {
+  return dayFormat.format(new Date(iso));
+}
+
+export type SourceQty = Pick<SourceRow, 'qty_report' | 'qty_driver' | 'qty_telematics'>;
+
+export function sourceQty(row: SourceQty, source: FuelSource): number | null {
+  const value = source === 'IMPORT' ? row.qty_report : source === 'DRIVER' ? row.qty_driver : row.qty_telematics;
+  return value == null ? null : Number(value);
+}
+
+/** Линии за месяц `month` (YYYY-MM); `today` обрезает текущий месяц. */
+export function sourceSeries(rows: SourceRow[], month: string, today?: string): SourceSeries {
+  const [year, mon] = month.split('-').map(Number);
+  const length = new Date(Date.UTC(year, mon, 0)).getUTCDate();
+  const days: string[] = [];
+  for (let d = 1; d <= length; d += 1) {
+    const day = `${month}-${String(d).padStart(2, '0')}`;
+    if (today && day > today) break;
+    days.push(day);
+  }
+
+  const own = rows.filter((row) => dayOf(row.filled_at).startsWith(month));
+  const group: Exclude<FuelGroup, null> = own.some((row) => fuelGroup(row.product) === 'LIQUID')
+    ? 'LIQUID'
+    : own.some((row) => fuelGroup(row.product) === 'GAS')
+      ? 'GAS'
+      : 'LIQUID';
+  const inGroup = own.filter((row) => fuelGroup(row.product) === group);
+
+  const index = new Map(days.map((day, i) => [day, i]));
+  const lines = {} as Record<FuelSource, number[] | null>;
+  for (const source of FUEL_SOURCES) {
+    const daily = days.map(() => 0);
+    let seen = false;
+    for (const row of inGroup) {
+      const qty = sourceQty(row, source);
+      const i = index.get(dayOf(row.filled_at));
+      if (qty == null || i == null) continue;
+      daily[i] += qty;
+      seen = true;
+    }
+    let sum = 0;
+    lines[source] = seen ? daily.map((value) => Math.round((sum += value) * 10) / 10) : null;
+  }
+
+  return { days, unit: group === 'GAS' ? 'kg' : 'l', lines };
+}
+
+/**
+ * Насколько расходятся источники одной заправки: (макс − мин) / макс.
+ * null — источник один или ни одного.
+ */
+export function sourceSpread(row: SourceQty): number | null {
+  const values = FUEL_SOURCES.map((source) => sourceQty(row, source)).filter((v): v is number => v != null && v > 0);
+  if (values.length < 2) return null;
+  const max = Math.max(...values);
+  return (max - Math.min(...values)) / max;
+}
+
+/** Расхождение, которое стоит показать: больше 2 %. */
+export const SPREAD_NOTICE = 0.02;
+
 /* ── Месячный отчёт заправщика ──────────────────────────────────── */
 
 /**
