@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { Archivo, Geist, Geist_Mono } from 'next/font/google';
+import { Geist_Mono, Source_Sans_3 } from 'next/font/google';
 import { APP } from '@/lib/config';
 import { SITE_URL } from '@/lib/seo';
 import { getDictionary, isLocale, locales } from '@/lib/i18n';
@@ -19,38 +19,21 @@ import '../globals.css';
  */
 
 /*
- * Только латиница. Кириллический поднабор грузился, пока интерфейс был
- * русским; сейчас это два лишних файла шрифта на каждой странице ради
- * букв, которых на ней нет.
+ * Source Sans 3 (29.10.2026, как в OwnerHub): спокойный северный гротеск
+ * для текста и заголовков. Подмножества латиница, расширенная латиница и
+ * кириллица: у Geist была только латиница, и эстонские, латышские,
+ * литовские, польские и русские буквы подставлялись системным шрифтом.
+ * Файлы подмножеств грузятся только под те знаки, что есть на странице.
  */
-const sans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
+const sans = Source_Sans_3({
+  variable: '--font-sans-loaded',
+  subsets: ['latin', 'latin-ext', 'cyrillic'],
   display: 'swap',
 });
 
 const mono = Geist_Mono({
   variable: '--font-geist-mono',
   subsets: ['latin'],
-  display: 'swap',
-});
-
-/*
- * Шрифт заголовка первого экрана — и только его.
- *
- * Geist хорош в тексте и ровно тем плох в заголовке: он нейтрален.
- * Три коротких утверждения поверх съёмки порта должны звучать как
- * надпись на борту, а не как подпись к абзацу.
- *
- * Archivo взят за плотность и закрытые апертуры: буквы стоят тесно и
- * держат вес, но остаются тем же гротеском, что и текст, поэтому
- * страница не распадается на два разных характера. Латиницы достаточно
- * — ä и ö в ней есть, а других алфавитов на витрине нет.
- */
-const display = Archivo({
-  variable: '--font-display',
-  subsets: ['latin'],
-  weight: ['700'],
   display: 'swap',
 });
 
@@ -99,7 +82,7 @@ export default async function LocaleLayout({
   return (
     <html
       lang={dictionary.meta.htmlLang}
-      className={`${sans.variable} ${mono.variable} ${display.variable} h-full antialiased`}
+      className={`${sans.variable} ${mono.variable} h-full antialiased`}
     >
       <head>
         {/* До React: автопереводчик браузера не роняет страницу (см. translate-guard). */}

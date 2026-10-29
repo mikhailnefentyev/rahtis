@@ -83,7 +83,7 @@ export async function LandingSections({ locale, showBlog = false }: { locale: Lo
       <section className="border-b border-line bg-surface">
         <div className="mx-auto w-full max-w-6xl px-5 py-20">
           <p className="label-micro">{l.branchesEyebrow}</p>
-          <h2 className="mt-2.5 max-w-[22ch] text-[clamp(26px,3vw,34px)] leading-tight font-semibold tracking-tight text-balance">
+          <h2 className="mt-2.5 max-w-[30ch] text-[clamp(26px,3vw,34px)] leading-tight font-semibold tracking-tight text-balance">
             {l.branchesTitle}
           </h2>
           <p className="mt-3 max-w-[62ch] text-[16px] text-ink-muted">{l.branchesLede}</p>
@@ -111,7 +111,7 @@ export async function LandingSections({ locale, showBlog = false }: { locale: Lo
                 ],
               },
             ].map((card) => (
-              <Card key={card.title} className="border-t-2 border-t-accent">
+              <Card key={card.title} >
                 <CardBody className="flex h-full flex-col">
                   <p className="label-micro" data-accent>
                     {card.eyebrow}
@@ -177,7 +177,7 @@ export async function LandingSections({ locale, showBlog = false }: { locale: Lo
       {/* ── Что мы делаем ──────────────────────────────────────── */}
       <section id="service" className="mx-auto w-full max-w-6xl px-5 py-20">
         <p className="label-micro">{l.helpEyebrow}</p>
-        <h2 className="mt-2.5 max-w-[22ch] text-[clamp(26px,3vw,34px)] leading-tight font-semibold tracking-tight text-balance">
+        <h2 className="mt-2.5 max-w-[30ch] text-[clamp(26px,3vw,34px)] leading-tight font-semibold tracking-tight text-balance">
           {l.helpTitle}
         </h2>
         <p className="mt-3 max-w-[62ch] text-[16px] text-ink-muted">{l.helpLede}</p>
@@ -196,7 +196,7 @@ export async function LandingSections({ locale, showBlog = false }: { locale: Lo
               * только прочитав. Цвет здесь не украшение, а граница —
               * он говорит, где начинается следующая карточка.
               */
-            <Card key={card.title} className="border-t-2 border-t-accent">
+            <Card key={card.title} >
               <CardBody>
                 <p className="label-micro" data-accent>
                   {card.eyebrow}
@@ -298,7 +298,7 @@ export async function LandingSections({ locale, showBlog = false }: { locale: Lo
                 * эта секция, поэтому номер стал размером с заголовок,
                 * а полоса слева повторяет его цветом.
                 */
-              <Card key={step.n} className="border-l-2 border-l-accent">
+              <Card key={step.n} >
                 <CardBody>
                   <Mono className="text-[26px] leading-none font-bold tracking-[0.02em] text-accent">
                     {step.n}
@@ -315,7 +315,7 @@ export async function LandingSections({ locale, showBlog = false }: { locale: Lo
       {/* ── Сбои ───────────────────────────────────────────────── */}
       <section className="mx-auto w-full max-w-6xl px-5 py-20">
         <p className="label-micro">{l.faultsEyebrow}</p>
-        <h2 className="mt-2.5 max-w-[24ch] text-[clamp(26px,3vw,34px)] leading-tight font-semibold tracking-tight text-balance">
+        <h2 className="mt-2.5 max-w-[32ch] text-[clamp(26px,3vw,34px)] leading-tight font-semibold tracking-tight text-balance">
           {l.faultsTitle}
         </h2>
         <p className="mt-3 max-w-[62ch] text-[16px] text-ink-muted">{l.faultsLede}</p>
@@ -338,7 +338,7 @@ export async function LandingSections({ locale, showBlog = false }: { locale: Lo
                     * «Двумя дверями» той же ширины это читалось как
                     * второсортность, хотя секция равная.
                     */}
-                  <span className="block max-w-[26ch] text-[16px] font-semibold text-ink">
+                  <span className="block max-w-[34ch] text-[16px] font-semibold text-ink">
                     {fault.when}
                   </span>
                   <span className="mt-1 block text-[16px] text-ink-muted">{fault.then}</span>
@@ -493,7 +493,7 @@ export async function LandingSections({ locale, showBlog = false }: { locale: Lo
         <div className="mt-8 grid gap-4 md:grid-cols-2">
           <Card>
             <CardBody className="flex flex-col gap-3 p-6">
-              <span className="self-start rounded-pill border border-accent-line bg-accent-wash px-2.5 py-1 text-[11px] font-semibold text-accent">
+              <span className="self-start rounded-control border border-accent-line bg-accent-wash px-2.5 py-1 text-[11px] font-semibold text-accent">
                 {l.serviceLive}
               </span>
               <h3 className="text-[20px] font-semibold tracking-tight">
@@ -514,7 +514,7 @@ export async function LandingSections({ locale, showBlog = false }: { locale: Lo
             */}
           <Card>
             <CardBody className="flex flex-col gap-3 p-6">
-              <span className="self-start rounded-pill border border-accent-line bg-accent-wash px-2.5 py-1 text-[11px] font-semibold text-accent">
+              <span className="self-start rounded-control border border-accent-line bg-accent-wash px-2.5 py-1 text-[11px] font-semibold text-accent">
                 {l.serviceLive}
               </span>
               <h3 className="text-[20px] font-semibold tracking-tight">
@@ -533,7 +533,7 @@ export async function LandingSections({ locale, showBlog = false }: { locale: Lo
             */}
           <Card>
             <CardBody className="flex flex-col gap-3 p-6">
-              <span className="self-start rounded-pill border border-accent-line bg-accent-wash px-2.5 py-1 text-[11px] font-semibold text-accent">
+              <span className="self-start rounded-control border border-accent-line bg-accent-wash px-2.5 py-1 text-[11px] font-semibold text-accent">
                 {l.serviceLive}
               </span>
               <h3 className="text-[20px] font-semibold tracking-tight">
@@ -550,7 +550,7 @@ export async function LandingSections({ locale, showBlog = false }: { locale: Lo
             */}
           <Card>
             <CardBody className="flex flex-col gap-3 p-6">
-              <span className="self-start rounded-pill border border-accent-line bg-accent-wash px-2.5 py-1 text-[11px] font-semibold text-accent">
+              <span className="self-start rounded-control border border-accent-line bg-accent-wash px-2.5 py-1 text-[11px] font-semibold text-accent">
                 {l.serviceLive}
               </span>
               <h3 className="text-[20px] font-semibold tracking-tight">{l.service3}</h3>
@@ -565,7 +565,7 @@ export async function LandingSections({ locale, showBlog = false }: { locale: Lo
             */}
           <Card className="md:col-span-2">
             <CardBody className="flex flex-col gap-3 p-6">
-              <span className="self-start rounded-pill border border-accent-line bg-accent-wash px-2.5 py-1 text-[11px] font-semibold text-accent">
+              <span className="self-start rounded-control border border-accent-line bg-accent-wash px-2.5 py-1 text-[11px] font-semibold text-accent">
                 {l.serviceLive}
               </span>
               <h3 className="text-[20px] font-semibold tracking-tight">
@@ -598,7 +598,7 @@ export async function LandingSections({ locale, showBlog = false }: { locale: Lo
         */}
       <section id="api" className="mx-auto w-full max-w-6xl px-5 py-20">
         <p className="label-micro">{l.apiEyebrow}</p>
-        <h2 className="mt-2.5 max-w-[24ch] text-[clamp(26px,3vw,34px)] leading-tight font-semibold tracking-tight text-balance">
+        <h2 className="mt-2.5 max-w-[32ch] text-[clamp(26px,3vw,34px)] leading-tight font-semibold tracking-tight text-balance">
           {l.apiTitle}
         </h2>
         <p className="mt-3 max-w-[62ch] text-[16px] text-ink-muted">{l.apiLede}</p>
@@ -611,7 +611,7 @@ export async function LandingSections({ locale, showBlog = false }: { locale: Lo
               { eyebrow: l.apiAllEyebrow, title: l.apiAllTitle, text: l.apiAllText },
               { eyebrow: l.apiSafeEyebrow, title: l.apiSafeTitle, text: l.apiSafeText },
             ].map((card) => (
-              <Card key={card.title} className="border-t-2 border-t-accent">
+              <Card key={card.title} >
                 <CardBody>
                   <p className="label-micro" data-accent>
                     {card.eyebrow}

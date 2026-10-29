@@ -1,15 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { useRef } from 'react';
 
 /**
  * Карточка задачи на обзоре: число, что ждёт, куда идти.
  *
- * Единственное место кабинета с объёмом. Под курсором карточка чуть
- * наклоняется (до 4°) и ловит блик — взгляд идёт к делу, а не к
- * украшениям. Только с мышью: на телефоне наклонять нечем, а при
- * «уменьшить движение» карточка стоит.
+ * С 29.10.2026 плоская, как весь кабинет: наклон и блик под курсором
+ * убраны вместе с остальным «объёмом» (консервативный стиль, как в
+ * OwnerHub). Имя компонента оставлено, чтобы не трогать места вызова.
  */
 export function TiltCard({
   href,
@@ -28,29 +26,11 @@ export function TiltCard({
   tone: 'warn' | 'danger' | 'live' | 'ok' | 'neutral';
   index: number;
 }) {
-  const ref = useRef<HTMLAnchorElement>(null);
   const quiet = count === 0;
-
-  function move(e: React.PointerEvent<HTMLAnchorElement>) {
-    const el = ref.current;
-    if (!el || e.pointerType !== 'mouse') return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const r = el.getBoundingClientRect();
-    const x = (e.clientX - r.left) / r.width;
-    const y = (e.clientY - r.top) / r.height;
-    el.style.transform = `perspective(900px) rotateX(${((0.5 - y) * 4).toFixed(2)}deg) rotateY(${((x - 0.5) * 5).toFixed(2)}deg) translateY(-3px)`;
-    el.style.setProperty('--mx', `${x * 100}%`);
-    el.style.setProperty('--my', `${y * 100}%`);
-  }
 
   return (
     <Link
-      ref={ref}
       href={href}
-      onPointerMove={move}
-      onPointerLeave={() => {
-        if (ref.current) ref.current.style.transform = '';
-      }}
       className="task-card rise flex flex-col"
       style={
         {

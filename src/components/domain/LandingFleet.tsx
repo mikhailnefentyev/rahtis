@@ -99,7 +99,7 @@ export async function LandingFleet({ locale }: { locale: Locale }) {
     <section id="fleet" className="border-y border-line bg-surface">
       <div className="mx-auto w-full max-w-6xl px-5 py-20">
         <p className="label-micro">{l.fleetEyebrow}</p>
-        <h2 className="mt-2.5 max-w-[26ch] text-[clamp(26px,3vw,34px)] leading-tight font-semibold tracking-tight text-balance">{l.fleetTitle}</h2>
+        <h2 className="mt-2.5 max-w-[34ch] text-[clamp(26px,3vw,34px)] leading-tight font-semibold tracking-tight text-balance">{l.fleetTitle}</h2>
         <p className="mt-3 max-w-[62ch] text-[16px] text-ink-muted">{l.fleetLede}</p>
 
         {/* ── Конструктор сцепок ── */}
@@ -114,7 +114,7 @@ export async function LandingFleet({ locale }: { locale: Locale }) {
               const name = l[`combo${combo.key}`];
               const [code, ...rest] = name.split(' · ');
               return (
-                <Card key={combo.key} className="border-t-2 border-t-accent">
+                <Card key={combo.key} >
                   <CardBody className="flex h-full flex-col">
                     <ComboSketch combo={combo} />
                     <p className="mt-4 label-micro" data-accent>
@@ -179,11 +179,11 @@ export async function LandingPricing({ locale }: { locale: Locale }) {
     <section id="pricing" className="border-t border-line">
       <div className="mx-auto w-full max-w-6xl px-5 py-20">
         <p className="label-micro">{l.pricingEyebrow}</p>
-        <h2 className="mt-2.5 max-w-[24ch] text-[clamp(26px,3vw,34px)] leading-tight font-semibold tracking-tight text-balance">{l.pricingTitle}</h2>
+        <h2 className="mt-2.5 max-w-[32ch] text-[clamp(26px,3vw,34px)] leading-tight font-semibold tracking-tight text-balance">{l.pricingTitle}</h2>
         <p className="mt-3 max-w-[62ch] text-[16px] text-ink-muted">{l.pricingLede}</p>
 
         <div className="mt-8 grid gap-4 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
-          <Card className="border-t-2 border-t-accent">
+          <Card >
             <CardBody className="p-6">
               <p className="label-micro" data-accent>
                 {l.priceOwnEyebrow}
@@ -214,7 +214,7 @@ export async function LandingPricing({ locale }: { locale: Locale }) {
                 </tbody>
               </table>
 
-              <p className="mt-4 inline-flex rounded-pill border border-accent-line bg-accent-wash px-3 py-1 text-[13px] font-semibold text-accent">
+              <p className="mt-4 inline-flex rounded-control border border-accent-line bg-accent-wash px-3 py-1 text-[13px] font-semibold text-accent">
                 {l.priceYear}
               </p>
             </CardBody>
