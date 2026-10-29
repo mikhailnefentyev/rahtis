@@ -1,12 +1,12 @@
 import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
 
-import '@/lib/reports/pdfFont';
+import { PDF_FONT } from '@/lib/reports/pdfFont';
 import { ansi } from '@/lib/reports/PeriodReportPdf';
 
 /**
  * Отчёт по водителям — PDF для внутренних выплат.
  *
- * Та же раскладка и та же встроенная Helvetica, что у отчёта за период:
+ * Та же раскладка и тот же шрифт (Noto Sans, pdfFont), что у отчёта за период:
  * альбомный лист, сетка строк, итог жирным. Дисклеймер — прямо под
  * заголовком, до любой цифры: это справка, а не расчёт зарплаты.
  *
@@ -15,9 +15,9 @@ import { ansi } from '@/lib/reports/PeriodReportPdf';
  */
 
 const s = StyleSheet.create({
-  page: { paddingTop: 32, paddingBottom: 44, paddingHorizontal: 32, fontSize: 8, color: '#0c1626' },
-  brand: { fontSize: 13, fontFamily: 'Helvetica-Bold', letterSpacing: 1 },
-  title: { fontSize: 12, fontFamily: 'Helvetica-Bold', marginTop: 14 },
+  page: { fontFamily: PDF_FONT, paddingTop: 32, paddingBottom: 44, paddingHorizontal: 32, fontSize: 8, color: '#0c1626' },
+  brand: { fontSize: 13, fontWeight: 'bold', letterSpacing: 1 },
+  title: { fontSize: 12, fontWeight: 'bold', marginTop: 14 },
   sub: { fontSize: 8.5, color: '#44546b', marginTop: 3 },
   disclaimer: {
     fontSize: 8,
@@ -36,9 +36,9 @@ const s = StyleSheet.create({
   },
   row: { flexDirection: 'row', paddingVertical: 3, borderBottomWidth: 0.5, borderBottomColor: '#dae0ea' },
   total: { flexDirection: 'row', paddingVertical: 3, borderBottomWidth: 1, borderBottomColor: '#0c1626' },
-  th: { fontSize: 7, fontFamily: 'Helvetica-Bold', color: '#44546b', paddingRight: 4 },
+  th: { fontSize: 7, fontWeight: 'bold', color: '#44546b', paddingRight: 4 },
   cell: { fontSize: 7.5, paddingRight: 4 },
-  bold: { fontFamily: 'Helvetica-Bold' },
+  bold: { fontWeight: 'bold' },
   right: { textAlign: 'right' },
   empty: { fontSize: 8, color: '#44546b', marginTop: 10 },
   footer: {

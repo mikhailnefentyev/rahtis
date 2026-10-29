@@ -1,14 +1,12 @@
 import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
 
-import './pdfFont';
+import { PDF_FONT } from './pdfFont';
 
 /**
  * Отчёт за период — PDF для чтения.
  *
- * Та же встроенная Helvetica, что у недельного отчёта (см. WeeklyReport):
- * Windows-1252, без файла шрифта. Всё, что в кодировку не входит, до
- * вёрстки приводится к ближайшему латинскому знаку функцией ansi() —
- * иначе литовское «ė» в имени перевозчика молча превратилось бы в мусор.
+ * Шрифт — Noto Sans, общий для всех PDF (pdfFont): кириллица, ė, ł и
+ * стрелки выводятся как есть.
  *
  * Альбомный лист: у перевозчика и оператора до пятнадцати колонок, и в
  * книжном они сжимаются до нечитаемого.
@@ -17,51 +15,33 @@ import './pdfFont';
  * форматирует вызывающий — здесь только раскладка.
  */
 
-const CP1252_EXTRA = '€‚ƒ„…†‡ˆ‰Š‹ŒŽ‘’“”•–—˜™š›œžŸ';
-const FALLBACK: Record<string, string> = {
-  ł: 'l',
-  Ł: 'L',
-  đ: 'd',
-  Đ: 'D',
-  ı: 'i',
-  ß: 'ss',
-  '→': '-',
-  '≈': '~',
-};
+/**
+ * Знаки, которых нет в Noto Sans (pdfFont): без подмены стрелка выходит
+ * апострофом (проверено 29.10.2026). Остальное — кириллица, ė, ł, ų —
+ * шрифт рисует сам; до перехода с Helvetica здесь подменялось всё вне
+ * Windows-1252.
+ */
+const MISSING: Record<string, string> = { '→': '-', '←': '-', '≈': '~' };
 
-/** Строка, которую Helvetica с WinAnsiEncoding нарисует без подмены. */
 export function ansi(value: string): string {
-  let out = '';
-  for (const ch of value) {
-    const code = ch.codePointAt(0)!;
-    if (code < 0x100 || CP1252_EXTRA.includes(ch)) {
-      out += ch;
-      continue;
-    }
-    if (FALLBACK[ch]) {
-      out += FALLBACK[ch];
-      continue;
-    }
-    const base = ch.normalize('NFD').replace(/[̀-ͯ]/g, '');
-    out += base && base.codePointAt(0)! < 0x100 ? base : '?';
-  }
-  return out;
+  return value.replace(/[→←≈]/g, (ch) => MISSING[ch] ?? ch);
 }
 
 const s = StyleSheet.create({
   page: {
+    fontFamily: PDF_FONT,
     paddingTop: 32,
     paddingBottom: 44,
     paddingHorizontal: 32,
     fontSize: 8,
     color: '#0c1626',
   },
-  brand: { fontSize: 13, fontFamily: 'Helvetica-Bold', letterSpacing: 1 },
+  brand: { fontSize: 13, fontWeight: 'bold', letterSpacing: 1 },
   operator: { fontSize: 7.5, color: '#44546b', marginTop: 2 },
-  title: { fontSize: 12, fontFamily: 'Helvetica-Bold', marginTop: 14 },
+  title: { fontSize: 12, fontWeight: 'bold', marginTop: 14 },
   sub: { fontSize: 8.5, color: '#44546b', marginTop: 3 },
   note: { fontSize: 7.5, color: '#44546b', marginTop: 8 },
-  section: { fontSize: 9.5, fontFamily: 'Helvetica-Bold', marginTop: 16 },
+  section: { fontSize: 9.5, fontWeight: 'bold', marginTop: 16 },
   head: {
     flexDirection: 'row',
     marginTop: 6,
@@ -77,7 +57,7 @@ const s = StyleSheet.create({
   },
   th: {
     fontSize: 7,
-    fontFamily: 'Helvetica-Bold',
+    fontWeight: 'bold',
     color: '#44546b',
     paddingRight: 4,
   },
@@ -91,7 +71,7 @@ const s = StyleSheet.create({
     borderBottomWidth: 0.5,
     borderBottomColor: '#dae0ea',
   },
-  bold: { fontFamily: 'Helvetica-Bold' },
+  bold: { fontWeight: 'bold' },
   empty: { fontSize: 8, color: '#44546b', marginTop: 6 },
   footer: {
     position: 'absolute',

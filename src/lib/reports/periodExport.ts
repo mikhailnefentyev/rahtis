@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { csvNumber, csvText } from '@/lib/csv';
 import writeExcelFile, { type SheetData } from 'write-excel-file/node';
 import type { Dictionary } from '@/lib/i18n';
 import type { PeriodReport, ReportClaim, ReportLine } from './period';
@@ -305,10 +306,11 @@ export async function periodXlsx(report: PeriodReport, t: Dictionary): Promise<B
 
 /* ── CSV ───────────────────────────────────────────────────────── */
 
+/* Текст (имена, адреса, номера) — с защитой от формул; числа пишет код, они без апострофа (lib/csv). */
 function csvValue(kind: Kind, value: string | number | null): string {
-  if (value == null) return '';
-  const text = kind === 'money' ? Number(value).toFixed(2) : String(value);
-  return /[";\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+  if (kind === 'text' || kind === 'date') return csvText(value);
+  if (value == null) return csvNumber(null);
+  return csvNumber(kind === 'money' ? Number(value).toFixed(2) : String(value));
 }
 
 /**

@@ -1,5 +1,5 @@
 import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
-import '@/lib/reports/pdfFont';
+import { PDF_FONT } from '@/lib/reports/pdfFont';
 import { ansi } from '@/lib/reports/PeriodReportPdf';
 
 /**
@@ -29,17 +29,17 @@ export type SiteInvoicePdfInput = {
 };
 
 const s = StyleSheet.create({
-  page: { paddingTop: 36, paddingBottom: 48, paddingHorizontal: 40, fontSize: 9, color: '#0c1626' },
+  page: { fontFamily: PDF_FONT, paddingTop: 36, paddingBottom: 48, paddingHorizontal: 40, fontSize: 9, color: '#0c1626' },
   row: { flexDirection: 'row', justifyContent: 'space-between' },
-  seller: { fontSize: 13, fontFamily: 'Helvetica-Bold' },
+  seller: { fontSize: 13, fontWeight: 'bold' },
   muted: { color: '#44546b' },
   small: { fontSize: 7.5, color: '#5f6f86' },
-  title: { fontSize: 18, fontFamily: 'Helvetica-Bold', marginTop: 20 },
+  title: { fontSize: 18, fontWeight: 'bold', marginTop: 20 },
   box: { marginTop: 14, flexDirection: 'row', gap: 24 },
   col: { flex: 1 },
   label: { fontSize: 7, color: '#5f6f86', marginBottom: 2, textTransform: 'uppercase' },
   table: { marginTop: 18, borderTopWidth: 1, borderTopColor: '#dae0ea' },
-  head: { flexDirection: 'row', paddingVertical: 4, borderBottomWidth: 1, borderBottomColor: '#dae0ea', fontFamily: 'Helvetica-Bold', fontSize: 8 },
+  head: { flexDirection: 'row', paddingVertical: 4, borderBottomWidth: 1, borderBottomColor: '#dae0ea', fontWeight: 'bold', fontSize: 8 },
   line: { flexDirection: 'row', paddingVertical: 3, borderBottomWidth: 0.5, borderBottomColor: '#eef1f6' },
   cDate: { width: 62 },
   cText: { flex: 1 },
@@ -48,7 +48,7 @@ const s = StyleSheet.create({
   cAmount: { width: 72, textAlign: 'right' },
   totals: { marginTop: 10, alignSelf: 'flex-end', width: 240 },
   totalRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 2 },
-  bold: { fontFamily: 'Helvetica-Bold' },
+  bold: { fontWeight: 'bold' },
   pay: { marginTop: 22, padding: 10, borderWidth: 1, borderColor: '#dae0ea', borderRadius: 4, flexDirection: 'row', gap: 18 },
   footer: { position: 'absolute', bottom: 22, left: 40, right: 40, fontSize: 7, color: '#8894a6', textAlign: 'center' },
 });

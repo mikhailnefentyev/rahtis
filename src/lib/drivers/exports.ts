@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { csvNumber, csvText } from '@/lib/csv';
 import writeExcelFile, { type SheetData } from 'write-excel-file/node';
 import { payableKm, type WorkDay } from '@/lib/driverPay';
 import type { Dictionary } from '@/lib/i18n';
@@ -129,10 +130,11 @@ export async function reportXlsx(report: DriverReport, t: Dictionary): Promise<B
 
 /* ── CSV ───────────────────────────────────────────────────────── */
 
+/* Текст (имена, адреса, номера) — с защитой от формул; числа пишет код, они без апострофа (lib/csv). */
 function csvValue(kind: Kind, value: string | number | null): string {
-  if (value == null) return '';
-  const text = kind === 'money' || kind === 'hours' ? Number(value).toFixed(2) : String(value);
-  return /[";\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+  if (kind === 'text' || kind === 'date') return csvText(value);
+  if (value == null) return csvNumber(null);
+  return csvNumber(kind === 'money' || kind === 'hours' ? Number(value).toFixed(2) : String(value));
 }
 
 export function reportCsv(report: DriverReport, t: Dictionary): string {

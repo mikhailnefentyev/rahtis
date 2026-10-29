@@ -1,19 +1,13 @@
 import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
 
-import './pdfFont';
+import { PDF_FONT } from './pdfFont';
 
 /**
  * Недельный отчёт.
  *
- * Шрифт не регистрируется. Встроенная Helvetica выводится с
- * WinAnsiEncoding, а это Windows-1252: ä, ö, å, €, ·, — в ней есть.
- * Финского и шведского хватает, файл шрифта в репозиторий не нужен.
- *
- * Плата за это — всё, чего в Windows-1252 нет, рисуется неверно и молча.
- * Стрелка U+2192 в первом выпущенном отчёте стала апострофом; свои
- * разделители мы после этого держим внутри кодировки. Но имя польского
- * или литовского перевозчика с ł или ė так же тихо поедет, и починит это
- * только встроенный шрифт с полным Юникодом.
+ * Шрифт — Noto Sans (lib/reports/pdfFont): с 29.10.2026 вместо встроенной
+ * Helvetica, которая знала только Windows-1252 и молча портила кириллицу,
+ * ł, ė и стрелки.
  *
  * Вёрстка своя, а не наша веб-разметка: react-pdf понимает подмножество
  * flexbox и ничего не знает о Tailwind. Числа выровнены по правому краю
@@ -31,17 +25,17 @@ const s = StyleSheet.create({
   parties: { flexDirection: 'row', marginTop: 14 },
   party: { flex: 1, paddingRight: 12 },
   partyLabel: { fontSize: 7, color: '#44546b', marginBottom: 2, textTransform: 'uppercase' },
-  partyName: { fontSize: 9, fontFamily: 'Helvetica-Bold' },
+  partyName: { fontSize: 9, fontWeight: 'bold' },
   partyLine: { fontSize: 8, color: '#0c1626', marginTop: 1 },
-  page: { paddingTop: 40, paddingBottom: 52, paddingHorizontal: 40, fontSize: 9, color: '#0c1626' },
+  page: { fontFamily: PDF_FONT, paddingTop: 40, paddingBottom: 52, paddingHorizontal: 40, fontSize: 9, color: '#0c1626' },
 
-  brand: { fontSize: 14, fontFamily: 'Helvetica-Bold', letterSpacing: 1 },
+  brand: { fontSize: 14, fontWeight: 'bold', letterSpacing: 1 },
   operator: { fontSize: 8, color: '#44546b', marginTop: 2 },
 
-  title: { fontSize: 13, fontFamily: 'Helvetica-Bold', marginTop: 18 },
+  title: { fontSize: 13, fontWeight: 'bold', marginTop: 18 },
   period: { fontSize: 9, color: '#44546b', marginTop: 3 },
   /* Срок оплаты — единственная строка шапки, набранная жирным: её ищут. */
-  due: { fontSize: 10, fontFamily: 'Helvetica-Bold', marginTop: 5 },
+  due: { fontSize: 10, fontWeight: 'bold', marginTop: 5 },
 
   /* Пометка про налог обязана быть на каждой странице, а не только на первой. */
   vat: { fontSize: 8, color: '#44546b', marginTop: 10 },
@@ -59,7 +53,7 @@ const s = StyleSheet.create({
     borderBottomWidth: 0.5,
     borderBottomColor: '#dae0ea',
   },
-  th: { fontSize: 8, fontFamily: 'Helvetica-Bold', color: '#44546b', paddingRight: 6 },
+  th: { fontSize: 8, fontWeight: 'bold', color: '#44546b', paddingRight: 6 },
   cell: { fontSize: 9, paddingRight: 6 },
   right: { textAlign: 'right' },
 
@@ -71,11 +65,11 @@ const s = StyleSheet.create({
     borderTopColor: '#0c1626',
   },
   vatRow: { flexDirection: 'row', marginTop: 4 },
-  totalLabel: { fontSize: 9, fontFamily: 'Helvetica-Bold', paddingRight: 6 },
+  totalLabel: { fontSize: 9, fontWeight: 'bold', paddingRight: 6 },
 
   empty: { marginTop: 18, fontSize: 9, color: '#44546b' },
   ownBlock: { marginTop: 22 },
-  ownTitle: { fontSize: 11, fontFamily: 'Helvetica-Bold', marginBottom: 2 },
+  ownTitle: { fontSize: 11, fontWeight: 'bold', marginBottom: 2 },
 
   note: { marginTop: 22, fontSize: 8, color: '#44546b', lineHeight: 1.5 },
 

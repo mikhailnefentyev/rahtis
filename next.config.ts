@@ -16,12 +16,14 @@ const nextConfig: NextConfig = {
       : ['dev.tsx', 'dev.ts', 'tsx', 'ts'],
 
   /*
-   * Шрифт отчёта о топливе (Noto Sans, кириллица и вся латиница) читается
-   * с диска при сборке PDF. Сам по себе файл в функцию Vercel не попадает:
-   * трассировка видит только import, а не путь в Font.register.
+   * Шрифт всех PDF (Noto Sans, кириллица и вся латиница) читается с диска
+   * при сборке документа. Сам по себе файл в функцию Vercel не попадает:
+   * трассировка видит только import, а не путь в Font.register. PDF
+   * собирают маршруты выгрузки, крон недельного отчёта и действия счетов,
+   * поэтому шрифт кладётся во все функции (два файла, ~1,2 МБ).
    */
   outputFileTracingIncludes: {
-    '/**/carrier/fuel/export': ['./src/lib/reports/fonts/*.ttf'],
+    '/**/*': ['./src/lib/reports/fonts/*.ttf'],
   },
 
   experimental: {

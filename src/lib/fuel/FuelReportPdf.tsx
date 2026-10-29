@@ -1,35 +1,18 @@
-import path from 'node:path';
-import { Document, Font, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
+import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
 
-import '@/lib/reports/pdfFont';
+import { PDF_FONT } from '@/lib/reports/pdfFont';
 
 /**
  * Отчёт о топливе за месяц — PDF.
  *
- * В отличие от остальных отчётов здесь не встроенная Helvetica, а Noto Sans
- * из файла (src/lib/reports/fonts, лицензия OFL): кабинет есть на русском,
- * литовском, латышском и польском, а Helvetica знает только Windows-1252 —
- * кириллица вышла бы знаками вопроса, «ė» и «ų» потеряли бы точки.
- *
- * Файлы шрифта читаются с диска; на Vercel их кладёт в функцию
- * outputFileTracingIncludes (next.config.ts).
+ * Шрифт — Noto Sans, общий для всех PDF (lib/reports/pdfFont).
  *
  * Шаблон получает уже отформатированные строки — считает и форматирует
  * маршрут выгрузки.
  */
 
-const FONTS = path.join(process.cwd(), 'src', 'lib', 'reports', 'fonts');
-
-Font.register({
-  family: 'NotoSans',
-  fonts: [
-    { src: path.join(FONTS, 'NotoSans-Regular.ttf') },
-    { src: path.join(FONTS, 'NotoSans-Bold.ttf'), fontWeight: 'bold' },
-  ],
-});
-
 const s = StyleSheet.create({
-  page: { paddingTop: 32, paddingBottom: 44, paddingHorizontal: 32, fontSize: 8, color: '#0c1626', fontFamily: 'NotoSans' },
+  page: { paddingTop: 32, paddingBottom: 44, paddingHorizontal: 32, fontSize: 8, color: '#0c1626', fontFamily: PDF_FONT },
   brand: { fontSize: 13, fontWeight: 'bold', letterSpacing: 1 },
   title: { fontSize: 12, fontWeight: 'bold', marginTop: 14 },
   sub: { fontSize: 8.5, color: '#44546b', marginTop: 3 },
