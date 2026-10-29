@@ -121,7 +121,7 @@
      Данные — только моноширинным: номера машин, суммы, время, километры
      должны выстраиваться в колонку. */
   --font-sans:
-    var(--font-sans-loaded), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+    var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, 'Cascadia Mono', Consolas, monospace;
 
   --text-micro: 0.625rem; /* 10px — надписи капсом над данными */
@@ -131,19 +131,9 @@
   /* ── Форма ──────────────────────────────────────────────────────
      Плоско и тесно: радиусы маленькие, тени отсутствуют. Глубину даёт
      поверхность и граница, а не размытие. */
-  --radius-control: 3px;
-  --radius-card: 4px;
+  --radius-control: 6px;
+  --radius-card: 10px;
   --radius-pill: 999px;
-  /* Консервативный северный стиль (29.10.2026, как в OwnerHub): утилиты
-     rounded-* Tailwind ужаты до тех же малых радиусов. rounded-full
-     остаётся круглым — только для счётчиков и аватаров. */
-  --radius-xs: 1px;
-  --radius-sm: 2px;
-  --radius-md: 3px;
-  --radius-lg: 4px;
-  --radius-xl: 4px;
-  --radius-2xl: 6px;
-  --radius-3xl: 8px;
 
   /* ── Время ──────────────────────────────────────────────────────
      Три ступени на три разные работы, и больше никаких.
@@ -164,12 +154,10 @@
   /* Тени (8.10.2026). Тонированы в синий: серые на этом фоне выглядят
      грязными. Лежит, поднято под курсором, плавает (лист, панель);
      и цветная тень главной кнопки. */
-  /* С 29.10.2026 — почти плоско: глубину дают граница и поверхность,
-     тень только у того, что действительно лежит поверх (меню, лист). */
-  --shadow-card: 0 1px 1px rgb(12 22 38 / 0.04);
-  --shadow-lift: 0 1px 3px rgb(12 22 38 / 0.08);
-  --shadow-float: 0 10px 28px -10px rgb(12 22 38 / 0.32);
-  --shadow-primary: none;
+  --shadow-card: 0 1px 2px rgb(12 22 38 / 0.05), 0 6px 16px -8px rgb(12 40 70 / 0.12);
+  --shadow-lift: 0 2px 4px rgb(12 22 38 / 0.06), 0 16px 34px -14px rgb(12 40 70 / 0.26);
+  --shadow-float: 0 24px 48px -16px rgb(12 22 38 / 0.38);
+  --shadow-primary: inset 0 1px 0 rgb(255 255 255 / 0.22), 0 8px 18px -8px rgb(13 100 127 / 0.7), 0 1px 2px rgb(12 22 38 / 0.18);
 }
 
 @layer base {
@@ -959,7 +947,7 @@
    * разрядка ужата: три утверждения должны стоять тремя плотными
    * строками, как надпись на борту, а не растекаться по экрану.
    */
-  font-family: var(--font-display), var(--font-sans);
+  font-family: var(--font-display), var(--font-geist-sans), system-ui, sans-serif;
   /*
    * Кегль меньше прежнего, хотя шрифт сменился на более крупный по
    * рисунку: Archivo шире Geist на знак, и на прежних 52 пунктах третья
@@ -974,10 +962,9 @@
    * становилось шесть. Теперь размер едет вместе с шириной и упирается
    * только в потолок.
    */
-  /* С 29.10.2026 — Source Sans 3: потолок 44, чтобы «Полуприцеп, контейнер, груз.» стоял одной строкой. */
-  font-size: clamp(20px, 6.4vw, 44px);
-  line-height: 1.08;
-  letter-spacing: -0.018em;
+  font-size: clamp(20px, 6.8vw, 48px);
+  line-height: 1.06;
+  letter-spacing: -0.026em;
   font-weight: 700;
   color: #ffffff;
   text-wrap: balance;
@@ -1654,7 +1641,7 @@
   gap: 10px;
   min-height: 38px;
   padding: 7px 10px;
-  border-radius: var(--radius-card);
+  border-radius: 9px;
   color: var(--color-night-muted);
   font-size: 13.5px;
   font-weight: 500;
@@ -1688,7 +1675,7 @@
   align-items: center;
   gap: 10px;
   padding: 10px;
-  border-radius: var(--radius-card);
+  border-radius: 12px;
   background: var(--color-night-raised);
   color: var(--color-night-ink);
   font-size: 12.5px;
@@ -1702,7 +1689,7 @@
   flex: none;
   width: 32px;
   height: 32px;
-  border-radius: var(--radius-card);
+  border-radius: 9px;
   color: #ffffff;
   font-family: var(--font-display), var(--font-sans);
   font-weight: 800;
@@ -1735,7 +1722,7 @@
   width: 36px;
   height: 36px;
   border: 1px solid var(--color-line);
-  border-radius: var(--radius-card);
+  border-radius: 10px;
   background: var(--color-surface);
   color: var(--color-ink-muted);
   box-shadow: var(--shadow-card);
@@ -1820,7 +1807,7 @@
     gap: 2px;
     min-height: 48px;
     padding: 6px 2px;
-    border-radius: var(--radius-card);
+    border-radius: 10px;
     color: var(--color-night-muted);
     font-size: 10.5px;
     font-weight: 500;
@@ -1850,7 +1837,7 @@
     flex-direction: column;
     gap: 16px;
     padding: 18px 12px calc(18px + env(safe-area-inset-bottom, 0px));
-    border-radius: 6px 6px 0 0;
+    border-radius: 18px 18px 0 0;
     background: var(--color-night);
     color: var(--color-night-muted);
     box-shadow: var(--shadow-float);
@@ -1899,7 +1886,7 @@
   overflow: hidden;
   padding: 16px 16px 14px 18px;
   border: 1px solid var(--color-line);
-  border-radius: var(--radius-card);
+  border-radius: 14px;
   background: var(--color-surface);
   box-shadow: var(--shadow-card), inset 0 1px 0 rgb(255 255 255 / 0.9);
   transform-style: preserve-3d;
@@ -2080,7 +2067,7 @@
 
 /* Очертания содержимого, пока раздел загружается. */
 .skeleton {
-  border-radius: var(--radius-card);
+  border-radius: 12px;
   background: linear-gradient(90deg, var(--color-raised) 0%, var(--color-sunken) 50%, var(--color-raised) 100%);
   background-size: 200% 100%;
   animation: skeleton-shine 1.2s ease-in-out infinite;
@@ -2112,78 +2099,6 @@
 .blog-article table { display: block; overflow-x: auto; width: 100%; margin: 1.2em 0; border-collapse: collapse; font-size: 14px; line-height: 1.5; }
 .blog-article th, .blog-article td { padding: 8px 10px; border: 1px solid var(--color-line); text-align: start; vertical-align: top; }
 .blog-article th { background: var(--color-sunken); font-weight: 600; }
-.blog-toc { margin: 1.6em 0; padding: 14px 18px; border: 1px solid var(--color-line); border-radius: var(--radius-card); }
+.blog-toc { margin: 1.6em 0; padding: 14px 18px; border: 1px solid var(--color-line); border-radius: 8px; }
 .blog-toc h2 { margin: 0 0 0.4em; font-size: 15px; }
 .blog-toc ol { margin: 0; font-size: 14px; }
-
-
-/* ── Консервативный северный стиль (29.10.2026) ──────────────────────
-   Как в OwnerHub: плоско, тонкие линии, малые радиусы, без градиентов,
-   свечений и наклонов. Пользователь: «дизайн сделай более консервативный
-   как делали в ownerhub». Правила ниже перекрывают прежние «объёмные»
-   блоки выше по файлу; убрать этот раздел — вернётся прежний вид. */
-
-/* Иллюстрация телефона: без свечения за ним, наклона и блика. */
-.assistant__stage::before { display: none; }
-.phone {
-  transform: none;
-  border-radius: 36px;
-  background: #1f262f;
-  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.55), 0 12px 28px -16px rgb(0 0 0 / 0.6);
-}
-.phone__glare { display: none; }
-
-/* Кабинет: текущий пункт меню — полоса слева, а не подсвеченная плашка. */
-.cab-nav__link[aria-current='page'] {
-  background: var(--color-night-raised);
-  box-shadow: inset 2px 0 0 var(--color-accent-bright);
-}
-.cab-company { border-radius: var(--radius-card); }
-.cab-avatar {
-  border-radius: var(--radius-control);
-  background: var(--color-accent);
-  box-shadow: none;
-  font-family: var(--font-sans);
-  font-weight: 700;
-}
-
-/* Карточки задач: ровные, без наклона и блика под курсором. */
-.task-card {
-  border-radius: var(--radius-card);
-  box-shadow: none;
-  transform: none !important;
-  transition: border-color var(--duration-quick);
-}
-.task-card::after { display: none; }
-.task-card:hover { box-shadow: none; border-color: var(--color-line-strong); }
-
-/* Строгие графики: прямоугольные столбики одним цветом, текущая неделя темнее. */
-.pulse-bars__bar {
-  background: var(--color-accent-line);
-  border-radius: 1px;
-  box-shadow: none;
-}
-.pulse-bars__col:last-child .pulse-bars__bar:not([data-zero]) { background: var(--color-accent); }
-.trip-seg i { background: var(--color-ok); }
-
-/* Кнопка помощника: плоская, без парения. */
-.assistant-fab {
-  border-radius: var(--radius-card);
-  background: var(--color-accent);
-  box-shadow: 0 1px 3px rgb(12 22 38 / 0.25);
-  animation: none;
-}
-
-/* Кнопки шапки, переключатель языка, метки и чипы — прямоугольные с малым
-   радиусом. Круглыми остаются только счётчики (unread, cab-nav__count). */
-.site-head__signin,
-.site-head__apply,
-.locale-switch,
-.locale-switch a,
-.locale-menu > summary,
-.locale-menu > summary > span[data-on],
-.pulse-chip,
-.trip-preview__badge,
-.cab-terms,
-.cab-terms__btn { border-radius: var(--radius-control); }
-.site-head__apply { box-shadow: none; background-image: none; }

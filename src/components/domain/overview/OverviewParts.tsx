@@ -311,7 +311,7 @@ function TripRow({
 
 function Kpi({ value, label }: { value: string; label: string }) {
   return (
-    <div className="rounded-control border border-line bg-sunken px-3 py-2">
+    <div className="rounded-[11px] border border-line bg-sunken px-3 py-2 shadow-[inset_0_1px_2px_rgb(12_22_38/0.04)]">
       <Mono className="block font-display text-[18px] leading-tight font-extrabold">{value}</Mono>
       <span className="text-[11.5px] text-ink-muted">{label}</span>
     </div>
@@ -322,7 +322,7 @@ function QuickLink({ href, title, text }: { href: string; title: string; text: s
   return (
     <Link
       href={href}
-      className="flex items-center gap-3 rounded-xl border border-line bg-surface p-3 transition-colors duration-150 hover:border-line-strong"
+      className="flex items-center gap-3 rounded-xl border border-line bg-surface p-3 shadow-card transition-[transform,box-shadow] duration-150 hover:-translate-y-0.5 hover:shadow-lift"
     >
       <span className="min-w-0">
         <b className="block text-[14px]">{title}</b>
