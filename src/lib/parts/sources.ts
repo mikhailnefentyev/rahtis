@@ -16,7 +16,7 @@
  * компонент страницы.
  */
 
-export const PARTS_COUNTRIES = ['FI', 'SE', 'NO', 'EE', 'LV', 'LT', 'PL', 'DE'] as const;
+export const PARTS_COUNTRIES = ['FI', 'SE', 'NO', 'DK', 'EE', 'LV', 'LT', 'PL', 'DE'] as const;
 export type PartsCountry = (typeof PARTS_COUNTRIES)[number];
 
 export type PartsMode = 'PARTS' | 'TYRES';
@@ -218,6 +218,12 @@ const PARTS: Record<PartsCountry, Entry[]> = {
     { id: 'finn', name: 'FINN.no Torget', kind: 'USED', pricesPublic: true, direct: true, url: (c) => `https://www.finn.no/recommerce/forsale/search?q=${enc(c.number ?? c.text)}` },
     { id: 'mascus-no', name: 'Mascus', kind: 'USED', pricesPublic: true, direct: true, url: (c) => `https://www.mascus.no/+/${enc(c.number ?? c.text)},1,relevance,search.html` },
   ],
+  DK: [
+    { id: 'europart-dk', name: 'Europart Danmark', kind: 'NEW', pricesPublic: false, direct: false, url: site('https://www.europart.net/dk/') },
+    { id: 'ftz-truck', name: 'FTZ Truck', kind: 'NEW', pricesPublic: false, direct: false, url: site('https://www.ftz.dk/ftz-truck/'), phone: '65 65 40 00' },
+    { id: 'dba', name: 'DBA.dk', kind: 'USED', pricesPublic: true, direct: true, url: (c) => `https://www.dba.dk/recommerce/forsale/search?q=${enc(c.number ?? c.text)}` },
+    { id: 'mascus-dk', name: 'Mascus', kind: 'USED', pricesPublic: true, direct: true, url: (c) => `https://www.mascus.dk/+/${enc(c.number ?? c.text)},1,relevance,search.html` },
+  ],
 };
 
 const TYRES: Record<PartsCountry, Entry[]> = {
@@ -285,6 +291,10 @@ const TYRES: Record<PartsCountry, Entry[]> = {
     { id: 'dekkpartner', name: 'Dekkpartner', kind: 'TYRES', pricesPublic: false, direct: false, mobile24: true, url: site('https://www.dekkpartner.no/lastebildekk') },
     { id: 'finn-t', name: 'FINN.no Torget', kind: 'USED', pricesPublic: true, direct: true, url: (c) => `https://www.finn.no/recommerce/forsale/search?q=${enc(c.size)}` },
   ],
+  DK: [
+    { id: 'sds', name: 'Super Dæk Service', kind: 'TYRES', pricesPublic: false, direct: false, mobile24: true, url: site('https://sds.dk/erhverv/'), phone: '76 15 30 00' },
+    { id: 'dba-t', name: 'DBA.dk', kind: 'USED', pricesPublic: true, direct: true, url: (c) => `https://www.dba.dk/recommerce/forsale/search?q=${enc(c.size)}` },
+  ],
 };
 
 /* Слово для поиска в Google на языке страны. */
@@ -297,6 +307,7 @@ const WEB_WORD: Record<PartsCountry, { parts: string; tyres: string }> = {
   DE: { parts: 'Ersatzteil', tyres: 'LKW Reifen' },
   SE: { parts: 'reservdel', tyres: 'lastbilsdäck' },
   NO: { parts: 'reservedel', tyres: 'lastebildekk' },
+  DK: { parts: 'reservedel', tyres: 'lastbildæk' },
 };
 
 /** Опубликованные номера круглосуточной помощи при проколе, проверены 29.10.2026. */
@@ -322,6 +333,7 @@ export const BREAKDOWN: Record<PartsCountry, Breakdown[]> = {
     { name: 'VianorFlex 24/7', phone: '+47 22 07 04 04', url: 'https://vianor.no/bedriftskunder/bedriftstjenester/vianor-flex-24-7/', contractOnly: false },
     { name: 'BestDrive 24-timers veihjelp', phone: '920 70 111', url: 'https://www.bestdrive.no/bedrift/veihjelp.html', contractOnly: true },
   ],
+  DK: [{ name: 'Road Mobility Services', phone: '+45 75 55 45 45', url: 'https://www.roadmobilityservices.com/da', contractOnly: true }],
 };
 
 export function partsSources(q: PartsQuery & { country?: PartsCountry; mode?: PartsMode }): PartsSource[] {
@@ -415,6 +427,13 @@ const QUOTE: Record<PartsCountry, { subject: string; vehicle: string; note: stri
     note: 'Annet',
     ask: 'Vi ber om pris, leveringstid og om delen er original eller tilsvarende.',
     tyresAsk: 'Vi ber om pris, leveringstid, merke og mønster (styring, driv, henger) samt pris for montering.',
+  },
+  DK: {
+    subject: 'Tilbudsforespørgsel',
+    vehicle: 'Køretøj',
+    note: 'Øvrigt',
+    ask: 'Vi beder om pris, leveringstid og om delen er original eller tilsvarende.',
+    tyresAsk: 'Vi beder om pris, leveringstid, mærke og mønster (styre, træk, trailer) samt pris for montering.',
   },
 };
 

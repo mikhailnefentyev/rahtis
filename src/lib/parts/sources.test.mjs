@@ -9,7 +9,7 @@ const find = (list, id) => list.find((s) => s.id === id);
 
 test('страна: известная — как есть, иначе Финляндия', () => {
   assert.equal(partsCountry('lt'), 'LT');
-  assert.equal(partsCountry('DK'), 'FI');
+  assert.equal(partsCountry('US'), 'FI');
   assert.equal(partsCountry(null), 'FI');
 });
 
@@ -75,4 +75,10 @@ test('Швеция и Норвегия: поиск по номеру у глав
   assert.equal(find(se, 'rydahls').url, 'https://www.rydahlsreservdelar.se/search?q=21620181');
   assert.equal(find(no, 'vdlparts').url, 'https://www.vdlparts.no/search?q=21620181');
   assert.match(quoteRequestText({ query: '21620181', make: null, plate: null, company: 'Oy', note: '', country: 'NO' }), /^Tilbudsforespørsel: 21620181/);
+});
+
+test('Дания: объявления по номеру и запрос на датском', () => {
+  const dk = partsSources({ query: '21620181', make: null, plate: null, country: 'DK' });
+  assert.equal(find(dk, 'dba').url, 'https://www.dba.dk/recommerce/forsale/search?q=21620181');
+  assert.match(quoteRequestText({ query: '21620181', make: null, plate: null, company: 'Oy', note: '', country: 'DK' }), /^Tilbudsforespørgsel: 21620181/);
 });
