@@ -9,7 +9,7 @@ const find = (list, id) => list.find((s) => s.id === id);
 
 test('страна: известная — как есть, иначе Финляндия', () => {
   assert.equal(partsCountry('lt'), 'LT');
-  assert.equal(partsCountry('SE'), 'FI');
+  assert.equal(partsCountry('DK'), 'FI');
   assert.equal(partsCountry(null), 'FI');
 });
 
@@ -67,4 +67,12 @@ test('Inter Cars в Финляндии — эстонский магазин с 
   assert.equal(find(parts, 'ic-fi').url, 'https://www.intercars24.ee/autoosad/search=MjE2MjAxODE=');
   assert.equal(find(parts, 'ic-fi').deliveryDays, '1–2');
   assert.equal(find(tyres, 'ic-fi-t').url, 'https://www.intercars24.ee/autoosad/search=MzE1LzgwUjIyLjU=');
+});
+
+test('Швеция и Норвегия: поиск по номеру у главных поставщиков', () => {
+  const se = partsSources({ query: '21620181', make: null, plate: null, country: 'SE' });
+  const no = partsSources({ query: '21620181', make: null, plate: null, country: 'NO' });
+  assert.equal(find(se, 'rydahls').url, 'https://www.rydahlsreservdelar.se/search?q=21620181');
+  assert.equal(find(no, 'vdlparts').url, 'https://www.vdlparts.no/search?q=21620181');
+  assert.match(quoteRequestText({ query: '21620181', make: null, plate: null, company: 'Oy', note: '', country: 'NO' }), /^Tilbudsforespørsel: 21620181/);
 });

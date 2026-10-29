@@ -16,7 +16,7 @@
  * компонент страницы.
  */
 
-export const PARTS_COUNTRIES = ['FI', 'EE', 'LV', 'LT', 'PL', 'DE'] as const;
+export const PARTS_COUNTRIES = ['FI', 'SE', 'NO', 'EE', 'LV', 'LT', 'PL', 'DE'] as const;
 export type PartsCountry = (typeof PARTS_COUNTRIES)[number];
 
 export type PartsMode = 'PARTS' | 'TYRES';
@@ -202,6 +202,22 @@ const PARTS: Record<PartsCountry, Entry[]> = {
     { id: 'kleinanzeigen', name: 'Kleinanzeigen', kind: 'USED', pricesPublic: true, direct: true, url: (c) => `https://www.kleinanzeigen.de/s-${enc(c.number ?? c.text)}/k0` },
     { id: 'ebay-de', name: 'eBay', kind: 'USED', pricesPublic: true, direct: true, url: (c) => `https://www.ebay.de/sch/i.html?_nkw=${enc(c.number ?? c.text)}` },
   ],
+  SE: [
+    { id: 'rydahls', name: 'Rydahls Reservdelar', kind: 'NEW', pricesPublic: false, direct: true, url: (c) => `https://www.rydahlsreservdelar.se/search?q=${enc(c.number ?? c.text)}`, email: 'info@rydahls.se', phone: '0771-27 66 72' },
+    { id: 'htd', name: 'Huzells Tunga Delar (Trucknik)', kind: 'NEW', pricesPublic: false, direct: false, url: site('https://katalogen.htd.se'), email: 'info@htd.se', phone: '054-85 22 00' },
+    { id: 'slapis', name: 'Släpis', kind: 'NEW', pricesPublic: false, direct: false, url: site('https://webshop.slapis.se'), email: 'info@slapis.se' },
+    { id: 'autokada-se', name: 'Auto Kada', kind: 'NEW', pricesPublic: false, direct: true, url: (c) => `https://b2b.aknet.eu/search?search=${enc(c.number ?? c.text)}` },
+    { id: 'bildelsbasen', name: 'Bildelsbasen', kind: 'USED', pricesPublic: true, direct: true, url: (c) => `https://www.bildelsbasen.se/sv-se/OEM/${enc(c.number ?? c.text)}` },
+    { id: 'blocket', name: 'Blocket', kind: 'USED', pricesPublic: true, direct: true, url: (c) => `https://www.blocket.se/recommerce/forsale/search?q=${enc(c.number ?? c.text)}` },
+    { id: 'tradera', name: 'Tradera', kind: 'USED', pricesPublic: true, direct: true, url: (c) => `https://www.tradera.com/search?q=${enc(c.number ?? c.text)}` },
+  ],
+  NO: [
+    { id: 'vdlparts', name: 'VDL Parts (ex TTI)', kind: 'NEW', pricesPublic: false, direct: true, url: (c) => `https://www.vdlparts.no/search?q=${enc(c.number ?? c.text)}`, email: 'salg@vdlparts.no', phone: '95 00 08 84' },
+    { id: 'bpw-hofstad', name: 'BPW Hofstad (henger)', kind: 'NEW', pricesPublic: false, direct: false, url: site('https://webshop.bpw.no'), email: 'post@bpw.no', phone: '+47 22 10 10 50' },
+    { id: 'autokada-no', name: 'Auto Kada', kind: 'NEW', pricesPublic: false, direct: true, url: (c) => `https://b2b.aknet.eu/search?search=${enc(c.number ?? c.text)}` },
+    { id: 'finn', name: 'FINN.no Torget', kind: 'USED', pricesPublic: true, direct: true, url: (c) => `https://www.finn.no/recommerce/forsale/search?q=${enc(c.number ?? c.text)}` },
+    { id: 'mascus-no', name: 'Mascus', kind: 'USED', pricesPublic: true, direct: true, url: (c) => `https://www.mascus.no/+/${enc(c.number ?? c.text)},1,relevance,search.html` },
+  ],
 };
 
 const TYRES: Record<PartsCountry, Entry[]> = {
@@ -255,6 +271,20 @@ const TYRES: Record<PartsCountry, Entry[]> = {
     { id: 'vergoelst', name: 'Vergölst (BestDrive)', kind: 'TYRES', pricesPublic: false, direct: false, mobile24: true, url: site('https://vergoelst.de/flottenkunden.html'), phone: '+49 511 938-20555' },
     { id: 'ebay-de-t', name: 'eBay', kind: 'USED', pricesPublic: true, direct: true, url: (c) => `https://www.ebay.de/sch/i.html?_nkw=${enc(`${c.size} LKW Reifen`)}` },
   ],
+  SE: [
+    { id: 'vianor-se', name: 'Vianor', kind: 'TYRES', pricesPublic: false, direct: false, mobile24: true, url: site('https://www.vianor.se/foretagskunder/kontakta-oss/offertforfragan/') },
+    { id: 'dackteam', name: 'Däckteam', kind: 'TYRES', pricesPublic: false, direct: false, mobile24: true, url: site('https://www.dackteam.se/lastbil') },
+    { id: 'euromaster-se', name: 'Euromaster', kind: 'TYRES', pricesPublic: false, direct: false, url: site('https://foretag.euromaster.se/affarsomrade/lastbil-trailer'), phone: '0340-829 00' },
+    { id: 'dackia', name: 'Däckia', kind: 'TYRES', pricesPublic: false, direct: false, url: site('https://www.dackia.se/foretag') },
+    { id: 'blocket-t', name: 'Blocket', kind: 'USED', pricesPublic: true, direct: true, url: (c) => `https://www.blocket.se/recommerce/forsale/search?q=${enc(c.size)}` },
+  ],
+  NO: [
+    { id: 'vianor-no', name: 'Vianor', kind: 'TYRES', pricesPublic: false, direct: false, mobile24: true, url: site('https://vianor.no/bedriftskunder/'), phone: '915 11 500' },
+    { id: 'bestdrive-no', name: 'BestDrive (Continental)', kind: 'TYRES', pricesPublic: false, direct: false, mobile24: true, url: site('https://www.bestdrive.no/bedrift/lastebil.html'), phone: '23 06 81 10' },
+    { id: 'dekkteam-no', name: 'DekkTeam', kind: 'TYRES', pricesPublic: false, direct: false, url: site('https://dekkteam.no/dekk/buss-og-lastebildekk/'), phone: '800 33 558' },
+    { id: 'dekkpartner', name: 'Dekkpartner', kind: 'TYRES', pricesPublic: false, direct: false, mobile24: true, url: site('https://www.dekkpartner.no/lastebildekk') },
+    { id: 'finn-t', name: 'FINN.no Torget', kind: 'USED', pricesPublic: true, direct: true, url: (c) => `https://www.finn.no/recommerce/forsale/search?q=${enc(c.size)}` },
+  ],
 };
 
 /* Слово для поиска в Google на языке страны. */
@@ -265,6 +295,8 @@ const WEB_WORD: Record<PartsCountry, { parts: string; tyres: string }> = {
   LT: { parts: 'atsarginė dalis', tyres: 'sunkvežimio padanga' },
   PL: { parts: 'część', tyres: 'opona ciężarowa' },
   DE: { parts: 'Ersatzteil', tyres: 'LKW Reifen' },
+  SE: { parts: 'reservdel', tyres: 'lastbilsdäck' },
+  NO: { parts: 'reservedel', tyres: 'lastebildekk' },
 };
 
 /** Опубликованные номера круглосуточной помощи при проколе, проверены 29.10.2026. */
@@ -282,6 +314,14 @@ export const BREAKDOWN: Record<PartsCountry, Breakdown[]> = {
     { name: 'Continental Conti360', phone: '+48 22 577 13 60', url: 'https://www.continental-tyres.co.uk/b2b/services-and-solutions/conti-360/breakdown-service', contractOnly: true },
   ],
   DE: [{ name: 'Continental Conti360', phone: '+49 511 938 2000', url: 'https://www.continental-tyres.co.uk/b2b/services-and-solutions/conti-360/breakdown-service', contractOnly: true }],
+  SE: [
+    { name: 'VianorFlex 24/7', phone: '0771-217 217', url: 'https://www.vianor.se/foretagskunder/foretagstjanster/vianor-flex-24-7/', contractOnly: false },
+    { name: 'Hankook Road Assist 24h', phone: '+32 3540 5121', url: 'https://www.hankooktire.com/se/sv/help-support/tbr-support/road-assist-24h.html', contractOnly: true },
+  ],
+  NO: [
+    { name: 'VianorFlex 24/7', phone: '+47 22 07 04 04', url: 'https://vianor.no/bedriftskunder/bedriftstjenester/vianor-flex-24-7/', contractOnly: false },
+    { name: 'BestDrive 24-timers veihjelp', phone: '920 70 111', url: 'https://www.bestdrive.no/bedrift/veihjelp.html', contractOnly: true },
+  ],
 };
 
 export function partsSources(q: PartsQuery & { country?: PartsCountry; mode?: PartsMode }): PartsSource[] {
@@ -361,6 +401,20 @@ const QUOTE: Record<PartsCountry, { subject: string; vehicle: string; note: stri
     note: 'Weitere Angaben',
     ask: 'Bitte um Preis, Lieferzeit und Angabe, ob Original- oder Nachbauteil.',
     tyresAsk: 'Bitte um Preis, Lieferzeit, Marke und Profil (Lenk-, Antriebs-, Aufliegerachse) sowie den Montagepreis.',
+  },
+  SE: {
+    subject: 'Offertförfrågan',
+    vehicle: 'Fordon',
+    note: 'Övrigt',
+    ask: 'Vi ber om pris, leveranstid och om delen är original eller motsvarande.',
+    tyresAsk: 'Vi ber om pris, leveranstid, märke och mönster (styr, driv, trailer) samt pris för montering.',
+  },
+  NO: {
+    subject: 'Tilbudsforespørsel',
+    vehicle: 'Kjøretøy',
+    note: 'Annet',
+    ask: 'Vi ber om pris, leveringstid og om delen er original eller tilsvarende.',
+    tyresAsk: 'Vi ber om pris, leveringstid, merke og mønster (styring, driv, henger) samt pris for montering.',
   },
 };
 
