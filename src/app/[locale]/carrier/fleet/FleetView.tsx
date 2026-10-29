@@ -74,6 +74,10 @@ export function FleetView({
                     <span className="font-mono text-xs text-ink-dim">
                       {EURO_LABEL[vehicle.euro_class]}
                     </span>
+                    {/* Деньги машины — на странице доходности: покупка, платежи, страховки, расходы и итог. */}
+                    <a href={`/${locale}/carrier/economics/${vehicle.id}`} className="text-[12px] text-accent hover:underline">
+                      {t.economics.vehicleLink} ›
+                    </a>
                   </div>
 
                   {/*

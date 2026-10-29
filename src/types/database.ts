@@ -893,6 +893,32 @@ export type Database = {
           },
         ]
       }
+      company_economics: {
+        Row: {
+          company_id: string
+          employer_cost_bps: number
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          employer_cost_bps?: number
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          employer_cost_bps?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_economics_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       company_events: {
         Row: {
           actor_id: string | null
@@ -4340,6 +4366,57 @@ export type Database = {
           },
         ]
       }
+      vehicle_costs: {
+        Row: {
+          amount_cents: number
+          category: string
+          company_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          note: string | null
+          spent_on: string
+          vehicle_id: string
+        }
+        Insert: {
+          amount_cents: number
+          category: string
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          note?: string | null
+          spent_on: string
+          vehicle_id: string
+        }
+        Update: {
+          amount_cents?: number
+          category?: string
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          note?: string | null
+          spent_on?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_costs_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_costs_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vehicle_drivers: {
         Row: {
           assigned_by: string | null
@@ -4415,6 +4492,75 @@ export type Database = {
             foreignKeyName: "vehicle_events_vehicle_id_fkey"
             columns: ["vehicle_id"]
             isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vehicle_finance: {
+        Row: {
+          company_id: string
+          financing: string
+          insurance_cents_year: number | null
+          kasko_cents_year: number | null
+          monthly_payment_cents: number | null
+          other_fixed_cents_month: number | null
+          payments_until: string | null
+          purchase_price_cents: number | null
+          purchased_on: string | null
+          residual_cents: number | null
+          tax_cents_year: number | null
+          updated_at: string
+          updated_by: string | null
+          useful_life_months: number
+          vehicle_id: string
+        }
+        Insert: {
+          company_id: string
+          financing?: string
+          insurance_cents_year?: number | null
+          kasko_cents_year?: number | null
+          monthly_payment_cents?: number | null
+          other_fixed_cents_month?: number | null
+          payments_until?: string | null
+          purchase_price_cents?: number | null
+          purchased_on?: string | null
+          residual_cents?: number | null
+          tax_cents_year?: number | null
+          updated_at?: string
+          updated_by?: string | null
+          useful_life_months?: number
+          vehicle_id: string
+        }
+        Update: {
+          company_id?: string
+          financing?: string
+          insurance_cents_year?: number | null
+          kasko_cents_year?: number | null
+          monthly_payment_cents?: number | null
+          other_fixed_cents_month?: number | null
+          payments_until?: string | null
+          purchase_price_cents?: number | null
+          purchased_on?: string | null
+          residual_cents?: number | null
+          tax_cents_year?: number | null
+          updated_at?: string
+          updated_by?: string | null
+          useful_life_months?: number
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_finance_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_finance_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: true
             referencedRelation: "vehicles"
             referencedColumns: ["id"]
           },
