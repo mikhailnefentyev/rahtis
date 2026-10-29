@@ -308,12 +308,16 @@ export default async function FuelPage({
                 const flag = stats.flags.get(row.id);
                 return (
                   <Tr key={row.id}>
-                    <Td mono>{f.dateTime(row.filled_at)}</Td>
+                    {/* Таблица широкая: время под датой, длинное — переносом, иначе последние колонки уходят за край. */}
+                    <Td mono>
+                      {f.date(row.filled_at)}
+                      <span className="block text-[11px] text-ink-dim">{f.time(row.filled_at)}</span>
+                    </Td>
                     <Td mono>{plates.get(row.vehicle_id) ?? '—'}</Td>
-                    <Td>{row.driver_id ? (driverNames.get(row.driver_id) ?? '—') : '—'}</Td>
+                    <Td className="min-w-[96px] whitespace-normal">{row.driver_id ? (driverNames.get(row.driver_id) ?? '—') : '—'}</Td>
                     <Td>
                       {t.fuelDriver.products[row.product as keyof typeof t.fuelDriver.products] ?? row.product}
-                      {!row.full_tank && <span className="text-ink-faint"> · {s.partial}</span>}
+                      {!row.full_tank && <span className="block text-[11px] text-ink-faint">{s.partial}</span>}
                     </Td>
                     <Td numeric>
                       {f.decimal(row.quantity)} {row.unit}
@@ -328,10 +332,10 @@ export default async function FuelPage({
                         </span>
                       )}
                     </Td>
-                    <Td>{row.station ?? ''}</Td>
-                    <Td>
+                    <Td className="min-w-[110px] max-w-[170px] whitespace-normal">{row.station ?? ''}</Td>
+                    <Td className="px-2">
                       {row.receipt_path && (
-                        <a href={`/api/fuel/receipt/${row.id}`} target="_blank" rel="noreferrer" className="mr-3 text-[12px] text-accent">
+                        <a href={`/api/fuel/receipt/${row.id}`} target="_blank" rel="noreferrer" className="mb-1 block text-[12px] text-accent">
                           {s.receipt}
                         </a>
                       )}
