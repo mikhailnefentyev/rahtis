@@ -210,8 +210,15 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
   return new Response(new Uint8Array(buffer), { headers: headers('application/pdf', 'pdf') });
 }
 
+/**
+ * Ячейка CSV. Станция приходит из распознанного отчёта, имя — из карточки
+ * водителя: значение с «=», «+», «-», «@» в начале Excel принял бы за
+ * формулу, поэтому впереди ставится апостроф. Свои числа маршрут пишет
+ * без знака, их это не задевает.
+ */
 function csv(value: string): string {
-  return /[";\r\n]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value;
+  const safe = /^[=+\-@\t\r]/.test(value) ? `'${value}` : value;
+  return /[";\r\n]/.test(safe) ? `"${safe.replace(/"/g, '""')}"` : safe;
 }
 
 /** YYYY-MM-DD HH:MM в часовом поясе зрителя — так дату понимает Excel. */
