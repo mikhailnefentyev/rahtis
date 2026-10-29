@@ -300,7 +300,6 @@ export default async function FuelPage({
                 <Th numeric>{s.colAmount}</Th>
                 <Th numeric>{s.colOdometer}</Th>
                 <Th>{s.colStation}</Th>
-                <Th>{s.colSource}</Th>
                 <Th />
               </tr>
             </thead>
@@ -318,6 +317,7 @@ export default async function FuelPage({
                     </Td>
                     <Td numeric>
                       {f.decimal(row.quantity)} {row.unit}
+                      <SourceCell row={row} unit={row.unit ?? 'l'} labels={s.sourceLine} manual={s.source.MANUAL} diff={s.sourcesDiff} f={f} />
                     </Td>
                     <Td numeric>{row.amount_cents != null ? f.eur(row.amount_cents) : '—'}</Td>
                     <Td numeric>
@@ -330,17 +330,11 @@ export default async function FuelPage({
                     </Td>
                     <Td>{row.station ?? ''}</Td>
                     <Td>
-                      <SourceCell row={row} labels={s.sourceLine} manual={s.source.MANUAL} diff={s.sourcesDiff} f={f} />
                       {row.receipt_path && (
-                        <>
-                          {' · '}
-                          <a href={`/api/fuel/receipt/${row.id}`} target="_blank" rel="noreferrer" className="text-accent">
-                            {s.receipt}
-                          </a>
-                        </>
+                        <a href={`/api/fuel/receipt/${row.id}`} target="_blank" rel="noreferrer" className="mr-3 text-[12px] text-accent">
+                          {s.receipt}
+                        </a>
                       )}
-                    </Td>
-                    <Td>
                       <form action={deleteFuelEntryAction}>
                         <input type="hidden" name="locale" value={locale} />
                         <input type="hidden" name="id" value={row.id} />
@@ -361,15 +355,20 @@ export default async function FuelPage({
   );
 }
 
-/** Источники заправки с их объёмами; расхождение больше 2 % — отметкой. */
+/**
+ * Под объёмом: сколько показал каждый источник, по строке на источник;
+ * расхождение больше 2 % — отметкой. Ручная строка — одной пометкой.
+ */
 function SourceCell({
   row,
+  unit,
   labels,
   manual,
   diff,
   f,
 }: {
   row: { qty_report: number | null; qty_driver: number | null; qty_telematics: number | null };
+  unit: string;
   labels: Record<(typeof FUEL_SOURCES)[number], string>;
   manual: string;
   diff: string;
@@ -377,21 +376,23 @@ function SourceCell({
 }) {
   const parts = FUEL_SOURCES.flatMap((source) => {
     const qty = sourceQty(row, source);
-    return qty == null ? [] : [`${labels[source]} ${f.decimal(qty)}`];
+    return qty == null ? [] : [{ source, qty }];
   });
   const spread = sourceSpread(row);
-  if (parts.length === 0) return <>{manual}</>;
   return (
-    <>
-      {parts.join(' · ')}
-      {spread != null && spread > SPREAD_NOTICE && (
-        <span className="ml-2">
-          <Badge tone="warn">
-            {diff} {Math.round(spread * 100)} %
-          </Badge>
+    <span className="mt-1 flex flex-col items-end gap-0.5 text-[11px] leading-tight text-ink-dim">
+      {parts.length === 0 && <span>{manual}</span>}
+      {parts.map((part) => (
+        <span key={part.source} className="whitespace-nowrap">
+          {labels[part.source]} {f.decimal(part.qty)} {unit}
         </span>
+      ))}
+      {spread != null && spread > SPREAD_NOTICE && (
+        <Badge tone="warn">
+          {diff} {Math.round(spread * 100)} %
+        </Badge>
       )}
-    </>
+    </span>
   );
 }
 

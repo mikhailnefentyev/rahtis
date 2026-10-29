@@ -34,7 +34,9 @@ const STYLE: Record<FuelSource, { color: string; dash?: string }> = {
 };
 
 const HEIGHT = 220;
-const PAD = { top: 12, right: 92, bottom: 26, left: 52 };
+const PAD = { top: 12, bottom: 26, left: 52 };
+/* Уже этого подписи у края не помещаются: остаются легенда и подсказка. */
+const NARROW = 520;
 
 export function SourceLines({ days, unit, lines, intl, labels, vehicles, vehicle, baseHref }: SourceLinesProps) {
   const router = useRouter();
@@ -59,7 +61,10 @@ export function SourceLines({ days, unit, lines, intl, labels, vehicles, vehicle
   const yMax = niceCeil(max);
   const ticks = [0, yMax / 2, yMax];
 
-  const plotW = width - PAD.left - PAD.right;
+  /* Справа место под самую длинную подпись линии (11 px, ~6,5 px на знак). */
+  const endLabelsOn = width >= NARROW;
+  const right = endLabelsOn ? 16 + Math.max(...FUEL_SOURCES.map((source) => labels[source].length)) * 6.5 : 12;
+  const plotW = width - PAD.left - right;
   const plotH = HEIGHT - PAD.top - PAD.bottom;
   const x = (i: number) => PAD.left + (days.length > 1 ? (i / (days.length - 1)) * plotW : plotW / 2);
   const y = (v: number) => PAD.top + plotH - (v / yMax) * plotH;
@@ -147,7 +152,7 @@ export function SourceLines({ days, unit, lines, intl, labels, vehicles, vehicle
             />
           ))}
 
-          {endLabels.map((item) => (
+          {endLabelsOn && endLabels.map((item) => (
             <text key={item.source} x={PAD.left + plotW + 8} y={item.at + 4} className="source-lines__end">
               {labels[item.source]}
             </text>
