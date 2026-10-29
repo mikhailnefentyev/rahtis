@@ -9,11 +9,12 @@ import { APP } from '@/lib/config';
 import { getI18n, LOCALE_NAMES, locales, type Locale } from '@/lib/i18n';
 import { placeCountries } from '@/lib/routing/places';
 import { EARTHWORKS, earthworksPath } from '@/lib/landing/earthworks';
+import { LandingFleet, LandingPricing } from './LandingFleet';
 
 /**
  * Всё, что лежит на главной ниже первого экрана.
  *
- * Один файл на восемь секций намеренно: это одна страница с одним
+ * Один файл на секции намеренно (кабинет и цены — в LandingFleet.tsx): это одна страница с одним
  * рассказом, и разносить её по восьми файлам значит потерять из виду
  * порядок, в котором она читается. Разделять начнём, когда секции
  * научатся жить порознь.
@@ -208,83 +209,8 @@ export async function LandingSections({ locale, showBlog = false }: { locale: Lo
         </div>
       </section>
 
-      {/* ── Время ──────────────────────────────────────────────── */}
-      <section className="border-y border-line bg-surface">
-        <div className="mx-auto w-full max-w-6xl px-5 py-20">
-          <p className="label-micro">{l.timeEyebrow}</p>
-          <h2 className="mt-2.5 max-w-[22ch] text-[clamp(26px,3vw,34px)] leading-tight font-semibold tracking-tight text-balance">
-            {l.timeTitle}
-          </h2>
-          <p className="mt-3 max-w-[62ch] text-[16px] text-ink-muted">{l.timeLede}</p>
-
-          {/*
-            * Пары, а не два списка.
-            *
-            * Раньше здесь стояли две колонки по шесть законченных
-            * предложений, и попарно они говорили об одном и том же —
-            * обзвон против одной публикации, поиск груза против общего
-            * стола. Но сопоставить их должен был читатель: удержать шесть
-            * пунктов и найти к ним шесть ответов. Он этого не делает, он
-            * видит двенадцать длинных строк и листает дальше.
-            *
-            * Теперь пара стоит на одной строке. Сравнение делает раскладка,
-            * и поэтому предложение может ужаться до выражения — а разные
-            * маркеры у колонок стали не нужны: противопоставление несёт
-            * сетка, а не форма точки.
-            *
-            * На телефоне колонки складываются, и «было» просто стоит над
-            * «стало». Порядок сохраняется, значок для этого не нужен.
-            */}
-          <div className="mt-8 overflow-hidden rounded-card border border-line">
-            <div className="hidden bg-sunken sm:grid sm:grid-cols-2">
-              {/*
-                * Оба заголовка одинаково тихие. Акцентом красить правый
-                * нечем: .label-micro задаёт цвет в том же слое, и утилита
-                * text-accent до него не достаёт. Подпирать важностью ради
-                * оттенка не стоит — сторону и так видно по колонке: слева
-                * бледное, справа чернильное.
-                */}
-              <p className="label-micro border-r border-line px-5 py-3">{l.timeOld}</p>
-              <p className="label-micro bg-accent-wash px-5 py-3" data-accent>
-                {l.timeNew}
-              </p>
-            </div>
-
-            <ul>
-              {[
-                [l.timeOld1, l.timeNew1],
-                [l.timeOld2, l.timeNew2],
-                [l.timeOld3, l.timeNew3],
-                [l.timeOld4, l.timeNew4],
-                [l.timeOld5, l.timeNew5],
-                [l.timeOld6, l.timeNew6],
-                [l.timeOld7, l.timeNew7],
-              ].map(([was, now]) => (
-                <li
-                  key={now}
-                  className="grid gap-y-1 border-t border-line first:border-t-0 sm:grid-cols-2 sm:first:border-t"
-                >
-                  <span className="px-5 pt-4 text-[16px] text-ink-faint sm:border-r sm:border-line sm:py-4">
-                    {was}
-                  </span>
-                  {/*
-                    * Правая половина подкрашена накрест всей таблицы.
-                    *
-                    * Раньше стороны различались только насыщенностью
-                    * букв — бледное слева, чернильное справа, — и на
-                    * беглом взгляде таблица читалась как один серый
-                    * блок. Заливка несёт тот же смысл, что и колонка:
-                    * это сторона RAHTIS.
-                    */}
-                  <span className="bg-accent-wash px-5 pb-4 text-[16px] font-medium text-ink sm:py-4">
-                    {now}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </section>
+      {/* ── Кабинет перевозчика: конструктор сцепок и инструменты автопарка ── */}
+      <LandingFleet locale={locale} />
 
       {/* ── Две двери ──────────────────────────────────────────── */}
       <section id="roles" className="mx-auto w-full max-w-6xl px-5 py-20">
@@ -346,6 +272,9 @@ export async function LandingSections({ locale, showBlog = false }: { locale: Lo
           ))}
         </div>
       </section>
+
+      {/* ── Цены ── */}
+      <LandingPricing locale={locale} />
 
       {/* ── Путь рейса ─────────────────────────────────────────── */}
       <section id="steps" className="border-y border-line bg-surface">
@@ -784,6 +713,8 @@ Rahtis-Event: order.stop_arrived`}</code>
               links: [
                 { href: '#service', label: l.menuService },
                 { href: '#roles', label: l.menuRoles },
+                { href: '#fleet', label: l.menuFleet },
+                { href: '#pricing', label: l.menuPricing },
                 { href: '#steps', label: l.menuSteps },
                 { href: '#assistant', label: l.menuAssistant },
                 { href: '#api', label: l.footerApi },

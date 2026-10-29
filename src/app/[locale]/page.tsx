@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import { HeroPort } from '@/components/domain/HeroPort';
 import { LandingSections } from '@/components/domain/LandingSections';
 import { SiteHeader } from '@/components/layout/SiteHeader';
-import { APP, SUBSCRIPTION_UNIT_CENTS } from '@/lib/config';
+import { APP, SUBSCRIPTION_LADDER } from '@/lib/config';
 import { getI18n, isLocale } from '@/lib/i18n';
 import { placeCountries } from '@/lib/routing/places';
 import { hasArticles } from '@/lib/blog/heycatch';
@@ -122,11 +122,13 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     description: t.seo.homeDescription,
     featureList: t.seo.features,
     inLanguage: ['fi', 'en'],
+    /* Лесенка: от 23,90 € (50–99 машин) до 29,90 € (1–9), от 100 машин — по запросу. */
     offers: {
-      '@type': 'Offer',
-      price: (SUBSCRIPTION_UNIT_CENTS / 100).toFixed(2),
+      '@type': 'AggregateOffer',
+      lowPrice: (Math.min(...SUBSCRIPTION_LADDER.map((s) => s.cents)) / 100).toFixed(2),
+      highPrice: (SUBSCRIPTION_LADDER[0].cents / 100).toFixed(2),
       priceCurrency: 'EUR',
-      priceSpecification: { '@type': 'UnitPriceSpecification', price: (SUBSCRIPTION_UNIT_CENTS / 100).toFixed(2), priceCurrency: 'EUR', unitText: locale === 'fi' ? 'auto / kuukausi, alv 0 %' : 'vehicle / month, excl. VAT', valueAddedTaxIncluded: false },
+      priceSpecification: { '@type': 'UnitPriceSpecification', price: (SUBSCRIPTION_LADDER[0].cents / 100).toFixed(2), priceCurrency: 'EUR', unitText: locale === 'fi' ? 'auto / kuukausi, alv 0 %' : 'vehicle / month, excl. VAT', valueAddedTaxIncluded: false },
     },
     provider: { '@type': 'Organization', name: APP.operator.legalName },
   };

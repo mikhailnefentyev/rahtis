@@ -95,7 +95,8 @@ export function SiteHeader({ showBlog = false }: { showBlog?: boolean }) {
   const menu = [
     { href: '#service', label: t.landing.menuService },
     { href: '#roles', label: t.landing.menuRoles },
-    { href: '#steps', label: t.landing.menuSteps },
+    { href: '#fleet', label: t.landing.menuFleet },
+    { href: '#pricing', label: t.landing.menuPricing },
     { href: '#assistant', label: t.landing.menuAssistant },
     { href: '#api', label: t.landing.footerApi },
     ...(showBlog ? [{ href: '/blog', label: t.site.blog }] : []),
