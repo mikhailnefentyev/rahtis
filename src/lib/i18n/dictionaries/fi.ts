@@ -1384,12 +1384,12 @@ export const fi = {
     priceOnRequest: "tarjouksen mukaan",
     priceFromN: "{n} alkaen",
     priceYear: "Vuosi etukäteen: −10 %",
-    priceSubEyebrow: "Alihankinta RAHTISin kautta",
+    priceSubEyebrow: "Alihankinta RAHTIKSEN kautta",
     priceSubTitle: "3 % keikan hinnasta",
     priceSubText: "Otat keikkoja tarjouspöydältä, ja me hoidamme laskun asiakkaalle, rahtikirjat ja reklamaatiot. Ei kuukausimaksua, kuljettajasovellus sisältyy hintaan.",
     priceShipEyebrow: "Toimeksiantajalle",
     priceShipTitle: "5 % keikan hinnasta",
-    priceShipText: "Palvelumaksu RAHTISin sopimuksella ajetusta keikasta, vähintään 15 € yhdessä kuljetusliikkeen maksun kanssa. Suora sopimus kuukausimaksulla toimivan kuljetusliikkeen kanssa ja API ovat maksuttomia.",
+    priceShipText: "Palvelumaksu RAHTIKSEN sopimuksella ajetusta keikasta, vähintään 15 € yhdessä kuljetusliikkeen maksun kanssa. Suora sopimus kuukausimaksulla toimivan kuljetusliikkeen kanssa ja API ovat maksuttomia.",
   },
 
   done: {
