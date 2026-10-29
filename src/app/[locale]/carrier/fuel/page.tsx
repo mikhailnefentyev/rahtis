@@ -1,22 +1,21 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { Badge, Bars, Card, CardBody, EmptyState, Stat, StatRow, Table, TableFrame, Td, Th, Tr } from '@/components/ui';
+import { Badge, Bars, Card, CardBody, EmptyState, Stat, StatRow, Table, TableFrame, Td, Th, Tr, buttonClass } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
 import { deleteFuelEntryAction } from '@/lib/fuel/actions';
 import {
   FUEL_SOURCES,
   SPREAD_NOTICE,
   dayOf,
-  fuelStats,
   monthOf,
   monthsBack,
   sourceQty,
   sourceSeries,
   sourceSpread,
-  type FuelRow,
   type MonthStat,
 } from '@/lib/fuel/fuel';
+import { currentFuelMonth, loadFuelMonth, nextMonth, parseFuelMonth } from '@/lib/fuel/month';
 import { isLocale } from '@/lib/i18n';
 import { getViewerI18n } from '@/lib/i18n/viewer';
 import { createClient } from '@/lib/supabase/server';
@@ -34,7 +33,6 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 /* Разбор отчёта моделью идёт внутри действия загрузки: до двух минут. */
 export const maxDuration = 120;
 
-const MONTHS = 12;
 
 /**
  * Топливо перевозчика: расход машин, траты, заправки и месячные отчёты.
@@ -76,24 +74,10 @@ export default async function FuelPage({
     );
   }
 
-  const current = monthOf(new Date().toISOString());
-  const month = /^\d{4}-\d{2}$/.test(query.month ?? '') && query.month! <= current ? query.month! : current;
-  const months = monthsBack(month, MONTHS);
-  /* С запасом в месяц: первый интервал года открывается заправкой месяцем раньше. */
-  const since = `${monthsBack(months[0], 2)[0]}-01T00:00:00Z`;
-  const untilNext = `${nextMonth(month)}-01T00:00:00Z`;
-
-  const [{ data: entries }, { data: vehicles }, { data: drivers }, { data: imports }] = await Promise.all([
-    supabase
-      .from('fuel_entries')
-      .select('id, vehicle_id, driver_id, filled_at, product, quantity, unit, amount_cents, odometer_km, full_tank, station, source, receipt_path, qty_report, qty_driver, qty_telematics')
-      .eq('company_id', company.id)
-      .gte('filled_at', since)
-      .lt('filled_at', untilNext)
-      .order('filled_at', { ascending: true })
-      .limit(5000),
-    supabase.from('vehicles').select('id, plate').eq('company_id', company.id).order('plate'),
-    supabase.from('drivers').select('id, full_name').eq('company_id', company.id),
+  const current = currentFuelMonth();
+  const month = parseFuelMonth(query.month);
+  const [{ months, rows, stats, vehicles, drivers }, { data: imports }] = await Promise.all([
+    loadFuelMonth(supabase, company.id, month),
     supabase
       .from('fuel_imports')
       .select('id, file_name, status, supplier, created_at, inserted, merged')
@@ -101,17 +85,8 @@ export default async function FuelPage({
       .order('created_at', { ascending: false })
       .limit(8),
   ]);
-
-  const rows = (entries ?? []).map((e) => ({
-    ...e,
-    quantity: Number(e.quantity),
-    qty_report: e.qty_report == null ? null : Number(e.qty_report),
-    qty_driver: e.qty_driver == null ? null : Number(e.qty_driver),
-    qty_telematics: e.qty_telematics == null ? null : Number(e.qty_telematics),
-  }));
-  const stats = fuelStats(rows as FuelRow[]);
-  const plates = new Map((vehicles ?? []).map((v) => [v.id, v.plate]));
-  const driverNames = new Map((drivers ?? []).map((d) => [d.id, d.full_name]));
+  const plates = new Map(vehicles.map((v) => [v.id, v.plate]));
+  const driverNames = new Map(drivers.map((d) => [d.id, d.full_name]));
 
   const fleetByMonth = new Map(stats.fleet.map((m) => [m.month, m]));
   const thisMonth = fleetByMonth.get(month);
@@ -129,7 +104,7 @@ export default async function FuelPage({
     .sort((a, b) => a.plate.localeCompare(b.plate));
 
   /* Три линии: весь парк или одна машина (только своя — чужой id просто ничего не покажет). */
-  const vehicle = (vehicles ?? []).some((v) => v.id === query.vehicle) ? query.vehicle! : null;
+  const vehicle = vehicles.some((v) => v.id === query.vehicle) ? query.vehicle! : null;
   const series = sourceSeries(
     vehicle ? rows.filter((row) => row.vehicle_id === vehicle) : rows,
     month,
@@ -157,6 +132,20 @@ export default async function FuelPage({
             {label(nextMonth(month))} ›
           </Link>
         )}
+        {/* Выгрузка за этот месяц и ту же машину, что выбрана на графике. Обычная ссылка: файл отдаёт маршрут, не страница. */}
+        <div className="ml-auto flex items-center gap-2">
+          <span className="text-[12px] text-ink-muted">{s.download}</span>
+          {(['pdf', 'csv'] as const).map((format) => (
+            <a
+              key={format}
+              href={`${base}/export?format=${format}&month=${month}${vehicle ? `&vehicle=${vehicle}` : ''}`}
+              className={buttonClass({ variant: 'default', size: 'sm' })}
+              download
+            >
+              {format.toUpperCase()}
+            </a>
+          ))}
+        </div>
       </div>
 
       <StatRow>
@@ -209,7 +198,7 @@ export default async function FuelPage({
               lines={series.lines}
               intl={t.meta.intl}
               labels={{ ...s.sourceLine, title: s.sourcesTitle, noData: s.sourcesNoData, fleet: s.sourcesFleet, vehicle: s.colVehicle }}
-              vehicles={vehicles ?? []}
+              vehicles={vehicles}
               vehicle={vehicle}
               baseHref={`${base}?month=${month}`}
             />
@@ -253,7 +242,7 @@ export default async function FuelPage({
 
       <section className="mt-8 grid gap-4 lg:grid-cols-2">
         <FuelUpload />
-        <FuelEntryForm vehicles={vehicles ?? []} />
+        <FuelEntryForm vehicles={vehicles} />
       </section>
 
       {(imports ?? []).length > 0 && (
@@ -398,10 +387,4 @@ function SourceCell({
       )}
     </span>
   );
-}
-
-function nextMonth(month: string): string {
-  const [y, m] = month.split('-').map(Number);
-  const date = new Date(Date.UTC(y, m, 1));
-  return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}`;
 }

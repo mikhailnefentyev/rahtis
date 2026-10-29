@@ -238,6 +238,11 @@ export const pl = {
     sourcesFleet: 'Cała flota',
     sourcesDiff: 'Różnica',
     sourcesHint: 'To samo tankowanie może pochodzić z trzech źródeł: raportu karty paliwowej, aplikacji kierowcy i systemu śledzenia (GPS). Gdy linie się rozchodzą, w którymś źródle brakuje tankowania albo ilości się nie zgadzają – różnica jest widoczna także w wierszu tankowania.',
+    download: 'Pobierz raport',
+    reportTitle: 'Raport paliwowy',
+    reportFile: 'paliwo',
+    colUnit: 'Jednostka',
+    reportSourcesNote: 'To samo tankowanie może pochodzić z trzech źródeł: raportu karty paliwowej, aplikacji kierowcy i systemu śledzenia (GPS). Gdy ilości różnią się o więcej niż 2 %, różnica jest wyróżniona.',
     failed: { not_configured: 'Automatyczne rozpoznawanie raportów nie jest jeszcze włączone. Wpisz tankowania ręcznie lub poproś kierowców o rejestrowanie ich w aplikacji.', failed: 'Nie udało się odczytać raportu. Spróbuj pliku CSV albo wpisz tankowania ręcznie.', empty: 'W raporcie nie znaleziono tankowań.' },
   },
 

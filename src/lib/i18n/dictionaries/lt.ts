@@ -238,6 +238,11 @@ export const lt = {
     sourcesFleet: 'Visas parkas',
     sourcesDiff: 'Skirtumas',
     sourcesHint: 'Tas pats pylimas gali ateiti iš trijų šaltinių: degalų kortelės ataskaitos, vairuotojo programėlės ir sekimo sistemos (GPS). Jei linijos išsiskiria, kuriame nors šaltinyje trūksta pylimo arba nesutampa kiekiai – skirtumas matomas ir pylimo eilutėje.',
+    download: 'Atsisiųsti ataskaitą',
+    reportTitle: 'Degalų ataskaita',
+    reportFile: 'degalai',
+    colUnit: 'Vienetas',
+    reportSourcesNote: 'Tas pats pylimas gali ateiti iš trijų šaltinių: degalų kortelės ataskaitos, vairuotojo programėlės ir sekimo sistemos (GPS). Jei kiekiai skiriasi daugiau nei 2 %, skirtumas paryškintas.',
     failed: { not_configured: 'Automatinis ataskaitų atpažinimas dar nenaudojamas. Įveskite pylimus rankiniu būdu arba paprašykite vairuotojų juos registruoti programėlėje.', failed: 'Ataskaitos nepavyko perskaityti. Pabandykite CSV failą arba įveskite pylimus rankiniu būdu.', empty: 'Ataskaitoje pylimų nerasta.' },
   },
 

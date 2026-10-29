@@ -238,6 +238,11 @@ export const sv = {
     sourcesFleet: 'Hela fordonsparken',
     sourcesDiff: 'Skillnad',
     sourcesHint: 'Samma tankning kan komma från tre källor: bränslekortets rapport, förarappen och spårningssystemet (GPS). När linjerna glider isär saknas en tankning i någon källa eller så stämmer mängderna inte – skillnaden visas också på tankningens rad.',
+    download: 'Ladda ner rapport',
+    reportTitle: 'Bränslerapport',
+    reportFile: 'bransle',
+    colUnit: 'Enhet',
+    reportSourcesNote: 'Samma tankning kan komma från tre källor: bränslekortets rapport, förarappen och spårningssystemet (GPS). Om mängderna skiljer sig med mer än 2 % är skillnaden markerad.',
     failed: { not_configured: 'Automatisk igenkänning av rapporter används inte ännu. Registrera tankningar manuellt eller be förarna registrera dem i appen.', failed: 'Rapporten kunde inte läsas. Prova en CSV-fil eller registrera tankningar manuellt.', empty: 'Inga tankningar hittades i rapporten.' },
   },
 

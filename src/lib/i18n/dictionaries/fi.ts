@@ -261,6 +261,11 @@ export const fi = {
     sourcesFleet: 'Koko kalusto',
     sourcesDiff: 'Ero',
     sourcesHint: 'Sama tankkaus voi tulla kolmesta lähteestä: polttoainekortin raportista, kuljettajan sovelluksesta ja seurantajärjestelmästä (GPS). Jos viivat erkanevat, jokin tankkaus puuttuu yhdestä lähteestä tai määrät eivät täsmää – ero näkyy myös tankkauksen rivillä.',
+    download: 'Lataa raportti',
+    reportTitle: 'Polttoaineraportti',
+    reportFile: 'polttoaine',
+    colUnit: 'Yksikkö',
+    reportSourcesNote: 'Sama tankkaus voi tulla kolmesta lähteestä: polttoainekortin raportista, kuljettajan sovelluksesta ja seurantajärjestelmästä (GPS). Jos lähteiden määrät eroavat yli 2 %, ero on korostettu.',
     failed: { not_configured: 'Raporttien automaattinen tunnistus ei ole vielä käytössä. Kirjaa tankkaukset käsin tai pyydä kuljettajia kirjaamaan ne sovelluksessa.', failed: 'Raporttia ei saatu luettua. Kokeile CSV-tiedostoa tai kirjaa tankkaukset käsin.', empty: 'Raportista ei löytynyt tankkauksia.' },
   },
 

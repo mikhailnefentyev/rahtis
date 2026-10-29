@@ -238,6 +238,11 @@ export const et = {
     sourcesFleet: 'Kogu autopark',
     sourcesDiff: 'Erinevus',
     sourcesHint: 'Sama tankimine võib tulla kolmest allikast: kütusekaardi aruandest, juhi rakendusest ja jälgimissüsteemist (GPS). Kui jooned lähevad lahku, puudub mõnes allikas tankimine või kogused ei klapi – erinevus on näha ka tankimise real.',
+    download: 'Laadi aruanne alla',
+    reportTitle: 'Kütusearuanne',
+    reportFile: 'kutus',
+    colUnit: 'Ühik',
+    reportSourcesNote: 'Sama tankimine võib tulla kolmest allikast: kütusekaardi aruandest, juhi rakendusest ja jälgimissüsteemist (GPS). Kui kogused erinevad üle 2 %, on erinevus esile tõstetud.',
     failed: { not_configured: 'Aruannete automaatne tuvastamine pole veel kasutusel. Sisesta tankimised käsitsi või palu juhtidel need rakenduses sisestada.', failed: 'Aruannet ei õnnestunud lugeda. Proovi CSV-faili või sisesta tankimised käsitsi.', empty: 'Aruandest ei leitud tankimisi.' },
   },
 

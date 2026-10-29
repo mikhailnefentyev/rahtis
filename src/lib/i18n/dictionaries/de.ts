@@ -238,6 +238,11 @@ export const de = {
     sourcesFleet: 'Gesamte Flotte',
     sourcesDiff: 'Abweichung',
     sourcesHint: 'Dieselbe Tankung kann aus drei Quellen kommen: dem Tankkartenbericht, der Fahrer-App und dem Ortungssystem (GPS). Laufen die Linien auseinander, fehlt eine Tankung in einer Quelle oder die Mengen stimmen nicht – die Abweichung steht auch in der Zeile der Tankung.',
+    download: 'Bericht herunterladen',
+    reportTitle: 'Kraftstoffbericht',
+    reportFile: 'kraftstoff',
+    colUnit: 'Einheit',
+    reportSourcesNote: 'Dieselbe Tankung kann aus drei Quellen kommen: dem Tankkartenbericht, der Fahrer-App und dem Ortungssystem (GPS). Weichen die Mengen um mehr als 2 % ab, ist die Abweichung hervorgehoben.',
     failed: { not_configured: 'Die automatische Berichtserkennung ist noch nicht aktiv. Erfassen Sie Tankvorgänge manuell oder bitten Sie die Fahrer, sie in der App einzutragen.', failed: 'Der Bericht konnte nicht gelesen werden. Versuchen Sie eine CSV-Datei oder erfassen Sie die Tankvorgänge manuell.', empty: 'Im Bericht wurden keine Tankvorgänge gefunden.' },
   },
 

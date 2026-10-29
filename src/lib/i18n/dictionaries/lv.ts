@@ -238,6 +238,11 @@ export const lv = {
     sourcesFleet: 'Viss autoparks',
     sourcesDiff: 'Atšķirība',
     sourcesHint: 'Viena uzpilde var nākt no trim avotiem: degvielas kartes atskaites, vadītāja lietotnes un izsekošanas sistēmas (GPS). Ja līnijas atšķiras, kādā avotā trūkst uzpildes vai nesakrīt daudzumi – starpība redzama arī uzpildes rindā.',
+    download: 'Lejupielādēt atskaiti',
+    reportTitle: 'Degvielas atskaite',
+    reportFile: 'degviela',
+    colUnit: 'Mērvienība',
+    reportSourcesNote: 'Viena uzpilde var nākt no trim avotiem: degvielas kartes atskaites, vadītāja lietotnes un izsekošanas sistēmas (GPS). Ja daudzumi atšķiras vairāk nekā par 2 %, atšķirība ir izcelta.',
     failed: { not_configured: 'Automātiskā atskaišu atpazīšana vēl netiek izmantota. Ievadiet uzpildes manuāli vai lūdziet vadītājiem tās reģistrēt lietotnē.', failed: 'Atskaiti neizdevās nolasīt. Mēģiniet CSV failu vai ievadiet uzpildes manuāli.', empty: 'Atskaitē netika atrastas uzpildes.' },
   },
 

@@ -254,6 +254,11 @@ export const en = {
     sourcesFleet: 'Whole fleet',
     sourcesDiff: 'Difference',
     sourcesHint: 'The same refuelling can come from three sources: the fuel card report, the driver app and the tracking system (GPS). When the lines drift apart, a refuelling is missing from one source or the quantities do not match – the difference is also shown on the refuelling row.',
+    download: 'Download report',
+    reportTitle: 'Fuel report',
+    reportFile: 'fuel',
+    colUnit: 'Unit',
+    reportSourcesNote: 'The same refuelling can come from three sources: the fuel card report, the driver app and the tracking system (GPS). When the quantities differ by more than 2 %, the difference is highlighted.',
     failed: { not_configured: 'Automatic report recognition is not in use yet. Enter refuelling manually or ask drivers to record it in the app.', failed: 'The report could not be read. Try a CSV file or enter refuelling manually.', empty: 'No refuelling found in the report.' },
   },
 
