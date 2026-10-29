@@ -172,7 +172,7 @@ export const en = {
     nav: "GPS tracking",
     title: "GPS tracking",
     lede: "Your vehicles on the map from your own tracking system (Wialon, Mapon, Navirec, Ruptela, Navixy, Samsara, Webfleet or ABAX). Connect the system's key to see the position, whether the vehicle is moving or standing and since when, fuel, odometer and driver – as far as the system provides them. We store only the latest status, no route history. Refuelling detected by the system goes to the Fuel view.",
-    locked: "GPS tracking is included in the RAHTIS subscription (from €29.90 / vehicle / month). Contact us and we will open it.",
+    locked: "GPS tracking is included in the RAHTIS subscription (up to €29.90 / vehicle / month). Contact us and we will open it.",
     add: "Connect a tracking system",
     addHint: "Using another tracking system or account? Connect it too.",
     connectTitle: "Connect Wialon",
@@ -285,7 +285,7 @@ export const en = {
     nav: "Profitability",
     title: "Profitability",
     lede: "Income, costs and result for each vehicle and the whole fleet in one place: trip income, fuel, driver pay, vehicle financing or depreciation, insurance, tax and other costs. Fill in the purchase and cost details on the vehicle's page.",
-    locked: "Profitability is part of the RAHTIS subscription (from €29.90 / vehicle / month). Contact us and we will open it.",
+    locked: "Profitability is part of the RAHTIS subscription (up to €29.90 / vehicle / month). Contact us and we will open it.",
     statRevenue: "Income",
     statCosts: "Costs",
     statProfit: "Result",
@@ -365,7 +365,7 @@ export const en = {
     nav: 'Fuel',
     title: 'Fuel',
     lede: 'Consumption and fuel costs of your vehicles by month. Refuelling comes from three sources: the driver app, the monthly fuel card report and manual entries. The same refuelling from two sources is merged into one line.',
-    locked: 'Fuel tracking is part of the RAHTIS subscription (from €29.90 per vehicle per month). Contact us and we will switch it on.',
+    locked: 'Fuel tracking is part of the RAHTIS subscription (up to €29.90 per vehicle per month). Contact us and we will switch it on.',
     importedNote: 'Report saved.',
     prevMonth: 'Previous month',
     nextMonth: 'Next month',
@@ -693,16 +693,24 @@ export const en = {
     /* What the platform does, as a list for the schema.org card (answer engines read it). */
     features: [
       'Fleet and driver management',
+      'Vehicle combinations with the maximum permitted weight and payload for each country',
+      'Fuel from three sources (fuel card report, driver entries, GPS) with PDF and CSV export',
+      'GPS from your own tracker via an API key: Wialon, Mapon, Navirec, Ruptela, Navixy, Samsara, Webfleet, ABAX',
+      'Profitability per vehicle; parts, tyre and breakdown suppliers in nine countries',
       'Own customers and direct orders, tracking link for the customer',
       'Freight exchange (load board) for trailer swaps, containers and express transport',
       'Earthworks and dump trucks: weighed loads, Finnish waste transfer documents, hours and invoices from the worksite',
       'Driver app in 10 languages, works offline',
-      'Working time and estimated pay',
+      'Working time and estimated pay: per kilometre, percentage of job value, flat hourly rate or collective agreement (TES)',
       'Electronic consignment note (CMR), photos and signature',
       'Step-by-step job tracking with delay and waiting-time alerts',
       'Weekly report and claims per job',
       'API (REST and webhooks) for the shipper\'s own system',
     ],
+    /* Род программы для schema.org (applicationSubCategory). */
+    category: 'Transport management system (TMS) and freight exchange',
+    /* Единица цены абонемента в разметке: за машину в месяц, без налога. */
+    priceUnit: 'vehicle / month, excl. VAT',
     homeDescription:
       'RAHTIS is a transport management platform and freight exchange for carriers. Run your fleet, drivers, working time and CMR notes in one place, take orders directly from your own customers and fill empty trucks from the load board. Trailer swaps, containers and express transport in Finland, the Nordics, the Baltics, Poland and Germany — shippers publish once and follow the job step by step. For earthworks: dump-truck loads, weighings, hours and invoices from the worksite.',
     termsDescription:
@@ -870,7 +878,7 @@ export const en = {
     partnershipSub: 'The platform for a monthly fee',
     partnershipCon: 'Subcontracting',
     partnershipSubText:
-      'From €29.90 (excl. VAT) a month for each vehicle that drove during the month. No percentage is charged on your own customers, direct orders and direct-contract board jobs, and you get a weekly report of them. Other load board jobs: 3%. Larger fleets pay less per vehicle: from the 10th vehicle €27.90, from the 20th €25.90 and from the 50th €23.90. Pay a year in advance: −10 %. From 100 vehicles, price on request.',
+      'Up to €29.90 (excl. VAT) a month for each vehicle that drove during the month. No percentage is charged on your own customers, direct orders and direct-contract board jobs, and you get a weekly report of them. Other load board jobs: 3%. Larger fleets pay less per vehicle: from the 10th vehicle €27.90, from the 20th €25.90 and from the 50th €23.90. Pay a year in advance: −10 %. From 100 vehicles, price on request.',
     partnershipConText:
       '3% of the price of every job, deducted from the payout. We handle the invoices to customers, the CMR notes and the claims; no monthly fee is charged.',
     partnershipSwitch: 'Switch to: {mode}',
@@ -1114,7 +1122,7 @@ export const en = {
     own2: 'Working time and estimated pay from your own rates or the collective agreement tables.',
     own3: 'A map of rest, wash and service places in the Nordics, the Baltics, Poland and Germany.',
     own4: 'Your customer sends the order straight to your vehicle, or you add the job yourself and give it to your own vehicle. The customer can get a tracking link. The whole price is yours, and the job goes into your weekly report.',
-    own5: "From €29.90 a month per active vehicle. A vehicle that stays parked costs nothing.",
+    own5: "Up to €29.90 a month per active vehicle. A vehicle that stays parked costs nothing.",
     own6: 'The load board is still there when a truck is free.',
 
     stepsEyebrow: 'How a job runs',
@@ -2020,7 +2028,7 @@ export const en = {
     partnership: 'Carrier’s plan',
     partnershipSub: 'Monthly fee',
     partnershipCon: 'Subcontracting',
-    partnershipSubHint: 'From €29.90 a month per vehicle that drove. No percentage on own customers, direct orders and direct-contract board jobs, with a weekly report; other board jobs 3%.',
+    partnershipSubHint: 'Up to €29.90 a month per vehicle that drove. No percentage on own customers, direct orders and direct-contract board jobs, with a weekly report; other board jobs 3%.',
     partnershipConHint: '3% of every job. We handle the invoices to customers, the CMR notes and the claims; no monthly fee.',
     partnershipSwitch: 'Switch to {mode}',
     testHint: 'A test company’s jobs aren’t invoiced or paid out.',
@@ -2083,7 +2091,7 @@ export const en = {
     howTitle: 'How do you want to use the service?',
     howSub: 'The platform for a monthly fee',
     howSubText:
-      'You run jobs for your own customers and use the app, working time, the map and the load board. From €29.90 a month for each vehicle that drove during the month. You get a weekly report of the jobs.',
+      'You run jobs for your own customers and use the app, working time, the map and the load board. Up to €29.90 a month for each vehicle that drove during the month. You get a weekly report of the jobs.',
     howCon: 'Subcontracting',
     howConText:
       'We find the work, invoice the customer and handle the CMR notes and claims. 3% of the job price, no monthly fee.',
@@ -3656,7 +3664,7 @@ export const en = {
     clientRequired: 'Choose a customer or type the name of a new one.',
     clientInvalid: "Check the customer’s business ID and email.",
     subscriptionOnly:
-      'Own jobs are part of the monthly plan: from €29.90 a month per vehicle that drove, no percentage. The first month is free.',
+      'Own jobs are part of the monthly plan: up to €29.90 a month per vehicle that drove, no percentage. The first month is free.',
     trackLink: 'Tracking link for the customer',
     badge: 'Own job',
     clients: 'Customers',

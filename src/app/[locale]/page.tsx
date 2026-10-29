@@ -4,11 +4,15 @@ import { notFound } from 'next/navigation';
 import { HeroPort } from '@/components/domain/HeroPort';
 import { LandingSections } from '@/components/domain/LandingSections';
 import { SiteHeader } from '@/components/layout/SiteHeader';
-import { APP, SUBSCRIPTION_LADDER } from '@/lib/config';
+import { APP, ON_REQUEST_FROM, SUBSCRIPTION_LADDER } from '@/lib/config';
 import { getI18n, isLocale } from '@/lib/i18n';
+import { locales } from '@/lib/i18n/config';
 import { placeCountries } from '@/lib/routing/places';
 import { hasArticles } from '@/lib/blog/heycatch';
 import { ORG_SAME_AS, SITE_URL, pageMetadata, samePath } from '@/lib/seo';
+
+/* Цена для schema.org: точка и два знака, как требует разметка. */
+const euro = (cents: number) => (cents / 100).toFixed(2);
 
 /**
  * Главная страница.
@@ -78,9 +82,15 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
    * четыре страны работы. Адреса конторы здесь нет — на витрине его
    * тоже нет, и появляться он должен решением, а не заодно с разметкой.
    */
+  /*
+   * Три карточки связаны через @id: издатель сайта и поставщик программы —
+   * та же организация, а не три разных лица с одним именем.
+   */
+  const orgId = `${SITE_URL}/#organization`;
   const organisation = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
+    '@id': orgId,
     name: t.brand.name,
     legalName: APP.operator.legalName,
     url: pageUrl,
@@ -101,8 +111,9 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     '@type': 'WebSite',
     name: t.brand.name,
     url: `${SITE_URL}/`,
-    inLanguage: ['fi', 'en'],
-    publisher: { '@type': 'Organization', name: APP.operator.legalName },
+    /* Витрина на девяти языках; раньше здесь стояли только fi и en. */
+    inLanguage: [...locales],
+    publisher: { '@id': orgId },
   };
 
   /*
@@ -117,20 +128,45 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     name: t.brand.name,
     url: pageUrl,
     applicationCategory: 'BusinessApplication',
-    applicationSubCategory: locale === 'fi' ? 'Kuljetusten hallintajärjestelmä (TMS) ja rahtipörssi' : 'Transport management system (TMS) and freight exchange',
+    applicationSubCategory: t.seo.category,
     operatingSystem: 'Web, Android, iOS',
     description: t.seo.homeDescription,
     featureList: t.seo.features,
-    inLanguage: ['fi', 'en'],
-    /* Лесенка: от 23,90 € (50–99 машин) до 29,90 € (1–9), от 100 машин — по запросу. */
+    inLanguage: [...locales],
+    /*
+     * Лесенка из config: каждая ступень — своё предложение с ценой за
+     * машину в месяц и диапазоном машин. От ON_REQUEST_FROM машин цена по
+     * запросу, поэтому у последней ступени верхняя граница ON_REQUEST_FROM − 1.
+     * Описание — тот же абзац, что в кабинете (машины, которые ездили,
+     * лесенка, −10 % за год).
+     */
     offers: {
       '@type': 'AggregateOffer',
-      lowPrice: (Math.min(...SUBSCRIPTION_LADDER.map((s) => s.cents)) / 100).toFixed(2),
-      highPrice: (SUBSCRIPTION_LADDER[0].cents / 100).toFixed(2),
+      lowPrice: euro(Math.min(...SUBSCRIPTION_LADDER.map((s) => s.cents))),
+      highPrice: euro(SUBSCRIPTION_LADDER[0].cents),
       priceCurrency: 'EUR',
-      priceSpecification: { '@type': 'UnitPriceSpecification', price: (SUBSCRIPTION_LADDER[0].cents / 100).toFixed(2), priceCurrency: 'EUR', unitText: locale === 'fi' ? 'auto / kuukausi, alv 0 %' : 'vehicle / month, excl. VAT', valueAddedTaxIncluded: false },
+      offerCount: SUBSCRIPTION_LADDER.length,
+      description: t.subscription.lede,
+      offers: SUBSCRIPTION_LADDER.map((step) => {
+        const to = step.to ?? ON_REQUEST_FROM - 1;
+        return {
+          '@type': 'Offer',
+          name: `${t.subscription.colVehicles}: ${step.from}–${to}`,
+          price: euro(step.cents),
+          priceCurrency: 'EUR',
+          priceSpecification: {
+            '@type': 'UnitPriceSpecification',
+            price: euro(step.cents),
+            priceCurrency: 'EUR',
+            unitText: t.seo.priceUnit,
+            referenceQuantity: { '@type': 'QuantitativeValue', value: 1, unitCode: 'MON' },
+            eligibleQuantity: { '@type': 'QuantitativeValue', minValue: step.from, maxValue: to, unitText: t.subscription.colVehicles },
+            valueAddedTaxIncluded: false,
+          },
+        };
+      }),
     },
-    provider: { '@type': 'Organization', name: APP.operator.legalName },
+    provider: { '@id': orgId },
   };
 
   return (

@@ -156,7 +156,7 @@ export const de = {
     nav: "GPS-Ortung",
     title: "GPS-Ortung",
     lede: "Ihre Fahrzeuge auf der Karte aus Ihrem eigenen Ortungssystem (Wialon, Mapon, Navirec, Ruptela, Navixy, Samsara, Webfleet oder ABAX). Verbinden Sie den Schlüssel des Systems und sehen Sie Position, ob das Fahrzeug fährt oder steht und seit wann, Kraftstoff, Kilometerstand und Fahrer – soweit das System sie liefert. Wir speichern nur den letzten Stand, keinen Routenverlauf. Vom System erkannte Tankungen erscheinen in der Ansicht Kraftstoff.",
-    locked: "GPS-Ortung ist im RAHTIS-Abo enthalten (ab 29,90 € / Fahrzeug / Monat). Kontaktieren Sie uns, dann schalten wir sie frei.",
+    locked: "GPS-Ortung ist im RAHTIS-Abo enthalten (bis zu 29,90 € / Fahrzeug / Monat). Kontaktieren Sie uns, dann schalten wir sie frei.",
     add: "Ortungssystem verbinden",
     addHint: "Nutzen Sie ein weiteres Ortungssystem oder Konto? Verbinden Sie es ebenfalls.",
     connectTitle: "Wialon verbinden",
@@ -269,7 +269,7 @@ export const de = {
     nav: "Rentabilität",
     title: "Rentabilität",
     lede: "Einnahmen, Kosten und Ergebnis für jedes Fahrzeug und die ganze Flotte an einem Ort: Einnahmen aus Fahrten, Kraftstoff, Fahrerlohn, Finanzierung oder Abschreibung, Versicherungen, Steuer und sonstige Kosten. Kauf- und Kostendaten tragen Sie auf der Fahrzeugseite ein.",
-    locked: "Rentabilität ist Teil des RAHTIS-Abonnements (ab 29,90 € / Fahrzeug / Monat). Kontaktieren Sie uns, wir schalten es frei.",
+    locked: "Rentabilität ist Teil des RAHTIS-Abonnements (bis zu 29,90 € / Fahrzeug / Monat). Kontaktieren Sie uns, wir schalten es frei.",
     statRevenue: "Einnahmen",
     statCosts: "Kosten",
     statProfit: "Ergebnis",
@@ -349,7 +349,7 @@ export const de = {
     nav: 'Kraftstoff',
     title: 'Kraftstoff',
     lede: 'Verbrauch und Kraftstoffkosten Ihrer Fahrzeuge pro Monat. Tankvorgänge kommen aus drei Quellen: der Fahrer-App, dem Monatsbericht der Tankkarte und manueller Erfassung. Derselbe Tankvorgang aus zwei Quellen wird zu einer Zeile zusammengeführt.',
-    locked: 'Die Kraftstofferfassung ist Teil des RAHTIS-Abonnements (ab 29,90 € pro Fahrzeug und Monat). Kontaktieren Sie uns, dann schalten wir sie frei.',
+    locked: 'Die Kraftstofferfassung ist Teil des RAHTIS-Abonnements (bis zu 29,90 € pro Fahrzeug und Monat). Kontaktieren Sie uns, dann schalten wir sie frei.',
     importedNote: 'Bericht gespeichert.',
     prevMonth: 'Vorheriger Monat',
     nextMonth: 'Nächster Monat',
@@ -676,16 +676,24 @@ export const de = {
     privacyTitle: 'Datenschutzhinweise: Umgang mit personenbezogenen Daten',
     features: [
       'Fuhrpark- und Fahrerverwaltung',
+      'Fahrzeugkombinationen mit zulässiger Gesamtmasse und Nutzlast je Land',
+      'Kraftstoff aus drei Quellen (Tankkarte, Fahrereingaben, GPS) mit Export als PDF und CSV',
+      'GPS aus Ihrem eigenen Tracker per API-Schlüssel: Wialon, Mapon, Navirec, Ruptela, Navixy, Samsara, Webfleet, ABAX',
+      'Rentabilität jedes Fahrzeugs; Lieferanten für Ersatzteile, Reifen und Pannenhilfe in neun Ländern',
       'Eigene Kunden und Direktaufträge, Tracking-Link für den Kunden',
       'Frachtenbörse für Trailertausch, Container und Expressfahrten',
       'Erdbau und Kipper: gewogene Ladungen, finnische Abfall-Begleitscheine, Stunden und Rechnungen von der Baustelle',
       'Fahrer-App in 10 Sprachen, funktioniert offline',
-      'Arbeitszeit und voraussichtlicher Lohn',
+      'Arbeitszeit und voraussichtlicher Lohn: pro Kilometer, Prozent vom Auftrag, fester Stundenlohn oder Tarifvertrag',
       'Elektronischer Frachtbrief, Fotos und Unterschrift',
       'Transport Schritt für Schritt verfolgen, Warnungen bei Verspätung und Standzeit',
       'Wochenbericht und Reklamationen pro Auftrag',
       'Schnittstelle (REST und Webhooks) zum System des Auftraggebers',
     ],
+    /* Род программы для schema.org (applicationSubCategory). */
+    category: 'Transportmanagementsystem (TMS) und Frachtenbörse',
+    /* Единица цены абонемента в разметке: за машину в месяц, без налога. */
+    priceUnit: 'Fahrzeug / Monat, zzgl. MwSt.',
     homeDescription:
       'RAHTIS ist die Arbeitsplattform und Frachtenbörse für Transportunternehmen. Verwalten Sie Fuhrpark, Fahrer, Arbeitszeit und Frachtbriefe an einem Ort, nehmen Sie Aufträge direkt von Ihren eigenen Kunden an und füllen Sie freie Lkw über die Frachtenbörse. Trailertausch, Container und Expressfahrten in Finnland, den nordischen Ländern, dem Baltikum, Polen und Deutschland — der Auftraggeber findet mit einer einzigen Veröffentlichung einen Fahrer und sieht den Transport Schritt für Schritt. Für den Erdbau: Kipperladungen, Wiegungen, Stunden und Rechnungen von der Baustelle.',
     termsDescription:
@@ -853,7 +861,7 @@ export const de = {
     partnershipSub: 'Plattform gegen Monatsgebühr',
     partnershipCon: 'Subunternehmer',
     partnershipSubText:
-      'Ab 29,90 € (zzgl. MwSt.) im Monat für jedes Fahrzeug, das in dem Monat gefahren ist. Für eigene Kunden, Direktaufträge und Direktverträge über die Börse gibt es keinen Prozentsatz, sie landen im Wochenbericht. Andere Aufträge aus der Börse: 3 %. Größere Flotten zahlen weniger je Fahrzeug: ab dem 10. Fahrzeug 27,90 €, ab dem 20. 25,90 € und ab dem 50. 23,90 €. Ein Jahr im Voraus: −10 %. Ab 100 Fahrzeugen: Preis auf Anfrage.',
+      'Bis zu 29,90 € (zzgl. MwSt.) im Monat für jedes Fahrzeug, das in dem Monat gefahren ist. Für eigene Kunden, Direktaufträge und Direktverträge über die Börse gibt es keinen Prozentsatz, sie landen im Wochenbericht. Andere Aufträge aus der Börse: 3 %. Größere Flotten zahlen weniger je Fahrzeug: ab dem 10. Fahrzeug 27,90 €, ab dem 20. 25,90 € und ab dem 50. 23,90 €. Ein Jahr im Voraus: −10 %. Ab 100 Fahrzeugen: Preis auf Anfrage.',
     partnershipConText:
       '3 % vom Preis jedes Auftrags, wird von der Abrechnung abgezogen. Rechnungen an die Kunden, Frachtbriefe und Reklamationen erledigen wir. Keine Monatsgebühr.',
     partnershipSwitch: 'Wechseln zu: {mode}',
@@ -1058,7 +1066,7 @@ export const de = {
     own2: 'Arbeitszeit und voraussichtlicher Lohn nach Ihren eigenen Sätzen oder nach Tariftabelle.',
     own3: 'Eine Karte mit Rast-, Wasch- und Serviceplätzen in den nordischen Ländern, im Baltikum, in Polen und Deutschland.',
     own4: 'Ihr Kunde schickt den Auftrag direkt an Ihr Fahrzeug, oder Sie legen den Auftrag selbst an und geben ihn Ihrem eigenen Fahrzeug. Der Kunde bekommt auf Wunsch einen Tracking-Link. Der volle Preis gehört Ihnen, und der Auftrag landet in Ihrem Wochenbericht.',
-    own5: "Ab 29,90 € pro Monat für jedes Fahrzeug, das gefahren ist. Ein stehendes Fahrzeug kostet nichts.",
+    own5: "Bis zu 29,90 € pro Monat für jedes Fahrzeug, das gefahren ist. Ein stehendes Fahrzeug kostet nichts.",
     own6: 'Die Frachtenbörse steht Ihnen trotzdem offen, wenn ein Fahrzeug frei wird.',
 
     stepsEyebrow: 'So läuft ein Auftrag',
@@ -1885,7 +1893,7 @@ export const de = {
     partnership: 'Modell des Transportunternehmens',
     partnershipSub: 'Monatsgebühr',
     partnershipCon: 'Subunternehmer',
-    partnershipSubHint: 'Ab 29,90 € im Monat je gefahrenem Fahrzeug. Für eigene Kunden, Direktaufträge und Direktverträge über die Börse kein Prozentsatz, sie landen im Wochenbericht; andere Börsenaufträge 3 %.',
+    partnershipSubHint: 'Bis zu 29,90 € im Monat je gefahrenem Fahrzeug. Für eigene Kunden, Direktaufträge und Direktverträge über die Börse kein Prozentsatz, sie landen im Wochenbericht; andere Börsenaufträge 3 %.',
     partnershipConHint: '3 % von jedem Auftrag. Rechnungen an die Kunden, Frachtbriefe und Reklamationen erledigen wir; keine Monatsgebühr.',
     partnershipSwitch: 'Wechseln zu {mode}',
     testHint: 'Aufträge eines Testunternehmens kommen weder in Rechnungen noch in Abrechnungen.',
@@ -1948,7 +1956,7 @@ export const de = {
     howTitle: 'Wie möchten Sie den Service nutzen?',
     howSub: 'Plattform gegen Monatsgebühr',
     howSubText:
-      'Sie fahren Ihre eigenen Kunden und nutzen App, Arbeitszeit, Karte und Frachtenbörse. Ab 29,90 € im Monat für jedes Fahrzeug, das in dem Monat gefahren ist. Über die Aufträge bekommen Sie einen Wochenbericht.',
+      'Sie fahren Ihre eigenen Kunden und nutzen App, Arbeitszeit, Karte und Frachtenbörse. Bis zu 29,90 € im Monat für jedes Fahrzeug, das in dem Monat gefahren ist. Über die Aufträge bekommen Sie einen Wochenbericht.',
     howCon: 'Subunternehmer',
     howConText:
       'Wir besorgen die Aufträge, stellen dem Kunden die Rechnung und kümmern uns um Frachtbriefe und Reklamationen. 3 % vom Auftragspreis, keine Monatsgebühr.',
@@ -3505,7 +3513,7 @@ export const de = {
     clientRequired: 'Wählen Sie einen Kunden oder geben Sie den Namen eines neuen ein.',
     clientInvalid: 'Prüfen Sie Y-tunnus und E-Mail des Kunden.',
     subscriptionOnly:
-      'Eigene Aufträge gehören zum Monatsmodell: ab 29,90 € im Monat je gefahrenem Fahrzeug, kein Prozentsatz. Der erste Monat ist kostenlos.',
+      'Eigene Aufträge gehören zum Monatsmodell: bis zu 29,90 € im Monat je gefahrenem Fahrzeug, kein Prozentsatz. Der erste Monat ist kostenlos.',
     trackLink: 'Tracking-Link für den Kunden',
     badge: 'Eigener Auftrag',
     clients: 'Kunden',

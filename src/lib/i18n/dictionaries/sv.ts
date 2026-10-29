@@ -156,7 +156,7 @@ export const sv = {
     nav: "GPS-spårning",
     title: "GPS-spårning",
     lede: "Fordonen på kartan från ditt eget spårningssystem (Wialon, Mapon, Navirec, Ruptela, Navixy, Samsara, Webfleet eller ABAX). Anslut systemets nyckel så ser du position, om fordonet kör eller står och sedan när, bränsle, mätarställning och förare – så långt systemet ger dem. Vi sparar bara senaste status, ingen rutthistorik. Tankningar som systemet upptäcker går till vyn Bränsle.",
-    locked: "GPS-spårning ingår i RAHTIS-abonnemanget (från 29,90 € / fordon / mån). Kontakta oss så öppnar vi den.",
+    locked: "GPS-spårning ingår i RAHTIS-abonnemanget (högst 29,90 € / fordon / mån). Kontakta oss så öppnar vi den.",
     add: "Anslut ett spårningssystem",
     addHint: "Har du ett annat spårningssystem eller konto? Anslut det också.",
     connectTitle: "Anslut Wialon",
@@ -269,7 +269,7 @@ export const sv = {
     nav: "Lönsamhet",
     title: "Lönsamhet",
     lede: "Intäkter, kostnader och resultat för varje fordon och hela fordonsparken på ett ställe: intäkter från körningar, bränsle, förarlön, finansiering eller avskrivning, försäkringar, skatt och övriga kostnader. Fyll i inköps- och kostnadsuppgifter på fordonets sida.",
-    locked: "Lönsamhet ingår i RAHTIS-abonnemanget (från 29,90 € / fordon / mån). Kontakta oss så öppnar vi det.",
+    locked: "Lönsamhet ingår i RAHTIS-abonnemanget (högst 29,90 € / fordon / mån). Kontakta oss så öppnar vi det.",
     statRevenue: "Intäkter",
     statCosts: "Kostnader",
     statProfit: "Resultat",
@@ -349,7 +349,7 @@ export const sv = {
     nav: 'Bränsle',
     title: 'Bränsle',
     lede: 'Fordonens förbrukning och bränslekostnader per månad. Tankningar kommer från tre källor: förarappen, bränslekortets månadsrapport och manuell inmatning. Samma tankning från två källor slås ihop till en rad.',
-    locked: 'Bränsleuppföljning ingår i RAHTIS-abonnemanget (från 29,90 € per fordon och månad). Kontakta oss så aktiverar vi den.',
+    locked: 'Bränsleuppföljning ingår i RAHTIS-abonnemanget (högst 29,90 € per fordon och månad). Kontakta oss så aktiverar vi den.',
     importedNote: 'Rapporten sparad.',
     prevMonth: 'Föregående månad',
     nextMonth: 'Nästa månad',
@@ -676,16 +676,24 @@ export const sv = {
     privacyTitle: 'Integritetspolicy: hur personuppgifter behandlas',
     features: [
       'Hantering av flotta och förare',
+      'Ekipage med högsta tillåtna bruttovikt och lastförmåga i varje land',
+      'Bränsle från tre källor (bränslekort, förarens anteckningar, GPS) med export till PDF och CSV',
+      'GPS från ditt eget spårningssystem via API-nyckel: Wialon, Mapon, Navirec, Ruptela, Navixy, Samsara, Webfleet, ABAX',
+      'Lönsamhet per fordon; leverantörer av reservdelar, däck och bärgning i nio länder',
       'Egna kunder och direktorder, spårningslänk till kunden',
       'Lastbörs (anbudstavla) för trailerbyten, containrar och expresstransporter',
       'Markarbeten och tippbilar: vägda lass, finska transportdokument för avfall, timmar och fakturor från arbetsplatsen',
       'Förarapp på 10 språk, fungerar offline',
-      'Arbetstid och vägledande lön',
+      'Arbetstid och uppskattad lön: per kilometer, procentlön, fast timlön eller kollektivavtal',
       'Elektronisk fraktsedel (CMR), foton och signatur',
       'Uppföljning av uppdraget steg för steg med larm om förseningar och väntetid',
       'Veckorapport och reklamationer per uppdrag',
       'API (REST och webhooks) för uppdragsgivarens eget system',
     ],
+    /* Род программы для schema.org (applicationSubCategory). */
+    category: 'Transportledningssystem (TMS) och lastbörs',
+    /* Единица цены абонемента в разметке: за машину в месяц, без налога. */
+    priceUnit: 'fordon / månad, exkl. moms',
     homeDescription:
       'RAHTIS är en plattform för transportledning och en lastbörs för åkerier. Hantera flotta, förare, arbetstid och fraktsedlar på ett ställe, ta emot order direkt från egna kunder och fyll tomma bilar från anbudstavlan. Trailerbyten, containrar och expresstransporter i Finland, Norden, Baltikum, Polen och Tyskland – uppdragsgivaren publicerar en gång och följer uppdraget steg för steg. För markarbeten: tippbilarnas lass, vägning, timmar och fakturor från arbetsplatsen.',
     termsDescription:
@@ -853,7 +861,7 @@ export const sv = {
     partnershipSub: 'Plattformen mot månadsavgift',
     partnershipCon: 'Underentreprenad',
     partnershipSubText:
-      'Från 29,90 € (exkl. moms) i månaden per fordon som har kört under månaden. Egna kunder, direktorder och direktavtal från anbudstavlan: ingen procent, de kommer med i veckorapporten. Övriga uppdrag från anbudstavlan: serviceavgift 3 %. Större flottor betalar mindre per fordon: från fordon 10 27,90 €, från fordon 20 25,90 € och från fordon 50 23,90 €. Betala ett år i förväg: −10 %. Från 100 fordon: pris på begäran.',
+      'Högst 29,90 € (exkl. moms) i månaden per fordon som har kört under månaden. Egna kunder, direktorder och direktavtal från anbudstavlan: ingen procent, de kommer med i veckorapporten. Övriga uppdrag från anbudstavlan: serviceavgift 3 %. Större flottor betalar mindre per fordon: från fordon 10 27,90 €, från fordon 20 25,90 € och från fordon 50 23,90 €. Betala ett år i förväg: −10 %. Från 100 fordon: pris på begäran.',
     partnershipConText:
       'Serviceavgift 3 % av uppdragets pris, dras av vid avräkningen. I priset ingår fakturering av kunden, fraktsedlar och hantering av reklamationer. Ingen månadsavgift.',
     partnershipSwitch: 'Byt till: {mode}',
@@ -1058,7 +1066,7 @@ export const sv = {
     own2: 'Arbetstid och vägledande lön utifrån egna taxor eller kollektivavtalets tabeller.',
     own3: 'En karta över rast-, tvätt- och serviceplatser i Norden, Baltikum, Polen och Tyskland.',
     own4: 'Din kund skickar ordern direkt till ditt fordon, eller så lägger du in uppdraget själv och ger det till ditt eget fordon. Kunden kan få en spårningslänk. Hela priset är ditt, och uppdraget hamnar i din veckorapport.',
-    own5: 'Du betalar från 29,90 € i månaden per bil som har kört. En bil som står still kostar ingenting.',
+    own5: 'Du betalar högst 29,90 € i månaden per bil som har kört. En bil som står still kostar ingenting.',
     own6: 'Anbudstavlan finns kvar när ett fordon blir ledigt.',
 
     stepsEyebrow: 'Så går ett uppdrag till',
@@ -1885,7 +1893,7 @@ export const sv = {
     partnership: 'Hur åkeriet arbetar',
     partnershipSub: 'Månadsavgift',
     partnershipCon: 'Underentreprenad',
-    partnershipSubHint: 'Från 29,90 € i månaden per bil som har kört. Egna kunder, direktorder och direktavtal från anbudstavlan: ingen procent, de kommer med i veckorapporten; övriga uppdrag från anbudstavlan 3 %.',
+    partnershipSubHint: 'Högst 29,90 € i månaden per bil som har kört. Egna kunder, direktorder och direktavtal från anbudstavlan: ingen procent, de kommer med i veckorapporten; övriga uppdrag från anbudstavlan 3 %.',
     partnershipConHint: 'Serviceavgift 3 % av varje uppdrag. I priset ingår fakturering av kunden, fraktsedlar och hantering av reklamationer. Ingen månadsavgift.',
     partnershipSwitch: 'Byt till {mode}',
     testHint: 'Ett testföretags uppdrag faktureras och avräknas inte.',
@@ -1948,7 +1956,7 @@ export const sv = {
     howTitle: 'Hur vill du använda tjänsten?',
     howSub: 'Plattformen mot månadsavgift',
     howSubText:
-      'Du kör dina egna kunder och använder appen, arbetstiden, kartan och anbudstavlan. Från 29,90 € i månaden för varje bil som har kört under månaden. Uppdragen kommer med i veckorapporten.',
+      'Du kör dina egna kunder och använder appen, arbetstiden, kartan och anbudstavlan. Högst 29,90 € i månaden för varje bil som har kört under månaden. Uppdragen kommer med i veckorapporten.',
     howCon: 'Underentreprenad',
     howConText:
       'Du får uppdrag från anbudstavlan. I priset ingår fakturering av kunden, fraktsedlar och hantering av reklamationer. Serviceavgift 3 % av uppdragets pris, ingen månadsavgift.',
@@ -3479,7 +3487,7 @@ export const sv = {
     clientRequired: 'Välj en kund eller skriv namnet på en ny.',
     clientInvalid: 'Kontrollera kundens FO-nummer och e-post.',
     subscriptionOnly:
-      'Egna uppdrag ingår i månadsplanen: från 29,90 € i månaden per bil som har kört, ingen procent. Första månaden är gratis.',
+      'Egna uppdrag ingår i månadsplanen: högst 29,90 € i månaden per bil som har kört, ingen procent. Första månaden är gratis.',
     trackLink: 'Spårningslänk till kunden',
     badge: 'Eget uppdrag',
     clients: 'Kunder',

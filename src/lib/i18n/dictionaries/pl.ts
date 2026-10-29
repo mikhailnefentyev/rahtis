@@ -156,7 +156,7 @@ export const pl = {
     nav: "Śledzenie GPS",
     title: "Śledzenie GPS",
     lede: "Pojazdy na mapie z Twojego systemu śledzenia (Wialon, Mapon, Navirec, Ruptela, Navixy, Samsara, Webfleet lub ABAX). Podłącz klucz systemu, a zobaczysz pozycję, czy pojazd jedzie, czy stoi i od kiedy, paliwo, przebieg i kierowcę – na ile system je udostępnia. Zapisujemy tylko ostatni stan, bez historii tras. Tankowania wykryte przez system trafiają do widoku Paliwo.",
-    locked: "Śledzenie GPS jest w abonamencie RAHTIS (od 29,90 € / pojazd / mies.). Skontaktuj się z nami, a je otworzymy.",
+    locked: "Śledzenie GPS jest w abonamencie RAHTIS (do 29,90 € / pojazd / mies.). Skontaktuj się z nami, a je otworzymy.",
     add: "Podłącz system śledzenia",
     addHint: "Używasz innego systemu śledzenia lub konta? Podłącz je również.",
     connectTitle: "Podłącz Wialon",
@@ -269,7 +269,7 @@ export const pl = {
     nav: "Rentowność",
     title: "Rentowność",
     lede: "Przychody, koszty i wynik każdego pojazdu i całej floty w jednym miejscu: przychody z kursów, paliwo, wynagrodzenie kierowcy, finansowanie lub amortyzacja, ubezpieczenia, podatek i inne koszty. Dane zakupu i kosztów uzupełnij na stronie pojazdu.",
-    locked: "Rentowność jest częścią subskrypcji RAHTIS (od 29,90 € / pojazd / mies.). Skontaktuj się z nami, a ją włączymy.",
+    locked: "Rentowność jest częścią subskrypcji RAHTIS (do 29,90 € / pojazd / mies.). Skontaktuj się z nami, a ją włączymy.",
     statRevenue: "Przychody",
     statCosts: "Koszty",
     statProfit: "Wynik",
@@ -349,7 +349,7 @@ export const pl = {
     nav: 'Paliwo',
     title: 'Paliwo',
     lede: 'Zużycie i koszty paliwa pojazdów w podziale na miesiące. Tankowania pochodzą z trzech źródeł: aplikacji kierowcy, miesięcznego raportu karty paliwowej i wpisów ręcznych. To samo tankowanie z dwóch źródeł jest łączone w jeden wiersz.',
-    locked: 'Rozliczanie paliwa jest częścią subskrypcji RAHTIS (od 29,90 € za pojazd miesięcznie). Skontaktuj się z nami, a je włączymy.',
+    locked: 'Rozliczanie paliwa jest częścią subskrypcji RAHTIS (do 29,90 € za pojazd miesięcznie). Skontaktuj się z nami, a je włączymy.',
     importedNote: 'Raport zapisany.',
     prevMonth: 'Poprzedni miesiąc',
     nextMonth: 'Następny miesiąc',
@@ -670,22 +670,30 @@ export const pl = {
   seo: {
     homeTitle: 'Giełda ładunków i TMS: wymiany naczep, kontenery',
     /* Описание для выдачи поиска: до 160 знаков, иначе обрезается. Длинное homeDescription — для разметки. */
-    homeMeta: 'Giełda ładunków i zarządzanie transportem dla przewoźników: flota, kierowcy, listy przewozowe i zlecenia bezpośrednie. Wymiany naczep, kontenery i transport ekspresowy.',
+    homeMeta: 'Giełda ładunków i system TMS dla przewoźników: flota, kierowcy, listy przewozowe i zlecenia bezpośrednie. Wymiany naczep, kontenery i transport ekspresowy.',
     applyTitle: 'Dołącz jako przewoźnik lub zleceniodawca',
     termsTitle: 'Regulamin dla przewoźników i zleceniodawców',
     privacyTitle: 'Polityka prywatności: dane osobowe',
     features: [
       'Zarządzanie flotą i kierowcami',
+      'Zestawy pojazdów: dopuszczalna masa całkowita i ładowność według przepisów każdego kraju',
+      'Paliwo z trzech źródeł (karta paliwowa, wpisy kierowcy, GPS), eksport do PDF i CSV',
+      'GPS z Twojego systemu monitoringu przez klucz API: Wialon, Mapon, Navirec, Ruptela, Navixy, Samsara, Webfleet, ABAX',
+      'Rentowność każdego pojazdu; dostawcy części, opon i pomocy drogowej w dziewięciu krajach',
       'Własni klienci i zlecenia bezpośrednie, link do śledzenia dla klienta',
       'Giełda ładunków (tablica ofert) dla wymian naczep, kontenerów i transportu ekspresowego',
       'Roboty ziemne i wywrotki: ważone kursy, fińskie dokumenty przewozu odpadów, godziny i faktury z budowy',
       'Aplikacja kierowcy w 10 językach, działa offline',
-      'Czas pracy i orientacyjne wynagrodzenie',
+      'Czas pracy i szacunkowe wynagrodzenie: za kilometr, procent od frachtu, stała stawka godzinowa lub układ zbiorowy pracy',
       'Elektroniczny list przewozowy (CMR), zdjęcia i podpis',
       'Śledzenie przewozu krok po kroku z alertami o opóźnieniach i czasie oczekiwania',
       'Raport tygodniowy i reklamacje dla każdego przewozu',
       'API (REST i webhooki) dla systemu zleceniodawcy',
     ],
+    /* Род программы для schema.org (applicationSubCategory). */
+    category: 'System zarządzania transportem (TMS) i giełda ładunków',
+    /* Единица цены абонемента в разметке: за машину в месяц, без налога. */
+    priceUnit: 'pojazd / miesiąc, netto',
     homeDescription:
       'RAHTIS to platforma do zarządzania transportem i giełda ładunków dla przewoźników. Flota, kierowcy, czas pracy i listy przewozowe w jednym miejscu, zlecenia prosto od własnych klientów, a wolne auta zapełnisz z giełdy. Wymiany naczep, kontenery i transport ekspresowy w Finlandii, Skandynawii, krajach bałtyckich, Polsce i Niemczech — zleceniodawca publikuje zlecenie raz i śledzi przewóz krok po kroku. Do robót ziemnych: kursy wywrotek, ważenia, godziny i faktury z budowy.',
     termsDescription:
@@ -853,7 +861,7 @@ export const pl = {
     partnershipSub: 'Platforma w abonamencie miesięcznym',
     partnershipCon: 'Podwykonawstwo',
     partnershipSubText:
-      'Od 29,90 € netto miesięcznie za każdy pojazd, który jeździł w danym miesiącu. Od własnych klientów, zleceń bezpośrednich i przewozów z giełdy na umowie bezpośredniej nie pobieramy prowizji — trafiają do raportu tygodniowego. Od pozostałych przewozów z giełdy: 3 %. Większa flota płaci mniej za pojazd: od 10. pojazdu 27,90 €, od 20. 25,90 €, od 50. 23,90 €. Płacąc za rok z góry −10 %. Od 100 pojazdów cena na zapytanie.',
+      'Do 29,90 € netto miesięcznie za każdy pojazd, który jeździł w danym miesiącu. Od własnych klientów, zleceń bezpośrednich i przewozów z giełdy na umowie bezpośredniej nie pobieramy prowizji — trafiają do raportu tygodniowego. Od pozostałych przewozów z giełdy: 3 %. Większa flota płaci mniej za pojazd: od 10. pojazdu 27,90 €, od 20. 25,90 €, od 50. 23,90 €. Płacąc za rok z góry −10 %. Od 100 pojazdów cena na zapytanie.',
     partnershipConText:
       '3 % ceny każdego przewozu, potrącane z rozliczenia. Faktury dla klientów, listy przewozowe i reklamacje są po naszej stronie. Bez abonamentu.',
     partnershipSwitch: 'Przejdź na: {mode}',
@@ -1058,7 +1066,7 @@ export const pl = {
     own2: 'Czas pracy i orientacyjne wynagrodzenie według własnych stawek lub tabel układu zbiorowego.',
     own3: 'Mapa miejsc odpoczynku, myjni i serwisów w krajach nordyckich, krajach bałtyckich, Polsce i Niemczech.',
     own4: 'Twój klient wysyła zlecenie prosto do Twojego auta albo sam dodajesz przewóz i przydzielasz go własnemu autu. Na życzenie klient dostaje link do śledzenia. Cała kwota jest Twoja, a przewóz trafia do raportu tygodniowego.',
-    own5: 'Płacisz od 29,90 € miesięcznie za pojazd, który jeździł. Pojazd, który stoi, nic nie kosztuje.',
+    own5: 'Płacisz do 29,90 € miesięcznie za pojazd, który jeździł. Pojazd, który stoi, nic nie kosztuje.',
     own6: 'Gdy auto się zwolni, giełda nadal jest do Twojej dyspozycji.',
 
     stepsEyebrow: 'Jak przebiega przewóz',
@@ -1884,7 +1892,7 @@ export const pl = {
     partnership: 'Model współpracy',
     partnershipSub: 'Abonament miesięczny',
     partnershipCon: 'Podwykonawstwo',
-    partnershipSubHint: 'Od 29,90 € miesięcznie za pojazd, który jeździł. Bez prowizji od własnych klientów, zleceń bezpośrednich i przewozów z giełdy na umowie bezpośredniej, z raportem tygodniowym; pozostałe przewozy z giełdy 3 %.',
+    partnershipSubHint: 'Do 29,90 € miesięcznie za pojazd, który jeździł. Bez prowizji od własnych klientów, zleceń bezpośrednich i przewozów z giełdy na umowie bezpośredniej, z raportem tygodniowym; pozostałe przewozy z giełdy 3 %.',
     partnershipConHint: '3 % każdego przewozu. Zajmujemy się fakturami dla klientów, listami przewozowymi i reklamacjami; bez abonamentu.',
     partnershipSwitch: 'Przejdź na {mode}',
     testHint: 'Przewozy firmy testowej nie są fakturowane ani rozliczane.',
@@ -1947,7 +1955,7 @@ export const pl = {
     howTitle: 'Jak chcesz korzystać z usługi?',
     howSub: 'Platforma w abonamencie miesięcznym',
     howSubText:
-      'Obsługujesz własnych klientów i korzystasz z aplikacji, ewidencji czasu pracy, mapy i giełdy. Od 29,90 € miesięcznie za każdy pojazd, który jeździł w danym miesiącu. Przewozy trafiają do raportu tygodniowego.',
+      'Obsługujesz własnych klientów i korzystasz z aplikacji, ewidencji czasu pracy, mapy i giełdy. Do 29,90 € miesięcznie za każdy pojazd, który jeździł w danym miesiącu. Przewozy trafiają do raportu tygodniowego.',
     howCon: 'Podwykonawstwo',
     howConText:
       'Znajdujemy pracę, fakturujemy klienta, zajmujemy się listami przewozowymi i reklamacjami. 3 % ceny przewozu, bez abonamentu.',
@@ -3504,7 +3512,7 @@ export const pl = {
     clientRequired: 'Wybierz klienta lub wpisz nazwę nowego.',
     clientInvalid: 'Sprawdź Y-tunnus i e-mail klienta.',
     subscriptionOnly:
-      'Własne przewozy są częścią abonamentu: od 29,90 € miesięcznie za pojazd, który jeździł, bez prowizji. Pierwszy miesiąc jest bezpłatny.',
+      'Własne przewozy są częścią abonamentu: do 29,90 € miesięcznie za pojazd, który jeździł, bez prowizji. Pierwszy miesiąc jest bezpłatny.',
     trackLink: 'Link do śledzenia dla klienta',
     badge: 'Własny przewóz',
     clients: 'Klienci',

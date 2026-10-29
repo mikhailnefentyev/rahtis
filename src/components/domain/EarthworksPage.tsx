@@ -5,7 +5,7 @@ import { ConsentSettingsLink } from '@/components/layout/AnalyticsConsent';
 import { LocaleSwitch } from '@/components/layout/LocaleSwitch';
 import { buttonClass, Card, CardBody } from '@/components/ui';
 import { signInPath } from '@/lib/auth/paths';
-import { APP, SUBSCRIPTION_UNIT_CENTS } from '@/lib/config';
+import { APP, ON_REQUEST_FROM, SUBSCRIPTION_LADDER } from '@/lib/config';
 import { isLocale } from '@/lib/i18n';
 import { EARTHWORKS, earthworksPath } from '@/lib/landing/earthworks';
 import { SITE_URL } from '@/lib/seo';
@@ -20,7 +20,6 @@ export async function EarthworksPage({ locale }: { locale: string }) {
   if (!isLocale(locale)) notFound();
   const c = EARTHWORKS[locale];
   const url = `${SITE_URL}${earthworksPath(locale)}`;
-  const price = (SUBSCRIPTION_UNIT_CENTS / 100).toFixed(2);
 
   /*
    * Разметка для поиска и ответчиков: услуга с ценой и вопросы-ответы.
@@ -38,7 +37,20 @@ export async function EarthworksPage({ locale }: { locale: string }) {
       description: c.metaDescription,
       featureList: c.features_ld,
       inLanguage: locale,
-      offers: { '@type': 'Offer', price, priceCurrency: 'EUR' },
+      /* Лесенка, как на главной: цена за машину в месяц по ступеням, без ALV; от ON_REQUEST_FROM — по запросу. */
+      offers: {
+        '@type': 'AggregateOffer',
+        priceCurrency: 'EUR',
+        lowPrice: (Math.min(...SUBSCRIPTION_LADDER.map((s) => s.cents)) / 100).toFixed(2),
+        highPrice: (SUBSCRIPTION_LADDER[0].cents / 100).toFixed(2),
+        offers: SUBSCRIPTION_LADDER.map((step) => ({
+          '@type': 'Offer',
+          price: (step.cents / 100).toFixed(2),
+          priceCurrency: 'EUR',
+          eligibleQuantity: { '@type': 'QuantitativeValue', minValue: step.from, maxValue: step.to ?? ON_REQUEST_FROM - 1, unitText: 'vehicle' },
+          priceSpecification: { '@type': 'UnitPriceSpecification', price: (step.cents / 100).toFixed(2), priceCurrency: 'EUR', valueAddedTaxIncluded: false },
+        })),
+      },
       provider: { '@type': 'Organization', name: APP.operator.legalName, url: `${SITE_URL}/` },
     },
     {

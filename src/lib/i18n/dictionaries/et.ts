@@ -156,7 +156,7 @@ export const et = {
     nav: "GPS-jälgimine",
     title: "GPS-jälgimine",
     lede: "Autod kaardil teie oma jälgimissüsteemist (Wialon, Mapon, Navirec, Ruptela, Navixy, Samsara, Webfleet või ABAX). Ühendage süsteemi võti ja näete asukohta, kas auto sõidab või seisab ja mis ajast, kütust, läbisõitu ja juhti – niipalju, kui süsteem neid annab. Salvestame ainult viimase oleku, marsruudi ajalugu mitte. Süsteemi tuvastatud tankimised lähevad vaatesse Kütus.",
-    locked: "GPS-jälgimine kuulub RAHTISe tellimusse (alates 29,90 € / sõiduk / kuu). Võtke ühendust ja avame selle.",
+    locked: "GPS-jälgimine kuulub RAHTISe tellimusse (kuni 29,90 € / sõiduk / kuu). Võtke ühendust ja avame selle.",
     add: "Ühenda jälgimissüsteem",
     addHint: "Kas kasutate veel mõnda jälgimissüsteemi või kontot? Ühendage ka see.",
     connectTitle: "Ühenda Wialon",
@@ -269,7 +269,7 @@ export const et = {
     nav: "Tasuvus",
     title: "Tasuvus",
     lede: "Iga auto ja kogu autopargi tulud, kulud ja tulemus ühes kohas: vedude tulu, kütus, juhi palk, auto liising või kulum, kindlustused, maks ja muud kulud. Täitke ostu- ja kuluandmed auto lehel.",
-    locked: "Tasuvus kuulub RAHTISe tellimusse (alates 29,90 € / auto / kuu). Võtke ühendust ja avame selle.",
+    locked: "Tasuvus kuulub RAHTISe tellimusse (kuni 29,90 € / auto / kuu). Võtke ühendust ja avame selle.",
     statRevenue: "Tulud",
     statCosts: "Kulud",
     statProfit: "Tulemus",
@@ -349,7 +349,7 @@ export const et = {
     nav: 'Kütus',
     title: 'Kütus',
     lede: 'Autode kütusekulu ja kütusekulud kuude kaupa. Tankimised tulevad kolmest allikast: juhi rakendusest, kütusekaardi kuuaruandest ja käsitsi sisestatult. Sama tankimine kahest allikast liidetakse üheks reaks.',
-    locked: 'Kütuse jälgimine kuulub RAHTISe tellimusse (alates 29,90 € auto kohta kuus). Võta meiega ühendust ja lülitame selle sisse.',
+    locked: 'Kütuse jälgimine kuulub RAHTISe tellimusse (kuni 29,90 € auto kohta kuus). Võta meiega ühendust ja lülitame selle sisse.',
     importedNote: 'Aruanne salvestatud.',
     prevMonth: 'Eelmine kuu',
     nextMonth: 'Järgmine kuu',
@@ -676,16 +676,24 @@ export const et = {
     privacyTitle: 'Privaatsusteade: kuidas isikuandmeid töödeldakse',
     features: [
       'Autopargi ja juhtide haldus',
+      'Autorongid: lubatud täismass ja kandevõime iga riigi nõuete järgi',
+      'Kütus kolmest allikast (kütusekaart, juhi märked, GPS), eksport PDF- ja CSV-vormingusse',
+      'GPS teie jälgimissüsteemist API-võtmega: Wialon, Mapon, Navirec, Ruptela, Navixy, Samsara, Webfleet, ABAX',
+      'Iga auto tasuvus; varuosade, rehvide ja puksiirabi tarnijad üheksas riigis',
       'Omad kliendid ja otsetellimused, jälgimislink kliendile',
       'Veobörs haagisevahetusteks, konteineriteks ja ekspressvedudeks',
       'Pinnasetööd ja kallurid: kaalutud koormad, Soome jäätmeveo saatekirjad, tunnid ja arved objektilt',
       'Juhi rakendus 10 keeles, töötab ka ilma võrguta',
-      'Tööaeg ja orienteeruv palk',
+      'Tööaeg ja hinnanguline palk: kilomeetritasu, protsent veo hinnast, fikseeritud tunnitasu või kollektiivleping',
       'Elektrooniline veoseleht (CMR), fotod ja allkiri',
       'Veo jälgimine samm-sammult, teavitused hilinemisest ja seisakust',
       'Nädalaaruanne ja pretensioonid veo kaupa',
       'API (REST ja webhookid) tellija oma süsteemi jaoks',
     ],
+    /* Род программы для schema.org (applicationSubCategory). */
+    category: 'Veokorraldussüsteem (TMS) ja veobörs',
+    /* Единица цены абонемента в разметке: за машину в месяц, без налога. */
+    priceUnit: 'auto / kuu, km-ta',
     homeDescription:
       'RAHTIS on veokorralduse platvorm ja veobörs vedajatele. Halda autoparki, juhte, tööaega ja veoselehti ühes kohas, võta tellimusi otse oma klientidelt ja leia vabadele autodele tööd veobörsilt. Haagisevahetused, konteinerid ja ekspressveod Soomes, Põhjamaades, Baltikumis, Poolas ja Saksamaal — tellija leiab vedaja ühe avaldusega ja näeb veo kulgu samm-sammult. Pinnasetöödeks: kallurite koormad, kaalumised, tunnid ja arved objektilt.',
     termsDescription:
@@ -853,7 +861,7 @@ export const et = {
     partnershipSub: 'Platvorm kuutasu eest',
     partnershipCon: 'Allhange',
     partnershipSubText:
-      'Alates 29,90 € (km-ta) kuus iga auto eest, mis kuu jooksul sõitis. Oma klientide, otsetellimuste ja börsi otselepingutega vedude pealt protsenti ei võeta, need lähevad nädalaaruandesse. Muud veod veobörsilt: teenustasu 3 %. Suurem autopark maksab auto kohta vähem: alates 10. autost 27,90 €, alates 20. autost 25,90 € ja alates 50. autost 23,90 €. Aasta ette makstes −10 %. Alates 100 autost hind päringu alusel.',
+      'Kuni 29,90 € (km-ta) kuus iga auto eest, mis kuu jooksul sõitis. Oma klientide, otsetellimuste ja börsi otselepingutega vedude pealt protsenti ei võeta, need lähevad nädalaaruandesse. Muud veod veobörsilt: teenustasu 3 %. Suurem autopark maksab auto kohta vähem: alates 10. autost 27,90 €, alates 20. autost 25,90 € ja alates 50. autost 23,90 €. Aasta ette makstes −10 %. Alates 100 autost hind päringu alusel.',
     partnershipConText:
       'Teenustasu 3 % veo hinnast, arvestatakse väljamaksest maha. Hinna sees on kliendi arveldamine, veoselehed ja pretensioonide käsitlemine. Kuutasu pole.',
     partnershipSwitch: 'Vaheta: {mode}',
@@ -1058,7 +1066,7 @@ export const et = {
     own2: 'Tööaeg ja orienteeruv palk sinu enda määrade või kollektiivlepingu tabelite järgi.',
     own3: 'Puhke-, pesu- ja hoolduskohtade kaart Põhjamaades, Baltikumis, Poolas ja Saksamaal.',
     own4: 'Klient saadab tellimuse otse sinu autole või lisad veo ise ja annad selle oma autole. Soovi korral saab klient jälgimislingi. Kogu hind jääb sulle ja vedu läheb sinu nädalaaruandesse.',
-    own5: "Maksate alates 29,90 € kuus iga auto eest, mis sõitis. Seisev auto ei maksa midagi.",
+    own5: "Maksate kuni 29,90 € kuus iga auto eest, mis sõitis. Seisev auto ei maksa midagi.",
     own6: 'Kui auto jääb vabaks, saad ikka veobörsi kasutada.',
 
     stepsEyebrow: 'Nii vedu kulgeb',
@@ -1885,7 +1893,7 @@ export const et = {
     partnership: 'Vedaja töörežiim',
     partnershipSub: 'Kuutasu',
     partnershipCon: 'Allhange',
-    partnershipSubHint: 'Alates 29,90 € kuus iga auto eest, mis sõitis. Oma klientide, otsetellimuste ja börsi otselepingutega vedude pealt protsenti pole, need lähevad nädalaaruandesse; muud börsiveod 3 %.',
+    partnershipSubHint: 'Kuni 29,90 € kuus iga auto eest, mis sõitis. Oma klientide, otsetellimuste ja börsi otselepingutega vedude pealt protsenti pole, need lähevad nädalaaruandesse; muud börsiveod 3 %.',
     partnershipConHint: 'Teenustasu 3 % igast veost. Hinna sees on kliendi arveldamine, veoselehed ja pretensioonide käsitlemine. Kuutasu pole.',
     partnershipSwitch: 'Vaheta: {mode}',
     testHint: 'Testettevõtte veod ei lähe arvetele ega väljamaksetesse.',
@@ -1948,7 +1956,7 @@ export const et = {
     howTitle: 'Kuidas soovid teenust kasutada?',
     howSub: 'Platvorm kuutasu eest',
     howSubText:
-      'Teenindad oma kliente ja kasutad rakendust, tööaja arvestust, kaarti ja veobörsi. Alates 29,90 € kuus iga auto eest, mis kuu jooksul sõitis. Veod lähevad nädalaaruandesse.',
+      'Teenindad oma kliente ja kasutad rakendust, tööaja arvestust, kaarti ja veobörsi. Kuni 29,90 € kuus iga auto eest, mis kuu jooksul sõitis. Veod lähevad nädalaaruandesse.',
     howCon: 'Allhange',
     howConText:
       'Saad vedusid veobörsilt. Hinna sees on kliendi arveldamine, veoselehed ja pretensioonide käsitlemine. Teenustasu 3 % veo hinnast, kuutasu pole.',
@@ -3465,7 +3473,7 @@ export const et = {
     clientRequired: 'Vali klient või kirjuta uue kliendi nimi.',
     clientInvalid: 'Kontrolli kliendi Y-tunnust ja e-posti.',
     subscriptionOnly:
-      'Omad veod kuuluvad kuutasu sisse: alates 29,90 € kuus iga auto eest, mis sõitis, protsenti pole. Esimene kuu on tasuta.',
+      'Omad veod kuuluvad kuutasu sisse: kuni 29,90 € kuus iga auto eest, mis sõitis, protsenti pole. Esimene kuu on tasuta.',
     trackLink: 'Jälgimislink kliendile',
     badge: 'Oma vedu',
     clients: 'Kliendid',

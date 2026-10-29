@@ -156,7 +156,7 @@ export const lv = {
     nav: "GPS izsekošana",
     title: "GPS izsekošana",
     lede: "Automašīnas kartē no jūsu izsekošanas sistēmas (Wialon, Mapon, Navirec, Ruptela, Navixy, Samsara, Webfleet vai ABAX). Pievienojiet sistēmas atslēgu un redzēsiet atrašanās vietu, vai auto brauc vai stāv un kopš kura laika, degvielu, nobraukumu un vadītāju – cik to sniedz sistēma. Glabājam tikai pēdējo stāvokli, maršrutu vēsturi – ne. Sistēmas konstatētās uzpildes nonāk sadaļā “Degviela”.",
-    locked: "GPS izsekošana ir iekļauta RAHTIS abonementā (no 29,90 € / transportlīdzeklis / mēn.). Sazinieties ar mums, un mēs to atvērsim.",
+    locked: "GPS izsekošana ir iekļauta RAHTIS abonementā (līdz 29,90 € / transportlīdzeklis / mēn.). Sazinieties ar mums, un mēs to atvērsim.",
     add: "Pievienot izsekošanas sistēmu",
     addHint: "Izmantojat vēl kādu izsekošanas sistēmu vai kontu? Pievienojiet arī to.",
     connectTitle: "Pievienot Wialon",
@@ -269,7 +269,7 @@ export const lv = {
     nav: "Rentabilitāte",
     title: "Rentabilitāte",
     lede: "Katras automašīnas un visa autoparka ienākumi, izdevumi un rezultāts vienuviet: pārvadājumu ienākumi, degviela, vadītāja alga, auto finansējums vai nolietojums, apdrošināšana, nodoklis un citi izdevumi. Pirkuma un izdevumu datus ievadiet automašīnas lapā.",
-    locked: "Rentabilitāte ietilpst RAHTIS abonementā (no 29,90 € / auto / mēn.). Sazinieties – ieslēgsim.",
+    locked: "Rentabilitāte ietilpst RAHTIS abonementā (līdz 29,90 € / auto / mēn.). Sazinieties – ieslēgsim.",
     statRevenue: "Ienākumi",
     statCosts: "Izdevumi",
     statProfit: "Rezultāts",
@@ -349,7 +349,7 @@ export const lv = {
     nav: 'Degviela',
     title: 'Degviela',
     lede: 'Automašīnu patēriņš un degvielas izmaksas pa mēnešiem. Uzpildes nāk no trim avotiem: vadītāja lietotnes, degvielas kartes mēneša atskaites un manuāliem ierakstiem. Viena un tā pati uzpilde no diviem avotiem tiek apvienota vienā rindā.',
-    locked: 'Degvielas uzskaite ietilpst RAHTIS abonementā (no 29,90 € par automašīnu mēnesī). Sazinieties ar mums, un mēs to ieslēgsim.',
+    locked: 'Degvielas uzskaite ietilpst RAHTIS abonementā (līdz 29,90 € par automašīnu mēnesī). Sazinieties ar mums, un mēs to ieslēgsim.',
     importedNote: 'Atskaite saglabāta.',
     prevMonth: 'Iepriekšējais mēnesis',
     nextMonth: 'Nākamais mēnesis',
@@ -676,16 +676,24 @@ export const lv = {
     privacyTitle: 'Privātuma paziņojums: personas datu apstrāde',
     features: [
       'Autoparka un vadītāju pārvaldība',
+      'Autovilcieni: maksimāli pieļaujamā masa un kravnesība pēc katras valsts noteikumiem',
+      'Degviela no trim avotiem (degvielas karte, vadītāja ievadītie dati, GPS), eksports PDF un CSV formātā',
+      'GPS no jūsu monitoringa sistēmas ar API atslēgu: Wialon, Mapon, Navirec, Ruptela, Navixy, Samsara, Webfleet, ABAX',
+      'Katras automašīnas rentabilitāte; rezerves daļu, riepu un palīdzības uz ceļa piegādātāji deviņās valstīs',
       'Savi klienti un tiešie pasūtījumi, izsekošanas saite klientam',
       'Kravu birža (piedāvājumu tabula) piekabju maiņai, konteineriem un ekspresa pārvadājumiem',
       'Zemes darbi un pašizgāzēji: svērtās kravas, Somijas atkritumu pavadzīmes, stundas un rēķini no objekta',
       'Vadītāja lietotne 10 valodās, darbojas bez interneta',
-      'Darba laiks un orientējošā alga',
+      'Darba laiks un aptuvenā alga: par kilometru, procenti no reisa cenas, fiksēta stundas likme vai darba koplīgums',
       'Elektroniskā pavadzīme (CMR), foto un paraksts',
       'Reisa izsekošana pa posmiem ar brīdinājumiem par kavēšanos un gaidīšanu',
       'Nedēļas atskaite un pretenzijas par katru reisu',
       'API (REST un webhooks) pasūtītāja sistēmai',
     ],
+    /* Род программы для schema.org (applicationSubCategory). */
+    category: 'Transporta vadības sistēma (TMS) un kravu birža',
+    /* Единица цены абонемента в разметке: за машину в месяц, без налога. */
+    priceUnit: 'automašīna / mēnesī, bez PVN',
     homeDescription:
       'RAHTIS ir transporta vadības platforma un kravu birža pārvadātājiem. Pārvaldiet autoparku, vadītājus, darba laiku un pavadzīmes vienuviet, saņemiet pasūtījumus tieši no saviem klientiem un noslogojiet brīvās mašīnas ar reisiem no biržas. Piekabju maiņa, konteineri un ekspresa pārvadājumi Somijā, Ziemeļvalstīs, Baltijā, Polijā un Vācijā — pasūtītājs vienā publikācijā atrod izpildītāju un redz pārvadājumu soli pa solim. Zemes darbiem: pašizgāzēju kravas, svēršana, stundas un rēķini no objekta.',
     termsDescription:
@@ -853,7 +861,7 @@ export const lv = {
     partnershipSub: 'Platforma par ikmēneša maksu',
     partnershipCon: 'Apakšuzņēmums',
     partnershipSubText:
-      'No 29,90 € (bez PVN) mēnesī par katru auto, kas mēneša laikā ir braucis. No saviem klientiem, tiešajiem pasūtījumiem un biržas tiešajiem līgumiem procentus neņem, tie nonāk nedēļas atskaitē. Citiem biržas reisiem — pakalpojuma maksa 3 %. Lielākam autoparkam cena ir pakāpeniska: no 10. automašīnas 27,90 €, no 20. – 25,90 €, no 50. – 23,90 €. Samaksājot gadu uz priekšu −10 %. No 100 automašīnām – cena pēc pieprasījuma.',
+      'Līdz 29,90 € (bez PVN) mēnesī par katru auto, kas mēneša laikā ir braucis. No saviem klientiem, tiešajiem pasūtījumiem un biržas tiešajiem līgumiem procentus neņem, tie nonāk nedēļas atskaitē. Citiem biržas reisiem — pakalpojuma maksa 3 %. Lielākam autoparkam cena ir pakāpeniska: no 10. automašīnas 27,90 €, no 20. – 25,90 €, no 50. – 23,90 €. Samaksājot gadu uz priekšu −10 %. No 100 automašīnām – cena pēc pieprasījuma.',
     partnershipConText:
       'Pakalpojuma maksa 3 % no reisa cenas, to ietur no norēķina. Cenā ietilpst rēķini klientiem, pavadzīmes un pretenziju kārtošana. Ikmēneša maksas nav.',
     partnershipSwitch: 'Pāriet uz: {mode}',
@@ -1058,7 +1066,7 @@ export const lv = {
     own2: 'Darba laiks un orientējošā alga pēc jūsu likmēm vai darba koplīguma tabulām.',
     own3: 'Atpūtas, mazgāšanas un servisa vietu karte Ziemeļvalstīs, Baltijā, Polijā un Vācijā.',
     own4: 'Jūsu klients sūta pasūtījumu tieši uz jūsu auto, vai arī jūs paši pievienojat reisu un iedodat to savam auto. Ja klients vēlas, viņš saņem izsekošanas saiti. Visa cena ir jūsu, un reiss nonāk jūsu nedēļas atskaitē.',
-    own5: "Maksājat no 29,90 € mēnesī par katru auto, kas brauca. Par stāvošu auto nav jāmaksā.",
+    own5: "Maksājat līdz 29,90 € mēnesī par katru auto, kas brauca. Par stāvošu auto nav jāmaksā.",
     own6: 'Kravu birža joprojām ir jūsu rīcībā, kad auto paliek brīvs.',
 
     stepsEyebrow: 'Kā noris reiss',
@@ -1885,7 +1893,7 @@ export const lv = {
     partnership: 'Kā strādā pārvadātājs',
     partnershipSub: 'Ikmēneša maksa',
     partnershipCon: 'Apakšuzņēmums',
-    partnershipSubHint: 'No 29,90 € mēnesī par katru auto, kas brauca. No saviem klientiem, tiešajiem pasūtījumiem un biržas tiešajiem līgumiem procentus neņem, tie nonāk nedēļas atskaitē; citiem biržas reisiem 3 %.',
+    partnershipSubHint: 'Līdz 29,90 € mēnesī par katru auto, kas brauca. No saviem klientiem, tiešajiem pasūtījumiem un biržas tiešajiem līgumiem procentus neņem, tie nonāk nedēļas atskaitē; citiem biržas reisiem 3 %.',
     partnershipConHint: 'Pakalpojuma maksa 3 % no katra reisa. Cenā ietilpst rēķini klientiem, pavadzīmes un pretenziju kārtošana. Bez ikmēneša maksas.',
     partnershipSwitch: 'Pāriet uz: {mode}',
     testHint: 'Testa uzņēmuma reisi nenonāk rēķinos un norēķinos.',
@@ -1948,7 +1956,7 @@ export const lv = {
     howTitle: 'Kā vēlaties izmantot pakalpojumu?',
     howSub: 'Platforma par ikmēneša maksu',
     howSubText:
-      'Braucat saviem klientiem un izmantojat lietotni, darba laika uzskaiti, karti un kravu biržu. No 29,90 € mēnesī par katru auto, kas mēneša laikā ir braucis. Reisi nonāk nedēļas atskaitē.',
+      'Braucat saviem klientiem un izmantojat lietotni, darba laika uzskaiti, karti un kravu biržu. Līdz 29,90 € mēnesī par katru auto, kas mēneša laikā ir braucis. Reisi nonāk nedēļas atskaitē.',
     howCon: 'Apakšuzņēmums',
     howConText:
       'Saņemat reisus no kravu biržas. Cenā ietilpst rēķini klientiem, pavadzīmes un pretenziju kārtošana. Pakalpojuma maksa 3 % no reisa cenas, bez ikmēneša maksas.',
@@ -3505,7 +3513,7 @@ export const lv = {
     clientRequired: 'Izvēlieties klientu vai ierakstiet jauna klienta nosaukumu.',
     clientInvalid: 'Pārbaudiet klienta Y-tunnus un e-pastu.',
     subscriptionOnly:
-      'Savi reisi ietilpst ikmēneša maksā: no 29,90 € mēnesī par katru auto, kas brauca, bez procentiem. Pirmais mēnesis bez maksas.',
+      'Savi reisi ietilpst ikmēneša maksā: līdz 29,90 € mēnesī par katru auto, kas brauca, bez procentiem. Pirmais mēnesis bez maksas.',
     trackLink: 'Izsekošanas saite klientam',
     badge: 'Savs reiss',
     clients: 'Klienti',

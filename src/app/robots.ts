@@ -21,13 +21,42 @@ const PRIVATE = ['/shipper/', '/carrier/', '/track/', '/site/', '/admin/', '/acc
  * робот не тратил обход на десяток адресов, каждый из которых ответит
  * одним и тем же редиректом.
  */
+/*
+ * Роботы ответчиков на языковых моделях (поиск и обучение) — пускаем
+ * (29.10.2026): витрина, llms.txt и документация API для того и написаны,
+ * чтобы ChatGPT, Claude, Perplexity и Gemini пересказывали RAHTIS по
+ * фактам. Отдельной группой, а не только через «*»: у робота, названного
+ * по имени, своя группа заменяет общую целиком, поэтому правила те же.
+ * Так решение видно в файле, и общее правило не закроет их случайно.
+ */
+const AI_BOTS = [
+  'GPTBot',
+  'OAI-SearchBot',
+  'ChatGPT-User',
+  'ClaudeBot',
+  'Claude-SearchBot',
+  'Claude-User',
+  'PerplexityBot',
+  'Perplexity-User',
+  'Google-Extended',
+  'Applebot-Extended',
+];
+
 export default function robots(): MetadataRoute.Robots {
+  /*
+   * /api/ закрыт, кроме описания OpenAPI: на него ссылаются документация
+   * и llms.txt, и робот должен суметь его прочитать. Более длинное
+   * правило allow побеждает более короткое disallow.
+   */
+  const rule = {
+    allow: ['/', '/api/v1/openapi.json'],
+    disallow: ['/api/', ...locales.flatMap((l) => PRIVATE.map((path) => `/${l}${path}`))],
+  };
   return {
-    rules: {
-      userAgent: '*',
-      allow: '/',
-      disallow: ['/api/', ...locales.flatMap((l) => PRIVATE.map((path) => `/${l}${path}`))],
-    },
+    rules: [
+      { userAgent: '*', ...rule },
+      { userAgent: AI_BOTS, ...rule },
+    ],
     sitemap: `${SITE_URL}/sitemap.xml`,
     /*
      * Host: убран 6.10.2026 — директива только Яндекса, а Search Console

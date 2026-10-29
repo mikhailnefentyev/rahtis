@@ -179,7 +179,7 @@ export const fi = {
     nav: "GPS-seuranta",
     title: "GPS-seuranta",
     lede: "Autot kartalla omasta seurantajärjestelmästäsi (Wialon, Mapon, Navirec, Ruptela, Navixy, Samsara, Webfleet tai ABAX). Liitä järjestelmän avain, niin näet sijainnin, liikkuuko vai seisooko auto ja mistä lähtien, polttoaineen, mittarilukeman ja kuljettajan – sen mukaan, mitä järjestelmä antaa. Tallennamme vain viimeisimmän tilan, emme reittihistoriaa. Järjestelmän havaitsemat tankkaukset siirtyvät Polttoaine-näkymään.",
-    locked: "GPS-seuranta kuuluu RAHTIS-tilaukseen (alk. 29,90 € / auto / kk). Ota yhteyttä, niin avaamme sen.",
+    locked: "GPS-seuranta kuuluu RAHTIS-tilaukseen (enintään 29,90 € / auto / kk). Ota yhteyttä, niin avaamme sen.",
     add: "Liitä seurantajärjestelmä",
     addHint: "Onko käytössä toinen seurantajärjestelmä tai tili? Liitä se myös.",
     connectTitle: "Liitä Wialon",
@@ -292,7 +292,7 @@ export const fi = {
     nav: "Kannattavuus",
     title: "Kannattavuus",
     lede: "Tulot, kulut ja tulos jokaiselle autolle ja koko kalustolle samassa paikassa: kuljetusten tulot, polttoaine, kuljettajan palkka, auton rahoitus tai poistot, vakuutukset, vero ja muut kulut. Täytä auton hankinta- ja kulutiedot auton sivulla.",
-    locked: "Kannattavuus kuuluu RAHTIS-tilaukseen (alk. 29,90 € / auto / kk). Ota yhteyttä, niin avaamme sen.",
+    locked: "Kannattavuus kuuluu RAHTIS-tilaukseen (enintään 29,90 € / auto / kk). Ota yhteyttä, niin avaamme sen.",
     statRevenue: "Tulot",
     statCosts: "Kulut",
     statProfit: "Tulos",
@@ -372,7 +372,7 @@ export const fi = {
     nav: 'Polttoaine',
     title: 'Polttoaine',
     lede: 'Autojen kulutus ja polttoainekulut kuukausittain. Tankkaukset tulevat kolmesta lähteestä: kuljettajan sovelluksesta, polttoainekortin kuukausiraportista ja käsin kirjattuina. Sama tankkaus kahdesta lähteestä yhdistetään yhdeksi riviksi.',
-    locked: 'Polttoaineseuranta kuuluu RAHTIS-tilaukseen (alk. 29,90 € / auto / kk). Ota yhteyttä, niin avaamme sen.',
+    locked: 'Polttoaineseuranta kuuluu RAHTIS-tilaukseen (enintään 29,90 € / auto / kk). Ota yhteyttä, niin avaamme sen.',
     importedNote: 'Raportti tallennettu.',
     prevMonth: 'Edellinen kuukausi',
     nextMonth: 'Seuraava kuukausi',
@@ -691,25 +691,33 @@ export const fi = {
     schedules: { MANUAL: 'Kun painan Lähetä-nappia', WEEKLY: 'Joka viikko (ma)', BIWEEKLY: 'Joka toinen viikko (ma)' },
   },
   seo: {
-    homeTitle: 'Rahtipörssi ja TMS: irtoperät ja kontit',
+    homeTitle: 'Rahtipörssi ja TMS-ohjelmisto kuljetusliikkeille',
     /* Описание для выдачи поиска: до 160 знаков, иначе обрезается. Длинное homeDescription — для разметки. */
-    homeMeta: 'Rahtipörssi ja kuljetusten hallinta kuljetusliikkeille: kalusto, kuljettajat, rahtikirjat ja suorat tilaukset. Irtoperät, kontit ja pikakuljetukset.',
+    homeMeta: 'Kuljetusten hallintajärjestelmä ja rahtipörssi kuljetusliikkeille: kalusto, kuljettajat, rahtikirjat ja suorat tilaukset. Irtoperät, kontit ja pikakuljetukset.',
     applyTitle: 'Liity kuljetusliikkeenä tai rahdinantajana',
     termsTitle: 'Käyttöehdot kuljetusliikkeille ja rahdinantajille',
     privacyTitle: 'Tietosuojaseloste: henkilötietojen käsittely',
     /* What the platform does, as a list for the schema.org card (answer engines read it). */
     features: [
       'Kaluston ja kuljettajien hallinta',
+      'Ajoneuvoyhdistelmät: suurin sallittu massa ja kantavuus kunkin maan säännöillä',
+      'Polttoaine kolmesta lähteestä (polttoainekortti, kuljettajan merkinnät, GPS), vienti PDF- ja CSV-muotoon',
+      'GPS omasta seurantajärjestelmästä API-avaimella: Wialon, Mapon, Navirec, Ruptela, Navixy, Samsara, Webfleet, ABAX',
+      'Jokaisen auton kannattavuus; varaosien, renkaiden ja tiepalvelun toimittajat yhdeksässä maassa',
       'Omat asiakkaat ja suorat tilaukset, seurantalinkki asiakkaalle',
       'Rahtipörssi (tarjouspöytä) irtoperille, konteille ja pikakuljetuksille',
       'Maansiirto ja kippiautot: kuormat punnituksineen, siirtoasiakirjat, tunnit ja laskut työmaalta',
       'Kuljettajan sovellus 10 kielellä, toimii ilman verkkoa',
-      'Työaika ja suuntaa-antava palkka',
+      'Työaika ja palkka-arvio: kilometripalkka, prosentti keikasta, läpituntipalkka tai TES',
       'Sähköinen rahtikirja, kuvat ja allekirjoitus',
       'Kuljetuksen seuranta vaihe vaiheelta, myöhästymis- ja seisontahälytykset',
       'Viikkoraportti ja reklamaatiot keikoittain',
       'Rajapinta (REST ja webhookit) tilaajan järjestelmään',
     ],
+    /* Род программы для schema.org (applicationSubCategory). */
+    category: 'Kuljetusten hallintajärjestelmä (TMS) ja rahtipörssi',
+    /* Единица цены абонемента в разметке: за машину в месяц, без налога. */
+    priceUnit: 'auto / kuukausi, alv 0 %',
     homeDescription:
       'RAHTIS on kuljetusliikkeen työalusta ja rahtipörssi. Hallitse kalustoa, kuljettajia, työaikaa ja rahtikirjoja yhdessä paikassa, ota tilaukset suoraan omilta asiakkailtasi ja täytä vapaat autot tarjouspöydältä. Irtoperät, kontit ja pikakuljetukset Suomessa, Pohjoismaissa, Baltiassa, Puolassa ja Saksassa — tilaaja saa tekijän yhdellä julkaisulla ja näkee kuljetuksen vaihe vaiheelta. Maansiirtoon kippiautoilla: kuormat, punnitukset, tunnit ja laskut työmaalta.',
     termsDescription:
@@ -877,7 +885,7 @@ export const fi = {
     partnershipSub: 'Alusta kuukausimaksulla',
     partnershipCon: 'Alihankinta',
     partnershipSubText:
-      'Alk. 29,90 € (ilman alv:tä) kuukaudessa jokaisesta autosta, joka on ajanut kuukauden aikana. Omista asiakkaista, suorista tilauksista ja tarjouspöydän suorista sopimuksista ei mene prosenttia, ja ne tulevat viikkoraporttiin. Muista tarjouspöydän keikoista palvelumaksu 3 %. Isommalle kalustolle hinta porrastuu: 10. autosta 27,90 €, 20. autosta 25,90 € ja 50. autosta 23,90 €. Vuoden etukäteen maksaen −10 %. 100 autosta alkaen hinta tarjouksen mukaan.',
+      'Enintään 29,90 € (ilman alv:tä) kuukaudessa jokaisesta autosta, joka on ajanut kuukauden aikana. Omista asiakkaista, suorista tilauksista ja tarjouspöydän suorista sopimuksista ei mene prosenttia, ja ne tulevat viikkoraporttiin. Muista tarjouspöydän keikoista palvelumaksu 3 %. Isommalle kalustolle hinta porrastuu: 10. autosta 27,90 €, 20. autosta 25,90 € ja 50. autosta 23,90 €. Vuoden etukäteen maksaen −10 %. 100 autosta alkaen hinta tarjouksen mukaan.',
     partnershipConText:
       'Palvelumaksu 3 % keikan hinnasta, vähennetään tilityksestä. Hintaan kuuluvat asiakaslaskutus, rahtikirjat ja reklamaatioiden hoito. Ei kuukausimaksua.',
     partnershipSwitch: 'Vaihda: {mode}',
@@ -1162,7 +1170,7 @@ export const fi = {
     own2: 'Työaika ja suuntaa-antava palkka omilla hinnoillasi tai työehtosopimuksen taulukoilla.',
     own3: 'Kartta tauko-, pesu- ja huoltopaikoista Pohjoismaissa, Baltiassa, Puolassa ja Saksassa.',
     own4: 'Asiakkaasi lähettää tilauksen suoraan autollesi, tai lisäät keikan itse ja annat sen omalle autolle. Asiakas saa halutessaan seurantalinkin. Koko hinta on sinun, ja keikka tulee viikkoraporttiisi.',
-    own5: 'Maksat alk. 29,90 € kuukaudessa autosta, joka ajoi. Seisova auto on maksuton.',
+    own5: 'Maksat enintään 29,90 € kuukaudessa autosta, joka ajoi. Seisova auto on maksuton.',
     own6: 'Tarjouspöytä on silti käytössäsi, kun auto jää vapaaksi.',
 
     stepsEyebrow: 'Näin keikka etenee',
@@ -2109,7 +2117,7 @@ export const fi = {
     partnership: 'Kuljetusliikkeen tapa',
     partnershipSub: 'Kuukausimaksu',
     partnershipCon: 'Alihankinta',
-    partnershipSubHint: 'Alk. 29,90 € kuukaudessa ajanutta autoa kohden. Omista asiakkaista, suorista tilauksista ja tarjouspöydän suorista sopimuksista ei prosenttia, ne tulevat viikkoraporttiin; muista tarjouspöydän keikoista 3 %.',
+    partnershipSubHint: 'Enintään 29,90 € kuukaudessa ajanutta autoa kohden. Omista asiakkaista, suorista tilauksista ja tarjouspöydän suorista sopimuksista ei prosenttia, ne tulevat viikkoraporttiin; muista tarjouspöydän keikoista 3 %.',
     partnershipConHint: 'Palvelumaksu 3 % jokaisesta keikasta. Hintaan kuuluvat asiakaslaskutus, rahtikirjat ja reklamaatioiden hoito. Ei kuukausimaksua.',
     partnershipSwitch: 'Vaihda tavaksi {mode}',
     testHint: 'Testiyrityksen keikat eivät mene laskuihin eivätkä tilityksiin.',
@@ -2177,7 +2185,7 @@ export const fi = {
     howTitle: 'Miten haluat käyttää palvelua?',
     howSub: 'Alusta kuukausimaksulla',
     howSubText:
-      'Ajat omia asiakkaitasi ja käytät sovellusta, työaikaa, karttaa ja tarjouspöytää. Alk. 29,90 € kuukaudessa jokaisesta autosta, joka on ajanut kuukauden aikana. Keikat tulevat viikkoraporttiin.',
+      'Ajat omia asiakkaitasi ja käytät sovellusta, työaikaa, karttaa ja tarjouspöytää. Enintään 29,90 € kuukaudessa jokaisesta autosta, joka on ajanut kuukauden aikana. Keikat tulevat viikkoraporttiin.',
     howCon: 'Alihankinta',
     howConText:
       'Saat keikkoja tarjouspöydältä. Hintaan kuuluvat asiakaslaskutus, rahtikirjat ja reklamaatioiden hoito. Palvelumaksu 3 % keikan hinnasta, ei kuukausimaksua.',
@@ -3762,7 +3770,7 @@ export const fi = {
     clientRequired: 'Valitse asiakas tai kirjoita uuden asiakkaan nimi.',
     clientInvalid: 'Tarkista asiakkaan yritystunnus ja sähköposti.',
     subscriptionOnly:
-      'Omat keikat kuuluvat kuukausimaksuun: alk. 29,90 € kuukaudessa ajanutta autoa kohden, ilman prosenttia. Ensimmäinen kuukausi on maksuton.',
+      'Omat keikat kuuluvat kuukausimaksuun: enintään 29,90 € kuukaudessa ajanutta autoa kohden, ilman prosenttia. Ensimmäinen kuukausi on maksuton.',
     trackLink: 'Seurantalinkki asiakkaalle',
     badge: 'Oma keikka',
     clients: 'Asiakkaat',

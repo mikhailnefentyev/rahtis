@@ -104,6 +104,8 @@ export function pageMetadata(input: {
       title,
       description,
       locale: OG_LOCALE[locale],
+      /* Остальные настоящие переводы страницы — то же, что hreflang, для og-читателей. */
+      alternateLocale: textLocales.filter((l) => l !== locale).map((l) => OG_LOCALE[l]),
       images: [OG_IMAGE],
     },
     twitter: {

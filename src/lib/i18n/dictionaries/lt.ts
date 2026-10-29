@@ -156,7 +156,7 @@ export const lt = {
     nav: "GPS sekimas",
     title: "GPS sekimas",
     lede: "Automobiliai žemėlapyje iš jūsų sekimo sistemos (Wialon, Mapon, Navirec, Ruptela, Navixy, Samsara, Webfleet ar ABAX). Prijunkite sistemos raktą ir matysite vietą, ar automobilis važiuoja, ar stovi ir nuo kada, degalus, ridą ir vairuotoją – kiek tai pateikia sistema. Saugome tik paskutinę būseną, maršrutų istorijos – ne. Sistemos aptikti pylimai patenka į skiltį „Degalai“.",
-    locked: "GPS sekimas įtrauktas į RAHTIS prenumeratą (nuo 29,90 € / transporto priemonė / mėn.). Susisiekite ir mes jį atidarysime.",
+    locked: "GPS sekimas įtrauktas į RAHTIS prenumeratą (iki 29,90 € / transporto priemonė / mėn.). Susisiekite ir mes jį atidarysime.",
     add: "Prijungti sekimo sistemą",
     addHint: "Naudojate dar vieną sekimo sistemą ar paskyrą? Prijunkite ir ją.",
     connectTitle: "Prijungti Wialon",
@@ -269,7 +269,7 @@ export const lt = {
     nav: "Pelningumas",
     title: "Pelningumas",
     lede: "Kiekvieno automobilio ir viso parko pajamos, išlaidos ir rezultatas vienoje vietoje: pervežimų pajamos, degalai, vairuotojo atlyginimas, automobilio finansavimas ar nusidėvėjimas, draudimai, mokestis ir kitos išlaidos. Pirkimo ir išlaidų duomenis įveskite automobilio puslapyje.",
-    locked: "Pelningumas įeina į RAHTIS prenumeratą (nuo 29,90 € / automobilis / mėn.). Susisiekite – įjungsime.",
+    locked: "Pelningumas įeina į RAHTIS prenumeratą (iki 29,90 € / automobilis / mėn.). Susisiekite – įjungsime.",
     statRevenue: "Pajamos",
     statCosts: "Išlaidos",
     statProfit: "Rezultatas",
@@ -349,7 +349,7 @@ export const lt = {
     nav: 'Kuras',
     title: 'Kuras',
     lede: 'Automobilių sąnaudos ir kuro išlaidos pagal mėnesius. Pylimai gaunami iš trijų šaltinių: vairuotojo programėlės, kuro kortelės mėnesio ataskaitos ir rankinių įrašų. Tas pats pylimas iš dviejų šaltinių sujungiamas į vieną eilutę.',
-    locked: 'Kuro apskaita įeina į RAHTIS prenumeratą (nuo 29,90 € už automobilį per mėnesį). Susisiekite su mumis ir ją įjungsime.',
+    locked: 'Kuro apskaita įeina į RAHTIS prenumeratą (iki 29,90 € už automobilį per mėnesį). Susisiekite su mumis ir ją įjungsime.',
     importedNote: 'Ataskaita išsaugota.',
     prevMonth: 'Ankstesnis mėnuo',
     nextMonth: 'Kitas mėnuo',
@@ -670,22 +670,30 @@ export const lt = {
   seo: {
     homeTitle: 'Krovinių birža ir TMS: priekabos ir konteineriai',
     /* Описание для выдачи поиска: до 160 знаков, иначе обрезается. Длинное homeDescription — для разметки. */
-    homeMeta: 'Krovinių birža ir transporto valdymas vežėjams: transportas, vairuotojai, CMR važtaraščiai ir tiesioginiai užsakymai. Priekabos, konteineriai, skubūs pervežimai.',
+    homeMeta: 'Krovinių birža ir TMS sistema vežėjams: transportas, vairuotojai, CMR važtaraščiai ir tiesioginiai užsakymai. Priekabos, konteineriai, skubūs pervežimai.',
     applyTitle: 'Prisijunkite kaip vežėjas arba užsakovas',
     termsTitle: 'Naudojimo sąlygos vežėjams ir užsakovams',
     privacyTitle: 'Privatumo politika: asmens duomenų tvarkymas',
     features: [
       'Transporto parko ir vairuotojų valdymas',
+      'Transporto priemonių junginiai: didžiausia leidžiamoji masė ir keliamoji galia pagal kiekvienos šalies taisykles',
+      'Kuras iš trijų šaltinių (kuro kortelė, vairuotojo įrašai, GPS), eksportas į PDF ir CSV',
+      'GPS duomenys iš jūsų sekimo sistemos su API raktu: Wialon, Mapon, Navirec, Ruptela, Navixy, Samsara, Webfleet, ABAX',
+      'Kiekvienos transporto priemonės pelningumas; atsarginių dalių, padangų ir techninės pagalbos kelyje tiekėjai devyniose šalyse',
       'Savi klientai ir tiesioginiai užsakymai, sekimo nuoroda klientui',
       'Krovinių birža priekaboms, konteineriams ir skubiems pervežimams',
       'Žemės darbai ir savivarčiai: pasverti kroviniai, Suomijos atliekų lydraščiai, valandos ir sąskaitos iš objekto',
       'Vairuotojo programėlė 10 kalbų, veikia ir be ryšio',
-      'Darbo laikas ir orientacinis atlyginimas',
+      'Darbo laikas ir apytikslis darbo užmokestis: už kilometrą, procentas nuo reiso kainos, fiksuotas valandinis įkainis arba kolektyvinė sutartis',
       'Elektroninis važtaraštis (CMR), nuotraukos ir parašas',
       'Pervežimo sekimas etapais, vėlavimo ir prastovos įspėjimai',
       'Savaitės ataskaita ir pretenzijos pagal kiekvieną reisą',
       'API (REST ir webhook) užsakovo sistemai',
     ],
+    /* Род программы для schema.org (applicationSubCategory). */
+    category: 'Transporto valdymo sistema (TMS) ir krovinių birža',
+    /* Единица цены абонемента в разметке: за машину в месяц, без налога. */
+    priceUnit: 'transporto priemonė / mėn., be PVM',
     homeDescription:
       'RAHTIS – transporto valdymo platforma ir krovinių birža vežėjams. Valdykite transportą, vairuotojus, darbo laiką ir važtaraščius vienoje vietoje, priimkite užsakymus tiesiai iš savo klientų, o laisvus sunkvežimius užpildykite kroviniais iš biržos. Priekabos, konteineriai ir skubūs pervežimai Suomijoje, Šiaurės šalyse, Baltijos šalyse, Lenkijoje ir Vokietijoje – užsakovas vienu skelbimu randa vežėją ir mato pervežimą etapais. Žemės darbams: savivarčių kroviniai, svėrimai, valandos ir sąskaitos iš objekto.',
     termsDescription:
@@ -853,7 +861,7 @@ export const lt = {
     partnershipSub: 'Platforma už mėnesinį mokestį',
     partnershipCon: 'Subranga',
     partnershipSubText:
-      'Nuo 29,90 € (be PVM) per mėnesį už kiekvieną transporto priemonę, kuri tą mėnesį važiavo. Nuo savų klientų, tiesioginių užsakymų ir biržos tiesioginių sutarčių procento nėra – jie patenka į savaitės ataskaitą. Už kitus biržos reisus paslaugos mokestis 3 %. Didesniam parkui kaina pakopinė: nuo 10-osios transporto priemonės 27,90 €, nuo 20-osios 25,90 €, nuo 50-osios 23,90 €. Sumokėjus metams iš anksto −10 %. Nuo 100 transporto priemonių – kaina pagal užklausą.',
+      'Iki 29,90 € (be PVM) per mėnesį už kiekvieną transporto priemonę, kuri tą mėnesį važiavo. Nuo savų klientų, tiesioginių užsakymų ir biržos tiesioginių sutarčių procento nėra – jie patenka į savaitės ataskaitą. Už kitus biržos reisus paslaugos mokestis 3 %. Didesniam parkui kaina pakopinė: nuo 10-osios transporto priemonės 27,90 €, nuo 20-osios 25,90 €, nuo 50-osios 23,90 €. Sumokėjus metams iš anksto −10 %. Nuo 100 transporto priemonių – kaina pagal užklausą.',
     partnershipConText:
       'Paslaugos mokestis 3 % reiso kainos, išskaičiuojamas iš išmokos. Į kainą įeina sąskaitos klientams, važtaraščiai ir pretenzijų tvarkymas. Mėnesinio mokesčio nėra.',
     partnershipSwitch: 'Pereiti prie: {mode}',
@@ -1058,7 +1066,7 @@ export const lt = {
     own2: 'Darbo laikas ir orientacinis atlyginimas pagal jūsų tarifus arba kolektyvinės sutarties lenteles.',
     own3: 'Poilsio, plovyklų ir servisų žemėlapis Šiaurės ir Baltijos šalyse, Lenkijoje ir Vokietijoje.',
     own4: 'Jūsų klientas siunčia užsakymą tiesiai jūsų mašinai, arba reisą įvedate patys ir skiriate savo mašinai. Klientas, jei nori, gauna sekimo nuorodą. Visa kaina – jūsų, o reisas patenka į jūsų savaitės ataskaitą.',
-    own5: 'Mokate nuo 29,90 € per mėnesį už kiekvieną tą mėnesį važiavusią mašiną. Stovinti mašina nieko nekainuoja.',
+    own5: 'Mokate iki 29,90 € per mėnesį už kiekvieną tą mėnesį važiavusią mašiną. Stovinti mašina nieko nekainuoja.',
     own6: 'Kai mašina atsilaisvina, krovinių birža vis tiek po ranka.',
 
     stepsEyebrow: 'Kaip vyksta reisas',
@@ -1885,7 +1893,7 @@ export const lt = {
     partnership: 'Vežėjo darbo būdas',
     partnershipSub: 'Mėnesinis mokestis',
     partnershipCon: 'Subranga',
-    partnershipSubHint: 'Nuo 29,90 € per mėnesį už važiavusią mašiną. Nuo savų klientų, tiesioginių užsakymų ir biržos tiesioginių sutarčių procento nėra – jie patenka į savaitės ataskaitą; kiti biržos reisai 3 %.',
+    partnershipSubHint: 'Iki 29,90 € per mėnesį už važiavusią mašiną. Nuo savų klientų, tiesioginių užsakymų ir biržos tiesioginių sutarčių procento nėra – jie patenka į savaitės ataskaitą; kiti biržos reisai 3 %.',
     partnershipConHint: 'Paslaugos mokestis 3 % nuo kiekvieno reiso. Į kainą įeina sąskaitos klientams, važtaraščiai ir pretenzijų tvarkymas. Mėnesinio mokesčio nėra.',
     partnershipSwitch: 'Pakeisti į: {mode}',
     testHint: 'Bandomosios įmonės reisai nepatenka nei į sąskaitas, nei į išmokas.',
@@ -1948,7 +1956,7 @@ export const lt = {
     howTitle: 'Kaip norite naudotis paslauga?',
     howSub: 'Platforma už mėnesinį mokestį',
     howSubText:
-      'Vežate savus klientus ir naudojatės programėle, darbo laiko apskaita, žemėlapiu ir krovinių birža. Nuo 29,90 € per mėnesį už kiekvieną tą mėnesį važiavusią mašiną. Reisai patenka į savaitės ataskaitą.',
+      'Vežate savus klientus ir naudojatės programėle, darbo laiko apskaita, žemėlapiu ir krovinių birža. Iki 29,90 € per mėnesį už kiekvieną tą mėnesį važiavusią mašiną. Reisai patenka į savaitės ataskaitą.',
     howCon: 'Subranga',
     howConText:
       'Reisus gaunate iš krovinių biržos. Į kainą įeina sąskaitos klientams, važtaraščiai ir pretenzijų tvarkymas. Paslaugos mokestis 3 % reiso kainos, mėnesinio mokesčio nėra.',
@@ -3507,7 +3515,7 @@ export const lt = {
     clientRequired: 'Pasirinkite klientą arba įveskite naujo kliento pavadinimą.',
     clientInvalid: 'Patikrinkite kliento įmonės kodą ir el. paštą.',
     subscriptionOnly:
-      'Savi reisai įeina į mėnesinį mokestį: nuo 29,90 € per mėnesį už važiavusią mašiną, be procento. Pirmas mėnuo nemokamas.',
+      'Savi reisai įeina į mėnesinį mokestį: iki 29,90 € per mėnesį už važiavusią mašiną, be procento. Pirmas mėnuo nemokamas.',
     trackLink: 'Sekimo nuoroda klientui',
     badge: 'Savas reisas',
     clients: 'Klientai',
