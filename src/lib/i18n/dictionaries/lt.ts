@@ -210,6 +210,9 @@ export const lt = {
     states: { MOVING: "Važiuoja", STOPPED: "Stovi", PARKED: "Stovėjimo aikštelėje", OFFLINE: "Nėra ryšio" },
   },
   economics: {
+    download: "Atsisiųsti ataskaitą",
+    reportTitle: "Pelningumo ataskaita",
+    reportFile: "pelningumas",
     nav: "Pelningumas",
     title: "Pelningumas",
     lede: "Kiekvieno automobilio ir viso parko pajamos, išlaidos ir rezultatas vienoje vietoje: pervežimų pajamos, degalai, vairuotojo atlyginimas, automobilio finansavimas ar nusidėvėjimas, draudimai, mokestis ir kitos išlaidos. Pirkimo ir išlaidų duomenis įveskite automobilio puslapyje.",

@@ -210,6 +210,9 @@ export const sv = {
     states: { MOVING: "Kör", STOPPED: "Står still", PARKED: "Parkerad", OFFLINE: "Ingen anslutning" },
   },
   economics: {
+    download: "Ladda ner rapport",
+    reportTitle: "Lönsamhetsrapport",
+    reportFile: "lonsamhet",
     nav: "Lönsamhet",
     title: "Lönsamhet",
     lede: "Intäkter, kostnader och resultat för varje fordon och hela fordonsparken på ett ställe: intäkter från körningar, bränsle, förarlön, finansiering eller avskrivning, försäkringar, skatt och övriga kostnader. Fyll i inköps- och kostnadsuppgifter på fordonets sida.",

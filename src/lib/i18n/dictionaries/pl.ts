@@ -210,6 +210,9 @@ export const pl = {
     states: { MOVING: "W trasie", STOPPED: "Stoi", PARKED: "Na postoju", OFFLINE: "Brak połączenia" },
   },
   economics: {
+    download: "Pobierz raport",
+    reportTitle: "Raport rentowności",
+    reportFile: "rentownosc",
     nav: "Rentowność",
     title: "Rentowność",
     lede: "Przychody, koszty i wynik każdego pojazdu i całej floty w jednym miejscu: przychody z kursów, paliwo, wynagrodzenie kierowcy, finansowanie lub amortyzacja, ubezpieczenia, podatek i inne koszty. Dane zakupu i kosztów uzupełnij na stronie pojazdu.",

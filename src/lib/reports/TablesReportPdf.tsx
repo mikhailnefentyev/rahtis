@@ -3,12 +3,12 @@ import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
 import { PDF_FONT } from '@/lib/reports/pdfFont';
 
 /**
- * Отчёт о топливе за месяц — PDF.
+ * Отчёт таблицами — PDF: заголовок, итоги плитками и несколько таблиц со
+ * своими пояснениями. Им собраны отчёт о топливе и отчёт о доходности.
  *
- * Шрифт — Noto Sans, общий для всех PDF (lib/reports/pdfFont).
- *
- * Шаблон получает уже отформатированные строки — считает и форматирует
- * маршрут выгрузки.
+ * Шрифт — Noto Sans, общий для всех PDF (lib/reports/pdfFont). Шаблон
+ * получает уже отформатированные строки — считает и форматирует маршрут
+ * выгрузки.
  */
 
 const s = StyleSheet.create({
@@ -42,21 +42,21 @@ const s = StyleSheet.create({
   },
 });
 
-export type FuelPdfColumn = { header: string; flex: number; right?: boolean };
-export type FuelPdfTable = {
+export type TablesPdfColumn = { header: string; flex: number; right?: boolean };
+export type TablesPdfTable = {
   title: string;
   note?: string;
   empty: string;
-  columns: FuelPdfColumn[];
+  columns: TablesPdfColumn[];
   /** Ячейки строки; warn — номер колонки, которую выделить (расхождение). */
   rows: { cells: string[]; warn?: number }[];
 };
 
-export function FuelReportPdf(input: {
+export function TablesReportPdf(input: {
   title: string;
   subtitle: string;
   stats: { label: string; value: string; hint?: string }[];
-  tables: FuelPdfTable[];
+  tables: TablesPdfTable[];
   page: string;
   footer: string;
 }) {
@@ -78,7 +78,8 @@ export function FuelReportPdf(input: {
         </View>
 
         {input.tables.map((table) => (
-          <View key={table.title}>
+          /* Небольшая таблица не рвётся: заголовок, шапка и строки переносятся на новую страницу вместе. */
+          <View key={table.title} wrap={table.rows.length > 15}>
             <Text style={s.section} minPresenceAhead={40}>
               {table.title}
             </Text>

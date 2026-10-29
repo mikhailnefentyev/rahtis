@@ -226,6 +226,9 @@ export const en = {
     states: { MOVING: "Driving", STOPPED: "Stopped", PARKED: "Parked", OFFLINE: "No connection" },
   },
   economics: {
+    download: "Download report",
+    reportTitle: "Profitability report",
+    reportFile: "profitability",
     nav: "Profitability",
     title: "Profitability",
     lede: "Income, costs and result for each vehicle and the whole fleet in one place: trip income, fuel, driver pay, vehicle financing or depreciation, insurance, tax and other costs. Fill in the purchase and cost details on the vehicle's page.",

@@ -233,6 +233,9 @@ export const fi = {
     states: { MOVING: "Ajossa", STOPPED: "Pysähtynyt", PARKED: "Pysäköity", OFFLINE: "Ei yhteyttä" },
   },
   economics: {
+    download: "Lataa raportti",
+    reportTitle: "Kannattavuusraportti",
+    reportFile: "kannattavuus",
     nav: "Kannattavuus",
     title: "Kannattavuus",
     lede: "Tulot, kulut ja tulos jokaiselle autolle ja koko kalustolle samassa paikassa: kuljetusten tulot, polttoaine, kuljettajan palkka, auton rahoitus tai poistot, vakuutukset, vero ja muut kulut. Täytä auton hankinta- ja kulutiedot auton sivulla.",

@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import { noAccessPath, signInPath } from '@/lib/auth/paths';
 import { getViewer } from '@/lib/auth/viewer';
 import { FUEL_SOURCES, monthOf, sourceQty, sourceSpread, SPREAD_NOTICE, type MonthStat } from '@/lib/fuel/fuel';
-import { FuelReportPdf } from '@/lib/fuel/FuelReportPdf';
+import { TablesReportPdf } from '@/lib/reports/TablesReportPdf';
 import { loadFuelMonth, parseFuelMonth, type FuelEntry } from '@/lib/fuel/month';
 import { defaultLocale, isLocale } from '@/lib/i18n';
 import { getViewerI18n } from '@/lib/i18n/viewer';
@@ -111,7 +111,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
   const dash = (value: string | null | undefined) => value ?? '—';
 
   const buffer = await renderToBuffer(
-    FuelReportPdf({
+    TablesReportPdf({
       title: s.reportTitle,
       subtitle: [monthName, viewer.company.name, scope].join(' · '),
       stats: [

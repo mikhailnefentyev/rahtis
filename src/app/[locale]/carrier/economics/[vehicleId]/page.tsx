@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { Card, CardBody, Table, TableFrame, Td, Th, Tr } from '@/components/ui';
+import { Card, CardBody, Table, TableFrame, Td, Th, Tr, buttonClass } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
 import { deleteVehicleCostAction } from '@/lib/economics/actions';
 import { loadEconomics, monthRange } from '@/lib/economics/load';
@@ -83,6 +83,19 @@ export default async function VehicleEconomicsPage({
         {vehicle.make ? <span className="ml-2 text-[15px] font-normal text-ink-muted">{vehicle.make}</span> : null}
       </h1>
       {econ.paybackPct != null && <p className="mt-2 text-[13px] text-ink-muted">{s.paybackLine.replace('{pct}', f.decimal(econ.paybackPct))}</p>}
+      <div className="mt-3 flex items-center gap-2">
+        <span className="text-[12px] text-ink-muted">{s.download}</span>
+        {(['pdf', 'csv'] as const).map((format) => (
+          <a
+            key={format}
+            href={`/${locale}/carrier/economics/export?format=${format}&month=${month}&vehicle=${vehicleId}`}
+            className={buttonClass({ variant: 'default', size: 'sm' })}
+            download
+          >
+            {format.toUpperCase()}
+          </a>
+        ))}
+      </div>
 
       <div className="mt-6 flex max-w-5xl flex-col gap-4">
         <FinanceForm vehicleId={vehicleId} finance={data.finance.get(vehicleId) ?? null} />

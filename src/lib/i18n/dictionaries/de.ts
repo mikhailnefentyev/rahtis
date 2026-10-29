@@ -210,6 +210,9 @@ export const de = {
     states: { MOVING: "Fährt", STOPPED: "Steht", PARKED: "Geparkt", OFFLINE: "Keine Verbindung" },
   },
   economics: {
+    download: "Bericht herunterladen",
+    reportTitle: "Rentabilitätsbericht",
+    reportFile: "rentabilitaet",
     nav: "Rentabilität",
     title: "Rentabilität",
     lede: "Einnahmen, Kosten und Ergebnis für jedes Fahrzeug und die ganze Flotte an einem Ort: Einnahmen aus Fahrten, Kraftstoff, Fahrerlohn, Finanzierung oder Abschreibung, Versicherungen, Steuer und sonstige Kosten. Kauf- und Kostendaten tragen Sie auf der Fahrzeugseite ein.",

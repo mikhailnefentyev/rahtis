@@ -210,6 +210,9 @@ export const et = {
     states: { MOVING: "Sõidab", STOPPED: "Seisab", PARKED: "Parkimas", OFFLINE: "Ühendus puudub" },
   },
   economics: {
+    download: "Laadi aruanne alla",
+    reportTitle: "Tasuvusaruanne",
+    reportFile: "tasuvus",
     nav: "Tasuvus",
     title: "Tasuvus",
     lede: "Iga auto ja kogu autopargi tulud, kulud ja tulemus ühes kohas: vedude tulu, kütus, juhi palk, auto liising või kulum, kindlustused, maks ja muud kulud. Täitke ostu- ja kuluandmed auto lehel.",

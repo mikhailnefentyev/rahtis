@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { Card, CardBody, Stat, StatRow, Table, TableFrame, Td, Th, Tr } from '@/components/ui';
+import { Card, CardBody, Stat, StatRow, Table, TableFrame, Td, Th, Tr, buttonClass } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
 import { loadEconomics, monthRange } from '@/lib/economics/load';
 import type { MonthEconomics } from '@/lib/economics/profit';
@@ -86,6 +86,14 @@ export default async function EconomicsPage({
             {label(nextMonth(month))} ›
           </Link>
         )}
+        <div className="ml-auto flex items-center gap-2">
+          <span className="text-[12px] text-ink-muted">{s.download}</span>
+          {(['pdf', 'csv'] as const).map((format) => (
+            <a key={format} href={`${base}/export?format=${format}&month=${month}`} className={buttonClass({ variant: 'default', size: 'sm' })} download>
+              {format.toUpperCase()}
+            </a>
+          ))}
+        </div>
       </div>
 
       <StatRow>

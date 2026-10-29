@@ -210,6 +210,9 @@ export const lv = {
     states: { MOVING: "Brauc", STOPPED: "Stāv", PARKED: "Stāvvietā", OFFLINE: "Nav savienojuma" },
   },
   economics: {
+    download: "Lejupielādēt atskaiti",
+    reportTitle: "Rentabilitātes atskaite",
+    reportFile: "rentabilitate",
     nav: "Rentabilitāte",
     title: "Rentabilitāte",
     lede: "Katras automašīnas un visa autoparka ienākumi, izdevumi un rezultāts vienuviet: pārvadājumu ienākumi, degviela, vadītāja alga, auto finansējums vai nolietojums, apdrošināšana, nodoklis un citi izdevumi. Pirkuma un izdevumu datus ievadiet automašīnas lapā.",
