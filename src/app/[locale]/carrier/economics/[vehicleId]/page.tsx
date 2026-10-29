@@ -56,6 +56,12 @@ export default async function VehicleEconomicsPage({
   const costs = data.costs.filter((c) => c.vehicle_id === vehicleId);
   const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Helsinki' }).format(new Date());
 
+  const fin = data.finance.get(vehicleId);
+  /* Износ купленной сразу машины — с расчётом: это доля цены в месяц, а не платёж. */
+  const depLabel =
+    fin?.financing === 'CASH' && fin.purchase_price_cents
+      ? `${s.lineDepreciation} (${fin.residual_cents ? `(${f.eur(fin.purchase_price_cents)} − ${f.eur(fin.residual_cents)})` : f.eur(fin.purchase_price_cents)} ÷ ${fin.useful_life_months} ${s.monthsShort})`
+      : s.lineDepreciation;
   const lines: { label: string; get: (m: MonthEconomics) => number; strong?: boolean }[] = [
     { label: s.revenuePlatform, get: (m) => m.revenue.platform },
     { label: s.revenueOwn, get: (m) => m.revenue.own },
@@ -64,7 +70,7 @@ export default async function VehicleEconomicsPage({
     { label: s.colFuel, get: (m) => -m.costs.fuel },
     { label: s.colDriver, get: (m) => -m.costs.driver },
     { label: s.lineFinancing, get: (m) => -m.costs.financing },
-    { label: s.lineDepreciation, get: (m) => -m.costs.depreciation },
+    { label: depLabel, get: (m) => -m.costs.depreciation },
     { label: s.lineInsurance, get: (m) => -m.costs.insurance },
     { label: s.lineTax, get: (m) => -m.costs.tax },
     { label: s.lineFixed, get: (m) => -m.costs.fixed },

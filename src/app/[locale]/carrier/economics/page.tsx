@@ -68,7 +68,13 @@ export default async function EconomicsPage({
   const eur = (cents: number) => f.eur(cents);
   const tone = (cents: number) => (cents < 0 ? 'text-danger' : '');
   const insuranceTax = (m: MonthEconomics) => m.costs.insurance + m.costs.tax;
-  const vehicleCost = (m: MonthEconomics) => m.costs.financing + m.costs.depreciation;
+  /* Износ купленной сразу машины — с расчётом под суммой, чтобы его не путали с платежом. */
+  const depreciationHint = (vehicleId: string) => {
+    const fin = data.finance.get(vehicleId);
+    if (!fin || fin.financing !== 'CASH' || !fin.purchase_price_cents) return null;
+    const price = fin.residual_cents ? `(${eur(fin.purchase_price_cents)} − ${eur(fin.residual_cents)})` : eur(fin.purchase_price_cents);
+    return `${price} ÷ ${fin.useful_life_months} ${s.monthsShort}`;
+  };
   const other = (m: MonthEconomics) => m.costs.fixed + m.costs.journal + m.costs.rahtis;
 
   return (
@@ -111,7 +117,8 @@ export default async function EconomicsPage({
               <Th numeric>{s.colRevenue}</Th>
               <Th numeric>{s.colFuel}</Th>
               <Th numeric>{s.colDriver}</Th>
-              <Th numeric>{s.colVehicleCost}</Th>
+              <Th numeric>{s.colFinancing}</Th>
+              <Th numeric>{s.colDepreciation}</Th>
               <Th numeric>{s.colInsurance}</Th>
               <Th numeric>{s.colOther}</Th>
               <Th numeric>{s.colProfit}</Th>
@@ -131,7 +138,13 @@ export default async function EconomicsPage({
                 <Td numeric>{eur(r.m.revenue.total)}</Td>
                 <Td numeric>{eur(r.m.costs.fuel)}</Td>
                 <Td numeric>{eur(r.m.costs.driver)}</Td>
-                <Td numeric>{eur(vehicleCost(r.m))}</Td>
+                <Td numeric>{eur(r.m.costs.financing)}</Td>
+                <Td numeric>
+                  {eur(r.m.costs.depreciation)}
+                  {r.m.costs.depreciation > 0 && depreciationHint(r.vehicleId) && (
+                    <span className="block font-sans text-[11px] text-ink-dim">{depreciationHint(r.vehicleId)}</span>
+                  )}
+                </Td>
                 <Td numeric>{eur(insuranceTax(r.m))}</Td>
                 <Td numeric>{eur(other(r.m))}</Td>
                 <Td numeric className={`font-semibold ${tone(r.m.profit)}`}>{eur(r.m.profit)}</Td>
@@ -144,7 +157,8 @@ export default async function EconomicsPage({
               <Td numeric className="font-semibold">{eur(fleet.revenue.total)}</Td>
               <Td numeric>{eur(fleet.costs.fuel)}</Td>
               <Td numeric>{eur(fleet.costs.driver)}</Td>
-              <Td numeric>{eur(vehicleCost(fleet))}</Td>
+              <Td numeric>{eur(fleet.costs.financing)}</Td>
+              <Td numeric>{eur(fleet.costs.depreciation)}</Td>
               <Td numeric>{eur(insuranceTax(fleet))}</Td>
               <Td numeric>{eur(other(fleet))}</Td>
               <Td numeric className={`font-semibold ${tone(fleet.profit)}`}>{eur(fleet.profit)}</Td>
