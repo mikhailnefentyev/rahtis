@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import Image from 'next/image';
 import { Card, CardBody, Mono } from '@/components/ui';
 import { ON_REQUEST_FROM, SUBSCRIPTION_LADDER } from '@/lib/config';
 import { legalMassKg, type MotorUnit, type TrailerUnit } from '@/lib/fleet/mass';
@@ -13,55 +13,30 @@ import { getI18n, type Locale } from '@/lib/i18n';
  * не разойдётся с тем, что перевозчик увидит у себя.
  */
 
-type Body = 'BOX' | 'TIPPER' | 'LOWBED' | 'CONTAINER';
 type Combo = {
   key: 'Ppv' | 'Puolikas' | 'Tral' | 'Kasetti' | 'Tpv' | 'Kontti';
   motor: MotorUnit;
-  motorBody?: Body;
   trailer: TrailerUnit;
-  trailerBody: Body;
+  /** Снимок сбоку в public/media/combos: все в одном масштабе, ширина в точках. */
+  image: { src: string; width: number };
 };
 
-/* Типичные оси для каждой сцепки; точный предел в кабинете — по своим машинам. */
+/* Самая длинная сцепка на снимках (TPV): от неё считается ширина остальных, чтобы масштаб был общий. */
+const WIDEST = 1384;
+const HEIGHT = 264;
+
+/*
+ * Оси — как на снимках; точный предел в кабинете считается по своим машинам.
+ * Kasetti и TPV собраны из снимков PPV и puolikas (30.10.2026), остальные
+ * четыре — снимки пользователя.
+ */
 const COMBOS: readonly Combo[] = [
-  {
-    key: 'Ppv',
-    motor: { kind: 'TRACTOR', axles: 2 },
-    trailer: { kind: 'SEMI', axles: 3, twinWheels: false },
-    trailerBody: 'BOX',
-  },
-  {
-    key: 'Puolikas',
-    motor: { kind: 'TRACTOR', axles: 3 },
-    trailer: { kind: 'SEMI', axles: 3, twinWheels: true },
-    trailerBody: 'TIPPER',
-  },
-  {
-    key: 'Tral',
-    motor: { kind: 'TRACTOR', axles: 3 },
-    trailer: { kind: 'SEMI', axles: 4, twinWheels: false },
-    trailerBody: 'LOWBED',
-  },
-  {
-    key: 'Kasetti',
-    motor: { kind: 'TRUCK', axles: 5 },
-    motorBody: 'TIPPER',
-    trailer: { kind: 'FULL', axles: 4, twinWheels: true },
-    trailerBody: 'TIPPER',
-  },
-  {
-    key: 'Tpv',
-    motor: { kind: 'TRUCK', axles: 4 },
-    motorBody: 'BOX',
-    trailer: { kind: 'FULL', axles: 4, twinWheels: true },
-    trailerBody: 'BOX',
-  },
-  {
-    key: 'Kontti',
-    motor: { kind: 'TRACTOR', axles: 2 },
-    trailer: { kind: 'SEMI', axles: 3, twinWheels: false },
-    trailerBody: 'CONTAINER',
-  },
+  { key: 'Ppv', motor: { kind: 'TRACTOR', axles: 2 }, trailer: { kind: 'SEMI', axles: 3, twinWheels: false }, image: { src: '/media/combos/ppv.webp', width: 986 } },
+  { key: 'Puolikas', motor: { kind: 'TRACTOR', axles: 3 }, trailer: { kind: 'SEMI', axles: 3, twinWheels: true }, image: { src: '/media/combos/puolikas.webp', width: 988 } },
+  { key: 'Tral', motor: { kind: 'TRACTOR', axles: 3 }, trailer: { kind: 'SEMI', axles: 4, twinWheels: false }, image: { src: '/media/combos/tral.webp', width: 993 } },
+  { key: 'Kasetti', motor: { kind: 'TRUCK', axles: 4 }, trailer: { kind: 'FULL', axles: 5, twinWheels: true }, image: { src: '/media/combos/kasetti.webp', width: 1346 } },
+  { key: 'Tpv', motor: { kind: 'TRUCK', axles: 3 }, trailer: { kind: 'FULL', axles: 4, twinWheels: true }, image: { src: '/media/combos/tpv.webp', width: 1384 } },
+  { key: 'Kontti', motor: { kind: 'TRACTOR', axles: 2 }, trailer: { kind: 'SEMI', axles: 3, twinWheels: false }, image: { src: '/media/combos/kontti.webp', width: 1002 } },
 ];
 
 export async function LandingFleet({ locale }: { locale: Locale }) {
@@ -116,7 +91,17 @@ export async function LandingFleet({ locale }: { locale: Locale }) {
               return (
                 <Card key={combo.key} className="border-t-2 border-t-accent">
                   <CardBody className="flex h-full flex-col">
-                    <ComboSketch combo={combo} />
+                    {/* aria-hidden: что на снимке, сказано подписью ниже. */}
+                    <div className="flex h-24 items-end" aria-hidden="true">
+                      <Image
+                        src={combo.image.src}
+                        alt=""
+                        width={combo.image.width}
+                        height={HEIGHT}
+                        sizes="(min-width: 1024px) 340px, (min-width: 640px) 45vw, 90vw"
+                        style={{ width: `${(combo.image.width / WIDEST) * 100}%`, height: 'auto' }}
+                      />
+                    </div>
                     <p className="mt-4 label-micro" data-accent>
                       {code}
                     </p>
@@ -245,256 +230,5 @@ export async function LandingPricing({ locale }: { locale: Locale }) {
         </div>
       </div>
     </section>
-  );
-}
-
-/*
- * Схема сцепки сбоку, в одном масштабе для всех карточек: 1 единица = 10 см,
- * поэтому длины сцепок честно сравнимы между собой. Иллюстрация — подпись
- * рядом говорит то же словами, поэтому aria-hidden.
- */
-const G = 48; // земля
-const VIEW_W = 192;
-const AXLE = 12; // шаг осей в тележке, 1,2 м
-
-const INK = 'fill-ink';
-const BODY = 'fill-accent-wash stroke-accent';
-const RIB = 'stroke-accent';
-
-function Wheel({ cx, r = 4.8 }: { cx: number; r?: number }) {
-  return (
-    <g>
-      <circle cx={cx} cy={G - r} r={r} className={INK} />
-      <circle cx={cx} cy={G - r} r={r * 0.5} className="fill-sunken" />
-      <circle cx={cx} cy={G - r} r={r * 0.18} className={INK} />
-    </g>
-  );
-}
-
-/* Оси тележки вокруг центра группы. */
-const group = (center: number, n: number, step = AXLE) => Array.from({ length: n }, (_, i) => center + (i - (n - 1) / 2) * step);
-
-/** Кабина над передней осью, смотрит влево. x — передний край. */
-function Cab({ x }: { x: number }) {
-  return (
-    <g strokeLinejoin="round">
-      <path
-        d={`M${x + 0.6} ${G - 10} L${x} ${G - 21} L${x + 1.4} ${G - 34} Q${x + 2} ${G - 37.5} ${x + 5.5} ${G - 37.5} L${x + 21.5} ${G - 37.5} Q${x + 23} ${G - 37.5} ${x + 23} ${G - 36} L${x + 23} ${G - 10} Z`}
-        className="fill-surface stroke-ink"
-        strokeWidth={1.1}
-      />
-      {/* окно двери и стойка */}
-      <path d={`M${x + 2.6} ${G - 32.5} L${x + 12.5} ${G - 32.5} L${x + 12.5} ${G - 23.5} L${x + 1.8} ${G - 23.5} Z`} className="fill-sunken stroke-ink" strokeWidth={0.8} />
-      <line x1={x + 14} y1={G - 34} x2={x + 14} y2={G - 12} className="stroke-ink" strokeWidth={0.6} />
-      {/* спальник: окно сзади */}
-      <rect x={x + 16} y={G - 32.5} width={5} height={5} rx={1} className="fill-sunken stroke-ink" strokeWidth={0.6} />
-      {/* ступени и бампер */}
-      <rect x={x + 3} y={G - 16} width={7} height={1.2} className={INK} />
-      <rect x={x - 0.8} y={G - 12.5} width={6.5} height={3} rx={0.8} className={INK} />
-      <rect x={x - 0.2} y={G - 15} width={2.4} height={1.6} rx={0.4} className="fill-warn" />
-    </g>
-  );
-}
-
-function Frame({ x0, x1, y = G - 12.5, h = 2.4 }: { x0: number; x1: number; y?: number; h?: number }) {
-  return <rect x={x0} y={y} width={x1 - x0} height={h} className={INK} />;
-}
-
-/** Тентовый или фургонный кузов: стенка с рёбрами и рамы сверху/снизу. */
-function BoxBody({ x0, x1, top = G - 40, bottom = G - 13 }: { x0: number; x1: number; top?: number; bottom?: number }) {
-  const ribs = [];
-  for (let x = x0 + 9; x < x1 - 4; x += 9) ribs.push(<line key={x} x1={x} y1={top + 1.5} x2={x} y2={bottom - 1.5} className={RIB} strokeWidth={0.5} opacity={0.45} />);
-  return (
-    <g>
-      <rect x={x0} y={top} width={x1 - x0} height={bottom - top} rx={1.2} className={BODY} strokeWidth={1} />
-      {ribs}
-      <line x1={x0} y1={top + 2.2} x2={x1} y2={top + 2.2} className={RIB} strokeWidth={0.6} />
-      <line x1={x0} y1={bottom - 2.2} x2={x1} y2={bottom - 2.2} className={RIB} strokeWidth={0.6} />
-    </g>
-  );
-}
-
-/** Самосвальный кузов: корыто, выше спереди, с вертикальными рёбрами. */
-function TipperBody({ x0, x1, bottom = G - 13 }: { x0: number; x1: number; bottom?: number }) {
-  const top = bottom - 19;
-  const ribs = [];
-  for (let x = x0 + 8; x < x1 - 4; x += 8) ribs.push(<line key={x} x1={x} y1={top + 1.6} x2={x} y2={bottom - 1} className={RIB} strokeWidth={0.7} opacity={0.6} />);
-  return (
-    <g strokeLinejoin="round">
-      <path d={`M${x0 + 1.5} ${bottom} L${x0} ${top - 2} L${x1 - 1} ${top} L${x1} ${bottom - 3} Q${x1} ${bottom} ${x1 - 3} ${bottom} Z`} className={BODY} strokeWidth={1} />
-      {ribs}
-      <line x1={x0 + 0.4} y1={top - 0.2} x2={x1 - 1} y2={top + 1.6} className={RIB} strokeWidth={1.4} />
-    </g>
-  );
-}
-
-/** 40-футовый контейнер на шасси: гофра и угловые фитинги. */
-function ContainerBody({ x0, x1, bottom = G - 13.5 }: { x0: number; x1: number; bottom?: number }) {
-  const top = bottom - 26;
-  const ribs = [];
-  for (let x = x0 + 3; x < x1 - 2; x += 3) ribs.push(<line key={x} x1={x} y1={top + 1.5} x2={x} y2={bottom - 1.5} className={RIB} strokeWidth={0.45} opacity={0.4} />);
-  return (
-    <g>
-      <rect x={x0} y={top} width={x1 - x0} height={bottom - top} className={BODY} strokeWidth={1} />
-      {ribs}
-      {[
-        [x0, top],
-        [x1 - 2.4, top],
-        [x0, bottom - 2],
-        [x1 - 2.4, bottom - 2],
-      ].map(([x, y]) => (
-        <rect key={`${x}-${y}`} x={x} y={y} width={2.4} height={2} className="fill-accent" />
-      ))}
-    </g>
-  );
-}
-
-/** Низкорамный полуприцеп с гусем, аппарелями и экскаватором на площадке. */
-function Lowbed({ f, axles }: { f: number; axles: number }) {
-  const deckTop = G - 10.5;
-  const end = f + 150;
-  return (
-    <g strokeLinejoin="round">
-      <path
-        d={`M${f} ${G - 16.5} L${f + 25} ${G - 16.5} L${f + 32} ${deckTop} L${end} ${deckTop} L${end} ${deckTop + 2.8} L${f + 31} ${deckTop + 2.8} L${f + 24} ${G - 13.5} L${f} ${G - 13.5} Z`}
-        className={BODY}
-        strokeWidth={1}
-      />
-      {/* аппарели, поднятые */}
-      <path d={`M${end - 7} ${deckTop} L${end - 2} ${deckTop} L${end + 1} ${deckTop - 13} L${end - 3} ${deckTop - 13} Z`} className={BODY} strokeWidth={0.9} />
-      {/* экскаватор: гусеница, поворотная часть, кабина, стрела с ковшом */}
-      <rect x={f + 44} y={deckTop - 6} width={36} height={6} rx={3} className={INK} />
-      {[f + 48, f + 56, f + 64, f + 72, f + 77].map((x) => (
-        <circle key={x} cx={x} cy={deckTop - 3} r={1.4} className="fill-sunken" />
-      ))}
-      <path d={`M${f + 47} ${deckTop - 6} L${f + 47} ${deckTop - 16} L${f + 80} ${deckTop - 16} Q${f + 84} ${deckTop - 16} ${f + 84} ${deckTop - 12} L${f + 84} ${deckTop - 6} Z`} className="fill-warn stroke-ink" strokeWidth={0.9} />
-      <path d={`M${f + 49} ${deckTop - 16} L${f + 49} ${deckTop - 27} L${f + 58} ${deckTop - 27} L${f + 60} ${deckTop - 16} Z`} className="fill-warn stroke-ink" strokeWidth={0.9} />
-      <path d={`M${f + 50.5} ${deckTop - 25.5} L${f + 57} ${deckTop - 25.5} L${f + 58.3} ${deckTop - 18} L${f + 50.5} ${deckTop - 18} Z`} className="fill-sunken" />
-      <path d={`M${f + 62} ${deckTop - 15} L${f + 74} ${deckTop - 33} L${f + 96} ${deckTop - 22} L${f + 98} ${deckTop - 6}`} className="fill-none stroke-ink" strokeWidth={2.6} strokeLinecap="round" />
-      <path d={`M${f + 94} ${deckTop - 8} L${f + 103} ${deckTop - 8} L${f + 101} ${deckTop - 1} L${f + 95} ${deckTop - 1} Z`} className="fill-ink" />
-      {group(end - 22, axles, 9).map((x) => (
-        <Wheel key={x} cx={x} r={3.8} />
-      ))}
-    </g>
-  );
-}
-
-/** Тягач: кабина, рама, бак, седло. Возвращает центр седла. */
-function Tractor({ x, axles }: { x: number; axles: number }) {
-  const rear = axles === 2 ? [x + 37] : [x + 35, x + 47];
-  const len = rear[rear.length - 1] + 8 - x;
-  const kingpin = (rear[0] + rear[rear.length - 1]) / 2 - 1;
-  return {
-    kingpin,
-    node: (
-      <g>
-        <Frame x0={x + 2} x1={x + len} />
-        <rect x={kingpin - 5} y={G - 14} width={10} height={1.6} rx={0.5} className={INK} />
-        <Cab x={x} />
-        <Wheel cx={x + 9} />
-        {rear.map((cx) => (
-          <Wheel key={cx} cx={cx} />
-        ))}
-      </g>
-    ),
-  };
-}
-
-/** Полуприцеп от переднего края f: длина, кузов, опорные стойки, тележка у хвоста. */
-function Semi({ f, len, axles, body }: { f: number; len: number; axles: number; body: 'BOX' | 'TIPPER' | 'CONTAINER' }) {
-  const end = f + len;
-  const legAt = body === 'TIPPER' ? 36 : 44;
-  return (
-    <g>
-      <Frame x0={f} x1={end} y={G - 14} h={1.8} />
-      {/* опорные стойки — метра три за шкворнем */}
-      <line x1={f + legAt} y1={G - 12} x2={f + legAt} y2={G - 3.5} className="stroke-ink" strokeWidth={1} />
-      <rect x={f + legAt - 1.8} y={G - 3.5} width={3.6} height={1.2} rx={0.4} className={INK} />
-      {body === 'BOX' && <BoxBody x0={f} x1={end} top={G - 40} bottom={G - 14} />}
-      {body === 'TIPPER' && <TipperBody x0={f + 1} x1={end} bottom={G - 14} />}
-      {body === 'CONTAINER' && <ContainerBody x0={f + 2} x1={end - 1} bottom={G - 14} />}
-      {group(end - (body === 'TIPPER' ? 20 : 30), axles).map((cx) => (
-        <Wheel key={cx} cx={cx} />
-      ))}
-    </g>
-  );
-}
-
-/** Грузовик (нуппи) с кузовом: 2 передние оси при 4+ осях, остальные сзади. */
-function Truck({ x, axles, body }: { x: number; axles: number; body: 'BOX' | 'TIPPER' }) {
-  const front = axles >= 4 ? [x + 9, x + 21] : [x + 9];
-  const rearN = axles - front.length;
-  const len = 52 + rearN * AXLE;
-  const rearCenter = x + len - 14;
-  return {
-    end: x + len,
-    node: (
-      <g>
-        <Frame x0={x + 2} x1={x + len} />
-        {body === 'BOX' ? <BoxBody x0={x + 25} x1={x + len} /> : <TipperBody x0={x + 25} x1={x + len} />}
-        <Cab x={x} />
-        {[...front, ...group(rearCenter, rearN)].map((cx) => (
-          <Wheel key={cx} cx={cx} />
-        ))}
-      </g>
-    ),
-  };
-}
-
-/** Прицеп на дышле: поворотная тележка спереди, вторая сзади. */
-function FullTrailer({ x, axles, body }: { x: number; axles: number; body: 'BOX' | 'TIPPER' }) {
-  const len = 72;
-  const frontN = Math.ceil(axles / 2);
-  return (
-    <g>
-      <Frame x0={x} x1={x + len} y={G - 14} h={1.8} />
-      {body === 'BOX' ? <BoxBody x0={x} x1={x + len} top={G - 40} bottom={G - 14} /> : <TipperBody x0={x} x1={x + len} bottom={G - 14} />}
-      {[...group(x + 15, frontN), ...group(x + len - 14, axles - frontN)].map((cx) => (
-        <Wheel key={cx} cx={cx} />
-      ))}
-    </g>
-  );
-}
-
-function ComboSketch({ combo }: { combo: Combo }) {
-  const x = 3;
-  let art: ReactNode;
-
-  if (combo.motor.kind === 'TRACTOR') {
-    const tractor = Tractor({ x, axles: combo.motor.axles });
-    const k = tractor.kingpin;
-    art = (
-      <>
-        {combo.trailerBody === 'LOWBED' ? (
-          <Lowbed f={k - 12} axles={combo.trailer.axles} />
-        ) : (
-          <Semi
-            f={k - (combo.trailerBody === 'TIPPER' ? 8 : 14)}
-            len={combo.trailerBody === 'TIPPER' ? 95 : combo.trailerBody === 'CONTAINER' ? 124 : 136}
-            axles={combo.trailer.axles}
-            body={combo.trailerBody === 'CONTAINER' ? 'CONTAINER' : combo.trailerBody === 'TIPPER' ? 'TIPPER' : 'BOX'}
-          />
-        )}
-        {tractor.node}
-      </>
-    );
-  } else {
-    const body = combo.motorBody === 'TIPPER' ? 'TIPPER' : 'BOX';
-    const truck = Truck({ x, axles: combo.motor.axles, body });
-    const t0 = truck.end + 9;
-    art = (
-      <>
-        <path d={`M${truck.end - 1} ${G - 11} L${t0 + 2} ${G - 11}`} className="fill-none stroke-ink" strokeWidth={1.4} />
-        <FullTrailer x={t0} axles={combo.trailer.axles} body={combo.trailerBody === 'TIPPER' ? 'TIPPER' : 'BOX'} />
-        {truck.node}
-      </>
-    );
-  }
-
-  return (
-    <svg viewBox={`0 0 ${VIEW_W} ${G + 2}`} className="h-auto w-full" aria-hidden="true">
-      <line x1={0} y1={G + 0.5} x2={VIEW_W} y2={G + 0.5} className="stroke-line-strong" strokeWidth={0.8} />
-      {art}
-    </svg>
   );
 }
