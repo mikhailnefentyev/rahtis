@@ -1,25 +1,28 @@
 /*
- * Абонемент лесенкой и год вперёд (тот же расчёт — app.subscription_ladder_cents). Запуск: npm test.
+ * Абонемент с 3.11.2026: первая машина бесплатно, каждая следующая 14,90 €;
+ * год вперёд −10 % (тот же расчёт — app.subscription_ladder_cents). Запуск: npm test.
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { annualPlanCents, subscriptionLadderCents } from './config.ts';
+import { annualPlanCents, billedVehicles, subscriptionLadderCents } from './config.ts';
 
-test('лесенка: каждая ступень платит свою цену', () => {
+test('первая машина бесплатно, следующие по 14,90 €', () => {
   assert.equal(subscriptionLadderCents(0), 0);
-  assert.equal(subscriptionLadderCents(1), 2990);
-  assert.equal(subscriptionLadderCents(9), 26910);
-  assert.equal(subscriptionLadderCents(10), 29700);
-  assert.equal(subscriptionLadderCents(20), 57400);
-  assert.equal(subscriptionLadderCents(50), 134900);
-  assert.equal(subscriptionLadderCents(100), 254400);
+  assert.equal(subscriptionLadderCents(1), 0);
+  assert.equal(subscriptionLadderCents(2), 1490);
+  assert.equal(subscriptionLadderCents(3), 2980);
+  assert.equal(subscriptionLadderCents(10), 13410);
+  assert.equal(subscriptionLadderCents(100), 147510);
+  assert.equal(billedVehicles(1), 0);
+  assert.equal(billedVehicles(5), 4);
 });
 
-test('следующая машина всегда добавляет к сумме — провалов нет', () => {
+test('со второй машины каждая следующая добавляет к сумме', () => {
   for (let n = 1; n < 200; n += 1) assert.ok(subscriptionLadderCents(n + 1) > subscriptionLadderCents(n), String(n));
 });
 
 test('год вперёд: 12 месяцев минус 10 %', () => {
-  assert.equal(annualPlanCents(1), 32292);
-  assert.equal(annualPlanCents(10), 320760);
+  assert.equal(annualPlanCents(1), 0);
+  assert.equal(annualPlanCents(3), 32184);
+  assert.equal(annualPlanCents(10), 144828);
 });
