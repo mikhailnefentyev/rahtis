@@ -109,6 +109,9 @@ create table public.verification_documents (
   valid_until date not null,
   uploaded_by uuid default auth.uid(),
   created_at timestamptz not null default now(),
+  /* Когда оператор принял файл. Значок держится только на принятых: иначе после
+     решения оператора можно было бы продлить его любой загрузкой. */
+  reviewed_at timestamptz,
   constraint verification_documents_items
     check (cardinality(items) between 1 and 7 and items <@ app.verification_required_items()),
   constraint verification_documents_dates
@@ -141,7 +144,39 @@ create policy verification_documents_admin
   on public.verification_documents for select to authenticated
   using ((select app.is_admin()));
 
-grant select, insert, delete on public.verification_documents to authenticated;
+/* Вставляет перевозчик, но reviewed_at он не задаёт: колонки — поимённо. */
+grant select on public.verification_documents to authenticated;
+grant insert (id, company_id, items, source, storage_path, file_name, mime_type, size_bytes, issued_on, valid_until)
+  on public.verification_documents to authenticated;
+grant delete on public.verification_documents to authenticated;
+
+/* Даты против «сегодня»: CHECK не может ссылаться на now(), поэтому триггер.
+   Выдана не в будущем и на момент загрузки ещё действует. */
+create or replace function app.verification_documents_guard()
+returns trigger
+language plpgsql
+set search_path = ''
+as $$
+declare
+  v_today date := (now() at time zone 'Europe/Helsinki')::date;
+begin
+  if new.issued_on > v_today then
+    raise exception 'Дата выдачи в будущем.' using errcode = '22023';
+  end if;
+  if new.valid_until < v_today then
+    raise exception 'Справка уже истекла.' using errcode = '22023';
+  end if;
+  /* Принимает только оператор: функцией grant_verification. */
+  new.reviewed_at := null;
+  new.created_at := now();
+  new.uploaded_by := auth.uid();
+  return new;
+end;
+$$;
+
+create trigger verification_documents_guard
+  before insert on public.verification_documents
+  for each row execute function app.verification_documents_guard();
 
 -- ── Значок: решение оператора ─────────────────────────────────────
 
@@ -166,7 +201,8 @@ create policy verification_grants_admin
   on public.verification_grants for select to authenticated
   using ((select app.is_admin()));
 
-grant select on public.verification_grants to authenticated;
+/* Поколоночно: заметки и кто решал — только оператору (админка читает служебным клиентом). */
+grant select (company_id, granted_at, revoked_at) on public.verification_grants to authenticated;
 
 -- ── Ссылки для заказчиков вне RAHTIS ──────────────────────────────
 
@@ -222,7 +258,7 @@ alter table public.verification_reminders enable row level security;
  * Срок каждого пункта: самый поздний из документа и снимка PRH.
  * NULL — пункт ничем не закрыт.
  */
-create or replace function app.verification_items(p_company_id uuid)
+create or replace function app.verification_items(p_company_id uuid, p_reviewed_only boolean default false)
 returns table (item text, valid_until date, source text)
 language sql
 stable
@@ -237,6 +273,7 @@ as $$
     from public.verification_documents d
     cross join lateral unnest(d.items) as i(item)
     where d.company_id = p_company_id
+      and (not p_reviewed_only or d.reviewed_at is not null)
     group by i.item
   ),
   prh as (
@@ -271,7 +308,7 @@ as $$
   left join prh_items p on p.item = r.item;
 $$;
 
-revoke all on function app.verification_items(uuid) from public, anon, authenticated;
+revoke all on function app.verification_items(uuid, boolean) from public, anon, authenticated;
 
 create or replace function app.company_verified(p_company_id uuid)
 returns boolean
@@ -285,7 +322,8 @@ as $$
     where g.company_id = p_company_id and g.revoked_at is null
   )
   and not exists (
-    select 1 from app.verification_items(p_company_id) i
+    /* Только принятые оператором файлы (и данные PRH, их снимает сервер). */
+    select 1 from app.verification_items(p_company_id, true) i
     where i.valid_until is null
        or i.valid_until < (now() at time zone 'Europe/Helsinki')::date
   );
@@ -321,7 +359,8 @@ as $$
     'documents', coalesce((
       select jsonb_agg(jsonb_build_object(
         'id', d.id, 'items', d.items, 'source', d.source, 'file_name', d.file_name,
-        'storage_path', d.storage_path, 'issued_on', d.issued_on, 'valid_until', d.valid_until
+        'storage_path', d.storage_path, 'issued_on', d.issued_on, 'valid_until', d.valid_until,
+        'reviewed', d.reviewed_at is not null
       ) order by d.valid_until desc)
       from public.verification_documents d
       where d.company_id = c.id
@@ -484,6 +523,12 @@ begin
         revoked_at = null,
         revoked_by = null,
         revoke_note = null;
+
+  /* Решение оператора принимает все файлы, которые он видел на странице.
+     Новый файл после этого продлит значок только после повторного решения. */
+  update public.verification_documents
+  set reviewed_at = now()
+  where company_id = p_company_id and reviewed_at is null;
 end;
 $$;
 

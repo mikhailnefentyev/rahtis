@@ -4847,6 +4847,7 @@ export type Database = {
           created_at: string
           file_name: string
           id: string
+          reviewed_at: string | null
           issued_on: string
           items: string[]
           mime_type: string
@@ -4861,6 +4862,7 @@ export type Database = {
           created_at?: string
           file_name: string
           id?: string
+          reviewed_at?: string | null
           issued_on: string
           items: string[]
           mime_type: string
@@ -4875,6 +4877,7 @@ export type Database = {
           created_at?: string
           file_name?: string
           id?: string
+          reviewed_at?: string | null
           issued_on?: string
           items?: string[]
           mime_type?: string

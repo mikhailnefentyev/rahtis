@@ -107,7 +107,6 @@ export async function uploadVerificationAction(
     size_bytes: file.size,
     issued_on: issuedOn,
     valid_until: validUntil,
-    uploaded_by: viewer.userId,
   });
 
   if (insertError) {

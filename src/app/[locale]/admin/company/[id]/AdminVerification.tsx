@@ -2,7 +2,7 @@ import { Button, Card, CardBody, Textarea } from '@/components/ui';
 import { VerificationPackageView } from '@/components/domain/VerificationPackageView';
 import { VerifiedBadge } from '@/components/domain/VerifiedBadge';
 import { getI18n, type Locale } from '@/lib/i18n';
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { grantVerificationAction, revokeVerificationAction } from '@/lib/verification/actions';
 import { fill } from '@/lib/verification/fill';
 import { loadPackage } from '@/lib/verification/package';
@@ -17,7 +17,9 @@ import { loadPackage } from '@/lib/verification/package';
  * все пункты в сроке; снятие — отдельной кнопкой с причиной.
  */
 export async function AdminVerification({ locale, companyId }: { locale: Locale; companyId: string }) {
-  const [i18n, supabase] = await Promise.all([getI18n(locale), createClient()]);
+  /* Страница уже за requireRole(ADMIN); заметки оператора закрыты от authenticated поколоночно. */
+  const i18n = await getI18n(locale);
+  const supabase = createAdminClient();
   const v = i18n.t.verification;
 
   const [pkg, { data: grant }] = await Promise.all([

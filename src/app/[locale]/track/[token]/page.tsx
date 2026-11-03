@@ -108,7 +108,12 @@ export default async function TrackPage({ params }: { params: Promise<{ locale: 
     active && order.status === 'IN_PROGRESS'
       ? await vehicleFix(order.assigned_vehicle_id, order.assigned_company_id)
       : null;
-  if (fix) after(() => refreshFix(fix, now).catch(() => undefined));
+  /*
+   * Обновлять GPS с публичной страницы пока нельзя: PRIVACY (GPS, 29.10)
+   * обещает запрос к провайдеру, только когда перевозчик открывает GPS.
+   * Включить — после правки текста: TRACK_REFRESH_GPS=1.
+   */
+  if (fix && process.env.TRACK_REFRESH_GPS === '1') after(() => refreshFix(fix, now).catch(() => undefined));
 
   const eta: TrackEta | null = active && next && !next.arrived_at ? await trackEta(next, fix, now) : null;
 
