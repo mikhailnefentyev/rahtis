@@ -13,6 +13,7 @@ import { createClient } from '@/lib/supabase/server';
 import { carrierApproveDayAction } from '@/lib/sites/actions';
 import { JobControls } from './JobControls';
 import { Invoices } from './Invoices';
+import { LoadTicket } from './LoadTicket';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; id: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -40,7 +41,7 @@ export default async function SiteJobPage({ params }: { params: Promise<{ locale
   const { data: job } = await supabase.from('site_jobs').select('*').eq('id', id).eq('company_id', company.id).maybeSingle();
   if (!job) notFound();
 
-  const [{ data: days }, { data: loads }, { data: scaleSites }, { data: drivers }, { data: vehicles }, { data: trailers }, { data: invoices }] = await Promise.all([
+  const [{ data: days }, { data: loads }, { data: scaleSites }, { data: drivers }, { data: vehicles }, { data: trailers }, { data: invoices }, { data: tickets }] = await Promise.all([
     supabase.from('site_days').select('*').eq('job_id', job.id).order('day', { ascending: false }),
     supabase.from('site_loads').select('*').eq('job_id', job.id).order('unloaded_at', { ascending: true }),
     supabase.from('scale_sites').select('id, name, city').order('name'),
@@ -48,7 +49,11 @@ export default async function SiteJobPage({ params }: { params: Promise<{ locale
     supabase.from('vehicles').select('id, plate, vehicle_class, axles, gross_max_kg, tare_kg, coupling_distance_m').eq('company_id', company.id),
     supabase.from('trailers').select('id, plate, kind, axles, twin_wheels, gross_max_kg, tare_kg, coupling_distance_m').eq('company_id', company.id),
     supabase.from('carrier_invoices').select('id, number, issued_on, due_on, total_cents, sent_at, sent_to').eq('job_id', id).order('issued_on', { ascending: false }),
+    /* Фото весовых талонов рейсов: последнее у рейса — ссылка в таблице. */
+    supabase.from('weigh_tickets').select('id, load_id').eq('job_id', id).not('load_id', 'is', null).order('created_at', { ascending: true }),
   ]);
+  const ticketByLoad = new Map((tickets ?? []).map((tk) => [tk.load_id as string, tk.id]));
+  const canEdit = job.status === 'ACTIVE';
 
   const driverName = new Map((drivers ?? []).map((d) => [d.id, d.full_name]));
   const vehicleById = new Map((vehicles ?? []).map((v) => [v.id, v]));
@@ -68,7 +73,7 @@ export default async function SiteJobPage({ params }: { params: Promise<{ locale
     const times = { arrivedAt: day.arrived_at, endedAt: day.ended_at, bufferMinutes: day.buffer_minutes, unloads: dayLoads.map((l) => l.unloaded_at) };
     const vehicle = day.vehicle_id ? vehicleById.get(day.vehicle_id) : undefined;
     const trailer = day.trailer_id ? trailerById.get(day.trailer_id) : undefined;
-    const limitKg = vehicle
+    const mass = vehicle
       ? combinationMass(
           country,
           {
@@ -90,7 +95,7 @@ export default async function SiteJobPage({ params }: { params: Promise<{ locale
                 },
               ]
             : [],
-        ).limitKg
+        )
       : null;
     return {
       day,
@@ -99,7 +104,9 @@ export default async function SiteJobPage({ params }: { params: Promise<{ locale
       minutes: dayMinutes(times),
       netKg: dayLoads.reduce((sum, l) => sum + (l.net_kg ?? 0), 0),
       plate: [vehicle?.plate, trailer?.plate].filter(Boolean).join(' + '),
-      limitKg,
+      plates: [vehicle?.plate, trailer?.plate].filter((p): p is string => Boolean(p)),
+      limitKg: mass?.limitKg ?? null,
+      comboTareKg: mass?.tareKg ?? null,
     };
   });
 
@@ -179,6 +186,20 @@ export default async function SiteJobPage({ params }: { params: Promise<{ locale
                   <span className="font-mono">{r.loads.length}</span> · {s.colTonnes} <span className="font-mono">{tonnes(r.netKg)}</span>
                 </p>
                 {r.day.approval_note && <p className="text-[13px] text-ink-muted">“{r.day.approval_note}”</p>}
+                {canEdit && !r.day.invoice_id && !job.order_id && (
+                  <div>
+                    <LoadTicket
+                      jobId={job.id}
+                      dayId={r.day.id}
+                      orderJob={false}
+                      defaultMaterial={job.material_code}
+                      scaleSites={scaleSites ?? []}
+                      expectedPlates={r.plates}
+                      limitKg={r.limitKg}
+                      comboTareKg={r.comboTareKg}
+                    />
+                  </div>
+                )}
                 {!r.day.approved_at && (
                   <form action={carrierApproveDayAction} className="flex flex-wrap items-center gap-3">
                     <input type="hidden" name="locale" value={locale} />
@@ -191,7 +212,7 @@ export default async function SiteJobPage({ params }: { params: Promise<{ locale
                 )}
                 {r.loads.length > 0 && (
                   <div className="overflow-x-auto">
-                    <table className="w-full min-w-[620px] text-[13px]">
+                    <table className="w-full min-w-[720px] text-[13px]">
                       <thead className="text-left text-xs text-ink-faint">
                         <tr>
                           <th className="py-1 pr-3 font-medium">{s.colTime}</th>
@@ -201,6 +222,7 @@ export default async function SiteJobPage({ params }: { params: Promise<{ locale
                           <th className="py-1 pr-3 font-medium">{s.colTare}</th>
                           <th className="py-1 pr-3 font-medium">{s.colNet}</th>
                           <th className="py-1 pr-3 font-medium">{s.colTicket}</th>
+                          <th className="py-1 pr-3 font-medium">{t.weighTicket.colPhoto}</th>
                           <th className="py-1 font-medium" />
                         </tr>
                       </thead>
@@ -219,6 +241,28 @@ export default async function SiteJobPage({ params }: { params: Promise<{ locale
                               <td className="py-1 pr-3 font-mono">{l.tare_kg ? tonnes(l.tare_kg) : '—'}</td>
                               <td className="py-1 pr-3 font-mono font-semibold">{l.net_kg != null ? tonnes(l.net_kg) : '—'}</td>
                               <td className="py-1 pr-3 font-mono">{l.ticket_no ?? '—'}</td>
+                              <td className="py-1 pr-3">
+                                <div className="flex flex-wrap items-center gap-2">
+                                  {ticketByLoad.has(l.id) && (
+                                    <a className="text-accent underline" href={`/api/weigh-ticket/${ticketByLoad.get(l.id)}`} target="_blank" rel="noreferrer">
+                                      {t.weighTicket.view}
+                                    </a>
+                                  )}
+                                  {canEdit && !r.day.invoice_id && (
+                                    <LoadTicket
+                                      jobId={job.id}
+                                      dayId={r.day.id}
+                                      load={l}
+                                      orderJob={Boolean(job.order_id)}
+                                      defaultMaterial={job.material_code}
+                                      scaleSites={scaleSites ?? []}
+                                      expectedPlates={r.plates}
+                                      limitKg={r.limitKg}
+                                      comboTareKg={r.comboTareKg}
+                                    />
+                                  )}
+                                </div>
+                              </td>
                               <td className="py-1">
                                 {/^\d{6}$/.test(l.material_code) && (
                                   <Link className="text-accent underline" href={`/${locale}/carrier/sites/${job.id}/load/${l.id}`}>

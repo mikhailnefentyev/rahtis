@@ -19,7 +19,7 @@ export type OutboxEvent = {
   kind: OutboxKind;
   /** Поля формы для серверного действия. */
   fields: Record<string, string>;
-  /** Файл снимка или подписи — у UPLOAD; фото чека — у FUEL. */
+  /** Файл снимка или подписи — у UPLOAD; фото чека — у FUEL; фото весового талона без связи — у SITE (LOAD). */
   blob?: Blob;
   /** Момент нажатия. В учёт идёт он, а не время отправки. */
   pressedAt: string;

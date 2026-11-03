@@ -4906,6 +4906,86 @@ export type Database = {
           },
         ]
       }
+      weigh_tickets: {
+        Row: {
+          company_id: string
+          created_at: string
+          driver_id: string | null
+          id: string
+          job_id: string
+          load_id: string | null
+          mime_type: string
+          reading: Json | null
+          reading_status: string
+          sha256: string
+          size_bytes: number
+          storage_path: string
+          ticket_no: string | null
+          uploaded_by: string | null
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          driver_id?: string | null
+          id?: string
+          job_id: string
+          load_id?: string | null
+          mime_type: string
+          reading?: Json | null
+          reading_status: string
+          sha256: string
+          size_bytes: number
+          storage_path: string
+          ticket_no?: string | null
+          uploaded_by?: string | null
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          driver_id?: string | null
+          id?: string
+          job_id?: string
+          load_id?: string | null
+          mime_type?: string
+          reading?: Json | null
+          reading_status?: string
+          sha256?: string
+          size_bytes?: number
+          storage_path?: string
+          ticket_no?: string | null
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "weigh_tickets_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "weigh_tickets_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "weigh_tickets_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "site_jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "weigh_tickets_load_id_fkey"
+            columns: ["load_id"]
+            isOneToOne: false
+            referencedRelation: "site_loads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       incident_feed: {
@@ -5908,6 +5988,15 @@ export type Database = {
       carrier_site_approve_day: {
         Args: { p_day_id: string }
         Returns: undefined
+      }
+      carrier_site_load_save: {
+        Args: {
+          p_data?: Json
+          p_day_id: string
+          p_load_id?: string
+          p_weigh_ticket_id?: string
+        }
+        Returns: string
       }
       carrier_trip_trailers: {
         Args: { p_order_ids: string[] }
@@ -8066,6 +8155,21 @@ export type Database = {
           week: string
         }[]
       }
+      weigh_ticket_add: {
+        Args: {
+          p_id: string
+          p_job_id: string
+          p_load_event_id?: string
+          p_mime_type: string
+          p_reading?: Json
+          p_sha256: string
+          p_size_bytes: number
+          p_status: string
+          p_storage_path: string
+        }
+        Returns: Json
+      }
+      weigh_ticket_context: { Args: { p_job_id: string }; Returns: Json }
       withdraw_order: {
         Args: { p_order_id: string; p_reason?: string }
         Returns: {

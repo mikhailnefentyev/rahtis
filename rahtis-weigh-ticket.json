@@ -1,0 +1,232 @@
+{
+  "name": "RAHTIS — весовой талон",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "rahtis-weigh-ticket",
+        "responseMode": "responseNode",
+        "options": {
+          "rawBody": true
+        }
+      },
+      "name": "Весовой талон",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -800,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Проверка подписи RAHTIS на входящем фото весового талона.\n//\n// Платформа подписывает исходящий запрос тем же секретом, которым мы\n// подписываем обратные: HMAC-SHA256 на AGENT_WEBHOOK_SECRET от строки\n// `${timestamp}.${body}`, заголовок x-rahtis-signature вида sha256=<hex>.\n//\n// Без проверки вебхук открыт: кто узнал адрес, тот будет гонять\n// OpenAI за наш счёт.\n\nconst crypto = require('crypto');\n\n// Секрет для подписи.\n//\n// $env в узлах Code на n8n Cloud закрыт наглухо: с версии 2.0\n// N8N_BLOCK_ENV_ACCESS_IN_NODE по умолчанию true, и на облаке этот\n// переключатель недоступен. Поэтому секрет берётся из переменных n8n\n// ($vars — планы Pro и Enterprise Cloud).\n//\n// Если у вас Starter, где переменных нет, впишите значение в SECRET\n// ниже. Оно останется видимым каждому, у кого есть доступ в n8n, —\n// это плата за отсутствие хранилища секретов на этом тарифе.\nlet SECRET = '';\ntry { if (typeof $vars !== 'undefined' && $vars.AGENT_WEBHOOK_SECRET) SECRET = $vars.AGENT_WEBHOOK_SECRET; } catch (e) {}\nif (!SECRET) throw new Error('AGENT_WEBHOOK_SECRET не задан: создайте переменную в n8n или впишите значение в SECRET.');\nconst secret = SECRET;\n\n// Сырое тело подписи. n8n отдаёт его по-разному: строкой, буфером,\n// разобранным объектом, а при rawBody иногда двоичным вложением. Подпись\n// считается от БАЙТОВ, которые прислала платформа, поэтому читаем все\n// формы, а разбор JSON оставляем на потом.\nfunction rawBody() {\n  try {\n    const bin = $input.item.binary;\n    if (bin && bin.data && bin.data.data) return Buffer.from(bin.data.data, 'base64').toString('utf8');\n  } catch (e) {}\n  const b = $json.body;\n  if (typeof b === 'string') return b;\n  if (Buffer.isBuffer(b)) return b.toString('utf8');\n  if (b && b.type === 'Buffer' && Array.isArray(b.data)) return Buffer.from(b.data).toString('utf8');\n  return JSON.stringify(b || {});\n}\nconst raw = rawBody();\nconst ts = $json.headers['x-rahtis-timestamp'] || '';\nconst given = $json.headers['x-rahtis-signature'] || '';\n\n// Окно 300 секунд: перехваченный запрос нельзя повторить назавтра.\nconst age = Math.abs(Math.floor(Date.now() / 1000) - Number(ts));\nconst fresh = Number.isFinite(age) && age <= 300;\n\nconst expected = 'sha256=' + crypto.createHmac('sha256', secret).update(ts + '.' + raw).digest('hex');\nconst a = Buffer.from(expected);\nconst b = Buffer.from(given);\nconst signed = a.length === b.length && crypto.timingSafeEqual(a, b);\n\nlet p = {};\ntry { p = JSON.parse(raw); } catch (e) { try { p = (typeof $json.body === 'object' && $json.body) || {}; } catch (e2) { p = {}; } }\n\nconst MIMES = ['image/jpeg', 'image/png', 'image/webp'];\nconst mime = MIMES.includes(p.mime) ? p.mime : 'image/jpeg';\nconst data = typeof p.data_base64 === 'string' ? p.data_base64 : '';\nreturn [{\n  json: {\n    // Фото не больше ~10 МБ (в base64 — ~14 МБ строки).\n    ok: signed && fresh && data.length > 0 && data.length < 15000000,\n    why: signed ? (fresh ? null : 'stale') : 'signature',\n    mime,\n    data_base64: data,\n    plates: Array.isArray(p.plates) ? p.plates.filter((x) => typeof x === 'string').slice(0, 300) : [],\n    expected_plates: Array.isArray(p.expected_plates) ? p.expected_plates.filter((x) => typeof x === 'string').slice(0, 5) : [],\n    country: typeof p.country === 'string' ? p.country.slice(0, 2) : 'FI',\n  },\n}];\n"
+      },
+      "name": "Проверить подпись RAHTIS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -580,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.ok }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "name": "Подпись верна?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -360,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Запрос к OpenAI: поля весового талона (punnituskuitti / vaakakuitti / vågsedel) с фото.\n// Ответ — строго по схеме; сайт пересчитывает веса из напечатанных строк\n// сам (src/lib/weighTicket/reading.ts) и показывает человеку на проверку.\nconst MATERIALS = ['170504', '170506', '170503', '170107', '170302', '170904', 'SORA', 'MURSKE', 'HIEKKA', 'MULTA', 'LOUHE'];\nconst system = [\n  'You read photos of weighing tickets from Nordic and Baltic scales (Finnish: punnituskuitti, vaakakuitti, punnitustosite; Swedish: vågsedel, vägningskvitto; Norwegian: veieseddel; Estonian: kaalumistõend). They come from earthworks: soil, gravel, crushed rock and construction waste hauled by tipper trucks.',\n  'Read only what is printed or clearly handwritten on the ticket. Never invent a value: if it is missing, cut off or unreadable, use null and say so in notes.',\n  'ticket_number: the ticket or weighing number (Kuitti nro, Punnitus nro, Tosite, Nro, Vågsedel nr, Kvitto nr), exactly as printed without the label.',\n  'weighed_at: the date and time of the (last) weighing as YYYY-MM-DDTHH:MM in local time, or YYYY-MM-DD if there is no time; null if absent. Finnish and Swedish dates are day first (3.11.2026 = 2026-11-03).',\n  'plates: every vehicle and trailer registration number on the ticket (Rek.nro, Rekisterinumero, Ajoneuvo, Auto, Perävaunu, Reg.nr, Fordon, Släp), as printed, truck first. Known plates of this company: ' + ($json.plates.join(', ') || 'none') + '. Plates expected on this trip: ' + ($json.expected_plates.join(', ') || 'unknown') + '. Report what the ticket says even if it differs from these.',\n  'Weights: gross = Brutto / Kokonaispaino / Bruttovikt / Kokonaismassa (the loaded vehicle); tare = Tara / Taara / Omapaino / Tomvikt; net = Netto / Nettopaino / Nettovikt / Kuorma. gross_text, tare_text and net_text are the numbers EXACTLY as printed, with the original separators (for example \"24 560\", \"24.560\", \"24,56\"), without the unit; null if absent.',\n  'unit: the unit printed next to the weights: \"kg\" or \"t\" (tonnes, tn, tonnia); null if none is printed.',\n  'gross_kg, tare_kg and net_kg: the same weights converted to whole kilograms. In tonnes the comma or point is the decimal separator (24,56 t = 24560 kg). In kilograms a point or space between groups of three digits is a thousands separator (24.560 kg = 24560 kg). If no unit is printed, values under 100 are tonnes and values of 1000 or more are kilograms. Do not compute a missing value from the other two; leave it null.',\n  'material: the material or product as printed (Tuote, Materiaali, Laji, Jätelaji, Produkt, Material), short; null if absent. material_code: the closest of these codes, or null if none fits: 170504 = clean soil and stones (maa-aines, kivennäismaa, puhdas maa, savi, moreeni), 170506 = dredging spoil (ruoppausmassa), 170503 = contaminated soil (pilaantunut maa), 170107 = concrete or brick waste (betoni, tiili), 170302 = asphalt waste (asfaltti), 170904 = mixed construction waste (sekajäte, rakennusjäte), SORA = gravel, MURSKE = crushed rock (murske, kalliomurske), HIEKKA = sand, MULTA = topsoil or mould (multa, kasvualusta), LOUHE = blasted rock (louhe).',\n  'scale_name: the name of the scale site or company that issued the ticket (the header, for example \"HSY Ämmässuo\" or \"NCC Mäntsälä\"), with the town if printed; null if absent. customer: the customer or site name if printed, else null.',\n  'confidence: \"high\" if all printed values are clearly legible, \"medium\" if some are uncertain, \"low\" if the photo is blurred, cut off or not a weighing ticket. notes: one short English sentence about anything uncertain (for example a smudged digit or two weighings on one ticket), or null.',\n  'Country of the carrier: ' + $json.country + '.',\n].join(' ');\n\nconst num = { type: ['integer', 'null'] };\nconst str = { type: ['string', 'null'] };\nconst schema = {\n  type: 'object',\n  additionalProperties: false,\n  required: ['ticket_number', 'weighed_at', 'plates', 'gross_text', 'tare_text', 'net_text', 'unit', 'gross_kg', 'tare_kg', 'net_kg', 'material', 'material_code', 'scale_name', 'customer', 'confidence', 'notes'],\n  properties: {\n    ticket_number: str,\n    weighed_at: str,\n    plates: { type: 'array', items: { type: 'string' } },\n    gross_text: str,\n    tare_text: str,\n    net_text: str,\n    unit: { type: ['string', 'null'], enum: ['kg', 't', null] },\n    gross_kg: num,\n    tare_kg: num,\n    net_kg: num,\n    material: str,\n    material_code: { type: ['string', 'null'], enum: [...MATERIALS, null] },\n    scale_name: str,\n    customer: str,\n    confidence: { type: 'string', enum: ['high', 'medium', 'low'] },\n    notes: str,\n  },\n};\n\nconst user = [\n  { type: 'image_url', image_url: { url: 'data:' + $json.mime + ';base64,' + $json.data_base64, detail: 'high' } },\n  { type: 'text', text: 'Read this weighing ticket.' },\n];\n\nreturn [{ json: { payload: JSON.stringify({\n  // gpt-4.1 и 4o уходят 14.01.2027; у gpt-6-luna нет temperature, усилие — low (талон короткий, ответ за секунды).\n  model: 'gpt-6-luna',\n  reasoning_effort: 'low',\n  response_format: { type: 'json_schema', json_schema: { name: 'weigh_ticket', strict: true, schema } },\n  messages: [ { role: 'system', content: system }, { role: 'user', content: user } ],\n}) } }];\n"
+      },
+      "name": "Собрать запрос",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -140,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.parse($json.payload) }}",
+        "options": {
+          "timeout": 60000,
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "name": "OpenAI: прочитать талон",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        80,
+        220
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Ответ OpenAI → то, что ждёт сайт. Поля сайт проверит и пересчитает сам (src/lib/weighTicket/reading.ts).\nlet out = { ok: false, ticket: null };\ntry {\n  const data = JSON.parse($json.choices[0].message.content);\n  out = { ok: !!data && typeof data === 'object', ticket: data };\n} catch (e) {\n  out = { ok: false, ticket: null, detail: ($json.error && $json.error.message) || 'parse' };\n}\nreturn [{ json: out }];\n"
+      },
+      "name": "Разобрать ответ",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        300,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { ok: false, ticket: null, detail: $json.why || 'bad request' } }];"
+      },
+      "name": "Отказано",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -140,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"ok\": $json.ok === true, \"ticket\": $json.ticket || null, \"detail\": $json.detail || null } }}",
+        "options": {}
+      },
+      "name": "Ответ платформе",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        520,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Весовой талон": {
+      "main": [
+        [
+          {
+            "node": "Проверить подпись RAHTIS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Проверить подпись RAHTIS": {
+      "main": [
+        [
+          {
+            "node": "Подпись верна?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Подпись верна?": {
+      "main": [
+        [
+          {
+            "node": "Собрать запрос",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Отказано",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Собрать запрос": {
+      "main": [
+        [
+          {
+            "node": "OpenAI: прочитать талон",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI: прочитать талон": {
+      "main": [
+        [
+          {
+            "node": "Разобрать ответ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Разобрать ответ": {
+      "main": [
+        [
+          {
+            "node": "Ответ платформе",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Отказано": {
+      "main": [
+        [
+          {
+            "node": "Ответ платформе",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

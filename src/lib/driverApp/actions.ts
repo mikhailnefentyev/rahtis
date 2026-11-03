@@ -10,6 +10,7 @@ import { cancelOrderAction } from '@/lib/orders/matching';
 import { refineEtaAfter } from '@/lib/orders/eta';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
+import { storeWeighTicket } from '@/lib/weighTicket/store';
 import type { Json } from '@/types/database';
 
 /**
@@ -308,6 +309,23 @@ export async function applyDriverEventAction(formData: FormData): Promise<EventR
         p_event_id: eventId,
       });
       result = outcome(error);
+      /*
+       * Фото весового талона, снятое без связи, едет с рейсом: рейс уже
+       * записан, фото прикрепляется к нему по идентификатору действия.
+       * Не дошло — повтор: база рейс второй раз не запишет, а фото ляжет.
+       */
+      const file = formData.get('file');
+      if (result.status === 'ok' && str(formData, 'action') === 'LOAD' && file instanceof File && file.size > 0) {
+        const stored = await storeWeighTicket(supabase, {
+          id: eventId,
+          jobId: str(formData, 'job_id'),
+          file,
+          read: false,
+          expectedPlates: [],
+          loadEventId: eventId,
+        });
+        if (!stored.ok && stored.error === 'retry') result = { status: 'retry' };
+      }
       break;
     }
     case 'UPLOAD':
