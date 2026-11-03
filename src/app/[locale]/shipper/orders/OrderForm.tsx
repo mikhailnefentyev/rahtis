@@ -36,6 +36,9 @@ import { StopFields, type StopDefaults } from './StopFields';
 import type { CarrierClient, KnownVehicle, OrderStop, OwnVehicle, ShipperOrder, StopRole } from '@/types/db';
 import { DispatchPicker } from './DirectPanel';
 import { OwnPicker } from '../../carrier/own/OwnPicker';
+import { OrderImport } from './OrderImport';
+import type { DraftStop, OrderDraft } from '@/lib/orders/importDraft';
+import { cn } from '@/lib/cn';
 
 const initial: PublishState = { error: null, ref: null };
 
@@ -102,6 +105,23 @@ function stopChosen(stop: OrderStop | undefined): ChosenAddress | null {
   };
 }
 
+/** Точка черновика из письма — в тех же ключах, что повтор. */
+function draftDefaults(stop: DraftStop | null | undefined): StopDefaults {
+  if (!stop) return {};
+  return {
+    place_name: stop.address.placeName,
+    company: stop.company,
+    address: stop.chosen?.address ?? stop.address.text,
+    date: stop.date,
+    time: stop.time,
+    contact: stop.contact,
+    phone: stop.phone,
+    weight: stop.weight,
+    ref: stop.ref,
+    note: stop.note,
+  };
+}
+
 /*
  * Роль DELIVERY форма не создаёт: выгрузки добавляются кнопкой и
  * приезжают как EXTRA_UNLOAD. Повторяя старый заказ с DELIVERY, мы
@@ -118,13 +138,7 @@ function repeatableRole(role: StopRole): 'EXTRA_LOAD' | 'EXTRA_UNLOAD' | null {
   return null;
 }
 
-export function OrderForm({
-  onPublished,
-  onNew,
-  template,
-  knownVehicles,
-  own,
-}: {
+type OrderFormProps = {
   onPublished: () => void;
   /* Следующий заказ сразу из плашки «julkaistu» — без её закрытия. */
   onNew?: () => void;
@@ -136,8 +150,50 @@ export function OrderForm({
    * перевозчика и его машина, а цена — только для его отчёта.
    */
   own?: { clients: CarrierClient[]; vehicles: OwnVehicle[]; trailers?: { id: string; plate: string; kind: string; body_type: string | null }[]; homeCountry?: string };
-}) {
+  /** Открыть сразу с панелью «из текста или PDF» (кнопка рядом с «новый рейс»). */
+  importOpen?: boolean;
+};
+
+/**
+ * Форма и «Luo tekstistä tai PDF:stä» над ней.
+ *
+ * Черновик из письма открывает ту же форму заново (новый key): все поля
+ * формы берут значения при монтировании, как у повтора заказа, и
+ * пересоздать форму честнее, чем дотягиваться до каждого поля. Черновик
+ * заменяет повтор — это разные источники одного и того же.
+ */
+export function OrderForm(props: OrderFormProps) {
+  const [draft, setDraft] = useState<OrderDraft | null>(null);
+  const [version, setVersion] = useState(0);
+  return (
+    <OrderFormInner
+      key={version}
+      {...props}
+      template={draft ? undefined : props.template}
+      draft={draft}
+      onDraft={(next) => {
+        setDraft(next);
+        setVersion((v) => v + 1);
+      }}
+    />
+  );
+}
+
+function OrderFormInner({
+  onPublished,
+  onNew,
+  template,
+  knownVehicles,
+  own,
+  importOpen = false,
+  draft,
+  onDraft,
+}: OrderFormProps & { draft: OrderDraft | null; onDraft: (draft: OrderDraft) => void }) {
   const { t, m, f, locale } = useI18n();
+  /* Что заполнил разбор письма — подсвечивается. */
+  const aiFilled = useMemo(() => new Set(draft?.filled ?? []), [draft]);
+  const ai = (key: string) => (aiFilled.has(key) ? 'ai-filled' : undefined);
+  const aiStop = (slot: string) => (field: string) => aiFilled.has(`${slot}.${field}`);
   /* Примеры адресов — страны компании: польскому перевозчику не «Satamakatu 1, Hanko». */
   const sample = countryPack(useCompanyCountry()).sample;
   const [state, formAction, pending] = useActionState(own ? ownOrderAction : publishOrderAction, initial);
@@ -160,14 +216,14 @@ export function OrderForm({
   const originDelivery = originStops.find((s) => s.role === 'DELIVERY');
   const originWork = originStops.filter((s) => repeatableRole(s.role) !== null);
 
-  const [haulKind, setHaulKind] = useState<HaulKind>(origin?.haul_kind ?? 'TRAILER');
+  const [haulKind, setHaulKind] = useState<HaulKind>(draft?.haulKind ?? origin?.haul_kind ?? 'TRAILER');
   const container = haulKind === 'CONTAINER';
   /*
    * Номер контейнера проверяется по контрольной цифре ISO 6346 прямо при
    * вводе: опечатка — это чужой контейнер в терминале. Номер прицепа
    * контрольной цифры не имеет, его поле остаётся свободным.
    */
-  const [unitPlate, setUnitPlate] = useState('');
+  const [unitPlate, setUnitPlate] = useState(draft?.unitPlate ?? '');
   /*
    * Прямой заказ уходит одной машине, а не всем перевозчикам региона, —
    * подпись кнопки «näkyy alueen kuljetusliikkeille» там была неправдой.
@@ -202,8 +258,14 @@ export function OrderForm({
     (origin?.semi_features ?? []).filter(isSemiFeature),
   );
 
-  const [feet, setFeet] = useState(origin?.container_feet ? String(origin.container_feet) : '40');
-  const [ldm, setLdm] = useState(origin?.ldm ? String(origin.ldm).replace('.', ',') : '');
+  const [feet, setFeet] = useState(draft?.containerFeet || (origin?.container_feet ? String(origin.container_feet) : '40'));
+  const [ldm, setLdm] = useState(
+    draft
+      ? draft.ldm || (draft.haulKind === 'SEMI' ? String(SEMI_LDM).replace('.', ',') : '')
+      : origin?.ldm
+        ? String(origin.ldm).replace('.', ',')
+        : '',
+  );
 
   /*
    * Пока делаем только перецеп (irtoperä).
@@ -216,7 +278,9 @@ export function OrderForm({
    * это ещё одна причина не заводить под него тип рейса.
    */
   const [extras, setExtras] = useState<Extra[]>(() =>
-    originWork.map((stop, i) => ({ key: i + 1, role: repeatableRole(stop.role)! })),
+    draft
+      ? draft.extras.map((extra, i) => ({ key: i + 1, role: extra.role }))
+      : originWork.map((stop, i) => ({ key: i + 1, role: repeatableRole(stop.role)! })),
   );
   /*
    * Точки, которые повтор перенести не смог. Сейчас это только
@@ -230,7 +294,7 @@ export function OrderForm({
 
   const [distance, setDistance] = useState(origin?.distance_km ? String(origin.distance_km) : '');
   const [rate, setRate] = useState(
-    origin?.rate_cents ? String(origin.rate_cents / 100).replace('.', ',') : '',
+    draft ? draft.rate : origin?.rate_cents ? String(origin.rate_cents / 100).replace('.', ',') : '',
   );
 
   /*
@@ -248,6 +312,17 @@ export function OrderForm({
    * заказ выглядел готовым и не публиковался — худший вид поломки.
    */
   const [coords, setCoords] = useState<Record<string, ChosenAddress | null>>(() => {
+    if (draft) {
+      const seed: Record<string, ChosenAddress | null> = {
+        pickup: draft.pickup?.chosen ?? null,
+        delivery: draft.delivery?.chosen ?? null,
+        ret: draft.ret?.chosen ?? null,
+      };
+      draft.extras.forEach((extra, i) => {
+        seed[`extra-${i + 1}`] = extra.stop.chosen ?? null;
+      });
+      return seed;
+    }
     if (!template) return {};
     const seed: Record<string, ChosenAddress | null> = {
       pickup: stopChosen(originPickup),
@@ -448,6 +523,17 @@ export function OrderForm({
   }
 
   return (
+    <>
+    {/*
+      * Письмо или PDF заказа → эта же форма, заполненная. Снаружи формы:
+      * у панели своя форма, а вложенные формы HTML не допускает. У повтора
+      * свой источник — там панели нет.
+      */}
+    {!template && (
+      <div className="mb-4">
+        <OrderImport onDraft={onDraft} defaultOpen={importOpen && !draft} />
+      </div>
+    )}
     <form
       action={formAction}
       /*
@@ -478,6 +564,27 @@ export function OrderForm({
           {m('orderForm.repeatedFrom', { ref: template.order.ref })}
           {skipped > 0 ? ` ${m('orderForm.repeatSkipped', { count: skipped })}` : ''}
         </p>
+      )}
+      {draft && (
+        <div className="flex flex-col gap-1.5 rounded-control border border-accent-line bg-accent-wash px-3 py-2.5 text-[13px] text-ink">
+          <p>
+            {t.orderImport.filledBanner}{' '}
+            <span className="text-ink-muted">
+              {t.orderImport.confidence}: {t.orderImport.confidenceLevels[draft.confidence]}
+            </span>
+          </p>
+          {(draft.missing.length > 0 || draft.foreignPrice) && (
+            <div>
+              <p className="font-semibold">{t.orderImport.missingTitle}</p>
+              <ul className="mt-1 list-disc pl-5 text-ink-muted">
+                {draft.missing.map((key) => (
+                  <li key={key}>{t.orderImport.missing[key]}</li>
+                ))}
+                {draft.foreignPrice && <li>{t.orderImport.foreignPrice.replace('{price}', draft.foreignPrice)}</li>}
+              </ul>
+            </div>
+          )}
+        </div>
       )}
       <input type="hidden" name="locale" value={locale} />
 
@@ -527,7 +634,7 @@ export function OrderForm({
             * секции вообще есть, и человек должен решить это до того, как
             * начнёт их заполнять.
             */}
-          <Field label={t.orderForm.haulKind}>
+          <Field label={t.orderForm.haulKind} className={ai('haulKind')}>
             {(p) => (
               <Select
                 {...p}
@@ -549,8 +656,8 @@ export function OrderForm({
             )}
           </Field>
 
-          <Field label={t.orderForm.shipperRef} hint={t.orderForm.shipperRefHint}>
-            {(p) => <InputMono {...p} name="shipper_ref" placeholder="BF-2026-0912" />}
+          <Field label={t.orderForm.shipperRef} hint={t.orderForm.shipperRefHint} className={ai('shipperRef')}>
+            {(p) => <InputMono {...p} name="shipper_ref" defaultValue={draft?.shipperRef ?? ''} placeholder="BF-2026-0912" />}
           </Field>
         </CardBody>
       </Card>
@@ -581,8 +688,9 @@ export function OrderForm({
             showContact={express}
             requireWeight={express && !tipper}
             haulKind={haulKind}
-            defaults={stopDefaults(originPickup)}
-            defaultChosen={stopChosen(originPickup)}
+            defaults={draft ? draftDefaults(draft.pickup) : stopDefaults(originPickup)}
+            defaultChosen={draft ? (draft.pickup?.chosen ?? null) : stopChosen(originPickup)}
+            filled={aiStop('pickup')}
             requireDate
             addressPlaceholder={sample.address}
             placeNamePlaceholder={sample.place}
@@ -605,8 +713,9 @@ export function OrderForm({
               requireCompany
               showContact
               requireDate
-              defaults={stopDefaults(originDelivery)}
-              defaultChosen={stopChosen(originDelivery)}
+              defaults={draft ? draftDefaults(draft.delivery) : stopDefaults(originDelivery)}
+              defaultChosen={draft ? (draft.delivery?.chosen ?? null) : stopChosen(originDelivery)}
+              filled={aiStop('delivery')}
               addressPlaceholder={sample.address}
               onChosen={onChosen('delivery')}
             />
@@ -661,8 +770,9 @@ export function OrderForm({
                   repeated
                   requireCompany
                   showContact
-                  defaults={stopDefaults(originWork[index])}
-                  defaultChosen={stopChosen(originWork[index])}
+                  defaults={draft ? draftDefaults(draft.extras[index]?.stop) : stopDefaults(originWork[index])}
+                  defaultChosen={draft ? (draft.extras[index]?.stop.chosen ?? null) : stopChosen(originWork[index])}
+                  filled={aiStop(`extra-${extra.key}`)}
                   onChosen={onChosen(`extra-${extra.key}`)}
                 />
               </div>
@@ -703,8 +813,9 @@ export function OrderForm({
             showPlaceName
             showTrailerState
             haulKind={haulKind}
-            defaults={stopDefaults(originReturn)}
-            defaultChosen={stopChosen(originReturn)}
+            defaults={draft ? draftDefaults(draft.ret) : stopDefaults(originReturn)}
+            defaultChosen={draft ? (draft.ret?.chosen ?? null) : stopChosen(originReturn)}
+            filled={aiStop('ret')}
             addressPlaceholder={sample.address}
             placeNamePlaceholder={sample.place}
             onChosen={onChosen('ret')}
@@ -737,7 +848,7 @@ export function OrderForm({
                 label={t.orderForm.ldm}
                 hint={t.orderForm.ldmHint}
                 required
-                className="sm:col-span-2"
+                className={cn('sm:col-span-2', ai('ldm'))}
               >
                 {(p) => (
                   <InputMono
@@ -914,7 +1025,7 @@ export function OrderForm({
               hint={container ? t.orderForm.containerNumberHint : t.orderForm.trailerPlateHint}
               error={containerNumberError}
               required
-              className="sm:col-span-2"
+              className={cn('sm:col-span-2', ai('unit'))}
             >
               {(p) => (
                 <InputMono
@@ -940,7 +1051,7 @@ export function OrderForm({
               * перечисление значило бы звать миграцию ради одного заказа.
               */}
             {container && (
-              <Field label={t.orderForm.containerFeet} hint={t.orderForm.containerFeetHint} required>
+              <Field label={t.orderForm.containerFeet} hint={t.orderForm.containerFeetHint} required className={ai('containerFeet')}>
                 {(p) => (
                   <Select
                     {...p}
@@ -1039,6 +1150,7 @@ export function OrderForm({
               label={`${own ? t.own.rateLabel : t.orderForm.rate} ${perKm}`}
               hint={own ? t.own.rateHint : `${t.money.addVat} ${t.orderForm.feeHint}`}
               required
+              className={ai('rate')}
             >
               {(p) => (
                 <InputMono
@@ -1065,13 +1177,13 @@ export function OrderForm({
                 {lowRate && <> {t.priceGuide.low}</>}
               </p>
             )}
-            <Field label={t.order.comment} className="sm:col-span-4">
+            <Field label={t.order.comment} className={cn('sm:col-span-4', ai('comment'))}>
               {(p) => (
                 <Textarea
                   {...p}
                   name="comment"
-                  rows={2}
-                  defaultValue={origin?.comment ?? ''}
+                  rows={draft?.comment ? 4 : 2}
+                  defaultValue={draft ? draft.comment : (origin?.comment ?? '')}
                   placeholder={
                     express ? t.orderForm.expressCommentPlaceholder : t.order.commentPlaceholder
                   }
@@ -1090,7 +1202,14 @@ export function OrderForm({
       <Card>
         <CardBody>
           {own ? (
-            <OwnPicker clients={own.clients} vehicles={own.vehicles} trailers={own.trailers} haulKind={haulKind} homeCountry={own.homeCountry} />
+            <OwnPicker
+              clients={own.clients}
+              vehicles={own.vehicles}
+              trailers={own.trailers}
+              haulKind={haulKind}
+              homeCountry={own.homeCountry}
+              draftClient={draft?.client ?? null}
+            />
           ) : (
             <DispatchPicker vehicles={knownVehicles} haulKind={haulKind} onDirectChange={setDirect} />
           )}
@@ -1137,6 +1256,7 @@ export function OrderForm({
         </Button>
       </div>
     </form>
+    </>
   );
 }
 

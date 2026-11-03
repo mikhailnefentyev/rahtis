@@ -51,6 +51,8 @@ export function OwnView({
   const { t, f } = useI18n();
   const router = useRouter();
   const [composing, setComposing] = useState(startNew);
+  /* Пересланный заказ клиента — самый частый путь: панель «из текста или PDF» открыта сразу. */
+  const [importing, setImporting] = useState(false);
   const [formKey, setFormKey] = useState(0);
   const [copied, setCopied] = useState<string | null>(null);
 
@@ -75,6 +77,7 @@ export function OwnView({
             key={formKey}
             knownVehicles={[]}
             own={{ clients, vehicles, trailers, homeCountry }}
+            importOpen={importing}
             onNew={() => {
               setFormKey((k) => k + 1);
               router.refresh();
@@ -85,9 +88,25 @@ export function OwnView({
             }}
           />
         ) : (
-          <Button variant="primary" onClick={() => setComposing(true)}>
-            {t.own.newJob}
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant="primary"
+              onClick={() => {
+                setImporting(false);
+                setComposing(true);
+              }}
+            >
+              {t.own.newJob}
+            </Button>
+            <Button
+              onClick={() => {
+                setImporting(true);
+                setComposing(true);
+              }}
+            >
+              {t.orderImport.open}
+            </Button>
+          </div>
         )}
       </div>
 
