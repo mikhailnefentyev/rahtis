@@ -51,7 +51,8 @@ const LANG_NAME: Record<Locale, string> = {
 function ladderLines(): string[] {
   return SUBSCRIPTION_LADDER.map((step) => {
     const to = step.to ?? ON_REQUEST_FROM - 1;
-    return `  - ${step.from}–${to} vehicles: ${eur(step.cents)} per vehicle per month`;
+    if (step.cents === 0) return `  - vehicle ${step.from}: free`;
+    return `  - vehicles ${step.from}–${to}: ${eur(step.cents)} per vehicle per month`;
   });
 }
 
@@ -60,7 +61,7 @@ const SUMMARY = `> RAHTIS (${SITE_URL}) is a transport management system (TMS) a
 function pricing(): string {
   return `## Pricing (all prices excl. VAT)
 
-- Carrier subscription (own customers, own jobs, full TMS): charged per active vehicle per month — only vehicles that completed a job during the month; a parked vehicle costs nothing. Tiered, each tier at its own price:
+- Carrier subscription (own customers, own jobs, full TMS): charged per active vehicle per month — only vehicles that completed a job during the month; a parked vehicle costs nothing. The first active vehicle is free:
 ${ladderLines().join('\n')}
   - from ${ON_REQUEST_FROM} vehicles: price on request
 - Paying a year in advance: ${pct(ANNUAL_DISCOUNT_BPS)} off. First month free for new companies. No set-up fee, no multi-year contract.

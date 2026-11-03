@@ -5,7 +5,7 @@ import { ConsentSettingsLink } from '@/components/layout/AnalyticsConsent';
 import { LocaleSwitch } from '@/components/layout/LocaleSwitch';
 import { buttonClass, Card, CardBody } from '@/components/ui';
 import { signInPath } from '@/lib/auth/paths';
-import { APP, ON_REQUEST_FROM, SUBSCRIPTION_LADDER } from '@/lib/config';
+import { APP, ON_REQUEST_FROM, SUBSCRIPTION_LADDER, SUBSCRIPTION_MAX_CENTS } from '@/lib/config';
 import { isLocale } from '@/lib/i18n';
 import { EARTHWORKS, earthworksPath } from '@/lib/landing/earthworks';
 import { SITE_URL } from '@/lib/seo';
@@ -37,12 +37,12 @@ export async function EarthworksPage({ locale }: { locale: string }) {
       description: c.metaDescription,
       featureList: c.features_ld,
       inLanguage: locale,
-      /* Лесенка, как на главной: цена за машину в месяц по ступеням, без ALV; от ON_REQUEST_FROM — по запросу. */
+      /* Как на главной: первая машина 0 €, следующие по цене за машину в месяц, без ALV; от ON_REQUEST_FROM — по запросу. */
       offers: {
         '@type': 'AggregateOffer',
         priceCurrency: 'EUR',
         lowPrice: (Math.min(...SUBSCRIPTION_LADDER.map((s) => s.cents)) / 100).toFixed(2),
-        highPrice: (SUBSCRIPTION_LADDER[0].cents / 100).toFixed(2),
+        highPrice: (SUBSCRIPTION_MAX_CENTS / 100).toFixed(2),
         offers: SUBSCRIPTION_LADDER.map((step) => ({
           '@type': 'Offer',
           price: (step.cents / 100).toFixed(2),

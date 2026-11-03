@@ -2,7 +2,7 @@
 
 import { useActionState, useMemo, useState } from 'react';
 import { Button, Card, CardBody, Field, Input } from '@/components/ui';
-import { annualPlanCents, ON_REQUEST_FROM, subscriptionLadderCents } from '@/lib/config';
+import { ANNUAL_MIN_VEHICLES, annualPlanCents, ON_REQUEST_FROM, subscriptionLadderCents } from '@/lib/config';
 import { useI18n } from '@/lib/i18n/provider';
 import { buyAnnualPlanAction, type AnnualState } from '@/lib/subscription/actions';
 
@@ -12,11 +12,11 @@ const initial: AnnualState = { error: null, done: false };
 export function AnnualForm({ suggested, startsOn }: { suggested: number; startsOn: string }) {
   const { t, locale } = useI18n();
   const s = t.subscription;
-  const [vehicles, setVehicles] = useState(String(Math.max(1, suggested)));
+  const [vehicles, setVehicles] = useState(String(Math.max(ANNUAL_MIN_VEHICLES, suggested)));
   const [state, action, pending] = useActionState(buyAnnualPlanAction, initial);
 
   const n = Number(vehicles);
-  const valid = Number.isInteger(n) && n >= 1 && n < ON_REQUEST_FROM;
+  const valid = Number.isInteger(n) && n >= ANNUAL_MIN_VEHICLES && n < ON_REQUEST_FROM;
   const eur = useMemo(() => new Intl.NumberFormat(t.meta.intl, { style: 'currency', currency: 'EUR' }), [t.meta.intl]);
   const year = valid ? annualPlanCents(n) : 0;
   const monthly = valid ? subscriptionLadderCents(n) * 12 : 0;

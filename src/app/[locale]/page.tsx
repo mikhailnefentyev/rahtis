@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import { HeroPort } from '@/components/domain/HeroPort';
 import { LandingSections } from '@/components/domain/LandingSections';
 import { SiteHeader } from '@/components/layout/SiteHeader';
-import { APP, ON_REQUEST_FROM, SUBSCRIPTION_LADDER } from '@/lib/config';
+import { APP, ladderStepLabel, ON_REQUEST_FROM, SUBSCRIPTION_LADDER, SUBSCRIPTION_MAX_CENTS } from '@/lib/config';
 import { getI18n, isLocale } from '@/lib/i18n';
 import { locales } from '@/lib/i18n/config';
 import { placeCountries } from '@/lib/routing/places';
@@ -134,16 +134,16 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     featureList: t.seo.features,
     inLanguage: [...locales],
     /*
-     * Лесенка из config: каждая ступень — своё предложение с ценой за
-     * машину в месяц и диапазоном машин. От ON_REQUEST_FROM машин цена по
+     * Ступени из config: первая машина за 0 €, каждая следующая — своя
+     * цена за машину в месяц. От ON_REQUEST_FROM машин цена по
      * запросу, поэтому у последней ступени верхняя граница ON_REQUEST_FROM − 1.
      * Описание — тот же абзац, что в кабинете (машины, которые ездили,
-     * лесенка, −10 % за год).
+     * первая бесплатно, −10 % за год).
      */
     offers: {
       '@type': 'AggregateOffer',
       lowPrice: euro(Math.min(...SUBSCRIPTION_LADDER.map((s) => s.cents))),
-      highPrice: euro(SUBSCRIPTION_LADDER[0].cents),
+      highPrice: euro(SUBSCRIPTION_MAX_CENTS),
       priceCurrency: 'EUR',
       offerCount: SUBSCRIPTION_LADDER.length,
       description: t.subscription.lede,
@@ -151,7 +151,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         const to = step.to ?? ON_REQUEST_FROM - 1;
         return {
           '@type': 'Offer',
-          name: `${t.subscription.colVehicles}: ${step.from}–${to}`,
+          name: `${t.subscription.colVehicles}: ${ladderStepLabel(step)}`,
           price: euro(step.cents),
           priceCurrency: 'EUR',
           priceSpecification: {

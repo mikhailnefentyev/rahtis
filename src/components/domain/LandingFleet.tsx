@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { Card, CardBody, Mono } from '@/components/ui';
-import { ON_REQUEST_FROM, SUBSCRIPTION_LADDER } from '@/lib/config';
+import { ladderStepLabel, ON_REQUEST_FROM, SUBSCRIPTION_LADDER } from '@/lib/config';
 import { legalMassKg, type MotorUnit, type TrailerUnit } from '@/lib/fleet/mass';
 import { getI18n, type Locale } from '@/lib/i18n';
 
@@ -166,9 +166,9 @@ export async function LandingPricing({ locale }: { locale: Locale }) {
                 <tbody>
                   {SUBSCRIPTION_LADDER.map((step, i) => (
                     <tr key={step.from} className="border-b border-line">
-                      <td className="py-2.5 font-mono">{`${step.from}–${step.to ?? ON_REQUEST_FROM - 1}`}</td>
+                      <td className="py-2.5 font-mono">{ladderStepLabel(step)}</td>
                       <td className={`py-2.5 text-right font-mono ${i === 0 ? 'text-[18px] font-semibold text-ink' : 'text-ink'}`}>
-                        {eur.format(step.cents / 100)}
+                        {step.cents === 0 ? l.priceFree : eur.format(step.cents / 100)}
                       </td>
                     </tr>
                   ))}

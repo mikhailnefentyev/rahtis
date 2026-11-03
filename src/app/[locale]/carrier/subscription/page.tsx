@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Badge, Card, CardBody, Stat, StatRow, Table, TableFrame, Td, Th, Tr } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
-import { ANNUAL_DISCOUNT_BPS, ON_REQUEST_FROM, SUBSCRIPTION_LADDER, subscriptionLadderCents } from '@/lib/config';
+import { ANNUAL_DISCOUNT_BPS, ladderStepLabel, ON_REQUEST_FROM, SUBSCRIPTION_LADDER, subscriptionLadderCents } from '@/lib/config';
 import { isLocale } from '@/lib/i18n';
 import { getViewerI18n } from '@/lib/i18n/viewer';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 const ANNUAL_TERMS_VERSION = 21;
 
 /**
- * Абонемент перевозчика: лесенка цен, сколько машин работало в этом месяце
+ * Абонемент перевозчика: цена (первая машина бесплатно), сколько машин работало в этом месяце
  * и примерная сумма, оплата года вперёд (−10 %) и начисления.
  */
 export default async function SubscriptionPage({ params }: { params: Promise<{ locale: string }> }) {
@@ -65,7 +65,7 @@ export default async function SubscriptionPage({ params }: { params: Promise<{ l
   const plan = (plans ?? []).find((p) => !p.cancelled_at && p.ends_on >= monthStart) ?? null;
   const annualOpen = (terms?.version ?? 0) >= ANNUAL_TERMS_VERSION;
   const date = (iso: string) => f.date(`${iso}T12:00:00Z`);
-  const examples = [5, 10, 20, 50];
+  const examples = [2, 5, 10, 20];
 
   return (
     <main className="cab-page">
@@ -102,8 +102,8 @@ export default async function SubscriptionPage({ params }: { params: Promise<{ l
             <tbody>
               {SUBSCRIPTION_LADDER.map((step) => (
                 <Tr key={step.from}>
-                  <Td>{`${step.from}–${step.to ?? ON_REQUEST_FROM - 1}`}</Td>
-                  <Td numeric>{f.eur(step.cents)}</Td>
+                  <Td>{ladderStepLabel(step)}</Td>
+                  <Td numeric>{step.cents === 0 ? s.free : f.eur(step.cents)}</Td>
                 </Tr>
               ))}
               <Tr>

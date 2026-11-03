@@ -20,7 +20,7 @@ const zone = 'Europe/Helsinki';
 const dateFormat = new Intl.DateTimeFormat('en-CA', { timeZone: zone, year: 'numeric', month: '2-digit', day: '2-digit' });
 const localDate = (iso: string) => dateFormat.format(new Date(iso));
 
-/* Абонемент лесенкой: средняя цена за машину месяца по числу машин, у которых был доход. */
+/* Абонемент: средняя цена за машину месяца по числу машин, у которых был доход (первая бесплатна). */
 function ladderUnits(revenue: EconomicsInput['revenue'], months: string[]): Record<string, number> {
   const worked = new Map<string, Set<string>>();
   for (const r of revenue) {

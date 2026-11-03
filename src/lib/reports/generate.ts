@@ -536,7 +536,7 @@ async function issue(
     for (const row of fees ?? []) {
       deducted += row.amount_cents;
       deductions.push({
-        /* Год вперёд — своей строкой; месяц — машины сверх года по лесенке, средняя цена за машину. */
+        /* Год вперёд — своей строкой; месяц — платные машины сверх года (первая бесплатна) × цена за машину. */
         label: (row.kind === 'ANNUAL' ? t.report_.feeLineAnnual : t.report_.feeLine)
           .replace('{month}', `${Number(row.month.slice(5, 7))}/${row.month.slice(0, 4)}`)
           .replace('{count}', String(row.active_vehicles))

@@ -148,23 +148,28 @@ export function withVat(cents: number, bps: number): number {
  */
 
 /**
- * Месячный сбор перевозчика-подписчика за активную машину, без ALV:
- * 29,90 €. У субподрядчика сбора нет: в трёх процентах всё включено.
+ * Месячный сбор перевозчика-подписчика за каждую активную машину после
+ * первой, без ALV: 14,90 € (с 3.11.2026; первая машина бесплатно). У
+ * субподрядчика сбора нет: в трёх процентах всё включено.
  */
-export const SUBSCRIPTION_UNIT_CENTS = 2990;
+export const SUBSCRIPTION_UNIT_CENTS = 1490;
 
 /**
- * Абонемент лесенкой с 30.10.2026: каждая ступень платит свою цену за
- * машину — 1–9 по 29,90 €, 10–19 по 27,90 €, 20–49 по 25,90 €, 50–99 по
- * 23,90 €. От 100 машин цена по запросу (ON_REQUEST_FROM); пока не
- * договорились — считается как 50–99. Копия app.subscription_ladder_cents: менять оба места.
+ * Абонемент с 3.11.2026 (решение пользователя — агрессивный вход в рынок):
+ * первая активная машина бесплатно, каждая следующая 14,90 €. От 100 машин
+ * цена по запросу (ON_REQUEST_FROM); пока не договорились — 14,90 €.
+ * До 3.11 была лесенка 29,90 → 23,90 €. Копия app.subscription_ladder_cents:
+ * менять оба места.
  */
 export const SUBSCRIPTION_LADDER: readonly { from: number; to: number | null; cents: number }[] = [
-  { from: 1, to: 9, cents: 2990 },
-  { from: 10, to: 19, cents: 2790 },
-  { from: 20, to: 49, cents: 2590 },
-  { from: 50, to: null, cents: 2390 },
+  { from: 1, to: 1, cents: 0 },
+  { from: 2, to: null, cents: SUBSCRIPTION_UNIT_CENTS },
 ];
+
+/** Сколько машин из n активных платные: все, кроме первой. */
+export function billedVehicles(vehicles: number): number {
+  return Math.max(vehicles - 1, 0);
+}
 
 /** Год вперёд: скидка 10 % (app.annual_discount_bps). */
 export const ANNUAL_DISCOUNT_BPS = 1000;
@@ -172,7 +177,19 @@ export const ANNUAL_DISCOUNT_BPS = 1000;
 /** С этой машины цена по запросу; год вперёд в кабинете — до ON_REQUEST_FROM − 1 машин. */
 export const ON_REQUEST_FROM = 100;
 
-/** Сумма месяца за n активных машин без ALV, лесенкой. */
+/** Год вперёд — от 2 машин: одна и так бесплатна. */
+export const ANNUAL_MIN_VEHICLES = 2;
+
+/** Подпись ступени для таблиц: «1» или «2–99». */
+export function ladderStepLabel(step: { from: number; to: number | null }): string {
+  const to = step.to ?? ON_REQUEST_FROM - 1;
+  return step.from === to ? String(step.from) : `${step.from}–${to}`;
+}
+
+/** Самая высокая цена за машину — для highPrice в разметке поисковиков. */
+export const SUBSCRIPTION_MAX_CENTS = Math.max(...SUBSCRIPTION_LADDER.map((s) => s.cents));
+
+/** Сумма месяца за n активных машин без ALV: первая бесплатно, остальные по 14,90 €. */
 export function subscriptionLadderCents(vehicles: number): number {
   let sum = 0;
   for (const step of SUBSCRIPTION_LADDER) {
@@ -183,7 +200,7 @@ export function subscriptionLadderCents(vehicles: number): number {
   return sum;
 }
 
-/** Год вперёд за n машин без ALV: 12 месяцев лесенки минус 10 %. */
+/** Год вперёд за n машин без ALV (первая из них бесплатна): 12 месяцев минус 10 %. */
 export function annualPlanCents(vehicles: number): number {
   return Math.round((subscriptionLadderCents(vehicles) * 12 * (10_000 - ANNUAL_DISCOUNT_BPS)) / 10_000);
 }
