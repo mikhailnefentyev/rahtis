@@ -177,6 +177,7 @@ function navigation(
           label: t.nav.groupDocuments,
           items: [
             { href: `/${locale}/carrier/reports`, label: t.periodReport.title, icon: 'reports' },
+            { href: `/${locale}/carrier/verification`, label: t.verification.nav, icon: 'legal' },
             { href: `/${locale}/carrier/subscription`, label: t.subscription.nav, icon: 'billing' },
             { href: `/${locale}/carrier/claims`, label: t.claims.title, icon: 'claims' },
           ],

@@ -74,6 +74,7 @@ export function OrderCard({
         name: directVehicle.carrier_name,
         businessId: directVehicle.carrier_business_id,
         iban: directVehicle.carrier_iban || null,
+        id: directVehicle.carrier_id ?? null,
       }
     : null;
   /*

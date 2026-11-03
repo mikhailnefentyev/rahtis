@@ -119,7 +119,11 @@ export type CarrierPartner = Database['public']['Functions']['carrier_partners']
 
 /** Знакомая машина заказчика: без названия перевозчика и телефона водителя. */
 export type KnownVehicle =
-  Database['public']['Functions']['known_vehicles_for_shipper']['Returns'][number];
+  Database['public']['Functions']['known_vehicles_for_shipper']['Returns'][number] & {
+    /* Значок «Tarkastettu» и перевозчик для пакета tilaajavastuu (verification_badges_for_known). */
+    verified?: boolean;
+    carrier_id?: string | null;
+  };
 
 /** Что возвращает public.company_readiness — гейт стола заказов. */
 export type CompanyReadiness = Database['public']['Functions']['company_readiness']['Returns'][number];
@@ -147,6 +151,8 @@ export type ShipperOffer = Omit<
   /* Карточка перевозчика без имени (offer_scorecards): рейсы и приезд вовремя за 12 месяцев. */
   trips?: number;
   on_time_pct?: number | null;
+  /* Значок «Tarkastettu» (verification_badges_for_offers) — только да/нет, без имени. */
+  verified?: boolean;
 };
 
 /**

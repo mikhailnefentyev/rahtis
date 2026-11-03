@@ -4841,6 +4841,167 @@ export type Database = {
           },
         ]
       }
+      verification_documents: {
+        Row: {
+          company_id: string
+          created_at: string
+          file_name: string
+          id: string
+          issued_on: string
+          items: string[]
+          mime_type: string
+          size_bytes: number
+          source: string
+          storage_path: string
+          uploaded_by: string | null
+          valid_until: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          file_name: string
+          id?: string
+          issued_on: string
+          items: string[]
+          mime_type: string
+          size_bytes: number
+          source?: string
+          storage_path: string
+          uploaded_by?: string | null
+          valid_until: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          file_name?: string
+          id?: string
+          issued_on?: string
+          items?: string[]
+          mime_type?: string
+          size_bytes?: number
+          source?: string
+          storage_path?: string
+          uploaded_by?: string | null
+          valid_until?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "verification_documents_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      verification_grants: {
+        Row: {
+          company_id: string
+          granted_at: string
+          granted_by: string | null
+          note: string | null
+          revoke_note: string | null
+          revoked_at: string | null
+          revoked_by: string | null
+        }
+        Insert: {
+          company_id: string
+          granted_at?: string
+          granted_by?: string | null
+          note?: string | null
+          revoke_note?: string | null
+          revoked_at?: string | null
+          revoked_by?: string | null
+        }
+        Update: {
+          company_id?: string
+          granted_at?: string
+          granted_by?: string | null
+          note?: string | null
+          revoke_note?: string | null
+          revoked_at?: string | null
+          revoked_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "verification_grants_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      verification_reminders: {
+        Row: {
+          company_id: string
+          item: string
+          sent_at: string
+          valid_until: string
+        }
+        Insert: {
+          company_id: string
+          item: string
+          sent_at?: string
+          valid_until: string
+        }
+        Update: {
+          company_id?: string
+          item?: string
+          sent_at?: string
+          valid_until?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "verification_reminders_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      verification_shares: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string | null
+          expires_at: string | null
+          id: string
+          label: string | null
+          revoked_at: string | null
+          token: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          label?: string | null
+          revoked_at?: string | null
+          token: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          label?: string | null
+          revoked_at?: string | null
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "verification_shares_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       weekly_reports: {
         Row: {
           bytes: number | null
@@ -8143,6 +8304,41 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      company_verified: { Args: { p_company_id: string }; Returns: boolean }
+      grant_verification: {
+        Args: { p_company_id: string; p_note?: string }
+        Returns: undefined
+      }
+      revoke_verification: {
+        Args: { p_company_id: string; p_note?: string }
+        Returns: undefined
+      }
+      verification_badges_for_known: {
+        Args: never
+        Returns: {
+          carrier_id: string | null
+          vehicle_id: string
+          verified: boolean
+        }[]
+      }
+      verification_badges_for_offers: {
+        Args: { p_order_ids: string[] }
+        Returns: {
+          offer_id: string
+          verified: boolean
+        }[]
+      }
+      verification_expiring_items: {
+        Args: { p_days: number }
+        Returns: {
+          company_id: string
+          item: string
+          source: string
+          valid_until: string
+        }[]
+      }
+      verification_package: { Args: { p_company_id: string }; Returns: Json }
+      verification_share_package: { Args: { p_token: string }; Returns: Json }
       weekly_totals: {
         Args: { p_weeks?: number }
         Returns: {

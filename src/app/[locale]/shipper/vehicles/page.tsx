@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
 import { Badge, Button, Card, CardBody, EmptyState, Mono, Plate } from '@/components/ui';
+import { VerifiedBadge } from '@/components/domain/VerifiedBadge';
 import { requireRole } from '@/lib/auth/guard';
 import { EURO_LABEL } from '@/lib/fleet/labels';
 import { isLocale, type Locale } from '@/lib/i18n';
@@ -36,8 +38,17 @@ export default async function KnownVehiclesPage({ params }: { params: Promise<{ 
   await requireRole(locale, 'SHIPPER');
   const [{ t }, supabase] = await Promise.all([getViewerI18n(locale), createClient()]);
 
-  const { data } = await supabase.rpc('known_vehicles_for_shipper');
-  const vehicles = data ?? [];
+  const [{ data }, { data: badges }] = await Promise.all([
+    supabase.rpc('known_vehicles_for_shipper'),
+    /* Значок «Tarkastettu» и перевозчик для пакета — там, где он заказчику известен. */
+    supabase.rpc('verification_badges_for_known'),
+  ]);
+  const badgeByVehicle = new Map((badges ?? []).map((b) => [b.vehicle_id, b]));
+  const vehicles: KnownVehicle[] = (data ?? []).map((v) => ({
+    ...v,
+    verified: badgeByVehicle.get(v.vehicle_id)?.verified ?? false,
+    carrier_id: badgeByVehicle.get(v.vehicle_id)?.carrier_id ?? null,
+  }));
   const pool = vehicles.filter((v) => v.in_pool);
   const others = vehicles.filter((v) => !v.in_pool);
 
@@ -87,6 +98,7 @@ async function VehicleList({
                   {v.rating != null && (
                     <span className="text-xs text-ink-muted">★ {f.decimal(Number(v.rating), 1)}</span>
                   )}
+                  {v.verified && <VerifiedBadge label={t.verification.badge} hint={t.verification.badgeHint} />}
                 </div>
                 <p className="mt-1.5 text-[13px] text-ink">
                   {t.vehicleClass[v.vehicle_class]} · {v.make} · {EURO_LABEL[v.euro_class]}
@@ -140,6 +152,11 @@ async function VehicleList({
                       </p>
                     )}
                     <p className="text-[12px] text-ink-dim">{t.known.directBillingHint}</p>
+                    {v.carrier_id && (
+                      <Link href={`/${locale}/shipper/carriers/${v.carrier_id}`} className="text-[12px] text-accent hover:underline">
+                        {t.verification.viewPackage}
+                      </Link>
+                    )}
                   </div>
                 )}
               </div>

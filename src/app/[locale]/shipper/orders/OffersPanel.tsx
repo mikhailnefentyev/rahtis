@@ -1,11 +1,13 @@
 'use client';
 
+import Link from 'next/link';
 import { useActionState } from 'react';
 import { Badge, Button, Countdown, Kv, Plate, Stars } from '@/components/ui';
 import { APP, MATCHING } from '@/lib/config';
 import { EURO_LABEL } from '@/lib/fleet/labels';
 import { cancelOrderAction, chooseOfferAction } from '@/lib/orders/matching';
 import { useI18n } from '@/lib/i18n/provider';
+import { VerifiedBadge } from '@/components/domain/VerifiedBadge';
 import type { ShipperOffer, ShipperOrder } from '@/types/db';
 
 /**
@@ -21,7 +23,7 @@ import type { ShipperOffer, ShipperOrder } from '@/types/db';
  * сцепка по его площадке и успеет ли машина к окну погрузки.
  */
 function VehicleLine({ offer, badge }: { offer: ShipperOffer; badge?: React.ReactNode }) {
-  const { m } = useI18n();
+  const { t, m } = useI18n();
 
   return (
     <div className="min-w-0">
@@ -30,6 +32,8 @@ function VehicleLine({ offer, badge }: { offer: ShipperOffer; badge?: React.Reac
           {m('matching.variant', { no: offer.variant_no })}
         </span>
         <Stars value={offer.rating} />
+        {/* Только значок: на заказе стола стороны друг друга не видят. */}
+        {offer.verified && <VerifiedBadge label={t.verification.badge} hint={t.verification.badgeHint} />}
         {badge}
       </div>
 
@@ -148,6 +152,8 @@ export type DirectCarrier = {
   name: string;
   businessId: string;
   iban: string | null;
+  /** Для ссылки на пакет tilaajavastuu: перевозчик заказчику известен. */
+  id?: string | null;
 };
 
 export function AssignedCarrier({
@@ -157,7 +163,7 @@ export function AssignedCarrier({
   offer: ShipperOffer;
   direct?: DirectCarrier | null;
 }) {
-  const { t, m } = useI18n();
+  const { t, m, locale } = useI18n();
 
   return (
     <div className="mt-4 border-t border-line pt-4">
@@ -167,6 +173,7 @@ export function AssignedCarrier({
         <div className="mb-2.5 flex flex-wrap items-center gap-2.5">
           {offer.plate && <Plate>{offer.plate}</Plate>}
           <Badge tone="ok">{direct ? direct.name : APP.operator.legalName}</Badge>
+          {offer.verified && <VerifiedBadge label={t.verification.badge} hint={t.verification.badgeHint} />}
         </div>
 
         {direct && (
@@ -174,6 +181,11 @@ export function AssignedCarrier({
             <Kv k="Y-tunnus" v={direct.businessId} />
             {direct.iban && <Kv k={t.known.carrierAccount} v={direct.iban} />}
             <p className="text-xs text-ink-muted">{t.known.directBillingHint}</p>
+            {direct.id && (
+              <Link href={`/${locale}/shipper/carriers/${direct.id}`} className="text-xs text-accent hover:underline">
+                {t.verification.viewPackage}
+              </Link>
+            )}
           </div>
         )}
 

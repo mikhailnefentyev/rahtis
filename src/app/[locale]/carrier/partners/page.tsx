@@ -7,6 +7,8 @@ import { isLocale } from '@/lib/i18n';
 import { setShipperLinkAction } from '@/lib/partners/actions';
 import { createClient } from '@/lib/supabase/server';
 import { InviteShipperForm } from './InviteShipperForm';
+import Link from 'next/link';
+import { VerifiedBadge } from '@/components/domain/VerifiedBadge';
 import type { LinkStatus } from '@/types/db';
 import { getViewerI18n } from '@/lib/i18n/viewer';
 
@@ -44,13 +46,15 @@ export default async function PartnersPage({ params }: { params: Promise<{ local
   const subscriber = viewer.company?.partnership === 'SUBSCRIBER';
   const [{ t, m, f }, supabase] = await Promise.all([getViewerI18n(locale), createClient()]);
 
-  const [{ data: partners }, { data: invites }] = await Promise.all([
+  const [{ data: partners }, { data: invites }, { data: verified }] = await Promise.all([
     supabase.rpc('carrier_partners'),
     supabase
       .from('shipper_invites')
       .select('id, company_name, email, created_at, applied_company_id, applied_at, invite_kind')
       .order('created_at', { ascending: false })
       .limit(50),
+    /* Свой значок «Tarkastettu» — так его видят заказчики рядом с машинами. */
+    supabase.rpc('company_verified', { p_company_id: viewer.company!.id }),
   ]);
   /* Одобренный — тот, с кем уже есть активная связь. */
   const approved = new Set((partners ?? []).filter((p) => p.status === 'ACTIVE').map((p) => p.shipper_id));
@@ -58,7 +62,16 @@ export default async function PartnersPage({ params }: { params: Promise<{ local
 
   return (
     <main className="cab-page">
-      <h1 className="page-title">{t.partners.title}</h1>
+      <div className="flex flex-wrap items-center gap-3">
+        <h1 className="page-title">{t.partners.title}</h1>
+        {verified ? (
+          <VerifiedBadge label={t.verification.badge} hint={t.verification.badgeHint} />
+        ) : (
+          <Link href={`/${locale}/carrier/verification`} className="text-[13px] text-accent hover:underline">
+            {t.verification.nav}
+          </Link>
+        )}
+      </div>
       <p className="mt-2 max-w-xl text-[13px] leading-relaxed text-ink-muted">{t.partners.subtitle}</p>
       <p className="mt-2 mb-6 max-w-xl text-xs text-ink-dim">{subscriber ? t.partners.anonymitySubscriber : t.partners.anonymity}</p>
 
