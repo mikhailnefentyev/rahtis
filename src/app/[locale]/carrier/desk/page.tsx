@@ -8,6 +8,8 @@ import type { SiteWaiting } from '@/lib/orders/waiting';
 import { createClient } from '@/lib/supabase/server';
 import type { OrderAmendment, TripDocument } from '@/types/db';
 import { Assignments } from './Assignments';
+import { BackhaulBlock } from './BackhaulBlock';
+import { DEFAULT_RADIUS, isRadius } from '@/lib/backhaul/radius';
 import { DeskList, type DeskBusy } from './DeskList';
 import { getViewerI18n } from '@/lib/i18n/viewer';
 
@@ -27,7 +29,7 @@ export default async function DeskPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ region?: string }>;
+  searchParams: Promise<{ region?: string; r?: string }>;
 }) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
@@ -35,18 +37,22 @@ export default async function DeskPage({
   const viewer = await requireRole(locale, 'CARRIER');
   const company = viewer.company!;
 
-  const [{ t, m }, supabase, { region }] = await Promise.all([
+  const [i18n, supabase, { region, r }] = await Promise.all([
     getViewerI18n(locale),
     createClient(),
     searchParams,
   ]);
+  const { t, m } = i18n;
+  /* Радиус «рядом» для обратного груза: 25/50/75/150 км, по умолчанию 75. */
+  const radiusParam = Number(r);
+  const radius = isRadius(radiusParam) ? radiusParam : DEFAULT_RADIUS;
 
   /*
    * Гейт спрашивается у базы, а не выводится из данных на странице:
    * то же правило действует внутри desk_orders, и держать его в двух
    * местах значит рано или поздно получить расхождение.
    */
-  const [{ data: readiness }, { data: orders }, { data: regions }, { data: assignments }, { data: vehicles }] =
+  const [{ data: readiness }, { data: orders }, { data: regions }, { data: assignments }, { data: vehicles }, { data: backhaul }] =
     await Promise.all([
       supabase.rpc('company_readiness', { p_company_id: company.id }),
       supabase.rpc('desk_orders', { p_region: region ?? undefined }),
@@ -59,6 +65,8 @@ export default async function DeskPage({
         .eq('company_id', company.id)
         .eq('access', 'APPROVED')
         .order('plate'),
+      /* Paluukuorma: где машины освободятся и что на столе рядом (только из desk_orders). */
+      supabase.rpc('backhaul_suggestions', { p_radius_km: radius }),
     ]);
 
   /*
@@ -236,6 +244,8 @@ export default async function DeskPage({
         </Card>
       ) : (
         <>
+          <BackhaulBlock rows={backhaul ?? []} radius={radius} region={region} i18n={i18n} locale={locale} />
+
           <nav className="mb-5 flex flex-wrap gap-1.5">
             <Link
               href={`/${locale}/carrier/desk`}

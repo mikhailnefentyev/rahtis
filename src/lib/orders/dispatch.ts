@@ -88,8 +88,8 @@ export async function dispatchPublishedOrder(orderId: string): Promise<void> {
     const order = card as Card | null;
     const list = (recipients ?? []) as Recipient[];
 
-    /* Заказ уже не на столе или брать его некому — рассылать нечего. */
-    if (!order || list.length === 0) return;
+    /* Заказ уже не на столе — рассылать нечего. */
+    if (!order) return;
 
     const from = order.pickup_city ?? '—';
     const to = order.delivery_city ?? from;
@@ -101,6 +101,20 @@ export async function dispatchPublishedOrder(orderId: string): Promise<void> {
      * в секунду, и веер из полусотни писем одним залпом получает отказ по
      * скорости — то есть ровно те письма, ради которых всё и затевалось.
      */
+    /*
+     * Kuormavahti: совпавшие подписки с флажком письма. Отметку «письмо
+     * ушло» ставит сама функция, повторный вызов ничего не вернёт. Кто
+     * уже в общей рассылке, второе письмо о том же заказе не получает.
+     */
+    const { data: watchers } = await admin.rpc('lane_watch_take_recipients', { p_order_id: orderId });
+    const inList = new Set(list.map((c) => c.company_id));
+    const laneOf = new Map<string, string>();
+    for (const w of (watchers ?? []) as (Recipient & { lane: string })[]) {
+      if (inList.has(w.company_id) || laneOf.has(w.company_id)) continue;
+      laneOf.set(w.company_id, w.lane);
+      list.push(w);
+    }
+
     for (const carrier of list) {
       const locale = emailLocaleOf(carrier.language) as Locale;
       const t = await getDictionary(locale);
@@ -125,6 +139,7 @@ export async function dispatchPublishedOrder(orderId: string): Promise<void> {
           link: `${site}/${locale}/carrier/desk`,
           operatorEmail: operator,
           locale: emailLocaleOf(carrier.language),
+          lane: laneOf.get(carrier.company_id) ?? null,
         }),
       );
     }
