@@ -127,6 +127,7 @@ create table public.verification_documents (
 create index verification_documents_company_idx on public.verification_documents (company_id, valid_until desc);
 
 alter table public.verification_documents enable row level security;
+revoke all on public.verification_documents from anon, authenticated;
 
 create policy verification_documents_own
   on public.verification_documents for select to authenticated
@@ -192,6 +193,7 @@ create table public.verification_grants (
 );
 
 alter table public.verification_grants enable row level security;
+revoke all on public.verification_grants from anon, authenticated;
 
 create policy verification_grants_own
   on public.verification_grants for select to authenticated
@@ -221,6 +223,7 @@ create table public.verification_shares (
 create index verification_shares_company_idx on public.verification_shares (company_id, created_at desc);
 
 alter table public.verification_shares enable row level security;
+revoke all on public.verification_shares from anon, authenticated;
 
 create policy verification_shares_own
   on public.verification_shares for select to authenticated
@@ -250,6 +253,7 @@ create table public.verification_reminders (
 );
 
 alter table public.verification_reminders enable row level security;
+revoke all on public.verification_reminders from anon, authenticated;
 /* Пишет и читает только сервер служебным ключом. */
 
 -- ── Состояние пунктов ─────────────────────────────────────────────
@@ -288,12 +292,12 @@ as $$
   prh_items as (
     select 'REGISTERS'::text as item, p.valid_until
     from prh p
-    where coalesce((p.registry_check ->> 'prepayment')::boolean, false)
-      and coalesce((p.registry_check ->> 'vat')::boolean, false)
+    where p.registry_check -> 'prepayment' = 'true'::jsonb
+      and p.registry_check -> 'vat' = 'true'::jsonb
     union all
     select 'TRADE_REGISTER', p.valid_until
     from prh p
-    where coalesce((p.registry_check ->> 'tradeRegister')::boolean, false)
+    where p.registry_check -> 'tradeRegister' = 'true'::jsonb
   )
   select
     r.item,

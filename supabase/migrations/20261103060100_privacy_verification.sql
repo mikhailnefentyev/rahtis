@@ -6,9 +6,10 @@
 -- предпринимателя), реестровые данные берутся из открытых данных PRH,
 -- справки видят заказчики-партнёры и те, кому перевозчик дал ссылку.
 --
--- Отдельный новый подпункт в разделе 4 (источники данных) — следующим
--- свободным номером: другая доработка в это же время добавляет пункт об
--- автоматическом чтении OpenAI в другое место, и номера не сталкиваются.
+-- Отдельный новый подпункт в разделе 2 (какие данные; там же 2.16–2.19
+-- других доработок) — следующим свободным номером. Раздел 3 — источники,
+-- раздел 4 — цели и основания, туда описание данных не ложится. Файл идёт
+-- после 20261103020100 (пункт 2.19), поэтому номер будет 2.20.
 -- Черновик PRIVACY, активация — решение пользователя.
 -- ═══════════════════════════════════════════════════════════════════
 
@@ -56,13 +57,13 @@ begin
 
   select coalesce(max(path[2]), 0) + 1 into v_no
   from public.legal_clauses
-  where document_id = v_doc and cardinality(path) = 2 and path[1] = 4;
+  where document_id = v_doc and cardinality(path) = 2 and path[1] = 2;
 
   insert into public.legal_clauses (document_id, locale, path, title, body)
   values
-    (v_doc, 'fi', array[4, v_no], null,
+    (v_doc, 'fi', array[2, v_no], null,
      'Tilaajavastuuselvitykset: kuljetusliike voi tallentaa palveluun tilaajavastuulain mukaiset selvitykset, kuten verovelkatodistuksen, eläkevakuutustodistuksen, selvityksen työterveyshuollosta, vakuutustodistuksen tai Luotettava Kumppani -raportin, sekä niiden päivämäärät. Yrityksen Y-tunnus, nimi sekä merkinnät ennakkoperintä-, arvonlisävero- ja kaupparekisterissä haetaan PRH:n avoimesta datasta, kun kuljetusliike hakee palveluun tai päivittää tiedot. Selvitykset näkevät kuljetusliike, palvelun ylläpito, tilaajat, joille kuljetusliike on sallinut suorat tilaukset, sekä ne, joille kuljetusliike antaa jakolinkin; muut tilaajat näkevät vain, onko yritys tarkastettu. Kuljetusliike voi poistaa selvityksen ja perua jakolinkin milloin tahansa. Toiminimen selvityksissä voi olla elinkeinonharjoittajan henkilötietoja.'),
-    (v_doc, 'en', array[4, v_no], null,
+    (v_doc, 'en', array[2, v_no], null,
      'Contractor''s obligations reports: a carrier may store in the service the reports required by the Finnish Act on the Contractor''s Obligations and Liability (tilaajavastuulaki), such as a tax debt certificate, a pension insurance certificate, a report on occupational health care, an insurance certificate or a Reliable Partner (Luotettava Kumppani) report, together with their dates. The company''s business ID, name and its entries in the prepayment, VAT and trade registers are retrieved from the open data of the Finnish Patent and Registration Office (PRH) when the carrier applies to the service or refreshes the data. The reports are visible to the carrier, the service administrators, shippers whom the carrier has allowed to send direct orders, and anyone the carrier gives a share link to; other shippers only see whether the company has been verified. The carrier may delete a report and revoke a share link at any time. The reports of a sole trader may contain the trader''s personal data.');
 end;
 $$;

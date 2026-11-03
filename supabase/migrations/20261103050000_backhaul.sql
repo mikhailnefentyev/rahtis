@@ -284,6 +284,7 @@ create trigger lane_watches_limit
   for each row execute function app.lane_watch_limit();
 
 alter table public.lane_watches enable row level security;
+revoke all on public.lane_watches from anon, authenticated;
 
 create policy lane_watches_own
   on public.lane_watches for all to authenticated
@@ -313,6 +314,7 @@ create index lane_watch_hits_watch on public.lane_watch_hits (watch_id);
 create index lane_watch_hits_created on public.lane_watch_hits (created_at);
 
 alter table public.lane_watch_hits enable row level security;
+revoke all on public.lane_watch_hits from anon, authenticated;
 
 create policy lane_watch_hits_own
   on public.lane_watch_hits for select to authenticated
@@ -474,7 +476,12 @@ begin
   if new.status = 'OPEN'
      and (old.status is distinct from 'OPEN'
           or (new.group_released_at is not null and old.group_released_at is null)) then
-    perform app.notify_lane_watches(new.id);
+    /* Сбой рассылки не должен откатывать публикацию заказа. */
+    begin
+      perform app.notify_lane_watches(new.id);
+    exception when others then
+      raise warning 'Kuormavahti: заказ %: %', new.id, sqlerrm;
+    end;
   end if;
   return new;
 end;
