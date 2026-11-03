@@ -20,6 +20,7 @@ import { createClient } from '@/lib/supabase/server';
 import type { CompanyDocument, DocumentKind } from '@/types/db';
 import { AdminDocument } from './AdminDocument';
 import { RegistryBlock } from '../../ApplicationCard';
+import { AdminVerification } from './AdminVerification';
 
 /**
  * Карточка компании глазами оператора.
@@ -266,6 +267,13 @@ export default async function AdminCompanyPage({
               );
             })}
           </div>
+        </section>
+      )}
+
+      {/* Значок «Tarkastettu» и пакет tilaajavastuu: решение оператора, сроки — из пакета. */}
+      {carrier && (
+        <section className="mt-8">
+          <AdminVerification locale={locale} companyId={id} />
         </section>
       )}
 

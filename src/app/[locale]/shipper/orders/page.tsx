@@ -131,17 +131,37 @@ export default async function OrdersPage({
     (stopsByOrder[stop.order_id] ??= []).push(stop);
   }
 
-  /* К откликам — карточка перевозчика без имени: рейсы и приезд вовремя. */
-  const { data: scores } = (offers ?? []).length
-    ? await supabase.rpc('offer_scorecards', { p_order_ids: withCarrierIds })
-    : { data: [] };
+  /*
+   * К откликам — карточка перевозчика без имени: рейсы и приезд вовремя,
+   * и значок «Tarkastettu» (только да/нет). Значки знакомых машин — с
+   * перевозчиком там, где он заказчику и так известен.
+   */
+  const [{ data: scores }, { data: badges }, { data: knownBadges }] = await Promise.all([
+    (offers ?? []).length
+      ? supabase.rpc('offer_scorecards', { p_order_ids: withCarrierIds })
+      : Promise.resolve({ data: [] }),
+    (offers ?? []).length
+      ? supabase.rpc('verification_badges_for_offers', { p_order_ids: withCarrierIds })
+      : Promise.resolve({ data: [] as { offer_id: string; verified: boolean }[] }),
+    (known ?? []).length
+      ? supabase.rpc('verification_badges_for_known')
+      : Promise.resolve({ data: [] as { vehicle_id: string; verified: boolean; carrier_id: string | null }[] }),
+  ]);
   const scoreByOffer = new Map((scores ?? []).map((s) => [s.offer_id, s]));
+  const verifiedOffers = new Set((badges ?? []).filter((b) => b.verified).map((b) => b.offer_id));
+  const badgeByVehicle = new Map((knownBadges ?? []).map((b) => [b.vehicle_id, b]));
+  const knownVehicles = (known ?? []).map((v) => ({
+    ...v,
+    verified: badgeByVehicle.get(v.vehicle_id)?.verified ?? false,
+    carrier_id: badgeByVehicle.get(v.vehicle_id)?.carrier_id ?? null,
+  }));
 
   const offersByOrder: Record<string, ShipperOffer[]> = {};
   for (const offer of (offers ?? []) as ShipperOffer[]) {
     const score = scoreByOffer.get(offer.offer_id);
+    const verified = verifiedOffers.has(offer.offer_id);
     (offersByOrder[offer.order_id] ??= []).push(
-      score ? { ...offer, trips: score.trips, on_time_pct: score.on_time_pct } : offer,
+      score ? { ...offer, verified, trips: score.trips, on_time_pct: score.on_time_pct } : { ...offer, verified },
     );
   }
 
@@ -183,7 +203,7 @@ export default async function OrdersPage({
           offersByOrder={offersByOrder}
           tripTrailerByOrder={Object.fromEntries((tripTrailerRows ?? []).map((r) => [r.order_id, r.plate]))}
           amendmentsByOrder={amendmentsByOrder}
-          knownVehicles={known ?? []}
+          knownVehicles={knownVehicles}
           documentsByOrder={documentsByOrder}
           startNew={startNew}
         />

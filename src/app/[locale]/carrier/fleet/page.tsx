@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { freeUntil, SUBSCRIPTION_UNIT_CENTS } from '@/lib/config';
 import { todayInHelsinki } from '@/lib/dates';
@@ -134,8 +135,12 @@ export default async function FleetPage({ params }: { params: Promise<{ locale: 
       </Card>
 
       <section className="mb-8">
-        <h2 className="mb-4 border-b border-line pb-2 text-[13px] font-semibold tracking-tight text-ink-faint">
+        <h2 className="mb-4 flex flex-wrap items-baseline justify-between gap-2 border-b border-line pb-2 text-[13px] font-semibold tracking-tight text-ink-faint">
           {t.documents.title}
+          {/* Справки tilaajavastuu — отдельный пакет, но ищут их здесь, рядом с лицензией. */}
+          <Link href={`/${locale}/carrier/verification`} className="font-normal text-accent hover:underline">
+            {t.verification.nav} →
+          </Link>
         </h2>
         <div className="grid gap-3 lg:grid-cols-2">
           <DocumentCard
