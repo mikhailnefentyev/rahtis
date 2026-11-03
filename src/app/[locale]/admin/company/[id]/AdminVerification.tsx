@@ -19,6 +19,8 @@ import { loadPackage } from '@/lib/verification/package';
 export async function AdminVerification({ locale, companyId }: { locale: Locale; companyId: string }) {
   /* Страница уже за requireRole(ADMIN); заметки оператора закрыты от authenticated поколоночно. */
   const i18n = await getI18n(locale);
+  /* Время, когда пакет показан оператору, — до загрузки данных пакета. */
+  const seenAt = new Date().toISOString();
   const supabase = createAdminClient();
   const v = i18n.t.verification;
 
@@ -56,6 +58,7 @@ export async function AdminVerification({ locale, companyId }: { locale: Locale;
           <div className="grid gap-3 sm:grid-cols-2">
             <form action={grantVerificationAction} className="flex flex-col gap-2">
               <input type="hidden" name="locale" value={locale} />
+              <input type="hidden" name="seen_at" value={seenAt} />
               <input type="hidden" name="company_id" value={companyId} />
               <label className="label-micro" htmlFor="verification-note">
                 {v.adminNote}

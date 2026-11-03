@@ -260,9 +260,12 @@ export async function grantVerificationAction(formData: FormData): Promise<void>
   await requireAdmin();
   const companyId = String(formData.get('company_id') ?? '');
   const note = String(formData.get('note') ?? '').trim().slice(0, 1000);
+  /* Когда оператор открыл пакет: принимаются только файлы, загруженные до этого. */
+  const seen = new Date(String(formData.get('seen_at') ?? ''));
+  const seenAt = Number.isNaN(seen.getTime()) ? new Date(0).toISOString() : seen.toISOString();
 
   const supabase = await createClient();
-  const { error } = await supabase.rpc('grant_verification', { p_company_id: companyId, p_note: note || undefined });
+  const { error } = await supabase.rpc('grant_verification', { p_company_id: companyId, p_seen_at: seenAt, p_note: note || undefined });
 
   revalidatePath(`/${locale}/admin/company/${companyId}`);
   if (error) {

@@ -8309,7 +8309,7 @@ export type Database = {
       }
       company_verified: { Args: { p_company_id: string }; Returns: boolean }
       grant_verification: {
-        Args: { p_company_id: string; p_note?: string }
+        Args: { p_company_id: string; p_seen_at: string; p_note?: string }
         Returns: undefined
       }
       revoke_verification: {
