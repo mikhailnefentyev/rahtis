@@ -214,7 +214,8 @@ export default async function TrackPage({ params }: { params: Promise<{ locale: 
           <ol className="relative">
             <Step
               state={confirmedEvent || ['AWAIT_DRIVER', 'IN_PROGRESS', 'DONE'].includes(order.status) ? 'done' : 'todo'}
-              last={stops.length === 0}>
+              last={stops.length === 0}
+            >
               <span className="text-[13px] font-semibold">{t.track.confirmed}</span>
               {confirmedEvent?.created_at && (
                 <span className="text-xs text-ink-dim">{time(confirmedEvent.created_at, null)}</span>
