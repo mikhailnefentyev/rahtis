@@ -1406,6 +1406,14 @@
 .trip-preview__stop { display: block; font-size: 13px; line-height: 1.35; }
 .trip-preview__sub { display: block; font-size: 11px; color: var(--color-ink-dim); }
 .trip-preview__time { font-size: 11px; color: var(--color-ink-faint); }
+
+/* Поле, заполненное разбором письма или PDF заказа (OrderImport): видно, что проверить. */
+.ai-filled :is(input:not([type='hidden']):not([type='checkbox']):not([type='radio']), select, textarea) {
+  border-color: var(--color-accent-line);
+  background: var(--color-accent-wash);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 12%, transparent);
+}
+.ai-filled > label::after { content: ' \2726'; color: var(--color-accent); }
 .trip-preview__foot {
   margin-top: 14px;
   padding-top: 12px;

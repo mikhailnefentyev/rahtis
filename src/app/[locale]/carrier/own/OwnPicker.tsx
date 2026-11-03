@@ -7,6 +7,8 @@ import { countryPack } from '@/lib/country';
 import { vehicleClassFits, type HaulKind } from '@/lib/orders/haul';
 import { useI18n } from '@/lib/i18n/provider';
 import type { CarrierClient, OwnVehicle } from '@/types/db';
+import type { DraftClient } from '@/lib/orders/importDraft';
+import { cn } from '@/lib/cn';
 
 /**
  * Клиент и машина своего рейса — последним блоком формы вместо выбора
@@ -25,6 +27,7 @@ export function OwnPicker({
   trailers = [],
   haulKind,
   homeCountry = 'FI',
+  draftClient = null,
 }: {
   clients: CarrierClient[];
   vehicles: OwnVehicle[];
@@ -33,20 +36,25 @@ export function OwnPicker({
   haulKind: HaulKind;
   /** Страна перевозчика — с неё начинается выбор страны нового клиента. */
   homeCountry?: string;
+  /** Заказчик из письма или PDF: найденный в справочнике или новый. */
+  draftClient?: DraftClient | null;
 }) {
   const { t } = useI18n();
-  const [clientId, setClientId] = useState(clients[0]?.id ?? '');
+  const [clientId, setClientId] = useState(draftClient ? (draftClient.id ?? '') : (clients[0]?.id ?? ''));
   const chosen = clients.find((c) => c.id === clientId) ?? null;
   /*
    * Поля держит состояние, а не браузер: после отказа сервера React
    * сбрасывает неуправляемые поля формы, и клиент с машиной пропадали —
    * форму приходилось дозаполнять заново (прогон 12.10.2026).
    */
-  const [name, setName] = useState('');
-  const [businessId, setBusinessId] = useState('');
+  const [name, setName] = useState(draftClient?.name ?? '');
+  const [businessId, setBusinessId] = useState(draftClient?.businessId ?? '');
   const [country, setCountry] = useState(homeCountry);
   const pack = countryPack(country);
-  const [email, setEmail] = useState(clients[0]?.contact_email ?? '');
+  const [email, setEmail] = useState(
+    draftClient?.email || (clients.find((c) => c.id === (draftClient ? draftClient.id : clients[0]?.id))?.contact_email ?? ''),
+  );
+  const ai = draftClient ? 'ai-filled' : undefined;
   const [vehicleId, setVehicleId] = useState('');
 
   /*
@@ -73,7 +81,7 @@ export function OwnPicker({
       <fieldset className="grid gap-3 sm:grid-cols-3">
         <legend className="label-micro mb-2">{t.own.clientSection}</legend>
         {clients.length > 0 && (
-          <Field label={t.own.clientPick} className="sm:col-span-3">
+          <Field label={t.own.clientPick} className={cn('sm:col-span-3', ai)}>
             {(p) => (
               <Select
                 key={resets}
@@ -99,7 +107,7 @@ export function OwnPicker({
         )}
         {!chosen && (
           <>
-            <Field label={t.own.clientName} required>
+            <Field label={t.own.clientName} required className={ai}>
               {(p) => (
                 <Input
                   {...p}

@@ -5,6 +5,7 @@ import { Field, Input, InputMono, Select, Textarea } from '@/components/ui';
 import { hasCargo, hasConsignee, hasExternalRef } from '@/lib/orders/stopFields';
 import type { HaulKind } from '@/lib/orders/haul';
 import { useI18n } from '@/lib/i18n/provider';
+import { cn } from '@/lib/cn';
 import type { StopRole } from '@/types/db';
 
 /**
@@ -64,6 +65,7 @@ export function StopFields({
   defaults,
   onChosen,
   defaultChosen,
+  filled,
 }: {
   role: StopRole;
   /** Имена полей: `${prefix}_address` и так далее. */
@@ -94,8 +96,11 @@ export function StopFields({
   onChosen?: (chosen: ChosenAddress | null) => void;
   /** Уже выбранный адрес: при повторе заказа он приходит из прошлого рейса. */
   defaultChosen?: ChosenAddress | null;
+  /** Поля, заполненные разбором письма или PDF, — подсвечиваются. */
+  filled?: (field: string) => boolean;
 }) {
   const { t } = useI18n();
+  const ai = (field: string) => (filled?.(field) ? 'ai-filled' : undefined);
 
 
   const name = (field: string) => `${prefix}_${field}`;
@@ -113,7 +118,7 @@ export function StopFields({
   return (
     <div className="grid gap-4 sm:grid-cols-2">
       {showPlaceName ? (
-        <Field label={t.orderForm.placeName}>
+        <Field label={t.orderForm.placeName} className={ai('place_name')}>
           {(p) => (
             <Input
               {...p}
@@ -128,7 +133,7 @@ export function StopFields({
       )}
 
       {requireCompany ? (
-        <Field label={t.orderForm.company} required>
+        <Field label={t.orderForm.company} required className={ai('company')}>
           {(p) => <Input {...p} name={name('company')} defaultValue={was('company')} required />}
         </Field>
       ) : (
@@ -139,7 +144,7 @@ export function StopFields({
         label={t.orderForm.address}
         hint={t.orderForm.addressHint}
         required
-        className="sm:col-span-2"
+        className={cn('sm:col-span-2', ai('address'))}
       >
         {(p) => (
           <AddressInput
@@ -169,7 +174,7 @@ export function StopFields({
           * равно уходит в ISO независимо от вида, так что данным ничего не
           * грозит.
           */}
-        <Field label={t.orderForm.date} required={requireDate}>
+        <Field label={t.orderForm.date} required={requireDate} className={ai('date')}>
           {(p) => (
               <Input
                 {...p}
@@ -180,14 +185,14 @@ export function StopFields({
               />
             )}
         </Field>
-        <Field label={t.orderForm.time}>
+        <Field label={t.orderForm.time} className={ai('time')}>
           {(p) => <Input {...p} type="time" name={name('time')} defaultValue={was('time')} />}
         </Field>
       </div>
 
       {showContact && (
         <>
-          <Field label={t.orderForm.contact}>
+          <Field label={t.orderForm.contact} className={ai('contact')}>
             {(p) => (
               <Input
                 {...p}
@@ -197,7 +202,7 @@ export function StopFields({
               />
             )}
           </Field>
-          <Field label={t.orderForm.phone}>
+          <Field label={t.orderForm.phone} className={ai('phone')}>
             {(p) => (
               <InputMono
                 {...p}
@@ -223,7 +228,7 @@ export function StopFields({
               : haulKind === 'TRUCK'
                 ? t.orderForm.cargoWeightHintTruck
                 : t.orderForm.cargoWeightHint
-          } required={requireWeight}>
+          } required={requireWeight} className={ai('weight')}>
             {(p) => (
               <InputMono
                 {...p}
@@ -265,7 +270,7 @@ export function StopFields({
       )}
 
       {externalRef ? (
-        <Field label={t.orderForm.loadingRef} hint={t.orderForm.loadingRefHint}>
+        <Field label={t.orderForm.loadingRef} hint={t.orderForm.loadingRefHint} className={ai('ref')}>
           {(p) => (
             <InputMono
               {...p}
@@ -300,7 +305,7 @@ export function StopFields({
        * комментарий водитель читает один раз перед рейсом, а «звонить за
        * час», «въезд с задней стороны» нужны в конкретном месте.
        */}
-      <Field label={t.orderForm.stopNote} className="sm:col-span-2">
+      <Field label={t.orderForm.stopNote} className={cn('sm:col-span-2', ai('note'))}>
         {(p) => (
           <Textarea
           {...p}
