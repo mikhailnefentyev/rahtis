@@ -2159,6 +2159,90 @@ export type Database = {
           },
         ]
       }
+      lane_watch_hits: {
+        Row: {
+          company_id: string
+          created_at: string
+          emailed_at: string | null
+          order_id: string
+          watch_id: string | null
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          emailed_at?: string | null
+          order_id: string
+          watch_id?: string | null
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          emailed_at?: string | null
+          order_id?: string
+          watch_id?: string | null
+        }
+        Relationships: []
+      }
+      lane_watches: {
+        Row: {
+          active: boolean
+          company_id: string
+          created_at: string
+          created_by: string | null
+          date_from: string | null
+          date_to: string | null
+          from_city: string
+          from_lat: number
+          from_lon: number
+          from_radius_km: number
+          haul_kind: Database["public"]["Enums"]["haul_kind"] | null
+          id: string
+          notify_email: boolean
+          to_city: string | null
+          to_lat: number | null
+          to_lon: number | null
+          to_radius_km: number | null
+        }
+        Insert: {
+          active?: boolean
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          date_from?: string | null
+          date_to?: string | null
+          from_city: string
+          from_lat: number
+          from_lon: number
+          from_radius_km?: number
+          haul_kind?: Database["public"]["Enums"]["haul_kind"] | null
+          id?: string
+          notify_email?: boolean
+          to_city?: string | null
+          to_lat?: number | null
+          to_lon?: number | null
+          to_radius_km?: number | null
+        }
+        Update: {
+          active?: boolean
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          date_from?: string | null
+          date_to?: string | null
+          from_city?: string
+          from_lat?: number
+          from_lon?: number
+          from_radius_km?: number
+          haul_kind?: Database["public"]["Enums"]["haul_kind"] | null
+          id?: string
+          notify_email?: boolean
+          to_city?: string | null
+          to_lat?: number | null
+          to_lon?: number | null
+          to_radius_km?: number | null
+        }
+        Relationships: []
+      }
       legal_acceptances: {
         Row: {
           accepted_at: string
@@ -5058,6 +5142,18 @@ export type Database = {
           status: Database["public"]["Enums"]["order_status"]
         }[]
       }
+      admin_lane_demand: {
+        Args: never
+        Returns: {
+          companies: number
+          from_city: string
+          haul_kind: Database["public"]["Enums"]["haul_kind"]
+          hits_30d: number
+          last_created: string
+          to_city: string
+          watches: number
+        }[]
+      }
       admin_orders_without_offers: {
         Args: never
         Returns: {
@@ -5409,6 +5505,31 @@ export type Database = {
       auth_throttle_hit: {
         Args: { p_key_hash: string; p_limit: number; p_window_seconds: number }
         Returns: boolean
+      }
+      backhaul_suggestions: {
+        Args: { p_radius_km?: number }
+        Returns: {
+          after_ref: string
+          deadhead_km: number
+          desk_contract: Database["public"]["Enums"]["contract_party"]
+          distance_km: number
+          finish_city: string
+          free_city: string
+          free_date: string
+          free_source: string
+          free_time: string
+          haul_kind: Database["public"]["Enums"]["haul_kind"]
+          order_id: string
+          pickup_city: string
+          pickup_date: string
+          pickup_time: string
+          plate: string
+          rate_cents: number
+          ref: string
+          total_count: number
+          toward_home: boolean
+          vehicle_id: string
+        }[]
       }
       billing_overview: {
         Args: never
@@ -6762,6 +6883,26 @@ export type Database = {
           trips: number
           vehicle_class: Database["public"]["Enums"]["vehicle_class"]
           vehicle_id: string
+        }[]
+      }
+      lane_places: {
+        Args: never
+        Returns: {
+          city: string
+          country: string
+          lat: number
+          lon: number
+          uses: number
+        }[]
+      }
+      lane_watch_take_recipients: {
+        Args: { p_order_id: string }
+        Returns: {
+          company_id: string
+          company_name: string
+          contact_email: string
+          language: string
+          lane: string
         }[]
       }
       legal_clause: {

@@ -35,6 +35,8 @@ export function orderPublishedEmail(input: {
   link: string;
   operatorEmail: string;
   locale: EmailLocale;
+  /** Kuormavahti: письмо пришло по подписке на это направление — так и сказано внизу. */
+  lane?: string | null;
 }): EmailMessage {
   const t = emailText(input.locale);
   const heading = t.dispatch.heading(input.from, input.to_);
@@ -50,11 +52,11 @@ export function orderPublishedEmail(input: {
     { kind: 'text', value: t.dispatch.lead },
     { kind: 'facts', rows },
     { kind: 'button', label: t.dispatch.button, href: input.link },
-    { kind: 'note', value: t.dispatch.note },
+    { kind: 'note', value: input.lane ? t.dispatch.laneNote(input.lane) : t.dispatch.note },
   ];
 
   return {
-    template: 'order.published',
+    template: input.lane ? 'lane.match' : 'order.published',
     to: input.to,
     toName: input.companyName,
     subject: t.dispatch.subject(input.ref, input.from, input.to_),

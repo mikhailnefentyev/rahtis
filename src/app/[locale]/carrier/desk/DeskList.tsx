@@ -192,7 +192,7 @@ export function DeskList({
           .filter((x): x is { stop: DeskStop; w: SiteWaiting } => Boolean(x.w));
 
         return (
-          <Card key={order.id} stripe="info">
+          <Card key={order.id} id={`desk-${order.id}`} stripe="info" className="scroll-mt-24">
             <CardBody>
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="min-w-0">

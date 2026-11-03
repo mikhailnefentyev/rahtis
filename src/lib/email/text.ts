@@ -159,6 +159,8 @@ type Texts = {
     lead: string;
     button: string;
     note: string;
+    /** Kuormavahti: письмо по подписке на направление. */
+    laneNote: (lane: string) => string;
     fieldOrder: string;
     fieldPickup: string;
     fieldRoute: string;
@@ -395,6 +397,8 @@ const fi: Texts = {
     lead: 'Kuljetus on avoinna tarjouspöydällä. Kolme ensimmäistä tarjousta pääsee mukaan.',
     button: 'Avaa tarjouspöytä',
     note: 'Saatte tämän viestin, koska yrityksellänne on palvelussa hyväksytty auto.',
+    laneNote: (lane) =>
+      `Saatte tämän viestin, koska yrityksellänne on Kuormavahti reitille ${lane}. Vahdin voi keskeyttää tai poistaa tarjouspöydän Kuormavahti-sivulla.`,
     fieldOrder: 'Kuljetus',
     fieldPickup: 'Nouto',
     fieldRoute: 'Reitti',
@@ -631,6 +635,8 @@ const en: Texts = {
     lead: 'This job is open on the load board. The first three offers get through.',
     button: 'Open load board',
     note: 'You’re getting this email because your company has an approved truck on RAHTIS.',
+    laneNote: (lane) =>
+      `You’re getting this email because your company has a load alert for ${lane}. You can pause or delete the alert on the Load alerts page of the load board.`,
     fieldOrder: 'Job',
     fieldPickup: 'Pickup',
     fieldRoute: 'Route',
