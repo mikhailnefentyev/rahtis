@@ -32,12 +32,12 @@ export default async function ApplyPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ invite?: string }>;
+  searchParams: Promise<{ invite?: string; kind?: string }>;
 }) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
 
-  const [{ t }, { invite: token }] = await Promise.all([getI18n(locale), searchParams]);
+  const [{ t }, { invite: token, kind }] = await Promise.all([getI18n(locale), searchParams]);
   const invite = token ? await inviteByToken(token) : null;
 
   return (
@@ -64,7 +64,7 @@ export default async function ApplyPage({
           <p className="label-micro mt-2">{t.brand.tagline}</p>
         </div>
 
-        <ApplyForm invite={invite} />
+        <ApplyForm invite={invite} defaultKind={kind === 'shipper' ? 'SHIPPER' : 'CARRIER'} />
 
         <p className="mt-5 text-center text-[13px] text-ink-muted">
           <Link href={signInPath(locale)} className="text-accent hover:underline">

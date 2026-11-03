@@ -12,13 +12,20 @@ import { useKeepOnError } from '@/lib/forms/keepOnError';
 
 const initial: ApplyState = { error: null, done: false };
 
-export function ApplyForm({ invite = null }: { invite?: ApplyInvite | null }) {
+export function ApplyForm({
+  invite = null,
+  defaultKind = 'CARRIER',
+}: {
+  invite?: ApplyInvite | null;
+  /* Ссылка «julkaise oma kuljetuksesi» со страницы отслеживания открывает ветку заказчика. */
+  defaultKind?: CompanyRole;
+}) {
   const { t, m } = useI18n();
   const { locale } = useI18n();
   const [state, formAction, pending] = useActionState(submitApplicationAction, initial);
   const keepFormAction = useKeepOnError(state);
 
-  const [kind, setKind] = useState<CompanyRole>(invite?.kind ?? 'CARRIER');
+  const [kind, setKind] = useState<CompanyRole>(invite?.kind ?? defaultKind);
   /*
    * Ветка перевозчика. По умолчанию подряд: он ничего не стоит, пока
    * нет работы, и человек, пришедший «посмотреть», не должен случайно
