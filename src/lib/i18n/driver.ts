@@ -42,6 +42,8 @@ export type DriverPack = {
   /** Тренажёр и сроки сертификатов — экраны водителя, на его языке. */
   training: Dictionary['training'];
   certificates: Dictionary['certificates'];
+  /** Весовой талон по фото на экране объекта. */
+  weighTicket: Dictionary['weighTicket'];
   /** Работа на объекте: самосвалы, весы, часы. */
   siteWork: Dictionary['siteWork'];
   /** Заправка: одометр, литры, AdBlue, чек. */
@@ -79,6 +81,7 @@ function packOf(dictionary: Dictionary): DriverPack {
     places: dictionary.places,
     training: dictionary.training,
     certificates: dictionary.certificates,
+    weighTicket: dictionary.weighTicket,
     siteWork: dictionary.siteWork,
     fuelDriver: dictionary.fuelDriver,
     stopKind: dictionary.stopKind,
@@ -139,6 +142,7 @@ export async function driverDictionary(
     places: pack.places,
     training: pack.training,
     certificates: pack.certificates,
+    weighTicket: pack.weighTicket,
     siteWork: pack.siteWork,
     fuelDriver: pack.fuelDriver,
     stopKind: pack.stopKind,

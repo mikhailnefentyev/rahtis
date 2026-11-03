@@ -1,11 +1,15 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { WeighTicketWarnings } from '@/components/domain/WeighTicketWarnings';
 import { cn } from '@/lib/cn';
+import { compressPhoto } from '@/lib/driverApp/photo';
 import { combinationMass, isMassCountry, type TrailerUnit } from '@/lib/fleet/mass';
 import { useI18n } from '@/lib/i18n/provider';
 import { askPosition } from '@/lib/orders/position';
-import { MATERIALS, dayEnd } from '@/lib/sites/work';
+import { MATERIALS, dayEnd, isMaterialCode } from '@/lib/sites/work';
+import { readWeighTicketAction } from '@/lib/weighTicket/actions';
+import { formWeights, matchScaleSite, ticketWarnings, type Duplicates, type TicketReading } from '@/lib/weighTicket/reading';
 import { useOutbox } from '../../OutboxProvider';
 
 type Load = {
@@ -152,6 +156,14 @@ function JobCard({
   const [tare, setTare] = useState('');
   const [ticket, setTicket] = useState('');
   const [busy, setBusy] = useState(false);
+  /* Весовой талон по фото: прочитанное, повторы, фото без связи и подтверждение предупреждений. */
+  const camera = useRef<HTMLInputElement>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [photoState, setPhotoState] = useState<'none' | 'reading' | 'READ' | 'NOT_CONFIGURED' | 'FAILED' | 'offline'>('none');
+  const [ticketId, setTicketId] = useState<string | null>(null);
+  const [reading, setReading] = useState<TicketReading | null>(null);
+  const [duplicates, setDuplicates] = useState<Duplicates | null>(null);
+  const [offlinePhoto, setOfflinePhoto] = useState<Blob | null>(null);
 
   const pendingArrive = pendingFor.find((e) => e.fields.action === 'ARRIVE');
   const pendingLoads = pendingFor.filter((e) => e.fields.action === 'LOAD');
@@ -159,22 +171,107 @@ function JobCard({
   const dayTrailer = state.trailers.find((tr) => tr.id === (job.day?.trailer_id ?? trailerId)) ?? null;
 
   /* Предел массы сегодняшней сцепки — для предупреждения о перегрузе. */
-  const limitKg = useMemo(() => {
+  const mass = useMemo(() => {
     if (!state.vehicle) return null;
     /* Тягач без полуприцепа груз не возит: предел «18 т» дал бы ложный перегруз на каждом рейсе. */
     if (state.vehicle.vehicle_class === 'TRACTOR' && !dayTrailer) return null;
     const country = isMassCountry(state.country) ? state.country : 'FI';
     return combinationMass(
       country,
-      { kind: state.vehicle.vehicle_class === 'TRACTOR' ? 'TRACTOR' : 'TRUCK', axles: state.vehicle.axles, grossMaxKg: state.vehicle.gross_max_kg },
-      dayTrailer ? [{ kind: dayTrailer.kind, axles: dayTrailer.axles, twinWheels: dayTrailer.twin_wheels, grossMaxKg: dayTrailer.gross_max_kg }] : [],
-    ).limitKg;
+      {
+        kind: state.vehicle.vehicle_class === 'TRACTOR' ? 'TRACTOR' : 'TRUCK',
+        axles: state.vehicle.axles,
+        grossMaxKg: state.vehicle.gross_max_kg,
+        tareKg: state.vehicle.tare_kg,
+      },
+      dayTrailer
+        ? [{ kind: dayTrailer.kind, axles: dayTrailer.axles, twinWheels: dayTrailer.twin_wheels, grossMaxKg: dayTrailer.gross_max_kg, tareKg: dayTrailer.tare_kg }]
+        : [],
+    );
   }, [state.vehicle, state.country, dayTrailer]);
+  const limitKg = mass?.limitKg ?? null;
 
   const grossKg = Number.parseInt(gross.replace(/\s/g, ''), 10);
   const tareKg = Number.parseInt(tare.replace(/\s/g, ''), 10);
   const net = Number.isFinite(grossKg) && Number.isFinite(tareKg) && grossKg > tareKg ? grossKg - tareKg : null;
   const over = limitKg && Number.isFinite(grossKg) && grossKg > limitKg ? grossKg - limitKg : 0;
+
+  const expectedPlates = [state.vehicle?.plate, dayTrailer?.plate].filter((p): p is string => Boolean(p));
+  const warnings = ticketWarnings({
+    grossKg: Number.isFinite(grossKg) ? grossKg : null,
+    tareKg: Number.isFinite(tareKg) ? tareKg : null,
+    ticketNo: ticket.trim() || null,
+    scaleSiteId: scaleId || null,
+    reading,
+    duplicates,
+    expectedPlates,
+    limitKg,
+    comboTareKg: mass?.tareKg ?? null,
+  });
+
+  function resetTicket() {
+    if (preview) URL.revokeObjectURL(preview);
+    setPreview(null);
+    setPhotoState('none');
+    setTicketId(null);
+    setReading(null);
+    setDuplicates(null);
+    setOfflinePhoto(null);
+  }
+
+  /**
+   * Фото талона: сжать, отправить на чтение, разложить прочитанное по
+   * полям. Ничего не сохраняет — рейс водитель сохраняет сам. Без связи
+   * фото ждёт и уйдёт вместе с рейсом через очередь.
+   */
+  async function onPhoto(file: File | undefined) {
+    if (!file) return;
+    resetTicket();
+    const blob = await compressPhoto(file);
+    setPreview(URL.createObjectURL(blob));
+
+    if (!navigator.onLine) {
+      setOfflinePhoto(blob);
+      setPhotoState('offline');
+      return;
+    }
+
+    setPhotoState('reading');
+    const form = new FormData();
+    form.set('file', new File([blob], 'ticket.jpg', { type: blob.type || 'image/jpeg' }));
+    form.set('ticket_id', crypto.randomUUID());
+    form.set('job_id', job.id);
+    form.set('expected_plates', JSON.stringify(expectedPlates));
+
+    try {
+      const result = await readWeighTicketAction(form);
+      if (!result.ok) {
+        /* Не легло на сервер — фото поедет с рейсом через очередь. */
+        setOfflinePhoto(blob);
+        setPhotoState(result.error === 'failed' ? 'offline' : 'FAILED');
+        return;
+      }
+      setTicketId(result.ticketId);
+      setDuplicates(result.duplicates);
+      setPhotoState(result.status);
+      if (result.reading) {
+        const r = result.reading;
+        setReading(r);
+        const weights = formWeights(r);
+        if (weights.grossKg) setGross(String(weights.grossKg));
+        if (weights.tareKg) setTare(String(weights.tareKg));
+        if (r.ticketNumber) setTicket(r.ticketNumber);
+        if (r.materialCode && isMaterialCode(r.materialCode)) setMaterial(r.materialCode);
+        const site = matchScaleSite(r.scaleName, sites);
+        /* Поля весов видны только при выбранных весах: нашлись по шапке — их, иначе весы объекта. */
+        if (site) setScaleId(site.id);
+        else if (!scaleId && (weights.grossKg || weights.tareKg)) setScaleId(job.receiving_site_id ?? sites[0]?.id ?? '');
+      }
+    } catch {
+      setOfflinePhoto(blob);
+      setPhotoState('offline');
+    }
+  }
 
   const loads = job.day?.loads ?? [];
   const netTotal = loads.reduce((s, l) => s + (l.net_kg ?? 0), 0);
@@ -182,10 +279,10 @@ function JobCard({
     ? dayEnd({ arrivedAt: job.day.arrived_at, endedAt: job.day.ended_at, bufferMinutes: job.day.buffer_minutes, unloads: loads.map((l) => l.unloaded_at) })
     : null;
 
-  async function send(action: 'ARRIVE' | 'LOAD' | 'END', data: Record<string, unknown> = {}) {
+  async function send(action: 'ARRIVE' | 'LOAD' | 'END', data: Record<string, unknown> = {}, blob?: Blob) {
     setBusy(true);
     try {
-      await enqueue('SITE', { action, job_id: job.id, data: JSON.stringify(data) });
+      await enqueue('SITE', { action, job_id: job.id, data: JSON.stringify(data) }, blob);
     } finally {
       setBusy(false);
     }
@@ -197,16 +294,22 @@ function JobCard({
   }
 
   async function saveLoad() {
-    await send('LOAD', {
-      material_code: material,
-      scale_site_id: scaleId || null,
-      gross_kg: Number.isFinite(grossKg) ? grossKg : null,
-      tare_kg: Number.isFinite(tareKg) ? tareKg : null,
-      ticket_no: ticket.trim() || null,
-    });
+    await send(
+      'LOAD',
+      {
+        material_code: material,
+        scale_site_id: scaleId || null,
+        gross_kg: Number.isFinite(grossKg) ? grossKg : null,
+        tare_kg: Number.isFinite(tareKg) ? tareKg : null,
+        ticket_no: ticket.trim() || null,
+        weigh_ticket_id: ticketId,
+      },
+      ticketId ? undefined : (offlinePhoto ?? undefined),
+    );
     setGross('');
     setTare('');
     setTicket('');
+    resetTicket();
   }
 
   return (
@@ -259,6 +362,52 @@ function JobCard({
           {!job.day?.invoiced && (
           <div className="mt-4 flex flex-col gap-3 border-t border-line pt-4">
             <h3 className="text-[15px] font-semibold">{t.siteWork.newLoad}</h3>
+
+            {/* Весовой талон: фото → поля ниже. Сохраняет водитель сам, после проверки. */}
+            <input
+              ref={camera}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              className="hidden"
+              onChange={(e) => {
+                void onPhoto(e.target.files?.[0]);
+                e.target.value = '';
+              }}
+            />
+            <div className="flex items-center gap-3">
+              {preview && (
+                // eslint-disable-next-line @next/next/no-img-element -- снимок с телефона, ещё не на сервере
+                <img src={preview} alt="" className="size-14 shrink-0 rounded-control border border-line object-cover" />
+              )}
+              <button
+                type="button"
+                className="h-12 flex-1 rounded-control border-[1.5px] border-line-strong bg-surface px-4 text-[15px] font-semibold disabled:opacity-50"
+                disabled={busy || photoState === 'reading'}
+                onClick={() => camera.current?.click()}
+              >
+                {preview ? t.weighTicket.photoRetake : t.weighTicket.photo}
+              </button>
+            </div>
+            {photoState === 'none' ? (
+              <p className="-mt-1 text-[12px] text-ink-dim">{t.weighTicket.photoHint}</p>
+            ) : (
+              <p
+                className={cn('text-[14px]', photoState === 'READ' ? 'text-ok' : photoState === 'reading' ? 'text-ink-muted' : 'text-warn')}
+                aria-live="polite"
+              >
+                {photoState === 'reading'
+                  ? t.weighTicket.reading
+                  : photoState === 'READ'
+                    ? t.weighTicket.read
+                    : photoState === 'NOT_CONFIGURED'
+                      ? t.weighTicket.notConfigured
+                      : photoState === 'FAILED'
+                        ? t.weighTicket.failed
+                        : t.weighTicket.offline}
+              </p>
+            )}
+
             <label className="flex flex-col gap-1 text-[13px]">
               {t.siteWork.material}
               <select className={INPUT} value={material} onChange={(e) => setMaterial(e.target.value)}>
@@ -309,8 +458,17 @@ function JobCard({
                 {t.siteWork.overload} {over.toLocaleString('fi-FI')} kg · {t.siteWork.limit} {tonnes(limitKg)} {t.siteWork.tonnes}
               </p>
             )}
-            <button type="button" className={cn(BUTTON, 'bg-accent text-white')} disabled={busy} onClick={saveLoad}>
-              {t.siteWork.saveLoad}
+            <WeighTicketWarnings
+              warnings={warnings}
+              onFix={(field, kg) => (field === 'gross' ? setGross(String(kg)) : setTare(String(kg)))}
+            />
+            <button
+              type="button"
+              className={cn(BUTTON, warnings.length > 0 ? 'bg-ink text-surface' : 'bg-accent text-white')}
+              disabled={busy || photoState === 'reading'}
+              onClick={saveLoad}
+            >
+              {warnings.length > 0 ? t.weighTicket.confirmAnyway : t.siteWork.saveLoad}
             </button>
           </div>
           )}
