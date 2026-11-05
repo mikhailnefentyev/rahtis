@@ -374,9 +374,9 @@ export type Database = {
       }
       carrier_invoices: {
         Row: {
-          currency: string
           company_id: string
           created_at: string
+          currency: string
           customer: Json
           due_on: string
           file_path: string | null
@@ -397,9 +397,9 @@ export type Database = {
           vat_cents: number
         }
         Insert: {
-          currency?: string
           company_id: string
           created_at?: string
+          currency: string
           customer: Json
           due_on: string
           file_path?: string | null
@@ -420,9 +420,9 @@ export type Database = {
           vat_cents: number
         }
         Update: {
-          currency?: string
           company_id?: string
           created_at?: string
+          currency?: string
           customer?: Json
           due_on?: string
           file_path?: string | null
@@ -759,7 +759,6 @@ export type Database = {
       }
       companies: {
         Row: {
-          currency: string
           activated_at: string | null
           approved_at: string | null
           bic: string | null
@@ -774,6 +773,7 @@ export type Database = {
           contact_email: string
           country: string
           created_at: string
+          currency: string
           einvoice_operator: string | null
           einvoice_ovt: string | null
           freeze_reason: string | null
@@ -804,7 +804,6 @@ export type Database = {
           waste_registrations: Json
         }
         Insert: {
-          currency?: string
           activated_at?: string | null
           approved_at?: string | null
           bic?: string | null
@@ -819,6 +818,7 @@ export type Database = {
           contact_email: string
           country?: string
           created_at?: string
+          currency?: string
           einvoice_operator?: string | null
           einvoice_ovt?: string | null
           freeze_reason?: string | null
@@ -849,7 +849,6 @@ export type Database = {
           waste_registrations?: Json
         }
         Update: {
-          currency?: string
           activated_at?: string | null
           approved_at?: string | null
           bic?: string | null
@@ -864,6 +863,7 @@ export type Database = {
           contact_email?: string
           country?: string
           created_at?: string
+          currency?: string
           einvoice_operator?: string | null
           einvoice_ovt?: string | null
           freeze_reason?: string | null
@@ -1298,9 +1298,9 @@ export type Database = {
       }
       driver_pay_profiles: {
         Row: {
-          currency: string
           created_at: string
           created_by: string | null
+          currency: string
           driver_id: string
           hourly_cents: number | null
           id: string
@@ -1313,9 +1313,9 @@ export type Database = {
           valid_from: string
         }
         Insert: {
-          currency?: string
           created_at?: string
           created_by?: string | null
+          currency: string
           driver_id: string
           hourly_cents?: number | null
           id?: string
@@ -1328,9 +1328,9 @@ export type Database = {
           valid_from: string
         }
         Update: {
-          currency?: string
           created_at?: string
           created_by?: string | null
+          currency?: string
           driver_id?: string
           hourly_cents?: number | null
           id?: string
@@ -1715,27 +1715,6 @@ export type Database = {
           },
         ]
       }
-      fx_rates: {
-        Row: {
-          currency: string
-          day: string
-          fetched_at: string
-          per_eur: number
-        }
-        Insert: {
-          currency: string
-          day: string
-          fetched_at?: string
-          per_eur: number
-        }
-        Update: {
-          currency?: string
-          day?: string
-          fetched_at?: string
-          per_eur?: number
-        }
-        Relationships: []
-      }
       fuel_cards: {
         Row: {
           card_ref: string
@@ -1774,11 +1753,11 @@ export type Database = {
       }
       fuel_entries: {
         Row: {
-          currency: string
           amount_cents: number | null
           card_ref: string | null
           company_id: string
           created_at: string
+          currency: string
           driver_id: string | null
           event_id: string | null
           filled_at: string
@@ -1800,11 +1779,11 @@ export type Database = {
           vehicle_id: string
         }
         Insert: {
-          currency?: string
           amount_cents?: number | null
           card_ref?: string | null
           company_id: string
           created_at?: string
+          currency: string
           driver_id?: string | null
           event_id?: string | null
           filled_at: string
@@ -1826,11 +1805,11 @@ export type Database = {
           vehicle_id: string
         }
         Update: {
-          currency?: string
           amount_cents?: number | null
           card_ref?: string | null
           company_id?: string
           created_at?: string
+          currency?: string
           driver_id?: string | null
           event_id?: string | null
           filled_at?: string
@@ -1937,6 +1916,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      fx_rates: {
+        Row: {
+          currency: string
+          day: string
+          fetched_at: string
+          per_eur: number
+        }
+        Insert: {
+          currency: string
+          day: string
+          fetched_at?: string
+          per_eur: number
+        }
+        Update: {
+          currency?: string
+          day?: string
+          fetched_at?: string
+          per_eur?: number
+        }
+        Relationships: []
       }
       gps_connections: {
         Row: {
@@ -2214,7 +2214,29 @@ export type Database = {
           order_id?: string
           watch_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "lane_watch_hits_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lane_watch_hits_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lane_watch_hits_watch_id_fkey"
+            columns: ["watch_id"]
+            isOneToOne: false
+            referencedRelation: "lane_watches"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       lane_watches: {
         Row: {
@@ -2274,7 +2296,15 @@ export type Database = {
           to_lon?: number | null
           to_radius_km?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "lane_watches_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       legal_acceptances: {
         Row: {
@@ -3256,7 +3286,6 @@ export type Database = {
       }
       orders: {
         Row: {
-          currency: string
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -3270,6 +3299,7 @@ export type Database = {
           contract_party: Database["public"]["Enums"]["contract_party"]
           created_at: string
           created_by: string | null
+          currency: string
           deadline_at: string | null
           desk_contract: Database["public"]["Enums"]["contract_party"]
           dispatch_mode: Database["public"]["Enums"]["dispatch_mode"]
@@ -3317,7 +3347,6 @@ export type Database = {
           waiting_cents: number
         }
         Insert: {
-          currency?: string
           assigned_company_id?: string | null
           assigned_driver_id?: string | null
           assigned_trailer_id?: string | null
@@ -3331,6 +3360,7 @@ export type Database = {
           contract_party?: Database["public"]["Enums"]["contract_party"]
           created_at?: string
           created_by?: string | null
+          currency?: string
           deadline_at?: string | null
           desk_contract?: Database["public"]["Enums"]["contract_party"]
           dispatch_mode?: Database["public"]["Enums"]["dispatch_mode"]
@@ -3378,7 +3408,6 @@ export type Database = {
           waiting_cents?: number
         }
         Update: {
-          currency?: string
           assigned_company_id?: string | null
           assigned_driver_id?: string | null
           assigned_trailer_id?: string | null
@@ -3392,6 +3421,7 @@ export type Database = {
           contract_party?: Database["public"]["Enums"]["contract_party"]
           created_at?: string
           created_by?: string | null
+          currency?: string
           deadline_at?: string | null
           desk_contract?: Database["public"]["Enums"]["contract_party"]
           dispatch_mode?: Database["public"]["Enums"]["dispatch_mode"]
@@ -3900,12 +3930,12 @@ export type Database = {
       }
       site_jobs: {
         Row: {
-          currency: string
           address: string | null
           buffer_minutes: number
           company_id: string
           country: string
           created_at: string
+          currency: string
           customer_business_id: string | null
           customer_city: string | null
           customer_country: string
@@ -3930,12 +3960,12 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          currency?: string
           address?: string | null
           buffer_minutes?: number
           company_id: string
           country?: string
           created_at?: string
+          currency: string
           customer_business_id?: string | null
           customer_city?: string | null
           customer_country?: string
@@ -3960,12 +3990,12 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          currency?: string
           address?: string | null
           buffer_minutes?: number
           company_id?: string
           country?: string
           created_at?: string
+          currency?: string
           customer_business_id?: string | null
           customer_city?: string | null
           customer_country?: string
@@ -4139,12 +4169,12 @@ export type Database = {
       }
       tes_rule_sets: {
         Row: {
-          currency: string
           base_hourly_cents: number
           based_on: string | null
           company_id: string | null
           created_at: string
           created_by: string | null
+          currency: string
           daily_regular_minutes: number
           evening_bps: number
           evening_cents: number
@@ -4171,12 +4201,12 @@ export type Database = {
           valid_from: string
         }
         Insert: {
-          currency?: string
           base_hourly_cents: number
           based_on?: string | null
           company_id?: string | null
           created_at?: string
           created_by?: string | null
+          currency: string
           daily_regular_minutes?: number
           evening_bps?: number
           evening_cents?: number
@@ -4203,12 +4233,12 @@ export type Database = {
           valid_from: string
         }
         Update: {
-          currency?: string
           base_hourly_cents?: number
           based_on?: string | null
           company_id?: string | null
           created_at?: string
           created_by?: string | null
+          currency?: string
           daily_regular_minutes?: number
           evening_bps?: number
           evening_cents?: number
@@ -4548,12 +4578,12 @@ export type Database = {
       }
       vehicle_costs: {
         Row: {
-          currency: string
           amount_cents: number
           category: string
           company_id: string
           created_at: string
           created_by: string | null
+          currency: string
           id: string
           note: string | null
           spent_on: string
@@ -4561,12 +4591,12 @@ export type Database = {
           vehicle_id: string
         }
         Insert: {
-          currency?: string
           amount_cents: number
           category: string
           company_id: string
           created_at?: string
           created_by?: string | null
+          currency: string
           id?: string
           note?: string | null
           spent_on: string
@@ -4574,12 +4604,12 @@ export type Database = {
           vehicle_id: string
         }
         Update: {
-          currency?: string
           amount_cents?: number
           category?: string
           company_id?: string
           created_at?: string
           created_by?: string | null
+          currency?: string
           id?: string
           note?: string | null
           spent_on?: string
@@ -4685,8 +4715,8 @@ export type Database = {
       }
       vehicle_finance: {
         Row: {
-          currency: string
           company_id: string
+          currency: string
           financing: string
           insurance_cents_year: number | null
           kasko_cents_year: number | null
@@ -4703,8 +4733,8 @@ export type Database = {
           vehicle_id: string
         }
         Insert: {
-          currency?: string
           company_id: string
+          currency: string
           financing?: string
           insurance_cents_year?: number | null
           kasko_cents_year?: number | null
@@ -4721,8 +4751,8 @@ export type Database = {
           vehicle_id: string
         }
         Update: {
-          currency?: string
           company_id?: string
+          currency?: string
           financing?: string
           insurance_cents_year?: number | null
           kasko_cents_year?: number | null
@@ -4895,10 +4925,10 @@ export type Database = {
           created_at: string
           file_name: string
           id: string
-          reviewed_at: string | null
           issued_on: string
           items: string[]
           mime_type: string
+          reviewed_at: string | null
           size_bytes: number
           source: string
           storage_path: string
@@ -4910,10 +4940,10 @@ export type Database = {
           created_at?: string
           file_name: string
           id?: string
-          reviewed_at?: string | null
           issued_on: string
           items: string[]
           mime_type: string
+          reviewed_at?: string | null
           size_bytes: number
           source?: string
           storage_path: string
@@ -4925,10 +4955,10 @@ export type Database = {
           created_at?: string
           file_name?: string
           id?: string
-          reviewed_at?: string | null
           issued_on?: string
           items?: string[]
           mime_type?: string
+          reviewed_at?: string | null
           size_bytes?: number
           source?: string
           storage_path?: string
@@ -5250,7 +5280,6 @@ export type Database = {
       abandon_order: {
         Args: { p_order_id: string; p_reason?: string }
         Returns: {
-          currency: string
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -5264,6 +5293,7 @@ export type Database = {
           contract_party: Database["public"]["Enums"]["contract_party"]
           created_at: string
           created_by: string | null
+          currency: string
           deadline_at: string | null
           desk_contract: Database["public"]["Enums"]["contract_party"]
           dispatch_mode: Database["public"]["Enums"]["dispatch_mode"]
@@ -5336,6 +5366,7 @@ export type Database = {
           contact_email: string
           country: string
           created_at: string
+          currency: string
           einvoice_operator: string | null
           einvoice_ovt: string | null
           freeze_reason: string | null
@@ -5876,7 +5907,6 @@ export type Database = {
       cancel_order: {
         Args: { p_order_id: string }
         Returns: {
-          currency: string
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -5890,6 +5920,7 @@ export type Database = {
           contract_party: Database["public"]["Enums"]["contract_party"]
           created_at: string
           created_by: string | null
+          currency: string
           deadline_at: string | null
           desk_contract: Database["public"]["Enums"]["contract_party"]
           dispatch_mode: Database["public"]["Enums"]["dispatch_mode"]
@@ -5967,7 +5998,6 @@ export type Database = {
           p_vehicle_id: string
         }
         Returns: {
-          currency: string
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -5981,6 +6011,7 @@ export type Database = {
           contract_party: Database["public"]["Enums"]["contract_party"]
           created_at: string
           created_by: string | null
+          currency: string
           deadline_at: string | null
           desk_contract: Database["public"]["Enums"]["contract_party"]
           dispatch_mode: Database["public"]["Enums"]["dispatch_mode"]
@@ -6134,7 +6165,6 @@ export type Database = {
       carrier_set_trip_trailer: {
         Args: { p_order_id: string; p_trailer_id: string }
         Returns: {
-          currency: string
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -6148,6 +6178,7 @@ export type Database = {
           contract_party: Database["public"]["Enums"]["contract_party"]
           created_at: string
           created_by: string | null
+          currency: string
           deadline_at: string | null
           desk_contract: Database["public"]["Enums"]["contract_party"]
           dispatch_mode: Database["public"]["Enums"]["dispatch_mode"]
@@ -6234,7 +6265,6 @@ export type Database = {
       choose_offer: {
         Args: { p_offer_id: string }
         Returns: {
-          currency: string
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -6248,6 +6278,7 @@ export type Database = {
           contract_party: Database["public"]["Enums"]["contract_party"]
           created_at: string
           created_by: string | null
+          currency: string
           deadline_at: string | null
           desk_contract: Database["public"]["Enums"]["contract_party"]
           dispatch_mode: Database["public"]["Enums"]["dispatch_mode"]
@@ -6310,7 +6341,6 @@ export type Database = {
       close_order: {
         Args: { p_order_id: string }
         Returns: {
-          currency: string
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -6324,6 +6354,7 @@ export type Database = {
           contract_party: Database["public"]["Enums"]["contract_party"]
           created_at: string
           created_by: string | null
+          currency: string
           deadline_at: string | null
           desk_contract: Database["public"]["Enums"]["contract_party"]
           dispatch_mode: Database["public"]["Enums"]["dispatch_mode"]
@@ -6404,6 +6435,7 @@ export type Database = {
           license_valid_until: string
         }[]
       }
+      company_verified: { Args: { p_company_id: string }; Returns: boolean }
       complete_stop: {
         Args: {
           p_accuracy_m?: number
@@ -6462,7 +6494,6 @@ export type Database = {
       completed_orders: {
         Args: { p_from?: string; p_to?: string }
         Returns: {
-          currency: string
           can_rate: boolean
           carrier_name: string
           closed_at: string
@@ -6470,6 +6501,7 @@ export type Database = {
           commission_cents: number
           container_feet: number
           contract_party: Database["public"]["Enums"]["contract_party"]
+          currency: string
           distance_km: number
           documents: Json
           haul_kind: Database["public"]["Enums"]["haul_kind"]
@@ -6494,7 +6526,6 @@ export type Database = {
       confirm_order: {
         Args: { p_order_id: string }
         Returns: {
-          currency: string
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -6508,6 +6539,7 @@ export type Database = {
           contract_party: Database["public"]["Enums"]["contract_party"]
           created_at: string
           created_by: string | null
+          currency: string
           deadline_at: string | null
           desk_contract: Database["public"]["Enums"]["contract_party"]
           dispatch_mode: Database["public"]["Enums"]["dispatch_mode"]
@@ -6572,7 +6604,6 @@ export type Database = {
       create_order: {
         Args: { p_order: Json; p_publish?: boolean; p_stops: Json }
         Returns: {
-          currency: string
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -6586,6 +6617,7 @@ export type Database = {
           contract_party: Database["public"]["Enums"]["contract_party"]
           created_at: string
           created_by: string | null
+          currency: string
           deadline_at: string | null
           desk_contract: Database["public"]["Enums"]["contract_party"]
           dispatch_mode: Database["public"]["Enums"]["dispatch_mode"]
@@ -6741,7 +6773,6 @@ export type Database = {
       direct_assign_order: {
         Args: { p_order_id: string; p_vehicle_id: string }
         Returns: {
-          currency: string
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -6755,6 +6786,7 @@ export type Database = {
           contract_party: Database["public"]["Enums"]["contract_party"]
           created_at: string
           created_by: string | null
+          currency: string
           deadline_at: string | null
           desk_contract: Database["public"]["Enums"]["contract_party"]
           dispatch_mode: Database["public"]["Enums"]["dispatch_mode"]
@@ -7035,6 +7067,7 @@ export type Database = {
           contact_email: string
           country: string
           created_at: string
+          currency: string
           einvoice_operator: string | null
           einvoice_ovt: string | null
           freeze_reason: string | null
@@ -7093,10 +7126,13 @@ export type Database = {
         Returns: undefined
       }
       gps_connection_token: { Args: { p_id: string }; Returns: string }
+      grant_verification: {
+        Args: { p_company_id: string; p_note?: string; p_seen_at: string }
+        Returns: undefined
+      }
       group_take_order: {
         Args: { p_order_id: string; p_vehicle_id: string }
         Returns: {
-          currency: string
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -7110,6 +7146,7 @@ export type Database = {
           contract_party: Database["public"]["Enums"]["contract_party"]
           created_at: string
           created_by: string | null
+          currency: string
           deadline_at: string | null
           desk_contract: Database["public"]["Enums"]["contract_party"]
           dispatch_mode: Database["public"]["Enums"]["dispatch_mode"]
@@ -7213,8 +7250,8 @@ export type Database = {
           company_id: string
           company_name: string
           contact_email: string
-          language: string
           lane: string
+          language: string
         }[]
       }
       legal_clause: {
@@ -7256,6 +7293,7 @@ export type Database = {
           contact_email: string
           country: string
           created_at: string
+          currency: string
           einvoice_operator: string | null
           einvoice_ovt: string | null
           freeze_reason: string | null
@@ -7491,7 +7529,6 @@ export type Database = {
       period_report: {
         Args: { p_company?: string; p_from: string; p_to: string }
         Returns: {
-          currency: string
           carrier_country: string
           carrier_id: string
           carrier_name: string
@@ -7503,6 +7540,7 @@ export type Database = {
           commission_cents: number
           container_feet: number
           contract_party: Database["public"]["Enums"]["contract_party"]
+          currency: string
           distance_km: number
           documents_count: number
           haul_kind: Database["public"]["Enums"]["haul_kind"]
@@ -7617,7 +7655,6 @@ export type Database = {
           p_rate_cents: number
         }
         Returns: {
-          currency: string
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -7631,6 +7668,7 @@ export type Database = {
           contract_party: Database["public"]["Enums"]["contract_party"]
           created_at: string
           created_by: string | null
+          currency: string
           deadline_at: string | null
           desk_contract: Database["public"]["Enums"]["contract_party"]
           dispatch_mode: Database["public"]["Enums"]["dispatch_mode"]
@@ -7700,6 +7738,10 @@ export type Database = {
           storage_path: string
         }[]
       }
+      revoke_verification: {
+        Args: { p_company_id: string; p_note?: string }
+        Returns: undefined
+      }
       role_privileges: {
         Args: { p_role: string }
         Returns: {
@@ -7716,7 +7758,6 @@ export type Database = {
           p_order_id: string
         }
         Returns: {
-          currency: string
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -7730,6 +7771,7 @@ export type Database = {
           contract_party: Database["public"]["Enums"]["contract_party"]
           created_at: string
           created_by: string | null
+          currency: string
           deadline_at: string | null
           desk_contract: Database["public"]["Enums"]["contract_party"]
           dispatch_mode: Database["public"]["Enums"]["dispatch_mode"]
@@ -7950,7 +7992,6 @@ export type Database = {
       store_route: {
         Args: { p_order_id: string; p_route: Json }
         Returns: {
-          currency: string
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -7964,6 +8005,7 @@ export type Database = {
           contract_party: Database["public"]["Enums"]["contract_party"]
           created_at: string
           created_by: string | null
+          currency: string
           deadline_at: string | null
           desk_contract: Database["public"]["Enums"]["contract_party"]
           dispatch_mode: Database["public"]["Enums"]["dispatch_mode"]
@@ -8096,7 +8138,6 @@ export type Database = {
       take_order: {
         Args: { p_order_id: string; p_vehicle_id: string }
         Returns: {
-          currency: string
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -8110,6 +8151,7 @@ export type Database = {
           contract_party: Database["public"]["Enums"]["contract_party"]
           created_at: string
           created_by: string | null
+          currency: string
           deadline_at: string | null
           desk_contract: Database["public"]["Enums"]["contract_party"]
           dispatch_mode: Database["public"]["Enums"]["dispatch_mode"]
@@ -8166,7 +8208,6 @@ export type Database = {
       take_order_combo: {
         Args: { p_combo_id: string; p_order_id: string }
         Returns: {
-          currency: string
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -8180,6 +8221,7 @@ export type Database = {
           contract_party: Database["public"]["Enums"]["contract_party"]
           created_at: string
           created_by: string | null
+          currency: string
           deadline_at: string | null
           desk_contract: Database["public"]["Enums"]["contract_party"]
           dispatch_mode: Database["public"]["Enums"]["dispatch_mode"]
@@ -8305,6 +8347,7 @@ export type Database = {
           contact_email: string
           country: string
           created_at: string
+          currency: string
           einvoice_operator: string | null
           einvoice_ovt: string | null
           freeze_reason: string | null
@@ -8372,19 +8415,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      company_verified: { Args: { p_company_id: string }; Returns: boolean }
-      grant_verification: {
-        Args: { p_company_id: string; p_seen_at: string; p_note?: string }
-        Returns: undefined
-      }
-      revoke_verification: {
-        Args: { p_company_id: string; p_note?: string }
-        Returns: undefined
-      }
       verification_badges_for_known: {
         Args: never
         Returns: {
-          carrier_id: string | null
+          carrier_id: string
           vehicle_id: string
           verified: boolean
         }[]
@@ -8437,7 +8471,6 @@ export type Database = {
       withdraw_order: {
         Args: { p_order_id: string; p_reason?: string }
         Returns: {
-          currency: string
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -8451,6 +8484,7 @@ export type Database = {
           contract_party: Database["public"]["Enums"]["contract_party"]
           created_at: string
           created_by: string | null
+          currency: string
           deadline_at: string | null
           desk_contract: Database["public"]["Enums"]["contract_party"]
           dispatch_mode: Database["public"]["Enums"]["dispatch_mode"]

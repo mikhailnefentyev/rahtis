@@ -1,5 +1,6 @@
 'use server';
 
+import { asCurrency } from '@/lib/money/currency';
 import { revalidatePath } from 'next/cache';
 import { requireRole } from '@/lib/auth/guard';
 import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
@@ -97,7 +98,7 @@ export async function saveSiteJobAction(_previous: SiteJobState, formData: FormD
   const id = text(formData, 'id');
   const { data, error } = id
     ? await supabase.from('site_jobs').update(values).eq('id', id).select('id').single()
-    : await supabase.from('site_jobs').insert({ ...values, company_id: company.id }).select('id').single();
+    : await supabase.from('site_jobs').insert({ ...values, company_id: company.id, currency: asCurrency(company.currency) }).select('id').single();
 
   if (error || !data) return { error: t.error.generic, done: false };
 

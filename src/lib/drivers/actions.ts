@@ -1,5 +1,6 @@
 'use server';
 
+import { asCurrency } from '@/lib/money/currency';
 import { revalidatePath } from 'next/cache';
 import { requireRole } from '@/lib/auth/guard';
 import { operationsLocalToIso } from '@/lib/dates';
@@ -171,7 +172,7 @@ export async function savePayProfileAction(
 ): Promise<FormState> {
   const locale = toLocale(formData.get('locale'));
   const t = await getDictionary(locale);
-  await requireCarrier(locale);
+  const viewer = await requireCarrier(locale);
 
   const model = str(formData, 'model') as PayModel;
   const driverId = str(formData, 'driver_id');
@@ -214,7 +215,12 @@ export async function savePayProfileAction(
   if (!filled) return { error: t.validation.positiveNumber, done: false };
 
   const supabase = await createClient();
-  const { error } = await supabase.from('driver_pay_profiles').insert(row);
+  /* Валюта ставки: у TES — валюта набора (копия финского шаблона — евро), иначе — валюта компании. */
+  const { data: tesSet } = row.tes_rule_set_id
+    ? await supabase.from('tes_rule_sets').select('currency').eq('id', row.tes_rule_set_id).maybeSingle()
+    : { data: null };
+  const currency = asCurrency(tesSet?.currency ?? viewer.company?.currency);
+  const { error } = await supabase.from('driver_pay_profiles').insert({ ...row, currency });
 
   if (error) {
     return {
@@ -399,7 +405,8 @@ export async function saveTesAction(_previous: FormState, formData: FormData): P
     ? await supabase.from('tes_rule_sets').update(row).eq('id', id)
     : await supabase
         .from('tes_rule_sets')
-        .insert({ ...row, company_id: viewer.company!.id, created_by: viewer.userId });
+        /* Свой набор с нуля — в валюте компании; копия шаблона идёт через copyTesTemplateAction. */
+        .insert({ ...row, company_id: viewer.company!.id, created_by: viewer.userId, currency: asCurrency(viewer.company!.currency) });
 
   if (error) {
     return { error: error.code === '23514' ? t.validation.positiveNumber : t.error.generic, done: false };
