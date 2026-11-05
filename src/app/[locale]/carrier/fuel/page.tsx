@@ -77,7 +77,7 @@ export default async function FuelPage({
   const current = currentFuelMonth();
   const month = parseFuelMonth(query.month);
   const [{ months, rows, stats, vehicles, drivers }, { data: imports }] = await Promise.all([
-    loadFuelMonth(supabase, company.id, month),
+    loadFuelMonth(supabase, company.id, month, f.currency),
     supabase
       .from('fuel_imports')
       .select('id, file_name, status, supplier, created_at, inserted, merged')
@@ -150,11 +150,11 @@ export default async function FuelPage({
 
       <StatRow>
         <Stat label={s.statLitres} value={thisMonth ? f.number(Math.round(thisMonth.liquidL)) : '—'} hint={thisMonth?.gasKg ? `${s.statGas}: ${f.number(Math.round(thisMonth.gasKg))}` : undefined} />
-        <Stat label={s.statAmount} value={thisMonth ? f.eur(thisMonth.amountCents) : '—'} />
+        <Stat label={s.statAmount} value={thisMonth ? f.money(thisMonth.amountCents) : '—'} />
         <Stat label={s.statL100} value={thisMonth?.l100 != null ? f.decimal(thisMonth.l100) : '—'} hint={thisMonth?.kg100 != null ? `${f.decimal(thisMonth.kg100)} kg/100 km` : 'l/100 km'} />
         <Stat
           label={s.statCentsKm}
-          value={thisMonth?.centsPerKm != null ? f.eur(Math.round(thisMonth.centsPerKm)) : '—'}
+          value={thisMonth?.centsPerKm != null ? f.money(Math.round(thisMonth.centsPerKm)) : '—'}
           hint={thisMonth?.adbluePct != null ? `AdBlue ${f.decimal(thisMonth.adbluePct)} %` : undefined}
         />
       </StatRow>
@@ -180,7 +180,7 @@ export default async function FuelPage({
                 points={months.map((m, i) => ({
                   value: fleetSpend[i],
                   label: label(m),
-                  title: `${label(m)}: ${f.eur(fleetSpend[i])}`,
+                  title: `${label(m)}: ${f.money(fleetSpend[i])}`,
                 }))}
               />
             </CardBody>
@@ -219,7 +219,7 @@ export default async function FuelPage({
                 <Th numeric>{s.colAmount}</Th>
                 <Th numeric>km</Th>
                 <Th numeric>l/100 km</Th>
-                <Th numeric>{s.colPerKm}</Th>
+                <Th numeric>{f.label(s.colPerKm)}</Th>
               </tr>
             </thead>
             <tbody>
@@ -229,10 +229,10 @@ export default async function FuelPage({
                   <Td numeric>{stat.liquidL ? f.decimal(stat.liquidL) : '—'}</Td>
                   <Td numeric>{stat.adblueL ? f.decimal(stat.adblueL) : '—'}</Td>
                   <Td numeric>{stat.gasKg ? f.decimal(stat.gasKg) : '—'}</Td>
-                  <Td numeric>{stat.amountCents ? f.eur(stat.amountCents) : '—'}</Td>
+                  <Td numeric>{stat.amountCents ? f.money(stat.amountCents) : '—'}</Td>
                   <Td numeric>{stat.km ? f.number(stat.km) : '—'}</Td>
                   <Td numeric>{stat.l100 != null ? f.decimal(stat.l100) : stat.kg100 != null ? `${f.decimal(stat.kg100)} kg` : '—'}</Td>
-                  <Td numeric>{stat.centsPerKm != null ? f.eur(Math.round(stat.centsPerKm)) : '—'}</Td>
+                  <Td numeric>{stat.centsPerKm != null ? f.money(Math.round(stat.centsPerKm)) : '—'}</Td>
                 </Tr>
               ))}
             </tbody>
@@ -312,7 +312,16 @@ export default async function FuelPage({
                       {f.decimal(row.quantity)} {row.unit}
                       <SourceCell row={row} unit={row.unit ?? 'l'} labels={s.sourceLine} manual={s.source.MANUAL} diff={s.sourcesDiff} f={f} />
                     </Td>
-                    <Td numeric>{row.amount_cents != null ? f.eur(row.amount_cents) : '—'}</Td>
+                    <Td numeric>
+                      {row.amount_cents != null ? f.money(row.amount_cents, row.currency) : '—'}
+                      {/* Чек в чужой валюте — код («kr» бывает трёх стран) и пересчёт в валюту компании по курсу дня заправки. */}
+                      {row.amount_cents != null && row.currency !== f.currency && (
+                        <span className="block text-[11px] text-ink-dim">
+                          {row.currency}
+                          {row.own_amount_cents != null && ` · ≈ ${f.money(Math.round(row.own_amount_cents / 100) * 100)}`}
+                        </span>
+                      )}
+                    </Td>
                     <Td numeric>
                       {row.odometer_km != null ? f.number(row.odometer_km) : '—'}
                       {flag && (

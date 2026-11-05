@@ -125,12 +125,12 @@ export function OrderCard({
                   <p className="mt-1.5 text-[13px] text-ink-muted">
                     {order.trailer ? `${order.trailer} · ` : ''}
                     {m('order.distance', { km: order.distance_km ?? 0 })} ·{' '}
-                    <span className="font-semibold text-ink">{f.eur(order.rate_cents ?? 0)}</span>{' '}
+                    <span className="font-semibold text-ink">{f.money(order.rate_cents ?? 0, order.currency)}</span>{' '}
                     <span className="text-ink-dim">{t.money.addVat}</span>{' '}
                     {order.distance_km && order.rate_cents ? (
                       <span className="text-ink-dim">
                         · {m('order.ratePerKm', {
-                          rate: f.eurPerKm(order.rate_cents, order.distance_km) ?? '',
+                          rate: f.moneyPerKm(order.rate_cents, order.distance_km, order.currency) ?? '',
                         })}
                       </span>
                     ) : null}
@@ -268,6 +268,7 @@ export function OrderCard({
                     amendments={amendmentsByOrder[order.id] ?? []}
                     orderId={order.id}
                     haulKind={order.haul_kind}
+                    currency={order.currency}
                     className="mt-4"
                   />
                 </>
@@ -290,6 +291,7 @@ export function OrderCard({
                   orderId={order.id}
                   distanceKm={order.distance_km}
                   rateCents={order.rate_cents}
+                  currency={order.currency}
                   autoKm={order.distance_auto_km}
                   started={stops.some((stop) => stop.completed_at)}
                   className="mt-4 border-t border-line pt-4"

@@ -1,9 +1,10 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useState } from 'react';
 import { Button, Card, CardBody, Field, Input, Select } from '@/components/ui';
 import { addVehicleCostAction, type CostState } from '@/lib/economics/actions';
 import { useI18n } from '@/lib/i18n/provider';
+import { CURRENCIES, type Currency } from '@/lib/money/currency';
 
 const initial: CostState = { error: null, done: false };
 
@@ -11,6 +12,7 @@ const initial: CostState = { error: null, done: false };
  * Записать покупку: деталь, работу или шины — в журнал расходов машины,
  * откуда она сразу попадает в доходность (Kannattavuus). Поставщик — из
  * найденных или свой, в пометке — что искали (номер детали, размер шины).
+ * Сумма — в валюте чека (по умолчанию — компании).
  */
 export function PurchaseForm({
   vehicles,
@@ -27,9 +29,10 @@ export function PurchaseForm({
   tyres: boolean;
   today: string;
 }) {
-  const { t, locale } = useI18n();
+  const { t, f, locale } = useI18n();
   const s = t.parts;
   const e = t.economics;
+  const [currency, setCurrency] = useState<Currency>(f.currency);
   const [state, action, pending] = useActionState(addVehicleCostAction, initial);
 
   return (
@@ -69,7 +72,7 @@ export function PurchaseForm({
               )}
             </Field>
           </div>
-          <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_9rem_minmax(0,1fr)]">
+          <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_15rem_minmax(0,1fr)]">
             <Field label={s.supplier}>
               {(p) => <Input {...p} name="supplier" list="parts-suppliers" maxLength={120} defaultValue={suppliers[0] ?? ''} />}
             </Field>
@@ -78,9 +81,24 @@ export function PurchaseForm({
                 <option key={name} value={name} />
               ))}
             </datalist>
-            <Field label={e.amount} required>
-              {(p) => <Input {...p} name="amount" inputMode="decimal" required placeholder="0" />}
-            </Field>
+            <div className="flex items-end gap-2">
+              <Field label={f.label(e.amount, currency)} required className="flex-1">
+                {(p) => <Input {...p} name="amount" inputMode="decimal" required placeholder="0" />}
+              </Field>
+              <Select
+                name="currency"
+                value={currency}
+                onChange={(ev) => setCurrency(ev.target.value as Currency)}
+                aria-label={t.orderForm.currency}
+                className="w-24 font-mono"
+              >
+                {CURRENCIES.map((code) => (
+                  <option key={code} value={code}>
+                    {code}
+                  </option>
+                ))}
+              </Select>
+            </div>
             <Field label={e.note}>{(p) => <Input {...p} name="note" maxLength={200} defaultValue={query} />}</Field>
           </div>
           {state.error && <p className="text-xs text-danger">{state.error}</p>}

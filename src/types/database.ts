@@ -374,6 +374,7 @@ export type Database = {
       }
       carrier_invoices: {
         Row: {
+          currency: string
           company_id: string
           created_at: string
           customer: Json
@@ -396,6 +397,7 @@ export type Database = {
           vat_cents: number
         }
         Insert: {
+          currency?: string
           company_id: string
           created_at?: string
           customer: Json
@@ -418,6 +420,7 @@ export type Database = {
           vat_cents: number
         }
         Update: {
+          currency?: string
           company_id?: string
           created_at?: string
           customer?: Json
@@ -756,6 +759,7 @@ export type Database = {
       }
       companies: {
         Row: {
+          currency: string
           activated_at: string | null
           approved_at: string | null
           bic: string | null
@@ -800,6 +804,7 @@ export type Database = {
           waste_registrations: Json
         }
         Insert: {
+          currency?: string
           activated_at?: string | null
           approved_at?: string | null
           bic?: string | null
@@ -844,6 +849,7 @@ export type Database = {
           waste_registrations?: Json
         }
         Update: {
+          currency?: string
           activated_at?: string | null
           approved_at?: string | null
           bic?: string | null
@@ -1292,6 +1298,7 @@ export type Database = {
       }
       driver_pay_profiles: {
         Row: {
+          currency: string
           created_at: string
           created_by: string | null
           driver_id: string
@@ -1306,6 +1313,7 @@ export type Database = {
           valid_from: string
         }
         Insert: {
+          currency?: string
           created_at?: string
           created_by?: string | null
           driver_id: string
@@ -1320,6 +1328,7 @@ export type Database = {
           valid_from: string
         }
         Update: {
+          currency?: string
           created_at?: string
           created_by?: string | null
           driver_id?: string
@@ -1706,6 +1715,27 @@ export type Database = {
           },
         ]
       }
+      fx_rates: {
+        Row: {
+          currency: string
+          day: string
+          fetched_at: string
+          per_eur: number
+        }
+        Insert: {
+          currency: string
+          day: string
+          fetched_at?: string
+          per_eur: number
+        }
+        Update: {
+          currency?: string
+          day?: string
+          fetched_at?: string
+          per_eur?: number
+        }
+        Relationships: []
+      }
       fuel_cards: {
         Row: {
           card_ref: string
@@ -1744,6 +1774,7 @@ export type Database = {
       }
       fuel_entries: {
         Row: {
+          currency: string
           amount_cents: number | null
           card_ref: string | null
           company_id: string
@@ -1769,6 +1800,7 @@ export type Database = {
           vehicle_id: string
         }
         Insert: {
+          currency?: string
           amount_cents?: number | null
           card_ref?: string | null
           company_id: string
@@ -1794,6 +1826,7 @@ export type Database = {
           vehicle_id: string
         }
         Update: {
+          currency?: string
           amount_cents?: number | null
           card_ref?: string | null
           company_id?: string
@@ -3223,6 +3256,7 @@ export type Database = {
       }
       orders: {
         Row: {
+          currency: string
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -3283,6 +3317,7 @@ export type Database = {
           waiting_cents: number
         }
         Insert: {
+          currency?: string
           assigned_company_id?: string | null
           assigned_driver_id?: string | null
           assigned_trailer_id?: string | null
@@ -3343,6 +3378,7 @@ export type Database = {
           waiting_cents?: number
         }
         Update: {
+          currency?: string
           assigned_company_id?: string | null
           assigned_driver_id?: string | null
           assigned_trailer_id?: string | null
@@ -3864,6 +3900,7 @@ export type Database = {
       }
       site_jobs: {
         Row: {
+          currency: string
           address: string | null
           buffer_minutes: number
           company_id: string
@@ -3893,6 +3930,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          currency?: string
           address?: string | null
           buffer_minutes?: number
           company_id: string
@@ -3922,6 +3960,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          currency?: string
           address?: string | null
           buffer_minutes?: number
           company_id?: string
@@ -4100,6 +4139,7 @@ export type Database = {
       }
       tes_rule_sets: {
         Row: {
+          currency: string
           base_hourly_cents: number
           based_on: string | null
           company_id: string | null
@@ -4131,6 +4171,7 @@ export type Database = {
           valid_from: string
         }
         Insert: {
+          currency?: string
           base_hourly_cents: number
           based_on?: string | null
           company_id?: string | null
@@ -4162,6 +4203,7 @@ export type Database = {
           valid_from: string
         }
         Update: {
+          currency?: string
           base_hourly_cents?: number
           based_on?: string | null
           company_id?: string | null
@@ -4506,6 +4548,7 @@ export type Database = {
       }
       vehicle_costs: {
         Row: {
+          currency: string
           amount_cents: number
           category: string
           company_id: string
@@ -4518,6 +4561,7 @@ export type Database = {
           vehicle_id: string
         }
         Insert: {
+          currency?: string
           amount_cents: number
           category: string
           company_id: string
@@ -4530,6 +4574,7 @@ export type Database = {
           vehicle_id: string
         }
         Update: {
+          currency?: string
           amount_cents?: number
           category?: string
           company_id?: string
@@ -4640,6 +4685,7 @@ export type Database = {
       }
       vehicle_finance: {
         Row: {
+          currency: string
           company_id: string
           financing: string
           insurance_cents_year: number | null
@@ -4657,6 +4703,7 @@ export type Database = {
           vehicle_id: string
         }
         Insert: {
+          currency?: string
           company_id: string
           financing?: string
           insurance_cents_year?: number | null
@@ -4674,6 +4721,7 @@ export type Database = {
           vehicle_id: string
         }
         Update: {
+          currency?: string
           company_id?: string
           financing?: string
           insurance_cents_year?: number | null
@@ -5202,6 +5250,7 @@ export type Database = {
       abandon_order: {
         Args: { p_order_id: string; p_reason?: string }
         Returns: {
+          currency: string
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -5827,6 +5876,7 @@ export type Database = {
       cancel_order: {
         Args: { p_order_id: string }
         Returns: {
+          currency: string
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -5917,6 +5967,7 @@ export type Database = {
           p_vehicle_id: string
         }
         Returns: {
+          currency: string
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -6083,6 +6134,7 @@ export type Database = {
       carrier_set_trip_trailer: {
         Args: { p_order_id: string; p_trailer_id: string }
         Returns: {
+          currency: string
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -6182,6 +6234,7 @@ export type Database = {
       choose_offer: {
         Args: { p_offer_id: string }
         Returns: {
+          currency: string
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -6257,6 +6310,7 @@ export type Database = {
       close_order: {
         Args: { p_order_id: string }
         Returns: {
+          currency: string
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -6408,6 +6462,7 @@ export type Database = {
       completed_orders: {
         Args: { p_from?: string; p_to?: string }
         Returns: {
+          currency: string
           can_rate: boolean
           carrier_name: string
           closed_at: string
@@ -6439,6 +6494,7 @@ export type Database = {
       confirm_order: {
         Args: { p_order_id: string }
         Returns: {
+          currency: string
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -6516,6 +6572,7 @@ export type Database = {
       create_order: {
         Args: { p_order: Json; p_publish?: boolean; p_stops: Json }
         Returns: {
+          currency: string
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -6684,6 +6741,7 @@ export type Database = {
       direct_assign_order: {
         Args: { p_order_id: string; p_vehicle_id: string }
         Returns: {
+          currency: string
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -7038,6 +7096,7 @@ export type Database = {
       group_take_order: {
         Args: { p_order_id: string; p_vehicle_id: string }
         Returns: {
+          currency: string
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -7432,6 +7491,7 @@ export type Database = {
       period_report: {
         Args: { p_company?: string; p_from: string; p_to: string }
         Returns: {
+          currency: string
           carrier_country: string
           carrier_id: string
           carrier_name: string
@@ -7557,6 +7617,7 @@ export type Database = {
           p_rate_cents: number
         }
         Returns: {
+          currency: string
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -7655,6 +7716,7 @@ export type Database = {
           p_order_id: string
         }
         Returns: {
+          currency: string
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -7888,6 +7950,7 @@ export type Database = {
       store_route: {
         Args: { p_order_id: string; p_route: Json }
         Returns: {
+          currency: string
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -8033,6 +8096,7 @@ export type Database = {
       take_order: {
         Args: { p_order_id: string; p_vehicle_id: string }
         Returns: {
+          currency: string
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -8102,6 +8166,7 @@ export type Database = {
       take_order_combo: {
         Args: { p_combo_id: string; p_order_id: string }
         Returns: {
+          currency: string
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -8372,6 +8437,7 @@ export type Database = {
       withdraw_order: {
         Args: { p_order_id: string; p_reason?: string }
         Returns: {
+          currency: string
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null

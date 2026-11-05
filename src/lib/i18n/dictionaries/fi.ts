@@ -725,6 +725,7 @@ export const fi = {
     resultNoIban: 'Lisää yrityksesi tilinumero (IBAN) yrityksen tietoihin.',
     resultNoEmail: 'Lisää asiakkaan sähköposti kohteeseen.',
     resultNoAddress: 'Lisää asiakkaan laskutusosoite kohteeseen.',
+    resultPlatformOrder: 'Kohde tuli RAHTIS-tilauksesta, joten sen laskuttaa RAHTIS. Omaa laskua ei voi tehdä.',
     resultCreated: 'Lasku luotiin, mutta sähköposti ei lähtenyt. Lataa PDF ja lähetä se itse.',
     invoiced: 'Laskutettu',
     due: 'Eräpäivä',
@@ -1800,6 +1801,11 @@ export const fi = {
     requiredBody: 'Kori',
     anyBody: 'Mikä tahansa',
     feeHint: 'Palvelumaksu 5 % (vähintään 15 € keikalta yhdessä kuljetusliikkeen maksun kanssa). Suora sopimus kuukausimaksua käyttävän kuljetusliikkeen kanssa on maksuton.',
+    /* Валюта цены: не евро — только у прямого договора и своих рейсов. */
+    currency: 'Valuutta',
+    currencyEurOnly: 'RAHTIS-palvelun kautta kuljetus hinnoitellaan ja laskutetaan euroina. Muu valuutta onnistuu suoralla sopimuksella.',
+    currencyErrorDirect: 'Muu valuutta kuin euro vain suoralla sopimuksella kuljetusliikkeen kanssa. RAHTIS-palvelun kautta hinta on euroina.',
+    currencyErrorRahtis: 'Tämä kuljetusliike ajaa RAHTIS-palvelun kautta — kuljetuksen hinta vain euroina.',
     title: 'Uusi kuljetus',
     subtitle: 'Täytä reitti kokonaan ja julkaise. Kuljetus näkyy kuljetusliikkeille heti.',
     type: 'Kuljetuksen tyyppi',
@@ -2428,6 +2434,15 @@ export const fi = {
 
   account: {
     title: 'Omat tiedot',
+    currencyTitle: 'Yrityksen valuutta',
+    currencyHintCarrier:
+      'Omat keikat, kulut, polttoaine, palkat ja omat työmaat kirjataan tässä valuutassa. RAHTIS-palvelun keikat, maksut ja laskut ovat aina euroissa. Aiemmat summat säilyvät omassa valuutassaan, ja yhteenvedot muunnetaan EKP:n kurssilla.',
+    currencyHintShipper:
+      'Suoraan kuljetusliikkeen kanssa sovittujen tilausten oletusvaluutta. RAHTIS-palvelun kautta kulkevat tilaukset ja maksut ovat aina euroissa.',
+    currencyLabel: 'Valuutta',
+    currencySave: 'Tallenna',
+    currencySaved: 'Valuutta tallennettu.',
+    currencyError: 'Valuuttaa ei voitu tallentaa.',
     passwordTitle: 'Salasanan vaihto',
     passwordHint: 'Uusi salasana tulee voimaan heti. Muista se — emme näe emmekä voi palauttaa sitä.',
     current: 'Nykyinen salasana',
@@ -3794,6 +3809,8 @@ export const fi = {
     sunday: 'Sunnuntailisä, %',
     note: 'Huomio',
     templates: 'Operaattorin pohjat',
+    templatesEur:
+      'Pohjat ovat Suomen kuorma-autoalan TES euroina. Kopio pysyy euroissa; omassa valuutassa toimivan sääntösarjan voit luoda tyhjästä.',
     copy: 'Kopioi omaksi',
     own: 'Omat sääntösarjat',
     none: 'Ei vielä sääntösarjoja',

@@ -702,6 +702,7 @@ export const sv = {
     resultNoIban: 'Lägg till företagets kontonummer (IBAN) i företagsuppgifterna.',
     resultNoEmail: 'Lägg till kundens e-post i objektet.',
     resultNoAddress: 'Lägg till kundens faktureringsadress i objektet.',
+    resultPlatformOrder: 'Objektet kommer från en RAHTIS-beställning, så RAHTIS fakturerar det. Du kan inte skapa en egen faktura.',
     resultCreated: 'Fakturan skapades men mejlet gick inte iväg. Ladda ner PDF:en och skicka den själv.',
     invoiced: 'Fakturerad',
     due: 'Förfallodag',
@@ -1597,6 +1598,11 @@ export const sv = {
     requiredBody: 'Påbyggnad',
     anyBody: 'Vilken som helst',
     feeHint: 'Serviceavgift 5 % (minst 15 € per uppdrag tillsammans med åkeriets avgift). Ett direktavtal med ett åkeri på månadsplanen är gratis.',
+    /* Валюта цены: не евро — только у прямого договора и своих рейсов. */
+    currency: 'Valuta',
+    currencyEurOnly: 'Via RAHTIS-tjänsten prissätts och faktureras uppdraget i euro. Annan valuta går med direktavtal.',
+    currencyErrorDirect: 'Annan valuta än euro endast med direktavtal med åkeriet. Via RAHTIS-tjänsten är priset i euro.',
+    currencyErrorRahtis: 'Det här åkeriet kör via RAHTIS-tjänsten — uppdragets pris endast i euro.',
     title: 'Ny order',
     subtitle: 'Fyll i hela rutten och publicera. Åkerierna ser den direkt.',
     type: 'Typ av transport',
@@ -2197,6 +2203,15 @@ export const sv = {
 
   account: {
     title: 'Dina uppgifter',
+    currencyTitle: 'Företagets valuta',
+    currencyHintCarrier:
+      'Egna körningar, kostnader, bränsle, löner och egna arbetsplatser bokförs i den här valutan. Körningar, avgifter och fakturor via RAHTIS är alltid i euro. Tidigare belopp behåller sin valuta, och summor räknas om till ECB:s kurs.',
+    currencyHintShipper:
+      'Standardvaluta för order som avtalas direkt med en åkeri. Order och avgifter via RAHTIS är alltid i euro.',
+    currencyLabel: 'Valuta',
+    currencySave: 'Spara',
+    currencySaved: 'Valutan har sparats.',
+    currencyError: 'Valutan kunde inte sparas.',
     passwordTitle: 'Byt lösenord',
     passwordHint: 'Det nya lösenordet gäller direkt. Kom ihåg det – vi kan varken se det eller återskapa det.',
     current: 'Nuvarande lösenord',
@@ -3524,6 +3539,8 @@ export const sv = {
     sunday: 'Söndagstillägg, %',
     note: 'Anteckning',
     templates: 'Plattformens mallar',
+    templatesEur:
+      'Mallarna är det finska kollektivavtalet för lastbilsbranschen i euro. En kopia förblir i euro; skapa en egen regeluppsättning från grunden för att räkna i din egen valuta.',
     copy: 'Kopiera som egen',
     own: 'Mina regeluppsättningar',
     none: 'Inga regeluppsättningar än',

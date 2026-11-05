@@ -5,6 +5,7 @@ import { cn } from '@/lib/cn';
 import { compressPhoto } from '@/lib/driverApp/photo';
 import { FUEL_MAX_QUANTITY, fuelUnit, type FuelProduct } from '@/lib/fuel/fuel';
 import { useI18n } from '@/lib/i18n/provider';
+import { CURRENCIES, type Currency } from '@/lib/money/currency';
 import { useOutbox } from '../../OutboxProvider';
 
 export type FuelState = {
@@ -18,6 +19,8 @@ export type FuelState = {
     quantity: number;
     unit: 'l' | 'kg';
     amount_cents: number | null;
+    /** Валюта чека; старая база её не отдаёт — тогда валюта компании. */
+    currency?: string | null;
     odometer_km: number | null;
     station: string | null;
     plate: string | null;
@@ -54,6 +57,8 @@ export function FuelScreen({ state }: { state: FuelState }) {
   const [odometer, setOdometer] = useState('');
   const [lines, setLines] = useState<Line[]>([{ product: 'DIESEL', quantity: '' }]);
   const [amount, setAmount] = useState('');
+  /* Валюта чека: по умолчанию — компании; за границей водитель выбирает местную (поляк в Германии платит евро). */
+  const [currency, setCurrency] = useState<Currency>(f.currency);
   const [station, setStation] = useState('');
   const [fullTank, setFullTank] = useState(true);
   const [photo, setPhoto] = useState<Blob | null>(null);
@@ -114,6 +119,7 @@ export function FuelScreen({ state }: { state: FuelState }) {
             odometer_km: Math.round(km),
             lines: parsed.map((line) => ({ product: line.product, quantity: Math.round(line.quantity! * 100) / 100 })),
             amount: number(amount),
+            currency,
             station: station.trim() || null,
             full_tank: fullTank,
           }),
@@ -123,6 +129,7 @@ export function FuelScreen({ state }: { state: FuelState }) {
       setOdometer('');
       setLines([{ product: 'DIESEL', quantity: '' }]);
       setAmount('');
+      setCurrency(f.currency);
       setStation('');
       setFullTank(true);
       setPhoto(null);
@@ -212,11 +219,31 @@ export function FuelScreen({ state }: { state: FuelState }) {
           {d.fullTank}
         </label>
 
-        <div className="grid grid-cols-2 gap-3">
-          <label className="flex flex-col gap-1 text-[13px]">
-            {d.amount}
-            <input className={cn(INPUT, 'font-mono')} inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} />
-          </label>
+        <div className="grid gap-3">
+          <div className="flex flex-col gap-1 text-[13px]">
+            <label htmlFor="fuel-amount">{f.label(d.amount, currency)}</label>
+            <div className="flex gap-1.5">
+              <input
+                id="fuel-amount"
+                className={cn(INPUT, 'min-w-0 font-mono')}
+                inputMode="decimal"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+              />
+              <select
+                className={cn(INPUT, 'w-[5.5rem] shrink-0 px-2 font-mono')}
+                value={currency}
+                onChange={(e) => setCurrency(e.target.value as Currency)}
+                aria-label={f.label(d.amount, currency)}
+              >
+                {CURRENCIES.map((code) => (
+                  <option key={code} value={code}>
+                    {code}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
           <label className="flex flex-col gap-1 text-[13px]">
             {d.station}
             <input className={INPUT} value={station} onChange={(e) => setStation(e.target.value)} maxLength={120} />
@@ -288,7 +315,7 @@ export function FuelScreen({ state }: { state: FuelState }) {
             <li key={entry.id} className="rounded-card border border-line bg-surface px-4 py-3 text-[15px]">
               <p className="font-semibold">
                 {d.products[entry.product]} {f.decimal(entry.quantity)} {entry.unit}
-                {entry.amount_cents != null && <span className="font-normal text-ink-muted"> · {f.eur(entry.amount_cents)}</span>}
+                {entry.amount_cents != null && <span className="font-normal text-ink-muted"> · {f.money(entry.amount_cents, entry.currency ?? null)}</span>}
               </p>
               <p className="text-[13px] text-ink-muted">
                 {f.dateTime(entry.filled_at)}

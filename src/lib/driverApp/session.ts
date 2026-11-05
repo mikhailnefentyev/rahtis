@@ -21,6 +21,8 @@ export type DriverMe = {
   company_name: string;
   /** Страна перевозчика — пояс времени смены и уведомлений. */
   company_country: string | null;
+  /** Рабочая валюта компании (driver_me, с 5.11.2026). */
+  company_currency?: string | null;
   vehicle_id: string | null;
   plate: string | null;
   shift: {

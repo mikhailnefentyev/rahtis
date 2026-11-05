@@ -48,7 +48,7 @@ export default async function SiteJobPage({ params }: { params: Promise<{ locale
     supabase.from('drivers').select('id, full_name').eq('company_id', company.id),
     supabase.from('vehicles').select('id, plate, vehicle_class, axles, gross_max_kg, tare_kg, coupling_distance_m').eq('company_id', company.id),
     supabase.from('trailers').select('id, plate, kind, axles, twin_wheels, gross_max_kg, tare_kg, coupling_distance_m').eq('company_id', company.id),
-    supabase.from('carrier_invoices').select('id, number, issued_on, due_on, total_cents, sent_at, sent_to').eq('job_id', id).order('issued_on', { ascending: false }),
+    supabase.from('carrier_invoices').select('id, number, issued_on, due_on, total_cents, currency, sent_at, sent_to').eq('job_id', id).order('issued_on', { ascending: false }),
     /* Фото весовых талонов рейсов: последнее у рейса — ссылка в таблице. */
     supabase.from('weigh_tickets').select('id, load_id').eq('job_id', id).not('load_id', 'is', null).order('created_at', { ascending: true }),
   ]);
@@ -127,17 +127,20 @@ export default async function SiteJobPage({ params }: { params: Promise<{ locale
       </div>
       <p className="mt-1 mb-6 text-[13px] text-ink-muted">
         {job.customer_name}
-        {job.address ? ` · ${job.address}` : ''} · {s.pricingOptions[job.pricing]} {f.eur(job.rate_cents)} ·{' '}
+        {job.address ? ` · ${job.address}` : ''} · {s.pricingOptions[job.pricing]} {f.money(job.rate_cents, job.currency)} ·{' '}
         {t.siteWork.materials[job.material_code as keyof typeof t.siteWork.materials] ?? job.material_code}
       </p>
 
       <JobControls job={job} scaleSites={scaleSites ?? []} foremanUrl={`${siteUrl()}/${locale}/site/${job.foreman_token}`} />
 
-      <Invoices
-        jobId={job.id}
-        schedule={job.invoice_schedule}
-        invoices={(invoices ?? []).map((inv) => ({ ...inv, total: f.eur(inv.total_cents) }))}
-      />
+      {/* Объект из заказа RAHTIS оплачивается через платформу — своих счетов клиенту нет (сервер тоже не даст). */}
+      {(!job.order_id || (invoices ?? []).length > 0) && (
+        <Invoices
+          jobId={job.id}
+          schedule={job.invoice_schedule}
+          invoices={(invoices ?? []).map((inv) => ({ ...inv, total: f.money(inv.total_cents, inv.currency) }))}
+        />
+      )}
 
       <Card className="mb-8">
         <CardBody className="flex flex-wrap gap-x-8 gap-y-2 text-[13px]">
@@ -151,7 +154,7 @@ export default async function SiteJobPage({ params }: { params: Promise<{ locale
             {s.colTonnes}: <span className="font-mono font-semibold">{tonnes(totals.netKg)}</span>
           </span>
           <span>
-            {s.amount}: <span className="font-mono font-semibold">{f.eur(amount)}</span>
+            {s.amount}: <span className="font-mono font-semibold">{f.money(amount, job.currency)}</span>
           </span>
         </CardBody>
       </Card>

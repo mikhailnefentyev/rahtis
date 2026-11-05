@@ -4,6 +4,7 @@ import { FlashNotice } from '@/components/layout/FlashNotice';
 import { requireRole } from '@/lib/auth/guard';
 import { isLocale } from '@/lib/i18n';
 import { TimeZoneProvider } from '@/lib/i18n/provider';
+import { viewerMoney } from '@/lib/i18n/viewer';
 import { stopTimeZone } from '@/lib/country';
 
 /**
@@ -25,7 +26,11 @@ export default async function ShipperLayout({
 
   return (
     /* Время в кабинете — по стране компании (src/lib/i18n/viewer). */
-    <TimeZoneProvider zone={stopTimeZone(viewer.company?.country)} country={viewer.company?.country ?? null}>
+    <TimeZoneProvider
+      zone={stopTimeZone(viewer.company?.country)}
+      country={viewer.company?.country ?? null}
+      money={await viewerMoney()}
+    >
       <CabinetShell locale={locale} role="SHIPPER" company={viewer.company}>
         <FlashNotice />
         {children}

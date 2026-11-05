@@ -20,7 +20,10 @@
  *  · RAHTIS — абонемент за машину, если компания на подписке и машина в
  *    месяце работала: лесенкой, на машину — средняя цена месяца.
  *
- * Всё без ALV, в центах. Это оценка для решений, а не бухгалтерия.
+ * Всё без ALV, в центах одной валюты — рабочей валюты компании: строки
+ * доходов и расходов приходят уже пересчитанными (load.ts, курс ЕЦБ дня
+ * строки). Карточка машины хранит суммы в своей валюте — её переводит
+ * множитель financeRate на месяц. Это оценка для решений, а не бухгалтерия.
  *
  * Без зависимостей: модуль читают тесты (node --test).
  */
@@ -39,6 +42,8 @@ export type VehicleFinance = {
   kasko_cents_year: number | null;
   tax_cents_year: number | null;
   other_fixed_cents_month: number | null;
+  /** Валюта сумм карточки (EUR, PLN…); пересчёт — financeRate. */
+  currency?: string;
 };
 
 export type RevenueKind = 'PLATFORM' | 'OWN' | 'SITE';
@@ -59,6 +64,13 @@ export type EconomicsInput = {
    * подписке. Число — та же цена на все месяцы.
    */
   subscriptionUnitCents: number | Record<string, number> | null;
+  /**
+   * Множитель «валюта карточки → валюта компании» на месяц (курс первого
+   * числа). Нет — суммы карточки уже в валюте компании; null из функции —
+   * курса нет: постоянные расходы месяца не считаются, чем сложить злотые
+   * с евро как равные.
+   */
+  financeRate?: (vehicleId: string, month: string) => number | null;
 };
 
 export type MonthEconomics = {
@@ -144,6 +156,14 @@ export function fixedCosts(finance: VehicleFinance | undefined, month: string) {
   return out;
 }
 
+/** Постоянные расходы карточки → в валюту компании (множитель курса). */
+export function scaleCosts<T extends Record<string, number>>(costs: T, rate: number): T {
+  if (rate === 1) return costs;
+  const out = { ...costs };
+  for (const k of Object.keys(out) as (keyof T)[]) out[k] = Math.round(out[k] * rate) as T[keyof T];
+  return out;
+}
+
 export function vehicleEconomics(input: EconomicsInput): { vehicles: VehicleEconomics[]; fleet: MonthEconomics[] } {
   const key = (v: string, m: string) => `${v}|${m}`;
   const sums = <T extends { vehicleId: string; month: string; cents: number }>(rows: T[]) => {
@@ -173,7 +193,8 @@ export function vehicleEconomics(input: EconomicsInput): { vehicles: VehicleEcon
       if (r) Object.assign(m.revenue, r);
       m.costs.fuel = fuel.get(k) ?? 0;
       m.costs.driver = Math.round((pay.get(k) ?? 0) * (1 + input.employerCostBps / 10_000));
-      Object.assign(m.costs, fixedCosts(finance, month));
+      const rate = input.financeRate ? input.financeRate(v.id, month) : 1;
+      if (rate !== null) Object.assign(m.costs, scaleCosts(fixedCosts(finance, month), rate));
       m.costs.journal = journal.get(k) ?? 0;
       const worked = (r?.platform ?? 0) + (r?.own ?? 0) + (r?.site ?? 0) > 0;
       const unit = input.subscriptionUnitCents;
@@ -184,7 +205,10 @@ export function vehicleEconomics(input: EconomicsInput): { vehicles: VehicleEcon
     /* Окупаемость купленной сразу: прибыль до износа с месяца покупки против цены без остаточной. */
     let paybackPct: number | null = null;
     if (finance?.financing === 'CASH' && finance.purchase_price_cents) {
-      const base = finance.purchase_price_cents - (finance.residual_cents ?? 0);
+      /* Цена — в валюте карточки: по курсу месяца покупки (или первого показанного). */
+      const priceMonth = finance.purchased_on ? monthOfDate(finance.purchased_on) : input.months[0];
+      const rate = input.financeRate ? input.financeRate(v.id, priceMonth ?? '') : 1;
+      const base = rate === null ? 0 : Math.round((finance.purchase_price_cents - (finance.residual_cents ?? 0)) * rate);
       if (base > 0) {
         const earned = months
           .filter((m) => !finance.purchased_on || m.month >= monthOfDate(finance.purchased_on))

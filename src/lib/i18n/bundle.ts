@@ -1,4 +1,4 @@
-import { createFormat, type Format } from '@/lib/format';
+import { createFormat, type Format, type MoneyContext } from '@/lib/format';
 import type { Locale } from './config';
 import type { Dictionary } from './dictionaries';
 import { createMessages, type MessageFn } from './message';
@@ -23,12 +23,15 @@ export type I18n = {
   f: Format;
 };
 
-/** zone — пояс компании зрителя; без него время по Хельсинки (витрина, письма). */
-export function createI18n(locale: Locale, dictionary: Dictionary, zone?: string): I18n {
+/**
+ * zone — пояс компании зрителя; без него время по Хельсинки (витрина, письма).
+ * money — валюта компании зрителя и курсы; без неё деньги в евро.
+ */
+export function createI18n(locale: Locale, dictionary: Dictionary, zone?: string, money?: MoneyContext): I18n {
   return {
     locale,
     t: dictionary,
     m: createMessages(dictionary.meta.intl, dictionary),
-    f: createFormat(dictionary.meta.intl, zone),
+    f: createFormat(dictionary.meta.intl, zone, money),
   };
 }

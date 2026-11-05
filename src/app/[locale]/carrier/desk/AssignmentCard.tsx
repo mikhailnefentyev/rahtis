@@ -48,9 +48,12 @@ export function AssignmentCard({
   documentsByOrder,
   amendmentsByOrder,
   ownClient,
+  currency = 'EUR',
   tripTrailerId = null,
   trailers = [],
 }: {
+  /** Валюта цены рейса (my_assignments её не отдаёт — страница читает отдельно). */
+  currency?: string;
   /** Прицеп рейса перевозчика (конструктор сцепок) и прицепы компании для выбора. */
   tripTrailerId?: string | null;
   trailers?: TripTrailerOption[];
@@ -104,7 +107,11 @@ export function AssignmentCard({
                 <p className="mt-1.5 text-[13px] text-ink-muted">
                   {order.trailer ? `${order.trailer} · ` : ''}
                   {m('order.distance', { km: order.distance_km ?? 0 })} ·{' '}
-                  <span className="font-semibold text-ink">{f.eur(order.rate_cents ?? 0)}</span>{' '}
+                  <span className="font-semibold text-ink">{f.money(order.rate_cents ?? 0, currency)}</span>{' '}
+                  {/* Рейс RAHTIS — в евро; справка в валюте компании рядом. */}
+                  {order.rate_cents && f.approx(order.rate_cents, currency) ? (
+                    <span className="text-ink-dim">({f.approx(order.rate_cents, currency)}) </span>
+                  ) : null}
                   <span className="text-ink-dim">{t.money.addVat}</span>
                 </p>
                 {own ? (
@@ -183,6 +190,7 @@ export function AssignmentCard({
               amendments={amendments}
               orderId={order.id}
               haulKind={order.haul_kind}
+              currency={currency}
               canAcknowledge={order.status === 'IN_PROGRESS'}
               className="mt-3"
             />
@@ -228,6 +236,7 @@ export function AssignmentCard({
                     orderId={order.id}
                     distanceKm={order.distance_km}
                     rateCents={order.rate_cents}
+                    currency={currency}
                     className="mt-4 rounded-control border border-line bg-sunken p-3"
                   />
                 )}

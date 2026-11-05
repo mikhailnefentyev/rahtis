@@ -7,6 +7,7 @@ import { getDictionary, isLocale, defaultLocale, type Locale } from '@/lib/i18n'
 import { suggestAddressAction } from '@/lib/routing/actions';
 import { PLACES } from '@/lib/routing/places';
 import { createClient } from '@/lib/supabase/server';
+import { CURRENCIES } from '@/lib/money/currency';
 import { draftIsEmpty, normalizeDraft, type DraftStop, type OrderDraft } from './importDraft';
 import { parseOrderDocument } from './importParse';
 
@@ -100,6 +101,8 @@ export async function importOrderAction(formData: FormData): Promise<ImportState
   const draft = normalizeDraft(result.draft, {
     isValidContainer: isValidContainerNumber,
     clients: carrier ? (clients ?? []).map((c) => ({ id: c.id, name: c.name, business_id: c.business_id })) : null,
+    /* Свой рейс — в любой валюте RAHTIS (форма покажет её); заказ заказчика — только евро. */
+    currencies: carrier ? CURRENCIES : undefined,
     today,
   });
   if (!draft || draftIsEmpty(draft)) return { ok: false, error: t.orderImport.empty };

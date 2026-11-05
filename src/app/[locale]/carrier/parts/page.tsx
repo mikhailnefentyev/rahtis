@@ -38,7 +38,7 @@ export default async function PartsPage({ params }: { params: Promise<{ locale: 
   const { data: purchases } = access
     ? await supabase
         .from('vehicle_costs')
-        .select('id, vehicle_id, spent_on, category, amount_cents, supplier, note')
+        .select('id, vehicle_id, spent_on, category, amount_cents, currency, supplier, note')
         .eq('company_id', viewer.company!.id)
         .in('category', ['PARTS', 'REPAIR', 'TYRES'])
         .order('spent_on', { ascending: false })
@@ -69,7 +69,7 @@ export default async function PartsPage({ params }: { params: Promise<{ locale: 
                   <Th>{t.economics.category}</Th>
                   <Th>{t.parts.supplier}</Th>
                   <Th>{t.economics.note}</Th>
-                  <Th numeric>{t.economics.amount}</Th>
+                  <Th numeric>{f.label(t.economics.amount)}</Th>
                 </tr>
               </thead>
               <tbody>
@@ -84,7 +84,7 @@ export default async function PartsPage({ params }: { params: Promise<{ locale: 
                     <Td>{t.economics.categories[c.category as keyof typeof t.economics.categories] ?? c.category}</Td>
                     <Td className="whitespace-normal">{c.supplier ?? ''}</Td>
                     <Td className="whitespace-normal">{c.note ?? ''}</Td>
-                    <Td numeric>{f.eur(c.amount_cents)}</Td>
+                    <Td numeric>{f.money(c.amount_cents, c.currency)}</Td>
                   </Tr>
                 ))}
               </tbody>

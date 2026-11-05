@@ -6,7 +6,17 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { splitShift, summarizeDriver, payableKm, profileOn, finnishHolidays, tesBaseOn, tesGradeOn } from './driverPay.ts';
+import {
+  splitShift,
+  summarizeDriver,
+  totalsOf,
+  payableKm,
+  payCurrency,
+  profileOn,
+  finnishHolidays,
+  tesBaseOn,
+  tesGradeOn,
+} from './driverPay.ts';
 
 const NOW = Date.parse('2026-12-31T00:00:00Z');
 
@@ -256,4 +266,103 @@ test('забытая незакрытая смена считается не д�
   const s = splitShift(shift('2026-09-14T05:00:00Z', null), null, NOW);
   assert.equal(s.workMinutes, 24 * 60);
   assert.equal(s.date, '2026-09-14');
+});
+
+/* ── Валюта ─────────────────────────────────────────────────────── */
+
+/* Курс-заглушка: 1 € = 4 zł = 11 kr, на любой день. */
+const PER_EUR = { EUR: 1, PLN: 4, SEK: 11 };
+const fx = (cents, from, to) =>
+  PER_EUR[from] && PER_EUR[to] ? Math.round((cents / PER_EUR[from]) * PER_EUR[to]) : null;
+
+test('валюта: сумма дня — в валюте ставки, у TES — в валюте набора', () => {
+  const hourly = { validFrom: '2026-01-01', model: 'FLAT_HOURLY', perKmCents: null, tripBps: null, hourlyCents: 8000, tes: null, currency: 'PLN' };
+  assert.equal(payCurrency(hourly), 'PLN');
+  const tesProfile = { validFrom: '2026-01-01', model: 'TES', perKmCents: null, tripBps: null, hourlyCents: null, tes: { ...tes, currency: 'EUR' }, currency: 'PLN' };
+  assert.equal(payCurrency(tesProfile), 'EUR');
+  assert.equal(payCurrency({ ...hourly, currency: null }, 'SEK'), 'SEK');
+
+  const summary = summarizeDriver({
+    shifts: [shift('2026-09-14T05:00:00Z', '2026-09-14T06:00:00Z')],
+    trips: [],
+    profiles: [hourly],
+    now: NOW,
+    currency: 'PLN',
+  });
+  assert.equal(summary.days[0].currency, 'PLN');
+  assert.equal(summary.days[0].amountCents, 8000);
+  assert.equal(summary.totals.currency, 'PLN');
+  assert.equal(summary.totals.amountCents, 8000);
+});
+
+test('валюта: процент от выплаты в злотых при ставке в евро — по курсу дня', () => {
+  const profile = { validFrom: '2026-01-01', model: 'TRIP_PERCENT', perKmCents: null, tripBps: 2500, hourlyCents: null, tes: null, currency: 'EUR' };
+  const summary = summarizeDriver({
+    shifts: [],
+    trips: [{ closedAt: '2026-09-14T10:00:00Z', distanceKm: 100, stopsDone: 2, payoutCents: 400_00 }],
+    profiles: [profile],
+    now: NOW,
+    currency: 'PLN',
+    fx,
+  });
+  const [day] = summary.days;
+  // 400 zł = 100 €, 25 % = 25 €
+  assert.equal(day.currency, 'EUR');
+  assert.equal(day.amountCents, 25_00);
+  // итог — в злотых
+  assert.equal(summary.totals.currency, 'PLN');
+  assert.equal(summary.totals.amountCents, 100_00);
+});
+
+test('валюта: доля уже в валюте ставки (payoutCurrency: null) не пересчитывается', () => {
+  const profile = { validFrom: '2026-01-01', model: 'TRIP_PERCENT', perKmCents: null, tripBps: 10_000, hourlyCents: null, tes: null, currency: 'EUR' };
+  const summary = summarizeDriver({
+    shifts: [],
+    trips: [{ closedAt: '2026-09-14T10:00:00Z', distanceKm: null, stopsDone: 1, payoutCents: 30_00 }],
+    profiles: [profile],
+    now: NOW,
+    currency: 'PLN',
+    payoutCurrency: null,
+    fx,
+  });
+  assert.equal(summary.days[0].amountCents, 30_00);
+  assert.equal(summary.totals.amountCents, 120_00);
+});
+
+test('валюта: итог не складывает разные валюты, без курса день пропускается', () => {
+  const day = (date, amountCents, currency) => ({
+    date, workMinutes: 60, paidMinutes: 60, breakMinutes: 0, eveningMinutes: 0, nightMinutes: 0,
+    saturdayMinutes: 0, sundayMinutes: 0, overtime1Minutes: 0, overtime2Minutes: 0, odometerKm: 0,
+    tripKm: 0, stops: 0, trips: 0, payoutCents: 0, model: 'FLAT_HOURLY', amountCents, currency,
+    parts: { baseCents: amountCents, overtimeCents: 0, eveningCents: 0, nightCents: 0, weekendCents: 0 },
+  });
+  const days = [day('2026-09-14', 10_00, 'EUR'), day('2026-09-15', 40_00, 'PLN'), day('2026-09-16', 5_00, 'NOK')];
+
+  const totals = totalsOf(days, { currency: 'PLN', fx });
+  assert.equal(totals.currency, 'PLN');
+  // 10 € = 40 zł, + 40 zł; кроны без курса — мимо суммы, итог помечен неполным
+  assert.equal(totals.amountCents, 80_00);
+  assert.equal(totals.parts.baseCents, 80_00);
+  assert.equal(totals.missingRate, true);
+
+  // без курсов вовсе — в итог только своя валюта
+  const plain = totalsOf(days, { currency: 'EUR' });
+  assert.equal(plain.amountCents, 10_00);
+  assert.equal(plain.missingRate, true);
+
+  // старый вызов без валюты — валюта первого дня
+  assert.equal(totalsOf([days[0]]).currency, 'EUR');
+});
+
+test('валюта: процент без курса — сумма дня пустая, а не злотые как евро', () => {
+  const profile = { validFrom: '2026-01-01', model: 'TRIP_PERCENT', perKmCents: null, tripBps: 2500, hourlyCents: null, tes: null, currency: 'EUR' };
+  const summary = summarizeDriver({
+    shifts: [],
+    trips: [{ closedAt: '2026-09-14T10:00:00Z', distanceKm: 100, stopsDone: 2, payoutCents: 400_00 }],
+    profiles: [profile],
+    now: NOW,
+    currency: 'PLN',
+  });
+  assert.equal(summary.days[0].amountCents, null);
+  assert.equal(summary.totals.missingRate, true);
 });

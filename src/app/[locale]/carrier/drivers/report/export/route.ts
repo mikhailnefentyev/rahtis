@@ -52,20 +52,23 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
   });
 
   if (format === 'csv') {
-    return new Response(reportCsv(report, t), { headers: headers('text/csv; charset=utf-8', 'csv') });
+    return new Response(reportCsv(report, t, f), { headers: headers('text/csv; charset=utf-8', 'csv') });
   }
 
   if (format === 'xlsx') {
-    const buffer = await reportXlsx(report, t);
+    const buffer = await reportXlsx(report, t, f);
     return new Response(new Uint8Array(buffer), {
       headers: headers('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'xlsx'),
     });
   }
 
-  const columns = reportColumns(t);
-  const show = (kind: string, value: string | number | null): string => {
+  /* В PDF валюта — знаком у суммы, отдельная колонка не нужна. */
+  const all = reportColumns(t, f, report.currency);
+  const columns = all.filter((c) => c.kind !== 'currency');
+  const currencyOf = all.find((c) => c.kind === 'currency')!;
+  const show = (kind: string, value: string | number | null, currency: string | null): string => {
     if (value == null || value === '') return '';
-    if (kind === 'money') return f.eur(Math.round(Number(value) * 100));
+    if (kind === 'money') return f.money(Math.round(Number(value) * 100), currency ?? report.currency);
     if (kind === 'hours') return f.decimal(Number(value), 2);
     if (kind === 'date') return f.date(`${value}T12:00:00Z`);
     if (kind === 'int') return f.number(Number(value));
@@ -88,7 +91,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
         right: c.kind !== 'text' && c.kind !== 'date',
       })),
       rows: reportRows(report).map((row) => ({
-        cells: columns.map((c) => show(c.kind, c.get(row))),
+        cells: columns.map((c) => show(c.kind, c.get(row), currencyOf.get(row) as string | null)),
         total: row.totals,
       })),
     }),

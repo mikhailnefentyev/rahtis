@@ -192,7 +192,7 @@ export default async function DriverReportPage({
                     <Th numeric>{t.workReport.colKm}</Th>
                     <Th numeric>{t.workReport.colTrips}</Th>
                     <Th>{t.workReport.colModel}</Th>
-                    <Th numeric>{t.workReport.colAmount}</Th>
+                    <Th numeric>{f.label(t.workReport.colAmount, report.currency)}</Th>
                   </tr>
                 </thead>
                 <tbody>
@@ -206,7 +206,7 @@ export default async function DriverReportPage({
                       <Td numeric>{f.number(payableKm(day))}</Td>
                       <Td numeric>{f.number(day.trips)}</Td>
                       <Td>{day.model ? t.payModel[day.model] : t.workReport.noRate}</Td>
-                      <Td numeric>{day.amountCents == null ? '—' : f.eur(day.amountCents)}</Td>
+                      <Td numeric>{day.amountCents == null ? '—' : f.money(day.amountCents, day.currency)}</Td>
                     </Tr>
                   ))}
                 </tbody>

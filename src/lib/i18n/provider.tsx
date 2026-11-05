@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useMemo } from 'react';
+import type { MoneyContext } from '@/lib/format';
 import { createI18n, type I18n } from './bundle';
 import type { Locale } from './config';
 import type { Dictionary } from './dictionaries';
@@ -8,6 +9,7 @@ import type { Dictionary } from './dictionaries';
 const I18nContext = createContext<I18n | null>(null);
 const ZoneContext = createContext<string | null>(null);
 const CountryContext = createContext<string | null>(null);
+const MoneyCtx = createContext<MoneyContext | null>(null);
 
 /**
  * Часовой пояс компании зрителя для клиентских компонентов кабинета.
@@ -20,16 +22,21 @@ const CountryContext = createContext<string | null>(null);
 export function TimeZoneProvider({
   zone,
   country = null,
+  money = null,
   children,
 }: {
   zone: string;
   /** Страна компании зрителя — для примеров в формах и значений по умолчанию. */
   country?: string | null;
+  /** Рабочая валюта компании зрителя и курсы ЕЦБ (src/lib/money). */
+  money?: MoneyContext | null;
   children: React.ReactNode;
 }) {
   return (
     <ZoneContext.Provider value={zone}>
-      <CountryContext.Provider value={country}>{children}</CountryContext.Provider>
+      <CountryContext.Provider value={country}>
+        <MoneyCtx.Provider value={money}>{children}</MoneyCtx.Provider>
+      </CountryContext.Provider>
     </ZoneContext.Provider>
   );
 }
@@ -76,12 +83,13 @@ export function I18nProvider({
 export function useI18n(): I18n {
   const value = useContext(I18nContext);
   const zone = useContext(ZoneContext);
+  const money = useContext(MoneyCtx);
   if (!value) {
     throw new Error('useI18n called outside I18nProvider — wrap the tree in the locale provider.');
   }
-  /* В кабинете — с поясом компании зрителя; форматтеры кешируются внутри createFormat. */
+  /* В кабинете — с поясом и валютой компании зрителя; форматтеры кешируются внутри createFormat. */
   return useMemo(
-    () => (zone && zone !== value.f.zone ? createI18n(value.locale, value.t, zone) : value),
-    [value, zone],
+    () => (zone || money ? createI18n(value.locale, value.t, zone ?? value.f.zone, money ?? undefined) : value),
+    [value, zone, money],
   );
 }

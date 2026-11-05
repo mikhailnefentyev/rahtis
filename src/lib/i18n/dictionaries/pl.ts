@@ -702,6 +702,7 @@ export const pl = {
     resultNoIban: 'Dodaj numer konta firmy (IBAN) w danych firmy.',
     resultNoEmail: 'Dodaj e-mail klienta w ustawieniach budowy.',
     resultNoAddress: 'Dodaj adres do faktury klienta w ustawieniach budowy.',
+    resultPlatformOrder: 'Ta budowa pochodzi ze zlecenia w RAHTIS, więc fakturę wystawia RAHTIS. Nie możesz wystawić własnej faktury.',
     resultCreated: 'Faktura jest gotowa, ale e-mail nie wyszedł. Pobierz PDF i wyślij go samodzielnie.',
     invoiced: 'Zafakturowano',
     due: 'Termin płatności',
@@ -1596,6 +1597,11 @@ export const pl = {
     requiredBody: 'Zabudowa',
     anyBody: 'Dowolna',
     feeHint: 'Opłata serwisowa 5 % (co najmniej 15 € za przewóz łącznie z opłatą przewoźnika). Bezpośrednia umowa z przewoźnikiem w abonamencie jest bezpłatna.',
+    /* Валюта цены: не евро — только у прямого договора и своих рейсов. */
+    currency: 'Waluta',
+    currencyEurOnly: 'Przez usługę RAHTIS przewóz jest wyceniany i fakturowany w euro. Inna waluta jest możliwa przy umowie bezpośredniej.',
+    currencyErrorDirect: 'Waluta inna niż euro tylko przy umowie bezpośredniej z przewoźnikiem. Przez usługę RAHTIS cena jest w euro.',
+    currencyErrorRahtis: 'Ten przewoźnik działa przez usługę RAHTIS — cena przewozu tylko w euro.',
     title: 'Nowe zlecenie',
     subtitle: 'Uzupełnij całą trasę i opublikuj. Przewoźnicy od razu zobaczą zlecenie.',
     type: 'Rodzaj przewozu',
@@ -2196,6 +2202,15 @@ export const pl = {
 
   account: {
     title: 'Twoje dane',
+    currencyTitle: 'Waluta firmy',
+    currencyHintCarrier:
+      'Własne kursy, koszty, paliwo, wynagrodzenia i własne budowy są ewidencjonowane w tej walucie. Kursy, opłaty i faktury w ramach usługi RAHTIS są zawsze w euro. Wcześniejsze kwoty zachowują swoją walutę, a sumy są przeliczane po kursie EBC.',
+    currencyHintShipper:
+      'Domyślna waluta zleceń uzgadnianych bezpośrednio z przewoźnikiem. Zlecenia i opłaty w ramach usługi RAHTIS są zawsze w euro.',
+    currencyLabel: 'Waluta',
+    currencySave: 'Zapisz',
+    currencySaved: 'Waluta została zapisana.',
+    currencyError: 'Nie udało się zapisać waluty.',
     passwordTitle: 'Zmiana hasła',
     passwordHint: 'Nowe hasło obowiązuje od razu. Zapamiętaj je — nie widzimy go i nie możemy go odzyskać.',
     current: 'Obecne hasło',
@@ -3549,6 +3564,8 @@ export const pl = {
     sunday: 'Dodatek niedzielny, %',
     note: 'Uwaga',
     templates: 'Szablony operatora',
+    templatesEur:
+      'Szablony to fiński układ zbiorowy branży transportu ciężarowego w euro. Kopia pozostaje w euro; aby liczyć we własnej walucie, utwórz zestaw zasad od podstaw.',
     copy: 'Skopiuj jako własny',
     own: 'Moje zestawy zasad',
     none: 'Brak zestawów zasad',

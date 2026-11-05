@@ -80,10 +80,13 @@ export async function dispatchPublishedOrder(orderId: string): Promise<void> {
   try {
     const admin = createAdminClient();
 
-    const [{ data: card }, { data: recipients }] = await Promise.all([
+    const [{ data: card }, { data: recipients }, { data: money }] = await Promise.all([
       admin.rpc('order_dispatch_card', { p_order_id: orderId }),
       admin.rpc('order_dispatch_recipients', { p_order_id: orderId }),
+      /* Валюта цены: стол RAHTIS — евро, «напрямую с перевозчиком» — выбранная заказчиком. */
+      admin.from('orders').select('currency').eq('id', orderId).maybeSingle(),
     ]);
+    const currency = money?.currency ?? 'EUR';
 
     const order = card as Card | null;
     const list = (recipients ?? []) as Recipient[];
@@ -135,7 +138,7 @@ export async function dispatchPublishedOrder(orderId: string): Promise<void> {
           pickup: [order.pickup_place, pickupAt].filter(Boolean).join(' · ') || null,
           unit: unitLabel(order, t),
           distance: order.distance_km ? `${f.number(order.distance_km)} km` : null,
-          rate: order.rate_cents ? f.eur(order.rate_cents) : null,
+          rate: order.rate_cents ? f.money(order.rate_cents, currency) : null,
           link: `${site}/${locale}/carrier/desk`,
           operatorEmail: operator,
           locale: emailLocaleOf(carrier.language),
@@ -170,7 +173,7 @@ export async function notifyDirectOrder(orderId: string): Promise<void> {
       admin
         .from('orders')
         .select(
-          'status, deadline_at, assigned_company_id, carrier:companies!orders_assigned_company_id_fkey(name, contact_email, language), vehicle:vehicles!orders_assigned_vehicle_id_fkey(plate), shipper_company_id',
+          'status, deadline_at, assigned_company_id, currency, carrier:companies!orders_assigned_company_id_fkey(name, contact_email, language), vehicle:vehicles!orders_assigned_vehicle_id_fkey(plate), shipper_company_id',
         )
         .eq('id', orderId)
         .maybeSingle(),
@@ -213,7 +216,7 @@ export async function notifyDirectOrder(orderId: string): Promise<void> {
         pickup: [c.pickup_place, pickupAt].filter(Boolean).join(' · ') || null,
         unit: unitLabel(c, t),
         distance: c.distance_km ? `${f.number(c.distance_km)} km` : null,
-        rate: c.rate_cents ? f.eur(c.rate_cents) : null,
+        rate: c.rate_cents ? f.money(c.rate_cents, order.currency) : null,
         link: `${siteUrl()}/${locale}/carrier/desk`,
         operatorEmail: operatorInbox(),
         locale: emailLocaleOf(carrier.language),

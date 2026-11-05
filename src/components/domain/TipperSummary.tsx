@@ -32,7 +32,7 @@ export function TipperSummary({ orderId, className }: { orderId: string; classNa
       <p className="label-micro mb-1">{s.title}</p>
       <p className="text-[13px]">
         {s.days} {summary.days} · {s.hours} {hoursLabel(summary.minutes)} · {s.loads} {summary.loads} · {s.tonnes}{' '}
-        {f.decimal(summary.net_kg / 1000)} · <span className="font-semibold">{f.eur(summary.amount_cents)}</span>
+        {f.decimal(summary.net_kg / 1000)} · <span className="font-semibold">{f.money(summary.amount_cents, summary.currency)}</span>
       </p>
     </div>
   );

@@ -73,7 +73,7 @@ export default async function DriverShell({
   return (
     <I18nProvider locale={locale} dictionary={t}>
       {/* Время — по стране перевозчика водителя (getDriverI18n). */}
-      <TimeZoneProvider zone={f.zone}>
+      <TimeZoneProvider zone={f.zone} money={{ currency: f.currency, rates: f.rates }}>
         <div data-app="driver" className="min-h-dvh overflow-x-clip bg-ground text-ink">
           {/*
             * Экран загрузки: тот же, что заставка iPhone, — без белой вспышки

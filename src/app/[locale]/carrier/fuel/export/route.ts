@@ -37,7 +37,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
   if (!access) return new Response('Subscription required', { status: 403 });
 
   const month = parseFuelMonth(url.searchParams.get('month'));
-  const [{ t, f }, data] = await Promise.all([getViewerI18n(locale), loadFuelMonth(supabase, viewer.company.id, month)]);
+  const { t, f } = await getViewerI18n(locale);
+  const data = await loadFuelMonth(supabase, viewer.company.id, month, f.currency);
   const s = t.fuel;
 
   /* Одна машина — только своя: чужой id просто даёт весь парк. */
@@ -67,7 +68,10 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
   const sourceHeader = (source: (typeof FUEL_SOURCES)[number]) => `${s.colQty}: ${s.sourceLine[source]}`;
 
   if (format === 'csv') {
-    /* Числа — с точкой и без разделителя тысяч, как в остальных выгрузках: так их читает любая программа. */
+    /*
+     * Числа — с точкой и без разделителя тысяч, как в остальных выгрузках: так их читает любая программа.
+     * Сумма — в валюте чека с кодом валюты рядом, и та же сумма в валюте компании по курсу дня заправки.
+     */
     const header = [
       s.colDate,
       s.colVehicle,
@@ -75,7 +79,9 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
       s.colProduct,
       s.colQty,
       s.colUnit,
-      `${s.colAmount} €`,
+      s.colAmount,
+      t.account.currencyLabel,
+      `${s.colAmount} ${f.currency}`,
       s.colOdometer,
       s.colStation,
       ...FUEL_SOURCES.map(sourceHeader),
@@ -91,6 +97,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
         csvNumber(row.quantity.toFixed(2)),
         csvText(row.unit ?? 'l'),
         csvNumber(row.amount_cents != null ? (row.amount_cents / 100).toFixed(2) : null),
+        csvText(row.amount_cents != null ? row.currency : null),
+        csvNumber(row.own_amount_cents != null ? (row.own_amount_cents / 100).toFixed(2) : null),
         csvNumber(row.odometer_km),
         csvText(row.station),
         ...FUEL_SOURCES.map((source) => csvNumber(sourceQty(row, source)?.toFixed(2))),
@@ -120,7 +128,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
           value: total ? f.number(Math.round(total.liquidL)) : '—',
           hint: total?.gasKg ? `${s.statGas}: ${f.number(Math.round(total.gasKg))}` : undefined,
         },
-        { label: s.statAmount, value: total ? f.eur(total.amountCents) : '—' },
+        { label: s.statAmount, value: total ? f.money(total.amountCents) : '—' },
         {
           label: s.statL100,
           value: total?.l100 != null ? f.decimal(total.l100) : '—',
@@ -128,7 +136,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
         },
         {
           label: s.statCentsKm,
-          value: total?.centsPerKm != null ? f.eur(Math.round(total.centsPerKm)) : '—',
+          value: total?.centsPerKm != null ? f.money(Math.round(total.centsPerKm)) : '—',
           hint: total?.adbluePct != null ? `AdBlue ${f.decimal(total.adbluePct)} %` : undefined,
         },
       ],
@@ -145,7 +153,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
             { header: s.colAmount, flex: 1.2, right: true },
             { header: 'km', flex: 0.9, right: true },
             { header: 'l/100 km', flex: 0.9, right: true },
-            { header: s.colPerKm, flex: 0.9, right: true },
+            { header: f.label(s.colPerKm), flex: 0.9, right: true },
           ],
           rows: byVehicle.map(({ plate, stat }) => ({
             cells: [
@@ -153,10 +161,10 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
               f.decimal(stat.liquidL),
               stat.adblueL ? f.decimal(stat.adblueL) : '—',
               stat.gasKg ? f.decimal(stat.gasKg) : '—',
-              f.eur(stat.amountCents),
+              f.money(stat.amountCents),
               stat.km ? f.number(stat.km) : '—',
               dash(stat.l100 != null ? f.decimal(stat.l100) : null),
-              dash(stat.centsPerKm != null ? f.eur(Math.round(stat.centsPerKm)) : null),
+              dash(stat.centsPerKm != null ? f.money(Math.round(stat.centsPerKm)) : null),
             ],
           })),
         },
@@ -185,7 +193,10 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
                 row.driver_id ? (drivers.get(row.driver_id) ?? '—') : '—',
                 product(row),
                 `${f.decimal(row.quantity)} ${row.unit ?? 'l'}`,
-                row.amount_cents != null ? f.eur(row.amount_cents) : '—',
+                /* В валюте чека; чужая валюта — с кодом («kr» бывает трёх стран). */
+                row.amount_cents != null
+                  ? `${f.money(row.amount_cents, row.currency)}${row.currency !== f.currency ? ` ${row.currency}` : ''}`
+                  : '—',
                 row.odometer_km != null ? f.number(row.odometer_km) : '—',
                 row.station ?? '',
                 ...FUEL_SOURCES.map((source) => {

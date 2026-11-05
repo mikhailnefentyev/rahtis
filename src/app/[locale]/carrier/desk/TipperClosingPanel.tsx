@@ -59,9 +59,9 @@ export function TipperClosingPanel({ orderId }: { orderId: string }) {
         </div>
       </dl>
       <p className="mt-3 text-[13px]">
-        {s.amount}: <span className="font-mono font-semibold">{f.eur(summary.amount_cents)}</span>{' '}
+        {s.amount}: <span className="font-mono font-semibold">{f.money(summary.amount_cents, summary.currency)}</span>{' '}
         <span className="text-ink-faint">
-          ({t.sites.pricingOptions[summary.pricing]}, {f.eur(summary.unit_rate_cents)})
+          ({t.sites.pricingOptions[summary.pricing]}, {f.money(summary.unit_rate_cents, summary.currency)})
         </span>
       </p>
       <p className="mt-1 text-xs text-ink-faint">{s.hint}</p>

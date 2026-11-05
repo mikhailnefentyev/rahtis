@@ -19,6 +19,7 @@ import { ownTrackEmail } from '@/lib/email/templates/ownTrack';
 import { checkBusinessId, isCountryCode } from '@/lib/country';
 import { routeLabel } from '@/lib/orders/route';
 import { siteUrl } from '@/lib/config';
+import { isCurrency, type Currency } from '@/lib/money/currency';
 
 export type PublishState = { error: string | null; ref: string | null };
 
@@ -30,9 +31,13 @@ function toLocale(value: FormDataEntryValue | null): Locale {
 const str = (form: FormData, key: string): string =>
   String(form.get(key) ?? '').trim();
 
-/** Евро из формы в центы: деньги в системе целые (см. lib/config.ts). */
+/**
+ * Сумма из формы в центы: деньги в системе целые (см. lib/config.ts).
+ * Знак валюты не важен — «480 €», «1200 zł», «5000 kr» читаются как число;
+ * валюта приходит отдельным полем.
+ */
 function toCents(value: string): number | null {
-  const normalised = value.replace(/\s/g, '').replace(',', '.');
+  const normalised = value.replace(/[^\d,.-]/g, '').replace(',', '.');
   const euros = Number.parseFloat(normalised);
   return Number.isFinite(euros) && euros > 0 ? Math.round(euros * 100) : null;
 }
@@ -265,6 +270,9 @@ function explainPublish(t: Dictionary, code: string | undefined, message: string
   if (code === '55001' || code === '55002' || code === '55003') return t.direct.notFit;
   if (code === '55000') return t.orderForm.needActive;
   if (code === '22023' && message?.includes('групп')) return t.direct.groupPickTwo;
+  /* Проверка валюты в базе (orders_zz_currency_guard): не евро — только напрямую. */
+  if (code === '22023' && message?.includes('другой валюте')) return t.orderForm.currencyErrorDirect;
+  if (code === '22023' && message?.includes('только в евро')) return t.orderForm.currencyErrorRahtis;
   return t.orderForm.failed;
 }
 
@@ -274,6 +282,16 @@ function explainPublish(t: Dictionary, code: string | undefined, message: string
  * Одна и та же у заказа заказчика и у своего рейса перевозчика: форма
  * одна, и проверки у неё должны быть одни.
  */
+/**
+ * Валюта цены из формы. Пусто — null (решает база: свой рейс — валюта
+ * перевозчика, иначе евро); не из списка — ошибка, а не тихие евро.
+ */
+function readCurrency(formData: FormData): { currency: Currency | null } | { error: true } {
+  const raw = str(formData, 'currency').toUpperCase();
+  if (!raw) return { currency: null };
+  return isCurrency(raw) ? { currency: raw } : { error: true };
+}
+
 function readOrderForm(
   formData: FormData,
   t: Dictionary,
@@ -425,6 +443,17 @@ export async function publishOrderAction(
     return { error: t.direct.chooseVehicle, ref: null };
   }
 
+  /* Стол «напрямую с перевозчиком»: договор между сторонами, только подписчики. */
+  const deskContract = !direct && !group && str(formData, 'desk_contract') === 'CARRIER' ? 'CARRIER' : 'RAHTIS';
+  /*
+   * Валюта — только у прямого договора; через RAHTIS цена всегда в евро.
+   * Евро здесь явное: скрытое поле от прошлого выбора не должно увести
+   * заказ RAHTIS в кроны (база всё равно откажет, но с худшим текстом).
+   */
+  const chosenCurrency = readCurrency(formData);
+  if ('error' in chosenCurrency) return { error: t.orderForm.failed, ref: null };
+  const currency = deskContract === 'CARRIER' ? (chosenCurrency.currency ?? 'EUR') : 'EUR';
+
   const supabase = await createClient();
 
   const { data, error } = await supabase.rpc('create_order', {
@@ -437,8 +466,8 @@ export async function publishOrderAction(
        */
       direct_vehicle_id: direct ? directVehicle : '',
       ...(group ? { group_vehicle_ids: groupVehicles, group_minutes: str(formData, 'group_minutes') } : {}),
-      /* Стол «напрямую с перевозчиком»: договор между сторонами, только подписчики. */
-      desk_contract: !direct && !group && str(formData, 'desk_contract') === 'CARRIER' ? 'CARRIER' : 'RAHTIS',
+      desk_contract: deskContract,
+      currency,
     },
     p_stops: form.stops,
     p_publish: true,
@@ -485,6 +514,10 @@ export async function ownOrderAction(_previous: PublishState, formData: FormData
   const vehicle = str(formData, 'own_vehicle_id');
   if (!vehicle) return { error: t.direct.chooseVehicle, ref: null };
 
+  /* Свой рейс — в любой валюте RAHTIS; не выбрана — база берёт валюту перевозчика. */
+  const chosenCurrency = readCurrency(formData);
+  if ('error' in chosenCurrency) return { error: t.orderForm.failed, ref: null };
+
   const clientId = str(formData, 'client_id');
   /* Лишние пробелы внутри имени заводили второго клиента с тем же названием. */
   const clientName = str(formData, 'client_name').replace(/\s+/g, ' ');
@@ -516,7 +549,7 @@ export async function ownOrderAction(_previous: PublishState, formData: FormData
           business_id: rawClientBusinessId ? clientBusinessId.normalized : '',
           email: clientEmail,
         },
-    p_order: form.order as Json,
+    p_order: (chosenCurrency.currency ? { ...form.order, currency: chosenCurrency.currency } : form.order) as Json,
     p_stops: form.stops as unknown as Json,
     p_vehicle_id: vehicle,
   });

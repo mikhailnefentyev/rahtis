@@ -150,7 +150,11 @@ export async function OverviewBody({ locale, role }: { locale: Locale; role: Rol
     ];
   }
 
-  /* ── Неделя ───────────────────────────────────────────────────── */
+  /*
+   * ── Неделя ──
+   * weekly_totals уже в валюте компании: рейсы RAHTIS (евро) и свои
+   * (кроны, злотые) пересчитаны по курсу ЕЦБ дня закрытия.
+   */
   const weekly = weeklyRes.data;
   const weeks = fillWeeks(
     (weekly ?? []).map((w) => ({
@@ -202,13 +206,13 @@ export async function OverviewBody({ locale, role }: { locale: Locale; role: Rol
               <div className="grid grid-cols-3 gap-2">
                 <Kpi value={f.number(current.trips)} label={t.overview.trips} />
                 <Kpi value={f.number(current.km)} label={t.unit.km} />
-                <Kpi value={f.eur(current.cents)} label={carrier ? t.overview.payout : t.overview.spend} />
+                <Kpi value={f.money(current.cents, f.currency)} label={carrier ? t.overview.payout : t.overview.spend} />
               </div>
               <Bars
                 points={weeks.map((w) => ({
                   value: w.cents,
                   label: m('pulse.week', { no: isoWeek(w.week) }),
-                  title: m('pulse.weekAmount', { no: isoWeek(w.week), amount: f.eur(w.cents) }),
+                  title: m('pulse.weekAmount', { no: isoWeek(w.week), amount: f.money(w.cents, f.currency) }),
                 }))}
               />
             </CardBody>

@@ -21,6 +21,8 @@ export function WorkSummary({
   const { t, f } = useI18n();
   const s = summary.totals;
   const hours = (minutes: number) => `${f.decimal(minutes / 60, 1)} h`;
+  /* Итог — в валюте компании: дни в другой валюте ставки пересчитаны по курсу своего дня. */
+  const money = (cents: number) => f.money(cents, s.currency);
 
   const hasSupplements =
     s.parts.overtimeCents + s.parts.eveningCents + s.parts.nightCents + s.parts.weekendCents > 0;
@@ -32,7 +34,7 @@ export function WorkSummary({
         <Stat label={t.workReport.colKm} value={f.number(payableKm(s))} />
         <Stat label={t.workReport.colTrips} value={f.number(s.trips)} />
         <Stat label={t.workReport.colStops} value={f.number(s.stops)} />
-        <Stat label={t.workReport.colAmount} value={f.eur(s.amountCents)} />
+        <Stat label={f.label(t.workReport.colAmount, s.currency)} value={money(s.amountCents)} />
       </StatRow>
 
       <p className="text-xs text-ink-dim">
@@ -46,10 +48,10 @@ export function WorkSummary({
       {/* Из чего сложилась сумма — только когда есть надбавки, иначе это одна строка. */}
       {hasSupplements && (
         <p className="text-xs text-ink-dim">
-          {t.payModel.TES}: {f.eur(s.parts.baseCents)} + {t.workReport.colOvertime}{' '}
-          {f.eur(s.parts.overtimeCents)} + {t.workReport.colEvening} {f.eur(s.parts.eveningCents)} +{' '}
-          {t.workReport.colNight} {f.eur(s.parts.nightCents)} + {t.workReport.colSaturday}/
-          {t.workReport.colSunday} {f.eur(s.parts.weekendCents)}
+          {t.payModel.TES}: {money(s.parts.baseCents)} + {t.workReport.colOvertime}{' '}
+          {money(s.parts.overtimeCents)} + {t.workReport.colEvening} {money(s.parts.eveningCents)} +{' '}
+          {t.workReport.colNight} {money(s.parts.nightCents)} + {t.workReport.colSaturday}/
+          {t.workReport.colSunday} {money(s.parts.weekendCents)}
         </p>
       )}
 

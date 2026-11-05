@@ -44,14 +44,15 @@ export default async function VehicleEconomicsPage({
 
   const month = parseFuelMonth(query.month);
   const months = monthRange(month, 12);
-  const data = await loadEconomics(supabase, { id: company.id, partnership: company.partnership ?? null }, months);
+  const data = await loadEconomics(supabase, { id: company.id, partnership: company.partnership ?? null, currency: f.currency }, months);
   const vehicle = data.vehicles.find((v) => v.id === vehicleId);
   const econ = data.economics.find((v) => v.vehicleId === vehicleId);
   if (!vehicle || !econ) notFound();
 
   const monthLabel = new Intl.DateTimeFormat(t.meta.intl, { month: 'short', year: 'numeric', timeZone: 'UTC' });
   const label = (m: string) => monthLabel.format(new Date(`${m}-15T00:00:00Z`));
-  const eur = (cents: number) => (cents ? f.eur(cents) : '—');
+  /* Разбивка — в рабочей валюте компании; карточка и журнал — в своей валюте строки. */
+  const eur = (cents: number) => (cents ? f.money(cents, data.currency) : '—');
   const list = [...econ.months].reverse();
   const costs = data.costs.filter((c) => c.vehicle_id === vehicleId);
   const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Helsinki' }).format(new Date());
@@ -60,7 +61,7 @@ export default async function VehicleEconomicsPage({
   /* Износ купленной сразу машины — с расчётом: это доля цены в месяц, а не платёж. */
   const depLabel =
     fin?.financing === 'CASH' && fin.purchase_price_cents
-      ? `${s.lineDepreciation} (${fin.residual_cents ? `(${f.eur(fin.purchase_price_cents)} − ${f.eur(fin.residual_cents)})` : f.eur(fin.purchase_price_cents)} ÷ ${fin.useful_life_months} ${s.monthsShort})`
+      ? `${s.lineDepreciation} (${fin.residual_cents ? `(${f.money(fin.purchase_price_cents, fin.currency)} − ${f.money(fin.residual_cents, fin.currency)})` : f.money(fin.purchase_price_cents, fin.currency)} ÷ ${fin.useful_life_months} ${s.monthsShort})`
       : s.lineDepreciation;
   const lines: { label: string; get: (m: MonthEconomics) => number; strong?: boolean }[] = [
     { label: s.revenuePlatform, get: (m) => m.revenue.platform },
@@ -153,7 +154,7 @@ export default async function VehicleEconomicsPage({
                 <tr>
                   <Th>{s.spentOn}</Th>
                   <Th>{s.category}</Th>
-                  <Th numeric>{s.amount}</Th>
+                  <Th numeric>{f.label(s.amount)}</Th>
                   <Th>{s.note}</Th>
                   <Th />
                 </tr>
@@ -163,7 +164,7 @@ export default async function VehicleEconomicsPage({
                   <Tr key={c.id}>
                     <Td mono>{f.date(`${c.spent_on}T12:00:00Z`)}</Td>
                     <Td>{s.categories[c.category as keyof typeof s.categories] ?? c.category}</Td>
-                    <Td numeric>{f.eur(c.amount_cents)}</Td>
+                    <Td numeric>{f.money(c.amount_cents, c.currency)}</Td>
                     <Td className="whitespace-normal">{[c.supplier, c.note].filter(Boolean).join(' · ')}</Td>
                     <Td>
                       <form action={deleteVehicleCostAction}>

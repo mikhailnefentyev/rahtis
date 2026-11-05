@@ -10,6 +10,8 @@ import {
   type DriverLocale,
 } from '@/lib/i18n/driver';
 import { getDriver } from './session';
+import { asCurrency, countryCurrency } from '@/lib/money/currency';
+import { latestFxRates } from '@/lib/money/fx';
 import { stopTimeZone } from '@/lib/country';
 
 /**
@@ -37,5 +39,10 @@ export const getDriverI18n = cache(async (locale: Locale): Promise<I18n> => {
   const driverLocale = await driverLocaleOf(locale);
   /* Время — по стране перевозчика водителя, как у диспетчера той же компании. */
   const driver = await getDriver();
-  return createI18n(locale, await driverDictionary(locale, driverLocale), stopTimeZone(driver?.company_country));
+  /* Деньги — в валюте компании (заработок, заправка); курсы — для справки. */
+  const currency = asCurrency(driver?.company_currency, countryCurrency(driver?.company_country));
+  return createI18n(locale, await driverDictionary(locale, driverLocale), stopTimeZone(driver?.company_country), {
+    currency,
+    rates: currency === 'EUR' ? null : await latestFxRates(),
+  });
 });

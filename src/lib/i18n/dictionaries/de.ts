@@ -702,6 +702,7 @@ export const de = {
     resultNoIban: 'Tragen Sie Ihre Kontonummer (IBAN) in den Firmendaten ein.',
     resultNoEmail: 'Tragen Sie bei der Baustelle die E-Mail des Kunden ein.',
     resultNoAddress: 'Tragen Sie bei der Baustelle die Rechnungsadresse des Kunden ein.',
+    resultPlatformOrder: 'Diese Baustelle stammt aus einem RAHTIS-Auftrag, daher stellt RAHTIS die Rechnung. Eine eigene Rechnung ist nicht möglich.',
     resultCreated: 'Die Rechnung wurde erstellt, aber die E-Mail ging nicht raus. Laden Sie das PDF herunter und senden Sie es selbst.',
     invoiced: 'Abgerechnet',
     due: 'Fällig',
@@ -1597,6 +1598,11 @@ export const de = {
     requiredBody: 'Aufbau',
     anyBody: 'Beliebig',
     feeHint: 'Servicegebühr 5 % (mindestens 15 € pro Auftrag zusammen mit der Gebühr des Transportunternehmens). Ein Direktvertrag mit einem Transportunternehmen im Monatsmodell ist kostenlos.',
+    /* Валюта цены: не евро — только у прямого договора и своих рейсов. */
+    currency: 'Währung',
+    currencyEurOnly: 'Über den RAHTIS-Service wird der Auftrag in Euro bepreist und abgerechnet. Eine andere Währung ist mit einem Direktvertrag möglich.',
+    currencyErrorDirect: 'Eine andere Währung als Euro nur mit einem Direktvertrag mit dem Transportunternehmen. Über den RAHTIS-Service ist der Preis in Euro.',
+    currencyErrorRahtis: 'Dieses Transportunternehmen fährt über den RAHTIS-Service — der Auftragspreis nur in Euro.',
     title: 'Neuer Auftrag',
     subtitle: 'Füllen Sie die ganze Route aus und veröffentlichen Sie den Auftrag. Transportunternehmen sehen ihn sofort.',
     type: 'Transportart',
@@ -2197,6 +2203,15 @@ export const de = {
 
   account: {
     title: 'Ihre Daten',
+    currencyTitle: 'Firmenwährung',
+    currencyHintCarrier:
+      'Eigene Fahrten, Kosten, Kraftstoff, Löhne und eigene Baustellen werden in dieser Währung erfasst. Fahrten, Gebühren und Rechnungen über RAHTIS sind immer in Euro. Frühere Beträge behalten ihre Währung, Summen werden zum EZB-Kurs umgerechnet.',
+    currencyHintShipper:
+      'Standardwährung für Aufträge, die direkt mit einem Frachtführer vereinbart werden. Aufträge und Gebühren über RAHTIS sind immer in Euro.',
+    currencyLabel: 'Währung',
+    currencySave: 'Speichern',
+    currencySaved: 'Währung gespeichert.',
+    currencyError: 'Die Währung konnte nicht gespeichert werden.',
     passwordTitle: 'Passwort ändern',
     passwordHint: 'Das neue Passwort gilt sofort. Merken Sie es sich — wir können es weder sehen noch wiederherstellen.',
     current: 'Aktuelles Passwort',
@@ -3550,6 +3565,8 @@ export const de = {
     sunday: 'Sonntagszuschlag, %',
     note: 'Notiz',
     templates: 'RAHTIS-Vorlagen',
+    templatesEur:
+      'Die Vorlagen sind der finnische Tarifvertrag für das Lkw-Gewerbe in Euro. Eine Kopie bleibt in Euro; für Ihre eigene Währung legen Sie ein Regelwerk neu an.',
     copy: 'Als eigenes kopieren',
     own: 'Meine Regelwerke',
     none: 'Noch keine Regelwerke',

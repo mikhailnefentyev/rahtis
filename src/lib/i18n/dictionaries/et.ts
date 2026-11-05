@@ -702,6 +702,7 @@ export const et = {
     resultNoIban: 'Lisa ettevõtte andmetesse oma kontonumber (IBAN).',
     resultNoEmail: 'Lisa objektile kliendi e-post.',
     resultNoAddress: 'Lisa objektile kliendi arve aadress.',
+    resultPlatformOrder: 'See objekt tuli RAHTISe tellimusest, seega esitab arve RAHTIS. Oma arvet esitada ei saa.',
     resultCreated: 'Arve on loodud, aga e-kiri ei läinud välja. Laadi PDF alla ja saada see ise.',
     invoiced: 'Arveldatud',
     due: 'Tähtaeg',
@@ -1597,6 +1598,11 @@ export const et = {
     requiredBody: 'Kere',
     anyBody: 'Ükskõik milline',
     feeHint: 'Teenustasu 5 % (koos vedaja tasuga vähemalt 15 € veo kohta). Otseleping kuutasuga vedajaga on tasuta.',
+    /* Валюта цены: не евро — только у прямого договора и своих рейсов. */
+    currency: 'Valuuta',
+    currencyEurOnly: 'RAHTISe teenuse kaudu hinnatakse ja arveldatakse vedu eurodes. Muu valuuta on võimalik otselepinguga.',
+    currencyErrorDirect: 'Muu valuuta kui euro ainult otselepinguga vedajaga. RAHTISe teenuse kaudu on hind eurodes.',
+    currencyErrorRahtis: 'See vedaja töötab RAHTISe teenuse kaudu — veo hind ainult eurodes.',
     title: 'Uus vedu',
     subtitle: 'Täida kogu marsruut ja avalda. Vedajad näevad vedu kohe.',
     type: 'Veo liik',
@@ -2197,6 +2203,15 @@ export const et = {
 
   account: {
     title: 'Sinu andmed',
+    currencyTitle: 'Ettevõtte valuuta',
+    currencyHintCarrier:
+      'Omad veod, kulud, kütus, palgad ja omad objektid arvestatakse selles valuutas. RAHTISe teenuse veod, tasud ja arved on alati eurodes. Varasemad summad jäävad oma valuutasse ning kokkuvõtted arvutatakse ümber EKP kursiga.',
+    currencyHintShipper:
+      'Vaikevaluuta tellimustele, mis lepitakse kokku otse vedajaga. RAHTISe teenuse kaudu tellimused ja tasud on alati eurodes.',
+    currencyLabel: 'Valuuta',
+    currencySave: 'Salvesta',
+    currencySaved: 'Valuuta salvestatud.',
+    currencyError: 'Valuutat ei õnnestunud salvestada.',
     passwordTitle: 'Muuda parooli',
     passwordHint: 'Uus parool hakkab kehtima kohe. Jäta see meelde — me ei näe seda ega saa seda taastada.',
     current: 'Praegune parool',
@@ -3510,6 +3525,8 @@ export const et = {
     sunday: 'Pühapäevalisa, %',
     note: 'Märkus',
     templates: 'RAHTISe mallid',
+    templatesEur:
+      'Mallid on Soome veoautonduse kollektiivleping eurodes. Koopia jääb eurodesse; oma valuutas arvestamiseks loo reeglistik nullist.',
     copy: 'Kopeeri endale',
     own: 'Minu reeglistikud',
     none: 'Reeglistikke veel pole',

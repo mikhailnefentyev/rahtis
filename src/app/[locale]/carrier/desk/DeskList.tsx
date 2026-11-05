@@ -159,8 +159,11 @@ export function DeskList({
   combos = [],
   busy = [],
   waiting = {},
+  currencyByOrder = {},
 }: {
   orders: DeskOrder[];
+  /** Валюта цены по id заказа; нет — евро (стол RAHTIS всегда в евро). */
+  currencyByOrder?: Record<string, string>;
   vehicles: Vehicle[];
   /** Сохранённые сцепки перевозчика (конструктор в автопарке). */
   combos?: DeskCombo[];
@@ -179,6 +182,9 @@ export function DeskList({
     <div className="flex flex-col gap-3">
       {orders.map((order) => {
         const stops = (order.stops ?? []) as unknown as DeskStop[];
+        const currency = currencyByOrder[order.id] ?? 'EUR';
+        /* Справка в валюте перевозчика: «≈ 5 400 kr» рядом с ценой в евро. */
+        const approx = order.rate_cents ? f.approx(order.rate_cents, currency) : '';
 
         /*
          * Вес заказа — самый тяжёлый из пунктов, как и в базе
@@ -232,12 +238,13 @@ export function DeskList({
                       */}
                     {cargoKg ? `${cargoKg} kg · ` : ''}
                     {m('order.distance', { km: order.distance_km ?? 0 })} ·{' '}
-                    <span className="font-semibold text-ink">{f.eur(order.rate_cents ?? 0)}</span>{' '}
+                    <span className="font-semibold text-ink">{f.money(order.rate_cents ?? 0, currency)}</span>{' '}
+                    {approx && <span className="text-ink-dim">({approx}) </span>}
                     <span className="text-ink-dim">{t.money.addVat}</span>{' '}
                     {order.distance_km && order.rate_cents ? (
                       <span className="text-ink-dim">
                         · {m('order.ratePerKm', {
-                          rate: f.eurPerKm(order.rate_cents, order.distance_km) ?? '',
+                          rate: f.moneyPerKm(order.rate_cents, order.distance_km, currency) ?? '',
                         })}
                       </span>
                     ) : null}

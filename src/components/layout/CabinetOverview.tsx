@@ -213,6 +213,8 @@ export async function CabinetOverview({
                     {openFee > 0 && (
                       <p className="text-[12px] font-medium text-warn">
                         {t.cabinet.feeOpen.replace('{amount}', f.eur(openFee))}
+                        {/* Сбор RAHTIS — в евро; справка в валюте компании. */}
+                        {f.approx(openFee) && <span className="ml-1 font-normal text-ink-dim">({f.approx(openFee)})</span>}
                       </p>
                     )}
                     {/*

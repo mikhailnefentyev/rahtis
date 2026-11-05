@@ -60,10 +60,13 @@ export function OrderAmendments({
   orderId,
   haulKind = 'TRAILER',
   canAcknowledge = false,
+  currency = 'EUR',
   className,
 }: {
   amendments: OrderAmendment[];
   orderId: string;
+  /** Валюта цены заказа: пересчёт её не меняет. */
+  currency?: string;
   /* Забор и возврат называются по единице: у контейнера прицепа нет. */
   haulKind?: HaulKind;
 
@@ -115,7 +118,7 @@ export function OrderAmendments({
       const code = String(value) as keyof typeof t.role;
       return t.role[code] ?? String(value);
     }
-    if (field === 'rate_cents' && typeof value === 'number') return f.eur(value);
+    if (field === 'rate_cents' && typeof value === 'number') return f.money(value, currency);
     if (field === 'distance_km' && typeof value === 'number') {
       return m('order.distance', { km: value });
     }
@@ -193,7 +196,7 @@ export function OrderAmendments({
 
               <ul className="mt-1.5 flex flex-col gap-0.5">
                 {Object.entries(changes).map(([field, change]) => {
-                  const label = labels[field];
+                  const label = field === 'rate_cents' ? f.label(labels[field] ?? '', currency) : labels[field];
                   if (!label) return null;
 
                   const from = show(field, change.from);

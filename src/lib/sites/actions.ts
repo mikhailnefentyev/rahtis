@@ -62,7 +62,9 @@ export async function saveSiteJobAction(_previous: SiteJobState, formData: FormD
   const customer = text(formData, 'customer_name');
   const pricing = String(formData.get('pricing') ?? 'HOUR') as SitePricing;
   const material = String(formData.get('material_code') ?? '170504');
-  const rateRaw = String(formData.get('rate') ?? '0').replace(/\s/g, '').replace(',', '.');
+  /* Ставка в валюте объекта: символ любой («95 €», «950 kr», «400 zł») — оставляем только число.
+     Валюту не пишем: новый объект получает валюту компании триггером, у старого она своя. */
+  const rateRaw = String(formData.get('rate') ?? '0').replace(/[^\d,.-]/g, '').replace(',', '.');
   const rate = Number.parseFloat(rateRaw || '0');
   const buffer = Number.parseInt(String(formData.get('buffer_minutes') ?? '30'), 10);
 
@@ -200,6 +202,8 @@ export async function sendSiteInvoiceNowAction(_previous: SendInvoiceState, form
         return { message: s.resultNoEmail, ok: false };
       case 'NO_CUSTOMER_ADDRESS':
         return { message: s.resultNoAddress, ok: false };
+      case 'PLATFORM_ORDER':
+        return { message: s.resultPlatformOrder, ok: false };
       case 'NOTHING':
       case 'BUSY':
         return { message: s.resultNothing, ok: false };

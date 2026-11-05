@@ -1,5 +1,6 @@
 import { APP } from './config';
 import { zoneOffsetMinutes } from './dates';
+import { asCurrency, convertCents, type Currency, type FxRates } from './money/currency';
 
 /**
  * Форматирование денег, дат и чисел.
@@ -43,10 +44,96 @@ function toDate(value: Date | string | number): Date {
  * Создаёт набор форматтеров под конкретную локаль.
  * Тег берётся из словаря: `createFormat(t.meta.intl)`.
  */
-export function createFormat(intlLocale: string, zone: string = APP.timeZone) {
+/**
+ * Деньги зрителя: рабочая валюта его компании и последние курсы ЕЦБ.
+ * Без них — евро и без подсказок (витрина, письма, оператор).
+ */
+export type MoneyContext = { currency: Currency; rates: FxRates | null };
+
+export function createFormat(intlLocale: string, zone: string = APP.timeZone, moneyContext?: MoneyContext) {
+  const ownCurrency: Currency = moneyContext?.currency ?? 'EUR';
+  const rates = moneyContext?.rates ?? null;
+
+  function moneyFormat(currency: Currency, whole: boolean): Intl.NumberFormat {
+    return cached(`money:${intlLocale}:${currency}:${whole}`, () =>
+      new Intl.NumberFormat(intlLocale, {
+        style: 'currency',
+        currency,
+        currencyDisplay: 'narrowSymbol',
+        minimumFractionDigits: whole ? 0 : 2,
+        maximumFractionDigits: whole ? 0 : 2,
+      }),
+    );
+  }
+
+  function symbolOf(cur: Currency): string {
+    const part = moneyFormat(cur, true)
+      .formatToParts(0)
+      .find((p) => p.type === 'currency');
+    return part?.value ?? cur;
+  }
+
+  function money(cents: number, currency: Currency | string | null = ownCurrency): string {
+    const cur = asCurrency(currency, ownCurrency);
+    return moneyFormat(cur, cents % 100 === 0).format(cents / 100);
+  }
+
   return {
     /** Пояс, в котором показывается время: компании зрителя или операций. */
     zone,
+
+    /** Рабочая валюта компании зрителя (EUR вне кабинета). */
+    currency: ownCurrency,
+
+    /** Последние курсы ЕЦБ, если известны. */
+    rates,
+
+    /**
+     * Сумма в своей валюте строки: 48000, 'PLN' → «480 zł». Без валюты —
+     * валюта компании зрителя. Копейки — только когда они есть, как у eur().
+     */
+    money,
+
+    /** Ставка за километр в валюте строки: «16,20 zł/км» без единицы — «16,20 zł». */
+    moneyPerKm(cents: number, km: number, currency: Currency | string | null = ownCurrency): string | null {
+      if (!km || km <= 0) return null;
+      return moneyFormat(asCurrency(currency, ownCurrency), false).format(cents / 100 / km);
+    },
+
+    /** Знак валюты для подписей полей: «€», «zł», «kr». */
+    symbol(currency: Currency | string | null = ownCurrency): string {
+      return symbolOf(asCurrency(currency, ownCurrency));
+    },
+
+    /**
+     * Подпись словаря с «€» → с знаком нужной валюты:
+     * «Summa (€)» → «Summa (zł)». Для подписей денег перевозчика, которые
+     * писались, когда валюта была одна.
+     */
+    label(text: string, currency: Currency | string | null = ownCurrency): string {
+      const cur = asCurrency(currency, ownCurrency);
+      if (cur === 'EUR') return text;
+      return text.replace(/€/g, symbolOf(cur));
+    },
+
+    /**
+     * Справочный пересчёт в валюту зрителя: «≈ 2 107 zł». Пусто, когда
+     * валюта та же или курса нет. Для денег RAHTIS (они в евро): польский
+     * перевозчик видит, сколько это в злотых, а расчёты остаются в евро.
+     */
+    approx(cents: number, from: Currency | string | null = 'EUR'): string {
+      const src = asCurrency(from, 'EUR');
+      if (src === ownCurrency) return '';
+      const converted = convertCents(cents, src, ownCurrency, rates);
+      if (converted === null) return '';
+      /* Справка — без копеек: «≈ 2 107 zł», а не «≈ 2 106,72 zł». */
+      return `≈ ${moneyFormat(ownCurrency, true).format(Math.round(converted / 100))}`;
+    },
+
+    /** Пересчёт по последнему курсу в валюту зрителя; курса нет — null. */
+    toOwn(cents: number, from: Currency | string | null): number | null {
+      return convertCents(cents, asCurrency(from, 'EUR'), ownCurrency, rates);
+    },
 
     /** Сумма из центов: 48000 → «480 €» (ru-RU) / «480 €» (fi-FI). */
     eur(cents: number): string {

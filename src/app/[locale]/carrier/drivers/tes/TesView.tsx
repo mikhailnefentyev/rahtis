@@ -31,6 +31,10 @@ export type WageRate = {
  * водителя напрямую — тогда повышения по договору подхватываются сами —
  * или скопировать к себе и править как свой: местный договор может
  * отличаться. Свой набор перевозчик заводит и с нуля.
+ *
+ * Суммы набора — в его валюте (tes_rule_sets.currency). Шаблоны — финский
+ * TES в евро, и копия остаётся в евро: в злотые его суммы не переводятся.
+ * Свой набор с нуля — в валюте компании.
  */
 export function TesView({
   own,
@@ -49,18 +53,18 @@ export function TesView({
   const span = (a: string | null, b: string | null) => (a && b ? `${a.slice(0, 5)}–${b.slice(0, 5)}` : '—');
 
   /* Доплата окна: сумма, процент или обе — как записано в наборе. */
-  const extra = (cents: number, bps: number) =>
-    [cents > 0 ? f.eur(cents) : null, bps > 0 ? pct(bps) : null].filter(Boolean).join(' + ') || '—';
+  const extra = (cents: number, bps: number, currency: string) =>
+    [cents > 0 ? f.money(cents, currency) : null, bps > 0 ? pct(bps) : null].filter(Boolean).join(' + ') || '—';
 
   const describe = (s: TesRuleSet) =>
     [
-      `${f.eur(s.base_hourly_cents)} / h`,
+      `${f.money(s.base_hourly_cents, s.currency)} / h`,
       s.overtime_basis === 'PERIOD'
         ? `${f.decimal(s.period_regular_minutes / 60, 0)} h / 2 vk`
         : `${f.decimal(s.daily_regular_minutes / 60, 1)} h`,
       `${t.workReport.colOvertime} ${pct(s.overtime1_bps)} / ${pct(s.overtime2_bps)}`,
-      `${t.workReport.colEvening} ${span(s.evening_start, s.evening_end)} ${extra(s.evening_cents, s.evening_bps)}`,
-      `${t.workReport.colNight} ${span(s.night_start, s.night_end)} ${extra(s.night_cents, s.night_bps)}`,
+      `${t.workReport.colEvening} ${span(s.evening_start, s.evening_end)} ${extra(s.evening_cents, s.evening_bps, s.currency)}`,
+      `${t.workReport.colNight} ${span(s.night_start, s.night_end)} ${extra(s.night_cents, s.night_bps, s.currency)}`,
       s.saturday_bps > 0 ? `${t.workReport.colSaturday} ${pct(s.saturday_bps)}` : null,
       `${t.workReport.colSunday} ${pct(s.sunday_bps)}`,
       s.min_paid_minutes > 0 ? `min ${f.decimal(s.min_paid_minutes / 60, 2)} h` : null,
@@ -101,7 +105,7 @@ export function TesView({
                     </p>
                     <p className="mt-1 text-xs text-ink-muted">{describe(s)}</p>
                     {s.note && <p className="mt-1 text-xs text-ink-dim">{s.note}</p>}
-                    <RatesTable rates={ratesOf(s.id)} />
+                    <RatesTable rates={ratesOf(s.id)} currency={s.currency} />
                   </div>
                   <div className="flex gap-1.5">
                     <Button size="sm" onClick={() => setEditing(s)}>
@@ -121,6 +125,8 @@ export function TesView({
           <h2 className="mb-4 border-b border-line pb-2 text-[13px] font-semibold tracking-tight text-ink-faint">
             {t.tes.templates}
           </h2>
+          {/* Компания не в евро: шаблоны — финский договор в евро, и копия остаётся в евро. */}
+          {f.currency !== 'EUR' && <p className="-mt-2 mb-4 max-w-xl text-xs text-ink-dim">{t.tes.templatesEur}</p>}
           <div className="flex flex-col gap-2">
             {templates.map((s) => (
               <Card key={s.id}>
@@ -131,7 +137,7 @@ export function TesView({
                     </p>
                     <p className="mt-1 text-xs text-ink-muted">{describe(s)}</p>
                     {s.note && <p className="mt-1 text-xs text-ink-dim">{s.note}</p>}
-                    <RatesTable rates={ratesOf(s.id)} />
+                    <RatesTable rates={ratesOf(s.id)} currency={s.currency} />
                   </div>
                   <form action={copyTesTemplateAction}>
                     <input type="hidden" name="locale" value={locale} />
@@ -151,7 +157,7 @@ export function TesView({
 }
 
 /** Таблица ставок: категория строкой, даты повышений столбцами. */
-function RatesTable({ rates }: { rates: WageRate[] }) {
+function RatesTable({ rates, currency }: { rates: WageRate[]; currency: string }) {
   const { t, f } = useI18n();
   if (rates.length === 0) return null;
 
@@ -183,7 +189,7 @@ function RatesTable({ rates }: { rates: WageRate[] }) {
                   const value = cell(g.grade, d);
                   return (
                     <td key={d} className="py-1 pr-3 text-right font-mono">
-                      {value == null ? '—' : f.eur(value)}
+                      {value == null ? '—' : f.money(value, currency)}
                     </td>
                   );
                 })}
@@ -214,7 +220,9 @@ function DeleteTes({ id }: { id: string }) {
 }
 
 function TesForm({ set, onClose }: { set: TesRuleSet | null; onClose: () => void }) {
-  const { t, locale } = useI18n();
+  const { t, f, locale } = useI18n();
+  /* Суммы набора — в его валюте; новый набор база запишет в валюте компании. */
+  const currency = set?.currency ?? f.currency;
   const [state, formAction, pending] = useActionState(saveTesAction, initial);
   const keepFormAction = useKeepOnError(state);
 
@@ -222,7 +230,7 @@ function TesForm({ set, onClose }: { set: TesRuleSet | null; onClose: () => void
     if (state.done) onClose();
   }, [state.done, onClose]);
 
-  /* Центы и базисные пункты — в евро и проценты, как их пишут в договоре. */
+  /* Центы и базисные пункты — в суммы валюты набора и проценты, как их пишут в договоре. */
   const eur = (cents: number | undefined) => (cents == null ? '' : (cents / 100).toFixed(2).replace('.', ','));
   const pct = (bps: number | undefined) => (bps == null ? '' : String(bps / 100).replace('.', ','));
   const hrs = (min: number | undefined) => (min == null ? '' : String(min / 60).replace('.', ','));
@@ -241,7 +249,7 @@ function TesForm({ set, onClose }: { set: TesRuleSet | null; onClose: () => void
             {(p) => <Input {...p} type="date" name="valid_from" required defaultValue={set?.valid_from ?? ''} />}
           </Field>
 
-          <Field label={t.tes.base} hint={t.tes.basePlaceholderHint} required>
+          <Field label={f.label(t.tes.base, currency)} hint={t.tes.basePlaceholderHint} required>
             {(p) => (
               <InputMono {...p} name="base_hourly" required inputMode="decimal" defaultValue={eur(set?.base_hourly_cents)} />
             )}
@@ -305,6 +313,7 @@ function TesForm({ set, onClose }: { set: TesRuleSet | null; onClose: () => void
             end={set?.evening_end ?? ''}
             cents={eur(set?.evening_cents)}
             percent={pct(set?.evening_bps)}
+            currency={currency}
           />
           <WindowFields
             label={t.tes.night}
@@ -313,6 +322,7 @@ function TesForm({ set, onClose }: { set: TesRuleSet | null; onClose: () => void
             end={set?.night_end ?? ''}
             cents={eur(set?.night_cents)}
             percent={pct(set?.night_bps)}
+            currency={currency}
           />
 
           <Field label={t.tes.saturday}>
@@ -368,6 +378,7 @@ function WindowFields({
   end,
   cents,
   percent,
+  currency,
 }: {
   label: string;
   prefix: string;
@@ -375,8 +386,9 @@ function WindowFields({
   end: string;
   cents: string;
   percent: string;
+  currency: string;
 }) {
-  const { t } = useI18n();
+  const { t, f } = useI18n();
   return (
     <fieldset className="grid grid-cols-2 gap-2 sm:col-span-2 sm:grid-cols-4">
       <legend className="label-micro mb-1.5">{label}</legend>
@@ -386,7 +398,7 @@ function WindowFields({
       <Field label={t.tes.to}>
         {(p) => <Input {...p} type="time" name={`${prefix}_end`} defaultValue={end.slice(0, 5)} />}
       </Field>
-      <Field label={t.tes.perHour}>
+      <Field label={f.label(t.tes.perHour, currency)}>
         {(p) => <InputMono {...p} name={prefix} inputMode="decimal" defaultValue={cents} />}
       </Field>
       <Field label={t.tes.pctOfBase}>

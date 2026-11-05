@@ -36,6 +36,7 @@ export function OrderTrouble({
   orderId,
   distanceKm,
   rateCents,
+  currency,
   autoKm,
   started,
   className,
@@ -43,6 +44,8 @@ export function OrderTrouble({
   orderId: string;
   distanceKm: number | null;
   rateCents: number | null;
+  /** Валюта цены заказа: пересчёт её не меняет. */
+  currency: string;
   /** Что насчитал роутер после правки маршрута. Расхождение и есть повод. */
   autoKm: number | null;
   /** Первая точка пройдена: снять заказ база уже не даст, остаётся пересчёт. */
@@ -78,6 +81,7 @@ export function OrderTrouble({
           orderId={orderId}
           distanceKm={distanceKm}
           rateCents={rateCents}
+          currency={currency}
           autoKm={autoKm}
           onDone={() => setOpen('none')}
         />
@@ -93,11 +97,11 @@ export function OrderTrouble({
           {m('lifecycle.wasNow', {
             before: m('lifecycle.kmAndMoney', {
               km: distanceKm,
-              amount: f.eur(rateCents ?? 0),
+              amount: f.money(rateCents ?? 0, currency),
             }),
             after: m('lifecycle.kmAndMoney', {
               km: autoKm,
-              amount: f.eur(repricedRateCents(rateCents ?? 0, distanceKm, autoKm)),
+              amount: f.money(repricedRateCents(rateCents ?? 0, distanceKm, autoKm), currency),
             }),
           })}
         </p>
@@ -118,12 +122,14 @@ function RepriceForm({
   orderId,
   distanceKm,
   rateCents,
+  currency,
   autoKm,
   onDone,
 }: {
   orderId: string;
   distanceKm: number | null;
   rateCents: number | null;
+  currency: string;
   autoKm: number | null;
   onDone: () => void;
 }) {
@@ -165,7 +171,7 @@ function RepriceForm({
 
       {distanceKm !== null && rateCents !== null && (
         <Mono className="mb-3 block text-[11px] text-ink-dim">
-          {m('lifecycle.kmAndMoney', { km: distanceKm, amount: f.eur(rateCents) })}
+          {m('lifecycle.kmAndMoney', { km: distanceKm, amount: f.money(rateCents, currency) })}
         </Mono>
       )}
 
@@ -183,7 +189,7 @@ function RepriceForm({
           )}
         </Field>
 
-        <Field label={t.orderForm.rate} hint={t.money.addVat} required>
+        <Field label={f.label(t.orderForm.rate, currency)} hint={t.money.addVat} required>
           {(p) => (
             <Input
               {...p}

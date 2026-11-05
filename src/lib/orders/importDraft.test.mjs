@@ -82,7 +82,33 @@ test('контейнер с неверной контрольной цифрой
   assert.ok(draft.missing.includes('unit'));
   assert.equal(draft.containerFeet, '40');
   assert.equal(draft.rate, '');
+  assert.equal(draft.currency, null);
   assert.equal(draft.foreignPrice, '5000 SEK');
+});
+
+test('свой рейс перевозчика: цена в валюте письма подставляется вместе с валютой', () => {
+  const currencies = ['EUR', 'SEK', 'NOK', 'DKK', 'PLN'];
+  const sek = normalizeDraft(
+    { haul_kind: 'TRUCK', price: 5000, currency: 'sek', stops: [] },
+    { isValidContainer, today, clients: [], currencies },
+  );
+  assert.equal(sek.rate, '5000');
+  assert.equal(sek.currency, 'SEK');
+  assert.equal(sek.foreignPrice, null);
+  assert.ok(!sek.missing.includes('rate'));
+
+  /* Валюта не из наших — как раньше, в список «проверьте». */
+  const usd = normalizeDraft(
+    { haul_kind: 'TRUCK', price: 900, currency: 'USD', stops: [] },
+    { isValidContainer, today, clients: [], currencies },
+  );
+  assert.equal(usd.rate, '');
+  assert.equal(usd.foreignPrice, '900 USD');
+
+  /* Евро без названной валюты — евро. */
+  const eur = normalizeDraft({ haul_kind: 'TRUCK', price: 480, stops: [] }, { isValidContainer, today });
+  assert.equal(eur.rate, '480');
+  assert.equal(eur.currency, 'EUR');
 });
 
 test('тип не назван — догадка и пометка', () => {

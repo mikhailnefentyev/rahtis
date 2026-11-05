@@ -69,6 +69,10 @@ export function tripColumns(report: PeriodReport, t: Dictionary): Column<ReportL
     { header: p.colTrailer, kind: 'text', get: (l) => l.trailer, width: 11 },
     { header: p.colKm, kind: 'int', get: (l) => l.km, width: 8 },
     { header: p.colRate, kind: 'money', get: (l) => euros(l.rate), width: 12 },
+    /* Валюта — колонкой, когда в таблице есть не евро (у оператора — прямые договоры). */
+    ...(report.lines.some((l) => l.currency !== 'EUR')
+      ? [{ header: t.orderForm.currency, kind: 'text' as const, get: (l: ReportLine) => l.currency, width: 8 }]
+      : []),
     ...(shipperFee
       ? [
           {
@@ -204,6 +208,8 @@ export function ownColumns(report: PeriodReport, t: Dictionary): Column<ReportLi
     { header: p.colVehicle, kind: 'text', get: (l) => l.vehicle, width: 12 },
     { header: p.colKm, kind: 'int', get: (l) => l.km, width: 8 },
     { header: p.colRate, kind: 'money', get: (l) => euros(l.rate), width: 12 },
+    /* Цена своего рейса — в его валюте; колонка рядом, чтобы кроны не читались евро. */
+    { header: t.orderForm.currency, kind: 'text', get: (l) => l.currency, width: 8 },
   ];
 }
 

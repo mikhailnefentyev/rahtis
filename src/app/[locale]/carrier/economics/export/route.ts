@@ -21,6 +21,10 @@ import { createClient } from '@/lib/supabase/server';
  * PDF: итоги месяца, таблица по машинам и парк за год; для одной машины —
  * её статьи по месяцам и журнал разовых расходов. CSV — строка на машину и
  * месяц со всеми статьями: так его удобно сводить в таблице.
+ *
+ * Суммы — в рабочей валюте компании (load.ts пересчитал каждую строку по
+ * курсу ЕЦБ её дня); в CSV валюта — отдельной колонкой, журнал в PDF — в
+ * валюте каждой записи.
  */
 export const dynamic = 'force-dynamic';
 
@@ -44,10 +48,12 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
 
   const month = parseFuelMonth(url.searchParams.get('month'));
   const months = monthRange(month, 12);
-  const [{ t, f }, data] = await Promise.all([
-    getViewerI18n(locale),
-    loadEconomics(supabase, { id: viewer.company.id, partnership: viewer.company.partnership ?? null }, months),
-  ]);
+  const { t, f } = await getViewerI18n(locale);
+  const data = await loadEconomics(
+    supabase,
+    { id: viewer.company.id, partnership: viewer.company.partnership ?? null, currency: f.currency },
+    months,
+  );
   const s = t.economics;
 
   /* Одна машина — только своя: чужой id даёт весь парк. */
@@ -82,6 +88,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
       s.statCosts,
       s.colProfit,
       `${s.colMargin} %`,
+      t.orderForm.currency,
     ].map((h) => csvText(h));
     const lines = [header];
     for (const v of econ) {
@@ -94,6 +101,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
             (x) => csvNumber(cents2(x)),
           ),
           csvNumber(m.marginPct?.toFixed(1)),
+          csvText(data.currency),
         ]);
       }
     }
@@ -102,7 +110,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
 
   const monthName = (m: string, style: 'long' | 'short' = 'long') =>
     new Intl.DateTimeFormat(t.meta.intl, { month: style, year: 'numeric', timeZone: 'UTC' }).format(new Date(`${m}-15T00:00:00Z`));
-  const eur = (c: number) => f.eur(c);
+  const eur = (c: number) => f.money(c, data.currency);
   const margin = (m: MonthEconomics) => (m.marginPct != null ? `${f.decimal(m.marginPct)} %` : '—');
   const totalOf = vehicle ? econ[0]!.months.find((m) => m.month === month)! : data.fleet.find((m) => m.month === month)!;
   const num = (header: string, flex = 1): TablesPdfColumn => ({ header, flex, right: true });
@@ -216,9 +224,9 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
     tables.push({
       title: s.costsTitle,
       empty: s.noCosts,
-      columns: [{ header: s.spentOn, flex: 1 }, { header: s.category, flex: 1.4 }, num(s.amount, 1.2), { header: s.note, flex: 3 }],
+      columns: [{ header: s.spentOn, flex: 1 }, { header: s.category, flex: 1.4 }, num(f.label(s.amount), 1.2), { header: s.note, flex: 3 }],
       rows: costs.map((c) => ({
-        cells: [f.date(`${c.spent_on}T12:00:00Z`), s.categories[c.category as keyof typeof s.categories] ?? c.category, eur(c.amount_cents), c.note ?? ''],
+        cells: [f.date(`${c.spent_on}T12:00:00Z`), s.categories[c.category as keyof typeof s.categories] ?? c.category, f.money(c.amount_cents, c.currency), c.note ?? ''],
       })),
     } as typeof year);
   }

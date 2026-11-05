@@ -81,6 +81,8 @@ export type OrderDraft = {
   containerFeet: string;
   ldm: string;
   rate: string;
+  /** Валюта подставленной ставки (евро или, у своего рейса, валюта письма); цены нет — null. */
+  currency: string | null;
   comment: string;
   pickup: DraftStop | null;
   /** Вторая точка экспресса. */
@@ -200,6 +202,12 @@ export function normalizeDraft(
     isValidContainer: (value: string) => boolean;
     /** Свой рейс перевозчика: клиент из письма. */
     clients?: { id: string; name: string; business_id: string | null }[] | null;
+    /**
+     * Валюты, в которых цену можно подставить в поле как есть. По
+     * умолчанию — только евро (заказ через RAHTIS); у своего рейса
+     * перевозчика — все валюты RAHTIS.
+     */
+    currencies?: readonly string[];
     today: string;
   },
 ): OrderDraft | null {
@@ -254,17 +262,24 @@ export function normalizeDraft(
   if (ldm) filled.push('ldm');
   else if (express && haulKind !== 'TIPPER' && haulKind !== 'SEMI') missing.add('ldm');
 
-  /* Цена — только в евро: поле ставки в евро, курс угадывать нельзя. */
+  /*
+   * Цена — в принятой валюте: у заказа через RAHTIS только евро, у своего
+   * рейса — валюта письма, если она из наших. Курс не угадываем: чужая
+   * валюта уходит в список «проверьте», поле остаётся пустым.
+   */
   const price = num(r.price);
-  const currency = text(r.currency, 3).toUpperCase() || 'EUR';
+  const priceCurrency = text(r.currency, 3).toUpperCase() || 'EUR';
+  const accepted = options.currencies ?? ['EUR'];
   let rate = '';
+  let currency: string | null = null;
   let foreignPrice: string | null = null;
   if (price && price > 0 && price < 1_000_000) {
-    if (currency === 'EUR') {
+    if (accepted.includes(priceCurrency)) {
       rate = decimal(price);
+      currency = priceCurrency;
       filled.push('rate');
     } else {
-      foreignPrice = `${decimal(price)} ${currency}`;
+      foreignPrice = `${decimal(price)} ${priceCurrency}`;
     }
   }
   if (!rate) missing.add('rate');
@@ -416,6 +431,7 @@ export function normalizeDraft(
     containerFeet,
     ldm,
     rate,
+    currency,
     comment: commentText,
     pickup,
     delivery,

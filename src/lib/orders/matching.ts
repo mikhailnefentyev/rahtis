@@ -54,6 +54,9 @@ async function explain(locale: Locale, code: string | undefined, message: string
   /* Машина без водителя или с просроченными документами — это не «время вышло». */
   if (code === '55000' && message?.includes('не допущена')) return t.matching.vehicleNotReady;
   if (code === '55000') return t.matching.tooLate;
+  /* Проверка валюты (orders_zz_currency_guard): цена не в евро — только напрямую. */
+  if (code === '22023' && message?.includes('только в евро')) return t.orderForm.currencyErrorRahtis;
+  if (code === '22023' && message?.includes('другой валюте')) return t.orderForm.currencyErrorDirect;
 
   return t.matching.failed;
 }
@@ -230,7 +233,9 @@ export async function directAssignAction(
               ? t.direct.notFit
               : error.code === '55000'
                 ? t.direct.hasOffers
-                : t.matching.failed;
+                : error.code === '22023' && error.message.includes('только в евро')
+                  ? t.orderForm.currencyErrorRahtis
+                  : t.matching.failed;
     return { error: message, done: false };
   }
 

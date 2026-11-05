@@ -1,9 +1,18 @@
 import 'server-only';
 
-import { summarizeDriver, type PayModelCode, type PayProfileInput, type ShiftInput } from '@/lib/driverPay';
+import {
+  summarizeDriver,
+  totalsOf,
+  type PayModelCode,
+  type PayProfileInput,
+  type ShiftInput,
+} from '@/lib/driverPay';
 import { tesRules } from '@/lib/drivers/report';
 import { todayInHelsinki } from '@/lib/dates';
+import { asCurrency, countryCurrency } from '@/lib/money/currency';
+import { loadFxHistory } from '@/lib/money/fx';
 import { createClient } from '@/lib/supabase/server';
+import { getDriver } from './session';
 import type { TesRuleSet } from '@/types/db';
 
 /**
@@ -19,6 +28,10 @@ import type { TesRuleSet } from '@/types/db';
  * километры (если в тот день не записан одометр — тогда километры дня
  * берутся с одометра и на рейсы не делятся). У почасовых моделей и TES
  * сумма есть только у дня: час работы не принадлежит одному рейсу.
+ *
+ * Валюта: сумма дня и рейса — в валюте ставки (профиль, у TES — набор);
+ * доля share_cents база уже пересчитала в неё. Итог месяца и нарастающий
+ * итог — в валюте компании, дни в другой валюте — по курсу своего дня.
  */
 
 type RawShift = {
@@ -44,6 +57,7 @@ type RawTrip = {
 type RawProfile = {
   valid_from: string;
   model: PayModelCode;
+  currency?: string | null;
   per_km_cents: number | null;
   hourly_cents: number | null;
   tes: TesRuleSet | null;
@@ -58,6 +72,7 @@ export type EarningTrip = {
   routeFrom: string | null;
   routeTo: string | null;
   km: number | null;
+  /** В валюте дня (EarningDay.currency). */
   amountCents: number | null;
 };
 
@@ -66,7 +81,9 @@ export type EarningDay = {
   model: PayModelCode | null;
   workMinutes: number;
   amountCents: number | null;
-  /** Сколько набралось за месяц к концу этого дня. */
+  /** Валюта amountCents и сумм рейсов: валюта ставки дня. */
+  currency: string | null;
+  /** Сколько набралось за месяц к концу этого дня — в валюте компании. */
   runningCents: number;
   trips: EarningTrip[];
 };
@@ -74,6 +91,8 @@ export type EarningDay = {
 export type DriverEarnings = {
   month: string;
   hasProfile: boolean;
+  /** Валюта итогов: рабочая валюта компании. */
+  currency: string;
   totalCents: number;
   trips: number;
   workMinutes: number;
@@ -101,7 +120,8 @@ export async function getDriverEarnings(month: string): Promise<DriverEarnings> 
     .toISOString()
     .slice(0, 10);
 
-  const supabase = await createClient();
+  const [supabase, driver] = await Promise.all([createClient(), getDriver()]);
+  const currency = asCurrency(driver?.company_currency, countryCurrency(driver?.company_country));
   const { data } = await supabase.rpc('driver_earnings', { p_from: from, p_to: to });
   const raw = (data ?? { shifts: [], trips: [], profiles: [] }) as unknown as {
     shifts: RawShift[];
@@ -118,7 +138,15 @@ export async function getDriverEarnings(month: string): Promise<DriverEarnings> 
     tes: p.tes ? tesRules(p.tes, p.rates) : null,
     tesGrade: p.tes_grade,
     tesExperienceSince: p.tes_experience_since,
+    currency: p.currency ?? null,
   }));
+
+  /* Курсы — только если есть ставка не в валюте компании. */
+  const foreign = raw.profiles.some((p) => (p.tes?.currency ?? p.currency ?? currency) !== currency);
+  const history = foreign ? await loadFxHistory(supabase, from, to) : null;
+  const fx = history
+    ? (cents: number, a: string, b: string, day: string) => history.convert(cents, asCurrency(a), asCurrency(b), day)
+    : undefined;
 
   const shifts: ShiftInput[] = raw.shifts.map((s) => ({
     id: s.id,
@@ -139,6 +167,10 @@ export async function getDriverEarnings(month: string): Promise<DriverEarnings> 
     })),
     profiles,
     now: new Date().getTime(),
+    currency,
+    /* share_cents уже в валюте ставки — пересчитывать нечего. */
+    payoutCurrency: null,
+    fx,
   });
 
   const dayOf = (iso: string) => todayInHelsinki(new Date(iso));
@@ -149,7 +181,8 @@ export async function getDriverEarnings(month: string): Promise<DriverEarnings> 
   for (const day of summary.days) {
     if (day.date < from || day.date > to) continue;
 
-    running += day.amountCents ?? 0;
+    /* В валюте компании; день без курса в итог не входит. */
+    running += totalsOf([day], { currency, fx }).amountCents;
 
     const trips = raw.trips
       .filter((t) => dayOf(t.closed_at) === day.date)
@@ -175,6 +208,7 @@ export async function getDriverEarnings(month: string): Promise<DriverEarnings> 
       model: day.model,
       workMinutes: day.workMinutes,
       amountCents: day.amountCents,
+      currency: day.currency,
       runningCents: running,
       trips,
     });
@@ -183,6 +217,7 @@ export async function getDriverEarnings(month: string): Promise<DriverEarnings> 
   return {
     month,
     hasProfile: profiles.length > 0,
+    currency,
     totalCents: running,
     trips: days.reduce((s, d) => s + d.trips.length, 0),
     workMinutes: days.reduce((s, d) => s + d.workMinutes, 0),

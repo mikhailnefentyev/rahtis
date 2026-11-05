@@ -1,7 +1,9 @@
 import 'server-only';
 
 import type { createClient } from '@/lib/supabase/server';
-import { fuelStats, monthOf, monthsBack, type FuelRow, type FuelStats } from './fuel';
+import { asCurrency, type Currency } from '@/lib/money/currency';
+import { loadFxHistory } from '@/lib/money/fx';
+import { fuelAmountIn, fuelStats, monthOf, monthsBack, type FuelRow, type FuelStats } from './fuel';
 
 /**
  * Заправки компании за месяц и год до него — для страницы «Топливо» и
@@ -9,11 +11,17 @@ import { fuelStats, monthOf, monthsBack, type FuelRow, type FuelStats } from './
  *
  * Год нужен расходу: интервал полного бака, начатый в прошлом месяце,
  * закрывается в этом, и без предыдущих строк месяц посчитался бы неверно.
+ *
+ * Сумма строки — в валюте чека (row.currency); итоги и цена километра —
+ * в валюте компании, каждая строка по курсу ЕЦБ дня заправки.
  */
 
 export const FUEL_MONTHS = 12;
 
 export type FuelEntry = FuelRow & {
+  currency: Currency;
+  /** Сумма в валюте компании по курсу дня заправки; null — суммы нет или курса нет. */
+  own_amount_cents: number | null;
   driver_id: string | null;
   unit: string | null;
   station: string | null;
@@ -27,6 +35,8 @@ export type FuelEntry = FuelRow & {
 export type FuelMonth = {
   month: string;
   months: string[];
+  /** Валюта компании: в ней итоги. */
+  currency: Currency;
   rows: FuelEntry[];
   stats: FuelStats;
   vehicles: { id: string; plate: string }[];
@@ -55,17 +65,18 @@ export async function loadFuelMonth(
   supabase: Awaited<ReturnType<typeof createClient>>,
   companyId: string,
   month: string,
+  currency: Currency,
 ): Promise<FuelMonth> {
   const months = monthsBack(month, FUEL_MONTHS);
   /* С запасом в месяц: первый интервал года открывается заправкой месяцем раньше. */
   const since = `${monthsBack(months[0], 2)[0]}-01T00:00:00Z`;
   const until = `${nextMonth(month)}-01T00:00:00Z`;
 
-  const [{ data: entries }, { data: vehicles }, { data: drivers }] = await Promise.all([
+  const [{ data: entries }, { data: vehicles }, { data: drivers }, fx] = await Promise.all([
     supabase
       .from('fuel_entries')
       .select(
-        'id, vehicle_id, driver_id, filled_at, product, quantity, unit, amount_cents, odometer_km, full_tank, station, source, receipt_path, qty_report, qty_driver, qty_telematics',
+        'id, vehicle_id, driver_id, filled_at, product, quantity, unit, amount_cents, currency, odometer_km, full_tank, station, source, receipt_path, qty_report, qty_driver, qty_telematics',
       )
       .eq('company_id', companyId)
       .gte('filled_at', since)
@@ -74,21 +85,28 @@ export async function loadFuelMonth(
       .limit(5000),
     supabase.from('vehicles').select('id, plate').eq('company_id', companyId).order('plate'),
     supabase.from('drivers').select('id, full_name').eq('company_id', companyId),
+    loadFxHistory(supabase, since, until),
   ]);
 
-  const rows: FuelEntry[] = (entries ?? []).map((e) => ({
-    ...e,
-    quantity: Number(e.quantity),
-    qty_report: num(e.qty_report),
-    qty_driver: num(e.qty_driver),
-    qty_telematics: num(e.qty_telematics),
-  }));
+  const toOwn = fuelAmountIn(currency, fx);
+  const rows: FuelEntry[] = (entries ?? []).map((e) => {
+    const row = {
+      ...e,
+      currency: asCurrency(e.currency, currency),
+      quantity: Number(e.quantity),
+      qty_report: num(e.qty_report),
+      qty_driver: num(e.qty_driver),
+      qty_telematics: num(e.qty_telematics),
+    };
+    return { ...row, own_amount_cents: toOwn(row) };
+  });
 
   return {
     month,
     months,
+    currency,
     rows,
-    stats: fuelStats(rows),
+    stats: fuelStats(rows, (row) => row.own_amount_cents),
     vehicles: vehicles ?? [],
     drivers: drivers ?? [],
   };
