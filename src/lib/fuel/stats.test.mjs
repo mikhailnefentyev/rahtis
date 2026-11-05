@@ -3,7 +3,7 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { fuelStats, monthOf, monthsBack } from './fuel.ts';
+import { fuelAmountIn, fuelStats, monthOf, monthsBack } from './fuel.ts';
 
 let n = 0;
 const row = (over) => ({
@@ -109,4 +109,40 @@ test('месяц — по Хельсинки, интервал — в месяц
 
 test('месяцы назад через границу года', () => {
   assert.deepEqual(monthsBack('2026-02', 4), ['2025-11', '2025-12', '2026-01', '2026-02']);
+});
+
+test('валюты: чек в евро у польской компании пересчитан по курсу дня заправки', () => {
+  /* Курс злотого: 4,30 до 4 октября, с 5-го — 4,40. */
+  const fx = {
+    convert(cents, from, to, day) {
+      const rate = (cur) => (cur === 'EUR' ? 1 : cur === 'PLN' ? (day < '2026-10-05' ? 4.3 : 4.4) : null);
+      const a = rate(from);
+      const b = rate(to);
+      return a == null || b == null ? null : Math.round((cents / a) * b);
+    },
+  };
+  const toPln = fuelAmountIn('PLN', fx);
+  const rows = [
+    row({ filled_at: '2026-10-01T06:00:00Z', quantity: 300, odometer_km: 100000, amount_cents: 200000, currency: 'PLN' }),
+    row({ filled_at: '2026-10-05T06:00:00Z', quantity: 330, odometer_km: 101000, amount_cents: 59400, currency: 'EUR' }),
+    /* Кроны без курса: литры считаются, деньги — нет. */
+    row({ filled_at: '2026-10-06T06:00:00Z', quantity: 10, product: 'ADBLUE', amount_cents: 50000, currency: 'SEK' }),
+  ];
+  assert.equal(toPln(rows[0]), 200000);
+  assert.equal(toPln(rows[1]), 261360);
+  assert.equal(toPln(rows[2]), null);
+  assert.equal(toPln(row({ filled_at: '2026-10-01T06:00:00Z', quantity: 1, amount_cents: null })), null);
+
+  const oct = fuelStats(rows, toPln).byVehicle.get('A')[0];
+  /* 2000 zł + 594 € × 4,40 = 4613,60 zł; кроны пропущены. */
+  assert.equal(oct.amountCents, 461360);
+  assert.equal(oct.adblueL, 10);
+  /* Цена литра (461360 / 630) × 0,33 л/км. */
+  assert.equal(oct.centsPerKm, Math.round((461360 / 630) * 0.33 * 10) / 10);
+});
+
+test('валюта без названия — валюта компании, без пересчёта', () => {
+  const toEur = fuelAmountIn('EUR', { convert: () => { throw new Error('не нужен'); } });
+  assert.equal(toEur(row({ filled_at: '2026-10-01T06:00:00Z', quantity: 1, amount_cents: 1234 })), 1234);
+  assert.equal(toEur(row({ filled_at: '2026-10-01T06:00:00Z', quantity: 1, amount_cents: 1234, currency: 'EUR' })), 1234);
 });

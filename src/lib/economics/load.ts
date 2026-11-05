@@ -4,14 +4,23 @@ import { payoutCents, COMMISSION_BPS, subscriptionLadderCents } from '@/lib/conf
 import { buildDriverReport } from '@/lib/drivers/report';
 import { invoiceLines, type InvoiceDay } from '@/lib/sites/invoice';
 import { dayMinutes } from '@/lib/sites/work';
+import { asCurrency, type Currency } from '@/lib/money/currency';
+import { loadFxHistory } from '@/lib/money/fx';
 import { createAdminClient } from '@/lib/supabase/admin';
 import type { createClient } from '@/lib/supabase/server';
+import { companyConverter } from './convert';
 import { vehicleEconomics, type EconomicsInput, type VehicleFinance } from './profit';
 
 /**
  * Данные доходности компании за месяцы: рейсы, работа на объектах,
  * топливо, зарплаты по сменам, карточки машин и журнал расходов — под
  * сессией перевозчика (RLS), считает profit.ts.
+ *
+ * Валюта: каждая строка — в своей валюте (рейсы RAHTIS и простой — евро,
+ * свои рейсы — валюта заказа, объекты — валюта объекта, топливо — валюта
+ * чека, расходы и карточка — своя колонка, абонемент — евро). Всё
+ * переводится в рабочую валюту компании по курсу ЕЦБ дня строки до
+ * сложения; строка без курса в итог не входит (missingRates).
  */
 
 type Supabase = Awaited<ReturnType<typeof createClient>>;
@@ -20,7 +29,7 @@ const zone = 'Europe/Helsinki';
 const dateFormat = new Intl.DateTimeFormat('en-CA', { timeZone: zone, year: 'numeric', month: '2-digit', day: '2-digit' });
 const localDate = (iso: string) => dateFormat.format(new Date(iso));
 
-/* Абонемент: средняя цена за машину месяца по числу машин, у которых был доход (первая бесплатна). */
+/* Абонемент (евро): средняя цена за машину месяца по числу машин, у которых был доход (первая бесплатна). */
 function ladderUnits(revenue: EconomicsInput['revenue'], months: string[]): Record<string, number> {
   const worked = new Map<string, Set<string>>();
   for (const r of revenue) {
@@ -52,7 +61,12 @@ const endOf = (month: string) => {
   return new Date(Date.UTC(y, m, 0)).toISOString().slice(0, 10);
 };
 
-export async function loadEconomics(supabase: Supabase, company: { id: string; partnership: string | null }, months: string[]) {
+export async function loadEconomics(
+  supabase: Supabase,
+  company: { id: string; partnership: string | null; currency?: string | null },
+  months: string[],
+) {
+  const currency: Currency = asCurrency(company.currency, 'EUR');
   const from = `${months[0]}-01`;
   const to = endOf(months[months.length - 1]);
   const sinceIso = `${from}T00:00:00Z`;
@@ -67,12 +81,12 @@ export async function loadEconomics(supabase: Supabase, company: { id: string; p
    * компании (assigned_company_id), компания — из проверенной сессии.
    */
   const admin = createAdminClient();
-  const [{ data: vehicles }, { data: orders }, { data: fuel }, { data: finance }, { data: costs }, { data: settings }, { data: jobs }] =
+  const [{ data: vehicles }, { data: orders }, { data: fuel }, { data: finance }, { data: costs }, { data: settings }, { data: jobs }, fx] =
     await Promise.all([
       supabase.from('vehicles').select('id, plate, make').eq('company_id', company.id).order('plate'),
       admin
         .from('orders')
-        .select('id, rate_cents, commission_bps, waiting_cents, contract_party, closed_at, updated_at, assigned_vehicle_id')
+        .select('id, rate_cents, commission_bps, waiting_cents, contract_party, currency, closed_at, updated_at, assigned_vehicle_id')
         .eq('assigned_company_id', company.id)
         .eq('status', 'DONE')
         .gte('closed_at', new Date(Date.parse(sinceIso) - 86_400_000).toISOString())
@@ -80,16 +94,22 @@ export async function loadEconomics(supabase: Supabase, company: { id: string; p
         .limit(5000),
       supabase
         .from('fuel_entries')
-        .select('vehicle_id, filled_at, amount_cents')
+        .select('vehicle_id, filled_at, amount_cents, currency')
         .eq('company_id', company.id)
         .gte('filled_at', new Date(Date.parse(sinceIso) - 86_400_000).toISOString())
         .lt('filled_at', untilIso)
         .limit(10000),
       supabase.from('vehicle_finance').select('*').eq('company_id', company.id),
-      supabase.from('vehicle_costs').select('id, vehicle_id, spent_on, category, amount_cents, note, supplier').eq('company_id', company.id).gte('spent_on', from).lte('spent_on', to).order('spent_on', { ascending: false }),
+      supabase.from('vehicle_costs').select('id, vehicle_id, spent_on, category, amount_cents, currency, note, supplier').eq('company_id', company.id).gte('spent_on', from).lte('spent_on', to).order('spent_on', { ascending: false }),
       supabase.from('company_economics').select('employer_cost_bps').eq('company_id', company.id).maybeSingle(),
-      supabase.from('site_jobs').select('id, pricing, rate_cents').eq('company_id', company.id),
+      /*
+       * Только свои объекты: объект самосвального заказа (order_id) уже
+       * посчитан доходом заказа выше — иначе рейс вошёл бы дважды.
+       */
+      supabase.from('site_jobs').select('id, pricing, rate_cents, currency').eq('company_id', company.id).is('order_id', null),
+      loadFxHistory(supabase, from, to),
     ]);
+  const conv = companyConverter(fx, currency);
 
   const vehicleIds = new Set((vehicles ?? []).map((v) => v.id));
 
@@ -109,10 +129,14 @@ export async function loadEconomics(supabase: Supabase, company: { id: string; p
     if (!inRange(date)) continue;
     const rate = o.rate_cents ?? 0;
     const own = o.contract_party === 'CARRIER';
+    /* Свой рейс — полная цена в валюте заказа; рейс RAHTIS — выплата в евро. Простой — евро. */
+    const main = conv.cents(own ? rate : payoutCents(rate, o.commission_bps ?? COMMISSION_BPS), own ? o.currency : 'EUR', date);
+    const waiting = conv.cents(o.waiting_cents ?? 0, 'EUR', date);
+    if (main === null && waiting === null) continue;
     revenue.push({
       vehicleId,
       month: date.slice(0, 7),
-      cents: (own ? rate : payoutCents(rate, o.commission_bps ?? COMMISSION_BPS)) + (o.waiting_cents ?? 0),
+      cents: (main ?? 0) + (waiting ?? 0),
       kind: own ? 'OWN' : 'PLATFORM',
     });
   }
@@ -147,15 +171,27 @@ export async function loadEconomics(supabase: Supabase, company: { id: string; p
         netKg: dl.reduce((s, l) => s + (l.net_kg ?? 0), 0),
       } as InvoiceDay;
       const [line] = invoiceLines(job.pricing, job.rate_cents, [invoiceDay]);
-      if (line) revenue.push({ vehicleId: d.vehicle_id, month: d.day.slice(0, 7), cents: line.amountCents, kind: 'SITE' });
+      const cents = line ? conv.cents(line.amountCents, job.currency, d.day) : null;
+      if (cents !== null) revenue.push({ vehicleId: d.vehicle_id, month: d.day.slice(0, 7), cents, kind: 'SITE' });
     }
   }
 
   /* Зарплата: ориентировочная по дням водителя, день — на машину его смены. */
-  const [report, { data: shifts }] = await Promise.all([
+  const [report, { data: shifts }, { data: profiles }] = await Promise.all([
     buildDriverReport({ from, to }).catch(() => null),
     supabase.from('driver_shifts').select('driver_id, started_at, vehicle_id').gte('started_at', sinceIso).lt('started_at', untilIso).limit(10000),
+    supabase.from('driver_pay_profiles').select('driver_id, valid_from, currency').order('valid_from'),
   ]);
+  /*
+   * Зарплата дня — в валюте профиля оплаты, действующего в этот день
+   * (lib/driverPay считает в ней); день без профиля — валюта компании.
+   * Если день сам несёт currency — берётся она.
+   */
+  const payCurrency = (driverId: string, day: string): string => {
+    let cur: string = currency;
+    for (const p of profiles ?? []) if (p.driver_id === driverId && p.valid_from <= day) cur = p.currency;
+    return cur;
+  };
   const vehicleOfDay = new Map<string, string>();
   for (const s of shifts ?? []) {
     if (s.vehicle_id && vehicleIds.has(s.vehicle_id)) vehicleOfDay.set(`${s.driver_id}|${localDate(s.started_at)}`, s.vehicle_id);
@@ -165,9 +201,11 @@ export async function loadEconomics(supabase: Supabase, company: { id: string; p
   for (const entry of report?.entries ?? []) {
     for (const day of entry.summary.days) {
       if (!day.amountCents || !inRange(day.date)) continue;
+      const cents = conv.cents(day.amountCents, (day as { currency?: string }).currency ?? payCurrency(entry.driver.id, day.date), day.date);
+      if (cents === null) continue;
       const vehicleId = vehicleOfDay.get(`${entry.driver.id}|${day.date}`);
-      if (vehicleId) pay.push({ vehicleId, month: day.date.slice(0, 7), cents: day.amountCents });
-      else unassignedPay += day.amountCents;
+      if (vehicleId) pay.push({ vehicleId, month: day.date.slice(0, 7), cents });
+      else unassignedPay += cents;
     }
   }
 
@@ -175,8 +213,21 @@ export async function loadEconomics(supabase: Supabase, company: { id: string; p
   for (const f of fuel ?? []) {
     if (!f.amount_cents || !vehicleIds.has(f.vehicle_id)) continue;
     const date = localDate(f.filled_at);
-    if (inRange(date)) fuelRows.push({ vehicleId: f.vehicle_id, month: date.slice(0, 7), cents: f.amount_cents });
+    if (!inRange(date)) continue;
+    /* Чек — в своей валюте (польская машина заправилась в Германии — евро). */
+    const cents = conv.cents(f.amount_cents, f.currency, date);
+    if (cents !== null) fuelRows.push({ vehicleId: f.vehicle_id, month: date.slice(0, 7), cents });
   }
+
+  /* Абонемент — в евро: в валюту компании по курсу первого числа месяца. */
+  const subscriptionUnits = (eur: Record<string, number>): Record<string, number> => {
+    const out: Record<string, number> = {};
+    for (const [m, cents] of Object.entries(eur)) {
+      const v = conv.cents(cents, 'EUR', `${m}-01`);
+      if (v !== null) out[m] = v;
+    }
+    return out;
+  };
 
   const financeMap = new Map<string, VehicleFinance>((finance ?? []).map((f) => [f.vehicle_id, f as unknown as VehicleFinance]));
   const employerCostBps = settings?.employer_cost_bps ?? 2500;
@@ -187,14 +238,23 @@ export async function loadEconomics(supabase: Supabase, company: { id: string; p
     revenue,
     fuel: fuelRows,
     pay,
-    journal: (costs ?? []).map((c) => ({ vehicleId: c.vehicle_id, month: c.spent_on.slice(0, 7), cents: c.amount_cents })),
+    journal: (costs ?? []).flatMap((c) => {
+      const cents = conv.cents(c.amount_cents, c.currency, c.spent_on);
+      return cents === null ? [] : [{ vehicleId: c.vehicle_id, month: c.spent_on.slice(0, 7), cents }];
+    }),
     finance: financeMap,
+    /* Карточка машины — в своей валюте: курс первого числа месяца. */
+    financeRate: (vehicleId, month) => conv.rate(financeMap.get(vehicleId)?.currency ?? currency, `${month}-01`),
     employerCostBps,
-    subscriptionUnitCents: company.partnership === 'SUBSCRIBER' ? ladderUnits(revenue, months) : null,
+    subscriptionUnitCents: company.partnership === 'SUBSCRIBER' ? subscriptionUnits(ladderUnits(revenue, months)) : null,
   });
 
   return {
     ...result,
+    /** Валюта всех сумм результата — рабочая валюта компании. */
+    currency,
+    /** Строк без курса ЕЦБ (в итоги не вошли). */
+    missingRates: conv.missing,
     vehicles: vehicles ?? [],
     economics: result.vehicles,
     finance: financeMap,

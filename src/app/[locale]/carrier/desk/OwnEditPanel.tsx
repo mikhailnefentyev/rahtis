@@ -21,14 +21,17 @@ export function OwnEditPanel({
   orderId,
   distanceKm,
   rateCents,
+  currency = 'EUR',
   className,
 }: {
   orderId: string;
   distanceKm: number | null;
   rateCents: number | null;
+  /** Валюта рейса: правка цены её не меняет — знак только для подписи. */
+  currency?: string;
   className?: string;
 }) {
-  const { t, locale } = useI18n();
+  const { t, f, locale } = useI18n();
   const [state, formAction, pending] = useActionState(repriceOrderAction, initial);
   const keepFormAction = useKeepOnError(state);
 
@@ -42,7 +45,7 @@ export function OwnEditPanel({
         <Field label={t.orderForm.distance} className="w-32">
           {(p) => <Input {...p} name="distance_km" inputMode="numeric" required defaultValue={distanceKm ?? ''} />}
         </Field>
-        <Field label={t.own.rateLabel} className="w-36">
+        <Field label={`${t.own.rateLabel}, ${f.symbol(currency)}`} className="w-36">
           {(p) => (
             <Input
               {...p}

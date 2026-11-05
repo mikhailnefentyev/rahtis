@@ -9,6 +9,9 @@ import {
   type TesRate,
   type TesRules,
 } from '@/lib/driverPay';
+import { viewerMoney } from '@/lib/i18n/viewer';
+import { asCurrency } from '@/lib/money/currency';
+import { loadFxHistory } from '@/lib/money/fx';
 import { createClient } from '@/lib/supabase/server';
 import type { Driver, TesRuleSet } from '@/types/db';
 
@@ -32,6 +35,8 @@ export type DriverReportEntry = {
 export type DriverReport = {
   from: string;
   to: string;
+  /** Валюта итогов: рабочая валюта компании. Суммы дней — каждая в своей валюте (day.currency). */
+  currency: string;
   entries: DriverReportEntry[];
 };
 
@@ -62,6 +67,7 @@ export function tesRules(
     nightCents: set.night_cents,
     saturdayBps: set.saturday_bps,
     sundayBps: set.sunday_bps,
+    currency: asCurrency(set.currency, 'EUR'),
   };
 }
 
@@ -112,6 +118,20 @@ export async function buildDriverReport(input: {
       supabase.from('tes_wage_rates').select('rule_set_id, grade, valid_from, hourly_cents'),
     ]);
 
+  /*
+   * Курсы нужны, только если есть ставка не в валюте компании (компания
+   * сменила валюту, набор из финского шаблона в евро): тогда процент от
+   * рейса и итог пересчитываются по курсу дня.
+   */
+  const { currency } = await viewerMoney();
+  const foreign =
+    (profiles ?? []).some((p) => p.currency !== currency) || (sets ?? []).some((s) => s.currency !== currency);
+  const fx = foreign ? await loadFxHistory(supabase, since.slice(0, 10), input.to) : null;
+  const convert = fx
+    ? (cents: number, from: string, to: string, day: string) =>
+        fx.convert(cents, asCurrency(from), asCurrency(to), day)
+    : undefined;
+
   const rulesById = new Map(
     (sets ?? []).map((s) => [s.id, tesRules(s, (rates ?? []).filter((r) => r.rule_set_id === s.id))]),
   );
@@ -141,6 +161,7 @@ export async function buildDriverReport(input: {
         tes: p.tes_rule_set_id ? (rulesById.get(p.tes_rule_set_id) ?? null) : null,
         tesGrade: p.tes_grade,
         tesExperienceSince: p.tes_experience_since,
+        currency: p.currency,
       }));
 
     const summary = summarizeDriver({
@@ -155,6 +176,9 @@ export async function buildDriverReport(input: {
         })),
       profiles: payProfiles,
       now,
+      /* driver_trips отдаёт выплату уже в валюте компании. */
+      currency,
+      fx: convert,
     });
 
     const days = summary.days.filter((d) => d.date >= input.from && d.date <= input.to);
@@ -164,7 +188,7 @@ export async function buildDriverReport(input: {
      * запасом, не должна попасть в сумму периода, которому не
      * принадлежит.
      */
-    const trimmed = totalsOf(days);
+    const trimmed = totalsOf(days, { currency, fx: convert });
 
     /* Водитель без единой строки за период в отчёт не попадает — кроме выбранного явно. */
     if (days.length === 0 && !input.driverId) continue;
@@ -172,5 +196,5 @@ export async function buildDriverReport(input: {
     entries.push({ driver, summary: { days, totals: trimmed } });
   }
 
-  return { from: input.from, to: input.to, entries };
+  return { from: input.from, to: input.to, currency, entries };
 }

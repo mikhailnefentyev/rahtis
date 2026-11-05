@@ -13,6 +13,8 @@ import { createMessages } from '@/lib/i18n/message';
 import { notify } from '@/lib/notify';
 import { getOperatorProfile, operatorLines } from '@/lib/operator/profile';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { asCurrency } from '@/lib/money/currency';
+import { loadFxHistory } from '@/lib/money/fx';
 import { WeeklyReport, type OwnRow, type OwnSection, type ReportRow, type ReportTexts } from './WeeklyReport';
 
 /**
@@ -92,6 +94,8 @@ type OrderRow = {
   updated_at: string;
   distance_km: number | null;
   rate_cents: number | null;
+  /** Валюта цены: рейсы RAHTIS — евро, свои — валюта перевозчика или выбранная. */
+  currency: string;
   commission_bps: number | null;
   /** Плата заказчика сверху цены, зафиксированная при закрытии. */
   shipper_fee_bps: number | null;
@@ -231,7 +235,7 @@ async function run(span: Span): Promise<GenerateResult> {
   const { data: orders, error } = await admin
     .from('orders')
     .select(
-      'id, ref, closed_at, updated_at, distance_km, rate_cents, commission_bps, shipper_fee_bps, shipper_company_id, assigned_company_id, contract_party, waiting_cents, waiting',
+      'id, ref, closed_at, updated_at, distance_km, rate_cents, currency, commission_bps, shipper_fee_bps, shipper_company_id, assigned_company_id, contract_party, waiting_cents, waiting',
     )
     .eq('status', 'DONE')
     .gte('closed_at', from)
@@ -367,7 +371,7 @@ async function issue(
   const { data: company } = await admin
     .from('companies')
     .select(
-      'name, country, language, contact_email, billing_email, frozen_at, business_id, vat_number, legal_name, legal_street, legal_postal_code, legal_city, legal_country, billing_street, billing_postal_code, billing_city, billing_country, billing_reference',
+      'name, country, currency, language, contact_email, billing_email, frozen_at, business_id, vat_number, legal_name, legal_street, legal_postal_code, legal_city, legal_country, billing_street, billing_postal_code, billing_city, billing_country, billing_reference',
     )
     .eq('id', companyId)
     .single();
@@ -555,10 +559,24 @@ async function issue(
     : { data: [] };
   const counterpartName = new Map((counterparts ?? []).map((c) => [c.id, c.name]));
   let ownKm = 0;
+  /*
+   * Цена своего рейса — в его валюте. Итог: одна валюта — простая сумма;
+   * разные — пересчёт в валюту компании по курсу ЕЦБ дня закрытия, с
+   * пометкой «≈». Строка без курса в итог не входит.
+   */
+  const ownCurrencies = new Set(ownOrders.map((o) => asCurrency(o.currency)));
+  const companyCurrency = asCurrency(company.currency);
+  const totalCurrency = ownCurrencies.size === 1 ? [...ownCurrencies][0]! : companyCurrency;
+  const fx = ownCurrencies.size > 1 ? await loadFxHistory(admin, week, span.end) : null;
   let ownPrice = 0;
   const ownRows: OwnRow[] = ownOrders.map((order) => {
     ownKm += order.distance_km ?? 0;
-    ownPrice += order.rate_cents ?? 0;
+    const cents = order.rate_cents ?? 0;
+    const cur = asCurrency(order.currency);
+    const converted = fx
+      ? fx.convert(cents, cur, totalCurrency, helsinkiDate(order.closed_at ?? order.updated_at))
+      : cents;
+    ownPrice += converted ?? 0;
     const party = carrier ? order.shipper_company_id : order.assigned_company_id;
     return {
       ref: order.ref,
@@ -567,7 +585,7 @@ async function issue(
       route: route.get(order.id) ?? '—',
       vehicle: plate.get(order.id) ?? '—',
       distance: String(order.distance_km ?? 0),
-      price: f.eur(order.rate_cents ?? 0),
+      price: f.money(cents, cur),
     };
   });
   const own: OwnSection | null = ownRows.length
@@ -578,7 +596,7 @@ async function issue(
         total: t.report_.total,
         rows: ownRows,
         distance: String(ownKm),
-        price: f.eur(ownPrice),
+        price: `${fx ? '≈ ' : ''}${f.money(ownPrice, totalCurrency)}`,
       }
     : null;
 

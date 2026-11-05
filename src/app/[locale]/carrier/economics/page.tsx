@@ -55,7 +55,7 @@ export default async function EconomicsPage({
   const current = currentFuelMonth();
   const month = parseFuelMonth(query.month);
   const months = monthRange(month, 12);
-  const data = await loadEconomics(supabase, { id: company.id, partnership: company.partnership ?? null }, months);
+  const data = await loadEconomics(supabase, { id: company.id, partnership: company.partnership ?? null, currency: f.currency }, months);
 
   const monthLabel = new Intl.DateTimeFormat(t.meta.intl, { month: 'short', year: 'numeric', timeZone: 'UTC' });
   const monthLong = new Intl.DateTimeFormat(t.meta.intl, { month: 'long', year: 'numeric', timeZone: 'UTC' });
@@ -65,14 +65,17 @@ export default async function EconomicsPage({
 
   const fleet = data.fleet.find((m) => m.month === month)!;
   const rows = data.economics.map((v) => ({ ...v, m: v.months.find((x) => x.month === month)! }));
-  const eur = (cents: number) => f.eur(cents);
+  /* Все суммы — в рабочей валюте компании (load.ts пересчитал по курсу дня строки). */
+  const eur = (cents: number) => f.money(cents, data.currency);
   const tone = (cents: number) => (cents < 0 ? 'text-danger' : '');
   const insuranceTax = (m: MonthEconomics) => m.costs.insurance + m.costs.tax;
   /* Износ купленной сразу машины — с расчётом под суммой, чтобы его не путали с платежом. */
   const depreciationHint = (vehicleId: string) => {
     const fin = data.finance.get(vehicleId);
     if (!fin || fin.financing !== 'CASH' || !fin.purchase_price_cents) return null;
-    const price = fin.residual_cents ? `(${eur(fin.purchase_price_cents)} − ${eur(fin.residual_cents)})` : eur(fin.purchase_price_cents);
+    /* Цена и остаточная — как записаны, в валюте карточки. */
+    const own = (cents: number) => f.money(cents, fin.currency);
+    const price = fin.residual_cents ? `(${own(fin.purchase_price_cents)} − ${own(fin.residual_cents)})` : own(fin.purchase_price_cents);
     return `${price} ÷ ${fin.useful_life_months} ${s.monthsShort}`;
   };
   const other = (m: MonthEconomics) => m.costs.fixed + m.costs.journal + m.costs.rahtis;

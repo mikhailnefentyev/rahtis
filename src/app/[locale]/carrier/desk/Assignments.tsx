@@ -44,9 +44,12 @@ export function Assignments({
   documentsByOrder,
   amendmentsByOrder,
   ownByOrder = {},
+  currencyByOrder = {},
   tripTrailers = {},
   trailers = [],
 }: {
+  /** Валюта цены рейса: id → код; нет — евро. */
+  currencyByOrder?: Record<string, string>;
   /** Прицеп рейса: id рейса → id прицепа. */
   tripTrailers?: Record<string, string | null>;
   trailers?: TripTrailerOption[];
@@ -89,6 +92,7 @@ export function Assignments({
         documentsByOrder={documentsByOrder}
         amendmentsByOrder={amendmentsByOrder}
         ownClient={ownByOrder[order.id]}
+        currency={currencyByOrder[order.id] ?? 'EUR'}
       />
     );
   }
@@ -114,6 +118,7 @@ export function Assignments({
             <TripRow
               key={order.id}
               order={order}
+              currency={currencyByOrder[order.id] ?? 'EUR'}
               open={opened === order.id}
               onToggle={() => setOpened(opened === order.id ? null : order.id)}
             >
@@ -150,11 +155,13 @@ export function Assignments({
  */
 function TripRow({
   order,
+  currency,
   open,
   onToggle,
   children,
 }: {
   order: Assignment;
+  currency: string;
   open: boolean;
   onToggle: () => void;
   children: React.ReactNode;
@@ -205,7 +212,7 @@ function TripRow({
             * рядом стоит сама комиссия. Показать здесь одно число без
             * второго значило бы предложить гадать, какое это из двух.
             */}
-          {f.eur(order.rate_cents ?? 0)}
+          {f.money(order.rate_cents ?? 0, currency)}
         </span>
         <span aria-hidden className="text-ink-dim">
           {open ? '−' : '+'}

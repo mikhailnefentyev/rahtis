@@ -702,6 +702,7 @@ export const lt = {
     resultNoIban: 'Įmonės duomenyse įrašykite banko sąskaitos numerį (IBAN).',
     resultNoEmail: 'Objekte įrašykite kliento el. paštą.',
     resultNoAddress: 'Objekte įrašykite kliento adresą sąskaitai.',
+    resultPlatformOrder: 'Šis objektas gautas iš RAHTIS užsakymo, todėl sąskaitą išrašo RAHTIS. Savos sąskaitos išrašyti negalima.',
     resultCreated: 'Sąskaita sukurta, bet laiškas neišsiųstas. Atsisiųskite PDF ir išsiųskite patys.',
     invoiced: 'Sąskaita išrašyta',
     due: 'Apmokėti iki',
@@ -1597,6 +1598,11 @@ export const lt = {
     requiredBody: 'Kėbulas',
     anyBody: 'Bet koks',
     feeHint: 'Paslaugos mokestis 5 % (ne mažiau kaip 15 € už reisą kartu su vežėjo mokesčiu). Tiesioginė sutartis su vežėju, mokančiu mėnesinį mokestį, nemokama.',
+    /* Валюта цены: не евро — только у прямого договора и своих рейсов. */
+    currency: 'Valiuta',
+    currencyEurOnly: 'Per RAHTIS paslaugą reiso kaina nustatoma ir sąskaita išrašoma eurais. Kita valiuta galima sudarius tiesioginę sutartį.',
+    currencyErrorDirect: 'Kita valiuta nei euras – tik pagal tiesioginę sutartį su vežėju. Per RAHTIS paslaugą kaina yra eurais.',
+    currencyErrorRahtis: 'Šis vežėjas dirba per RAHTIS paslaugą – reiso kaina tik eurais.',
     title: 'Naujas pervežimas',
     subtitle: 'Užpildykite visą maršrutą ir paskelbkite. Vežėjai jį pamatys iš karto.',
     type: 'Pervežimo tipas',
@@ -2197,6 +2203,15 @@ export const lt = {
 
   account: {
     title: 'Jūsų duomenys',
+    currencyTitle: 'Įmonės valiuta',
+    currencyHintCarrier:
+      'Savi reisai, išlaidos, kuras, atlyginimai ir savi objektai apskaitomi šia valiuta. RAHTIS paslaugos reisai, mokesčiai ir sąskaitos visada yra eurais. Ankstesnės sumos lieka savo valiuta, o sumos perskaičiuojamos ECB kursu.',
+    currencyHintShipper:
+      'Numatytoji valiuta užsakymams, sutartiems tiesiogiai su vežėju. Užsakymai ir mokesčiai per RAHTIS visada yra eurais.',
+    currencyLabel: 'Valiuta',
+    currencySave: 'Išsaugoti',
+    currencySaved: 'Valiuta išsaugota.',
+    currencyError: 'Valiutos išsaugoti nepavyko.',
     passwordTitle: 'Keisti slaptažodį',
     passwordHint: 'Naujas slaptažodis galioja iš karto. Įsiminkite jį – mes jo nematome ir negalime atkurti.',
     current: 'Dabartinis slaptažodis',
@@ -3552,6 +3567,8 @@ export const lt = {
     sunday: 'Sekmadienio priedas, %',
     note: 'Pastaba',
     templates: 'RAHTIS šablonai',
+    templatesEur:
+      'Šablonai – Suomijos krovininio autotransporto kolektyvinė sutartis eurais. Kopija lieka eurais; norėdami skaičiuoti savo valiuta, sukurkite taisyklių rinkinį iš naujo.',
     copy: 'Kopijuoti kaip savo',
     own: 'Mano taisyklių rinkiniai',
     none: 'Taisyklių rinkinių dar nėra',

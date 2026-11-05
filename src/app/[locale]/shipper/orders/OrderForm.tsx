@@ -39,6 +39,7 @@ import { OwnPicker } from '../../carrier/own/OwnPicker';
 import { OrderImport } from './OrderImport';
 import type { DraftStop, OrderDraft } from '@/lib/orders/importDraft';
 import { cn } from '@/lib/cn';
+import { asCurrency, CURRENCIES, type Currency } from '@/lib/money/currency';
 
 const initial: PublishState = { error: null, ref: null };
 
@@ -298,6 +299,21 @@ function OrderFormInner({
   );
 
   /*
+   * Валюта цены. Свой рейс — в валюте компании (или выбранной). Заказ
+   * заказчика — в евро, кроме стола «напрямую с перевозчиком»: там
+   * стороны договариваются сами, по умолчанию валюта заказчика. Через
+   * RAHTIS — только евро (база проверяет то же самое).
+   */
+  /* Повтор заказа RAHTIS (евро) у заказчика не навязывает евро прямому договору — там валюта компании. */
+  const originCurrency = own || origin?.currency !== 'EUR' ? origin?.currency : undefined;
+  const [currency, setCurrency] = useState<Currency>(
+    asCurrency(draft?.currency ?? originCurrency ?? f.currency, f.currency),
+  );
+  const [carrierContract, setCarrierContract] = useState(false);
+  const currencyOpen = Boolean(own) || carrierContract;
+  const orderCurrency: Currency = currencyOpen ? currency : 'EUR';
+
+  /*
    * Координаты выбранных адресов, по слотам маршрута. Ключ слота живёт
    * столько же, сколько блок формы: у доп.точек это их собственный key,
    * поэтому удаление второй точки не сдвигает координаты третьей.
@@ -487,7 +503,7 @@ function OrderFormInner({
   const euros = Number.parseFloat(rate.replace(/\s/g, '').replace(',', '.'));
   const perKm =
     Number.isFinite(km) && km > 0 && Number.isFinite(euros) && euros > 0
-      ? `€${(euros / km).toFixed(2)}/${t.unit.km}`
+      ? `${f.moneyPerKm(Math.round(euros * 100), km, orderCurrency)}/${t.unit.km}`
       : '';
 
   /*
@@ -501,7 +517,9 @@ function OrderFormInner({
     }, 600);
     return () => clearTimeout(timer);
   }, [haulKind, km, own]);
-  const lowRate = guide !== null && Number.isFinite(euros) && euros > 0 && euros * 100 < guide.median * 0.8;
+  /* Справочник цен — по рейсам в евро; к цене в кронах или злотых он не применим. */
+  const shownGuide = orderCurrency === 'EUR' ? guide : null;
+  const lowRate = shownGuide !== null && Number.isFinite(euros) && euros > 0 && euros * 100 < shownGuide.median * 0.8;
 
   if (state.ref) {
     return (
@@ -904,7 +922,7 @@ function OrderFormInner({
                     </Select>
                   )}
                 </Field>
-                <Field label={t.tipper.unitRate[sitePricing as SitePricingKind]} required>
+                <Field label={f.label(t.tipper.unitRate[sitePricing as SitePricingKind], orderCurrency)} required>
                   {(p) => (
                     <InputMono
                       {...p}
@@ -1147,7 +1165,7 @@ function OrderFormInner({
             )}
 
             <Field
-              label={`${own ? t.own.rateLabel : t.orderForm.rate} ${perKm}`}
+              label={`${own ? t.own.rateLabel : f.label(t.orderForm.rate, orderCurrency)} ${perKm}`}
               hint={own ? t.own.rateHint : `${t.money.addVat} ${t.orderForm.feeHint}`}
               required
               className={ai('rate')}
@@ -1166,13 +1184,35 @@ function OrderFormInner({
                 />
               )}
             </Field>
-            {guide && (
-              <p className={`sm:col-span-3 self-end pb-2 text-xs ${lowRate ? 'text-warn' : 'text-ink-muted'}`} role="status">
+            {/* Валюта уходит всегда: без выбора — евро, и база это же проверит. */}
+            <input type="hidden" name="currency" value={orderCurrency} />
+            {currencyOpen ? (
+              <Field label={t.orderForm.currency}>
+                {(p) => (
+                  <Select {...p} value={currency} onChange={(e) => setCurrency(asCurrency(e.target.value, f.currency))}>
+                    {CURRENCIES.map((c) => (
+                      <option key={c} value={c}>
+                        {c} ({f.symbol(c)})
+                      </option>
+                    ))}
+                  </Select>
+                )}
+              </Field>
+            ) : (
+              f.currency !== 'EUR' && (
+                <p className="sm:col-span-3 self-end pb-2 text-xs text-ink-muted">{t.orderForm.currencyEurOnly}</p>
+              )
+            )}
+            {shownGuide && (
+              <p
+                className={`${currencyOpen ? 'sm:col-span-2' : f.currency !== 'EUR' ? 'sm:col-span-4' : 'sm:col-span-3'} self-end pb-2 text-xs ${lowRate ? 'text-warn' : 'text-ink-muted'}`}
+                role="status"
+              >
                 {m('priceGuide.range', {
-                  low: f.eur(guide.low),
-                  high: f.eur(guide.high),
-                  median: f.eur(guide.median),
-                  count: guide.samples,
+                  low: f.eur(shownGuide.low),
+                  high: f.eur(shownGuide.high),
+                  median: f.eur(shownGuide.median),
+                  count: shownGuide.samples,
                 })}
                 {lowRate && <> {t.priceGuide.low}</>}
               </p>
@@ -1211,7 +1251,12 @@ function OrderFormInner({
               draftClient={draft?.client ?? null}
             />
           ) : (
-            <DispatchPicker vehicles={knownVehicles} haulKind={haulKind} onDirectChange={setDirect} />
+            <DispatchPicker
+              vehicles={knownVehicles}
+              haulKind={haulKind}
+              onDirectChange={setDirect}
+              onContractChange={setCarrierContract}
+            />
           )}
         </CardBody>
       </Card>

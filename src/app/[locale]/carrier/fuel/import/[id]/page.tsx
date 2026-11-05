@@ -135,7 +135,13 @@ export default async function FuelImportPage({ params }: { params: Promise<{ loc
                       <Td numeric>
                         {f.decimal(row.quantity, 2)} {row.product === 'LNG' || row.product === 'LBG' || row.product === 'CNG' || row.product === 'CBG' ? 'kg' : 'l'}
                       </Td>
-                      <Td numeric>{row.amount_cents != null ? f.eur(row.amount_cents) : '—'}</Td>
+                      <Td numeric>
+                        {row.amount_cents != null ? f.money(row.amount_cents, row.currency) : '—'}
+                        {/* Валюта отчёта не та, что у компании, — код рядом: «kr» бывает шведской, норвежской и датской. */}
+                        {row.amount_cents != null && row.currency && row.currency !== f.currency && (
+                          <span className="block text-[11px] text-ink-dim">{row.currency}</span>
+                        )}
+                      </Td>
                       <Td numeric>{row.odometer_km != null ? f.number(row.odometer_km) : '—'}</Td>
                       <Td>{row.station ?? ''}</Td>
                     </Tr>

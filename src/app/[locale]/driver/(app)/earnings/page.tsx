@@ -73,7 +73,7 @@ export default async function DriverEarnings({
 
       <section className="rounded-card bg-ink px-5 py-5 text-surface">
         <p className="text-[15px] opacity-80">{t.driverApp.earningsMonth}</p>
-        <p className="mt-1 font-mono text-4xl font-bold tracking-tight">{f.eur(earnings.totalCents)}</p>
+        <p className="mt-1 font-mono text-4xl font-bold tracking-tight">{f.money(earnings.totalCents, earnings.currency)}</p>
         <p className="mt-2 text-[15px] opacity-80">
           {m('driverApp.earnTrips', { count: earnings.trips })} · {hours(earnings.workMinutes)}
         </p>
@@ -101,10 +101,10 @@ export default async function DriverEarnings({
                   </div>
                   <div className="text-right">
                     <p className="font-mono text-xl font-bold">
-                      {day.amountCents == null ? '—' : `+${f.eur(day.amountCents)}`}
+                      {day.amountCents == null ? '—' : `+${f.money(day.amountCents, day.currency)}`}
                     </p>
                     <p className="text-[13px] text-ink-muted">
-                      {t.driverApp.earningsRunning} {f.eur(day.runningCents)}
+                      {t.driverApp.earningsRunning} {f.money(day.runningCents, earnings.currency)}
                     </p>
                   </div>
                 </div>
@@ -121,7 +121,7 @@ export default async function DriverEarnings({
                           </p>
                         </div>
                         {trip.amountCents != null && (
-                          <span className="font-mono text-[16px] font-semibold">{f.eur(trip.amountCents)}</span>
+                          <span className="font-mono text-[16px] font-semibold">{f.money(trip.amountCents, day.currency)}</span>
                         )}
                       </li>
                     ))}

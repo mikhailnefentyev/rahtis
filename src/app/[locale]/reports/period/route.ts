@@ -63,6 +63,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
     to: range.to,
     country: viewer.company?.country ?? null,
     companyId,
+    currency: f.currency,
   });
 
   if (!report) {
@@ -95,9 +96,10 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
   const claims = claimColumns(report, t);
   const own = ownColumns(report, t);
 
-  const show = (kind: string, value: string | number | null): string => {
+  /* Деньги строки — в её валюте (рейсы RAHTIS и претензии — евро). */
+  const show = (kind: string, value: string | number | null, currency: string = 'EUR'): string => {
     if (value == null || value === '') return '—';
-    if (kind === 'money') return f.eur(Math.round(Number(value) * 100));
+    if (kind === 'money') return f.money(Math.round(Number(value) * 100), currency);
     if (kind === 'percent') return `${f.decimal(Number(value), 1)} %`;
     if (kind === 'date') return f.date(`${value}T12:00:00Z`);
     if (kind === 'int') return f.number(Number(value));
@@ -172,7 +174,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
       noClaims: t.periodReport.noClaims,
       page: t.report_.page,
       tripColumns: tripFlex,
-      tripRows: report.lines.map((line) => trips.map((c) => show(c.kind, c.get(line)))),
+      tripRows: report.lines.map((line) => trips.map((c) => show(c.kind, c.get(line), line.currency))),
       claimColumns: claims.map((c) => flex(c.kind, c.header)),
       claimRows: report.claims.map((claim) => claims.map((c) => show(c.kind, c.get(claim)))),
       own: report.own.lines.length
@@ -182,7 +184,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
             columns: own.map((c) =>
               c.header === t.periodReport.colRoute ? { ...flex(c.kind, c.header), flex: 3 } : flex(c.kind, c.header),
             ),
-            rows: report.own.lines.map((line) => own.map((c) => show(c.kind, c.get(line)))),
+            rows: report.own.lines.map((line) => own.map((c) => show(c.kind, c.get(line), line.currency))),
           }
         : null,
       summary,

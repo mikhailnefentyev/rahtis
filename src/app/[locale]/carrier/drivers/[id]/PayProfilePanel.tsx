@@ -91,9 +91,9 @@ export function PayProfilePanel({
   const rate = (p: DriverPayProfile): string => {
     switch (p.model) {
       case 'PER_KM':
-        return `${f.eur(p.per_km_cents ?? 0)} / km`;
+        return `${f.money(p.per_km_cents ?? 0, p.currency)} / km`;
       case 'FLAT_HOURLY':
-        return `${f.eur(p.hourly_cents ?? 0)} / h`;
+        return `${f.money(p.hourly_cents ?? 0, p.currency)} / h`;
       case 'TRIP_PERCENT':
         return `${f.decimal((p.trip_bps ?? 0) / 100, 1)} %`;
       case 'TES':
@@ -144,13 +144,13 @@ export function PayProfilePanel({
             </Field>
 
             {model === 'FLAT_HOURLY' && (
-              <Field label={t.pay.hourly} required>
+              <Field label={f.label(t.pay.hourly)} required>
                 {(p) => <InputMono {...p} name="hourly" required inputMode="decimal" placeholder="18,50" />}
               </Field>
             )}
 
             {model === 'PER_KM' && (
-              <Field label={t.pay.perKm} required>
+              <Field label={f.label(t.pay.perKm)} required>
                 {(p) => <InputMono {...p} name="per_km" required inputMode="decimal" placeholder="0,35" />}
               </Field>
             )}

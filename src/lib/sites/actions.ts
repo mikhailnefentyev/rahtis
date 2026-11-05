@@ -1,5 +1,6 @@
 'use server';
 
+import { asCurrency } from '@/lib/money/currency';
 import { revalidatePath } from 'next/cache';
 import { requireRole } from '@/lib/auth/guard';
 import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
@@ -62,7 +63,9 @@ export async function saveSiteJobAction(_previous: SiteJobState, formData: FormD
   const customer = text(formData, 'customer_name');
   const pricing = String(formData.get('pricing') ?? 'HOUR') as SitePricing;
   const material = String(formData.get('material_code') ?? '170504');
-  const rateRaw = String(formData.get('rate') ?? '0').replace(/\s/g, '').replace(',', '.');
+  /* Ставка в валюте объекта: символ любой («95 €», «950 kr», «400 zł») — оставляем только число.
+     Валюту не пишем: новый объект получает валюту компании триггером, у старого она своя. */
+  const rateRaw = String(formData.get('rate') ?? '0').replace(/[^\d,.-]/g, '').replace(',', '.');
   const rate = Number.parseFloat(rateRaw || '0');
   const buffer = Number.parseInt(String(formData.get('buffer_minutes') ?? '30'), 10);
 
@@ -95,7 +98,7 @@ export async function saveSiteJobAction(_previous: SiteJobState, formData: FormD
   const id = text(formData, 'id');
   const { data, error } = id
     ? await supabase.from('site_jobs').update(values).eq('id', id).select('id').single()
-    : await supabase.from('site_jobs').insert({ ...values, company_id: company.id }).select('id').single();
+    : await supabase.from('site_jobs').insert({ ...values, company_id: company.id, currency: asCurrency(company.currency) }).select('id').single();
 
   if (error || !data) return { error: t.error.generic, done: false };
 
@@ -200,6 +203,8 @@ export async function sendSiteInvoiceNowAction(_previous: SendInvoiceState, form
         return { message: s.resultNoEmail, ok: false };
       case 'NO_CUSTOMER_ADDRESS':
         return { message: s.resultNoAddress, ok: false };
+      case 'PLATFORM_ORDER':
+        return { message: s.resultPlatformOrder, ok: false };
       case 'NOTHING':
       case 'BUSY':
         return { message: s.resultNothing, ok: false };

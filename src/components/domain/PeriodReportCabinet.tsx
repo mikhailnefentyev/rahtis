@@ -67,6 +67,7 @@ export async function PeriodReportCabinet({
         to: range.to,
         country: viewer.company?.country ?? null,
         companyId: company,
+        currency: f.currency,
       })
     : null;
 
@@ -258,28 +259,28 @@ export async function PeriodReportCabinet({
                             <Mono>{line.km}</Mono>
                           </Td>
                           <Td className="text-right">
-                            <Mono>{f.eur(line.rate)}</Mono>
+                            <Mono>{f.money(line.rate, line.currency)}</Mono>
                           </Td>
                           {role !== 'CARRIER' && (
                             <Td className="text-right">
-                              <Mono>{line.fee != null ? f.eur(line.fee) : '—'}</Mono>
+                              <Mono>{line.fee != null ? f.money(line.fee, line.currency) : '—'}</Mono>
                             </Td>
                           )}
                           {role === 'CARRIER' && report.showsCommission && (
                             <Td className="text-right">
-                              <Mono>{line.commission != null ? f.eur(line.commission) : '—'}</Mono>
+                              <Mono>{line.commission != null ? f.money(line.commission, line.currency) : '—'}</Mono>
                             </Td>
                           )}
                           {report.showsCommission && (
                             <Td className="text-right">
-                              <Mono>{line.payout != null ? f.eur(line.payout) : '—'}</Mono>
+                              <Mono>{line.payout != null ? f.money(line.payout, line.currency) : '—'}</Mono>
                             </Td>
                           )}
                           <Td className="text-right">
-                            <Mono>{f.eur(line.vat)}</Mono>
+                            <Mono>{f.money(line.vat, line.currency)}</Mono>
                           </Td>
                           <Td className="text-right">
-                            <Mono>{f.eur(line.gross)}</Mono>
+                            <Mono>{f.money(line.gross, line.currency)}</Mono>
                           </Td>
                           <Td>
                             <div className="flex flex-wrap gap-1">
@@ -338,7 +339,8 @@ export async function PeriodReportCabinet({
                             <Mono>{line.km}</Mono>
                           </Td>
                           <Td className="text-right">
-                            <Mono>{f.eur(line.rate)}</Mono>
+                            {/* Цена своего рейса — в его валюте. */}
+                            <Mono>{f.money(line.rate, line.currency)}</Mono>
                           </Td>
                         </Tr>
                       ))}
@@ -350,7 +352,11 @@ export async function PeriodReportCabinet({
                           <Mono>{report.own.km}</Mono>
                         </Td>
                         <Td className="text-right">
-                          <Mono>{f.eur(report.own.rate)}</Mono>
+                          {/* Разные валюты — итог пересчитан по курсу ЕЦБ дня рейса, отсюда «≈». */}
+                          <Mono>
+                            {report.own.converted ? '≈ ' : ''}
+                            {f.money(report.own.rate, report.own.currency)}
+                          </Mono>
                         </Td>
                       </Tr>
                     </tbody>

@@ -1,5 +1,6 @@
 'use server';
 
+import { asCurrency } from '@/lib/money/currency';
 import { revalidatePath } from 'next/cache';
 import { requireRole } from '@/lib/auth/guard';
 import { operationsLocalToIso } from '@/lib/dates';
@@ -30,9 +31,15 @@ function toLocale(value: FormDataEntryValue | null): Locale {
 const str = (form: FormData, key: string): string => String(form.get(key) ?? '').trim();
 const opt = (form: FormData, key: string): string | null => str(form, key) || null;
 
-/** Евро из поля формы в центы: «1,25» → 125. Пусто и мусор — null. */
+/**
+ * Сумма из поля формы в центы: «1,25» → 125, «18,50 zł» → 1850. Валюта —
+ * у строки (её впишет база), знак в поле не важен. Пусто и мусор — null.
+ */
 function cents(form: FormData, key: string): number | null {
-  const raw = str(form, key).replace(/\s/g, '').replace(',', '.');
+  const raw = str(form, key)
+    .replace(/[\s  ]/g, '')
+    .replace(/[^\d,.-]/g, '')
+    .replace(',', '.');
   if (!raw) return null;
   const value = Number.parseFloat(raw);
   return Number.isFinite(value) && value >= 0 ? Math.round(value * 100) : null;
@@ -165,7 +172,7 @@ export async function savePayProfileAction(
 ): Promise<FormState> {
   const locale = toLocale(formData.get('locale'));
   const t = await getDictionary(locale);
-  await requireCarrier(locale);
+  const viewer = await requireCarrier(locale);
 
   const model = str(formData, 'model') as PayModel;
   const driverId = str(formData, 'driver_id');
@@ -208,7 +215,12 @@ export async function savePayProfileAction(
   if (!filled) return { error: t.validation.positiveNumber, done: false };
 
   const supabase = await createClient();
-  const { error } = await supabase.from('driver_pay_profiles').insert(row);
+  /* Валюта ставки: у TES — валюта набора (копия финского шаблона — евро), иначе — валюта компании. */
+  const { data: tesSet } = row.tes_rule_set_id
+    ? await supabase.from('tes_rule_sets').select('currency').eq('id', row.tes_rule_set_id).maybeSingle()
+    : { data: null };
+  const currency = asCurrency(tesSet?.currency ?? viewer.company?.currency);
+  const { error } = await supabase.from('driver_pay_profiles').insert({ ...row, currency });
 
   if (error) {
     return {
@@ -393,7 +405,8 @@ export async function saveTesAction(_previous: FormState, formData: FormData): P
     ? await supabase.from('tes_rule_sets').update(row).eq('id', id)
     : await supabase
         .from('tes_rule_sets')
-        .insert({ ...row, company_id: viewer.company!.id, created_by: viewer.userId });
+        /* Свой набор с нуля — в валюте компании; копия шаблона идёт через copyTesTemplateAction. */
+        .insert({ ...row, company_id: viewer.company!.id, created_by: viewer.userId, currency: asCurrency(viewer.company!.currency) });
 
   if (error) {
     return { error: error.code === '23514' ? t.validation.positiveNumber : t.error.generic, done: false };
@@ -423,7 +436,25 @@ export async function copyTesTemplateAction(formData: FormData): Promise<void> {
   await requireCarrier(locale);
 
   const supabase = await createClient();
-  const { error } = await supabase.rpc('copy_tes_template', { p_template_id: str(formData, 'id') });
+  const templateId = str(formData, 'id');
+  const { data: copyId, error } = await supabase.rpc('copy_tes_template', { p_template_id: templateId });
+
+  /*
+   * Шаблон оператора — финский TES в евро. Копия остаётся в валюте
+   * шаблона: суммы договора в злотые не переводятся. Функция базы валюту
+   * не передаёт, и триггер вписал бы валюту компании — поправляем здесь.
+   */
+  if (!error && copyId) {
+    const { data: template } = await supabase
+      .from('tes_rule_sets')
+      .select('currency')
+      .eq('id', templateId)
+      .maybeSingle();
+    await supabase
+      .from('tes_rule_sets')
+      .update({ currency: template?.currency ?? 'EUR' })
+      .eq('id', copyId);
+  }
   await flashFailure(locale, error);
 
   revalidatePath(`/${locale}/carrier/drivers/tes`);

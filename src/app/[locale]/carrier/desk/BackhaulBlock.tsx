@@ -21,8 +21,11 @@ export function BackhaulBlock({
   region,
   i18n,
   locale,
+  currencyByOrder = {},
 }: {
   rows: BackhaulRow[];
+  /** Валюта цены по id заказа; нет — евро (стол RAHTIS). */
+  currencyByOrder?: Record<string, string>;
   radius: Radius;
   region: string | undefined;
   i18n: I18n;
@@ -113,7 +116,11 @@ export function BackhaulBlock({
                           </span>
                         )}
                         <span className="text-ink-muted">{m('backhaul.deadhead', { km: item.deadhead_km ?? 0 })}</span>
-                        {item.rate_cents ? <span className="font-semibold text-ink">{f.eur(item.rate_cents)}</span> : null}
+                        {item.rate_cents ? (
+                          <span className="font-semibold text-ink">
+                            {f.money(item.rate_cents, currencyByOrder[item.order_id] ?? 'EUR')}
+                          </span>
+                        ) : null}
                         {item.toward_home && <Badge tone="ok">{b.towardHome}</Badge>}
                       </li>
                     ))}

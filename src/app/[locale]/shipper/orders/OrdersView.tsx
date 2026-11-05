@@ -439,7 +439,7 @@ function Row({
         )}
 
         <span className="ml-auto text-[13px] font-semibold text-ink">
-          {f.eur(order.rate_cents ?? 0)}
+          {f.money(order.rate_cents ?? 0, order.currency)}
         </span>
         <span aria-hidden className="text-ink-dim">
           {open ? '−' : '+'}

@@ -10,6 +10,9 @@ import { agentSecret, signOutgoing } from '@/lib/agent/signature';
  * PDF уходит файлом (base64), CSV — текстом. Номера машин компании идут
  * подсказкой: по ним разбор узнаёт, где в отчёте номер машины.
  *
+ * Суммы — в валюте отчёта, у каждой строки свой код валюты (карта DKV
+ * польской машины в Германии — евро). Валюта компании идёт подсказкой.
+ *
  * Не настроено — 'not_configured', не ответило или ответило не тем —
  * 'failed': перевозчик видит, что отчёт не распознан, и может внести
  * заправки вручную.
@@ -25,6 +28,8 @@ export async function extractFuelReport(input: {
   bytes: ArrayBuffer;
   plates: string[];
   country: string;
+  /** Рабочая валюта компании — подсказка, если в отчёте валюта не названа. */
+  currency: string;
 }): Promise<ExtractResult> {
   const url = process.env.N8N_FUEL_WEBHOOK_URL?.trim();
   const secret = agentSecret();
@@ -40,6 +45,7 @@ export async function extractFuelReport(input: {
     text: isPdf ? undefined : decodeText(buffer).slice(0, 200_000),
     plates: input.plates.slice(0, 300),
     country: input.country,
+    currency: input.currency,
   });
 
   try {

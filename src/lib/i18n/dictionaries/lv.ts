@@ -702,6 +702,7 @@ export const lv = {
     resultNoIban: 'Ievadiet uzņēmuma datos konta numuru (IBAN).',
     resultNoEmail: 'Ievadiet objektā klienta e-pastu.',
     resultNoAddress: 'Ievadiet objektā klienta rēķina adresi.',
+    resultPlatformOrder: 'Šis objekts ir no RAHTIS pasūtījuma, tāpēc rēķinu izraksta RAHTIS. Savu rēķinu izrakstīt nevar.',
     resultCreated: 'Rēķins izveidots, bet e-pasts neaizgāja. Lejupielādējiet PDF un nosūtiet to paši.',
     invoiced: 'Iekļauts rēķinā',
     due: 'Termiņš',
@@ -1597,6 +1598,11 @@ export const lv = {
     requiredBody: 'Virsbūve',
     anyBody: 'Jebkura',
     feeHint: 'Pakalpojuma maksa 5 % (vismaz 15 € par reisu kopā ar pārvadātāja maksu). Tiešais līgums ar pārvadātāju, kas izmanto ikmēneša maksu, ir bez maksas.',
+    /* Валюта цены: не евро — только у прямого договора и своих рейсов. */
+    currency: 'Valūta',
+    currencyEurOnly: 'Ar RAHTIS pakalpojuma starpniecību reisa cena tiek noteikta un rēķins izrakstīts eiro. Cita valūta ir iespējama ar tiešo līgumu.',
+    currencyErrorDirect: 'Cita valūta, nevis eiro, tikai ar tiešo līgumu ar pārvadātāju. Ar RAHTIS pakalpojumu cena ir eiro.',
+    currencyErrorRahtis: 'Šis pārvadātājs strādā ar RAHTIS pakalpojuma starpniecību — reisa cena tikai eiro.',
     title: 'Jauns pasūtījums',
     subtitle: 'Aizpildiet visu maršrutu un publicējiet. Pārvadātāji to redz uzreiz.',
     type: 'Pārvadājuma veids',
@@ -2197,6 +2203,15 @@ export const lv = {
 
   account: {
     title: 'Jūsu dati',
+    currencyTitle: 'Uzņēmuma valūta',
+    currencyHintCarrier:
+      'Savi reisi, izmaksas, degviela, algas un savi objekti tiek uzskaitīti šajā valūtā. RAHTIS pakalpojuma reisi, maksas un rēķini vienmēr ir eiro. Iepriekšējās summas saglabā savu valūtu, un kopsummas tiek pārrēķinātas pēc ECB kursa.',
+    currencyHintShipper:
+      'Noklusējuma valūta pasūtījumiem, kas saskaņoti tieši ar pārvadātāju. Pasūtījumi un maksas caur RAHTIS vienmēr ir eiro.',
+    currencyLabel: 'Valūta',
+    currencySave: 'Saglabāt',
+    currencySaved: 'Valūta saglabāta.',
+    currencyError: 'Valūtu neizdevās saglabāt.',
     passwordTitle: 'Mainīt paroli',
     passwordHint: 'Jaunā parole stājas spēkā uzreiz. Atcerieties to — mēs to neredzam un nevaram atjaunot.',
     current: 'Pašreizējā parole',
@@ -3550,6 +3565,8 @@ export const lv = {
     sunday: 'Svētdienas piemaksa, %',
     note: 'Piezīme',
     templates: 'Operatora veidnes',
+    templatesEur:
+      'Veidnes ir Somijas kravas autopārvadājumu nozares koplīgums eiro. Kopija paliek eiro; lai rēķinātu savā valūtā, izveidojiet noteikumu kopu no jauna.',
     copy: 'Kopēt kā savu',
     own: 'Manas noteikumu kopas',
     none: 'Noteikumu kopu vēl nav',

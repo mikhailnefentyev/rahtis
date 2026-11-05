@@ -28,7 +28,7 @@ export async function CompletedCabinet({
   const [{ t, m }, supabase] = await Promise.all([getViewerI18n(locale), createClient()]);
 
   /* Двенадцать недель: квартал закрытых рейсов покрывает любой спор о счёте. */
-  const [{ data: orders }, { data: totals }, { data: rating }] = await Promise.all([
+  const [{ data: orders }, { data: rating }] = await Promise.all([
     /*
      * Окно, а не «всё за всё время».
      *
@@ -41,7 +41,6 @@ export async function CompletedCabinet({
      * документах расчётного периода или у агента.
      */
     supabase.rpc('completed_orders', { p_from: weeksAgoMonday(COMPLETED_WEEKS) }),
-    supabase.rpc('weekly_totals', { p_weeks: 12 }),
     /*
      * Средняя оценка — только перевозчику и только своя: по ней его
      * выбирают из откликов, и видеть её он должен там же, где видит
@@ -84,7 +83,8 @@ export async function CompletedCabinet({
 
       {role === 'CARRIER' && <CarrierScorecard locale={locale} />}
 
-      <CompletedList orders={orders ?? []} totals={totals ?? []} canClaim />
+      {/* Итоги недель — по строкам: рейсы RAHTIS в евро и свои в своей валюте не складываются. */}
+      <CompletedList orders={orders ?? []} canClaim />
 
       {/*
         * Сказано прямо, где кончается список.

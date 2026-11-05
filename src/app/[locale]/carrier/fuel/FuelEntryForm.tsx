@@ -5,15 +5,18 @@ import { Button, Card, CardBody, Field, Input, InputMono, Select } from '@/compo
 import { addFuelEntryAction, type FuelEntryState } from '@/lib/fuel/actions';
 import { FUEL_PRODUCTS, fuelUnit, type FuelProduct } from '@/lib/fuel/fuel';
 import { useI18n } from '@/lib/i18n/provider';
+import { CURRENCIES, type Currency } from '@/lib/money/currency';
 
 const initial: FuelEntryState = { error: null, done: false };
 
 /** Заправка вручную: то, чего нет ни у водителя, ни в отчёте заправщика. */
 export function FuelEntryForm({ vehicles }: { vehicles: { id: string; plate: string }[] }) {
-  const { t, locale } = useI18n();
+  const { t, f, locale } = useI18n();
   const s = t.fuel;
   const [open, setOpen] = useState(false);
   const [product, setProduct] = useState<FuelProduct>('DIESEL');
+  /* Валюта чека: по умолчанию — компании; заправка за границей — местная. */
+  const [currency, setCurrency] = useState<Currency>(f.currency);
   const [state, action, pending] = useActionState(addFuelEntryAction, initial);
   const form = useRef<HTMLFormElement>(null);
 
@@ -66,7 +69,24 @@ export function FuelEntryForm({ vehicles }: { vehicles: { id: string; plate: str
             <Field label={`${s.colQty}, ${fuelUnit(product)}`} required>
               {(p) => <InputMono {...p} name="quantity" inputMode="decimal" required />}
             </Field>
-            <Field label={s.amountVat}>{(p) => <InputMono {...p} name="amount" inputMode="decimal" />}</Field>
+            <div className="flex items-end gap-2">
+              <Field label={f.label(s.amountVat, currency)} className="flex-1">
+                {(p) => <InputMono {...p} name="amount" inputMode="decimal" />}
+              </Field>
+              <Select
+                name="currency"
+                value={currency}
+                onChange={(e) => setCurrency(e.target.value as Currency)}
+                aria-label={f.label(s.amountVat, currency)}
+                className="w-24 font-mono"
+              >
+                {CURRENCIES.map((code) => (
+                  <option key={code} value={code}>
+                    {code}
+                  </option>
+                ))}
+              </Select>
+            </div>
             <Field label={s.colOdometer}>{(p) => <InputMono {...p} name="odometer_km" inputMode="numeric" />}</Field>
             <Field label={s.colStation} className="col-span-2">
               {(p) => <Input {...p} name="station" maxLength={120} />}

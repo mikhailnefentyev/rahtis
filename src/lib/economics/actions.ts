@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { requireRole } from '@/lib/auth/guard';
 import { flashError } from '@/lib/forms/flash';
 import { defaultLocale, getDictionary, isLocale, type Locale } from '@/lib/i18n';
+import { asCurrency } from '@/lib/money/currency';
 import { createClient } from '@/lib/supabase/server';
 import { eurosToCents } from './money';
 
@@ -21,6 +22,13 @@ function toLocale(value: FormDataEntryValue | null): Locale {
 const str = (form: FormData, key: string) => String(form.get(key) ?? '').trim();
 
 const date = (value: string): string | null => (/^\d{4}-\d{2}-\d{2}$/.test(value) ? value : null);
+
+/*
+ * Валюта сумм формы: выбранная в форме, иначе рабочая валюта компании.
+ * Суммы вводятся в той валюте, что показывает форма, — она и пишется.
+ */
+const currencyOf = (form: FormData, company: { currency?: string | null } | null) =>
+  asCurrency(str(form, 'currency'), asCurrency(company?.currency, 'EUR'));
 
 export type FinanceState = { error: string | null; done: boolean };
 
@@ -57,6 +65,7 @@ export async function saveVehicleFinanceAction(_prev: FinanceState, formData: Fo
       kasko_cents_year: money.kasko_year,
       tax_cents_year: money.tax_year,
       other_fixed_cents_month: money.other_fixed_month,
+      currency: currencyOf(formData, viewer.company),
       updated_at: new Date().toISOString(),
       updated_by: viewer.userId,
     },
@@ -91,6 +100,7 @@ export async function addVehicleCostAction(_prev: CostState, formData: FormData)
     spent_on: spentOn,
     category,
     amount_cents: amount,
+    currency: currencyOf(formData, viewer.company),
     note: str(formData, 'note').slice(0, 200) || null,
     /* Покупка из «Запчастей» — у кого куплено. */
     supplier: str(formData, 'supplier').slice(0, 120) || null,

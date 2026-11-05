@@ -182,7 +182,8 @@ export async function repriceOrderAction(
   }
 
   const km = Number.parseInt(str(formData, 'distance_km').replace(/\D/g, ''), 10);
-  const euros = Number.parseFloat(str(formData, 'rate').replace(/\s/g, '').replace(',', '.'));
+  /* Сумма в валюте заказа (она не меняется): знак «€», «zł», «kr» не важен. */
+  const euros = Number.parseFloat(str(formData, 'rate').replace(/[^\d,.-]/g, '').replace(',', '.'));
 
   if (!Number.isFinite(km) || km <= 0 || !Number.isFinite(euros) || euros <= 0) {
     return { error: t.validation.positiveNumber, done: false };

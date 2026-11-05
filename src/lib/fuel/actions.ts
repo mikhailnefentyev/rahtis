@@ -9,6 +9,7 @@ import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n'
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { stopTimeZone } from '@/lib/country';
+import { asCurrency, countryCurrency } from '@/lib/money/currency';
 import type { Json } from '@/types/database';
 import { extractFuelReport } from './extract';
 import { FUEL_MAX_QUANTITY, isFuelProduct, normalizeReport, parseNumber, type ImportRow } from './fuel';
@@ -42,6 +43,11 @@ async function hasAccess(): Promise<boolean> {
   const supabase = await createClient();
   const { data } = await supabase.rpc('own_orders_access');
   return data === true;
+}
+
+/** Рабочая валюта компании: ею считается сумма без названной валюты. */
+function companyCurrency(company: { currency?: string | null; country?: string | null }) {
+  return asCurrency(company.currency, countryCurrency(company.country));
 }
 
 function revalidateFuel(locale: Locale) {
@@ -107,12 +113,13 @@ export async function uploadFuelReportAction(_previous: FuelUploadState, formDat
     bytes,
     plates: (vehicles ?? []).map((v) => v.plate),
     country: company.country ?? 'FI',
+    currency: companyCurrency(company),
   });
 
   if (!result.ok) {
     await supabase.from('fuel_imports').update({ status: 'FAILED', error: result.reason }).eq('id', id);
   } else {
-    const rows = normalizeReport(result.rows, vehicles ?? [], cards ?? []);
+    const rows = normalizeReport(result.rows, vehicles ?? [], cards ?? [], companyCurrency(company));
     await supabase
       .from('fuel_imports')
       .update(
@@ -167,6 +174,8 @@ export async function confirmFuelImportAction(formData: FormData): Promise<void>
         product: row.product,
         quantity: row.quantity,
         amount_cents: row.amount_cents,
+        /* Отчёт, разобранный до валют, строк с валютой не имеет — тогда решает база (валюта компании). */
+        currency: row.currency ?? null,
         odometer_km: row.odometer_km,
         station: row.station,
         card_ref: row.card_ref,
@@ -222,6 +231,8 @@ export async function addFuelEntryAction(_previous: FuelEntryState, formData: Fo
   const odometer = parseNumber(str(formData, 'odometer_km'));
   const filledAt = operationsLocalToIso(str(formData, 'filled_at'), stopTimeZone(company.country));
   const vehicle = str(formData, 'vehicle_id');
+  /* Валюта чека из формы; мусор — валюта компании. */
+  const currency = asCurrency(str(formData, 'currency'), companyCurrency(company));
 
   if (!vehicle || !filledAt || !isFuelProduct(product) || quantity == null || quantity <= 0 || quantity > FUEL_MAX_QUANTITY) {
     return { error: t.validation.required, done: false };
@@ -235,6 +246,7 @@ export async function addFuelEntryAction(_previous: FuelEntryState, formData: Fo
     product,
     quantity: Math.round(quantity * 100) / 100,
     amount_cents: amount != null && amount >= 0 ? Math.round(amount * 100) : null,
+    currency,
     odometer_km: odometer != null && odometer > 0 ? Math.round(odometer) : null,
     full_tank: formData.get('full_tank') === '1',
     station: str(formData, 'station').slice(0, 120) || null,

@@ -297,13 +297,19 @@ export type TipperSummary = {
   pricing: 'HOUR' | 'LOAD' | 'TONNE';
   unit_rate_cents: number;
   amount_cents: number;
+  /** Валюта заказа: ставка и сумма в ней (у заказов RAHTIS — всегда EUR). */
+  currency: string;
 };
 
 /** Наработанное по самосвальному заказу — для панели закрытия (права решает база). */
 export async function tipperSummaryAction(orderId: string): Promise<TipperSummary | null> {
   if (!/^[0-9a-f-]{36}$/i.test(orderId)) return null;
   const supabase = await createClient();
-  const { data, error } = await supabase.rpc('tipper_order_summary', { p_order_id: orderId });
+  const [{ data, error }, { data: order }] = await Promise.all([
+    supabase.rpc('tipper_order_summary', { p_order_id: orderId }),
+    supabase.from('orders').select('currency').eq('id', orderId).maybeSingle(),
+  ]);
   if (error || !data) return null;
-  return data as unknown as TipperSummary;
+  /* Заказ не виден под RLS — значит, не наш случай; валюта по умолчанию — евро. */
+  return { ...(data as unknown as Omit<TipperSummary, 'currency'>), currency: order?.currency ?? 'EUR' };
 }

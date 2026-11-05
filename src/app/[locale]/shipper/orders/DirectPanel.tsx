@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useState } from 'react';
+import { useActionState, useEffect, useState } from 'react';
 import { Badge, Button, Field, Select } from '@/components/ui';
 import { cn } from '@/lib/cn';
 import { useI18n } from '@/lib/i18n/provider';
@@ -50,11 +50,14 @@ export function DispatchPicker({
   vehicles,
   haulKind,
   onDirectChange,
+  onContractChange,
 }: {
   vehicles: KnownVehicle[];
   haulKind: HaulKind;
   /* Форма подписывает кнопку: «на стол» и «одной машине» — разные действия. */
   onDirectChange?: (direct: boolean) => void;
+  /* Стол «напрямую с перевозчиком»: только тогда форма даёт выбрать валюту цены. */
+  onContractChange?: (carrierContract: boolean) => void;
 }) {
   const { t } = useI18n();
   const fitting = fittingVehicles(vehicles, haulKind);
@@ -66,6 +69,14 @@ export function DispatchPicker({
   const group = mode === 'GROUP' && fitting.length > 1;
   const effective = direct ? 'DIRECT' : group ? 'GROUP' : 'DESK';
   const [deskContract, setDeskContract] = useState<'RAHTIS' | 'CARRIER'>('RAHTIS');
+  /*
+   * Договор напрямую — по тому, что реально уйдёт в форме: смена единицы
+   * может сбросить «одной машине» обратно на стол без клика.
+   */
+  const carrierContract = effective === 'DESK' && deskContract === 'CARRIER';
+  useEffect(() => {
+    onContractChange?.(carrierContract);
+  }, [carrierContract, onContractChange]);
 
   return (
     <fieldset className="flex flex-col gap-3">

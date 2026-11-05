@@ -3,7 +3,7 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { normalizeReport, parseDate, parseNumber } from './fuel.ts';
+import { normalizeReport, parseDate, parseNumber, reportCurrency } from './fuel.ts';
 
 const vehicles = [
   { id: 'v1', plate: 'ABC-123' },
@@ -58,4 +58,34 @@ test('непонятный продукт, объём или дата — стр
     cards,
   );
   assert.equal(rows.length, 0);
+});
+
+test('валюта строки: из разбора; пустая — валюта компании; чужая — без суммы', () => {
+  const rows = normalizeReport(
+    [
+      { date: '2026-10-05', plate: 'ABC-123', product: 'DIESEL', quantity: 300, amount_gross: 540, currency: 'eur' },
+      { date: '2026-10-06', plate: 'ABC-123', product: 'DIESEL', quantity: 300, amount_gross: '2 350,00 zł', currency: null },
+      { date: '2026-10-07', plate: 'ABC-123', product: 'DIESEL', quantity: 300, amount_gross: 6100, currency: 'CHF' },
+    ],
+    vehicles,
+    cards,
+    'PLN',
+  );
+  assert.deepEqual(
+    rows.map((r) => [r.currency, r.amount_cents]),
+    [
+      ['EUR', 54000],
+      ['PLN', 235000],
+      ['PLN', null],
+    ],
+  );
+  assert.equal(reportCurrency(' sek ', 'EUR'), 'SEK');
+  assert.equal(reportCurrency(undefined, 'NOK'), 'NOK');
+});
+
+test('числа со знаком валюты', () => {
+  assert.equal(parseNumber('1 450,50 kr'), 1450.5);
+  assert.equal(parseNumber('1 450,50 kr.'), 1450.5);
+  assert.equal(parseNumber('PLN 890'), 890);
+  assert.equal(parseNumber('890 zł'), 890);
 });

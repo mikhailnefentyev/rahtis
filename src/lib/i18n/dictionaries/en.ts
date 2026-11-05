@@ -718,6 +718,7 @@ export const en = {
     resultNoIban: 'Add your company\'s bank account (IBAN) to the company details.',
     resultNoEmail: 'Add the customer\'s email to the site.',
     resultNoAddress: 'Add the customer\'s billing address to the site.',
+    resultPlatformOrder: 'This site came from a RAHTIS order, so RAHTIS invoices it. You cannot issue your own invoice.',
     resultCreated: 'The invoice was created, but the email didn’t go out. Download the PDF and send it yourself.',
     invoiced: 'Invoiced',
     due: 'Due',
@@ -1712,6 +1713,11 @@ export const en = {
     requiredBody: 'Body',
     anyBody: 'Any',
     feeHint: 'Service fee 5% (at least €15 per job together with the carrier fee). A direct contract with a carrier on the monthly plan is free.',
+    /* Валюта цены: не евро — только у прямого договора и своих рейсов. */
+    currency: 'Currency',
+    currencyEurOnly: 'Through the RAHTIS service the job is priced and invoiced in euros. Another currency is possible with a direct contract.',
+    currencyErrorDirect: 'A currency other than the euro only with a direct contract with the carrier. Through the RAHTIS service the price is in euros.',
+    currencyErrorRahtis: 'This carrier works through the RAHTIS service — the job price is in euros only.',
     title: 'New order',
     subtitle: 'Fill in the whole route and publish. Carriers see it immediately.',
     type: 'Type of transport',
@@ -2332,6 +2338,15 @@ export const en = {
 
   account: {
     title: 'Your details',
+    currencyTitle: 'Company currency',
+    currencyHintCarrier:
+      'Your own jobs, costs, fuel, wages and your own worksites are recorded in this currency. RAHTIS service jobs, fees and invoices are always in euros. Earlier amounts keep their own currency, and totals are converted at the ECB rate.',
+    currencyHintShipper:
+      'Default currency for orders agreed directly with a carrier. Orders and fees through the RAHTIS service are always in euros.',
+    currencyLabel: 'Currency',
+    currencySave: 'Save',
+    currencySaved: 'Currency saved.',
+    currencyError: 'The currency could not be saved.',
     passwordTitle: 'Change password',
     passwordHint: 'The new password takes effect immediately. Remember it — we can’t see it or get it back.',
     current: 'Current password',
@@ -3701,6 +3716,8 @@ export const en = {
     sunday: 'Sunday supplement, %',
     note: 'Note',
     templates: 'RAHTIS templates',
+    templatesEur:
+      'The templates are the Finnish trucking collective agreement in euros. A copy stays in euros; to work in your own currency, create a rule set from scratch.',
     copy: 'Copy as my own',
     own: 'My rule sets',
     none: 'No rule sets yet',

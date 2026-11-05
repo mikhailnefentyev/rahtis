@@ -69,6 +69,8 @@ export type FuelRow = {
   product: string;
   quantity: number;
   amount_cents: number | null;
+  /** Валюта суммы — валюта чека (польская машина в Германии платит евро). */
+  currency?: string | null;
   odometer_km: number | null;
   full_tank: boolean;
 };
@@ -81,6 +83,7 @@ export type MonthStat = {
   liquidL: number;
   gasKg: number;
   adblueL: number;
+  /** Траты в валюте компании (каждая строка пересчитана по курсу дня заправки). */
   amountCents: number;
   /** Километры интервалов, закрытых в этом месяце (жидкое и газ вместе — у машины одна дорога). */
   km: number;
@@ -89,7 +92,7 @@ export type MonthStat = {
   kg100: number | null;
   /** AdBlue, % от жидкого топлива. */
   adbluePct: number | null;
-  /** Стоимость топлива на километр, центы: расход × средняя цена единицы в месяце. */
+  /** Стоимость топлива на километр, центы валюты компании: расход × средняя цена единицы в месяце. */
   centsPerKm: number | null;
 };
 
@@ -227,13 +230,33 @@ function sumInto(target: Acc, source: Acc): void {
   for (const key of Object.keys(source) as (keyof Acc)[]) target[key] += source[key];
 }
 
-/** Помесячно по машинам и по парку. Месяцы — по возрастанию, только те, где что-то было. */
-export function fuelStats(rows: FuelRow[]): FuelStats {
+/**
+ * Сумма строки в валюте компании: валюта чека → валюта компании по курсу
+ * ЕЦБ дня заправки (день по Хельсинки, как и месяц). Курса нет — null:
+ * строка остаётся в литрах, но не в деньгах. `fx` — FxHistory из
+ * src/lib/money (сюда не импортируется: модуль без зависимостей).
+ */
+export type FuelFx = { convert(cents: number, from: string, to: string, day: string): number | null };
+
+export function fuelAmountIn(own: string, fx: FuelFx): (row: FuelRow) => number | null {
+  return (row) => {
+    if (row.amount_cents == null) return null;
+    const from = row.currency || own;
+    if (from === own) return row.amount_cents;
+    return fx.convert(row.amount_cents, from, own, dayOf(row.filled_at));
+  };
+}
+
+/**
+ * Помесячно по машинам и по парку. Месяцы — по возрастанию, только те, где что-то было.
+ * `amountOf` — сумма строки в валюте компании (fuelAmountIn); без него — amount_cents как есть.
+ */
+export function fuelStats<R extends FuelRow>(rows: R[], amountOf?: (row: R) => number | null): FuelStats {
   const flags = new Map<string, FuelFlag>();
   const perVehicle = new Map<string, Map<string, Acc>>();
 
   const sorted = [...rows].sort((a, b) => a.filled_at.localeCompare(b.filled_at));
-  const byVehicle = new Map<string, FuelRow[]>();
+  const byVehicle = new Map<string, R[]>();
   for (const row of sorted) {
     const list = byVehicle.get(row.vehicle_id) ?? [];
     list.push(row);
@@ -248,17 +271,19 @@ export function fuelStats(rows: FuelRow[]): FuelStats {
     for (const row of list) {
       const acc = accOf(months, monthOf(row.filled_at));
       const group = fuelGroup(row.product);
-      const amount = row.amount_cents ?? 0;
+      /* Сумма без курса — как неизвестная: в литры идёт, в деньги и цену — нет. */
+      const paid = row.amount_cents == null ? null : amountOf ? amountOf(row) : row.amount_cents;
+      const amount = paid ?? 0;
       acc.amountCents += amount;
       if (group === 'LIQUID') {
         acc.liquidL += row.quantity;
-        if (row.amount_cents != null) {
+        if (paid != null) {
           acc.liquidPaid += amount;
           acc.liquidPaidQty += row.quantity;
         }
       } else if (group === 'GAS') {
         acc.gasKg += row.quantity;
-        if (row.amount_cents != null) {
+        if (paid != null) {
           acc.gasPaid += amount;
           acc.gasPaidQty += row.quantity;
         }
@@ -427,6 +452,8 @@ export type ImportRow = {
   product: FuelProduct;
   quantity: number;
   amount_cents: number | null;
+  /** Валюта суммы по отчёту; не названа или чужая — валюта компании. */
+  currency: string;
   odometer_km: number | null;
   /** Машина, найденная по номеру или карте; null — выберет перевозчик. */
   vehicle_id: string | null;
@@ -447,7 +474,8 @@ const text = (value: unknown, max: number): string | null => {
 export function parseNumber(value: unknown): number | null {
   if (typeof value === 'number') return Number.isFinite(value) ? value : null;
   if (typeof value !== 'string') return null;
-  let s = value.replace(/[\s €]/g, '');
+  /* Знаки валют числу не мешают: «312,4 €», «1 450,50 kr», «890 zł», «PLN 890». */
+  let s = value.replace(/[\s €]|zł|kr\.?|[A-Z]{3}/gi, '');
   if (s.includes(',') && s.includes('.')) {
     /* Последний разделитель — дробный: «1.234,56» и «1,234.56». */
     s = s.lastIndexOf(',') > s.lastIndexOf('.') ? s.replace(/\./g, '').replace(',', '.') : s.replace(/,/g, '');
@@ -484,11 +512,24 @@ export function parseTime(value: unknown): string | null {
   return `${m[1].padStart(2, '0')}:${m[2]}`;
 }
 
-/** Строки разбора → строки проверки. Порядок — по дате и времени. */
+/* Валюты сумм — как CURRENCIES в src/lib/money/currency.ts (и домен currency_code в базе). */
+const REPORT_CURRENCIES: readonly string[] = ['EUR', 'SEK', 'NOK', 'DKK', 'PLN'];
+
+/** Валюта строки отчёта: код ISO из разбора; пусто или незнакомо — валюта компании. */
+export function reportCurrency(value: unknown, fallback: string): string {
+  const code = typeof value === 'string' ? value.trim().toUpperCase() : '';
+  return REPORT_CURRENCIES.includes(code) ? code : fallback;
+}
+
+/**
+ * Строки разбора → строки проверки. Порядок — по дате и времени.
+ * `currency` — валюта компании: ею считается сумма, у которой валюта не названа.
+ */
 export function normalizeReport(
   raw: unknown,
   vehicles: VehicleRef[],
   cards: { card_ref: string; vehicle_id: string }[],
+  currency = 'EUR',
 ): ImportRow[] {
   if (!Array.isArray(raw)) return [];
   const byPlate = new Map(vehicles.map((v) => [plateKey(v.plate), v.id]));
@@ -502,7 +543,10 @@ export function normalizeReport(
     const date = parseDate(item.date);
     if (!isFuelProduct(product) || quantity == null || quantity <= 0 || quantity > FUEL_MAX_QUANTITY || !date) continue;
 
-    const amount = parseNumber(item.amount_gross);
+    /* Валюта названа, но не наша (франки, исландские кроны) — суммы нет: выдавать её за валюту компании нельзя. */
+    const rowCurrency = reportCurrency(item.currency, currency);
+    const named = typeof item.currency === 'string' ? item.currency.trim().toUpperCase() : '';
+    const amount = named && named !== rowCurrency ? null : parseNumber(item.amount_gross);
     const odometer = parseNumber(item.odometer);
     const plate = text(item.plate, 16);
     const card = text(item.card, 40);
@@ -517,6 +561,7 @@ export function normalizeReport(
       product,
       quantity: Math.round(quantity * 100) / 100,
       amount_cents: amount != null && amount >= 0 && amount < 100000 ? Math.round(amount * 100) : null,
+      currency: rowCurrency,
       odometer_km: odometer != null && odometer > 0 && odometer < 5000000 ? Math.round(odometer) : null,
       vehicle_id: (plate && byPlate.get(plateKey(plate))) || (cardRef && byCard.get(cardRef)) || null,
     });

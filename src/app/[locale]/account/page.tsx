@@ -14,6 +14,7 @@ import { createClient } from '@/lib/supabase/server';
 import { ChangePasswordForm } from './form';
 import { MembersPanel } from './MembersPanel';
 import { WasteRegistrationsForm } from './WasteRegistrationsForm';
+import { CurrencyForm } from './CurrencyForm';
 import { parseRegistrations } from '@/lib/waste/registrations';
 import { getViewerI18n } from '@/lib/i18n/viewer';
 
@@ -114,6 +115,11 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
 
             <RequisitesForm company={company} prefill={prefill} />
           </section>
+        )}
+
+        {/* Рабочая валюта компании (5.11.2026): деньги RAHTIS остаются в евро. */}
+        {company && company.status === 'ACTIVE' && (company.kind === 'CARRIER' || company.kind === 'SHIPPER') && (
+          <CurrencyForm currency={company.currency} kind={company.kind} canEdit={isOwner} />
         )}
 
         {/* Регистрации перевозчика отходов — только у перевозчика, печатаются в документах на отходы. */}

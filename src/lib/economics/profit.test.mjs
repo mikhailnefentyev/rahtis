@@ -99,7 +99,75 @@ test('суммы из формы', async () => {
   assert.equal(eurosToCents('85000 €'), 8_500_000);
   assert.equal(eurosToCents(''), null);
   assert.equal(eurosToCents('abc'), undefined);
+  /* Любой знак валюты отбрасывается: валюта — отдельным полем. */
+  assert.equal(eurosToCents('4 200,50 zł'), 420_050);
+  assert.equal(eurosToCents('950 kr'), 95_000);
+  assert.equal(eurosToCents('950 kr.'), 95_000);
+  assert.equal(eurosToCents('1200 PLN'), 120_000);
   assert.equal(centsToInput(1_250_050), '12500.50');
   assert.equal(centsToInput(8_500_000), '85000');
 });
 
+
+test('карточка в другой валюте: постоянные расходы и окупаемость — по курсу месяца', () => {
+  /* Карточка в евро, компания в злотых: 1 € = 4 zł в сентябре, 5 zł в октябре. */
+  const rates = { '2026-09': 4, '2026-10': 5 };
+  const { vehicles } = vehicleEconomics({
+    months: ['2026-09', '2026-10'],
+    vehicles: [{ id: 'A', plate: 'X' }],
+    revenue: [{ vehicleId: 'A', month: '2026-10', cents: 4_000_000, kind: 'OWN' }],
+    fuel: [],
+    pay: [],
+    journal: [],
+    finance: new Map([['A', fin({ currency: 'EUR', purchase_price_cents: 6_000_000, useful_life_months: 60, purchased_on: '2026-09-01', insurance_cents_year: 120_000 })]]),
+    employerCostBps: 0,
+    subscriptionUnitCents: null,
+    financeRate: (_v, m) => rates[m] ?? null,
+  });
+  const [sep, oct] = vehicles[0].months;
+  assert.equal(sep.costs.depreciation, 400_000);
+  assert.equal(oct.costs.depreciation, 500_000);
+  assert.equal(oct.costs.insurance, 50_000);
+  /* Цена — по курсу месяца покупки: 60 000 € × 4 = 240 000 zł. */
+  const earned = sep.profit + sep.costs.depreciation + oct.profit + oct.costs.depreciation;
+  assert.equal(vehicles[0].paybackPct, Math.round((earned / 24_000_000) * 1000) / 10);
+});
+
+test('курса нет — постоянные расходы месяца не считаются', () => {
+  const { vehicles } = vehicleEconomics({
+    months: ['2026-10'],
+    vehicles: [{ id: 'A', plate: 'X' }],
+    revenue: [],
+    fuel: [],
+    pay: [],
+    journal: [],
+    finance: new Map([['A', fin({ currency: 'SEK', other_fixed_cents_month: 100_000 })]]),
+    employerCostBps: 0,
+    subscriptionUnitCents: null,
+    financeRate: () => null,
+  });
+  assert.equal(vehicles[0].months[0].costs.total, 0);
+});
+
+test('пересчёт строк в валюту компании по курсу дня', async () => {
+  const { fxHistory } = await import('../money/currency.ts');
+  const { companyConverter } = await import('./convert.ts');
+  const fx = fxHistory([
+    { day: '2026-10-01', currency: 'PLN', per_eur: 4 },
+    { day: '2026-10-15', currency: 'PLN', per_eur: 5 },
+    { day: '2026-10-01', currency: 'SEK', per_eur: 10 },
+  ]);
+  const conv = companyConverter(fx, 'PLN');
+  assert.equal(conv.cents(10_000, 'EUR', '2026-10-10'), 40_000);
+  assert.equal(conv.cents(10_000, 'EUR', '2026-10-20'), 50_000);
+  assert.equal(conv.cents(10_000, 'PLN', '2026-10-20'), 10_000);
+  /* 100 kr → 10 € → 40 zł. */
+  assert.equal(conv.cents(10_000, 'SEK', '2026-10-05'), 4_000);
+  assert.equal(conv.cents(10_000, null, '2026-10-05'), 40_000);
+  assert.equal(conv.rate('EUR', '2026-10-20'), 5);
+  assert.equal(conv.missing, 0);
+  /* Курса NOK нет — строка пропускается и считается. */
+  assert.equal(conv.cents(10_000, 'NOK', '2026-10-05'), null);
+  assert.equal(conv.rate('NOK', '2026-10-05'), null);
+  assert.equal(conv.missing, 2);
+});

@@ -2,6 +2,8 @@ import 'server-only';
 
 import { vatBpsFor, withVat } from '@/lib/config';
 import { createClient } from '@/lib/supabase/server';
+import { asCurrency, type Currency } from '@/lib/money/currency';
+import { loadFxHistory } from '@/lib/money/fx';
 import type { ClaimKind, ClaimStatus, PartyRole, PeriodClaim, PeriodReportRow } from '@/types/db';
 
 /**
@@ -34,6 +36,8 @@ export type ReportLine = {
   trailer: string | null;
   km: number;
   rate: number;
+  /** Валюта цены рейса: RAHTIS — евро, свой рейс и прямой договор — своя. Все суммы строки в ней. */
+  currency: Currency;
   commissionBps: number | null;
   commission: number | null;
   payout: number | null;
@@ -91,7 +95,15 @@ export type PeriodReport = {
    * блоком: работа, но не наши деньги, и в итогах расчёта их нет. У
    * оператора они остаются в общей таблице, own пуст.
    */
-  own: { lines: ReportLine[]; km: number; rate: number };
+  own: {
+    lines: ReportLine[];
+    km: number;
+    /** Итог цены в currency. */
+    rate: number;
+    currency: Currency;
+    /** Валюты строк разные — итог пересчитан по курсу ЕЦБ дня закрытия (≈). */
+    converted: boolean;
+  };
   claims: ReportClaim[];
   totals: {
     trips: number;
@@ -119,6 +131,8 @@ export async function buildPeriodReport(input: {
   country: string | null;
   /** Только оператор: отчёт по одной компании. */
   companyId?: string | null;
+  /** Валюта компании смотрящего: в неё сводится итог своих рейсов в разных валютах. */
+  currency?: string | null;
 }): Promise<{ report: PeriodReport | null; error: string | null }> {
   const supabase = await createClient();
   const company = input.role === 'ADMIN' ? (input.companyId ?? undefined) : undefined;
@@ -166,8 +180,26 @@ export async function buildPeriodReport(input: {
     carrier: c.carrier_name,
   }));
 
+  /*
+   * Итоги расчёта — в евро: это деньги RAHTIS. Строки в другой валюте
+   * (у оператора — прямые договоры в общей таблице) в сумму не входят:
+   * кроны с евро не складываются.
+   */
+  const eurLines = lines.filter((l) => l.currency === 'EUR');
   const sum = (pick: (l: ReportLine) => number | null) =>
-    lines.reduce((acc, l) => acc + (pick(l) ?? 0), 0);
+    eurLines.reduce((acc, l) => acc + (pick(l) ?? 0), 0);
+
+  /* Свои рейсы: одна валюта — сумма; разные — пересчёт в валюту компании по курсу дня. */
+  const ownCurrencies = new Set(ownLines.map((l) => l.currency));
+  const ownConverted = ownCurrencies.size > 1;
+  const ownCurrency: Currency = ownConverted
+    ? asCurrency(input.currency)
+    : ([...ownCurrencies][0] ?? asCurrency(input.currency));
+  const fx = ownConverted ? await loadFxHistory(supabase, input.from, input.to) : null;
+  const ownRate = ownLines.reduce(
+    (acc, l) => acc + (fx ? (fx.convert(l.rate, l.currency, ownCurrency, l.closedOn) ?? 0) : l.rate),
+    0,
+  );
   /* Удержание с перевозчика — с рейсов подряда: оператор видит всегда, перевозчик — если оно у него было. */
   const seesFees =
     input.role === 'ADMIN' || (input.role === 'CARRIER' && lines.some((l) => (l.commission ?? 0) > 0));
@@ -185,7 +217,9 @@ export async function buildPeriodReport(input: {
       own: {
         lines: ownLines,
         km: ownLines.reduce((acc, l) => acc + l.km, 0),
-        rate: ownLines.reduce((acc, l) => acc + l.rate, 0),
+        rate: ownRate,
+        currency: ownCurrency,
+        converted: ownConverted,
       },
       claims,
       totals: {
@@ -222,6 +256,7 @@ function line(row: PeriodReportRow, role: PartyRole, country: string | null): Re
     trailer: row.trailer_plate,
     km: row.distance_km ?? 0,
     rate,
+    currency: asCurrency(row.currency),
     commissionBps: row.commission_bps,
     commission: row.commission_cents,
     payout: row.payout_cents,

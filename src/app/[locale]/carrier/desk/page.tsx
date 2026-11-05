@@ -12,6 +12,7 @@ import { BackhaulBlock } from './BackhaulBlock';
 import { DEFAULT_RADIUS, isRadius } from '@/lib/backhaul/radius';
 import { DeskList, type DeskBusy } from './DeskList';
 import { getViewerI18n } from '@/lib/i18n/viewer';
+import { orderCurrencies } from '@/lib/orders/currencies';
 
 export async function generateMetadata({
   params,
@@ -180,6 +181,24 @@ export default async function DeskPage({
     (tripRows ?? []).map((o) => [o.order_id, o.trailer_id]),
   );
 
+  /*
+   * Валюта цены. Закреплённые рейсы перевозчик читает сам (свой рейс — в
+   * его валюте); у стола не евро бывает только «напрямую с перевозчиком».
+   */
+  const [{ data: assignedCurrencyRows }, deskCurrencies] = await Promise.all([
+    assignedIds.length
+      ? supabase.from('orders').select('id, currency').in('id', assignedIds)
+      : Promise.resolve({ data: [] as { id: string; currency: string }[] }),
+    orderCurrencies([
+      ...(orders ?? []).filter((o) => o.desk_contract === 'CARRIER').map((o) => o.id),
+      ...(backhaul ?? []).filter((b) => b.order_id && b.desk_contract === 'CARRIER').map((b) => b.order_id),
+    ]),
+  ]);
+  const currencyByOrder: Record<string, string> = {
+    ...deskCurrencies,
+    ...Object.fromEntries((assignedCurrencyRows ?? []).map((o) => [o.id, o.currency])),
+  };
+
   const ownByOrder: Record<string, string> = Object.fromEntries(
     (ownRows ?? []).map((o) => [o.id, clientNames.get(o.shipper_company_id) ?? '']),
   );
@@ -219,6 +238,7 @@ export default async function DeskPage({
         documentsByOrder={documentsByOrder}
         amendmentsByOrder={amendmentsByOrder}
         ownByOrder={ownByOrder}
+        currencyByOrder={currencyByOrder}
       />
 
       {!canTakeOrders ? (
@@ -244,7 +264,14 @@ export default async function DeskPage({
         </Card>
       ) : (
         <>
-          <BackhaulBlock rows={backhaul ?? []} radius={radius} region={region} i18n={i18n} locale={locale} />
+          <BackhaulBlock
+            rows={backhaul ?? []}
+            radius={radius}
+            region={region}
+            i18n={i18n}
+            locale={locale}
+            currencyByOrder={currencyByOrder}
+          />
 
           <nav className="mb-5 flex flex-wrap gap-1.5">
             <Link
@@ -274,7 +301,14 @@ export default async function DeskPage({
             {m('desk.ordersCount', { count: (orders ?? []).length })}
           </p>
 
-          <DeskList orders={orders ?? []} vehicles={deskVehicles} combos={deskCombos} busy={busy} waiting={waiting} />
+          <DeskList
+            orders={orders ?? []}
+            vehicles={deskVehicles}
+            combos={deskCombos}
+            busy={busy}
+            waiting={waiting}
+            currencyByOrder={currencyByOrder}
+          />
         </>
       )}
     </main>

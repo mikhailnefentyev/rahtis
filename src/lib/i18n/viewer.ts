@@ -4,6 +4,9 @@ import { cache } from 'react';
 import { getViewer } from '@/lib/auth/viewer';
 import { APP } from '@/lib/config';
 import { stopTimeZone } from '@/lib/country';
+import type { MoneyContext } from '@/lib/format';
+import { asCurrency } from '@/lib/money/currency';
+import { latestFxRates } from '@/lib/money/fx';
 import { createI18n, type I18n } from './bundle';
 import type { Locale } from './config';
 import { getDictionary } from './dictionaries';
@@ -26,8 +29,25 @@ export const viewerTimeZone = cache(async (): Promise<string> => {
   }
 });
 
-/** getI18n с временем по поясу компании зрителя — для страниц кабинетов. */
+/**
+ * Деньги зрителя: рабочая валюта компании и последние курсы ЕЦБ.
+ * Оператор и гость — евро (деньги платформы).
+ */
+export const viewerMoney = cache(async (): Promise<MoneyContext> => {
+  try {
+    const viewer = await getViewer();
+    if (viewer.status !== 'ready' || viewer.role === 'ADMIN' || !viewer.company) {
+      return { currency: 'EUR', rates: null };
+    }
+    const currency = asCurrency((viewer.company as { currency?: string }).currency, 'EUR');
+    return { currency, rates: await latestFxRates() };
+  } catch {
+    return { currency: 'EUR', rates: null };
+  }
+});
+
+/** getI18n с временем и валютой компании зрителя — для страниц кабинетов. */
 export async function getViewerI18n(locale: Locale): Promise<I18n> {
-  const [dictionary, zone] = await Promise.all([getDictionary(locale), viewerTimeZone()]);
-  return createI18n(locale, dictionary, zone);
+  const [dictionary, zone, money] = await Promise.all([getDictionary(locale), viewerTimeZone(), viewerMoney()]);
+  return createI18n(locale, dictionary, zone, money);
 }

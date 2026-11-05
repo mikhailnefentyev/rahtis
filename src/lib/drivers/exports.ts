@@ -3,6 +3,7 @@ import 'server-only';
 import { csvNumber, csvText } from '@/lib/csv';
 import writeExcelFile, { type SheetData } from 'write-excel-file/node';
 import { payableKm, type WorkDay } from '@/lib/driverPay';
+import type { Format } from '@/lib/format';
 import type { Dictionary } from '@/lib/i18n';
 import type { DriverReport } from './report';
 
@@ -10,8 +11,9 @@ import type { DriverReport } from './report';
  * Отчёт по водителям для внутренних выплат: XLSX и CSV.
  *
  * Колонки описаны один раз и общие для обоих форматов и для PDF — как у
- * отчёта за период. Числа — числами: часы десятичной дробью, суммы в
- * евро. CSV — «;», UTF-8 с BOM: так его без настройки открывает Excel с
+ * отчёта за период. Числа — числами: часы десятичной дробью, суммы — в
+ * валюте строки, она отдельной колонкой (у дня — валюта ставки, у итога —
+ * валюта компании): валюты в одной колонке без подписи не смешиваются. CSV — «;», UTF-8 с BOM: так его без настройки открывает Excel с
  * финской локалью.
  *
  * Дисклеймер стоит первой строкой в обоих форматах: файл уходит в
@@ -19,7 +21,7 @@ import type { DriverReport } from './report';
  * расчёт зарплаты.
  */
 
-export type Kind = 'text' | 'date' | 'hours' | 'int' | 'money';
+export type Kind = 'text' | 'date' | 'hours' | 'int' | 'money' | 'currency';
 
 export type Row = { driver: string; day: WorkDay | null; totals: boolean };
 
@@ -32,7 +34,8 @@ export type Column = {
 
 const h = (minutes: number) => Math.round((minutes / 60) * 100) / 100;
 
-export function reportColumns(t: Dictionary): Column[] {
+/** f — для подписи «Summa, €» знаком валюты отчёта; без него подпись как в словаре. */
+export function reportColumns(t: Dictionary, f?: Pick<Format, 'label'>, currency?: string): Column[] {
   const w = t.workReport;
   const d = (row: Row) => row.day!;
   return [
@@ -61,10 +64,16 @@ export function reportColumns(t: Dictionary): Column[] {
       width: 16,
     },
     {
-      header: w.colAmount,
+      header: f ? f.label(w.colAmount, currency) : w.colAmount,
       kind: 'money',
       get: (r) => (d(r).amountCents == null ? null : d(r).amountCents! / 100),
       width: 14,
+    },
+    {
+      header: t.account.currencyLabel,
+      kind: 'currency',
+      get: (r) => (d(r).amountCents == null ? null : d(r).currency),
+      width: 8,
     },
   ];
 }
@@ -103,12 +112,12 @@ function cell(kind: Kind, value: string | number | null, bold = false) {
   if (kind === 'date') {
     return { value: new Date(`${value}T00:00:00Z`), type: Date, format: FORMAT.date, ...weight };
   }
-  if (kind === 'text') return { value: String(value), type: String, ...weight };
+  if (kind === 'text' || kind === 'currency') return { value: String(value), type: String, ...weight };
   return { value: Number(value), type: Number, format: FORMAT[kind], ...weight };
 }
 
-export async function reportXlsx(report: DriverReport, t: Dictionary): Promise<Buffer> {
-  const columns = reportColumns(t);
+export async function reportXlsx(report: DriverReport, t: Dictionary, f?: Pick<Format, 'label'>): Promise<Buffer> {
+  const columns = reportColumns(t, f, report.currency);
   const rows = reportRows(report);
 
   const data: SheetData = [
@@ -132,13 +141,13 @@ export async function reportXlsx(report: DriverReport, t: Dictionary): Promise<B
 
 /* Текст (имена, адреса, номера) — с защитой от формул; числа пишет код, они без апострофа (lib/csv). */
 function csvValue(kind: Kind, value: string | number | null): string {
-  if (kind === 'text' || kind === 'date') return csvText(value);
+  if (kind === 'text' || kind === 'date' || kind === 'currency') return csvText(value);
   if (value == null) return csvNumber(null);
   return csvNumber(kind === 'money' || kind === 'hours' ? Number(value).toFixed(2) : String(value));
 }
 
-export function reportCsv(report: DriverReport, t: Dictionary): string {
-  const columns = reportColumns(t);
+export function reportCsv(report: DriverReport, t: Dictionary, f?: Pick<Format, 'label'>): string {
+  const columns = reportColumns(t, f, report.currency);
   const lines = [
     csvValue('text', t.pay.disclaimer),
     columns.map((c) => csvValue('text', c.header)).join(';'),

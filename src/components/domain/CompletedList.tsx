@@ -38,11 +38,15 @@ import type { CompletedOrder, OrderStop, TripDocument, WeeklyTotal } from '@/typ
  */
 export function CompletedList({
   orders,
-  totals,
   canClaim = false,
 }: {
   orders: CompletedOrder[];
-  totals: WeeklyTotal[];
+  /**
+   * Не используется: итоги недели считаются по строкам (недели в окне
+   * полные). weekly_totals пересчитывает всё в валюту зрителя, а здесь
+   * рейсы RAHTIS (евро) и свои (своя валюта) показываются раздельно.
+   */
+  totals?: WeeklyTotal[];
   /** Сторона рейса может подать claim; оператор — нет, он посредник. */
   canClaim?: boolean;
 }) {
@@ -64,12 +68,16 @@ export function CompletedList({
     return <EmptyState title={t.done.none} description={t.done.noneHint} />;
   }
 
-  const totalOf = (week: string) => totals.find((x) => x.week === week);
+  /* Сумма по валютам: «12 000 kr + 480 €» — без сложения крон с евро. */
+  const byCurrency = (list: CompletedOrder[]) => {
+    const sums = new Map<string, number>();
+    for (const o of list) sums.set(o.currency ?? 'EUR', (sums.get(o.currency ?? 'EUR') ?? 0) + (o.rate_cents ?? 0));
+    return [...sums.entries()].map(([cur, cents]) => f.money(cents, cur)).join(' + ');
+  };
 
   return (
     <div className="flex flex-col gap-8">
       {weeks.map(([week, list]) => {
-        const sum = totalOf(week);
         /*
          * Рейсы по договору перевозчика с клиентом — свои рейсы и прямые
          * заказы подписчика — своей группой ниже и без итогов недели:
@@ -77,8 +85,13 @@ export function CompletedList({
          */
         const ownList = list.filter((o) => o.contract_party === 'CARRIER');
         const paidList = list.filter((o) => o.contract_party !== 'CARRIER');
-        const ownRate = ownList.reduce((acc, o) => acc + (o.rate_cents ?? 0), 0);
-        const ownPayout = ownList.reduce((acc, o) => acc + (o.payout_cents ?? 0), 0);
+        /* Рейсы RAHTIS — всегда в евро: итог по строкам, без пересчёта. */
+        const paidRate = paidList.reduce((acc, o) => acc + (o.rate_cents ?? 0), 0);
+        const commissionRows = paidList.filter((o) => o.commission_cents != null);
+        const paidCommission = commissionRows.reduce((acc, o) => acc + (o.commission_cents ?? 0), 0);
+        const payoutRows = paidList.filter((o) => o.payout_cents != null);
+        const paidPayout = payoutRows.reduce((acc, o) => acc + (o.payout_cents ?? 0), 0);
+        const paidApprox = f.approx(payoutRows.length > 0 ? paidPayout : paidRate);
 
         return (
           <section key={week}>
@@ -101,24 +114,27 @@ export function CompletedList({
                 <span className="text-ink-muted">
                   {t.done.rate}{' '}
                   <span className="font-semibold text-ink">
-                    {f.eur(Number(sum?.rate_cents ?? 0) - ownRate)}
+                    {f.eur(paidRate)}
                   </span>
                 </span>
 
-                {sum?.commission_cents != null && (
+                {commissionRows.length > 0 && (
                   <span className="text-ink-dim">
-                    {t.done.commission} {f.eur(Number(sum.commission_cents))}
+                    {t.done.commission} {f.eur(paidCommission)}
                   </span>
                 )}
 
-                {sum?.payout_cents != null && (
+                {payoutRows.length > 0 && (
                   <span className="text-ink-muted">
                     {t.done.payout}{' '}
                     <span className="font-semibold text-ok">
-                      {f.eur(Number(sum.payout_cents) - ownPayout)}
+                      {f.eur(paidPayout)}
                     </span>
                   </span>
                 )}
+
+                {/* Справка в валюте компании: расчёты с RAHTIS остаются в евро. */}
+                {paidApprox && <span className="text-ink-dim">{paidApprox}</span>}
 
                 {/* Все числа выше нетто — налог добавляется в счёте. */}
                 <span className="text-ink-dim">{t.money.addVat}</span>
@@ -140,7 +156,7 @@ export function CompletedList({
                       <p className="mt-3 text-[13px] text-ink-muted">
                         <span className="font-semibold text-ink">{t.report_.ownTitle}</span>
                         {' · '}
-                        {m('order.tripsCount', { count: ownList.length })} · {f.eur(ownRate)}
+                        {m('order.tripsCount', { count: ownList.length })} · {byCurrency(ownList)}
                         <span className="block text-xs text-ink-dim">{t.report_.ownNote}</span>
                       </p>
                     )}
@@ -184,14 +200,14 @@ export function CompletedList({
   
                           <div className="flex flex-col items-end gap-1.5">
                             <span className="text-[15px] font-semibold text-ink">
-                              {f.eur(order.rate_cents ?? 0)}
+                              {f.money(order.rate_cents ?? 0, order.currency)}
                             </span>
   
                             {!own && order.payout_cents != null && (
                               <span className="text-xs text-ink-muted">
                                 {t.done.payout}{' '}
                                 <span className="font-semibold text-ok">
-                                  {f.eur(order.payout_cents)}
+                                  {f.money(order.payout_cents, order.currency)}
                                 </span>
                               </span>
                             )}
@@ -227,7 +243,7 @@ export function CompletedList({
                                 v={
                                   <Mono>
                                     {order.distance_km && order.rate_cents
-                                      ? (f.eurPerKm(order.rate_cents, order.distance_km) ?? '—')
+                                      ? (f.moneyPerKm(order.rate_cents, order.distance_km, order.currency) ?? '—')
                                       : '—'}
                                   </Mono>
                                 }
@@ -237,7 +253,7 @@ export function CompletedList({
                                   k={t.done.commission}
                                   v={
                                     <Mono>
-                                      {f.eur(order.commission_cents)}
+                                      {f.money(order.commission_cents, order.currency)}
                                       {order.commission_bps != null &&
                                         ` · ${m('done.bps', { rate: order.commission_bps / 10000 })}`}
                                     </Mono>
@@ -245,7 +261,7 @@ export function CompletedList({
                                 />
                               )}
                               {!own && order.payout_cents != null && (
-                                <Kv k={t.done.payout} v={<Mono>{f.eur(order.payout_cents)}</Mono>} />
+                                <Kv k={t.done.payout} v={<Mono>{f.money(order.payout_cents, order.currency)}</Mono>} />
                               )}
                             </div>
   

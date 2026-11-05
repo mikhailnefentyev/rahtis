@@ -12,6 +12,14 @@
  * Одна функция на экран, PDF и таблицу — чтобы три вида одного отчёта
  * не разошлись.
  *
+ * Валюта. Ставка считается в валюте своей строки: профиль водителя
+ * (driver_pay_profiles.currency), у TES — валюта набора правил. Сумма дня
+ * — в этой валюте (WorkDay.currency). Выплата за рейсы приходит в валюте
+ * компании (payoutCurrency) и для процента пересчитывается в валюту
+ * ставки по курсу дня. Итог периода — в валюте компании: дни в другой
+ * валюте пересчитываются по курсу своего дня, сырые центы разных валют не
+ * складываются. Курсы подаёт вызывающий (fx), модуль их не грузит.
+ *
  * Модуль без импортов намеренно: тесты гоняются голым `node --test`, а
  * он не знает алиасов сборки. Поэтому и часовой пояс здесь параметр со
  * значением по умолчанию, а не импорт из config.
@@ -66,7 +74,15 @@ export type TesRules = {
   /** Короткий рабочий день оплачивается как этот минимум (TES § 11.3: 285). */
   minPaidMinutes?: number;
   rates?: TesRate[];
+  /** Валюта сумм набора (EUR, SEK…); шаблоны оператора — финский TES в евро. */
+  currency?: string;
 };
+
+/**
+ * Пересчёт центов по курсу дня; курса нет — null. Подаётся снаружи
+ * (lib/money: fxHistory().convert), чтобы модуль остался без импортов.
+ */
+export type FxConvert = (cents: number, from: string, to: string, day: string) => number | null;
 
 export type PayProfileInput = {
   validFrom: string;
@@ -82,6 +98,8 @@ export type PayProfileInput = {
   tesGrade?: string | null;
   /** Начало стажа водителя (YYYY-MM-DD). */
   tesExperienceSince?: string | null;
+  /** Валюта ставки (driver_pay_profiles.currency). Нет — валюта компании. */
+  currency?: string | null;
 };
 
 /** Итог одного дня. День — местная дата начала смены (см. splitShift). */
@@ -106,6 +124,8 @@ export type WorkDay = {
   /** Модель, по которой посчитан день. NULL — на эту дату ставки не было. */
   model: PayModelCode | null;
   amountCents: number | null;
+  /** Валюта amountCents и parts: валюта ставки дня. NULL — ставки не было. */
+  currency: string | null;
   parts: PayParts;
 };
 
@@ -119,9 +139,14 @@ export type PayParts = {
 
 export type DriverSummary = {
   days: WorkDay[];
-  totals: Omit<WorkDay, 'date' | 'model' | 'amountCents' | 'parts'> & {
+  totals: Omit<WorkDay, 'date' | 'model' | 'amountCents' | 'parts' | 'currency'> & {
     amountCents: number;
-    /** Есть дни с работой, но без ставки — сумма тогда неполная. */
+    /** Валюта итога: валюта компании, а без неё — валюта первого дня со ставкой. */
+    currency: string | null;
+    /**
+     * Есть дни с работой, но без ставки, — сумма тогда неполная. Сюда же
+     * дни, которые не пересчитать в валюту итога (нет курса ЕЦБ).
+     */
     missingRate: boolean;
     parts: PayParts;
   };
@@ -426,10 +451,27 @@ export function tesBaseOn(profile: PayProfileInput, date: string): number {
   return best?.hourlyCents ?? rules.baseHourlyCents;
 }
 
-function payDay(day: WorkDay, profile: PayProfileInput | null): WorkDay {
+/**
+ * Валюта ставки: у TES — валюта набора (суммы в нём), иначе профиля.
+ * Нет ни той ни другой — запасная (валюта компании).
+ */
+export function payCurrency(profile: PayProfileInput, fallback: string | null = null): string | null {
+  if (profile.model === 'TES' && profile.tes?.currency) return profile.tes.currency;
+  return profile.currency ?? fallback;
+}
+
+type Money = {
+  /** Валюта выплат за рейсы (day.payoutCents); нет — та же, что у ставки. */
+  payoutCurrency?: string | null;
+  fx?: FxConvert;
+};
+
+function payDay(day: WorkDay, profile: PayProfileInput | null, money: Money = {}): WorkDay {
   const parts = emptyParts();
 
-  if (!profile) return { ...day, model: null, amountCents: null, parts };
+  if (!profile) return { ...day, model: null, amountCents: null, currency: null, parts };
+
+  const currency = payCurrency(profile, money.payoutCurrency ?? null);
 
   switch (profile.model) {
     case 'FLAT_HOURLY':
@@ -440,13 +482,21 @@ function payDay(day: WorkDay, profile: PayProfileInput | null): WorkDay {
       parts.baseCents = payableKm(day) * (profile.perKmCents ?? 0);
       break;
 
-    case 'TRIP_PERCENT':
-      parts.baseCents = Math.round((day.payoutCents * (profile.tripBps ?? 0)) / 10_000);
+    case 'TRIP_PERCENT': {
+      /* Выплата — в валюте компании, процент — в валюте ставки: пересчёт по курсу дня. */
+      let payout: number | null = day.payoutCents;
+      const from = money.payoutCurrency;
+      if (from && currency && from !== currency && payout !== 0) {
+        payout = money.fx ? money.fx(payout, from, currency, day.date) : null;
+      }
+      if (payout == null) return { ...day, model: profile.model, amountCents: null, currency, parts };
+      parts.baseCents = Math.round((payout * (profile.tripBps ?? 0)) / 10_000);
       break;
+    }
 
     case 'TES': {
       const r = profile.tes;
-      if (!r) return { ...day, model: profile.model, amountCents: null, parts };
+      if (!r) return { ...day, model: profile.model, amountCents: null, currency, parts };
 
       const base = tesBaseOn(profile, day.date);
       parts.baseCents = perHour(day.paidMinutes, base);
@@ -464,7 +514,7 @@ function payDay(day: WorkDay, profile: PayProfileInput | null): WorkDay {
   const amountCents =
     parts.baseCents + parts.overtimeCents + parts.eveningCents + parts.nightCents + parts.weekendCents;
 
-  return { ...day, model: profile.model, amountCents, parts };
+  return { ...day, model: profile.model, amountCents, currency, parts };
 }
 
 /* ── Сводка по водителю ─────────────────────────────────────────── */
@@ -483,6 +533,14 @@ export function summarizeDriver(input: {
   profiles: PayProfileInput[];
   now: number;
   timeZone?: string;
+  /** Валюта компании: в ней выплаты за рейсы (если не задана payoutCurrency) и итог. */
+  currency?: string | null;
+  /**
+   * Валюта trips[].payoutCents. По умолчанию — валюта компании; null —
+   * выплаты уже в валюте ставки (доля водителя из driver_earnings).
+   */
+  payoutCurrency?: string | null;
+  fx?: FxConvert;
 }): DriverSummary {
   const tz = input.timeZone ?? DEFAULT_TZ;
   const clock = localClock(tz);
@@ -509,6 +567,7 @@ export function summarizeDriver(input: {
         payoutCents: 0,
         model: null,
         amountCents: null,
+        currency: null,
         parts: emptyParts(),
       };
       days.set(date, day);
@@ -552,6 +611,7 @@ export function summarizeDriver(input: {
    * числом в его последний день.
    */
   const periods = new Map<string, { worked: number; step1: number }>();
+  const payoutCurrency = input.payoutCurrency === undefined ? (input.currency ?? null) : input.payoutCurrency;
 
   for (const day of [...days.values()].sort((a, b) => a.date.localeCompare(b.date))) {
     const profile = profileOn(input.profiles, day.date);
@@ -586,10 +646,10 @@ export function summarizeDriver(input: {
       }
     }
 
-    result.push(payDay(day, profile));
+    result.push(payDay(day, profile, { payoutCurrency, fx: input.fx }));
   }
 
-  return { days: result, totals: totalsOf(result) };
+  return { days: result, totals: totalsOf(result, { currency: input.currency, fx: input.fx }) };
 }
 
 /**
@@ -597,7 +657,13 @@ export function summarizeDriver(input: {
  * по обрезанному списку дней: смена, выбранная из базы с запасом, не
  * должна попасть в сумму чужого периода.
  */
-export function totalsOf(days: WorkDay[]): DriverSummary['totals'] {
+export function totalsOf(
+  days: WorkDay[],
+  options: { currency?: string | null; fx?: FxConvert } = {},
+): DriverSummary['totals'] {
+  /* Валюта итога: компании, а без неё — первого дня со ставкой (одна валюта, старые вызовы). */
+  const target = options.currency ?? days.find((d) => d.amountCents != null && d.currency)?.currency ?? null;
+
   const totals: DriverSummary['totals'] = {
     workMinutes: 0,
     paidMinutes: 0,
@@ -614,6 +680,7 @@ export function totalsOf(days: WorkDay[]): DriverSummary['totals'] {
     trips: 0,
     payoutCents: 0,
     amountCents: 0,
+    currency: target,
     missingRate: false,
     parts: emptyParts(),
   };
@@ -636,15 +703,41 @@ export function totalsOf(days: WorkDay[]): DriverSummary['totals'] {
 
     if (day.amountCents == null) {
       if (day.workMinutes > 0 || day.trips > 0) totals.missingRate = true;
-    } else {
-      totals.amountCents += day.amountCents;
-      totals.parts.baseCents += day.parts.baseCents;
-      totals.parts.overtimeCents += day.parts.overtimeCents;
-      totals.parts.eveningCents += day.parts.eveningCents;
-      totals.parts.nightCents += day.parts.nightCents;
-      totals.parts.weekendCents += day.parts.weekendCents;
+      continue;
     }
+
+    /* День в другой валюте — по курсу своего дня; курса нет — день не в сумме, итог неполный. */
+    let parts: PayParts = day.parts;
+    if (target && day.currency && day.currency !== target) {
+      const converted = convertParts(day.parts, day.currency, target, day.date, options.fx);
+      if (!converted) {
+        totals.missingRate = true;
+        continue;
+      }
+      parts = converted;
+    }
+
+    /* Сумма — из частей: после пересчёта части и итог сходятся до цента. */
+    totals.amountCents +=
+      parts.baseCents + parts.overtimeCents + parts.eveningCents + parts.nightCents + parts.weekendCents;
+    totals.parts.baseCents += parts.baseCents;
+    totals.parts.overtimeCents += parts.overtimeCents;
+    totals.parts.eveningCents += parts.eveningCents;
+    totals.parts.nightCents += parts.nightCents;
+    totals.parts.weekendCents += parts.weekendCents;
   }
 
   return totals;
+}
+
+/** Части суммы дня в другую валюту; хоть одной не пересчитать — null. */
+function convertParts(parts: PayParts, from: string, to: string, day: string, fx?: FxConvert): PayParts | null {
+  if (!fx) return null;
+  const out = emptyParts();
+  for (const key of Object.keys(out) as (keyof PayParts)[]) {
+    const value = parts[key] === 0 ? 0 : fx(parts[key], from, to, day);
+    if (value == null) return null;
+    out[key] = value;
+  }
+  return out;
 }

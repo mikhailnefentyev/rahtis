@@ -27,7 +27,7 @@ export function SiteJobForm({
   defaultCountry?: string;
   onClose?: () => void;
 }) {
-  const { t, locale } = useI18n();
+  const { t, f, locale } = useI18n();
   const router = useRouter();
   const [state, action, pending] = useActionState(saveSiteJobAction, initial);
   const s = t.sites;
@@ -133,7 +133,8 @@ export function SiteJobForm({
               </Select>
             )}
           </Field>
-          <Field label={s.rate} hint={s.rateHint}>
+          {/* Валюта ставки: у нового объекта — валюта компании, у старого — его собственная. */}
+          <Field label={f.label(s.rate, job?.currency ?? f.currency)} hint={s.rateHint}>
             {(p) => (
               <InputMono
                 {...p}

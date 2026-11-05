@@ -13,7 +13,9 @@ const BUCKET = 'reports';
 
 export type SiteInvoiceResult =
   | { status: 'SENT' | 'CREATED'; invoiceId: string; number: string }
-  | { status: 'NOTHING' | 'BUSY' | 'NO_VAT_RATE' | 'NO_IBAN' | 'NO_CUSTOMER_EMAIL' | 'NO_CUSTOMER_ADDRESS' | 'NOT_FOUND' };
+  | {
+      status: 'NOTHING' | 'BUSY' | 'NO_VAT_RATE' | 'NO_IBAN' | 'NO_CUSTOMER_EMAIL' | 'NO_CUSTOMER_ADDRESS' | 'NOT_FOUND' | 'PLATFORM_ORDER';
+    };
 
 const addDays = (iso: string, days: number) => {
   const d = new Date(`${iso}T12:00:00Z`);
@@ -36,10 +38,20 @@ const fiDate = (iso: string) => {
  */
 export async function createSiteInvoice(jobId: string, upTo: string): Promise<SiteInvoiceResult> {
   const admin = createAdminClient();
+  /* Счёт на финском/английском — формат чисел fi-FI, валюта — из объекта ниже. */
   const f = createFormat('fi-FI');
 
   const { data: job } = await admin.from('site_jobs').select('*').eq('id', jobId).maybeSingle();
   if (!job) return { status: 'NOT_FOUND' };
+  /* Объект из заказа самосвалов по договору RAHTIS оплачивает заказчик через
+     Aivomaa — свой счёт перевозчика был бы двойным. */
+  if (job.order_id) {
+    /* Заказ «напрямую с перевозчиком» (contract_party CARRIER) Aivomaa не выставляет — счёт за перевозчиком. */
+    const { data: order } = await admin.from('orders').select('contract_party').eq('id', job.order_id).maybeSingle();
+    if (order?.contract_party !== 'CARRIER') return { status: 'PLATFORM_ORDER' };
+  }
+  /* Валюта счёта — валюта объекта (ставка в ней); в БД её же ставит триггер. */
+  const currency = job.currency;
 
   const { data: seller } = await admin
     .from('companies')
@@ -116,6 +128,7 @@ export async function createSiteInvoice(jobId: string, upTo: string): Promise<Si
       vat_bps: totals.vatBps,
       vat_cents: totals.vatCents,
       total_cents: totals.totalCents,
+      currency,
     })
     .select('id')
     .single();
@@ -167,13 +180,13 @@ export async function createSiteInvoice(jobId: string, upTo: string): Promise<Si
         text: l.text,
         quantity: l.quantity.toLocaleString('fi-FI', { maximumFractionDigits: 2 }),
         unit: unit[l.unit],
-        unitPrice: f.eur(l.unitCents),
-        amount: f.eur(l.amountCents),
+        unitPrice: f.money(l.unitCents, currency),
+        amount: f.money(l.amountCents, currency),
       })),
-      net: f.eur(totals.netCents),
+      net: f.money(totals.netCents, currency),
       vatLabel: `${seller.country === 'FI' ? 'ALV / VAT' : 'VAT'} ${(totals.vatBps / 100).toLocaleString('fi-FI', { maximumFractionDigits: 1 })} %`,
-      vat: f.eur(totals.vatCents),
-      total: f.eur(totals.totalCents),
+      vat: f.money(totals.vatCents, currency),
+      total: f.money(totals.totalCents, currency),
       note: 'Päivät ja kuormat on hyväksytty työmaalla. Kuormien ja punnitusten erittely toimitetaan pyynnöstä. / Days and loads have been approved at the site. A breakdown of loads and weighings is available on request.',
     }),
   );
@@ -187,13 +200,13 @@ export async function createSiteInvoice(jobId: string, upTo: string): Promise<Si
     `Hei,`,
     ``,
     `liitteenä lasku ${number}, työmaa ${job.name}. Laskuttaja: ${sellerName}.`,
-    `Maksettava ${f.eur(totals.totalCents)}, eräpäivä ${fiDate(dueOn)}.`,
+    `Maksettava ${f.money(totals.totalCents, currency)}, eräpäivä ${fiDate(dueOn)}.`,
     `Tilinumero (IBAN) ${seller.iban}, viitenumero ${reference}.`,
     ``,
     `Jos laskusta on kysyttävää, vastatkaa tähän viestiin (${replyTo}).`,
     ``,
     `—`,
-    `Attached is invoice ${number} from ${sellerName} for worksite ${job.name}. Amount due ${f.eur(totals.totalCents)}, due date ${fiDate(dueOn)}, IBAN ${seller.iban}, reference ${reference}. Questions about the invoice? Just reply to this email.`,
+    `Attached is invoice ${number} from ${sellerName} for worksite ${job.name}. Amount due ${f.money(totals.totalCents, currency)}, due date ${fiDate(dueOn)}, IBAN ${seller.iban}, reference ${reference}. Questions about the invoice? Just reply to this email.`,
   ].join('\n');
 
   const mail = await sendEmail({
@@ -223,7 +236,7 @@ export async function runScheduledSiteInvoices(): Promise<{ sent: number; skippe
   const yesterday = addDays(today, -1);
   const out = { sent: 0, skipped: 0, errors: [] as string[] };
 
-  const { data: jobs } = await admin.from('site_jobs').select('id, invoice_schedule').neq('invoice_schedule', 'MANUAL');
+  const { data: jobs } = await admin.from('site_jobs').select('id, invoice_schedule').neq('invoice_schedule', 'MANUAL').is('order_id', null);
   for (const job of jobs ?? []) {
     if (!invoiceDue(job.invoice_schedule, today)) continue;
     try {
