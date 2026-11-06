@@ -433,3 +433,37 @@ begin
   );
 end;
 $$;
+
+
+-- ── Набор суточных в профиле — только свой или шаблон ──────────────
+
+/*
+ * Внешний ключ RLS не проверяет: без этой проверки перевозчик мог бы
+ * сослаться на чужой набор по id и тем самым запретить владельцу его
+ * удалить (ON DELETE RESTRICT). Как app.check_pay_profile_tes для TES.
+ */
+create or replace function app.check_pay_profile_allowance()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  if new.allowance_rule_set_id is not null and not exists (
+    select 1
+    from public.allowance_rule_sets s
+    join public.drivers d on d.id = new.driver_id
+    where s.id = new.allowance_rule_set_id
+      and (s.company_id is null or s.company_id = d.company_id)
+  ) then
+    raise exception 'Набор суточных не найден.' using errcode = '23503';
+  end if;
+  return new;
+end;
+$$;
+
+revoke all on function app.check_pay_profile_allowance() from public, anon, authenticated;
+
+create trigger driver_pay_profiles_allowance_check
+  before insert or update of allowance_rule_set_id, driver_id on public.driver_pay_profiles
+  for each row execute function app.check_pay_profile_allowance();
