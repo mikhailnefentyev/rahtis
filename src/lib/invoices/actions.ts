@@ -89,7 +89,8 @@ export async function markFreightPaidAction(_previous: InvoiceFormState, formDat
   const supabase = await createClient();
   const { error } = await supabase.rpc('mark_freight_invoice_paid', {
     p_invoice_id: String(formData.get('invoice_id') ?? ''),
-    p_paid_on: clear ? null : paidOn,
+    /* null снимает отметку — база это принимает; сгенерированный тип про null не знает. */
+    p_paid_on: (clear ? null : paidOn) as string,
   });
   if (error) {
     console.error('оплата счёта не отмечена:', error.message);
@@ -126,7 +127,8 @@ export async function markSiteInvoicePaidAction(formData: FormData): Promise<voi
   const supabase = await createClient();
   const { error } = await supabase.rpc('mark_site_invoice_paid', {
     p_invoice_id: String(formData.get('invoice_id') ?? ''),
-    p_paid_on: clear ? null : paidOn,
+    /* null снимает отметку — база это принимает; сгенерированный тип про null не знает. */
+    p_paid_on: (clear ? null : paidOn) as string,
   });
   if (error) console.error('оплата счёта объекта не отмечена:', error.message);
   revalidatePath(`/${locale}/carrier/sites/${String(formData.get('job_id') ?? '')}`);

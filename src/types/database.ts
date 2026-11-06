@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.15"
+    PostgrestVersion: "14.18"
   }
   graphql_public: {
     Tables: {
@@ -806,10 +806,6 @@ export type Database = {
       carrier_invoices: {
         Row: {
           collection_hint_at: string | null
-          paid_at: string | null
-          paid_marked_by: string | null
-          reminder_1_at: string | null
-          reminder_2_at: string | null
           company_id: string
           created_at: string
           currency: string
@@ -822,9 +818,13 @@ export type Database = {
           lines: Json
           net_cents: number
           number: string
+          paid_at: string | null
+          paid_marked_by: string | null
           period_from: string
           period_to: string
           reference: string
+          reminder_1_at: string | null
+          reminder_2_at: string | null
           seller: Json
           sent_at: string | null
           sent_to: string | null
@@ -834,10 +834,6 @@ export type Database = {
         }
         Insert: {
           collection_hint_at?: string | null
-          paid_at?: string | null
-          paid_marked_by?: string | null
-          reminder_1_at?: string | null
-          reminder_2_at?: string | null
           company_id: string
           created_at?: string
           currency: string
@@ -850,9 +846,13 @@ export type Database = {
           lines: Json
           net_cents: number
           number: string
+          paid_at?: string | null
+          paid_marked_by?: string | null
           period_from: string
           period_to: string
           reference: string
+          reminder_1_at?: string | null
+          reminder_2_at?: string | null
           seller: Json
           sent_at?: string | null
           sent_to?: string | null
@@ -862,10 +862,6 @@ export type Database = {
         }
         Update: {
           collection_hint_at?: string | null
-          paid_at?: string | null
-          paid_marked_by?: string | null
-          reminder_1_at?: string | null
-          reminder_2_at?: string | null
           company_id?: string
           created_at?: string
           currency?: string
@@ -878,9 +874,13 @@ export type Database = {
           lines?: Json
           net_cents?: number
           number?: string
+          paid_at?: string | null
+          paid_marked_by?: string | null
           period_from?: string
           period_to?: string
           reference?: string
+          reminder_1_at?: string | null
+          reminder_2_at?: string | null
           seller?: Json
           sent_at?: string | null
           sent_to?: string | null
@@ -1355,42 +1355,6 @@ export type Database = {
           },
         ]
       }
-      company_sensitive_changes: {
-        Row: {
-          changed_at: string
-          changed_by: string | null
-          company_id: string
-          field: string
-          id: number
-          new_value: string | null
-          notified_at: string | null
-          notify_old_email: string | null
-          old_value: string | null
-        }
-        Insert: {
-          changed_at?: string
-          changed_by?: string | null
-          company_id: string
-          field: string
-          id?: number
-          new_value?: string | null
-          notified_at?: string | null
-          notify_old_email?: string | null
-          old_value?: string | null
-        }
-        Update: {
-          changed_at?: string
-          changed_by?: string | null
-          company_id?: string
-          field?: string
-          id?: number
-          new_value?: string | null
-          notified_at?: string | null
-          notify_old_email?: string | null
-          old_value?: string | null
-        }
-        Relationships: []
-      }
       company_documents: {
         Row: {
           cmr_covered: boolean | null
@@ -1398,8 +1362,8 @@ export type Database = {
           file_name: string
           id: string
           insurer: string | null
-          issued_on: string | null
           is_current: boolean
+          issued_on: string | null
           kind: Database["public"]["Enums"]["document_kind"]
           limit_currency: string | null
           limit_event_cents: number | null
@@ -1424,8 +1388,8 @@ export type Database = {
           file_name: string
           id?: string
           insurer?: string | null
-          issued_on?: string | null
           is_current?: boolean
+          issued_on?: string | null
           kind: Database["public"]["Enums"]["document_kind"]
           limit_currency?: string | null
           limit_event_cents?: number | null
@@ -1450,8 +1414,8 @@ export type Database = {
           file_name?: string
           id?: string
           insurer?: string | null
-          issued_on?: string | null
           is_current?: boolean
+          issued_on?: string | null
           kind?: Database["public"]["Enums"]["document_kind"]
           limit_currency?: string | null
           limit_event_cents?: number | null
@@ -1544,6 +1508,50 @@ export type Database = {
           },
         ]
       }
+      company_sensitive_changes: {
+        Row: {
+          changed_at: string
+          changed_by: string | null
+          company_id: string
+          field: string
+          id: number
+          new_value: string | null
+          notified_at: string | null
+          notify_old_email: string | null
+          old_value: string | null
+        }
+        Insert: {
+          changed_at?: string
+          changed_by?: string | null
+          company_id: string
+          field: string
+          id?: never
+          new_value?: string | null
+          notified_at?: string | null
+          notify_old_email?: string | null
+          old_value?: string | null
+        }
+        Update: {
+          changed_at?: string
+          changed_by?: string | null
+          company_id?: string
+          field?: string
+          id?: never
+          new_value?: string | null
+          notified_at?: string | null
+          notify_old_email?: string | null
+          old_value?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_sensitive_changes_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       conversations: {
         Row: {
           audience: Database["public"]["Enums"]["chat_audience"]
@@ -1599,12 +1607,12 @@ export type Database = {
       }
       direct_payment_reports: {
         Row: {
-          prefilled: boolean
           carrier_company_id: string
           days_late: number | null
           id: string
           note: string | null
           order_id: string
+          prefilled: boolean
           removed_at: string | null
           removed_by: string | null
           removed_note: string | null
@@ -1615,12 +1623,12 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          prefilled?: boolean
           carrier_company_id: string
           days_late?: number | null
           id?: string
           note?: string | null
           order_id: string
+          prefilled?: boolean
           removed_at?: string | null
           removed_by?: string | null
           removed_note?: string | null
@@ -1631,12 +1639,12 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          prefilled?: boolean
           carrier_company_id?: string
           days_late?: number | null
           id?: string
           note?: string | null
           order_id?: string
+          prefilled?: boolean
           removed_at?: string | null
           removed_by?: string | null
           removed_note?: string | null
@@ -2486,7 +2494,29 @@ export type Database = {
           shipper_company_id?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "freight_invoices_carrier_company_id_fkey"
+            columns: ["carrier_company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "freight_invoices_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: true
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "freight_invoices_shipper_company_id_fkey"
+            columns: ["shipper_company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       fuel_cards: {
         Row: {
@@ -3421,63 +3451,70 @@ export type Database = {
       }
       order_amendments: {
         Row: {
-          actor_company_id: string | null
-          proposal_status: string | null
-          reason: string | null
-          actor_name: string | null
-          actor_side: string | null
-          driver_seen_at: string | null
           acknowledged_at: string | null
           acknowledged_by: string | null
+          actor_company_id: string | null
           actor_id: string | null
+          actor_name: string | null
+          actor_side: string | null
           changes: Json
           created_at: string
+          driver_seen_at: string | null
           id: number
           kind: Database["public"]["Enums"]["amendment_kind"]
           order_id: string
+          proposal_status: string | null
+          reason: string | null
           stop_id: string | null
           stop_label: string | null
           stop_role: Database["public"]["Enums"]["stop_role"] | null
         }
         Insert: {
-          actor_company_id?: string | null
-          proposal_status?: string | null
-          reason?: string | null
-          actor_name?: string | null
-          actor_side?: string | null
-          driver_seen_at?: string | null
           acknowledged_at?: string | null
           acknowledged_by?: string | null
+          actor_company_id?: string | null
           actor_id?: string | null
+          actor_name?: string | null
+          actor_side?: string | null
           changes: Json
           created_at?: string
+          driver_seen_at?: string | null
           id?: never
           kind: Database["public"]["Enums"]["amendment_kind"]
           order_id: string
+          proposal_status?: string | null
+          reason?: string | null
           stop_id?: string | null
           stop_label?: string | null
           stop_role?: Database["public"]["Enums"]["stop_role"] | null
         }
         Update: {
-          actor_company_id?: string | null
-          proposal_status?: string | null
-          reason?: string | null
-          actor_name?: string | null
-          actor_side?: string | null
-          driver_seen_at?: string | null
           acknowledged_at?: string | null
           acknowledged_by?: string | null
+          actor_company_id?: string | null
           actor_id?: string | null
+          actor_name?: string | null
+          actor_side?: string | null
           changes?: Json
           created_at?: string
+          driver_seen_at?: string | null
           id?: never
           kind?: Database["public"]["Enums"]["amendment_kind"]
           order_id?: string
+          proposal_status?: string | null
+          reason?: string | null
           stop_id?: string | null
           stop_label?: string | null
           stop_role?: Database["public"]["Enums"]["stop_role"] | null
         }
         Relationships: [
+          {
+            foreignKeyName: "order_amendments_actor_company_id_fkey"
+            columns: ["actor_company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "order_amendments_order_id_fkey"
             columns: ["order_id"]
@@ -3540,7 +3577,36 @@ export type Database = {
           resolved_by?: string | null
           stop_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "order_change_requests_amendment_id_fkey"
+            columns: ["amendment_id"]
+            isOneToOne: false
+            referencedRelation: "order_amendments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_change_requests_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_change_requests_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_change_requests_stop_id_fkey"
+            columns: ["stop_id"]
+            isOneToOne: false
+            referencedRelation: "order_stops"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       order_direct_requests: {
         Row: {
@@ -3678,6 +3744,66 @@ export type Database = {
           },
         ]
       }
+      order_email_drafts: {
+        Row: {
+          company_id: string
+          created_at: string
+          draft: Json | null
+          from_address: string
+          id: string
+          message_id: string
+          order_id: string | null
+          provider_email_id: string | null
+          received_at: string
+          status: string
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          draft?: Json | null
+          from_address: string
+          id?: string
+          message_id: string
+          order_id?: string | null
+          provider_email_id?: string | null
+          received_at: string
+          status?: string
+          subject?: string
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          draft?: Json | null
+          from_address?: string
+          id?: string
+          message_id?: string
+          order_id?: string | null
+          provider_email_id?: string | null
+          received_at?: string
+          status?: string
+          subject?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_email_drafts_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_email_drafts_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       order_events: {
         Row: {
           actor_id: string | null
@@ -3716,13 +3842,48 @@ export type Database = {
           },
         ]
       }
+      order_inbox_addresses: {
+        Row: {
+          allowed_senders: string[]
+          company_id: string
+          created_at: string
+          rotated_at: string | null
+          rotated_by: string | null
+          token: string
+        }
+        Insert: {
+          allowed_senders?: string[]
+          company_id: string
+          created_at?: string
+          rotated_at?: string | null
+          rotated_by?: string | null
+          token: string
+        }
+        Update: {
+          allowed_senders?: string[]
+          company_id?: string
+          created_at?: string
+          rotated_at?: string | null
+          rotated_by?: string | null
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_inbox_addresses_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       order_messages: {
         Row: {
           author_driver_id: string | null
-          auto: Json | null
           author_name: string | null
           author_role: string
           author_user_id: string | null
+          auto: Json | null
           body: string
           carrier_company_id: string | null
           created_at: string
@@ -3734,10 +3895,10 @@ export type Database = {
         }
         Insert: {
           author_driver_id?: string | null
-          auto?: Json | null
           author_name?: string | null
           author_role: string
           author_user_id?: string | null
+          auto?: Json | null
           body: string
           carrier_company_id?: string | null
           created_at?: string
@@ -3749,10 +3910,10 @@ export type Database = {
         }
         Update: {
           author_driver_id?: string | null
-          auto?: Json | null
           author_name?: string | null
           author_role?: string
           author_user_id?: string | null
+          auto?: Json | null
           body?: string
           carrier_company_id?: string | null
           created_at?: string
@@ -3941,78 +4102,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      order_email_drafts: {
-        Row: {
-          company_id: string
-          created_at: string
-          draft: Json | null
-          from_address: string
-          id: string
-          message_id: string
-          order_id: string | null
-          provider_email_id: string | null
-          received_at: string
-          status: string
-          subject: string
-          updated_at: string
-        }
-        Insert: {
-          company_id: string
-          created_at?: string
-          draft?: Json | null
-          from_address: string
-          id?: string
-          message_id: string
-          order_id?: string | null
-          provider_email_id?: string | null
-          received_at: string
-          status?: string
-          subject?: string
-          updated_at?: string
-        }
-        Update: {
-          company_id?: string
-          created_at?: string
-          draft?: Json | null
-          from_address?: string
-          id?: string
-          message_id?: string
-          order_id?: string | null
-          provider_email_id?: string | null
-          received_at?: string
-          status?: string
-          subject?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      order_inbox_addresses: {
-        Row: {
-          allowed_senders: string[]
-          company_id: string
-          created_at: string
-          rotated_at: string | null
-          rotated_by: string | null
-          token: string
-        }
-        Insert: {
-          allowed_senders?: string[]
-          company_id: string
-          created_at?: string
-          rotated_at?: string | null
-          rotated_by?: string | null
-          token: string
-        }
-        Update: {
-          allowed_senders?: string[]
-          company_id?: string
-          created_at?: string
-          rotated_at?: string | null
-          rotated_by?: string | null
-          token?: string
-        }
-        Relationships: []
       }
       order_stops: {
         Row: {
@@ -4221,8 +4310,6 @@ export type Database = {
       }
       orders: {
         Row: {
-          pricing_mode: string
-          rate_per_km_cents: number | null
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -4256,8 +4343,10 @@ export type Database = {
           paid_at: string | null
           planned_qty: number | null
           planned_volume_m3: number | null
+          pricing_mode: string
           published_at: string | null
           rate_cents: number | null
+          rate_per_km_cents: number | null
           ref: string
           required_body: string | null
           required_loading: string[]
@@ -4284,8 +4373,6 @@ export type Database = {
           waiting_cents: number
         }
         Insert: {
-          pricing_mode?: string
-          rate_per_km_cents?: number | null
           assigned_company_id?: string | null
           assigned_driver_id?: string | null
           assigned_trailer_id?: string | null
@@ -4319,8 +4406,10 @@ export type Database = {
           paid_at?: string | null
           planned_qty?: number | null
           planned_volume_m3?: number | null
+          pricing_mode?: string
           published_at?: string | null
           rate_cents?: number | null
+          rate_per_km_cents?: number | null
           ref?: string
           required_body?: string | null
           required_loading?: string[]
@@ -4347,8 +4436,6 @@ export type Database = {
           waiting_cents?: number
         }
         Update: {
-          pricing_mode?: string
-          rate_per_km_cents?: number | null
           assigned_company_id?: string | null
           assigned_driver_id?: string | null
           assigned_trailer_id?: string | null
@@ -4382,8 +4469,10 @@ export type Database = {
           paid_at?: string | null
           planned_qty?: number | null
           planned_volume_m3?: number | null
+          pricing_mode?: string
           published_at?: string | null
           rate_cents?: number | null
+          rate_per_km_cents?: number | null
           ref?: string
           required_body?: string | null
           required_loading?: string[]
@@ -5489,6 +5578,90 @@ export type Database = {
         }
         Relationships: []
       }
+      vehicle_checks: {
+        Row: {
+          carrier_confirmed_at: string | null
+          carrier_confirmed_by: string | null
+          carrier_reason: string | null
+          created_at: string
+          driver_matches: boolean | null
+          expected_plate: string | null
+          expected_trailer_plate: string | null
+          gps_distance_m: number | null
+          gps_seen_at: string | null
+          id: string
+          order_id: string
+          reasons: Json
+          reported_plate: string | null
+          reported_trailer_plate: string | null
+          shipper_confirmed_at: string | null
+          shipper_confirmed_by: string | null
+          shipper_reason: string | null
+          source: string
+          stop_id: string
+          verdict: string
+        }
+        Insert: {
+          carrier_confirmed_at?: string | null
+          carrier_confirmed_by?: string | null
+          carrier_reason?: string | null
+          created_at?: string
+          driver_matches?: boolean | null
+          expected_plate?: string | null
+          expected_trailer_plate?: string | null
+          gps_distance_m?: number | null
+          gps_seen_at?: string | null
+          id?: string
+          order_id: string
+          reasons?: Json
+          reported_plate?: string | null
+          reported_trailer_plate?: string | null
+          shipper_confirmed_at?: string | null
+          shipper_confirmed_by?: string | null
+          shipper_reason?: string | null
+          source: string
+          stop_id: string
+          verdict: string
+        }
+        Update: {
+          carrier_confirmed_at?: string | null
+          carrier_confirmed_by?: string | null
+          carrier_reason?: string | null
+          created_at?: string
+          driver_matches?: boolean | null
+          expected_plate?: string | null
+          expected_trailer_plate?: string | null
+          gps_distance_m?: number | null
+          gps_seen_at?: string | null
+          id?: string
+          order_id?: string
+          reasons?: Json
+          reported_plate?: string | null
+          reported_trailer_plate?: string | null
+          shipper_confirmed_at?: string | null
+          shipper_confirmed_by?: string | null
+          shipper_reason?: string | null
+          source?: string
+          stop_id?: string
+          verdict?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_checks_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_checks_stop_id_fkey"
+            columns: ["stop_id"]
+            isOneToOne: true
+            referencedRelation: "order_stops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vehicle_combos: {
         Row: {
           axles: number
@@ -5624,90 +5797,6 @@ export type Database = {
             columns: ["vehicle_id"]
             isOneToOne: false
             referencedRelation: "vehicles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      vehicle_checks: {
-        Row: {
-          carrier_confirmed_at: string | null
-          carrier_confirmed_by: string | null
-          carrier_reason: string | null
-          created_at: string
-          driver_matches: boolean | null
-          expected_plate: string | null
-          expected_trailer_plate: string | null
-          gps_distance_m: number | null
-          gps_seen_at: string | null
-          id: string
-          order_id: string
-          reasons: Json
-          reported_plate: string | null
-          reported_trailer_plate: string | null
-          shipper_confirmed_at: string | null
-          shipper_confirmed_by: string | null
-          shipper_reason: string | null
-          source: string
-          stop_id: string
-          verdict: string
-        }
-        Insert: {
-          carrier_confirmed_at?: string | null
-          carrier_confirmed_by?: string | null
-          carrier_reason?: string | null
-          created_at?: string
-          driver_matches?: boolean | null
-          expected_plate?: string | null
-          expected_trailer_plate?: string | null
-          gps_distance_m?: number | null
-          gps_seen_at?: string | null
-          id?: string
-          order_id: string
-          reasons?: Json
-          reported_plate?: string | null
-          reported_trailer_plate?: string | null
-          shipper_confirmed_at?: string | null
-          shipper_confirmed_by?: string | null
-          shipper_reason?: string | null
-          source: string
-          stop_id: string
-          verdict: string
-        }
-        Update: {
-          carrier_confirmed_at?: string | null
-          carrier_confirmed_by?: string | null
-          carrier_reason?: string | null
-          created_at?: string
-          driver_matches?: boolean | null
-          expected_plate?: string | null
-          expected_trailer_plate?: string | null
-          gps_distance_m?: number | null
-          gps_seen_at?: string | null
-          id?: string
-          order_id?: string
-          reasons?: Json
-          reported_plate?: string | null
-          reported_trailer_plate?: string | null
-          shipper_confirmed_at?: string | null
-          shipper_confirmed_by?: string | null
-          shipper_reason?: string | null
-          source?: string
-          stop_id?: string
-          verdict?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "vehicle_checks_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: false
-            referencedRelation: "orders"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "vehicle_checks_stop_id_fkey"
-            columns: ["stop_id"]
-            isOneToOne: true
-            referencedRelation: "order_stops"
             referencedColumns: ["id"]
           },
         ]
@@ -6356,17 +6445,9 @@ export type Database = {
       }
     }
     Functions: {
-      two_step_users: {
-        Args: { p_company_id?: string }
-        Returns: {
-          user_id: string
-        }[]
-      }
       abandon_order: {
         Args: { p_order_id: string; p_reason?: string }
         Returns: {
-          pricing_mode: string
-          rate_per_km_cents: number | null
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -6400,8 +6481,10 @@ export type Database = {
           paid_at: string | null
           planned_qty: number | null
           planned_volume_m3: number | null
+          pricing_mode: string
           published_at: string | null
           rate_cents: number | null
+          rate_per_km_cents: number | null
           ref: string
           required_body: string | null
           required_loading: string[]
@@ -6519,12 +6602,18 @@ export type Database = {
         Returns: {
           acknowledged_at: string | null
           acknowledged_by: string | null
+          actor_company_id: string | null
           actor_id: string | null
+          actor_name: string | null
+          actor_side: string | null
           changes: Json
           created_at: string
+          driver_seen_at: string | null
           id: number
           kind: Database["public"]["Enums"]["amendment_kind"]
           order_id: string
+          proposal_status: string | null
+          reason: string | null
           stop_id: string | null
           stop_label: string | null
           stop_role: Database["public"]["Enums"]["stop_role"] | null
@@ -6744,12 +6833,18 @@ export type Database = {
         Returns: {
           acknowledged_at: string | null
           acknowledged_by: string | null
+          actor_company_id: string | null
           actor_id: string | null
+          actor_name: string | null
+          actor_side: string | null
           changes: Json
           created_at: string
+          driver_seen_at: string | null
           id: number
           kind: Database["public"]["Enums"]["amendment_kind"]
           order_id: string
+          proposal_status: string | null
+          reason: string | null
           stop_id: string | null
           stop_label: string | null
           stop_role: Database["public"]["Enums"]["stop_role"] | null
@@ -6760,6 +6855,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      annotate_amendment: {
+        Args: { p_id: number; p_reason: string }
+        Returns: undefined
       }
       api_authenticate: {
         Args: { p_hash: string }
@@ -6899,6 +6998,7 @@ export type Database = {
         }[]
       }
       apply_pending_partnerships: { Args: never; Returns: number }
+      apply_route_distance: { Args: { p_order_id: string }; Returns: string }
       archive_driver: { Args: { p_driver_id: string }; Returns: undefined }
       ask_order_status: {
         Args: { p_body?: string; p_kind: string; p_order_id: string }
@@ -6946,6 +7046,13 @@ export type Database = {
           total_count: number
           toward_home: boolean
           vehicle_id: string
+        }[]
+      }
+      bank_change_marks: {
+        Args: { p_company_ids: string[] }
+        Returns: {
+          changed_at: string
+          company_id: string
         }[]
       }
       billing_overview: {
@@ -7000,8 +7107,6 @@ export type Database = {
       cancel_order: {
         Args: { p_order_id: string }
         Returns: {
-          pricing_mode: string
-          rate_per_km_cents: number | null
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -7035,8 +7140,10 @@ export type Database = {
           paid_at: string | null
           planned_qty: number | null
           planned_volume_m3: number | null
+          pricing_mode: string
           published_at: string | null
           rate_cents: number | null
+          rate_per_km_cents: number | null
           ref: string
           required_body: string | null
           required_loading: string[]
@@ -7071,7 +7178,10 @@ export type Database = {
       }
       capacity_expire: { Args: never; Returns: number }
       capacity_fleet_trips: { Args: never; Returns: Json }
-      capacity_fleet_trips_for: { Args: { p_company_ids: string[] }; Returns: Json }
+      capacity_fleet_trips_for: {
+        Args: { p_company_ids: string[] }
+        Returns: Json
+      }
       capacity_offers_search: {
         Args: {
           p_city?: string
@@ -7099,7 +7209,10 @@ export type Database = {
           verified: boolean
         }[]
       }
-      capacity_request_cancel: { Args: { p_request_id: string }; Returns: undefined }
+      capacity_request_cancel: {
+        Args: { p_request_id: string }
+        Returns: undefined
+      }
       capacity_request_create: {
         Args: {
           p_date_from?: string
@@ -7206,8 +7319,6 @@ export type Database = {
           p_vehicle_id: string
         }
         Returns: {
-          pricing_mode: string
-          rate_per_km_cents: number | null
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -7241,8 +7352,10 @@ export type Database = {
           paid_at: string | null
           planned_qty: number | null
           planned_volume_m3: number | null
+          pricing_mode: string
           published_at: string | null
           rate_cents: number | null
+          rate_per_km_cents: number | null
           ref: string
           required_body: string | null
           required_loading: string[]
@@ -7375,8 +7488,6 @@ export type Database = {
       carrier_set_trip_trailer: {
         Args: { p_order_id: string; p_trailer_id: string }
         Returns: {
-          pricing_mode: string
-          rate_per_km_cents: number | null
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -7410,8 +7521,10 @@ export type Database = {
           paid_at: string | null
           planned_qty: number | null
           planned_volume_m3: number | null
+          pricing_mode: string
           published_at: string | null
           rate_cents: number | null
+          rate_per_km_cents: number | null
           ref: string
           required_body: string | null
           required_loading: string[]
@@ -7474,11 +7587,18 @@ export type Database = {
         }
         Returns: undefined
       }
+      change_trip_assignment: {
+        Args: {
+          p_driver_id?: string
+          p_order_id: string
+          p_reason?: string
+          p_vehicle_id?: string
+        }
+        Returns: undefined
+      }
       choose_offer: {
         Args: { p_offer_id: string }
         Returns: {
-          pricing_mode: string
-          rate_per_km_cents: number | null
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -7512,8 +7632,10 @@ export type Database = {
           paid_at: string | null
           planned_qty: number | null
           planned_volume_m3: number | null
+          pricing_mode: string
           published_at: string | null
           rate_cents: number | null
+          rate_per_km_cents: number | null
           ref: string
           required_body: string | null
           required_loading: string[]
@@ -7555,8 +7677,6 @@ export type Database = {
       close_order: {
         Args: { p_order_id: string }
         Returns: {
-          pricing_mode: string
-          rate_per_km_cents: number | null
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -7590,8 +7710,10 @@ export type Database = {
           paid_at: string | null
           planned_qty: number | null
           planned_volume_m3: number | null
+          pricing_mode: string
           published_at: string | null
           rate_cents: number | null
+          rate_per_km_cents: number | null
           ref: string
           required_body: string | null
           required_loading: string[]
@@ -7624,176 +7746,13 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      close_order_email_draft: {
+        Args: { p_id: string; p_order_id?: string }
+        Returns: undefined
+      }
       comment_claim: {
         Args: { p_body: string; p_claim_id: string }
         Returns: number
-      }
-      annotate_amendment: {
-        Args: { p_id: number; p_reason: string }
-        Returns: undefined
-      }
-      apply_route_distance: {
-        Args: { p_order_id: string }
-        Returns: string
-      }
-      change_trip_assignment: {
-        Args: { p_driver_id?: string; p_order_id: string; p_reason?: string; p_vehicle_id?: string }
-        Returns: undefined
-      }
-      confirm_vehicle_check: {
-        Args: { p_check_id: string; p_reason: string }
-        Returns: undefined
-      }
-      record_vehicle_check: { Args: { p_check: Json }; Returns: string }
-      vehicle_check_evidence: { Args: { p_stop_id: string }; Returns: Json }
-      driver_request_change: {
-        Args: {
-          p_address?: string
-          p_lat?: number
-          p_lon?: number
-          p_message: string
-          p_order_id: string
-          p_stop_id: string | null
-        }
-        Returns: string
-      }
-      order_pricing_info: {
-        Args: { p_order_ids: string[] }
-        Returns: {
-          currency: string
-          distance_auto_km: number | null
-          distance_km: number | null
-          order_id: string
-          pricing_mode: string
-          rate_cents: number | null
-          rate_per_km_cents: number | null
-        }[]
-      }
-      propose_price: {
-        Args: { p_order_id: string; p_rate_cents: number; p_reason?: string }
-        Returns: undefined
-      }
-      resolve_change_request: {
-        Args: { p_amendment_id?: number; p_id: string; p_resolution: string }
-        Returns: undefined
-      }
-      respond_price_proposal: {
-        Args: { p_accept: boolean; p_amendment_id: number }
-        Returns: undefined
-      }
-      set_order_pricing: {
-        Args: { p_mode: string; p_order_id: string; p_per_km_cents: number | null }
-        Returns: undefined
-      }
-      bank_change_marks: {
-        Args: { p_company_ids: string[] }
-        Returns: {
-          changed_at: string
-          company_id: string
-        }[]
-      }
-      confirm_freight_invoice_paid: {
-        Args: { p_invoice_id: string }
-        Returns: undefined
-      }
-      delete_freight_invoice: {
-        Args: { p_invoice_id: string }
-        Returns: undefined
-      }
-      driver_ack_route_changes: {
-        Args: { p_order_id: string }
-        Returns: number
-      }
-      driver_route_changes: {
-        Args: { p_order_id: string }
-        Returns: {
-          actor_side: string
-          changes: Json
-          created_at: string
-          id: number
-          kind: Database["public"]["Enums"]["amendment_kind"]
-          reason: string | null
-          stop_label: string
-          stop_role: Database["public"]["Enums"]["stop_role"]
-        }[]
-      }
-      freight_invoice_targets: {
-        Args: never
-        Returns: {
-          amount_cents: number | null
-          currency: string | null
-          default_amount_cents: number | null
-          default_currency: string
-          default_send_to: string | null
-          due_on: string | null
-          editable: boolean
-          invoice_id: string | null
-          issued_on: string | null
-          number: string | null
-          order_id: string
-          paid_at: string | null
-          paid_confirmed_at: string | null
-          paid_marked_side: string | null
-          reminder_1_at: string | null
-          reminder_2_at: string | null
-          report_prefilled: boolean
-          send_to: string | null
-        }[]
-      }
-      mark_freight_invoice_paid: {
-        Args: { p_invoice_id: string; p_paid_on: string | null }
-        Returns: undefined
-      }
-      mark_site_invoice_paid: {
-        Args: { p_invoice_id: string; p_paid_on: string | null }
-        Returns: undefined
-      }
-      save_freight_invoice: {
-        Args: {
-          p_amount_cents: number
-          p_currency: string
-          p_due_on: string
-          p_issued_on: string
-          p_number: string
-          p_order_id: string
-          p_send_to: string
-        }
-        Returns: string
-      }
-      sensitive_changes_pending: {
-        Args: { p_limit?: number }
-        Returns: {
-          actor_is_operator: boolean
-          actor_name: string | null
-          changed_at: string
-          company_id: string
-          company_language: string
-          company_name: string
-          contact_email: string
-          field: string
-          id: number
-          member_emails: string[]
-          new_value: string | null
-          notify_old_email: string | null
-          old_value: string | null
-        }[]
-      }
-      shipper_freight_invoices: {
-        Args: never
-        Returns: {
-          amount_cents: number
-          carrier_name: string
-          currency: string
-          due_on: string
-          id: string
-          issued_on: string
-          number: string
-          order_id: string
-          order_ref: string
-          paid_at: string | null
-          paid_confirmed_at: string | null
-          paid_marked_side: string | null
-        }[]
       }
       company_members: {
         Args: never
@@ -7822,10 +7781,16 @@ export type Database = {
         Args: { p_company_id?: string }
         Returns: {
           avg_days_late: number
+          bank_changed_at: string
           company_id: string
           country: string
           done_12m: number
           first_done_at: string
+          freight_avg_days_late: number
+          freight_invoices_count: number
+          freight_overdue: number
+          freight_paid_late: number
+          freight_paid_on_time: number
           invoiced_count: number
           on_platform_since: string
           overdue_count: number
@@ -7852,12 +7817,6 @@ export type Database = {
           vat_certificate_approved: boolean
           vat_certificate_issued_on: string
           vat_certificate_valid_until: string
-          bank_changed_at: string
-          freight_avg_days_late: number
-          freight_invoices_count: number
-          freight_overdue: number
-          freight_paid_late: number
-          freight_paid_on_time: number
         }[]
       }
       company_verified: { Args: { p_company_id: string }; Returns: boolean }
@@ -7948,11 +7907,13 @@ export type Database = {
           week: string
         }[]
       }
+      confirm_freight_invoice_paid: {
+        Args: { p_invoice_id: string }
+        Returns: undefined
+      }
       confirm_order: {
         Args: { p_order_id: string }
         Returns: {
-          pricing_mode: string
-          rate_per_km_cents: number | null
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -7986,8 +7947,10 @@ export type Database = {
           paid_at: string | null
           planned_qty: number | null
           planned_volume_m3: number | null
+          pricing_mode: string
           published_at: string | null
           rate_cents: number | null
+          rate_per_km_cents: number | null
           ref: string
           required_body: string | null
           required_loading: string[]
@@ -8020,6 +7983,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      confirm_vehicle_check: {
+        Args: { p_check_id: string; p_reason: string }
+        Returns: undefined
+      }
       copy_allowance_template: {
         Args: { p_template_id: string }
         Returns: string
@@ -8035,8 +8002,6 @@ export type Database = {
       create_order: {
         Args: { p_order: Json; p_publish?: boolean; p_stops: Json }
         Returns: {
-          pricing_mode: string
-          rate_per_km_cents: number | null
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -8070,8 +8035,10 @@ export type Database = {
           paid_at: string | null
           planned_qty: number | null
           planned_volume_m3: number | null
+          pricing_mode: string
           published_at: string | null
           rate_cents: number | null
+          rate_per_km_cents: number | null
           ref: string
           required_body: string | null
           required_loading: string[]
@@ -8163,13 +8130,17 @@ export type Database = {
         Args: { p_conversation_id: string }
         Returns: string
       }
+      delete_freight_invoice: {
+        Args: { p_invoice_id: string }
+        Returns: undefined
+      }
       delete_order: { Args: { p_order_id: string }; Returns: string }
       desk_matches: {
         Args: { p_region?: string }
         Returns: {
-          combo_id: string | null
-          line_km: number | null
-          misfit: string | null
+          combo_id: string
+          line_km: number
+          misfit: string
           order_id: string
           vehicle_id: string
         }[]
@@ -8216,8 +8187,6 @@ export type Database = {
       direct_assign_order: {
         Args: { p_order_id: string; p_vehicle_id: string }
         Returns: {
-          pricing_mode: string
-          rate_per_km_cents: number | null
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -8251,8 +8220,10 @@ export type Database = {
           paid_at: string | null
           planned_qty: number | null
           planned_volume_m3: number | null
+          pricing_mode: string
           published_at: string | null
           rate_cents: number | null
+          rate_per_km_cents: number | null
           ref: string
           required_body: string | null
           required_loading: string[]
@@ -8295,6 +8266,10 @@ export type Database = {
           kind: Database["public"]["Enums"]["document_kind"]
           valid_until: string
         }[]
+      }
+      driver_ack_route_changes: {
+        Args: { p_order_id: string }
+        Returns: number
       }
       driver_arrive_stop: {
         Args: {
@@ -8379,6 +8354,30 @@ export type Database = {
       driver_report_problem: {
         Args: { p_order_id: string; p_text: string }
         Returns: undefined
+      }
+      driver_request_change: {
+        Args: {
+          p_address?: string
+          p_lat?: number
+          p_lon?: number
+          p_message: string
+          p_order_id: string
+          p_stop_id: string
+        }
+        Returns: string
+      }
+      driver_route_changes: {
+        Args: { p_order_id: string }
+        Returns: {
+          actor_side: string
+          changes: Json
+          created_at: string
+          id: number
+          kind: Database["public"]["Enums"]["amendment_kind"]
+          reason: string
+          stop_label: string
+          stop_role: Database["public"]["Enums"]["stop_role"]
+        }[]
       }
       driver_shift_action: {
         Args: {
@@ -8500,8 +8499,8 @@ export type Database = {
       fleet_free_points: {
         Args: never
         Returns: {
-          after_ref: string | null
-          city: string | null
+          after_ref: string
+          city: string
           free_local: string
           source: string
           vehicle_id: string
@@ -8591,6 +8590,29 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      freight_invoice_targets: {
+        Args: never
+        Returns: {
+          amount_cents: number
+          currency: string
+          default_amount_cents: number
+          default_currency: string
+          default_send_to: string
+          due_on: string
+          editable: boolean
+          invoice_id: string
+          issued_on: string
+          number: string
+          order_id: string
+          paid_at: string
+          paid_confirmed_at: string
+          paid_marked_side: string
+          reminder_1_at: string
+          reminder_2_at: string
+          report_prefilled: boolean
+          send_to: string
+        }[]
+      }
       gps_connection_create: {
         Args: {
           p_account_name: string
@@ -8620,8 +8642,6 @@ export type Database = {
       group_take_order: {
         Args: { p_order_id: string; p_vehicle_id: string }
         Returns: {
-          pricing_mode: string
-          rate_per_km_cents: number | null
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -8655,8 +8675,10 @@ export type Database = {
           paid_at: string | null
           planned_qty: number | null
           planned_volume_m3: number | null
+          pricing_mode: string
           published_at: string | null
           rate_cents: number | null
+          rate_per_km_cents: number | null
           ref: string
           required_body: string | null
           required_loading: string[]
@@ -8690,6 +8712,7 @@ export type Database = {
         }
       }
       handle_support_message: { Args: { p_id: number }; Returns: undefined }
+      inbound_order_target: { Args: { p_token: string }; Returns: Json }
       invoice_subscription_fees: { Args: { p_month: string }; Returns: number }
       issue_monthly_subscriptions: {
         Args: { p_month: string }
@@ -8756,6 +8779,14 @@ export type Database = {
           title: string
           version: number
         }[]
+      }
+      mark_freight_invoice_paid: {
+        Args: { p_invoice_id: string; p_paid_on: string }
+        Returns: undefined
+      }
+      mark_site_invoice_paid: {
+        Args: { p_invoice_id: string; p_paid_on: string }
+        Returns: undefined
       }
       merge_message_translation: {
         Args: { p_id: number; p_lang: string; p_source: string; p_text: string }
@@ -8976,12 +9007,17 @@ export type Database = {
           token: string
         }[]
       }
-      rotate_order_inbox_address: { Args: never; Returns: string }
-      set_order_inbox_senders: { Args: { p_senders: string[] }; Returns: string[] }
-      inbound_order_target: { Args: { p_token: string }; Returns: Json }
-      close_order_email_draft: {
-        Args: { p_id: string; p_order_id?: string }
-        Returns: undefined
+      order_pricing_info: {
+        Args: { p_order_ids: string[] }
+        Returns: {
+          currency: string
+          distance_auto_km: number
+          distance_km: number
+          order_id: string
+          pricing_mode: string
+          rate_cents: number
+          rate_per_km_cents: number
+        }[]
       }
       own_orders_access: { Args: never; Returns: boolean }
       partner_totals: {
@@ -9124,6 +9160,10 @@ export type Database = {
           samples: number
         }[]
       }
+      propose_price: {
+        Args: { p_order_id: string; p_rate_cents: number; p_reason?: string }
+        Returns: undefined
+      }
       prune_auth_throttle: { Args: never; Returns: number }
       prune_incidents: { Args: { p_keep_days?: number }; Returns: number }
       rate_order: {
@@ -9158,18 +9198,25 @@ export type Database = {
         }
         Returns: number
       }
+      record_vehicle_check: { Args: { p_check: Json }; Returns: string }
       remove_company_member: { Args: { p_user_id: string }; Returns: string }
       remove_stop: {
         Args: { p_stop_id: string }
         Returns: {
           acknowledged_at: string | null
           acknowledged_by: string | null
+          actor_company_id: string | null
           actor_id: string | null
+          actor_name: string | null
+          actor_side: string | null
           changes: Json
           created_at: string
+          driver_seen_at: string | null
           id: number
           kind: Database["public"]["Enums"]["amendment_kind"]
           order_id: string
+          proposal_status: string | null
+          reason: string | null
           stop_id: string | null
           stop_label: string | null
           stop_role: Database["public"]["Enums"]["stop_role"] | null
@@ -9188,8 +9235,6 @@ export type Database = {
           p_rate_cents: number
         }
         Returns: {
-          pricing_mode: string
-          rate_per_km_cents: number | null
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -9223,8 +9268,10 @@ export type Database = {
           paid_at: string | null
           planned_qty: number | null
           planned_volume_m3: number | null
+          pricing_mode: string
           published_at: string | null
           rate_cents: number | null
+          rate_per_km_cents: number | null
           ref: string
           required_body: string | null
           required_loading: string[]
@@ -9257,6 +9304,14 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      resolve_change_request: {
+        Args: { p_amendment_id?: number; p_id: string; p_resolution: string }
+        Returns: undefined
+      }
+      respond_price_proposal: {
+        Args: { p_accept: boolean; p_amendment_id: number }
+        Returns: undefined
+      }
       restore_driver: { Args: { p_driver_id: string }; Returns: undefined }
       retention_fuel_candidates: {
         Args: { p_limit?: number }
@@ -9281,8 +9336,8 @@ export type Database = {
           file_name: string
           id: string
           insurer: string | null
-          issued_on: string | null
           is_current: boolean
+          issued_on: string | null
           kind: Database["public"]["Enums"]["document_kind"]
           limit_currency: string | null
           limit_event_cents: number | null
@@ -9319,8 +9374,39 @@ export type Database = {
           privilege: string
         }[]
       }
+      rotate_order_inbox_address: { Args: never; Returns: string }
       run_scheduled_job: { Args: { p_job: string }; Returns: Json }
+      save_freight_invoice: {
+        Args: {
+          p_amount_cents: number
+          p_currency: string
+          p_due_on: string
+          p_issued_on: string
+          p_number: string
+          p_order_id: string
+          p_send_to: string
+        }
+        Returns: string
+      }
       scheduler_health: { Args: never; Returns: Json }
+      sensitive_changes_pending: {
+        Args: { p_limit?: number }
+        Returns: {
+          actor_is_operator: boolean
+          actor_name: string
+          changed_at: string
+          company_id: string
+          company_language: string
+          company_name: string
+          contact_email: string
+          field: string
+          id: number
+          member_emails: string[]
+          new_value: string
+          notify_old_email: string
+          old_value: string
+        }[]
+      }
       set_billing: {
         Args: {
           p_invoice_ref?: string
@@ -9328,8 +9414,6 @@ export type Database = {
           p_order_id: string
         }
         Returns: {
-          pricing_mode: string
-          rate_per_km_cents: number | null
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -9363,8 +9447,10 @@ export type Database = {
           paid_at: string | null
           planned_qty: number | null
           planned_volume_m3: number | null
+          pricing_mode: string
           published_at: string | null
           rate_cents: number | null
+          rate_per_km_cents: number | null
           ref: string
           required_body: string | null
           required_loading: string[]
@@ -9443,6 +9529,14 @@ export type Database = {
         Returns: undefined
       }
       set_driver_language: { Args: { p_language: string }; Returns: undefined }
+      set_order_inbox_senders: {
+        Args: { p_senders: string[] }
+        Returns: string[]
+      }
+      set_order_pricing: {
+        Args: { p_mode: string; p_order_id: string; p_per_km_cents: number }
+        Returns: undefined
+      }
       set_own_partnership: {
         Args: { p_mode: Database["public"]["Enums"]["partnership_mode"] }
         Returns: string
@@ -9521,6 +9615,23 @@ export type Database = {
           period_start: string
         }[]
       }
+      shipper_freight_invoices: {
+        Args: never
+        Returns: {
+          amount_cents: number
+          carrier_name: string
+          currency: string
+          due_on: string
+          id: string
+          issued_on: string
+          number: string
+          order_id: string
+          order_ref: string
+          paid_at: string
+          paid_confirmed_at: string
+          paid_marked_side: string
+        }[]
+      }
       shipper_sites_waiting: {
         Args: never
         Returns: {
@@ -9546,10 +9657,16 @@ export type Database = {
         Args: { p_company_ids: string[] }
         Returns: {
           avg_days_late: number
+          bank_changed_at: string
           company_id: string
           country: string
           done_12m: number
           first_done_at: string
+          freight_avg_days_late: number
+          freight_invoices_count: number
+          freight_overdue: number
+          freight_paid_late: number
+          freight_paid_on_time: number
           invoiced_count: number
           on_platform_since: string
           overdue_count: number
@@ -9576,12 +9693,6 @@ export type Database = {
           vat_certificate_approved: boolean
           vat_certificate_issued_on: string
           vat_certificate_valid_until: string
-          bank_changed_at: string
-          freight_avg_days_late: number
-          freight_invoices_count: number
-          freight_overdue: number
-          freight_paid_late: number
-          freight_paid_on_time: number
         }[]
       }
       site_foreman_approve: {
@@ -9606,8 +9717,6 @@ export type Database = {
       store_route: {
         Args: { p_order_id: string; p_route: Json }
         Returns: {
-          pricing_mode: string
-          rate_per_km_cents: number | null
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -9641,8 +9750,10 @@ export type Database = {
           paid_at: string | null
           planned_qty: number | null
           planned_volume_m3: number | null
+          pricing_mode: string
           published_at: string | null
           rate_cents: number | null
+          rate_per_km_cents: number | null
           ref: string
           required_body: string | null
           required_loading: string[]
@@ -9754,8 +9865,6 @@ export type Database = {
       take_order: {
         Args: { p_order_id: string; p_vehicle_id: string }
         Returns: {
-          pricing_mode: string
-          rate_per_km_cents: number | null
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -9789,8 +9898,10 @@ export type Database = {
           paid_at: string | null
           planned_qty: number | null
           planned_volume_m3: number | null
+          pricing_mode: string
           published_at: string | null
           rate_cents: number | null
+          rate_per_km_cents: number | null
           ref: string
           required_body: string | null
           required_loading: string[]
@@ -9826,8 +9937,6 @@ export type Database = {
       take_order_combo: {
         Args: { p_combo_id: string; p_order_id: string }
         Returns: {
-          pricing_mode: string
-          rate_per_km_cents: number | null
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -9861,8 +9970,10 @@ export type Database = {
           paid_at: string | null
           planned_qty: number | null
           planned_volume_m3: number | null
+          pricing_mode: string
           published_at: string | null
           rate_cents: number | null
+          rate_per_km_cents: number | null
           ref: string
           required_body: string | null
           required_loading: string[]
@@ -9909,6 +10020,12 @@ export type Database = {
           id: string
           name: string
           vat_number: string
+        }[]
+      }
+      two_step_users: {
+        Args: { p_company_id?: string }
+        Returns: {
+          user_id: string
         }[]
       }
       uncomplete_stop: {
@@ -10047,6 +10164,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      vehicle_check_evidence: { Args: { p_stop_id: string }; Returns: Json }
       verification_badges_for_known: {
         Args: never
         Returns: {
@@ -10103,8 +10221,6 @@ export type Database = {
       withdraw_order: {
         Args: { p_order_id: string; p_reason?: string }
         Returns: {
-          pricing_mode: string
-          rate_per_km_cents: number | null
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -10138,8 +10254,10 @@ export type Database = {
           paid_at: string | null
           planned_qty: number | null
           planned_volume_m3: number | null
+          pricing_mode: string
           published_at: string | null
           rate_cents: number | null
+          rate_per_km_cents: number | null
           ref: string
           required_body: string | null
           required_loading: string[]

@@ -538,7 +538,8 @@ export async function reportDifferentAddressAction(_previous: DriverState, formD
   const supabase = await createClient();
   const { error } = await supabase.rpc('driver_request_change', {
     p_order_id: str(formData, 'order_id'),
-    p_stop_id: str(formData, 'stop_id') || null,
+    /* Без точки — null (сообщение о заказе в целом); тип генератора этого не знает. */
+    p_stop_id: (str(formData, 'stop_id') || null) as string,
     p_message: message,
     p_address: str(formData, 'address').slice(0, 300) || undefined,
     p_lat: num(formData, 'lat') ?? undefined,
