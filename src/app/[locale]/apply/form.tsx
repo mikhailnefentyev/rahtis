@@ -32,6 +32,12 @@ export function ApplyForm({
    * подписаться на ежемесячный счёт.
    */
   const [mode, setMode] = useState<'SUBCONTRACTOR' | 'SUBSCRIBER'>('SUBCONTRACTOR');
+  /*
+   * Заказчик: экспедитор или грузовладелец (6.11.2026). От этого зависит,
+   * нужен ли полис экспедитора для договора напрямую с перевозчиком.
+   * По умолчанию экспедитор — заявка называется «Huolitsijan hakemus».
+   */
+  const [shipperRole, setShipperRole] = useState<'FORWARDER' | 'CARGO_OWNER'>('FORWARDER');
   const [name, setName] = useState(invite?.name ?? '');
   /*
    * Страна компании — от неё номер (Y-tunnus, NIP, USt-IdNr.…), его
@@ -137,6 +143,7 @@ export function ApplyForm({
           <input type="hidden" name="locale" value={locale} />
           <input type="hidden" name="kind" value={kind} />
           <input type="hidden" name="partnership" value={mode} />
+          <input type="hidden" name="shipper_role" value={shipperRole} />
           {invite && <input type="hidden" name="invite" value={invite.token} />}
           {invite && (
             <p className="rounded-control border border-accent-line bg-accent-wash px-3 py-2 text-[13px] leading-relaxed text-ink">
@@ -204,6 +211,34 @@ export function ApplyForm({
                 </button>
               ))}
               <p className="text-[12px] leading-relaxed text-ink-dim">{t.apply.howNote}</p>
+            </div>
+          )}
+
+          {kind === 'SHIPPER' && (
+            <div className="flex flex-col gap-2">
+              <span className="label-micro">{t.forwarder.applyRoleTitle}</span>
+              {(
+                [
+                  ['FORWARDER', t.forwarder.FORWARDER, t.forwarder.forwarderHint],
+                  ['CARGO_OWNER', t.forwarder.CARGO_OWNER, t.forwarder.cargoOwnerHint],
+                ] as const
+              ).map(([value, label, text]) => (
+                <button
+                  key={value}
+                  type="button"
+                  role="radio"
+                  aria-checked={shipperRole === value}
+                  onClick={() => setShipperRole(value)}
+                  className={
+                    shipperRole === value
+                      ? 'cursor-pointer rounded-control border border-accent bg-accent/5 p-3 text-left'
+                      : 'cursor-pointer rounded-control border border-line p-3 text-left transition-colors duration-150 hover:border-ink-dim'
+                  }
+                >
+                  <span className="block text-[13px] font-semibold tracking-tight">{label}</span>
+                  <span className="mt-1 block text-[12px] leading-relaxed text-ink-muted">{text}</span>
+                </button>
+              ))}
             </div>
           )}
 

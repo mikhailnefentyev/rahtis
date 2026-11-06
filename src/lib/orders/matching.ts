@@ -235,7 +235,9 @@ export async function directAssignAction(
                 ? t.direct.hasOffers
                 : error.code === '22023' && error.message.includes('только в евро')
                   ? t.orderForm.currencyErrorRahtis
-                  : t.matching.failed;
+                  : error.code === '22023' && error.message.includes('полис')
+                    ? t.forwarder.publishError
+                    : t.matching.failed;
     return { error: message, done: false };
   }
 

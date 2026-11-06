@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useState } from 'react';
 import { Badge, Button, Field, Select } from '@/components/ui';
+import { ForwarderBlockNotice, useForwarderBlock } from '@/components/domain/ForwarderDirect';
 import { cn } from '@/lib/cn';
 import { useI18n } from '@/lib/i18n/provider';
 import { cancelOrderAction, directAssignAction, type DirectState } from '@/lib/orders/matching';
@@ -28,6 +29,16 @@ export function fittingVehicles(vehicles: KnownVehicle[], haulKind: HaulKind): K
     .filter((v) => vehicleClassFits(haulKind, v.vehicle_class))
     .filter((v) => v.available)
     .sort((a, b) => Number(b.in_pool) - Number(a.in_pool));
+}
+
+/*
+ * Машина подписчика берёт прямой заказ по своему договору (contract_party
+ * CARRIER), а такой договор экспедитору без проверенного полиса закрыт
+ * (app.forwarder_direct_allowed). Такие машины не предлагаются, чтобы
+ * отправка не падала, а над выбором объясняется почему.
+ */
+function withoutCarrierContract(vehicles: KnownVehicle[], blocked: boolean): KnownVehicle[] {
+  return blocked ? vehicles.filter((v) => !v.direct_billing) : vehicles;
 }
 
 function VehicleOptions({ vehicles }: { vehicles: KnownVehicle[] }) {
@@ -60,7 +71,10 @@ export function DispatchPicker({
   onContractChange?: (carrierContract: boolean) => void;
 }) {
   const { t } = useI18n();
-  const fitting = fittingVehicles(vehicles, haulKind);
+  const block = useForwarderBlock();
+  const allFitting = fittingVehicles(vehicles, haulKind);
+  const fitting = withoutCarrierContract(allFitting, block !== null);
+  const hiddenDirect = fitting.length < allFitting.length;
   const [mode, setMode] = useState<'DESK' | 'DIRECT' | 'GROUP'>('DESK');
   const [vehicleId, setVehicleId] = useState('');
 
@@ -73,7 +87,7 @@ export function DispatchPicker({
    * Договор напрямую — по тому, что реально уйдёт в форме: смена единицы
    * может сбросить «одной машине» обратно на стол без клика.
    */
-  const carrierContract = effective === 'DESK' && deskContract === 'CARRIER';
+  const carrierContract = effective === 'DESK' && deskContract === 'CARRIER' && block === null;
   useEffect(() => {
     onContractChange?.(carrierContract);
   }, [carrierContract, onContractChange]);
@@ -148,15 +162,23 @@ export function DispatchPicker({
       {/* Стол: Aivomaa отвечает (подряд) или договор напрямую с перевозчиком-подписчиком. */}
       {effective === 'DESK' && (
         <div className="flex flex-col gap-2">
-          <input type="hidden" name="desk_contract" value={deskContract} />
+          {/* Договор напрямую закрыт — уходит подряд, что бы ни было выбрано раньше. */}
+          <input type="hidden" name="desk_contract" value={carrierContract ? 'CARRIER' : 'RAHTIS'} />
           <span className="label-micro">{t.direct.deskContract}</span>
           {(['RAHTIS', 'CARRIER'] as const).map((value) => (
-            <label key={value} className="flex cursor-pointer items-start gap-2 text-[13px]">
+            <label
+              key={value}
+              className={cn(
+                'flex cursor-pointer items-start gap-2 text-[13px]',
+                value === 'CARRIER' && block && 'cursor-not-allowed opacity-50',
+              )}
+            >
               <input
                 type="radio"
                 name="desk_contract_choice"
                 value={value}
-                checked={deskContract === value}
+                checked={value === 'CARRIER' ? carrierContract : !carrierContract}
+                disabled={value === 'CARRIER' && block !== null}
                 onChange={() => setDeskContract(value)}
                 className="mt-0.5 accent-[var(--color-accent)]"
               />
@@ -168,8 +190,12 @@ export function DispatchPicker({
               </span>
             </label>
           ))}
+          {block && <ForwarderBlockNotice block={block} />}
         </div>
       )}
+
+      {/* Машины подписчиков скрыты из прямого выбора — почему, сказано здесь. */}
+      {effective !== 'DESK' && block && hiddenDirect && <ForwarderBlockNotice block={block} />}
 
       {direct && chosen?.busy && <p className="text-xs text-warn">{t.direct.busyWarn}</p>}
 
@@ -246,7 +272,8 @@ export function SendDirect({
 }) {
   const { t, locale } = useI18n();
   const [state, action, pending] = useActionState(directAssignAction, idle);
-  const fitting = fittingVehicles(vehicles, haulKind);
+  const block = useForwarderBlock();
+  const fitting = withoutCarrierContract(fittingVehicles(vehicles, haulKind), block !== null);
   const [vehicleId, setVehicleId] = useState('');
 
   if (fitting.length === 0) return null;

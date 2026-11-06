@@ -1,6 +1,7 @@
 import { bearerMatches } from '@/lib/auth/bearer';
 import { sendCertificateReminders } from '@/lib/drivers/reminders';
 import { sendVerificationReminders } from '@/lib/verification/reminders';
+import { sendForwarderReminders } from '@/lib/forwarders/reminders';
 
 /**
  * Напоминания о сроках удостоверений водителей.
@@ -14,7 +15,8 @@ import { sendVerificationReminders } from '@/lib/verification/reminders';
  *
  * Тем же запуском — напоминания о сроках пакета tilaajavastuu
  * (src/lib/verification/reminders.ts): отдельное расписание в базе ради
- * одного запроса в день не нужно.
+ * одного запроса в день не нужно. Им же — за 30 и 7 дней до конца
+ * полиса экспедитора (src/lib/forwarders/reminders.ts).
  */
 export async function POST(request: Request) {
   const expected = process.env.REPORTS_CRON_SECRET?.trim();
@@ -28,7 +30,11 @@ export async function POST(request: Request) {
     return Response.json({ error: 'forbidden' }, { status: 401 });
   }
 
-  const [result, verification] = await Promise.all([sendCertificateReminders(), sendVerificationReminders()]);
-  const failed = result.errors.length > 0 || verification.errors.length > 0;
-  return Response.json({ ...result, verification }, { status: failed ? 207 : 200 });
+  const [result, verification, forwarder] = await Promise.all([
+    sendCertificateReminders(),
+    sendVerificationReminders(),
+    sendForwarderReminders(),
+  ]);
+  const failed = result.errors.length > 0 || verification.errors.length > 0 || forwarder.errors.length > 0;
+  return Response.json({ ...result, verification, forwarder }, { status: failed ? 207 : 200 });
 }

@@ -9,6 +9,8 @@ import { createClient } from '@/lib/supabase/server';
 import type { OrderAmendment, OrderStop, ShipperOffer, TripDocument } from '@/types/db';
 import { OrdersView } from './OrdersView';
 import { getViewerI18n } from '@/lib/i18n/viewer';
+import { ForwarderDirectProvider, ForwarderGraceBanner } from '@/components/domain/ForwarderDirect';
+import { loadForwarderState } from '@/lib/forwarders/status';
 
 export async function generateMetadata({
   params,
@@ -36,7 +38,7 @@ export default async function OrdersPage({
   const viewer = await requireRole(locale, 'SHIPPER');
   const company = viewer.company!;
 
-  const [{ t }, supabase] = await Promise.all([getViewerI18n(locale), createClient()]);
+  const [{ t }, supabase, forwarder] = await Promise.all([getViewerI18n(locale), createClient(), loadForwarderState()]);
 
   /*
    * Колонки поимённо, а не select('*'): колонки назначения заказчику не
@@ -183,6 +185,11 @@ export default async function OrdersPage({
         {t.orders.subtitle}
       </p>
 
+      {/* Отсрочка прежним экспедиторам: с какой даты прямой договор потребует полис. */}
+      {forwarder.status?.applies && forwarder.status.in_grace && !forwarder.status.policy_until && forwarder.status.grace_until && (
+        <ForwarderGraceBanner graceUntil={forwarder.status.grace_until} />
+      )}
+
       {/* Публиковать может только активная компания — объясняем это до формы. */}
       {company.status !== 'ACTIVE' ? (
         <Card stripe="warn">
@@ -197,6 +204,7 @@ export default async function OrdersPage({
           </CardBody>
         </Card>
       ) : (
+        <ForwarderDirectProvider block={forwarder.block}>
         <OrdersView
           orders={orders ?? []}
           stopsByOrder={stopsByOrder}
@@ -207,6 +215,7 @@ export default async function OrdersPage({
           documentsByOrder={documentsByOrder}
           startNew={startNew}
         />
+        </ForwarderDirectProvider>
       )}
     </main>
   );

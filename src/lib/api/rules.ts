@@ -56,6 +56,11 @@ const RULES: Rule[] = [
     field: 'order_ref',
     message: 'This is a direct transport with a carrier on the monthly plan: the contract of carriage is between you and the carrier, so claims are settled directly with them, not through RAHTIS.',
   },
+  {
+    prefix: 'Договор напрямую с перевозчиком недоступен',
+    field: 'contract',
+    message: "A direct contract with a carrier requires valid freight forwarder's liability insurance checked by RAHTIS (at least EUR 250,000 per occurrence and EUR 500,000 per year). Upload it in the RAHTIS cabinet (Account) or use contract RAHTIS.",
+  },
   { prefix: 'Претензия подаётся в течение 30 дней', field: 'order_ref', message: 'A claim must be filed within 30 days after the trip is closed.' },
   { prefix: 'По этому рейсу у вас уже есть открытая претензия', field: 'order_ref', message: 'Your company already has an open claim for this trip; add a comment or an attachment to it.' },
   { prefix: 'Claim закрыт', field: 'status', message: 'The claim is closed.' },

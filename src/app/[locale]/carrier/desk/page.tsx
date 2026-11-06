@@ -13,6 +13,7 @@ import { DEFAULT_RADIUS, isRadius } from '@/lib/backhaul/radius';
 import { DeskList, type DeskBusy } from './DeskList';
 import { getViewerI18n } from '@/lib/i18n/viewer';
 import { orderCurrencies } from '@/lib/orders/currencies';
+import { forwarderPolicyByOrder } from '@/lib/forwarders/status';
 
 export async function generateMetadata({
   params,
@@ -203,6 +204,12 @@ export default async function DeskPage({
     (ownRows ?? []).map((o) => [o.id, clientNames.get(o.shipper_company_id) ?? '']),
   );
 
+  /* «Полис экспедитора проверен до …» — у заказов и рейсов по прямому договору, кроме своих. */
+  const policyByOrder = await forwarderPolicyByOrder([
+    ...(orders ?? []).filter((o) => o.desk_contract === 'CARRIER').map((o) => o.id),
+    ...assignedIds.filter((id) => !(id in ownByOrder)),
+  ]);
+
   /*
    * Откликаться может только машина, которая выходит на рейсы: допущена и
    * с водителем. Допущенную машину без водителя стол предлагал наравне с
@@ -239,6 +246,7 @@ export default async function DeskPage({
         amendmentsByOrder={amendmentsByOrder}
         ownByOrder={ownByOrder}
         currencyByOrder={currencyByOrder}
+        policyByOrder={policyByOrder}
       />
 
       {!canTakeOrders ? (
@@ -308,6 +316,7 @@ export default async function DeskPage({
             busy={busy}
             waiting={waiting}
             currencyByOrder={currencyByOrder}
+            policyByOrder={policyByOrder}
           />
         </>
       )}

@@ -896,6 +896,7 @@ export type Database = {
             | Database["public"]["Enums"]["partnership_mode"]
             | null
           pending_partnership_from: string | null
+          shipper_role: Database["public"]["Enums"]["shipper_role"]
           registry_check: Json | null
           rejected_at: string | null
           rejection_reason: string | null
@@ -941,6 +942,7 @@ export type Database = {
             | Database["public"]["Enums"]["partnership_mode"]
             | null
           pending_partnership_from?: string | null
+          shipper_role?: Database["public"]["Enums"]["shipper_role"]
           registry_check?: Json | null
           rejected_at?: string | null
           rejection_reason?: string | null
@@ -986,6 +988,7 @@ export type Database = {
             | Database["public"]["Enums"]["partnership_mode"]
             | null
           pending_partnership_from?: string | null
+          shipper_role?: Database["public"]["Enums"]["shipper_role"]
           registry_check?: Json | null
           rejected_at?: string | null
           rejection_reason?: string | null
@@ -1007,6 +1010,18 @@ export type Database = {
       company_documents: {
         Row: {
           company_id: string
+          cmr_covered: boolean | null
+          insurer: string | null
+          limit_currency: string | null
+          limit_event_cents: number | null
+          limit_year_cents: number | null
+          policy_number: string | null
+          review_note: string | null
+          review_status: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          terms: string | null
+          territory: string | null
           file_name: string
           id: string
           is_current: boolean
@@ -1020,6 +1035,18 @@ export type Database = {
         }
         Insert: {
           company_id: string
+          cmr_covered?: boolean | null
+          insurer?: string | null
+          limit_currency?: string | null
+          limit_event_cents?: number | null
+          limit_year_cents?: number | null
+          policy_number?: string | null
+          review_note?: string | null
+          review_status?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          terms?: string | null
+          territory?: string | null
           file_name: string
           id?: string
           is_current?: boolean
@@ -1033,6 +1060,18 @@ export type Database = {
         }
         Update: {
           company_id?: string
+          cmr_covered?: boolean | null
+          insurer?: string | null
+          limit_currency?: string | null
+          limit_event_cents?: number | null
+          limit_year_cents?: number | null
+          policy_number?: string | null
+          review_note?: string | null
+          review_status?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          terms?: string | null
+          territory?: string | null
           file_name?: string
           id?: string
           is_current?: boolean
@@ -1884,6 +1923,35 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "email_outbox_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      forwarder_reminders: {
+        Row: {
+          company_id: string
+          sent_at: string
+          stage: number
+          valid_until: string
+        }
+        Insert: {
+          company_id: string
+          sent_at?: string
+          stage: number
+          valid_until: string
+        }
+        Update: {
+          company_id?: string
+          sent_at?: string
+          stage?: number
+          valid_until?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "forwarder_reminders_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
@@ -7416,6 +7484,31 @@ export type Database = {
         Args: { p_month: string }
         Returns: number
       }
+      forwarder_policies: {
+        Args: { p_company_ids: string[] }
+        Returns: {
+          cargo_owner: boolean
+          company_id: string
+          policy_until: string | null
+        }[]
+      }
+      forwarder_status: {
+        Args: { p_company_id?: string }
+        Returns: {
+          allowed: boolean
+          applies: boolean
+          grace_until: string | null
+          in_grace: boolean
+          license_ok: boolean
+          needs_license: boolean
+          policy_until: string | null
+          shipper_role: Database["public"]["Enums"]["shipper_role"]
+        }[]
+      }
+      review_company_document: {
+        Args: { p_decision: string; p_document_id: string; p_note?: string }
+        Returns: Database["public"]["Tables"]["company_documents"]["Row"]
+      }
       known_vehicles_for_shipper: {
         Args: never
         Returns: {
@@ -8787,7 +8880,11 @@ export type Database = {
       direct_outcome: "PENDING" | "ACCEPTED" | "DECLINED" | "WITHDRAWN"
       dispatch_mode: "DESK" | "DIRECT"
       distance_source: "MANUAL" | "AUTO"
-      document_kind: "CARRIER_LICENSE" | "INSURANCE"
+      document_kind:
+        | "CARRIER_LICENSE"
+        | "INSURANCE"
+        | "FORWARDER_INSURANCE"
+        | "FORWARDER_LICENSE"
       driver_certificate_type:
         | "CODE95"
         | "ADR_BASIC"
@@ -8854,6 +8951,7 @@ export type Database = {
         | "CONTINUATION"
         | "TRAILER_RETURN"
       trailer_kind: "SEMI" | "FULL" | "CENTER_AXLE"
+      shipper_role: "FORWARDER" | "CARGO_OWNER"
       trip_document_kind:
         | "CMR"
         | "LOADING_PHOTO"
@@ -9033,7 +9131,12 @@ export const Constants = {
       direct_outcome: ["PENDING", "ACCEPTED", "DECLINED", "WITHDRAWN"],
       dispatch_mode: ["DESK", "DIRECT"],
       distance_source: ["MANUAL", "AUTO"],
-      document_kind: ["CARRIER_LICENSE", "INSURANCE"],
+      document_kind: [
+        "CARRIER_LICENSE",
+        "INSURANCE",
+        "FORWARDER_INSURANCE",
+        "FORWARDER_LICENSE",
+      ],
       driver_certificate_type: [
         "CODE95",
         "ADR_BASIC",
@@ -9106,6 +9209,7 @@ export const Constants = {
         "TRAILER_RETURN",
       ],
       trailer_kind: ["SEMI", "FULL", "CENTER_AXLE"],
+      shipper_role: ["FORWARDER", "CARGO_OWNER"],
       trip_document_kind: [
         "CMR",
         "LOADING_PHOTO",

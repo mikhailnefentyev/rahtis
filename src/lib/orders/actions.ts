@@ -273,6 +273,8 @@ function explainPublish(t: Dictionary, code: string | undefined, message: string
   /* Проверка валюты в базе (orders_zz_currency_guard): не евро — только напрямую. */
   if (code === '22023' && message?.includes('другой валюте')) return t.orderForm.currencyErrorDirect;
   if (code === '22023' && message?.includes('только в евро')) return t.orderForm.currencyErrorRahtis;
+  /* Договор напрямую без проверенного полиса экспедитора (orders_zz_forwarder_guard). */
+  if (code === '22023' && message?.includes('полис')) return t.forwarder.publishError;
   return t.orderForm.failed;
 }
 

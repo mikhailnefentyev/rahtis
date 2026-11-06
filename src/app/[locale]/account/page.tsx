@@ -15,6 +15,8 @@ import { ChangePasswordForm } from './form';
 import { MembersPanel } from './MembersPanel';
 import { WasteRegistrationsForm } from './WasteRegistrationsForm';
 import { CurrencyForm } from './CurrencyForm';
+import { ForwarderPanel } from './ForwarderPanel';
+import { loadForwarderState } from '@/lib/forwarders/status';
 import { parseRegistrations } from '@/lib/waste/registrations';
 import { getViewerI18n } from '@/lib/i18n/viewer';
 
@@ -73,6 +75,25 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
     viewer.status === 'ready' && company ? await (await createClient()).rpc('company_members') : { data: null };
   const isOwner = viewer.status === 'ready' && viewer.profile.member_kind !== 'DISPATCHER';
 
+  /*
+   * Заказчик: экспедитор или грузовладелец и полис экспедитора для
+   * договора напрямую с перевозчиком (6.11.2026). Последние загруженные
+   * документы — в любом статусе: экспедитор должен видеть и отказ.
+   */
+  const shipper = company && company.kind === 'SHIPPER' && company.status === 'ACTIVE' && !company.client_of ? company : null;
+  const [forwarder, forwarderDocs] = shipper
+    ? await Promise.all([
+        loadForwarderState(),
+        (await createClient())
+          .from('company_documents')
+          .select('*')
+          .in('kind', ['FORWARDER_INSURANCE', 'FORWARDER_LICENSE'])
+          .order('uploaded_at', { ascending: false })
+          .limit(20)
+          .then((r) => r.data ?? []),
+      ])
+    : [null, []];
+
   const content = (
     <main className="cab-page cab-page--narrow">
       <h1 className="page-title">{t.account.title}</h1>
@@ -120,6 +141,16 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
         {/* Рабочая валюта компании (5.11.2026): деньги RAHTIS остаются в евро. */}
         {company && company.status === 'ACTIVE' && (company.kind === 'CARRIER' || company.kind === 'SHIPPER') && (
           <CurrencyForm currency={company.currency} kind={company.kind} canEdit={isOwner} />
+        )}
+
+        {shipper && (
+          <ForwarderPanel
+            role={shipper.shipper_role ?? 'FORWARDER'}
+            canEditRole={isOwner}
+            status={forwarder?.status ?? null}
+            insurance={forwarderDocs.find((d) => d.kind === 'FORWARDER_INSURANCE') ?? null}
+            license={forwarderDocs.find((d) => d.kind === 'FORWARDER_LICENSE') ?? null}
+          />
         )}
 
         {/* Регистрации перевозчика отходов — только у перевозчика, печатаются в документах на отходы. */}

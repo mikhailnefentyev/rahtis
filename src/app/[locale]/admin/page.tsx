@@ -36,6 +36,7 @@ import { ApplicationCard } from './ApplicationCard';
 import { DeleteOrderButton } from './DeleteOrderButton';
 import { NoticeForm } from './NoticeForm';
 import { VehicleCard } from './VehicleCard';
+import { ForwarderReview, type ReviewDocument } from './forwarders/ForwarderReview';
 
 /**
  * Пульт оператора: очередь заявок и последние решения.
@@ -146,6 +147,18 @@ export default async function AdminPage({
         .eq('is_current', true)
     : { data: [] };
 
+  /*
+   * Полисы и лицензии экспедиторов на проверке (6.11.2026). Без них
+   * экспедитор не откроет договор напрямую с перевозчиком.
+   */
+  const { data: forwarderDocs } = await supabase
+    .from('company_documents')
+    .select('*, company:companies(name, country, business_id)')
+    .in('kind', ['FORWARDER_INSURANCE', 'FORWARDER_LICENSE'])
+    .eq('review_status', 'PENDING')
+    .order('uploaded_at', { ascending: true })
+    .limit(50);
+
   /* Заявки по приглашению перевозчика: оператор видит, кто позвал. */
   const queueIds = (pending ?? []).map((c) => c.id);
   const { data: invites } = queueIds.length
@@ -240,6 +253,19 @@ export default async function AdminPage({
           </div>
         )}
       </section>
+
+      {(forwarderDocs ?? []).length > 0 && (
+        <section className="mt-10">
+          <h2 className="mb-4 border-b border-line pb-2 text-[13px] font-semibold tracking-tight text-ink-faint">
+            {t.forwarder.adminTitle} · {f.number((forwarderDocs ?? []).length)}
+          </h2>
+          <ForwarderReview
+            locale={locale}
+            documents={(forwarderDocs ?? []) as ReviewDocument[]}
+            back={`/${locale}/admin`}
+          />
+        </section>
+      )}
 
       {(withoutOffers ?? []).length > 0 && (
         <section className="mt-10">
