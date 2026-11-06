@@ -58,6 +58,12 @@ export const et = {
     ref: 'Viide',
     note: 'Märkus',
     markDone: 'Märgi tehtuks',
+    /* Сверка машины на первой погрузке (6.11.2026). */
+    vehiclePlates: 'Numbrimärgid',
+    vehicleTruck: 'Veok',
+    vehicleTrailer: 'Haagis',
+    vehicleChange: 'Muuda',
+    vehicleHint: 'Sisesta selle sõiduki number, millega tegelikult sõidad.',
     stopDone: 'Tehtud',
     damage: 'Märkus auto, haagise või veose kohta',
     damagePlaceholder: 'Vabatahtlik: kahjustused, puudused',

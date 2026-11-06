@@ -5223,6 +5223,90 @@ export type Database = {
           },
         ]
       }
+      vehicle_checks: {
+        Row: {
+          carrier_confirmed_at: string | null
+          carrier_confirmed_by: string | null
+          carrier_reason: string | null
+          created_at: string
+          driver_matches: boolean | null
+          expected_plate: string | null
+          expected_trailer_plate: string | null
+          gps_distance_m: number | null
+          gps_seen_at: string | null
+          id: string
+          order_id: string
+          reasons: Json
+          reported_plate: string | null
+          reported_trailer_plate: string | null
+          shipper_confirmed_at: string | null
+          shipper_confirmed_by: string | null
+          shipper_reason: string | null
+          source: string
+          stop_id: string
+          verdict: string
+        }
+        Insert: {
+          carrier_confirmed_at?: string | null
+          carrier_confirmed_by?: string | null
+          carrier_reason?: string | null
+          created_at?: string
+          driver_matches?: boolean | null
+          expected_plate?: string | null
+          expected_trailer_plate?: string | null
+          gps_distance_m?: number | null
+          gps_seen_at?: string | null
+          id?: string
+          order_id: string
+          reasons?: Json
+          reported_plate?: string | null
+          reported_trailer_plate?: string | null
+          shipper_confirmed_at?: string | null
+          shipper_confirmed_by?: string | null
+          shipper_reason?: string | null
+          source: string
+          stop_id: string
+          verdict: string
+        }
+        Update: {
+          carrier_confirmed_at?: string | null
+          carrier_confirmed_by?: string | null
+          carrier_reason?: string | null
+          created_at?: string
+          driver_matches?: boolean | null
+          expected_plate?: string | null
+          expected_trailer_plate?: string | null
+          gps_distance_m?: number | null
+          gps_seen_at?: string | null
+          id?: string
+          order_id?: string
+          reasons?: Json
+          reported_plate?: string | null
+          reported_trailer_plate?: string | null
+          shipper_confirmed_at?: string | null
+          shipper_confirmed_by?: string | null
+          shipper_reason?: string | null
+          source?: string
+          stop_id?: string
+          verdict?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_checks_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_checks_stop_id_fkey"
+            columns: ["stop_id"]
+            isOneToOne: true
+            referencedRelation: "order_stops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vehicle_drivers: {
         Row: {
           assigned_by: string | null
@@ -7034,6 +7118,12 @@ export type Database = {
         Args: { p_driver_id?: string; p_order_id: string; p_reason?: string; p_vehicle_id?: string }
         Returns: undefined
       }
+      confirm_vehicle_check: {
+        Args: { p_check_id: string; p_reason: string }
+        Returns: undefined
+      }
+      record_vehicle_check: { Args: { p_check: Json }; Returns: string }
+      vehicle_check_evidence: { Args: { p_stop_id: string }; Returns: Json }
       driver_request_change: {
         Args: {
           p_address?: string

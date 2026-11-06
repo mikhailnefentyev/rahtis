@@ -22,7 +22,7 @@ import type {
   TripDocument,
 } from '@/types/db';
 import { AmendPanel } from './AmendPanel';
-import { ChangeRequests, PricingNote, type OrderChangesData } from '@/components/domain/OrderChanges';
+import { ChangeRequests, PricingNote, VehicleCheckMark, type OrderChangesData } from '@/components/domain/OrderChanges';
 import { OrderChat } from '@/components/domain/OrderChat';
 import { DirectWaiting, SendDirect } from './DirectPanel';
 import { AssignedCarrier, OffersPanel } from './OffersPanel';
@@ -215,6 +215,8 @@ export function OrderCard({
               {order.status === 'IN_PROGRESS' && stops.length > 0 && (
                 <TripStage stops={stops} className="mt-3" />
               )}
+              {/* Та ли машина приехала: сверка на первой погрузке. */}
+              <VehicleCheckMark check={changes?.vehicleCheck} side="SHIPPER" className="mt-3" />
 
               {order.status === 'IN_PROGRESS' && documents.length > 0 && (
                 <div className="mt-3 rounded-control border border-line bg-sunken p-3">

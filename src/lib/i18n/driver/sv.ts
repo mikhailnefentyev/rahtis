@@ -58,6 +58,12 @@ export const sv = {
     ref: 'Referens',
     note: 'Notering',
     markDone: 'Markera som klar',
+    /* Сверка машины на первой погрузке (6.11.2026). */
+    vehiclePlates: 'Registreringsnummer',
+    vehicleTruck: 'Bil',
+    vehicleTrailer: 'Släp',
+    vehicleChange: 'Ändra',
+    vehicleHint: 'Skriv numret på fordonet du faktiskt kör.',
     stopDone: 'Klar',
     damage: 'Anmärkning om fordon eller last',
     damagePlaceholder: 'Valfritt: skador, brister',

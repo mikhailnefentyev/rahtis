@@ -8,6 +8,7 @@ import { snoozeInboxItemAction } from '@/lib/inbox/actions';
 import type { InboxItem } from '@/lib/inbox/rank';
 import { confirmFreightPaidAction } from '@/lib/invoices/actions';
 import { acknowledgeAmendmentsAction, dismissChangeRequestAction, respondProposalAction } from '@/lib/orders/amend';
+import { confirmVehicleCheckAction } from '@/lib/orders/vehicleCheckActions';
 import { ConfirmOrderButton, MarkPaidButton } from './InboxButtons';
 
 /** Сколько пунктов видно сразу; остальные — под «Показать все». */
@@ -149,6 +150,31 @@ async function Row({ item, locale }: { item: InboxItem; locale: Locale }) {
         <>
           <MarkPaidButton invoiceId={op.invoiceId} paidOn={todayInHelsinki()} label={ti.markPaid} />
           {open(false)}
+        </>
+      );
+      break;
+    case 'vehicleCheck':
+      /* Флаг, не блокировка: подтвердить с причиной или связаться (чат и телефон — на карточке). */
+      actions = (
+        <>
+          <form action={confirmVehicleCheckAction} className="flex flex-wrap items-center gap-2">
+            {hidden({ check_id: op.checkId })}
+            <input
+              name="reason"
+              required
+              minLength={3}
+              maxLength={500}
+              placeholder={t.vehicleCheck.reasonPlaceholder}
+              aria-label={t.vehicleCheck.reasonLabel}
+              className="h-8 w-52 rounded-control border border-line bg-surface px-2 text-[13px]"
+            />
+            <Button type="submit" size="sm">
+              {ti.confirmOk}
+            </Button>
+          </form>
+          <Link href={item.href} className={buttonClass({ variant: 'primary', size: 'sm' })}>
+            {op.side === 'SHIPPER' ? ti.contactCarrier : ti.contactDriver}
+          </Link>
         </>
       );
       break;

@@ -3094,6 +3094,12 @@ export const pl = {
     ref: 'Numer',
     note: 'Uwaga',
     markDone: 'Oznacz jako wykonane',
+    /* Сверка машины на первой погрузке (6.11.2026). */
+    vehiclePlates: 'Numery rejestracyjne',
+    vehicleTruck: 'Pojazd',
+    vehicleTrailer: 'Naczepa',
+    vehicleChange: 'Zmień',
+    vehicleHint: 'Wpisz numer pojazdu, którym faktycznie jedziesz.',
     stopDone: 'Wykonane',
     damage: 'Uwaga o pojeździe lub ładunku',
     damagePlaceholder: 'Opcjonalnie: uszkodzenia, braki',
@@ -4553,6 +4559,25 @@ export const pl = {
 
   /* Публичная страница правил площадки (/rules). */
   /* «Требует вашего действия» на обзоре кабинета (src/components/domain/inbox). */
+  /* «Та ли машина приехала»: сверка на первой погрузке (6.11.2026). */
+  vehicleCheck: {
+    verified: 'Pojazd sprawdzony przy załadunku',
+    mismatch: 'Sprawdź pojazd',
+    lead: 'Przy załadunku pojazd nie zgadzał się ze zleceniem. Przewóz nie został wstrzymany — sprawdź to.',
+    plateReported: 'W zleceniu {expected}, kierowca wpisał {reported}',
+    trailerReported: 'Naczepa w zleceniu {expected}, kierowca wpisał {reported}',
+    gpsFar: 'Według GPS pojazd był {km} km od miejsca załadunku',
+    driverOther: 'Załadunek potwierdził inny kierowca przewoźnika',
+    reasonLabel: 'Dlaczego wszystko jest w porządku?',
+    reasonPlaceholder: 'Np. zmiana pojazdu, sprawdzone telefonicznie',
+    confirm: 'Potwierdź, że wszystko w porządku',
+    confirmedShipper: 'Zleceniodawca potwierdził: {reason}',
+    confirmedCarrier: 'Przewoźnik potwierdził: {reason}',
+    failed: 'Nie udało się zapisać. Spróbuj ponownie.',
+    emailSubject: 'Sprawdź pojazd w zleceniu {ref}',
+    open: 'Otwórz zlecenie',
+  },
+
   inbox: {
     title: 'Wymaga Twojego działania',
     empty: 'Nic nie wymaga Twojej uwagi.',
@@ -4601,6 +4626,10 @@ export const pl = {
     daysLate: '{days} dni po terminie',
     pickup: 'Załadunek {date}',
     tripsCount: 'Transporty bez faktury: {count}',
+    vehicleCheck: 'Sprawdź pojazd: załadunek się nie zgadzał',
+    confirmOk: 'Wszystko OK',
+    contactCarrier: 'Skontaktuj się z przewoźnikiem',
+    contactDriver: 'Skontaktuj się z kierowcą',
   },
 
   /* Двухэтапный вход и устройства входа (6.11.2026). */
@@ -4821,6 +4850,7 @@ export const pl = {
     'event.order.released': 'Przewóz {ref} wrócił na giełdę',
     'event.order.cancelled': 'Przewóz {ref} został anulowany — zobacz historię zmian',
     'event.order.amended': 'Zmieniła się trasa przewozu {ref}',
+    'event.order.vehicle_mismatch': 'Przewóz {ref}: przy załadunku pojazd nie zgadzał się ze zleceniem — sprawdź',
     'event.order.change_requested': 'Kierowca zgłosił inny adres w zleceniu {ref}',
     'event.order.price_proposed': 'Zaproponowano nową cenę za zlecenie {ref} — przyjmij lub odrzuć ją w historii zmian',
     'event.company.sensitive_changed': '{field, select, IBAN {Rachunek bankowy Twojej firmy został zmieniony} CONTACT_EMAIL {E-mail kontaktowy Twojej firmy został zmieniony} BILLING_EMAIL {E-mail do faktur Twojej firmy został zmieniony} OWNER {Główny użytkownik Twojej firmy został zmieniony} other {Dane Twojej firmy zostały zmienione}} — jeśli to nie Ty, skontaktuj się z pomocą RAHTIS',

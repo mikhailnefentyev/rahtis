@@ -3096,6 +3096,12 @@ export const et = {
     ref: 'Viide',
     note: 'Märkus',
     markDone: 'Märgi tehtuks',
+    /* Сверка машины на первой погрузке (6.11.2026). */
+    vehiclePlates: 'Numbrimärgid',
+    vehicleTruck: 'Veok',
+    vehicleTrailer: 'Haagis',
+    vehicleChange: 'Muuda',
+    vehicleHint: 'Sisesta selle sõiduki number, millega tegelikult sõidad.',
     stopDone: 'Tehtud',
     damage: 'Märkus auto, haagise või veose kohta',
     damagePlaceholder: 'Vabatahtlik: kahjustused, puudused',
@@ -4514,6 +4520,25 @@ export const et = {
 
   /* Публичная страница правил площадки (/rules). */
   /* «Требует вашего действия» на обзоре кабинета (src/components/domain/inbox). */
+  /* «Та ли машина приехала»: сверка на первой погрузке (6.11.2026). */
+  vehicleCheck: {
+    verified: 'Sõiduk kontrollitud pealelaadimisel',
+    mismatch: 'Kontrollige sõidukit',
+    lead: 'Pealelaadimisel ei vastanud sõiduk tellimusele. Vedu ei ole peatatud – palun kontrollige.',
+    plateReported: 'Tellimuses {expected}, juht sisestas {reported}',
+    trailerReported: 'Haagis tellimuses {expected}, juht sisestas {reported}',
+    gpsFar: 'GPS-i järgi oli sõiduk pealelaadimiskohast {km} km kaugusel',
+    driverOther: 'Pealelaadimise kinnitas vedaja teine juht',
+    reasonLabel: 'Miks on kõik korras?',
+    reasonPlaceholder: 'Nt sõiduk vahetati, kontrollitud telefoni teel',
+    confirm: 'Kinnita, et kõik on korras',
+    confirmedShipper: 'Tellija kinnitas: {reason}',
+    confirmedCarrier: 'Vedaja kinnitas: {reason}',
+    failed: 'Salvestamine ebaõnnestus. Proovige uuesti.',
+    emailSubject: 'Kontrollige veo {ref} sõidukit',
+    open: 'Ava tellimus',
+  },
+
   inbox: {
     title: 'Vajab sinu tegevust',
     empty: 'Praegu ei vaja miski tähelepanu.',
@@ -4562,6 +4587,10 @@ export const et = {
     daysLate: '{days} päeva hilinenud',
     pickup: 'Pealelaadimine {date}',
     tripsCount: 'Vedusid ilma arveta: {count}',
+    vehicleCheck: 'Kontrollige sõidukit: pealelaadimine ei klappinud',
+    confirmOk: 'Kõik korras',
+    contactCarrier: 'Võta vedajaga ühendust',
+    contactDriver: 'Võta juhiga ühendust',
   },
 
   /* Двухэтапный вход и устройства входа (6.11.2026). */
@@ -4782,6 +4811,7 @@ export const et = {
     'event.order.released': 'Vedu {ref} on tagasi börsil',
     'event.order.cancelled': 'Vedu {ref} on tühistatud — vaata muudatuste logi',
     'event.order.amended': 'Veo {ref} marsruut muutus',
+    'event.order.vehicle_mismatch': 'Vedu {ref}: pealelaadimisel ei vastanud sõiduk tellimusele – kontrollige',
     'event.order.change_requested': 'Juht teatas veo {ref} kohta teisest aadressist',
     'event.order.price_proposed': 'Veole {ref} pakuti uut hinda – nõustuge sellega või lükake see tagasi muudatuste ajaloos',
     'event.company.sensitive_changed': '{field, select, IBAN {Teie ettevõtte pangakontot muudeti} CONTACT_EMAIL {Teie ettevõtte kontakti e-posti muudeti} BILLING_EMAIL {Teie ettevõtte arvete e-posti muudeti} OWNER {Teie ettevõtte peakasutajat muudeti} other {Teie ettevõtte andmeid muudeti}} – kui see polnud teie, võtke ühendust klienditoega',

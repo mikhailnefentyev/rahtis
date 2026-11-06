@@ -31,7 +31,7 @@ import { WasteLink } from '@/components/domain/WasteLink';
 import { TripPanel } from './TripPanel';
 import { OwnEditPanel } from './OwnEditPanel';
 import { AmendPanel } from '../../shipper/orders/AmendPanel';
-import { ChangeRequests, PricingNote, TripAssignmentPanel, type FleetOption, type OrderChangesData } from '@/components/domain/OrderChanges';
+import { ChangeRequests, PricingNote, TripAssignmentPanel, VehicleCheckMark, type FleetOption, type OrderChangesData } from '@/components/domain/OrderChanges';
 import type { Database } from '@/types/database';
 import type { OrderAmendment, OrderStop, TripDocument } from '@/types/db';
 
@@ -200,6 +200,8 @@ export function AssignmentCard({
             {order.status === 'IN_PROGRESS' && stops.length > 0 && (
               <TripStage stops={stops} className="mt-3" />
             )}
+            {/* Та ли машина приехала: сверка на первой погрузке. */}
+            <VehicleCheckMark check={changes?.vehicleCheck} side="CARRIER" className="mt-3" />
 
             {/*
               * Правки заказчика идут выше маршрута, а не в конце

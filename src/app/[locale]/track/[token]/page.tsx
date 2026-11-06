@@ -74,7 +74,7 @@ export default async function TrackPage({ params }: { params: Promise<{ locale: 
     );
   }
 
-  const [{ data: carrier }, { data: stopRows }, { data: shipper }, { data: confirmedEvent }] = await Promise.all([
+  const [{ data: carrier }, { data: stopRows }, { data: shipper }, { data: confirmedEvent }, { data: vehicleOk }] = await Promise.all([
     order.assigned_company_id
       ? admin.from('companies').select('name').eq('id', order.assigned_company_id).single()
       : Promise.resolve({ data: null }),
@@ -94,6 +94,8 @@ export default async function TrackPage({ params }: { params: Promise<{ locale: 
       .order('created_at')
       .limit(1)
       .maybeSingle(),
+    /* Сверка машины на погрузке: клиенту только «проверена», без позиций и причин. */
+    admin.from('vehicle_checks').select('id').eq('order_id', order.id).eq('verdict', 'OK').limit(1).maybeSingle(),
   ]);
   const stops = stopRows ?? [];
 
@@ -181,6 +183,7 @@ export default async function TrackPage({ params }: { params: Promise<{ locale: 
           {order.trailer_plate ? ` · ${order.trailer_plate}` : ''}
         </p>
       )}
+      {vehicleOk && <p className="mt-1 text-[13px] font-semibold text-ok">✓ {t.vehicleCheck.verified}</p>}
 
       {/* ── Когда будет ─────────────────────────────────────────── */}
       {active && next && (

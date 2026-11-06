@@ -2,6 +2,7 @@ import 'server-only';
 
 import type { ChangeRequest, FleetOption, OrderChangesData, OrderPricing } from '@/components/domain/OrderChanges';
 import { createClient } from '@/lib/supabase/server';
+import { loadVehicleChecks } from './vehicleCheckServer';
 
 /**
  * Для карточек заказа (обе стороны): режим цены и пробег по маршруту,
@@ -15,7 +16,7 @@ export async function loadOrderChanges(orderIds: readonly string[]): Promise<Rec
   for (const id of ids) result[id] = { requests: [] };
 
   const supabase = await createClient();
-  const [{ data: pricing }, { data: requests }] = await Promise.all([
+  const [{ data: pricing }, { data: requests }, checks] = await Promise.all([
     supabase.rpc('order_pricing_info', { p_order_ids: ids }),
     supabase
       .from('order_change_requests')
@@ -23,7 +24,10 @@ export async function loadOrderChanges(orderIds: readonly string[]): Promise<Rec
       .in('order_id', ids)
       .is('resolved_at', null)
       .order('created_at'),
+    /* Сверка машины на погрузке (6.11.2026). */
+    loadVehicleChecks(supabase, ids),
   ]);
+  for (const [orderId, check] of Object.entries(checks)) if (result[orderId]) result[orderId].vehicleCheck = check;
 
   for (const p of pricing ?? []) {
     const entry: OrderPricing = {

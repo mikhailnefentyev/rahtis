@@ -3095,6 +3095,12 @@ export const de = {
     ref: 'Referenz',
     note: 'Hinweis',
     markDone: 'Als erledigt markieren',
+    /* Сверка машины на первой погрузке (6.11.2026). */
+    vehiclePlates: 'Kennzeichen',
+    vehicleTruck: 'Lkw',
+    vehicleTrailer: 'Anhänger',
+    vehicleChange: 'Ändern',
+    vehicleHint: 'Geben Sie das Kennzeichen des Fahrzeugs ein, das Sie tatsächlich fahren.',
     stopDone: 'Erledigt',
     damage: 'Hinweis zu Fahrzeug oder Ladung',
     damagePlaceholder: 'Optional: Schäden, Mängel',
@@ -4554,6 +4560,25 @@ export const de = {
 
   /* Публичная страница правил площадки (/rules). */
   /* «Требует вашего действия» на обзоре кабинета (src/components/domain/inbox). */
+  /* «Та ли машина приехала»: сверка на первой погрузке (6.11.2026). */
+  vehicleCheck: {
+    verified: 'Fahrzeug bei der Abholung geprüft',
+    mismatch: 'Fahrzeug prüfen',
+    lead: 'Bei der Abholung passte das Fahrzeug nicht zum Auftrag. Der Transport wurde nicht gestoppt – bitte prüfen Sie das.',
+    plateReported: 'Im Auftrag {expected}, Fahrer hat {reported} eingegeben',
+    trailerReported: 'Anhänger im Auftrag {expected}, Fahrer hat {reported} eingegeben',
+    gpsFar: 'Laut GPS war das Fahrzeug {km} km von der Ladestelle entfernt',
+    driverOther: 'Die Abholung hat ein anderer Fahrer des Transportunternehmens bestätigt',
+    reasonLabel: 'Warum ist alles in Ordnung?',
+    reasonPlaceholder: 'Z. B. Fahrzeug gewechselt, telefonisch geprüft',
+    confirm: 'Bestätigen, dass alles in Ordnung ist',
+    confirmedShipper: 'Auftraggeber hat bestätigt: {reason}',
+    confirmedCarrier: 'Transportunternehmen hat bestätigt: {reason}',
+    failed: 'Speichern fehlgeschlagen. Bitte erneut versuchen.',
+    emailSubject: 'Fahrzeug von Transport {ref} prüfen',
+    open: 'Auftrag öffnen',
+  },
+
   inbox: {
     title: 'Ihre Aktion erforderlich',
     empty: 'Nichts erfordert Ihre Aufmerksamkeit.',
@@ -4602,6 +4627,10 @@ export const de = {
     daysLate: '{days} Tage überfällig',
     pickup: 'Abholung {date}',
     tripsCount: 'Transporte ohne Rechnung: {count}',
+    vehicleCheck: 'Fahrzeug prüfen: Abholung stimmte nicht',
+    confirmOk: 'Alles in Ordnung',
+    contactCarrier: 'Transportunternehmen kontaktieren',
+    contactDriver: 'Fahrer kontaktieren',
   },
 
   /* Двухэтапный вход и устройства входа (6.11.2026). */
@@ -4822,6 +4851,7 @@ export const de = {
     'event.order.released': 'Transport {ref} ist zurück in der Börse',
     'event.order.cancelled': 'Transport {ref} wurde storniert — siehe Änderungsprotokoll',
     'event.order.amended': 'Die Route von Transport {ref} hat sich geändert',
+    'event.order.vehicle_mismatch': 'Transport {ref}: Bei der Abholung passte das Fahrzeug nicht zum Auftrag – bitte prüfen',
     'event.order.change_requested': 'Der Fahrer hat für Transport {ref} eine andere Adresse gemeldet',
     'event.order.price_proposed': 'Für Transport {ref} wurde ein neuer Preis vorgeschlagen – nehmen Sie ihn im Änderungsverlauf an oder lehnen Sie ihn ab',
     'event.company.sensitive_changed': '{field, select, IBAN {Das Bankkonto Ihres Unternehmens wurde geändert} CONTACT_EMAIL {Die Kontakt-E-Mail Ihres Unternehmens wurde geändert} BILLING_EMAIL {Die Rechnungs-E-Mail Ihres Unternehmens wurde geändert} OWNER {Der Hauptbenutzer Ihres Unternehmens wurde geändert} other {Die Daten Ihres Unternehmens wurden geändert}} – falls Sie das nicht waren, wenden Sie sich an den Support',

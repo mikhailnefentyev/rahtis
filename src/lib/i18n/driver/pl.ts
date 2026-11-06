@@ -58,6 +58,12 @@ export const pl = {
     ref: 'Numer',
     note: 'Uwaga',
     markDone: 'Oznacz jako wykonane',
+    /* Сверка машины на первой погрузке (6.11.2026). */
+    vehiclePlates: 'Numery rejestracyjne',
+    vehicleTruck: 'Pojazd',
+    vehicleTrailer: 'Naczepa',
+    vehicleChange: 'Zmień',
+    vehicleHint: 'Wpisz numer pojazdu, którym faktycznie jedziesz.',
     stopDone: 'Wykonane',
     damage: 'Uwaga o pojeździe lub ładunku',
     damagePlaceholder: 'Opcjonalnie: uszkodzenia, braki',

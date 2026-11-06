@@ -3358,6 +3358,12 @@ export const fi = {
     ref: 'Viite',
     note: 'Huomio',
     markDone: 'Merkitse tehdyksi',
+    /* Сверка машины на первой погрузке (6.11.2026). */
+    vehiclePlates: 'Rekisterinumerot',
+    vehicleTruck: 'Auto',
+    vehicleTrailer: 'Perävaunu',
+    vehicleChange: 'Muuta',
+    vehicleHint: 'Kirjoita sen ajoneuvon numero, jolla todella ajat.',
     stopDone: 'Tehty',
     damage: 'Huomautus kalustosta tai kuormasta',
     damagePlaceholder: 'Valinnainen: vauriot, puutteet',
@@ -4837,6 +4843,25 @@ export const fi = {
 
   /* Публичная страница правил площадки (/rules). */
   /* «Требует вашего действия» на обзоре кабинета (src/components/domain/inbox). */
+  /* «Та ли машина приехала»: сверка на первой погрузке (6.11.2026). */
+  vehicleCheck: {
+    verified: 'Auto tarkistettu noudossa',
+    mismatch: 'Tarkista auto',
+    lead: 'Noudossa ajoneuvo ei vastannut tilausta. Kuljetusta ei ole pysäytetty – tarkista asia.',
+    plateReported: 'Tilauksessa {expected}, kuljettaja ilmoitti {reported}',
+    trailerReported: 'Perävaunu tilauksessa {expected}, kuljettaja ilmoitti {reported}',
+    gpsFar: 'GPS:n mukaan auto oli {km} km:n päässä noutopaikasta',
+    driverOther: 'Noudon kuittasi kuljetusliikkeen toinen kuljettaja',
+    reasonLabel: 'Miksi kaikki on kunnossa?',
+    reasonPlaceholder: 'Esim. auto vaihdettiin, varmistettu puhelimella',
+    confirm: 'Vahvista, että kunnossa',
+    confirmedShipper: 'Tilaaja vahvisti: {reason}',
+    confirmedCarrier: 'Kuljetusliike vahvisti: {reason}',
+    failed: 'Tallennus ei onnistunut. Yritä uudelleen.',
+    emailSubject: 'Tarkista kuljetuksen {ref} auto',
+    open: 'Avaa tilaus',
+  },
+
   inbox: {
     title: 'Vaatii toimenpiteitäsi',
     empty: 'Mikään ei vaadi huomiotasi.',
@@ -4885,6 +4910,10 @@ export const fi = {
     daysLate: '{days} pv myöhässä',
     pickup: 'Nouto {date}',
     tripsCount: 'Kuljetuksia ilman laskua: {count}',
+    vehicleCheck: 'Tarkista auto: nouto ei täsmännyt',
+    confirmOk: 'Kunnossa',
+    contactCarrier: 'Ota yhteys kuljetusliikkeeseen',
+    contactDriver: 'Ota yhteys kuljettajaan',
   },
 
   /* Двухэтапный вход и устройства входа (6.11.2026). */
@@ -5125,6 +5154,7 @@ export const fi = {
     'event.order.released': 'Kuljetus {ref} palasi tarjolle',
     'event.order.cancelled': 'Kuljetus {ref} on peruutettu — katso muutosloki',
     'event.order.amended': 'Kuljetuksen {ref} reitti muuttui',
+    'event.order.vehicle_mismatch': 'Kuljetus {ref}: noudossa ajoneuvo ei täsmännyt tilaukseen – tarkista',
     'event.order.change_requested': 'Kuljettaja ilmoitti eri osoitteesta kuljetuksessa {ref}',
     'event.order.price_proposed': 'Kuljetukselle {ref} ehdotettiin uutta hintaa – hyväksy tai hylkää se muutoshistoriassa',
     'event.company.sensitive_changed': '{field, select, IBAN {Yrityksenne tilinumero muutettiin} CONTACT_EMAIL {Yrityksenne yhteyssähköposti muutettiin} BILLING_EMAIL {Yrityksenne laskutussähköposti muutettiin} OWNER {Yrityksenne pääkäyttäjä vaihtui} other {Yrityksenne tietoja muutettiin}} – jos ette tehneet muutosta itse, ottakaa yhteyttä tukeen',

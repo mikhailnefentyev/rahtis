@@ -7,6 +7,7 @@ import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n'
 import { createClient } from '@/lib/supabase/server';
 import { flashError, flashFailure } from '@/lib/forms/flash';
 import { refineEtaAfter } from '@/lib/orders/eta';
+import { recordVehicleCheck } from '@/lib/orders/vehicleCheckServer';
 import { operationsLocalToIso } from '@/lib/dates';
 
 /**
@@ -109,6 +110,8 @@ export async function completeStopAction(
    * сразу видели одну и ту же цифру.
    */
   if (!error) await refineEtaAfter(supabase, stopId);
+  /* Первая погрузка из кабинета: сверка по GPS и водителю, номер не подтверждался. */
+  if (!error) await recordVehicleCheck(supabase, stopId);
 
   revalidateOrder(locale);
 

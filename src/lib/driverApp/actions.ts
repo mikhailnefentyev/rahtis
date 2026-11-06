@@ -8,6 +8,7 @@ import { FLASH_COOKIE, flashError } from '@/lib/forms/flash';
 import { isLocale, type Locale, defaultLocale } from '@/lib/i18n';
 import { cancelOrderAction } from '@/lib/orders/matching';
 import { refineEtaAfter } from '@/lib/orders/eta';
+import { recordVehicleCheck } from '@/lib/orders/vehicleCheckServer';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { storeWeighTicket } from '@/lib/weighTicket/store';
@@ -291,6 +292,13 @@ export async function applyDriverEventAction(formData: FormData): Promise<EventR
       result = outcome(error);
       /* Отметка из очереди старше четверти часа пересчёт пропустит сама. */
       if (!error) await refineEtaAfter(supabase, str(formData, 'stop_id'));
+      /* Первая погрузка: та ли машина. Номера подтвердил водитель; повтор из очереди сверку не дублирует. */
+      if (!error) {
+        await recordVehicleCheck(supabase, str(formData, 'stop_id'), {
+          plate: str(formData, 'reported_plate') || null,
+          trailer: str(formData, 'reported_trailer') || null,
+        });
+      }
       break;
     }
     case 'SITE': {

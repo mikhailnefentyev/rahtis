@@ -59,6 +59,17 @@ export default async function DriverTaskPage({
     reason: r.reason,
   }));
 
+  /*
+   * Та ли машина: на первой погрузке водитель подтверждает номера —
+   * тягача (его машина в рейсе) и прицепа (единица заказа или прицеп сцепки).
+   */
+  const checkStopId = task.stops.find((s) => s.role === 'PICKUP')?.id ?? null;
+  const { data: tripTrailers } = running && checkStopId ? await (await createClient()).rpc('driver_trip_trailers') : { data: [] };
+  const plates = {
+    truck: task.plate,
+    trailer: task.trailer_plate ?? (tripTrailers ?? []).find((r) => r.order_id === task.id)?.plate ?? null,
+  };
+
   /* Перегон закрывается фото при сдаче — напоминать о накладной незачем. */
   const hasCmr = isTransfer(task.stops) || photos.some((p) => p.kind === 'CMR');
   const lastStop = task.stops[task.stops.length - 1];
@@ -116,6 +127,7 @@ export default async function DriverTaskPage({
             running={running}
             last={index === task.stops.length - 1}
             hasCmr={hasCmr}
+            plates={stop.id === checkStopId ? plates : null}
           />
         ))}
       </ol>
@@ -165,6 +177,7 @@ async function StopItem({
   running,
   last,
   hasCmr,
+  plates,
 }: {
   task: DriverTask;
   photos: TripPhoto[];
@@ -173,6 +186,8 @@ async function StopItem({
   running: boolean;
   last: boolean;
   hasCmr: boolean;
+  /** Первая погрузка: номера для подтверждения. */
+  plates: { truck: string | null; trailer: string | null } | null;
 }) {
   const { t, m, f } = await getDriverI18n(locale);
   const done = Boolean(stop.completed_at);
@@ -321,7 +336,7 @@ async function StopItem({
                     <CmrReminder orderId={task.id} stopId={stop.id} hasCmr={hasCmr} withScan={!confirmation} />
                   )}
 
-                  <StopDone stopId={stop.id} />
+                  <StopDone stopId={stop.id} plates={plates} />
                 </StopGate>
               </div>
             </StopGate>

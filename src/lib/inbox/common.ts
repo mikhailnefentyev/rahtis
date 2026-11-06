@@ -39,7 +39,7 @@ export async function orderChangeItems(
     .in('order_id', ids)
     .is('acknowledged_at', null);
   /* Чужие правки — как на карточке (OrderAmendments): у старых записей стороны нет, это заказчик. */
-  const [{ data: amendments }, { data: requests }] = await Promise.all([
+  const [{ data: amendments }, { data: requests }, { data: checks }] = await Promise.all([
     (side === 'SHIPPER'
       ? amendmentQuery.eq('actor_side', 'CARRIER')
       : amendmentQuery.or('actor_side.is.null,actor_side.neq.CARRIER')
@@ -52,6 +52,14 @@ export async function orderChangeItems(
       .in('order_id', ids)
       .is('resolved_at', null)
       .order('created_at')
+      .limit(50),
+    /* Сверка машины: расхождение, которое эта сторона ещё не подтвердила. */
+    supabase
+      .from('vehicle_checks')
+      .select('id, order_id, created_at')
+      .in('order_id', ids)
+      .eq('verdict', 'MISMATCH')
+      .is(side === 'SHIPPER' ? 'shipper_confirmed_at' : 'carrier_confirmed_at', null)
       .limit(50),
   ]);
 
@@ -112,6 +120,20 @@ export async function orderChangeItems(
       note: r.address || r.message,
       href: order.href,
       op: { op: 'dismissRequest', requestId: r.id },
+    });
+  }
+  for (const c of checks ?? []) {
+    const order = orders.get(c.order_id);
+    if (!order) continue;
+    items.push({
+      key: `vehicle:${c.id}`,
+      kind: 'vehicleCheck',
+      urgency: 0,
+      at: c.created_at,
+      ref: order.ref,
+      party: order.party,
+      href: order.href,
+      op: { op: 'vehicleCheck', checkId: c.id, side },
     });
   }
   return items;

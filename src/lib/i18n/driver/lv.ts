@@ -58,6 +58,12 @@ export const lv = {
     ref: 'Atsauce',
     note: 'Piezīme',
     markDone: 'Atzīmēt kā izpildītu',
+    /* Сверка машины на первой погрузке (6.11.2026). */
+    vehiclePlates: 'Numura zīmes',
+    vehicleTruck: 'Auto',
+    vehicleTrailer: 'Piekabe',
+    vehicleChange: 'Mainīt',
+    vehicleHint: 'Ievadiet tā transportlīdzekļa numuru, ar kuru tiešām braucat.',
     stopDone: 'Izpildīts',
     damage: 'Piezīme par mašīnu vai kravu',
     damagePlaceholder: 'Pēc izvēles: bojājumi, trūkumi',

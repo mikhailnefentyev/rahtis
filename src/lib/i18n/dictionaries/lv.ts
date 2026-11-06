@@ -3095,6 +3095,12 @@ export const lv = {
     ref: 'Atsauce',
     note: 'Piezīme',
     markDone: 'Atzīmēt kā izpildītu',
+    /* Сверка машины на первой погрузке (6.11.2026). */
+    vehiclePlates: 'Numura zīmes',
+    vehicleTruck: 'Auto',
+    vehicleTrailer: 'Piekabe',
+    vehicleChange: 'Mainīt',
+    vehicleHint: 'Ievadiet tā transportlīdzekļa numuru, ar kuru tiešām braucat.',
     stopDone: 'Izpildīts',
     damage: 'Piezīme par auto vai kravu',
     damagePlaceholder: 'Nav obligāts: bojājumi, iztrūkumi',
@@ -4554,6 +4560,25 @@ export const lv = {
 
   /* Публичная страница правил площадки (/rules). */
   /* «Требует вашего действия» на обзоре кабинета (src/components/domain/inbox). */
+  /* «Та ли машина приехала»: сверка на первой погрузке (6.11.2026). */
+  vehicleCheck: {
+    verified: 'Transportlīdzeklis pārbaudīts iekraušanā',
+    mismatch: 'Pārbaudiet transportlīdzekli',
+    lead: 'Iekraušanā transportlīdzeklis neatbilda pasūtījumam. Pārvadājums nav apturēts — lūdzu, pārbaudiet.',
+    plateReported: 'Pasūtījumā {expected}, vadītājs ievadīja {reported}',
+    trailerReported: 'Piekabe pasūtījumā {expected}, vadītājs ievadīja {reported}',
+    gpsFar: 'Pēc GPS datiem transportlīdzeklis bija {km} km no iekraušanas vietas',
+    driverOther: 'Iekraušanu apstiprināja cits pārvadātāja vadītājs',
+    reasonLabel: 'Kāpēc viss ir kārtībā?',
+    reasonPlaceholder: 'Piem., nomainīts auto, pārbaudīts pa tālruni',
+    confirm: 'Apstiprināt, ka viss kārtībā',
+    confirmedShipper: 'Pasūtītājs apstiprināja: {reason}',
+    confirmedCarrier: 'Pārvadātājs apstiprināja: {reason}',
+    failed: 'Neizdevās saglabāt. Mēģiniet vēlreiz.',
+    emailSubject: 'Pārbaudiet pārvadājuma {ref} transportlīdzekli',
+    open: 'Atvērt pasūtījumu',
+  },
+
   inbox: {
     title: 'Nepieciešama jūsu rīcība',
     empty: 'Nekas neprasa jūsu uzmanību.',
@@ -4602,6 +4627,10 @@ export const lv = {
     daysLate: 'Kavēts {days} d.',
     pickup: 'Iekraušana {date}',
     tripsCount: 'Pārvadājumi bez rēķina: {count}',
+    vehicleCheck: 'Pārbaudiet transportlīdzekli: iekraušana nesakrita',
+    confirmOk: 'Viss kārtībā',
+    contactCarrier: 'Sazināties ar pārvadātāju',
+    contactDriver: 'Sazināties ar vadītāju',
   },
 
   /* Двухэтапный вход и устройства входа (6.11.2026). */
@@ -4822,6 +4851,7 @@ export const lv = {
     'event.order.released': 'Pārvadājums {ref} atkal ir biržā',
     'event.order.cancelled': 'Pārvadājums {ref} ir atcelts — skatiet izmaiņu vēsturi',
     'event.order.amended': 'Pārvadājumam {ref} mainījās maršruts',
+    'event.order.vehicle_mismatch': 'Pārvadājums {ref}: iekraušanā transportlīdzeklis neatbilda pasūtījumam — pārbaudiet',
     'event.order.change_requested': 'Vadītājs ziņoja par citu adresi pasūtījumā {ref}',
     'event.order.price_proposed': 'Pasūtījumam {ref} piedāvāta jauna cena — pieņemiet vai noraidiet to izmaiņu vēsturē',
     'event.company.sensitive_changed': '{field, select, IBAN {Jūsu uzņēmuma bankas konts ir mainīts} CONTACT_EMAIL {Jūsu uzņēmuma kontakta e-pasts ir mainīts} BILLING_EMAIL {Jūsu uzņēmuma e-pasts rēķiniem ir mainīts} OWNER {Jūsu uzņēmuma galvenais lietotājs ir mainīts} other {Jūsu uzņēmuma dati ir mainīti}} — ja tas nebijāt jūs, sazinieties ar klientu atbalstu',

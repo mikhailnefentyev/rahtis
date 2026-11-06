@@ -58,6 +58,12 @@ export const da = {
     ref: 'Reference',
     note: 'Bemærkning',
     markDone: 'Marker som udført',
+    /* Сверка машины на первой погрузке (6.11.2026). */
+    vehiclePlates: 'Nummerplader',
+    vehicleTruck: 'Lastbil',
+    vehicleTrailer: 'Trailer',
+    vehicleChange: 'Ret',
+    vehicleHint: 'Skriv nummeret på det køretøj, du faktisk kører.',
     stopDone: 'Udført',
     damage: 'Bemærkning om bil eller last',
     damagePlaceholder: 'Valgfrit: skader, mangler',

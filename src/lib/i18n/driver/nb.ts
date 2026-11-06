@@ -58,6 +58,12 @@ export const nb = {
     ref: 'Referanse',
     note: 'Merknad',
     markDone: 'Merk som utført',
+    /* Сверка машины на первой погрузке (6.11.2026). */
+    vehiclePlates: 'Registreringsnummer',
+    vehicleTruck: 'Bil',
+    vehicleTrailer: 'Henger',
+    vehicleChange: 'Endre',
+    vehicleHint: 'Skriv nummeret på kjøretøyet du faktisk kjører.',
     stopDone: 'Utført',
     damage: 'Merknad om bil eller last',
     damagePlaceholder: 'Valgfritt: skader, mangler',

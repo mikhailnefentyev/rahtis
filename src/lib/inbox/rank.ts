@@ -16,7 +16,9 @@ export type InboxOp =
   | { op: 'confirmInvoicePaid'; invoiceId: string }
   | { op: 'confirmOrder'; orderId: string }
   | { op: 'markInvoicePaid'; invoiceId: string }
-  | { op: 'driverAckChanges'; orderId: string };
+  | { op: 'driverAckChanges'; orderId: string }
+  /* Сверка машины: «всё в порядке» с причиной или связаться (6.11.2026). */
+  | { op: 'vehicleCheck'; checkId: string; side: 'SHIPPER' | 'CARRIER' };
 
 export type InboxItem = {
   /** Устойчивый ключ — по нему же скрывают («позже»). */

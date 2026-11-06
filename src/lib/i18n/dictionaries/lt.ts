@@ -3096,6 +3096,12 @@ export const lt = {
     ref: 'Užsakymo nr.',
     note: 'Pastaba',
     markDone: 'Pažymėti atliktą',
+    /* Сверка машины на первой погрузке (6.11.2026). */
+    vehiclePlates: 'Valstybiniai numeriai',
+    vehicleTruck: 'Vilkikas',
+    vehicleTrailer: 'Priekaba',
+    vehicleChange: 'Keisti',
+    vehicleHint: 'Įveskite transporto priemonės, kuria iš tikrųjų važiuojate, numerį.',
     stopDone: 'Atlikta',
     damage: 'Pastaba dėl technikos ar krovinio',
     damagePlaceholder: 'Neprivaloma: pažeidimai, trūkumai',
@@ -4556,6 +4562,25 @@ export const lt = {
 
   /* Публичная страница правил площадки (/rules). */
   /* «Требует вашего действия» на обзоре кабинета (src/components/domain/inbox). */
+  /* «Та ли машина приехала»: сверка на первой погрузке (6.11.2026). */
+  vehicleCheck: {
+    verified: 'Transporto priemonė patikrinta pakrovimo metu',
+    mismatch: 'Patikrinkite transporto priemonę',
+    lead: 'Pakrovimo metu transporto priemonė neatitiko užsakymo. Pervežimas nesustabdytas – patikrinkite.',
+    plateReported: 'Užsakyme {expected}, vairuotojas įvedė {reported}',
+    trailerReported: 'Priekaba užsakyme {expected}, vairuotojas įvedė {reported}',
+    gpsFar: 'Pagal GPS transporto priemonė buvo už {km} km nuo pakrovimo vietos',
+    driverOther: 'Pakrovimą patvirtino kitas vežėjo vairuotojas',
+    reasonLabel: 'Kodėl viskas tvarkoje?',
+    reasonPlaceholder: 'Pvz., pakeista mašina, patikrinta telefonu',
+    confirm: 'Patvirtinti, kad viskas tvarkoje',
+    confirmedShipper: 'Užsakovas patvirtino: {reason}',
+    confirmedCarrier: 'Vežėjas patvirtino: {reason}',
+    failed: 'Nepavyko išsaugoti. Bandykite dar kartą.',
+    emailSubject: 'Patikrinkite pervežimo {ref} transporto priemonę',
+    open: 'Atidaryti užsakymą',
+  },
+
   inbox: {
     title: 'Reikia jūsų veiksmo',
     empty: 'Niekas nereikalauja jūsų dėmesio.',
@@ -4604,6 +4629,10 @@ export const lt = {
     daysLate: 'Pradelsta {days} d.',
     pickup: 'Pakrovimas {date}',
     tripsCount: 'Pervežimai be sąskaitos: {count}',
+    vehicleCheck: 'Patikrinkite transporto priemonę: pakrovimas nesutapo',
+    confirmOk: 'Viskas tvarkoje',
+    contactCarrier: 'Susisiekti su vežėju',
+    contactDriver: 'Susisiekti su vairuotoju',
   },
 
   /* Двухэтапный вход и устройства входа (6.11.2026). */
@@ -4824,6 +4853,7 @@ export const lt = {
     'event.order.released': 'Pervežimas {ref} grįžo į biržą',
     'event.order.cancelled': 'Pervežimas {ref} atšauktas – žr. pakeitimų istoriją',
     'event.order.amended': 'Pervežimo {ref} maršrutas pasikeitė',
+    'event.order.vehicle_mismatch': 'Pervežimas {ref}: pakrovimo metu transporto priemonė neatitiko užsakymo – patikrinkite',
     'event.order.change_requested': 'Vairuotojas pranešė apie kitą adresą užsakyme {ref}',
     'event.order.price_proposed': 'Užsakymui {ref} pasiūlyta nauja kaina – priimkite arba atmeskite ją pakeitimų istorijoje',
     'event.company.sensitive_changed': '{field, select, IBAN {Pakeista jūsų įmonės banko sąskaita} CONTACT_EMAIL {Pakeistas jūsų įmonės kontaktinis el. paštas} BILLING_EMAIL {Pakeistas jūsų įmonės el. paštas sąskaitoms} OWNER {Pakeistas jūsų įmonės pagrindinis naudotojas} other {Pakeisti jūsų įmonės duomenys}} – jei tai padarėte ne jūs, kreipkitės į klientų aptarnavimą',

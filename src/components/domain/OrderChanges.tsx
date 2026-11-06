@@ -11,6 +11,8 @@ import {
   proposePriceAction,
   type AmendState,
 } from '@/lib/orders/amend';
+import { reasonLines, type VehicleCheckView } from '@/lib/orders/vehicleCheck';
+import { confirmVehicleCheckAction } from '@/lib/orders/vehicleCheckActions';
 
 /*
  * Правки заказа после назначения (6.11.2026): режим цены и разница
@@ -37,7 +39,7 @@ export type ChangeRequest = {
   createdAt: string;
 };
 
-export type OrderChangesData = { pricing?: OrderPricing; requests: ChangeRequest[] };
+export type OrderChangesData = { pricing?: OrderPricing; requests: ChangeRequest[]; vehicleCheck?: VehicleCheckView };
 
 export type FleetOption = { id: string; label: string };
 
@@ -158,6 +160,88 @@ function ChangeRequestRow({ request }: { request: ChangeRequest }) {
       </div>
       {state.error && <p className="mt-1 text-danger">{state.error}</p>}
     </li>
+  );
+}
+
+/**
+ * Сверка машины на погрузке (6.11.2026). OK — маленькая зелёная отметка;
+ * расхождение — красная «Проверьте машину» с причинами и подтверждением
+ * «всё в порядке» с причиной. «Нет данных» не показывается — только
+ * справочная строка о другом водителе, если она есть.
+ */
+export function VehicleCheckMark({
+  check,
+  side,
+  className,
+}: {
+  check?: VehicleCheckView;
+  side: 'SHIPPER' | 'CARRIER';
+  className?: string;
+}) {
+  const { t, f, locale } = useI18n();
+  if (!check) return null;
+  const tv = t.vehicleCheck;
+  const lines = reasonLines(check.reasons, tv);
+
+  if (check.verdict !== 'MISMATCH') {
+    if (check.verdict === 'NO_DATA' && lines.length === 0) return null;
+    return (
+      <p className={cn('text-xs', className)}>
+        {check.verdict === 'OK' && <span className="font-semibold text-ok">✓ {tv.verified}</span>}
+        {check.verdict === 'OK' && lines.length > 0 && ' · '}
+        {lines.length > 0 && <span className="text-ink-muted">{lines.join(' · ')}</span>}
+      </p>
+    );
+  }
+
+  const mine = side === 'SHIPPER' ? check.shipperConfirmedAt : check.carrierConfirmedAt;
+  const confirmations = [
+    check.shipperConfirmedAt && `${tv.confirmedShipper.replace('{reason}', check.shipperReason ?? '')} · ${f.dateTime(check.shipperConfirmedAt)}`,
+    check.carrierConfirmedAt && `${tv.confirmedCarrier.replace('{reason}', check.carrierReason ?? '')} · ${f.dateTime(check.carrierConfirmedAt)}`,
+  ].filter(Boolean) as string[];
+
+  return (
+    <div
+      id={`vehicle-check-${check.id}`}
+      className={cn(
+        'rounded-control border px-3 py-2 text-xs',
+        mine ? 'border-line bg-sunken' : 'border-danger/40 bg-danger/10',
+        className,
+      )}
+    >
+      <p className={cn('font-semibold', mine ? 'text-ink' : 'text-danger')}>⚠ {tv.mismatch}</p>
+      {!mine && <p className="mt-0.5 text-ink-muted">{tv.lead}</p>}
+      {lines.length > 0 && (
+        <ul className="mt-1 list-disc pl-4 text-ink">
+          {lines.map((line) => (
+            <li key={line}>{line}</li>
+          ))}
+        </ul>
+      )}
+      {confirmations.map((line) => (
+        <p key={line} className="mt-1 text-ink-dim">
+          ✓ {line}
+        </p>
+      ))}
+      {!mine && (
+        <form action={confirmVehicleCheckAction} className="mt-2 flex flex-wrap items-end gap-2">
+          <input type="hidden" name="locale" value={locale} />
+          <input type="hidden" name="check_id" value={check.id} />
+          <Input
+            name="reason"
+            required
+            minLength={3}
+            maxLength={500}
+            placeholder={tv.reasonPlaceholder}
+            aria-label={tv.reasonLabel}
+            className="w-64"
+          />
+          <Button type="submit" size="sm">
+            {tv.confirm}
+          </Button>
+        </form>
+      )}
+    </div>
   );
 }
 

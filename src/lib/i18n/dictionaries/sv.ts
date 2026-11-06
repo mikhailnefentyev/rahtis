@@ -3095,6 +3095,12 @@ export const sv = {
     ref: 'Referens',
     note: 'Notering',
     markDone: 'Markera som klar',
+    /* Сверка машины на первой погрузке (6.11.2026). */
+    vehiclePlates: 'Registreringsnummer',
+    vehicleTruck: 'Bil',
+    vehicleTrailer: 'Släp',
+    vehicleChange: 'Ändra',
+    vehicleHint: 'Skriv numret på fordonet du faktiskt kör.',
     stopDone: 'Klar',
     damage: 'Anmärkning om fordon eller last',
     damagePlaceholder: 'Valfritt: skador, brister',
@@ -4528,6 +4534,25 @@ export const sv = {
 
   /* Публичная страница правил площадки (/rules). */
   /* «Требует вашего действия» на обзоре кабинета (src/components/domain/inbox). */
+  /* «Та ли машина приехала»: сверка на первой погрузке (6.11.2026). */
+  vehicleCheck: {
+    verified: 'Fordonet kontrollerat vid lastning',
+    mismatch: 'Kontrollera fordonet',
+    lead: 'Fordonet vid lastningen stämde inte med ordern. Transporten har inte stoppats – kontrollera.',
+    plateReported: 'Ordern har {expected}, föraren angav {reported}',
+    trailerReported: 'Släpet i ordern {expected}, föraren angav {reported}',
+    gpsFar: 'Enligt GPS var fordonet {km} km från lastplatsen',
+    driverOther: 'Lastningen kvitterades av en annan förare hos åkeriet',
+    reasonLabel: 'Varför är det i ordning?',
+    reasonPlaceholder: 'T.ex. bytt fordon, kontrollerat per telefon',
+    confirm: 'Bekräfta att det är i ordning',
+    confirmedShipper: 'Uppdragsgivaren bekräftade: {reason}',
+    confirmedCarrier: 'Åkeriet bekräftade: {reason}',
+    failed: 'Det gick inte att spara. Försök igen.',
+    emailSubject: 'Kontrollera fordonet för transport {ref}',
+    open: 'Öppna ordern',
+  },
+
   inbox: {
     title: 'Kräver din åtgärd',
     empty: 'Inget kräver din uppmärksamhet.',
@@ -4576,6 +4601,10 @@ export const sv = {
     daysLate: '{days} dagar sen',
     pickup: 'Hämtning {date}',
     tripsCount: 'Transporter utan faktura: {count}',
+    vehicleCheck: 'Kontrollera fordonet: lastningen stämde inte',
+    confirmOk: 'Det är i ordning',
+    contactCarrier: 'Kontakta åkeriet',
+    contactDriver: 'Kontakta föraren',
   },
 
   /* Двухэтапный вход и устройства входа (6.11.2026). */
@@ -4796,6 +4825,7 @@ export const sv = {
     'event.order.released': 'Transport {ref} är tillbaka på börsen',
     'event.order.cancelled': 'Transport {ref} har avbokats – se ändringsloggen',
     'event.order.amended': 'Rutten för transport {ref} har ändrats',
+    'event.order.vehicle_mismatch': 'Transport {ref}: fordonet vid lastningen stämde inte med ordern – kontrollera',
     'event.order.change_requested': 'Föraren har anmält en annan adress för order {ref}',
     'event.order.price_proposed': 'Ett nytt pris har föreslagits för order {ref} – godkänn eller avböj det i ändringshistoriken',
     'event.company.sensitive_changed': '{field, select, IBAN {Ert företags kontonummer har ändrats} CONTACT_EMAIL {Ert företags kontaktmejl har ändrats} BILLING_EMAIL {Ert företags faktureringsmejl har ändrats} OWNER {Ert företags huvudanvändare har ändrats} other {Ert företags uppgifter har ändrats}} – om det inte var du, kontakta supporten',

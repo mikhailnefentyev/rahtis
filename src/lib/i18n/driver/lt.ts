@@ -58,6 +58,12 @@ export const lt = {
     ref: 'Užsakymo nr.',
     note: 'Pastaba',
     markDone: 'Pažymėti atliktą',
+    /* Сверка машины на первой погрузке (6.11.2026). */
+    vehiclePlates: 'Valstybiniai numeriai',
+    vehicleTruck: 'Vilkikas',
+    vehicleTrailer: 'Priekaba',
+    vehicleChange: 'Keisti',
+    vehicleHint: 'Įveskite transporto priemonės, kuria iš tikrųjų važiuojate, numerį.',
     stopDone: 'Atlikta',
     damage: 'Pastaba dėl technikos ar krovinio',
     damagePlaceholder: 'Neprivaloma: pažeidimai, trūkumai',

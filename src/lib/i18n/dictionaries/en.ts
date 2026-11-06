@@ -3245,6 +3245,12 @@ export const en = {
     ref: 'Reference',
     note: 'Note',
     markDone: 'Mark as done',
+    /* Сверка машины на первой погрузке (6.11.2026). */
+    vehiclePlates: 'Plates',
+    vehicleTruck: 'Truck',
+    vehicleTrailer: 'Trailer',
+    vehicleChange: 'Change',
+    vehicleHint: 'Enter the plate of the vehicle you are actually driving.',
     stopDone: 'Done',
     damage: 'Note on the equipment or load',
     damagePlaceholder: 'Optional: damage, shortages',
@@ -4717,6 +4723,25 @@ export const en = {
 
   /* Публичная страница правил площадки (/rules). */
   /* «Требует вашего действия» на обзоре кабинета (src/components/domain/inbox). */
+  /* «Та ли машина приехала»: сверка на первой погрузке (6.11.2026). */
+  vehicleCheck: {
+    verified: 'Truck verified at pickup',
+    mismatch: 'Check the truck',
+    lead: 'The vehicle at pickup did not match the order. The transport has not been stopped — please check.',
+    plateReported: 'Order has {expected}, driver entered {reported}',
+    trailerReported: 'Trailer on the order {expected}, driver entered {reported}',
+    gpsFar: 'GPS put the truck {km} km from the pickup',
+    driverOther: 'Pickup completed by another driver of the carrier',
+    reasonLabel: 'Why is it OK?',
+    reasonPlaceholder: 'E.g. truck changed, checked by phone',
+    confirm: 'Confirm it’s OK',
+    confirmedShipper: 'Customer confirmed: {reason}',
+    confirmedCarrier: 'Carrier confirmed: {reason}',
+    failed: 'Could not save. Try again.',
+    emailSubject: 'Check the truck on order {ref}',
+    open: 'Open the order',
+  },
+
   inbox: {
     title: 'Needs your action',
     empty: 'Nothing needs your attention.',
@@ -4765,6 +4790,10 @@ export const en = {
     daysLate: '{days} days late',
     pickup: 'Pickup {date}',
     tripsCount: 'Transports without an invoice: {count}',
+    vehicleCheck: 'Check the truck: pickup did not match',
+    confirmOk: 'It’s OK',
+    contactCarrier: 'Contact carrier',
+    contactDriver: 'Contact driver',
   },
 
   /* Двухэтапный вход и устройства входа (6.11.2026). */
@@ -4985,6 +5014,7 @@ export const en = {
     'event.order.released': 'Order {ref} is back on the board',
     'event.order.cancelled': 'Order {ref} has been cancelled — see the change log',
     'event.order.amended': 'The route of order {ref} changed',
+    'event.order.vehicle_mismatch': 'Order {ref}: the vehicle at pickup did not match the order — check it',
     'event.order.change_requested': 'The driver reported a different address on order {ref}',
     'event.order.price_proposed': 'A new price was proposed for order {ref} — accept or decline it in the change log',
     'event.company.sensitive_changed': '{field, select, IBAN {Your company’s bank account was changed} CONTACT_EMAIL {Your company’s contact email was changed} BILLING_EMAIL {Your company’s invoicing email was changed} OWNER {Your company’s main user was changed} other {Your company details were changed}} — if this wasn’t you, contact support',
