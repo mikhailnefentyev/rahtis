@@ -5,6 +5,13 @@ import { sv as trainingSv } from './training/sv';
 export const sv = {
   intl: 'sv-SE',
   driverApp: {
+    /* «Требует действия» на главной водителя. */
+    needsTitle: 'Kräver åtgärd',
+    needsRouteChanged: 'Rutten har ändrats',
+    needsRouteCount: '{count} ändringar – markera som sedda',
+    needsShiftOpen: 'Passet står fortfarande öppet',
+    needsShiftSince: 'Började {date}',
+    needsShiftAction: 'Avsluta dagen',
     /* Нижнее меню: короткие формы, принятые в приложениях на этом языке. Заголовки разделов — полные. */
     nav: { tasks: 'Uppdrag', earnings: 'Inkomster', map: 'Karta', inbox: 'Meddelanden', profile: 'Profil' },
     map: 'Karta',

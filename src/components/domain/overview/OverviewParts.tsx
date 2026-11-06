@@ -2,9 +2,7 @@ import Link from 'next/link';
 import { Bars, Card, CardBody, Mono, Plate } from '@/components/ui';
 import { type Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
-import { isTransfer } from '@/lib/orders/transfer';
 import type { OrderStatus, StopRole } from '@/types/db';
-import { TiltCard } from './TiltCard';
 import { getViewerI18n } from '@/lib/i18n/viewer';
 
 type Supabase = Awaited<ReturnType<typeof createClient>>;
@@ -65,90 +63,11 @@ export async function OverviewBody({ locale, role }: { locale: Locale; role: Rol
   const carrier = role === 'CARRIER';
 
   /*
-   * Независимые запросы — разом, а не по очереди (8.10.2026): обзор
-   * собирался из шести последовательных походов в базу.
+   * Независимые запросы — разом. Карточки «Tarvitsee huomiota» ушли
+   * 6.11.2026 в список «Требует вашего действия» (ActionInbox) — там
+   * каждое дело с кнопкой, а не счётчик со ссылкой на раздел.
    */
-  const [trips, weeklyRes, deskRes, offersRes, claimsRes] = await Promise.all([
-    liveTrips(supabase, role),
-    supabase.rpc('weekly_totals', { p_weeks: 8 }),
-    carrier ? supabase.rpc('desk_orders', { p_limit: 100 }) : Promise.resolve({ data: [] as unknown[] }),
-    carrier
-      ? Promise.resolve({ count: 0 })
-      : supabase.from('orders').select('id', { count: 'exact', head: true }).eq('status', 'REQUESTED'),
-    carrier ? Promise.resolve({ data: [] as Array<{ status: string }> }) : supabase.rpc('my_claims'),
-  ]);
-
-  /* ── Что ждёт ─────────────────────────────────────────────────── */
-  let cards: Array<{ href: string; count: number; title: string; text: string; tone: 'warn' | 'danger' | 'live' }>;
-
-  if (carrier) {
-    /* Перегон закрывается фото при сдаче — в «нет накладной» он не попадает. */
-    const running = trips.filter(
-      (o) => o.status === 'IN_PROGRESS' && o.stops.length > 0 && o.stops.every((s) => s.done) && !isTransfer(o.stops),
-    );
-    const { data: cmr } = running.length
-      ? await supabase
-          .from('order_documents')
-          .select('order_id')
-          .eq('kind', 'CMR')
-          .in(
-            'order_id',
-            running.map((o) => o.id),
-          )
-      : { data: [] };
-    const withCmr = new Set((cmr ?? []).map((d) => d.order_id));
-    const desk = deskRes.data;
-
-    cards = [
-      {
-        href: `/${locale}/carrier/desk`,
-        count: trips.filter((o) => o.status === 'AWAIT_DRIVER').length,
-        title: t.overview.awaitTitle,
-        text: t.overview.awaitText,
-        tone: 'warn',
-      },
-      {
-        href: `/${locale}/carrier/desk`,
-        count: running.filter((o) => !withCmr.has(o.id)).length,
-        title: t.overview.noCmrTitle,
-        text: t.overview.noCmrText,
-        tone: 'danger',
-      },
-      {
-        href: `/${locale}/carrier/desk`,
-        count: (desk ?? []).length,
-        title: t.overview.deskTitle,
-        text: t.overview.deskText,
-        tone: 'live',
-      },
-    ];
-  } else {
-    const offers = offersRes.count;
-    const claims = claimsRes.data;
-    cards = [
-      {
-        href: `/${locale}/shipper/orders`,
-        count: offers ?? 0,
-        title: t.overview.offersTitle,
-        text: t.overview.offersText,
-        tone: 'warn',
-      },
-      {
-        href: `/${locale}/shipper/orders`,
-        count: trips.filter((o) => o.status === 'IN_PROGRESS').length,
-        title: t.overview.runningTitle,
-        text: t.overview.runningText,
-        tone: 'live',
-      },
-      {
-        href: `/${locale}/shipper/claims`,
-        count: (claims ?? []).filter((c) => c.status === 'OPEN' || c.status === 'IN_REVIEW').length,
-        title: t.overview.claimsTitle,
-        text: t.overview.claimsText,
-        tone: 'danger',
-      },
-    ];
-  }
+  const [trips, weeklyRes] = await Promise.all([liveTrips(supabase, role), supabase.rpc('weekly_totals', { p_weeks: 8 })]);
 
   /*
    * ── Неделя ──
@@ -168,17 +87,6 @@ export async function OverviewBody({ locale, role }: { locale: Locale; role: Rol
 
   return (
     <>
-      <section aria-label={t.overview.needs} className="flex flex-col gap-2.5">
-        <p className="label-micro rise" style={{ '--i': 1 } as React.CSSProperties}>
-          {t.overview.needs}
-        </p>
-        <div className="grid gap-3.5 sm:grid-cols-3">
-          {cards.map((card, i) => (
-            <TiltCard key={card.title} {...card} action={t.overview.open} index={i + 2} />
-          ))}
-        </div>
-      </section>
-
       <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
         <Card className="rise" style={{ '--i': 5 } as React.CSSProperties}>
           <div className="flex items-center gap-2.5 px-4 pt-4 pb-2">

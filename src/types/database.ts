@@ -2546,6 +2546,27 @@ export type Database = {
           },
         ]
       }
+      inbox_dismissals: {
+        Row: {
+          created_at: string
+          item_key: string
+          until: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          item_key: string
+          until: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          item_key?: string
+          until?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       incidents: {
         Row: {
           fingerprint: string

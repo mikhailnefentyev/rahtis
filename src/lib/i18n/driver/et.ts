@@ -5,6 +5,13 @@ import { et as trainingEt } from './training/et';
 export const et = {
   intl: 'et-EE',
   driverApp: {
+    /* «Требует действия» на главной водителя. */
+    needsTitle: 'Vajab tegevust',
+    needsRouteChanged: 'Marsruuti muudeti',
+    needsRouteCount: 'Muudatusi: {count} – märgi nähtuks',
+    needsShiftOpen: 'Vahetus on jäänud lahti',
+    needsShiftSince: 'Algas {date}',
+    needsShiftAction: 'Lõpeta päev',
     /* Нижнее меню: короткие формы, принятые в приложениях на этом языке. Заголовки разделов — полные. */
     nav: { tasks: 'Ülesanded', earnings: 'Teenistus', map: 'Kaart', inbox: 'Sõnumid', profile: 'Profiil' },
     map: 'Kaart',

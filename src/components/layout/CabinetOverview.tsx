@@ -4,6 +4,9 @@ import { AssistantDock } from '@/components/domain/overview/AssistantDock';
 import { isoWeek, OverviewBody } from '@/components/domain/overview/OverviewParts';
 import { CarrierPresence } from '@/components/domain/CarrierPresence';
 import { OnboardingSteps } from '@/components/domain/OnboardingSteps';
+import { ActionInbox } from '@/components/domain/inbox/ActionInbox';
+import { loadCarrierInbox } from '@/lib/inbox/carrier';
+import { loadShipperInbox } from '@/lib/inbox/shipper';
 import { ReportArchive } from '@/components/domain/ReportArchive';
 import { Badge, buttonClass, Card, CardBody, Kv, Mono } from '@/components/ui';
 import { companyStatusTone } from '@/components/ui/tone';
@@ -92,11 +95,14 @@ export async function CabinetOverview({
   const aside = !steps && (needsRequisites || hint !== null);
 
   const today = todayInHelsinki();
+  /* «Требует вашего действия» — тот же расчёт, что у счётчика в меню (cache на запрос). */
+  const inbox =
+    role === 'CARRIER' ? await loadCarrierInbox(locale) : role === 'SHIPPER' ? await loadShipperInbox(locale) : null;
   const ownAccess =
     role === 'CARRIER' ? (await (await createClient()).rpc('own_orders_access')).data === true : false;
 
   /*
-   * Обзор 8.10.2026: сверху — что ждёт человека, ниже — рейсы в работе и
+   * Обзор 8.10.2026 (6.11.2026 — список «Требует действия»): сверху — что ждёт человека, ниже — рейсы в работе и
    * неделя. Компания и модель работы уехали вниз под раскрывашку: в них
    * заходят раз в месяц, а обзор открывают каждое утро. Помощник —
    * кнопкой в углу, а не карточкой на пол-экрана.
@@ -130,6 +136,8 @@ export async function CabinetOverview({
           )}
         </div>
       </div>
+
+      {inbox && <ActionInbox locale={locale} items={inbox.items} total={inbox.total} />}
 
       {aside && (
         <Card stripe={needsRequisites ? 'warn' : 'neutral'}>

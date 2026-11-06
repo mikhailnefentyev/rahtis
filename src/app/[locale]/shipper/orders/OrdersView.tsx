@@ -1,5 +1,6 @@
 'use client';
 
+import { useHashTarget } from '@/lib/useHashTarget';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { HaulBadge } from '@/components/domain/HaulBadge';
 import { Badge, Button, EmptyState, Input, Mono, Plate } from '@/components/ui';
@@ -143,6 +144,7 @@ export function OrdersView({
   const [template, setTemplate] = useState<{ order: ShipperOrder; stops: OrderStop[] } | null>(null);
   /* Раскрыт один заказ за раз: иначе список снова превращается в ленту карточек. */
   const [opened, setOpened] = useState<string | null>(null);
+  useHashTarget('order', setOpened);
   const [query, setQuery] = useState('');
   const [when, setWhen] = useState<When>('all');
 

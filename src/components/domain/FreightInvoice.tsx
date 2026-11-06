@@ -266,7 +266,7 @@ export function ShipperInvoices({ rows }: { rows: ShipperInvoiceRow[] }) {
               {rows.map((r) => {
                 const status = invoiceStatus({ dueOn: r.dueOn, paidAt: r.paidAt, paidSide: r.paidSide, confirmed: r.confirmed }, today);
                 return (
-                  <tr key={r.id} className="border-b border-line align-top">
+                  <tr key={r.id} id={`invoice-${r.id}`} className="scroll-mt-24 border-b border-line align-top target:bg-warn/10">
                     <td className="py-2 pr-3">{r.carrierName}</td>
                     <td className="py-2 pr-3">
                       <span className="font-mono">{r.number}</span>

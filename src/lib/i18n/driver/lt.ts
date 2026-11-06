@@ -5,6 +5,13 @@ import { lt as trainingLt } from './training/lt';
 export const lt = {
   intl: 'lt-LT',
   driverApp: {
+    /* «Требует действия» на главной водителя. */
+    needsTitle: 'Reikia veiksmo',
+    needsRouteChanged: 'Maršrutas pakeistas',
+    needsRouteCount: 'Pakeitimai: {count} – pažymėkite kaip matytus',
+    needsShiftOpen: 'Pamaina liko neuždaryta',
+    needsShiftSince: 'Pradėta {date}',
+    needsShiftAction: 'Baigti dieną',
     /* Нижнее меню: короткие формы, принятые в приложениях на этом языке. Заголовки разделов — полные. */
     nav: { tasks: 'Užduotys', earnings: 'Uždarbis', map: 'Žemėlapis', inbox: 'Žinutės', profile: 'Profilis' },
     map: 'Žemėlapis',

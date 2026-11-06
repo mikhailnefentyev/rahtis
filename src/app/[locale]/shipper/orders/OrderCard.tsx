@@ -92,6 +92,9 @@ export function OrderCard({
   return (
           <Card
             key={order.id}
+            /* Якорь для «Требует действия» на обзоре. */
+            id={`order-${order.id}`}
+            className="scroll-mt-24"
             stripe={orderStatusTone[order.status]}
             /* Дышит только то, где идёт отсчёт и решение за заказчиком. */
             attention={Boolean(order.deadline_at)}

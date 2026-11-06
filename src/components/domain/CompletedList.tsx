@@ -1,5 +1,6 @@
 'use client';
 
+import { useHashTarget } from '@/lib/useHashTarget';
 import { Fragment, useMemo, useState } from 'react';
 import { OrderRouteMap } from '@/components/domain/RouteMap';
 import { HaulBadge } from '@/components/domain/HaulBadge';
@@ -60,6 +61,7 @@ export function CompletedList({
 }) {
   const { t, m, f } = useI18n();
   const [opened, setOpened] = useState<string | null>(null);
+  useHashTarget('done', setOpened);
 
   const weeks = useMemo(() => {
     const byWeek = new Map<string, CompletedOrder[]>();
@@ -168,7 +170,7 @@ export function CompletedList({
                         <span className="block text-xs text-ink-dim">{t.report_.ownNote}</span>
                       </p>
                     )}
-                    <Card stripe={open ? 'ok' : 'neutral'}>
+                    <Card id={`done-${order.id}`} className="scroll-mt-24" stripe={open ? 'ok' : 'neutral'}>
                       <CardBody>
                         <div className="flex flex-wrap items-start justify-between gap-3">
                           <div className="min-w-0">

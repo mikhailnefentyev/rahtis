@@ -57,6 +57,7 @@ export async function saveFreightInvoiceAction(_previous: InvoiceFormState, form
   }
 
   revalidatePath(`/${locale}/carrier/done`);
+  revalidatePath(`/${locale}/carrier`);
   return { error: null, saved: true };
 }
 
@@ -68,6 +69,7 @@ export async function deleteFreightInvoiceAction(formData: FormData): Promise<vo
   const { error } = await supabase.rpc('delete_freight_invoice', { p_invoice_id: String(formData.get('invoice_id') ?? '') });
   if (error) console.error('счёт перевозчика не удалён:', error.message);
   revalidatePath(`/${locale}/carrier/done`);
+  revalidatePath(`/${locale}/carrier`);
 }
 
 /**
@@ -96,6 +98,9 @@ export async function markFreightPaidAction(_previous: InvoiceFormState, formDat
 
   revalidatePath(`/${locale}/carrier/done`);
   revalidatePath(`/${locale}/shipper/done`);
+  /* Обзоры: пункт «счёт к оплате» уходит из «Требует действия». */
+  revalidatePath(`/${locale}/carrier`);
+  revalidatePath(`/${locale}/shipper`);
   return { error: null, saved: true };
 }
 
@@ -107,6 +112,7 @@ export async function confirmFreightPaidAction(formData: FormData): Promise<void
   const { error } = await supabase.rpc('confirm_freight_invoice_paid', { p_invoice_id: String(formData.get('invoice_id') ?? '') });
   if (error) console.error('оплата не подтверждена:', error.message);
   revalidatePath(`/${locale}/carrier/done`);
+  revalidatePath(`/${locale}/carrier`);
 }
 
 /** Счёт объекта: перевозчик отмечает оплату (дата) или снимает отметку. */

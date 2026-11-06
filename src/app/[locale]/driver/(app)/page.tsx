@@ -11,6 +11,7 @@ import { GaugeIcon } from '../training/icons';
 import { DeclineTask } from './DeclineTask';
 import { PushSetup } from './PushSetup';
 import { ShiftBar } from './ShiftBar';
+import { DriverInbox } from './DriverInbox';
 import { TaskTabs } from './TaskTabs';
 import { createClient } from '@/lib/supabase/server';
 import type { SiteState } from './site/SiteScreen';
@@ -60,8 +61,13 @@ export default async function DriverHome({
       {/* Без уведомлений прямой заказ водитель увидит, только открыв приложение. */}
       <PushSetup compact />
 
+      {/* Что ждёт водителя помимо карточек: правки маршрута, незакрытая смена. Пусто — блока нет. */}
+      <DriverInbox locale={locale} />
+
       {/* Порядок — как идёт день: смена, быстрые действия, работа. */}
-      <ShiftBar shift={driver.shift} />
+      <div id="shift" className="scroll-mt-4">
+        <ShiftBar shift={driver.shift} />
+      </div>
 
       {/*
         Быстрые действия — плитками в один ряд, не выше карточки смены:

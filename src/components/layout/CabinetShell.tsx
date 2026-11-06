@@ -13,6 +13,8 @@ import type { Company, PartyRole } from '@/types/db';
 import { SideNav, TabBar, type NavGroup, type NavItem } from './CabinetNav';
 import { NavIcon } from './NavIcon';
 import { getViewerI18n } from '@/lib/i18n/viewer';
+import { loadCarrierInbox } from '@/lib/inbox/carrier';
+import { loadShipperInbox } from '@/lib/inbox/shipper';
 
 /**
  * Каркас кабинета: боковая панель, строка сверху, содержимое.
@@ -36,13 +38,15 @@ export async function CabinetShell({
   company: Company | null;
   children: React.ReactNode;
 }) {
-  const [{ t }, { data: unread }] = await Promise.all([
+  const [{ t }, { data: unread }, inbox] = await Promise.all([
     getViewerI18n(locale),
     createClient().then((supabase) => supabase.rpc('unread_notifications')),
+    /* Счётчик «Требует действия» у обзора — тот же расчёт, что на странице (cache на запрос). */
+    role === 'CARRIER' ? loadCarrierInbox(locale) : role === 'SHIPPER' ? loadShipperInbox(locale) : Promise.resolve(null),
   ]);
 
   const home = cabinetPath(locale, role);
-  const { groups, primary } = navigation(locale, role, home, t);
+  const { groups, primary } = navigation(locale, role, home, t, inbox?.total ?? 0);
   const count = typeof unread === 'number' ? unread : 0;
 
   const signOut = (
@@ -148,8 +152,9 @@ function navigation(
   role: PartyRole,
   home: string,
   t: Dictionary,
+  actions = 0,
 ): { groups: NavGroup[]; primary: NavItem[] } {
-  const overview: NavItem = { href: home, label: t.nav.overview, icon: 'home' };
+  const overview: NavItem = { href: home, label: t.nav.overview, icon: 'home', count: actions };
 
   if (role === 'CARRIER') {
     const desk: NavItem = { href: `/${locale}/carrier/desk`, label: t.desk.title, short: t.nav.deskShort, icon: 'desk' };

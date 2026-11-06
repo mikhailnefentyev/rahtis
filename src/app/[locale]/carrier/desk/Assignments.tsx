@@ -1,5 +1,6 @@
 'use client';
 
+import { useHashTarget } from '@/lib/useHashTarget';
 import { useMemo, useState } from 'react';
 import { HaulBadge } from '@/components/domain/HaulBadge';
 import { Badge, Card, CardBody, Mono, Plate } from '@/components/ui';
@@ -77,6 +78,7 @@ export function Assignments({
   const { t } = useI18n();
   /* Раскрыт один рейс за раз, как и у заказчика. */
   const [opened, setOpened] = useState<string | null>(null);
+  useHashTarget('trip', setOpened);
 
   const bands = useMemo(() => {
     const confirm: Assignment[] = [];

@@ -94,6 +94,9 @@ export function AssignmentCard({
   return (
         <Card
           key={order.id}
+          /* Якорь для «Требует действия» на обзоре. */
+          id={`trip-${order.id}`}
+          className="scroll-mt-24"
           stripe={orderStatusTone[order.status]}
           /*
            * У перевозчика отсчёт идёт только в AWAIT_DRIVER: заказчик

@@ -5,6 +5,13 @@ import { da as trainingDa } from './training/da';
 export const da = {
   intl: 'da-DK',
   driverApp: {
+    /* «Требует действия» на главной водителя. */
+    needsTitle: 'Kræver handling',
+    needsRouteChanged: 'Ruten er ændret',
+    needsRouteCount: '{count} ændringer – markér som set',
+    needsShiftOpen: 'Vagten står stadig åben',
+    needsShiftSince: 'Startede {date}',
+    needsShiftAction: 'Afslut dagen',
     /* Нижнее меню: короткие формы, принятые в приложениях на этом языке. Заголовки разделов — полные. */
     nav: { tasks: 'Opgaver', earnings: 'Indtjening', map: 'Kort', inbox: 'Beskeder', profile: 'Profil' },
     map: 'Kort',

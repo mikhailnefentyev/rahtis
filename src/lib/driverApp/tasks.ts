@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { cache } from 'react';
 import { createClient } from '@/lib/supabase/server';
 import type { HaulKind } from '@/lib/orders/haul';
 import type { OrderStatus, OrderType, StopRole } from '@/types/db';
@@ -57,11 +58,12 @@ export type DriverTask = {
   stops: DriverStop[];
 };
 
-export async function getDriverTasks(): Promise<DriverTask[]> {
+/* cache: главная и «Требует действия» берут задания одним запросом. */
+export const getDriverTasks = cache(async (): Promise<DriverTask[]> => {
   const supabase = await createClient();
   const { data } = await supabase.rpc('driver_tasks');
   return (data ?? []) as unknown as DriverTask[];
-}
+});
 
 /** Следующая непройденная точка — по ней строится главная кнопка задания. */
 export function nextStop(task: DriverTask): DriverStop | null {

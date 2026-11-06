@@ -5,6 +5,13 @@ import { ru as trainingRu } from './training/ru';
 export const ru = {
   intl: 'ru-RU',
   driverApp: {
+    /* «Требует действия» на главной водителя. */
+    needsTitle: 'Требует действия',
+    needsRouteChanged: 'Маршрут изменён',
+    needsRouteCount: 'Изменений: {count} — отметьте «видел»',
+    needsShiftOpen: 'Смена осталась открытой',
+    needsShiftSince: 'Начата {date}',
+    needsShiftAction: 'Закончить день',
     /* Нижнее меню: короткие формы, принятые в приложениях на этом языке. Заголовки разделов — полные. */
     nav: { tasks: 'Задания', earnings: 'Заработок', map: 'Карта', inbox: 'Сообщения', profile: 'Профиль' },
     map: 'Карта',

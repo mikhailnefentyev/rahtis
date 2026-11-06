@@ -5,6 +5,13 @@ import { nb as trainingNb } from './training/nb';
 export const nb = {
   intl: 'nb-NO',
   driverApp: {
+    /* «Требует действия» на главной водителя. */
+    needsTitle: 'Krever handling',
+    needsRouteChanged: 'Ruten er endret',
+    needsRouteCount: '{count} endringer – merk som sett',
+    needsShiftOpen: 'Skiftet står fortsatt åpent',
+    needsShiftSince: 'Startet {date}',
+    needsShiftAction: 'Avslutt dagen',
     /* Нижнее меню: короткие формы, принятые в приложениях на этом языке. Заголовки разделов — полные. */
     nav: { tasks: 'Oppdrag', earnings: 'Inntjening', map: 'Kart', inbox: 'Meldinger', profile: 'Profil' },
     map: 'Kart',

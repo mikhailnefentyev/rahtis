@@ -5,6 +5,13 @@ import { lv as trainingLv } from './training/lv';
 export const lv = {
   intl: 'lv-LV',
   driverApp: {
+    /* «Требует действия» на главной водителя. */
+    needsTitle: 'Nepieciešama rīcība',
+    needsRouteChanged: 'Maršruts mainīts',
+    needsRouteCount: 'Izmaiņas: {count} – atzīmējiet kā redzētas',
+    needsShiftOpen: 'Maiņa palikusi atvērta',
+    needsShiftSince: 'Sākta {date}',
+    needsShiftAction: 'Beigt dienu',
     /* Нижнее меню: короткие формы, принятые в приложениях на этом языке. Заголовки разделов — полные. */
     nav: { tasks: 'Uzdevumi', earnings: 'Ienākumi', map: 'Karte', inbox: 'Ziņas', profile: 'Profils' },
     map: 'Karte',

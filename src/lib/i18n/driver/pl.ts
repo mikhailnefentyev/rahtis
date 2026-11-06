@@ -5,6 +5,13 @@ import { pl as trainingPl } from './training/pl';
 export const pl = {
   intl: 'pl-PL',
   driverApp: {
+    /* «Требует действия» на главной водителя. */
+    needsTitle: 'Wymaga działania',
+    needsRouteChanged: 'Trasa została zmieniona',
+    needsRouteCount: 'Zmiany: {count} – oznacz jako widziane',
+    needsShiftOpen: 'Zmiana nie została zamknięta',
+    needsShiftSince: 'Rozpoczęta {date}',
+    needsShiftAction: 'Zakończ dzień',
     /* Нижнее меню: короткие формы, принятые в приложениях на этом языке. Заголовки разделов — полные. */
     nav: { tasks: 'Zadania', earnings: 'Zarobki', map: 'Mapa', inbox: 'Skrzynka', profile: 'Profil' },
     map: 'Mapa',

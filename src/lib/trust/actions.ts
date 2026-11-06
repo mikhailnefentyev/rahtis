@@ -52,6 +52,7 @@ export async function reportPaymentAction(_previous: PaymentReportState, formDat
   }
 
   revalidatePath(`/${locale}/carrier/done`);
+  revalidatePath(`/${locale}/carrier`);
   return { error: null, saved: true };
 }
 
