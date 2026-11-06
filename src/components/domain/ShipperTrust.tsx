@@ -3,13 +3,16 @@
 import { useActionState, useState } from 'react';
 import { Button, Input, Select } from '@/components/ui';
 import { cn } from '@/lib/cn';
+import { todayInHelsinki } from '@/lib/dates';
+import { markState } from '@/lib/shipper-docs/model';
 import { useI18n } from '@/lib/i18n/provider';
 import { reportPaymentAction, type PaymentReportState } from '@/lib/trust/actions';
 import { trustTone, type ReportStatus, type ShipperTrust } from '@/lib/trust/model';
 
 /*
  * Сведения о заказчике в режиме «напрямую с перевозчиком» (6.11.2026):
- * возраст, реестр, оплата счетов Aivomaa, отметки перевозчиков, объём.
+ * возраст, реестр, оплата счетов Aivomaa, отметки перевозчиков, объём,
+ * проверенные документы заказчика (только отметка и даты).
  * Справка, не гарантия и не рейтинг — так и подписано (TERMS, раздел 8).
  */
 
@@ -45,6 +48,28 @@ export function ShipperTrustDetails({ trust, className }: { trust: ShipperTrust;
     registryParts.push(trust.registry.prepayment ? tr.prepaymentYes : tr.prepaymentNo);
   }
 
+  /*
+   * Документы заказчика: только одобренные. Нет документа — строки нет
+   * (отсутствие не красный флаг); истёк — нейтрально «устарел».
+   */
+  const sd = t.shipperDocs;
+  const today = todayInHelsinki();
+  const documents = trust.documents.map((d) => {
+    const state = markState(d.validUntil, today);
+    const dates = [
+      d.issuedOn ? sd.issuedShort.replace('{date}', date(d.issuedOn)) : null,
+      state === 'ok' && d.validUntil ? sd.untilShort.replace('{date}', date(d.validUntil)) : null,
+    ].filter(Boolean);
+    return (
+      <span key={d.kind} className={cn('block', state === 'ok' ? 'text-ok' : 'text-ink-muted')}>
+        {state === 'ok' && <span aria-hidden>✓ </span>}
+        {sd[`mark${d.kind}`]}
+        {dates.length > 0 && ` (${dates.join(', ')})`}
+        {state === 'expired' && <span className="text-ink-dim"> · {sd.markExpired}</span>}
+      </span>
+    );
+  });
+
   const rows: { k: string; v: React.ReactNode; tone?: 'bad' | 'warn' }[] = [
     {
       k: tr.age,
@@ -64,6 +89,7 @@ export function ShipperTrustDetails({ trust, className }: { trust: ShipperTrust;
         </>
       ),
     },
+    ...(documents.length > 0 ? [{ k: sd.trustRow, v: <>{documents}</> }] : []),
     {
       k: tr.aivomaa,
       tone: a.overdue > 0 ? 'bad' : a.late > 0 ? 'warn' : undefined,

@@ -1014,6 +1014,7 @@ export type Database = {
           file_name: string
           id: string
           insurer: string | null
+          issued_on: string | null
           is_current: boolean
           kind: Database["public"]["Enums"]["document_kind"]
           limit_currency: string | null
@@ -1039,6 +1040,7 @@ export type Database = {
           file_name: string
           id?: string
           insurer?: string | null
+          issued_on?: string | null
           is_current?: boolean
           kind: Database["public"]["Enums"]["document_kind"]
           limit_currency?: string | null
@@ -1064,6 +1066,7 @@ export type Database = {
           file_name?: string
           id?: string
           insurer?: string | null
+          issued_on?: string | null
           is_current?: boolean
           kind?: Database["public"]["Enums"]["document_kind"]
           limit_currency?: string | null
@@ -6784,6 +6787,9 @@ export type Database = {
           overdue_count: number
           paid_late: number
           paid_on_time: number
+          register_extract_approved: boolean
+          register_extract_issued_on: string
+          register_extract_valid_until: string
           registered_on: string
           registry_checked_at: string
           registry_prepayment: boolean
@@ -6793,6 +6799,15 @@ export type Database = {
           reports_late: number
           reports_on_time: number
           reports_unpaid: number
+          signatory_approved: boolean
+          signatory_issued_on: string
+          signatory_valid_until: string
+          tax_debt_approved: boolean
+          tax_debt_issued_on: string
+          tax_debt_valid_until: string
+          vat_certificate_approved: boolean
+          vat_certificate_issued_on: string
+          vat_certificate_valid_until: string
         }[]
       }
       company_verified: { Args: { p_company_id: string }; Returns: boolean }
@@ -8157,6 +8172,7 @@ export type Database = {
           file_name: string
           id: string
           insurer: string | null
+          issued_on: string | null
           is_current: boolean
           kind: Database["public"]["Enums"]["document_kind"]
           limit_currency: string | null
@@ -8428,6 +8444,9 @@ export type Database = {
           overdue_count: number
           paid_late: number
           paid_on_time: number
+          register_extract_approved: boolean
+          register_extract_issued_on: string
+          register_extract_valid_until: string
           registered_on: string
           registry_checked_at: string
           registry_prepayment: boolean
@@ -8437,6 +8456,15 @@ export type Database = {
           reports_late: number
           reports_on_time: number
           reports_unpaid: number
+          signatory_approved: boolean
+          signatory_issued_on: string
+          signatory_valid_until: string
+          tax_debt_approved: boolean
+          tax_debt_issued_on: string
+          tax_debt_valid_until: string
+          vat_certificate_approved: boolean
+          vat_certificate_issued_on: string
+          vat_certificate_valid_until: string
         }[]
       }
       site_foreman_approve: {
@@ -9062,6 +9090,10 @@ export type Database = {
         | "INSURANCE"
         | "FORWARDER_INSURANCE"
         | "FORWARDER_LICENSE"
+        | "REGISTER_EXTRACT"
+        | "TAX_DEBT_CERTIFICATE"
+        | "VAT_CERTIFICATE"
+        | "SIGNATORY_AUTHORITY"
       driver_certificate_type:
         | "CODE95"
         | "ADR_BASIC"
@@ -9320,6 +9352,10 @@ export const Constants = {
         "INSURANCE",
         "FORWARDER_INSURANCE",
         "FORWARDER_LICENSE",
+        "REGISTER_EXTRACT",
+        "TAX_DEBT_CERTIFICATE",
+        "VAT_CERTIFICATE",
+        "SIGNATORY_AUTHORITY",
       ],
       driver_certificate_type: [
         "CODE95",

@@ -22,6 +22,7 @@ import { AdminDocument } from './AdminDocument';
 import { RegistryBlock } from '../../ApplicationCard';
 import { AdminVerification } from './AdminVerification';
 import { ForwarderReview } from '../../forwarders/ForwarderReview';
+import { SHIPPER_DOC_KINDS } from '@/lib/shipper-docs/model';
 import { AdminPaymentReports } from './AdminPaymentReports';
 
 /**
@@ -91,7 +92,7 @@ export default async function AdminCompanyPage({
 
   /* Экспедитор: роль, полис и лицензия с решениями оператора (6.11.2026). */
   const shipper = company.kind === 'SHIPPER' && !company.client_of;
-  const [{ data: forwarderDocs }, { data: forwarderRows }] = shipper
+  const [{ data: forwarderDocs }, { data: forwarderRows }, { data: shipperDocs }] = shipper
     ? await Promise.all([
         supabase
           .from('company_documents')
@@ -101,8 +102,16 @@ export default async function AdminCompanyPage({
           .order('uploaded_at', { ascending: false })
           .limit(10),
         supabase.rpc('forwarder_status', { p_company_id: id }),
+        /* Выписка, налоги, право подписи (6.11.2026): все версии, новые первыми. */
+        supabase
+          .from('company_documents')
+          .select('*')
+          .eq('company_id', id)
+          .in('kind', [...SHIPPER_DOC_KINDS])
+          .order('uploaded_at', { ascending: false })
+          .limit(20),
       ])
-    : [{ data: [] }, { data: [] }];
+    : [{ data: [] }, { data: [] }, { data: [] }];
   const forwarder = forwarderRows?.[0] ?? null;
 
   const asShipper = Number(counts?.[0]?.as_shipper ?? 0);
@@ -306,6 +315,19 @@ export default async function AdminCompanyPage({
             documents={forwarderDocs ?? []}
             back={`/${locale}/admin/company/${id}`}
             showCompany={false}
+          />
+        </section>
+      )}
+
+      {shipper && (
+        <section className="mt-8">
+          <h2 className="label-micro mb-3">{t.shipperDocs.adminTitle}</h2>
+          <ForwarderReview
+            locale={locale}
+            documents={shipperDocs ?? []}
+            back={`/${locale}/admin/company/${id}`}
+            showCompany={false}
+            kinds="shipper"
           />
         </section>
       )}

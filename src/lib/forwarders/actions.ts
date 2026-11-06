@@ -11,6 +11,7 @@ import { emailLocaleOf } from '@/lib/email/text';
 import { isCurrency } from '@/lib/money/currency';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
+import { isShipperDocKind } from '@/lib/shipper-docs/model';
 import { isForwarderTerms, parseAmountCents } from './policy';
 import { notifyForwarder } from './reminders';
 
@@ -161,7 +162,8 @@ export async function setShipperRoleAction(_previous: ShipperRoleState, formData
 /* ── Оператор ──────────────────────────────────────────────────── */
 
 /**
- * Одобрить или отклонить документ экспедитора. Компании — уведомление в
+ * Одобрить или отклонить документ экспедитора или заказчика (выписка,
+ * налоговые справки, право подписи — 6.11.2026). Компании — уведомление в
  * кабинете и письмо: отказ без причины ничего не объясняет, причину база
  * требует сама.
  */
@@ -202,8 +204,17 @@ async function announceReview(companyId: string, kind: string, decision: 'APPROV
     .maybeSingle();
   if (!company) return;
 
-  const fw = (await getDictionary(emailLocaleOf(company.language))).forwarder;
-  const what = kind === 'FORWARDER_LICENSE' ? fw.licenseTitle : fw.insuranceTitle;
+  const t = await getDictionary(emailLocaleOf(company.language));
+  const fw = t.forwarder;
+  /* Документ заказчика — свой текст: про прямой режим и полис там ни слова. */
+  const shipperDoc = isShipperDocKind(kind);
+  const what = shipperDoc
+    ? t.documents[kind]
+    : kind === 'FORWARDER_LICENSE'
+      ? fw.licenseTitle
+      : fw.insuranceTitle;
+  const approvedBody = shipperDoc ? t.shipperDocs.approvedBody : fw.approvedBody;
+  const rejectedBody = shipperDoc ? t.shipperDocs.rejectedBody : fw.rejectedBody;
 
   await notifyForwarder({
     companyId: company.id,
@@ -211,7 +222,7 @@ async function announceReview(companyId: string, kind: string, decision: 'APPROV
     contactEmail: company.contact_email,
     template: 'forwarder.review',
     title: (decision === 'APPROVED' ? fw.approvedTitle : fw.rejectedTitle).replace('{document}', what),
-    lead: decision === 'APPROVED' ? fw.approvedBody : fw.rejectedBody.replace('{note}', note ?? '—'),
+    lead: decision === 'APPROVED' ? approvedBody : rejectedBody.replace('{note}', note ?? '—'),
     button: fw.openAccount,
   });
 }

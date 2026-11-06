@@ -16,6 +16,8 @@ import { MembersPanel } from './MembersPanel';
 import { WasteRegistrationsForm } from './WasteRegistrationsForm';
 import { CurrencyForm } from './CurrencyForm';
 import { ForwarderPanel } from './ForwarderPanel';
+import { ShipperDocumentsPanel } from './ShipperDocumentsPanel';
+import { SHIPPER_DOC_KINDS } from '@/lib/shipper-docs/model';
 import { loadForwarderState } from '@/lib/forwarders/status';
 import { ShipperTrustDetails } from '@/components/domain/ShipperTrust';
 import { loadCompanyTrust } from '@/lib/trust/status';
@@ -81,6 +83,7 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
    * Заказчик: экспедитор или грузовладелец и полис экспедитора для
    * договора напрямую с перевозчиком (6.11.2026). Последние загруженные
    * документы — в любом статусе: экспедитор должен видеть и отказ.
+   * Там же документы заказчика — выписка, налоги, право подписи.
    */
   const shipper = company && company.kind === 'SHIPPER' && company.status === 'ACTIVE' && !company.client_of ? company : null;
   const [forwarder, forwarderDocs] = shipper
@@ -89,9 +92,9 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
         (await createClient())
           .from('company_documents')
           .select('*')
-          .in('kind', ['FORWARDER_INSURANCE', 'FORWARDER_LICENSE'])
+          .in('kind', ['FORWARDER_INSURANCE', 'FORWARDER_LICENSE', ...SHIPPER_DOC_KINDS])
           .order('uploaded_at', { ascending: false })
-          .limit(20)
+          .limit(40)
           .then((r) => r.data ?? []),
       ])
     : [null, []];
@@ -154,6 +157,14 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
             status={forwarder?.status ?? null}
             insurance={forwarderDocs.find((d) => d.kind === 'FORWARDER_INSURANCE') ?? null}
             license={forwarderDocs.find((d) => d.kind === 'FORWARDER_LICENSE') ?? null}
+          />
+        )}
+
+        {/* Документы заказчика: по желанию, у экспедитора и грузовладельца (6.11.2026). */}
+        {shipper && (
+          <ShipperDocumentsPanel
+            country={shipper.country ?? null}
+            documents={forwarderDocs.filter((d) => (SHIPPER_DOC_KINDS as readonly string[]).includes(d.kind))}
           />
         )}
 

@@ -7,6 +7,8 @@
  * доли, флаги и проверка отметки перевозчика.
  */
 
+import type { ShipperDocKind } from '../shipper-docs/model';
+
 export const REPORT_STATUSES = ['ON_TIME', 'LATE', 'UNPAID'] as const;
 export type ReportStatus = (typeof REPORT_STATUSES)[number];
 
@@ -35,7 +37,43 @@ export type TrustRow = {
   reports_unpaid: number;
   done_12m: number;
   first_done_at: string | null;
+  /* Документы заказчика (20261106150100): до миграции колонок нет. */
+  register_extract_approved?: boolean | null;
+  register_extract_issued_on?: string | null;
+  register_extract_valid_until?: string | null;
+  tax_debt_approved?: boolean | null;
+  tax_debt_issued_on?: string | null;
+  tax_debt_valid_until?: string | null;
+  vat_certificate_approved?: boolean | null;
+  vat_certificate_issued_on?: string | null;
+  vat_certificate_valid_until?: string | null;
+  signatory_approved?: boolean | null;
+  signatory_issued_on?: string | null;
+  signatory_valid_until?: string | null;
 };
+
+/** Проверенный оператором документ заказчика: только даты, без файла и проверяющего. */
+export type DocMark = { kind: ShipperDocKind; issuedOn: string | null; validUntil: string | null };
+
+/* Порядок отметок и префикс колонок сводки. */
+const DOC_COLUMNS: [ShipperDocKind, 'register_extract' | 'tax_debt' | 'vat_certificate' | 'signatory'][] = [
+  ['REGISTER_EXTRACT', 'register_extract'],
+  ['TAX_DEBT_CERTIFICATE', 'tax_debt'],
+  ['VAT_CERTIFICATE', 'vat_certificate'],
+  ['SIGNATORY_AUTHORITY', 'signatory'],
+];
+
+/**
+ * Одобренные документы из строки сводки. Отклонённый и отсутствующий не
+ * показываются вовсе: отсутствие — не красный флаг.
+ */
+export function docMarks(row: TrustRow): DocMark[] {
+  return DOC_COLUMNS.filter(([, p]) => row[`${p}_approved`] === true).map(([kind, p]) => ({
+    kind,
+    issuedOn: row[`${p}_issued_on`] ?? null,
+    validUntil: row[`${p}_valid_until`] ?? null,
+  }));
+}
 
 /** Ситуации реестра, которые красят сводку красным. */
 export type RegistryFlag = 'BANKRUPTCY' | 'RESTRUCTURING' | 'LIQUIDATION' | 'OTHER';
@@ -66,6 +104,8 @@ export type ShipperTrust = {
   reports: { onTime: number; late: number; unpaid: number; total: number };
   done12m: number;
   firstDoneAt: string | null;
+  /** Проверенные документы заказчика (выписка, налоги, право подписи). */
+  documents: DocMark[];
 };
 
 /*
@@ -118,6 +158,7 @@ export function toTrust(row: TrustRow): ShipperTrust {
     reports,
     done12m: row.done_12m ?? 0,
     firstDoneAt: row.first_done_at,
+    documents: docMarks(row),
   };
 }
 

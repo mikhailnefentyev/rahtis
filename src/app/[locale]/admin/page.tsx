@@ -37,6 +37,7 @@ import { DeleteOrderButton } from './DeleteOrderButton';
 import { NoticeForm } from './NoticeForm';
 import { VehicleCard } from './VehicleCard';
 import { ForwarderReview, type ReviewDocument } from './forwarders/ForwarderReview';
+import { SHIPPER_DOC_KINDS } from '@/lib/shipper-docs/model';
 
 /**
  * Пульт оператора: очередь заявок и последние решения.
@@ -159,6 +160,15 @@ export default async function AdminPage({
     .order('uploaded_at', { ascending: true })
     .limit(50);
 
+  /* Документы заказчиков на проверке: выписка, налоги, право подписи (6.11.2026). */
+  const { data: shipperDocs } = await supabase
+    .from('company_documents')
+    .select('*, company:companies(name, country, business_id)')
+    .in('kind', [...SHIPPER_DOC_KINDS])
+    .eq('review_status', 'PENDING')
+    .order('uploaded_at', { ascending: true })
+    .limit(50);
+
   /* Заявки по приглашению перевозчика: оператор видит, кто позвал. */
   const queueIds = (pending ?? []).map((c) => c.id);
   const { data: invites } = queueIds.length
@@ -263,6 +273,20 @@ export default async function AdminPage({
             locale={locale}
             documents={(forwarderDocs ?? []) as ReviewDocument[]}
             back={`/${locale}/admin`}
+          />
+        </section>
+      )}
+
+      {(shipperDocs ?? []).length > 0 && (
+        <section className="mt-10">
+          <h2 className="mb-4 border-b border-line pb-2 text-[13px] font-semibold tracking-tight text-ink-faint">
+            {t.shipperDocs.adminTitle} · {f.number((shipperDocs ?? []).length)}
+          </h2>
+          <ForwarderReview
+            locale={locale}
+            documents={(shipperDocs ?? []) as ReviewDocument[]}
+            back={`/${locale}/admin`}
+            kinds="shipper"
           />
         </section>
       )}

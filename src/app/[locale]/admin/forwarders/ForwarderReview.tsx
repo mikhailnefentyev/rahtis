@@ -6,6 +6,8 @@ import { belowThreshold, type ReviewStatus } from '@/lib/forwarders/policy';
 import { getI18n, type Locale } from '@/lib/i18n';
 import { asCurrency, convertCents } from '@/lib/money/currency';
 import { latestFxRates } from '@/lib/money/fx';
+import { freshUntil, isShipperDocKind } from '@/lib/shipper-docs/model';
+import { createClient } from '@/lib/supabase/server';
 import type { CompanyDocument } from '@/types/db';
 import { OpenDocumentButton } from './OpenDocumentButton';
 
@@ -24,39 +26,62 @@ export type ReviewDocument = CompanyDocument & { company?: { name: string; count
  *
  * Отклонить можно и одобренный прежде документ — так приостанавливается
  * прямой режим (TERMS, раздел 8).
+ *
+ * Тот же список — для документов заказчика (kinds = 'shipper', 6.11.2026):
+ * выписка, налоговые справки, право подписи. У них свой чек-лист на
+ * каждом документе, даты выдачи и срока отметки и имя загрузившего —
+ * для сверки с доверенностью.
  */
 export async function ForwarderReview({
   locale,
   documents,
   back,
   showCompany = true,
+  kinds = 'forwarder',
 }: {
   locale: Locale;
   documents: ReviewDocument[];
   /** Куда вернуться после решения: пульт или карточка компании. */
   back: string;
   showCompany?: boolean;
+  /** Полисы экспедитора (общий чек-лист сверху) или документы заказчика. */
+  kinds?: 'forwarder' | 'shipper';
 }) {
   const [{ t, f }, rates] = await Promise.all([getI18n(locale), latestFxRates()]);
   const fw = t.forwarder;
+  const sd = t.shipperDocs;
+  const day = (d: string) => f.date(`${d}T12:00:00Z`);
+
+  /* Кто загрузил: право подписи сверяется с именем заявителя. */
+  const uploaderIds = [
+    ...new Set(
+      documents.filter((d) => isShipperDocKind(d.kind)).map((d) => d.uploaded_by).filter((id): id is string => Boolean(id)),
+    ),
+  ];
+  const { data: uploaders } = uploaderIds.length
+    ? await (await createClient()).from('profiles').select('id, full_name').in('id', uploaderIds)
+    : { data: [] };
+  const uploaderName = new Map((uploaders ?? []).map((p) => [p.id, p.full_name]));
 
   return (
     <div className="flex flex-col gap-3">
-      <details className="rounded-control border border-line px-3 py-2 text-[13px]">
-        <summary className="cursor-pointer font-semibold">{fw.adminChecklistTitle}</summary>
-        <ol className="mt-2 list-decimal space-y-1 pl-5 leading-relaxed text-ink-muted">
-          <li>{fw.check1}</li>
-          <li>{fw.check2}</li>
-          <li>{fw.check3}</li>
-          <li>{fw.check4}</li>
-          <li>{fw.check5}</li>
-          <li>{fw.check6}</li>
-          <li>{fw.check7}</li>
-        </ol>
-      </details>
+      {kinds === 'forwarder' && (
+        <details className="rounded-control border border-line px-3 py-2 text-[13px]">
+          <summary className="cursor-pointer font-semibold">{fw.adminChecklistTitle}</summary>
+          <ol className="mt-2 list-decimal space-y-1 pl-5 leading-relaxed text-ink-muted">
+            <li>{fw.check1}</li>
+            <li>{fw.check2}</li>
+            <li>{fw.check3}</li>
+            <li>{fw.check4}</li>
+            <li>{fw.check5}</li>
+            <li>{fw.check6}</li>
+            <li>{fw.check7}</li>
+          </ol>
+        </details>
+      )}
 
       {documents.length === 0 ? (
-        <EmptyState title={fw.adminEmpty} />
+        <EmptyState title={kinds === 'shipper' ? sd.adminEmpty : fw.adminEmpty} />
       ) : (
         documents.map((doc) => {
           const review = (doc.review_status ?? 'PENDING') as ReviewStatus;
@@ -67,6 +92,7 @@ export async function ForwarderReview({
             doc.limit_year_cents != null ? convertCents(doc.limit_year_cents, currency, 'EUR', rates) : null;
           const insurance = doc.kind === 'FORWARDER_INSURANCE';
           const low = insurance && belowThreshold(eventEur, yearEur);
+          const markUntil = isShipperDocKind(doc.kind) ? freshUntil(doc.kind, doc.issued_on, doc.valid_until) : null;
 
           return (
             <Card key={doc.id} stripe={reviewTone[review]}>
@@ -138,10 +164,27 @@ export async function ForwarderReview({
                     </div>
                   </dl>
                 )}
-                {!insurance && (
+                {!insurance && !isShipperDocKind(doc.kind) && (
                   <p className="text-ink-muted">
                     {fw.validUntil}: {doc.valid_until ? f.date(`${doc.valid_until}T12:00:00Z`) : t.documents.perpetual}
                   </p>
+                )}
+                {isShipperDocKind(doc.kind) && (
+                  <ShipperDocFacts
+                    labels={{
+                      issuedOn: sd.issuedOn,
+                      validUntil: sd.validUntil,
+                      markUntil: sd.markUntil,
+                      uploadedBy: sd.uploadedBy,
+                      perpetual: t.documents.perpetual,
+                      checklist: sd.checklistTitle,
+                    }}
+                    issuedOn={doc.issued_on ? day(doc.issued_on) : null}
+                    validUntil={doc.valid_until ? day(doc.valid_until) : null}
+                    markUntil={markUntil ? day(markUntil) : null}
+                    uploader={doc.uploaded_by ? (uploaderName.get(doc.uploaded_by) ?? null) : null}
+                    checks={sd[`checks${doc.kind}`]}
+                  />
                 )}
 
                 {low && <p className="font-semibold text-danger">{fw.belowThreshold}</p>}
@@ -179,5 +222,50 @@ export async function ForwarderReview({
         })
       )}
     </div>
+  );
+}
+
+/** Даты, загрузивший и чек-лист документа заказчика. */
+function ShipperDocFacts({
+  labels,
+  issuedOn,
+  validUntil,
+  markUntil,
+  uploader,
+  checks,
+}: {
+  labels: { issuedOn: string; validUntil: string; markUntil: string; uploadedBy: string; perpetual: string; checklist: string };
+  issuedOn: string | null;
+  validUntil: string | null;
+  markUntil: string | null;
+  uploader: string | null;
+  checks: readonly string[];
+}) {
+  return (
+    <>
+      <dl className="grid gap-x-4 gap-y-1 sm:grid-cols-3">
+        <div>
+          <dt className="label-micro">{labels.issuedOn}</dt>
+          <dd>{issuedOn ?? '—'}</dd>
+        </div>
+        <div>
+          <dt className="label-micro">{labels.validUntil}</dt>
+          <dd>{validUntil ?? '—'}</dd>
+        </div>
+        <div>
+          <dt className="label-micro">{labels.markUntil}</dt>
+          <dd>{markUntil ?? labels.perpetual}</dd>
+        </div>
+      </dl>
+      {uploader && <p className="text-ink-muted">{labels.uploadedBy.replace('{name}', uploader)}</p>}
+      <details className="rounded-control border border-line px-3 py-2">
+        <summary className="cursor-pointer font-semibold">{labels.checklist}</summary>
+        <ol className="mt-2 list-decimal space-y-1 pl-5 leading-relaxed text-ink-muted">
+          {checks.map((c) => (
+            <li key={c}>{c}</li>
+          ))}
+        </ol>
+      </details>
+    </>
   );
 }

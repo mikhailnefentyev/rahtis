@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { onTimePct, parseReport, registryFlag, toTrust, trustTone } from './model.ts';
+import { docMarks, onTimePct, parseReport, registryFlag, toTrust, trustTone } from './model.ts';
 
 const row = {
   company_id: 'c1',
@@ -59,4 +59,24 @@ test('отметка перевозчика: разбор формы', () => {
   assert.deepEqual(parseReport('LATE', '-3', ''), { ok: false, error: 'days' });
   assert.deepEqual(parseReport('PAID', '', ''), { ok: false, error: 'status' });
   assert.deepEqual(parseReport('UNPAID', '', 'x'.repeat(301)), { ok: false, error: 'note' });
+});
+
+test('сведения о заказчике: отметки о документах', () => {
+  assert.deepEqual(toTrust(row).documents, []);
+  assert.deepEqual(
+    docMarks({
+      ...row,
+      register_extract_approved: true,
+      register_extract_issued_on: '2026-11-01',
+      register_extract_valid_until: '2027-11-01',
+      tax_debt_approved: false,
+      signatory_approved: true,
+      signatory_issued_on: null,
+      signatory_valid_until: null,
+    }),
+    [
+      { kind: 'REGISTER_EXTRACT', issuedOn: '2026-11-01', validUntil: '2027-11-01' },
+      { kind: 'SIGNATORY_AUTHORITY', issuedOn: null, validUntil: null },
+    ],
+  );
 });
