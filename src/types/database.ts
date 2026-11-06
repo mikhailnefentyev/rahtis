@@ -61,7 +61,15 @@ export type Database = {
           hotel_limit_cents?: number | null
           rule_set_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "allowance_rates_rule_set_id_fkey"
+            columns: ["rule_set_id"]
+            isOneToOne: false
+            referencedRelation: "allowance_rule_sets"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       allowance_rule_sets: {
         Row: {
@@ -115,7 +123,22 @@ export type Database = {
           updated_at?: string
           valid_from?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "allowance_rule_sets_based_on_fkey"
+            columns: ["based_on"]
+            isOneToOne: false
+            referencedRelation: "allowance_rule_sets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "allowance_rule_sets_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       api_idempotency: {
         Row: {
@@ -1316,7 +1339,15 @@ export type Database = {
           updated_at?: string
           updated_by?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "driver_day_facts_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       driver_invites: {
         Row: {
@@ -1460,6 +1491,13 @@ export type Database = {
           valid_from?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "driver_pay_profiles_allowance_rule_set_id_fkey"
+            columns: ["allowance_rule_set_id"]
+            isOneToOne: false
+            referencedRelation: "allowance_rule_sets"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "driver_pay_profiles_driver_id_fkey"
             columns: ["driver_id"]
@@ -4286,16 +4324,11 @@ export type Database = {
       }
       tes_rule_sets: {
         Row: {
-          base_monthly_cents: number | null
-          country: string
-          holiday_bps: number
-          legality: string
-          min_monthly_cents: number | null
-          source_note: string | null
-          template_code: string | null
           base_hourly_cents: number
+          base_monthly_cents: number | null
           based_on: string | null
           company_id: string | null
+          country: string
           created_at: string
           created_by: string | null
           currency: string
@@ -4304,8 +4337,11 @@ export type Database = {
           evening_cents: number
           evening_end: string | null
           evening_start: string | null
+          holiday_bps: number
           holidays_as_sunday: boolean
           id: string
+          legality: string
+          min_monthly_cents: number | null
           min_paid_minutes: number
           name: string
           night_bps: number
@@ -4320,21 +4356,18 @@ export type Database = {
           period_anchor: string
           period_regular_minutes: number
           saturday_bps: number
+          source_note: string | null
           sunday_bps: number
+          template_code: string | null
           updated_at: string
           valid_from: string
         }
         Insert: {
-          base_monthly_cents?: number | null
-          country?: string
-          holiday_bps?: number
-          legality?: string
-          min_monthly_cents?: number | null
-          source_note?: string | null
-          template_code?: string | null
           base_hourly_cents: number
+          base_monthly_cents?: number | null
           based_on?: string | null
           company_id?: string | null
+          country?: string
           created_at?: string
           created_by?: string | null
           currency: string
@@ -4343,8 +4376,11 @@ export type Database = {
           evening_cents?: number
           evening_end?: string | null
           evening_start?: string | null
+          holiday_bps?: number
           holidays_as_sunday?: boolean
           id?: string
+          legality?: string
+          min_monthly_cents?: number | null
           min_paid_minutes?: number
           name: string
           night_bps?: number
@@ -4359,21 +4395,18 @@ export type Database = {
           period_anchor?: string
           period_regular_minutes?: number
           saturday_bps?: number
+          source_note?: string | null
           sunday_bps?: number
+          template_code?: string | null
           updated_at?: string
           valid_from: string
         }
         Update: {
-          base_monthly_cents?: number | null
-          country?: string
-          holiday_bps?: number
-          legality?: string
-          min_monthly_cents?: number | null
-          source_note?: string | null
-          template_code?: string | null
           base_hourly_cents?: number
+          base_monthly_cents?: number | null
           based_on?: string | null
           company_id?: string | null
+          country?: string
           created_at?: string
           created_by?: string | null
           currency?: string
@@ -4382,8 +4415,11 @@ export type Database = {
           evening_cents?: number
           evening_end?: string | null
           evening_start?: string | null
+          holiday_bps?: number
           holidays_as_sunday?: boolean
           id?: string
+          legality?: string
+          min_monthly_cents?: number | null
           min_paid_minutes?: number
           name?: string
           night_bps?: number
@@ -4398,7 +4434,9 @@ export type Database = {
           period_anchor?: string
           period_regular_minutes?: number
           saturday_bps?: number
+          source_note?: string | null
           sunday_bps?: number
+          template_code?: string | null
           updated_at?: string
           valid_from?: string
         }
@@ -6731,7 +6769,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      copy_allowance_template: { Args: { p_template_id: string }; Returns: string }
+      copy_allowance_template: {
+        Args: { p_template_id: string }
+        Returns: string
+      }
       copy_tes_template: { Args: { p_template_id: string }; Returns: string }
       create_driver_invite: {
         Args: { p_driver_id: string }
@@ -7012,6 +7053,15 @@ export type Database = {
         }
         Returns: undefined
       }
+      driver_day_countries: {
+        Args: { p_from: string; p_to: string }
+        Returns: {
+          countries: string[]
+          day: string
+          driver_id: string
+          last_country: string
+        }[]
+      }
       driver_earnings: { Args: { p_from: string; p_to: string }; Returns: Json }
       driver_fuel_add: {
         Args: { p_at?: string; p_data: Json; p_event_id?: string }
@@ -7129,15 +7179,6 @@ export type Database = {
           kind: Database["public"]["Enums"]["trailer_kind"]
           order_id: string
           plate: string
-        }[]
-      }
-      driver_day_countries: {
-        Args: { p_from: string; p_to: string }
-        Returns: {
-          countries: string[]
-          day: string
-          driver_id: string
-          last_country: string
         }[]
       }
       driver_trips: {
