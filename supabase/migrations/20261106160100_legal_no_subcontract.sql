@@ -447,8 +447,8 @@ begin
 
   /* Счета и оплата: перевозчику напрямую; старые заказы — 9.7. */
   perform pg_temp.put(v_doc, array[9, 1],
-    'Kuljetusliike laskuttaa tilaajaa omissa nimissään valmistuneesta kuljetuksesta ja sovituista lisistä. Laskun voi muodostaa ja lähettää palvelun kautta kuljetusliikkeen nimissä, jolloin se näkyy tilaajalle myös palvelussa. Aivomaa Oy ei ole laskun osapuoli.',
-    'The carrier invoices the shipper in its own name for a completed transport and the agreed extras. The invoice may be produced and sent through the service in the carrier''s name, in which case the shipper also sees it in the service. Aivomaa Oy is not a party to the invoice.');
+    'Kuljetusliike laskuttaa tilaajaa omissa nimissään valmistuneesta kuljetuksesta ja sovituista lisistä. Työmaakuljetuksista kuljetusliike voi muodostaa ja lähettää laskun palvelun kautta omissa nimissään. Aivomaa Oy ei ole laskun osapuoli.',
+    'The carrier invoices the shipper in its own name for a completed transport and the agreed extras. For worksite transports the carrier may produce and send the invoice through the service in its own name. Aivomaa Oy is not a party to the invoice.');
 
   perform pg_temp.put(v_doc, array[9, 2],
     'Tilaaja maksaa laskun suoraan kuljetusliikkeen ilmoittamalle tilille osapuolten sopimien maksuehtojen mukaisesti. Viivästyksen seuraukset määräytyvät osapuolten sopimuksen ja korkolain mukaan.',
