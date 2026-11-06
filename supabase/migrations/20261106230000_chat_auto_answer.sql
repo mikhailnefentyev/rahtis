@@ -146,6 +146,8 @@ begin
     where m.order_id = p_order_id and m.author_user_id = v_uid and m.quick_code like 'ASK\_%'
       and m.created_at > now() - interval '5 minutes'
   ) then
+    /* Код ASK_ ставит только эта функция (проверка в триггере ниже). */
+    perform set_config('rahtis.ask_status', '1', true);
     insert into public.order_messages (order_id, carrier_company_id, author_role, author_user_id, body, quick_code)
     values (p_order_id, v_order.assigned_company_id, v_role, v_uid, v_body, 'ASK_' || p_kind);
   end if;
@@ -221,3 +223,34 @@ $$;
 revoke all on function public.post_order_auto_answer(uuid, uuid, text, text, text, jsonb, boolean)
   from public, anon, authenticated;
 grant execute on function public.post_order_auto_answer(uuid, uuid, text, text, text, jsonb, boolean) to service_role;
+
+
+-- ── Коды ASK_ и автор AUTO — только из служебных функций ───────────
+
+/*
+ * Вопрос-кнопка и автоответ не будят диспетчера (app.on_order_message).
+ * Без этой проверки любое сообщение с quick_code «ASK_…» через
+ * post_order_message тоже прошло бы молча.
+ */
+create or replace function app.order_message_reserved_guard()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  if coalesce(new.quick_code, '') like 'ASK\_%' and current_setting('rahtis.ask_status', true) is distinct from '1' then
+    raise exception 'Код вопроса зарезервирован.' using errcode = '22023';
+  end if;
+  if new.author_role = 'AUTO' and coalesce(auth.role(), '') <> 'service_role' then
+    raise exception 'Автоответ пишет только RAHTIS.' using errcode = '42501';
+  end if;
+  return new;
+end;
+$$;
+
+revoke all on function app.order_message_reserved_guard() from public, anon, authenticated;
+
+create trigger order_messages_reserved_guard
+  before insert or update of quick_code, author_role on public.order_messages
+  for each row execute function app.order_message_reserved_guard();
