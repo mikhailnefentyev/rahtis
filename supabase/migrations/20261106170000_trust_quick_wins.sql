@@ -769,8 +769,19 @@ begin
   ) then
     raise exception 'Нет доступа к заказу.' using errcode = '42501';
   end if;
-  if v_order.created_at < now() - interval '15 minutes' then
-    raise exception 'Режим цены задаётся при создании заказа.' using errcode = '55000';
+  /*
+   * Режим цены — только пока заказ не взят: черновик или на столе без
+   * назначения и без откликов. Дальше цена меняется через предложение
+   * (propose_price / respond_price_proposal) и пишется в историю.
+   */
+  if v_order.status not in ('DRAFT', 'OPEN')
+     or v_order.assigned_company_id is not null
+     or exists (select 1 from public.order_offers f where f.order_id = p_order_id) then
+    raise exception 'Режим цены меняется только до назначения перевозчика.' using errcode = '55000';
+  end if;
+
+  if p_mode = 'PER_KM' and (v_order.distance_km is null or v_order.distance_km <= 0) then
+    raise exception 'Для цены за км нужен пробег маршрута.' using errcode = '22023';
   end if;
 
   if p_mode = 'PER_KM' then
@@ -1327,6 +1338,25 @@ begin
   end if;
 
   select o.shipper_company_id into v_shipper from public.orders o where o.id = p_order_id;
+
+  /*
+   * Напоминания уходят от RAHTIS — адрес только заказчика: его почта для
+   * счетов, общая почта или почта его пользователей. Иначе через сервис
+   * можно было бы слать письма кому угодно.
+   */
+  if v_send_to = '' then
+    select lower(coalesce(nullif(btrim(c.billing_email), ''), c.contact_email)) into v_send_to
+    from public.companies c where c.id = v_shipper;
+  elsif not exists (
+    select 1 from public.companies c
+    where c.id = v_shipper and v_send_to in (lower(btrim(coalesce(c.billing_email, ''))), lower(btrim(coalesce(c.contact_email, ''))))
+  ) and not exists (
+    select 1 from public.profiles pr join auth.users u on u.id = pr.id
+    where pr.company_id = v_shipper and lower(u.email) = v_send_to
+  ) then
+    raise exception 'Напоминания отправляются только на адрес заказчика (почта для счетов, общая почта или почта его пользователей).'
+      using errcode = '22023';
+  end if;
 
   insert into public.freight_invoices (
     order_id, carrier_company_id, shipper_company_id, number, amount_cents, currency,
@@ -1997,3 +2027,153 @@ $$;
 
 revoke all on function public.company_trust(uuid) from public, anon;
 grant execute on function public.company_trust(uuid) to authenticated, service_role;
+
+
+-- ── Режим цены — в момент создания заказа ──────────────────────────
+
+/*
+ * Цена «за км» задаётся при создании (как валюта — через настройку
+ * транзакции из обёрток create_order / carrier_create_own_order), а не
+ * отдельным вызовом после: свой рейс и прямой заказ к тому моменту уже
+ * назначены, и менять режим цены после назначения нельзя.
+ */
+create or replace function app.order_pricing_fill()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $fn$
+declare
+  v_mode text := nullif(current_setting('rahtis.order_pricing', true), '');
+  v_per_km integer := nullif(current_setting('rahtis.order_per_km', true), '')::integer;
+begin
+  if v_mode = 'PER_KM' and v_per_km between 1 and 100000 and coalesce(new.distance_km, 0) > 0 then
+    new.pricing_mode := 'PER_KM';
+    new.rate_per_km_cents := v_per_km;
+    new.rate_cents := greatest(1, round(v_per_km::numeric * new.distance_km))::integer;
+  end if;
+  return new;
+end;
+$fn$;
+
+revoke all on function app.order_pricing_fill() from public, anon, authenticated;
+
+create trigger orders_pricing_fill
+  before insert on public.orders
+  for each row execute function app.order_pricing_fill();
+
+create or replace function public.create_order(p_order jsonb, p_stops jsonb, p_publish boolean default true)
+returns public.orders
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_company public.companies;
+begin
+  select * into v_company
+  from public.companies
+  where id = (select app.current_company_id());
+
+  if v_company.id is null or v_company.kind <> 'SHIPPER' then
+    raise exception 'Публиковать заказы может только заказчик.' using errcode = '42501';
+  end if;
+
+  if v_company.status <> 'ACTIVE' then
+    raise exception 'Заполните реквизиты компании — без них заказ не опубликовать.'
+      using errcode = '55000';
+  end if;
+
+  perform set_config('rahtis.order_currency', coalesce(nullif(upper(p_order ->> 'currency'), ''), ''), true);
+  perform set_config('rahtis.order_pricing', coalesce(nullif(upper(p_order ->> 'pricing_mode'), ''), ''), true);
+  perform set_config('rahtis.order_per_km', coalesce(nullif(p_order ->> 'rate_per_km_cents', ''), ''), true);
+  return app.create_order_for(v_company.id, p_order, p_stops, p_publish, null);
+end;
+$$;
+
+create or replace function public.carrier_create_own_order(
+  p_client jsonb, p_order jsonb, p_stops jsonb, p_vehicle_id uuid
+)
+returns public.orders
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_carrier public.companies;
+  v_client uuid;
+  v_name text := app.clean_client_name(p_client->>'name');
+  v_bid text := upper(btrim(coalesce(p_client->>'business_id', '')));
+  v_email text := lower(btrim(coalesce(p_client->>'email', '')));
+  v_country text;
+begin
+  if (select app.current_party_role()) is distinct from 'CARRIER' then
+    raise exception 'Свой рейс заводит перевозчик.' using errcode = '42501';
+  end if;
+
+  select * into v_carrier from public.companies where id = (select app.current_company_id());
+
+  if v_carrier.id is null or v_carrier.status <> 'ACTIVE' or v_carrier.frozen_at is not null then
+    raise exception 'Свои рейсы — у активной компании.' using errcode = '55000';
+  end if;
+
+  perform app.assert_legal_current(v_carrier.id);
+
+  if not app.own_orders_allowed(v_carrier.id) then
+    raise exception 'Свои рейсы — по подписке.' using errcode = '55010';
+  end if;
+
+  if p_vehicle_id is null then
+    raise exception 'Выберите машину.' using errcode = '22023';
+  end if;
+
+  if not app.client_email_ok(v_email) then
+    raise exception 'Почта клиента указана неверно.' using errcode = '22023';
+  end if;
+
+  v_country := upper(btrim(coalesce(nullif(p_client->>'country', ''), v_carrier.country)));
+  if v_country !~ '^[A-Z]{2}$' or not app.business_id_ok(v_country, v_bid) then
+    raise exception 'Номер клиента указан неверно.' using errcode = '22023';
+  end if;
+
+  if nullif(p_client->>'id', '') is not null then
+    select id into v_client from public.companies
+    where id = (p_client->>'id')::uuid and client_of = v_carrier.id;
+    if v_client is null then
+      raise exception 'Клиент не найден.' using errcode = 'P0002';
+    end if;
+  else
+    if length(v_name) < 2 or length(v_name) > 200 then
+      raise exception 'Укажите имя клиента.' using errcode = '22023';
+    end if;
+
+    select id into v_client from public.companies
+    where client_of = v_carrier.id
+      and ((v_bid <> '' and country = v_country and business_id = v_bid)
+        or (v_bid = '' and lower(app.clean_client_name(name)) = lower(v_name)))
+    order by created_at
+    limit 1;
+
+    if v_client is null then
+      /* Клиент тестового перевозчика — тестовый: контуры не смешиваются. */
+      insert into public.companies (kind, status, name, country, business_id, contact_email, language, client_of, is_test)
+      values ('SHIPPER', 'APPROVED', v_name, v_country, v_bid, v_email, v_carrier.language, v_carrier.id, v_carrier.is_test)
+      returning id into v_client;
+    end if;
+  end if;
+
+  /* Новая почта клиента заменяет старую: ссылку отправляют на неё. */
+  if v_email <> '' then
+    update public.companies set contact_email = v_email where id = v_client and contact_email <> v_email;
+  end if;
+
+  perform set_config('rahtis.order_currency', coalesce(nullif(upper(p_order ->> 'currency'), ''), v_carrier.currency), true);
+  perform set_config('rahtis.order_pricing', coalesce(nullif(upper(p_order ->> 'pricing_mode'), ''), ''), true);
+  perform set_config('rahtis.order_per_km', coalesce(nullif(p_order ->> 'rate_per_km_cents', ''), ''), true);
+
+  return app.create_order_for(
+    v_client,
+    p_order - 'direct_vehicle_id' - 'group_vehicle_ids' - 'group_minutes' - 'desk_contract',
+    p_stops, true, p_vehicle_id);
+end;
+$$;

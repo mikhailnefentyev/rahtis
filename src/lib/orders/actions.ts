@@ -295,12 +295,6 @@ function readCurrency(formData: FormData): { currency: Currency | null } | { err
 
 type OrderPricingInput = { mode: 'FIXED' | 'PER_KM'; perKmCents: number | null };
 
-/** Режим цены — сразу после создания (create_order его не знает); фиксированная — умолчание базы. */
-async function applyPricing(supabase: Awaited<ReturnType<typeof createClient>>, orderId: string, pricing: OrderPricingInput) {
-  if (pricing.mode !== 'PER_KM') return;
-  const { error } = await supabase.rpc('set_order_pricing', { p_order_id: orderId, p_mode: 'PER_KM', p_per_km_cents: pricing.perKmCents });
-  if (error) console.error('режим цены не записан:', error.message);
-}
 
 function readOrderForm(
   formData: FormData,
@@ -375,6 +369,9 @@ function readOrderForm(
     stops,
     pricing,
     order: {
+      /* Режим цены — в самом заказе: база ставит его при создании (orders_pricing_fill). */
+      pricing_mode: pricing.mode,
+      rate_per_km_cents: pricing.perKmCents,
       order_type: str(formData, 'order_type'),
       /*
        * Чем выполняется рейс — вторая ось рядом с типом рейса. Значение
@@ -497,7 +494,6 @@ export async function publishOrderAction(
   if (error || !data) {
     return { error: explainPublish(t, error?.code, error?.message), ref: null };
   }
-  await applyPricing(supabase, data.id, form.pricing);
 
   /*
    * Рассылка письмами. Уведомления в кабинеты перевозчиков уже написаны
@@ -582,7 +578,6 @@ export async function ownOrderAction(_previous: PublishState, formData: FormData
     return { error: explainPublish(t, error?.code, error?.message), ref: null };
   }
 
-  await applyPricing(supabase, data.id, form.pricing);
 
   /* Прицеп рейса из формы — та же проверка, что в карточке рейса (carrier_set_trip_trailer). */
   const trailerId = str(formData, 'own_trailer_id');
