@@ -8,6 +8,7 @@ import { markState } from '@/lib/shipper-docs/model';
 import { useI18n } from '@/lib/i18n/provider';
 import { reportPaymentAction, type PaymentReportState } from '@/lib/trust/actions';
 import { trustTone, type ReportStatus, type ShipperTrust } from '@/lib/trust/model';
+import { BankChangedNote } from './BankChanged';
 
 /*
  * Сведения о заказчике в режиме «напрямую с перевозчиком» (6.11.2026):
@@ -26,6 +27,8 @@ export function ShipperTrustDetails({ trust, className }: { trust: ShipperTrust;
   const date = (d: string) => f.date(day(d));
   const bad = trust.registry.flags.filter((x) => x !== 'OTHER');
   const a = trust.aivomaa;
+  const inv = trust.invoices;
+  const tw = t.trustWins;
   const r = trust.reports;
 
   /*
@@ -109,6 +112,29 @@ export function ShipperTrustDetails({ trust, className }: { trust: ShipperTrust;
             ),
           },
         ]),
+    /* Счета перевозчиков (напоминания об оплате, с 6.11.2026); нет счетов — строки нет. */
+    ...(inv.count === 0
+      ? []
+      : [
+          {
+            k: tw.trustInvoices,
+            tone: inv.overdue > 0 ? ('bad' as const) : inv.late > 0 ? ('warn' as const) : undefined,
+            v: (
+              <>
+                {inv.onTimePct === null
+                  ? tw.trustInvoicesOpen.replace('{count}', String(inv.count))
+                  : tw.trustInvoicesLine.replace('{pct}', String(inv.onTimePct)).replace('{count}', String(inv.count))}
+                {inv.late > 0 &&
+                  ` · ${tw.trustInvoicesLate.replace('{count}', String(inv.late)).replace('{days}', String(inv.avgDaysLate ?? 0))}`}
+                {inv.overdue > 0 && ` · ${tw.trustInvoicesOverdue.replace('{count}', String(inv.overdue))}`}
+              </>
+            ),
+          },
+        ]),
+    /* Смена счёта заказчика за 30 дней: только «N дней назад». */
+    ...(trust.bankChangedAt
+      ? [{ k: tw.trustBank, tone: 'warn' as const, v: <BankChangedNote at={trust.bankChangedAt} hint /> }]
+      : []),
     {
       k: tr.reports,
       tone: r.unpaid > 0 ? 'bad' : r.late > 0 ? 'warn' : undefined,

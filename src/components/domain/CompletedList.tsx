@@ -9,6 +9,7 @@ import { RateTrip } from '@/components/domain/RateTrip';
 import { DocumentList } from '@/components/domain/TripDocuments';
 import { FileClaim } from '@/components/domain/claims/ClaimActions';
 import { PaymentReportControl, type PaymentReportValue } from '@/components/domain/ShipperTrust';
+import { FreightInvoiceBadge, FreightInvoiceControl, type FreightInvoiceTarget } from '@/components/domain/FreightInvoice';
 import {
   Badge,
   Button,
@@ -41,7 +42,10 @@ export function CompletedList({
   orders,
   canClaim = false,
   paymentReports = {},
+  freightInvoices = {},
 }: {
+  /** Счета перевозчика по прямым рейсам: id → счёт и подстановки (напоминания об оплате). */
+  freightInvoices?: Record<string, FreightInvoiceTarget>;
   /** Прямые рейсы, где перевозчик отмечает оплату заказчиком: id → отметка (решает база). */
   paymentReports?: Record<string, PaymentReportValue>;
   orders: CompletedOrder[];
@@ -176,6 +180,7 @@ export function CompletedList({
                                 containerFeet={order.container_feet}
                               />
                               <Mono className="text-xs text-ink-dim">{order.ref}</Mono>
+                              <FreightInvoiceBadge target={freightInvoices[order.id]} />
                               {order.shipper_ref && (
                                 <Mono className="text-xs text-ink-dim">{order.shipper_ref}</Mono>
                               )}
@@ -299,6 +304,9 @@ export function CompletedList({
                                 <>
                                   <p className="mt-4 border-t border-line pt-4 text-xs text-ink-muted">{t.claims.directDeal}</p>
                                   {/* Оплата прямого рейса: отметка перевозчика для сводки о заказчике. */}
+                                  {freightInvoices[order.id] && (
+                                    <FreightInvoiceControl orderId={order.id} target={freightInvoices[order.id]} className="mt-3" />
+                                  )}
                                   {paymentReports[order.id] && (
                                     <PaymentReportControl orderId={order.id} value={paymentReports[order.id]} className="mt-3" />
                                   )}

@@ -9,6 +9,8 @@ import { createClient } from '@/lib/supabase/server';
 import type { OrderAmendment, OrderStop, ShipperOffer, TripDocument } from '@/types/db';
 import { OrdersView } from './OrdersView';
 import { getViewerI18n } from '@/lib/i18n/viewer';
+import { bankChangeMarks } from '@/lib/trust/sensitive';
+import { loadOrderChanges } from '@/lib/orders/changes';
 
 export async function generateMetadata({
   params,
@@ -46,7 +48,7 @@ export default async function OrdersPage({
   const { data: orders } = await supabase
     .from('orders')
     .select(
-      'id,ref,shipper_ref,order_type,haul_kind,container_feet,ldm,semi_features,tipper_config,site_pricing,site_rate_cents,planned_qty,material_code,planned_volume_m3,required_body,required_loading,trailer,trailer_plate,distance_km,rate_cents,comment,status,published_at,deadline_at,created_at,distance_source,distance_auto_km,route_geometry,route_bounds,dispatch_mode,contract_party,group_until,group_released_at,group_vehicle_ids,desk_contract,currency',
+      'id,ref,shipper_ref,order_type,haul_kind,container_feet,ldm,semi_features,tipper_config,site_pricing,site_rate_cents,planned_qty,material_code,planned_volume_m3,required_body,required_loading,trailer,trailer_plate,distance_km,rate_cents,comment,status,published_at,deadline_at,created_at,distance_source,distance_auto_km,route_geometry,route_bounds,dispatch_mode,contract_party,group_until,group_released_at,group_vehicle_ids,desk_contract,currency,pricing_mode,rate_per_km_cents',
     )
     .eq('shipper_company_id', company.id)
     /*
@@ -150,11 +152,17 @@ export default async function OrdersPage({
   const scoreByOffer = new Map((scores ?? []).map((s) => [s.offer_id, s]));
   const verifiedOffers = new Set((badges ?? []).filter((b) => b.verified).map((b) => b.offer_id));
   const badgeByVehicle = new Map((knownBadges ?? []).map((b) => [b.vehicle_id, b]));
-  const knownVehicles = (known ?? []).map((v) => ({
-    ...v,
-    verified: badgeByVehicle.get(v.vehicle_id)?.verified ?? false,
-    carrier_id: badgeByVehicle.get(v.vehicle_id)?.carrier_id ?? null,
-  }));
+  /* Перевозчики, известные заказчику по имени (прямые машины): отметка о смене счёта за 30 дней. */
+  const bankMarks = await bankChangeMarks((knownBadges ?? []).map((b) => b.carrier_id));
+  const knownVehicles = (known ?? []).map((v) => {
+    const carrierId = badgeByVehicle.get(v.vehicle_id)?.carrier_id ?? null;
+    return {
+      ...v,
+      verified: badgeByVehicle.get(v.vehicle_id)?.verified ?? false,
+      carrier_id: carrierId,
+      carrier_bank_changed_at: carrierId ? (bankMarks[carrierId] ?? null) : null,
+    };
+  });
 
   const offersByOrder: Record<string, ShipperOffer[]> = {};
   for (const offer of (offers ?? []) as ShipperOffer[]) {
@@ -171,6 +179,9 @@ export default async function OrdersPage({
    * Заказчику он показывает, что он сам поменял после старта, — карточка
    * идущего рейса иначе не отличается от той, которую взял перевозчик.
    */
+  /* Режим цены, пробег по маршруту и сообщения водителя — для правок после публикации. */
+  const changesByOrder = await loadOrderChanges(orderIds);
+
   const amendmentsByOrder: Record<string, OrderAmendment[]> = {};
   for (const row of amendmentRows ?? []) {
     (amendmentsByOrder[row.order_id] ??= []).push(row);
@@ -203,6 +214,7 @@ export default async function OrdersPage({
           offersByOrder={offersByOrder}
           tripTrailerByOrder={Object.fromEntries((tripTrailerRows ?? []).map((r) => [r.order_id, r.plate]))}
           amendmentsByOrder={amendmentsByOrder}
+          changesByOrder={changesByOrder}
           knownVehicles={knownVehicles}
           documentsByOrder={documentsByOrder}
           startNew={startNew}

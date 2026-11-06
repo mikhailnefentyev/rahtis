@@ -7,6 +7,7 @@ import { orderStatusTone } from '@/components/ui/tone';
 import { useI18n } from '@/lib/i18n/provider';
 import { cityOfStop, routeEnds } from '@/lib/orders/route';
 import { AssignmentCard, type TripTrailerOption } from './AssignmentCard';
+import type { FleetOption, OrderChangesData } from '@/components/domain/OrderChanges';
 import type { ForwarderPolicyInfo } from '@/components/domain/ForwarderDirect';
 import type { ShipperTrust } from '@/lib/trust/model';
 import type { Database } from '@/types/database';
@@ -51,7 +52,13 @@ export function Assignments({
   trustByOrder = {},
   tripTrailers = {},
   trailers = [],
+  changesByOrder = {},
+  fleet,
 }: {
+  /** Цена и пробег, сообщения водителя (правки после назначения). */
+  changesByOrder?: Record<string, OrderChangesData>;
+  /** Машины и водители для смены на рейсе. */
+  fleet?: { vehicles: FleetOption[]; drivers: FleetOption[] };
   /** Полис экспедитора-заказчика у рейсов по прямому договору: справка. */
   policyByOrder?: Record<string, ForwarderPolicyInfo>;
   /** Сведения об оплате заказчика у рейсов по прямому договору: справка. */
@@ -103,6 +110,8 @@ export function Assignments({
         currency={currencyByOrder[order.id] ?? 'EUR'}
         forwarderPolicy={policyByOrder[order.id]}
         shipperTrust={trustByOrder[order.id]}
+        changes={changesByOrder[order.id]}
+        fleet={fleet}
       />
     );
   }

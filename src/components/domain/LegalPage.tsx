@@ -37,6 +37,14 @@ export async function LegalPage({ locale: raw, kind }: { locale: string; kind: K
       </nav>
 
       <h1 className="text-2xl font-semibold tracking-tight">{t.legal[kind]}</h1>
+      {/* Правила простым языком — рядом с условиями (P2B). */}
+      {kind === 'TERMS' && (
+        <p className="mt-2 text-[13px]">
+          <Link href={`/${locale}/rules`} className="text-accent hover:underline">
+            {t.trustWins.rulesLink} →
+          </Link>
+        </p>
+      )}
 
       <LegalDocument locale={locale} kind={kind} />
 

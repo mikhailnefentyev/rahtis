@@ -261,16 +261,19 @@ async function refreshRoute(ctx: ApiContext, orderId: string) {
   const country = stops.find((s) => s.role === 'PICKUP')?.country ?? 'FI';
   try {
     const route = await tomtom.route(points, truckProfile(country));
-    await act(ctx, 'store_route', {
-      order_id: orderId,
-      route: {
-        geometry: route.geometry,
-        bounds: route.bounds,
-        fingerprint: routeFingerprint(points, country),
-        km: String(metresToKm(route.distanceM)),
-        legs: route.legs,
-      },
-    });
+    const stored = {
+      geometry: route.geometry,
+      bounds: route.bounds,
+      fingerprint: routeFingerprint(points, country),
+      km: String(metresToKm(route.distanceM)),
+      legs: route.legs,
+    };
+    await act(ctx, 'store_route', { order_id: orderId, route: stored });
+    /*
+     * Километры от ключа пользователя база не принимает (цена за км,
+     * 6.11.2026): права проверены вызовом выше, пробег пишет служебный ключ.
+     */
+    await admin.rpc('store_route', { p_order_id: orderId, p_route: stored });
   } catch (cause) {
     /* Маршрут не посчитался — правка остаётся, как в кабинете; пробег поправит пересчёт. */
     if (cause instanceof ApiError) throw cause;

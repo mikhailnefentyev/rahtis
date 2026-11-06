@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { Badge, Button, Card, CardBody, EmptyState, Mono, Plate } from '@/components/ui';
 import { VerifiedBadge } from '@/components/domain/VerifiedBadge';
+import { BankChangedNote } from '@/components/domain/BankChanged';
+import { bankChangeMarks } from '@/lib/trust/sensitive';
 import { requireRole } from '@/lib/auth/guard';
 import { EURO_LABEL } from '@/lib/fleet/labels';
 import { isLocale, type Locale } from '@/lib/i18n';
@@ -44,11 +46,17 @@ export default async function KnownVehiclesPage({ params }: { params: Promise<{ 
     supabase.rpc('verification_badges_for_known'),
   ]);
   const badgeByVehicle = new Map((badges ?? []).map((b) => [b.vehicle_id, b]));
-  const vehicles: KnownVehicle[] = (data ?? []).map((v) => ({
-    ...v,
-    verified: badgeByVehicle.get(v.vehicle_id)?.verified ?? false,
-    carrier_id: badgeByVehicle.get(v.vehicle_id)?.carrier_id ?? null,
-  }));
+  /* Смена счёта перевозчика за 30 дней — отметка у реквизитов (только срок). */
+  const bankMarks = await bankChangeMarks((badges ?? []).map((b) => b.carrier_id));
+  const vehicles: KnownVehicle[] = (data ?? []).map((v) => {
+    const carrierId = badgeByVehicle.get(v.vehicle_id)?.carrier_id ?? null;
+    return {
+      ...v,
+      verified: badgeByVehicle.get(v.vehicle_id)?.verified ?? false,
+      carrier_id: carrierId,
+      carrier_bank_changed_at: carrierId ? (bankMarks[carrierId] ?? null) : null,
+    };
+  });
   const pool = vehicles.filter((v) => v.in_pool);
   const others = vehicles.filter((v) => !v.in_pool);
 
@@ -151,6 +159,7 @@ async function VehicleList({
                         )}
                       </p>
                     )}
+                    <BankChangedNote at={v.carrier_bank_changed_at} hint className="text-[12px]" />
                     <p className="text-[12px] text-ink-dim">{t.known.directBillingHint}</p>
                     {v.carrier_id && (
                       <Link href={`/${locale}/shipper/carriers/${v.carrier_id}`} className="text-[12px] text-accent hover:underline">

@@ -8,6 +8,7 @@ import { EURO_LABEL } from '@/lib/fleet/labels';
 import { cancelOrderAction, chooseOfferAction } from '@/lib/orders/matching';
 import { useI18n } from '@/lib/i18n/provider';
 import { VerifiedBadge } from '@/components/domain/VerifiedBadge';
+import { BankChangedNote } from '@/components/domain/BankChanged';
 import type { ShipperOffer, ShipperOrder } from '@/types/db';
 
 /**
@@ -154,6 +155,8 @@ export type DirectCarrier = {
   iban: string | null;
   /** Для ссылки на пакет tilaajavastuu: перевозчик заказчику известен. */
   id?: string | null;
+  /** Смена IBAN перевозчика за 30 дней — отметка без значений. */
+  bankChangedAt?: string | null;
 };
 
 export function AssignedCarrier({
@@ -180,6 +183,7 @@ export function AssignedCarrier({
           <div className="mb-2.5 flex flex-col gap-1">
             <Kv k="Y-tunnus" v={direct.businessId} />
             {direct.iban && <Kv k={t.known.carrierAccount} v={direct.iban} />}
+            <BankChangedNote at={direct.bankChangedAt} hint className="text-xs" />
             <p className="text-xs text-ink-muted">{t.known.directBillingHint}</p>
             {direct.id && (
               <Link href={`/${locale}/shipper/carriers/${direct.id}`} className="text-xs text-accent hover:underline">

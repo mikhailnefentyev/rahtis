@@ -297,6 +297,11 @@ function OrderFormInner({
   const [rate, setRate] = useState(
     draft ? draft.rate : origin?.rate_cents ? String(origin.rate_cents / 100).replace('.', ',') : '',
   );
+  /* Цена: фиксированная или за км (итог = ставка × пробег, при правке маршрута пересчитывается). */
+  const [pricing, setPricing] = useState<'FIXED' | 'PER_KM'>(origin?.pricing_mode === 'PER_KM' ? 'PER_KM' : 'FIXED');
+  const [perKmRate, setPerKmRate] = useState(
+    origin?.rate_per_km_cents ? String(origin.rate_per_km_cents / 100).replace('.', ',') : '',
+  );
 
   /*
    * Валюта цены. С 6.11.2026 каждый заказ — договор напрямую с
@@ -498,6 +503,11 @@ function OrderFormInner({
   /* Ставка за километр — подсказка при вводе, в базе не хранится. */
   const km = Number.parseInt(distance.replace(/\D/g, ''), 10);
   const euros = Number.parseFloat(rate.replace(/\s/g, '').replace(',', '.'));
+  const perKmEuros = Number.parseFloat(perKmRate.replace(/\s/g, '').replace(',', '.'));
+  const perKmTotal =
+    pricing === 'PER_KM' && Number.isFinite(km) && km > 0 && Number.isFinite(perKmEuros) && perKmEuros > 0
+      ? Math.max(1, Math.round(perKmEuros * 100 * km))
+      : null;
   const perKm =
     Number.isFinite(km) && km > 0 && Number.isFinite(euros) && euros > 0
       ? `${f.moneyPerKm(Math.round(euros * 100), km, orderCurrency)}/${t.unit.km}`
@@ -1161,6 +1171,44 @@ function OrderFormInner({
               </p>
             )}
 
+            {!tipper && (
+              <Field label={t.trustWins.pricingMode}>
+                {(p) => (
+                  <Select {...p} name="pricing_mode" value={pricing} onChange={(e) => setPricing(e.target.value === 'PER_KM' ? 'PER_KM' : 'FIXED')}>
+                    <option value="FIXED">{t.trustWins.pricingFIXED}</option>
+                    <option value="PER_KM">{t.trustWins.pricingPER_KM}</option>
+                  </Select>
+                )}
+              </Field>
+            )}
+            {!tipper && pricing === 'PER_KM' ? (
+              <Field
+                label={f.label(t.trustWins.ratePerKm, orderCurrency)}
+                hint={
+                  perKmTotal !== null
+                    ? t.trustWins.perKmTotal.replace('{amount}', f.money(perKmTotal, orderCurrency)).replace('{km}', String(km))
+                    : t.trustWins.pricingPerKmNote
+                }
+                required
+                className={ai('rate')}
+              >
+                {(p) => (
+                  <>
+                    <InputMono
+                      {...p}
+                      name="rate_per_km"
+                      required
+                      inputMode="decimal"
+                      value={perKmRate}
+                      onChange={(e) => setPerKmRate(e.target.value)}
+                      placeholder="1,80"
+                    />
+                    {/* Итог для проверок формы; сервер считает его заново. */}
+                    <input type="hidden" name="rate" value={perKmTotal !== null ? String(perKmTotal / 100) : ''} />
+                  </>
+                )}
+              </Field>
+            ) : (
             <Field
               label={`${own ? t.own.rateLabel : f.label(t.orderForm.rate, orderCurrency)} ${perKm}`}
               hint={own ? t.own.rateHint : `${t.money.addVat} ${t.orderForm.feeHint}`}
@@ -1181,6 +1229,7 @@ function OrderFormInner({
                 />
               )}
             </Field>
+            )}
             <input type="hidden" name="currency" value={orderCurrency} />
             <Field label={t.orderForm.currency}>
               {(p) => (

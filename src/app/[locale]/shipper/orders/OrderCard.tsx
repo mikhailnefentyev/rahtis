@@ -22,6 +22,7 @@ import type {
   TripDocument,
 } from '@/types/db';
 import { AmendPanel } from './AmendPanel';
+import { ChangeRequests, PricingNote, type OrderChangesData } from '@/components/domain/OrderChanges';
 import { OrderChat } from '@/components/domain/OrderChat';
 import { DirectWaiting, SendDirect } from './DirectPanel';
 import { AssignedCarrier, OffersPanel } from './OffersPanel';
@@ -43,10 +44,13 @@ export function OrderCard({
   stops,
   offers,
   amendments,
+  changes,
   knownVehicles,
   documents,
   onRepeat,
 }: {
+  /** Режим цены, пробег по маршруту, сообщения водителя. */
+  changes?: OrderChangesData;
   /** Номер прицепа назначенного рейса. */
   tripTrailer?: string | null;
   /** Снимки и документы идущего рейса. */
@@ -75,6 +79,7 @@ export function OrderCard({
         businessId: directVehicle.carrier_business_id,
         iban: directVehicle.carrier_iban || null,
         id: directVehicle.carrier_id ?? null,
+        bankChangedAt: directVehicle.carrier_bank_changed_at ?? null,
       }
     : null;
   /*
@@ -255,13 +260,24 @@ export function OrderCard({
                     * над ним: сначала человек смотрит, что едет сейчас,
                     * и только потом решает, что менять.
                     */}
-                  {order.status === 'IN_PROGRESS' && (
-                    <AmendPanel
-                      orderId={order.id}
-                      stops={stops}
-                      haulKind={order.haul_kind}
-                      className="mt-4"
-                    />
+                  {/* С 6.11.2026 — на любой стадии до закрытия; каждая правка в журнале. */}
+                  {['OPEN', 'REQUESTED', 'AWAIT_DRIVER', 'IN_PROGRESS'].includes(order.status) && (
+                    <>
+                      <ChangeRequests requests={changes?.requests ?? []} className="mt-4" />
+                      <AmendPanel
+                        orderId={order.id}
+                        stops={stops}
+                        haulKind={order.haul_kind}
+                        pricingMode={order.pricing_mode === 'PER_KM' ? 'PER_KM' : 'FIXED'}
+                        className="mt-4"
+                      />
+                      <PricingNote
+                        orderId={order.id}
+                        pricing={changes?.pricing}
+                        canPropose={order.status === 'AWAIT_DRIVER' || order.status === 'IN_PROGRESS'}
+                        className="mt-3"
+                      />
+                    </>
                   )}
 
                   <OrderAmendments
@@ -269,6 +285,8 @@ export function OrderCard({
                     orderId={order.id}
                     haulKind={order.haul_kind}
                     currency={order.currency}
+                    side="SHIPPER"
+                    canAcknowledge={order.status === 'AWAIT_DRIVER' || order.status === 'IN_PROGRESS'}
                     className="mt-4"
                   />
                 </>

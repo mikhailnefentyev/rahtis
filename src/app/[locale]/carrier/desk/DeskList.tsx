@@ -165,8 +165,11 @@ export function DeskList({
   currencyByOrder = {},
   policyByOrder = {},
   trustByOrder = {},
+  perKmByOrder = {},
 }: {
   orders: DeskOrder[];
+  /** Цена за км (ставка в центах): при правке маршрута цена пересчитывается. */
+  perKmByOrder?: Record<string, number>;
   /** Полис экспедитора-заказчика у заказов «напрямую с перевозчиком»: справка. */
   policyByOrder?: Record<string, ForwarderPolicyInfo>;
   /** Сведения об оплате заказчика у заказов «напрямую»: справка, не гарантия. */
@@ -251,6 +254,11 @@ export function DeskList({
                     {m('order.distance', { km: order.distance_km ?? 0 })} ·{' '}
                     <span className="font-semibold text-ink">{f.money(order.rate_cents ?? 0, currency)}</span>{' '}
                     {approx && <span className="text-ink-dim">({approx}) </span>}
+                    {perKmByOrder[order.id] && (
+                      <Badge tone="info">
+                        {t.trustWins.perKmBadge.replace('{rate}', f.money(perKmByOrder[order.id], currency))}
+                      </Badge>
+                    )}{' '}
                     <span className="text-ink-dim">{t.money.addVat}</span>{' '}
                     {order.distance_km && order.rate_cents ? (
                       <span className="text-ink-dim">

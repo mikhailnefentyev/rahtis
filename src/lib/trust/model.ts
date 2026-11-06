@@ -50,6 +50,13 @@ export type TrustRow = {
   signatory_approved?: boolean | null;
   signatory_issued_on?: string | null;
   signatory_valid_until?: string | null;
+  /* Счета перевозчиков (freight_invoices) и смена счёта (20261106170000): до миграции колонок нет. */
+  freight_invoices_count?: number | null;
+  freight_paid_on_time?: number | null;
+  freight_paid_late?: number | null;
+  freight_avg_days_late?: number | null;
+  freight_overdue?: number | null;
+  bank_changed_at?: string | null;
 };
 
 /** Проверенный оператором документ заказчика: только даты, без файла и проверяющего. */
@@ -101,6 +108,17 @@ export type ShipperTrust = {
     /** Доля вовремя среди решённых (оплачен или просрочен), 0–100; NULL — решённых нет. */
     onTimePct: number | null;
   };
+  /** Счета перевозчиков по прямым рейсам за 12 месяцев (напоминания об оплате). */
+  invoices: {
+    count: number;
+    onTime: number;
+    late: number;
+    avgDaysLate: number | null;
+    overdue: number;
+    onTimePct: number | null;
+  };
+  /** Последняя смена счёта заказчика за 30 дней (только момент). */
+  bankChangedAt: string | null;
   reports: { onTime: number; late: number; unpaid: number; total: number };
   done12m: number;
   firstDoneAt: string | null;
@@ -155,6 +173,15 @@ export function toTrust(row: TrustRow): ShipperTrust {
       overdue: row.overdue_count ?? 0,
       onTimePct: onTimePct(row.paid_on_time ?? 0, row.paid_late ?? 0, row.overdue_count ?? 0),
     },
+    invoices: {
+      count: row.freight_invoices_count ?? 0,
+      onTime: row.freight_paid_on_time ?? 0,
+      late: row.freight_paid_late ?? 0,
+      avgDaysLate: row.freight_avg_days_late ?? null,
+      overdue: row.freight_overdue ?? 0,
+      onTimePct: onTimePct(row.freight_paid_on_time ?? 0, row.freight_paid_late ?? 0, row.freight_overdue ?? 0),
+    },
+    bankChangedAt: row.bank_changed_at ?? null,
     reports,
     done12m: row.done_12m ?? 0,
     firstDoneAt: row.first_done_at,
@@ -164,15 +191,15 @@ export function toTrust(row: TrustRow): ShipperTrust {
 
 /**
  * Тон сводки для значка: красный — банкротство, ликвидация,
- * реструктуризация, просроченные счета Aivomaa или отметки «не оплачен»;
- * жёлтый — опоздания; иначе нейтральный. Это не оценка, а подсказка,
+ * реструктуризация, просроченные счета (Aivomaa или перевозчиков), «не оплачен»;
+ * жёлтый — опоздания и недавняя смена счёта; иначе нейтральный. Это не оценка, а подсказка,
  * куда смотреть.
  */
 export type TrustTone = 'bad' | 'warn' | 'neutral';
 
 export function trustTone(t: ShipperTrust): TrustTone {
-  if (t.registry.flags.some((f) => f !== 'OTHER') || t.aivomaa.overdue > 0 || t.reports.unpaid > 0) return 'bad';
-  if (t.aivomaa.late > 0 || t.reports.late > 0 || t.registry.flags.length > 0) return 'warn';
+  if (t.registry.flags.some((f) => f !== 'OTHER') || t.aivomaa.overdue > 0 || t.invoices.overdue > 0 || t.reports.unpaid > 0) return 'bad';
+  if (t.aivomaa.late > 0 || t.invoices.late > 0 || t.reports.late > 0 || t.registry.flags.length > 0 || t.bankChangedAt) return 'warn';
   return 'neutral';
 }
 

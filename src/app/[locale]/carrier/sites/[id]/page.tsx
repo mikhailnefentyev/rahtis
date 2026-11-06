@@ -48,7 +48,7 @@ export default async function SiteJobPage({ params }: { params: Promise<{ locale
     supabase.from('drivers').select('id, full_name').eq('company_id', company.id),
     supabase.from('vehicles').select('id, plate, vehicle_class, axles, gross_max_kg, tare_kg, coupling_distance_m').eq('company_id', company.id),
     supabase.from('trailers').select('id, plate, kind, axles, twin_wheels, gross_max_kg, tare_kg, coupling_distance_m').eq('company_id', company.id),
-    supabase.from('carrier_invoices').select('id, number, issued_on, due_on, total_cents, currency, sent_at, sent_to').eq('job_id', id).order('issued_on', { ascending: false }),
+    supabase.from('carrier_invoices').select('id, number, issued_on, due_on, total_cents, currency, sent_at, sent_to, paid_at, reminder_1_at, reminder_2_at').eq('job_id', id).order('issued_on', { ascending: false }),
     /* Фото весовых талонов рейсов: последнее у рейса — ссылка в таблице. */
     supabase.from('weigh_tickets').select('id, load_id').eq('job_id', id).not('load_id', 'is', null).order('created_at', { ascending: true }),
   ]);

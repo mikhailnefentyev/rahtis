@@ -5,6 +5,8 @@ import { todayInHelsinki } from '@/lib/dates';
 import { sendEmail } from '@/lib/email';
 import { createFormat } from '@/lib/format';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { ibanHoldActive, maskIban } from '@/lib/trust/changes';
+import { lastIbanChange } from '@/lib/trust/sensitive';
 import { finnishReference, invoiceLines, invoiceTotals, standardVatBps, type InvoiceDay } from './invoice';
 import { SiteInvoicePdf } from './SiteInvoicePdf';
 import { dayMinutes } from './work';
@@ -13,6 +15,8 @@ const BUCKET = 'reports';
 
 export type SiteInvoiceResult =
   | { status: 'SENT' | 'CREATED'; invoiceId: string; number: string }
+  /* IBAN сменили меньше 48 часов назад: сам счёт не уходит, вручную — после подтверждения. */
+  | { status: 'IBAN_RECENT'; changedAt: string; iban: string | null }
   | {
       status: 'NOTHING' | 'BUSY' | 'NO_VAT_RATE' | 'NO_IBAN' | 'NO_CUSTOMER_EMAIL' | 'NO_CUSTOMER_ADDRESS' | 'NOT_FOUND' | 'PLATFORM_ORDER';
     };
@@ -36,7 +40,12 @@ const fiDate = (iso: string) => {
  * Работает секретным ключом: зовут и кнопка перевозчика (после проверки,
  * что объект его), и задание по понедельникам.
  */
-export async function createSiteInvoice(jobId: string, upTo: string): Promise<SiteInvoiceResult> {
+export async function createSiteInvoice(
+  jobId: string,
+  upTo: string,
+  /** Смена IBAN за 48 часов уже подтверждена перевозчиком (ручная отправка). */
+  options: { ibanConfirmed?: boolean } = {},
+): Promise<SiteInvoiceResult> {
   const admin = createAdminClient();
   /* Счёт на финском/английском — формат чисел fi-FI, валюта — из объекта ниже. */
   const f = createFormat('fi-FI');
@@ -60,6 +69,14 @@ export async function createSiteInvoice(jobId: string, upTo: string): Promise<Si
     .maybeSingle();
   if (!seller) return { status: 'NOT_FOUND' };
   if (!seller.iban) return { status: 'NO_IBAN' };
+  /*
+   * Счёт со свежим IBAN — то, ради чего захватывают кабинет: 48 часов
+   * после смены сам он не уходит, вручную — только после подтверждения.
+   */
+  if (!options.ibanConfirmed) {
+    const changedAt = await lastIbanChange(seller.id);
+    if (changedAt && ibanHoldActive(changedAt)) return { status: 'IBAN_RECENT', changedAt, iban: maskIban(seller.iban) };
+  }
   /* НДС — обычный, по стране перевозчика (FI 25,5 %, SE 25 %…): заказы между странами не бывают. */
   const vatBps = standardVatBps(seller.country);
   if (vatBps === null) return { status: 'NO_VAT_RATE' };

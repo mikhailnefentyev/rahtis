@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { EmptyState } from '@/components/ui';
 import { VerificationPackageView } from '@/components/domain/VerificationPackageView';
+import { BankChangedNote } from '@/components/domain/BankChanged';
+import { bankChangeMarks } from '@/lib/trust/sensitive';
 import { requireRole } from '@/lib/auth/guard';
 import { isLocale } from '@/lib/i18n';
 import { getViewerI18n } from '@/lib/i18n/viewer';
@@ -31,6 +33,7 @@ export default async function ShipperCarrierPackagePage({ params }: { params: Pr
   const i18n = await getViewerI18n(locale);
   const v = i18n.t.verification;
   const pkg = await loadPackage(id);
+  const bankMarks = pkg ? await bankChangeMarks([id]) : {};
 
   return (
     <main className="cab-page">
@@ -43,6 +46,8 @@ export default async function ShipperCarrierPackagePage({ params }: { params: Pr
       {pkg ? (
         <>
           <p className="mt-2 mb-6 max-w-2xl text-[13px] leading-relaxed text-ink-muted">{v.sharePageLead}</p>
+          {/* Пакет открыт — перевозчик заказчику известен; смена его счёта за 30 дней — отметкой. */}
+          <BankChangedNote at={bankMarks[id]} hint className="mb-6 max-w-2xl text-[13px]" />
           <VerificationPackageView pkg={pkg} i18n={i18n} />
         </>
       ) : (

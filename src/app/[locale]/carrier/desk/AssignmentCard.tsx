@@ -31,6 +31,7 @@ import { WasteLink } from '@/components/domain/WasteLink';
 import { TripPanel } from './TripPanel';
 import { OwnEditPanel } from './OwnEditPanel';
 import { AmendPanel } from '../../shipper/orders/AmendPanel';
+import { ChangeRequests, PricingNote, TripAssignmentPanel, type FleetOption, type OrderChangesData } from '@/components/domain/OrderChanges';
 import type { Database } from '@/types/database';
 import type { OrderAmendment, OrderStop, TripDocument } from '@/types/db';
 
@@ -56,7 +57,13 @@ export function AssignmentCard({
   trailers = [],
   forwarderPolicy,
   shipperTrust,
+  changes,
+  fleet,
 }: {
+  /** Режим цены, пробег по маршруту, сообщения водителя. */
+  changes?: OrderChangesData;
+  /** Машины и водители компании для смены на рейсе. */
+  fleet?: { vehicles: FleetOption[]; drivers: FleetOption[] };
   /** Сведения об оплате заказчика (рейс по прямому договору): справка, не гарантия. */
   shipperTrust?: ShipperTrust;
   /** Полис экспедитора-заказчика (рейс по прямому договору): справка, не гарантия оплаты. */
@@ -202,7 +209,8 @@ export function AssignmentCard({
               orderId={order.id}
               haulKind={order.haul_kind}
               currency={currency}
-              canAcknowledge={order.status === 'IN_PROGRESS'}
+              side="CARRIER"
+              canAcknowledge={order.status === 'IN_PROGRESS' || order.status === 'AWAIT_DRIVER'}
               className="mt-3"
             />
 
@@ -229,6 +237,20 @@ export function AssignmentCard({
                     {order.comment}
                   </p>
                 )}
+                {/*
+                  * Правки после назначения (6.11.2026): обе стороны, на любой
+                  * стадии, всё в журнал. Сообщения водителя — правкой в одну кнопку.
+                  */}
+                {(order.status === 'IN_PROGRESS' || order.status === 'AWAIT_DRIVER') && (
+                  <>
+                    <p className="mt-3 rounded-control border border-line bg-sunken px-3 py-2 text-xs text-ink-muted">
+                      {t.trustWins.changesRecorded}
+                    </p>
+                    <ChangeRequests requests={changes?.requests ?? []} className="mt-3" />
+                    <PricingNote orderId={order.id} pricing={changes?.pricing} canPropose={!own} className="mt-3" />
+                    {fleet && <TripAssignmentPanel orderId={order.id} vehicles={fleet.vehicles} drivers={fleet.drivers} className="mt-3" />}
+                  </>
+                )}
                 {/* Стройка ведётся экраном объекта у водителя — точки здесь не отмечаются. */}
                 {order.status === 'IN_PROGRESS' && order.haul_kind !== 'TIPPER' && (
                   <TripPanel stops={stops} haulKind={order.haul_kind} />
@@ -239,8 +261,14 @@ export function AssignmentCard({
                   * Точки — пока рейс идёт, как у заказчика; пробег и цена —
                   * до закрытия.
                   */}
-                {own && order.status === 'IN_PROGRESS' && (
-                  <AmendPanel orderId={order.id} stops={stops} haulKind={order.haul_kind} className="mt-4" />
+                {(order.status === 'IN_PROGRESS' || order.status === 'AWAIT_DRIVER') && (
+                  <AmendPanel
+                    orderId={order.id}
+                    stops={stops}
+                    haulKind={order.haul_kind}
+                    pricingMode={changes?.pricing?.mode}
+                    className="mt-4"
+                  />
                 )}
                 {own && (
                   <OwnEditPanel

@@ -3,7 +3,7 @@
 import { asCurrency } from '@/lib/money/currency';
 import { revalidatePath } from 'next/cache';
 import { requireRole } from '@/lib/auth/guard';
-import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
+import { getDictionary, getI18n, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import { flashFailure } from '@/lib/forms/flash';
 import type { SitePricing } from '@/types/db';
@@ -166,7 +166,8 @@ export async function decideScaleSiteAction(formData: FormData): Promise<void> {
   revalidatePath(`/${locale}/admin/scale-sites`);
 }
 
-export type SendInvoiceState = { message: string | null; ok: boolean };
+/** confirmIban — IBAN сменили меньше 48 часов назад: форма просит подтвердить отправку. */
+export type SendInvoiceState = { message: string | null; ok: boolean; confirmIban?: boolean };
 
 /**
  * «Отправить счёт сейчас»: все подтверждённые и ещё не выставленные дни
@@ -189,7 +190,7 @@ export async function sendSiteInvoiceNowAction(_previous: SendInvoiceState, form
   const { createSiteInvoice } = await import('./invoicing');
   const { todayInHelsinki } = await import('@/lib/dates');
   try {
-    const result = await createSiteInvoice(job.id, todayInHelsinki());
+    const result = await createSiteInvoice(job.id, todayInHelsinki(), { ibanConfirmed: formData.get('confirm_iban') === '1' });
     revalidatePath(`/${locale}/carrier/sites/${job.id}`);
     const s = t.siteInvoice;
     switch (result.status) {
@@ -199,6 +200,14 @@ export async function sendSiteInvoiceNowAction(_previous: SendInvoiceState, form
         return { message: `${result.number}: ${s.resultCreated}`, ok: false };
       case 'NO_IBAN':
         return { message: s.resultNoIban, ok: false };
+      case 'IBAN_RECENT': {
+        const { f } = await getI18n(locale);
+        return {
+          message: t.trustWins.ibanHoldWarning.replace('{iban}', result.iban ?? '').replace('{date}', f.dateTime(result.changedAt)),
+          ok: false,
+          confirmIban: true,
+        };
+      }
       case 'NO_CUSTOMER_EMAIL':
         return { message: s.resultNoEmail, ok: false };
       case 'NO_CUSTOMER_ADDRESS':

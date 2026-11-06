@@ -13,6 +13,7 @@ import {
 import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import { lookupCompany } from '@/lib/registry/prh';
+import { deliverSensitiveChanges } from '@/lib/trust/sensitive';
 
 export type RequisitesState = { error: string | null; done: boolean };
 
@@ -140,6 +141,9 @@ export async function saveRequisitesAction(
   if (updateError) {
     return { error: t.requisites.failed, done: false };
   }
+
+  /* Смена счёта или почты: триггер записал событие — письма людям компании и на прежний адрес сразу. */
+  await deliverSensitiveChanges().catch((cause: unknown) => console.error('письма о смене реквизитов:', cause));
 
   /*
    * Согласие записывается до активации, а не после.

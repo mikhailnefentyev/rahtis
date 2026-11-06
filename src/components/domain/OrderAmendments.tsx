@@ -1,7 +1,7 @@
 'use client';
 
 import { Badge, Button, Mono } from '@/components/ui';
-import { acknowledgeAmendmentsAction } from '@/lib/orders/amend';
+import { acknowledgeAmendmentsAction, respondProposalAction } from '@/lib/orders/amend';
 import { stopTitle, type HaulKind } from '@/lib/orders/haul';
 import { useI18n } from '@/lib/i18n/provider';
 import type { AmendmentChange, OrderAmendment, StopRole } from '@/types/db';
@@ -52,6 +52,8 @@ function useFieldLabels(): Record<string, string> {
     reason: t.lifecycle.fieldReason,
     distance_km: t.order.distance,
     rate_cents: t.orderForm.rate,
+    vehicle: t.trustWins.fieldVehicle,
+    driver: t.vehicle.driver,
   };
 }
 
@@ -60,6 +62,7 @@ export function OrderAmendments({
   orderId,
   haulKind = 'TRAILER',
   canAcknowledge = false,
+  side,
   currency = 'EUR',
   className,
 }: {
@@ -70,8 +73,13 @@ export function OrderAmendments({
   /* Забор и возврат называются по единице: у контейнера прицепа нет. */
   haulKind?: HaulKind;
 
-  /** Кнопка «принял к сведению» — только у перевозчика этого рейса. */
+  /** Кнопка «принял к сведению» у стороны рейса (side), пока рейс идёт. */
   canAcknowledge?: boolean;
+  /**
+   * Чья это карточка. С 6.11.2026 правят обе стороны: каждая отмечает
+   * правки другой и отвечает на её предложение цены.
+   */
+  side?: 'SHIPPER' | 'CARRIER';
   className?: string;
 }) {
   const { t, m, f, locale } = useI18n();
@@ -79,7 +87,15 @@ export function OrderAmendments({
 
   if (amendments.length === 0) return null;
 
-  const pending = amendments.filter((a) => a.acknowledged_at === null);
+  /* Своих правок сторона не «принимает к сведению» — только чужие. */
+  const theirs = (a: OrderAmendment) => (side === 'CARRIER' ? a.actor_side !== 'CARRIER' : a.actor_side === 'CARRIER');
+  const pending = amendments.filter((a) => a.acknowledged_at === null && (!side || theirs(a)));
+  const tw = t.trustWins;
+  const actorLabel = (side: string, name: string | null): string => {
+    const label =
+      side === 'SHIPPER' ? tw.actorSHIPPER : side === 'CARRIER' ? tw.actorCARRIER : side === 'OPERATOR' ? tw.actorOPERATOR : tw.actorSYSTEM;
+    return name && side !== 'OPERATOR' ? `${label} (${name})` : label;
+  };
 
   /**
    * Значение поля так, как его читают люди.
@@ -138,7 +154,9 @@ export function OrderAmendments({
            */}
           <p className="label-micro">
             {canAcknowledge && pending.length > 0
-              ? t.order.changelogFromShipper
+              ? side === 'SHIPPER'
+                ? tw.changelogFromCarrier
+                : t.order.changelogFromShipper
               : t.order.changelog}
           </p>
           {pending.length > 0 && (
@@ -163,7 +181,16 @@ export function OrderAmendments({
 
       <ul className="flex flex-col gap-2">
         {amendments.map((amendment) => {
-          const fresh = amendment.acknowledged_at === null;
+          const fresh = amendment.acknowledged_at === null && (!side || theirs(amendment));
+          const kindLabel =
+            amendment.kind === 'ASSIGNMENT_CHANGED'
+              ? tw.kindASSIGNMENT_CHANGED
+              : amendment.kind === 'PRICE_PROPOSED'
+                ? tw.kindPRICE_PROPOSED
+                : t.amendKind[amendment.kind];
+          /* Предложение цены ждёт ответа другой стороны. */
+          const proposal = amendment.kind === 'PRICE_PROPOSED' ? amendment.proposal_status : null;
+          const canRespond = proposal === 'PROPOSED' && side !== undefined && amendment.actor_side !== side && amendment.actor_side !== 'OPERATOR';
           const changes = (amendment.changes ?? {}) as Record<string, AmendmentChange>;
 
           return (
@@ -183,7 +210,12 @@ export function OrderAmendments({
                 * была бы шумом.
                 */}
               <div className="flex flex-wrap items-center gap-2">
-                <Badge tone={fresh ? 'warn' : 'neutral'}>{t.amendKind[amendment.kind]}</Badge>
+                <Badge tone={fresh ? 'warn' : 'neutral'}>{kindLabel}</Badge>
+                {proposal && (
+                  <Badge tone={proposal === 'ACCEPTED' ? 'ok' : proposal === 'DECLINED' ? 'neutral' : 'warn'}>
+                    {proposal === 'ACCEPTED' ? tw.proposalAccepted : proposal === 'DECLINED' ? tw.proposalDeclined : tw.proposalOpen}
+                  </Badge>
+                )}
                 {amendment.stop_role !== null && (
                   <span className="text-[13px] text-ink">
                     {m('amend.stopAt', {
@@ -213,9 +245,30 @@ export function OrderAmendments({
                 })}
               </ul>
 
+              {amendment.reason && <p className="mt-1 text-xs text-ink">{tw.reasonLine.replace('{reason}', amendment.reason)}</p>}
+
+              {canRespond && (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {(['1', '0'] as const).map((accept) => (
+                    <form key={accept} action={respondProposalAction}>
+                      <input type="hidden" name="locale" value={locale} />
+                      <input type="hidden" name="amendment_id" value={amendment.id} />
+                      <input type="hidden" name="accept" value={accept} />
+                      <Button type="submit" size="sm" variant={accept === '1' ? 'primary' : undefined}>
+                        {accept === '1' ? tw.proposalAccept : tw.proposalDecline}
+                      </Button>
+                    </form>
+                  ))}
+                </div>
+              )}
+
               <Mono className="mt-1 block text-[11px] text-ink-dim">
                 {m('amend.madeAt', { date: f.dateTime(amendment.created_at) })}
+                {/* Кто правил: сторона и имя (снимок на момент правки). */}
+                {amendment.actor_side && ` · ${tw.amendBy.replace('{who}', actorLabel(amendment.actor_side, amendment.actor_name))}`}
                 {!fresh && ` · ${t.amend.acknowledged}`}
+                {/* Водитель отмечает правку точки в приложении («Nähty»). */}
+                {amendment.driver_seen_at && ` · ${tw.driverSeen.replace('{date}', f.dateTime(amendment.driver_seen_at))}`}
               </Mono>
             </li>
           );

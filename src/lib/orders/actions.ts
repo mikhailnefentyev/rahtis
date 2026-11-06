@@ -1,5 +1,6 @@
 'use server';
 
+import { perKmTotal } from './routePricing';
 import { flashError } from '@/lib/forms/flash';
 
 import { isValidContainerNumber } from '@/lib/containerNumber';
@@ -292,12 +293,33 @@ function readCurrency(formData: FormData): { currency: Currency | null } | { err
   return isCurrency(raw) ? { currency: raw } : { error: true };
 }
 
+type OrderPricingInput = { mode: 'FIXED' | 'PER_KM'; perKmCents: number | null };
+
+/** Режим цены — сразу после создания (create_order его не знает); фиксированная — умолчание базы. */
+async function applyPricing(supabase: Awaited<ReturnType<typeof createClient>>, orderId: string, pricing: OrderPricingInput) {
+  if (pricing.mode !== 'PER_KM') return;
+  const { error } = await supabase.rpc('set_order_pricing', { p_order_id: orderId, p_mode: 'PER_KM', p_per_km_cents: pricing.perKmCents });
+  if (error) console.error('режим цены не записан:', error.message);
+}
+
 function readOrderForm(
   formData: FormData,
   t: Dictionary,
-): { error: string } | { order: Record<string, unknown>; stops: StopInput[] } {
-  const rateCents = toCents(str(formData, 'rate'));
+): { error: string } | { order: Record<string, unknown>; stops: StopInput[]; pricing: OrderPricingInput } {
   const distance = Number.parseInt(str(formData, 'distance_km').replace(/\D/g, ''), 10);
+  /*
+   * Цена за км (6.11.2026): итог = ставка × пробег, считается здесь, а при
+   * правке маршрута — базой (apply_route_distance). У стройки — только
+   * фиксированная: там цена своя (ставка × ориентир).
+   */
+  const perKmMode = str(formData, 'pricing_mode') === 'PER_KM' && haulKind(str(formData, 'haul_kind')) !== 'TIPPER';
+  const perKmCents = perKmMode ? toCents(str(formData, 'rate_per_km')) : null;
+  if (perKmMode && (!perKmCents || perKmCents > 100000)) return { error: t.validation.positiveNumber };
+  const rateCents =
+    perKmMode && perKmCents && Number.isFinite(distance) && distance > 0
+      ? perKmTotal(perKmCents, distance)
+      : toCents(str(formData, 'rate'));
+  const pricing: OrderPricingInput = perKmMode && perKmCents ? { mode: 'PER_KM', perKmCents } : { mode: 'FIXED', perKmCents: null };
 
   if (!rateCents || !Number.isFinite(distance) || distance <= 0) {
     return { error: t.validation.positiveNumber };
@@ -351,6 +373,7 @@ function readOrderForm(
 
   return {
     stops,
+    pricing,
     order: {
       order_type: str(formData, 'order_type'),
       /*
@@ -474,6 +497,7 @@ export async function publishOrderAction(
   if (error || !data) {
     return { error: explainPublish(t, error?.code, error?.message), ref: null };
   }
+  await applyPricing(supabase, data.id, form.pricing);
 
   /*
    * Рассылка письмами. Уведомления в кабинеты перевозчиков уже написаны
@@ -557,6 +581,8 @@ export async function ownOrderAction(_previous: PublishState, formData: FormData
     if (error?.code === '22023' && error.message.includes('клиент')) return { error: t.own.clientInvalid, ref: null };
     return { error: explainPublish(t, error?.code, error?.message), ref: null };
   }
+
+  await applyPricing(supabase, data.id, form.pricing);
 
   /* Прицеп рейса из формы — та же проверка, что в карточке рейса (carrier_set_trip_trailer). */
   const trailerId = str(formData, 'own_trailer_id');

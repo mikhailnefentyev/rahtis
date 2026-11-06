@@ -32,6 +32,8 @@ const PAGES: { fi: string; en: string; priority: number; updated: string; docs?:
   { fi: '/kayttoehdot', en: '/terms', priority: 0.3, updated: '2026-10-01', docs: true },
   { fi: '/tietosuoja', en: '/privacy', priority: 0.3, updated: '2026-10-08', docs: true },
   { fi: '/api-docs', en: '/api-docs', priority: 0.4, updated: '2026-09-29', docs: true },
+  /* Правила площадки — на всех языках (6.11.2026). */
+  { fi: '/rules', en: '/rules', priority: 0.4, updated: '2026-11-06' },
 ];
 
 /* Корень отвечает страницей (x-default главной), а не редиректом. */

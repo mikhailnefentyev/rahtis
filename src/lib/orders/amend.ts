@@ -209,7 +209,13 @@ async function refreshRoute(supabase: Client, orderId: string, locale: Locale): 
   const route = await computeRouteAction(points, country, locale);
   if (!route.ok) return;
 
-  await supabase.rpc('store_route', {
+  /*
+   * Километры клиенту не доверяются (от них цена за км): маршрут считал
+   * этот сервер, пишет его служебный ключ. Что зовущий — сторона рейса,
+   * база проверила только что (правка точки прошла под его правами).
+   */
+  const { createAdminClient } = await import('@/lib/supabase/admin');
+  const { error } = await createAdminClient().rpc('store_route', {
     p_order_id: orderId,
     p_route: {
       geometry: route.geometry,
@@ -219,6 +225,17 @@ async function refreshRoute(supabase: Client, orderId: string, locale: Locale): 
       legs: route.legs,
     },
   });
+  /*
+   * Цена за км: правка заказчика — сразу, правка перевозчика —
+   * предложением заказчику; неправдоподобный пробег — только оператору.
+   */
+  if (!error) await supabase.rpc('apply_route_distance', { p_order_id: orderId });
+}
+
+/** Причина правки — видят обе стороны. Только что сделанная, только автором (база). */
+async function annotate(supabase: Client, amendmentId: number | null | undefined, reason: string): Promise<void> {
+  if (!amendmentId || !reason) return;
+  await supabase.rpc('annotate_amendment', { p_id: amendmentId, p_reason: reason.slice(0, 500) });
 }
 
 /**
@@ -287,6 +304,7 @@ export async function amendStopAction(
    * PostgREST разворачивает NULL-композит в объект из одних null, и
    * проверка на пустоту ответа считала бы состоявшейся любую правку.
    */
+  if (data?.changes) await annotate(supabase, data.id, str(formData, 'reason'));
   if (data?.changes && 'address' in patch) await refreshRoute(supabase, orderId, locale);
 
   revalidateOrder(locale);
@@ -315,7 +333,7 @@ export async function addStopAction(
   const supabase = await createClient();
   const orderId = str(formData, 'order_id');
 
-  const { error } = await supabase.rpc('add_stop', {
+  const { data: added, error } = await supabase.rpc('add_stop', {
     p_before_stop_id: str(formData, 'before_stop_id'),
     p_stop: {
       role,
@@ -326,6 +344,7 @@ export async function addStopAction(
 
   if (error) return { error: await explain(locale, error.code, error.message), saved: false };
 
+  await annotate(supabase, added?.id, str(formData, 'reason'));
   await refreshRoute(supabase, orderId, locale);
 
   revalidateOrder(locale);
@@ -368,7 +387,8 @@ export async function acknowledgeAmendmentsAction(formData: FormData): Promise<v
   const locale = toLocale(formData.get('locale'));
 
   const viewer = await getViewer();
-  if (viewer.status !== 'ready' || viewer.role !== 'CARRIER') return;
+  /* С 6.11.2026 правит и перевозчик: его правки отмечает заказчик. */
+  if (viewer.status !== 'ready' || (viewer.role !== 'CARRIER' && viewer.role !== 'SHIPPER')) return;
 
   const supabase = await createClient();
   const { error } = await supabase.rpc('acknowledge_amendments', {
@@ -376,5 +396,137 @@ export async function acknowledgeAmendmentsAction(formData: FormData): Promise<v
   });
   await flashFailure(locale, error);
 
+  revalidateOrder(locale);
+}
+
+/* ── Правки сторон: машина, цена, сообщения водителя (6.11.2026) ── */
+
+/** Перевозчик меняет машину и/или водителя рейса; запись в журнал делает база. */
+export async function changeTripAssignmentAction(_previous: AmendState, formData: FormData): Promise<AmendState> {
+  const locale = toLocale(formData.get('locale'));
+  const viewer = await getViewer();
+  const t = await getDictionary(locale);
+  if (viewer.status !== 'ready' || viewer.role !== 'CARRIER') return { error: t.error.forbidden, saved: false };
+
+  const vehicle = str(formData, 'vehicle_id');
+  const driver = str(formData, 'driver_id');
+  if (!vehicle && !driver) return { error: t.trustWins.assignmentPick, saved: false };
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc('change_trip_assignment', {
+    p_order_id: str(formData, 'order_id'),
+    p_vehicle_id: vehicle || undefined,
+    p_driver_id: driver || undefined,
+    p_reason: str(formData, 'reason') || undefined,
+  });
+  if (error) {
+    console.error('машина рейса не сменилась:', error.message);
+    return { error: error.code === '42501' ? t.amend.notYours : t.amend.failed, saved: false };
+  }
+  revalidateOrder(locale);
+  return { ...idle, saved: true };
+}
+
+/** Предложение новой цены — любая сторона; принимает другая. */
+export async function proposePriceAction(_previous: AmendState, formData: FormData): Promise<AmendState> {
+  const locale = toLocale(formData.get('locale'));
+  const forbidden = await guard(locale);
+  if (forbidden) return { error: forbidden, saved: false };
+  const t = await getDictionary(locale);
+
+  const euros = Number.parseFloat(str(formData, 'rate').replace(/[^\d,.-]/g, '').replace(',', '.'));
+  if (!Number.isFinite(euros) || euros <= 0) return { error: t.validation.positiveNumber, saved: false };
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc('propose_price', {
+    p_order_id: str(formData, 'order_id'),
+    p_rate_cents: Math.round(euros * 100),
+    p_reason: str(formData, 'reason') || undefined,
+  });
+  if (error) {
+    console.error('предложение цены не записано:', error.message);
+    return { error: error.code === '55000' ? t.trustWins.proposalPending : t.amend.failed, saved: false };
+  }
+  revalidateOrder(locale);
+  return { ...idle, saved: true };
+}
+
+/** Ответ на предложение цены: принять (цена меняется) или отклонить. */
+export async function respondProposalAction(formData: FormData): Promise<void> {
+  const locale = toLocale(formData.get('locale'));
+  if (await guard(locale)) return;
+  const supabase = await createClient();
+  const { error } = await supabase.rpc('respond_price_proposal', {
+    p_amendment_id: Number(str(formData, 'amendment_id')),
+    p_accept: str(formData, 'accept') === '1',
+  });
+  await flashFailure(locale, error);
+  revalidateOrder(locale);
+}
+
+/**
+ * Сообщение водителя — в правку одной кнопкой: адрес из сообщения
+ * (точка с телефона водителя или первая подсказка геокодера) ставится
+ * в выбранную точку, маршрут и цена PER_KM пересчитываются, сообщение
+ * закрывается со ссылкой на правку.
+ */
+export async function applyChangeRequestAction(_previous: AmendState, formData: FormData): Promise<AmendState> {
+  const locale = toLocale(formData.get('locale'));
+  const forbidden = await guard(locale);
+  if (forbidden) return { error: forbidden, saved: false };
+  const t = await getDictionary(locale);
+
+  const supabase = await createClient();
+  const { data: request } = await supabase
+    .from('order_change_requests')
+    .select('id, order_id, stop_id, message, address, lat, lon, resolved_at')
+    .eq('id', str(formData, 'request_id'))
+    .maybeSingle();
+  if (!request || request.resolved_at || !request.stop_id) return { error: t.trustWins.applyFailed, saved: false };
+
+  const address = (str(formData, 'address') || request.address || '').trim();
+  if (!address) return { error: t.trustWins.applyFailed, saved: false };
+
+  const { suggestAddressAction } = await import('@/lib/routing/actions');
+  const near = request.lat !== null && request.lon !== null ? { lat: request.lat, lon: request.lon } : undefined;
+  const found = await suggestAddressAction(address, near, locale);
+  const hit = found.ok ? found.suggestions.find((x) => x.position) : undefined;
+  /* Точка с телефона водителя точнее подсказки, если подсказки нет. */
+  const position = hit?.position ?? near;
+  if (!position) return { error: t.trustWins.applyFailed, saved: false };
+
+  const { data: amendment, error } = await supabase.rpc('amend_stop', {
+    p_stop_id: request.stop_id,
+    p_patch: {
+      address: hit?.label ?? address,
+      city: hit?.city ?? '',
+      lat: String(position.lat),
+      lon: String(position.lon),
+    },
+  });
+  if (error) return { error: await explain(locale, error.code, error.message), saved: false };
+
+  await annotate(supabase, amendment?.id, `${t.trustWins.fromDriver}: ${request.message}`);
+  await refreshRoute(supabase, request.order_id, locale);
+  await supabase.rpc('resolve_change_request', {
+    p_id: request.id,
+    p_resolution: 'APPLIED',
+    p_amendment_id: amendment?.id ?? undefined,
+  });
+
+  revalidateOrder(locale);
+  return { ...idle, saved: true };
+}
+
+/** Сообщение водителя прочитано, правки не нужно. */
+export async function dismissChangeRequestAction(formData: FormData): Promise<void> {
+  const locale = toLocale(formData.get('locale'));
+  if (await guard(locale)) return;
+  const supabase = await createClient();
+  const { error } = await supabase.rpc('resolve_change_request', {
+    p_id: str(formData, 'request_id'),
+    p_resolution: 'DISMISSED',
+  });
+  await flashFailure(locale, error);
   revalidateOrder(locale);
 }

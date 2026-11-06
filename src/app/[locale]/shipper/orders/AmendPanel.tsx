@@ -1,7 +1,7 @@
 'use client';
 
 import { useActionState, useEffect, useState } from 'react';
-import { Button, SectionTitle } from '@/components/ui';
+import { Button, Input, SectionTitle } from '@/components/ui';
 import {
   addStopAction,
   amendStopAction,
@@ -67,10 +67,13 @@ export function AmendPanel({
   orderId,
   stops,
   haulKind = 'TRAILER',
+  pricingMode,
   className,
 }: {
   orderId: string;
   stops: OrderStop[];
+  /** Режим цены: от него зависит, что правка делает с ценой. */
+  pricingMode?: 'FIXED' | 'PER_KM';
   /* Забор и возврат называются по единице: у контейнера прицепа нет. */
   haulKind?: HaulKind;
   className?: string;
@@ -89,7 +92,9 @@ export function AmendPanel({
     <div className={className}>
       <div className="mb-2.5 flex flex-wrap items-baseline justify-between gap-2">
         <p className="label-micro">{t.amend.title}</p>
-        <p className="text-xs text-ink-dim">{t.amend.rateUnchanged}</p>
+        <p className="text-xs text-ink-dim">
+          {pricingMode === 'PER_KM' ? t.trustWins.pricingPerKmNote : pricingMode === 'FIXED' ? t.trustWins.pricingFixedNote : t.amend.rateUnchanged}
+        </p>
       </div>
 
       <div className="flex flex-col gap-2">
@@ -234,6 +239,9 @@ function StopEditor({
         haulKind={haulKind}
         defaults={adding ? undefined : defaultsOf(editing.stop)}
       />
+
+      {/* Причина видна обеим сторонам и водителю (order_amendments.reason). */}
+      <Input name="reason" maxLength={500} placeholder={t.trustWins.amendReason} aria-label={t.trustWins.amendReason} className="mt-3" />
 
       {state.error && (
         <p role="alert" className="mt-3 text-xs text-danger">

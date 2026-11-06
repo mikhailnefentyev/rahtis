@@ -504,3 +504,42 @@ export async function pushUnsubscribeAction(formData: FormData): Promise<void> {
   const supabase = await createClient();
   await supabase.rpc('driver_push_unsubscribe', { p_endpoint: str(formData, 'endpoint') });
 }
+
+/* ── Правки маршрута глазами водителя (6.11.2026) ───────────────── */
+
+/** «Видел»: водитель отметил правки маршрута своего рейса — время видят обе стороны. */
+export async function ackRouteChangesAction(formData: FormData): Promise<void> {
+  const locale = toLocale(formData.get('locale'));
+  const supabase = await createClient();
+  const { error } = await supabase.rpc('driver_ack_route_changes', { p_order_id: str(formData, 'order_id') });
+  if (error) console.error('правки не отмечены:', error.message);
+  revalidateDriver(locale);
+}
+
+/**
+ * «Другой адрес»: водитель сам маршрут не правит, а сообщает —
+ * текст, при желании адрес и точка с телефона. Перевозчику и заказчику
+ * приходит уведомление, правкой его делают они.
+ */
+export async function reportDifferentAddressAction(_previous: DriverState, formData: FormData): Promise<DriverState> {
+  const locale = toLocale(formData.get('locale'));
+  const { t } = await getDriverI18n(locale);
+  const message = str(formData, 'message').slice(0, 500);
+  if (!message) return { error: t.driverApp.reportFailed, done: false };
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc('driver_request_change', {
+    p_order_id: str(formData, 'order_id'),
+    p_stop_id: str(formData, 'stop_id') || null,
+    p_message: message,
+    p_address: str(formData, 'address').slice(0, 300) || undefined,
+    p_lat: num(formData, 'lat') ?? undefined,
+    p_lon: num(formData, 'lon') ?? undefined,
+  });
+  if (error) {
+    console.error('сообщение водителя не записано:', error.message);
+    return { error: t.driverApp.reportFailed, done: false };
+  }
+  revalidateDriver(locale);
+  return { error: null, done: true };
+}

@@ -3,6 +3,8 @@ import { sendCertificateReminders } from '@/lib/drivers/reminders';
 import { sendVerificationReminders } from '@/lib/verification/reminders';
 import { sendForwarderReminders } from '@/lib/forwarders/reminders';
 import { refreshShipperRegistry } from '@/lib/trust/status';
+import { deliverSensitiveChanges } from '@/lib/trust/sensitive';
+import { sendInvoiceReminders } from '@/lib/invoices/reminders';
 
 /* Перепроверка реестра идёт по одной компании с паузой — нужен запас (pg_net ждёт 60 с). */
 export const maxDuration = 60;
@@ -25,6 +27,10 @@ export const maxDuration = 60;
  * сведения об оплате для перевозчика не должны стареть с даты заявки.
  * Её ошибки (реестр не ответил) статус ответа не портят — снимок
  * остаётся прежним, попытка повторится завтра.
+ *
+ * С 6.11.2026 им же — напоминания об оплате счетов перевозчиков
+ * (src/lib/invoices/reminders.ts) и письма о смене реквизитов, не
+ * ушедшие сразу (src/lib/trust/sensitive.ts): правка мимо формы.
  */
 export async function POST(request: Request) {
   const expected = process.env.REPORTS_CRON_SECRET?.trim();
@@ -38,7 +44,7 @@ export async function POST(request: Request) {
     return Response.json({ error: 'forbidden' }, { status: 401 });
   }
 
-  const [result, verification, forwarder, registry] = await Promise.all([
+  const [result, verification, forwarder, registry, invoices, sensitive] = await Promise.all([
     sendCertificateReminders(),
     sendVerificationReminders(),
     sendForwarderReminders(),
@@ -47,7 +53,23 @@ export async function POST(request: Request) {
       updated: 0,
       errors: [error instanceof Error ? error.message : String(error)],
     })),
+    sendInvoiceReminders().catch((error: unknown) => ({
+      checked: 0,
+      emails: 0,
+      collections: 0,
+      errors: [error instanceof Error ? error.message : String(error)],
+    })),
+    deliverSensitiveChanges().catch((error: unknown) => ({
+      checked: 0,
+      sent: 0,
+      errors: [error instanceof Error ? error.message : String(error)],
+    })),
   ]);
-  const failed = result.errors.length > 0 || verification.errors.length > 0 || forwarder.errors.length > 0;
-  return Response.json({ ...result, verification, forwarder, registry }, { status: failed ? 207 : 200 });
+  const failed =
+    result.errors.length > 0 ||
+    verification.errors.length > 0 ||
+    forwarder.errors.length > 0 ||
+    invoices.errors.length > 0 ||
+    sensitive.errors.length > 0;
+  return Response.json({ ...result, verification, forwarder, registry, invoices, sensitive }, { status: failed ? 207 : 200 });
 }

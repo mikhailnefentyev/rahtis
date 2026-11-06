@@ -16,6 +16,8 @@ import { Inspection } from './Inspection';
 import { ProblemForm } from './ProblemForm';
 import { StopDone } from './StopDone';
 import { QueuedMark, StopDot, StopGate, TaskBanner, TaskProgress } from './TaskProgress';
+import { ReportAddress, RouteChanges, RouteNotice, type DriverRouteChange } from './RouteChanges';
+import { createClient } from '@/lib/supabase/server';
 
 /**
  * Задание водителя.
@@ -43,6 +45,19 @@ export default async function DriverTaskPage({
   const running = task.status === 'IN_PROGRESS';
   /* Снимки нужны только на идущем рейсе: там осмотр и сравнение сторон. */
   const photos = running ? await getTripPhotos(task.id) : [];
+  /* Правки маршрута, которых водитель ещё не отметил (только его рейс — решает база). */
+  const active = running || task.status === 'AWAIT_DRIVER';
+  const { data: changeRows } = active
+    ? await (await createClient()).rpc('driver_route_changes', { p_order_id: task.id })
+    : { data: [] };
+  const routeChanges: DriverRouteChange[] = (changeRows ?? []).map((r) => ({
+    id: r.id,
+    kind: r.kind,
+    stopLabel: r.stop_label,
+    changes: (r.changes ?? {}) as DriverRouteChange['changes'],
+    createdAt: r.created_at,
+    reason: r.reason,
+  }));
 
   /* Перегон закрывается фото при сдаче — напоминать о накладной незачем. */
   const hasCmr = isTransfer(task.stops) || photos.some((p) => p.kind === 'CMR');
@@ -75,6 +90,9 @@ export default async function DriverTaskPage({
         </div>
       )}
 
+      {active && <RouteChanges orderId={task.id} changes={routeChanges} />}
+      {active && <RouteNotice />}
+
       {running && allDone && lastStop && <CmrMissing orderId={task.id} stopId={lastStop.id} hasCmr={hasCmr} />}
 
       {(task.trailer_plate || task.trailer || task.comment) && (
@@ -102,6 +120,14 @@ export default async function DriverTaskPage({
         ))}
       </ol>
 
+      {running && (
+        <ReportAddress
+          orderId={task.id}
+          stops={task.stops
+            .filter((s) => !s.completed_at)
+            .map((s) => ({ id: s.id, label: `${stopTitle(t, s.role, task.haul_kind)} · ${s.place_name ?? s.company_name ?? s.city}` }))}
+        />
+      )}
       {running && <ProblemForm orderId={task.id} />}
 
       {/* Переписка с заказчиком и диспетчером: быстрые ответы — одной кнопкой. */}

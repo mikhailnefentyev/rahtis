@@ -126,6 +126,8 @@ export type KnownVehicle =
     /* Значок «Tarkastettu» и перевозчик для пакета tilaajavastuu (verification_badges_for_known). */
     verified?: boolean;
     carrier_id?: string | null;
+    /* Смена IBAN перевозчика за 30 дней (bank_change_marks): только момент. */
+    carrier_bank_changed_at?: string | null;
   };
 
 /** Что возвращает public.company_readiness — гейт стола заказов. */

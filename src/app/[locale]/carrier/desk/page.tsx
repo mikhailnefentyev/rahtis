@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Card, CardBody, buttonClass } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
+import { loadFleetOptions, loadOrderChanges, perKmByOrder } from '@/lib/orders/changes';
 import { isLocale } from '@/lib/i18n';
 import type { SiteWaiting } from '@/lib/orders/waiting';
 import { createClient } from '@/lib/supabase/server';
@@ -156,6 +157,12 @@ export default async function DeskPage({
     (amendmentsByOrder[row.order_id] ??= []).push(row);
   }
 
+  /* Правки после назначения: цена и пробег, сообщения водителя, машины и водители для смены. */
+  const [changesByOrder, fleet] = await Promise.all([
+    loadOrderChanges(assignedIds),
+    viewer.company ? loadFleetOptions(viewer.company.id) : Promise.resolve(undefined),
+  ]);
+
   /*
    * Свои рейсы перевозчика среди закреплённых: у них другой текст (рейс
    * завёл он сам, отказ его снимает) и право править. my_assignments этого
@@ -211,9 +218,10 @@ export default async function DeskPage({
     ...assignedIds.filter((id) => !(id in ownByOrder)),
   ];
   /* И сведения об оплате заказчика: при прямом договоре счёт выставляет перевозчик, Aivomaa не гарантирует (6.11.2026). */
-  const [policyByOrder, trustByOrder] = await Promise.all([
+  const [policyByOrder, trustByOrder, perKm] = await Promise.all([
     forwarderPolicyByOrder(directIds),
     shipperTrustByOrder(directIds),
+    perKmByOrder((orders ?? []).map((o) => o.id)),
   ]);
 
   /*
@@ -254,6 +262,8 @@ export default async function DeskPage({
         currencyByOrder={currencyByOrder}
         policyByOrder={policyByOrder}
         trustByOrder={trustByOrder}
+        changesByOrder={changesByOrder}
+        fleet={fleet}
       />
 
       {!canTakeOrders ? (
@@ -325,6 +335,7 @@ export default async function DeskPage({
             currencyByOrder={currencyByOrder}
             policyByOrder={policyByOrder}
             trustByOrder={trustByOrder}
+            perKmByOrder={perKm}
           />
         </>
       )}

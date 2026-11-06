@@ -15,6 +15,7 @@ import type {
   ShipperOrder,
   TripDocument,
 } from '@/types/db';
+import type { OrderChangesData } from '@/components/domain/OrderChanges';
 import { OrderCard } from './OrderCard';
 
 /**
@@ -112,10 +113,13 @@ export function OrdersView({
   offersByOrder,
   tripTrailerByOrder = {},
   amendmentsByOrder,
+  changesByOrder = {},
   knownVehicles,
   documentsByOrder,
   startNew = false,
 }: {
+  /** Цена и пробег, сообщения водителя (правки после назначения). */
+  changesByOrder?: Record<string, OrderChangesData>;
   /** Пришли с обзора по «+ Uusi tilaus» — форма открыта сразу. */
   startNew?: boolean;
   orders: ShipperOrder[];
@@ -251,6 +255,7 @@ export function OrdersView({
         offers={offersByOrder[order.id] ?? []}
         tripTrailer={tripTrailerByOrder[order.id] ?? null}
         amendments={amendmentsByOrder[order.id] ?? []}
+        changes={changesByOrder[order.id]}
         knownVehicles={knownVehicles}
         documents={documentsByOrder[order.id] ?? []}
         onRepeat={() => startComposing({ order, stops: stopsByOrder[order.id] ?? [] })}

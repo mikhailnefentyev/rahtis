@@ -736,6 +736,7 @@ Rahtis-Event: order.stop_arrived`}</code>
               links: [
                 { href: `/${locale}/${locale === 'fi' ? 'kayttoehdot' : 'terms'}`, label: t.legal.TERMS },
                 { href: `/${locale}/${locale === 'fi' ? 'tietosuoja' : 'privacy'}`, label: t.legal.PRIVACY },
+                { href: `/${locale}/rules`, label: t.trustWins.rulesLink },
                 { href: '/api/v1/openapi.json', label: 'OpenAPI' },
               ],
             },
