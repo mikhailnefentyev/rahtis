@@ -1,5 +1,8 @@
 'use client';
 
+import { ForwarderPolicyNote, type ForwarderPolicyInfo } from '@/components/domain/ForwarderDirect';
+import { ShipperTrustBadge } from '@/components/domain/ShipperTrust';
+import type { ShipperTrust } from '@/lib/trust/model';
 import { useActionState, useState } from 'react';
 import { HaulBadge } from '@/components/domain/HaulBadge';
 import { OrderAmendments } from '@/components/domain/OrderAmendments';
@@ -51,7 +54,13 @@ export function AssignmentCard({
   currency = 'EUR',
   tripTrailerId = null,
   trailers = [],
+  forwarderPolicy,
+  shipperTrust,
 }: {
+  /** Сведения об оплате заказчика (рейс по прямому договору): справка, не гарантия. */
+  shipperTrust?: ShipperTrust;
+  /** Полис экспедитора-заказчика (рейс по прямому договору): справка, не гарантия оплаты. */
+  forwarderPolicy?: ForwarderPolicyInfo;
   /** Валюта цены рейса (my_assignments её не отдаёт — страница читает отдельно). */
   currency?: string;
   /** Прицеп рейса перевозчика (конструктор сцепок) и прицепы компании для выбора. */
@@ -121,6 +130,8 @@ export function AssignmentCard({
                 ) : (
                   order.shipper_name && <p className="mt-1 text-xs text-ink-dim">{order.shipper_name}</p>
                 )}
+                {!own && <ForwarderPolicyNote info={forwarderPolicy} className="mt-1" />}
+                {!own && <ShipperTrustBadge trust={shipperTrust} className="mt-1" />}
 
                 {direct ? (
                   <p className="mt-2 flex flex-wrap items-center gap-2 text-[13px] text-ink">

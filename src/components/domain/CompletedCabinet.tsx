@@ -7,6 +7,7 @@ import { CarrierScorecard } from '@/components/domain/CarrierScorecard';
 import { type Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import { getViewerI18n } from '@/lib/i18n/viewer';
+import { loadPaymentReportTargets } from '@/lib/trust/status';
 
 /**
  * Вкладка выполненных рейсов — одна на заказчика и перевозчика.
@@ -50,6 +51,8 @@ export async function CompletedCabinet({
   ]);
 
   const own = rating?.[0];
+  /* Отметки об оплате прямых рейсов: перевозчику, по окну 180 дней (6.11.2026). */
+  const paymentReports = role === 'CARRIER' ? await loadPaymentReportTargets() : {};
 
   const title = role === 'CARRIER' ? t.done.titleCarrier : t.done.titleShipper;
   const subtitle = role === 'CARRIER' ? t.done.subtitleCarrier : t.done.subtitleShipper;
@@ -84,7 +87,7 @@ export async function CompletedCabinet({
       {role === 'CARRIER' && <CarrierScorecard locale={locale} />}
 
       {/* Итоги недель — по строкам: рейсы RAHTIS в евро и свои в своей валюте не складываются. */}
-      <CompletedList orders={orders ?? []} canClaim />
+      <CompletedList orders={orders ?? []} canClaim paymentReports={paymentReports} />
 
       {/*
         * Сказано прямо, где кончается список.

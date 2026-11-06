@@ -21,6 +21,8 @@ import type { CompanyDocument, DocumentKind } from '@/types/db';
 import { AdminDocument } from './AdminDocument';
 import { RegistryBlock } from '../../ApplicationCard';
 import { AdminVerification } from './AdminVerification';
+import { ForwarderReview } from '../../forwarders/ForwarderReview';
+import { AdminPaymentReports } from './AdminPaymentReports';
 
 /**
  * Карточка компании глазами оператора.
@@ -49,7 +51,7 @@ export default async function AdminCompanyPage({
 
   await requireRole(locale, 'ADMIN');
 
-  const [{ t, m }, supabase] = await Promise.all([getI18n(locale), createClient()]);
+  const [{ t, m, f }, supabase] = await Promise.all([getI18n(locale), createClient()]);
 
   const { data: company } = await supabase
     .from('companies')
@@ -86,6 +88,22 @@ export default async function AdminCompanyPage({
        */
       supabase.rpc('admin_company_orders', { p_company_id: id }),
     ]);
+
+  /* Экспедитор: роль, полис и лицензия с решениями оператора (6.11.2026). */
+  const shipper = company.kind === 'SHIPPER' && !company.client_of;
+  const [{ data: forwarderDocs }, { data: forwarderRows }] = shipper
+    ? await Promise.all([
+        supabase
+          .from('company_documents')
+          .select('*')
+          .eq('company_id', id)
+          .in('kind', ['FORWARDER_INSURANCE', 'FORWARDER_LICENSE'])
+          .order('uploaded_at', { ascending: false })
+          .limit(10),
+        supabase.rpc('forwarder_status', { p_company_id: id }),
+      ])
+    : [{ data: [] }, { data: [] }];
+  const forwarder = forwarderRows?.[0] ?? null;
 
   const asShipper = Number(counts?.[0]?.as_shipper ?? 0);
   const asCarrier = Number(counts?.[0]?.as_carrier ?? 0);
@@ -269,6 +287,31 @@ export default async function AdminCompanyPage({
           </div>
         </section>
       )}
+
+      {shipper && (
+        <section className="mt-8">
+          <h2 className="label-micro mb-3">{t.forwarder.adminTitle}</h2>
+          <p className="mb-3 text-[13px] text-ink-muted">
+            {t.forwarder.roleTitle}: <span className="font-semibold text-ink">{t.forwarder[company.shipper_role ?? 'FORWARDER']}</span>
+            {forwarder && (
+              <>
+                {' · '}
+                {forwarder.allowed ? t.forwarder.adminDirectOpen : t.forwarder.directClosed}
+                {forwarder.in_grace && forwarder.grace_until && ` · ${t.forwarder.graceTitle.replace('{date}', f.date(`${forwarder.grace_until}T12:00:00Z`))}`}
+              </>
+            )}
+          </p>
+          <ForwarderReview
+            locale={locale}
+            documents={forwarderDocs ?? []}
+            back={`/${locale}/admin/company/${id}`}
+            showCompany={false}
+          />
+        </section>
+      )}
+
+      {/* Сведения об оплате для перевозчиков прямого режима и отметки перевозчиков (6.11.2026). */}
+      {shipper && <AdminPaymentReports locale={locale} companyId={id} />}
 
       {/* Значок «Tarkastettu» и пакет tilaajavastuu: решение оператора, сроки — из пакета. */}
       {carrier && (

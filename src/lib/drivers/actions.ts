@@ -171,7 +171,36 @@ export async function archiveDriverAction(formData: FormData): Promise<void> {
 
 /* ── Модель оплаты ──────────────────────────────────────────────── */
 
-const PAY_MODELS: PayModel[] = ['PER_KM', 'TRIP_PERCENT', 'FLAT_HOURLY', 'TES'];
+const PAY_MODELS: PayModel[] = ['PER_KM', 'TRIP_PERCENT', 'FLAT_HOURLY', 'TES', 'DAY_NET', 'MONTHLY_NET', 'PER_TRIP'];
+
+/** Договорённость «на руки» (lib/pay/agreed): за день, за месяц, за рейс. */
+const AGREED_MODELS: PayModel[] = ['DAY_NET', 'MONTHLY_NET', 'PER_TRIP'];
+const DAY_BASES = ['ROUTE', 'WORK', 'ABROAD'];
+
+/**
+ * Ставки по странам из формы: JSON [{ country, amount }] → { CC: центы }.
+ * Пустые строки пропускаются; плохой код, повтор или сумма — null (ошибка формы).
+ */
+function agreedCountryRates(text: string): Record<string, number> | null | 'bad' {
+  if (!text) return null;
+  let rows: unknown;
+  try {
+    rows = JSON.parse(text);
+  } catch {
+    return 'bad';
+  }
+  if (!Array.isArray(rows)) return 'bad';
+  const out: Record<string, number> = {};
+  for (const row of rows) {
+    const country = String((row as { country?: unknown })?.country ?? '').trim().toUpperCase();
+    const amount = String((row as { amount?: unknown })?.amount ?? '').trim();
+    if (!country && !amount) continue;
+    const value = amountCents(amount);
+    if (!/^[A-Z]{2}$/.test(country) || country in out || value == null || value < 1 || value > 1000000) return 'bad';
+    out[country] = value;
+  }
+  return Object.keys(out).length ? out : null;
+}
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export async function savePayProfileAction(
@@ -202,7 +231,11 @@ export async function savePayProfileAction(
     per_km_cents: model === 'PER_KM' ? cents(formData, 'per_km') : null,
     hourly_cents: model === 'FLAT_HOURLY' ? cents(formData, 'hourly') : null,
     trip_bps: model === 'TRIP_PERCENT' ? bps(formData, 'trip_percent') : null,
-    tes_rule_set_id: model === 'TES' ? opt(formData, 'tes_rule_set_id') : null,
+    /* У договорённости набор необязателен: оклад по бумагам и минимум для законной схемы. */
+    tes_rule_set_id:
+      model === 'TES' || (AGREED_MODELS.includes(model) && UUID.test(str(formData, 'tes_rule_set_id')))
+        ? opt(formData, 'tes_rule_set_id')
+        : null,
     tes_grade: model === 'TES' ? opt(formData, 'tes_grade') : null,
     tes_experience_since:
       model === 'TES' && /^\d{4}-\d{2}-\d{2}$/.test(str(formData, 'tes_experience_since'))
@@ -217,9 +250,33 @@ export async function savePayProfileAction(
      */
     bonus_per_km_cents: model === 'TES' || model === 'FLAT_HOURLY' ? cents(formData, 'bonus_per_km') || null : null,
     bonus_trip_bps: model === 'TES' || model === 'FLAT_HOURLY' ? bps(formData, 'bonus_trip_percent') || null : null,
+    /* Договорённость «на руки» — только поля своей модели. */
+    agreed_day_cents: model === 'DAY_NET' ? cents(formData, 'agreed_day') || null : null,
+    agreed_day_basis:
+      model === 'DAY_NET' ? (DAY_BASES.includes(str(formData, 'agreed_day_basis')) ? str(formData, 'agreed_day_basis') : 'ROUTE') : null,
+    agreed_home_day_cents: model === 'DAY_NET' ? cents(formData, 'agreed_home_day') : null,
+    agreed_country_day_cents: null as Record<string, number> | null,
+    agreed_monthly_cents: model === 'MONTHLY_NET' ? cents(formData, 'agreed_monthly') || null : null,
+    agreed_trip_cents: model === 'PER_TRIP' ? cents(formData, 'agreed_trip') || null : null,
+    third_country_driver: AGREED_MODELS.includes(model) && formData.get('third_country_driver') != null,
   };
 
   if ((row.bonus_per_km_cents ?? 0) > 100000 || (row.bonus_trip_bps ?? 0) > 10000) {
+    return { error: t.validation.positiveNumber, done: false };
+  }
+
+  if (model === 'DAY_NET') {
+    const rates = agreedCountryRates(str(formData, 'agreed_country_rates'));
+    if (rates === 'bad') return { error: t.agreed.badRates, done: false };
+    row.agreed_country_day_cents = rates;
+  }
+  /* Пределы — как ограничение базы driver_pay_profiles_agreed_amounts. */
+  if (
+    (row.agreed_day_cents ?? 0) > 1000000 ||
+    (row.agreed_home_day_cents ?? 0) > 1000000 ||
+    (row.agreed_monthly_cents ?? 0) > 100000000 ||
+    (row.agreed_trip_cents ?? 0) > 10000000
+  ) {
     return { error: t.validation.positiveNumber, done: false };
   }
 
@@ -232,14 +289,22 @@ export async function savePayProfileAction(
     (model === 'PER_KM' && row.per_km_cents) ||
     (model === 'FLAT_HOURLY' && row.hourly_cents) ||
     (model === 'TRIP_PERCENT' && row.trip_bps) ||
-    (model === 'TES' && row.tes_rule_set_id);
+    (model === 'TES' && row.tes_rule_set_id) ||
+    (model === 'DAY_NET' && (row.agreed_day_cents || row.agreed_country_day_cents)) ||
+    (model === 'MONTHLY_NET' && row.agreed_monthly_cents) ||
+    (model === 'PER_TRIP' && row.agreed_trip_cents);
   if (!filled) return { error: t.validation.positiveNumber, done: false };
 
   const supabase = await createClient();
-  /* Валюта ставки: у TES — валюта набора (копия финского шаблона — евро), иначе — валюта компании. */
-  const { data: tesSet } = row.tes_rule_set_id
-    ? await supabase.from('tes_rule_sets').select('currency').eq('id', row.tes_rule_set_id).maybeSingle()
-    : { data: null };
+  /*
+   * Валюта ставки: у TES — валюта набора (копия финского шаблона — евро),
+   * иначе — валюта компании. Договорённость — всегда в валюте компании:
+   * набор у неё только «оклад по бумагам», его суммы отчёт пересчитает.
+   */
+  const { data: tesSet } =
+    row.tes_rule_set_id && model === 'TES'
+      ? await supabase.from('tes_rule_sets').select('currency').eq('id', row.tes_rule_set_id).maybeSingle()
+      : { data: null };
   const currency = asCurrency(tesSet?.currency ?? viewer.company?.currency);
   /* Набор суточных — только свой (база ещё раз проверит триггером driver_pay_profiles_allowance_check). */
   if (row.allowance_rule_set_id) {

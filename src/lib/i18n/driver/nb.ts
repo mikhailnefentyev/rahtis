@@ -17,6 +17,8 @@ export const nb = {
     earningsNoPay: 'Arbeidsgiveren har ikke lagt inn lønnen din ennå. Timer og turer vises likevel.',
     earningsEmpty: 'Ingen fullførte turer denne måneden ennå.',
     earningsRunning: 'Hittil i måneden',
+    earningsAgreedShifts: 'Etter avtale — telt etter skift',
+    earningsAgreedMonthly: 'Månedsbeløp etter avtale',
     tabActive: 'Aktive',
     tabDone: 'Ferdige',
     noTasks: 'Du har ingen oppdrag.',

@@ -17,6 +17,8 @@ export const sv = {
     earningsNoPay: 'Arbetsgivaren har inte lagt in din lön ännu. Timmar och körningar visas ändå.',
     earningsEmpty: 'Inga avslutade körningar den här månaden ännu.',
     earningsRunning: 'Totalt i månaden',
+    earningsAgreedShifts: 'Enligt överenskommelse — räknat på arbetspass',
+    earningsAgreedMonthly: 'Månadsbelopp enligt överenskommelse',
     tabActive: 'Aktiva',
     tabDone: 'Klara',
     noTasks: 'Du har inga uppdrag.',

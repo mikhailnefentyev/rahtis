@@ -17,6 +17,8 @@ export const lt = {
     earningsNoPay: 'Darbdavys dar nesuvedė tavo atlygio. Valandas ir reisus vis tiek matai.',
     earningsEmpty: 'Šį mėnesį baigtų reisų dar nėra.',
     earningsRunning: 'Per mėnesį',
+    earningsAgreedShifts: 'Pagal susitarimą — skaičiuojama pagal pamainas',
+    earningsAgreedMonthly: 'Mėnesio suma pagal susitarimą',
     tabActive: 'Aktyvios',
     tabDone: 'Baigtos',
     noTasks: 'Užduočių nėra.',

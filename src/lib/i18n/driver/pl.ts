@@ -17,6 +17,8 @@ export const pl = {
     earningsNoPay: 'Pracodawca nie wprowadził jeszcze twojej stawki. Godziny i kursy i tak są widoczne.',
     earningsEmpty: 'W tym miesiącu nie ma jeszcze zakończonych kursów.',
     earningsRunning: 'W tym miesiącu',
+    earningsAgreedShifts: 'Według umowy — liczone ze zmian',
+    earningsAgreedMonthly: 'Pensja miesięczna wg umowy',
     tabActive: 'Aktywne',
     tabDone: 'Zakończone',
     noTasks: 'Nie masz zadań.',

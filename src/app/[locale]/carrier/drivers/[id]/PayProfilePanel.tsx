@@ -15,10 +15,26 @@ import { wageWarnings } from '@/lib/pay/allowances';
 import { asLegality, inEea } from '../payCountry';
 
 const initial: FormState = { error: null, done: false };
-const MODELS: PayModel[] = ['FLAT_HOURLY', 'TES', 'PER_KM', 'TRIP_PERCENT'];
+const MODELS: PayModel[] = ['FLAT_HOURLY', 'TES', 'DAY_NET', 'MONTHLY_NET', 'PER_TRIP', 'PER_KM', 'TRIP_PERCENT'];
 
 /** Премии — только поверх часов или оклада. */
 const withBonus = (model: PayModel) => model === 'TES' || model === 'FLAT_HOURLY';
+
+/** Договорённость «на руки»: за день, за месяц, за рейс (lib/pay/agreed). */
+const isAgreed = (model: PayModel) => model === 'DAY_NET' || model === 'MONTHLY_NET' || model === 'PER_TRIP';
+
+const BASES = ['ROUTE', 'WORK', 'ABROAD'] as const;
+type Basis = (typeof BASES)[number];
+const asBasis = (value: string | null | undefined): Basis =>
+  BASES.includes(value as Basis) ? (value as Basis) : 'ROUTE';
+
+type CountryRateDraft = { key: number; country: string; amount: string };
+
+/** Ставки по странам из jsonb профиля. */
+const countryRatesOf = (value: unknown): Array<[string, number]> =>
+  value && typeof value === 'object' && !Array.isArray(value)
+    ? Object.entries(value as Record<string, unknown>).filter((e): e is [string, number] => typeof e[1] === 'number')
+    : [];
 
 /**
  * Модель оплаты водителя: действующая, история и форма новой ставки.
@@ -58,6 +74,25 @@ export function PayProfilePanel({
   const keepFormAction = useKeepOnError(state);
   const [model, setModel] = useState<PayModel>(profiles[0]?.model ?? 'FLAT_HOURLY');
   const [allowanceId, setAllowanceId] = useState<string>(profiles[0]?.allowance_rule_set_id ?? '');
+  /*
+   * Договорённость: прошлые значения — в форму по умолчанию, ставки по
+   * странам — строками и одним JSON в скрытом поле.
+   */
+  const lastAgreed = profiles[0] && isAgreed(profiles[0].model) ? profiles[0] : null;
+  const [paperId, setPaperId] = useState<string>(lastAgreed?.tes_rule_set_id ?? '');
+  const [countryRows, setCountryRows] = useState<CountryRateDraft[]>(() =>
+    countryRatesOf(lastAgreed?.agreed_country_day_cents).map(([country, cents], key) => ({
+      key,
+      country,
+      amount: (cents / 100).toFixed(2).replace('.', ','),
+    })),
+  );
+  const [nextRowKey, setNextRowKey] = useState(countryRows.length);
+  const patchRow = (key: number, change: Partial<CountryRateDraft>) =>
+    setCountryRows((list) => list.map((r) => (r.key === key ? { ...r, ...change } : r)));
+  const countryRatesJson = JSON.stringify(
+    countryRows.map((r) => ({ country: r.country.trim().toUpperCase(), amount: r.amount })),
+  );
   /*
    * Категории водителя без ступени стажа: из «TRUCK_4 · …, 4–8 v» остаётся
    * «TRUCK · …». Ступень калькулятор выводит сам из даты начала стажа.
@@ -114,6 +149,25 @@ export function PayProfilePanel({
         return `${f.decimal((p.trip_bps ?? 0) / 100, 1)} %`;
       case 'TES':
         return [setName(p.tes_rule_set_id), gradeLabel(p)].filter(Boolean).join(' · ');
+      case 'DAY_NET':
+      case 'MONTHLY_NET':
+      case 'PER_TRIP': {
+        const g = t.agreed;
+        const amount =
+          p.model === 'DAY_NET'
+            ? [
+                p.agreed_day_cents ? `${f.money(p.agreed_day_cents, p.currency)} / ${g.perDay}` : null,
+                g.basis[asBasis(p.agreed_day_basis)],
+                p.agreed_home_day_cents != null ? `${g.homeShort} ${f.money(p.agreed_home_day_cents, p.currency)}` : null,
+                ...countryRatesOf(p.agreed_country_day_cents).map(([c, cents]) => `${c} ${f.money(cents, p.currency)}`),
+              ]
+            : p.model === 'MONTHLY_NET'
+              ? [`${f.money(p.agreed_monthly_cents ?? 0, p.currency)} / ${g.perMonth}`]
+              : [`${f.money(p.agreed_trip_cents ?? 0, p.currency)} / ${g.perTrip}`];
+        return [...amount, p.tes_rule_set_id ? setName(p.tes_rule_set_id) : null, p.third_country_driver ? g.thirdShort : null]
+          .filter(Boolean)
+          .join(' · ');
+      }
     }
   };
 
@@ -137,7 +191,12 @@ export function PayProfilePanel({
   /* Валюта ставки: у TES — валюта набора, иначе — компании (как в savePayProfileAction). */
   const bonusCurrency = (model === 'TES' ? sets.find((s) => s.id === setId)?.currency : null) ?? f.currency;
   const money = (cents: number | null | undefined) => (cents ? (cents / 100).toFixed(2).replace('.', ',') : '');
-  const tesLegality = model === 'TES' ? asLegality(sets.find((s) => s.id === setId)?.legality) : 'LEGAL';
+  const tesLegality =
+    model === 'TES'
+      ? asLegality(sets.find((s) => s.id === setId)?.legality)
+      : isAgreed(model) && paperId
+        ? asLegality(sets.find((s) => s.id === paperId)?.legality)
+        : 'LEGAL';
   const allowanceLegality = asLegality(allowanceSets.find((s) => s.id === allowanceId)?.legality);
   const warnings = wageWarnings({ model, country, legality: tesLegality, currency: f.currency }).filter(
     (w) => w.code !== 'OUTPUT_PAY' || inEea(country),
@@ -209,6 +268,157 @@ export function PayProfilePanel({
                   <InputMono {...p} name="trip_percent" required inputMode="decimal" placeholder="25" />
                 )}
               </Field>
+            )}
+
+            {/* Договорённость «на руки» — в валюте компании (как пишет savePayProfileAction). */}
+            {model === 'DAY_NET' && (
+              <>
+                <Field label={f.label(t.agreed.dayAmount)} required={countryRows.length === 0}>
+                  {(p) => (
+                    <InputMono
+                      {...p}
+                      name="agreed_day"
+                      required={countryRows.length === 0}
+                      inputMode="decimal"
+                      placeholder="120,00"
+                      defaultValue={money(lastAgreed?.agreed_day_cents)}
+                    />
+                  )}
+                </Field>
+                <Field label={t.agreed.dayBasis} required>
+                  {(p) => (
+                    <Select {...p} name="agreed_day_basis" defaultValue={asBasis(lastAgreed?.agreed_day_basis)}>
+                      {BASES.map((b) => (
+                        <option key={b} value={b}>
+                          {t.agreed.basis[b]}
+                        </option>
+                      ))}
+                    </Select>
+                  )}
+                </Field>
+                <Field label={f.label(t.agreed.homeDay)} hint={t.agreed.homeDayHint}>
+                  {(p) => (
+                    <InputMono
+                      {...p}
+                      name="agreed_home_day"
+                      inputMode="decimal"
+                      defaultValue={
+                        lastAgreed?.agreed_home_day_cents != null ? money(lastAgreed.agreed_home_day_cents) || '0' : ''
+                      }
+                    />
+                  )}
+                </Field>
+                <fieldset className="sm:col-span-2">
+                  <legend className="label-micro mb-1.5">{t.agreed.countryRates}</legend>
+                  <p className="mb-2 text-xs text-ink-dim">{t.agreed.countryRatesHint}</p>
+                  <input type="hidden" name="agreed_country_rates" value={countryRatesJson} />
+                  <div className="flex flex-col gap-2">
+                    {countryRows.map((r) => (
+                      <div key={r.key} className="grid grid-cols-[5rem_1fr_auto] items-end gap-2 sm:max-w-md">
+                        <Field label={t.agreed.rateCountry}>
+                          {(p) => (
+                            <Input
+                              {...p}
+                              value={r.country}
+                              maxLength={2}
+                              onChange={(e) => patchRow(r.key, { country: e.target.value.toUpperCase() })}
+                            />
+                          )}
+                        </Field>
+                        <Field label={f.label(`${t.agreed.rateAmount}, €`)}>
+                          {(p) => (
+                            <InputMono
+                              {...p}
+                              value={r.amount}
+                              inputMode="decimal"
+                              onChange={(e) => patchRow(r.key, { amount: e.target.value })}
+                            />
+                          )}
+                        </Field>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setCountryRows((list) => list.filter((x) => x.key !== r.key))}
+                        >
+                          {t.agreed.removeCountry}
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                  <Button
+                    type="button"
+                    size="sm"
+                    className="mt-2"
+                    onClick={() => {
+                      setCountryRows((list) => [...list, { key: nextRowKey, country: '', amount: '' }]);
+                      setNextRowKey((k) => k + 1);
+                    }}
+                  >
+                    {t.agreed.addCountry}
+                  </Button>
+                </fieldset>
+              </>
+            )}
+
+            {model === 'MONTHLY_NET' && (
+              <Field label={f.label(t.agreed.monthly)} required>
+                {(p) => (
+                  <InputMono
+                    {...p}
+                    name="agreed_monthly"
+                    required
+                    inputMode="decimal"
+                    placeholder="3000,00"
+                    defaultValue={money(lastAgreed?.agreed_monthly_cents)}
+                  />
+                )}
+              </Field>
+            )}
+
+            {model === 'PER_TRIP' && (
+              <Field label={f.label(t.agreed.trip)} required>
+                {(p) => (
+                  <InputMono
+                    {...p}
+                    name="agreed_trip"
+                    required
+                    inputMode="decimal"
+                    placeholder="2000,00"
+                    defaultValue={money(lastAgreed?.agreed_trip_cents)}
+                  />
+                )}
+              </Field>
+            )}
+
+            {/* Законная схема для договорённости: оклад по бумагам из набора правил и водитель из третьей страны. */}
+            {isAgreed(model) && (
+              <>
+                <Field label={t.agreed.paperSet} hint={t.agreed.paperSetHint}>
+                  {(p) => (
+                    <Select {...p} name="tes_rule_set_id" value={paperId} onChange={(e) => setPaperId(e.target.value)}>
+                      <option value="">{t.agreed.paperNone}</option>
+                      {sets.map((s) => (
+                        <option key={s.id} value={s.id}>
+                          {s.name} · {f.date(`${s.valid_from}T12:00:00Z`)}
+                        </option>
+                      ))}
+                    </Select>
+                  )}
+                </Field>
+                <label className="flex items-start gap-2 self-end text-[13px]">
+                  <input
+                    type="checkbox"
+                    name="third_country_driver"
+                    defaultChecked={lastAgreed?.third_country_driver === true}
+                    className="mt-0.5 size-4 accent-accent"
+                  />
+                  <span>
+                    {t.agreed.thirdCountry}
+                    <span className="block text-xs text-ink-dim">{t.agreed.thirdCountryHint}</span>
+                  </span>
+                </label>
+              </>
             )}
 
             {model === 'TES' &&

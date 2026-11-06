@@ -17,6 +17,8 @@ export const lv = {
     earningsNoPay: 'Darba devējs vēl nav ievadījis tavu samaksu. Stundas un reisi tāpat ir redzami.',
     earningsEmpty: 'Šomēnes vēl nav pabeigtu reisu.',
     earningsRunning: 'Mēnesī kopā',
+    earningsAgreedShifts: 'Pēc vienošanās — pēc maiņām',
+    earningsAgreedMonthly: 'Mēneša summa pēc vienošanās',
     tabActive: 'Aktīvie',
     tabDone: 'Pabeigtie',
     noTasks: 'Tev nav uzdevumu.',

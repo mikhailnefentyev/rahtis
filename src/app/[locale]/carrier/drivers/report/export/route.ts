@@ -3,7 +3,8 @@ import { redirect } from 'next/navigation';
 import { noAccessPath, signInPath } from '@/lib/auth/paths';
 import { getViewer } from '@/lib/auth/viewer';
 import { DriverReportPdf } from '@/lib/drivers/DriverReportPdf';
-import { hasAllowances, reportColumns, reportCsv, reportRows, reportXlsx } from '@/lib/drivers/exports';
+import { hasAgreements, hasAllowances, reportColumns, reportCsv, reportRows, reportXlsx } from '@/lib/drivers/exports';
+import { agreementLines, agreementTitle } from '@/lib/drivers/agreementText';
 import { warningText } from '@/lib/drivers/warningText';
 import { buildDriverReport } from '@/lib/drivers/report';
 import { defaultLocale, isLocale } from '@/lib/i18n';
@@ -65,7 +66,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
 
   /* В PDF валюта — знаком у суммы, отдельная колонка не нужна. */
   const withAllowance = hasAllowances(report);
-  const all = reportColumns(t, f, report.currency, withAllowance);
+  const withAgreement = hasAgreements(report);
+  const all = reportColumns(t, f, report.currency, withAllowance, withAgreement);
   const columns = all.filter((c) => c.kind !== 'currency');
   const currencyOf = all.find((c) => c.kind === 'currency')!;
   const show = (kind: string, value: string | number | null, currency: string | null): string => {
@@ -99,21 +101,39 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
         total: row.totals,
       })),
       notes: report.entries
-        .filter((e) => e.warnings.length > 0 || Object.values(e.allowanceDays).some((a) => a.hasSet))
+        .filter(
+          (e) => e.warnings.length > 0 || e.agreements.length > 0 || Object.values(e.allowanceDays).some((a) => a.hasSet),
+        )
         .map((e) => {
           const s = e.summary.totals;
           const a = e.allowanceTotals;
           const d = t.dayPay;
+          const agreed = e.agreements.length > 0;
           const lines = Object.values(e.allowanceDays).some((x) => x.hasSet)
             ? [
                 `${d.wage}: ${f.money(s.amountCents, s.currency)} · ${d.allowances}: ${f.money(a.allowanceCents, a.currency)} (${d.colTaxFree} ${f.money(a.taxFreeCents, a.currency)} · ${d.colTaxable} ${f.money(a.taxableCents, a.currency)}) · ${d.lodging}: ${f.money(a.lodgingCents, a.currency)}`,
-                `${d.employerCost}: ${f.money(s.amountCents + a.allowanceCents + a.lodgingCents, a.currency)} — ${d.employerCostHint}`,
+                `${d.employerCost}: ${f.money(e.employerCostCents, report.currency)} — ${d.employerCostHint}${agreed ? `; ${t.agreed.employerHint}` : ''}`,
                 ...(a.missingRate ? [d.missingRate] : []),
               ]
-            : [];
+            : agreed
+              ? [`${d.employerCost}: ${f.money(e.employerCostCents, report.currency)} — ${t.agreed.employerHint}`]
+              : [];
+          /* Договорённость «на руки» против законной схемы — по отрезкам. */
+          for (const ag of e.agreements) {
+            lines.push(
+              `${t.agreed.title}: ${agreementTitle(ag, { t, f })}`,
+              agreementLines(ag, { t, f })
+                .map((line) => `${line.label}: ${line.value}`)
+                .join(' · '),
+            );
+            if (!ag.result.legal) lines.push(t.agreed.noFactors);
+          }
           return { title: e.driver.full_name, lines, warnings: e.warnings.map((w) => warningText(w, { t, m, f })) };
         }),
-      notesDisclaimer: withAllowance ? t.dayPay.disclaimer : undefined,
+      notesDisclaimer:
+        [withAllowance ? t.dayPay.disclaimer : null, withAgreement ? t.agreed.disclaimer : null]
+          .filter(Boolean)
+          .join(' ') || undefined,
     }),
   );
 

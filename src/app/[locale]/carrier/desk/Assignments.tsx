@@ -7,6 +7,8 @@ import { orderStatusTone } from '@/components/ui/tone';
 import { useI18n } from '@/lib/i18n/provider';
 import { cityOfStop, routeEnds } from '@/lib/orders/route';
 import { AssignmentCard, type TripTrailerOption } from './AssignmentCard';
+import type { ForwarderPolicyInfo } from '@/components/domain/ForwarderDirect';
+import type { ShipperTrust } from '@/lib/trust/model';
 import type { Database } from '@/types/database';
 import type { OrderAmendment, OrderStop, TripDocument } from '@/types/db';
 
@@ -45,9 +47,15 @@ export function Assignments({
   amendmentsByOrder,
   ownByOrder = {},
   currencyByOrder = {},
+  policyByOrder = {},
+  trustByOrder = {},
   tripTrailers = {},
   trailers = [],
 }: {
+  /** Полис экспедитора-заказчика у рейсов по прямому договору: справка. */
+  policyByOrder?: Record<string, ForwarderPolicyInfo>;
+  /** Сведения об оплате заказчика у рейсов по прямому договору: справка. */
+  trustByOrder?: Record<string, ShipperTrust>;
   /** Валюта цены рейса: id → код; нет — евро. */
   currencyByOrder?: Record<string, string>;
   /** Прицеп рейса: id рейса → id прицепа. */
@@ -93,6 +101,8 @@ export function Assignments({
         amendmentsByOrder={amendmentsByOrder}
         ownClient={ownByOrder[order.id]}
         currency={currencyByOrder[order.id] ?? 'EUR'}
+        forwarderPolicy={policyByOrder[order.id]}
+        shipperTrust={trustByOrder[order.id]}
       />
     );
   }

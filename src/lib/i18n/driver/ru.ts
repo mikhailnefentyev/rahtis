@@ -17,6 +17,8 @@ export const ru = {
     earningsNoPay: 'Работодатель ещё не внёс вашу ставку. Часы и рейсы всё равно видны.',
     earningsEmpty: 'В этом месяце завершённых рейсов пока нет.',
     earningsRunning: 'За месяц',
+    earningsAgreedShifts: 'По договорённости — по сменам',
+    earningsAgreedMonthly: 'Оклад за месяц по договорённости',
     tabActive: 'Текущие',
     tabDone: 'Завершённые',
     noTasks: 'Заданий нет.',

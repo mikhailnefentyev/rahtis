@@ -125,6 +125,8 @@ export async function submitApplicationAction(
   const wish = String(formData.get('partnership') ?? '');
   const partnership =
     kind === 'CARRIER' ? (wish === 'SUBSCRIBER' ? 'SUBSCRIBER' : 'SUBCONTRACTOR') : null;
+  /* Заказчик сам говорит, экспедитор он или грузовладелец; у перевозчика колонка не используется. */
+  const shipperRole = kind === 'SHIPPER' && formData.get('shipper_role') === 'CARGO_OWNER' ? 'CARGO_OWNER' : 'FORWARDER';
 
   const admin = createAdminClient();
   const { data: company, error } = await admin
@@ -132,6 +134,7 @@ export async function submitApplicationAction(
     .insert({
       kind,
       partnership,
+      shipper_role: shipperRole,
       name,
       country,
       /*

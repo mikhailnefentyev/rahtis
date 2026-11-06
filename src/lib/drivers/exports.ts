@@ -21,7 +21,9 @@ import type { DriverReport, ReportDayAllowance } from './report';
  * расчёт зарплаты.
  *
  * Страна дня — всегда; суточные, ночлег, без налога и облагаемая часть —
- * если у кого-то в отчёте есть набор суточных. Валюта суточных — своей
+ * если у кого-то в отчёте есть набор суточных. Договорённость «на руки»,
+ * разрыв и расходы работодателя — колонками итога водителя, если у кого-то
+ * она есть. Валюта суточных — своей
  * колонкой: польские зарубежные — в евро при зарплате в злотых.
  */
 
@@ -36,6 +38,11 @@ export type Row = {
     ReportDayAllowance,
     'country' | 'allowanceCents' | 'lodgingCents' | 'taxFreeCents' | 'taxableCents' | 'currency' | 'hasSet'
   > | null;
+  /**
+   * Только у итога: договорённость «на руки», разрыв (облагаемая зарплата)
+   * и расходы работодателя (оценка) — в валюте отчёта. null — нет суммы.
+   */
+  agreed?: { netCents: number | null; gapCents: number | null; employerCents: number } | null;
 };
 
 export type Column = {
@@ -46,6 +53,11 @@ export type Column = {
   /** Валюта денежной колонки, если не валюта суммы дня (суточные). */
   currency?: (row: Row) => string | null;
 };
+
+/** В отчёте есть водитель с договорённостью «на руки». */
+export function hasAgreements(report: DriverReport): boolean {
+  return report.entries.some((e) => e.agreements.length > 0);
+}
 
 /** В отчёте есть хотя бы один день с набором суточных. */
 export function hasAllowances(report: DriverReport): boolean {
@@ -60,6 +72,7 @@ export function reportColumns(
   f?: Pick<Format, 'label'>,
   currency?: string,
   withAllowance = false,
+  withAgreement = false,
 ): Column[] {
   const w = t.workReport;
   const p = t.dayPay;
@@ -90,6 +103,24 @@ export function reportColumns(
           get: (r) => al(r)?.currency ?? null,
           width: 10,
         },
+      ]
+    : [];
+  /* Договорённость — колонками итога водителя, в валюте отчёта. */
+  const agreedMoney = (key: 'netCents' | 'gapCents' | 'employerCents', header: string): Column => ({
+    header: currency ? `${header} (${currency})` : header,
+    kind: 'money',
+    get: (r) => {
+      const v = r.agreed?.[key];
+      return v == null ? null : v / 100;
+    },
+    width: 14,
+    currency: () => currency ?? null,
+  });
+  const agreedColumns: Column[] = withAgreement
+    ? [
+        agreedMoney('netCents', t.agreed.colAgreed),
+        agreedMoney('gapCents', t.agreed.colGap),
+        agreedMoney('employerCents', t.agreed.colEmployer),
       ]
     : [];
   return [
@@ -131,6 +162,7 @@ export function reportColumns(
     },
     { header: p.colCountry, kind: 'text', get: (r) => (r.totals ? null : (r.allowance?.country ?? null)), width: 8 },
     ...allowanceColumns,
+    ...agreedColumns,
   ];
 }
 
@@ -151,9 +183,19 @@ export function reportRows(report: DriverReport): Row[] {
       day: { ...t, date: '', model: null, amountCents: t.amountCents },
       totals: true,
       allowance: { ...a, country: null, hasSet: true },
+      agreed: agreedTotals(entry),
     });
   }
   return rows;
+}
+
+/** Итог договорённости водителя в валюте отчёта; у водителя без неё — только расходы работодателя. */
+function agreedTotals(entry: DriverReport['entries'][number]): Row['agreed'] {
+  const sum = (key: 'agreedReportCents' | 'gapReportCents') =>
+    entry.agreements.length === 0 || entry.agreements.some((a) => a[key] == null)
+      ? null
+      : entry.agreements.reduce((acc, a) => acc + (a[key] ?? 0), 0);
+  return { netCents: sum('agreedReportCents'), gapCents: sum('gapReportCents'), employerCents: entry.employerCostCents };
 }
 
 /* ── XLSX ──────────────────────────────────────────────────────── */
@@ -176,12 +218,14 @@ function cell(kind: Kind, value: string | number | null, bold = false) {
 
 export async function reportXlsx(report: DriverReport, t: Dictionary, f?: Pick<Format, 'label'>): Promise<Buffer> {
   const withAllowance = hasAllowances(report);
-  const columns = reportColumns(t, f, report.currency, withAllowance);
+  const withAgreement = hasAgreements(report);
+  const columns = reportColumns(t, f, report.currency, withAllowance, withAgreement);
   const rows = reportRows(report);
 
   const data: SheetData = [
     [{ value: t.pay.disclaimer, fontWeight: 'bold' }],
     ...(withAllowance ? [[{ value: t.dayPay.disclaimer }]] : []),
+    ...(withAgreement ? [[{ value: t.agreed.disclaimer }]] : []),
     [{ value: `${report.from} – ${report.to}` }],
     [],
     columns.map((c) => ({ value: c.header, fontWeight: 'bold' as const })),
@@ -208,10 +252,12 @@ function csvValue(kind: Kind, value: string | number | null): string {
 
 export function reportCsv(report: DriverReport, t: Dictionary, f?: Pick<Format, 'label'>): string {
   const withAllowance = hasAllowances(report);
-  const columns = reportColumns(t, f, report.currency, withAllowance);
+  const withAgreement = hasAgreements(report);
+  const columns = reportColumns(t, f, report.currency, withAllowance, withAgreement);
   const lines = [
     csvValue('text', t.pay.disclaimer),
     ...(withAllowance ? [csvValue('text', t.dayPay.disclaimer)] : []),
+    ...(withAgreement ? [csvValue('text', t.agreed.disclaimer)] : []),
     columns.map((c) => csvValue('text', c.header)).join(';'),
     ...reportRows(report).map((row) => columns.map((c) => csvValue(c.kind, c.get(row))).join(';')),
   ];

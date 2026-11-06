@@ -15,6 +15,8 @@ import { type Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import type { Company, PartyRole } from '@/types/db';
 import { getViewerI18n } from '@/lib/i18n/viewer';
+import { ForwarderGraceBanner } from '@/components/domain/ForwarderDirect';
+import { loadForwarderState } from '@/lib/forwarders/status';
 
 /**
  * Первый экран кабинета: кто вы и куда отсюда идти.
@@ -92,6 +94,10 @@ export async function CabinetOverview({
   const aside = !steps && (needsRequisites || hint !== null);
 
   const today = todayInHelsinki();
+  /* Отсрочка экспедитору: с какой даты прямой договор потребует полис (6.11.2026). */
+  const forwarder = role === 'SHIPPER' && company?.status === 'ACTIVE' ? (await loadForwarderState()).status : null;
+  const graceUntil =
+    forwarder?.applies && forwarder.in_grace && !forwarder.policy_until ? forwarder.grace_until : null;
   const ownAccess =
     role === 'CARRIER' ? (await (await createClient()).rpc('own_orders_access')).data === true : false;
 
@@ -155,6 +161,8 @@ export async function CabinetOverview({
           </CardBody>
         </Card>
       )}
+
+      {graceUntil && <ForwarderGraceBanner graceUntil={graceUntil} className="" />}
 
       {steps && company && <OnboardingSteps locale={locale} company={company} />}
 

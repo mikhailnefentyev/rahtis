@@ -896,6 +896,7 @@ export type Database = {
             | Database["public"]["Enums"]["partnership_mode"]
             | null
           pending_partnership_from: string | null
+          shipper_role: Database["public"]["Enums"]["shipper_role"]
           registry_check: Json | null
           rejected_at: string | null
           rejection_reason: string | null
@@ -941,6 +942,7 @@ export type Database = {
             | Database["public"]["Enums"]["partnership_mode"]
             | null
           pending_partnership_from?: string | null
+          shipper_role?: Database["public"]["Enums"]["shipper_role"]
           registry_check?: Json | null
           rejected_at?: string | null
           rejection_reason?: string | null
@@ -986,6 +988,7 @@ export type Database = {
             | Database["public"]["Enums"]["partnership_mode"]
             | null
           pending_partnership_from?: string | null
+          shipper_role?: Database["public"]["Enums"]["shipper_role"]
           registry_check?: Json | null
           rejected_at?: string | null
           rejection_reason?: string | null
@@ -1007,6 +1010,18 @@ export type Database = {
       company_documents: {
         Row: {
           company_id: string
+          cmr_covered: boolean | null
+          insurer: string | null
+          limit_currency: string | null
+          limit_event_cents: number | null
+          limit_year_cents: number | null
+          policy_number: string | null
+          review_note: string | null
+          review_status: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          terms: string | null
+          territory: string | null
           file_name: string
           id: string
           is_current: boolean
@@ -1020,6 +1035,18 @@ export type Database = {
         }
         Insert: {
           company_id: string
+          cmr_covered?: boolean | null
+          insurer?: string | null
+          limit_currency?: string | null
+          limit_event_cents?: number | null
+          limit_year_cents?: number | null
+          policy_number?: string | null
+          review_note?: string | null
+          review_status?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          terms?: string | null
+          territory?: string | null
           file_name: string
           id?: string
           is_current?: boolean
@@ -1033,6 +1060,18 @@ export type Database = {
         }
         Update: {
           company_id?: string
+          cmr_covered?: boolean | null
+          insurer?: string | null
+          limit_currency?: string | null
+          limit_event_cents?: number | null
+          limit_year_cents?: number | null
+          policy_number?: string | null
+          review_note?: string | null
+          review_status?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          terms?: string | null
+          territory?: string | null
           file_name?: string
           id?: string
           is_current?: boolean
@@ -1165,6 +1204,76 @@ export type Database = {
           {
             foreignKeyName: "conversations_company_id_fkey"
             columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      direct_payment_reports: {
+        Row: {
+          carrier_company_id: string
+          days_late: number | null
+          id: string
+          note: string | null
+          order_id: string
+          removed_at: string | null
+          removed_by: string | null
+          removed_note: string | null
+          reported_at: string
+          reported_by: string | null
+          shipper_company_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          carrier_company_id?: string
+          days_late?: number | null
+          id?: string
+          note?: string | null
+          order_id: string
+          removed_at?: string | null
+          removed_by?: string | null
+          removed_note?: string | null
+          reported_at?: string
+          reported_by?: string | null
+          shipper_company_id?: string
+          status: string
+          updated_at?: string
+        }
+        Update: {
+          carrier_company_id?: string
+          days_late?: number | null
+          id?: string
+          note?: string | null
+          order_id?: string
+          removed_at?: string | null
+          removed_by?: string | null
+          removed_note?: string | null
+          reported_at?: string
+          reported_by?: string | null
+          shipper_company_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "direct_payment_reports_carrier_company_id_fkey"
+            columns: ["carrier_company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "direct_payment_reports_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: true
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "direct_payment_reports_shipper_company_id_fkey"
+            columns: ["shipper_company_id"]
             isOneToOne: false
             referencedRelation: "companies"
             referencedColumns: ["id"]
@@ -1437,6 +1546,13 @@ export type Database = {
       }
       driver_pay_profiles: {
         Row: {
+          agreed_country_day_cents: Json | null
+          agreed_day_basis: string | null
+          agreed_day_cents: number | null
+          agreed_home_day_cents: number | null
+          agreed_monthly_cents: number | null
+          agreed_trip_cents: number | null
+          third_country_driver: boolean
           allowance_rule_set_id: string | null
           bonus_per_km_cents: number | null
           bonus_trip_bps: number | null
@@ -1455,6 +1571,13 @@ export type Database = {
           valid_from: string
         }
         Insert: {
+          agreed_country_day_cents?: Json | null
+          agreed_day_basis?: string | null
+          agreed_day_cents?: number | null
+          agreed_home_day_cents?: number | null
+          agreed_monthly_cents?: number | null
+          agreed_trip_cents?: number | null
+          third_country_driver?: boolean
           allowance_rule_set_id?: string | null
           bonus_per_km_cents?: number | null
           bonus_trip_bps?: number | null
@@ -1473,6 +1596,13 @@ export type Database = {
           valid_from: string
         }
         Update: {
+          agreed_country_day_cents?: Json | null
+          agreed_day_basis?: string | null
+          agreed_day_cents?: number | null
+          agreed_home_day_cents?: number | null
+          agreed_monthly_cents?: number | null
+          agreed_trip_cents?: number | null
+          third_country_driver?: boolean
           allowance_rule_set_id?: string | null
           bonus_per_km_cents?: number | null
           bonus_trip_bps?: number | null
@@ -1863,6 +1993,35 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "email_outbox_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      forwarder_reminders: {
+        Row: {
+          company_id: string
+          sent_at: string
+          stage: number
+          valid_until: string
+        }
+        Insert: {
+          company_id: string
+          sent_at?: string
+          stage: number
+          valid_until: string
+        }
+        Update: {
+          company_id?: string
+          sent_at?: string
+          stage?: number
+          valid_until?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "forwarder_reminders_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
@@ -6612,6 +6771,30 @@ export type Database = {
         }[]
       }
       company_verified: { Args: { p_company_id: string }; Returns: boolean }
+      company_trust: {
+        Args: { p_company_id?: string }
+        Returns: {
+          avg_days_late: number | null
+          company_id: string
+          country: string
+          done_12m: number
+          first_done_at: string | null
+          invoiced_count: number
+          on_platform_since: string
+          overdue_count: number
+          paid_late: number
+          paid_on_time: number
+          registered_on: string | null
+          registry_checked_at: string | null
+          registry_prepayment: boolean | null
+          registry_situations: string[]
+          registry_vat: boolean | null
+          registry_verdict: string | null
+          reports_late: number
+          reports_on_time: number
+          reports_unpaid: number
+        }[]
+      }
       complete_stop: {
         Args: {
           p_accuracy_m?: number
@@ -7395,6 +7578,46 @@ export type Database = {
         Args: { p_month: string }
         Returns: number
       }
+      forwarder_policies: {
+        Args: { p_company_ids: string[] }
+        Returns: {
+          cargo_owner: boolean
+          company_id: string
+          policy_until: string | null
+        }[]
+      }
+      forwarder_status: {
+        Args: { p_company_id?: string }
+        Returns: {
+          allowed: boolean
+          applies: boolean
+          grace_until: string | null
+          in_grace: boolean
+          license_ok: boolean
+          needs_license: boolean
+          policy_until: string | null
+          shipper_role: Database["public"]["Enums"]["shipper_role"]
+        }[]
+      }
+      moderate_payment_report: {
+        Args: { p_note?: string; p_remove: boolean; p_report_id: string }
+        Returns: undefined
+      }
+      payment_report_targets: {
+        Args: never
+        Returns: {
+          days_late: number | null
+          editable: boolean
+          note: string | null
+          order_id: string
+          removed: boolean
+          status: string | null
+        }[]
+      }
+      review_company_document: {
+        Args: { p_decision: string; p_document_id: string; p_note?: string }
+        Returns: Database["public"]["Tables"]["company_documents"]["Row"]
+      }
       known_vehicles_for_shipper: {
         Args: never
         Returns: {
@@ -8159,6 +8382,30 @@ export type Database = {
           plate: string
         }[]
       }
+      shipper_trust: {
+        Args: { p_company_ids: string[] }
+        Returns: {
+          avg_days_late: number | null
+          company_id: string
+          country: string
+          done_12m: number
+          first_done_at: string | null
+          invoiced_count: number
+          on_platform_since: string
+          overdue_count: number
+          paid_late: number
+          paid_on_time: number
+          registered_on: string | null
+          registry_checked_at: string | null
+          registry_prepayment: boolean | null
+          registry_situations: string[]
+          registry_vat: boolean | null
+          registry_verdict: string | null
+          reports_late: number
+          reports_on_time: number
+          reports_unpaid: number
+        }[]
+      }
       site_foreman_approve: {
         Args: {
           p_day_id: string
@@ -8470,6 +8717,16 @@ export type Database = {
       }
       tipper_order_summary: { Args: { p_order_id: string }; Returns: Json }
       training_sync: { Args: { p_cards: Json }; Returns: number }
+      trust_registry_due: {
+        Args: { p_limit?: number }
+        Returns: {
+          business_id: string
+          country: string
+          id: string
+          name: string
+          vat_number: string | null
+        }[]
+      }
       uncomplete_stop: {
         Args: { p_stop_id: string }
         Returns: {
@@ -8766,7 +9023,11 @@ export type Database = {
       direct_outcome: "PENDING" | "ACCEPTED" | "DECLINED" | "WITHDRAWN"
       dispatch_mode: "DESK" | "DIRECT"
       distance_source: "MANUAL" | "AUTO"
-      document_kind: "CARRIER_LICENSE" | "INSURANCE"
+      document_kind:
+        | "CARRIER_LICENSE"
+        | "INSURANCE"
+        | "FORWARDER_INSURANCE"
+        | "FORWARDER_LICENSE"
       driver_certificate_type:
         | "CODE95"
         | "ADR_BASIC"
@@ -8813,7 +9074,7 @@ export type Database = {
       order_type: "TRAILER_SWAP" | "ROUND_TRIP" | "ONE_WAY"
       partnership_mode: "SUBCONTRACTOR" | "SUBSCRIBER"
       party_role: "CARRIER" | "SHIPPER" | "ADMIN"
-      pay_model: "PER_KM" | "TRIP_PERCENT" | "FLAT_HOURLY" | "TES"
+      pay_model: "PER_KM" | "TRIP_PERCENT" | "FLAT_HOURLY" | "TES" | "DAY_NET" | "MONTHLY_NET" | "PER_TRIP"
       photo_subject:
         | "TRAILER"
         | "CARGO"
@@ -8833,6 +9094,7 @@ export type Database = {
         | "CONTINUATION"
         | "TRAILER_RETURN"
       trailer_kind: "SEMI" | "FULL" | "CENTER_AXLE"
+      shipper_role: "FORWARDER" | "CARGO_OWNER"
       trip_document_kind:
         | "CMR"
         | "LOADING_PHOTO"
@@ -9012,7 +9274,12 @@ export const Constants = {
       direct_outcome: ["PENDING", "ACCEPTED", "DECLINED", "WITHDRAWN"],
       dispatch_mode: ["DESK", "DIRECT"],
       distance_source: ["MANUAL", "AUTO"],
-      document_kind: ["CARRIER_LICENSE", "INSURANCE"],
+      document_kind: [
+        "CARRIER_LICENSE",
+        "INSURANCE",
+        "FORWARDER_INSURANCE",
+        "FORWARDER_LICENSE",
+      ],
       driver_certificate_type: [
         "CODE95",
         "ADR_BASIC",
@@ -9063,7 +9330,7 @@ export const Constants = {
       order_type: ["TRAILER_SWAP", "ROUND_TRIP", "ONE_WAY"],
       partnership_mode: ["SUBCONTRACTOR", "SUBSCRIBER"],
       party_role: ["CARRIER", "SHIPPER", "ADMIN"],
-      pay_model: ["PER_KM", "TRIP_PERCENT", "FLAT_HOURLY", "TES"],
+      pay_model: ["PER_KM", "TRIP_PERCENT", "FLAT_HOURLY", "TES", "DAY_NET", "MONTHLY_NET", "PER_TRIP"],
       photo_subject: [
         "TRAILER",
         "CARGO",
@@ -9085,6 +9352,7 @@ export const Constants = {
         "TRAILER_RETURN",
       ],
       trailer_kind: ["SEMI", "FULL", "CENTER_AXLE"],
+      shipper_role: ["FORWARDER", "CARGO_OWNER"],
       trip_document_kind: [
         "CMR",
         "LOADING_PHOTO",

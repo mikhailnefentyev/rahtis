@@ -24,6 +24,7 @@ import { createClient } from '@/lib/supabase/server';
 import { WorkSummary } from '../WorkSummary';
 import { getViewerI18n } from '@/lib/i18n/viewer';
 import { warningText, warningTone } from '@/lib/drivers/warningText';
+import { agreementLines, agreementTitle } from '@/lib/drivers/agreementText';
 import { DayCountryCell } from './DayCountryCell';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
@@ -169,8 +170,12 @@ export default async function DriverReportPage({
         const withAllowance = Object.values(entry.allowanceDays).some((a) => a.hasSet);
         const s = entry.summary.totals;
         const a = entry.allowanceTotals;
-        /* Справочно: зарплата + суточные + ночлег, без взносов работодателя. */
-        const employerCost = s.amountCents + a.allowanceCents + a.lodgingCents;
+        /*
+         * Справочно: зарплата + суточные + ночлег без взносов; у договорённости
+         * «на руки» — законная схема со взносами (суточные уже внутри).
+         */
+        const employerCost = entry.employerCostCents;
+        const withAgreement = entry.agreements.length > 0;
         return (
           <section key={entry.driver.id} className="mt-8">
             <h2 className="mb-3 border-b border-line pb-2 text-[13px] font-semibold tracking-tight">
@@ -213,7 +218,12 @@ export default async function DriverReportPage({
                           <Td numeric>{f.number(payableKm(day))}</Td>
                           <Td numeric>{f.number(day.trips)}</Td>
                           <Td>{day.model ? t.payModel[day.model] : t.workReport.noRate}</Td>
-                          <Td numeric>{day.amountCents == null ? '—' : f.money(day.amountCents, day.currency)}</Td>
+                          <Td numeric>
+                            {/* Оклад за месяц по договорённости — строкой отрезка ниже, не по дням. */}
+                            {day.amountCents == null || day.model === 'MONTHLY_NET'
+                              ? '—'
+                              : f.money(day.amountCents, day.currency)}
+                          </Td>
                           <Td>
                             {al ? (
                               <DayCountryCell
@@ -270,11 +280,44 @@ export default async function DriverReportPage({
                   {f.money(a.lodgingCents, a.currency)}
                 </p>
                 <p className="font-semibold">
-                  {d.employerCost}: {f.money(employerCost, a.currency)}{' '}
-                  <span className="font-normal text-ink-dim">— {d.employerCostHint}</span>
+                  {d.employerCost}: {f.money(employerCost, report.currency)}{' '}
+                  <span className="font-normal text-ink-dim">
+                    — {d.employerCostHint}
+                    {withAgreement && `; ${t.agreed.employerHint}`}
+                  </span>
                 </p>
                 {a.missingRate && <p className="text-warn">{d.missingRate}</p>}
                 <p className="text-xs text-ink-dim">{d.disclaimer}</p>
+              </div>
+            )}
+
+            {/* Договорённость «на руки» против законной схемы — по отрезкам профиля. */}
+            {withAgreement && (
+              <div className="mt-3 flex flex-col gap-3 rounded-control border border-line px-3 py-2.5 text-[13px]">
+                <p className="label-micro">{t.agreed.title}</p>
+                {entry.agreements.map((ag) => (
+                  <div key={ag.from} className="flex flex-col gap-0.5">
+                    <p className="text-ink-muted">{agreementTitle(ag, { t, f })}</p>
+                    <dl className="grid grid-cols-[1fr_auto] gap-x-4 gap-y-0.5 sm:max-w-xl">
+                      {agreementLines(ag, { t, f }).map((line) => (
+                        <div key={line.label} className="contents">
+                          <dt className={line.strong ? 'font-semibold' : 'text-ink-muted'}>{line.label}</dt>
+                          <dd className={['text-right font-mono', line.strong ? 'font-semibold' : ''].join(' ')}>
+                            {line.value}
+                          </dd>
+                        </div>
+                      ))}
+                    </dl>
+                    {!ag.result.legal && <p className="text-warn">{t.agreed.noFactors}</p>}
+                  </div>
+                ))}
+                {!withAllowance && (
+                  <p className="font-semibold">
+                    {d.employerCost}: {f.money(employerCost, report.currency)}{' '}
+                    <span className="font-normal text-ink-dim">— {t.agreed.employerHint}</span>
+                  </p>
+                )}
+                <p className="text-xs text-ink-dim">{t.agreed.disclaimer}</p>
               </div>
             )}
 
