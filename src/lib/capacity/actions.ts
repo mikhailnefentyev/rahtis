@@ -4,9 +4,10 @@ import { revalidatePath } from 'next/cache';
 import { after } from 'next/server';
 import { requireRole } from '@/lib/auth/guard';
 import { flashError } from '@/lib/forms/flash';
-import { defaultLocale, getDictionary, isLocale, type Dictionary, type Locale } from '@/lib/i18n';
+import { defaultLocale, getDictionary, isLocale, type Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import { correctFree, worthOffering } from './compute';
+import { explainCapacityError as explain } from './explain';
 import { loadCarrierCapacity, offerInsert, syncCapacity } from './load';
 
 /*
@@ -34,31 +35,6 @@ const date = (form: FormData, key: string): string | undefined => {
   const value = text(form, key);
   return /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : undefined;
 };
-
-/** Отказ базы → текст. */
-function explain(t: Dictionary, error: { code?: string; message?: string } | null): string {
-  const c = t.capacity;
-  switch (error?.code) {
-    case '55000':
-      return c.unavailable;
-    case '55004':
-      return c.vehicleIdle;
-    case '55009':
-      return c.termsChanged;
-    case '23505':
-      return c.alreadyRequested;
-    case '42501':
-      return t.error.forbidden;
-    case 'P0002':
-      return c.unavailable;
-    case '22023':
-      if (error.message?.includes('помещается')) return c.noFit;
-      if (error.message?.includes('Даты')) return c.badDates;
-      return c.badPrice;
-    default:
-      return t.error.generic;
-  }
-}
 
 function revalidateCarrier(locale: Locale) {
   revalidatePath(`/${locale}/carrier`, 'layout');

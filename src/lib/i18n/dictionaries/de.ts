@@ -4658,6 +4658,8 @@ export const de = {
     capacityPropose: "Freien Laderaum anderen zeigen?",
     capacityAutoPublished: "Freier Laderaum wurde automatisch veröffentlicht",
     capacityRequest: "Anfrage für freien Laderaum",
+    capacityDeclined: "Anfrage für freien Laderaum nicht angenommen – Auftrag auf der Börse veröffentlichen?",
+    publishDesk: "Auf der Börse veröffentlichen",
     capacityShow: "Anderen zeigen",
     capacityCorrect: "Korrigieren",
     capacityWithdraw: "Zurückziehen",
@@ -4777,6 +4779,13 @@ export const de = {
     suggestLead: "Fahrzeuge, die bereits in dieselbe Richtung fahren und zu Ihren Teilladungen passen. Die Anfrage geht zum Auftragspreis; einen anderen Preis oder andere Daten wählen Sie auf der Laderaumseite.",
     seeAll: "Alle und anderer Preis",
     quickRequest: "Für {price} anfragen",
+    holdNew: "Ladung beschreiben",
+    holdHint: "Kein passender Auftrag? Beschreiben Sie die Ladung: Sie wird als Entwurf gespeichert, andere sehen sie nicht auf der Börse, und die Anfrage geht an dieses Fahrzeug.",
+    holdNotice: "Der Auftrag wird für diesen freien Laderaum gespeichert: Andere Transportunternehmen sehen ihn nicht auf der Börse, und die Anfrage geht zu diesem Preis an das Unternehmen. Wird die Anfrage nicht angenommen, können Sie den Auftrag mit einem Klick auf der Börse veröffentlichen.",
+    holdSubmit: "Speichern und Anfrage senden",
+    holdOnlyExpress: "Freier Laderaum passt nur für Ladung im Fahrzeug: Transporter, Lkw oder Sattelauflieger.",
+    heldSaved: "Als Entwurf gespeichert",
+    requestNotSent: "Der Auftrag ist als Entwurf gespeichert, die Anfrage wurde aber nicht gesendet: {reason}",
   },
 
   /* Двухэтапный вход и устройства входа (6.11.2026). */

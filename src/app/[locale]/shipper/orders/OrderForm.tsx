@@ -156,6 +156,8 @@ type OrderFormProps = {
   importOpen?: boolean;
   /** Черновик из пересланного письма: форма заполнена, после публикации черновик закрывается. */
   emailDraft?: EmailDraftInfo | null;
+  /** Под запрос свободного места (?space=): черновик мимо стола и запрос этому месту. */
+  capacityOfferId?: string | null;
 };
 
 /**
@@ -191,6 +193,7 @@ function OrderFormInner({
   own,
   importOpen = false,
   emailDraft = null,
+  capacityOfferId = null,
   draft,
   onDraft,
 }: OrderFormProps & { draft: OrderDraft | null; onDraft: (draft: OrderDraft) => void }) {
@@ -221,7 +224,8 @@ function OrderFormInner({
   const originDelivery = originStops.find((s) => s.role === 'DELIVERY');
   const originWork = originStops.filter((s) => repeatableRole(s.role) !== null);
 
-  const [haulKind, setHaulKind] = useState<HaulKind>(draft?.haulKind ?? origin?.haul_kind ?? 'TRAILER');
+  /* Свободное место — только груз в кузове: по умолчанию грузовик, а не перецеп. */
+  const [haulKind, setHaulKind] = useState<HaulKind>(draft?.haulKind ?? origin?.haul_kind ?? (capacityOfferId ? 'TRUCK' : 'TRAILER'));
   const container = haulKind === 'CONTAINER';
   /*
    * Номер контейнера проверяется по контрольной цифре ISO 6346 прямо при
@@ -532,6 +536,27 @@ function OrderFormInner({
   const shownGuide = orderCurrency === 'EUR' ? guide : null;
   const lowRate = shownGuide !== null && Number.isFinite(euros) && euros > 0 && euros * 100 < shownGuide.median * 0.8;
 
+  if (state.ref && state.held) {
+    const held = state.held;
+    return (
+      <Card stripe={held.requestError ? 'warn' : 'ok'}>
+        <CardBody className="flex flex-wrap items-center gap-3">
+          <Badge tone={held.requestError ? 'warn' : 'ok'}>{t.capacity.heldSaved}</Badge>
+          <Mono className="text-[13px]">{state.ref}</Mono>
+          <span className="text-[13px] text-ink-muted">
+            {held.requestError ? t.capacity.requestNotSent.replace('{reason}', held.requestError) : t.capacity.requestSent}
+          </span>
+          <a href={`/${locale}/shipper/capacity?order=${held.orderId}`} className="text-[13px] text-accent hover:underline">
+            {t.capacity.shipperTitle}
+          </a>
+          <Button size="sm" onClick={onPublished} className="ml-auto">
+            {t.action.close}
+          </Button>
+        </CardBody>
+      </Card>
+    );
+  }
+
   if (state.ref) {
     return (
       <Card stripe="ok">
@@ -626,6 +651,7 @@ function OrderFormInner({
       )}
       <input type="hidden" name="locale" value={locale} />
       {emailDraft && <input type="hidden" name="email_draft_id" value={emailDraft.id} />}
+      {capacityOfferId && <input type="hidden" name="capacity_offer_id" value={capacityOfferId} />}
 
       {/*
        * Кэш маршрута уезжает вместе с заказом: пересчитывать его при
@@ -1303,6 +1329,9 @@ function OrderFormInner({
               homeCountry={own.homeCountry}
               draftClient={draft?.client ?? null}
             />
+          ) : capacityOfferId ? (
+            /* Под свободное место: не на стол и не другой машине — только запрос этому месту. */
+            <p className="text-[13px] leading-relaxed text-ink-muted">{t.capacity.holdNotice}</p>
           ) : (
             <DispatchPicker
               vehicles={knownVehicles}
@@ -1347,7 +1376,9 @@ function OrderFormInner({
               : t.own.send
             : pending
               ? t.orderForm.publishing
-              : direct
+              : capacityOfferId
+                ? t.capacity.holdSubmit
+                : direct
                 ? t.orderForm.publishDirect
                 : t.orderForm.publish}
         </Button>

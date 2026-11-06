@@ -7,6 +7,7 @@ import { CabotageNote, spaceText, vehicleText } from '@/components/domain/capaci
 import { RequestForm, type RequestOrderOption } from '@/components/domain/capacity/RequestForm';
 import { requireRole } from '@/lib/auth/guard';
 import { cancelCapacityRequestAction } from '@/lib/capacity/actions';
+import { publishDraftOrderAction } from '@/lib/orders/actions';
 import { isLocale } from '@/lib/i18n';
 import { getViewerI18n } from '@/lib/i18n/viewer';
 import { createClient } from '@/lib/supabase/server';
@@ -92,7 +93,18 @@ export default async function ShipperCapacityPage({
   const focus = options.find((o) => o.id === focusOrder);
   const day = (d: string) => f.date(`${d}T12:00:00Z`);
   const dates = (a: string, b: string) => (a === b ? day(a) : `${day(a)} – ${day(b)}`);
-  const newOrderHref = `/${locale}/shipper/orders?new=1`;
+  /* «Описать груз»: заказ черновиком под это место — на стол он не уходит, пока не решит заказчик. */
+  const newOrderHref = (offerId: string) => `/${locale}/shipper/orders?new=1&space=${offerId}`;
+  /* Черновик, по которому запрос не принят и другого не ждёт, — «опубликовать на столе». */
+  const drafts = new Set((myOrders ?? []).filter((o) => o.status === 'DRAFT').map((o) => o.id));
+  const waiting = new Set(requests.filter((r) => r.status === 'PENDING').map((r) => r.order_id));
+  /* Кнопка — у последнего такого запроса заказа (список — свежие выше). */
+  const publishAt = new Map<string, string>();
+  for (const r of requests) {
+    if ((r.status === 'DECLINED' || r.status === 'EXPIRED') && r.order_id && drafts.has(r.order_id) && !waiting.has(r.order_id) && !publishAt.has(r.order_id)) {
+      publishAt.set(r.order_id, r.request_id);
+    }
+  }
 
   const offerCard = (o: Pick<OfferRow, 'offer_id' | 'from_city' | 'to_city' | 'available_from' | 'available_to' | 'free_ldm' | 'free_kg' | 'free_pallets' | 'body' | 'vehicle_class' | 'carrier_name' | 'verified' | 'cabotage_ops' | 'my_pending'> & { detour_km?: number }) => (
     <Card key={o.offer_id} id={`offer-${o.offer_id}`} className="scroll-mt-24">
@@ -117,7 +129,7 @@ export default async function ShipperCapacityPage({
         <details>
           <summary className="cursor-pointer text-[13px] font-semibold text-accent">{c.requestSpace}</summary>
           <div className="mt-2">
-            <RequestForm offerId={o.offer_id} orders={options} defaultOrderId={focusOrder} newOrderHref={newOrderHref} />
+            <RequestForm offerId={o.offer_id} orders={options} defaultOrderId={focusOrder} newOrderHref={newOrderHref(o.offer_id)} />
           </div>
         </details>
       </CardBody>
@@ -172,6 +184,15 @@ export default async function ShipperCapacityPage({
                     <input type="hidden" name="request_id" value={r.request_id} />
                     <Button type="submit" size="sm" variant="ghost">
                       {c.cancelRequest}
+                    </Button>
+                  </form>
+                )}
+                {r.order_id && publishAt.get(r.order_id) === r.request_id && (
+                  <form action={publishDraftOrderAction}>
+                    <input type="hidden" name="locale" value={locale} />
+                    <input type="hidden" name="order_id" value={r.order_id} />
+                    <Button type="submit" size="sm" variant="primary">
+                      {t.inbox.publishDesk}
                     </Button>
                   </form>
                 )}

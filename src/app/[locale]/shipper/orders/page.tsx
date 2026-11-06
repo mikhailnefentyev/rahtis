@@ -31,11 +31,13 @@ export default async function OrdersPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ new?: string; email?: string }>;
+  searchParams: Promise<{ new?: string; email?: string; space?: string }>;
 }) {
   /* «+ Uusi tilaus» с обзора открывает форму сразу. */
   const query = await searchParams;
-  const startNew = query.new === '1' || Boolean(query.email);
+  /* ?space= — «Описать груз» у свободного места: черновик под это место, не на стол. */
+  const spaceOffer = /^[0-9a-f-]{36}$/i.test(query.space ?? '') ? query.space! : null;
+  const startNew = query.new === '1' || Boolean(query.email) || Boolean(spaceOffer);
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
 
@@ -236,6 +238,7 @@ export default async function OrdersPage({
           documentsByOrder={documentsByOrder}
           startNew={startNew}
           emailDraft={emailDraft}
+          capacityOfferId={spaceOffer}
         />
         </>
       )}

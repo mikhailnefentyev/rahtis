@@ -4618,6 +4618,8 @@ export const et = {
     capacityPropose: "Kas näidata vaba ruumi teistele?",
     capacityAutoPublished: "Vaba ruum avaldati automaatselt",
     capacityRequest: "Päring vaba ruumi kohta",
+    capacityDeclined: "Vaba ruumi päringut ei kinnitatud – kas avaldada tellimus börsil?",
+    publishDesk: "Avalda börsil",
     capacityShow: "Näita teistele",
     capacityCorrect: "Paranda",
     capacityWithdraw: "Eemalda",
@@ -4737,6 +4739,13 @@ export const et = {
     suggestLead: "Autod, mis juba sõidavad samas suunas ja sobivad sinu osakoormatele. Päring saadetakse tellimuse hinnaga; muu hinna või kuupäevad saad valida vaba ruumi lehel.",
     seeAll: "Kõik ja muu hind",
     quickRequest: "Küsi hinnaga {price}",
+    holdNew: "Kirjelda koormat",
+    holdHint: "Sobivat tellimust pole? Kirjelda koormat: see salvestatakse mustandina, teised ei näe seda börsil ja päring läheb sellele autole.",
+    holdNotice: "Tellimus salvestatakse selle vaba ruumi jaoks: teised vedajad ei näe seda börsil ja päring läheb vedajale selle hinnaga. Kui päringut ei kinnitata, saad tellimuse ühe vajutusega börsil avaldada.",
+    holdSubmit: "Salvesta ja saada päring",
+    holdOnlyExpress: "Vaba ruum sobib ainult autos veetavale koormale: kaubik, veoauto või poolhaagis.",
+    heldSaved: "Salvestatud mustandina",
+    requestNotSent: "Tellimus on salvestatud mustandina, kuid päringut ei saadetud: {reason}",
   },
 
   /* Двухэтапный вход и устройства входа (6.11.2026). */

@@ -23,6 +23,8 @@ export type InboxOp =
   | { op: 'publishCapacity'; vehicleId: string; orderId: string }
   | { op: 'withdrawCapacity'; offerId: string }
   | { op: 'capacityRequest'; requestId: string }
+  /* Запрос на место не принят — черновик на стол одним нажатием. */
+  | { op: 'publishDraft'; orderId: string }
   /* Черновик из письма: «не нужно» — открыть форму ведёт href. */
   | { op: 'dismissEmailDraft'; draftId: string };
 

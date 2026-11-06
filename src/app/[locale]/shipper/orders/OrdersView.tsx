@@ -120,7 +120,10 @@ export function OrdersView({
   documentsByOrder,
   startNew = false,
   emailDraft = null,
+  capacityOfferId = null,
 }: {
+  /** Пришли с «Описать груз» у свободного места (?space=): форма — черновиком под это место. */
+  capacityOfferId?: string | null;
   /** Черновик из пересланного письма (?email=): форма открывается заполненной. */
   emailDraft?: EmailDraftInfo | null;
   /** Цена и пробег, сообщения водителя (правки после назначения). */
@@ -144,9 +147,12 @@ export function OrdersView({
     template?: { order: ShipperOrder; stops: OrderStop[] };
     knownVehicles: KnownVehicle[];
     emailDraft?: EmailDraftInfo | null;
+    capacityOfferId?: string | null;
   }> | null>(null);
   /* Черновик из письма — только для первой формы; «следующий заказ» и повтор открывают чистую. */
   const [fromEmail, setFromEmail] = useState(emailDraft);
+  /* Место — тоже только для первой формы. */
+  const [forSpace, setForSpace] = useState(capacityOfferId);
   /* Какой заказ повторяем. Пусто — форма открыта пустой. */
   const [template, setTemplate] = useState<{ order: ShipperOrder; stops: OrderStop[] } | null>(null);
   /* Раскрыт один заказ за раз: иначе список снова превращается в ленту карточек. */
@@ -184,6 +190,7 @@ export function OrdersView({
     }
     setTemplate(from ?? null);
     setFromEmail(null);
+    setForSpace(null);
     setComposing(true);
     /* Повтор открывает форму наверху — иначе она уедет под раскрытую карточку. */
     if (from) window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -323,9 +330,11 @@ export function OrdersView({
             key={formKey}
             template={template ?? undefined}
             emailDraft={fromEmail}
+            capacityOfferId={forSpace}
             onNew={() => {
               setTemplate(null);
               setFromEmail(null);
+              setForSpace(null);
               setFormKey((k) => k + 1);
             }}
             knownVehicles={knownVehicles}
@@ -333,6 +342,7 @@ export function OrdersView({
               setComposing(false);
               setTemplate(null);
               setFromEmail(null);
+              setForSpace(null);
             }}
           />
         </div>

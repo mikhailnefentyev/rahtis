@@ -4821,6 +4821,8 @@ export const en = {
     capacityPropose: "Show free space to others?",
     capacityAutoPublished: "Free space was published automatically",
     capacityRequest: "Request for free space",
+    capacityDeclined: "Free space request not accepted – publish the order on the board?",
+    publishDesk: "Publish on the board",
     capacityShow: "Show to others",
     capacityCorrect: "Correct",
     capacityWithdraw: "Withdraw",
@@ -4940,6 +4942,13 @@ export const en = {
     suggestLead: "Trucks already heading the same way that suit your part loads. The request goes at the order price; change the price or dates on the free space page.",
     seeAll: "All and another price",
     quickRequest: "Request for {price}",
+    holdNew: "Describe the load",
+    holdHint: "No suitable order? Describe the load: it is saved as a draft, other carriers do not see it on the board, and the request goes to this vehicle.",
+    holdNotice: "The order is saved for this free space: other carriers do not see it on the board, and the request goes to the carrier at this price. If the request is not accepted, you can publish the order on the board with one tap.",
+    holdSubmit: "Save and send the request",
+    holdOnlyExpress: "Free space suits only loads carried in the vehicle: van, truck or semi-trailer.",
+    heldSaved: "Saved as a draft",
+    requestNotSent: "The order is saved as a draft, but the request was not sent: {reason}",
   },
 
   /* Двухэтапный вход и устройства входа (6.11.2026). */

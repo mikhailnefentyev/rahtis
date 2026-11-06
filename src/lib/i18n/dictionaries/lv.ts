@@ -4658,6 +4658,8 @@ export const lv = {
     capacityPropose: "Rādīt brīvo vietu citiem?",
     capacityAutoPublished: "Brīvā vieta publicēta automātiski",
     capacityRequest: "Pieprasījums par brīvo vietu",
+    capacityDeclined: "Pieprasījums par brīvo vietu netika pieņemts – publicēt pasūtījumu biržā?",
+    publishDesk: "Publicēt biržā",
     capacityShow: "Rādīt citiem",
     capacityCorrect: "Labot",
     capacityWithdraw: "Noņemt",
@@ -4777,6 +4779,13 @@ export const lv = {
     suggestLead: "Automašīnas, kas jau brauc tajā pašā virzienā un der jūsu daļējām kravām. Pieprasījums tiek nosūtīts par pasūtījuma cenu; citu cenu vai datumus norādiet brīvās vietas lapā.",
     seeAll: "Visas un cita cena",
     quickRequest: "Pieprasīt par {price}",
+    holdNew: "Aprakstīt kravu",
+    holdHint: "Nav piemērota pasūtījuma? Aprakstiet kravu: tā tiks saglabāta kā melnraksts, citi to biržā neredzēs, un pieprasījums aizies šim auto.",
+    holdNotice: "Pasūtījums tiek saglabāts šai brīvajai vietai: citi pārvadātāji to biržā neredz, un pieprasījums aiziet pārvadātājam par šo cenu. Ja pieprasījumu nepieņem, pasūtījumu var publicēt biržā ar vienu klikšķi.",
+    holdSubmit: "Saglabāt un nosūtīt pieprasījumu",
+    holdOnlyExpress: "Brīvā vieta der tikai kravai transportlīdzeklī: furgonam, kravas auto vai puspiekabei.",
+    heldSaved: "Saglabāts kā melnraksts",
+    requestNotSent: "Pasūtījums saglabāts kā melnraksts, bet pieprasījums netika nosūtīts: {reason}",
   },
 
   /* Двухэтапный вход и устройства входа (6.11.2026). */

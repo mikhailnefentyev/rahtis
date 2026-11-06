@@ -9166,6 +9166,78 @@ export type Database = {
       }
       prune_auth_throttle: { Args: never; Returns: number }
       prune_incidents: { Args: { p_keep_days?: number }; Returns: number }
+      publish_draft_order: {
+        Args: { p_order_id: string }
+        Returns: {
+          assigned_company_id: string | null
+          assigned_driver_id: string | null
+          assigned_trailer_id: string | null
+          assigned_vehicle_id: string | null
+          billing: Database["public"]["Enums"]["billing_status"]
+          chosen_offer_id: string | null
+          closed_at: string | null
+          comment: string | null
+          commission_bps: number | null
+          container_feet: number | null
+          contract_party: Database["public"]["Enums"]["contract_party"]
+          created_at: string
+          created_by: string | null
+          currency: string
+          deadline_at: string | null
+          desk_contract: Database["public"]["Enums"]["contract_party"]
+          dispatch_mode: Database["public"]["Enums"]["dispatch_mode"]
+          distance_auto_km: number | null
+          distance_km: number | null
+          distance_source: Database["public"]["Enums"]["distance_source"]
+          group_released_at: string | null
+          group_until: string | null
+          group_vehicle_ids: string[] | null
+          haul_kind: Database["public"]["Enums"]["haul_kind"]
+          id: string
+          invoice_ref: string | null
+          invoiced_at: string | null
+          ldm: number | null
+          material_code: string | null
+          order_type: Database["public"]["Enums"]["order_type"]
+          paid_at: string | null
+          planned_qty: number | null
+          planned_volume_m3: number | null
+          pricing_mode: string
+          published_at: string | null
+          rate_cents: number | null
+          rate_per_km_cents: number | null
+          ref: string
+          required_body: string | null
+          required_loading: string[]
+          route_bounds: Json | null
+          route_computed_at: string | null
+          route_fingerprint: string | null
+          route_geometry: string | null
+          semi_features: string[]
+          settled_at: string | null
+          shipper_company_id: string
+          shipper_company_kind: Database["public"]["Enums"]["party_role"]
+          shipper_fee_bps: number | null
+          shipper_ref: string | null
+          site_pricing: Database["public"]["Enums"]["site_pricing"] | null
+          site_rate_cents: number | null
+          status: Database["public"]["Enums"]["order_status"]
+          terms_document_id: string | null
+          tipper_config: string | null
+          track_token: string | null
+          trailer: string | null
+          trailer_plate: string | null
+          updated_at: string
+          waiting: Json
+          waiting_cents: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       rate_order: {
         Args: { p_comment?: string; p_order_id: string; p_score: number }
         Returns: {

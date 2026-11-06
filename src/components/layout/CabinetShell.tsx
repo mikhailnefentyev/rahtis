@@ -13,8 +13,7 @@ import type { Company, PartyRole } from '@/types/db';
 import { SideNav, TabBar, type NavGroup, type NavItem } from './CabinetNav';
 import { NavIcon } from './NavIcon';
 import { getViewerI18n } from '@/lib/i18n/viewer';
-import { loadCarrierInbox } from '@/lib/inbox/carrier';
-import { loadShipperInbox } from '@/lib/inbox/shipper';
+import { inboxBadgeCount } from '@/lib/inbox/badge';
 
 /**
  * Каркас кабинета: боковая панель, строка сверху, содержимое.
@@ -38,15 +37,15 @@ export async function CabinetShell({
   company: Company | null;
   children: React.ReactNode;
 }) {
-  const [{ t }, { data: unread }, inbox] = await Promise.all([
+  const [{ t }, { data: unread }, pending] = await Promise.all([
     getViewerI18n(locale),
     createClient().then((supabase) => supabase.rpc('unread_notifications')),
-    /* Счётчик «Требует действия» у обзора — тот же расчёт, что на странице (cache на запрос). */
-    role === 'CARRIER' ? loadCarrierInbox(locale) : role === 'SHIPPER' ? loadShipperInbox(locale) : Promise.resolve(null),
+    /* Счётчик «Требует действия»: итог обзора не старше минуты, а не полный расчёт на каждой странице. */
+    inboxBadgeCount(locale, role),
   ]);
 
   const home = cabinetPath(locale, role);
-  const { groups, primary } = navigation(locale, role, home, t, inbox?.total ?? 0);
+  const { groups, primary } = navigation(locale, role, home, t, pending);
   const count = typeof unread === 'number' ? unread : 0;
 
   const signOut = (

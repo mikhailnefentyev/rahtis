@@ -11,6 +11,7 @@ import { acknowledgeAmendmentsAction, dismissChangeRequestAction, respondProposa
 import { confirmVehicleCheckAction } from '@/lib/orders/vehicleCheckActions';
 import { decideCapacityRequestAction, publishCapacityAction, withdrawCapacityAction } from '@/lib/capacity/actions';
 import { dismissEmailDraftAction } from '@/lib/inbound/actions';
+import { publishDraftOrderAction } from '@/lib/orders/actions';
 import { ConfirmOrderButton, MarkPaidButton } from './InboxButtons';
 
 /** Сколько пунктов видно сразу; остальные — под «Показать все». */
@@ -222,6 +223,20 @@ async function Row({ item, locale }: { item: InboxItem; locale: Locale }) {
             {hidden({ request_id: op.requestId, accept: '0' })}
             <Button type="submit" size="sm">
               {ti.decline}
+            </Button>
+          </form>
+          {open(false)}
+        </>
+      );
+      break;
+    case 'publishDraft':
+      /* Запрос на место не принят: черновик — на стол; или открыть место и спросить другую машину. */
+      actions = (
+        <>
+          <form action={publishDraftOrderAction}>
+            {hidden({ order_id: op.orderId })}
+            <Button type="submit" size="sm" variant="primary">
+              {ti.publishDesk}
             </Button>
           </form>
           {open(false)}

@@ -6,6 +6,7 @@ import { daysFromToday, todayInHelsinki } from '@/lib/dates';
 import type { Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import { companyDocumentItems, emailDraftItems, loadDismissals, orderChangeItems, sensitiveChangeItems, type InboxResult } from './common';
+import { inboxTotalKey, inboxTotals } from './memo';
 import { rankItems, shipperInvoiceItem, twoStepItem, type InboxItem } from './rank';
 
 /**
@@ -20,7 +21,7 @@ export const loadShipperInbox = cache(async (locale: Locale): Promise<InboxResul
   const base = `/${locale}/shipper`;
   const card = (id: string) => `${base}/orders#order-${id}`;
 
-  const [{ data: orders }, invoicesRes, docItems, sensitive, { data: claims }, dismissed, emailItems] = await Promise.all([
+  const [{ data: orders }, invoicesRes, docItems, sensitive, { data: claims }, dismissed, emailItems, capacityRes] = await Promise.all([
     /* Колонки поимённо: назначение заказчику грантом не отдаётся. */
     supabase
       .from('orders')
@@ -34,6 +35,7 @@ export const loadShipperInbox = cache(async (locale: Locale): Promise<InboxResul
     supabase.rpc('my_claims'),
     loadDismissals(supabase),
     emailDraftItems(supabase, (id) => `${base}/orders?new=1&email=${id}`),
+    supabase.rpc('capacity_requests_for_shipper'),
   ]);
 
   const items: InboxItem[] = [
@@ -96,6 +98,30 @@ export const loadShipperInbox = cache(async (locale: Locale): Promise<InboxResul
     }
   }
 
+  /*
+   * Черновик под свободное место: запрос отклонён или истёк, другого не
+   * ждёт — «опубликовать на столе». Последний запрос заказа (список — свежие выше).
+   */
+  const draftIds = new Set(drafts);
+  const seenOrders = new Set<string>();
+  for (const r of capacityRes.error ? [] : (capacityRes.data ?? [])) {
+    if (!r.order_id || !draftIds.has(r.order_id) || seenOrders.has(r.order_id)) continue;
+    seenOrders.add(r.order_id);
+    if (r.status !== 'DECLINED' && r.status !== 'EXPIRED') continue;
+    items.push({
+      key: `capacity-declined:${r.request_id}`,
+      kind: 'capacityDeclined',
+      urgency: 1,
+      at: r.created_at,
+      ref: r.order_ref,
+      party: r.carrier_name,
+      note: `${r.from_city} → ${r.to_city}`,
+      href: `${base}/capacity#offer-${r.offer_id}`,
+      op: { op: 'publishDraft', orderId: r.order_id },
+      snooze: 7,
+    });
+  }
+
   /* Счета перевозчиков: срок через три дня или прошёл. «Оплачен» — одной кнопкой с сегодняшней датой. */
   for (const inv of invoicesRes.error ? [] : (invoicesRes.data ?? [])) {
     const item = shipperInvoiceItem(inv, { today, soonDays: 3, href: `/${locale}/shipper/done#invoice-${inv.id}` });
@@ -108,5 +134,8 @@ export const loadShipperInbox = cache(async (locale: Locale): Promise<InboxResul
     items.push({ key: `claim:${c.id}`, kind: 'claimAnswer', urgency: 1, at: c.last_event_at ?? c.updated_at, ref: c.order_ref, party: c.carrier_name, href: `${base}/claims/${c.id}` });
   }
 
-  return rankItems(items, dismissed, new Date(), 100);
+  const result = rankItems(items, dismissed, new Date(), 100);
+  /* Итог — в память меню (src/lib/inbox/badge): другие страницы не считают заново. */
+  if (viewer.status === 'ready') inboxTotals.set(inboxTotalKey(viewer.userId, 'SHIPPER'), result.total);
+  return result;
 });

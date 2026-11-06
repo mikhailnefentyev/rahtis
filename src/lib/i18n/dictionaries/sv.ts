@@ -4632,6 +4632,8 @@ export const sv = {
     capacityPropose: "Visa ledigt utrymme för andra?",
     capacityAutoPublished: "Ledigt utrymme publicerades automatiskt",
     capacityRequest: "Förfrågan om ledigt utrymme",
+    capacityDeclined: "Förfrågan om ledigt utrymme godkändes inte – publicera ordern på lastbörsen?",
+    publishDesk: "Publicera på lastbörsen",
     capacityShow: "Visa för andra",
     capacityCorrect: "Korrigera",
     capacityWithdraw: "Ta bort",
@@ -4751,6 +4753,13 @@ export const sv = {
     suggestLead: "Bilar som redan kör åt samma håll och passar dina dellaster. Förfrågan skickas till orderns pris; ändra pris eller datum på sidan för ledigt utrymme.",
     seeAll: "Alla och annat pris",
     quickRequest: "Begär för {price}",
+    holdNew: "Beskriv lasten",
+    holdHint: "Ingen passande order? Beskriv lasten: den sparas som utkast, andra åkerier ser den inte på lastbörsen, och förfrågan går till det här fordonet.",
+    holdNotice: "Ordern sparas för det här lediga utrymmet: andra åkerier ser den inte på lastbörsen, och förfrågan går till åkeriet till det här priset. Om förfrågan inte godkänns kan du publicera ordern på lastbörsen med ett tryck.",
+    holdSubmit: "Spara och skicka förfrågan",
+    holdOnlyExpress: "Ledigt utrymme passar bara last som körs i fordonet: skåpbil, lastbil eller semitrailer.",
+    heldSaved: "Sparad som utkast",
+    requestNotSent: "Ordern är sparad som utkast, men förfrågan skickades inte: {reason}",
   },
 
   /* Двухэтапный вход и устройства входа (6.11.2026). */

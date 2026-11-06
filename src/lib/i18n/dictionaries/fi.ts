@@ -4942,6 +4942,8 @@ export const fi = {
     capacityPropose: "Näytetäänkö vapaa tila muille?",
     capacityAutoPublished: "Vapaa tila julkaistiin automaattisesti",
     capacityRequest: "Pyyntö vapaasta tilasta",
+    capacityDeclined: "Vapaan tilan pyyntöä ei hyväksytty – julkaistaanko tilaus pöydälle?",
+    publishDesk: "Julkaise pöydälle",
     capacityShow: "Näytä muille",
     capacityCorrect: "Korjaa",
     capacityWithdraw: "Poista näkyvistä",
@@ -5061,6 +5063,13 @@ export const fi = {
     suggestLead: "Osakuormillesi sopivat autot, jotka ajavat jo samaan suuntaan. Pyyntö lähtee tilauksen hinnalla; muuta hintaa tai päiviä vapaan tilan sivulla.",
     seeAll: "Kaikki ja muu hinta",
     quickRequest: "Pyydä hintaan {price}",
+    holdNew: "Kuvaile kuorma",
+    holdHint: "Ei sopivaa tilausta? Kuvaile kuorma: se tallennetaan luonnoksena, ei näy pöydällä muille, ja pyyntö lähtee tälle autolle.",
+    holdNotice: "Tilaus tallennetaan tätä vapaata tilaa varten: se ei näy pöydällä muille kuljetusliikkeille, ja pyyntö lähtee kuljetusliikkeelle tällä hinnalla. Jos pyyntöä ei hyväksytä, voit julkaista tilauksen pöydälle yhdellä painalluksella.",
+    holdSubmit: "Tallenna ja lähetä pyyntö",
+    holdOnlyExpress: "Vapaaseen tilaan sopii vain autossa kulkeva kuorma: pakettiauto, kuorma-auto tai puoliperävaunu.",
+    heldSaved: "Tallennettu luonnoksena",
+    requestNotSent: "Tilaus on tallennettu luonnoksena, mutta pyyntöä ei lähetetty: {reason}",
   },
 
   /* Двухэтапный вход и устройства входа (6.11.2026). */

@@ -7,6 +7,7 @@ import { COLLECTION_DAY } from '@/lib/invoices/schedule';
 import type { Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import { companyDocumentItems, emailDraftItems, loadDismissals, orderChangeItems, sensitiveChangeItems, type InboxResult } from './common';
+import { inboxTotalKey, inboxTotals } from './memo';
 import { carrierInvoiceItems, collapseInvoiceSend, rankItems, twoStepItem, urgencyByDue, type InboxItem } from './rank';
 import { spaceLabel } from '@/lib/capacity/compute';
 import { loadCarrierCapacity } from '@/lib/capacity/load';
@@ -244,5 +245,8 @@ export const loadCarrierInbox = cache(async (locale: Locale): Promise<InboxResul
     });
   }
 
-  return rankItems(items, dismissed, new Date(), 100);
+  const result = rankItems(items, dismissed, new Date(), 100);
+  /* Итог — в память меню (src/lib/inbox/badge): другие страницы не считают заново. */
+  if (viewer.status === 'ready') inboxTotals.set(inboxTotalKey(viewer.userId, 'CARRIER'), result.total);
+  return result;
 });

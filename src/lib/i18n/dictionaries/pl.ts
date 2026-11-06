@@ -4657,6 +4657,8 @@ export const pl = {
     capacityPropose: "Pokazać wolne miejsce innym?",
     capacityAutoPublished: "Wolne miejsce opublikowano automatycznie",
     capacityRequest: "Zapytanie o wolne miejsce",
+    capacityDeclined: "Zapytanie o wolne miejsce nie zostało przyjęte – opublikować zlecenie na giełdzie?",
+    publishDesk: "Opublikuj na giełdzie",
     capacityShow: "Pokaż innym",
     capacityCorrect: "Popraw",
     capacityWithdraw: "Wycofaj",
@@ -4776,6 +4778,13 @@ export const pl = {
     suggestLead: "Pojazdy, które już jadą w tę samą stronę i pasują do Twoich doładunków. Zapytanie idzie w cenie zlecenia; inną cenę lub daty ustawisz na stronie wolnego miejsca.",
     seeAll: "Wszystkie i inna cena",
     quickRequest: "Zapytaj za {price}",
+    holdNew: "Opisz ładunek",
+    holdHint: "Brak pasującego zlecenia? Opisz ładunek: zapisze się jako szkic, inni nie zobaczą go na giełdzie, a zapytanie trafi do tego pojazdu.",
+    holdNotice: "Zlecenie zapisuje się pod to wolne miejsce: inni przewoźnicy nie zobaczą go na giełdzie, a zapytanie trafi do przewoźnika w tej cenie. Jeśli zapytanie nie zostanie przyjęte, opublikujesz zlecenie na giełdzie jednym kliknięciem.",
+    holdSubmit: "Zapisz i wyślij zapytanie",
+    holdOnlyExpress: "Wolne miejsce jest tylko dla ładunku w pojeździe: bus, ciężarówka lub naczepa.",
+    heldSaved: "Zapisano jako szkic",
+    requestNotSent: "Zlecenie zapisano jako szkic, ale zapytanie nie zostało wysłane: {reason}",
   },
 
   /* Двухэтапный вход и устройства входа (6.11.2026). */

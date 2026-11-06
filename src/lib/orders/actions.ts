@@ -21,8 +21,14 @@ import { checkBusinessId, isCountryCode } from '@/lib/country';
 import { routeLabel } from '@/lib/orders/route';
 import { siteUrl } from '@/lib/config';
 import { isCurrency, type Currency } from '@/lib/money/currency';
+import { explainCapacityError } from '@/lib/capacity/explain';
 
-export type PublishState = { error: string | null; ref: string | null };
+export type PublishState = {
+  error: string | null;
+  ref: string | null;
+  /** Сохранён черновиком под запрос свободного места; requestError — запрос не ушёл. */
+  held?: { orderId: string; requestError: string | null };
+};
 
 function toLocale(value: FormDataEntryValue | null): Locale {
   const raw = String(value ?? '');
@@ -451,9 +457,19 @@ export async function publishOrderAction(
   const form = readOrderForm(formData, t);
   if ('error' in form) return { error: form.error, ref: null };
 
-  const direct = str(formData, 'dispatch') === 'DIRECT';
+  /*
+   * Под запрос свободного места (?space=): черновик мимо стола — другой
+   * перевозчик не возьмёт заказ раньше, чем ответит перевозчик места.
+   */
+  const spaceOffer = str(formData, 'capacity_offer_id');
+  const hold = /^[0-9a-f-]{36}$/i.test(spaceOffer);
+  if (hold && !['VAN', 'TRUCK', 'SEMI'].includes(str(formData, 'haul_kind'))) {
+    return { error: t.capacity.holdOnlyExpress, ref: null };
+  }
+
+  const direct = !hold && str(formData, 'dispatch') === 'DIRECT';
   /* Группа своих машин: первые минуты заказ видят и берут только они. */
-  const group = str(formData, 'dispatch') === 'GROUP';
+  const group = !hold && str(formData, 'dispatch') === 'GROUP';
   const groupVehicles = group ? formData.getAll('group_vehicle_ids').map(String).filter(Boolean) : [];
   if (group && groupVehicles.length < 2) {
     return { error: t.direct.groupPickTwo, ref: null };
@@ -488,13 +504,29 @@ export async function publishOrderAction(
       currency,
     },
     p_stops: form.stops,
-    p_publish: true,
+    p_publish: !hold,
   });
 
   if (error || !data) {
     return { error: explainPublish(t, error?.code, error?.message), ref: null };
   }
   await closeEmailDraft(supabase, formData, data.id);
+
+  /* Черновик готов — запрос перевозчику места по ставке заказа (цену и даты можно поменять на странице места). */
+  if (hold) {
+    const { error: requestError } = await supabase.rpc('capacity_request_create', {
+      p_offer_id: spaceOffer,
+      p_order_id: data.id,
+      p_price_cents: data.rate_cents ?? 0,
+    });
+    if (requestError) console.error('запрос на место не отправлен:', requestError.message);
+    revalidatePath(`/${locale}/shipper`, 'layout');
+    return {
+      error: null,
+      ref: data.ref,
+      held: { orderId: data.id, requestError: requestError ? explainCapacityError(t, requestError) : null },
+    };
+  }
 
   /*
    * Рассылка письмами. Уведомления в кабинеты перевозчиков уже написаны
@@ -508,6 +540,27 @@ export async function publishOrderAction(
 
   revalidatePath(`/${locale}/shipper`, 'layout');
   return { error: null, ref: data.ref };
+}
+
+/**
+ * Черновик под свободное место — на стол одним нажатием (запрос отклонён
+ * или истёк). Проверки публикации — в базе (publish_draft_order).
+ */
+export async function publishDraftOrderAction(formData: FormData): Promise<void> {
+  const locale = toLocale(formData.get('locale'));
+  const t = await getDictionary(locale);
+  const viewer = await getViewer();
+  if (viewer.status !== 'ready' || viewer.role !== 'SHIPPER') return;
+
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc('publish_draft_order', { p_order_id: str(formData, 'order_id') });
+  if (error || !data) {
+    const gone = error?.code === 'P0002' || (error?.code === '55000' && !error.message.includes('реквизиты'));
+    await flashError(gone ? t.capacity.unavailable : explainPublish(t, error?.code, error?.message));
+  } else {
+    await dispatchPublishedOrder(data.id);
+  }
+  revalidatePath(`/${locale}/shipper`, 'layout');
 }
 
 /**

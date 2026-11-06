@@ -4660,6 +4660,8 @@ export const lt = {
     capacityPropose: "Rodyti laisvą vietą kitiems?",
     capacityAutoPublished: "Laisva vieta paskelbta automatiškai",
     capacityRequest: "Užklausa dėl laisvos vietos",
+    capacityDeclined: "Užklausa dėl laisvos vietos nepriimta – paskelbti užsakymą biržoje?",
+    publishDesk: "Paskelbti biržoje",
     capacityShow: "Rodyti kitiems",
     capacityCorrect: "Pataisyti",
     capacityWithdraw: "Pašalinti",
@@ -4779,6 +4781,13 @@ export const lt = {
     suggestLead: "Mašinos, kurios jau važiuoja ta pačia kryptimi ir tinka jūsų daliniams kroviniams. Užklausa siunčiama užsakymo kaina; kitą kainą ar datas nurodykite laisvos vietos puslapyje.",
     seeAll: "Visos ir kita kaina",
     quickRequest: "Užklausti už {price}",
+    holdNew: "Aprašyti krovinį",
+    holdHint: "Nėra tinkamo užsakymo? Aprašykite krovinį: jis bus išsaugotas kaip juodraštis, kiti jo biržoje nematys, o užklausa bus išsiųsta šiai mašinai.",
+    holdNotice: "Užsakymas išsaugomas šiai laisvai vietai: kiti vežėjai jo biržoje nemato, o užklausa siunčiama vežėjui už šią kainą. Jei užklausa nepriimama, užsakymą biržoje galite paskelbti vienu paspaudimu.",
+    holdSubmit: "Išsaugoti ir siųsti užklausą",
+    holdOnlyExpress: "Laisva vieta tinka tik kroviniui transporto priemonėje: furgonui, sunkvežimiui arba puspriekabei.",
+    heldSaved: "Išsaugota kaip juodraštis",
+    requestNotSent: "Užsakymas išsaugotas kaip juodraštis, bet užklausa neišsiųsta: {reason}",
   },
 
   /* Двухэтапный вход и устройства входа (6.11.2026). */

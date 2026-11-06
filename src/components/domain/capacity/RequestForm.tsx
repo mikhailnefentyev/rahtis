@@ -10,7 +10,8 @@ export type RequestOrderOption = { id: string; label: string; price: number | nu
 /**
  * Запрос на свободное место: свой заказ (черновик или на столе без
  * откликов), цена, окно дат, паллеты и описание груза. Принятый запрос
- * становится прямым заказом этой машине.
+ * становится прямым заказом этой машине. «Описать груз» (newOrderHref) —
+ * форма заказа черновиком под это место: на стол он не уходит.
  */
 export function RequestForm({
   offerId,
@@ -34,7 +35,7 @@ export function RequestForm({
       <p className="text-[13px] text-ink-muted">
         {c.noOrders}{' '}
         <a href={newOrderHref} className="text-accent hover:underline">
-          {c.newOrder}
+          {c.holdNew}
         </a>
       </p>
     );
@@ -89,6 +90,12 @@ export function RequestForm({
         <span className="text-[12px] text-ink-faint">{c.requestHint}</span>
       </div>
       {state.error && <p className="text-xs text-danger">{state.error}</p>}
+      <p className="text-[12px] text-ink-faint">
+        {c.holdHint}{' '}
+        <a href={newOrderHref} className="text-accent hover:underline">
+          {c.holdNew}
+        </a>
+      </p>
     </form>
   );
 }
