@@ -9,11 +9,16 @@ import {
   type FormState,
 } from '@/lib/drivers/actions';
 import { useI18n } from '@/lib/i18n/provider';
-import type { DriverPayProfile, PayModel, TesRuleSet } from '@/types/db';
+import type { AllowanceRuleSet, DriverPayProfile, PayModel, TesRuleSet } from '@/types/db';
 import { useKeepOnError } from '@/lib/forms/keepOnError';
+import { wageWarnings } from '@/lib/pay/allowances';
+import { asLegality, inEea } from '../payCountry';
 
 const initial: FormState = { error: null, done: false };
 const MODELS: PayModel[] = ['FLAT_HOURLY', 'TES', 'PER_KM', 'TRIP_PERCENT'];
+
+/** Премии — только поверх часов или оклада. */
+const withBonus = (model: PayModel) => model === 'TES' || model === 'FLAT_HOURLY';
 
 /**
  * Модель оплаты водителя: действующая, история и форма новой ставки.
@@ -21,11 +26,17 @@ const MODELS: PayModel[] = ['FLAT_HOURLY', 'TES', 'PER_KM', 'TRIP_PERCENT'];
  * Ставка не правится задним числом — новая строка с датой начала. Так
  * отчёт за прошлый месяц считается по ставке того месяца, а не по
  * сегодняшней.
+ *
+ * К модели — набор суточных и премии (за км, процент рейса) поверх часов
+ * или оклада. Предупреждения — сразу в форме: оплата только за км в
+ * ЕС/ЕЭЗ и выбранный «серый» или незаконный набор.
  */
 export function PayProfilePanel({
   driverId,
   profiles,
   sets,
+  allowanceSets,
+  country,
   grades,
   today,
 }: {
@@ -34,7 +45,11 @@ export function PayProfilePanel({
   today: string;
   /** По убыванию даты начала. */
   profiles: DriverPayProfile[];
-  sets: Pick<TesRuleSet, 'id' | 'name' | 'valid_from' | 'company_id'>[];
+  sets: Pick<TesRuleSet, 'id' | 'name' | 'valid_from' | 'company_id' | 'legality' | 'currency'>[];
+  /** Свои наборы суточных компании. */
+  allowanceSets: Pick<AllowanceRuleSet, 'id' | 'name' | 'valid_from' | 'legality' | 'country'>[];
+  /** Страна компании — для проверки «только за км» в ЕС/ЕЭЗ. */
+  country: string;
   /** Категории таблиц ставок: по одной строке на набор и категорию. */
   grades: Array<{ rule_set_id: string; grade: string; label: string }>;
 }) {
@@ -42,6 +57,7 @@ export function PayProfilePanel({
   const [state, formAction, pending] = useActionState(savePayProfileAction, initial);
   const keepFormAction = useKeepOnError(state);
   const [model, setModel] = useState<PayModel>(profiles[0]?.model ?? 'FLAT_HOURLY');
+  const [allowanceId, setAllowanceId] = useState<string>(profiles[0]?.allowance_rule_set_id ?? '');
   /*
    * Категории водителя без ступени стажа: из «TRUCK_4 · …, 4–8 v» остаётся
    * «TRUCK · …». Ступень калькулятор выводит сам из даты начала стажа.
@@ -88,7 +104,7 @@ export function PayProfilePanel({
   const current = profiles.find((p) => p.valid_from <= today) ?? null;
   const setName = (id: string | null) => sets.find((s) => s.id === id)?.name ?? '—';
 
-  const rate = (p: DriverPayProfile): string => {
+  const baseRate = (p: DriverPayProfile): string => {
     switch (p.model) {
       case 'PER_KM':
         return `${f.money(p.per_km_cents ?? 0, p.currency)} / km`;
@@ -100,6 +116,38 @@ export function PayProfilePanel({
         return [setName(p.tes_rule_set_id), gradeLabel(p)].filter(Boolean).join(' · ');
     }
   };
+
+  /* Ставка, премии поверх неё и суточные — одной строкой. */
+  const rate = (p: DriverPayProfile): string =>
+    [
+      baseRate(p),
+      p.bonus_per_km_cents ? `${t.paySetup.bonusShort} ${f.money(p.bonus_per_km_cents, p.currency)} / km` : null,
+      p.bonus_trip_bps ? `${t.paySetup.bonusShort} ${f.decimal(p.bonus_trip_bps / 100, 1)} %` : null,
+      p.allowance_rule_set_id
+        ? `${t.paySetup.allowanceShort}: ${allowanceSets.find((s) => s.id === p.allowance_rule_set_id)?.name ?? '—'}`
+        : null,
+    ]
+      .filter(Boolean)
+      .join(' · ');
+
+  /*
+   * Предупреждения формы — без сумм: модель, страна компании и законность
+   * выбранных наборов. «Только за км» — для стран ЕС/ЕЭЗ.
+   */
+  /* Валюта ставки: у TES — валюта набора, иначе — компании (как в savePayProfileAction). */
+  const bonusCurrency = (model === 'TES' ? sets.find((s) => s.id === setId)?.currency : null) ?? f.currency;
+  const money = (cents: number | null | undefined) => (cents ? (cents / 100).toFixed(2).replace('.', ',') : '');
+  const tesLegality = model === 'TES' ? asLegality(sets.find((s) => s.id === setId)?.legality) : 'LEGAL';
+  const allowanceLegality = asLegality(allowanceSets.find((s) => s.id === allowanceId)?.legality);
+  const warnings = wageWarnings({ model, country, legality: tesLegality, currency: f.currency }).filter(
+    (w) => w.code !== 'OUTPUT_PAY' || inEea(country),
+  );
+  const warningTexts = [
+    ...warnings.map((w) =>
+      w.code === 'OUTPUT_PAY' ? t.paySetup.warnOutput : w.code === 'LEGALITY' ? t.paySetup.warnLegality[w.level] : null,
+    ),
+    allowanceLegality !== 'LEGAL' ? t.paySetup.warnAllowanceLegality[allowanceLegality] : null,
+  ].filter((text): text is string => Boolean(text));
 
   return (
     <div className="flex flex-col gap-4">
@@ -238,6 +286,76 @@ export function PayProfilePanel({
                   )}
                 </>
               ))}
+
+            {/* Премии поверх часов или оклада — в валюте ставки. */}
+            {withBonus(model) && (
+              <>
+                <Field label={f.label(t.paySetup.bonusPerKm, bonusCurrency)} hint={t.paySetup.bonusHint}>
+                  {(p) => (
+                    <InputMono
+                      {...p}
+                      name="bonus_per_km"
+                      inputMode="decimal"
+                      placeholder="0,05"
+                      defaultValue={money(profiles[0]?.bonus_per_km_cents)}
+                    />
+                  )}
+                </Field>
+                <Field label={t.paySetup.bonusTrip} hint={t.paySetup.bonusHint}>
+                  {(p) => (
+                    <InputMono
+                      {...p}
+                      name="bonus_trip_percent"
+                      inputMode="decimal"
+                      placeholder="5"
+                      defaultValue={
+                        profiles[0]?.bonus_trip_bps ? String(profiles[0].bonus_trip_bps / 100).replace('.', ',') : ''
+                      }
+                    />
+                  )}
+                </Field>
+              </>
+            )}
+
+            <Field label={t.paySetup.allowanceSet} className="sm:col-span-2">
+              {(p) => (
+                <Select
+                  {...p}
+                  name="allowance_rule_set_id"
+                  value={allowanceId}
+                  onChange={(e) => setAllowanceId(e.target.value)}
+                >
+                  <option value="">{t.paySetup.allowanceNone}</option>
+                  {allowanceSets.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.name} · {f.date(`${s.valid_from}T12:00:00Z`)}
+                    </option>
+                  ))}
+                </Select>
+              )}
+            </Field>
+            {allowanceSets.length === 0 && (
+              <p className="-mt-2 text-xs text-ink-dim sm:col-span-2">
+                {t.paySetup.noAllowances}{' '}
+                <Link href={`/${locale}/carrier/drivers/allowances`} className="underline">
+                  {t.allowanceSetup.title}
+                </Link>
+              </p>
+            )}
+
+            {warningTexts.length > 0 && (
+              <div className="flex flex-col gap-1.5 sm:col-span-2">
+                {warningTexts.map((text) => (
+                  <p
+                    key={text}
+                    role="note"
+                    className="rounded-control border border-warn/35 bg-warn/10 px-3 py-2 text-[13px] text-warn"
+                  >
+                    {text}
+                  </p>
+                ))}
+              </div>
+            )}
 
             {state.error && (
               <p role="alert" className="text-[13px] text-danger sm:col-span-2">

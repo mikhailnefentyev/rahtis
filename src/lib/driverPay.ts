@@ -76,6 +76,15 @@ export type TesRules = {
   rates?: TesRate[];
   /** Валюта сумм набора (EUR, SEK…); шаблоны оператора — финский TES в евро. */
   currency?: string;
+  /** Страна правил (FI, PL, EE, LV, LT…): праздники и норма месяца. Нет — Финляндия. */
+  country?: string;
+  /** Надбавка за работу в праздник страны, б.п. (EE/LV/LT 100 %), отдельно от воскресенья. */
+  holidayBps?: number;
+  /**
+   * Оклад в месяц: ставка часа на день = оклад ÷ норма месяца (рабочие
+   * дни страны × дневная норма). Таблица ставок по категории — главнее.
+   */
+  baseMonthlyCents?: number | null;
 };
 
 /**
@@ -100,6 +109,10 @@ export type PayProfileInput = {
   tesExperienceSince?: string | null;
   /** Валюта ставки (driver_pay_profiles.currency). Нет — валюта компании. */
   currency?: string | null;
+  /** Премия за км поверх базы (часы, оклад, TES) — в валюте ставки. */
+  bonusPerKmCents?: number | null;
+  /** Премия — процент выплаты за рейсы поверх базы, б.п. */
+  bonusTripBps?: number | null;
 };
 
 /** Итог одного дня. День — местная дата начала смены (см. splitShift). */
@@ -114,6 +127,8 @@ export type WorkDay = {
   saturdayMinutes: number;
   /** Воскресенье, а при holidaysAsSunday — и праздники. */
   sundayMinutes: number;
+  /** Праздники страны набора — для надбавки holidayBps (не вместе с воскресеньем). */
+  holidayMinutes: number;
   overtime1Minutes: number;
   overtime2Minutes: number;
   odometerKm: number;
@@ -134,7 +149,10 @@ export type PayParts = {
   overtimeCents: number;
   eveningCents: number;
   nightCents: number;
+  /** Суббота, воскресенье и праздник. */
   weekendCents: number;
+  /** Премии поверх базы: за км и процент рейса. */
+  bonusCents: number;
 };
 
 export type DriverSummary = {
@@ -295,7 +313,78 @@ export function finnishHolidays(year: number): Set<string> {
   return set;
 }
 
-const isHoliday = (date: string) => finnishHolidays(Number(date.slice(0, 4))).has(date);
+/** Первое воскресенье месяца (LT: День матери, День отца). */
+function firstSunday(year: number, month: number): string {
+  const d = new Date(Date.UTC(year, month - 1, 1));
+  d.setUTCDate(1 + ((7 - d.getUTCDay()) % 7));
+  return d.toISOString().slice(0, 10);
+}
+
+const countryHolidayCache = new Map<string, Set<string>>();
+
+/**
+ * Государственные праздники страны (нерабочие дни) — для надбавки за
+ * праздник и нормы месяца. Переносы выходных (LV) не учитываются.
+ *   PL: ustawa o dniach wolnych od pracy (с 2025 и Wigilia).
+ *   EE: Pühade ja tähtpäevade seadus § 2.
+ *   LV: likums «Par svētku, atceres un atzīmējamām dienām» 1. p.
+ *   LT: Darbo kodeksas 123 str.
+ * Остальные страны — финский список (для FI) или пусто.
+ */
+export function countryHolidays(country: string | null | undefined, year: number): Set<string> {
+  const code = (country ?? 'FI').toUpperCase();
+  if (code === 'FI') return finnishHolidays(year);
+  const key = `${code}:${year}`;
+  const cached = countryHolidayCache.get(key);
+  if (cached) return cached;
+
+  const e = easter(year);
+  const y = String(year);
+  let days: string[] = [];
+  switch (code) {
+    case 'PL':
+      days = [`${y}-01-01`, `${y}-01-06`, e, addDays(e, 1), `${y}-05-01`, `${y}-05-03`, addDays(e, 49), addDays(e, 60),
+        `${y}-08-15`, `${y}-11-01`, `${y}-11-11`, ...(year >= 2025 ? [`${y}-12-24`] : []), `${y}-12-25`, `${y}-12-26`];
+      break;
+    case 'EE':
+      days = [`${y}-01-01`, `${y}-02-24`, addDays(e, -2), e, `${y}-05-01`, addDays(e, 49), `${y}-06-23`, `${y}-06-24`,
+        `${y}-08-20`, `${y}-12-24`, `${y}-12-25`, `${y}-12-26`];
+      break;
+    case 'LV':
+      days = [`${y}-01-01`, addDays(e, -2), e, addDays(e, 1), `${y}-05-01`, `${y}-05-04`, `${y}-06-23`, `${y}-06-24`,
+        `${y}-11-18`, `${y}-12-24`, `${y}-12-25`, `${y}-12-26`, `${y}-12-31`];
+      break;
+    case 'LT':
+      days = [`${y}-01-01`, `${y}-02-16`, `${y}-03-11`, e, addDays(e, 1), `${y}-05-01`, firstSunday(year, 5),
+        firstSunday(year, 6), `${y}-06-24`, `${y}-07-06`, `${y}-08-15`, `${y}-11-01`, `${y}-11-02`, `${y}-12-24`,
+        `${y}-12-25`, `${y}-12-26`];
+      break;
+    default:
+      days = [];
+  }
+  const set = new Set(days);
+  countryHolidayCache.set(key, set);
+  return set;
+}
+
+const isHolidayIn = (country: string | null | undefined, date: string) =>
+  countryHolidays(country, Number(date.slice(0, 4))).has(date);
+
+/**
+ * Норма месяца в минутах: рабочие дни (пн–пт без праздников страны) ×
+ * дневная норма. Для ставки часа из оклада.
+ */
+export function monthNormMinutes(country: string | null | undefined, month: string, dailyMinutes: number): number {
+  const [year, m] = month.split('-').map(Number);
+  const days = new Date(Date.UTC(year, m, 0)).getUTCDate();
+  let workdays = 0;
+  for (let d = 1; d <= days; d += 1) {
+    const date = `${month.slice(0, 7)}-${String(d).padStart(2, '0')}`;
+    const weekday = new Date(`${date}T00:00:00Z`).getUTCDay();
+    if (weekday !== 0 && weekday !== 6 && !isHolidayIn(country, date)) workdays += 1;
+  }
+  return workdays * dailyMinutes;
+}
 
 /* ── Смена → минуты ─────────────────────────────────────────────── */
 
@@ -307,6 +396,7 @@ type ShiftSlice = {
   nightMinutes: number;
   saturdayMinutes: number;
   sundayMinutes: number;
+  holidayMinutes: number;
 };
 
 /**
@@ -325,7 +415,10 @@ type ShiftSlice = {
  */
 export function splitShift(
   shift: ShiftInput,
-  rules: Pick<TesRules, 'eveningStart' | 'eveningEnd' | 'nightStart' | 'nightEnd' | 'holidaysAsSunday'> | null,
+  rules: Pick<
+    TesRules,
+    'eveningStart' | 'eveningEnd' | 'nightStart' | 'nightEnd' | 'holidaysAsSunday' | 'country' | 'holidayBps'
+  > | null,
   now: number,
   timeZone: string = DEFAULT_TZ,
 ): ShiftSlice {
@@ -347,6 +440,7 @@ export function splitShift(
     nightMinutes: 0,
     saturdayMinutes: 0,
     sundayMinutes: 0,
+    holidayMinutes: 0,
   };
 
   for (let ms = start; ms + MINUTE <= end; ms += MINUTE) {
@@ -367,8 +461,11 @@ export function splitShift(
     }
 
     /* Праздник, выпавший на субботу (Иванов день), — праздник, а не суббота. */
-    if (local.weekday === 0 || (rules?.holidaysAsSunday && isHoliday(local.date))) slice.sundayMinutes += 1;
+    const holiday = rules ? isHolidayIn(rules.country, local.date) : false;
+    if (local.weekday === 0 || (rules?.holidaysAsSunday && holiday)) slice.sundayMinutes += 1;
     else if (local.weekday === 6) slice.saturdayMinutes += 1;
+    /* Отдельная надбавка за праздник (Прибалтика): не вместе с воскресной. */
+    if (holiday && !rules?.holidaysAsSunday && (rules?.holidayBps ?? 0) > 0) slice.holidayMinutes += 1;
   }
 
   return slice;
@@ -392,6 +489,7 @@ const emptyParts = (): PayParts => ({
   eveningCents: 0,
   nightCents: 0,
   weekendCents: 0,
+  bonusCents: 0,
 });
 
 /** Минуты × ставка за час, в центах. */
@@ -448,7 +546,13 @@ export function tesBaseOn(profile: PayProfileInput, date: string): number {
     if (rate.grade !== grade || rate.validFrom > date) continue;
     if (!best || rate.validFrom > best.validFrom) best = rate;
   }
-  return best?.hourlyCents ?? rules.baseHourlyCents;
+  if (best) return best.hourlyCents;
+  /* Оклад: ставка часа — оклад ÷ норма месяца страны. */
+  if (rules.baseMonthlyCents && rules.baseMonthlyCents > 0) {
+    const norm = monthNormMinutes(rules.country, date.slice(0, 7), rules.dailyRegularMinutes || 480);
+    if (norm > 0) return Math.round((rules.baseMonthlyCents * 60) / norm);
+  }
+  return rules.baseHourlyCents;
 }
 
 /**
@@ -506,13 +610,35 @@ function payDay(day: WorkDay, profile: PayProfileInput | null, money: Money = {}
         perHour(day.eveningMinutes, r.eveningCents) + bonus(day.eveningMinutes, base, r.eveningBps ?? 0);
       parts.nightCents = perHour(day.nightMinutes, r.nightCents) + bonus(day.nightMinutes, base, r.nightBps ?? 0);
       parts.weekendCents =
-        bonus(day.saturdayMinutes, base, r.saturdayBps) + bonus(day.sundayMinutes, base, r.sundayBps);
+        bonus(day.saturdayMinutes, base, r.saturdayBps) +
+        bonus(day.sundayMinutes, base, r.sundayBps) +
+        bonus(day.holidayMinutes, base, r.holidayBps ?? 0);
       break;
     }
   }
 
+  /*
+   * Премии поверх базы. Оплата преимущественно за км или груз в ЕС
+   * запрещена (Reg. 561/2006 ст. 10), премия к часам или окладу — нет.
+   * У моделей «за км» и «процент» премий нет: там это и есть база.
+   */
+  if (profile.model === 'TES' || profile.model === 'FLAT_HOURLY') {
+    if (profile.bonusPerKmCents) parts.bonusCents += payableKm(day) * profile.bonusPerKmCents;
+    if (profile.bonusTripBps && day.payoutCents !== 0) {
+      let payout: number | null = day.payoutCents;
+      const from = money.payoutCurrency;
+      if (from && currency && from !== currency) payout = money.fx ? money.fx(payout, from, currency, day.date) : null;
+      if (payout != null) parts.bonusCents += Math.round((payout * profile.bonusTripBps) / 10_000);
+    }
+  }
+
   const amountCents =
-    parts.baseCents + parts.overtimeCents + parts.eveningCents + parts.nightCents + parts.weekendCents;
+    parts.baseCents +
+    parts.overtimeCents +
+    parts.eveningCents +
+    parts.nightCents +
+    parts.weekendCents +
+    parts.bonusCents;
 
   return { ...day, model: profile.model, amountCents, currency, parts };
 }
@@ -558,6 +684,7 @@ export function summarizeDriver(input: {
         nightMinutes: 0,
         saturdayMinutes: 0,
         sundayMinutes: 0,
+        holidayMinutes: 0,
         overtime1Minutes: 0,
         overtime2Minutes: 0,
         odometerKm: 0,
@@ -587,6 +714,7 @@ export function summarizeDriver(input: {
     day.nightMinutes += slice.nightMinutes;
     day.saturdayMinutes += slice.saturdayMinutes;
     day.sundayMinutes += slice.sundayMinutes;
+    day.holidayMinutes += slice.holidayMinutes;
 
     if (shift.odometerStart != null && shift.odometerEnd != null) {
       day.odometerKm += shift.odometerEnd - shift.odometerStart;
@@ -672,6 +800,7 @@ export function totalsOf(
     nightMinutes: 0,
     saturdayMinutes: 0,
     sundayMinutes: 0,
+    holidayMinutes: 0,
     overtime1Minutes: 0,
     overtime2Minutes: 0,
     odometerKm: 0,
@@ -693,6 +822,7 @@ export function totalsOf(
     totals.nightMinutes += day.nightMinutes;
     totals.saturdayMinutes += day.saturdayMinutes;
     totals.sundayMinutes += day.sundayMinutes;
+    totals.holidayMinutes += day.holidayMinutes;
     totals.overtime1Minutes += day.overtime1Minutes;
     totals.overtime2Minutes += day.overtime2Minutes;
     totals.odometerKm += day.odometerKm;
@@ -719,12 +849,18 @@ export function totalsOf(
 
     /* Сумма — из частей: после пересчёта части и итог сходятся до цента. */
     totals.amountCents +=
-      parts.baseCents + parts.overtimeCents + parts.eveningCents + parts.nightCents + parts.weekendCents;
+      parts.baseCents +
+      parts.overtimeCents +
+      parts.eveningCents +
+      parts.nightCents +
+      parts.weekendCents +
+      (parts.bonusCents ?? 0);
     totals.parts.baseCents += parts.baseCents;
     totals.parts.overtimeCents += parts.overtimeCents;
     totals.parts.eveningCents += parts.eveningCents;
     totals.parts.nightCents += parts.nightCents;
     totals.parts.weekendCents += parts.weekendCents;
+    totals.parts.bonusCents += parts.bonusCents ?? 0;
   }
 
   return totals;
@@ -735,7 +871,8 @@ function convertParts(parts: PayParts, from: string, to: string, day: string, fx
   if (!fx) return null;
   const out = emptyParts();
   for (const key of Object.keys(out) as (keyof PayParts)[]) {
-    const value = parts[key] === 0 ? 0 : fx(parts[key], from, to, day);
+    const cents = parts[key] ?? 0;
+    const value = cents === 0 ? 0 : fx(cents, from, to, day);
     if (value == null) return null;
     out[key] = value;
   }

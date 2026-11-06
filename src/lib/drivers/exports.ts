@@ -5,7 +5,7 @@ import writeExcelFile, { type SheetData } from 'write-excel-file/node';
 import { payableKm, type WorkDay } from '@/lib/driverPay';
 import type { Format } from '@/lib/format';
 import type { Dictionary } from '@/lib/i18n';
-import type { DriverReport } from './report';
+import type { DriverReport, ReportDayAllowance } from './report';
 
 /**
  * Отчёт по водителям для внутренних выплат: XLSX и CSV.
@@ -19,25 +19,79 @@ import type { DriverReport } from './report';
  * Дисклеймер стоит первой строкой в обоих форматах: файл уходит в
  * бухгалтерию отдельно от экрана, и справку нельзя принять там за
  * расчёт зарплаты.
+ *
+ * Страна дня — всегда; суточные, ночлег, без налога и облагаемая часть —
+ * если у кого-то в отчёте есть набор суточных. Валюта суточных — своей
+ * колонкой: польские зарубежные — в евро при зарплате в злотых.
  */
 
 export type Kind = 'text' | 'date' | 'hours' | 'int' | 'money' | 'currency';
 
-export type Row = { driver: string; day: WorkDay | null; totals: boolean };
+export type Row = {
+  driver: string;
+  day: WorkDay | null;
+  totals: boolean;
+  /** Страна и суточные дня; у итога — итог суточных в валюте отчёта. */
+  allowance: Pick<
+    ReportDayAllowance,
+    'country' | 'allowanceCents' | 'lodgingCents' | 'taxFreeCents' | 'taxableCents' | 'currency' | 'hasSet'
+  > | null;
+};
 
 export type Column = {
   header: string;
   kind: Kind;
   get: (row: Row) => string | number | null;
   width: number;
+  /** Валюта денежной колонки, если не валюта суммы дня (суточные). */
+  currency?: (row: Row) => string | null;
 };
+
+/** В отчёте есть хотя бы один день с набором суточных. */
+export function hasAllowances(report: DriverReport): boolean {
+  return report.entries.some((e) => Object.values(e.allowanceDays).some((a) => a.hasSet));
+}
 
 const h = (minutes: number) => Math.round((minutes / 60) * 100) / 100;
 
 /** f — для подписи «Summa, €» знаком валюты отчёта; без него подпись как в словаре. */
-export function reportColumns(t: Dictionary, f?: Pick<Format, 'label'>, currency?: string): Column[] {
+export function reportColumns(
+  t: Dictionary,
+  f?: Pick<Format, 'label'>,
+  currency?: string,
+  withAllowance = false,
+): Column[] {
   const w = t.workReport;
+  const p = t.dayPay;
   const d = (row: Row) => row.day!;
+  const al = (row: Row) => (row.allowance && (row.totals || row.allowance.hasSet) ? row.allowance : null);
+  const allowanceMoney = (
+    key: 'allowanceCents' | 'lodgingCents' | 'taxFreeCents' | 'taxableCents',
+    header: string,
+  ): Column => ({
+    header,
+    kind: 'money',
+    get: (r) => {
+      const a = al(r);
+      return a ? a[key] / 100 : null;
+    },
+    width: 12,
+    currency: (r) => al(r)?.currency ?? null,
+  });
+  const allowanceColumns: Column[] = withAllowance
+    ? [
+        allowanceMoney('allowanceCents', p.colAllowance),
+        allowanceMoney('lodgingCents', p.colLodging),
+        allowanceMoney('taxFreeCents', p.colTaxFree),
+        allowanceMoney('taxableCents', p.colTaxable),
+        {
+          header: `${t.account.currencyLabel} (${p.colAllowance})`,
+          kind: 'currency',
+          get: (r) => al(r)?.currency ?? null,
+          width: 10,
+        },
+      ]
+    : [];
   return [
     { header: w.driver, kind: 'text', get: (r) => r.driver, width: 22 },
     { header: w.colDate, kind: 'date', get: (r) => (r.totals ? null : d(r).date), width: 12 },
@@ -75,6 +129,8 @@ export function reportColumns(t: Dictionary, f?: Pick<Format, 'label'>, currency
       get: (r) => (d(r).amountCents == null ? null : d(r).currency),
       width: 8,
     },
+    { header: p.colCountry, kind: 'text', get: (r) => (r.totals ? null : (r.allowance?.country ?? null)), width: 8 },
+    ...allowanceColumns,
   ];
 }
 
@@ -86,13 +142,15 @@ export function reportRows(report: DriverReport): Row[] {
   const rows: Row[] = [];
   for (const entry of report.entries) {
     for (const day of entry.summary.days) {
-      rows.push({ driver: entry.driver.full_name, day, totals: false });
+      rows.push({ driver: entry.driver.full_name, day, totals: false, allowance: entry.allowanceDays[day.date] ?? null });
     }
     const t = entry.summary.totals;
+    const a = entry.allowanceTotals;
     rows.push({
       driver: entry.driver.full_name,
       day: { ...t, date: '', model: null, amountCents: t.amountCents },
       totals: true,
+      allowance: { ...a, country: null, hasSet: true },
     });
   }
   return rows;
@@ -117,11 +175,13 @@ function cell(kind: Kind, value: string | number | null, bold = false) {
 }
 
 export async function reportXlsx(report: DriverReport, t: Dictionary, f?: Pick<Format, 'label'>): Promise<Buffer> {
-  const columns = reportColumns(t, f, report.currency);
+  const withAllowance = hasAllowances(report);
+  const columns = reportColumns(t, f, report.currency, withAllowance);
   const rows = reportRows(report);
 
   const data: SheetData = [
     [{ value: t.pay.disclaimer, fontWeight: 'bold' }],
+    ...(withAllowance ? [[{ value: t.dayPay.disclaimer }]] : []),
     [{ value: `${report.from} – ${report.to}` }],
     [],
     columns.map((c) => ({ value: c.header, fontWeight: 'bold' as const })),
@@ -147,9 +207,11 @@ function csvValue(kind: Kind, value: string | number | null): string {
 }
 
 export function reportCsv(report: DriverReport, t: Dictionary, f?: Pick<Format, 'label'>): string {
-  const columns = reportColumns(t, f, report.currency);
+  const withAllowance = hasAllowances(report);
+  const columns = reportColumns(t, f, report.currency, withAllowance);
   const lines = [
     csvValue('text', t.pay.disclaimer),
+    ...(withAllowance ? [csvValue('text', t.dayPay.disclaimer)] : []),
     columns.map((c) => csvValue('text', c.header)).join(';'),
     ...reportRows(report).map((row) => columns.map((c) => csvValue(c.kind, c.get(row))).join(';')),
   ];

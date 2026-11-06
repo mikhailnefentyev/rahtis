@@ -55,6 +55,11 @@ export type EconomicsInput = {
   fuel: { vehicleId: string; month: string; cents: number }[];
   /** Ориентировочная зарплата без налогов работодателя. */
   pay: { vehicleId: string; month: string; cents: number }[];
+  /**
+   * Суточные и ночлег водителя (справочно): к затратам на водителя, но без
+   * взносов работодателя — это возмещение расходов, а не зарплата.
+   */
+  allowances?: { vehicleId: string; month: string; cents: number }[];
   journal: { vehicleId: string; month: string; cents: number }[];
   finance: Map<string, VehicleFinance>;
   employerCostBps: number;
@@ -173,6 +178,7 @@ export function vehicleEconomics(input: EconomicsInput): { vehicles: VehicleEcon
   };
   const fuel = sums(input.fuel);
   const pay = sums(input.pay);
+  const allowances = sums(input.allowances ?? []);
   const journal = sums(input.journal);
   const revenue = new Map<string, { platform: number; own: number; site: number }>();
   for (const r of input.revenue) {
@@ -192,7 +198,8 @@ export function vehicleEconomics(input: EconomicsInput): { vehicles: VehicleEcon
       const r = revenue.get(k);
       if (r) Object.assign(m.revenue, r);
       m.costs.fuel = fuel.get(k) ?? 0;
-      m.costs.driver = Math.round((pay.get(k) ?? 0) * (1 + input.employerCostBps / 10_000));
+      m.costs.driver =
+        Math.round((pay.get(k) ?? 0) * (1 + input.employerCostBps / 10_000)) + (allowances.get(k) ?? 0);
       const rate = input.financeRate ? input.financeRate(v.id, month) : 1;
       if (rate !== null) Object.assign(m.costs, scaleCosts(fixedCosts(finance, month), rate));
       m.costs.journal = journal.get(k) ?? 0;

@@ -9,8 +9,10 @@ import {
   type FormState,
 } from '@/lib/drivers/actions';
 import { useI18n } from '@/lib/i18n/provider';
+import { COUNTRY_CODES } from '@/lib/country';
 import type { TesRuleSet } from '@/types/db';
 import { useKeepOnError } from '@/lib/forms/keepOnError';
+import { byCountry, CountryLabel, LegalityBadge, SourceNote, useCountryName } from '../payCountry';
 
 const initial: FormState = { error: null, done: false };
 
@@ -24,28 +26,34 @@ export type WageRate = {
 };
 
 /**
- * Наборы правил TES.
+ * Наборы правил оплаты по странам.
  *
- * Шаблон оператора (Kuorma-autoalan TES 2025–2028) несёт правила и
- * таблицу ставок по категориям. Его можно выбрать в модели оплаты
- * водителя напрямую — тогда повышения по договору подхватываются сами —
- * или скопировать к себе и править как свой: местный договор может
- * отличаться. Свой набор перевозчик заводит и с нуля.
+ * Шаблоны оператора — по странам: финский Kuorma-autoalan TES с таблицей
+ * ставок, польский etat, эстонский, латвийский, литовский, норвежский
+ * минимум. Шаблоны страны компании — первыми, остальные свёрнуты. У
+ * каждого — степень законности и источник: не вполне законная схема
+ * показывается рекомендательно, с предупреждением. Шаблон можно выбрать
+ * в модели оплаты водителя напрямую — тогда повышения по договору
+ * подхватываются сами — или скопировать к себе и править.
  *
- * Суммы набора — в его валюте (tes_rule_sets.currency). Шаблоны — финский
- * TES в евро, и копия остаётся в евро: в злотые его суммы не переводятся.
- * Свой набор с нуля — в валюте компании.
+ * Суммы набора — в его валюте (tes_rule_sets.currency). Копия остаётся в
+ * валюте шаблона: суммы договора не переводятся. Свой набор с нуля — в
+ * валюте компании.
  */
 export function TesView({
   own,
   templates,
   rates,
+  home,
 }: {
   own: TesRuleSet[];
   templates: TesRuleSet[];
   rates: WageRate[];
+  /** Страна компании: её шаблоны — первыми. */
+  home: string;
 }) {
   const { t, f, locale } = useI18n();
+  const countryName = useCountryName();
   const [editing, setEditing] = useState<TesRuleSet | null | 'new'>(null);
   const close = useCallback(() => setEditing(null), []);
 
@@ -58,7 +66,10 @@ export function TesView({
 
   const describe = (s: TesRuleSet) =>
     [
-      `${f.money(s.base_hourly_cents, s.currency)} / h`,
+      /* Оклад — главное число набора; ставку часа калькулятор выводит из него и нормы месяца. */
+      s.base_monthly_cents
+        ? `${f.money(s.base_monthly_cents, s.currency)} / ${t.paySetup.perMonth}`
+        : `${f.money(s.base_hourly_cents, s.currency)} / h`,
       s.overtime_basis === 'PERIOD'
         ? `${f.decimal(s.period_regular_minutes / 60, 0)} h / 2 vk`
         : `${f.decimal(s.daily_regular_minutes / 60, 1)} h`,
@@ -67,12 +78,51 @@ export function TesView({
       `${t.workReport.colNight} ${span(s.night_start, s.night_end)} ${extra(s.night_cents, s.night_bps, s.currency)}`,
       s.saturday_bps > 0 ? `${t.workReport.colSaturday} ${pct(s.saturday_bps)}` : null,
       `${t.workReport.colSunday} ${pct(s.sunday_bps)}`,
+      s.holiday_bps > 0 ? `${t.paySetup.holidayShort} ${pct(s.holiday_bps)}` : null,
+      s.min_monthly_cents ? `${t.paySetup.minShort} ${f.money(s.min_monthly_cents, s.currency)}` : null,
       s.min_paid_minutes > 0 ? `min ${f.decimal(s.min_paid_minutes / 60, 2)} h` : null,
     ]
       .filter(Boolean)
       .join(' · ');
 
   const ratesOf = (id: string) => rates.filter((r) => r.rule_set_id === id);
+  const groups = byCountry(templates, home, countryName);
+  /* Шаблоны не в валюте компании: копия остаётся в валюте шаблона. */
+  const foreignCurrency = templates.some((s) => s.currency !== f.currency);
+
+  /* Карточка набора: страна, законность, правила, примечание, источник, ставки. */
+  const body = (s: TesRuleSet) => (
+    <div className="min-w-0">
+      <p className="flex flex-wrap items-center gap-2 text-[13px] font-semibold">
+        <span>
+          {s.name} · {f.date(`${s.valid_from}T12:00:00Z`)}
+        </span>
+        <LegalityBadge legality={s.legality} />
+      </p>
+      <p className="mt-1 text-xs text-ink-faint">
+        <CountryLabel code={s.country} /> · {s.currency}
+      </p>
+      <p className="mt-1 text-xs text-ink-muted">{describe(s)}</p>
+      {s.note && <p className="mt-1 text-xs text-ink-dim">{s.note}</p>}
+      <SourceNote note={s.source_note} />
+      <RatesTable rates={ratesOf(s.id)} currency={s.currency} />
+    </div>
+  );
+
+  const templateCard = (s: TesRuleSet) => (
+    <Card key={s.id}>
+      <CardBody className="flex flex-wrap items-start justify-between gap-3">
+        {body(s)}
+        <form action={copyTesTemplateAction}>
+          <input type="hidden" name="locale" value={locale} />
+          <input type="hidden" name="id" value={s.id} />
+          <Button type="submit" size="sm">
+            {t.tes.copy}
+          </Button>
+        </form>
+      </CardBody>
+    </Card>
+  );
 
   return (
     <div className="flex flex-col gap-8">
@@ -88,7 +138,7 @@ export function TesView({
 
         {editing !== null && (
           <div className="mb-4">
-            <TesForm set={editing === 'new' ? null : editing} onClose={close} />
+            <TesForm set={editing === 'new' ? null : editing} home={home} onClose={close} />
           </div>
         )}
 
@@ -99,14 +149,7 @@ export function TesView({
             {own.map((s) => (
               <Card key={s.id}>
                 <CardBody className="flex flex-wrap items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="text-[13px] font-semibold">
-                      {s.name} · {f.date(`${s.valid_from}T12:00:00Z`)}
-                    </p>
-                    <p className="mt-1 text-xs text-ink-muted">{describe(s)}</p>
-                    {s.note && <p className="mt-1 text-xs text-ink-dim">{s.note}</p>}
-                    <RatesTable rates={ratesOf(s.id)} currency={s.currency} />
-                  </div>
+                  {body(s)}
                   <div className="flex gap-1.5">
                     <Button size="sm" onClick={() => setEditing(s)}>
                       {t.drivers.edit}
@@ -125,31 +168,34 @@ export function TesView({
           <h2 className="mb-4 border-b border-line pb-2 text-[13px] font-semibold tracking-tight text-ink-faint">
             {t.tes.templates}
           </h2>
-          {/* Компания не в евро: шаблоны — финский договор в евро, и копия остаётся в евро. */}
-          {f.currency !== 'EUR' && <p className="-mt-2 mb-4 max-w-xl text-xs text-ink-dim">{t.tes.templatesEur}</p>}
-          <div className="flex flex-col gap-2">
-            {templates.map((s) => (
-              <Card key={s.id}>
-                <CardBody className="flex flex-wrap items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="text-[13px] font-semibold">
-                      {s.name} · {f.date(`${s.valid_from}T12:00:00Z`)}
-                    </p>
-                    <p className="mt-1 text-xs text-ink-muted">{describe(s)}</p>
-                    {s.note && <p className="mt-1 text-xs text-ink-dim">{s.note}</p>}
-                    <RatesTable rates={ratesOf(s.id)} currency={s.currency} />
+          {foreignCurrency && <p className="-mt-2 mb-4 max-w-xl text-xs text-ink-dim">{t.tes.templatesEur}</p>}
+          {groups.home.length > 0 ? (
+            <>
+              <h3 className="label-micro mb-2">
+                <CountryLabel code={home} />
+              </h3>
+              <div className="flex flex-col gap-2">{groups.home.map(templateCard)}</div>
+            </>
+          ) : (
+            <p className="mb-2 text-xs text-ink-dim">{t.paySetup.noHomeTemplates}</p>
+          )}
+          {groups.others.length > 0 && (
+            <details className="mt-6">
+              <summary className="cursor-pointer text-[13px] font-semibold text-ink-muted">
+                {t.paySetup.otherCountries} ({groups.others.map(([code]) => code).join(', ')})
+              </summary>
+              <div className="mt-3 flex flex-col gap-5">
+                {groups.others.map(([code, list]) => (
+                  <div key={code}>
+                    <h3 className="label-micro mb-2">
+                      <CountryLabel code={code} />
+                    </h3>
+                    <div className="flex flex-col gap-2">{list.map(templateCard)}</div>
                   </div>
-                  <form action={copyTesTemplateAction}>
-                    <input type="hidden" name="locale" value={locale} />
-                    <input type="hidden" name="id" value={s.id} />
-                    <Button type="submit" size="sm">
-                      {t.tes.copy}
-                    </Button>
-                  </form>
-                </CardBody>
-              </Card>
-            ))}
-          </div>
+                ))}
+              </div>
+            </details>
+          )}
         </section>
       )}
     </div>
@@ -219,10 +265,14 @@ function DeleteTes({ id }: { id: string }) {
   );
 }
 
-function TesForm({ set, onClose }: { set: TesRuleSet | null; onClose: () => void }) {
+function TesForm({ set, home, onClose }: { set: TesRuleSet | null; home: string; onClose: () => void }) {
   const { t, f, locale } = useI18n();
+  const countryName = useCountryName();
   /* Суммы набора — в его валюте; новый набор база запишет в валюте компании. */
   const currency = set?.currency ?? f.currency;
+  const country = set?.country ?? home;
+  /* Страны — из пакетов стран; у копии шаблона может быть и другая (NO, …). */
+  const countries = [...new Set([country, ...COUNTRY_CODES])];
   const [state, formAction, pending] = useActionState(saveTesAction, initial);
   const keepFormAction = useKeepOnError(state);
 
@@ -231,7 +281,7 @@ function TesForm({ set, onClose }: { set: TesRuleSet | null; onClose: () => void
   }, [state.done, onClose]);
 
   /* Центы и базисные пункты — в суммы валюты набора и проценты, как их пишут в договоре. */
-  const eur = (cents: number | undefined) => (cents == null ? '' : (cents / 100).toFixed(2).replace('.', ','));
+  const eur = (cents: number | null | undefined) => (cents == null ? '' : (cents / 100).toFixed(2).replace('.', ','));
   const pct = (bps: number | undefined) => (bps == null ? '' : String(bps / 100).replace('.', ','));
   const hrs = (min: number | undefined) => (min == null ? '' : String(min / 60).replace('.', ','));
 
@@ -249,11 +299,40 @@ function TesForm({ set, onClose }: { set: TesRuleSet | null; onClose: () => void
             {(p) => <Input {...p} type="date" name="valid_from" required defaultValue={set?.valid_from ?? ''} />}
           </Field>
 
-          <Field label={f.label(t.tes.base, currency)} hint={t.tes.basePlaceholderHint} required>
+          <Field label={t.paySetup.country} required>
             {(p) => (
-              <InputMono {...p} name="base_hourly" required inputMode="decimal" defaultValue={eur(set?.base_hourly_cents)} />
+              <Select {...p} name="country" defaultValue={country}>
+                {countries.map((code) => (
+                  <option key={code} value={code}>
+                    {countryName(code)}
+                  </option>
+                ))}
+              </Select>
             )}
           </Field>
+          <Field label={t.paySetup.currency}>
+            {(p) => <Input {...p} value={currency} disabled readOnly />}
+          </Field>
+
+          <Field label={f.label(t.tes.base, currency)} hint={t.tes.basePlaceholderHint}>
+            {(p) => (
+              <InputMono {...p} name="base_hourly" inputMode="decimal" defaultValue={eur(set?.base_hourly_cents)} />
+            )}
+          </Field>
+          <Field label={f.label(t.paySetup.monthly, currency)} hint={t.paySetup.monthlyHint}>
+            {(p) => (
+              <InputMono {...p} name="base_monthly" inputMode="decimal" defaultValue={eur(set?.base_monthly_cents)} />
+            )}
+          </Field>
+          <Field label={f.label(t.paySetup.minMonthly, currency)} hint={t.paySetup.minMonthlyHint}>
+            {(p) => (
+              <InputMono {...p} name="min_monthly" inputMode="decimal" defaultValue={eur(set?.min_monthly_cents)} />
+            )}
+          </Field>
+          <Field label={t.paySetup.holidayPct} hint={t.paySetup.holidayHint}>
+            {(p) => <InputMono {...p} name="holiday_pct" inputMode="decimal" defaultValue={pct(set?.holiday_bps)} />}
+          </Field>
+
           <Field label={t.tes.overtimeBasis}>
             {(p) => (
               <Select {...p} name="overtime_basis" defaultValue={set?.overtime_basis ?? 'DAY'}>

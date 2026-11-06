@@ -105,6 +105,8 @@ export type DriverShift = Tables<'driver_shifts'>;
 export type DriverBreak = Tables<'driver_breaks'>;
 export type TesRuleSet = Tables<'tes_rule_sets'>;
 export type DriverPayProfile = Tables<'driver_pay_profiles'>;
+export type AllowanceRuleSet = Tables<'allowance_rule_sets'>;
+export type AllowanceRateRow = Tables<'allowance_rates'>;
 export type PayModel = Database['public']['Enums']['pay_model'];
 
 /** Закрытый рейс водителя за период — public.driver_trips. */

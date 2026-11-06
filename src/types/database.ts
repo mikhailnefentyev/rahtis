@@ -39,6 +39,84 @@ export type Database = {
   }
   public: {
     Tables: {
+      allowance_rates: {
+        Row: {
+          country: string
+          currency: string
+          day_cents: number
+          hotel_limit_cents: number | null
+          rule_set_id: string
+        }
+        Insert: {
+          country: string
+          currency: string
+          day_cents: number
+          hotel_limit_cents?: number | null
+          rule_set_id: string
+        }
+        Update: {
+          country?: string
+          currency?: string
+          day_cents?: number
+          hotel_limit_cents?: number | null
+          rule_set_id?: string
+        }
+        Relationships: []
+      }
+      allowance_rule_sets: {
+        Row: {
+          based_on: string | null
+          company_id: string | null
+          country: string
+          created_at: string
+          created_by: string | null
+          currency: string
+          id: string
+          legality: string
+          name: string
+          params: Json
+          rule: string
+          source_note: string | null
+          template_code: string | null
+          updated_at: string
+          valid_from: string
+        }
+        Insert: {
+          based_on?: string | null
+          company_id?: string | null
+          country: string
+          created_at?: string
+          created_by?: string | null
+          currency: string
+          id?: string
+          legality?: string
+          name: string
+          params?: Json
+          rule: string
+          source_note?: string | null
+          template_code?: string | null
+          updated_at?: string
+          valid_from?: string
+        }
+        Update: {
+          based_on?: string | null
+          company_id?: string | null
+          country?: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          id?: string
+          legality?: string
+          name?: string
+          params?: Json
+          rule?: string
+          source_note?: string | null
+          template_code?: string | null
+          updated_at?: string
+          valid_from?: string
+        }
+        Relationships: []
+      }
       api_idempotency: {
         Row: {
           created_at: string
@@ -1210,6 +1288,36 @@ export type Database = {
           },
         ]
       }
+      driver_day_facts: {
+        Row: {
+          country: string | null
+          day: string
+          driver_id: string
+          meals: string | null
+          night: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          country?: string | null
+          day: string
+          driver_id: string
+          meals?: string | null
+          night?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          country?: string | null
+          day?: string
+          driver_id?: string
+          meals?: string | null
+          night?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       driver_invites: {
         Row: {
           code_hash: string | null
@@ -1298,6 +1406,9 @@ export type Database = {
       }
       driver_pay_profiles: {
         Row: {
+          allowance_rule_set_id: string | null
+          bonus_per_km_cents: number | null
+          bonus_trip_bps: number | null
           created_at: string
           created_by: string | null
           currency: string
@@ -1313,6 +1424,9 @@ export type Database = {
           valid_from: string
         }
         Insert: {
+          allowance_rule_set_id?: string | null
+          bonus_per_km_cents?: number | null
+          bonus_trip_bps?: number | null
           created_at?: string
           created_by?: string | null
           currency: string
@@ -1328,6 +1442,9 @@ export type Database = {
           valid_from: string
         }
         Update: {
+          allowance_rule_set_id?: string | null
+          bonus_per_km_cents?: number | null
+          bonus_trip_bps?: number | null
           created_at?: string
           created_by?: string | null
           currency?: string
@@ -4169,6 +4286,13 @@ export type Database = {
       }
       tes_rule_sets: {
         Row: {
+          base_monthly_cents: number | null
+          country: string
+          holiday_bps: number
+          legality: string
+          min_monthly_cents: number | null
+          source_note: string | null
+          template_code: string | null
           base_hourly_cents: number
           based_on: string | null
           company_id: string | null
@@ -4201,6 +4325,13 @@ export type Database = {
           valid_from: string
         }
         Insert: {
+          base_monthly_cents?: number | null
+          country?: string
+          holiday_bps?: number
+          legality?: string
+          min_monthly_cents?: number | null
+          source_note?: string | null
+          template_code?: string | null
           base_hourly_cents: number
           based_on?: string | null
           company_id?: string | null
@@ -4233,6 +4364,13 @@ export type Database = {
           valid_from: string
         }
         Update: {
+          base_monthly_cents?: number | null
+          country?: string
+          holiday_bps?: number
+          legality?: string
+          min_monthly_cents?: number | null
+          source_note?: string | null
+          template_code?: string | null
           base_hourly_cents?: number
           based_on?: string | null
           company_id?: string | null
@@ -6593,6 +6731,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      copy_allowance_template: { Args: { p_template_id: string }; Returns: string }
       copy_tes_template: { Args: { p_template_id: string }; Returns: string }
       create_driver_invite: {
         Args: { p_driver_id: string }
@@ -6990,6 +7129,15 @@ export type Database = {
           kind: Database["public"]["Enums"]["trailer_kind"]
           order_id: string
           plate: string
+        }[]
+      }
+      driver_day_countries: {
+        Args: { p_from: string; p_to: string }
+        Returns: {
+          countries: string[]
+          day: string
+          driver_id: string
+          last_country: string
         }[]
       }
       driver_trips: {

@@ -3,7 +3,8 @@ import { redirect } from 'next/navigation';
 import { noAccessPath, signInPath } from '@/lib/auth/paths';
 import { getViewer } from '@/lib/auth/viewer';
 import { DriverReportPdf } from '@/lib/drivers/DriverReportPdf';
-import { reportColumns, reportCsv, reportRows, reportXlsx } from '@/lib/drivers/exports';
+import { hasAllowances, reportColumns, reportCsv, reportRows, reportXlsx } from '@/lib/drivers/exports';
+import { warningText } from '@/lib/drivers/warningText';
 import { buildDriverReport } from '@/lib/drivers/report';
 import { defaultLocale, isLocale } from '@/lib/i18n';
 import { parseRange } from '@/lib/reports/periods';
@@ -41,7 +42,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
   const driver = url.searchParams.get('driver');
   const driverId = driver && UUID.test(driver) ? driver : null;
 
-  const { t, f } = await getViewerI18n(locale);
+  const { t, m, f } = await getViewerI18n(locale);
   const report = await buildDriverReport({ from: range.from, to: range.to, driverId });
 
   const name = `${t.workReport.fileName}-${range.from}_${range.to}`;
@@ -63,7 +64,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
   }
 
   /* В PDF валюта — знаком у суммы, отдельная колонка не нужна. */
-  const all = reportColumns(t, f, report.currency);
+  const withAllowance = hasAllowances(report);
+  const all = reportColumns(t, f, report.currency, withAllowance);
   const columns = all.filter((c) => c.kind !== 'currency');
   const currencyOf = all.find((c) => c.kind === 'currency')!;
   const show = (kind: string, value: string | number | null, currency: string | null): string => {
@@ -91,9 +93,27 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
         right: c.kind !== 'text' && c.kind !== 'date',
       })),
       rows: reportRows(report).map((row) => ({
-        cells: columns.map((c) => show(c.kind, c.get(row), currencyOf.get(row) as string | null)),
+        cells: columns.map((c) =>
+          show(c.kind, c.get(row), c.currency ? c.currency(row) : (currencyOf.get(row) as string | null)),
+        ),
         total: row.totals,
       })),
+      notes: report.entries
+        .filter((e) => e.warnings.length > 0 || Object.values(e.allowanceDays).some((a) => a.hasSet))
+        .map((e) => {
+          const s = e.summary.totals;
+          const a = e.allowanceTotals;
+          const d = t.dayPay;
+          const lines = Object.values(e.allowanceDays).some((x) => x.hasSet)
+            ? [
+                `${d.wage}: ${f.money(s.amountCents, s.currency)} · ${d.allowances}: ${f.money(a.allowanceCents, a.currency)} (${d.colTaxFree} ${f.money(a.taxFreeCents, a.currency)} · ${d.colTaxable} ${f.money(a.taxableCents, a.currency)}) · ${d.lodging}: ${f.money(a.lodgingCents, a.currency)}`,
+                `${d.employerCost}: ${f.money(s.amountCents + a.allowanceCents + a.lodgingCents, a.currency)} — ${d.employerCostHint}`,
+                ...(a.missingRate ? [d.missingRate] : []),
+              ]
+            : [];
+          return { title: e.driver.full_name, lines, warnings: e.warnings.map((w) => warningText(w, { t, m, f })) };
+        }),
+      notesDisclaimer: withAllowance ? t.dayPay.disclaimer : undefined,
     }),
   );
 

@@ -1,6 +1,6 @@
 'use server';
 
-import { asCurrency } from '@/lib/money/currency';
+import { asCurrency, isCurrency, type Currency } from '@/lib/money/currency';
 import { revalidatePath } from 'next/cache';
 import { requireRole } from '@/lib/auth/guard';
 import { operationsLocalToIso } from '@/lib/dates';
@@ -11,6 +11,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { flashFailure } from '@/lib/forms/flash';
 import type { PayModel } from '@/types/db';
+import type { Json } from '@/types/database';
 
 /**
  * Водители, их смены, модели оплаты и правила TES.
@@ -36,7 +37,13 @@ const opt = (form: FormData, key: string): string | null => str(form, key) || nu
  * у строки (её впишет база), знак в поле не важен. Пусто и мусор — null.
  */
 function cents(form: FormData, key: string): number | null {
-  const raw = str(form, key)
+  return amountCents(str(form, key));
+}
+
+/** То же для строки — строки ставок суточных приходят JSON-ом. */
+function amountCents(text: string): number | null {
+  const raw = text
+    .trim()
     .replace(/[\s  ]/g, '')
     .replace(/[^\d,.-]/g, '')
     .replace(',', '.');
@@ -165,6 +172,7 @@ export async function archiveDriverAction(formData: FormData): Promise<void> {
 /* ── Модель оплаты ──────────────────────────────────────────────── */
 
 const PAY_MODELS: PayModel[] = ['PER_KM', 'TRIP_PERCENT', 'FLAT_HOURLY', 'TES'];
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export async function savePayProfileAction(
   _previous: FormState,
@@ -200,7 +208,20 @@ export async function savePayProfileAction(
       model === 'TES' && /^\d{4}-\d{2}-\d{2}$/.test(str(formData, 'tes_experience_since'))
         ? str(formData, 'tes_experience_since')
         : null,
+    /* Суточные — при любой модели; набор только свой (RLS и выбор формы). */
+    allowance_rule_set_id: UUID.test(str(formData, 'allowance_rule_set_id')) ? str(formData, 'allowance_rule_set_id') : null,
+    /*
+     * Премии — только поверх часов или оклада: оплата преимущественно за
+     * км или фрахт в ЕС запрещена (Reg. 561/2006 ст. 10), премией — можно.
+     * Ноль — без премии.
+     */
+    bonus_per_km_cents: model === 'TES' || model === 'FLAT_HOURLY' ? cents(formData, 'bonus_per_km') || null : null,
+    bonus_trip_bps: model === 'TES' || model === 'FLAT_HOURLY' ? bps(formData, 'bonus_trip_percent') || null : null,
   };
+
+  if ((row.bonus_per_km_cents ?? 0) > 100000 || (row.bonus_trip_bps ?? 0) > 10000) {
+    return { error: t.validation.positiveNumber, done: false };
+  }
 
   /*
    * Ставка своей модели обязательна. Ограничение базы пропускало пустое
@@ -220,6 +241,16 @@ export async function savePayProfileAction(
     ? await supabase.from('tes_rule_sets').select('currency').eq('id', row.tes_rule_set_id).maybeSingle()
     : { data: null };
   const currency = asCurrency(tesSet?.currency ?? viewer.company?.currency);
+  /* Набор суточных — только свой (база ещё раз проверит триггером driver_pay_profiles_allowance_check). */
+  if (row.allowance_rule_set_id) {
+    const { data: own } = await supabase
+      .from('allowance_rule_sets')
+      .select('id')
+      .eq('id', row.allowance_rule_set_id)
+      .eq('company_id', viewer.company?.id ?? '')
+      .maybeSingle();
+    if (!own) return { error: t.validation.required, done: false };
+  }
   const { error } = await supabase.from('driver_pay_profiles').insert({ ...row, currency });
 
   if (error) {
@@ -361,18 +392,35 @@ export async function saveTesAction(_previous: FormState, formData: FormData): P
     return Number.isFinite(value) ? Math.round(value * 60) : null;
   };
 
-  const base = cents(formData, 'base_hourly');
+  const monthly = cents(formData, 'base_monthly') || null;
   const regular = hours('daily_regular_hours');
   const ot1Minutes = hours('overtime1_hours');
+  /*
+   * Ставка часа или оклад. С окладом калькулятор берёт ставку часа из
+   * оклада и нормы месяца страны; поле часа базе всё равно нужно — без
+   * него пишем оценку: оклад ÷ (21 рабочий день × дневная норма).
+   */
+  const base =
+    cents(formData, 'base_hourly') ||
+    (monthly && regular ? Math.max(1, Math.round((monthly * 60) / (21 * regular))) : null);
 
   if (!str(formData, 'name') || !str(formData, 'valid_from') || !base || !regular || ot1Minutes == null) {
     return { error: t.validation.required, done: false };
   }
 
+  const holiday = bps(formData, 'holiday_pct') ?? 0;
+  if (holiday > 30000) return { error: t.validation.positiveNumber, done: false };
+
+  const country = str(formData, 'country').toUpperCase();
+
   const row = {
     name: str(formData, 'name'),
     valid_from: str(formData, 'valid_from'),
     base_hourly_cents: base,
+    country: /^[A-Z]{2}$/.test(country) ? country : (viewer.company?.country ?? 'FI'),
+    base_monthly_cents: monthly,
+    min_monthly_cents: cents(formData, 'min_monthly') || null,
+    holiday_bps: holiday,
     daily_regular_minutes: regular,
     overtime1_minutes: ot1Minutes,
     overtime1_bps: bps(formData, 'overtime1_pct') ?? 0,
@@ -458,6 +506,181 @@ export async function copyTesTemplateAction(formData: FormData): Promise<void> {
   await flashFailure(locale, error);
 
   revalidatePath(`/${locale}/carrier/drivers/tes`);
+}
+
+/* ── Суточные ───────────────────────────────────────────────────── */
+
+const ALLOWANCE_RULES = ['PL_DOMESTIC', 'PL_INTERNATIONAL', 'EE_ABROAD', 'LV_TRIP', 'LT_ABROAD', 'GENERIC'] as const;
+type AllowanceRuleCode = (typeof ALLOWANCE_RULES)[number];
+
+/** Параметры правила из формы; пустое поле — ключ не пишется, движок возьмёт значение по умолчанию. */
+function allowanceParams(rule: AllowanceRuleCode, form: FormData): Record<string, Json> {
+  const out: Record<string, Json> = {};
+  const put = (key: string, value: number | null) => {
+    if (value != null) out[key] = value;
+  };
+  switch (rule) {
+    case 'PL_DOMESTIC':
+      put('day_cents', cents(form, 'day'));
+      put('lodging_cents', cents(form, 'lodging'));
+      out.cab_lodging = form.get('cab_lodging') === 'on';
+      break;
+    case 'PL_INTERNATIONAL':
+      put('day_cents', cents(form, 'day'));
+      out.day_currency = str(form, 'day_currency') === 'PLN' ? 'PLN' : 'EUR';
+      put('pit_relief_cents', cents(form, 'pit_relief'));
+      put('zus_relief_cents', cents(form, 'zus_relief'));
+      break;
+    case 'EE_ABROAD':
+      put('first_days', int(form, 'first_days'));
+      put('first_cents', cents(form, 'first'));
+      put('later_cents', cents(form, 'later'));
+      break;
+    case 'LV_TRIP':
+      put('cap_bps', bps(form, 'cap_pct'));
+      break;
+    case 'LT_ABROAD': {
+      /* Коэффициент «1,65» → 16500 б.п. */
+      const coef = bps(form, 'coef');
+      put('coef_bps', coef == null ? null : coef * 100);
+      put('mma_cents', cents(form, 'mma'));
+      put('half_bps', bps(form, 'half_pct'));
+      break;
+    }
+    case 'GENERIC':
+      break;
+  }
+  return out;
+}
+
+type RateRow = { country: string; currency: Currency; day_cents: number; hotel_limit_cents: number | null };
+
+/** Ставки по странам — JSON из формы: [{country, currency, day, hotel}]. Мусор — null. */
+function parseRates(raw: string): RateRow[] | null {
+  let list: unknown;
+  try {
+    list = JSON.parse(raw || '[]');
+  } catch {
+    return null;
+  }
+  if (!Array.isArray(list) || list.length > 300) return null;
+  const rows: RateRow[] = [];
+  for (const item of list) {
+    const r = (item ?? {}) as Record<string, unknown>;
+    const country = String(r.country ?? '').trim().toUpperCase();
+    const day = amountCents(String(r.day ?? ''));
+    const hotelRaw = String(r.hotel ?? '').trim();
+    const hotel = hotelRaw ? amountCents(hotelRaw) : null;
+    if (!/^[A-Z]{2}$/.test(country) || !isCurrency(r.currency) || day == null || day > 1000000) return null;
+    if (hotelRaw && (hotel == null || hotel > 10000000)) return null;
+    if (rows.some((x) => x.country === country)) return null;
+    rows.push({ country, currency: r.currency, day_cents: day, hotel_limit_cents: hotel });
+  }
+  return rows;
+}
+
+export async function saveAllowanceAction(_previous: FormState, formData: FormData): Promise<FormState> {
+  const locale = toLocale(formData.get('locale'));
+  const t = await getDictionary(locale);
+  const viewer = await requireCarrier(locale);
+
+  const name = str(formData, 'name');
+  const validFrom = str(formData, 'valid_from');
+  const country = str(formData, 'country').toUpperCase();
+  const rule = str(formData, 'rule') as AllowanceRuleCode;
+
+  if (
+    !name ||
+    name.length > 120 ||
+    !/^\d{4}-\d{2}-\d{2}$/.test(validFrom) ||
+    !/^[A-Z]{2}$/.test(country) ||
+    !ALLOWANCE_RULES.includes(rule)
+  ) {
+    return { error: t.validation.required, done: false };
+  }
+
+  const rates = parseRates(str(formData, 'rates'));
+  if (!rates) return { error: t.allowanceSetup.badRate, done: false };
+
+  const supabase = await createClient();
+  const id = opt(formData, 'id');
+
+  /*
+   * Параметры, которых нет в форме (польский порог ZUS и т. п.), остаются
+   * от прежней строки — если правило то же.
+   */
+  let params: Record<string, Json> = allowanceParams(rule, formData);
+  if (id) {
+    const { data: before } = await supabase.from('allowance_rule_sets').select('rule, params').eq('id', id).maybeSingle();
+    if (!before) return { error: t.error.generic, done: false };
+    if (before.rule === rule && before.params && typeof before.params === 'object' && !Array.isArray(before.params)) {
+      params = { ...(before.params as Record<string, Json>), ...params };
+    }
+  }
+
+  const row = {
+    name,
+    valid_from: validFrom,
+    country,
+    rule,
+    params,
+    currency: isCurrency(str(formData, 'currency'))
+      ? str(formData, 'currency')
+      : asCurrency(viewer.company?.currency),
+  };
+
+  const saved = id
+    ? await supabase.from('allowance_rule_sets').update(row).eq('id', id).select('id').single()
+    : await supabase
+        .from('allowance_rule_sets')
+        .insert({ ...row, company_id: viewer.company!.id, created_by: viewer.userId })
+        .select('id')
+        .single();
+
+  if (saved.error || !saved.data) {
+    return { error: saved.error?.code === '23514' ? t.validation.positiveNumber : t.error.generic, done: false };
+  }
+
+  /* Ставки заменяются целиком: таблица небольшая, сравнивать незачем. */
+  const setId = saved.data.id;
+  const { error: clearError } = await supabase.from('allowance_rates').delete().eq('rule_set_id', setId);
+  if (clearError) return { error: t.error.generic, done: false };
+  if (rates.length > 0) {
+    const { error: ratesError } = await supabase
+      .from('allowance_rates')
+      .insert(rates.map((r) => ({ ...r, rule_set_id: setId })));
+    if (ratesError) return { error: t.allowanceSetup.badRate, done: false };
+  }
+
+  revalidatePath(`/${locale}/carrier/drivers/allowances`);
+  return { error: null, done: true };
+}
+
+export async function deleteAllowanceAction(_previous: FormState, formData: FormData): Promise<FormState> {
+  const locale = toLocale(formData.get('locale'));
+  const t = await getDictionary(locale);
+  await requireCarrier(locale);
+
+  const supabase = await createClient();
+  const { error } = await supabase.from('allowance_rule_sets').delete().eq('id', str(formData, 'id'));
+
+  /* 23503 — набор держит модель оплаты водителя (on delete restrict). */
+  if (error) return { error: error.code === '23503' ? t.allowanceSetup.inUse : t.error.generic, done: false };
+
+  revalidatePath(`/${locale}/carrier/drivers/allowances`);
+  return { ...idle, done: true };
+}
+
+/** Копия шаблона суточных — со ставками по странам и в валюте шаблона (функция базы). */
+export async function copyAllowanceTemplateAction(formData: FormData): Promise<void> {
+  const locale = toLocale(formData.get('locale'));
+  await requireCarrier(locale);
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc('copy_allowance_template', { p_template_id: str(formData, 'id') });
+  await flashFailure(locale, error);
+
+  revalidatePath(`/${locale}/carrier/drivers/allowances`);
 }
 
 /* ── Приложение водителя ────────────────────────────────────────── */
