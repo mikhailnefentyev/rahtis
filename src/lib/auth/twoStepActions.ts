@@ -195,10 +195,15 @@ export async function resetMemberTwoStepAction(_previous: MemberResetState, form
   const userId = String(formData.get('user_id') ?? '');
   if (!userId || userId === viewer.userId) return { error: t.error.forbidden, done: false };
 
-  /* Только свой человек: список — та же функция, что на странице. */
+  /*
+   * Только свой диспетчер: список — та же функция, что на странице. Другому
+   * главному пользователю защиту снимает поддержка, а не коллега, — то же
+   * правило, что у remove_company_member.
+   */
   const supabase = await createClient();
   const { data: members } = await supabase.rpc('company_members');
-  if (!(members ?? []).some((m) => m.user_id === userId)) return { error: t.error.forbidden, done: false };
+  const target = (members ?? []).find((m) => m.user_id === userId);
+  if (!target || target.member_kind !== 'DISPATCHER') return { error: t.error.forbidden, done: false };
 
   const ok = await resetFactors(userId, { id: viewer.userId, email: viewer.email }, { by: 'owner', company_id: viewer.company.id });
   if (!ok) return { error: t.twoStep.failed, done: false };
