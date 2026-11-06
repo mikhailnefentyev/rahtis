@@ -9,6 +9,8 @@ import { useI18n } from '@/lib/i18n/provider';
 import type { CarrierClient, OrderStatus, OwnVehicle } from '@/types/db';
 import { OrderForm } from '../../shipper/orders/OrderForm';
 import { OwnClients } from './OwnClients';
+import { OrderInboxLine } from '@/components/domain/OrderInboxAddress';
+import type { EmailDraftInfo } from '@/lib/inbound/load';
 
 export type OwnJob = {
   id: string;
@@ -37,7 +39,13 @@ export function OwnView({
   startNew = false,
   blocked = null,
   homeCountry = 'FI',
+  inboxAddress = null,
+  emailDraft = null,
 }: {
+  /** Адрес пересылки заказов компании; приём не настроен — null. */
+  inboxAddress?: string | null;
+  /** Черновик из пересланного письма (?email=): форма открывается заполненной. */
+  emailDraft?: EmailDraftInfo | null;
   /** Страна перевозчика — страна нового клиента по умолчанию. */
   homeCountry?: string;
   startNew?: boolean;
@@ -55,6 +63,8 @@ export function OwnView({
   const [importing, setImporting] = useState(false);
   const [formKey, setFormKey] = useState(0);
   const [copied, setCopied] = useState<string | null>(null);
+  /* Черновик из письма — только для первой формы. */
+  const [fromEmail, setFromEmail] = useState(emailDraft);
 
   async function copy(job: OwnJob) {
     if (!job.track) return;
@@ -78,12 +88,15 @@ export function OwnView({
             knownVehicles={[]}
             own={{ clients, vehicles, trailers, homeCountry }}
             importOpen={importing}
+            emailDraft={fromEmail}
             onNew={() => {
+              setFromEmail(null);
               setFormKey((k) => k + 1);
               router.refresh();
             }}
             onPublished={() => {
               setComposing(false);
+              setFromEmail(null);
               router.refresh();
             }}
           />
@@ -93,6 +106,7 @@ export function OwnView({
               variant="primary"
               onClick={() => {
                 setImporting(false);
+                setFromEmail(null);
                 setComposing(true);
               }}
             >
@@ -101,6 +115,7 @@ export function OwnView({
             <Button
               onClick={() => {
                 setImporting(true);
+                setFromEmail(null);
                 setComposing(true);
               }}
             >
@@ -109,6 +124,12 @@ export function OwnView({
           </div>
         )}
       </div>
+
+      {inboxAddress && (
+        <div className="mb-6">
+          <OrderInboxLine address={inboxAddress} />
+        </div>
+      )}
 
       <p className="label-micro mb-2">{t.own.recent}</p>
       {jobs.length === 0 ? (

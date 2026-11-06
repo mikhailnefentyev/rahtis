@@ -1,6 +1,6 @@
 import { bearerMatches } from '@/lib/auth/bearer';
 import { purgeExpiredFuel, purgeExpiredTripPhotos } from '@/lib/retention/photos';
-import { purgeOldSignInDevices } from '@/lib/retention/signIns';
+import { purgeOldEmailDrafts, purgeOldSignInDevices } from '@/lib/retention/signIns';
 
 /**
  * Удаление фото рейсов, заправок и отчётов топлива старше срока хранения.
@@ -28,6 +28,8 @@ export async function POST(request: Request) {
   const fuel = await purgeExpiredFuel();
   /* Устройства входа старше 12 месяцев — тем же ежедневным запуском (6.11.2026). */
   const signIns = await purgeOldSignInDevices();
-  const failed = result.errors.length > 0 || fuel.errors.length > 0 || signIns.errors.length > 0;
-  return Response.json({ ...result, fuel, signIns }, { status: failed ? 207 : 200 });
+  /* Черновики из писем старше 30 дней (6.11.2026). */
+  const emailDrafts = await purgeOldEmailDrafts();
+  const failed = result.errors.length > 0 || fuel.errors.length > 0 || signIns.errors.length > 0 || emailDrafts.errors.length > 0;
+  return Response.json({ ...result, fuel, signIns, emailDrafts }, { status: failed ? 207 : 200 });
 }

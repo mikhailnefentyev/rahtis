@@ -10,6 +10,7 @@ import { createClient } from '@/lib/supabase/server';
 import type { StopRole } from '@/types/db';
 import { OwnView, type OwnJob } from './OwnView';
 import { getViewerI18n } from '@/lib/i18n/viewer';
+import { loadEmailDraft, loadInboxAddress } from '@/lib/inbound/load';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -30,11 +31,12 @@ export default async function OwnOrdersPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ new?: string }>;
+  searchParams: Promise<{ new?: string; email?: string }>;
 }) {
   const { locale } = await params;
   /* «+ Uusi oma keikka» с обзора открывает форму сразу. */
-  const startNew = (await searchParams).new === '1';
+  const query = await searchParams;
+  const startNew = query.new === '1' || Boolean(query.email);
   if (!isLocale(locale)) notFound();
 
   const viewer = await requireRole(locale, 'CARRIER');
@@ -85,7 +87,12 @@ export default async function OwnOrdersPage({
     list.push(s);
     route.set(s.order_id, list);
   }
-  const { data: assignments } = await supabase.rpc('my_assignments');
+  const [{ data: assignments }, inbox, emailDraft] = await Promise.all([
+    supabase.rpc('my_assignments'),
+    /* Заказ из пересланного письма: адрес компании и черновик по ссылке ?email=. */
+    active && access ? loadInboxAddress() : Promise.resolve(null),
+    active && access ? loadEmailDraft(query.email, locale) : Promise.resolve(null),
+  ]);
   const plates = new Map((assignments ?? []).map((a) => [a.id, a.vehicle_plate]));
   const site = siteUrl();
 
@@ -128,6 +135,8 @@ export default async function OwnOrdersPage({
           clients={clients ?? []}
           vehicles={vehicles ?? []}
           startNew={startNew}
+          inboxAddress={inbox?.address ?? null}
+          emailDraft={emailDraft}
           homeCountry={viewer.company?.country ?? 'FI'}
           blocked={legalPending ? t.legal.reacceptNeeded : null}
         />

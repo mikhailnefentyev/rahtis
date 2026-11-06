@@ -4662,6 +4662,31 @@ export const pl = {
     capacityWithdraw: "Wycofaj",
     decline: "Odrzuć",
     capacityDate: "Wyjazd {date}",
+    emailDraft: "Szkic zlecenia z e-maila – sprawdź i opublikuj",
+    emailDraftFailed: "Nie udało się odczytać zlecenia z e-maila – uzupełnij ręcznie",
+    emailDraftOpen: "Sprawdź i opublikuj",
+  },
+
+  /* Заказ из пересланного письма (6.11.2026, src/lib/inbound). */
+  emailInbox: {
+    title: "Zlecenia e-mailem",
+    hint: "Prześlij dalej e-mail klienta ze zleceniem (treść i załączniki PDF) na ten adres. RAHTIS odczyta go i utworzy szkic zlecenia w sekcji „Wymaga Twojego działania” – nic nie zostanie opublikowane przed sprawdzeniem.",
+    forwardHere: "Przesyłaj e-maile klientów ze zleceniami na ten adres:",
+    copy: "Kopiuj",
+    copied: "Skopiowano",
+    whoCanSend: "Adres przyjmuje wiadomości tylko z adresów logowania użytkowników firmy i z adresów podanych poniżej. Pozostałe wiadomości są odrzucane.",
+    sendersLabel: "Inni dozwoleni nadawcy (jeden adres w wierszu)",
+    sendersSave: "Zapisz nadawców",
+    saved: "Zapisano",
+    sendersInvalid: "Sprawdź adres e-mail: {value}",
+    sendersTooMany: "Maksymalnie 20 adresów.",
+    rotate: "Zmień adres",
+    rotateHint: "Stary adres przestaje działać od razu.",
+    rotateConfirm: "Zmienić adres? Wiadomości wysłane na stary adres nie będą już docierać.",
+    rotated: "Adres został zmieniony.",
+    ownerOnly: "Tylko główny użytkownik firmy może to zmienić.",
+    formSource: "Z e-maila: {subject} · {from} · {date}.",
+    formUnread: "Nie udało się odczytać zlecenia z wiadomości – formularz trzeba uzupełnić ręcznie.",
   },
 
   /* Догрузы: свободное место в машинах (6.11.2026, src/lib/capacity). */

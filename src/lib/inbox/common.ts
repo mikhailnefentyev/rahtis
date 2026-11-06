@@ -185,3 +185,37 @@ export async function sensitiveChangeItems(supabase: Supabase, me: string | null
     .filter((s) => !(s.changed_by && s.changed_by === me))
     .map((s) => ({ key: `sensitive:${s.id}`, kind: 'sensitiveChanged', urgency: 0, at: s.changed_at, date: s.changed_at, note: s.field, href, snooze: 30 }));
 }
+
+/** Разбор письма дольше этого — считаем, что он сорвался (запуск после ответа вебхуку оборвался). */
+const EMAIL_PARSE_STALE_MS = 10 * 60_000;
+
+/**
+ * Черновики из пересланных писем (6.11.2026): готов — «проверь и
+ * опубликуй», не прочитался — «заполни сам». Ссылка — прямо на форму.
+ * До миграции таблицы нет — пусто.
+ */
+export async function emailDraftItems(supabase: Supabase, href: (id: string) => string, now = Date.now()): Promise<InboxItem[]> {
+  const { data, error } = await supabase
+    .from('order_email_drafts')
+    .select('id, subject, from_address, received_at, status, created_at')
+    .in('status', ['PENDING', 'PARSED', 'FAILED'])
+    .order('received_at', { ascending: false })
+    .limit(20);
+  if (error) return [];
+  const items: InboxItem[] = [];
+  for (const d of data ?? []) {
+    const stale = d.status === 'PENDING' && now - Date.parse(d.created_at) > EMAIL_PARSE_STALE_MS;
+    if (d.status === 'PENDING' && !stale) continue;
+    items.push({
+      key: `email:${d.id}`,
+      kind: d.status === 'PARSED' ? 'emailDraft' : 'emailDraftFailed',
+      urgency: d.status === 'PARSED' ? 1 : 2,
+      at: d.received_at,
+      ref: d.subject || null,
+      party: d.from_address,
+      href: href(d.id),
+      op: { op: 'dismissEmailDraft', draftId: d.id },
+    });
+  }
+  return items;
+}

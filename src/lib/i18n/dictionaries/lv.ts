@@ -4663,6 +4663,31 @@ export const lv = {
     capacityWithdraw: "Noņemt",
     decline: "Noraidīt",
     capacityDate: "Izbraukšana {date}",
+    emailDraft: "Pasūtījuma melnraksts no e-pasta – pārbaudiet un publicējiet",
+    emailDraftFailed: "No e-pasta neizdevās nolasīt pasūtījumu – aizpildiet paši",
+    emailDraftOpen: "Pārbaudīt un publicēt",
+  },
+
+  /* Заказ из пересланного письма (6.11.2026, src/lib/inbound). */
+  emailInbox: {
+    title: "Pasūtījumi pa e-pastu",
+    hint: "Pārsūtiet klienta pasūtījuma e-pastu (tekstu un PDF pielikumus) uz šo adresi. RAHTIS to nolasīs un izveidos pasūtījuma melnrakstu sadaļā “Nepieciešama jūsu rīcība” – nekas netiek publicēts, kamēr neesat to pārbaudījis.",
+    forwardHere: "Pārsūtiet klientu pasūtījumu e-pastus uz šo adresi:",
+    copy: "Kopēt",
+    copied: "Nokopēts",
+    whoCanSend: "Adrese pieņem ziņojumus tikai no jūsu uzņēmuma lietotāju pieteikšanās adresēm un no tālāk norādītajām adresēm. Citi ziņojumi tiek noraidīti.",
+    sendersLabel: "Citi atļautie sūtītāji (viena adrese rindā)",
+    sendersSave: "Saglabāt sūtītājus",
+    saved: "Saglabāts",
+    sendersInvalid: "Pārbaudiet e-pasta adresi: {value}",
+    sendersTooMany: "Ne vairāk kā 20 adreses.",
+    rotate: "Mainīt adresi",
+    rotateHint: "Vecā adrese uzreiz pārstāj darboties.",
+    rotateConfirm: "Mainīt adresi? Uz veco adresi nosūtītie ziņojumi vairs netiks piegādāti.",
+    rotated: "Adrese nomainīta.",
+    ownerOnly: "To var mainīt tikai uzņēmuma galvenais lietotājs.",
+    formSource: "No e-pasta: {subject} · {from} · {date}.",
+    formUnread: "No ziņojuma neizdevās nolasīt pasūtījumu – aizpildiet veidlapu paši.",
   },
 
   /* Догрузы: свободное место в машинах (6.11.2026, src/lib/capacity). */

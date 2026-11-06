@@ -6,7 +6,7 @@ import { daysFromToday, todayInHelsinki } from '@/lib/dates';
 import { COLLECTION_DAY } from '@/lib/invoices/schedule';
 import type { Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
-import { companyDocumentItems, loadDismissals, orderChangeItems, sensitiveChangeItems, type InboxResult } from './common';
+import { companyDocumentItems, emailDraftItems, loadDismissals, orderChangeItems, sensitiveChangeItems, type InboxResult } from './common';
 import { carrierInvoiceItems, collapseInvoiceSend, rankItems, twoStepItem, urgencyByDue, type InboxItem } from './rank';
 import { spaceLabel } from '@/lib/capacity/compute';
 import { loadCarrierCapacity } from '@/lib/capacity/load';
@@ -38,6 +38,7 @@ export const loadCarrierInbox = cache(async (locale: Locale): Promise<InboxResul
     dismissed,
     capacity,
     capacityRequests,
+    emailItems,
   ] = await Promise.all([
     supabase.rpc('my_assignments'),
     supabase.rpc('freight_invoice_targets'),
@@ -64,9 +65,11 @@ export const loadCarrierInbox = cache(async (locale: Locale): Promise<InboxResul
     /* Догрузы: до миграции функций нет — пункты просто не появляются. */
     loadCarrierCapacity(),
     supabase.rpc('capacity_requests_for_carrier'),
+    emailDraftItems(supabase, (id) => `${base}/own?new=1&email=${id}`),
   ]);
 
   const items: InboxItem[] = [
+    ...emailItems,
     ...docItems,
     ...sensitive,
     ...twoStepItem({

@@ -4637,6 +4637,31 @@ export const sv = {
     capacityWithdraw: "Ta bort",
     decline: "Avböj",
     capacityDate: "Avgång {date}",
+    emailDraft: "Orderutkast från e-post – granska och publicera",
+    emailDraftFailed: "Ingen order kunde läsas från ett e-postmeddelande – fyll i själv",
+    emailDraftOpen: "Granska och publicera",
+  },
+
+  /* Заказ из пересланного письма (6.11.2026, src/lib/inbound). */
+  emailInbox: {
+    title: "Order via e-post",
+    hint: "Vidarebefordra kundens ordermejl (text och PDF-bilagor) till den här adressen. RAHTIS läser det och skapar ett orderutkast under ”Kräver din åtgärd” – inget publiceras innan du har granskat det.",
+    forwardHere: "Vidarebefordra kundernas ordermejl till den här adressen:",
+    copy: "Kopiera",
+    copied: "Kopierad",
+    whoCanSend: "Adressen tar bara emot meddelanden från inloggningsadresserna för ditt företags användare och från adresserna nedan. Andra meddelanden avvisas.",
+    sendersLabel: "Andra tillåtna avsändare (en adress per rad)",
+    sendersSave: "Spara avsändare",
+    saved: "Sparat",
+    sendersInvalid: "Kontrollera e-postadressen: {value}",
+    sendersTooMany: "Högst 20 adresser.",
+    rotate: "Byt adress",
+    rotateHint: "Den gamla adressen slutar fungera direkt.",
+    rotateConfirm: "Byta adress? Meddelanden till den gamla adressen kommer inte längre fram.",
+    rotated: "Adressen har bytts.",
+    ownerOnly: "Bara företagets huvudanvändare kan ändra detta.",
+    formSource: "Från e-post: {subject} · {from} · {date}.",
+    formUnread: "Ingen order kunde läsas från meddelandet – fyll i formuläret själv.",
   },
 
   /* Догрузы: свободное место в машинах (6.11.2026, src/lib/capacity). */

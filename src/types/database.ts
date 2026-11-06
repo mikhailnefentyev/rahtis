@@ -3942,6 +3942,78 @@ export type Database = {
           },
         ]
       }
+      order_email_drafts: {
+        Row: {
+          company_id: string
+          created_at: string
+          draft: Json | null
+          from_address: string
+          id: string
+          message_id: string
+          order_id: string | null
+          provider_email_id: string | null
+          received_at: string
+          status: string
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          draft?: Json | null
+          from_address: string
+          id?: string
+          message_id: string
+          order_id?: string | null
+          provider_email_id?: string | null
+          received_at: string
+          status?: string
+          subject?: string
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          draft?: Json | null
+          from_address?: string
+          id?: string
+          message_id?: string
+          order_id?: string | null
+          provider_email_id?: string | null
+          received_at?: string
+          status?: string
+          subject?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      order_inbox_addresses: {
+        Row: {
+          allowed_senders: string[]
+          company_id: string
+          created_at: string
+          rotated_at: string | null
+          rotated_by: string | null
+          token: string
+        }
+        Insert: {
+          allowed_senders?: string[]
+          company_id: string
+          created_at?: string
+          rotated_at?: string | null
+          rotated_by?: string | null
+          token: string
+        }
+        Update: {
+          allowed_senders?: string[]
+          company_id?: string
+          created_at?: string
+          rotated_at?: string | null
+          rotated_by?: string | null
+          token?: string
+        }
+        Relationships: []
+      }
       order_stops: {
         Row: {
           address: string
@@ -8895,6 +8967,21 @@ export type Database = {
           contact_email: string
           language: string
         }[]
+      }
+      order_inbox_address: {
+        Args: never
+        Returns: {
+          allowed_senders: string[]
+          rotated_at: string
+          token: string
+        }[]
+      }
+      rotate_order_inbox_address: { Args: never; Returns: string }
+      set_order_inbox_senders: { Args: { p_senders: string[] }; Returns: string[] }
+      inbound_order_target: { Args: { p_token: string }; Returns: Json }
+      close_order_email_draft: {
+        Args: { p_id: string; p_order_id?: string }
+        Returns: undefined
       }
       own_orders_access: { Args: never; Returns: boolean }
       partner_totals: {

@@ -22,7 +22,9 @@ export type InboxOp =
   /* Догрузы: показать место одним нажатием, снять автопубликацию, ответить на запрос. */
   | { op: 'publishCapacity'; vehicleId: string; orderId: string }
   | { op: 'withdrawCapacity'; offerId: string }
-  | { op: 'capacityRequest'; requestId: string };
+  | { op: 'capacityRequest'; requestId: string }
+  /* Черновик из письма: «не нужно» — открыть форму ведёт href. */
+  | { op: 'dismissEmailDraft'; draftId: string };
 
 export type InboxItem = {
   /** Устойчивый ключ — по нему же скрывают («позже»). */

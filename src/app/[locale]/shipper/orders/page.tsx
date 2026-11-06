@@ -12,6 +12,8 @@ import { getViewerI18n } from '@/lib/i18n/viewer';
 import { bankChangeMarks } from '@/lib/trust/sensitive';
 import { loadOrderChanges } from '@/lib/orders/changes';
 import { CapacitySuggestions } from '@/components/domain/capacity/CapacitySuggestions';
+import { OrderInboxLine } from '@/components/domain/OrderInboxAddress';
+import { loadEmailDraft, loadInboxAddress } from '@/lib/inbound/load';
 
 export async function generateMetadata({
   params,
@@ -29,10 +31,11 @@ export default async function OrdersPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ new?: string }>;
+  searchParams: Promise<{ new?: string; email?: string }>;
 }) {
   /* «+ Uusi tilaus» с обзора открывает форму сразу. */
-  const startNew = (await searchParams).new === '1';
+  const query = await searchParams;
+  const startNew = query.new === '1' || Boolean(query.email);
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
 
@@ -181,7 +184,12 @@ export default async function OrdersPage({
    * идущего рейса иначе не отличается от той, которую взял перевозчик.
    */
   /* Режим цены, пробег по маршруту и сообщения водителя — для правок после публикации. */
-  const changesByOrder = await loadOrderChanges(orderIds);
+  const [changesByOrder, inbox, emailDraft] = await Promise.all([
+    loadOrderChanges(orderIds),
+    /* Заказ из пересланного письма: адрес компании и черновик по ссылке ?email=. */
+    company.status === 'ACTIVE' ? loadInboxAddress() : Promise.resolve(null),
+    company.status === 'ACTIVE' ? loadEmailDraft(query.email, locale) : Promise.resolve(null),
+  ]);
 
   const amendmentsByOrder: Record<string, OrderAmendment[]> = {};
   for (const row of amendmentRows ?? []) {
@@ -210,6 +218,11 @@ export default async function OrdersPage({
         </Card>
       ) : (
         <>
+        {inbox && (
+          <div className="mb-4">
+            <OrderInboxLine address={inbox.address} />
+          </div>
+        )}
         {/* Догрузы: машины по пути со свободным местом — к частичным грузам. */}
         <CapacitySuggestions locale={locale} orders={orders ?? []} />
         <OrdersView
@@ -222,6 +235,7 @@ export default async function OrdersPage({
           knownVehicles={knownVehicles}
           documentsByOrder={documentsByOrder}
           startNew={startNew}
+          emailDraft={emailDraft}
         />
         </>
       )}

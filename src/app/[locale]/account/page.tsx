@@ -17,6 +17,8 @@ import { WasteRegistrationsForm } from './WasteRegistrationsForm';
 import { CurrencyForm } from './CurrencyForm';
 import { ForwarderPanel } from './ForwarderPanel';
 import { ShipperDocumentsPanel } from './ShipperDocumentsPanel';
+import { OrderInboxSettings } from '@/components/domain/OrderInboxAddress';
+import { loadInboxAddress } from '@/lib/inbound/load';
 import { SHIPPER_DOC_KINDS } from '@/lib/shipper-docs/model';
 import { loadForwarderState } from '@/lib/forwarders/status';
 import { ShipperTrustDetails } from '@/components/domain/ShipperTrust';
@@ -167,6 +169,8 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
     : [null, []];
   /* Что видят о заказчике перевозчики в прямом режиме — та же сводка, без имён отметивших. */
   const trust = shipper ? await loadCompanyTrust() : null;
+  /* Адрес пересылки заказов (6.11.2026): только когда приём писем настроен. */
+  const orderInbox = company && company.status === 'ACTIVE' && !company.client_of ? await loadInboxAddress() : null;
 
   const content = (
     <main className="cab-page cab-page--narrow">
@@ -216,6 +220,8 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
         {company && company.status === 'ACTIVE' && (company.kind === 'CARRIER' || company.kind === 'SHIPPER') && (
           <CurrencyForm currency={company.currency} kind={company.kind} canEdit={isOwner} />
         )}
+
+        {orderInbox && <OrderInboxSettings address={orderInbox.address} senders={orderInbox.senders} canManage={isOwner} />}
 
         {shipper && (
           <ForwarderPanel

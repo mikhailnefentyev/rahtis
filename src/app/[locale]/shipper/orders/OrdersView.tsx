@@ -17,6 +17,7 @@ import type {
   TripDocument,
 } from '@/types/db';
 import type { OrderChangesData } from '@/components/domain/OrderChanges';
+import type { EmailDraftInfo } from '@/lib/inbound/load';
 import { OrderCard } from './OrderCard';
 
 /**
@@ -118,7 +119,10 @@ export function OrdersView({
   knownVehicles,
   documentsByOrder,
   startNew = false,
+  emailDraft = null,
 }: {
+  /** Черновик из пересланного письма (?email=): форма открывается заполненной. */
+  emailDraft?: EmailDraftInfo | null;
   /** Цена и пробег, сообщения водителя (правки после назначения). */
   changesByOrder?: Record<string, OrderChangesData>;
   /** Пришли с обзора по «+ Uusi tilaus» — форма открыта сразу. */
@@ -139,7 +143,10 @@ export function OrdersView({
     onNew?: () => void;
     template?: { order: ShipperOrder; stops: OrderStop[] };
     knownVehicles: KnownVehicle[];
+    emailDraft?: EmailDraftInfo | null;
   }> | null>(null);
+  /* Черновик из письма — только для первой формы; «следующий заказ» и повтор открывают чистую. */
+  const [fromEmail, setFromEmail] = useState(emailDraft);
   /* Какой заказ повторяем. Пусто — форма открыта пустой. */
   const [template, setTemplate] = useState<{ order: ShipperOrder; stops: OrderStop[] } | null>(null);
   /* Раскрыт один заказ за раз: иначе список снова превращается в ленту карточек. */
@@ -176,6 +183,7 @@ export function OrdersView({
       setOrderForm(() => mod.OrderForm);
     }
     setTemplate(from ?? null);
+    setFromEmail(null);
     setComposing(true);
     /* Повтор открывает форму наверху — иначе она уедет под раскрытую карточку. */
     if (from) window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -314,14 +322,17 @@ export function OrdersView({
           <OrderForm
             key={formKey}
             template={template ?? undefined}
+            emailDraft={fromEmail}
             onNew={() => {
               setTemplate(null);
+              setFromEmail(null);
               setFormKey((k) => k + 1);
             }}
             knownVehicles={knownVehicles}
             onPublished={() => {
               setComposing(false);
               setTemplate(null);
+              setFromEmail(null);
             }}
           />
         </div>

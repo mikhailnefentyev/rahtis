@@ -4826,6 +4826,31 @@ export const en = {
     capacityWithdraw: "Withdraw",
     decline: "Decline",
     capacityDate: "Departs {date}",
+    emailDraft: "Order draft from email – review and publish",
+    emailDraftFailed: "No order could be read from an email – fill it in yourself",
+    emailDraftOpen: "Review and publish",
+  },
+
+  /* Заказ из пересланного письма (6.11.2026, src/lib/inbound). */
+  emailInbox: {
+    title: "Orders by email",
+    hint: "Forward a customer’s order email (text and PDF attachments) to this address. RAHTIS reads it and creates an order draft under “Needs your action” – nothing is published until you have checked it.",
+    forwardHere: "Forward customer order emails to this address:",
+    copy: "Copy",
+    copied: "Copied",
+    whoCanSend: "The address accepts messages only from the sign-in addresses of your company’s users and from the addresses listed below. Other messages are rejected.",
+    sendersLabel: "Other allowed senders (one address per line)",
+    sendersSave: "Save senders",
+    saved: "Saved",
+    sendersInvalid: "Check the email address: {value}",
+    sendersTooMany: "No more than 20 addresses.",
+    rotate: "Change address",
+    rotateHint: "The old address stops working immediately.",
+    rotateConfirm: "Change the address? Messages sent to the old address will no longer arrive.",
+    rotated: "Address changed.",
+    ownerOnly: "Only the company’s main user can change this.",
+    formSource: "From email: {subject} · {from} · {date}.",
+    formUnread: "No order could be read from the message – fill in the form yourself.",
   },
 
   /* Догрузы: свободное место в машинах (6.11.2026, src/lib/capacity). */

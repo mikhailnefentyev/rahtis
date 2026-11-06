@@ -36,6 +36,7 @@ import { StopFields, type StopDefaults } from './StopFields';
 import type { CarrierClient, KnownVehicle, OrderStop, OwnVehicle, ShipperOrder, StopRole } from '@/types/db';
 import { DispatchPicker } from './DirectPanel';
 import { OwnPicker } from '../../carrier/own/OwnPicker';
+import type { EmailDraftInfo } from '@/lib/inbound/load';
 import { OrderImport } from './OrderImport';
 import type { DraftStop, OrderDraft } from '@/lib/orders/importDraft';
 import { cn } from '@/lib/cn';
@@ -153,6 +154,8 @@ type OrderFormProps = {
   own?: { clients: CarrierClient[]; vehicles: OwnVehicle[]; trailers?: { id: string; plate: string; kind: string; body_type: string | null }[]; homeCountry?: string };
   /** Открыть сразу с панелью «из текста или PDF» (кнопка рядом с «новый рейс»). */
   importOpen?: boolean;
+  /** Черновик из пересланного письма: форма заполнена, после публикации черновик закрывается. */
+  emailDraft?: EmailDraftInfo | null;
 };
 
 /**
@@ -164,7 +167,7 @@ type OrderFormProps = {
  * заменяет повтор — это разные источники одного и того же.
  */
 export function OrderForm(props: OrderFormProps) {
-  const [draft, setDraft] = useState<OrderDraft | null>(null);
+  const [draft, setDraft] = useState<OrderDraft | null>(props.emailDraft?.draft ?? null);
   const [version, setVersion] = useState(0);
   return (
     <OrderFormInner
@@ -187,6 +190,7 @@ function OrderFormInner({
   knownVehicles,
   own,
   importOpen = false,
+  emailDraft = null,
   draft,
   onDraft,
 }: OrderFormProps & { draft: OrderDraft | null; onDraft: (draft: OrderDraft) => void }) {
@@ -590,6 +594,15 @@ function OrderFormInner({
           {skipped > 0 ? ` ${m('orderForm.repeatSkipped', { count: skipped })}` : ''}
         </p>
       )}
+      {emailDraft && (
+        <p className="rounded-control border border-line bg-surface px-3 py-2 text-[13px] text-ink-muted">
+          {t.emailInbox.formSource
+            .replace('{subject}', emailDraft.subject || '—')
+            .replace('{from}', emailDraft.from)
+            .replace('{date}', f.dateTime(emailDraft.receivedAt))}
+          {!emailDraft.draft && ` ${t.emailInbox.formUnread}`}
+        </p>
+      )}
       {draft && (
         <div className="flex flex-col gap-1.5 rounded-control border border-accent-line bg-accent-wash px-3 py-2.5 text-[13px] text-ink">
           <p>
@@ -612,6 +625,7 @@ function OrderFormInner({
         </div>
       )}
       <input type="hidden" name="locale" value={locale} />
+      {emailDraft && <input type="hidden" name="email_draft_id" value={emailDraft.id} />}
 
       {/*
        * Кэш маршрута уезжает вместе с заказом: пересчитывать его при

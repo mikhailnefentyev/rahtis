@@ -5,7 +5,7 @@ import { getViewer } from '@/lib/auth/viewer';
 import { daysFromToday, todayInHelsinki } from '@/lib/dates';
 import type { Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
-import { companyDocumentItems, loadDismissals, orderChangeItems, sensitiveChangeItems, type InboxResult } from './common';
+import { companyDocumentItems, emailDraftItems, loadDismissals, orderChangeItems, sensitiveChangeItems, type InboxResult } from './common';
 import { rankItems, shipperInvoiceItem, twoStepItem, type InboxItem } from './rank';
 
 /**
@@ -20,7 +20,7 @@ export const loadShipperInbox = cache(async (locale: Locale): Promise<InboxResul
   const base = `/${locale}/shipper`;
   const card = (id: string) => `${base}/orders#order-${id}`;
 
-  const [{ data: orders }, invoicesRes, docItems, sensitive, { data: claims }, dismissed] = await Promise.all([
+  const [{ data: orders }, invoicesRes, docItems, sensitive, { data: claims }, dismissed, emailItems] = await Promise.all([
     /* Колонки поимённо: назначение заказчику грантом не отдаётся. */
     supabase
       .from('orders')
@@ -33,9 +33,11 @@ export const loadShipperInbox = cache(async (locale: Locale): Promise<InboxResul
     sensitiveChangeItems(supabase, viewer.status === 'ready' ? viewer.userId : null, `/${locale}/account`),
     supabase.rpc('my_claims'),
     loadDismissals(supabase),
+    emailDraftItems(supabase, (id) => `${base}/orders?new=1&email=${id}`),
   ]);
 
   const items: InboxItem[] = [
+    ...emailItems,
     ...docItems,
     ...sensitive,
     ...twoStepItem({

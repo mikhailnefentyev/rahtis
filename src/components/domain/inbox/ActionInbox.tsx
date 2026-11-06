@@ -10,6 +10,7 @@ import { confirmFreightPaidAction } from '@/lib/invoices/actions';
 import { acknowledgeAmendmentsAction, dismissChangeRequestAction, respondProposalAction } from '@/lib/orders/amend';
 import { confirmVehicleCheckAction } from '@/lib/orders/vehicleCheckActions';
 import { decideCapacityRequestAction, publishCapacityAction, withdrawCapacityAction } from '@/lib/capacity/actions';
+import { dismissEmailDraftAction } from '@/lib/inbound/actions';
 import { ConfirmOrderButton, MarkPaidButton } from './InboxButtons';
 
 /** Сколько пунктов видно сразу; остальные — под «Показать все». */
@@ -224,6 +225,22 @@ async function Row({ item, locale }: { item: InboxItem; locale: Locale }) {
             </Button>
           </form>
           {open(false)}
+        </>
+      );
+      break;
+    case 'dismissEmailDraft':
+      /* Черновик из письма: форма заполнена — открыть и опубликовать; или «не нужно». */
+      actions = (
+        <>
+          <Link href={item.href} className={buttonClass({ variant: 'primary', size: 'sm' })}>
+            {item.kind === 'emailDraft' ? ti.emailDraftOpen : ti.open}
+          </Link>
+          <form action={dismissEmailDraftAction}>
+            {hidden({ draft_id: op.draftId })}
+            <Button type="submit" size="sm" variant="ghost">
+              {ti.dismiss}
+            </Button>
+          </form>
         </>
       );
       break;

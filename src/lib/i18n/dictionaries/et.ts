@@ -4623,6 +4623,31 @@ export const et = {
     capacityWithdraw: "Eemalda",
     decline: "Lükka tagasi",
     capacityDate: "Väljumine {date}",
+    emailDraft: "Tellimuse mustand e-kirjast – kontrolli ja avalda",
+    emailDraftFailed: "E-kirjast ei õnnestunud tellimust lugeda – täida ise",
+    emailDraftOpen: "Kontrolli ja avalda",
+  },
+
+  /* Заказ из пересланного письма (6.11.2026, src/lib/inbound). */
+  emailInbox: {
+    title: "Tellimused e-postiga",
+    hint: "Edasta kliendi tellimuse e-kiri (tekst ja PDF-manused) sellele aadressile. RAHTIS loeb selle ja loob tellimuse mustandi jaotisse „Vajab sinu tegevust“ – midagi ei avaldata enne, kui oled selle üle vaadanud.",
+    forwardHere: "Edasta klientide tellimuskirjad sellele aadressile:",
+    copy: "Kopeeri",
+    copied: "Kopeeritud",
+    whoCanSend: "Aadress võtab vastu ainult sinu ettevõtte kasutajate sisselogimisaadressidelt ja allpool loetletud aadressidelt saadetud kirju. Muud kirjad lükatakse tagasi.",
+    sendersLabel: "Teised lubatud saatjad (üks aadress real)",
+    sendersSave: "Salvesta saatjad",
+    saved: "Salvestatud",
+    sendersInvalid: "Kontrolli e-posti aadressi: {value}",
+    sendersTooMany: "Kuni 20 aadressi.",
+    rotate: "Muuda aadressi",
+    rotateHint: "Vana aadress lakkab kohe töötamast.",
+    rotateConfirm: "Kas muuta aadressi? Vanale aadressile saadetud kirjad enam kohale ei jõua.",
+    rotated: "Aadress muudetud.",
+    ownerOnly: "Seda saab muuta ainult ettevõtte peakasutaja.",
+    formSource: "E-kirjast: {subject} · {from} · {date}.",
+    formUnread: "Kirjast ei õnnestunud tellimust lugeda – täida vorm ise.",
   },
 
   /* Догрузы: свободное место в машинах (6.11.2026, src/lib/capacity). */

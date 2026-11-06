@@ -4663,6 +4663,31 @@ export const de = {
     capacityWithdraw: "Zurückziehen",
     decline: "Ablehnen",
     capacityDate: "Abfahrt {date}",
+    emailDraft: "Auftragsentwurf aus E-Mail – prüfen und veröffentlichen",
+    emailDraftFailed: "Aus einer E-Mail konnte kein Auftrag gelesen werden – selbst ausfüllen",
+    emailDraftOpen: "Prüfen und veröffentlichen",
+  },
+
+  /* Заказ из пересланного письма (6.11.2026, src/lib/inbound). */
+  emailInbox: {
+    title: "Aufträge per E-Mail",
+    hint: "Leiten Sie die Auftrags-E-Mail Ihres Kunden (Text und PDF-Anhänge) an diese Adresse weiter. RAHTIS liest sie und legt unter „Ihre Aktion erforderlich“ einen Auftragsentwurf an – veröffentlicht wird nichts, bevor Sie ihn geprüft haben.",
+    forwardHere: "Auftrags-E-Mails Ihrer Kunden an diese Adresse weiterleiten:",
+    copy: "Kopieren",
+    copied: "Kopiert",
+    whoCanSend: "Die Adresse nimmt nur Nachrichten von den Anmeldeadressen der Benutzer Ihres Unternehmens und von den unten aufgeführten Adressen an. Andere Nachrichten werden abgewiesen.",
+    sendersLabel: "Weitere zugelassene Absender (eine Adresse pro Zeile)",
+    sendersSave: "Absender speichern",
+    saved: "Gespeichert",
+    sendersInvalid: "Bitte E-Mail-Adresse prüfen: {value}",
+    sendersTooMany: "Höchstens 20 Adressen.",
+    rotate: "Adresse ändern",
+    rotateHint: "Die alte Adresse funktioniert sofort nicht mehr.",
+    rotateConfirm: "Adresse ändern? Nachrichten an die alte Adresse kommen dann nicht mehr an.",
+    rotated: "Adresse geändert.",
+    ownerOnly: "Nur der Hauptbenutzer des Unternehmens kann dies ändern.",
+    formSource: "Aus E-Mail: {subject} · {from} · {date}.",
+    formUnread: "Aus der Nachricht konnte kein Auftrag gelesen werden – bitte das Formular selbst ausfüllen.",
   },
 
   /* Догрузы: свободное место в машинах (6.11.2026, src/lib/capacity). */

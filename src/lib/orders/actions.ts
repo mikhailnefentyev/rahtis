@@ -494,6 +494,7 @@ export async function publishOrderAction(
   if (error || !data) {
     return { error: explainPublish(t, error?.code, error?.message), ref: null };
   }
+  await closeEmailDraft(supabase, formData, data.id);
 
   /*
    * Рассылка письмами. Уведомления в кабинеты перевозчиков уже написаны
@@ -577,7 +578,7 @@ export async function ownOrderAction(_previous: PublishState, formData: FormData
     if (error?.code === '22023' && error.message.includes('клиент')) return { error: t.own.clientInvalid, ref: null };
     return { error: explainPublish(t, error?.code, error?.message), ref: null };
   }
-
+  await closeEmailDraft(supabase, formData, data.id);
 
   /* Прицеп рейса из формы — та же проверка, что в карточке рейса (carrier_set_trip_trailer). */
   const trailerId = str(formData, 'own_trailer_id');
@@ -590,6 +591,14 @@ export async function ownOrderAction(_previous: PublishState, formData: FormData
 
   revalidatePath(`/${locale}/carrier`, 'layout');
   return { error: null, ref: data.ref };
+}
+
+/** Заказ создан из черновика письма — черновик закрыт и больше не висит в «Требует действия». */
+async function closeEmailDraft(supabase: Awaited<ReturnType<typeof createClient>>, formData: FormData, orderId: string): Promise<void> {
+  const id = str(formData, 'email_draft_id');
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return;
+  const { error } = await supabase.rpc('close_order_email_draft', { p_id: id, p_order_id: orderId });
+  if (error) console.error('черновик из письма не закрыт:', error.message);
 }
 
 /** Ссылка клиенту, если у него есть почта. Ошибки наружу не выпускает. */

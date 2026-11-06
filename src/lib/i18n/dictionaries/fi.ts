@@ -4947,6 +4947,31 @@ export const fi = {
     capacityWithdraw: "Poista näkyvistä",
     decline: "Hylkää",
     capacityDate: "Lähtö {date}",
+    emailDraft: "Tilausluonnos sähköpostista – tarkista ja julkaise",
+    emailDraftFailed: "Sähköpostista ei saatu luettua tilausta – täytä itse",
+    emailDraftOpen: "Tarkista ja julkaise",
+  },
+
+  /* Заказ из пересланного письма (6.11.2026, src/lib/inbound). */
+  emailInbox: {
+    title: "Tilaukset sähköpostilla",
+    hint: "Välitä asiakkaan tilausviesti (teksti ja PDF-liitteet) tähän osoitteeseen. RAHTIS lukee sen ja tekee tilausluonnoksen kohtaan ”Vaatii toimenpiteitäsi” – mitään ei julkaista ennen kuin olet tarkistanut sen.",
+    forwardHere: "Välitä asiakkaiden tilausviestit tähän osoitteeseen:",
+    copy: "Kopioi",
+    copied: "Kopioitu",
+    whoCanSend: "Osoite ottaa vastaan viestejä vain yrityksesi käyttäjien kirjautumisosoitteista ja alla luetelluista osoitteista. Muut viestit hylätään.",
+    sendersLabel: "Muut sallitut lähettäjät (yksi osoite riville)",
+    sendersSave: "Tallenna lähettäjät",
+    saved: "Tallennettu",
+    sendersInvalid: "Tarkista sähköpostiosoite: {value}",
+    sendersTooMany: "Enintään 20 osoitetta.",
+    rotate: "Vaihda osoite",
+    rotateHint: "Vanha osoite lakkaa toimimasta heti.",
+    rotateConfirm: "Vaihdetaanko osoite? Vanhaan osoitteeseen lähetetyt viestit eivät enää tule perille.",
+    rotated: "Osoite vaihdettu.",
+    ownerOnly: "Vain yrityksen pääkäyttäjä voi muuttaa tätä.",
+    formSource: "Sähköpostista: {subject} · {from} · {date}.",
+    formUnread: "Viestistä ei saatu luettua tilausta – täytä lomake itse.",
   },
 
   /* Догрузы: свободное место в машинах (6.11.2026, src/lib/capacity). */

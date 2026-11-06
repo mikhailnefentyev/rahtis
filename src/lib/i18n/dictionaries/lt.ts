@@ -4665,6 +4665,31 @@ export const lt = {
     capacityWithdraw: "Pašalinti",
     decline: "Atmesti",
     capacityDate: "Išvykimas {date}",
+    emailDraft: "Užsakymo juodraštis iš el. laiško – patikrinkite ir paskelbkite",
+    emailDraftFailed: "Iš el. laiško nepavyko nuskaityti užsakymo – užpildykite patys",
+    emailDraftOpen: "Patikrinti ir paskelbti",
+  },
+
+  /* Заказ из пересланного письма (6.11.2026, src/lib/inbound). */
+  emailInbox: {
+    title: "Užsakymai el. paštu",
+    hint: "Persiųskite kliento užsakymo el. laišką (tekstą ir PDF priedus) šiuo adresu. RAHTIS jį nuskaitys ir sukurs užsakymo juodraštį skiltyje „Reikia jūsų veiksmo“ – niekas neskelbiama, kol jo nepatikrinsite.",
+    forwardHere: "Klientų užsakymų laiškus persiųskite šiuo adresu:",
+    copy: "Kopijuoti",
+    copied: "Nukopijuota",
+    whoCanSend: "Adresas priima laiškus tik iš jūsų įmonės naudotojų prisijungimo adresų ir toliau nurodytų adresų. Kiti laiškai atmetami.",
+    sendersLabel: "Kiti leidžiami siuntėjai (po vieną adresą eilutėje)",
+    sendersSave: "Išsaugoti siuntėjus",
+    saved: "Išsaugota",
+    sendersInvalid: "Patikrinkite el. pašto adresą: {value}",
+    sendersTooMany: "Ne daugiau kaip 20 adresų.",
+    rotate: "Keisti adresą",
+    rotateHint: "Senas adresas iš karto nustoja veikti.",
+    rotateConfirm: "Keisti adresą? Senu adresu siųsti laiškai nebebus pristatomi.",
+    rotated: "Adresas pakeistas.",
+    ownerOnly: "Tai gali pakeisti tik pagrindinis įmonės naudotojas.",
+    formSource: "Iš el. laiško: {subject} · {from} · {date}.",
+    formUnread: "Iš laiško nepavyko nuskaityti užsakymo – užpildykite formą patys.",
   },
 
   /* Догрузы: свободное место в машинах (6.11.2026, src/lib/capacity). */
