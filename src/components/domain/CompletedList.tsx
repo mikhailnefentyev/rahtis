@@ -8,6 +8,7 @@ import { routeLabel } from '@/lib/orders/route';
 import { RateTrip } from '@/components/domain/RateTrip';
 import { DocumentList } from '@/components/domain/TripDocuments';
 import { FileClaim } from '@/components/domain/claims/ClaimActions';
+import { PaymentReportControl, type PaymentReportValue } from '@/components/domain/ShipperTrust';
 import {
   Badge,
   Button,
@@ -39,7 +40,10 @@ import type { CompletedOrder, OrderStop, TripDocument, WeeklyTotal } from '@/typ
 export function CompletedList({
   orders,
   canClaim = false,
+  paymentReports = {},
 }: {
+  /** Прямые рейсы, где перевозчик отмечает оплату заказчиком: id → отметка (решает база). */
+  paymentReports?: Record<string, PaymentReportValue>;
   orders: CompletedOrder[];
   /**
    * Не используется: итоги недели считаются по строкам (недели в окне
@@ -292,7 +296,13 @@ export function CompletedList({
                              */}
                             {canClaim &&
                               (order.contract_party === 'CARRIER' ? (
-                                <p className="mt-4 border-t border-line pt-4 text-xs text-ink-muted">{t.claims.directDeal}</p>
+                                <>
+                                  <p className="mt-4 border-t border-line pt-4 text-xs text-ink-muted">{t.claims.directDeal}</p>
+                                  {/* Оплата прямого рейса: отметка перевозчика для сводки о заказчике. */}
+                                  {paymentReports[order.id] && (
+                                    <PaymentReportControl orderId={order.id} value={paymentReports[order.id]} className="mt-3" />
+                                  )}
+                                </>
                               ) : (
                                 <div className="mt-4 border-t border-line pt-4">
                                   <FileClaim orderId={order.id} stops={stops} />

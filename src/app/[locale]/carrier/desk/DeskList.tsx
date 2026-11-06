@@ -1,6 +1,8 @@
 'use client';
 
 import { ForwarderPolicyNote, type ForwarderPolicyInfo } from '@/components/domain/ForwarderDirect';
+import { ShipperTrustBadge } from '@/components/domain/ShipperTrust';
+import type { ShipperTrust } from '@/lib/trust/model';
 import { useActionState, useState } from 'react';
 import { OrderRouteMap } from '@/components/domain/RouteMap';
 import { RouteStops } from '@/components/domain/RouteStops';
@@ -162,10 +164,13 @@ export function DeskList({
   waiting = {},
   currencyByOrder = {},
   policyByOrder = {},
+  trustByOrder = {},
 }: {
   orders: DeskOrder[];
   /** Полис экспедитора-заказчика у заказов «напрямую с перевозчиком»: справка. */
   policyByOrder?: Record<string, ForwarderPolicyInfo>;
+  /** Сведения об оплате заказчика у заказов «напрямую»: справка, не гарантия. */
+  trustByOrder?: Record<string, ShipperTrust>;
   /** Валюта цены по id заказа; нет — евро (стол RAHTIS всегда в евро). */
   currencyByOrder?: Record<string, string>;
   vehicles: Vehicle[];
@@ -226,6 +231,7 @@ export function DeskList({
                     {order.desk_contract === 'CARRIER' && <Badge tone="info">{t.direct.deskDirectBadge}</Badge>}
                   </div>
                   {order.desk_contract === 'CARRIER' && <ForwarderPolicyNote info={policyByOrder[order.id]} className="mt-1.5" />}
+                  {order.desk_contract === 'CARRIER' && <ShipperTrustBadge trust={trustByOrder[order.id]} className="mt-1.5" />}
 
                   <p className="mt-2 font-mono text-sm tracking-tight text-accent">
                     {routeLabel((order.stops ?? []) as DeskStop[]) ?? `${order.pickup_city} → ${order.finish_city ?? '—'}`}

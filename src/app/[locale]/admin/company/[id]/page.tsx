@@ -22,6 +22,7 @@ import { AdminDocument } from './AdminDocument';
 import { RegistryBlock } from '../../ApplicationCard';
 import { AdminVerification } from './AdminVerification';
 import { ForwarderReview } from '../../forwarders/ForwarderReview';
+import { AdminPaymentReports } from './AdminPaymentReports';
 
 /**
  * Карточка компании глазами оператора.
@@ -308,6 +309,9 @@ export default async function AdminCompanyPage({
           />
         </section>
       )}
+
+      {/* Сведения об оплате для перевозчиков прямого режима и отметки перевозчиков (6.11.2026). */}
+      {shipper && <AdminPaymentReports locale={locale} companyId={id} />}
 
       {/* Значок «Tarkastettu» и пакет tilaajavastuu: решение оператора, сроки — из пакета. */}
       {carrier && (

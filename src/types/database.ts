@@ -1210,6 +1210,76 @@ export type Database = {
           },
         ]
       }
+      direct_payment_reports: {
+        Row: {
+          carrier_company_id: string
+          days_late: number | null
+          id: string
+          note: string | null
+          order_id: string
+          removed_at: string | null
+          removed_by: string | null
+          removed_note: string | null
+          reported_at: string
+          reported_by: string | null
+          shipper_company_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          carrier_company_id?: string
+          days_late?: number | null
+          id?: string
+          note?: string | null
+          order_id: string
+          removed_at?: string | null
+          removed_by?: string | null
+          removed_note?: string | null
+          reported_at?: string
+          reported_by?: string | null
+          shipper_company_id?: string
+          status: string
+          updated_at?: string
+        }
+        Update: {
+          carrier_company_id?: string
+          days_late?: number | null
+          id?: string
+          note?: string | null
+          order_id?: string
+          removed_at?: string | null
+          removed_by?: string | null
+          removed_note?: string | null
+          reported_at?: string
+          reported_by?: string | null
+          shipper_company_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "direct_payment_reports_carrier_company_id_fkey"
+            columns: ["carrier_company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "direct_payment_reports_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: true
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "direct_payment_reports_shipper_company_id_fkey"
+            columns: ["shipper_company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       driver_app_events: {
         Row: {
           driver_id: string
@@ -6701,6 +6771,30 @@ export type Database = {
         }[]
       }
       company_verified: { Args: { p_company_id: string }; Returns: boolean }
+      company_trust: {
+        Args: { p_company_id?: string }
+        Returns: {
+          avg_days_late: number | null
+          company_id: string
+          country: string
+          done_12m: number
+          first_done_at: string | null
+          invoiced_count: number
+          on_platform_since: string
+          overdue_count: number
+          paid_late: number
+          paid_on_time: number
+          registered_on: string | null
+          registry_checked_at: string | null
+          registry_prepayment: boolean | null
+          registry_situations: string[]
+          registry_vat: boolean | null
+          registry_verdict: string | null
+          reports_late: number
+          reports_on_time: number
+          reports_unpaid: number
+        }[]
+      }
       complete_stop: {
         Args: {
           p_accuracy_m?: number
@@ -7505,6 +7599,21 @@ export type Database = {
           shipper_role: Database["public"]["Enums"]["shipper_role"]
         }[]
       }
+      moderate_payment_report: {
+        Args: { p_note?: string; p_remove: boolean; p_report_id: string }
+        Returns: undefined
+      }
+      payment_report_targets: {
+        Args: never
+        Returns: {
+          days_late: number | null
+          editable: boolean
+          note: string | null
+          order_id: string
+          removed: boolean
+          status: string | null
+        }[]
+      }
       review_company_document: {
         Args: { p_decision: string; p_document_id: string; p_note?: string }
         Returns: Database["public"]["Tables"]["company_documents"]["Row"]
@@ -8273,6 +8382,30 @@ export type Database = {
           plate: string
         }[]
       }
+      shipper_trust: {
+        Args: { p_company_ids: string[] }
+        Returns: {
+          avg_days_late: number | null
+          company_id: string
+          country: string
+          done_12m: number
+          first_done_at: string | null
+          invoiced_count: number
+          on_platform_since: string
+          overdue_count: number
+          paid_late: number
+          paid_on_time: number
+          registered_on: string | null
+          registry_checked_at: string | null
+          registry_prepayment: boolean | null
+          registry_situations: string[]
+          registry_vat: boolean | null
+          registry_verdict: string | null
+          reports_late: number
+          reports_on_time: number
+          reports_unpaid: number
+        }[]
+      }
       site_foreman_approve: {
         Args: {
           p_day_id: string
@@ -8584,6 +8717,16 @@ export type Database = {
       }
       tipper_order_summary: { Args: { p_order_id: string }; Returns: Json }
       training_sync: { Args: { p_cards: Json }; Returns: number }
+      trust_registry_due: {
+        Args: { p_limit?: number }
+        Returns: {
+          business_id: string
+          country: string
+          id: string
+          name: string
+          vat_number: string | null
+        }[]
+      }
       uncomplete_stop: {
         Args: { p_stop_id: string }
         Returns: {

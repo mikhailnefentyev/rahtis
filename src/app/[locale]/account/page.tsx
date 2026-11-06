@@ -17,6 +17,8 @@ import { WasteRegistrationsForm } from './WasteRegistrationsForm';
 import { CurrencyForm } from './CurrencyForm';
 import { ForwarderPanel } from './ForwarderPanel';
 import { loadForwarderState } from '@/lib/forwarders/status';
+import { ShipperTrustDetails } from '@/components/domain/ShipperTrust';
+import { loadCompanyTrust } from '@/lib/trust/status';
 import { parseRegistrations } from '@/lib/waste/registrations';
 import { getViewerI18n } from '@/lib/i18n/viewer';
 
@@ -93,6 +95,8 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
           .then((r) => r.data ?? []),
       ])
     : [null, []];
+  /* Что видят о заказчике перевозчики в прямом режиме — та же сводка, без имён отметивших. */
+  const trust = shipper ? await loadCompanyTrust() : null;
 
   const content = (
     <main className="cab-page cab-page--narrow">
@@ -151,6 +155,16 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
             insurance={forwarderDocs.find((d) => d.kind === 'FORWARDER_INSURANCE') ?? null}
             license={forwarderDocs.find((d) => d.kind === 'FORWARDER_LICENSE') ?? null}
           />
+        )}
+
+        {trust && (
+          <Card>
+            <CardBody>
+              <h2 className="text-[15px] font-semibold tracking-tight">{t.trust.ownTitle}</h2>
+              <p className="mt-1 mb-4 max-w-xl text-[13px] leading-relaxed text-ink-muted">{t.trust.ownIntro}</p>
+              <ShipperTrustDetails trust={trust} />
+            </CardBody>
+          </Card>
         )}
 
         {/* Регистрации перевозчика отходов — только у перевозчика, печатаются в документах на отходы. */}
