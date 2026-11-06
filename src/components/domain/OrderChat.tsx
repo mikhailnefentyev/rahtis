@@ -2,7 +2,9 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { cn } from '@/lib/cn';
-import { loadChatAction, postChatAction, type PostResult } from '@/lib/chat/actions';
+import { askChatAction, loadChatAction, postChatAction, type PostResult } from '@/lib/chat/actions';
+import { ASK_KINDS, detectAsk, type AskKind } from '@/lib/chat/autoAnswer';
+import { autoAnswerText } from '@/lib/chat/autoFormat';
 import { CABINET_QUICK, DRIVER_QUICK, displayText, type Chat } from '@/lib/chat/langs';
 import { useI18n } from '@/lib/i18n/provider';
 
@@ -18,6 +20,10 @@ const POLL_MS = 15_000;
  *
  * lang — язык читателя: на нём быстрые ответы и переводы свободного
  * текста. Оригинал всегда можно открыть.
+ *
+ * Заказчику и диспетчеру перевозчика — вопросы «Где машина?» с
+ * автоответом из данных рейса; свободный текст, похожий на такой вопрос,
+ * получает подсказку «ответ сразу» (сообщение всё равно уходит).
  */
 export function OrderChat({
   orderId,
@@ -32,6 +38,7 @@ export function OrderChat({
 }) {
   const { t, f } = useI18n();
   const c = t.driverApp;
+  const a = t.chatAuto;
   const driver = variant === 'driver';
 
   const [open, setOpen] = useState(driver);
@@ -40,6 +47,10 @@ export function OrderChat({
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<PostResult['error']>(null);
   const [original, setOriginal] = useState<Set<number>>(new Set());
+  /* Последний отправленный текст, похожий на «где машина?». */
+  const [asked, setAsked] = useState<AskKind | null>(null);
+  const [previous, setPrevious] = useState(false);
+  const [highlight, setHighlight] = useState<number | null>(null);
 
   const load = useCallback(async () => {
     const next = await loadChatAction(orderId, lang);
@@ -60,7 +71,9 @@ export function OrderChat({
     };
   }, [open, load]);
 
-  const quickText = (code: string) => (c.chatQuick as Record<string, string>)[code];
+  const quickText = (code: string) =>
+    (c.chatQuick as Record<string, string>)[code] ??
+    (code.startsWith('ASK_') ? (a.ask as Record<string, string>)[code.slice(4)] : undefined);
 
   async function send(body: string, quick: string | null) {
     if (!body.trim() || pending) return;
@@ -72,12 +85,36 @@ export function OrderChat({
       setError(result.error);
       return;
     }
-    if (!quick) setText('');
+    if (!quick) {
+      setText('');
+      setAsked(detectAsk(body));
+    }
     await load();
+  }
+
+  /* Вопрос кнопкой (withQuestion) или подсказкой — и сразу автоответ. */
+  async function ask(kind: AskKind, withQuestion: boolean) {
+    if (pending) return;
+    setPending(true);
+    setError(null);
+    setPrevious(false);
+    const result = await askChatAction(orderId, kind, lang, withQuestion);
+    setPending(false);
+    setAsked(null);
+    if (result.error) {
+      setError(result.error);
+      return;
+    }
+    setPrevious(Boolean(result.previous));
+    setHighlight(result.id ?? null);
+    await load();
+    if (result.id) document.getElementById(`chat-msg-${result.id}`)?.scrollIntoView({ block: 'nearest' });
   }
 
   const count = chat?.messages.length ?? 0;
   const quickCodes = driver ? DRIVER_QUICK : CABINET_QUICK;
+  const canAsk = !driver && (chat?.role === 'SHIPPER' || chat?.role === 'CARRIER');
+  const suggestion = canAsk ? (detectAsk(text) ?? asked) : null;
 
   return (
     <section className={cn('rounded-card border border-line bg-surface', className)}>
@@ -108,6 +145,25 @@ export function OrderChat({
           ) : (
             <ul className="flex max-h-96 flex-col gap-2 overflow-y-auto">
               {chat.messages.map((message) => {
+                if (message.author_role === 'AUTO') {
+                  return (
+                    <li
+                      key={message.id}
+                      id={`chat-msg-${message.id}`}
+                      className={cn(
+                        'max-w-[85%] self-start rounded-control border border-accent-line bg-surface px-3 py-2',
+                        highlight === message.id && 'ring-2 ring-accent/40',
+                      )}
+                    >
+                      <p className="text-[12px] text-ink-dim">
+                        {a.label} · {f.time(message.created_at)}
+                      </p>
+                      <p className={cn('whitespace-pre-wrap break-words', driver ? 'text-[16px]' : 'text-[14px]')}>
+                        {message.auto ? autoAnswerText(message.auto, t, f) : message.body}
+                      </p>
+                    </li>
+                  );
+                }
                 const shown = displayText(message, lang, quickText);
                 const showOriginal = original.has(message.id);
                 const who =
@@ -117,6 +173,7 @@ export function OrderChat({
                 return (
                   <li
                     key={message.id}
+                    id={`chat-msg-${message.id}`}
                     className={cn(
                       'max-w-[85%] rounded-control px-3 py-2',
                       message.mine ? 'self-end bg-accent-wash' : 'self-start bg-sunken',
@@ -152,6 +209,21 @@ export function OrderChat({
 
           {chat?.open ? (
             <div className="mt-3 flex flex-col gap-2">
+              {canAsk && (
+                <div className="flex flex-wrap gap-2">
+                  {ASK_KINDS.map((kind) => (
+                    <button
+                      key={kind}
+                      type="button"
+                      disabled={pending}
+                      onClick={() => ask(kind, true)}
+                      className="min-h-9 rounded-full border border-accent-line bg-accent-wash px-3 text-[13px] font-medium text-accent hover:border-accent disabled:opacity-60"
+                    >
+                      {a.ask[kind]}
+                    </button>
+                  ))}
+                </div>
+              )}
               <div className="flex flex-wrap gap-2">
                 {quickCodes.map((code) => (
                   <button
@@ -198,6 +270,20 @@ export function OrderChat({
                   {c.chatSend}
                 </button>
               </form>
+              {suggestion && (
+                <p className="flex flex-wrap items-center gap-2 text-[13px] text-ink-muted">
+                  <span>{a.suggest}</span>
+                  <button
+                    type="button"
+                    disabled={pending}
+                    onClick={() => ask(suggestion, false)}
+                    className="font-semibold text-accent underline disabled:opacity-60"
+                  >
+                    {a.suggestAction}
+                  </button>
+                </p>
+              )}
+              {previous && <p className="text-[13px] text-ink-muted">{a.previous}</p>}
               {error && <p className="text-[13px] text-danger">{c.chatError[error]}</p>}
               <p className="text-[12px] text-ink-dim">{c.chatNote}</p>
             </div>

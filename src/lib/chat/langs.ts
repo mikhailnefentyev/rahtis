@@ -1,3 +1,5 @@
+import type { AutoFacts } from './autoAnswer';
+
 /** Языки переписки: кабинет (fi, en) и приложение водителя. */
 export const CHAT_LANGS = ['fi', 'en', 'sv', 'nb', 'da', 'et', 'lv', 'lt', 'pl', 'ru'] as const;
 export type ChatLang = (typeof CHAT_LANGS)[number];
@@ -11,7 +13,8 @@ export type ChatRole = 'SHIPPER' | 'CARRIER' | 'DRIVER' | 'ADMIN';
 
 export type ChatMessage = {
   id: number;
-  author_role: Exclude<ChatRole, 'ADMIN'>;
+  /** AUTO — автоответ RAHTIS на «где машина?» (autoAnswer.ts). */
+  author_role: Exclude<ChatRole, 'ADMIN'> | 'AUTO';
   author_name: string | null;
   body: string;
   quick_code: string | null;
@@ -19,6 +22,8 @@ export type ChatMessage = {
   translations: Record<string, string>;
   created_at: string;
   mine: boolean;
+  /** Факты автоответа: текст собирается на языке читателя. */
+  auto?: AutoFacts | null;
 };
 
 export type Chat = { ref: string; role: ChatRole; open: boolean; messages: ChatMessage[] };

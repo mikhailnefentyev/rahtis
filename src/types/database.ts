@@ -3719,6 +3719,7 @@ export type Database = {
       order_messages: {
         Row: {
           author_driver_id: string | null
+          auto: Json | null
           author_name: string | null
           author_role: string
           author_user_id: string | null
@@ -3733,6 +3734,7 @@ export type Database = {
         }
         Insert: {
           author_driver_id?: string | null
+          auto?: Json | null
           author_name?: string | null
           author_role: string
           author_user_id?: string | null
@@ -3747,6 +3749,7 @@ export type Database = {
         }
         Update: {
           author_driver_id?: string | null
+          auto?: Json | null
           author_name?: string | null
           author_role?: string
           author_user_id?: string | null
@@ -6825,6 +6828,10 @@ export type Database = {
       }
       apply_pending_partnerships: { Args: never; Returns: number }
       archive_driver: { Args: { p_driver_id: string }; Returns: undefined }
+      ask_order_status: {
+        Args: { p_body?: string; p_kind: string; p_order_id: string }
+        Returns: Json
+      }
       assign_vehicle_driver: {
         Args: { p_driver_id: string; p_vehicle_id: string }
         Returns: undefined
@@ -9001,6 +9008,18 @@ export type Database = {
       pool_remove_vehicle: {
         Args: { p_vehicle_id: string }
         Returns: undefined
+      }
+      post_order_auto_answer: {
+        Args: {
+          p_body: string
+          p_facts: Json
+          p_lang: string
+          p_notify: boolean
+          p_order_id: string
+          p_role: string
+          p_user_id: string
+        }
+        Returns: number
       }
       post_order_message: {
         Args: { p_body: string; p_order_id: string; p_quick?: string }
