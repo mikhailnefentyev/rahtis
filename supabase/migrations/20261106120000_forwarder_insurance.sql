@@ -488,10 +488,20 @@ begin
      and new.contract_party = 'CARRIER'
      and new.assigned_company_id is not null
      and new.chosen_offer_id is distinct from old.chosen_offer_id
-     and new.group_vehicle_ids is null
+     /*
+      * Прямое назначение отличаем от взятия из группы по автору отклика:
+      * из группы отклик создаёт сам перевозчик (публикацию группы уже
+      * проверили), прямое назначение — заказчик или оператор. Признак
+      * «есть группа» не годится: заказчик может назначить машину и у
+      * заказа с группой.
+      */
      and exists (
        select 1 from public.order_offers f
        where f.id = new.chosen_offer_id and f.origin = 'DIRECT'
+         and not exists (
+           select 1 from public.profiles p
+           where p.id = f.created_by and p.company_id = f.carrier_company_id
+         )
      ) then
     v_assigning := true;
   end if;
