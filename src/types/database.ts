@@ -896,10 +896,10 @@ export type Database = {
             | Database["public"]["Enums"]["partnership_mode"]
             | null
           pending_partnership_from: string | null
-          shipper_role: Database["public"]["Enums"]["shipper_role"]
           registry_check: Json | null
           rejected_at: string | null
           rejection_reason: string | null
+          shipper_role: Database["public"]["Enums"]["shipper_role"]
           status: Database["public"]["Enums"]["company_status"]
           updated_at: string
           vat_number: string | null
@@ -942,10 +942,10 @@ export type Database = {
             | Database["public"]["Enums"]["partnership_mode"]
             | null
           pending_partnership_from?: string | null
-          shipper_role?: Database["public"]["Enums"]["shipper_role"]
           registry_check?: Json | null
           rejected_at?: string | null
           rejection_reason?: string | null
+          shipper_role?: Database["public"]["Enums"]["shipper_role"]
           status?: Database["public"]["Enums"]["company_status"]
           updated_at?: string
           vat_number?: string | null
@@ -988,10 +988,10 @@ export type Database = {
             | Database["public"]["Enums"]["partnership_mode"]
             | null
           pending_partnership_from?: string | null
-          shipper_role?: Database["public"]["Enums"]["shipper_role"]
           registry_check?: Json | null
           rejected_at?: string | null
           rejection_reason?: string | null
+          shipper_role?: Database["public"]["Enums"]["shipper_role"]
           status?: Database["public"]["Enums"]["company_status"]
           updated_at?: string
           vat_number?: string | null
@@ -1009,76 +1009,76 @@ export type Database = {
       }
       company_documents: {
         Row: {
-          company_id: string
           cmr_covered: boolean | null
+          company_id: string
+          file_name: string
+          id: string
           insurer: string | null
+          is_current: boolean
+          kind: Database["public"]["Enums"]["document_kind"]
           limit_currency: string | null
           limit_event_cents: number | null
           limit_year_cents: number | null
+          mime_type: string
           policy_number: string | null
           review_note: string | null
           review_status: string
           reviewed_at: string | null
           reviewed_by: string | null
-          terms: string | null
-          territory: string | null
-          file_name: string
-          id: string
-          is_current: boolean
-          kind: Database["public"]["Enums"]["document_kind"]
-          mime_type: string
           size_bytes: number
           storage_path: string
+          terms: string | null
+          territory: string | null
           uploaded_at: string
           uploaded_by: string | null
           valid_until: string | null
         }
         Insert: {
-          company_id: string
           cmr_covered?: boolean | null
+          company_id: string
+          file_name: string
+          id?: string
           insurer?: string | null
+          is_current?: boolean
+          kind: Database["public"]["Enums"]["document_kind"]
           limit_currency?: string | null
           limit_event_cents?: number | null
           limit_year_cents?: number | null
+          mime_type: string
           policy_number?: string | null
           review_note?: string | null
           review_status?: string
           reviewed_at?: string | null
           reviewed_by?: string | null
-          terms?: string | null
-          territory?: string | null
-          file_name: string
-          id?: string
-          is_current?: boolean
-          kind: Database["public"]["Enums"]["document_kind"]
-          mime_type: string
           size_bytes: number
           storage_path: string
+          terms?: string | null
+          territory?: string | null
           uploaded_at?: string
           uploaded_by?: string | null
           valid_until?: string | null
         }
         Update: {
-          company_id?: string
           cmr_covered?: boolean | null
+          company_id?: string
+          file_name?: string
+          id?: string
           insurer?: string | null
+          is_current?: boolean
+          kind?: Database["public"]["Enums"]["document_kind"]
           limit_currency?: string | null
           limit_event_cents?: number | null
           limit_year_cents?: number | null
+          mime_type?: string
           policy_number?: string | null
           review_note?: string | null
           review_status?: string
           reviewed_at?: string | null
           reviewed_by?: string | null
-          terms?: string | null
-          territory?: string | null
-          file_name?: string
-          id?: string
-          is_current?: boolean
-          kind?: Database["public"]["Enums"]["document_kind"]
-          mime_type?: string
           size_bytes?: number
           storage_path?: string
+          terms?: string | null
+          territory?: string | null
           uploaded_at?: string
           uploaded_by?: string | null
           valid_until?: string | null
@@ -1227,7 +1227,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          carrier_company_id?: string
+          carrier_company_id: string
           days_late?: number | null
           id?: string
           note?: string | null
@@ -1237,7 +1237,7 @@ export type Database = {
           removed_note?: string | null
           reported_at?: string
           reported_by?: string | null
-          shipper_company_id?: string
+          shipper_company_id: string
           status: string
           updated_at?: string
         }
@@ -1552,7 +1552,6 @@ export type Database = {
           agreed_home_day_cents: number | null
           agreed_monthly_cents: number | null
           agreed_trip_cents: number | null
-          third_country_driver: boolean
           allowance_rule_set_id: string | null
           bonus_per_km_cents: number | null
           bonus_trip_bps: number | null
@@ -1567,6 +1566,7 @@ export type Database = {
           tes_experience_since: string | null
           tes_grade: string | null
           tes_rule_set_id: string | null
+          third_country_driver: boolean
           trip_bps: number | null
           valid_from: string
         }
@@ -1577,7 +1577,6 @@ export type Database = {
           agreed_home_day_cents?: number | null
           agreed_monthly_cents?: number | null
           agreed_trip_cents?: number | null
-          third_country_driver?: boolean
           allowance_rule_set_id?: string | null
           bonus_per_km_cents?: number | null
           bonus_trip_bps?: number | null
@@ -1592,6 +1591,7 @@ export type Database = {
           tes_experience_since?: string | null
           tes_grade?: string | null
           tes_rule_set_id?: string | null
+          third_country_driver?: boolean
           trip_bps?: number | null
           valid_from: string
         }
@@ -1602,7 +1602,6 @@ export type Database = {
           agreed_home_day_cents?: number | null
           agreed_monthly_cents?: number | null
           agreed_trip_cents?: number | null
-          third_country_driver?: boolean
           allowance_rule_set_id?: string | null
           bonus_per_km_cents?: number | null
           bonus_trip_bps?: number | null
@@ -1617,6 +1616,7 @@ export type Database = {
           tes_experience_since?: string | null
           tes_grade?: string | null
           tes_rule_set_id?: string | null
+          third_country_driver?: boolean
           trip_bps?: number | null
           valid_from?: string
         }
@@ -5726,6 +5726,7 @@ export type Database = {
           registry_check: Json | null
           rejected_at: string | null
           rejection_reason: string | null
+          shipper_role: Database["public"]["Enums"]["shipper_role"]
           status: Database["public"]["Enums"]["company_status"]
           updated_at: string
           vat_number: string | null
@@ -6770,31 +6771,31 @@ export type Database = {
           license_valid_until: string
         }[]
       }
-      company_verified: { Args: { p_company_id: string }; Returns: boolean }
       company_trust: {
         Args: { p_company_id?: string }
         Returns: {
-          avg_days_late: number | null
+          avg_days_late: number
           company_id: string
           country: string
           done_12m: number
-          first_done_at: string | null
+          first_done_at: string
           invoiced_count: number
           on_platform_since: string
           overdue_count: number
           paid_late: number
           paid_on_time: number
-          registered_on: string | null
-          registry_checked_at: string | null
-          registry_prepayment: boolean | null
+          registered_on: string
+          registry_checked_at: string
+          registry_prepayment: boolean
           registry_situations: string[]
-          registry_vat: boolean | null
-          registry_verdict: string | null
+          registry_vat: boolean
+          registry_verdict: string
           reports_late: number
           reports_on_time: number
           reports_unpaid: number
         }[]
       }
+      company_verified: { Args: { p_company_id: string }; Returns: boolean }
       complete_stop: {
         Args: {
           p_accuracy_m?: number
@@ -7422,6 +7423,27 @@ export type Database = {
           vehicles: number
         }[]
       }
+      forwarder_policies: {
+        Args: { p_company_ids: string[] }
+        Returns: {
+          cargo_owner: boolean
+          company_id: string
+          policy_until: string
+        }[]
+      }
+      forwarder_status: {
+        Args: { p_company_id?: string }
+        Returns: {
+          allowed: boolean
+          applies: boolean
+          grace_until: string
+          in_grace: boolean
+          license_ok: boolean
+          needs_license: boolean
+          policy_until: string
+          shipper_role: Database["public"]["Enums"]["shipper_role"]
+        }[]
+      }
       freeze_company: {
         Args: { p_company_id: string; p_reason?: string }
         Returns: {
@@ -7464,6 +7486,7 @@ export type Database = {
           registry_check: Json | null
           rejected_at: string | null
           rejection_reason: string | null
+          shipper_role: Database["public"]["Enums"]["shipper_role"]
           status: Database["public"]["Enums"]["company_status"]
           updated_at: string
           vat_number: string | null
@@ -7578,46 +7601,6 @@ export type Database = {
         Args: { p_month: string }
         Returns: number
       }
-      forwarder_policies: {
-        Args: { p_company_ids: string[] }
-        Returns: {
-          cargo_owner: boolean
-          company_id: string
-          policy_until: string | null
-        }[]
-      }
-      forwarder_status: {
-        Args: { p_company_id?: string }
-        Returns: {
-          allowed: boolean
-          applies: boolean
-          grace_until: string | null
-          in_grace: boolean
-          license_ok: boolean
-          needs_license: boolean
-          policy_until: string | null
-          shipper_role: Database["public"]["Enums"]["shipper_role"]
-        }[]
-      }
-      moderate_payment_report: {
-        Args: { p_note?: string; p_remove: boolean; p_report_id: string }
-        Returns: undefined
-      }
-      payment_report_targets: {
-        Args: never
-        Returns: {
-          days_late: number | null
-          editable: boolean
-          note: string | null
-          order_id: string
-          removed: boolean
-          status: string | null
-        }[]
-      }
-      review_company_document: {
-        Args: { p_decision: string; p_document_id: string; p_note?: string }
-        Returns: Database["public"]["Tables"]["company_documents"]["Row"]
-      }
       known_vehicles_for_shipper: {
         Args: never
         Returns: {
@@ -7730,6 +7713,7 @@ export type Database = {
           registry_check: Json | null
           rejected_at: string | null
           rejection_reason: string | null
+          shipper_role: Database["public"]["Enums"]["shipper_role"]
           status: Database["public"]["Enums"]["company_status"]
           updated_at: string
           vat_number: string | null
@@ -7741,6 +7725,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      moderate_payment_report: {
+        Args: { p_note?: string; p_remove: boolean; p_report_id: string }
+        Returns: undefined
       }
       my_assignments: {
         Args: never
@@ -7900,6 +7888,17 @@ export type Database = {
           rate_cents: number
           rating: number
           ratings_count: number
+        }[]
+      }
+      payment_report_targets: {
+        Args: never
+        Returns: {
+          days_late: number
+          editable: boolean
+          note: string
+          order_id: string
+          removed: boolean
+          status: string
         }[]
       }
       period_claims: {
@@ -8150,6 +8149,40 @@ export type Database = {
           storage_path: string
         }[]
       }
+      review_company_document: {
+        Args: { p_decision: string; p_document_id: string; p_note?: string }
+        Returns: {
+          cmr_covered: boolean | null
+          company_id: string
+          file_name: string
+          id: string
+          insurer: string | null
+          is_current: boolean
+          kind: Database["public"]["Enums"]["document_kind"]
+          limit_currency: string | null
+          limit_event_cents: number | null
+          limit_year_cents: number | null
+          mime_type: string
+          policy_number: string | null
+          review_note: string | null
+          review_status: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          size_bytes: number
+          storage_path: string
+          terms: string | null
+          territory: string | null
+          uploaded_at: string
+          uploaded_by: string | null
+          valid_until: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "company_documents"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       revoke_verification: {
         Args: { p_company_id: string; p_note?: string }
         Returns: undefined
@@ -8385,22 +8418,22 @@ export type Database = {
       shipper_trust: {
         Args: { p_company_ids: string[] }
         Returns: {
-          avg_days_late: number | null
+          avg_days_late: number
           company_id: string
           country: string
           done_12m: number
-          first_done_at: string | null
+          first_done_at: string
           invoiced_count: number
           on_platform_since: string
           overdue_count: number
           paid_late: number
           paid_on_time: number
-          registered_on: string | null
-          registry_checked_at: string | null
-          registry_prepayment: boolean | null
+          registered_on: string
+          registry_checked_at: string
+          registry_prepayment: boolean
           registry_situations: string[]
-          registry_vat: boolean | null
-          registry_verdict: string | null
+          registry_vat: boolean
+          registry_verdict: string
           reports_late: number
           reports_on_time: number
           reports_unpaid: number
@@ -8724,7 +8757,7 @@ export type Database = {
           country: string
           id: string
           name: string
-          vat_number: string | null
+          vat_number: string
         }[]
       }
       uncomplete_stop: {
@@ -8818,6 +8851,7 @@ export type Database = {
           registry_check: Json | null
           rejected_at: string | null
           rejection_reason: string | null
+          shipper_role: Database["public"]["Enums"]["shipper_role"]
           status: Database["public"]["Enums"]["company_status"]
           updated_at: string
           vat_number: string | null
@@ -9074,7 +9108,14 @@ export type Database = {
       order_type: "TRAILER_SWAP" | "ROUND_TRIP" | "ONE_WAY"
       partnership_mode: "SUBCONTRACTOR" | "SUBSCRIBER"
       party_role: "CARRIER" | "SHIPPER" | "ADMIN"
-      pay_model: "PER_KM" | "TRIP_PERCENT" | "FLAT_HOURLY" | "TES" | "DAY_NET" | "MONTHLY_NET" | "PER_TRIP"
+      pay_model:
+        | "PER_KM"
+        | "TRIP_PERCENT"
+        | "FLAT_HOURLY"
+        | "TES"
+        | "DAY_NET"
+        | "MONTHLY_NET"
+        | "PER_TRIP"
       photo_subject:
         | "TRAILER"
         | "CARGO"
@@ -9085,6 +9126,7 @@ export type Database = {
       place_kind: "PORT" | "TERMINAL" | "PARKING" | "ADDRESS"
       report_kind: "WEEK" | "PERIOD" | "SUBSCRIPTION"
       shift_source: "APP" | "MANUAL"
+      shipper_role: "FORWARDER" | "CARGO_OWNER"
       site_pricing: "HOUR" | "LOAD" | "TONNE"
       stop_role:
         | "PICKUP"
@@ -9094,7 +9136,6 @@ export type Database = {
         | "CONTINUATION"
         | "TRAILER_RETURN"
       trailer_kind: "SEMI" | "FULL" | "CENTER_AXLE"
-      shipper_role: "FORWARDER" | "CARGO_OWNER"
       trip_document_kind:
         | "CMR"
         | "LOADING_PHOTO"
@@ -9330,7 +9371,15 @@ export const Constants = {
       order_type: ["TRAILER_SWAP", "ROUND_TRIP", "ONE_WAY"],
       partnership_mode: ["SUBCONTRACTOR", "SUBSCRIBER"],
       party_role: ["CARRIER", "SHIPPER", "ADMIN"],
-      pay_model: ["PER_KM", "TRIP_PERCENT", "FLAT_HOURLY", "TES", "DAY_NET", "MONTHLY_NET", "PER_TRIP"],
+      pay_model: [
+        "PER_KM",
+        "TRIP_PERCENT",
+        "FLAT_HOURLY",
+        "TES",
+        "DAY_NET",
+        "MONTHLY_NET",
+        "PER_TRIP",
+      ],
       photo_subject: [
         "TRAILER",
         "CARGO",
@@ -9342,6 +9391,7 @@ export const Constants = {
       place_kind: ["PORT", "TERMINAL", "PARKING", "ADDRESS"],
       report_kind: ["WEEK", "PERIOD", "SUBSCRIPTION"],
       shift_source: ["APP", "MANUAL"],
+      shipper_role: ["FORWARDER", "CARGO_OWNER"],
       site_pricing: ["HOUR", "LOAD", "TONNE"],
       stop_role: [
         "PICKUP",
@@ -9352,7 +9402,6 @@ export const Constants = {
         "TRAILER_RETURN",
       ],
       trailer_kind: ["SEMI", "FULL", "CENTER_AXLE"],
-      shipper_role: ["FORWARDER", "CARGO_OWNER"],
       trip_document_kind: [
         "CMR",
         "LOADING_PHOTO",

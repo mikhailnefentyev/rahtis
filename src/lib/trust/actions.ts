@@ -7,6 +7,7 @@ import { requireRole } from '@/lib/auth/guard';
 import { getViewer } from '@/lib/auth/viewer';
 import { defaultLocale, getDictionary, isLocale, type Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
+import type { TablesInsert } from '@/types/database';
 import { parseReport } from './model';
 
 function toLocale(value: FormDataEntryValue | null): Locale {
@@ -37,7 +38,13 @@ export async function reportPaymentAction(_previous: PaymentReportState, formDat
   const { data: existing } = await supabase.from('direct_payment_reports').select('id').eq('order_id', orderId).maybeSingle();
   const { error } = existing
     ? await supabase.from('direct_payment_reports').update(values).eq('id', existing.id)
-    : await supabase.from('direct_payment_reports').insert({ order_id: orderId, ...values });
+    : await supabase
+        .from('direct_payment_reports')
+        /*
+         * Перевозчика и заказчика ставит триггер базы; передать их перевозчику
+         * не дают поколоночные права. Сгенерированный тип этого не знает.
+         */
+        .insert({ order_id: orderId, ...values } as TablesInsert<'direct_payment_reports'>);
 
   if (error) {
     console.error('Отметка об оплате не записана:', error.message);
