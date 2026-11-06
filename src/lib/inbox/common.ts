@@ -198,7 +198,8 @@ export async function emailDraftItems(supabase: Supabase, href: (id: string) => 
   const { data, error } = await supabase
     .from('order_email_drafts')
     .select('id, subject, from_address, received_at, status, created_at')
-    .in('status', ['PENDING', 'PARSED', 'FAILED'])
+    /* PENDING — отправитель ещё не проверен: не показываем. */
+    .in('status', ['PARSED', 'FAILED'])
     .order('received_at', { ascending: false })
     .limit(20);
   if (error) return [];

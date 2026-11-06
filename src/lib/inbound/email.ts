@@ -12,7 +12,15 @@ const TOKEN = /^[a-z0-9]{12,32}$/;
 
 /** «Имя <a@b.fi>» или «a@b.fi» → «a@b.fi» в нижнем регистре; не адрес — ''. */
 export function bareAddress(value: string): string {
-  const angle = /<([^<>\s]+@[^<>\s]+)>/.exec(value);
+  /*
+   * Ровно одни угловые скобки: «"<a@b.fi>" <x@evil.com>» — подделка, где
+   * первое совпадение выдало бы чужой разрешённый адрес. Две пары — отказ.
+   */
+  const opens = (value.match(/</g) ?? []).length;
+  const closes = (value.match(/>/g) ?? []).length;
+  if (opens > 1 || closes > 1 || opens !== closes) return '';
+  const angle = /<([^<>\s]+@[^<>\s]+)>\s*$/.exec(value);
+  if (opens === 1 && !angle) return '';
   const raw = (angle ? angle[1] : value).trim().toLowerCase();
   return /^[^@\s<>,;"]+@[^@\s<>,;"]+\.[a-z]{2,}$/.test(raw) ? raw : '';
 }
@@ -50,13 +58,14 @@ export type MailAuth = { spf?: string | null; dkim?: string | null; dmarc?: stri
 
 /**
  * Поле From подделать просто — нужна проверка домена отправителя.
- * DMARC fail — отказ; иначе нужен хотя бы один pass (SPF или DKIM).
- * Нет результатов вовсе (старые письма провайдера) — тоже отказ.
  */
 export function senderAuthenticated(auth: MailAuth): boolean {
-  if (!auth) return false;
-  if (auth.dmarc === 'fail') return false;
-  return auth.dmarc === 'pass' || auth.dkim === 'pass' || auth.spf === 'pass';
+  /*
+   * Только DMARC pass: он означает, что прошедший SPF или DKIM выровнен с
+   * доменом в From. Голый SPF/DKIM pass может принадлежать чужому домену
+   * при подделанном From. Домен без DMARC (none) — отказ.
+   */
+  return auth?.dmarc === 'pass';
 }
 
 /** Список адресов из поля настройки: запятые, пробелы, строки. */

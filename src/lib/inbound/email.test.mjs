@@ -23,6 +23,9 @@ test('bareAddress: имя и угловые скобки, регистр', () =>
   assert.equal(bareAddress(' a@b.fi '), 'a@b.fi');
   assert.equal(bareAddress('not an address'), '');
   assert.equal(bareAddress('a@b'), '');
+  /* Подделка: две пары скобок — первая выдала бы разрешённый адрес. */
+  assert.equal(bareAddress('"<boss@yritys.fi>" <thief@evil.com>'), '');
+  assert.equal(bareAddress('Boss <boss@yritys.fi> extra'), '');
 });
 
 test('inboxToken: только наш домен и формат orders-<token>', () => {
@@ -47,9 +50,10 @@ test('senderAllowed: входы компании и дополнительные
   assert.equal(senderAllowed('', members, []), false);
 });
 
-test('senderAuthenticated: DMARC fail — нет, хоть один pass — да', () => {
+test('senderAuthenticated: только DMARC pass (выровненный с From)', () => {
   assert.equal(senderAuthenticated({ spf: 'pass', dkim: 'pass', dmarc: 'pass' }), true);
-  assert.equal(senderAuthenticated({ spf: 'fail', dkim: 'pass', dmarc: 'unknown' }), true);
+  assert.equal(senderAuthenticated({ spf: 'fail', dkim: 'pass', dmarc: 'unknown' }), false);
+  assert.equal(senderAuthenticated({ spf: 'pass', dkim: 'pass', dmarc: 'none' }), false);
   assert.equal(senderAuthenticated({ spf: 'pass', dkim: 'pass', dmarc: 'fail' }), false);
   assert.equal(senderAuthenticated({ spf: 'fail', dkim: 'fail', dmarc: 'gray' }), false);
   assert.equal(senderAuthenticated(null), false);

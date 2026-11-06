@@ -161,6 +161,8 @@ export async function processInbound(accepted: Accepted, apiKey: string): Promis
       .eq('status', 'PENDING');
 
   let parsed = false;
+  /* Пока домен отправителя не проверен, письма как бы нет: ни черновика, ни ответа. */
+  let authenticated = false;
   try {
     const email = await resend<ReceivedEmail>(`/emails/receiving/${encodeURIComponent(emailId)}`, apiKey);
 
@@ -170,6 +172,7 @@ export async function processInbound(accepted: Accepted, apiKey: string): Promis
       await admin.from('order_email_drafts').delete().eq('id', draftId);
       return;
     }
+    authenticated = true;
 
     if (!target.own_access) {
       await finish('FAILED');
@@ -213,6 +216,11 @@ export async function processInbound(accepted: Accepted, apiKey: string): Promis
     }
   } catch (cause) {
     console.error('inbound: письмо не обработано:', cause instanceof Error ? cause.message : cause);
+    if (!authenticated) {
+      /* Отправитель не подтверждён — следов не оставляем и не отвечаем. */
+      await admin.from('order_email_drafts').delete().eq('id', draftId);
+      return;
+    }
     await finish('FAILED');
   }
 
