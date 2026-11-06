@@ -241,6 +241,16 @@ export async function savePayProfileAction(
     ? await supabase.from('tes_rule_sets').select('currency').eq('id', row.tes_rule_set_id).maybeSingle()
     : { data: null };
   const currency = asCurrency(tesSet?.currency ?? viewer.company?.currency);
+  /* Набор суточных — только свой (база ещё раз проверит триггером driver_pay_profiles_allowance_check). */
+  if (row.allowance_rule_set_id) {
+    const { data: own } = await supabase
+      .from('allowance_rule_sets')
+      .select('id')
+      .eq('id', row.allowance_rule_set_id)
+      .eq('company_id', viewer.company?.id ?? '')
+      .maybeSingle();
+    if (!own) return { error: t.validation.required, done: false };
+  }
   const { error } = await supabase.from('driver_pay_profiles').insert({ ...row, currency });
 
   if (error) {
