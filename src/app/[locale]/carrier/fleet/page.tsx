@@ -13,6 +13,7 @@ import { DocumentCard } from './DocumentCard';
 import { FleetView } from './FleetView';
 import { TrailersMass } from './TrailersMass';
 import { CombosView } from './CombosView';
+import { CapacitySettings } from '@/components/domain/capacity/CapacitySettings';
 import { getViewerI18n } from '@/lib/i18n/viewer';
 
 export async function generateMetadata({
@@ -173,6 +174,9 @@ export default async function FleetPage({ params }: { params: Promise<{ locale: 
 
       {/* Конструктор: перевозчик сам собирает сцепки из своих машин и прицепов. */}
       <CombosView vehicles={vehicles ?? []} trailers={trailers ?? []} combos={combos ?? []} />
+
+      {/* Догрузы: показывать ли свободное место в машинах — компании и каждой машине. */}
+      <CapacitySettings locale={locale} vehicles={vehicles ?? []} />
     </main>
   );
 }

@@ -11,6 +11,7 @@ import { OrdersView } from './OrdersView';
 import { getViewerI18n } from '@/lib/i18n/viewer';
 import { bankChangeMarks } from '@/lib/trust/sensitive';
 import { loadOrderChanges } from '@/lib/orders/changes';
+import { CapacitySuggestions } from '@/components/domain/capacity/CapacitySuggestions';
 
 export async function generateMetadata({
   params,
@@ -208,6 +209,9 @@ export default async function OrdersPage({
           </CardBody>
         </Card>
       ) : (
+        <>
+        {/* Догрузы: машины по пути со свободным местом — к частичным грузам. */}
+        <CapacitySuggestions locale={locale} orders={orders ?? []} />
         <OrdersView
           orders={orders ?? []}
           stopsByOrder={stopsByOrder}
@@ -219,6 +223,7 @@ export default async function OrdersPage({
           documentsByOrder={documentsByOrder}
           startNew={startNew}
         />
+        </>
       )}
     </main>
   );

@@ -11,6 +11,7 @@ import { AssignmentCard, type TripTrailerOption } from './AssignmentCard';
 import type { FleetOption, OrderChangesData } from '@/components/domain/OrderChanges';
 import type { ForwarderPolicyInfo } from '@/components/domain/ForwarderDirect';
 import type { ShipperTrust } from '@/lib/trust/model';
+import type { TripCapacity } from '@/components/domain/capacity/CapacityLine';
 import type { Database } from '@/types/database';
 import type { OrderAmendment, OrderStop, TripDocument } from '@/types/db';
 
@@ -55,7 +56,10 @@ export function Assignments({
   trailers = [],
   changesByOrder = {},
   fleet,
+  capacityByOrder = {},
 }: {
+  /** Догрузы: свободное место по id рейса. */
+  capacityByOrder?: Record<string, TripCapacity>;
   /** Цена и пробег, сообщения водителя (правки после назначения). */
   changesByOrder?: Record<string, OrderChangesData>;
   /** Машины и водители для смены на рейсе. */
@@ -114,6 +118,7 @@ export function Assignments({
         shipperTrust={trustByOrder[order.id]}
         changes={changesByOrder[order.id]}
         fleet={fleet}
+        capacity={capacityByOrder[order.id]}
       />
     );
   }

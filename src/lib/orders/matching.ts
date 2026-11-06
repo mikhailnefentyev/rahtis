@@ -6,6 +6,8 @@ import { getViewer } from '@/lib/auth/viewer';
 import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import { flashError } from '@/lib/forms/flash';
+import { after } from 'next/server';
+import { syncCapacity } from '@/lib/capacity/load';
 
 export type MatchingState = { error: string | null };
 
@@ -160,6 +162,13 @@ export async function confirmOrderAction(
   const { error } = await supabase.rpc('confirm_order', {
     p_order_id: String(formData.get('order_id') ?? ''),
   });
+
+  /* Рейс подтверждён — догрузы машины пересчитываются (автопубликация — сразу). */
+  const viewer = await getViewer();
+  if (!error && viewer.status === 'ready' && viewer.role === 'CARRIER' && viewer.company) {
+    const companyId = viewer.company.id;
+    after(() => syncCapacity([companyId]).then(() => undefined, (e: unknown) => console.error('capacity sync:', e)));
+  }
 
   revalidateOrder(locale);
 

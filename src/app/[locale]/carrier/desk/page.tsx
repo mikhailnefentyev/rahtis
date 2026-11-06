@@ -18,6 +18,9 @@ import { forwarderPolicyByOrder } from '@/lib/forwarders/status';
 import { shipperTrustByOrder } from '@/lib/trust/status';
 import { matchDesk, type FreeSource, type OrderMatch } from '@/lib/desk/match';
 import { todayInHelsinki } from '@/lib/dates';
+import { loadCarrierCapacity } from '@/lib/capacity/load';
+import { spaceLabel } from '@/lib/capacity/compute';
+import type { TripCapacity } from '@/components/domain/capacity/CapacityLine';
 
 export async function generateMetadata({
   params,
@@ -280,6 +283,27 @@ export default async function DeskPage({
           Object.fromEntries(deskCombos.map((c) => [c.id, c.name])),
         );
 
+  /* Догрузы: свободное место отрезка — строкой на карточке каждого его рейса. */
+  const { proposals } = await loadCarrierCapacity();
+  const capacityByOrder: Record<string, TripCapacity> = {};
+  for (const p of proposals) {
+    if ((!p.offerable && !p.offer) || (p.mode === 'NEVER' && !p.offer)) continue;
+    const live = p.offer?.status === 'PUBLISHED';
+    const free = live && p.offer
+      ? { ldm: p.offer.free_ldm === null ? null : Number(p.offer.free_ldm), kg: p.offer.free_kg, pallets: null }
+      : p.free;
+    for (const id of p.orderIds) {
+      capacityByOrder[id] = {
+        vehicleId: p.vehicleId,
+        anchorOrderId: p.anchorOrderId,
+        label: spaceLabel(free, locale),
+        published: live,
+        offerId: p.offer?.id ?? null,
+        canPublish: p.offerable && p.mode !== 'NEVER',
+      };
+    }
+  }
+
   const state = readiness?.[0];
   const canTakeOrders = state?.can_take_orders ?? false;
 
@@ -304,6 +328,7 @@ export default async function DeskPage({
         trustByOrder={trustByOrder}
         changesByOrder={changesByOrder}
         fleet={fleet}
+        capacityByOrder={capacityByOrder}
       />
 
       {!canTakeOrders ? (

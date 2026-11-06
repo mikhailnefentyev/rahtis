@@ -32,6 +32,7 @@ import { TripPanel } from './TripPanel';
 import { OwnEditPanel } from './OwnEditPanel';
 import { AmendPanel } from '../../shipper/orders/AmendPanel';
 import { ChangeRequests, PricingNote, TripAssignmentPanel, VehicleCheckMark, type FleetOption, type OrderChangesData } from '@/components/domain/OrderChanges';
+import { CapacityLine, type TripCapacity } from '@/components/domain/capacity/CapacityLine';
 import type { Database } from '@/types/database';
 import type { OrderAmendment, OrderStop, TripDocument } from '@/types/db';
 
@@ -59,7 +60,10 @@ export function AssignmentCard({
   shipperTrust,
   changes,
   fleet,
+  capacity,
 }: {
+  /** Догрузы: свободное место отрезка, где едет этот рейс. */
+  capacity?: TripCapacity;
   /** Режим цены, пробег по маршруту, сообщения водителя. */
   changes?: OrderChangesData;
   /** Машины и водители компании для смены на рейсе. */
@@ -142,6 +146,7 @@ export function AssignmentCard({
                 )}
                 {!own && <ForwarderPolicyNote info={forwarderPolicy} className="mt-1" />}
                 {!own && <ShipperTrustBadge trust={shipperTrust} className="mt-1" />}
+                {capacity && <CapacityLine capacity={capacity} />}
 
                 {direct ? (
                   <p className="mt-2 flex flex-wrap items-center gap-2 text-[13px] text-ink">

@@ -9,6 +9,7 @@ import type { InboxItem } from '@/lib/inbox/rank';
 import { confirmFreightPaidAction } from '@/lib/invoices/actions';
 import { acknowledgeAmendmentsAction, dismissChangeRequestAction, respondProposalAction } from '@/lib/orders/amend';
 import { confirmVehicleCheckAction } from '@/lib/orders/vehicleCheckActions';
+import { decideCapacityRequestAction, publishCapacityAction, withdrawCapacityAction } from '@/lib/capacity/actions';
 import { ConfirmOrderButton, MarkPaidButton } from './InboxButtons';
 
 /** Сколько пунктов видно сразу; остальные — под «Показать все». */
@@ -178,6 +179,54 @@ async function Row({ item, locale }: { item: InboxItem; locale: Locale }) {
         </>
       );
       break;
+    case 'publishCapacity':
+      /* Одним нажатием — с расчётными цифрами; поправить — на странице места. */
+      actions = (
+        <>
+          <form action={publishCapacityAction}>
+            {hidden({ vehicle_id: op.vehicleId, order_id: op.orderId })}
+            <Button type="submit" size="sm" variant="primary">
+              {ti.capacityShow}
+            </Button>
+          </form>
+          <Link href={item.href} className={buttonClass({ variant: 'default', size: 'sm' })}>
+            {ti.capacityCorrect}
+          </Link>
+        </>
+      );
+      break;
+    case 'withdrawCapacity':
+      actions = (
+        <>
+          <form action={withdrawCapacityAction}>
+            {hidden({ offer_id: op.offerId })}
+            <Button type="submit" size="sm">
+              {ti.capacityWithdraw}
+            </Button>
+          </form>
+          {open(false)}
+        </>
+      );
+      break;
+    case 'capacityRequest':
+      actions = (
+        <>
+          <form action={decideCapacityRequestAction}>
+            {hidden({ request_id: op.requestId, accept: '1' })}
+            <Button type="submit" size="sm" variant="primary">
+              {ti.accept}
+            </Button>
+          </form>
+          <form action={decideCapacityRequestAction}>
+            {hidden({ request_id: op.requestId, accept: '0' })}
+            <Button type="submit" size="sm">
+              {ti.decline}
+            </Button>
+          </form>
+          {open(false)}
+        </>
+      );
+      break;
     default:
       actions = open(true);
   }
@@ -235,6 +284,7 @@ function contextLine(item: InboxItem, t: I18n['t'], f: I18n['f']): string {
     if (item.kind.startsWith('invoice')) parts.push(ti.due.replace('{date}', day(item.date)));
     else if (item.kind === 'docExpiring' || item.kind === 'certExpiring') parts.push(ti.expires.replace('{date}', day(item.date)));
     else if (item.kind === 'sensitiveChanged') parts.push(f.dateTime(item.date));
+    else if (item.kind.startsWith('capacity')) parts.push(ti.capacityDate.replace('{date}', day(item.date)));
     else parts.push(ti.pickup.replace('{date}', day(item.date)));
   }
 

@@ -164,7 +164,14 @@ function navigation(
       groups: [
         {
           label: t.nav.groupWork,
-          items: [overview, desk, own, { href: `/${locale}/carrier/sites`, label: t.sites.nav, icon: 'sites' }, done],
+          items: [
+            overview,
+            desk,
+            own,
+            { href: `/${locale}/carrier/capacity`, label: t.capacity.nav, icon: 'capacity' },
+            { href: `/${locale}/carrier/sites`, label: t.sites.nav, icon: 'sites' },
+            done,
+          ],
         },
         {
           label: t.nav.groupCompany,
@@ -198,7 +205,10 @@ function navigation(
     const reports: NavItem = { href: `/${locale}/shipper/reports`, label: t.periodReport.title, short: t.nav.reportsShort, icon: 'reports' };
     return {
       groups: [
-        { label: t.nav.groupWork, items: [overview, orders, done] },
+        {
+          label: t.nav.groupWork,
+          items: [overview, orders, { href: `/${locale}/shipper/capacity`, label: t.capacity.shipperNav, icon: 'capacity' }, done],
+        },
         {
           label: t.nav.groupCompany,
           items: [

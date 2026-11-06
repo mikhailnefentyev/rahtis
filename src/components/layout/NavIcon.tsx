@@ -13,6 +13,7 @@ export type NavIconName =
   | 'economics'
   | 'done'
   | 'fleet'
+  | 'capacity'
   | 'drivers'
   | 'clients'
   | 'reports'
@@ -93,6 +94,14 @@ const PATHS: Record<NavIconName, React.ReactNode> = {
       <path d="M15 10h4l3 3v3h-7" />
       <circle cx="6" cy="18" r="2" />
       <circle cx="18" cy="18" r="2" />
+    </>
+  ),
+  /* Догрузы: кузов, занятый наполовину, и плюс — место для ещё одного груза. */
+  capacity: (
+    <>
+      <rect x="2" y="6" width="13" height="11" rx="1" />
+      <path d="M8.5 6v11" />
+      <path d="M19 9v6M16 12h6" />
     </>
   ),
   drivers: (

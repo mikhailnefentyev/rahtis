@@ -8,6 +8,8 @@ import type { Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import { companyDocumentItems, loadDismissals, orderChangeItems, sensitiveChangeItems, type InboxResult } from './common';
 import { carrierInvoiceItems, collapseInvoiceSend, rankItems, twoStepItem, urgencyByDue, type InboxItem } from './rank';
+import { spaceLabel } from '@/lib/capacity/compute';
+import { loadCarrierCapacity } from '@/lib/capacity/load';
 
 type Stop = { completed_at: string | null; scheduled_date: string | null };
 
@@ -34,6 +36,8 @@ export const loadCarrierInbox = cache(async (locale: Locale): Promise<InboxResul
     { data: fleet },
     { data: clients },
     dismissed,
+    capacity,
+    capacityRequests,
   ] = await Promise.all([
     supabase.rpc('my_assignments'),
     supabase.rpc('freight_invoice_targets'),
@@ -57,6 +61,9 @@ export const loadCarrierInbox = cache(async (locale: Locale): Promise<InboxResul
     supabase.rpc('carrier_own_vehicles'),
     supabase.rpc('carrier_clients'),
     loadDismissals(supabase),
+    /* Догрузы: до миграции функций нет — пункты просто не появляются. */
+    loadCarrierCapacity(),
+    supabase.rpc('capacity_requests_for_carrier'),
   ]);
 
   const items: InboxItem[] = [
@@ -181,6 +188,57 @@ export const loadCarrierInbox = cache(async (locale: Locale): Promise<InboxResul
   }
   if (feeCents > 0) {
     items.push({ key: `fee:${(fees ?? []).map((f) => f.id).sort().join(',')}`.slice(0, 200), kind: 'feeOpen', urgency: 2, at: null, amountCents: feeCents, currency: 'EUR', href: `${base}/subscription`, snooze: 1 });
+  }
+
+  /* ── Догрузы: «показать место?», автопубликация за сутки, запросы ── */
+  const dayAgo = new Date(Date.now() - 86_400_000).toISOString();
+  for (const p of capacity.proposals) {
+    const route = `${p.from.city} → ${p.to.city}`;
+    const href = `${base}/capacity#cap-${p.vehicleId}-${p.anchorOrderId}`;
+    if (!p.offer && p.mode === 'ASK' && p.offerable && !p.withdrawn) {
+      items.push({
+        key: `capacity:${p.key}`,
+        kind: 'capacityPropose',
+        urgency: 2,
+        at: p.availableFrom,
+        party: p.plate,
+        date: p.availableFrom,
+        note: `${route} · ${spaceLabel(p.free, locale)}`,
+        href,
+        op: { op: 'publishCapacity', vehicleId: p.vehicleId, orderId: p.anchorOrderId },
+        snooze: 30,
+      });
+    } else if (p.offer?.status === 'PUBLISHED' && p.offer.auto && (p.offer.published_at ?? '') > dayAgo) {
+      const free = { ldm: p.offer.free_ldm === null ? null : Number(p.offer.free_ldm), kg: p.offer.free_kg, pallets: null };
+      items.push({
+        key: `capacity-auto:${p.offer.id}`,
+        kind: 'capacityAutoPublished',
+        urgency: 2,
+        at: p.offer.published_at,
+        party: p.plate,
+        date: p.availableFrom,
+        note: `${route} · ${spaceLabel(free, locale)}`,
+        href,
+        op: { op: 'withdrawCapacity', offerId: p.offer.id },
+        snooze: 1,
+      });
+    }
+  }
+  for (const r of capacityRequests.error ? [] : (capacityRequests.data ?? [])) {
+    if (r.status !== 'PENDING') continue;
+    items.push({
+      key: `capacity-request:${r.request_id}`,
+      kind: 'capacityRequest',
+      urgency: 1,
+      at: r.created_at,
+      party: r.shipper_name,
+      date: r.date_from,
+      amountCents: r.price_cents,
+      currency: r.currency,
+      note: `${r.from_city} → ${r.to_city}`,
+      href: `${base}/capacity#req-${r.request_id}`,
+      op: { op: 'capacityRequest', requestId: r.request_id },
+    });
   }
 
   return rankItems(items, dismissed, new Date(), 100);

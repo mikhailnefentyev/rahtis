@@ -390,6 +390,336 @@ export type Database = {
         }
         Relationships: []
       }
+      capacity_offers: {
+        Row: {
+          auto: boolean
+          available_from: string
+          available_to: string
+          body: string | null
+          closed_at: string | null
+          company_id: string
+          computed_kg: number | null
+          computed_ldm: number | null
+          created_at: string
+          created_by: string | null
+          free_kg: number | null
+          free_ldm: number | null
+          free_pallets: number | null
+          from_city: string
+          from_country: string | null
+          from_lat: number | null
+          from_lon: number | null
+          id: string
+          order_id: string | null
+          published_at: string | null
+          status: string
+          to_city: string
+          to_country: string | null
+          to_lat: number | null
+          to_lon: number | null
+          trip_order_ids: string[]
+          updated_at: string
+          vehicle_class: Database["public"]["Enums"]["vehicle_class"] | null
+          vehicle_id: string
+        }
+        Insert: {
+          auto?: boolean
+          available_from: string
+          available_to: string
+          body?: string | null
+          closed_at?: string | null
+          company_id: string
+          computed_kg?: number | null
+          computed_ldm?: number | null
+          created_at?: string
+          created_by?: string | null
+          free_kg?: number | null
+          free_ldm?: number | null
+          free_pallets?: number | null
+          from_city: string
+          from_country?: string | null
+          from_lat?: number | null
+          from_lon?: number | null
+          id?: string
+          order_id?: string | null
+          published_at?: string | null
+          status?: string
+          to_city: string
+          to_country?: string | null
+          to_lat?: number | null
+          to_lon?: number | null
+          trip_order_ids?: string[]
+          updated_at?: string
+          vehicle_class?: Database["public"]["Enums"]["vehicle_class"] | null
+          vehicle_id: string
+        }
+        Update: {
+          auto?: boolean
+          available_from?: string
+          available_to?: string
+          body?: string | null
+          closed_at?: string | null
+          company_id?: string
+          computed_kg?: number | null
+          computed_ldm?: number | null
+          created_at?: string
+          created_by?: string | null
+          free_kg?: number | null
+          free_ldm?: number | null
+          free_pallets?: number | null
+          from_city?: string
+          from_country?: string | null
+          from_lat?: number | null
+          from_lon?: number | null
+          id?: string
+          order_id?: string | null
+          published_at?: string | null
+          status?: string
+          to_city?: string
+          to_country?: string | null
+          to_lat?: number | null
+          to_lon?: number | null
+          trip_order_ids?: string[]
+          updated_at?: string
+          vehicle_class?: Database["public"]["Enums"]["vehicle_class"] | null
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "capacity_offers_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "capacity_offers_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "capacity_offers_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      capacity_publish_history: {
+        Row: {
+          changed_at: string
+          changed_by: string | null
+          company_id: string
+          id: number
+          new_mode: string | null
+          old_mode: string | null
+          plate: string | null
+          vehicle_id: string | null
+        }
+        Insert: {
+          changed_at?: string
+          changed_by?: string | null
+          company_id: string
+          id?: never
+          new_mode?: string | null
+          old_mode?: string | null
+          plate?: string | null
+          vehicle_id?: string | null
+        }
+        Update: {
+          changed_at?: string
+          changed_by?: string | null
+          company_id?: string
+          id?: never
+          new_mode?: string | null
+          old_mode?: string | null
+          plate?: string | null
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "capacity_publish_history_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      capacity_publish_settings: {
+        Row: {
+          changed_at: string
+          changed_by: string | null
+          company_id: string
+          id: string
+          mode: string
+          vehicle_id: string | null
+        }
+        Insert: {
+          changed_at?: string
+          changed_by?: string | null
+          company_id: string
+          id?: string
+          mode?: string
+          vehicle_id?: string | null
+        }
+        Update: {
+          changed_at?: string
+          changed_by?: string | null
+          company_id?: string
+          id?: string
+          mode?: string
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "capacity_publish_settings_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "capacity_publish_settings_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      capacity_requests: {
+        Row: {
+          carrier_company_id: string
+          created_at: string
+          created_by: string | null
+          created_order_id: string | null
+          currency: string
+          date_from: string
+          date_to: string
+          decided_at: string | null
+          decided_by: string | null
+          decline_reason: string | null
+          description: string | null
+          from_city: string
+          from_country: string | null
+          from_lat: number | null
+          from_lon: number | null
+          id: string
+          ldm: number | null
+          offer_id: string
+          order_id: string | null
+          pallets: number | null
+          price_cents: number
+          shipper_company_id: string
+          status: string
+          to_city: string
+          to_country: string | null
+          to_lat: number | null
+          to_lon: number | null
+          weight_kg: number | null
+        }
+        Insert: {
+          carrier_company_id: string
+          created_at?: string
+          created_by?: string | null
+          created_order_id?: string | null
+          currency: string
+          date_from: string
+          date_to: string
+          decided_at?: string | null
+          decided_by?: string | null
+          decline_reason?: string | null
+          description?: string | null
+          from_city: string
+          from_country?: string | null
+          from_lat?: number | null
+          from_lon?: number | null
+          id?: string
+          ldm?: number | null
+          offer_id: string
+          order_id?: string | null
+          pallets?: number | null
+          price_cents: number
+          shipper_company_id: string
+          status?: string
+          to_city: string
+          to_country?: string | null
+          to_lat?: number | null
+          to_lon?: number | null
+          weight_kg?: number | null
+        }
+        Update: {
+          carrier_company_id?: string
+          created_at?: string
+          created_by?: string | null
+          created_order_id?: string | null
+          currency?: string
+          date_from?: string
+          date_to?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          decline_reason?: string | null
+          description?: string | null
+          from_city?: string
+          from_country?: string | null
+          from_lat?: number | null
+          from_lon?: number | null
+          id?: string
+          ldm?: number | null
+          offer_id?: string
+          order_id?: string | null
+          pallets?: number | null
+          price_cents?: number
+          shipper_company_id?: string
+          status?: string
+          to_city?: string
+          to_country?: string | null
+          to_lat?: number | null
+          to_lon?: number | null
+          weight_kg?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "capacity_requests_carrier_company_id_fkey"
+            columns: ["carrier_company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "capacity_requests_created_order_id_fkey"
+            columns: ["created_order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "capacity_requests_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "capacity_offers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "capacity_requests_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "capacity_requests_shipper_company_id_fkey"
+            columns: ["shipper_company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       carrier_annual_plans: {
         Row: {
           cancelled_at: string | null
@@ -6659,6 +6989,119 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      capacity_expire: { Args: never; Returns: number }
+      capacity_fleet_trips: { Args: never; Returns: Json }
+      capacity_fleet_trips_for: { Args: { p_company_ids: string[] }; Returns: Json }
+      capacity_offers_search: {
+        Args: {
+          p_city?: string
+          p_country?: string
+          p_date_from?: string
+          p_date_to?: string
+        }
+        Returns: {
+          available_from: string
+          available_to: string
+          body: string
+          cabotage_ops: number
+          carrier_country: string
+          carrier_name: string
+          free_kg: number
+          free_ldm: number
+          free_pallets: number
+          from_city: string
+          from_country: string
+          my_pending: number
+          offer_id: string
+          to_city: string
+          to_country: string
+          vehicle_class: Database["public"]["Enums"]["vehicle_class"]
+          verified: boolean
+        }[]
+      }
+      capacity_request_cancel: { Args: { p_request_id: string }; Returns: undefined }
+      capacity_request_create: {
+        Args: {
+          p_date_from?: string
+          p_date_to?: string
+          p_description?: string
+          p_offer_id: string
+          p_order_id: string
+          p_pallets?: number
+          p_price_cents: number
+        }
+        Returns: string
+      }
+      capacity_request_decide: {
+        Args: { p_accept: boolean; p_reason?: string; p_request_id: string }
+        Returns: string
+      }
+      capacity_requests_for_carrier: {
+        Args: never
+        Returns: {
+          cabotage_ops: number
+          created_at: string
+          created_order_id: string
+          currency: string
+          date_from: string
+          date_to: string
+          description: string
+          from_city: string
+          from_country: string
+          ldm: number
+          offer_id: string
+          pallets: number
+          price_cents: number
+          request_id: string
+          shipper_name: string
+          shipper_verified: boolean
+          status: string
+          to_city: string
+          to_country: string
+          weight_kg: number
+        }[]
+      }
+      capacity_requests_for_shipper: {
+        Args: never
+        Returns: {
+          cabotage_ops: number
+          carrier_name: string
+          created_at: string
+          currency: string
+          date_from: string
+          date_to: string
+          decline_reason: string
+          from_city: string
+          offer_id: string
+          order_id: string
+          order_ref: string
+          price_cents: number
+          request_id: string
+          status: string
+          to_city: string
+        }[]
+      }
+      capacity_suggestions: {
+        Args: { p_order_ids: string[] }
+        Returns: {
+          available_from: string
+          available_to: string
+          body: string
+          cabotage_ops: number
+          carrier_name: string
+          detour_km: number
+          free_kg: number
+          free_ldm: number
+          free_pallets: number
+          from_city: string
+          my_pending: number
+          offer_id: string
+          order_id: string
+          to_city: string
+          vehicle_class: Database["public"]["Enums"]["vehicle_class"]
+          verified: boolean
+        }[]
       }
       carrier_annual_plan_create: {
         Args: { p_vehicles: number }

@@ -5,6 +5,7 @@ import { sendForwarderReminders } from '@/lib/forwarders/reminders';
 import { refreshShipperRegistry } from '@/lib/trust/status';
 import { deliverSensitiveChanges } from '@/lib/trust/sensitive';
 import { sendInvoiceReminders } from '@/lib/invoices/reminders';
+import { syncCapacity } from '@/lib/capacity/load';
 
 /* Перепроверка реестра идёт по одной компании с паузой — нужен запас (pg_net ждёт 60 с). */
 export const maxDuration = 60;
@@ -31,6 +32,10 @@ export const maxDuration = 60;
  * С 6.11.2026 им же — напоминания об оплате счетов перевозчиков
  * (src/lib/invoices/reminders.ts) и письма о смене реквизитов, не
  * ушедшие сразу (src/lib/trust/sensitive.ts): правка мимо формы.
+ *
+ * И ночной расчёт догрузов (src/lib/capacity/load.ts): истёкшее место
+ * снимается, в режиме «автоматически» новое публикуется. Его ошибки
+ * статус ответа не портят — расчёт повторится при заходе перевозчика.
  */
 export async function POST(request: Request) {
   const expected = process.env.REPORTS_CRON_SECRET?.trim();
@@ -44,7 +49,7 @@ export async function POST(request: Request) {
     return Response.json({ error: 'forbidden' }, { status: 401 });
   }
 
-  const [result, verification, forwarder, registry, invoices, sensitive] = await Promise.all([
+  const [result, verification, forwarder, registry, invoices, sensitive, capacity] = await Promise.all([
     sendCertificateReminders(),
     sendVerificationReminders(),
     sendForwarderReminders(),
@@ -64,6 +69,12 @@ export async function POST(request: Request) {
       sent: 0,
       errors: [error instanceof Error ? error.message : String(error)],
     })),
+    syncCapacity().catch((error: unknown) => ({
+      published: 0,
+      updated: 0,
+      closed: 0,
+      errors: [error instanceof Error ? error.message : String(error)],
+    })),
   ]);
   const failed =
     result.errors.length > 0 ||
@@ -71,5 +82,5 @@ export async function POST(request: Request) {
     forwarder.errors.length > 0 ||
     invoices.errors.length > 0 ||
     sensitive.errors.length > 0;
-  return Response.json({ ...result, verification, forwarder, registry, invoices, sensitive }, { status: failed ? 207 : 200 });
+  return Response.json({ ...result, verification, forwarder, registry, invoices, sensitive, capacity }, { status: failed ? 207 : 200 });
 }

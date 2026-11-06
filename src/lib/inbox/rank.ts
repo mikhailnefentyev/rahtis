@@ -18,7 +18,11 @@ export type InboxOp =
   | { op: 'markInvoicePaid'; invoiceId: string }
   | { op: 'driverAckChanges'; orderId: string }
   /* Сверка машины: «всё в порядке» с причиной или связаться (6.11.2026). */
-  | { op: 'vehicleCheck'; checkId: string; side: 'SHIPPER' | 'CARRIER' };
+  | { op: 'vehicleCheck'; checkId: string; side: 'SHIPPER' | 'CARRIER' }
+  /* Догрузы: показать место одним нажатием, снять автопубликацию, ответить на запрос. */
+  | { op: 'publishCapacity'; vehicleId: string; orderId: string }
+  | { op: 'withdrawCapacity'; offerId: string }
+  | { op: 'capacityRequest'; requestId: string };
 
 export type InboxItem = {
   /** Устойчивый ключ — по нему же скрывают («позже»). */
