@@ -16,6 +16,8 @@ import { getViewerI18n } from '@/lib/i18n/viewer';
 import { orderCurrencies } from '@/lib/orders/currencies';
 import { forwarderPolicyByOrder } from '@/lib/forwarders/status';
 import { shipperTrustByOrder } from '@/lib/trust/status';
+import { matchDesk, type FreeSource, type OrderMatch } from '@/lib/desk/match';
+import { todayInHelsinki } from '@/lib/dates';
 
 export async function generateMetadata({
   params,
@@ -56,7 +58,16 @@ export default async function DeskPage({
    * то же правило действует внутри desk_orders, и держать его в двух
    * местах значит рано или поздно получить расхождение.
    */
-  const [{ data: readiness }, { data: orders }, { data: regions }, { data: assignments }, { data: vehicles }, { data: backhaul }] =
+  const [
+    { data: readiness },
+    { data: orders },
+    { data: regions },
+    { data: assignments },
+    { data: vehicles },
+    { data: backhaul },
+    matchRes,
+    freeRes,
+  ] =
     await Promise.all([
       supabase.rpc('company_readiness', { p_company_id: company.id }),
       supabase.rpc('desk_orders', { p_region: region ?? undefined }),
@@ -71,6 +82,9 @@ export default async function DeskPage({
         .order('plate'),
       /* Paluukuorma: где машины освободятся и что на столе рядом (только из desk_orders). */
       supabase.rpc('backhaul_suggestions', { p_radius_km: radius }),
+      /* Подбор машины к заказам стола: годность и прямые км — одним запросом на весь стол. */
+      supabase.rpc('desk_matches', { p_region: region ?? undefined }),
+      supabase.rpc('fleet_free_points'),
     ]);
 
   /*
@@ -240,6 +254,32 @@ export default async function DeskPage({
     .order('created_at', { ascending: true });
   const deskCombos = (comboRows ?? []).filter((c) => ready.has(c.vehicle_id));
 
+  /*
+   * «Беру одним нажатием»: лучшая своя машина у каждого заказа. Нет функции
+   * в базе (миграция не применена) или ошибка — стол работает по-старому.
+   */
+  const matches: Record<string, OrderMatch> | undefined =
+    matchRes.error || freeRes.error
+      ? undefined
+      : matchDesk(
+          (orders ?? []).map((o) => ({ id: o.id, pickupDate: o.pickup_date, pickupTime: o.pickup_time })),
+          (matchRes.data ?? []).map((r) => ({
+            orderId: r.order_id,
+            vehicleId: r.vehicle_id,
+            comboId: r.combo_id,
+            misfit: r.misfit,
+            lineKm: r.line_km,
+          })),
+          (freeRes.data ?? []).map((p) => ({
+            vehicleId: p.vehicle_id,
+            source: p.source as FreeSource,
+            afterRef: p.after_ref,
+            freeLocal: p.free_local,
+          })),
+          Object.fromEntries(deskVehicles.map((v) => [v.id, v.plate])),
+          Object.fromEntries(deskCombos.map((c) => [c.id, c.name])),
+        );
+
   const state = readiness?.[0];
   const canTakeOrders = state?.can_take_orders ?? false;
 
@@ -336,6 +376,8 @@ export default async function DeskPage({
             policyByOrder={policyByOrder}
             trustByOrder={trustByOrder}
             perKmByOrder={perKm}
+            matches={matches}
+            today={todayInHelsinki()}
           />
         </>
       )}

@@ -7642,6 +7642,16 @@ export type Database = {
         Returns: string
       }
       delete_order: { Args: { p_order_id: string }; Returns: string }
+      desk_matches: {
+        Args: { p_region?: string }
+        Returns: {
+          combo_id: string | null
+          line_km: number | null
+          misfit: string | null
+          order_id: string
+          vehicle_id: string
+        }[]
+      }
       desk_orders: {
         Args: { p_limit?: number; p_region?: string }
         Returns: {
@@ -7964,6 +7974,16 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      fleet_free_points: {
+        Args: never
+        Returns: {
+          after_ref: string | null
+          city: string | null
+          free_local: string
+          source: string
+          vehicle_id: string
+        }[]
       }
       fleet_size: {
         Args: never

@@ -3,7 +3,7 @@
 import { ForwarderPolicyNote, type ForwarderPolicyInfo } from '@/components/domain/ForwarderDirect';
 import { ShipperTrustBadge } from '@/components/domain/ShipperTrust';
 import type { ShipperTrust } from '@/lib/trust/model';
-import { useActionState, useState } from 'react';
+import { useActionState, useState, type ReactNode } from 'react';
 import { OrderRouteMap } from '@/components/domain/RouteMap';
 import { RouteStops } from '@/components/domain/RouteStops';
 import { routeLabel } from '@/lib/orders/route';
@@ -16,6 +16,8 @@ import { useI18n } from '@/lib/i18n/provider';
 import { vehicleClassFits } from '@/lib/orders/haul';
 import { isTransfer } from '@/lib/orders/transfer';
 import type { DeskOrder, DeskStop, Vehicle } from '@/types/db';
+import type { MatchChoice, OrderMatch } from '@/lib/desk/match';
+import type { MessageKey } from '@/lib/i18n';
 
 const initialTake: MatchingState = { error: null };
 
@@ -23,7 +25,7 @@ const initialTake: MatchingState = { error: null };
  * «Беру» для заказа, предложенного группе машин заказчика: первый
  * получает, сразу подтверждено. Машины — только свои из группы.
  */
-function GroupTakeButton({ orderId, vehicles }: { orderId: string; vehicles: Vehicle[] }) {
+function GroupTakeButton({ orderId, vehicles, line }: { orderId: string; vehicles: Vehicle[]; line?: ReactNode }) {
   const { t, locale } = useI18n();
   const [state, formAction, pending] = useActionState(groupTakeAction, initialTake);
   const [vehicleId, setVehicleId] = useState(vehicles[0]?.id ?? '');
@@ -32,6 +34,7 @@ function GroupTakeButton({ orderId, vehicles }: { orderId: string; vehicles: Veh
     <form action={formAction} className="flex flex-col items-end gap-2">
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="order_id" value={orderId} />
+      {line}
       {vehicles.length === 1 ? (
         <input type="hidden" name="vehicle_id" value={vehicles[0]!.id} />
       ) : (
@@ -149,6 +152,179 @@ function TakeButton({
   );
 }
 
+const SOURCE_KEY: Record<string, MessageKey> = {
+  ORDER: 'deskMatch.src.ORDER',
+  GPS: 'deskMatch.src.GPS',
+  LAST: 'deskMatch.src.LAST',
+  BASE: 'deskMatch.src.BASE',
+};
+
+/** «Sopii ABC-123 · vapaa klo 14 · ≈15 km tyhjänä (GPS)» — одной строкой. */
+function FitLine({ choice, today }: { choice: MatchChoice; today: string }) {
+  const { m, f } = useI18n();
+  const free = choice.freeLocal;
+  /* Не идущий рейс — машина свободна сейчас (время в базе — «сейчас»). */
+  const freeNow = !free || choice.source !== 'ORDER';
+  const when = free
+    ? free.slice(0, 10) === today
+      ? free.slice(11, 16)
+      : `${f.date(`${free.slice(0, 10)}T12:00:00Z`)} ${free.slice(11, 16)}`
+    : '';
+  const source = choice.source ? SOURCE_KEY[choice.source] : undefined;
+
+  return (
+    <p className="max-w-72 text-right text-xs text-ink-muted">
+      <span className="font-semibold text-ink">{m('deskMatch.fits', { plate: choice.comboName ?? choice.plate })}</span>
+      {' · '}
+      {freeNow ? (
+        m('deskMatch.freeNow')
+      ) : choice.inTime ? (
+        m('deskMatch.freeAt', { when })
+      ) : (
+        <span className="text-warn">{m('deskMatch.freeLate', { when })}</span>
+      )}
+      {choice.emptyKm !== null && (
+        <>
+          {' · '}
+          {m('deskMatch.empty', { km: choice.emptyKm })}
+          {source && <span className="text-ink-dim"> ({m(source, { ref: choice.afterRef ?? '' })})</span>}
+        </>
+      )}
+    </p>
+  );
+}
+
+/** Подходящей машины нет — приглушённая причина вместо кнопки. */
+function MatchReason({ match, requirements, cargoKg }: { match: OrderMatch; requirements: unknown; cargoKg: number }) {
+  const { t, m } = useI18n();
+  const body = ((requirements ?? {}) as { body?: string | null }).body;
+  const text =
+    match.reason === 'BODY'
+      ? body
+        ? m('deskMatch.none.BODY', { body: t.mass.bodies[body as keyof typeof t.mass.bodies] ?? body })
+        : m('deskMatch.none.LOADING')
+      : match.reason === 'WEIGHT'
+        ? m('deskMatch.none.WEIGHT', { kg: cargoKg })
+        : match.reason === 'SIZE'
+          ? m('deskMatch.none.SIZE')
+          : match.reason === 'CLASS'
+            ? m('deskMatch.none.CLASS')
+            : m('deskMatch.none.NONE');
+  return <p className="max-w-60 text-right text-xs text-ink-dim">{text}</p>;
+}
+
+/**
+ * «Беру одним нажатием» (6.11.2026): лучшая своя машина уже выбрана,
+ * кнопка называет её номер. Второе нажатие — подтверждение с главным:
+ * цена, забор, машина. Отклик — тем же takeOrderAction (машина или сцепка).
+ */
+function OneTapTake({
+  orderId,
+  match,
+  price,
+  pickup,
+  pickupDate,
+  busy,
+  requirements,
+  cargoKg,
+  today,
+}: {
+  orderId: string;
+  match: OrderMatch;
+  price: string | null;
+  pickup: string;
+  pickupDate: string | null;
+  busy: DeskBusy[];
+  requirements: unknown;
+  cargoKg: number;
+  today: string;
+}) {
+  const { t, m, f, locale } = useI18n();
+  const [state, formAction, pending] = useActionState(takeOrderAction, initialTake);
+  const [value, setValue] = useState(match.choices[0]?.value ?? '');
+  const [confirming, setConfirming] = useState(false);
+  const choice = match.choices.find((c) => c.value === value) ?? match.choices[0];
+
+  if (!choice) {
+    return <MatchReason match={match} requirements={requirements} cargoKg={cargoKg} />;
+  }
+
+  /* Пересечение в тот же день — предупреждение, не запрет (решение 26.09.2026). */
+  const clash = pickupDate ? busy.find((b) => b.vehicleId === choice.vehicleId && b.date === pickupDate) : undefined;
+  const label = choice.comboName ?? choice.plate;
+
+  return (
+    <div className="flex flex-col items-end gap-2">
+      <FitLine choice={choice} today={today} />
+
+      {confirming ? (
+        <form action={formAction} className="flex w-64 flex-col gap-2 rounded-control border border-line bg-sunken p-3 text-xs">
+          <input type="hidden" name="locale" value={locale} />
+          <input type="hidden" name="order_id" value={orderId} />
+          <input type="hidden" name="vehicle_id" value={choice.value} />
+          <p className="font-semibold text-ink">{m('deskMatch.confirmTitle')}</p>
+          <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1">
+            {price && (
+              <>
+                <dt className="text-ink-dim">{m('deskMatch.price')}</dt>
+                <dd className="font-semibold text-ink">{price}</dd>
+              </>
+            )}
+            <dt className="text-ink-dim">{m('deskMatch.pickup')}</dt>
+            <dd className="text-ink">{pickup}</dd>
+            <dt className="text-ink-dim">{m('deskMatch.vehicle')}</dt>
+            <dd className="font-mono text-ink">{label}</dd>
+          </dl>
+          {clash && (
+            <p className="text-warn">
+              {m('matching.vehicleBusy', {
+                plate: choice.plate,
+                ref: clash.ref,
+                when: clash.time ? `${f.date(`${clash.date}T12:00:00Z`)} ${clash.time.slice(0, 5)}` : f.date(`${clash.date}T12:00:00Z`),
+              })}
+            </p>
+          )}
+          <div className="flex justify-end gap-2">
+            <Button type="button" size="sm" onClick={() => setConfirming(false)} disabled={pending}>
+              {m('deskMatch.back')}
+            </Button>
+            <Button type="submit" variant="primary" size="sm" disabled={pending}>
+              {pending ? t.matching.taking : m('deskMatch.send')}
+            </Button>
+          </div>
+        </form>
+      ) : (
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          {match.choices.length > 1 && (
+            <Select
+              aria-label={m('deskMatch.others', { count: match.choices.length - 1 })}
+              title={m('deskMatch.others', { count: match.choices.length - 1 })}
+              className="h-8 w-auto text-xs"
+              value={choice.value}
+              onChange={(e) => setValue(e.target.value)}
+            >
+              {match.choices.map((c) => (
+                <option key={c.value} value={c.value}>
+                  {`${c.comboName ?? c.plate}${c.emptyKm !== null ? ` · ≈${c.emptyKm} km` : ''}`}
+                </option>
+              ))}
+            </Select>
+          )}
+          <Button variant="primary" size="sm" onClick={() => setConfirming(true)}>
+            {m('deskMatch.take', { plate: label })}
+          </Button>
+        </div>
+      )}
+
+      {state.error && (
+        <p role="alert" className="max-w-60 text-right text-xs text-danger">
+          {state.error}
+        </p>
+      )}
+    </div>
+  );
+}
+
 /**
  * Стол заказов.
  *
@@ -166,8 +342,14 @@ export function DeskList({
   policyByOrder = {},
   trustByOrder = {},
   perKmByOrder = {},
+  matches,
+  today = '',
 }: {
   orders: DeskOrder[];
+  /** Подобранные свои машины по id заказа; нет — стол без подбора (старый выбор машины). */
+  matches?: Record<string, OrderMatch>;
+  /** Сегодня по Хельсинки: «свободна с 14:00» без даты, если сегодня. */
+  today?: string;
   /** Цена за км (ставка в центах): при правке маршрута цена пересчитывается. */
   perKmByOrder?: Record<string, number>;
   /** Полис экспедитора-заказчика у заказов «напрямую с перевозчиком»: справка. */
@@ -299,10 +481,20 @@ export function DeskList({
                   {order.group_until ? (
                     <>
                       <Badge tone="info">{m('direct.groupBadge', { time: f.time(order.group_until) })}</Badge>
-                      <GroupTakeButton
-                        orderId={order.id}
-                        vehicles={vehicles.filter((v) => (order.group_vehicle_ids ?? []).includes(v.id))}
-                      />
+                      {matches?.[order.id] && !matches[order.id]!.choices.length ? (
+                        <MatchReason match={matches[order.id]!} requirements={order.requirements} cargoKg={cargoKg} />
+                      ) : (
+                        <GroupTakeButton
+                          orderId={order.id}
+                          /* С подбором — подходящие машины группы по порядку: первая выбрана. */
+                          vehicles={
+                            matches?.[order.id]
+                              ? matches[order.id]!.choices.flatMap((c) => vehicles.filter((v) => v.id === c.vehicleId))
+                              : vehicles.filter((v) => (order.group_vehicle_ids ?? []).includes(v.id))
+                          }
+                          line={matches?.[order.id] && <FitLine choice={matches[order.id]!.choices[0]!} today={today} />}
+                        />
+                      )}
                     </>
                   ) : order.taken_by_me ? (
                     <>
@@ -317,6 +509,22 @@ export function DeskList({
                         max: MATCHING.maxOffersPerOrder,
                       })}
                     </Badge>
+                  ) : matches?.[order.id] ? (
+                    <OneTapTake
+                      orderId={order.id}
+                      match={matches[order.id]!}
+                      price={order.rate_cents ? `${f.money(order.rate_cents, currency)} ${t.money.addVat}` : null}
+                      pickup={
+                        order.pickup_date
+                          ? `${order.pickup_city} · ${f.date(`${order.pickup_date}T12:00:00Z`)}${order.pickup_time ? ` ${order.pickup_time.slice(0, 5)}` : ''}`
+                          : order.pickup_city
+                      }
+                      pickupDate={order.pickup_date}
+                      busy={busy.filter((b) => b.ref !== order.ref)}
+                      requirements={order.requirements}
+                      cargoKg={cargoKg}
+                      today={today}
+                    />
                   ) : (
                     <TakeButton
                       orderId={order.id}
