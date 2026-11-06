@@ -46,9 +46,9 @@ test('расстояние: Хельсинки — Тампере около 160
   assert.ok(km > 155 && km < 165, String(km));
 });
 
-test('водитель подтвердил тот же номер — OK', () => {
+test('водитель подтвердил тот же номер — без трекера ещё не «проверена»', () => {
   const r = vehicleVerdict({ ...base, reportedPlate: 'abc 123' });
-  assert.equal(r.verdict, 'OK');
+  assert.equal(r.verdict, 'NO_DATA');
   assert.deepEqual(codes(r), ['PLATE_CONFIRMED', 'NO_GPS']);
   assert.equal(r.driverMatches, true);
 });
@@ -91,7 +91,7 @@ test('без номера в заказе сверять не с чем', () => 
 
 test('другой водитель — справочно, без смены в журнале', () => {
   const other = vehicleVerdict({ ...base, reportedPlate: 'ABC-123', actualDriverId: 'd2' });
-  assert.equal(other.verdict, 'OK');
+  assert.equal(other.verdict, 'NO_DATA');
   assert.equal(other.driverMatches, false);
   assert.ok(codes(other).includes('DRIVER_OTHER'));
 

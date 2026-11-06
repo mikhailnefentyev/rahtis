@@ -139,7 +139,13 @@ export function vehicleVerdict(e: VehicleEvidence): VehicleCheckResult {
   const verdict: VehicleVerdict =
     codes.has('PLATE_MISMATCH') || codes.has('TRAILER_MISMATCH') || codes.has('GPS_FAR')
       ? 'MISMATCH'
-      : codes.has('PLATE_CONFIRMED') || codes.has('GPS_NEAR')
+      : /*
+         * «Проверена» — только по независимому доказательству: трекер
+         * назначенной машины рядом с точкой. Номер от водителя (он ещё и
+         * подставлен в форму) подделать проще всего: он может поднять
+         * тревогу, но не поставить зелёную отметку.
+         */
+        codes.has('GPS_NEAR')
         ? 'OK'
         : 'NO_DATA';
 
