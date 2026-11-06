@@ -25,7 +25,7 @@ export function WorkSummary({
   const money = (cents: number) => f.money(cents, s.currency);
 
   const hasSupplements =
-    s.parts.overtimeCents + s.parts.eveningCents + s.parts.nightCents + s.parts.weekendCents > 0;
+    s.parts.overtimeCents + s.parts.eveningCents + s.parts.nightCents + s.parts.weekendCents + (s.parts.bonusCents ?? 0) > 0;
 
   return (
     <div className={cn('flex flex-col gap-3', className)}>
@@ -41,8 +41,15 @@ export function WorkSummary({
         {t.workReport.colBreaks} {hours(s.breakMinutes)} · {t.workReport.colEvening}{' '}
         {hours(s.eveningMinutes)} · {t.workReport.colNight} {hours(s.nightMinutes)} ·{' '}
         {t.workReport.colSaturday} {hours(s.saturdayMinutes)} · {t.workReport.colSunday}{' '}
-        {hours(s.sundayMinutes)} · {t.workReport.colOvertime}{' '}
-        {hours(s.overtime1Minutes + s.overtime2Minutes)}
+        {hours(s.sundayMinutes)}
+        {/* Праздники страны набора (Прибалтика, Польша) — только если надбавка за праздник есть. */}
+        {(s.holidayMinutes ?? 0) > 0 && (
+          <>
+            {' '}
+            · {t.dayPay.holiday} {hours(s.holidayMinutes)}
+          </>
+        )}{' '}
+        · {t.workReport.colOvertime} {hours(s.overtime1Minutes + s.overtime2Minutes)}
       </p>
 
       {/* Из чего сложилась сумма — только когда есть надбавки, иначе это одна строка. */}
@@ -52,6 +59,12 @@ export function WorkSummary({
           {money(s.parts.overtimeCents)} + {t.workReport.colEvening} {money(s.parts.eveningCents)} +{' '}
           {t.workReport.colNight} {money(s.parts.nightCents)} + {t.workReport.colSaturday}/
           {t.workReport.colSunday} {money(s.parts.weekendCents)}
+          {(s.parts.bonusCents ?? 0) > 0 && (
+            <>
+              {' '}
+              + {t.dayPay.bonus} {money(s.parts.bonusCents)}
+            </>
+          )}
         </p>
       )}
 

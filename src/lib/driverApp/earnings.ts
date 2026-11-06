@@ -64,6 +64,9 @@ type RawProfile = {
   tes_grade: string | null;
   tes_experience_since: string | null;
   rates: Array<{ grade: string; valid_from: string; hourly_cents: number }>;
+  /* Премии поверх базы — если driver_earnings их отдаёт (иначе undefined). */
+  bonus_per_km_cents?: number | null;
+  bonus_trip_bps?: number | null;
 };
 
 export type EarningTrip = {
@@ -139,6 +142,14 @@ export async function getDriverEarnings(month: string): Promise<DriverEarnings> 
     tesGrade: p.tes_grade,
     tesExperienceSince: p.tes_experience_since,
     currency: p.currency ?? null,
+    /*
+     * Страна, праздники и оклад набора приходят в p.tes (to_jsonb строки) —
+     * их разбирает tesRules. Премия за км — как у перевозчика. Премия
+     * процентом: share_cents — уже доля водителя, поэтому 100 %; пока
+     * driver_earnings считает долю только по trip_bps, у TES она 0.
+     */
+    bonusPerKmCents: p.bonus_per_km_cents ?? null,
+    bonusTripBps: p.bonus_trip_bps ? 10_000 : null,
   }));
 
   /* Курсы — только если есть ставка не в валюте компании. */

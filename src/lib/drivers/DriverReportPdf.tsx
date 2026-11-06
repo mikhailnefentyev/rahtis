@@ -41,6 +41,10 @@ const s = StyleSheet.create({
   bold: { fontWeight: 'bold' },
   right: { textAlign: 'right' },
   empty: { fontSize: 8, color: '#44546b', marginTop: 10 },
+  notes: { marginTop: 14 },
+  noteTitle: { fontSize: 8.5, fontWeight: 'bold', marginTop: 8 },
+  note: { fontSize: 7.5, marginTop: 2 },
+  noteWarn: { fontSize: 7.5, marginTop: 2, color: '#7a4f12' },
   footer: {
     position: 'absolute',
     bottom: 20,
@@ -64,6 +68,9 @@ export function DriverReportPdf(input: {
   footer: string;
   columns: DriverPdfColumn[];
   rows: { cells: string[]; total: boolean }[];
+  /** Итоги суточных и предупреждения по водителям — под таблицей. */
+  notes?: { title: string; lines: string[]; warnings: string[] }[];
+  notesDisclaimer?: string;
 }) {
   return (
     <Document title={ansi(`${input.title} ${input.subtitle}`)} author="RAHTIS">
@@ -97,6 +104,27 @@ export function DriverReportPdf(input: {
                     ]}
                   >
                     {ansi(value)}
+                  </Text>
+                ))}
+              </View>
+            ))}
+          </View>
+        )}
+
+        {input.notes && input.notes.length > 0 && (
+          <View style={s.notes}>
+            {input.notesDisclaimer && <Text style={s.disclaimer}>{ansi(input.notesDisclaimer)}</Text>}
+            {input.notes.map((note, i) => (
+              <View key={i} wrap={false}>
+                <Text style={s.noteTitle}>{ansi(note.title)}</Text>
+                {note.lines.map((line, j) => (
+                  <Text key={j} style={s.note}>
+                    {ansi(line)}
+                  </Text>
+                ))}
+                {note.warnings.map((line, j) => (
+                  <Text key={j} style={s.noteWarn}>
+                    {ansi(`• ${line}`)}
                   </Text>
                 ))}
               </View>

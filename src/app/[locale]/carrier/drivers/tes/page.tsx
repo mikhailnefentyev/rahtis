@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { buttonClass } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
 import { isLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
@@ -22,7 +23,7 @@ export default async function TesPage({ params }: { params: Promise<{ locale: st
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
 
-  await requireRole(locale, 'CARRIER');
+  const viewer = await requireRole(locale, 'CARRIER');
   const [{ t }, supabase] = await Promise.all([getViewerI18n(locale), createClient()]);
 
   /* RLS отдаёт свои наборы и шаблоны оператора (company_id is null). */
@@ -40,14 +41,27 @@ export default async function TesPage({ params }: { params: Promise<{ locale: st
       <Link href={`/${locale}/carrier/drivers`} className="text-[13px] text-ink-faint hover:text-ink">
         ← {t.drivers.back}
       </Link>
-      <h1 className="page-title mt-3">{t.tes.title}</h1>
+      <div className="mt-3 flex flex-wrap items-start justify-between gap-3">
+        <h1 className="page-title">{t.tes.title}</h1>
+        <Link
+          href={`/${locale}/carrier/drivers/allowances`}
+          className={buttonClass({ variant: 'default', size: 'sm' })}
+        >
+          {t.allowanceSetup.title}
+        </Link>
+      </div>
       <p className="mt-2 mb-2 max-w-xl text-[13px] leading-relaxed text-ink-muted">{t.tes.subtitle}</p>
-      <p className="mb-6 max-w-xl text-xs text-ink-dim">{t.tes.later}</p>
+      <p className="mb-4 max-w-xl text-xs text-ink-dim">{t.tes.later}</p>
+      {/* Справка, а не расчёт зарплаты — до любой суммы. */}
+      <p className="mb-6 max-w-xl rounded-control border border-warn/35 bg-warn/10 px-3 py-2 text-[13px] text-warn">
+        {t.pay.disclaimer}
+      </p>
 
       <TesView
         own={(sets ?? []).filter((s) => s.company_id !== null)}
         templates={(sets ?? []).filter((s) => s.company_id === null)}
         rates={rates ?? []}
+        home={viewer.company?.country ?? 'FI'}
       />
     </main>
   );

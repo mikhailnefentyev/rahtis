@@ -62,6 +62,7 @@ export default async function DriverPage({
     report,
     { data: rates },
     { data: certificates },
+    { data: allowanceSets },
   ] = await Promise.all([
       supabase.from('drivers').select('*').eq('id', id).maybeSingle(),
       supabase
@@ -69,7 +70,7 @@ export default async function DriverPage({
         .select('*')
         .eq('driver_id', id)
         .order('valid_from', { ascending: false }),
-      supabase.from('tes_rule_sets').select('id, name, valid_from, company_id').order('valid_from', {
+      supabase.from('tes_rule_sets').select('id, name, valid_from, company_id, legality, currency').order('valid_from', {
         ascending: false,
       }),
       supabase.from('vehicles').select('id, plate').eq('company_id', company.id).order('plate'),
@@ -89,6 +90,12 @@ export default async function DriverPage({
         .select('id, type, issued_at, expires_at')
         .eq('driver_id', id)
         .order('expires_at'),
+      /* Суточные — только свои наборы: шаблон сначала копируют к себе. */
+      supabase
+        .from('allowance_rule_sets')
+        .select('id, name, valid_from, legality, country')
+        .eq('company_id', company.id)
+        .order('valid_from', { ascending: false }),
     ]);
 
   const grades = [
@@ -149,6 +156,8 @@ export default async function DriverPage({
           driverId={driver.id}
           profiles={profiles ?? []}
           sets={sets ?? []}
+          allowanceSets={allowanceSets ?? []}
+          country={company.country}
           grades={grades}
           today={helsinkiToday()}
         />

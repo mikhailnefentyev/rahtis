@@ -23,12 +23,10 @@ import { QUICK_PERIODS, parseRange, quickRange } from '@/lib/reports/periods';
 import { createClient } from '@/lib/supabase/server';
 import { WorkSummary } from '../WorkSummary';
 import { getViewerI18n } from '@/lib/i18n/viewer';
+import { warningText, warningTone } from '@/lib/drivers/warningText';
+import { DayCountryCell } from './DayCountryCell';
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
   if (!isLocale(locale)) return {};
   const { t } = await getViewerI18n(locale);
@@ -77,6 +75,7 @@ export default async function DriverReportPage({
     return `${base}/export?${q}`;
   };
   const hours = (minutes: number) => f.decimal(minutes / 60, 2);
+  const d = t.dayPay;
 
   return (
     <main className="cab-page">
@@ -84,9 +83,7 @@ export default async function DriverReportPage({
         ← {t.drivers.back}
       </Link>
       <h1 className="page-title mt-3">{t.workReport.title}</h1>
-      <p className="mt-2 mb-4 max-w-xl text-[13px] leading-relaxed text-ink-muted">
-        {t.workReport.subtitle}
-      </p>
+      <p className="mt-2 mb-4 max-w-xl text-[13px] leading-relaxed text-ink-muted">{t.workReport.subtitle}</p>
       <p className="mb-5 rounded-control border border-warn/35 bg-warn/10 px-3 py-2 text-[13px] text-warn">
         {t.pay.disclaimer}
       </p>
@@ -165,56 +162,138 @@ export default async function DriverReportPage({
         </CardBody>
       </Card>
 
-      {report && report.entries.length === 0 && (
-        <EmptyState title={t.workReport.empty} className="mt-6" />
-      )}
+      {report && report.entries.length === 0 && <EmptyState title={t.workReport.empty} className="mt-6" />}
 
-      {report?.entries.map((entry) => (
-        <section key={entry.driver.id} className="mt-8">
-          <h2 className="mb-3 border-b border-line pb-2 text-[13px] font-semibold tracking-tight">
-            <Link href={`/${locale}/carrier/drivers/${entry.driver.id}`} className="hover:underline">
-              {entry.driver.full_name}
-            </Link>
-          </h2>
+      {report?.entries.map((entry) => {
+        /* Колонки суточных — только если у водителя в периоде есть набор суточных. */
+        const withAllowance = Object.values(entry.allowanceDays).some((a) => a.hasSet);
+        const s = entry.summary.totals;
+        const a = entry.allowanceTotals;
+        /* Справочно: зарплата + суточные + ночлег, без взносов работодателя. */
+        const employerCost = s.amountCents + a.allowanceCents + a.lodgingCents;
+        return (
+          <section key={entry.driver.id} className="mt-8">
+            <h2 className="mb-3 border-b border-line pb-2 text-[13px] font-semibold tracking-tight">
+              <Link href={`/${locale}/carrier/drivers/${entry.driver.id}`} className="hover:underline">
+                {entry.driver.full_name}
+              </Link>
+            </h2>
 
-          <WorkSummary summary={entry.summary} className="mb-4" />
+            <WorkSummary summary={entry.summary} className="mb-4" />
 
-          {entry.summary.days.length > 0 && (
-            <TableFrame>
-              <Table>
-                <thead>
-                  <tr>
-                    <Th>{t.workReport.colDate}</Th>
-                    <Th numeric>{t.workReport.colHours}</Th>
-                    <Th numeric>{t.workReport.colEvening}</Th>
-                    <Th numeric>{t.workReport.colNight}</Th>
-                    <Th numeric>{t.workReport.colOvertime}</Th>
-                    <Th numeric>{t.workReport.colKm}</Th>
-                    <Th numeric>{t.workReport.colTrips}</Th>
-                    <Th>{t.workReport.colModel}</Th>
-                    <Th numeric>{f.label(t.workReport.colAmount, report.currency)}</Th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {entry.summary.days.map((day) => (
-                    <Tr key={day.date}>
-                      <Td>{f.date(`${day.date}T12:00:00Z`)}</Td>
-                      <Td numeric>{hours(day.workMinutes)}</Td>
-                      <Td numeric>{hours(day.eveningMinutes)}</Td>
-                      <Td numeric>{hours(day.nightMinutes)}</Td>
-                      <Td numeric>{hours(day.overtime1Minutes + day.overtime2Minutes)}</Td>
-                      <Td numeric>{f.number(payableKm(day))}</Td>
-                      <Td numeric>{f.number(day.trips)}</Td>
-                      <Td>{day.model ? t.payModel[day.model] : t.workReport.noRate}</Td>
-                      <Td numeric>{day.amountCents == null ? '—' : f.money(day.amountCents, day.currency)}</Td>
-                    </Tr>
+            {entry.summary.days.length > 0 && (
+              <TableFrame>
+                <Table>
+                  <thead>
+                    <tr>
+                      <Th>{t.workReport.colDate}</Th>
+                      <Th numeric>{t.workReport.colHours}</Th>
+                      <Th numeric>{t.workReport.colEvening}</Th>
+                      <Th numeric>{t.workReport.colNight}</Th>
+                      <Th numeric>{t.workReport.colOvertime}</Th>
+                      <Th numeric>{t.workReport.colKm}</Th>
+                      <Th numeric>{t.workReport.colTrips}</Th>
+                      <Th>{t.workReport.colModel}</Th>
+                      <Th numeric>{f.label(t.workReport.colAmount, report.currency)}</Th>
+                      <Th>{d.colCountry}</Th>
+                      {withAllowance && <Th numeric>{d.colAllowance}</Th>}
+                      {withAllowance && <Th numeric>{d.colLodging}</Th>}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {entry.summary.days.map((day) => {
+                      const al = entry.allowanceDays[day.date];
+                      return (
+                        <Tr key={day.date}>
+                          <Td>{f.date(`${day.date}T12:00:00Z`)}</Td>
+                          <Td numeric>{hours(day.workMinutes)}</Td>
+                          <Td numeric>{hours(day.eveningMinutes)}</Td>
+                          <Td numeric>{hours(day.nightMinutes)}</Td>
+                          <Td numeric>{hours(day.overtime1Minutes + day.overtime2Minutes)}</Td>
+                          <Td numeric>{f.number(payableKm(day))}</Td>
+                          <Td numeric>{f.number(day.trips)}</Td>
+                          <Td>{day.model ? t.payModel[day.model] : t.workReport.noRate}</Td>
+                          <Td numeric>{day.amountCents == null ? '—' : f.money(day.amountCents, day.currency)}</Td>
+                          <Td>
+                            {al ? (
+                              <DayCountryCell
+                                driverId={entry.driver.id}
+                                day={day.date}
+                                dayLabel={f.date(`${day.date}T12:00:00Z`)}
+                                home={report.country}
+                                country={al.country}
+                                source={al.source}
+                                countries={al.countries}
+                                manualCountry={al.source === 'manual' ? al.country : null}
+                                night={al.night}
+                                meals={al.meals}
+                              />
+                            ) : (
+                              '—'
+                            )}
+                          </Td>
+                          {withAllowance && (
+                            <Td numeric>
+                              {!al?.hasSet || (al.allowanceCents === 0 && al.lodgingCents === 0) ? (
+                                '—'
+                              ) : (
+                                <span className="flex flex-col items-end">
+                                  <span>{f.money(al.allowanceCents, al.currency)}</span>
+                                  {al.kind === 'WAGE' && <span className="text-[11px] text-ink-dim">{d.wagePart}</span>}
+                                  {al.taxableCents > 0 && (
+                                    <span className="text-[11px] text-warn">
+                                      {d.colTaxable} {f.money(al.taxableCents, al.currency)}
+                                    </span>
+                                  )}
+                                </span>
+                              )}
+                            </Td>
+                          )}
+                          {withAllowance && (
+                            <Td numeric>{al?.lodgingCents ? f.money(al.lodgingCents, al.currency) : '—'}</Td>
+                          )}
+                        </Tr>
+                      );
+                    })}
+                  </tbody>
+                </Table>
+              </TableFrame>
+            )}
+
+            {withAllowance && (
+              <div className="mt-3 flex flex-col gap-1 rounded-control border border-line px-3 py-2.5 text-[13px]">
+                <p>
+                  <span className="text-ink-muted">{d.wage}:</span> {f.money(s.amountCents, s.currency)} ·{' '}
+                  <span className="text-ink-muted">{d.allowances}:</span> {f.money(a.allowanceCents, a.currency)} (
+                  {d.colTaxFree} {f.money(a.taxFreeCents, a.currency)} · {d.colTaxable}{' '}
+                  {f.money(a.taxableCents, a.currency)}) · <span className="text-ink-muted">{d.lodging}:</span>{' '}
+                  {f.money(a.lodgingCents, a.currency)}
+                </p>
+                <p className="font-semibold">
+                  {d.employerCost}: {f.money(employerCost, a.currency)}{' '}
+                  <span className="font-normal text-ink-dim">— {d.employerCostHint}</span>
+                </p>
+                {a.missingRate && <p className="text-warn">{d.missingRate}</p>}
+                <p className="text-xs text-ink-dim">{d.disclaimer}</p>
+              </div>
+            )}
+
+            {entry.warnings.length > 0 && (
+              <div className="mt-3 rounded-control border border-warn/35 bg-warn/10 px-3 py-2.5">
+                <p className="label-micro mb-1.5">{d.warnings}</p>
+                <ul className="flex list-disc flex-col gap-1 pl-4 text-[13px]">
+                  {entry.warnings.map((w, i) => (
+                    <li key={i} className={warningTone(w) === 'danger' ? 'text-danger' : 'text-warn'}>
+                      {warningText(w, { t, m, f })}
+                    </li>
                   ))}
-                </tbody>
-              </Table>
-            </TableFrame>
-          )}
-        </section>
-      ))}
+                </ul>
+                {!withAllowance && <p className="mt-1.5 text-xs text-ink-dim">{d.disclaimer}</p>}
+              </div>
+            )}
+          </section>
+        );
+      })}
     </main>
   );
 }

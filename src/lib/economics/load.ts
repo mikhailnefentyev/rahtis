@@ -197,7 +197,9 @@ export async function loadEconomics(
     if (s.vehicle_id && vehicleIds.has(s.vehicle_id)) vehicleOfDay.set(`${s.driver_id}|${localDate(s.started_at)}`, s.vehicle_id);
   }
   const pay: EconomicsInput['pay'] = [];
+  const allowances: NonNullable<EconomicsInput['allowances']> = [];
   let unassignedPay = 0;
+  let unassignedAllowances = 0;
   for (const entry of report?.entries ?? []) {
     for (const day of entry.summary.days) {
       if (!day.amountCents || !inRange(day.date)) continue;
@@ -206,6 +208,16 @@ export async function loadEconomics(
       const vehicleId = vehicleOfDay.get(`${entry.driver.id}|${day.date}`);
       if (vehicleId) pay.push({ vehicleId, month: day.date.slice(0, 7), cents });
       else unassignedPay += cents;
+    }
+    /* Суточные и ночлег дня — в своей валюте (польские зарубежные — евро). */
+    for (const [date, al] of Object.entries(entry.allowanceDays ?? {})) {
+      const total = al.allowanceCents + al.lodgingCents;
+      if (!total || !inRange(date)) continue;
+      const cents = conv.cents(total, al.currency, date);
+      if (cents === null) continue;
+      const vehicleId = vehicleOfDay.get(`${entry.driver.id}|${date}`);
+      if (vehicleId) allowances.push({ vehicleId, month: date.slice(0, 7), cents });
+      else unassignedAllowances += cents;
     }
   }
 
@@ -238,6 +250,7 @@ export async function loadEconomics(
     revenue,
     fuel: fuelRows,
     pay,
+    allowances,
     journal: (costs ?? []).flatMap((c) => {
       const cents = conv.cents(c.amount_cents, c.currency, c.spent_on);
       return cents === null ? [] : [{ vehicleId: c.vehicle_id, month: c.spent_on.slice(0, 7), cents }];
@@ -261,6 +274,6 @@ export async function loadEconomics(
     costs: costs ?? [],
     employerCostBps,
     /* Зарплата дней без машины в смене — не разнесена: показываем отдельно, чтобы не потерялась. */
-    unassignedPayCents: Math.round(unassignedPay * (1 + employerCostBps / 10_000)),
+    unassignedPayCents: Math.round(unassignedPay * (1 + employerCostBps / 10_000)) + unassignedAllowances,
   };
 }

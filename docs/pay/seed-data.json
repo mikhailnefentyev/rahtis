@@ -1,0 +1,260 @@
+{
+  "verified_on": "2026-11-05",
+  "conventions": "All *_cents are hundredths of the stated currency (not always EUR/PLN). hotel_currency is given whenever the hotel limit is not in the day-rate currency. bps = basis points of a supplement on top of base pay (5000 = +50 %).",
+
+  "PL": {
+    "domestic": {
+      "day_cents": 4500,
+      "currency": "PLN",
+      "lodging_lump_cents": 6750,
+      "hotel_cap_cents": 90000,
+      "lodging_lump_rule": "150 % of dieta, only for a stay of at least 6 h between 21:00 and 07:00 (§ 8 ust. 3-4)",
+      "source": "Rozp. MPiPS 29.01.2013, consolidated text Dz.U. 2023 poz. 2190, § 7 ust. 1, § 8 ust. 1, 3, 4 — https://api.sejm.gov.pl/eli/acts/DU/2023/2190/text.pdf"
+    },
+    "foreign_source": "Annex to Rozp. MPiPS 29.01.2013 (wording by Dz.U. 2022 poz. 2302, in force 29.11.2022), consolidated text Dz.U. 2023 poz. 2190, pp. 8-11 — https://api.sejm.gov.pl/eli/acts/DU/2023/2190/text.pdf",
+    "foreign": [
+      {"country": "DE", "currency": "EUR", "day_cents": 4900, "hotel_limit_cents": 17000},
+      {"country": "FR", "currency": "EUR", "day_cents": 5500, "hotel_limit_cents": 20000},
+      {"country": "NL", "currency": "EUR", "day_cents": 5000, "hotel_limit_cents": 15000},
+      {"country": "BE", "currency": "EUR", "day_cents": 5500, "hotel_limit_cents": 20000},
+      {"country": "LU", "currency": "EUR", "day_cents": 5500, "hotel_limit_cents": 20000},
+      {"country": "AT", "currency": "EUR", "day_cents": 5700, "hotel_limit_cents": 15000},
+      {"country": "CH", "currency": "CHF", "day_cents": 8800, "hotel_limit_cents": 22000},
+      {"country": "IT", "currency": "EUR", "day_cents": 5300, "hotel_limit_cents": 19200},
+      {"country": "ES", "currency": "EUR", "day_cents": 5000, "hotel_limit_cents": 20000},
+      {"country": "PT", "currency": "EUR", "day_cents": 4900, "hotel_limit_cents": 15000},
+      {"country": "DK", "currency": "DKK", "day_cents": 44600, "hotel_limit_cents": 143000},
+      {"country": "SE", "currency": "SEK", "day_cents": 51000, "hotel_limit_cents": 200000},
+      {"country": "NO", "currency": "NOK", "day_cents": 49600, "hotel_limit_cents": 165000},
+      {"country": "FI", "currency": "EUR", "day_cents": 5300, "hotel_limit_cents": 18000},
+      {"country": "EE", "currency": "EUR", "day_cents": 4500, "hotel_limit_cents": 11000},
+      {"country": "LT", "currency": "EUR", "day_cents": 4500, "hotel_limit_cents": 15000},
+      {"country": "LV", "currency": "EUR", "day_cents": 5700, "hotel_limit_cents": 13200},
+      {"country": "CZ", "currency": "EUR", "day_cents": 4100, "hotel_limit_cents": 12000},
+      {"country": "SK", "currency": "EUR", "day_cents": 4700, "hotel_limit_cents": 13200},
+      {"country": "HU", "currency": "EUR", "day_cents": 4400, "hotel_limit_cents": 14300},
+      {"country": "SI", "currency": "EUR", "day_cents": 4500, "hotel_limit_cents": 14300},
+      {"country": "HR", "currency": "EUR", "day_cents": 4200, "hotel_limit_cents": 12500},
+      {"country": "RO", "currency": "EUR", "day_cents": 4200, "hotel_limit_cents": 11000},
+      {"country": "BG", "currency": "EUR", "day_cents": 4000, "hotel_limit_cents": 12000},
+      {"country": "GB", "currency": "GBP", "day_cents": 4500, "hotel_limit_cents": 22000},
+      {"country": "IE", "currency": "EUR", "day_cents": 5200, "hotel_limit_cents": 16000},
+      {"country": "OTHER", "currency": "EUR", "day_cents": 4100, "hotel_limit_cents": 14000, "note": "Państwa inne"}
+    ],
+    "pit_relief_eur_cents": 2000,
+    "zus_relief_eur_cents": 6000,
+    "zus_floor_cents": 942000,
+    "min_monthly_cents": 480600,
+    "min_hourly_cents": 3140,
+    "sources": {
+      "pit_relief": "PIT art. 21 ust. 1 pkt 23d, consolidated Dz.U. 2026 poz. 592 — https://api.sejm.gov.pl/eli/acts/DU/2026/592/text.pdf",
+      "zus_relief": "Ustawa o czasie pracy kierowców art. 26g pkt 1, art. 26h (partial days 1/3 ≤8 h, 1/2 8-12 h), consolidated Dz.U. 2026 poz. 477 — https://api.sejm.gov.pl/eli/acts/DU/2026/477/text.pdf",
+      "zus_floor": "Prognozowane przeciętne wynagrodzenie 2026 = 9 420 PLN, Obwieszczenie MRPiPS 19.11.2025, M.P. 2025 poz. 1206 — https://api.sejm.gov.pl/eli/acts/MP/2025/1206/text.pdf",
+      "min_wage": "Rozp. RM 11.09.2025, Dz.U. 2025 poz. 1242, § 1-2 — https://api.sejm.gov.pl/eli/acts/DU/2025/1242/text.pdf"
+    },
+    "pending": {
+      "unverified": true,
+      "reason": "Draft amendment (dieta 60 PLN, ryczałt za nocleg 90 PLN, hotel cap 1 200 PLN, new foreign table) is legislacja.gov.pl project 12406408, status 'otwarty' (uzgodnienia last changed 04.11.2026); not signed, not in Dziennik Ustaw as of 2026-11-04. Values come only from press reports. Do not seed.",
+      "source": "https://legislacja.gov.pl/projekt/12406408"
+    },
+    "notes": [
+      "No new diet regulation published; 45 PLN / 67.50 / 900 PLN and the 2022 foreign table remain in force.",
+      "ZUS 'wirtualna dieta' is still 60 EUR (art. 26g UCPK, not the 1998 ZUS regulation); no 90 EUR change enacted.",
+      "Foreign table currencies are not all EUR: CH=CHF, DK=DKK, SE=SEK, NO=NOK, GB=GBP.",
+      "Foreign ryczałt za nocleg = 25 % of the country's hotel limit (§ 16 of the 2013 regulation, business trips only; international drivers are not on podróż służbowa since 2022).",
+      "2027 minimum wage already published (Dz.U. 2026 poz. 1213), not extracted here."
+    ]
+  },
+
+  "EE": {
+    "min_monthly_cents": 94600,
+    "min_hourly_cents": 567,
+    "valid_from": "2026-04-01",
+    "previous": {"min_monthly_cents": 88600, "min_hourly_cents": 531, "valid_from": "2025-01-01", "valid_to": "2026-03-31"},
+    "per_diem": {
+      "first_days": 15,
+      "first_cents": 7500,
+      "later_cents": 4000,
+      "min_cents": 4000,
+      "max_first_days_per_month": 15,
+      "departure_counts_if_before": "21:00",
+      "return_counts_if_after": "03:00",
+      "min_distance_km": 50,
+      "meal_reduction_max_bps": 7000,
+      "domestic_tax_free": false
+    },
+    "night_bps": 2500,
+    "holiday_bps": 10000,
+    "overtime_bps": 5000,
+    "sources": {
+      "min_wage": "VV määrus 23.03.2026 nr 36 'Töötasu alammäära kehtestamine', RT I, 24.03.2026, 5, § 1 — https://www.riigiteataja.ee/et/akt/124032026005",
+      "min_wage_previous": "VV määrus 19.12.2024 nr 87, RT I, 21.12.2024, 26 — https://www.riigiteataja.ee/et/akt/121122024026",
+      "night_holiday": "TLS § 45 lg 1 (22-06, 1.25×) and lg 2 (public holiday 2×); lg 3 time-off alternative; RT I, 03.07.2026, 35 — https://www.riigiteataja.ee/et/akt/103072026035",
+      "overtime": "TLS § 44 lg 7 (1.5× if compensated in money; lg 6 default = time off) — same RT version",
+      "per_diem_tax_free": "TuMS § 13 lg 3 p 1, RT I, 09.07.2026, 66 — https://www.riigiteataja.ee/et/akt/109072026066",
+      "per_diem_rules": "VV määrus 25.06.2009 nr 110, RT I, 02.07.2025, 20: § 3 (min 40 €), § 4 lg 1-4 (50 km, 21:00/03:00, one payment on overlap day, up to 70 % reduction for free meals) — https://www.riigiteataja.ee/et/akt/102072025020",
+      "drivers": "https://emta.ee/ariklient/maksud-ja-tasumine/tulumaks-ja-sotsiaalmaks/erisoodustused/paevaraha-maksmine-kaugsoiduautojuhtidele",
+      "domestic": "https://emta.ee/ariklient/maksud-ja-tasumine/tulumaks-ja-sotsiaalmaks/erisoodustused/eesti-sisene-toolahetus"
+    },
+    "unverified_items": [
+      {"item": "How to count the 15 days when a trip spans two months or several trips fall in one month", "unverified": true, "reason": "Neither TuMS nor EMTA pages state a counting method."},
+      {"item": "Whether a meal-reduced per diem may fall below the 40 € minimum", "unverified": true, "reason": "Not seen in primary text. EMTA Q34 says the § 4 lg 4 reduction does not change the tax-free limit."}
+    ],
+    "notes": [
+      "Overtime is TLS § 44 lg 7, not lg 8 as in the research note.",
+      "886 €/5.31 € applied from 1.1.2025, not 1.1.2026 (still in force Jan-Mar 2026).",
+      "TLS and TuMS have new consolidated versions from 2027-01-01; not checked."
+    ]
+  },
+
+  "LV": {
+    "min_monthly_cents": 78000,
+    "min_hourly_rule": "monthly minimum / normal working hours in the month (MK 656 p. 3)",
+    "domestic": {"day_cents": 800, "half_day_cents": 400, "hotel_limit_riga_cents": 12000, "hotel_limit_other_cents": 6000, "source": "MK 969 p. 21.2 (8 EUR; 50 % if daily return is possible; 0 for one-day trip with return), p. 21.3/41.2 hotel maxima (binding for budget institutions)"},
+    "rates_source": "MK noteikumi Nr. 969 (12.10.2010) 1. pielikums, wording MK 19.11.2019 Nr. 555 as amended by MK 14.09.2021 Nr. 637 (in force 21.09.2021); consolidated version 18.08.2026 — https://likumi.lv/ta/id/220013",
+    "rates": [
+      {"country": "DE", "day_cents": 5000, "hotel_limit_cents": 18000, "hotel_currency": "EUR", "city_limits": [{"cities": ["Hamburg", "München", "Frankfurt", "Berlin"], "hotel_limit_cents": 22000}]},
+      {"country": "FR", "day_cents": 6000, "hotel_limit_cents": 25000, "hotel_currency": "EUR"},
+      {"country": "NL", "day_cents": 6000, "hotel_limit_cents": 22000, "hotel_currency": "EUR"},
+      {"country": "BE", "day_cents": 6000, "hotel_limit_cents": 25000, "hotel_currency": "EUR"},
+      {"country": "LU", "day_cents": 6000, "hotel_limit_cents": 28000, "hotel_currency": "EUR"},
+      {"country": "AT", "day_cents": 5000, "hotel_limit_cents": 20000, "hotel_currency": "EUR"},
+      {"country": "CH", "day_cents": 6000, "hotel_limit_cents": 32000, "hotel_currency": "CHF"},
+      {"country": "IT", "day_cents": 6000, "hotel_limit_cents": 30000, "hotel_currency": "EUR"},
+      {"country": "ES", "day_cents": 5000, "hotel_limit_cents": 18000, "hotel_currency": "EUR"},
+      {"country": "PT", "day_cents": 5000, "hotel_limit_cents": 20000, "hotel_currency": "EUR"},
+      {"country": "DK", "day_cents": 6000, "hotel_limit_cents": 170000, "hotel_currency": "DKK"},
+      {"country": "SE", "day_cents": 5000, "hotel_limit_cents": 26000, "hotel_currency": "EUR"},
+      {"country": "NO", "day_cents": 6500, "hotel_limit_cents": 200000, "hotel_currency": "NOK"},
+      {"country": "FI", "day_cents": 5500, "hotel_limit_cents": 22000, "hotel_currency": "EUR"},
+      {"country": "EE", "day_cents": 4000, "hotel_limit_cents": 12000, "hotel_currency": "EUR"},
+      {"country": "LT", "day_cents": 3000, "hotel_limit_cents": 12000, "hotel_currency": "EUR"},
+      {"country": "PL", "day_cents": 3500, "hotel_limit_cents": 15000, "hotel_currency": "EUR"},
+      {"country": "CZ", "day_cents": 4000, "hotel_limit_cents": 17000, "hotel_currency": "EUR"},
+      {"country": "SK", "day_cents": 3500, "hotel_limit_cents": 16000, "hotel_currency": "EUR"},
+      {"country": "HU", "day_cents": 3500, "hotel_limit_cents": 16000, "hotel_currency": "EUR"},
+      {"country": "SI", "day_cents": 3500, "hotel_limit_cents": 13000, "hotel_currency": "EUR"},
+      {"country": "HR", "day_cents": 4000, "hotel_limit_cents": 13000, "hotel_currency": "EUR"},
+      {"country": "RO", "day_cents": 3500, "hotel_limit_cents": 15000, "hotel_currency": "EUR"},
+      {"country": "BG", "day_cents": 3500, "hotel_limit_cents": 15000, "hotel_currency": "EUR"},
+      {"country": "GB", "day_cents": 6500, "hotel_limit_cents": 33000, "hotel_currency": "GBP"},
+      {"country": "IE", "day_cents": 6000, "hotel_limit_cents": 26000, "hotel_currency": "EUR"},
+      {"country": "OTHER", "day_cents": 3000, "hotel_limit_cents": 11000, "hotel_currency": "EUR", "note": "Pārējās valstis"}
+    ],
+    "cap_bps": 7000,
+    "posted_bps": 3000,
+    "free_board_max_bps": 3000,
+    "night_bps": 5000,
+    "overtime_bps": 10000,
+    "holiday_bps": 10000,
+    "sources": {
+      "min_wage": "MK noteikumi Nr. 656 (24.11.2015) p. 2, wording MK 19.11.2025 Nr. 680, from 01.01.2026 — https://likumi.lv/ta/id/278067",
+      "cap": "MK 969 p. 42 (70 % of calculated wage + calculated additional expenses; excess has no compensation character), p. 43 (no payment if return home within the same 24 h), p. 46 — https://likumi.lv/ta/id/220013",
+      "free_board": "MK 969 p. 13: free hotel + ≥3 meals/day → up to 30 % of the rate",
+      "posted": "Darba likums 14.² (5)-(7): 30 % of MK 969 rate; not owed if 3 meals provided or host-equivalent pay; counts as compensation, not wage — https://likumi.lv/ta/id/26019",
+      "night": "Darba likums 67. p. (1): ≥ 50 % — https://likumi.lv/ta/id/26019",
+      "overtime_holiday": "Darba likums 68. p. (1), consolidation from 22.10.2024: ≥ 100 % for overtime and public-holiday work; (3)-(4) general agreement may set ≥ 50 % if sector minimum wage raised ≥ 50 % — https://likumi.lv/ta/id/26019",
+      "overtime_bill": "Saeima bill Nr. 1022/Lp14 'Grozījumi Darba likumā' — https://titania.saeima.lv/LIVS14/saeimalivs14.nsf/0/C9AB1AD44E28E107C2258CF20048E8D4?OpenDocument"
+    },
+    "pending": {
+      "unverified": true,
+      "reason": "Overtime bill 1022/Lp14 passed only 1st reading (11.12.2025); no 2nd/3rd reading, not published, no effective date. Committee version (overtime 50 %, overtime on holiday 75 %, holiday 100 %) known only from lvportals.lv / LSM (March 2026). 14th Saeima term ended (elections 03.10.2026); continuation by the 15th Saeima not confirmed. Keep overtime_bps 10000."
+    },
+    "notes": [
+      "Domestic dienas nauda is 8 EUR (p. 21.2), applies to darba brauciens via p. 42.",
+      "Hotel limits are binding maxima for budget institutions (p. 10, 41.2; breakfast included); for private employers they are a reference. Do not convert CHF/DKK/NOK/GBP hotel limits as EUR.",
+      "Annex unchanged since 21.09.2021."
+    ]
+  },
+
+  "LT": {
+    "min_monthly_cents": 115300,
+    "min_hourly_cents": 705,
+    "coef_bps": 16500,
+    "threshold_monthly_cents": 190245,
+    "threshold_hourly_exact": 11.6325,
+    "half_cap_bps": 5000,
+    "domestic": {"day_cents": 2800, "hotel_limit_cents": 14500, "rule": "Only if the domestic trip lasts longer than one trip day (point 2², from 2026-10-01). Tax: 50 % monthly cap always applies to domestic per diem (Res. 99 p. 2.3), no 1.65 exception."},
+    "rates_source": "LRV nutarimas Nr. 526 (2004-04-29), 'Maksimalių dienpinigių dydžių sąrašas' and 'Gyvenamojo ploto nuomos išlaidų normų sąrašas', wording of Nr. 504 (2023-06-28) in force 2023-08-01; consolidated version 2026-10-01..2027-06-30 — https://www.e-tar.lt/portal/lt/legalAct/TAR.E356C85AC1C6/asr",
+    "rates": [
+      {"country": "DE", "day_cents": 6200, "hotel_limit_cents": 22000},
+      {"country": "FR", "day_cents": 6900, "hotel_limit_cents": 18800, "city_limits": [{"cities": ["Paris"], "hotel_limit_cents": 20000}]},
+      {"country": "NL", "day_cents": 6400, "hotel_limit_cents": 19000},
+      {"country": "BE", "day_cents": 6100, "hotel_limit_cents": 22000},
+      {"country": "LU", "day_cents": 6100, "hotel_limit_cents": 28000},
+      {"country": "AT", "day_cents": 6900, "hotel_limit_cents": 19000},
+      {"country": "CH", "day_cents": 8000, "hotel_limit_cents": 29000},
+      {"country": "IT", "day_cents": 6300, "hotel_limit_cents": 18800},
+      {"country": "ES", "day_cents": 5800, "hotel_limit_cents": 20000},
+      {"country": "PT", "day_cents": 5600, "hotel_limit_cents": 15500},
+      {"country": "DK", "day_cents": 8000, "hotel_limit_cents": 20000},
+      {"country": "SE", "day_cents": 7000, "hotel_limit_cents": 21000},
+      {"country": "NO", "day_cents": 7000, "hotel_limit_cents": 25000},
+      {"country": "FI", "day_cents": 6900, "hotel_limit_cents": 17400},
+      {"country": "EE", "day_cents": 4700, "hotel_limit_cents": 14500},
+      {"country": "LV", "day_cents": 4400, "hotel_limit_cents": 14500},
+      {"country": "PL", "day_cents": 4800, "hotel_limit_cents": 16500},
+      {"country": "CZ", "day_cents": 5000, "hotel_limit_cents": 19500},
+      {"country": "SK", "day_cents": 5300, "hotel_limit_cents": 16500},
+      {"country": "HU", "day_cents": 4800, "hotel_limit_cents": 18500},
+      {"country": "SI", "day_cents": 5200, "hotel_limit_cents": 19000},
+      {"country": "HR", "day_cents": 4500, "hotel_limit_cents": 16500},
+      {"country": "RO", "day_cents": 3500, "hotel_limit_cents": 16000},
+      {"country": "BG", "day_cents": 3900, "hotel_limit_cents": 16000},
+      {"country": "GB", "day_cents": 6700, "hotel_limit_cents": 25000, "city_limits": [{"cities": ["London"], "hotel_limit_cents": 27000}]},
+      {"country": "IE", "day_cents": 6900, "hotel_limit_cents": 17400},
+      {"country": "OTHER", "day_cents": 3300, "hotel_limit_cents": 14500, "note": "Kitos valstybės"}
+    ],
+    "payment_rules": {
+      "short_first_last_day_bps": 2000,
+      "short_day_hours_below": 4,
+      "min_bps_with_collective_agreement": 5000,
+      "min_bps_internal_act_trip_7d_plus": 6500,
+      "departure_day": "destination country rate",
+      "return_day": "rate of the country being left",
+      "multi_country_day": "average of the countries' rates (not for transit only)",
+      "source": "Dienpinigių mokėjimo tvarkos aprašas (Res. 526) points 2, 2¹ (from 2026-10-01, Res. Nr. 518), 3"
+    },
+    "night_bps": 5000,
+    "overtime_bps": 5000,
+    "overtime_night_bps": 10000,
+    "overtime_holiday_bps": 15000,
+    "holiday_bps": 10000,
+    "rest_day_unscheduled_bps": 10000,
+    "sources": {
+      "min_wage": "LRV nutarimas Nr. 700 (2025-10-16), TAR 2025-17211 — https://www.e-tar.lt/portal/lt/legalAct/2d7df1c2aab011f0a34db2fbd35a03b2",
+      "coef_and_half_cap": "LRV nutarimas Nr. 99 (2003-01-28) p. 2.5 (coefficient 1.65 since Res. Nr. 1038 of 2019-10-16) and p. 2.3 (domestic) — https://www.e-tar.lt/portal/lt/legalAct/TAR.DAAEC3C59FCE/asr",
+      "rates": "https://www.e-tar.lt/portal/lt/legalAct/TAR.E356C85AC1C6/asr",
+      "labour_code": "Darbo kodeksas 144 str. 1-4 d., consolidated 2026-11-01 — https://www.e-tar.lt/portal/lt/legalAct/f6d686707e7011e6b969d7ae07280e89/asr"
+    },
+    "unverified_items": [
+      {"item": "GPMĮ 17 str. 1 d. 5 p. text and current VMI explainer", "unverified": true, "reason": "Not opened (e-tar/VMI blocked automated fetch); the 1.65 rule itself is confirmed in Res. 99 p. 2.5."},
+      {"item": "hotel_limit_cents as a tax cap for private carriers", "unverified": true, "reason": "Table legally binds budget institutions (rule 11¹ allows +50 %); not checked whether Res. 99 applies these norms or actual documented costs to private employers. Treat as reference cap."}
+    ],
+    "notes": [
+      "Rates are maximum per diems; employer may set lower (≥ 50 % with collective agreement, ≥ 65 % via internal act for trips ≥ 7 days).",
+      "Domestic per diem 28 EUR exists (research note said none/unknown).",
+      "Compare hourly rate against 11.6325 exactly; regulation has no rounding rule."
+    ]
+  },
+
+  "posting_minimums": [
+    {"country": "DE", "valid_from": "2026-01-01", "currency": "EUR", "hourly_cents": 1390, "basis": "statutory", "source": "MiLoV5 (5.11.2025, BGBl. 2025 I Nr. 268) § 1 — https://www.gesetze-im-internet.de/milov5/BJNR10C0A0025.html"},
+    {"country": "DE", "valid_from": "2027-01-01", "currency": "EUR", "hourly_cents": 1460, "basis": "statutory", "source": "MiLoV5 § 1 — https://www.gesetze-im-internet.de/milov5/BJNR10C0A0025.html"},
+    {"country": "FR", "valid_from": "2026-01-01", "currency": "EUR", "hourly_cents": 1202, "basis": "statutory", "source": "Décret 2025-1228 du 17.12.2025 — https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000053042520"},
+    {"country": "FR", "valid_from": "2026-06-01", "currency": "EUR", "hourly_cents": 1231, "monthly_cents": 186702, "basis": "statutory", "source": "Arrêté du 22.5.2026, NOR TRST2612929A, JO n° 121 du 24.5.2026"},
+    {"country": "NL", "valid_from": "2026-01-01", "currency": "EUR", "hourly_cents": 1471, "basis": "statutory", "note": "age 21+", "source": "https://www.rijksoverheid.nl/onderwerpen/minimumloon/bedragen-minimumloon/bedragen-minimumloon-2026"},
+    {"country": "NL", "valid_from": "2026-07-01", "currency": "EUR", "hourly_cents": 1499, "basis": "statutory", "note": "age 21+", "source": "https://www.rijksoverheid.nl/onderwerpen/minimumloon/bedragen-minimumloon/bedragen-minimumloon-2026"},
+    {"country": "BE", "valid_from": "2026-07-01", "currency": "EUR", "hourly_cents": null, "monthly_cents": 223361, "basis": "statutory", "note": "GGMMI/RMMMG (CCT 43), monthly only; 2026-01-01: 215411, 2026-04-01: 218981", "source": "https://cnt-nar.be/sites/default/files/documents/fr/Tableau-Tabel-Montants%20CCT-CAO%20Bedragen-2026-07-01.pdf"},
+    {"country": "BE", "valid_from": "2026-01-01", "currency": "EUR", "hourly_cents": 1454, "basis": "generally_applicable_CA", "note": "PC 140.03 level 1 (14.5425 €, paid compensatory rest); levels 2-4: 15.0525/15.2280/15.4025", "unverified": true, "reason": "Level↔vehicle mapping not stated; possible re-indexation after 01/2026 not confirmed.", "source": "https://www.salairesminimums.be/document.html?jcId=e4f43b8462814a79b780b4feb1ae1eaa&date=01%2F11%2F2026"},
+    {"country": "AT", "valid_from": "2026-01-01", "currency": "EUR", "hourly_cents": 1259, "monthly_cents": 217807, "basis": "generally_applicable_CA", "note": "KV Güterbeförderungsgewerbe cat. 2 (truck >3.5 t, ≤3 axles, ≤5 years); cat. 3: 12.78, cat. 4 (articulated/trailer): 12.92", "unverified": true, "reason": "Binding via WKO membership, not erga omnes in strict sense; category depends on vehicle and service years.", "source": "https://www.wko.at/kollektivvertrag/lohnordnung-gueterbefoerderungsgewerbe-2026"},
+    {"country": "IT", "valid_from": null, "currency": "EUR", "hourly_cents": null, "basis": "none", "unverified": true, "reason": "No statutory minimum and no erga omnes mechanism; CCNL Logistica, Trasporto merci e Spedizione 2026 minimums not extracted."},
+    {"country": "ES", "valid_from": "2026-01-01", "currency": "EUR", "hourly_cents": null, "monthly_cents": 122100, "daily_cents": 4070, "basis": "statutory", "note": "SMI ×14 payments; no official general hourly rate", "source": "Real Decreto 126/2026, BOE 19.2.2026 — https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-3815"},
+    {"country": "DK", "valid_from": null, "currency": "DKK", "hourly_cents": null, "basis": "none", "source": "No statutory minimum, no generally applicable agreement"},
+    {"country": "SE", "valid_from": null, "currency": "SEK", "hourly_cents": null, "basis": "none", "source": "No statutory minimum, no generally applicable agreement"},
+    {"country": "NO", "valid_from": "2024-11-01", "currency": "NOK", "hourly_cents": 22900, "basis": "generally_applicable_CA", "note": "one rate for all goods vehicles >2.5 t (2.5-3.5 t from 2025-06-01)", "source": "FOR-2024-10-29-2601 — https://lovdata.no/dokument/SF/forskrift/2024-10-29-2601"},
+    {"country": "NO", "valid_from": "2026-11-06", "currency": "NOK", "hourly_cents": 24450, "basis": "generally_applicable_CA", "note": "replaces 2024-10-29-2601; also ≥7.5 paid h/day on multi-day trips except first/last day", "source": "FOR-2026-10-22-2232 — https://lovdata.no/dokument/SF/forskrift/2026-10-22-2232"},
+    {"country": "FI", "valid_from": "2025-03-01", "currency": "EUR", "hourly_cents": 1577, "basis": "generally_applicable_CA", "note": "Kuorma-autoalan TES, truck driver (B/C1/C), <4 years; CE 16.09, full-trailer 16.65", "source": "https://finlex.fi/api/media/collective-agreement-general-applicability-decision/584544/collectiveAgreement/Kuormauto2502.pdf"},
+    {"country": "FI", "valid_from": "2026-06-01", "currency": "EUR", "hourly_cents": 1623, "basis": "generally_applicable_CA", "note": "truck driver (B/C1/C), <4 years; CE 16.56, full-trailer 17.13; from pay period starting on/after date", "source": "https://finlex.fi/api/media/collective-agreement-general-applicability-decision/584544/collectiveAgreement/Kuormauto2502.pdf"}
+  ]
+}

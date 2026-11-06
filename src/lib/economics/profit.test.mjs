@@ -171,3 +171,22 @@ test('пересчёт строк в валюту компании по курс
   assert.equal(conv.rate('NOK', '2026-10-05'), null);
   assert.equal(conv.missing, 2);
 });
+
+test('суточные и ночлег — к затратам на водителя, но без взносов работодателя', () => {
+  const { vehicles } = vehicleEconomics({
+    months: ['2026-10'],
+    vehicles: [{ id: 'A', plate: 'TST-101' }],
+    revenue: [],
+    fuel: [],
+    pay: [{ vehicleId: 'A', month: '2026-10', cents: 200_000 }],
+    allowances: [
+      { vehicleId: 'A', month: '2026-10', cents: 30_000 },
+      { vehicleId: 'A', month: '2026-10', cents: 6_750 },
+    ],
+    journal: [],
+    finance: new Map(),
+    employerCostBps: 2500,
+    subscriptionUnitCents: null,
+  });
+  assert.equal(vehicles[0].months[0].costs.driver, 250_000 + 36_750);
+});
