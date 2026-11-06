@@ -1510,6 +1510,12 @@ $$;
 revoke all on function public.confirm_freight_invoice_paid(uuid) from public, anon;
 grant execute on function public.confirm_freight_invoice_paid(uuid) to authenticated;
 
+alter table public.direct_payment_reports
+  add column prefilled boolean not null default false;
+
+comment on column public.direct_payment_reports.prefilled is
+  'Заготовлена системой на 14-й день просрочки счёта (freight_invoices); перевозчик правит — флаг снимается.';
+
 /*
  * Для списка выполненных у перевозчика: рейсы, где можно отметить счёт
  * (условия — как у отметки об оплате), с подстановками по умолчанию —
@@ -1659,11 +1665,7 @@ grant execute on function public.mark_site_invoice_paid(uuid, date) to authentic
 
 -- ── Отметка «не оплачен» по заготовке ──────────────────────────────
 
-alter table public.direct_payment_reports
-  add column prefilled boolean not null default false;
-
-comment on column public.direct_payment_reports.prefilled is
-  'Заготовлена системой на 14-й день просрочки счёта (freight_invoices); перевозчик правит — флаг снимается.';
+/* Колонка prefilled добавлена выше, до freight_invoice_targets (функции на SQL проверяют колонки при создании). */
 
 /*
  * Тело из 20261106140000_shipper_trust: + prefilled. Пользователь его не
