@@ -13,6 +13,7 @@ import {
 import { companyStatusTone, vehicleAccessTone } from '@/components/ui/tone';
 import { requireRole } from '@/lib/auth/guard';
 import { setCompanyTestAction } from '@/lib/companies/actions';
+import { adminResetTwoStepAction } from '@/lib/auth/twoStepActions';
 import { daysUntil } from '@/lib/dates';
 import { getI18n, isLocale } from '@/lib/i18n';
 import { CarrierScorecard } from '@/components/domain/CarrierScorecard';
@@ -69,7 +70,7 @@ export default async function AdminCompanyPage({
    * дорисовывается по частям. Заказы считаются с обеих сторон — компания
    * могла быть и заказчиком, и перевозчиком.
    */
-  const [{ data: documents }, { data: vehicles }, { data: people }, { data: counts }] =
+  const [{ data: documents }, { data: vehicles }, { data: people }, { data: counts }, { data: twoStepRows }] =
     await Promise.all([
       supabase
         .from('company_documents')
@@ -88,7 +89,10 @@ export default async function AdminCompanyPage({
        * у перевозчика всегда выходило «нет рейсов».
        */
       supabase.rpc('admin_company_orders', { p_company_id: id }),
+      /* У кого включён двухэтапный вход — для сброса по просьбе (потерян телефон). */
+      supabase.rpc('two_step_users', { p_company_id: id }),
     ]);
+  const twoStep = new Set((twoStepRows ?? []).map((r) => r.user_id));
 
   /* Экспедитор: роль, полис и лицензия с решениями оператора (6.11.2026). */
   const shipper = company.kind === 'SHIPPER' && !company.client_of;
@@ -377,6 +381,29 @@ export default async function AdminCompanyPage({
                   <Badge>{t.role[p.role]}</Badge>
                   <span className="text-[13px] text-ink">{p.full_name ?? '—'}</span>
                   {p.phone && <Mono className="text-xs text-ink-dim">{p.phone}</Mono>}
+                  {twoStep.has(p.id) && (
+                    <>
+                      <Badge tone="ok">{t.twoStep.badge}</Badge>
+                      {/*
+                        * Сброс по просьбе человека или главного пользователя —
+                        * личность сверить до нажатия. Пишется в audit_log.
+                        */}
+                      <details className="ml-auto">
+                        <summary className="cursor-pointer text-[13px] text-ink-muted hover:text-ink">
+                          {t.twoStep.resetMember}
+                        </summary>
+                        <form action={adminResetTwoStepAction} className="mt-2 flex flex-col items-end gap-2">
+                          <input type="hidden" name="locale" value={locale} />
+                          <input type="hidden" name="user_id" value={p.id} />
+                          <input type="hidden" name="company_id" value={company.id} />
+                          <p className="max-w-xs text-right text-xs text-ink-muted">{t.twoStep.supportResetHint}</p>
+                          <Button type="submit" size="sm" variant="danger">
+                            {t.twoStep.resetMember}
+                          </Button>
+                        </form>
+                      </details>
+                    </>
+                  )}
                 </CardBody>
               </Card>
             ))}

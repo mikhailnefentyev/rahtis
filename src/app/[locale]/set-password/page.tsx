@@ -36,6 +36,10 @@ export default async function SetPasswordPage({
   if (viewer.status === 'guest') {
     redirect(`${signInPath(locale)}?reason=link`);
   }
+  /* Двухэтапный вход: сначала код, Supabase без aal2 пароль не сменит. */
+  if (viewer.status === 'mfa' && viewer.step === 'code') {
+    redirect(signInPath(locale, `/${locale}/set-password`));
+  }
 
   const { t } = await getI18n(locale);
 

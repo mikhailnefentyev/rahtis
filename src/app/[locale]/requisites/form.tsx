@@ -23,6 +23,7 @@ import { useI18n } from '@/lib/i18n/provider';
 import type { Company } from '@/types/db';
 import { useKeepOnError } from '@/lib/forms/keepOnError';
 import { vatNumberFor } from '@/lib/country';
+import { StepUpPrompt } from '@/components/domain/TwoStep';
 
 const initial: RequisitesState = { error: null, done: false };
 
@@ -406,13 +407,18 @@ export function RequisitesForm({
         </CardBody>
       </Card>
 
-      {state.error && (
-        <p
-          role="alert"
-          className="rounded-control border border-danger/35 bg-danger/10 px-3 py-2 text-[13px] text-danger"
-        >
-          {state.error}
-        </p>
+      {/* Счёт или почта для счетов при двухэтапном входе: код, потом та же форма уходит сама. */}
+      {state.stepUp ? (
+        <StepUpPrompt onVerified={() => keepFormAction.ref.current?.requestSubmit()} />
+      ) : (
+        state.error && (
+          <p
+            role="alert"
+            className="rounded-control border border-danger/35 bg-danger/10 px-3 py-2 text-[13px] text-danger"
+          >
+            {state.error}
+          </p>
+        )
       )}
 
       {/*

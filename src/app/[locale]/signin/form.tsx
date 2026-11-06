@@ -5,6 +5,7 @@ import { Button, Field, Input } from '@/components/ui';
 import { signInAction, type SignInState } from '@/lib/auth/actions';
 import { useI18n } from '@/lib/i18n/provider';
 import { useKeepOnError } from '@/lib/forms/keepOnError';
+import { CodeStep } from './code';
 
 const initial: SignInState = { error: null };
 
@@ -12,6 +13,9 @@ export function SignInForm({ next }: { next: string | null }) {
   const { t, locale } = useI18n();
   const [state, formAction, pending] = useActionState(signInAction, initial);
   const keepFormAction = useKeepOnError(state);
+
+  /* Пароль верный, включён двухэтапный вход — та же карточка спрашивает код. */
+  if (state.code) return <CodeStep next={next} />;
 
   return (
     <form {...keepFormAction} action={formAction} className="flex flex-col gap-4">

@@ -23,6 +23,8 @@ import { ShipperTrustDetails } from '@/components/domain/ShipperTrust';
 import { loadCompanyTrust } from '@/lib/trust/status';
 import { parseRegistrations } from '@/lib/waste/registrations';
 import { getViewerI18n } from '@/lib/i18n/viewer';
+import { TwoStepPanel } from '@/components/domain/TwoStep';
+import { APP } from '@/lib/config';
 
 export async function generateMetadata({
   params,
@@ -57,8 +59,71 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
 
   const viewer = await getViewer();
   if (viewer.status === 'guest') redirect(signInPath(locale, `/${locale}/account`));
+  if (viewer.status === 'mfa' && viewer.step === 'code') redirect(signInPath(locale, `/${locale}/account`));
 
-  const { t } = await getViewerI18n(locale);
+  const { t, f } = await getViewerI18n(locale);
+
+  /*
+   * Двухэтапный вход и последние входы (6.11.2026). Дата подключения —
+   * из факторов Supabase; устройства — свои строки sign_in_devices.
+   */
+  const security = viewer.status === 'ready' || viewer.status === 'mfa';
+  const sessionClient = await createClient();
+  const [factorAt, devices] = security
+    ? await Promise.all([
+        sessionClient.auth
+          .getUser()
+          .then(({ data }) => (data.user?.factors ?? []).find((x) => x.status === 'verified')?.created_at ?? null),
+        sessionClient
+          .from('sign_in_devices')
+          .select('id, label, country, last_seen')
+          .order('last_seen', { ascending: false })
+          .limit(5)
+          .then((r) => r.data ?? []),
+      ])
+    : [null, []];
+  const twoStepCard = security && (
+    <Card id="two-step" className="scroll-mt-24">
+      <CardBody className="flex flex-col gap-5">
+        <TwoStepPanel
+          enabled={viewer.status === 'ready' && viewer.twoStep}
+          enabledAt={factorAt}
+          required={viewer.status === 'mfa' || (viewer.status === 'ready' && viewer.role === 'ADMIN')}
+          support={APP.operator.email}
+        />
+        {devices.length > 0 && (
+          <div className="flex flex-col gap-2 border-t border-line pt-4">
+            <h3 className="label-micro">{t.twoStep.devicesTitle}</h3>
+            <ul className="flex flex-col gap-1 text-[13px]">
+              {devices.map((d) => (
+                <li key={d.id} className="flex flex-wrap gap-x-2 text-ink-muted">
+                  <span className="text-ink">{d.label}</span>
+                  {d.country && <span>{d.country}</span>}
+                  <span className="text-ink-dim">{t.twoStep.lastSeen.replace('{date}', f.dateTime(d.last_seen))}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="text-xs text-ink-faint">{t.twoStep.devicesHint}</p>
+          </div>
+        )}
+      </CardBody>
+    </Card>
+  );
+
+  /* Оператор без двухэтапного входа: здесь только подключение, остальное после. */
+  if (viewer.status === 'mfa') {
+    return (
+      <>
+        <nav className="mx-auto flex w-full max-w-2xl items-center justify-end gap-4 px-5 pt-8">
+          <LocaleSwitch current={locale} />
+        </nav>
+        <main className="cab-page cab-page--narrow">
+          <h1 className="page-title">{t.account.title}</h1>
+          <div className="mt-6 flex flex-col gap-4">{twoStepCard}</div>
+        </main>
+      </>
+    );
+  }
 
   /* Отклонённой компании тут править нечего — реквизиты ей не помогут. */
   const company =
@@ -75,8 +140,10 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
    * Люди компании. У оператора компании нет; до миграции функции тоже
    * нет — тогда раздела просто не видно.
    */
-  const { data: members } =
-    viewer.status === 'ready' && company ? await (await createClient()).rpc('company_members') : { data: null };
+  const [{ data: members }, { data: twoStepIds }] =
+    viewer.status === 'ready' && company
+      ? await Promise.all([sessionClient.rpc('company_members'), sessionClient.rpc('two_step_users', {})])
+      : [{ data: null }, { data: null }];
   const isOwner = viewer.status === 'ready' && viewer.profile.member_kind !== 'DISPATCHER';
 
   /*
@@ -230,10 +297,17 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
                 {isOwner && <p className="mt-1.5 text-[13px] leading-relaxed text-ink-muted">{t.members.hint}</p>}
               </div>
 
-              <MembersPanel members={members} selfId={viewer.userId} canManage={isOwner} />
+              <MembersPanel
+                members={members}
+                selfId={viewer.userId}
+                canManage={isOwner}
+                twoStep={(twoStepIds ?? []).map((r) => r.user_id)}
+              />
             </CardBody>
           </Card>
         )}
+
+        {twoStepCard}
 
         <Card>
           <CardBody className="flex flex-col gap-4">

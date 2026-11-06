@@ -7,7 +7,7 @@ import { COLLECTION_DAY } from '@/lib/invoices/schedule';
 import type { Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import { companyDocumentItems, loadDismissals, orderChangeItems, sensitiveChangeItems, type InboxResult } from './common';
-import { carrierInvoiceItems, collapseInvoiceSend, rankItems, urgencyByDue, type InboxItem } from './rank';
+import { carrierInvoiceItems, collapseInvoiceSend, rankItems, twoStepItem, urgencyByDue, type InboxItem } from './rank';
 
 type Stop = { completed_at: string | null; scheduled_date: string | null };
 
@@ -59,7 +59,15 @@ export const loadCarrierInbox = cache(async (locale: Locale): Promise<InboxResul
     loadDismissals(supabase),
   ]);
 
-  const items: InboxItem[] = [...docItems, ...sensitive];
+  const items: InboxItem[] = [
+    ...docItems,
+    ...sensitive,
+    ...twoStepItem({
+      owner: viewer.status === 'ready' && viewer.profile.member_kind !== 'DISPATCHER',
+      enabled: viewer.status === 'ready' && viewer.twoStep,
+      href: `/${locale}/account#two-step`,
+    }),
+  ];
   const trip = (id: string) => `${base}/desk#trip-${id}`;
   const done = (id: string) => `${base}/done#done-${id}`;
 

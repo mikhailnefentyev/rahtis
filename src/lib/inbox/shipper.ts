@@ -6,7 +6,7 @@ import { daysFromToday, todayInHelsinki } from '@/lib/dates';
 import type { Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import { companyDocumentItems, loadDismissals, orderChangeItems, sensitiveChangeItems, type InboxResult } from './common';
-import { rankItems, shipperInvoiceItem, type InboxItem } from './rank';
+import { rankItems, shipperInvoiceItem, twoStepItem, type InboxItem } from './rank';
 
 /**
  * «Требует вашего действия» заказчика и экспедитора: выбор из откликов,
@@ -35,7 +35,15 @@ export const loadShipperInbox = cache(async (locale: Locale): Promise<InboxResul
     loadDismissals(supabase),
   ]);
 
-  const items: InboxItem[] = [...docItems, ...sensitive];
+  const items: InboxItem[] = [
+    ...docItems,
+    ...sensitive,
+    ...twoStepItem({
+      owner: viewer.status === 'ready' && viewer.profile.member_kind !== 'DISPATCHER',
+      enabled: viewer.status === 'ready' && viewer.twoStep,
+      href: `/${locale}/account#two-step`,
+    }),
+  ];
   const list = orders ?? [];
   const label = (o: { ref: string; shipper_ref: string | null }) => (o.shipper_ref ? `${o.ref} · ${o.shipper_ref}` : o.ref);
 

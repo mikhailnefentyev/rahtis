@@ -1,14 +1,25 @@
 'use server';
 
 import { redirect } from 'next/navigation';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
+import { supabasePublishableKey, supabaseUrl } from '@/lib/env';
 import { createClient } from '@/lib/supabase/server';
 import { recordIncident } from '@/lib/incidents/record';
 import { getDictionary, isLocale, type Dictionary, type Locale, defaultLocale } from '@/lib/i18n';
-import { cabinetPath, noAccessPath, safeRedirect, signInPath } from './paths';
+import { recordSignIn } from './mfa';
+import { cabinetPath, noAccessPath, safeRedirect, signInPath, twoStepSetupPath } from './paths';
 import { clientIp, throttleAllowed } from './throttle';
-import { getViewer } from './viewer';
+import { getViewer, type Viewer } from './viewer';
 
-export type SignInState = { error: string | null };
+/** code — пароль верный, нужен код из приложения (двухэтапный вход). */
+export type SignInState = { error: string | null; code?: boolean };
+
+/** Куда вести того, кто только что вошёл. */
+function landingFor(locale: Locale, viewer: Viewer): string {
+  if (viewer.status === 'ready') return cabinetPath(locale, viewer.role);
+  if (viewer.status === 'mfa') return viewer.step === 'code' ? signInPath(locale) : twoStepSetupPath(locale);
+  return noAccessPath(locale);
+}
 
 /**
  * Вход по почте и паролю.
@@ -82,10 +93,16 @@ export async function signInAction(
   }
 
   const viewer = await getViewer();
-  const fallback =
-    viewer.status === 'ready' ? cabinetPath(locale, viewer.role) : noAccessPath(locale);
 
-  redirect(safeRedirect(String(formData.get('next') ?? ''), fallback));
+  /* Двухэтапный вход включён — та же форма спрашивает код. */
+  if (viewer.status === 'mfa' && viewer.step === 'code') return { error: null, code: true };
+
+  await recordSignIn(locale);
+
+  /* Оператор без двухэтапного входа — сначала подключить его, next подождёт. */
+  if (viewer.status === 'mfa') redirect(twoStepSetupPath(locale));
+
+  redirect(safeRedirect(String(formData.get('next') ?? ''), landingFor(locale, viewer)));
 }
 
 export type SetPasswordState = { error: string | null };
@@ -124,9 +141,7 @@ export async function setPasswordAction(
   if (error) return { error: passwordRefusal(t, error.code) };
 
   const viewer = await getViewer();
-  redirect(
-    viewer.status === 'ready' ? cabinetPath(locale, viewer.role) : noAccessPath(locale),
-  );
+  redirect(landingFor(locale, viewer));
 }
 
 export type ChangePasswordState = { error: string | null; done: boolean };
@@ -160,18 +175,28 @@ export async function changePasswordAction(
   if (password === current) return { error: t.account.sameAsOld, done: false };
 
   const viewer = await getViewer();
-  if (viewer.status === 'guest' || !viewer.email) {
+  if (viewer.status === 'guest' || viewer.status === 'mfa' || !viewer.email) {
     return { error: t.error.forbidden, done: false };
   }
 
-  const supabase = await createClient();
-
-  const { error: wrong } = await supabase.auth.signInWithPassword({
+  /*
+   * Текущий пароль проверяется отдельным клиентом без кук (6.11.2026).
+   * Вход тем же клиентом подменял сессию новой, aal1, — у кого включён
+   * двухэтапный вход, после этого Supabase отказывал в смене пароля
+   * (insufficient_aal), а сам человек оказывался на шаге кода. Пробная
+   * сессия тут же гасится.
+   */
+  const probe = createSupabaseClient(supabaseUrl(), supabasePublishableKey(), {
+    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+  });
+  const { error: wrong } = await probe.auth.signInWithPassword({
     email: viewer.email,
     password: current,
   });
   if (wrong) return { error: t.account.wrongCurrent, done: false };
+  await probe.auth.signOut({ scope: 'local' });
 
+  const supabase = await createClient();
   const { error } = await supabase.auth.updateUser({ password });
   if (error) return { error: passwordRefusal(t, error.code), done: false };
 
@@ -188,9 +213,18 @@ export async function signOutAction(formData: FormData): Promise<void> {
   redirect(signInPath(locale));
 }
 
-/** Уводит уже вошедшего пользователя со страницы входа в его кабинет. */
-export async function redirectIfSignedIn(locale: Locale): Promise<void> {
+/**
+ * Уводит уже вошедшего пользователя со страницы входа в его кабинет.
+ * true — пароль или ссылка уже пройдены, ждём код: страница входа
+ * показывает шаг кода.
+ */
+export async function redirectIfSignedIn(locale: Locale): Promise<boolean> {
   const viewer = await getViewer();
+
+  if (viewer.status === 'mfa') {
+    if (viewer.step === 'code') return true;
+    redirect(twoStepSetupPath(locale));
+  }
 
   if (viewer.status === 'ready') {
     redirect(cabinetPath(locale, viewer.role));
@@ -198,4 +232,5 @@ export async function redirectIfSignedIn(locale: Locale): Promise<void> {
   if (viewer.status === 'orphan') {
     redirect(noAccessPath(locale));
   }
+  return false;
 }

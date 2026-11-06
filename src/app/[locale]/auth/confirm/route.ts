@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { isLocale, defaultLocale, type Locale } from '@/lib/i18n';
+import { recordSignIn } from '@/lib/auth/mfa';
 import { noAccessPath, safeRedirect, signInPath } from '@/lib/auth/paths';
 
 /**
@@ -103,6 +104,17 @@ async function landing(locale: Locale, url: URL, rawNext: string | null) {
   if (!user) {
     return NextResponse.redirect(new URL(signInPath(locale), url.origin), 303);
   }
+
+  /*
+   * Двухэтапный вход включён: ссылка из письма — только первый шаг, как
+   * пароль. Дальше код на странице входа, потом туда, куда вела ссылка
+   * (восстановление пароля Supabase без aal2 и не разрешит).
+   */
+  if ((user.factors ?? []).some((f) => f.status === 'verified')) {
+    return NextResponse.redirect(new URL(signInPath(locale, next), url.origin), 303);
+  }
+
+  await recordSignIn(locale);
 
   const { data: profile } = await supabase
     .from('profiles')

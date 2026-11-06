@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { Button, buttonClass, Card, CardBody } from '@/components/ui';
 import { signOutAction } from '@/lib/auth/actions';
-import { cabinetPath, signInPath } from '@/lib/auth/paths';
+import { cabinetPath, signInPath, twoStepSetupPath } from '@/lib/auth/paths';
 import { getViewer } from '@/lib/auth/viewer';
 import { LocaleSwitch } from '@/components/layout/LocaleSwitch';
 import { getI18n, isLocale } from '@/lib/i18n';
@@ -23,6 +23,8 @@ export default async function NoAccessPage({ params }: { params: Promise<{ local
 
   const viewer = await getViewer();
   if (viewer.status === 'guest') redirect(signInPath(locale));
+  /* Вход не закончен — это не «нет доступа», а недостающий шаг. */
+  if (viewer.status === 'mfa') redirect(viewer.step === 'code' ? signInPath(locale) : twoStepSetupPath(locale));
 
   const frozen = viewer.status === 'ready' && Boolean(viewer.company?.frozen_at);
   const rejected = viewer.status === 'ready' && viewer.company?.status === 'REJECTED';

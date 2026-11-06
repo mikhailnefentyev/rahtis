@@ -1,6 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { stepUpRequired } from '@/lib/auth/mfa';
 import { getViewer } from '@/lib/auth/viewer';
 import {
   isValidBic,
@@ -15,7 +16,8 @@ import { createClient } from '@/lib/supabase/server';
 import { lookupCompany } from '@/lib/registry/prh';
 import { deliverSensitiveChanges } from '@/lib/trust/sensitive';
 
-export type RequisitesState = { error: string | null; done: boolean };
+/** stepUp — меняется счёт или почта для счетов при включённом двухэтапном входе: нужен код. */
+export type RequisitesState = { error: string | null; done: boolean; stepUp?: boolean };
 
 export type RegistryCompanyResult =
   | { found: true; name: string; street: string; postalCode: string; city: string }
@@ -130,6 +132,17 @@ export async function saveRequisitesAction(
     iban: iban ? normalizeIban(iban) : null,
     bic,
   };
+
+  /*
+   * Счёт и почта для счетов — то, что меняет захватчик учётной записи
+   * (схема подмены счёта). У кого включён двухэтапный вход, смену
+   * подтверждают кодом не старше 15 минут; остальные поля — без кода.
+   */
+  const sensitive =
+    (patch.iban ?? null) !== (company.iban ?? null) || (patch.billing_email ?? null) !== (company.billing_email ?? null);
+  if (sensitive && (await stepUpRequired(viewer))) {
+    return { error: t.twoStep.stepUpNeeded, done: false, stepUp: true };
+  }
 
   const supabase = await createClient();
 

@@ -1,5 +1,6 @@
 import { bearerMatches } from '@/lib/auth/bearer';
 import { purgeExpiredFuel, purgeExpiredTripPhotos } from '@/lib/retention/photos';
+import { purgeOldSignInDevices } from '@/lib/retention/signIns';
 
 /**
  * Удаление фото рейсов, заправок и отчётов топлива старше срока хранения.
@@ -25,6 +26,8 @@ export async function POST(request: Request) {
   const result = await purgeExpiredTripPhotos();
   /* Заправки и отчёты топлива — тем же запуском: тоже файлы в хранилище и тоже 24 месяца. */
   const fuel = await purgeExpiredFuel();
-  const failed = result.errors.length > 0 || fuel.errors.length > 0;
-  return Response.json({ ...result, fuel }, { status: failed ? 207 : 200 });
+  /* Устройства входа старше 12 месяцев — тем же ежедневным запуском (6.11.2026). */
+  const signIns = await purgeOldSignInDevices();
+  const failed = result.errors.length > 0 || fuel.errors.length > 0 || signIns.errors.length > 0;
+  return Response.json({ ...result, fuel, signIns }, { status: failed ? 207 : 200 });
 }

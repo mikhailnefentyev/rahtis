@@ -35,6 +35,11 @@ export function cabinetPath(locale: Locale, role: PartyRole): string {
   return `/${locale}/${cabinetSegment[role]}`;
 }
 
+/** Подключение двухэтапного входа: блок на странице своих данных. */
+export function twoStepSetupPath(locale: Locale): string {
+  return `${accountPath(locale)}#two-step`;
+}
+
 export function signInPath(locale: Locale, redirectTo?: string): string {
   const base = `/${locale}/signin`;
   return redirectTo ? `${base}?next=${encodeURIComponent(redirectTo)}` : base;

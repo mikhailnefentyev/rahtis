@@ -8,6 +8,7 @@ import { redirectIfSignedIn } from '@/lib/auth/actions';
 import { LocaleSwitch } from '@/components/layout/LocaleSwitch';
 import { getI18n, isLocale } from '@/lib/i18n';
 import { pageMetadata, samePath } from '@/lib/seo';
+import { CodeStep } from './code';
 import { SignInForm } from './form';
 
 export async function generateMetadata({
@@ -37,8 +38,12 @@ export default async function SignInPage({
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
 
-  /* Вошедшему на странице входа делать нечего. */
-  await redirectIfSignedIn(locale);
+  /*
+   * Вошедшему на странице входа делать нечего. Кроме одного случая:
+   * пароль или ссылка из письма пройдены, а код ещё не введён — тогда
+   * здесь шаг кода.
+   */
+  const pendingCode = await redirectIfSignedIn(locale);
 
   const { t } = await getI18n(locale);
   const { next, reason } = await searchParams;
@@ -81,18 +86,24 @@ export default async function SignInPage({
               </p>
             )}
 
-            <SignInForm next={next ?? null} />
+            {pendingCode ? (
+              <CodeStep next={next ?? null} />
+            ) : (
+              <>
+                <SignInForm next={next ?? null} />
 
-            {/*
-              * Ссылка под формой, а не над ней: сначала попытка войти,
-              * потом путь для тех, у кого не вышло. Наверху она отвлекала
-              * бы всех ради меньшинства.
-              */}
-            <p className="mt-4 text-[13px]">
-              <Link href={`/${locale}/forgot`} className="text-ink-muted hover:text-ink">
-                {t.recovery.link}
-              </Link>
-            </p>
+                {/*
+                  * Ссылка под формой, а не над ней: сначала попытка войти,
+                  * потом путь для тех, у кого не вышло. Наверху она отвлекала
+                  * бы всех ради меньшинства.
+                  */}
+                <p className="mt-4 text-[13px]">
+                  <Link href={`/${locale}/forgot`} className="text-ink-muted hover:text-ink">
+                    {t.recovery.link}
+                  </Link>
+                </p>
+              </>
+            )}
           </CardBody>
         </Card>
 

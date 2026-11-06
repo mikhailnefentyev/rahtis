@@ -99,6 +99,15 @@ export function expiresWithin(date: string | null | undefined, days: number, now
   return Boolean(date) && daysUntil(date as string, now) <= days;
 }
 
+/**
+ * Главный пользователь без двухэтапного входа (6.11.2026): захват учётной
+ * записи — главный способ увести груз. Совет, не требование: «позже» на 30 суток.
+ */
+export function twoStepItem(input: { owner: boolean; enabled: boolean; href: string }): InboxItem[] {
+  if (!input.owner || input.enabled) return [];
+  return [{ key: 'two-step', kind: 'twoStepOwner', urgency: 2, at: null, href: input.href, snooze: 30 }];
+}
+
 /* ── Пункты по счетам прямых рейсов — чистые, их проверяют тесты ── */
 
 /** Дней от a до b (даты YYYY-MM-DD). */

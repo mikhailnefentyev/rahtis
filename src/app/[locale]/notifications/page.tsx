@@ -38,7 +38,7 @@ export default async function NotificationsPage({
   if (!isLocale(locale)) notFound();
 
   const viewer = await getViewer();
-  if (viewer.status === 'guest') redirect(signInPath(locale, `/${locale}/notifications`));
+  if (viewer.status === 'guest' || viewer.status === 'mfa') redirect(signInPath(locale, `/${locale}/notifications`));
 
   const [{ t, m, f }, supabase] = await Promise.all([getViewerI18n(locale), createClient()]);
 

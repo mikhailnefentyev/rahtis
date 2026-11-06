@@ -1,6 +1,7 @@
 import { cache } from 'react';
 import { createClient } from '@/lib/supabase/server';
 import type { Company, PartyRole, Profile } from '@/types/db';
+import { aalOf, pendingStep } from './twoStep';
 
 /**
  * Кто смотрит на страницу.
@@ -13,11 +14,17 @@ import type { Company, PartyRole, Profile } from '@/types/db';
  *            без роли в app_metadata, а такой появляется, если завести
  *            его руками в панели Supabase. Роли у него нет, значит и
  *            кабинета нет — но и молча выкидывать его нельзя;
- *   ready  — вошёл, профиль есть.
+ *   ready  — вошёл, профиль есть;
+ *   mfa    — пароль верный, но вход не закончен (6.11.2026): step code —
+ *            включён двухэтапный вход, а код ещё не введён; step enrol —
+ *            оператор без двухэтапного входа (для оператора обязателен).
+ *            Для всего приложения это не вошедший: ни кабинета, ни
+ *            действий, пока шаг не пройден.
  */
 export type Viewer =
   | { status: 'guest' }
   | { status: 'orphan'; userId: string; email: string | null }
+  | { status: 'mfa'; step: 'code' | 'enrol'; userId: string; email: string | null }
   | {
       status: 'ready';
       userId: string;
@@ -26,6 +33,8 @@ export type Viewer =
       role: PartyRole;
       /** У администратора компании нет. */
       company: Company | null;
+      /** Двухэтапный вход включён (есть подтверждённый фактор TOTP). */
+      twoStep: boolean;
     };
 
 /**
@@ -47,6 +56,21 @@ export const getViewer = cache(async (): Promise<Viewer> => {
   if (!user) return { status: 'guest' };
 
   /*
+   * Двухэтапный вход. Факторы — из getUser (ответ сервера Supabase), уровень
+   * сессии — из того же токена, который getUser только что проверил.
+   * Код не введён — дальше не идём: профиль при aal1 база и не отдаст
+   * (политики mfa_required, 20261106190000_two_step).
+   */
+  const twoStep = (user.factors ?? []).some((f) => f.status === 'verified');
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  const aal = aalOf(session?.access_token);
+  if (pendingStep({ enabled: twoStep, aal, admin: false }) === 'code') {
+    return { status: 'mfa', step: 'code', userId: user.id, email: user.email ?? null };
+  }
+
+  /*
    * Компания подтягивается вместе с профилем одним запросом. Связь
    * составная — (company_id, role) → (id, kind), — поэтому имя внешнего
    * ключа указано явно: без подсказки PostgREST выбирает связь сам, и
@@ -64,6 +88,11 @@ export const getViewer = cache(async (): Promise<Viewer> => {
 
   const { company, ...profile } = data as Profile & { company: Company | null };
 
+  /* Оператор без двухэтапного входа — сначала подключить, потом админка. */
+  if (pendingStep({ enabled: twoStep, aal, admin: profile.role === 'ADMIN' }) === 'enrol') {
+    return { status: 'mfa', step: 'enrol', userId: user.id, email: user.email ?? null };
+  }
+
   return {
     status: 'ready',
     userId: user.id,
@@ -71,5 +100,6 @@ export const getViewer = cache(async (): Promise<Viewer> => {
     profile,
     role: profile.role,
     company: company ?? null,
+    twoStep,
   };
 });

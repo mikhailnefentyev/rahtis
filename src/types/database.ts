@@ -4367,6 +4367,39 @@ export type Database = {
           },
         ]
       }
+      sign_in_devices: {
+        Row: {
+          country: string | null
+          fingerprint: string
+          first_seen: string
+          id: number
+          ip_prefix: string | null
+          label: string
+          last_seen: string
+          user_id: string
+        }
+        Insert: {
+          country?: string | null
+          fingerprint: string
+          first_seen?: string
+          id?: never
+          ip_prefix?: string | null
+          label: string
+          last_seen?: string
+          user_id: string
+        }
+        Update: {
+          country?: string | null
+          fingerprint?: string
+          first_seen?: string
+          id?: never
+          ip_prefix?: string | null
+          label?: string
+          last_seen?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       site_days: {
         Row: {
           approval_note: string | null
@@ -5834,6 +5867,12 @@ export type Database = {
       }
     }
     Functions: {
+      two_step_users: {
+        Args: { p_company_id?: string }
+        Returns: {
+          user_id: string
+        }[]
+      }
       abandon_order: {
         Args: { p_order_id: string; p_reason?: string }
         Returns: {
@@ -9558,6 +9597,7 @@ export type Database = {
         | "ADMIN_MESSAGE"
         | "CLAIM"
         | "DRIVER"
+        | "SECURITY"
       offer_origin: "DESK" | "DIRECT"
       order_status:
         | "DRAFT"
@@ -9825,6 +9865,7 @@ export const Constants = {
         "ADMIN_MESSAGE",
         "CLAIM",
         "DRIVER",
+        "SECURITY",
       ],
       offer_origin: ["DESK", "DIRECT"],
       order_status: [

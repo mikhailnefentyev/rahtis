@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { confirmLink } from '@/lib/auth/links';
+import { stepUpRequired } from '@/lib/auth/mfa';
 import { accountPath } from '@/lib/auth/paths';
 import { getViewer } from '@/lib/auth/viewer';
 import { siteUrl } from '@/lib/config';
@@ -23,7 +24,8 @@ import { createClient } from '@/lib/supabase/server';
  * поэтому право проверяется здесь руками, до любого вызова под ключом.
  */
 
-export type MemberState = { error: string | null; done: boolean };
+/** stepUp — у главного включён двухэтапный вход: сначала код, потом форма заново. */
+export type MemberState = { error: string | null; done: boolean; stepUp?: boolean };
 
 /* Кабинет на одного-двух диспетчеров — норма; сотня приглашений — ошибка или злоупотребление. */
 const MAX_MEMBERS = 20;
@@ -51,6 +53,7 @@ export async function inviteMemberAction(_previous: MemberState, formData: FormD
 
   const owner = await requireOwner();
   if (!owner) return { error: t.members.ownerOnly, done: false };
+  if (await stepUpRequired(owner)) return { error: t.twoStep.stepUpNeeded, done: false, stepUp: true };
 
   const fullName = str(formData, 'full_name').replace(/\s+/g, ' ');
   const email = str(formData, 'email').toLowerCase();
@@ -127,6 +130,7 @@ export async function removeMemberAction(_previous: MemberState, formData: FormD
 
   const owner = await requireOwner();
   if (!owner) return { error: t.members.ownerOnly, done: false };
+  if (await stepUpRequired(owner)) return { error: t.twoStep.stepUpNeeded, done: false, stepUp: true };
 
   /* База проверяет ещё раз и снимает профиль: доступ пропадает в той же транзакции. */
   const supabase = await createClient();

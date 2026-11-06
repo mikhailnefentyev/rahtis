@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import type { Locale } from '@/lib/i18n';
 import type { PartyRole } from '@/types/db';
-import { cabinetPath, noAccessPath, signInPath } from './paths';
+import { cabinetPath, noAccessPath, signInPath, twoStepSetupPath } from './paths';
 import { getViewer, type Viewer } from './viewer';
 
 type ReadyViewer = Extract<Viewer, { status: 'ready' }>;
@@ -20,6 +20,15 @@ export async function requireRole(locale: Locale, role: PartyRole): Promise<Read
 
   if (viewer.status === 'guest') {
     redirect(signInPath(locale, cabinetPath(locale, role)));
+  }
+
+  /*
+   * Вход не закончен: код не введён — на шаг кода; оператор без
+   * двухэтапного входа — подключать. Админку без aal2 не открываем:
+   * getViewer отдаёт ready оператору только с введённым кодом.
+   */
+  if (viewer.status === 'mfa') {
+    redirect(viewer.step === 'code' ? signInPath(locale, cabinetPath(locale, role)) : twoStepSetupPath(locale));
   }
 
   if (viewer.status === 'orphan') {
