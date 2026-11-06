@@ -288,7 +288,12 @@ as $$
     p.why,
     case
       when o.lat is not null and o.lon is not null and f.lat is not null and f.lon is not null then
-        (round(app.km_between(f.lat, f.lon, o.lat, o.lon) / 5) * 5)::integer
+        /*
+         * До района точки, а не до точки: адрес до взятия скрыт, и стол
+         * показывает координаты с шагом 0,1°. Расстояние до точной точки
+         * позволило бы вычислить адрес, двигая базу машины.
+         */
+        (round(app.km_between(f.lat, f.lon, round(o.lat::numeric, 1)::double precision, round(o.lon::numeric, 1)::double precision) / 5) * 5)::integer
     end
   from pairs p
   join ord o on o.id = p.oid
