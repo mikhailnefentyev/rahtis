@@ -77,10 +77,10 @@ export function siteUrl(): string {
  */
 /*
  * С 23.09.2026 ставка 3 % — но только для рейсов, где сторона договора с
- * клиентом мы (orders.contract_party = 'RAHTIS'). У рейса своего клиента
- * подписчика она ноль: там мы не в деньгах. Решает это база при закрытии
- * рейса (app.freeze_order_fees), здесь — действующая ставка для оценок и
- * текстов кабинета.
+ * клиентом мы (orders.contract_party = 'RAHTIS'). С 6.11.2026 подряда нет
+ * и новых таких рейсов не бывает: ставка — только для старых рейсов без
+ * замороженной комиссии (отчёты, выплаты). Решает база при закрытии рейса
+ * (app.freeze_order_fees).
  */
 export const COMMISSION_BPS = 300;
 
@@ -148,9 +148,9 @@ export function withVat(cents: number, bps: number): number {
  */
 
 /**
- * Месячный сбор перевозчика-подписчика за каждую активную машину после
- * первой, без ALV: 14,90 € (с 3.11.2026; первая машина бесплатно). У
- * субподрядчика сбора нет: в трёх процентах всё включено.
+ * Месячный сбор перевозчика за каждую активную машину после первой, без
+ * ALV: 14,90 € (с 3.11.2026; первая машина бесплатно). С 6.11.2026 это
+ * единственная плата на платформе.
  */
 export const SUBSCRIPTION_UNIT_CENTS = 1490;
 
@@ -206,13 +206,13 @@ export function annualPlanCents(vehicles: number): number {
 }
 
 /**
- * Плата заказчика за рейс подряда (Aivomaa — сторона договора): 5 %
- * сверху цены, с 1.10.2026. Прямые рейсы подписчика и стол «напрямую» —
- * без платы.
+ * История: плата заказчика за рейс подряда (Aivomaa — сторона договора),
+ * 5 % сверху цены с 1.10.2026 по 6.11.2026. Новых таких рейсов нет —
+ * каждый договор напрямую, 0 %; значения остаются для старых рейсов.
  */
 export const SHIPPER_FEE_BPS = 500;
 
-/** Минимум оператора с рейса подряда, заказчик и перевозчик вместе: 15 €. */
+/** История: минимум оператора с рейса подряда (до 6.11.2026), заказчик и перевозчик вместе: 15 €. */
 export const MIN_FEE_CENTS = 1500;
 
 /**
@@ -224,6 +224,26 @@ export function shipperFeeBps(rateCents: number, commissionBps: number = COMMISS
   if (!Number.isFinite(rateCents) || rateCents <= 0) return SHIPPER_FEE_BPS;
   const carrier = Math.round((rateCents * commissionBps) / 10_000);
   return Math.max(SHIPPER_FEE_BPS, Math.ceil(((MIN_FEE_CENTS - carrier) * 10_000) / rateCents));
+}
+
+/**
+ * Начислять ли подписку за месяц: перевозчикам, переведённым с подряда
+ * 6.11.2026, сбор начисляется с companies.subscription_fees_from
+ * (1.1.2027). То же условие — в public.issue_monthly_subscriptions.
+ * Даты — 'YYYY-MM-DD'.
+ */
+export function subscriptionMonthCharged(month: string, feesFrom: string | null | undefined): boolean {
+  return !feesFrom || feesFrom.slice(0, 7) <= month.slice(0, 7);
+}
+
+/**
+ * Первый месяц года вперёд: следующий месяц, но не раньше начала
+ * начислений (public.carrier_annual_plan_create).
+ */
+export function annualPlanStart(nextMonth: string, feesFrom: string | null | undefined): string {
+  if (!feesFrom) return nextMonth;
+  const from = `${feesFrom.slice(0, 7)}-01`;
+  return from > nextMonth ? from : nextMonth;
 }
 
 /**

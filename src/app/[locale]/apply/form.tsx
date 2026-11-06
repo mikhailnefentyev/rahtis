@@ -31,7 +31,6 @@ export function ApplyForm({
    * нет работы, и человек, пришедший «посмотреть», не должен случайно
    * подписаться на ежемесячный счёт.
    */
-  const [mode, setMode] = useState<'SUBCONTRACTOR' | 'SUBSCRIBER'>('SUBCONTRACTOR');
   /*
    * Заказчик: экспедитор или грузовладелец (6.11.2026). От этого зависит,
    * нужен ли полис экспедитора для договора напрямую с перевозчиком.
@@ -77,7 +76,7 @@ export function ApplyForm({
 
   /* Итог для аналитики: только тип и страна, без названия и почты. Без согласия — ничего не уходит. */
   useEffect(() => {
-    if (state.done) analytics.trackEvent('application_submitted', { kind, mode: kind === 'CARRIER' ? mode : null, country });
+    if (state.done) analytics.trackEvent('application_submitted', { kind, mode: kind === 'CARRIER' ? 'SUBSCRIBER' : null, country });
     // eslint-disable-next-line react-hooks/exhaustive-deps -- одно событие на отправку
   }, [state.done]);
 
@@ -142,7 +141,6 @@ export function ApplyForm({
         <form {...keepFormAction} action={formAction} className="flex flex-col gap-4">
           <input type="hidden" name="locale" value={locale} />
           <input type="hidden" name="kind" value={kind} />
-          <input type="hidden" name="partnership" value={mode} />
           <input type="hidden" name="shipper_role" value={shipperRole} />
           {invite && <input type="hidden" name="invite" value={invite.token} />}
           {invite && (
@@ -181,36 +179,12 @@ export function ApplyForm({
             ))}
           </div>
 
-          {/*
-            * Ветка нужна только перевозчику: заказчик ничего не платит
-            * помесячно, и спрашивать его об этом не о чем.
-            */}
+          {/* Тариф перевозчика один — подписка; выбора нет (с 6.11.2026). */}
           {kind === 'CARRIER' && (
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1 rounded-control border border-line p-3">
               <span className="label-micro">{t.apply.howTitle}</span>
-              {(
-                [
-                  ['SUBCONTRACTOR', t.apply.howCon, t.apply.howConText],
-                  ['SUBSCRIBER', t.apply.howSub, t.apply.howSubText],
-                ] as const
-              ).map(([value, label, text]) => (
-                <button
-                  key={value}
-                  type="button"
-                  role="radio"
-                  aria-checked={mode === value}
-                  onClick={() => setMode(value)}
-                  className={
-                    mode === value
-                      ? 'cursor-pointer rounded-control border border-accent bg-accent/5 p-3 text-left'
-                      : 'cursor-pointer rounded-control border border-line p-3 text-left transition-colors duration-150 hover:border-ink-dim'
-                  }
-                >
-                  <span className="block text-[13px] font-semibold tracking-tight">{label}</span>
-                  <span className="mt-1 block text-[12px] leading-relaxed text-ink-muted">{text}</span>
-                </button>
-              ))}
-              <p className="text-[12px] leading-relaxed text-ink-dim">{t.apply.howNote}</p>
+              <span className="text-[13px] font-semibold tracking-tight">{t.apply.howSub}</span>
+              <span className="text-[12px] leading-relaxed text-ink-muted">{t.apply.howSubText}</span>
             </div>
           )}
 

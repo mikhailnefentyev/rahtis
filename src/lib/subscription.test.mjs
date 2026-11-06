@@ -26,3 +26,24 @@ test('год вперёд: 12 месяцев минус 10 %', () => {
   assert.equal(annualPlanCents(3), 32184);
   assert.equal(annualPlanCents(10), 144828);
 });
+
+/* 6.11.2026: подряда нет; переведённым с подряда подписка начисляется с 1.1.2027. */
+import { annualPlanStart, subscriptionMonthCharged } from './config.ts';
+
+test('переведённым с подряда — сбор с января 2027', () => {
+  assert.equal(subscriptionMonthCharged('2026-11-01', '2027-01-01'), false);
+  assert.equal(subscriptionMonthCharged('2026-12-01', '2027-01-01'), false);
+  assert.equal(subscriptionMonthCharged('2027-01-01', '2027-01-01'), true);
+  assert.equal(subscriptionMonthCharged('2027-02-01', '2027-01-01'), true);
+});
+
+test('новым перевозчикам — по общему правилу', () => {
+  assert.equal(subscriptionMonthCharged('2026-11-01', null), true);
+  assert.equal(subscriptionMonthCharged('2026-11-01', undefined), true);
+});
+
+test('год вперёд не раньше начала начислений', () => {
+  assert.equal(annualPlanStart('2026-12-01', '2027-01-01'), '2027-01-01');
+  assert.equal(annualPlanStart('2027-03-01', '2027-01-01'), '2027-03-01');
+  assert.equal(annualPlanStart('2026-12-01', null), '2026-12-01');
+});

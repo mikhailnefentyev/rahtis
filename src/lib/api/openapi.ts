@@ -29,7 +29,7 @@ const ROLE_DOC =
 const CLAIM_DOC =
   'CARGO_DAMAGE — damage to the cargo or trailer. SHORTAGE — shortage. DOWNTIME — waiting time. DEVIATION — deviation from the route or schedule. OTHER — other.';
 const CONTRACT_DOC =
-  'RAHTIS — the RAHTIS service: service fee 5 % of the price, at least 15 € per job together with the carrier fee. DIRECT — a direct contract with a carrier on the monthly plan: no service fee; only such carriers see and can take the order.';
+  'DIRECT — the contract of carriage is made directly between you and the carrier; no service fee, the carrier invoices you. Since 6 November 2026 every new order is DIRECT. RAHTIS — only orders made earlier with Aivomaa Oy as the contracting party.';
 const CLAIM_STATUSES = ['OPEN', 'IN_REVIEW', 'RESOLVED', 'REJECTED'];
 
 const nullable = (type: string, extra: Record<string, unknown> = {}) => ({ type: [type, 'null'], ...extra });
@@ -588,7 +588,7 @@ export function openApi(serverUrl: string) {
             waiting: {
               type: 'object',
               description:
-                'Waiting-time surcharge, fixed when the trip is closed. Each loading and unloading stop has one free hour, counted from arrival but not before the agreed time; an excess of at least 15 minutes is charged at EUR 45 excl. VAT per hour begun. Only for RAHTIS-service orders (contract RAHTIS).',
+                'Waiting-time surcharge, fixed when the trip is closed. Each loading and unloading stop has one free hour, counted from arrival but not before the agreed time; an excess of at least 15 minutes is charged at EUR 45 excl. VAT per hour begun. Only for orders made before 6 November 2026 with Aivomaa Oy as the contracting party (contract RAHTIS).',
               properties: {
                 amount: { type: 'string', example: '45.00' },
                 currency: { const: 'EUR' },
@@ -782,10 +782,10 @@ export function openApi(serverUrl: string) {
             },
             shipper_ref: { type: 'string', maxLength: 100 },
             contract: {
-              enum: ['RAHTIS', 'DIRECT'],
-              default: 'RAHTIS',
+              enum: ['DIRECT', 'RAHTIS'],
+              default: 'DIRECT',
               description:
-                'RAHTIS: the RAHTIS service, service fee 5 % of the price, at least 15 € per job together with the carrier fee. DIRECT: a direct contract with a carrier on the monthly plan, no service fee; only such carriers see and can take the order.',
+                'DIRECT: the contract of carriage is made directly between you and the carrier; no service fee, the carrier invoices you. Deprecated: RAHTIS is still accepted but is treated as DIRECT — since 6 November 2026 Aivomaa Oy is no longer a contracting party of new orders.',
             },
             trailer: { type: 'string', maxLength: 120, description: 'Trailer description, e.g. "Curtainsider 13.6 m".' },
             trailer_plate: {

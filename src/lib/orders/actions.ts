@@ -273,8 +273,6 @@ function explainPublish(t: Dictionary, code: string | undefined, message: string
   /* Проверка валюты в базе (orders_zz_currency_guard): не евро — только напрямую. */
   if (code === '22023' && message?.includes('другой валюте')) return t.orderForm.currencyErrorDirect;
   if (code === '22023' && message?.includes('только в евро')) return t.orderForm.currencyErrorRahtis;
-  /* Договор напрямую без проверенного полиса экспедитора (orders_zz_forwarder_guard). */
-  if (code === '22023' && message?.includes('полис')) return t.forwarder.publishError;
   return t.orderForm.failed;
 }
 
@@ -445,16 +443,14 @@ export async function publishOrderAction(
     return { error: t.direct.chooseVehicle, ref: null };
   }
 
-  /* Стол «напрямую с перевозчиком»: договор между сторонами, только подписчики. */
-  const deskContract = !direct && !group && str(formData, 'desk_contract') === 'CARRIER' ? 'CARRIER' : 'RAHTIS';
   /*
-   * Валюта — только у прямого договора; через RAHTIS цена всегда в евро.
-   * Евро здесь явное: скрытое поле от прошлого выбора не должно увести
-   * заказ RAHTIS в кроны (база всё равно откажет, но с худшим текстом).
+   * С 6.11.2026 каждый заказ — договор напрямую с перевозчиком (база
+   * ставит то же, app.order_direct_contract): валюту выбирает заказчик.
    */
+  const deskContract = 'CARRIER';
   const chosenCurrency = readCurrency(formData);
   if ('error' in chosenCurrency) return { error: t.orderForm.failed, ref: null };
-  const currency = deskContract === 'CARRIER' ? (chosenCurrency.currency ?? 'EUR') : 'EUR';
+  const currency = chosenCurrency.currency ?? 'EUR';
 
   const supabase = await createClient();
 

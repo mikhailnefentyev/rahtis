@@ -294,7 +294,7 @@ const fi: Texts = {
 
   operatorInvite: {
     SHIPPER: {
-      subject: 'RAHTIS — rahtipörssi ja suorat tilaukset omille kuljetusliikkeillenne, ensimmäinen kuukausi maksutta',
+      subject: 'RAHTIS — rahtipörssi ja suorat tilaukset omille kuljetusliikkeillenne, rahdinantajalle maksuton',
       heading: 'Perävaunu, kontti tai kuorma: julkaisette kerran ja seuraatte joka vaihetta',
       preheader: 'Yksi julkaisu alueen hyväksytyille kuljetusliikkeille tai suoraan tutulle autolle — tarjoukset, eteneminen, kuvat ja rahtikirja yhdessä näkymässä.',
       body: 'RAHTIS on kuljetusten hallintajärjestelmä ja rahtipörssi, joka toimii Pohjoismaissa, Baltiassa, Puolassa ja Saksassa. Julkaisette kuljetuksen kerran, ja se menee suoraan alueen hyväksytyille kuljetusliikkeille — tai lähetätte sen suoraan tutulle autolle. Perävaunujen vaihdot, kontit sekä pakettiauto- ja kuorma-autokuljetukset.',
@@ -303,7 +303,7 @@ const fi: Texts = {
         'Jos auto peruu tai ei vahvista, kuljetus palaa tarjouspöydälle automaattisesti ja menee heti seuraaville sopiville autoille.',
         'Muutokset menevät suoraan kuljetusliikkeelle ja kuljettajalle; kuvat ja rahtikirja tulevat, kun kuljetus on perillä.',
         'Viikkoraportti ja maksuton rajapinta (API) omaan ERP- tai TMS-järjestelmäänne.',
-        'Ensimmäinen kuukausi maksutta.',
+        'Rahdinantajalle palvelu on maksuton: kuljetussopimus tehdään suoraan kuljetusliikkeen kanssa, ja se laskuttaa teitä itse.',
       ],
       button: 'Hae mukaan',
     },
@@ -315,7 +315,7 @@ const fi: Texts = {
       points: [
         'Omat asiakkaat ja omat keikat: asiakas tilaa suoraan autollenne ja saa seurantalinkin. Ensimmäinen auto maksutta, jokainen seuraava ajossa ollut auto 14,90 € kuukaudessa, ei prosenttia.',
         'Kuljettajan sovellus kymmenellä kielellä: saapumiset, kuvat, työaika ja rahtikirja skannattuna PDF:ksi.',
-        'Keikkoja tarjouspöydältä satamista ja koko toiminta-alueelta. Alihankintakeikoista 3 % keikan hinnasta, ei kuukausimaksua.',
+        'Keikkoja tarjouspöydältä satamista ja koko toiminta-alueelta. Kuljetussopimus tehdään suoraan rahdinantajan kanssa, eikä keikoista peritä prosenttia.',
       ],
       button: 'Hae mukaan',
     },
@@ -532,7 +532,7 @@ const en: Texts = {
 
   operatorInvite: {
     SHIPPER: {
-      subject: 'RAHTIS — freight exchange and direct orders to your own carriers, first month free',
+      subject: 'RAHTIS — freight exchange and direct orders to your own carriers, free for shippers',
       heading: 'Trailer, container or load: post it once, follow every step',
       preheader: 'One posting to approved carriers in the area, or straight to a truck you know — offers, progress, photos and consignment note in one view.',
       body: 'RAHTIS is a transport management system and freight exchange covering the Nordics, the Baltics, Poland and Germany. You post a job once and it goes straight to approved carriers in the area — or you send it directly to a truck you know. Trailer swaps, containers, and van and truck loads.',
@@ -541,7 +541,7 @@ const en: Texts = {
         'If a truck cancels or doesn’t confirm, the job goes back on the load board automatically and reaches the next suitable trucks straight away.',
         'Changes go straight to the carrier and the driver; photos and the consignment note arrive when the delivery is done.',
         'A weekly report and a free API for your own ERP or TMS.',
-        'First month free.',
+        'Free for shippers: the contract of carriage is made directly with the carrier, who invoices you.',
       ],
       button: 'Apply',
     },
@@ -553,7 +553,7 @@ const en: Texts = {
       points: [
         'Your own customers and your own jobs: the customer books your truck directly and gets a tracking link. First truck free, each further truck on the road €14.90 a month, no percentage.',
         'A driver app in ten languages: arrivals, photos, working hours and the consignment note scanned to PDF.',
-        'Jobs from the load board, from ports and across your whole operating area. Subcontracted jobs cost 3% of the job price, with no monthly fee.',
+        'Jobs from the load board, from ports and across your whole operating area. The contract of carriage is made directly with the shipper, and no percentage is taken from any job.',
       ],
       button: 'Apply',
     },

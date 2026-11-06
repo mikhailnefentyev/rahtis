@@ -227,8 +227,8 @@ export function DeskList({
                     <Mono className="text-xs text-ink-dim">{order.ref}</Mono>
                     {/* Номер прицепа — по нему водитель находит железо на площадке. */}
                     {order.trailer_plate && <Plate>{order.trailer_plate}</Plate>}
-                    {/* Договор напрямую с заказчиком: без нашей платы, счёт выставляет перевозчик. */}
-                    {order.desk_contract === 'CARRIER' && <Badge tone="info">{t.direct.deskDirectBadge}</Badge>}
+                    {/* С 6.11.2026 всё напрямую; помечается только заказ, опубликованный раньше с Aivomaa как стороной. */}
+                    {order.desk_contract === 'RAHTIS' && <Badge tone="neutral">{t.direct.contractRahtis}</Badge>}
                   </div>
                   {order.desk_contract === 'CARRIER' && <ForwarderPolicyNote info={policyByOrder[order.id]} className="mt-1.5" />}
                   {order.desk_contract === 'CARRIER' && <ShipperTrustBadge trust={trustByOrder[order.id]} className="mt-1.5" />}

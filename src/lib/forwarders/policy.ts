@@ -45,23 +45,6 @@ export type ForwarderStatus = {
 
 export type ReviewStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 
-/**
- * Почему прямой режим закрыт — одно слово для текста в форме заказа.
- * null — открыт (или правило к компании не относится).
- */
-export type DirectBlock = 'PENDING' | 'REJECTED' | 'LICENSE' | 'MISSING';
-
-export function directBlockReason(
-  status: ForwarderStatus | null,
-  latestInsurance: ReviewStatus | null,
-): DirectBlock | null {
-  if (!status || status.allowed || !status.applies) return null;
-  if (status.policy_until && status.needs_license && !status.license_ok) return 'LICENSE';
-  if (latestInsurance === 'PENDING') return 'PENDING';
-  if (latestInsurance === 'REJECTED') return 'REJECTED';
-  return 'MISSING';
-}
-
 /** Ниже ли порога суммы полиса в евро (для подсказки оператору; база сравнивает сама). */
 export function belowThreshold(eventCentsEur: number | null, yearCentsEur: number | null): boolean {
   return (eventCentsEur ?? 0) < FORWARDER_MIN_EVENT_CENTS || (yearCentsEur ?? 0) < FORWARDER_MIN_YEAR_CENTS;

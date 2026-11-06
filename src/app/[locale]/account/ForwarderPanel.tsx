@@ -20,9 +20,9 @@ const reviewTone: Record<ReviewStatus, StatusTone> = { PENDING: 'warn', APPROVED
 /**
  * Экспедитор или грузовладелец, полис экспедитора и польская лицензия.
  *
- * Полис нужен только для договора напрямую с перевозчиком (решение
- * 6.11.2026): здесь сказано, что требуется, в каком состоянии документ и
- * открыт ли прямой режим. Решает база (app.forwarder_direct_allowed).
+ * Полис добровольный: с 6.11.2026 это отметка для перевозчика, а не
+ * допуск. Здесь — что проверяем, состояние документа и что увидит
+ * перевозчик (app.forwarder_policy_until).
  */
 export function ForwarderPanel({
   role,
@@ -97,20 +97,16 @@ function RoleCard({ role, canEdit }: { role: ShipperRole; canEdit: boolean }) {
   );
 }
 
-/** Состояние прямого режима одной строкой: открыт до …, отсрочка до …, закрыт. */
+/** Что видит перевозчик одной строкой: полис проверен до … или не подтверждён. */
 function DirectLine({ status }: { status: ForwarderStatus | null }) {
   const { t, f } = useI18n();
   const fw = t.forwarder;
   if (!status) return null;
-  const date = (d: string) => f.date(`${d}T12:00:00Z`);
 
-  if (status.allowed && status.policy_until && (!status.needs_license || status.license_ok)) {
-    return <p className="text-[13px] text-ok">{fw.directOpen.replace('{date}', date(status.policy_until))}</p>;
+  if (status.policy_until) {
+    return <p className="text-[13px] text-ok">{fw.directOpen.replace('{date}', f.date(`${status.policy_until}T12:00:00Z`))}</p>;
   }
-  if (status.allowed && status.in_grace && status.grace_until) {
-    return <p className="text-[13px] text-warn">{fw.directGrace.replace('{date}', date(status.grace_until))}</p>;
-  }
-  return <p className="text-[13px] text-danger">{fw.directClosed}</p>;
+  return <p className="text-[13px] text-ink-muted">{fw.directClosed}</p>;
 }
 
 function DocumentSummary({ document }: { document: CompanyDocument }) {

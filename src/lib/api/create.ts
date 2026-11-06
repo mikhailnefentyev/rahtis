@@ -92,9 +92,12 @@ async function prepare(body: unknown): Promise<Prepared> {
     issues.push({ field: 'rate.currency', issue: 'only EUR is supported' });
   }
 
-  /* Договор стола: RAHTIS — Aivomaa отвечает, DIRECT — напрямую с перевозчиком-подписчиком. */
-  const contract = body.contract === undefined ? 'RAHTIS' : body.contract;
-  if (contract !== 'RAHTIS' && contract !== 'DIRECT') issues.push({ field: 'contract', issue: 'one of RAHTIS, DIRECT' });
+  /*
+   * С 6.11.2026 договор всегда напрямую с перевозчиком. RAHTIS принимается
+   * ради старых интеграций и тоже становится DIRECT (база ставит то же).
+   */
+  const contract = body.contract === undefined ? 'DIRECT' : body.contract;
+  if (contract !== 'RAHTIS' && contract !== 'DIRECT') issues.push({ field: 'contract', issue: 'DIRECT (RAHTIS is accepted as an alias)' });
 
   /* Без пробелов, как в форме: база хранит номер слитно (orders_trailer_plate_format). */
   const trailerPlate = text(body.trailer_plate, 20)?.toUpperCase().replace(/\s+/g, '');
@@ -248,7 +251,7 @@ async function prepare(body: unknown): Promise<Prepared> {
       route_geometry: route.geometry,
       route_bounds: route.bounds,
       route_fingerprint: routeFingerprint(points, countryCode),
-      desk_contract: contract === 'DIRECT' ? 'CARRIER' : 'RAHTIS',
+      desk_contract: 'CARRIER',
     },
     stops,
   };

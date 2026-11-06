@@ -142,6 +142,13 @@ test('отказы базы переводятся для программист
   assert.equal(translateRule('Что-то новое, чего нет в списке.'), null);
 });
 
+test('запрета полиса экспедитора больше нет, претензии по прямому рейсу — между сторонами', () => {
+  assert.equal(translateRule('Договор напрямую с перевозчиком недоступен: нужен действующий полис ответственности экспедитора, проверенный RAHTIS.'), null);
+  const direct = translateRule('По прямому рейсу перевозчика на подписке претензию решают стороны между собой.');
+  assert.equal(direct?.field, 'order_ref');
+  assert.equal(/monthly plan/.test(direct?.message ?? ''), false);
+});
+
 test('точка водителя: расстояние до адреса точки', async () => {
   const { markAt, metersBetween } = await import('../orders/position.ts');
   const stop = { lat: 60.2934, lon: 25.0378 }; // Tikkurilantie 10, Vantaa

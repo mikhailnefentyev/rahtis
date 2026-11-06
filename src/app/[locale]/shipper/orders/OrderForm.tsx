@@ -299,19 +299,16 @@ function OrderFormInner({
   );
 
   /*
-   * Валюта цены. Свой рейс — в валюте компании (или выбранной). Заказ
-   * заказчика — в евро, кроме стола «напрямую с перевозчиком»: там
-   * стороны договариваются сами, по умолчанию валюта заказчика. Через
-   * RAHTIS — только евро (база проверяет то же самое).
+   * Валюта цены. С 6.11.2026 каждый заказ — договор напрямую с
+   * перевозчиком, стороны договариваются сами: по умолчанию валюта
+   * компании (у своего рейса — она же или выбранная).
    */
-  /* Повтор заказа RAHTIS (евро) у заказчика не навязывает евро прямому договору — там валюта компании. */
+  /* Повтор старого заказа RAHTIS (евро) не навязывает евро — там валюта компании. */
   const originCurrency = own || origin?.currency !== 'EUR' ? origin?.currency : undefined;
   const [currency, setCurrency] = useState<Currency>(
     asCurrency(draft?.currency ?? originCurrency ?? f.currency, f.currency),
   );
-  const [carrierContract, setCarrierContract] = useState(false);
-  const currencyOpen = Boolean(own) || carrierContract;
-  const orderCurrency: Currency = currencyOpen ? currency : 'EUR';
+  const orderCurrency: Currency = currency;
 
   /*
    * Координаты выбранных адресов, по слотам маршрута. Ключ слота живёт
@@ -1184,28 +1181,21 @@ function OrderFormInner({
                 />
               )}
             </Field>
-            {/* Валюта уходит всегда: без выбора — евро, и база это же проверит. */}
             <input type="hidden" name="currency" value={orderCurrency} />
-            {currencyOpen ? (
-              <Field label={t.orderForm.currency}>
-                {(p) => (
-                  <Select {...p} value={currency} onChange={(e) => setCurrency(asCurrency(e.target.value, f.currency))}>
-                    {CURRENCIES.map((c) => (
-                      <option key={c} value={c}>
-                        {c} ({f.symbol(c)})
-                      </option>
-                    ))}
-                  </Select>
-                )}
-              </Field>
-            ) : (
-              f.currency !== 'EUR' && (
-                <p className="sm:col-span-3 self-end pb-2 text-xs text-ink-muted">{t.orderForm.currencyEurOnly}</p>
-              )
-            )}
+            <Field label={t.orderForm.currency}>
+              {(p) => (
+                <Select {...p} value={currency} onChange={(e) => setCurrency(asCurrency(e.target.value, f.currency))}>
+                  {CURRENCIES.map((c) => (
+                    <option key={c} value={c}>
+                      {c} ({f.symbol(c)})
+                    </option>
+                  ))}
+                </Select>
+              )}
+            </Field>
             {shownGuide && (
               <p
-                className={`${currencyOpen ? 'sm:col-span-2' : f.currency !== 'EUR' ? 'sm:col-span-4' : 'sm:col-span-3'} self-end pb-2 text-xs ${lowRate ? 'text-warn' : 'text-ink-muted'}`}
+                className={`sm:col-span-2 self-end pb-2 text-xs ${lowRate ? 'text-warn' : 'text-ink-muted'}`}
                 role="status"
               >
                 {m('priceGuide.range', {
@@ -1255,7 +1245,6 @@ function OrderFormInner({
               vehicles={knownVehicles}
               haulKind={haulKind}
               onDirectChange={setDirect}
-              onContractChange={setCarrierContract}
             />
           )}
         </CardBody>

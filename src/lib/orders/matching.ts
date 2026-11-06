@@ -48,8 +48,6 @@ async function explain(locale: Locale, code: string | undefined, message: string
   if (code === '55003') return t.matching.wrongClass;
   /* 55005 — окно группы машин заказчика ещё открыто (take_order). */
   if (code === '55005') return t.direct.groupOnly;
-  /* 55006 — стол «напрямую»: берут только перевозчики на подписке. */
-  if (code === '55006') return t.direct.subscribersOnly;
   if (code === '55000' && message?.includes('Мест нет')) return t.matching.noSlotsLeft;
   /* Машина без водителя или с просроченными документами — это не «время вышло». */
   if (code === '55000' && message?.includes('не допущена')) return t.matching.vehicleNotReady;
@@ -235,9 +233,7 @@ export async function directAssignAction(
                 ? t.direct.hasOffers
                 : error.code === '22023' && error.message.includes('только в евро')
                   ? t.orderForm.currencyErrorRahtis
-                  : error.code === '22023' && error.message.includes('полис')
-                    ? t.forwarder.publishError
-                    : t.matching.failed;
+                  : t.matching.failed;
     return { error: message, done: false };
   }
 

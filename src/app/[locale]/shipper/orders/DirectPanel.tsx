@@ -1,8 +1,7 @@
 'use client';
 
-import { useActionState, useEffect, useState } from 'react';
+import { useActionState, useState } from 'react';
 import { Badge, Button, Field, Select } from '@/components/ui';
-import { ForwarderBlockNotice, useForwarderBlock } from '@/components/domain/ForwarderDirect';
 import { cn } from '@/lib/cn';
 import { useI18n } from '@/lib/i18n/provider';
 import { cancelOrderAction, directAssignAction, type DirectState } from '@/lib/orders/matching';
@@ -31,16 +30,6 @@ export function fittingVehicles(vehicles: KnownVehicle[], haulKind: HaulKind): K
     .sort((a, b) => Number(b.in_pool) - Number(a.in_pool));
 }
 
-/*
- * Машина подписчика берёт прямой заказ по своему договору (contract_party
- * CARRIER), а такой договор экспедитору без проверенного полиса закрыт
- * (app.forwarder_direct_allowed). Такие машины не предлагаются, чтобы
- * отправка не падала, а над выбором объясняется почему.
- */
-function withoutCarrierContract(vehicles: KnownVehicle[], blocked: boolean): KnownVehicle[] {
-  return blocked ? vehicles.filter((v) => !v.direct_billing) : vehicles;
-}
-
 function VehicleOptions({ vehicles }: { vehicles: KnownVehicle[] }) {
   const { t } = useI18n();
   return (
@@ -56,25 +45,24 @@ function VehicleOptions({ vehicles }: { vehicles: KnownVehicle[] }) {
   );
 }
 
-/** Выбор потока в форме публикации: общий стол или своя машина. */
+/**
+ * Выбор потока в форме публикации: общий стол или своя машина.
+ *
+ * Договор всегда напрямую с перевозчиком (с 6.11.2026): выбора «Aivomaa
+ * отвечает» больше нет, полис экспедитора — отметка, а не допуск.
+ */
 export function DispatchPicker({
   vehicles,
   haulKind,
   onDirectChange,
-  onContractChange,
 }: {
   vehicles: KnownVehicle[];
   haulKind: HaulKind;
   /* Форма подписывает кнопку: «на стол» и «одной машине» — разные действия. */
   onDirectChange?: (direct: boolean) => void;
-  /* Стол «напрямую с перевозчиком»: только тогда форма даёт выбрать валюту цены. */
-  onContractChange?: (carrierContract: boolean) => void;
 }) {
   const { t } = useI18n();
-  const block = useForwarderBlock();
-  const allFitting = fittingVehicles(vehicles, haulKind);
-  const fitting = withoutCarrierContract(allFitting, block !== null);
-  const hiddenDirect = fitting.length < allFitting.length;
+  const fitting = fittingVehicles(vehicles, haulKind);
   const [mode, setMode] = useState<'DESK' | 'DIRECT' | 'GROUP'>('DESK');
   const [vehicleId, setVehicleId] = useState('');
 
@@ -82,15 +70,6 @@ export function DispatchPicker({
   const direct = mode === 'DIRECT' && fitting.length > 0;
   const group = mode === 'GROUP' && fitting.length > 1;
   const effective = direct ? 'DIRECT' : group ? 'GROUP' : 'DESK';
-  const [deskContract, setDeskContract] = useState<'RAHTIS' | 'CARRIER'>('RAHTIS');
-  /*
-   * Договор напрямую — по тому, что реально уйдёт в форме: смена единицы
-   * может сбросить «одной машине» обратно на стол без клика.
-   */
-  const carrierContract = effective === 'DESK' && deskContract === 'CARRIER' && block === null;
-  useEffect(() => {
-    onContractChange?.(carrierContract);
-  }, [carrierContract, onContractChange]);
 
   return (
     <fieldset className="flex flex-col gap-3">
@@ -159,43 +138,13 @@ export function DispatchPicker({
         </Field>
       )}
 
-      {/* Стол: Aivomaa отвечает (подряд) или договор напрямую с перевозчиком-подписчиком. */}
+      {/* Стол — договор напрямую с перевозчиком; база ставит то же. */}
       {effective === 'DESK' && (
-        <div className="flex flex-col gap-2">
-          {/* Договор напрямую закрыт — уходит подряд, что бы ни было выбрано раньше. */}
-          <input type="hidden" name="desk_contract" value={carrierContract ? 'CARRIER' : 'RAHTIS'} />
-          <span className="label-micro">{t.direct.deskContract}</span>
-          {(['RAHTIS', 'CARRIER'] as const).map((value) => (
-            <label
-              key={value}
-              className={cn(
-                'flex cursor-pointer items-start gap-2 text-[13px]',
-                value === 'CARRIER' && block && 'cursor-not-allowed opacity-50',
-              )}
-            >
-              <input
-                type="radio"
-                name="desk_contract_choice"
-                value={value}
-                checked={value === 'CARRIER' ? carrierContract : !carrierContract}
-                disabled={value === 'CARRIER' && block !== null}
-                onChange={() => setDeskContract(value)}
-                className="mt-0.5 accent-[var(--color-accent)]"
-              />
-              <span>
-                <span className="font-semibold">{value === 'RAHTIS' ? t.direct.contractRahtis : t.direct.contractCarrier}</span>
-                <span className="block text-xs text-ink-muted">
-                  {value === 'RAHTIS' ? t.direct.contractRahtisHint : t.direct.contractCarrierHint}
-                </span>
-              </span>
-            </label>
-          ))}
-          {block && <ForwarderBlockNotice block={block} />}
-        </div>
+        <>
+          <input type="hidden" name="desk_contract" value="CARRIER" />
+          <p className="text-xs text-ink-muted">{t.direct.contractCarrierHint}</p>
+        </>
       )}
-
-      {/* Машины подписчиков скрыты из прямого выбора — почему, сказано здесь. */}
-      {effective !== 'DESK' && block && hiddenDirect && <ForwarderBlockNotice block={block} />}
 
       {direct && chosen?.busy && <p className="text-xs text-warn">{t.direct.busyWarn}</p>}
 
@@ -272,8 +221,7 @@ export function SendDirect({
 }) {
   const { t, locale } = useI18n();
   const [state, action, pending] = useActionState(directAssignAction, idle);
-  const block = useForwarderBlock();
-  const fitting = withoutCarrierContract(fittingVehicles(vehicles, haulKind), block !== null);
+  const fitting = fittingVehicles(vehicles, haulKind);
   const [vehicleId, setVehicleId] = useState('');
 
   if (fitting.length === 0) return null;

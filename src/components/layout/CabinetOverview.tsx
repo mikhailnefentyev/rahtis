@@ -5,18 +5,15 @@ import { isoWeek, OverviewBody } from '@/components/domain/overview/OverviewPart
 import { CarrierPresence } from '@/components/domain/CarrierPresence';
 import { OnboardingSteps } from '@/components/domain/OnboardingSteps';
 import { ReportArchive } from '@/components/domain/ReportArchive';
-import { Badge, Button, buttonClass, Card, CardBody, Kv, Mono } from '@/components/ui';
+import { Badge, buttonClass, Card, CardBody, Kv, Mono } from '@/components/ui';
 import { companyStatusTone } from '@/components/ui/tone';
 import { accountPath } from '@/lib/auth/paths';
-import { setOwnPartnershipAction } from '@/lib/companies/actions';
 import { freeUntil } from '@/lib/config';
 import { todayInHelsinki } from '@/lib/dates';
 import { type Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import type { Company, PartyRole } from '@/types/db';
 import { getViewerI18n } from '@/lib/i18n/viewer';
-import { ForwarderGraceBanner } from '@/components/domain/ForwarderDirect';
-import { loadForwarderState } from '@/lib/forwarders/status';
 
 /**
  * Первый экран кабинета: кто вы и куда отсюда идти.
@@ -52,7 +49,8 @@ export async function CabinetOverview({
    * который возит своих клиентов, выплаты от нас нет, и вычесть сбор не
    * из чего — счёт приходит письмом и иначе на глаза не попадётся.
    */
-  const subscriber = role === 'CARRIER' && company?.partnership === 'SUBSCRIBER';
+  /* С 6.11.2026 подряда нет: каждый перевозчик — на подписке. */
+  const subscriber = role === 'CARRIER';
   const free = role === 'CARRIER' ? freeUntil(company?.approved_at ?? null) : null;
 
   let openFee = 0;
@@ -94,10 +92,6 @@ export async function CabinetOverview({
   const aside = !steps && (needsRequisites || hint !== null);
 
   const today = todayInHelsinki();
-  /* Отсрочка экспедитору: с какой даты прямой договор потребует полис (6.11.2026). */
-  const forwarder = role === 'SHIPPER' && company?.status === 'ACTIVE' ? (await loadForwarderState()).status : null;
-  const graceUntil =
-    forwarder?.applies && forwarder.in_grace && !forwarder.policy_until ? forwarder.grace_until : null;
   const ownAccess =
     role === 'CARRIER' ? (await (await createClient()).rpc('own_orders_access')).data === true : false;
 
@@ -162,8 +156,6 @@ export async function CabinetOverview({
         </Card>
       )}
 
-      {graceUntil && <ForwarderGraceBanner graceUntil={graceUntil} className="" />}
-
       {steps && company && <OnboardingSteps locale={locale} company={company} />}
 
       {(role === 'CARRIER' || role === 'SHIPPER') && <OverviewBody locale={locale} role={role} />}
@@ -204,18 +196,20 @@ export async function CabinetOverview({
                   )}
                 </div>
 
-                {role === 'CARRIER' && company.partnership && (
+                {role === 'CARRIER' && (
                   <div className="mt-1 flex flex-col gap-1 border-t border-line pt-2.5">
                     <p className="label-micro">{t.cabinet.partnership}</p>
-                    <p className="text-[13px] font-semibold">
-                      {subscriber ? t.cabinet.partnershipSub : t.cabinet.partnershipCon}
-                    </p>
-                    <p className="text-[12px] leading-relaxed text-ink-muted">
-                      {subscriber ? t.cabinet.partnershipSubText : t.cabinet.partnershipConText}
-                    </p>
+                    <p className="text-[13px] font-semibold">{t.cabinet.partnershipSub}</p>
+                    <p className="text-[12px] leading-relaxed text-ink-muted">{t.cabinet.partnershipSubText}</p>
                     {free && free >= todayInHelsinki() && (
                       <p className="text-[12px] text-ok">
                         {t.cabinet.freeUntil.replace('{date}', f.date(free))}
+                      </p>
+                    )}
+                    {/* Переведённым с подряда сбор начисляется с 1.1.2027. */}
+                    {company.subscription_fees_from && company.subscription_fees_from > todayInHelsinki() && (
+                      <p className="text-[12px] text-ok">
+                        {t.cabinet.feesFrom.replace('{date}', f.date(`${company.subscription_fees_from}T12:00:00Z`))}
                       </p>
                     )}
                     {openFee > 0 && (
@@ -224,56 +218,6 @@ export async function CabinetOverview({
                         {/* Сбор RAHTIS — в евро; справка в валюте компании. */}
                         {f.approx(openFee) && <span className="ml-1 font-normal text-ink-dim">({f.approx(openFee)})</span>}
                       </p>
-                    )}
-                    {/*
-                      * Заявленная смена показывается вместо кнопки: пока
-                      * она висит, нажимать нечего — кроме отмены.
-                      */}
-                    {company.pending_partnership && company.pending_partnership_from ? (
-                      <form action={setOwnPartnershipAction} className="mt-1 flex flex-col gap-1">
-                        <input type="hidden" name="locale" value={locale} />
-                        <input type="hidden" name="mode" value={company.partnership} />
-                        <p className="text-[12px] font-medium text-warn">
-                          {t.cabinet.partnershipPending
-                            .replace(
-                              '{mode}',
-                              company.pending_partnership === 'SUBSCRIBER'
-                                ? t.cabinet.partnershipSub
-                                : t.cabinet.partnershipCon,
-                            )
-                            .replace('{date}', f.date(company.pending_partnership_from))}
-                        </p>
-                        <Button type="submit" size="sm" variant="default" className="self-start">
-                          {t.cabinet.partnershipCancel}
-                        </Button>
-                      </form>
-                    ) : (
-                      <form action={setOwnPartnershipAction} className="mt-1 flex flex-col gap-1">
-                        <input type="hidden" name="locale" value={locale} />
-                        <input
-                          type="hidden"
-                          name="mode"
-                          value={subscriber ? 'SUBCONTRACTOR' : 'SUBSCRIBER'}
-                        />
-                        {/*
-                          * Кнопка акцентная: это выбор, за который платят,
-                          * и он не должен выглядеть служебной ссылкой.
-                          */}
-                        <Button type="submit" size="md" variant="primary" className="self-start">
-                          {t.cabinet.partnershipSwitch.replace(
-                            '{mode}',
-                            subscriber ? t.cabinet.partnershipCon : t.cabinet.partnershipSub,
-                          )}
-                        </Button>
-                        {/*
-                          * Когда смена вступит в силу, сказано до нажатия:
-                          * уход из подряда действует со следующего месяца,
-                          * и узнавать об этом постфактум неприятно.
-                          */}
-                        <span className="text-[12px] text-ink-dim">
-                          {subscriber ? t.cabinet.partnershipNow : t.cabinet.partnershipNextMonth}
-                        </span>
-                      </form>
                     )}
                   </div>
                 )}

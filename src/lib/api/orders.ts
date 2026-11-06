@@ -158,7 +158,7 @@ function orderOut(o: OrderRow) {
     rate: money(o.rate_cents),
     comment: o.comment,
     dispatch: o.dispatch_mode,
-    /* RAHTIS — сервис с платой, DIRECT — прямой договор с перевозчиком на подписке. */
+    /* DIRECT — договор напрямую с перевозчиком (все новые с 6.11.2026), RAHTIS — старые заказы с Aivomaa как стороной. */
     contract: o.contract_party === 'CARRIER' || o.desk_contract === 'CARRIER' ? 'DIRECT' : 'RAHTIS',
     created_at: o.created_at,
     published_at: o.published_at,

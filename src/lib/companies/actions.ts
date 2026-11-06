@@ -117,14 +117,8 @@ export async function submitApplicationAction(
   }
   if (!/^\S+@\S+\.\S+$/.test(email)) return { error: t.validation.email, done: false };
 
-  /*
-   * Ветка перевозчика — его пожелание, а не решение. Окончательно её
-   * ставит оператор, проверяя компанию; до одобрения она ни на что не
-   * влияет, потому что рейсов ещё нет. У заказчика ветки не бывает.
-   */
-  const wish = String(formData.get('partnership') ?? '');
-  const partnership =
-    kind === 'CARRIER' ? (wish === 'SUBSCRIBER' ? 'SUBSCRIBER' : 'SUBCONTRACTOR') : null;
+  /* С 6.11.2026 подряда нет: перевозчик всегда на подписке (база ставит то же). */
+  const partnership = kind === 'CARRIER' ? 'SUBSCRIBER' : null;
   /* Заказчик сам говорит, экспедитор он или грузовладелец; у перевозчика колонка не используется. */
   const shipperRole = kind === 'SHIPPER' && formData.get('shipper_role') === 'CARGO_OWNER' ? 'CARGO_OWNER' : 'FORWARDER';
 
@@ -557,62 +551,6 @@ export async function setCompanyTestAction(formData: FormData): Promise<void> {
 
   if (error) {
     console.error('Отметка тестовой компании не изменилась:', error.message);
-    redirect(withAdminError(`/${locale}/admin/company/${companyId}`, explainAdmin(error)));
-  }
-}
-
-/**
- * Перевозчик меняет формат сотрудничества сам.
- *
- * Он выбирает, кем быть, — значит, он же и переключает. База не даст
- * сделать это посреди рейсов в работе: у них сторона договора
- * пересчитывается при закрытии, и переключение на ходу увело бы деньги
- * незакрытого рейса не туда.
- *
- * Ошибка не роняет страницу: кабинет и так показывает, когда смена
- * недоступна, а гонка между двумя вкладками не повод ломать экран.
- */
-export async function setOwnPartnershipAction(formData: FormData): Promise<void> {
-  const locale = toLocale(formData.get('locale'));
-  const mode = String(formData.get('mode') ?? '');
-  const supabase = await createClient();
-
-  const { error } = await supabase.rpc('set_own_partnership', {
-    p_mode: mode === 'SUBSCRIBER' ? 'SUBSCRIBER' : 'SUBCONTRACTOR',
-  });
-
-  if (error) console.error('Формат сотрудничества не изменён:', error.message);
-  await flashFailure(locale, error);
-
-  revalidatePath(`/${locale}/carrier`);
-}
-
-/**
- * Ветка перевозчика: подписка или подряд.
- *
- * Решение денежное и потому за оператором: подрядчик платит 3 % со всех
- * рейсов и счета клиентам идут через нас, подписчик платит за машины и
- * рассчитывается со своими заказчиками сам. Перевозчик выбирает ветку в
- * заявке, но окончательно её ставит тот, кто компанию проверял.
- */
-export async function setPartnershipAction(formData: FormData): Promise<void> {
-  const locale = toLocale(formData.get('locale'));
-  await requireAdmin();
-
-  const companyId = String(formData.get('company_id') ?? '');
-  const mode = String(formData.get('mode') ?? '');
-  const supabase = await createClient();
-
-  const { error } = await supabase.rpc('set_company_partnership', {
-    p_company_id: companyId,
-    p_mode: mode === 'SUBSCRIBER' ? 'SUBSCRIBER' : 'SUBCONTRACTOR',
-  });
-
-  revalidatePath(`/${locale}/admin/company/${companyId}`);
-  revalidatePath(`/${locale}/admin/billing`);
-
-  if (error) {
-    console.error('Ветка перевозчика не изменилась:', error.message);
     redirect(withAdminError(`/${locale}/admin/company/${companyId}`, explainAdmin(error)));
   }
 }

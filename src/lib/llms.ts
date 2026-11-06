@@ -1,12 +1,4 @@
-import {
-  ANNUAL_DISCOUNT_BPS,
-  APP,
-  COMMISSION_BPS,
-  MIN_FEE_CENTS,
-  ON_REQUEST_FROM,
-  SHIPPER_FEE_BPS,
-  SUBSCRIPTION_LADDER,
-} from '@/lib/config';
+import { ANNUAL_DISCOUNT_BPS, APP, ON_REQUEST_FROM, SUBSCRIPTION_LADDER } from '@/lib/config';
 import { locales, type Locale } from '@/lib/i18n/config';
 import { EARTHWORKS, earthworksPath } from '@/lib/landing/earthworks';
 import { SITE_URL } from '@/lib/seo';
@@ -65,9 +57,8 @@ function pricing(): string {
 ${ladderLines().join('\n')}
   - from ${ON_REQUEST_FROM} vehicles: price on request
 - Paying a year in advance: ${pct(ANNUAL_DISCOUNT_BPS)} off. First month free for new companies. No set-up fee, no multi-year contract.
-- No percentage on the carrier's own customers, direct orders and direct contracts from the load board.
-- Subcontracting through RAHTIS (load-board jobs under a RAHTIS contract): ${pct(COMMISSION_BPS)} of the job price, no monthly fee; RAHTIS handles customer invoicing, consignment notes and claims.
-- Shippers: service fee ${pct(SHIPPER_FEE_BPS)} on jobs under a RAHTIS contract, at least ${eur(MIN_FEE_CENTS)} per job together with the carrier's fee. A direct contract with a subscribing carrier is free.
+- No percentage on any job: own customers, direct orders and load-board jobs alike.
+- Shippers and forwarders: free. Every load-board job and direct order is a contract of carriage made directly between the shipper and the carrier; the carrier invoices the shipper. ${APP.operator.legalName} is not a party to the transport.
 - API: free (no monthly fee, no price per call).`;
 }
 
@@ -106,7 +97,7 @@ const DRIVER = `## Driver app
 
 const EXCHANGE = `## Freight exchange (load board) and direct orders
 
-- A shipper publishes a job once; it reaches approved, suitable vehicles in the area. Up to three offers; the shipper chooses on price, equipment and ratings. No downward price auction.
+- A shipper publishes a job once; it reaches approved, suitable vehicles in the area. Up to three offers; the shipper chooses on price, equipment and ratings. No downward price auction. The contract of carriage is made directly between the shipper and the carrier; before taking a job the carrier sees the shipper's payment information (company age, register status, other carriers' payment reports, checked company documents, forwarder's insurance if checked).
 - If a vehicle cancels or does not confirm within 15 minutes, the job returns to the board and goes to the next suitable vehicles automatically.
 - Direct orders: a shipper sends a job straight to a known vehicle, or first to its own carriers and then to the board.
 - Freight: trailer swaps between ports, terminals and customers; container haulage (20, 30, 40, 45 ft) to and from ports; express transport by van (up to 3.5 t) or truck (up to 26 t), with tail lift, side loading or refrigeration.
@@ -129,7 +120,7 @@ const ABOUT = `## Company
 
 const FI = `## Suomeksi
 
-RAHTIS on kuljetusten hallintajärjestelmä (TMS) ja rahtipörssi kuljetusliikkeille ja rahdinantajille: Suomi, Ruotsi, Norja, Tanska, Viro, Latvia, Liettua, Puola ja Saksa. Kuljetusliike hallitsee samassa paikassa kalustoa ja ajoneuvoyhdistelmiä, kuljettajia, polttoainetta, GPS-seurantaa, kannattavuutta, työaikaa, rahtikirjoja ja omia asiakkaitaan. Tarjouspöydältä eli rahtipörssistä hyväksytyt kuljetusliikkeet ottavat irtoperien vaihtoja, konttikuljetuksia ja pikakuljetuksia. Maansiirtoon kippiautoilla: kuormat punnituksineen, siirtoasiakirjat, tunnit ja laskut työmaalta (${SITE_URL}/fi/maansiirto). Kuukausimaksu vain ajaneista autoista, porrastettu ${euroFi(SUBSCRIPTION_LADDER[0].cents)}–${euroFi(Math.min(...SUBSCRIPTION_LADDER.map((s) => s.cents)))} € autolta kuukaudessa (alv 0 %), ${ON_REQUEST_FROM} autosta alkaen tarjouksen mukaan; vuosi etukäteen −${ANNUAL_DISCOUNT_BPS / 100} %, ensimmäinen kuukausi maksutta. Ylläpitäjä ${APP.operator.legalName} (Y-tunnus ${APP.operator.businessId}).`;
+RAHTIS on kuljetusten hallintajärjestelmä (TMS) ja rahtipörssi kuljetusliikkeille ja rahdinantajille: Suomi, Ruotsi, Norja, Tanska, Viro, Latvia, Liettua, Puola ja Saksa. Kuljetusliike hallitsee samassa paikassa kalustoa ja ajoneuvoyhdistelmiä, kuljettajia, polttoainetta, GPS-seurantaa, kannattavuutta, työaikaa, rahtikirjoja ja omia asiakkaitaan. Tarjouspöydältä eli rahtipörssistä hyväksytyt kuljetusliikkeet ottavat irtoperien vaihtoja, konttikuljetuksia ja pikakuljetuksia. Maansiirtoon kippiautoilla: kuormat punnituksineen, siirtoasiakirjat, tunnit ja laskut työmaalta (${SITE_URL}/fi/maansiirto). Kuljetussopimus syntyy aina suoraan rahdinantajan ja kuljetusliikkeen välillä, eikä keikoista peritä prosenttia; rahdinantajalle palvelu on maksuton. Kuljetusliikkeen kuukausimaksu vain ajaneista autoista: ensimmäinen auto maksutta, jokainen seuraava ${euroFi(SUBSCRIPTION_LADDER[SUBSCRIPTION_LADDER.length - 1].cents)} € kuukaudessa (alv 0 %), ${ON_REQUEST_FROM} autosta alkaen tarjouksen mukaan; vuosi etukäteen −${ANNUAL_DISCOUNT_BPS / 100} %, ensimmäinen kuukausi maksutta. Ylläpitäjä ${APP.operator.legalName} (Y-tunnus ${APP.operator.businessId}).`;
 
 /** Короткая справка: суть, цены, ссылки на каждый язык. */
 export function llmsTxt(): string {

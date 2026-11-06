@@ -901,6 +901,7 @@ export type Database = {
           rejection_reason: string | null
           shipper_role: Database["public"]["Enums"]["shipper_role"]
           status: Database["public"]["Enums"]["company_status"]
+          subscription_fees_from: string | null
           updated_at: string
           vat_number: string | null
           waste_registrations: Json
@@ -947,6 +948,7 @@ export type Database = {
           rejection_reason?: string | null
           shipper_role?: Database["public"]["Enums"]["shipper_role"]
           status?: Database["public"]["Enums"]["company_status"]
+          subscription_fees_from?: string | null
           updated_at?: string
           vat_number?: string | null
           waste_registrations?: Json
@@ -993,6 +995,7 @@ export type Database = {
           rejection_reason?: string | null
           shipper_role?: Database["public"]["Enums"]["shipper_role"]
           status?: Database["public"]["Enums"]["company_status"]
+          subscription_fees_from?: string | null
           updated_at?: string
           vat_number?: string | null
           waste_registrations?: Json
@@ -5731,6 +5734,7 @@ export type Database = {
           rejection_reason: string | null
           shipper_role: Database["public"]["Enums"]["shipper_role"]
           status: Database["public"]["Enums"]["company_status"]
+          subscription_fees_from: string | null
           updated_at: string
           vat_number: string | null
           waste_registrations: Json
@@ -7503,6 +7507,7 @@ export type Database = {
           rejection_reason: string | null
           shipper_role: Database["public"]["Enums"]["shipper_role"]
           status: Database["public"]["Enums"]["company_status"]
+          subscription_fees_from: string | null
           updated_at: string
           vat_number: string | null
           waste_registrations: Json
@@ -7730,6 +7735,7 @@ export type Database = {
           rejection_reason: string | null
           shipper_role: Database["public"]["Enums"]["shipper_role"]
           status: Database["public"]["Enums"]["company_status"]
+          subscription_fees_from: string | null
           updated_at: string
           vat_number: string | null
           waste_registrations: Json
@@ -8881,6 +8887,7 @@ export type Database = {
           rejection_reason: string | null
           shipper_role: Database["public"]["Enums"]["shipper_role"]
           status: Database["public"]["Enums"]["company_status"]
+          subscription_fees_from: string | null
           updated_at: string
           vat_number: string | null
           waste_registrations: Json

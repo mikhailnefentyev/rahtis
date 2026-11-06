@@ -2,7 +2,15 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Badge, Card, CardBody, Stat, StatRow, Table, TableFrame, Td, Th, Tr } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
-import { ANNUAL_DISCOUNT_BPS, ladderStepLabel, ON_REQUEST_FROM, SUBSCRIPTION_LADDER, subscriptionLadderCents } from '@/lib/config';
+import {
+  ANNUAL_DISCOUNT_BPS,
+  annualPlanStart,
+  ladderStepLabel,
+  ON_REQUEST_FROM,
+  SUBSCRIPTION_LADDER,
+  subscriptionLadderCents,
+  subscriptionMonthCharged,
+} from '@/lib/config';
 import { isLocale } from '@/lib/i18n';
 import { getViewerI18n } from '@/lib/i18n/viewer';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -61,7 +69,10 @@ export default async function SubscriptionPage({ params }: { params: Promise<{ l
 
   const active = new Set((orders ?? []).map((o) => o.assigned_vehicle_id)).size;
   const estimate = subscriptionLadderCents(active);
-  const subscriber = company.partnership === 'SUBSCRIBER';
+  /* Переведённым с подряда сбор — с 1.1.2027 (companies.subscription_fees_from); год вперёд — не раньше. */
+  const feesFrom = company.subscription_fees_from ?? null;
+  const pendingStart = feesFrom && !subscriptionMonthCharged(monthStart, feesFrom) ? feesFrom : null;
+  const annualStart = annualPlanStart(nextMonth, feesFrom);
   const plan = (plans ?? []).find((p) => !p.cancelled_at && p.ends_on >= monthStart) ?? null;
   const annualOpen = (terms?.version ?? 0) >= ANNUAL_TERMS_VERSION;
   const date = (iso: string) => f.date(`${iso}T12:00:00Z`);
@@ -72,23 +83,21 @@ export default async function SubscriptionPage({ params }: { params: Promise<{ l
       <h1 className="page-title">{s.title}</h1>
       <p className="mt-2 max-w-3xl text-[13px] leading-relaxed text-ink-muted">{s.lede}</p>
 
-      {!subscriber && (
+      {pendingStart && (
         <Card className="mt-6 max-w-3xl">
           <CardBody>
-            <p className="text-[13px]">{s.notSubscriber}</p>
+            <p className="text-[13px]">{s.feesFrom.replace('{date}', date(pendingStart))}</p>
           </CardBody>
         </Card>
       )}
 
-      {subscriber && (
-        <div className="mt-6">
-          <StatRow>
-            <Stat label={s.activeNow} value={String(active)} hint={s.activeHint} />
-            <Stat label={s.estimateNow} value={f.eur(estimate)} hint={active >= ON_REQUEST_FROM ? s.estimateLarge : s.vatExcl} />
-            <Stat label={s.planNow} value={plan ? String(plan.vehicles) : '—'} hint={plan ? `${date(plan.starts_on)}–${date(plan.ends_on)}` : s.noPlan} />
-          </StatRow>
-        </div>
-      )}
+      <div className="mt-6">
+        <StatRow>
+          <Stat label={s.activeNow} value={String(active)} hint={s.activeHint} />
+          <Stat label={s.estimateNow} value={f.eur(estimate)} hint={active >= ON_REQUEST_FROM ? s.estimateLarge : s.vatExcl} />
+          <Stat label={s.planNow} value={plan ? String(plan.vehicles) : '—'} hint={plan ? `${date(plan.starts_on)}–${date(plan.ends_on)}` : s.noPlan} />
+        </StatRow>
+      </div>
 
       <div className="mt-6 grid max-w-5xl gap-4 lg:grid-cols-2">
         <TableFrame caption={s.ladderTitle}>
@@ -136,27 +145,25 @@ export default async function SubscriptionPage({ params }: { params: Promise<{ l
       </div>
       <p className="mt-2 max-w-3xl text-[12px] leading-relaxed text-ink-dim">{s.ladderNote.replace('{pct}', String(ANNUAL_DISCOUNT_BPS / 100))}</p>
 
-      {subscriber && (
-        <div className="mt-6 max-w-3xl">
-          {plan ? (
-            <Card>
-              <CardBody>
-                <p className="text-[13px]">
-                  {s.planActive.replace('{n}', String(plan.vehicles)).replace('{from}', date(plan.starts_on)).replace('{to}', date(plan.ends_on))}
-                </p>
-              </CardBody>
-            </Card>
-          ) : annualOpen ? (
-            <AnnualForm suggested={active} startsOn={date(nextMonth)} />
-          ) : (
-            <Card>
-              <CardBody>
-                <p className="text-[13px] text-ink-muted">{s.annualSoon}</p>
-              </CardBody>
-            </Card>
-          )}
-        </div>
-      )}
+      <div className="mt-6 max-w-3xl">
+        {plan ? (
+          <Card>
+            <CardBody>
+              <p className="text-[13px]">
+                {s.planActive.replace('{n}', String(plan.vehicles)).replace('{from}', date(plan.starts_on)).replace('{to}', date(plan.ends_on))}
+              </p>
+            </CardBody>
+          </Card>
+        ) : annualOpen ? (
+          <AnnualForm suggested={active} startsOn={date(annualStart)} />
+        ) : (
+          <Card>
+            <CardBody>
+              <p className="text-[13px] text-ink-muted">{s.annualSoon}</p>
+            </CardBody>
+          </Card>
+        )}
+      </div>
 
       {(fees ?? []).length > 0 && (
         <TableFrame caption={s.feesTitle} className="mt-6 max-w-5xl">

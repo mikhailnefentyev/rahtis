@@ -12,7 +12,7 @@ import {
 } from '@/components/ui';
 import { companyStatusTone, vehicleAccessTone } from '@/components/ui/tone';
 import { requireRole } from '@/lib/auth/guard';
-import { setCompanyTestAction, setPartnershipAction } from '@/lib/companies/actions';
+import { setCompanyTestAction } from '@/lib/companies/actions';
 import { daysUntil } from '@/lib/dates';
 import { getI18n, isLocale } from '@/lib/i18n';
 import { CarrierScorecard } from '@/components/domain/CarrierScorecard';
@@ -163,13 +163,6 @@ export default async function AdminCompanyPage({
             <Badge tone={companyStatusTone[company.status]}>
               {t.companyStatus[company.status]}
             </Badge>
-            {carrier && company.partnership && (
-              <Badge tone={company.partnership === 'SUBSCRIBER' ? 'info' : 'neutral'}>
-                {company.partnership === 'SUBSCRIBER'
-                  ? t.moderation.partnershipSub
-                  : t.moderation.partnershipCon}
-              </Badge>
-            )}
             <Badge>{t.role[company.kind]}</Badge>
             {company.frozen_at && <Badge tone="danger">{t.moderation.frozen}</Badge>}
             {company.is_test && <Badge tone="warn">{t.moderation.test}</Badge>}
@@ -233,46 +226,21 @@ export default async function AdminCompanyPage({
         {orders > 0 && ` · ${t.moderation.removeBlocked}`}
       </p>
 
-      {/*
-         * Формат сотрудничества отдельным разделом, а не отметкой в
-         * шапке: это решение про деньги — кто кому выставляет счета, —
-         * и оно должно называться словом и стоять там, где его ищут.
-         */}
+      {/* Тариф перевозчика: с 6.11.2026 только подписка, переключателя нет. */}
       {carrier && (
         <section className="mt-8">
           <h2 className="label-micro mb-3">{t.moderation.partnership}</h2>
           <Card>
             <CardBody className="flex flex-wrap items-start justify-between gap-4">
               <div className="min-w-0 max-w-2xl">
-                <p className="text-[13px] font-semibold">
-                  {company.partnership === 'SUBSCRIBER'
-                    ? t.moderation.partnershipSub
-                    : t.moderation.partnershipCon}
-                </p>
-                <p className="mt-1 text-[13px] leading-relaxed text-ink-muted">
-                  {company.partnership === 'SUBSCRIBER'
-                    ? t.moderation.partnershipSubHint
-                    : t.moderation.partnershipConHint}
-                </p>
+                <p className="text-[13px] font-semibold">{t.moderation.partnershipSub}</p>
+                <p className="mt-1 text-[13px] leading-relaxed text-ink-muted">{t.moderation.partnershipSubHint}</p>
+                {company.subscription_fees_from && (
+                  <p className="mt-1 text-[13px] text-ink">
+                    {t.cabinet.feesFrom.replace('{date}', f.date(`${company.subscription_fees_from}T12:00:00Z`))}
+                  </p>
+                )}
               </div>
-
-              <form action={setPartnershipAction} className="flex flex-col items-end gap-1">
-                <input type="hidden" name="locale" value={locale} />
-                <input type="hidden" name="company_id" value={company.id} />
-                <input
-                  type="hidden"
-                  name="mode"
-                  value={company.partnership === 'SUBSCRIBER' ? 'SUBCONTRACTOR' : 'SUBSCRIBER'}
-                />
-                <Button type="submit" size="sm">
-                  {t.moderation.partnershipSwitch.replace(
-                    '{mode}',
-                    company.partnership === 'SUBSCRIBER'
-                      ? t.moderation.partnershipCon
-                      : t.moderation.partnershipSub,
-                  )}
-                </Button>
-              </form>
             </CardBody>
           </Card>
         </section>
@@ -302,11 +270,13 @@ export default async function AdminCompanyPage({
           <h2 className="label-micro mb-3">{t.forwarder.adminTitle}</h2>
           <p className="mb-3 text-[13px] text-ink-muted">
             {t.forwarder.roleTitle}: <span className="font-semibold text-ink">{t.forwarder[company.shipper_role ?? 'FORWARDER']}</span>
-            {forwarder && (
+            {forwarder?.applies && (
               <>
                 {' · '}
-                {forwarder.allowed ? t.forwarder.adminDirectOpen : t.forwarder.directClosed}
-                {forwarder.in_grace && forwarder.grace_until && ` · ${t.forwarder.graceTitle.replace('{date}', f.date(`${forwarder.grace_until}T12:00:00Z`))}`}
+                {/* Полис — отметка для перевозчиков, а не допуск (с 6.11.2026). */}
+                {forwarder.policy_until
+                  ? t.forwarder.policyChecked.replace('{date}', f.date(`${forwarder.policy_until}T12:00:00Z`))
+                  : t.forwarder.policyNotChecked}
               </>
             )}
           </p>

@@ -2,22 +2,19 @@ import 'server-only';
 
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
-import { directBlockReason, type DirectBlock, type ForwarderStatus, type ReviewStatus } from './policy';
+import type { ForwarderStatus, ReviewStatus } from './policy';
 
 export type ForwarderState = {
   status: ForwarderStatus | null;
-  /** Решение по последнему загруженному полису: от него зависит текст «почему закрыто». */
+  /** Решение по последнему загруженному полису. */
   latestInsurance: ReviewStatus | null;
-  block: DirectBlock | null;
 };
 
-const OPEN: ForwarderState = { status: null, latestInsurance: null, block: null };
+const NONE: ForwarderState = { status: null, latestInsurance: null };
 
 /**
- * Допуск своей компании к договору напрямую — для формы заказа,
- * баннера и /account. Проверяет база (public.forwarder_status); до
- * миграции функции нет — тогда режим считается открытым, как и раньше,
- * а запрет всё равно держит триггер, когда он появится.
+ * Полис своей компании для /account (public.forwarder_status). С
+ * 6.11.2026 это отметка для перевозчика, а не допуск к прямому договору.
  */
 export async function loadForwarderState(): Promise<ForwarderState> {
   try {
@@ -32,11 +29,11 @@ export async function loadForwarderState(): Promise<ForwarderState> {
         .limit(1),
     ]);
     const status = rows?.[0];
-    if (error || !status) return OPEN;
+    if (error || !status) return NONE;
     const latest = (docs?.[0]?.review_status ?? null) as ReviewStatus | null;
-    return { status, latestInsurance: latest, block: directBlockReason(status, latest) };
+    return { status, latestInsurance: latest };
   } catch {
-    return OPEN;
+    return NONE;
   }
 }
 

@@ -11,7 +11,7 @@ import { trustTone, type ReportStatus, type ShipperTrust } from '@/lib/trust/mod
 
 /*
  * Сведения о заказчике в режиме «напрямую с перевозчиком» (6.11.2026):
- * возраст, реестр, оплата счетов Aivomaa, отметки перевозчиков, объём,
+ * возраст, реестр, оплата счетов Aivomaa (если есть история), отметки перевозчиков, объём,
  * проверенные документы заказчика (только отметка и даты).
  * Справка, не гарантия и не рейтинг — так и подписано (TERMS, раздел 8).
  */
@@ -90,23 +90,25 @@ export function ShipperTrustDetails({ trust, className }: { trust: ShipperTrust;
       ),
     },
     ...(documents.length > 0 ? [{ k: sd.trustRow, v: <>{documents}</> }] : []),
-    {
-      k: tr.aivomaa,
-      tone: a.overdue > 0 ? 'bad' : a.late > 0 ? 'warn' : undefined,
-      v:
-        a.invoiced === 0 ? (
-          tr.aivomaaNone
-        ) : (
-          <>
-            {a.onTimePct === null
-              ? tr.aivomaaOpen.replace('{count}', String(a.invoiced))
-              : tr.aivomaaLine.replace('{pct}', String(a.onTimePct)).replace('{count}', String(a.invoiced))}
-            {a.late > 0 &&
-              ` · ${tr.aivomaaLate.replace('{count}', String(a.late)).replace('{days}', String(a.avgDaysLate ?? 0))}`}
-            {a.overdue > 0 && ` · ${tr.aivomaaOverdue.replace('{count}', String(a.overdue))}`}
-          </>
-        ),
-    },
+    /* Счета Aivomaa — только история рейсов, где Aivomaa была стороной (до 6.11.2026); нет истории — строки нет. */
+    ...(a.invoiced === 0
+      ? []
+      : [
+          {
+            k: tr.aivomaa,
+            tone: a.overdue > 0 ? ('bad' as const) : a.late > 0 ? ('warn' as const) : undefined,
+            v: (
+              <>
+                {a.onTimePct === null
+                  ? tr.aivomaaOpen.replace('{count}', String(a.invoiced))
+                  : tr.aivomaaLine.replace('{pct}', String(a.onTimePct)).replace('{count}', String(a.invoiced))}
+                {a.late > 0 &&
+                  ` · ${tr.aivomaaLate.replace('{count}', String(a.late)).replace('{days}', String(a.avgDaysLate ?? 0))}`}
+                {a.overdue > 0 && ` · ${tr.aivomaaOverdue.replace('{count}', String(a.overdue))}`}
+              </>
+            ),
+          },
+        ]),
     {
       k: tr.reports,
       tone: r.unpaid > 0 ? 'bad' : r.late > 0 ? 'warn' : undefined,
