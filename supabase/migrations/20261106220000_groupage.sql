@@ -1131,6 +1131,18 @@ begin
     raise exception 'Машина сейчас не выходит на рейсы.' using errcode = '55004';
   end if;
 
+  /* Своё изменение заказа при принятии не гасит этот же запрос (триггер ниже). */
+  perform set_config('rahtis.capacity_deciding', '1', true);
+
+  /* Заказчик ещё активен, а машина подходит под заказ таким, каков он сейчас. */
+  if not exists (
+    select 1 from public.companies c
+    where c.id = v_order.shipper_company_id and c.status = 'ACTIVE' and c.frozen_at is null
+  ) then
+    raise exception 'Заказчик сейчас не может давать заказы.' using errcode = '55000';
+  end if;
+  perform app.assert_vehicle_fits_order(v_order, (select v from public.vehicles v where v.id = v_offer.vehicle_id));
+
   if v_order.currency is distinct from v_request.currency then
     raise exception 'Валюта заказа изменилась.' using errcode = '55000';
   end if;
@@ -1320,3 +1332,48 @@ $$;
 
 revoke all on function public.capacity_requests_for_shipper() from public, anon;
 grant execute on function public.capacity_requests_for_shipper() to authenticated;
+
+
+-- ── Запрос гаснет, если заказ изменили ─────────────────────────────
+
+/*
+ * Перевозчик решает по условиям запроса. Если после отправки заказчик
+ * поменял точки, даты, вес или цену заказа, ожидающие запросы гаснут —
+ * принять устаревшие условия нельзя. Заказчик отправит запрос заново.
+ */
+create or replace function app.capacity_requests_expire_on_change()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_order uuid;
+begin
+  if current_setting('rahtis.capacity_deciding', true) = '1' then
+    return coalesce(new, old);
+  end if;
+  if tg_table_name = 'order_stops' then
+    v_order := coalesce(new.order_id, old.order_id);
+  else
+    v_order := coalesce(new.id, old.id);
+  end if;
+  update public.capacity_requests
+  set status = 'EXPIRED', decided_at = now()
+  where order_id = v_order and status = 'PENDING';
+  return coalesce(new, old);
+end;
+$$;
+
+revoke all on function app.capacity_requests_expire_on_change() from public, anon, authenticated;
+
+create trigger order_stops_capacity_requests_expire
+  after insert or update or delete on public.order_stops
+  for each row execute function app.capacity_requests_expire_on_change();
+
+create trigger orders_capacity_requests_expire
+  after update of ldm, haul_kind, rate_cents, currency, distance_km on public.orders
+  for each row
+  when (old.status in ('DRAFT', 'OPEN') and (old.ldm, old.haul_kind, old.rate_cents, old.currency, old.distance_km)
+        is distinct from (new.ldm, new.haul_kind, new.rate_cents, new.currency, new.distance_km))
+  execute function app.capacity_requests_expire_on_change();
