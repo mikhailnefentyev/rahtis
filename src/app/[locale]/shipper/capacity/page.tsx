@@ -118,7 +118,7 @@ export default async function ShipperCapacityPage({
         </div>
         <p className="text-[13px]">
           {c.freeLine.replace('{space}', spaceText(t, locale, { ldm: o.free_ldm === null ? null : Number(o.free_ldm), kg: o.free_kg, pallets: o.free_pallets }))}
-          <span className="text-ink-muted"> · {vehicleText(t, o.vehicle_class, o.body)}</span>
+          {vehicleText(t, o.vehicle_class, o.body) && <span className="text-ink-muted"> · {vehicleText(t, o.vehicle_class, o.body)}</span>}
           {typeof o.detour_km === 'number' && <span className="text-ink-muted"> · {c.detour.replace('{km}', String(o.detour_km))}</span>}
         </p>
         <p className="flex flex-wrap items-center gap-2 text-[13px]">
