@@ -25,7 +25,13 @@
  * значением по умолчанию, а не импорт из config.
  */
 
-export type PayModelCode = 'PER_KM' | 'TRIP_PERCENT' | 'FLAT_HOURLY' | 'TES';
+/**
+ * DAY_NET, MONTHLY_NET, PER_TRIP — договорённость «на руки» (lib/pay/agreed):
+ * здесь у их дней сумма 0 в валюте ставки, сумму по договорённости
+ * подставляет вызывающий (отчёт, приложение водителя) — ей нужны страна
+ * дня и ночи вне дома, которых у калькулятора нет.
+ */
+export type PayModelCode = 'PER_KM' | 'TRIP_PERCENT' | 'FLAT_HOURLY' | 'TES' | 'DAY_NET' | 'MONTHLY_NET' | 'PER_TRIP';
 
 export type Interval = { start: string; end: string | null };
 
@@ -667,6 +673,8 @@ export function summarizeDriver(input: {
    */
   payoutCurrency?: string | null;
   fx?: FxConvert;
+  /** Дни без смен и рейсов, которые всё равно нужны в списке (день в рейсе за границей, выходной в кабине). */
+  extraDates?: string[];
 }): DriverSummary {
   const tz = input.timeZone ?? DEFAULT_TZ;
   const clock = localClock(tz);
@@ -720,6 +728,8 @@ export function summarizeDriver(input: {
       day.odometerKm += shift.odometerEnd - shift.odometerStart;
     }
   }
+
+  for (const date of input.extraDates ?? []) dayOf(date);
 
   for (const trip of input.trips) {
     const day = dayOf(clock(Date.parse(trip.closedAt)).date);

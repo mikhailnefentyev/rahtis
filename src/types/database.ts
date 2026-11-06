@@ -1437,6 +1437,13 @@ export type Database = {
       }
       driver_pay_profiles: {
         Row: {
+          agreed_country_day_cents: Json | null
+          agreed_day_basis: string | null
+          agreed_day_cents: number | null
+          agreed_home_day_cents: number | null
+          agreed_monthly_cents: number | null
+          agreed_trip_cents: number | null
+          third_country_driver: boolean
           allowance_rule_set_id: string | null
           bonus_per_km_cents: number | null
           bonus_trip_bps: number | null
@@ -1455,6 +1462,13 @@ export type Database = {
           valid_from: string
         }
         Insert: {
+          agreed_country_day_cents?: Json | null
+          agreed_day_basis?: string | null
+          agreed_day_cents?: number | null
+          agreed_home_day_cents?: number | null
+          agreed_monthly_cents?: number | null
+          agreed_trip_cents?: number | null
+          third_country_driver?: boolean
           allowance_rule_set_id?: string | null
           bonus_per_km_cents?: number | null
           bonus_trip_bps?: number | null
@@ -1473,6 +1487,13 @@ export type Database = {
           valid_from: string
         }
         Update: {
+          agreed_country_day_cents?: Json | null
+          agreed_day_basis?: string | null
+          agreed_day_cents?: number | null
+          agreed_home_day_cents?: number | null
+          agreed_monthly_cents?: number | null
+          agreed_trip_cents?: number | null
+          third_country_driver?: boolean
           allowance_rule_set_id?: string | null
           bonus_per_km_cents?: number | null
           bonus_trip_bps?: number | null
@@ -8813,7 +8834,7 @@ export type Database = {
       order_type: "TRAILER_SWAP" | "ROUND_TRIP" | "ONE_WAY"
       partnership_mode: "SUBCONTRACTOR" | "SUBSCRIBER"
       party_role: "CARRIER" | "SHIPPER" | "ADMIN"
-      pay_model: "PER_KM" | "TRIP_PERCENT" | "FLAT_HOURLY" | "TES"
+      pay_model: "PER_KM" | "TRIP_PERCENT" | "FLAT_HOURLY" | "TES" | "DAY_NET" | "MONTHLY_NET" | "PER_TRIP"
       photo_subject:
         | "TRAILER"
         | "CARGO"
@@ -9063,7 +9084,7 @@ export const Constants = {
       order_type: ["TRAILER_SWAP", "ROUND_TRIP", "ONE_WAY"],
       partnership_mode: ["SUBCONTRACTOR", "SUBSCRIBER"],
       party_role: ["CARRIER", "SHIPPER", "ADMIN"],
-      pay_model: ["PER_KM", "TRIP_PERCENT", "FLAT_HOURLY", "TES"],
+      pay_model: ["PER_KM", "TRIP_PERCENT", "FLAT_HOURLY", "TES", "DAY_NET", "MONTHLY_NET", "PER_TRIP"],
       photo_subject: [
         "TRAILER",
         "CARGO",

@@ -17,6 +17,8 @@ export const da = {
     earningsNoPay: 'Arbejdsgiveren har ikke indtastet din løn endnu. Timer og ture vises alligevel.',
     earningsEmpty: 'Ingen afsluttede ture i denne måned endnu.',
     earningsRunning: 'Indtil nu i måneden',
+    earningsAgreedShifts: 'Efter aftale — talt efter vagter',
+    earningsAgreedMonthly: 'Månedsbeløb efter aftale',
     tabActive: 'Aktive',
     tabDone: 'Færdige',
     noTasks: 'Du har ingen opgaver.',

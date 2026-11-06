@@ -24,6 +24,16 @@ import {
   type NightType,
   type WageWarning,
 } from '@/lib/pay/allowances';
+import { compareAgreement, type Agreement, type AgreedModel, type AgreedResult, type AgreedWarning } from '@/lib/pay/agreed';
+import {
+  agreedDayInputs,
+  agreementOf,
+  isAgreedModel,
+  isAwayNight,
+  monthsIn,
+  profileSegments,
+  spreadCents,
+} from '@/lib/pay/agreedPeriods';
 import { createClient } from '@/lib/supabase/server';
 import type { Driver, TesRuleSet } from '@/types/db';
 import { allowanceDayInputs, fullMonths, groupDaysBySet, type DayCountrySource, type DayFact } from './allowanceDays';
@@ -62,7 +72,34 @@ export type ReportDayAllowance = {
 };
 
 /** Предупреждение отчёта; set — имя набора, к которому оно относится. */
-export type ReportWarning = (AllowanceWarning | WageWarning) & { set?: string };
+export type ReportWarning = (AllowanceWarning | WageWarning | AgreedWarning) & { set?: string };
+
+/**
+ * Договорённость «на руки» за отрезок периода, где действовал профиль
+ * DAY_NET / MONTHLY_NET / PER_TRIP, против законной схемы (lib/pay/agreed).
+ * Суммы result — в валюте договорённости.
+ */
+export type ReportAgreement = {
+  from: string;
+  to: string;
+  model: AgreedModel;
+  agreement: Agreement;
+  /** Доля месяцев отрезка. */
+  months: number;
+  /** Минимум и оклад по бумагам в месяц, в валюте договорённости. */
+  minMonthlyCents: number | null;
+  baseMonthlyCents: number | null;
+  result: AgreedResult;
+  /** Расходы работодателя: законная схема, а без коэффициентов страны — сама договорённость. */
+  employerCents: number;
+  /** Договорённость и расходы в валюте отчёта; null — нет курса. */
+  agreedReportCents: number | null;
+  /** Разрыв «на руки» в валюте отчёта; null — нет курса или законной схемы. */
+  gapReportCents: number | null;
+  employerReportCents: number | null;
+  /** Расходы по дням отрезка (валюта договорённости) — для экономики машин. */
+  costByDay: Record<string, number>;
+};
 
 export type DriverReportEntry = {
   driver: Pick<Driver, 'id' | 'full_name' | 'phone' | 'status'>;
@@ -72,6 +109,14 @@ export type DriverReportEntry = {
   /** Итог суточных в валюте отчёта. */
   allowanceTotals: AllowanceSummary['totals'];
   warnings: ReportWarning[];
+  /** Отрезки с договорённостью «на руки»; пусто — у водителя обычные модели. */
+  agreements: ReportAgreement[];
+  /**
+   * Расходы работодателя за период в валюте отчёта (оценка): по обычным
+   * моделям — зарплата + суточные + ночлег без взносов, по договорённости —
+   * законная схема (оклад и разрыв со взносами, суточные внутри).
+   */
+  employerCostCents: number;
 };
 
 export type DriverReport = {
@@ -311,7 +356,20 @@ export async function buildDriverReport(input: {
       bonusTripBps: p.bonus_trip_bps ?? null,
     }));
 
+    const ownFacts = new Map<string, DayFact>();
+    for (const f of facts ?? []) if (f.driver_id === driver.id) ownFacts.set(f.day, f);
+
+    /*
+     * «За день на руки» платится и за дни в рейсе без смены (выходной в
+     * кабине за границей): такие дни — по правке дня с ночью не дома.
+     */
+    const modelOn = (date: string) => ownProfiles.filter((p) => p.valid_from <= date).at(-1)?.model ?? null;
+    const extraDates = [...ownFacts.entries()]
+      .filter(([date, fact]) => isAwayNight(fact.night) && modelOn(date) === 'DAY_NET')
+      .map(([date]) => date);
+
     const summary = summarizeDriver({
+      extraDates,
       shifts: shiftInputs,
       trips: (trips ?? [])
         .filter((t) => t.driver_id === driver.id)
@@ -328,23 +386,62 @@ export async function buildDriverReport(input: {
       fx: convert,
     });
 
-    const days = summary.days.filter((d) => d.date >= input.from && d.date <= input.to);
+    let days = summary.days.filter((d) => d.date >= input.from && d.date <= input.to);
+
+    /* Отрезки периода с договорённостью «на руки». */
+    const segments = profileSegments(
+      ownProfiles.map((p) => ({ validFrom: p.valid_from })),
+      input.from,
+      input.to,
+    ).filter((s) => isAgreedModel(ownProfiles[s.index].model));
+
+    /* Водитель без единой строки за период в отчёт не попадает — кроме выбранного явно и с окладом по договорённости. */
+    if (days.length === 0 && !input.driverId && !segments.some((s) => ownProfiles[s.index].model === 'MONTHLY_NET'))
+      continue;
 
     /*
-     * Итоги пересчитываются по отфильтрованным дням: смена, взятая с
-     * запасом, не должна попасть в сумму периода, которому не
-     * принадлежит.
+     * Минимум и оклад по бумагам для договорённости — в её валюте на дату:
+     * минимум из набора профиля, а нет — из шаблона оператора для страны
+     * компании; оклад — из набора профиля (нет — минимум).
      */
-    const trimmed = totalsOf(days, { currency, fx: convert });
+    const paperBase = (p: (typeof ownProfiles)[number], day: string, target: string) => {
+      const own = p.tes_rule_set_id ? setById.get(p.tes_rule_set_id) : undefined;
+      const template = (sets ?? [])
+        .filter(
+          (s) =>
+            s.company_id == null &&
+            (s.country ?? 'FI').toUpperCase() === companyCountry &&
+            s.min_monthly_cents &&
+            s.valid_from <= day,
+        )
+        .sort((a, b) => a.valid_from.localeCompare(b.valid_from))
+        .at(-1);
+      const minSet = own?.min_monthly_cents ? own : template;
+      const conv = (cents: number, from: string) =>
+        from === target ? cents : (convert?.(cents, from, target, day) ?? null);
+      return {
+        minMonthlyCents: minSet?.min_monthly_cents ? conv(minSet.min_monthly_cents, minSet.currency) : null,
+        baseMonthlyCents: own?.base_monthly_cents ? conv(own.base_monthly_cents, own.currency) : null,
+      };
+    };
 
-    /* Водитель без единой строки за период в отчёт не попадает — кроме выбранного явно. */
-    if (days.length === 0 && !input.driverId) continue;
-
-    /* Зарплата полных месяцев с работой (без суточных) в нужной валюте — для потолков и минимума. */
+    /*
+     * Зарплата полных месяцев с работой (без суточных) в нужной валюте — для
+     * потолков и минимума. В месяце с договорённостью «на руки» зарплата по
+     * бумагам — оклад (не ниже минимума): сумма на руки уже включает
+     * суточные, и потолок суточных от неё был бы завышен.
+     */
     const wageByMonth = (target: string): Record<string, number> | undefined => {
       const out: Record<string, number> = {};
       for (const month of months) {
         const inMonth = days.filter((d) => d.date.startsWith(month));
+        const agreed = segments.find((s) => s.from <= `${month}-31` && s.to >= `${month}-01`);
+        if (agreed) {
+          const paper = paperBase(ownProfiles[agreed.index], `${month}-01` > agreed.from ? `${month}-01` : agreed.from, target);
+          const wage = Math.max(paper.baseMonthlyCents ?? 0, paper.minMonthlyCents ?? 0);
+          if (wage > 0) out[month] = wage;
+          continue;
+        }
         if (inMonth.length === 0) continue;
         const t = totalsOf(inMonth, { currency: target, fx: convert });
         if (!t.missingRate) out[month] = t.amountCents;
@@ -353,8 +450,6 @@ export async function buildDriverReport(input: {
     };
 
     /* ── Страна дня и суточные ── */
-    const ownFacts = new Map<string, DayFact>();
-    for (const f of facts ?? []) if (f.driver_id === driver.id) ownFacts.set(f.day, f);
     const auto = new Map<string, string | null>();
     const autoList = new Map<string, string[]>();
     for (const c of dayCountries ?? []) {
@@ -470,11 +565,129 @@ export async function buildDriverReport(input: {
         legality: tes?.legality ?? null,
         minMonthlyCents: tes?.min_monthly_cents ?? null,
         currency: minCurrency,
-        wageByMonth: tes?.min_monthly_cents ? wageByMonth(minCurrency) : undefined,
+        /* У договорённости оклад по бумагам не ниже минимума по построению — проверять нечего. */
+        wageByMonth: tes?.min_monthly_cents && !isAgreedModel(p.model) ? wageByMonth(minCurrency) : undefined,
       })) {
         warn(w.code === 'LEGALITY' && tes ? { ...w, set: tes.name } : w);
       }
     });
+
+    /* ── Договорённость «на руки» против законной схемы ── */
+    const toCurrency = (cents: number, from: string, to: string, day: string): number | null =>
+      from === to ? cents : (convert?.(cents, from, to, day) ?? null);
+    const agreements: ReportAgreement[] = [];
+    const agreedCents = new Map<string, { cents: number; currency: string }>();
+
+    for (const seg of segments) {
+      const p = ownProfiles[seg.index];
+      const agreement = agreementOf(p, currency);
+      if (!agreement) continue;
+      const segDays = days.filter((d) => d.date >= seg.from && d.date <= seg.to);
+      const dayInputsAgreed = agreedDayInputs({
+        days: segDays,
+        country: (date) => allowanceDays[date]?.country ?? null,
+        night: (date) => ownFacts.get(date)?.night ?? null,
+        home: companyCountry,
+      });
+
+      /* Суточные без налога за отрезок — в валюту договорённости; без курса день не в сумме. */
+      let taxFreeCents = 0;
+      for (const d of segDays) {
+        const al = allowanceDays[d.date];
+        if (!al?.hasSet || !al.taxFreeCents) continue;
+        taxFreeCents += toCurrency(al.taxFreeCents, al.currency, agreement.currency, d.date) ?? 0;
+      }
+
+      const paper = paperBase(p, seg.to, agreement.currency);
+      const months = monthsIn(seg.from, seg.to);
+      const result = compareAgreement({
+        agreement,
+        days: dayInputsAgreed,
+        country: companyCountry,
+        months,
+        minMonthlyCents: paper.minMonthlyCents,
+        baseMonthlyCents: paper.baseMonthlyCents,
+        taxFreeCents,
+        thirdCountryDriver: p.third_country_driver ?? false,
+      });
+      for (const w of result.warnings) warn(w);
+      for (const d of result.days) agreedCents.set(d.date, { cents: d.cents, currency: agreement.currency });
+
+      const employerCents = result.legal ? result.legal.employerTotalCents : result.agreedNetCents;
+      /*
+       * Расходы по дням — для машины дня в экономике: по сумме дня, у оклада
+       * за месяц — поровну по дням со сменой или в рейсе; дней нет —
+       * последним днём отрезка.
+       */
+      const weights =
+        agreement.model === 'MONTHLY_NET'
+          ? dayInputsAgreed.filter((d) => d.worked || d.away).map((d) => ({ date: d.date, weight: 1 }))
+          : result.days.map((d) => ({ date: d.date, weight: d.cents }));
+      const costByDay = weights.length ? spreadCents(employerCents, weights) : { [seg.to]: employerCents };
+
+      agreements.push({
+        from: seg.from,
+        to: seg.to,
+        model: agreement.model,
+        agreement,
+        months,
+        minMonthlyCents: paper.minMonthlyCents,
+        baseMonthlyCents: paper.baseMonthlyCents,
+        result,
+        employerCents,
+        agreedReportCents: toCurrency(result.agreedNetCents, agreement.currency, currency, seg.to),
+        gapReportCents: result.legal ? toCurrency(result.legal.gapNetCents, agreement.currency, currency, seg.to) : null,
+        employerReportCents: toCurrency(employerCents, agreement.currency, currency, seg.to),
+        costByDay,
+      });
+    }
+
+    /*
+     * Сумма дня по договорённости — в сводку: итог и экономика берут «на
+     * руки». Оклад за месяц днём не раскладывается: он строкой отрезка
+     * ниже прибавлен к итогу.
+     */
+    if (agreedCents.size) {
+      days = days.map((d) => {
+        const own = agreedCents.get(d.date);
+        if (!own || !isAgreedModel(d.model)) return d;
+        return {
+          ...d,
+          amountCents: own.cents,
+          currency: own.currency,
+          parts: { ...d.parts, baseCents: own.cents, overtimeCents: 0, eveningCents: 0, nightCents: 0, weekendCents: 0, bonusCents: 0 },
+        };
+      });
+    }
+
+    /*
+     * Итоги пересчитываются по отфильтрованным дням: смена, взятая с
+     * запасом, не должна попасть в сумму периода, которому не
+     * принадлежит.
+     */
+    const trimmed = totalsOf(days, { currency, fx: convert });
+    for (const a of agreements) {
+      if (a.model !== 'MONTHLY_NET') continue;
+      if (a.agreedReportCents == null) {
+        trimmed.missingRate = true;
+        continue;
+      }
+      trimmed.amountCents += a.agreedReportCents;
+      trimmed.parts.baseCents += a.agreedReportCents;
+    }
+
+    /* Расходы работодателя (оценка) в валюте отчёта. */
+    let employerCostCents = totalsOf(
+      days.filter((d) => !isAgreedModel(d.model)),
+      { currency, fx: convert },
+    ).amountCents;
+    for (const d of days) {
+      if (isAgreedModel(d.model)) continue;
+      const al = allowanceDays[d.date];
+      if (!al?.hasSet) continue;
+      employerCostCents += toCurrency(al.allowanceCents + al.lodgingCents, al.currency, currency, d.date) ?? 0;
+    }
+    for (const a of agreements) employerCostCents += a.employerReportCents ?? 0;
 
     entries.push({
       driver,
@@ -482,6 +695,8 @@ export async function buildDriverReport(input: {
       allowanceDays,
       allowanceTotals,
       warnings,
+      agreements,
+      employerCostCents,
     });
   }
 

@@ -12,6 +12,8 @@ import { todayInHelsinki } from '@/lib/dates';
 import { asCurrency, countryCurrency } from '@/lib/money/currency';
 import { loadFxHistory } from '@/lib/money/fx';
 import { createClient } from '@/lib/supabase/server';
+import { agreedDays } from '@/lib/pay/agreed';
+import { agreedDayInputs, agreementOf, isAgreedModel, monthsIn, profileSegments } from '@/lib/pay/agreedPeriods';
 import { getDriver } from './session';
 import type { TesRuleSet } from '@/types/db';
 
@@ -67,6 +69,13 @@ type RawProfile = {
   /* Премии поверх базы — если driver_earnings их отдаёт (иначе undefined). */
   bonus_per_km_cents?: number | null;
   bonus_trip_bps?: number | null;
+  /* Договорённость «на руки» — если driver_earnings её отдаёт. */
+  agreed_day_cents?: number | null;
+  agreed_day_basis?: string | null;
+  agreed_home_day_cents?: number | null;
+  agreed_country_day_cents?: unknown;
+  agreed_monthly_cents?: number | null;
+  agreed_trip_cents?: number | null;
 };
 
 export type EarningTrip = {
@@ -101,6 +110,12 @@ export type DriverEarnings = {
   workMinutes: number;
   /** Дни, свежие сверху. */
   days: EarningDay[];
+  /**
+   * Договорённость «на руки» в месяце. byShifts — дни посчитаны по сменам
+   * (страны и ночей вне дома у приложения нет); monthlyCents — оклад за
+   * месяц по договорённости (в валюте компании), он в totalCents, но не в днях.
+   */
+  agreed: { byShifts: boolean; monthlyCents: number | null } | null;
 };
 
 const DATE = /^\d{4}-\d{2}$/;
@@ -186,11 +201,50 @@ export async function getDriverEarnings(month: string): Promise<DriverEarnings> 
 
   const dayOf = (iso: string) => todayInHelsinki(new Date(iso));
 
+  /*
+   * Договорённость «на руки». У driver_earnings нет страны дня и ночей вне
+   * дома: день считается по смене (worked), ставки по странам и «только за
+   * границей» не применяются — у водителя честная пометка «по сменам».
+   * Полную картину видит перевозчик в отчёте.
+   */
+  const segments = profileSegments(
+    raw.profiles.map((p) => ({ validFrom: p.valid_from })),
+    from,
+    to,
+  ).filter((s) => isAgreedModel(raw.profiles[s.index].model));
+  const agreedByDay = new Map<string, number>();
+  let monthlyCents: number | null = null;
+  for (const seg of segments) {
+    const agreement = agreementOf(raw.profiles[seg.index], currency);
+    if (!agreement) continue;
+    if (agreement.model === 'MONTHLY_NET') {
+      const amount = Math.round((agreement.monthlyCents ?? 0) * monthsIn(seg.from, seg.to));
+      const inCompany =
+        agreement.currency === currency ? amount : (fx?.(amount, agreement.currency, currency, seg.to) ?? null);
+      if (inCompany != null) monthlyCents = (monthlyCents ?? 0) + inCompany;
+      continue;
+    }
+    const segDays = summary.days.filter((d) => d.date >= seg.from && d.date <= seg.to);
+    const inputs = agreedDayInputs({ days: segDays, country: () => null, night: () => null, home: 'XX' });
+    const byShifts = { ...agreement, dayBasis: 'WORK' as const, countryDayCents: null, homeDayCents: null };
+    for (const d of agreedDays(byShifts, inputs, 'XX')) agreedByDay.set(d.date, d.cents);
+  }
+
   let running = 0;
   const days: EarningDay[] = [];
 
-  for (const day of summary.days) {
-    if (day.date < from || day.date > to) continue;
+  for (const base of summary.days) {
+    if (base.date < from || base.date > to) continue;
+    /* Сумма дня по договорённости — в его валюте ставки (валюта профиля). */
+    const own = isAgreedModel(base.model) ? agreedByDay.get(base.date) : undefined;
+    const day =
+      own == null
+        ? base
+        : {
+            ...base,
+            amountCents: own,
+            parts: { ...base.parts, baseCents: own, overtimeCents: 0, eveningCents: 0, nightCents: 0, weekendCents: 0, bonusCents: 0 },
+          };
 
     /* В валюте компании; день без курса в итог не входит. */
     running += totalsOf([day], { currency, fx }).amountCents;
@@ -218,7 +272,8 @@ export async function getDriverEarnings(month: string): Promise<DriverEarnings> 
       date: day.date,
       model: day.model,
       workMinutes: day.workMinutes,
-      amountCents: day.amountCents,
+      /* Оклад за месяц — строкой месяца, не днём. */
+      amountCents: day.model === 'MONTHLY_NET' ? null : day.amountCents,
       currency: day.currency,
       runningCents: running,
       trips,
@@ -229,9 +284,12 @@ export async function getDriverEarnings(month: string): Promise<DriverEarnings> 
     month,
     hasProfile: profiles.length > 0,
     currency,
-    totalCents: running,
+    totalCents: running + (monthlyCents ?? 0),
     trips: days.reduce((s, d) => s + d.trips.length, 0),
     workMinutes: days.reduce((s, d) => s + d.workMinutes, 0),
     days: days.reverse(),
+    agreed: segments.length
+      ? { byShifts: segments.some((s) => raw.profiles[s.index].model !== 'MONTHLY_NET'), monthlyCents }
+      : null,
   };
 }

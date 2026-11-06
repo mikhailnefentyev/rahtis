@@ -28,6 +28,12 @@ type Supabase = Awaited<ReturnType<typeof createClient>>;
 const zone = 'Europe/Helsinki';
 const dateFormat = new Intl.DateTimeFormat('en-CA', { timeZone: zone, year: 'numeric', month: '2-digit', day: '2-digit' });
 const localDate = (iso: string) => dateFormat.format(new Date(iso));
+/** Следующий день YYYY-MM-DD. */
+const nextDay = (date: string) => {
+  const d = new Date(`${date}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + 1);
+  return d.toISOString().slice(0, 10);
+};
 
 /* Абонемент (евро): средняя цена за машину месяца по числу машин, у которых был доход (первая бесплатна). */
 function ladderUnits(revenue: EconomicsInput['revenue'], months: string[]): Record<string, number> {
@@ -201,8 +207,27 @@ export async function loadEconomics(
   let unassignedPay = 0;
   let unassignedAllowances = 0;
   for (const entry of report?.entries ?? []) {
+    /*
+     * Договорённость «на руки»: расходы водителя — законная схема целиком
+     * (оклад и разрыв со взносами работодателя плюс суточные без налога), а
+     * без коэффициентов страны — сама договорённость. Это одно место учёта:
+     * сумма дня и суточные этих дней ниже пропускаются, а расходы идут в
+     * ведро суточных — без надбавки employerCostBps, взносы уже внутри.
+     */
+    const agreedDates = new Set<string>();
+    for (const a of entry.agreements ?? []) {
+      for (let day = a.from; day <= a.to; day = nextDay(day)) agreedDates.add(day);
+      for (const [date, value] of Object.entries(a.costByDay)) {
+        if (!value || !inRange(date)) continue;
+        const cents = conv.cents(value, a.result.currency, date);
+        if (cents === null) continue;
+        const vehicleId = vehicleOfDay.get(`${entry.driver.id}|${date}`);
+        if (vehicleId) allowances.push({ vehicleId, month: date.slice(0, 7), cents });
+        else unassignedAllowances += cents;
+      }
+    }
     for (const day of entry.summary.days) {
-      if (!day.amountCents || !inRange(day.date)) continue;
+      if (!day.amountCents || !inRange(day.date) || agreedDates.has(day.date)) continue;
       const cents = conv.cents(day.amountCents, (day as { currency?: string }).currency ?? payCurrency(entry.driver.id, day.date), day.date);
       if (cents === null) continue;
       const vehicleId = vehicleOfDay.get(`${entry.driver.id}|${day.date}`);
@@ -212,7 +237,7 @@ export async function loadEconomics(
     /* Суточные и ночлег дня — в своей валюте (польские зарубежные — евро). */
     for (const [date, al] of Object.entries(entry.allowanceDays ?? {})) {
       const total = al.allowanceCents + al.lodgingCents;
-      if (!total || !inRange(date)) continue;
+      if (!total || !inRange(date) || agreedDates.has(date)) continue;
       const cents = conv.cents(total, al.currency, date);
       if (cents === null) continue;
       const vehicleId = vehicleOfDay.get(`${entry.driver.id}|${date}`);

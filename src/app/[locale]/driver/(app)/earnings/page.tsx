@@ -77,6 +77,13 @@ export default async function DriverEarnings({
         <p className="mt-2 text-[15px] opacity-80">
           {m('driverApp.earnTrips', { count: earnings.trips })} · {hours(earnings.workMinutes)}
         </p>
+        {/* Договорённость «на руки»: оклад за месяц и пометка, что дни посчитаны по сменам. */}
+        {earnings.agreed?.monthlyCents != null && (
+          <p className="mt-2 text-[15px] opacity-80">
+            {t.driverApp.earningsAgreedMonthly}: {f.money(earnings.agreed.monthlyCents, earnings.currency)}
+          </p>
+        )}
+        {earnings.agreed?.byShifts && <p className="mt-1 text-[15px] opacity-80">{t.driverApp.earningsAgreedShifts}</p>}
         <p className="mt-3 text-xs leading-relaxed opacity-60">{t.pay.disclaimer}</p>
       </section>
 

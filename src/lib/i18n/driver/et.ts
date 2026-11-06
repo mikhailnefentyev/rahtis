@@ -17,6 +17,8 @@ export const et = {
     earningsNoPay: 'Tööandja pole sinu palka veel sisestanud. Tunnid ja veod on ikkagi näha.',
     earningsEmpty: 'Sel kuul pole veel ühtegi lõpetatud vedu.',
     earningsRunning: 'Kuu kokku',
+    earningsAgreedShifts: 'Kokkuleppe järgi — arvestatud vahetustest',
+    earningsAgreedMonthly: 'Kuusumma kokkuleppe järgi',
     tabActive: 'Käimas',
     tabDone: 'Tehtud',
     noTasks: 'Sul pole ülesandeid.',
