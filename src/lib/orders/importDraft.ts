@@ -78,6 +78,8 @@ export type OrderDraft = {
   haulKind: HaulKind;
   shipperRef: string;
   unitPlate: string;
+  /** Номер машины (тягача, грузовика), если заказ его называет; ключ сравнения — plateKey. */
+  vehiclePlate: string;
   containerFeet: string;
   ldm: string;
   rate: string;
@@ -254,6 +256,11 @@ export function normalizeDraft(
   }
   if (!express && !unitPlate) missing.add('unit');
 
+  /* Машина под рейс: номер прицепа сюда не берём, даже если модель перепутала поля. */
+  const vehicleRaw = text(r.vehicle_plate, 20);
+  const vehiclePlate = plateKey(vehicleRaw).length >= 2 && plateKey(vehicleRaw) !== plateKey(unit) ? vehicleRaw.toUpperCase() : '';
+  if (vehiclePlate) filled.push('vehicle');
+
   const feetRaw = num(r.container_feet);
   const containerFeet = haulKind === 'CONTAINER' && feetRaw && [20, 30, 40, 45].includes(feetRaw) ? String(feetRaw) : '';
   if (containerFeet) filled.push('containerFeet');
@@ -428,6 +435,7 @@ export function normalizeDraft(
     haulKind,
     shipperRef,
     unitPlate,
+    vehiclePlate,
     containerFeet,
     ldm,
     rate,
@@ -443,6 +451,14 @@ export function normalizeDraft(
     confidence: conf === 'high' || conf === 'medium' || conf === 'low' ? conf : 'low',
     foreignPrice,
   };
+}
+
+/**
+ * Номер для сравнения: «abc-123», «ABC 123» и «ABC123» — одна машина.
+ * Только буквы и цифры, в верхнем регистре.
+ */
+export function plateKey(value: string | null | undefined): string {
+  return (value ?? '').toUpperCase().replace(/[^\p{L}\p{N}]/gu, '');
 }
 
 /** Есть ли в черновике хоть что-то, ради чего стоит открывать форму. */

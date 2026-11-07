@@ -7,7 +7,7 @@ import { countryPack } from '@/lib/country';
 import { vehicleClassFits, type HaulKind } from '@/lib/orders/haul';
 import { useI18n } from '@/lib/i18n/provider';
 import type { CarrierClient, OwnVehicle } from '@/types/db';
-import type { DraftClient } from '@/lib/orders/importDraft';
+import { plateKey, type DraftClient } from '@/lib/orders/importDraft';
 import { cn } from '@/lib/cn';
 
 /**
@@ -20,6 +20,10 @@ import { cn } from '@/lib/cn';
  * Машины — только подходящие единице: тягач для прицепа и контейнера,
  * фургон или грузовик для экспресса. Не выходящие на рейсы не
  * показываются, занятые — с пометкой: второй рейс в очередь бывает.
+ *
+ * Если заказ называет машину (письмо DFDS: «auto ABC-123»), она выбрана
+ * сразу. Не нашлась или не может взять рейс — выбор пустой и сказано почему:
+ * молча поставить другую машину хуже, чем спросить.
  */
 export function OwnPicker({
   clients,
@@ -28,6 +32,7 @@ export function OwnPicker({
   haulKind,
   homeCountry = 'FI',
   draftClient = null,
+  draftVehiclePlate = '',
 }: {
   clients: CarrierClient[];
   vehicles: OwnVehicle[];
@@ -38,6 +43,8 @@ export function OwnPicker({
   homeCountry?: string;
   /** Заказчик из письма или PDF: найденный в справочнике или новый. */
   draftClient?: DraftClient | null;
+  /** Номер машины из письма или PDF, как его прочитал разбор. */
+  draftVehiclePlate?: string;
 }) {
   const { t } = useI18n();
   const [clientId, setClientId] = useState(draftClient ? (draftClient.id ?? '') : (clients[0]?.id ?? ''));
@@ -55,7 +62,25 @@ export function OwnPicker({
     draftClient?.email || (clients.find((c) => c.id === (draftClient ? draftClient.id : clients[0]?.id))?.contact_email ?? ''),
   );
   const ai = draftClient ? 'ai-filled' : undefined;
-  const [vehicleId, setVehicleId] = useState('');
+  /* Тягач — перецеп, контейнер и полный полуприцеп (фура); фургон и грузовик — свой экспресс. */
+  const fitting = vehicles.filter((v) => v.available && vehicleClassFits(haulKind, v.vehicle_class));
+  const draftKey = plateKey(draftVehiclePlate);
+  const fromDraft = draftKey ? (vehicles.find((v) => plateKey(v.plate) === draftKey) ?? null) : null;
+  const draftFits = fromDraft !== null && fitting.some((v) => v.vehicle_id === fromDraft.vehicle_id);
+  const [vehicleId, setVehicleId] = useState(draftFits ? fromDraft.vehicle_id : '');
+  const draftNote = !draftKey
+    ? null
+    : draftFits
+      ? vehicleId === fromDraft.vehicle_id
+        ? { warn: false, text: t.own.vehicleFromDraft.replace('{plate}', fromDraft.plate) }
+        : null
+      : {
+          warn: true,
+          text: (fromDraft ? t.own.vehicleDraftUnfit : t.own.vehicleDraftUnknown).replace(
+            '{plate}',
+            fromDraft?.plate ?? draftVehiclePlate,
+          ),
+        };
 
   /*
    * Со списками хуже, чем с полями: сброс формы возвращает выпадающий
@@ -72,8 +97,6 @@ export function OwnPicker({
     form.addEventListener('reset', onReset);
     return () => form.removeEventListener('reset', onReset);
   }, []);
-  /* Тягач — перецеп, контейнер и полный полуприцеп (фура); фургон и грузовик — свой экспресс. */
-  const fitting = vehicles.filter((v) => v.available && vehicleClassFits(haulKind, v.vehicle_class));
   const optional = ` (${t.own.optional})`;
 
   return (
@@ -163,7 +186,12 @@ export function OwnPicker({
         </Field>
       </fieldset>
 
-      <Field label={t.own.vehicle} required>
+      <Field
+        label={t.own.vehicle}
+        required
+        className={draftNote && !draftNote.warn ? 'ai-filled' : undefined}
+        hint={draftNote && !draftNote.warn ? draftNote.text : undefined}
+      >
         {(p) =>
           fitting.length === 0 ? (
             <p id={p.id} className="text-[13px] text-warn" role="status">
@@ -184,6 +212,11 @@ export function OwnPicker({
           )
         }
       </Field>
+      {draftNote?.warn && (
+        <p className="-mt-2 text-[13px] text-warn" role="status">
+          {draftNote.text}
+        </p>
+      )}
       {/* Прицеп рейса — сразу: машина + прицеп = сцепка (полуприцеп к тягачу, прицеп к грузовику или нуппи). */}
       {(() => {
         const vclass = fitting.find((v) => v.vehicle_id === vehicleId)?.vehicle_class;

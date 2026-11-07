@@ -1328,6 +1328,7 @@ function OrderFormInner({
               haulKind={haulKind}
               homeCountry={own.homeCountry}
               draftClient={draft?.client ?? null}
+              draftVehiclePlate={draft?.vehiclePlate ?? ''}
             />
           ) : capacityOfferId ? (
             /* Под свободное место: не на стол и не другой машине — только запрос этому месту. */

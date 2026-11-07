@@ -3,7 +3,7 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { cleanDate, cleanTime, matchClient, normalizeDraft } from './importDraft.ts';
+import { cleanDate, cleanTime, matchClient, normalizeDraft, plateKey } from './importDraft.ts';
 
 /* Упрощённая проверка вместо ISO 6346 — тестам нужна только развилка. */
 const isValidContainer = (v) => v === 'MSCU1234566';
@@ -131,4 +131,38 @@ test('клиент перевозчика: по Y-tunnus, по имени без
     { isValidContainer, today, clients },
   );
   assert.deepEqual(draft.client, { id: null, name: 'Uusi Asiakas Oy', email: 'tilaus@asiakas.fi', businessId: '7654321-0' });
+});
+
+test('машина из заказа: номер тягача берётся, номер прицепа на его месте — нет', () => {
+  const semi = normalizeDraft(
+    {
+      haul_kind: 'SEMI', unit_number: null, vehicle_plate: 'abc-123',
+      stops: [stop({ kind: 'LOAD', city: 'Vuosaari', date: '2026-11-04' }), stop({ kind: 'UNLOAD', city: 'Tampere', date: '2026-11-04' })],
+      missing: [], confidence: 'high',
+    },
+    { isValidContainer, today },
+  );
+  assert.equal(semi.vehiclePlate, 'ABC-123');
+  assert.ok(semi.filled.includes('vehicle'));
+
+  const swap = normalizeDraft(
+    {
+      haul_kind: 'TRAILER', unit_number: 'XYZ-987', vehicle_plate: 'XYZ 987',
+      stops: [stop({ kind: 'PICKUP', city: 'Vuosaari', date: '2026-11-04' })],
+      missing: [], confidence: 'high',
+    },
+    { isValidContainer, today },
+  );
+  assert.equal(swap.unitPlate, 'XYZ-987');
+  assert.equal(swap.vehiclePlate, '');
+
+  const none = normalizeDraft({ haul_kind: 'SEMI', stops: [], missing: [], confidence: 'low' }, { isValidContainer, today });
+  assert.equal(none.vehiclePlate, '');
+});
+
+test('номер для сравнения: пробелы, дефисы и регистр не важны', () => {
+  assert.equal(plateKey('abc-123'), 'ABC123');
+  assert.equal(plateKey(' ABC 123 '), 'ABC123');
+  assert.equal(plateKey('ÅÄÖ-1'), 'ÅÄÖ1');
+  assert.equal(plateKey(null), '');
 });
