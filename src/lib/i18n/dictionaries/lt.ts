@@ -729,6 +729,13 @@ export const lt = {
       'Elektroninis važtaraštis (CMR), nuotraukos ir parašas',
       'Pervežimo sekimas etapais, vėlavimo ir prastovos įspėjimai',
       'Savaitės ataskaita ir pretenzijos pagal kiekvieną reisą',
+      'Užsakymai iš el. laiško, PDF ar nuotraukos: persiųskite kliento užsakymo laišką, ir juodraštis susiejamas su užsakyme nurodytu automobiliu',
+      'Sekimo nuoroda klientui: atvykimo laikas pagal GPS, etapai, pristatymo įrodymas ir kelių sąlygos maršrute',
+      'Grįžtamieji kroviniai prie iškrovimo vietos ir pranešimai apie išsaugotas kryptis',
+      'Laisva vieta kelyje: vieta jau važiuojančiuose automobiliuose, siūloma užsakovams vežėjo sutikimu',
+      'Ženklas „Patikrintas“ ir Suomijos užsakovo atsakomybės ataskaitos (tilaajavastuu) viename pakete',
+      'Sava valiuta (EUR, SEK, NOK, DKK, PLN) ir vairuotojo darbo užmokestis pagal šalis su dienpinigiais',
+      'Dviejų veiksmų prisijungimas su autentifikavimo programėle',
       'API (REST ir webhook) užsakovo sistemai',
     ],
     /* Род программы для schema.org (applicationSubCategory). */

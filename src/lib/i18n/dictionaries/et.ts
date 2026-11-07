@@ -729,6 +729,13 @@ export const et = {
       'Elektrooniline veoseleht (CMR), fotod ja allkiri',
       'Veo jälgimine samm-sammult, teavitused hilinemisest ja seisakust',
       'Nädalaaruanne ja pretensioonid veo kaupa',
+      'Tellimused e-kirjast, PDF-ist või fotolt: suuna kliendi tellimuskiri edasi ja mustand seotakse tellimuses nimetatud autoga',
+      'Jälgimislink kliendile: GPS-põhine saabumisaeg, etapid, kättetoimetamise tõend ja teeolud marsruudil',
+      'Tagasikoormad mahalaadimiskoha lähedalt ja teated salvestatud suundadel',
+      'Vaba ruum teel: ruum juba sõitvates autodes, mida pakutakse tellijatele vedaja nõusolekul',
+      'Märk Kontrollitud ja Soome tellija vastutuse aruanded (tilaajavastuu) ühes paketis',
+      'Oma valuuta (EUR, SEK, NOK, DKK, PLN) ja juhi palk riigiti koos päevarahadega',
+      'Kaheastmeline sisselogimine autentimisrakendusega',
       'API (REST ja webhookid) tellija oma süsteemi jaoks',
     ],
     /* Род программы для schema.org (applicationSubCategory). */

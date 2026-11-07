@@ -729,6 +729,13 @@ export const lv = {
       'Elektroniskā pavadzīme (CMR), foto un paraksts',
       'Reisa izsekošana pa posmiem ar brīdinājumiem par kavēšanos un gaidīšanu',
       'Nedēļas atskaite un pretenzijas par katru reisu',
+      'Pasūtījumi no e-pasta, PDF vai fotoattēla: pārsūtiet klienta pasūtījuma vēstuli, un melnraksts tiek piesaistīts pasūtījumā norādītajai automašīnai',
+      'Izsekošanas saite klientam: ierašanās laiks pēc GPS, posmi, piegādes apliecinājums un ceļa apstākļi maršrutā',
+      'Atpakaļkravas pie izkraušanas vietas un paziņojumi par saglabātiem maršrutiem',
+      'Brīvā vieta ceļā: vieta jau braucošās automašīnās, ko ar pārvadātāja piekrišanu piedāvā pasūtītājiem',
+      'Zīme „Pārbaudīts” un Somijas pasūtītāja atbildības pārskati (tilaajavastuu) vienā paketē',
+      'Sava valūta (EUR, SEK, NOK, DKK, PLN) un vadītāja alga pa valstīm ar dienas naudu',
+      'Divpakāpju pieteikšanās ar autentifikācijas lietotni',
       'API (REST un webhooks) pasūtītāja sistēmai',
     ],
     /* Род программы для schema.org (applicationSubCategory). */

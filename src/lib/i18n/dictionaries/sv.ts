@@ -729,6 +729,13 @@ export const sv = {
       'Elektronisk fraktsedel (CMR), foton och signatur',
       'Uppföljning av uppdraget steg för steg med larm om förseningar och väntetid',
       'Veckorapport och reklamationer per uppdrag',
+      'Order från e-post, PDF eller foto: vidarebefordra kundens ordermejl, så skapas ett utkast för bilen som nämns i ordern',
+      'Spårningslänk för kunden: beräknad ankomst från GPS, etapper, leveransbevis och väglag på rutten',
+      'Returlaster nära lossningsplatsen och bevakning av sparade sträckor',
+      'Ledigt utrymme på vägen: plats i bilar som redan kör, erbjuds till uppdragsgivare med transportörens samtycke',
+      'Märket Kontrollerad och finska beställaransvarsrapporter (tilaajavastuu) i ett paket',
+      'Egen valuta (EUR, SEK, NOK, DKK, PLN) och förarlön per land med traktamenten',
+      'Tvåstegsinloggning med autentiseringsapp',
       'API (REST och webhooks) för uppdragsgivarens eget system',
     ],
     /* Род программы для schema.org (applicationSubCategory). */

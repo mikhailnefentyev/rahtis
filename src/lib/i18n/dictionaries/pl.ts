@@ -729,6 +729,13 @@ export const pl = {
       'Elektroniczny list przewozowy (CMR), zdjęcia i podpis',
       'Śledzenie przewozu krok po kroku z alertami o opóźnieniach i czasie oczekiwania',
       'Raport tygodniowy i reklamacje dla każdego przewozu',
+      'Zlecenia z e-maila, PDF lub zdjęcia: prześlij dalej e-mail klienta ze zleceniem, a szkic zostanie przypisany do pojazdu wskazanego w zleceniu',
+      'Link śledzenia dla klienta: czas przyjazdu z GPS, etapy, potwierdzenie dostawy i warunki drogowe na trasie',
+      'Ładunki powrotne w pobliżu miejsca rozładunku i powiadomienia dla zapisanych tras',
+      'Wolne miejsce w trasie: miejsce w pojazdach, które już jadą, oferowane zleceniodawcom za zgodą przewoźnika',
+      'Odznaka „Zweryfikowany” i fińskie raporty odpowiedzialności zamawiającego (tilaajavastuu) w jednym pakiecie',
+      'Własna waluta (EUR, SEK, NOK, DKK, PLN) i wynagrodzenie kierowcy według kraju z dietami',
+      'Logowanie dwuetapowe z aplikacją uwierzytelniającą',
       'API (REST i webhooki) dla systemu zleceniodawcy',
     ],
     /* Род программы для schema.org (applicationSubCategory). */

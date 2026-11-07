@@ -753,6 +753,13 @@ export const fi = {
       'Sähköinen rahtikirja, kuvat ja allekirjoitus',
       'Kuljetuksen seuranta vaihe vaiheelta, myöhästymis- ja seisontahälytykset',
       'Viikkoraportti ja reklamaatiot keikoittain',
+      'Tilaukset sähköpostista, PDF:stä tai kuvasta: välitä asiakkaan tilausviesti, ja luonnos kohdistuu tilauksessa mainittuun autoon',
+      'Seurantalinkki asiakkaalle: saapumisarvio GPS:stä, vaiheet, toimitusvahvistus ja keli reitillä',
+      'Paluukuormat purkupaikan läheltä ja hälytykset tallennetuille reiteille',
+      'Vapaata tilaa matkalla: tila jo liikkeellä olevissa autoissa rahdinantajille kuljetusliikkeen luvalla',
+      'Tarkastettu-merkki ja tilaajavastuuraportit yhtenä pakettina',
+      'Oma valuutta (EUR, SEK, NOK, DKK, PLN) ja kuljettajan palkka maittain päivärahoineen',
+      'Kaksivaiheinen kirjautuminen todennussovelluksella',
       'Rajapinta (REST ja webhookit) tilaajan järjestelmään',
     ],
     /* Род программы для schema.org (applicationSubCategory). */

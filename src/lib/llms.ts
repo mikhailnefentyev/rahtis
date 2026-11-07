@@ -87,6 +87,12 @@ const CARRIER = `## For carriers (TMS)
 - Parts, tyre and breakdown suppliers in nine countries; a purchase goes straight into the vehicle's profitability.
 - Drivers: invited by link or code; shifts and breaks from the driver app; estimated pay under four schemes — per kilometre, percentage of job value, flat hourly rate or the Finnish collective agreement (TES: basic hours plus overtime, evening, night and Sunday premiums). The driver sees it in the app.
 - Own customers: add a job and give it to your own vehicle, or let your customer order straight to your vehicle; tracking link for the customer; the whole price is the carrier's.
+- Orders from email: each company gets its own forwarding address. A customer's order email (text, PDF or photo attachments) becomes an order draft to check under "Needs your action", matched to the vehicle named in the order by its registration plate (plate formats of EU and EEA countries). A later email with the same order number is shown as a change to accept or reject. An order can also be pasted as text or uploaded as a PDF or photo.
+- Return loads: load-board jobs near each drop-off with the empty kilometres to the pickup; saved lanes send an alert when a matching job is posted.
+- Free space on the way: a carrier can offer spare capacity in a truck already on the road; shippers send a request with their own order and price, and an accepted request becomes a direct order for that truck. Addresses and the registration plate are shown only after acceptance.
+- Own currency per company: EUR, SEK, NOK, DKK or PLN.
+- Driver pay by country: templates for Finland, Sweden, Norway, Denmark, Estonia, Latvia, Lithuania and Poland with per diems by the country of each day; an agreed net pay per day, month or trip is shown with its lawful structure (base salary, per diems, taxable part) and the employer cost.
+- Verified badge: company checks and Finnish contractor's liability reports (tilaajavastuu) in one package; shippers see it in RAHTIS or through a share link. The badge disappears by itself when a report expires.
 - Weekly report of jobs, earnings and documents; claims handled per job.`;
 
 const DRIVER = `## Driver app
@@ -101,7 +107,10 @@ const EXCHANGE = `## Freight exchange (load board) and direct orders
 - If a vehicle cancels or does not confirm within 15 minutes, the job returns to the board and goes to the next suitable vehicles automatically.
 - Direct orders: a shipper sends a job straight to a known vehicle, or first to its own carriers and then to the board.
 - Freight: trailer swaps between ports, terminals and customers; container haulage (20, 30, 40, 45 ft) to and from ports; express transport by van (up to 3.5 t) or truck (up to 26 t), with tail lift, side loading or refrigeration.
-- Live status for everyone on a job: arrivals, stops, ETA, delay and waiting-time alerts, photos and CMR in one place; messages per job with automatic translation.
+- Live status for everyone on a job: arrivals, stops, ETA, delay and waiting-time alerts, photos and CMR in one place; messages per job with automatic translation, and quick questions such as "Where is the truck?" answered from GPS without a call.
+- Tracking link for the consignee or end customer: ETA from live GPS, stage timeline, proof of delivery and traffic and road conditions on the route.
+- Vehicle check at pickup: whether the assigned truck is the one at the pickup is confirmed from independent GPS evidence.
+- One-tap take: a carrier takes a matching job from the board with its best-fitting own truck.
 - Shipper API: REST + signed webhooks, OpenAPI 3.1, key created in the dashboard.`;
 
 const EARTH = `## Earthworks and dump trucks
@@ -110,17 +119,19 @@ const EARTH = `## Earthworks and dump trucks
 - Each load logged with material, receiving site or weighbridge, gross, tare, net and weigh ticket number; overload warning against the combination's legal maximum weight per country (Finland 76 t).
 - Hours from arrival on site to the last unload + 30 minutes (buffer set per site).
 - The customer's foreman approves each day from a link without logging in; prices are not shown to the foreman.
-- Sites in Finland: waste transfer document (siirtoasiakirja) under section 121 of the Finnish Waste Act, with waste codes. National waste e-systems of other countries are not supported yet.
+- Weigh ticket photo: the driver photographs the weighbridge ticket and the weights are read into the load form for checking.
+- Sites in Finland: waste transfer document (siirtoasiakirja) under section 121 of the Finnish Waste Act, with waste codes, for construction waste and contaminated soil. A site is marked as contaminated (PIMA, above the lower guideline values of Government Decree 214/2007); its 17 05 04 and 17 05 03* loads then get the document. Clean soil needs no transfer document and gets a load record instead. National waste e-systems of other countries are not supported yet.
 - Invoices to the customer in the carrier's own name (business ID, bank account, own number series, Finnish reference number, VAT): on demand, weekly or every other week; by the hour, per load or per tonne.`;
 
 const ABOUT = `## Company
 
 - Platform name: RAHTIS. Legal entity: ${APP.operator.legalName}, Finland, business ID (Y-tunnus) ${APP.operator.businessId}.
-- Web interface in 9 languages (Finnish, English, Swedish, Estonian, Latvian, Lithuanian, Polish, German, Russian). Companies are checked against registers: PRH/YTJ for Finland, EU VIES for other EU countries; carriers also by operating licence and insurance.`;
+- Web interface in 9 languages (Finnish, English, Swedish, Estonian, Latvian, Lithuanian, Polish, German, Russian). Companies are checked against registers: PRH/YTJ for Finland, EU VIES for other EU countries; carriers also by operating licence and insurance.
+- Account security: two-step sign-in with an authenticator app, alerts on sign-in from a new device, and notices to the other party when a company's bank details change.`;
 
 const FI = `## Suomeksi
 
-RAHTIS on kuljetusten hallintajärjestelmä (TMS) ja rahtipörssi kuljetusliikkeille ja rahdinantajille: Suomi, Ruotsi, Norja, Tanska, Viro, Latvia, Liettua, Puola ja Saksa. Kuljetusliike hallitsee samassa paikassa kalustoa ja ajoneuvoyhdistelmiä, kuljettajia, polttoainetta, GPS-seurantaa, kannattavuutta, työaikaa, rahtikirjoja ja omia asiakkaitaan. Tarjouspöydältä eli rahtipörssistä hyväksytyt kuljetusliikkeet ottavat irtoperien vaihtoja, konttikuljetuksia ja pikakuljetuksia. Maansiirtoon kippiautoilla: kuormat punnituksineen, siirtoasiakirjat, tunnit ja laskut työmaalta (${SITE_URL}/fi/maansiirto). Kuljetussopimus syntyy aina suoraan rahdinantajan ja kuljetusliikkeen välillä, eikä keikoista peritä prosenttia; rahdinantajalle palvelu on maksuton. Kuljetusliikkeen kuukausimaksu vain ajaneista autoista: ensimmäinen auto maksutta, jokainen seuraava ${euroFi(SUBSCRIPTION_LADDER[SUBSCRIPTION_LADDER.length - 1].cents)} € kuukaudessa (alv 0 %), ${ON_REQUEST_FROM} autosta alkaen tarjouksen mukaan; vuosi etukäteen −${ANNUAL_DISCOUNT_BPS / 100} %, ensimmäinen kuukausi maksutta. Ylläpitäjä ${APP.operator.legalName} (Y-tunnus ${APP.operator.businessId}).`;
+RAHTIS on kuljetusten hallintajärjestelmä (TMS) ja rahtipörssi kuljetusliikkeille ja rahdinantajille: Suomi, Ruotsi, Norja, Tanska, Viro, Latvia, Liettua, Puola ja Saksa. Kuljetusliike hallitsee samassa paikassa kalustoa ja ajoneuvoyhdistelmiä, kuljettajia, polttoainetta, GPS-seurantaa, kannattavuutta, työaikaa, rahtikirjoja ja omia asiakkaitaan. Tarjouspöydältä eli rahtipörssistä hyväksytyt kuljetusliikkeet ottavat irtoperien vaihtoja, konttikuljetuksia ja pikakuljetuksia. Asiakkaan tilaussähköpostista syntyy tilausluonnos tilauksessa mainitulle autolle. Maansiirtoon kippiautoilla: kuormat punnituksineen, siirtoasiakirjat rakennusjätteelle ja pilaantuneelle maa-ainekselle, tunnit ja laskut työmaalta (${SITE_URL}/fi/maansiirto). Kuljetussopimus syntyy aina suoraan rahdinantajan ja kuljetusliikkeen välillä, eikä keikoista peritä prosenttia; rahdinantajalle palvelu on maksuton. Kuljetusliikkeen kuukausimaksu vain ajaneista autoista: ensimmäinen auto maksutta, jokainen seuraava ${euroFi(SUBSCRIPTION_LADDER[SUBSCRIPTION_LADDER.length - 1].cents)} € kuukaudessa (alv 0 %), ${ON_REQUEST_FROM} autosta alkaen tarjouksen mukaan; vuosi etukäteen −${ANNUAL_DISCOUNT_BPS / 100} %, ensimmäinen kuukausi maksutta. Ylläpitäjä ${APP.operator.legalName} (Y-tunnus ${APP.operator.businessId}).`;
 
 /** Короткая справка: суть, цены, ссылки на каждый язык. */
 export function llmsTxt(): string {
@@ -128,9 +139,9 @@ export function llmsTxt(): string {
 
 ${SUMMARY}
 
-- Carriers: TMS with fleet, vehicle combinations and legal weights, fuel, GPS integration (${GPS}), profitability per vehicle, drivers and pay, own customers, driver app.
-- Shippers and forwarders: freight exchange and direct orders for trailer swaps, containers and express transport; free REST API.
-- Earthworks: dump-truck loads with weighings, hours, foreman approval by link, Finnish waste transfer documents, invoices in the carrier's name.
+- Carriers: TMS with fleet, vehicle combinations and legal weights, fuel, GPS integration (${GPS}), profitability per vehicle, drivers and pay by country, own customers, orders from forwarded emails, return loads, driver app.
+- Shippers and forwarders: freight exchange and direct orders for trailer swaps, containers and express transport; free space in trucks already on the way; tracking link with live ETA and proof of delivery; free REST API.
+- Earthworks: dump-truck loads with weighings (also read from a photo of the weigh ticket), hours, foreman approval by link, Finnish waste transfer documents for construction waste and contaminated soil, invoices in the carrier's name.
 
 ${pricing()}
 

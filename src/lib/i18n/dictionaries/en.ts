@@ -746,6 +746,13 @@ export const en = {
       'Electronic consignment note (CMR), photos and signature',
       'Step-by-step job tracking with delay and waiting-time alerts',
       'Weekly report and claims per job',
+      'Orders from email, PDF or photo: forward the customer’s order email and a draft is created for the truck named in the order',
+      'Tracking link for the customer: ETA from GPS, stages, proof of delivery and road conditions on the route',
+      'Return loads near the drop-off and alerts for saved lanes',
+      'Free space in trucks already on the way, offered to shippers with the carrier’s consent',
+      'Verified badge and Finnish contractor’s liability reports (tilaajavastuu) in one package',
+      'Own currency (EUR, SEK, NOK, DKK, PLN) and driver pay by country with per diems',
+      'Two-step sign-in with an authenticator app',
       'API (REST and webhooks) for the shipper\'s own system',
     ],
     /* Род программы для schema.org (applicationSubCategory). */

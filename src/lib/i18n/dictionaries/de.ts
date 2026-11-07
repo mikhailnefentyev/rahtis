@@ -729,6 +729,13 @@ export const de = {
       'Elektronischer Frachtbrief, Fotos und Unterschrift',
       'Transport Schritt für Schritt verfolgen, Warnungen bei Verspätung und Standzeit',
       'Wochenbericht und Reklamationen pro Auftrag',
+      'Aufträge aus E-Mail, PDF oder Foto: Auftrags-E-Mail des Kunden weiterleiten, der Entwurf wird dem im Auftrag genannten Fahrzeug zugeordnet',
+      'Tracking-Link für den Kunden: Ankunftszeit per GPS, Etappen, Abliefernachweis und Straßenverhältnisse auf der Route',
+      'Rückladungen nahe der Entladestelle und Benachrichtigungen für gespeicherte Relationen',
+      'Freier Laderaum unterwegs: Platz in Fahrzeugen, die bereits fahren, für Auftraggeber mit Zustimmung des Frachtführers',
+      'Abzeichen „Geprüft“ und finnische Nachweise zur Auftraggeberhaftung (tilaajavastuu) in einem Paket',
+      'Eigene Währung (EUR, SEK, NOK, DKK, PLN) und Fahrerlohn je Land mit Spesen',
+      'Zwei-Faktor-Anmeldung mit Authenticator-App',
       'Schnittstelle (REST und Webhooks) zum System des Auftraggebers',
     ],
     /* Род программы для schema.org (applicationSubCategory). */
