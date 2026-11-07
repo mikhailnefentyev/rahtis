@@ -4959,6 +4959,21 @@ export const fi = {
     emailChangesOpen: 'Tarkista muutokset',
   },
 
+  /* Подключённые биржи грузов (7.11.2026, src/lib/exchanges). */
+  exchanges: {
+    title: 'Yhdistetyt kuormapörssit',
+    hint: 'Käytä omaa kuormapörssitiliäsi suoraan RAHTIKSESTA. Yhdistäminen avautuu, kun sopimus pörssin kanssa on valmis. Merkitse, minkä pörssin tarvitset, niin kerromme, kun yhdistäminen on mahdollista.',
+    soon: 'Tulossa',
+    want: 'Haluan yhdistää',
+    withdraw: 'Peru',
+    requested: 'Pyyntö vastaanotettu – kerromme, kun yhdistäminen avautuu.',
+    connected: 'Yhdistetty',
+    privacy: 'Kirjautuminen tapahtuu pörssin omalla sivulla, eikä RAHTIS näe salasanaasi. Tilisi tiedot näet vain sinä ja oma yrityksesi.',
+    carrier: '{provider}-tilisi kuormat ja ajoneuvotarjoukset suoraan RAHTIKSEEN.',
+    shipper: 'Kuormasi {provider}-pörssiin suoraan RAHTIKSESTA.',
+    failed: 'Tallennus ei onnistunut. Yritä uudelleen.',
+  },
+
   /* Поправка к рейсу из письма (7.11.2026, src/lib/inbound/changes.ts). */
   emailChanges: {
     title: 'Muutokset kuljetukseen {ref}',

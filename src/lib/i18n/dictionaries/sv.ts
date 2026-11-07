@@ -4649,6 +4649,21 @@ export const sv = {
     emailChangesOpen: 'Granska ändringar',
   },
 
+  /* Подключённые биржи грузов (7.11.2026, src/lib/exchanges). */
+  exchanges: {
+    title: 'Anslutna fraktbörser',
+    hint: 'Arbeta med ditt eget fraktbörskonto direkt från RAHTIS. Anslutningen öppnar när avtalet med börsen är klart. Markera vilken du behöver, så hör vi av oss när du kan ansluta.',
+    soon: 'Kommer snart',
+    want: 'Jag vill ansluta',
+    withdraw: 'Avbryt',
+    requested: 'Förfrågan mottagen – vi hör av oss när anslutningen öppnar.',
+    connected: 'Ansluten',
+    privacy: 'Du loggar in på börsens egen sida; RAHTIS ser aldrig ditt lösenord. Uppgifter från ditt konto ser bara du och ditt företag.',
+    carrier: 'Laster och fordonserbjudanden från ditt {provider}-konto direkt i RAHTIS.',
+    shipper: 'Dina laster på {provider} direkt från RAHTIS.',
+    failed: 'Det gick inte att spara. Försök igen.',
+  },
+
   /* Поправка к рейсу из письма (7.11.2026, src/lib/inbound/changes.ts). */
   emailChanges: {
     title: 'Ändringar i transport {ref}',

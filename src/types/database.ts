@@ -3744,6 +3744,39 @@ export type Database = {
           },
         ]
       }
+      exchange_connections: {
+        Row: {
+          company_id: string
+          connected_at: string | null
+          created_at: string
+          external_account: string | null
+          provider: string
+          requested_by: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          connected_at?: string | null
+          created_at?: string
+          external_account?: string | null
+          provider: string
+          requested_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          connected_at?: string | null
+          created_at?: string
+          external_account?: string | null
+          provider?: string
+          requested_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       order_email_drafts: {
         Row: {
           amends_order_id: string | null
@@ -7754,6 +7787,8 @@ export type Database = {
         Returns: undefined
       }
       detach_order_email_draft: { Args: { p_id: string }; Returns: undefined }
+      request_exchange_connection: { Args: { p_provider: string }; Returns: undefined }
+      withdraw_exchange_connection: { Args: { p_provider: string }; Returns: undefined }
       comment_claim: {
         Args: { p_body: string; p_claim_id: string }
         Returns: number

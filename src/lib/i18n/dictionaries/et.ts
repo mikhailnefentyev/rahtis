@@ -4635,6 +4635,21 @@ export const et = {
     emailChangesOpen: 'Vaata muudatused üle',
   },
 
+  /* Подключённые биржи грузов (7.11.2026, src/lib/exchanges). */
+  exchanges: {
+    title: 'Ühendatud veobörsid',
+    hint: 'Tööta oma veobörsi kontoga otse RAHTISest. Ühendamine avaneb, kui leping börsiga on valmis. Märgi, millist börsi vajad, ja anname teada, kui saad ühendada.',
+    soon: 'Tulekul',
+    want: 'Soovin ühendada',
+    withdraw: 'Tühista',
+    requested: 'Soov vastu võetud – anname teada, kui ühendamine avaneb.',
+    connected: 'Ühendatud',
+    privacy: 'Sisse logid börsi enda lehel, RAHTIS sinu parooli ei näe. Sinu konto andmeid näed ainult sina ja sinu ettevõte.',
+    carrier: 'Koormad ja sõidukipakkumised sinu {provider} kontolt otse RAHTISesse.',
+    shipper: 'Sinu koormad {provider} börsile otse RAHTISest.',
+    failed: 'Salvestamine ei õnnestunud. Proovi uuesti.',
+  },
+
   /* Поправка к рейсу из письма (7.11.2026, src/lib/inbound/changes.ts). */
   emailChanges: {
     title: 'Muudatused veos {ref}',

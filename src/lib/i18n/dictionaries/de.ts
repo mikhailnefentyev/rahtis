@@ -4675,6 +4675,21 @@ export const de = {
     emailChangesOpen: 'Änderungen prüfen',
   },
 
+  /* Подключённые биржи грузов (7.11.2026, src/lib/exchanges). */
+  exchanges: {
+    title: 'Verbundene Frachtbörsen',
+    hint: 'Arbeiten Sie mit Ihrem eigenen Frachtbörsenkonto direkt aus RAHTIS. Die Verbindung wird freigeschaltet, sobald der Vertrag mit der Börse steht. Markieren Sie, welche Sie brauchen, und wir melden uns, sobald Sie verbinden können.',
+    soon: 'Demnächst',
+    want: 'Ich möchte verbinden',
+    withdraw: 'Zurückziehen',
+    requested: 'Anfrage erhalten – wir melden uns, sobald die Verbindung freigeschaltet ist.',
+    connected: 'Verbunden',
+    privacy: 'Sie melden sich auf der Seite der Börse selbst an, RAHTIS sieht Ihr Passwort nie. Daten aus Ihrem Konto sehen nur Sie und Ihr Unternehmen.',
+    carrier: 'Ladungen und Fahrzeugangebote aus Ihrem {provider}-Konto direkt in RAHTIS.',
+    shipper: 'Ihre Ladungen bei {provider} direkt aus RAHTIS.',
+    failed: 'Speichern fehlgeschlagen. Bitte erneut versuchen.',
+  },
+
   /* Поправка к рейсу из письма (7.11.2026, src/lib/inbound/changes.ts). */
   emailChanges: {
     title: 'Änderungen am Transport {ref}',

@@ -4677,6 +4677,21 @@ export const lt = {
     emailChangesOpen: 'Peržiūrėti pakeitimus',
   },
 
+  /* Подключённые биржи грузов (7.11.2026, src/lib/exchanges). */
+  exchanges: {
+    title: 'Prijungtos krovinių biržos',
+    hint: 'Dirbkite su savo krovinių biržos paskyra tiesiai iš RAHTIS. Prijungimas atsivers, kai bus sudaryta sutartis su birža. Pažymėkite, kurios jums reikia, ir pranešime, kai galėsite prisijungti.',
+    soon: 'Netrukus',
+    want: 'Noriu prijungti',
+    withdraw: 'Atšaukti',
+    requested: 'Prašymas gautas – pranešime, kai prijungimas atsivers.',
+    connected: 'Prijungta',
+    privacy: 'Prisijungiate pačios biržos puslapyje, RAHTIS jūsų slaptažodžio nemato. Duomenis iš jūsų paskyros matote tik jūs ir jūsų įmonė.',
+    carrier: 'Kroviniai ir transporto pasiūlymai iš jūsų {provider} paskyros – tiesiai RAHTIS.',
+    shipper: 'Jūsų kroviniai {provider} – tiesiai iš RAHTIS.',
+    failed: 'Nepavyko išsaugoti. Bandykite dar kartą.',
+  },
+
   /* Поправка к рейсу из письма (7.11.2026, src/lib/inbound/changes.ts). */
   emailChanges: {
     title: 'Reiso {ref} pakeitimai',

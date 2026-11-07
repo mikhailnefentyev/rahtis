@@ -4838,6 +4838,21 @@ export const en = {
     emailChangesOpen: 'Review changes',
   },
 
+  /* Подключённые биржи грузов (7.11.2026, src/lib/exchanges). */
+  exchanges: {
+    title: 'Connected freight exchanges',
+    hint: 'Work with your own freight exchange account right from RAHTIS. Connecting opens once our agreement with the exchange is in place. Tell us which one you need and we’ll let you know when you can connect.',
+    soon: 'Coming soon',
+    want: 'I want to connect',
+    withdraw: 'Cancel',
+    requested: 'Request received – we’ll let you know when connecting opens.',
+    connected: 'Connected',
+    privacy: 'You log in on the exchange’s own page; RAHTIS never sees your password. Data from your account is visible only to you and your company.',
+    carrier: 'Loads and vehicle offers from your {provider} account, right in RAHTIS.',
+    shipper: 'Your loads on {provider}, right from RAHTIS.',
+    failed: 'Couldn’t save. Please try again.',
+  },
+
   /* Поправка к рейсу из письма (7.11.2026, src/lib/inbound/changes.ts). */
   emailChanges: {
     title: 'Changes to trip {ref}',

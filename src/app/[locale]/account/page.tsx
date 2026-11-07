@@ -19,6 +19,8 @@ import { ForwarderPanel } from './ForwarderPanel';
 import { ShipperDocumentsPanel } from './ShipperDocumentsPanel';
 import { OrderInboxSettings } from '@/components/domain/OrderInboxAddress';
 import { loadInboxAddress } from '@/lib/inbound/load';
+import { ExchangeConnections } from '@/components/domain/ExchangeConnections';
+import type { ExchangeRow } from '@/lib/exchanges/model';
 import { SHIPPER_DOC_KINDS } from '@/lib/shipper-docs/model';
 import { loadForwarderState } from '@/lib/forwarders/status';
 import { ShipperTrustDetails } from '@/components/domain/ShipperTrust';
@@ -171,6 +173,14 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
   const trust = shipper ? await loadCompanyTrust() : null;
   /* Адрес пересылки заказов (6.11.2026): только когда приём писем настроен. */
   const orderInbox = company && company.status === 'ACTIVE' && !company.client_of ? await loadInboxAddress() : null;
+  /* Подключённые биржи (7.11.2026): работающим компаниям, не клиентам перевозчика. До миграции таблицы нет — блок не показывается. */
+  const exchangeKind = company && company.status === 'ACTIVE' && !company.client_of && (company.kind === 'CARRIER' || company.kind === 'SHIPPER') ? company.kind : null;
+  const exchanges = exchangeKind
+    ? await (await createClient())
+        .from('exchange_connections')
+        .select('provider, status, external_account')
+        .then((r) => (r.error ? null : ((r.data ?? []) as ExchangeRow[])))
+    : null;
 
   const content = (
     <main className="cab-page cab-page--narrow">
@@ -222,6 +232,8 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
         )}
 
         {orderInbox && <OrderInboxSettings address={orderInbox.address} senders={orderInbox.senders} canManage={isOwner} />}
+
+        {exchangeKind && exchanges && <ExchangeConnections rows={exchanges} kind={exchangeKind} />}
 
         {shipper && (
           <ForwarderPanel

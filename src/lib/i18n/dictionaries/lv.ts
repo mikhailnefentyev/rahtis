@@ -4675,6 +4675,21 @@ export const lv = {
     emailChangesOpen: 'Pārbaudīt izmaiņas',
   },
 
+  /* Подключённые биржи грузов (7.11.2026, src/lib/exchanges). */
+  exchanges: {
+    title: 'Pievienotās kravu biržas',
+    hint: 'Strādājiet ar savu kravu biržas kontu tieši no RAHTIS. Pievienošana atvērsies, kad būs noslēgts līgums ar biržu. Atzīmējiet, kura jums vajadzīga, un mēs paziņosim, kad varēsiet pievienoties.',
+    soon: 'Drīzumā',
+    want: 'Vēlos pievienot',
+    withdraw: 'Atcelt',
+    requested: 'Pieprasījums saņemts — paziņosim, kad pievienošana atvērsies.',
+    connected: 'Pievienots',
+    privacy: 'Jūs piesakāties pašas biržas lapā, RAHTIS jūsu paroli neredz. Datus no jūsu konta redzat tikai jūs un jūsu uzņēmums.',
+    carrier: 'Kravas un transportlīdzekļu piedāvājumi no jūsu {provider} konta — tieši RAHTIS.',
+    shipper: 'Jūsu kravas {provider} — tieši no RAHTIS.',
+    failed: 'Neizdevās saglabāt. Mēģiniet vēlreiz.',
+  },
+
   /* Поправка к рейсу из письма (7.11.2026, src/lib/inbound/changes.ts). */
   emailChanges: {
     title: 'Izmaiņas reisā {ref}',

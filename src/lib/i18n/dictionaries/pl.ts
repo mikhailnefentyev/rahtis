@@ -4674,6 +4674,21 @@ export const pl = {
     emailChangesOpen: 'Sprawdź zmiany',
   },
 
+  /* Подключённые биржи грузов (7.11.2026, src/lib/exchanges). */
+  exchanges: {
+    title: 'Podłączone giełdy transportowe',
+    hint: 'Pracuj na swoim koncie giełdy transportowej prosto z RAHTIS. Podłączenie otworzy się po podpisaniu umowy z giełdą. Zaznacz, której potrzebujesz, a damy znać, kiedy będzie można się podłączyć.',
+    soon: 'Wkrótce',
+    want: 'Chcę podłączyć',
+    withdraw: 'Anuluj',
+    requested: 'Zgłoszenie przyjęte – damy znać, kiedy podłączenie się otworzy.',
+    connected: 'Podłączono',
+    privacy: 'Logujesz się na stronie samej giełdy, RAHTIS nie widzi Twojego hasła. Dane z Twojego konta widzisz tylko Ty i Twoja firma.',
+    carrier: 'Ładunki i oferty pojazdów z Twojego konta {provider} – prosto w RAHTIS.',
+    shipper: 'Twoje ładunki na {provider} – prosto z RAHTIS.',
+    failed: 'Nie udało się zapisać. Spróbuj ponownie.',
+  },
+
   /* Поправка к рейсу из письма (7.11.2026, src/lib/inbound/changes.ts). */
   emailChanges: {
     title: 'Zmiany w przewozie {ref}',
