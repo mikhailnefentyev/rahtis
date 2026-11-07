@@ -3,7 +3,7 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { cleanDate, cleanTime, matchClient, normalizeDraft, plateKey } from './importDraft.ts';
+import { cleanDate, cleanTime, matchClient, matchPlate, normalizeDraft, plateCandidates, plateKey } from './importDraft.ts';
 
 /* Упрощённая проверка вместо ISO 6346 — тестам нужна только развилка. */
 const isValidContainer = (v) => v === 'MSCU1234566';
@@ -165,4 +165,43 @@ test('номер для сравнения: пробелы, дефисы и ре
   assert.equal(plateKey(' ABC 123 '), 'ABC123');
   assert.equal(plateKey('ÅÄÖ-1'), 'ÅÄÖ1');
   assert.equal(plateKey(null), '');
+});
+
+test('номера разных стран находят машину парка', () => {
+  const fleet = [
+    { id: 'fi', plate: 'ABC-123' },
+    { id: 'se', plate: 'ABC 12D' },
+    { id: 'ee', plate: '123 ABC' },
+    { id: 'lv', plate: 'AB-1234' },
+    { id: 'pl', plate: 'WX 12345' },
+    { id: 'de', plate: 'HH-AB 1234' },
+    { id: 'de2', plate: 'MÜ-X 77' },
+    { id: 'no', plate: 'AB 12345' },
+    { id: 'dk', plate: 'CD 12 345' },
+  ];
+  const hit = (s) => matchPlate(s, fleet)?.id ?? null;
+  assert.equal(hit('abc123'), 'fi');
+  assert.equal(hit('FIN ABC-123'), 'fi');
+  assert.equal(hit('(FIN) ABC 123'), 'fi');
+  assert.equal(hit('АВС-123'), 'fi'); // кириллица
+  assert.equal(hit('ABC-123 / XYZ-987'), 'fi'); // сцепка: тягач первым
+  assert.equal(hit('ABC-123 + XYZ-987'), 'fi');
+  assert.equal(hit('ABC-123 ja XYZ-987'), 'fi');
+  assert.equal(hit('АВС-123 и XYZ-987'), 'fi');
+  assert.equal(hit('S ABC12D'), 'se');
+  assert.equal(hit('EST 123ABC'), 'ee');
+  assert.equal(hit('LV AB1234'), 'lv');
+  assert.equal(hit('PL WX12345'), 'pl');
+  assert.equal(hit('D HH AB 1234'), 'de');
+  assert.equal(hit('mü-x 77'), 'de2');
+  assert.equal(hit('N AB12345'), 'no');
+  assert.equal(hit('DK CD12345'), 'dk');
+  assert.equal(hit('ZZZ-999'), null);
+  assert.equal(hit(''), null);
+});
+
+test('код страны не съедает сам номер', () => {
+  /* «S-AB 123» (Штутгарт) — код города, не страны: слитно с номером, не снимается. */
+  assert.deepEqual(plateCandidates('S-AB 123'), ['SAB123']);
+  assert.deepEqual(plateCandidates('S AB 123'), ['SAB123', 'AB123']);
 });

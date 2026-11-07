@@ -7,7 +7,7 @@ import { countryPack } from '@/lib/country';
 import { vehicleClassFits, type HaulKind } from '@/lib/orders/haul';
 import { useI18n } from '@/lib/i18n/provider';
 import type { CarrierClient, OwnVehicle } from '@/types/db';
-import { plateKey, type DraftClient } from '@/lib/orders/importDraft';
+import { matchPlate, type DraftClient } from '@/lib/orders/importDraft';
 import { cn } from '@/lib/cn';
 
 /**
@@ -64,8 +64,8 @@ export function OwnPicker({
   const ai = draftClient ? 'ai-filled' : undefined;
   /* Тягач — перецеп, контейнер и полный полуприцеп (фура); фургон и грузовик — свой экспресс. */
   const fitting = vehicles.filter((v) => v.available && vehicleClassFits(haulKind, v.vehicle_class));
-  const draftKey = plateKey(draftVehiclePlate);
-  const fromDraft = draftKey ? (vehicles.find((v) => plateKey(v.plate) === draftKey) ?? null) : null;
+  const draftKey = draftVehiclePlate.trim();
+  const fromDraft = draftKey ? matchPlate(draftKey, vehicles) : null;
   const draftFits = fromDraft !== null && fitting.some((v) => v.vehicle_id === fromDraft.vehicle_id);
   const [vehicleId, setVehicleId] = useState(draftFits ? fromDraft.vehicle_id : '');
   const draftNote = !draftKey

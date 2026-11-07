@@ -257,8 +257,9 @@ export function normalizeDraft(
   if (!express && !unitPlate) missing.add('unit');
 
   /* Машина под рейс: номер прицепа сюда не берём, даже если модель перепутала поля. */
-  const vehicleRaw = text(r.vehicle_plate, 20);
-  const vehiclePlate = plateKey(vehicleRaw).length >= 2 && plateKey(vehicleRaw) !== plateKey(unit) ? vehicleRaw.toUpperCase() : '';
+  const vehicleRaw = text(r.vehicle_plate, 40);
+  const vehicleKeys = plateCandidates(vehicleRaw);
+  const vehiclePlate = vehicleKeys.length > 0 && !vehicleKeys.includes(plateKey(unit)) ? vehicleRaw.toUpperCase() : '';
   if (vehiclePlate) filled.push('vehicle');
 
   const feetRaw = num(r.container_feet);
@@ -453,12 +454,56 @@ export function normalizeDraft(
   };
 }
 
+/*
+ * Кириллица, которая на номере выглядит как латиница: диспетчер набирает
+ * «АВС-123» в русской раскладке, а в парке номер латиницей.
+ */
+const LOOKALIKE: Record<string, string> = {
+  А: 'A', В: 'B', Е: 'E', Ё: 'E', К: 'K', М: 'M', Н: 'H', О: 'O', Р: 'P', С: 'C', Т: 'T', У: 'Y', Х: 'X',
+};
+
+/*
+ * Коды стран на номерах и наклейках (Венская конвенция и ISO): «PL WX12345»,
+ * «FIN ABC-123», «(D) HH-AB 1234». Снимаются, только если стоят отдельным
+ * словом перед номером.
+ */
+const PLATE_COUNTRY = new Set([
+  'FIN', 'FI', 'S', 'SE', 'N', 'NO', 'DK', 'EST', 'EE', 'LV', 'LT', 'PL', 'D', 'DE',
+  'NL', 'B', 'BE', 'F', 'FR', 'A', 'AT', 'CZ', 'SK', 'H', 'HU', 'RO', 'BG', 'UA', 'BY', 'RUS', 'GB', 'UK', 'I', 'IT', 'E', 'ES', 'P', 'PT', 'CH', 'TR',
+]);
+
 /**
  * Номер для сравнения: «abc-123», «ABC 123» и «ABC123» — одна машина.
- * Только буквы и цифры, в верхнем регистре.
+ * Только буквы и цифры, в верхнем регистре, кириллические двойники
+ * латинских букв заменены латиницей.
  */
 export function plateKey(value: string | null | undefined): string {
-  return (value ?? '').toUpperCase().replace(/[^\p{L}\p{N}]/gu, '');
+  return (value ?? '')
+    .toUpperCase()
+    .replace(/[^\p{L}\p{N}]/gu, '')
+    .replace(/[АВЕЁКМНОРСТУХ]/g, (ch) => LOOKALIKE[ch] ?? ch);
+}
+
+/**
+ * Номер машины из заказа как его можно сравнить с парком: первый номер
+ * сцепки («ABC-123/XYZ-987», «ABC-123 + XYZ-987» — тягач идёт первым)
+ * и, отдельно, он же без кода страны впереди.
+ */
+export function plateCandidates(value: string | null | undefined): string[] {
+  const first = (value ?? '').split(/\s*(?:[/+&,;]|\s-\s|\bja\b|\boch\b|\band\b|\sи\s)\s*/i)[0] ?? '';
+  const words = first.replace(/[()]/g, ' ').trim().split(/\s+/).filter(Boolean);
+  const out = [plateKey(first)];
+  if (words.length > 1 && PLATE_COUNTRY.has(plateKey(words[0]))) out.push(plateKey(words.slice(1).join(' ')));
+  return [...new Set(out.filter((k) => k.length >= 2))];
+}
+
+/** Машина парка, названная в заказе: сначала номер целиком, потом без кода страны. */
+export function matchPlate<V extends { plate: string }>(value: string | null | undefined, vehicles: readonly V[]): V | null {
+  for (const key of plateCandidates(value)) {
+    const hit = vehicles.find((v) => plateKey(v.plate) === key);
+    if (hit) return hit;
+  }
+  return null;
 }
 
 /** Есть ли в черновике хоть что-то, ради чего стоит открывать форму. */
