@@ -40,25 +40,66 @@ comment on column public.site_jobs.treatment_code is
 
 -- ── Пункт приёмки как получатель в реестре ─────────────────────────
 
-alter table public.scale_sites
-  add column operator_name text,
-  add column operator_business_id text,
-  add column postal_code text,
-  add column contact_name text,
-  add column contact_phone text,
-  add column treatment_code text;
+/*
+ * Отдельной таблицей, а не колонками scale_sites: проверенные пункты
+ * видят все вошедшие, а здесь имя и телефон человека на приёмке.
+ * Читают: оператор, компания, добавившая пункт, и компании, у которых
+ * есть объект или рейс с этим пунктом. Пишут — только функцией ниже.
+ */
+create table public.scale_site_receivers (
+  site_id uuid primary key references public.scale_sites (id) on delete cascade,
+  operator_name text,
+  operator_business_id text,
+  postal_code text,
+  contact_name text,
+  contact_phone text,
+  treatment_code text,
+  updated_at timestamptz not null default now(),
+  updated_by uuid references auth.users (id) on delete set null,
 
-alter table public.scale_sites
-  add constraint scale_sites_operator_name check (operator_name is null or length(operator_name) <= 160),
-  add constraint scale_sites_operator_business_id check (operator_business_id is null or operator_business_id ~ '^[0-9]{7}-[0-9]$'),
-  add constraint scale_sites_postal_code check (postal_code is null or postal_code ~ '^[0-9A-Z -]{3,10}$'),
-  add constraint scale_sites_contact_name check (contact_name is null or length(contact_name) <= 120),
-  add constraint scale_sites_contact_phone check (contact_phone is null or contact_phone ~ '^\+?[0-9 ()-]{5,24}$'),
-  add constraint scale_sites_treatment_code check (treatment_code is null or treatment_code ~ '^(R|D)[0-9]{1,2}(\.[0-9])?$');
+  constraint scale_site_receivers_operator_name check (operator_name is null or length(operator_name) <= 160),
+  constraint scale_site_receivers_business_id check (operator_business_id is null or operator_business_id ~ '^[0-9]{7}-[0-9]$'),
+  constraint scale_site_receivers_postal_code check (postal_code is null or postal_code ~ '^[0-9A-Z -]{3,10}$'),
+  constraint scale_site_receivers_contact_name check (contact_name is null or length(contact_name) <= 120),
+  constraint scale_site_receivers_contact_phone check (contact_phone is null or contact_phone ~ '^\+?[0-9 ()-]{5,24}$'),
+  constraint scale_site_receivers_treatment_code check (treatment_code is null or treatment_code ~ '^(R|D)[0-9]{1,2}(\.[0-9])?$')
+);
+
+comment on table public.scale_site_receivers is
+  'Пункт приёмки как получатель в реестре отходов (SIIRTO): компания, Y-tunnus, индекс, контакт с телефоном, код переработки. Персональные данные контакта — только тем, кто с пунктом работает.';
+
+alter table public.scale_site_receivers enable row level security;
+revoke all on public.scale_site_receivers from anon, authenticated;
+
+create policy scale_site_receivers_read
+  on public.scale_site_receivers for select to authenticated
+  using (
+    (select app.is_admin())
+    or exists (
+      select 1 from public.scale_sites s
+      where s.id = site_id and s.created_by_company = (select app.current_company_id())
+    )
+    or exists (
+      select 1 from public.site_jobs j
+      where j.receiving_site_id = site_id and j.company_id = (select app.current_company_id())
+    )
+    or exists (
+      select 1 from public.site_loads l
+      where l.scale_site_id = site_id and l.company_id = (select app.current_company_id())
+    )
+  );
+
+create policy mfa_required on public.scale_site_receivers
+  as restrictive for all to authenticated
+  using ((select app.mfa_satisfied()))
+  with check ((select app.mfa_satisfied()));
+
+grant select on public.scale_site_receivers to authenticated;
+grant all on public.scale_site_receivers to service_role;
 
 /*
- * Пункт, добавленный компанией и ещё не проверенный оператором, она же и
- * дополняет (данные получателя для реестра). Проверенные правит оператор.
+ * Дополнить данные получателя. Проверенный пункт — оператор; непроверенный —
+ * добавившая его компания, если она работает (не отклонена и не заморожена).
  */
 create or replace function public.update_scale_site_receiver(
   p_site_id uuid,
@@ -79,20 +120,40 @@ declare
   v_company uuid := (select app.current_company_id());
 begin
   if not (select app.is_admin()) and not exists (
-    select 1 from public.scale_sites s
-    where s.id = p_site_id and s.created_by_company = v_company and s.approved_at is null
+    select 1
+    from public.scale_sites s
+    join public.companies c on c.id = s.created_by_company
+    where s.id = p_site_id
+      and s.created_by_company = v_company
+      and s.approved_at is null
+      and c.status <> 'REJECTED'
+      and c.frozen_at is null
   ) then
     raise exception 'Пункт правит оператор или добавившая его компания до проверки.' using errcode = '42501';
   end if;
 
-  update public.scale_sites set
-    operator_name = nullif(btrim(coalesce(p_operator_name, '')), ''),
-    operator_business_id = nullif(btrim(coalesce(p_operator_business_id, '')), ''),
-    postal_code = nullif(upper(btrim(coalesce(p_postal_code, ''))), ''),
-    contact_name = nullif(btrim(coalesce(p_contact_name, '')), ''),
-    contact_phone = nullif(btrim(coalesce(p_contact_phone, '')), ''),
-    treatment_code = nullif(upper(btrim(coalesce(p_treatment_code, ''))), '')
-  where id = p_site_id;
+  insert into public.scale_site_receivers as r
+    (site_id, operator_name, operator_business_id, postal_code, contact_name, contact_phone, treatment_code, updated_at, updated_by)
+  values (
+    p_site_id,
+    nullif(btrim(coalesce(p_operator_name, '')), ''),
+    nullif(btrim(coalesce(p_operator_business_id, '')), ''),
+    nullif(upper(btrim(coalesce(p_postal_code, ''))), ''),
+    nullif(btrim(coalesce(p_contact_name, '')), ''),
+    nullif(btrim(coalesce(p_contact_phone, '')), ''),
+    nullif(upper(btrim(coalesce(p_treatment_code, ''))), ''),
+    now(),
+    (select auth.uid())
+  )
+  on conflict (site_id) do update set
+    operator_name = excluded.operator_name,
+    operator_business_id = excluded.operator_business_id,
+    postal_code = excluded.postal_code,
+    contact_name = excluded.contact_name,
+    contact_phone = excluded.contact_phone,
+    treatment_code = excluded.treatment_code,
+    updated_at = excluded.updated_at,
+    updated_by = excluded.updated_by;
 end;
 $$;
 

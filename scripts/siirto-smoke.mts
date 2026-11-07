@@ -8,7 +8,7 @@
  * (тестовые, client_credentials). Рабочую среду скрипт не трогает.
  */
 import fs from 'node:fs';
-import { buildShippingDocument } from '../src/lib/siirto/document.ts';
+import { buildShippingDocument } from '../src/lib/siirto/document';
 
 const env = Object.fromEntries(
   fs

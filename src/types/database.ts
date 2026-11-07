@@ -4739,6 +4739,42 @@ export type Database = {
           },
         ]
       }
+      scale_site_receivers: {
+        Row: {
+          contact_name: string | null
+          contact_phone: string | null
+          operator_business_id: string | null
+          operator_name: string | null
+          postal_code: string | null
+          site_id: string
+          treatment_code: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          contact_name?: string | null
+          contact_phone?: string | null
+          operator_business_id?: string | null
+          operator_name?: string | null
+          postal_code?: string | null
+          site_id: string
+          treatment_code?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          contact_name?: string | null
+          contact_phone?: string | null
+          operator_business_id?: string | null
+          operator_name?: string | null
+          postal_code?: string | null
+          site_id?: string
+          treatment_code?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       scale_sites: {
         Row: {
           accepts: string | null
@@ -4755,12 +4791,6 @@ export type Database = {
           mscales: boolean
           name: string
           rejected_at: string | null
-          operator_name: string | null
-          operator_business_id: string | null
-          postal_code: string | null
-          contact_name: string | null
-          contact_phone: string | null
-          treatment_code: string | null
         }
         Insert: {
           accepts?: string | null
@@ -4777,12 +4807,6 @@ export type Database = {
           mscales?: boolean
           name: string
           rejected_at?: string | null
-          operator_name?: string | null
-          operator_business_id?: string | null
-          postal_code?: string | null
-          contact_name?: string | null
-          contact_phone?: string | null
-          treatment_code?: string | null
         }
         Update: {
           accepts?: string | null
@@ -4799,12 +4823,6 @@ export type Database = {
           mscales?: boolean
           name?: string
           rejected_at?: string | null
-          operator_name?: string | null
-          operator_business_id?: string | null
-          postal_code?: string | null
-          contact_name?: string | null
-          contact_phone?: string | null
-          treatment_code?: string | null
         }
         Relationships: [
           {

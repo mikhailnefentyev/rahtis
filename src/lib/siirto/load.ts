@@ -13,6 +13,16 @@ import { buildShippingDocument, type SiirtoInput, type SiirtoResult } from './do
 
 export type LoadSiirto = {
   loadId: string;
+  /** Данные пункта приёмки для формы «дописать получателя». */
+  receiver: {
+    siteId: string;
+    operatorName: string | null;
+    operatorBusinessId: string | null;
+    postalCode: string | null;
+    contactName: string | null;
+    contactPhone: string | null;
+    treatmentCode: string | null;
+  } | null;
   documentId: string | null;
   sentAt: string | null;
   error: string | null;
@@ -29,16 +39,14 @@ export async function loadSiirto(loadId: string, company: Company): Promise<Load
   ]);
   if (!job || !day) return null;
 
-  const [{ data: driver }, { data: vehicle }, { data: trailer }, { data: receiver }, fi] = await Promise.all([
+  const [{ data: driver }, { data: vehicle }, { data: trailer }, { data: site }, { data: details }, fi] = await Promise.all([
     supabase.from('drivers').select('full_name, phone, email').eq('id', day.driver_id).maybeSingle(),
     day.vehicle_id ? supabase.from('vehicles').select('plate').eq('id', day.vehicle_id).maybeSingle() : Promise.resolve({ data: null }),
     day.trailer_id ? supabase.from('trailers').select('plate').eq('id', day.trailer_id).maybeSingle() : Promise.resolve({ data: null }),
+    load.scale_site_id ? supabase.from('scale_sites').select('name, address, city').eq('id', load.scale_site_id).maybeSingle() : Promise.resolve({ data: null }),
+    /* Данные получателя — отдельной таблицей: контакт видят только те, кто с пунктом работает (RLS). */
     load.scale_site_id
-      ? supabase
-          .from('scale_sites')
-          .select('name, address, city, postal_code, operator_name, operator_business_id, contact_name, contact_phone, treatment_code')
-          .eq('id', load.scale_site_id)
-          .maybeSingle()
+      ? supabase.from('scale_site_receivers').select('*').eq('site_id', load.scale_site_id).maybeSingle()
       : Promise.resolve({ data: null }),
     getDictionary('fi'),
   ]);
@@ -79,23 +87,34 @@ export async function loadSiirto(loadId: string, company: Company): Promise<Load
       city: company.legal_city,
     },
     driver: { name: driver?.full_name ?? '', phone: driver?.phone ?? null, email: driver?.email ?? null },
-    receiver: receiver
+    receiver: site
       ? {
-          name: receiver.name,
-          address: receiver.address,
-          city: receiver.city,
-          postalCode: receiver.postal_code,
-          operatorName: receiver.operator_name,
-          operatorBusinessId: receiver.operator_business_id,
-          contactName: receiver.contact_name,
-          contactPhone: receiver.contact_phone,
-          treatmentCode: receiver.treatment_code,
+          name: site.name,
+          address: site.address,
+          city: site.city,
+          postalCode: details?.postal_code ?? null,
+          operatorName: details?.operator_name ?? null,
+          operatorBusinessId: details?.operator_business_id ?? null,
+          contactName: details?.contact_name ?? null,
+          contactPhone: details?.contact_phone ?? null,
+          treatmentCode: details?.treatment_code ?? null,
         }
       : null,
   };
 
   return {
     loadId: load.id,
+    receiver: load.scale_site_id
+      ? {
+          siteId: load.scale_site_id,
+          operatorName: details?.operator_name ?? null,
+          operatorBusinessId: details?.operator_business_id ?? null,
+          postalCode: details?.postal_code ?? null,
+          contactName: details?.contact_name ?? null,
+          contactPhone: details?.contact_phone ?? null,
+          treatmentCode: details?.treatment_code ?? null,
+        }
+      : null,
     documentId: load.siirto_document_id,
     sentAt: load.siirto_sent_at,
     error: load.siirto_error,

@@ -55,13 +55,7 @@ export default async function TransferDocumentPage({ params }: { params: Promise
     supabase.from('drivers').select('full_name').eq('id', day.driver_id).maybeSingle(),
     day.vehicle_id ? supabase.from('vehicles').select('plate').eq('id', day.vehicle_id).maybeSingle() : Promise.resolve({ data: null }),
     day.trailer_id ? supabase.from('trailers').select('plate').eq('id', day.trailer_id).maybeSingle() : Promise.resolve({ data: null }),
-    load.scale_site_id
-      ? supabase
-          .from('scale_sites')
-          .select('id, name, address, city, postal_code, operator_name, operator_business_id, contact_name, contact_phone, treatment_code')
-          .eq('id', load.scale_site_id)
-          .maybeSingle()
-      : Promise.resolve({ data: null }),
+    load.scale_site_id ? supabase.from('scale_sites').select('name, address, city').eq('id', load.scale_site_id).maybeSingle() : Promise.resolve({ data: null }),
   ]);
 
   const kind = material(load.material_code);
@@ -198,19 +192,7 @@ export default async function TransferDocumentPage({ params }: { params: Promise
           sentAt={siirto.sentAt}
           lastError={siirto.error}
           missing={siirto.result.ok ? null : siirto.result.missing}
-          receiver={
-            receiver
-              ? {
-                  siteId: receiver.id,
-                  operatorName: receiver.operator_name,
-                  operatorBusinessId: receiver.operator_business_id,
-                  postalCode: receiver.postal_code,
-                  contactName: receiver.contact_name,
-                  contactPhone: receiver.contact_phone,
-                  treatmentCode: receiver.treatment_code,
-                }
-              : null
-          }
+          receiver={siirto.receiver}
         />
       )}
     </main>

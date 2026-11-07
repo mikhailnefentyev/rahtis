@@ -17,6 +17,17 @@ import { loadSiirto } from './load';
 
 export type SiirtoState = { error: string | null; sent: boolean };
 
+/*
+ * Те же ворота, что у кабинета (requireRole): отклонённая или
+ * замороженная компания ничего не отправляет и не правит.
+ */
+async function activeCarrier() {
+  const viewer = await getViewer();
+  if (viewer.status !== 'ready' || viewer.role !== 'CARRIER' || !viewer.company) return null;
+  if (viewer.company.status === 'REJECTED' || viewer.company.frozen_at) return null;
+  return viewer;
+}
+
 const toLocale = (value: FormDataEntryValue | null): Locale => {
   const raw = String(value ?? '');
   return isLocale(raw) ? raw : defaultLocale;
@@ -25,15 +36,15 @@ const toLocale = (value: FormDataEntryValue | null): Locale => {
 export async function sendToSiirtoAction(_previous: SiirtoState, formData: FormData): Promise<SiirtoState> {
   const locale = toLocale(formData.get('locale'));
   const t = await getDictionary(locale);
-  const viewer = await getViewer();
-  if (viewer.status !== 'ready' || viewer.role !== 'CARRIER' || !viewer.company) return { error: t.error.forbidden, sent: false };
+  const viewer = await activeCarrier();
+  if (!viewer) return { error: t.error.forbidden, sent: false };
 
   const config = siirtoConfig();
   if (!config) return { error: t.siirto.off, sent: false };
 
   const loadId = String(formData.get('load_id') ?? '');
   if (!/^[0-9a-f-]{36}$/i.test(loadId)) return { error: t.error.forbidden, sent: false };
-  const data = await loadSiirto(loadId, viewer.company);
+  const data = await loadSiirto(loadId, viewer.company!);
   if (!data) return { error: t.error.forbidden, sent: false };
   if (!data.result.ok) return { error: t.siirto.incomplete, sent: false };
 
@@ -74,7 +85,8 @@ export async function saveReceiverAction(_previous: ReceiverState, formData: For
   const locale = toLocale(formData.get('locale'));
   const t = await getDictionary(locale);
   const viewer = await getViewer();
-  if (viewer.status !== 'ready') return { error: t.error.forbidden, saved: false };
+  const allowed = viewer.status === 'ready' && (viewer.role === 'ADMIN' || (await activeCarrier()) !== null);
+  if (!allowed) return { error: t.error.forbidden, saved: false };
 
   const read = (key: string) => String(formData.get(key) ?? '').trim();
   const { error } = await (await createClient()).rpc('update_scale_site_receiver', {
