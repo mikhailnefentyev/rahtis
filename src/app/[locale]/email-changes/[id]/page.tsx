@@ -67,6 +67,7 @@ export default async function EmailChangesPage({ params }: { params: Promise<{ l
     content = (
       <>
         <h1 className="page-title">{tc.title.replace('{ref}', value.order.ref)}</h1>
+        {value.order.client && <p className="mt-1 text-[14px] font-semibold">{value.order.client}</p>}
         <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-ink-muted">
           {tc.intro
             .replace('{subject}', value.subject || '—')

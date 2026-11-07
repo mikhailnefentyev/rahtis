@@ -157,19 +157,26 @@ const AMENDABLE = ['OPEN', 'REQUESTED', 'AWAIT_DRIVER', 'IN_PROGRESS'] as const;
  * поправка, а не новый заказ. Заказчику — его заказы, перевозчику —
  * рейсы, где он назначен (свои и со стола). Совпало несколько — самый
  * свежий. Сравнение без регистра и знаков: «DFDS-4471» = «dfds 4471».
+ *
+ * Клиентов у перевозчика много, и номера заказов у разных клиентов
+ * совпадают («4471» есть и у одного, и у другого). Если разбор узнал
+ * клиента из справочника, рейс ищется только среди рейсов этого клиента.
  */
 async function amendedOrder(
   admin: ReturnType<typeof createAdminClient>,
   target: Target,
   shipperRef: string,
+  clientId: string | null,
 ): Promise<{ id: string; ref: string } | null> {
   const key = refKey(shipperRef);
   if (key.length < 3) return null;
   const since = new Date(Date.now() - 120 * 86_400_000).toISOString();
-  const { data, error } = await admin
+  let query = admin
     .from('orders')
     .select('id, ref, shipper_ref, created_at')
-    .eq(target.kind === 'CARRIER' ? 'assigned_company_id' : 'shipper_company_id', target.company_id)
+    .eq(target.kind === 'CARRIER' ? 'assigned_company_id' : 'shipper_company_id', target.company_id);
+  if (target.kind === 'CARRIER' && clientId) query = query.eq('shipper_company_id', clientId);
+  const { data, error } = await query
     .in('status', [...AMENDABLE])
     .not('shipper_ref', 'is', null)
     .gte('created_at', since)
@@ -244,7 +251,7 @@ export async function processInbound(accepted: Accepted, apiKey: string): Promis
         : ({ ok: false, reason: 'empty' } as const);
       if (result.ok) {
         parsed = true;
-        amends = await amendedOrder(admin, target, result.draft.shipperRef);
+        amends = await amendedOrder(admin, target, result.draft.shipperRef, result.draft.client?.id ?? null);
         await finish('PARSED', result.draft as unknown as Json, amends?.id ?? null);
       } else {
         console.warn('inbound: разбор не удался:', result.reason, emailId);

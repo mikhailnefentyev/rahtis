@@ -17,7 +17,7 @@ export type EmailChanges = {
   subject: string;
   from: string;
   receivedAt: string;
-  order: { id: string; ref: string; status: string; shipperRef: string | null };
+  order: { id: string; ref: string; status: string; shipperRef: string | null; client: string | null };
   changes: TripChanges;
   /** Машину меняет только перевозчик рейса. */
   canChangeVehicle: boolean;
@@ -43,10 +43,12 @@ export async function loadEmailChanges(
 
   const { data: order } = await supabase
     .from('orders')
-    .select('id, ref, status, shipper_ref')
+    .select('id, ref, status, shipper_ref, shipper_company_id')
     .eq('id', row.amends_order_id)
     .maybeSingle();
   if (!order) return { ok: false, reason: 'notFound' };
+  /* Чей рейс — чтобы случайное совпадение номера у другого клиента было видно сразу. */
+  const { data: client } = await supabase.from('companies').select('name').eq('id', order.shipper_company_id).maybeSingle();
 
   const { data: stops, error } = await supabase
     .from('order_stops')
@@ -103,7 +105,7 @@ export async function loadEmailChanges(
       subject: row.subject,
       from: row.from_address,
       receivedAt: row.received_at,
-      order: { id: order.id, ref: order.ref, status: order.status, shipperRef: order.shipper_ref },
+      order: { id: order.id, ref: order.ref, status: order.status, shipperRef: order.shipper_ref, client: client?.name ?? null },
       changes,
       canChangeVehicle: carrier,
     },
