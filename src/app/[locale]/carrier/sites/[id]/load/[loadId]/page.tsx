@@ -6,9 +6,12 @@ import { getDictionary, isLocale } from '@/lib/i18n';
 import { getViewerI18n } from '@/lib/i18n/viewer';
 import { isSiteCountry, LABELS_EN, wasteDocFor } from '@/lib/sites/wasteDocs';
 import { parseRegistrations, registrationLine } from '@/lib/waste/registrations';
-import { material, wasteCodeLabel } from '@/lib/sites/work';
+import { finnishTransferRequired, isContaminated, material, wasteCodeLabel } from '@/lib/sites/work';
 import { createClient } from '@/lib/supabase/server';
 import { PrintButton } from './PrintButton';
+import { SiirtoPanel } from './SiirtoPanel';
+import { siirtoConfig } from '@/lib/siirto/client';
+import { loadSiirto } from '@/lib/siirto/load';
 
 export const metadata: Metadata = { title: 'Siirtoasiakirja' };
 
@@ -52,11 +55,22 @@ export default async function TransferDocumentPage({ params }: { params: Promise
     supabase.from('drivers').select('full_name').eq('id', day.driver_id).maybeSingle(),
     day.vehicle_id ? supabase.from('vehicles').select('plate').eq('id', day.vehicle_id).maybeSingle() : Promise.resolve({ data: null }),
     day.trailer_id ? supabase.from('trailers').select('plate').eq('id', day.trailer_id).maybeSingle() : Promise.resolve({ data: null }),
-    load.scale_site_id ? supabase.from('scale_sites').select('name, address, city').eq('id', load.scale_site_id).maybeSingle() : Promise.resolve({ data: null }),
+    load.scale_site_id
+      ? supabase
+          .from('scale_sites')
+          .select('id, name, address, city, postal_code, operator_name, operator_business_id, contact_name, contact_phone, treatment_code')
+          .eq('id', load.scale_site_id)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
   ]);
 
   const kind = material(load.material_code);
-  const doc = wasteDocFor(country, kind?.hazardous ?? false, day.day);
+  const contaminated = isContaminated(load.material_code, job.contaminated);
+  const fiRequired = finnishTransferRequired(load.material_code, job.contaminated);
+  const doc = wasteDocFor(country, kind?.hazardous ?? false, day.day, fiRequired);
+  /* Реестр SIIRTO — только финский объект и только когда документ обязателен. */
+  const siirto = country === 'FI' && fiRequired ? await loadSiirto(load.id, company) : null;
+  const siirtoCfg = siirtoConfig();
   const L = doc.labels;
   const E = LABELS_EN;
   const code = load.material_code as keyof typeof docDict.siteWork.materials;
@@ -147,6 +161,7 @@ export default async function TransferDocumentPage({ params }: { params: Promise
                 {materialName !== materialEn && <span className="block text-ink-muted">{materialEn}</span>}
               </>
             ))}
+            {kind?.soil && row(L.soil, E.soil, contaminated ? L.contaminated : L.clean)}
             {row(L.quantity, E.quantity, (
               <>
                 {load.net_kg != null ? <span className="font-mono font-semibold">{kg(load.net_kg)} kg</span> : '—'}
@@ -170,9 +185,34 @@ export default async function TransferDocumentPage({ params }: { params: Promise
           </div>
         )}
         {country === 'FI' && (
-          <p className="mt-4 text-[12px] text-ink-muted">{kind?.registry ? t.sites.registryNote : t.sites.registryNo}</p>
+          <p className="mt-4 text-[12px] text-ink-muted">{fiRequired ? t.sites.registryNote : t.sites.registryNo}</p>
         )}
       </article>
+
+      {siirto && (
+        <SiirtoPanel
+          loadId={load.id}
+          enabled={siirtoCfg !== null}
+          test={siirtoCfg?.test ?? true}
+          documentId={siirto.documentId}
+          sentAt={siirto.sentAt}
+          lastError={siirto.error}
+          missing={siirto.result.ok ? null : siirto.result.missing}
+          receiver={
+            receiver
+              ? {
+                  siteId: receiver.id,
+                  operatorName: receiver.operator_name,
+                  operatorBusinessId: receiver.operator_business_id,
+                  postalCode: receiver.postal_code,
+                  contactName: receiver.contact_name,
+                  contactPhone: receiver.contact_phone,
+                  treatmentCode: receiver.treatment_code,
+                }
+              : null
+          }
+        />
+      )}
     </main>
   );
 }

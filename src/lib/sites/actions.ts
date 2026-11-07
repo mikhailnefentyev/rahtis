@@ -1,5 +1,6 @@
 'use server';
 
+import { HAZARD_CODES, TREATMENT_CODES } from '@/lib/siirto/document';
 import { asCurrency } from '@/lib/money/currency';
 import { revalidatePath } from 'next/cache';
 import { requireRole } from '@/lib/auth/guard';
@@ -91,6 +92,13 @@ export async function saveSiteJobAction(_previous: SiteJobState, formData: FormD
     rate_cents: Math.round(rate * 100),
     material_code: material,
     receiving_site_id: text(formData, 'receiving_site_id'),
+    /* Документы на груз (7.11.2026): загрязнённость и данные для реестра отходов. */
+    contaminated: formData.get('contaminated') === '1',
+    customer_contact_name: (text(formData, 'customer_contact_name') ?? '').slice(0, 120) || null,
+    customer_contact_phone: (text(formData, 'customer_contact_phone') ?? '').replace(/[^\d+ ()-]/g, '').slice(0, 24) || null,
+    treatment_code: (TREATMENT_CODES as readonly string[]).includes(text(formData, 'treatment_code') ?? '') ? text(formData, 'treatment_code') : null,
+    hazard_codes: formData.getAll('hazard_codes').map(String).filter((x) => (HAZARD_CODES as readonly string[]).includes(x)),
+    hazard_composition: (text(formData, 'hazard_composition') ?? '').slice(0, 500) || null,
     buffer_minutes: Number.isFinite(buffer) ? Math.min(180, Math.max(0, buffer)) : 30,
   };
 

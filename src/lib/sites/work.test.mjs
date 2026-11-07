@@ -40,3 +40,17 @@ test('коды отходов', () => {
   assert.equal(material('170504')?.registry, false);
   assert.equal(material('SORA')?.waste, false);
 });
+
+test('Финляндия: siirtoasiakirja — строительные и опасные всегда, грунт только загрязнённый', async () => {
+  const { finnishTransferRequired, isContaminated } = await import('./work.ts');
+  assert.equal(finnishTransferRequired('170504', false), false); // чистый грунт
+  assert.equal(finnishTransferRequired('170504', true), true); // PIMA
+  assert.equal(finnishTransferRequired('170506', false), false);
+  assert.equal(finnishTransferRequired('170503', false), true); // опасный — всегда
+  assert.equal(finnishTransferRequired('170107', false), true); // бетон/кирпич — всегда
+  assert.equal(finnishTransferRequired('170904', false), true);
+  assert.equal(finnishTransferRequired('MURSKE', true), false); // товар, не отход
+  assert.equal(isContaminated('170503', false), true);
+  assert.equal(isContaminated('170504', true), true);
+  assert.equal(isContaminated('170107', true), false); // не грунт
+});

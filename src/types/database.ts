@@ -4755,6 +4755,12 @@ export type Database = {
           mscales: boolean
           name: string
           rejected_at: string | null
+          operator_name: string | null
+          operator_business_id: string | null
+          postal_code: string | null
+          contact_name: string | null
+          contact_phone: string | null
+          treatment_code: string | null
         }
         Insert: {
           accepts?: string | null
@@ -4771,6 +4777,12 @@ export type Database = {
           mscales?: boolean
           name: string
           rejected_at?: string | null
+          operator_name?: string | null
+          operator_business_id?: string | null
+          postal_code?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          treatment_code?: string | null
         }
         Update: {
           accepts?: string | null
@@ -4787,6 +4799,12 @@ export type Database = {
           mscales?: boolean
           name?: string
           rejected_at?: string | null
+          operator_name?: string | null
+          operator_business_id?: string | null
+          postal_code?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          treatment_code?: string | null
         }
         Relationships: [
           {
@@ -5057,6 +5075,12 @@ export type Database = {
           receiving_site_id: string | null
           status: string
           updated_at: string
+          contaminated: boolean
+          customer_contact_name: string | null
+          customer_contact_phone: string | null
+          treatment_code: string | null
+          hazard_codes: string[]
+          hazard_composition: string | null
         }
         Insert: {
           address?: string | null
@@ -5087,6 +5111,12 @@ export type Database = {
           receiving_site_id?: string | null
           status?: string
           updated_at?: string
+          contaminated?: boolean
+          customer_contact_name?: string | null
+          customer_contact_phone?: string | null
+          treatment_code?: string | null
+          hazard_codes?: string[]
+          hazard_composition?: string | null
         }
         Update: {
           address?: string | null
@@ -5117,6 +5147,12 @@ export type Database = {
           receiving_site_id?: string | null
           status?: string
           updated_at?: string
+          contaminated?: boolean
+          customer_contact_name?: string | null
+          customer_contact_phone?: string | null
+          treatment_code?: string | null
+          hazard_codes?: string[]
+          hazard_composition?: string | null
         }
         Relationships: [
           {
@@ -5157,6 +5193,9 @@ export type Database = {
           tare_kg: number | null
           ticket_no: string | null
           unloaded_at: string
+          siirto_document_id: string | null
+          siirto_sent_at: string | null
+          siirto_error: string | null
         }
         Insert: {
           company_id: string
@@ -5172,6 +5211,9 @@ export type Database = {
           tare_kg?: number | null
           ticket_no?: string | null
           unloaded_at: string
+          siirto_document_id?: string | null
+          siirto_sent_at?: string | null
+          siirto_error?: string | null
         }
         Update: {
           company_id?: string
@@ -5187,6 +5229,9 @@ export type Database = {
           tare_kg?: number | null
           ticket_no?: string | null
           unloaded_at?: string
+          siirto_document_id?: string | null
+          siirto_sent_at?: string | null
+          siirto_error?: string | null
         }
         Relationships: [
           {
@@ -7788,6 +7833,18 @@ export type Database = {
       }
       detach_order_email_draft: { Args: { p_id: string }; Returns: undefined }
       request_exchange_connection: { Args: { p_provider: string }; Returns: undefined }
+      update_scale_site_receiver: {
+        Args: {
+          p_contact_name: string
+          p_contact_phone: string
+          p_operator_business_id: string
+          p_operator_name: string
+          p_postal_code: string
+          p_site_id: string
+          p_treatment_code: string
+        }
+        Returns: undefined
+      }
       withdraw_exchange_connection: { Args: { p_provider: string }; Returns: undefined }
       comment_claim: {
         Args: { p_body: string; p_claim_id: string }

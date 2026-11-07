@@ -40,6 +40,10 @@ type Labels = {
   receiverOk: string;
   ticket: string;
   pending: string;
+  /* Качество грунта (7.11.2026): строка на документе, если груз — грунт. */
+  soil: string;
+  contaminated: string;
+  clean: string;
 };
 
 /* Английская строка под каждой подписью — как на финском документе. */
@@ -57,6 +61,9 @@ export const LABELS_EN: Labels = {
   receiverOk: 'Receiver confirmation',
   ticket: 'Weigh ticket',
   pending: 'Awaiting the foreman’s confirmation',
+  soil: 'Soil quality',
+  contaminated: 'Contaminated soil',
+  clean: 'Clean soil',
 };
 
 const LABELS: Record<SiteCountry, Labels> = {
@@ -65,54 +72,63 @@ const LABELS: Record<SiteCountry, Labels> = {
     from: 'Siirron alkamispaikka', to: 'Siirron päättymispaikka', waste: 'Jätteen nimike (jäteluettelo)', quantity: 'Määrä',
     holderOk: 'Haltijan vahvistus', carrierOk: 'Kuljettajan vahvistus', receiverOk: 'Vastaanottajan vahvistus',
     ticket: 'Punnituslippu', pending: 'Odottaa työnjohtajan vahvistusta',
+    soil: 'Maa-aineksen laatu', contaminated: 'Pilaantunut (PIMA)', clean: 'Pilaantumaton',
   },
   SE: {
     holder: 'Avlämnare (avfallsinnehavare)', carrier: 'Transportör', receiver: 'Mottagare', time: 'Datum och tid för transporten',
     from: 'Varifrån', to: 'Vart (slutlig mottagare)', waste: 'Avfallstyp (avfallskod)', quantity: 'Vikt',
     holderOk: 'Avlämnarens bekräftelse', carrierOk: 'Transportörens bekräftelse', receiverOk: 'Mottagarens bekräftelse',
     ticket: 'Vågsedel', pending: 'Väntar på arbetsledarens bekräftelse',
+    soil: 'Massornas kvalitet', contaminated: 'Förorenade massor', clean: 'Rena massor',
   },
   NO: {
     holder: 'Avfallsbesitter', carrier: 'Transportør', receiver: 'Mottaker', time: 'Dato og tid for transporten',
     from: 'Hentested', to: 'Leveringssted', waste: 'Avfallstype (EAL-kode)', quantity: 'Mengde',
     holderOk: 'Bekreftelse fra avfallsbesitter', carrierOk: 'Bekreftelse fra transportør', receiverOk: 'Bekreftelse fra mottaker',
     ticket: 'Veieseddel', pending: 'Venter på bekreftelse fra arbeidsleder',
+    soil: 'Massenes kvalitet', contaminated: 'Forurensede masser', clean: 'Rene masser',
   },
   DK: {
     holder: 'Anmelder (bygherre)', carrier: 'Transportør (navn, adresse, CVR)', receiver: 'Modtageanlæg', time: 'Dato og tid for læsset',
     from: 'Jorden flyttes fra', to: 'Jorden flyttes til', waste: 'Jord/affald (affaldskode)', quantity: 'Mængde',
     holderOk: 'Anmelders bekræftelse', carrierOk: 'Transportørens bekræftelse', receiverOk: 'Modtagerens kvittering',
     ticket: 'Vejeseddel', pending: 'Afventer byggelederens bekræftelse',
+    soil: 'Jordens kvalitet', contaminated: 'Forurenet jord', clean: 'Ren jord',
   },
   EE: {
     holder: 'Jäätmevaldaja (üleandja)', carrier: 'Vedaja', receiver: 'Vastuvõtja', time: 'Veo kuupäev ja kellaaeg',
     from: 'Laadimiskoht', to: 'Mahalaadimiskoht', waste: 'Jäätmekood ja nimetus', quantity: 'Kogus',
     holderOk: 'Üleandja kinnitus', carrierOk: 'Vedaja kinnitus', receiverOk: 'Vastuvõtja kinnitus',
     ticket: 'Kaalukviitung', pending: 'Ootab töödejuhataja kinnitust',
+    soil: 'Pinnase seisund', contaminated: 'Saastunud pinnas', clean: 'Saastumata pinnas',
   },
   LV: {
     holder: 'Atkritumu radītājs (nodevējs)', carrier: 'Pārvadātājs', receiver: 'Saņēmējs', time: 'Pārvadājuma datums un laiks',
     from: 'Iekraušanas vieta', to: 'Izkraušanas vieta', waste: 'Atkritumu klase un nosaukums', quantity: 'Daudzums',
     holderOk: 'Nodevēja apstiprinājums', carrierOk: 'Pārvadātāja apstiprinājums', receiverOk: 'Saņēmēja apstiprinājums',
     ticket: 'Svēršanas kvīts', pending: 'Gaida darbu vadītāja apstiprinājumu',
+    soil: 'Grunts stāvoklis', contaminated: 'Piesārņota grunts', clean: 'Nepiesārņota grunts',
   },
   LT: {
     holder: 'Atliekų turėtojas (siuntėjas)', carrier: 'Vežėjas', receiver: 'Gavėjas (atliekų tvarkytojas)', time: 'Vežimo data ir laikas',
     from: 'Pakrovimo vieta', to: 'Iškrovimo vieta', waste: 'Atliekų kodas ir pavadinimas', quantity: 'Kiekis',
     holderOk: 'Siuntėjo patvirtinimas', carrierOk: 'Vežėjo patvirtinimas', receiverOk: 'Gavėjo patvirtinimas',
     ticket: 'Svėrimo kvitas', pending: 'Laukia darbų vadovo patvirtinimo',
+    soil: 'Grunto būklė', contaminated: 'Užterštas gruntas', clean: 'Neužterštas gruntas',
   },
   PL: {
     holder: 'Przekazujący odpady (wytwórca)', carrier: 'Transportujący', receiver: 'Przejmujący odpady', time: 'Data i godzina transportu',
     from: 'Miejsce wytworzenia (budowa)', to: 'Miejsce przekazania', waste: 'Kod i rodzaj odpadu', quantity: 'Masa',
     holderOk: 'Potwierdzenie przekazującego', carrierOk: 'Potwierdzenie transportującego', receiverOk: 'Potwierdzenie przejmującego',
     ticket: 'Kwit wagowy', pending: 'Czeka na potwierdzenie kierownika budowy',
+    soil: 'Stan gleby i ziemi', contaminated: 'Zanieczyszczona gleba i ziemia', clean: 'Niezanieczyszczona gleba i ziemia',
   },
   DE: {
     holder: 'Abfallerzeuger / Besitzer', carrier: 'Beförderer', receiver: 'Annahmestelle', time: 'Datum und Uhrzeit der Fuhre',
     from: 'Anfallstelle (Baustelle)', to: 'Verbleib (Annahmestelle)', waste: 'Abfallschlüssel und Bezeichnung', quantity: 'Menge',
     holderOk: 'Bestätigung Erzeuger', carrierOk: 'Bestätigung Beförderer', receiverOk: 'Bestätigung Annahmestelle',
     ticket: 'Wiegeschein', pending: 'Wartet auf Bestätigung des Bauleiters',
+    soil: 'Bodenmaterial', contaminated: 'Belastetes Bodenmaterial', clean: 'Unbelastetes Bodenmaterial',
   },
 };
 
@@ -148,7 +164,12 @@ const EE_ALL_WASTE_FROM = '2027-01-01';
  * Какой документ на рейс. day — дата рейса (YYYY-MM-DD): в Эстонии
  * требование меняется 01.01.2027.
  */
-export function wasteDocFor(country: SiteCountry, hazardous: boolean, day: string): WasteDoc {
+/**
+ * fiRequired — только для Финляндии: нужен ли siirtoasiakirja (finnishTransferRequired
+ * в work.ts). Чистый грунт вне обязанности (SYKE 30.10.2026): вместо документа —
+ * простая запись о рейсе. В остальных странах правило своё и от отметки не зависит.
+ */
+export function wasteDocFor(country: SiteCountry, hazardous: boolean, day: string, fiRequired = true): WasteDoc {
   const labels = LABELS[country];
   const print = (title: string, titleEn: string, law: string, note: WasteDoc['note'] = null): WasteDoc => ({
     country, mode: 'PRINT', title, titleEn, law, labels, note, state: null,
@@ -159,7 +180,12 @@ export function wasteDocFor(country: SiteCountry, hazardous: boolean, day: strin
 
   switch (country) {
     case 'FI':
-      return print('Siirtoasiakirja', 'Waste transfer document', 'Jätelaki 646/2011, 121 §');
+      return fiRequired
+        ? print('Siirtoasiakirja', 'Waste transfer document', 'Jätelaki 646/2011, 121 §')
+        : print('Kuormatosite', 'Load record', 'Jätelaki 646/2011, 121 §', {
+            local: 'Pilaantumaton maa-aines ei kuulu siirtoasiakirjavelvoitteeseen, eikä sen tietoja ilmoiteta SIIRTO-rekisteriin. Tosite kirjaa kuorman, painon ja vastaanottajan.',
+            en: 'Clean soil is outside the waste transfer document obligation and is not reported to the SIIRTO register. This record shows the load, weight and receiver.',
+          });
     case 'DK':
       return print('Følgeseddel', 'Soil transport delivery note', 'Jordflytningsbekendtgørelsen (BEK nr. 1452 af 07/12/2015), §§ 9 og 12', {
         local: 'Følgesedlen er en kopi af anmeldelsen til kommunen. Transportøren påfører navn, adresse og CVR-nr. og medbringer den ved hvert læs. Anmeldelsen foretages i JordWeb eller kommunens system.',

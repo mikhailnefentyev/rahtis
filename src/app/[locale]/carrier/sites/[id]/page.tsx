@@ -7,7 +7,7 @@ import { siteUrl } from '@/lib/config';
 import { combinationMass, isMassCountry } from '@/lib/fleet/mass';
 import { isLocale } from '@/lib/i18n';
 import { getViewerI18n } from '@/lib/i18n/viewer';
-import { dayEnd, dayMinutes, hoursLabel, material, siteAmountCents } from '@/lib/sites/work';
+import { dayEnd, dayMinutes, finnishTransferRequired, hoursLabel, material, siteAmountCents } from '@/lib/sites/work';
 import { isSiteCountry, wasteDocFor } from '@/lib/sites/wasteDocs';
 import { createClient } from '@/lib/supabase/server';
 import { carrierApproveDayAction } from '@/lib/sites/actions';
@@ -274,6 +274,7 @@ export default async function SiteJobPage({ params }: { params: Promise<{ locale
                                       isSiteCountry(job.country) ? job.country : 'FI',
                                       material(l.material_code)?.hazardous ?? false,
                                       l.unloaded_at.slice(0, 10),
+                                      finnishTransferRequired(l.material_code, job.contaminated),
                                     ).title}
                                   </Link>
                                 )}

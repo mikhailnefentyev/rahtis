@@ -14,19 +14,22 @@
  * загрязнённого грунта и строительных отходов, нет для чистого грунта.
  * hazardous — опасный отход (в перечне со звёздочкой): в других странах
  * от него зависит, нужна ли госсистема (eANV, Avfallsregistret…).
+ * soil — грунт (maa-aines): чистый или загрязнённый решает не код, а
+ * отметка объекта «загрязнён» (PIMA). SYKE 30.10.2026: чистый грунт вне
+ * обязанности siirtoasiakirja; загрязнённый — 17 05 03* и 17 05 04.
  */
 export const MATERIALS = [
-  { code: '170504', waste: true, hazardous: false, registry: false },
-  { code: '170506', waste: true, hazardous: false, registry: false },
-  { code: '170503', waste: true, hazardous: true, registry: true },
-  { code: '170107', waste: true, hazardous: false, registry: true },
-  { code: '170302', waste: true, hazardous: false, registry: true },
-  { code: '170904', waste: true, hazardous: false, registry: true },
-  { code: 'SORA', waste: false, hazardous: false, registry: false },
-  { code: 'MURSKE', waste: false, hazardous: false, registry: false },
-  { code: 'HIEKKA', waste: false, hazardous: false, registry: false },
-  { code: 'MULTA', waste: false, hazardous: false, registry: false },
-  { code: 'LOUHE', waste: false, hazardous: false, registry: false },
+  { code: '170504', waste: true, hazardous: false, registry: false, soil: true },
+  { code: '170506', waste: true, hazardous: false, registry: false, soil: true },
+  { code: '170503', waste: true, hazardous: true, registry: true, soil: true },
+  { code: '170107', waste: true, hazardous: false, registry: true, soil: false },
+  { code: '170302', waste: true, hazardous: false, registry: true, soil: false },
+  { code: '170904', waste: true, hazardous: false, registry: true, soil: false },
+  { code: 'SORA', waste: false, hazardous: false, registry: false, soil: false },
+  { code: 'MURSKE', waste: false, hazardous: false, registry: false, soil: false },
+  { code: 'HIEKKA', waste: false, hazardous: false, registry: false, soil: false },
+  { code: 'MULTA', waste: false, hazardous: false, registry: false, soil: false },
+  { code: 'LOUHE', waste: false, hazardous: false, registry: false, soil: false },
 ] as const;
 
 export type MaterialCode = (typeof MATERIALS)[number]['code'];
@@ -37,6 +40,23 @@ export function isMaterialCode(value: unknown): value is MaterialCode {
 
 export function material(code: string) {
   return MATERIALS.find((m) => m.code === code) ?? null;
+}
+
+/**
+ * Финляндия: нужен ли siirtoasiakirja и подача в SIIRTO (jätelaki 121 §).
+ * Строительные отходы и опасное — всегда; грунт — только загрязнённый
+ * (отметка объекта); товарный материал и чистый грунт — нет.
+ */
+export function finnishTransferRequired(code: string, contaminated: boolean): boolean {
+  const m = material(code);
+  if (!m?.waste) return false;
+  return m.hazardous || !m.soil || contaminated;
+}
+
+/** Грунт загрязнён: отметка объекта или опасный код (17 05 03* загрязнён по определению). */
+export function isContaminated(code: string, contaminatedMark: boolean): boolean {
+  const m = material(code);
+  return Boolean(m?.soil && (contaminatedMark || m.hazardous));
 }
 
 /** «17 05 04», опасный — «17 05 03*»: как код пишут в документах. */

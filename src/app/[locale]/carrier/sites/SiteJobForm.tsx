@@ -5,6 +5,7 @@ import { useActionState, useEffect, useRef, useState, useTransition } from 'reac
 import { Button, Card, CardBody, Field, Input, InputMono, Select } from '@/components/ui';
 import { lookupCustomerAction, saveSiteJobAction, type SiteJobState } from '@/lib/sites/actions';
 import { MATERIALS } from '@/lib/sites/work';
+import { HAZARD_CODES, TREATMENT_CODES } from '@/lib/siirto/document';
 import { SITE_COUNTRIES } from '@/lib/sites/wasteDocs';
 import { useI18n } from '@/lib/i18n/provider';
 import type { ScaleSite, SiteJob } from '@/types/db';
@@ -210,6 +211,49 @@ export function SiteJobForm({
           </Field>
           <Field label={t.siteInvoice.paymentTerm}>
             {(p) => <InputMono {...p} name="payment_term_days" inputMode="numeric" defaultValue={String(job?.payment_term_days ?? 14)} />}
+          </Field>
+
+          {/* Документы на груз (7.11.2026): загрязнённость и данные для реестра отходов (SIIRTO и др.). */}
+          <p className="mt-2 border-t border-line pt-4 text-[13px] font-semibold sm:col-span-2">{t.siirto.jobSection}</p>
+          <label className="flex items-start gap-2.5 text-[13px] sm:col-span-2">
+            <input type="checkbox" name="contaminated" value="1" defaultChecked={job?.contaminated ?? false} className="mt-0.5 h-4 w-4" />
+            <span>
+              <span className="font-semibold">{t.siirto.contaminated}</span>
+              <span className="block text-ink-muted">{t.siirto.contaminatedHint}</span>
+            </span>
+          </label>
+          <Field label={t.siirto.contactName} hint={t.siirto.contactHint}>
+            {(p) => <Input {...p} name="customer_contact_name" defaultValue={job?.customer_contact_name ?? ''} />}
+          </Field>
+          <Field label={t.siirto.contactPhone}>
+            {(p) => <InputMono {...p} name="customer_contact_phone" type="tel" defaultValue={job?.customer_contact_phone ?? ''} placeholder="+358 40 123 4567" />}
+          </Field>
+          <Field label={t.siirto.treatment} hint={t.siirto.treatmentHint} className="sm:col-span-2">
+            {(p) => (
+              <Select {...p} name="treatment_code" defaultValue={job?.treatment_code ?? ''}>
+                <option value="">{t.siirto.treatmentFromSite}</option>
+                {TREATMENT_CODES.map((code) => (
+                  <option key={code} value={code}>
+                    {code} · {t.siirto.treatments[code]}
+                  </option>
+                ))}
+              </Select>
+            )}
+          </Field>
+          <fieldset className="flex flex-col gap-2 sm:col-span-2">
+            <legend className="text-[13px] font-semibold">{t.siirto.hazardCodes}</legend>
+            <p className="text-[12px] text-ink-muted">{t.siirto.hazardHint}</p>
+            <div className="flex flex-wrap gap-x-4 gap-y-1.5">
+              {HAZARD_CODES.map((code) => (
+                <label key={code} className="flex items-center gap-1.5 font-mono text-[12px]">
+                  <input type="checkbox" name="hazard_codes" value={code} defaultChecked={job?.hazard_codes?.includes(code) ?? false} className="h-4 w-4" />
+                  {code}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+          <Field label={t.siirto.hazardComposition} className="sm:col-span-2">
+            {(p) => <Input {...p} name="hazard_composition" maxLength={500} defaultValue={job?.hazard_composition ?? ''} />}
           </Field>
 
           {state.error && <p className="text-[13px] text-danger sm:col-span-2">{state.error}</p>}
