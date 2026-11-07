@@ -2,7 +2,8 @@
  * Проверка формата SIIRTO на тестовой среде SYKE: выдуманный рейс →
  * создать → прочитать → удалить. Реальных данных не трогает.
  *
- *   npx tsx scripts/siirto-smoke.mts
+ *   npx tsx scripts/siirto-smoke.mts            — чистый 17 05 04 с отметкой PIMA
+ *   npx tsx scripts/siirto-smoke.mts hazardous  — опасный 17 05 03*
  *
  * Ключи — из .env.local: SIIRTO_CLIENT_ID, SIIRTO_CLIENT_SECRET
  * (тестовые, client_credentials). Рабочую среду скрипт не трогает.
@@ -38,11 +39,12 @@ if (!tokenRes.ok) process.exit(1);
 const { access_token: token } = (await tokenRes.json()) as { access_token: string };
 const auth = { authorization: `Bearer ${token}`, accept: 'application/json' };
 
+const hazardous = process.argv.includes('hazardous');
 const doc = buildShippingDocument({
   required: true,
   country: 'FI',
-  materialCode: '170504',
-  hazardous: false,
+  materialCode: hazardous ? '170503' : '170504',
+  hazardous,
   materialName: 'Maa- ja kiviaines (RAHTIS testi)',
   contaminated: true,
   netKg: 18450,
@@ -62,8 +64,8 @@ const doc = buildShippingDocument({
     contactPhone: '+358401234567',
     contactEmail: null,
     treatmentCode: 'R5.3',
-    hazardCodes: [],
-    hazardComposition: null,
+    hazardCodes: hazardous ? ['HP7', 'HP14'] : [],
+    hazardComposition: hazardous ? 'Öljyhiilivedyt C10–C40 1 200 mg/kg (testi)' : null,
   },
   carrier: { name: 'Aivomaa Oy (testi)', businessId: '3592993-6', street: 'Kankarepolku 5F', postalCode: '00770', city: 'Helsinki' },
   driver: { name: 'Testi Kuljettaja', phone: '+358409876543', email: null },
@@ -97,6 +99,17 @@ const docId = createdText.replace(/^"|"$/g, '');
 const read = await fetch(`${API}/api/v4/shippingdocuments/${docId}`, { headers: auth });
 const readJson = (await read.json()) as { state?: string; wastes?: { loWCode: string; quantity: number }[] };
 console.log('read', read.status, readJson.state, JSON.stringify(readJson.wastes?.map((w) => [w.loWCode, w.quantity])));
+
+const body = doc.body as { wastes: Record<string, unknown>[] };
+const fixed = { ...body, wastes: body.wastes.map((w) => ({ ...w, quantity: 19.1 })) };
+const put = await fetch(`${API}/api/v4/shippingdocuments/${docId}`, {
+  method: 'PUT',
+  headers: { ...auth, 'content-type': 'application/json' },
+  body: JSON.stringify(fixed),
+});
+console.log('update', put.status, (await put.text()).slice(0, 800));
+const reread = (await (await fetch(`${API}/api/v4/shippingdocuments/${docId}`, { headers: auth })).json()) as typeof readJson;
+console.log('reread', JSON.stringify(reread.wastes?.map((w) => [w.loWCode, w.quantity])));
 
 const removed = await fetch(`${API}/api/v4/shippingdocuments/${docId}`, { method: 'DELETE', headers: auth });
 console.log('delete', removed.status);

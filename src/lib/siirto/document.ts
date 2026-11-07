@@ -178,7 +178,8 @@ export function buildShippingDocument(input: SiirtoInput): SiirtoResult {
       documentVersion: '1',
       wastes: [
         {
-          loWCode: input.materialCode,
+          /* В справочнике реестра опасные коды со звёздочкой: 170503*. */
+          loWCode: input.hazardous ? `${input.materialCode.replace(/\*$/, '')}*` : input.materialCode,
           quantity: Math.round(input.netKg!) / 1000,
           quantityUnit: 'Tonnes',
           description,

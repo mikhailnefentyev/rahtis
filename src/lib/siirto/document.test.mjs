@@ -67,6 +67,7 @@ test('опасный грунт: свойства, состав, упаковк�
   const r = buildShippingDocument(base({ materialCode: '170503', hazardous: true, job }));
   assert.equal(r.ok, true);
   const w = r.body.wastes[0];
+  assert.equal(w.loWCode, '170503*');
   assert.deepEqual([w.wasteTypeCode, w.packagingTypeCode, w.physicalStateCode, w.disposalCode, w.recoveryCode], ['3', '8', '2', 'D1', null]);
   assert.deepEqual(w.hazardousProperties, ['HP14']);
   assert.deepEqual(buildShippingDocument(base({ materialCode: '170503', hazardous: true })).missing, ['hazard']);
