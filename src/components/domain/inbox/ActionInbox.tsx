@@ -248,7 +248,7 @@ async function Row({ item, locale }: { item: InboxItem; locale: Locale }) {
       actions = (
         <>
           <Link href={item.href} className={buttonClass({ variant: 'primary', size: 'sm' })}>
-            {item.kind === 'emailDraft' ? ti.emailDraftOpen : ti.open}
+            {item.kind === 'emailDraft' ? ti.emailDraftOpen : item.kind === 'emailChanges' ? ti.emailChangesOpen : ti.open}
           </Link>
           <form action={dismissEmailDraftAction}>
             {hidden({ draft_id: op.draftId })}

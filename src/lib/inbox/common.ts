@@ -194,10 +194,15 @@ const EMAIL_PARSE_STALE_MS = 10 * 60_000;
  * опубликуй», не прочитался — «заполни сам». Ссылка — прямо на форму.
  * До миграции таблицы нет — пусто.
  */
-export async function emailDraftItems(supabase: Supabase, href: (id: string) => string, now = Date.now()): Promise<InboxItem[]> {
+export async function emailDraftItems(
+  supabase: Supabase,
+  href: (id: string) => string,
+  changesHref: (id: string) => string,
+  now = Date.now(),
+): Promise<InboxItem[]> {
   const { data, error } = await supabase
     .from('order_email_drafts')
-    .select('id, subject, from_address, received_at, status, created_at')
+    .select('id, subject, from_address, received_at, status, created_at, amends_order_id')
     /* PENDING — отправитель ещё не проверен: не показываем. */
     .in('status', ['PARSED', 'FAILED'])
     .order('received_at', { ascending: false })
@@ -207,14 +212,16 @@ export async function emailDraftItems(supabase: Supabase, href: (id: string) => 
   for (const d of data ?? []) {
     const stale = d.status === 'PENDING' && now - Date.parse(d.created_at) > EMAIL_PARSE_STALE_MS;
     if (d.status === 'PENDING' && !stale) continue;
+    /* Тот же номер заказа, что у идущего рейса, — поправка к нему (7.11.2026). */
+    const changes = d.status === 'PARSED' && d.amends_order_id !== null;
     items.push({
       key: `email:${d.id}`,
-      kind: d.status === 'PARSED' ? 'emailDraft' : 'emailDraftFailed',
-      urgency: d.status === 'PARSED' ? 1 : 2,
+      kind: changes ? 'emailChanges' : d.status === 'PARSED' ? 'emailDraft' : 'emailDraftFailed',
+      urgency: changes ? 0 : d.status === 'PARSED' ? 1 : 2,
       at: d.received_at,
       ref: d.subject || null,
       party: d.from_address,
-      href: href(d.id),
+      href: changes ? changesHref(d.id) : href(d.id),
       op: { op: 'dismissEmailDraft', draftId: d.id },
     });
   }

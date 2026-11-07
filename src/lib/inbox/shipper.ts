@@ -34,7 +34,7 @@ export const loadShipperInbox = cache(async (locale: Locale): Promise<InboxResul
     sensitiveChangeItems(supabase, viewer.status === 'ready' ? viewer.userId : null, `/${locale}/account`),
     supabase.rpc('my_claims'),
     loadDismissals(supabase),
-    emailDraftItems(supabase, (id) => `${base}/orders?new=1&email=${id}`),
+    emailDraftItems(supabase, (id) => `${base}/orders?new=1&email=${id}`, (id) => `/${locale}/email-changes/${id}`),
     supabase.rpc('capacity_requests_for_shipper'),
   ]);
 

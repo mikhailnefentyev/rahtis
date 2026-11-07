@@ -8,6 +8,7 @@ import { isLocale } from '@/lib/i18n';
 import { importHints, readOrderDraft } from '@/lib/orders/importServer';
 import { createAdminClient } from '@/lib/supabase/admin';
 import type { Json } from '@/types/database';
+import { refKey } from './changes';
 import { ATTACHMENT_MAX_BYTES, bareAddress, inboxToken, mailText, pickAttachment, senderAllowed, senderAuthenticated, type MailAuth } from './email';
 
 /*
@@ -148,19 +149,54 @@ async function download(url: string): Promise<ArrayBuffer | null> {
   return bytes.byteLength > ATTACHMENT_MAX_BYTES ? null : bytes;
 }
 
+/** Рейсы, которые ещё можно поправить (как app.assert_amendable). */
+const AMENDABLE = ['OPEN', 'REQUESTED', 'AWAIT_DRIVER', 'IN_PROGRESS'] as const;
+
+/**
+ * Рейс компании с тем же номером заказа клиента — письмо к нему
+ * поправка, а не новый заказ. Заказчику — его заказы, перевозчику —
+ * рейсы, где он назначен (свои и со стола). Совпало несколько — самый
+ * свежий. Сравнение без регистра и знаков: «DFDS-4471» = «dfds 4471».
+ */
+async function amendedOrder(
+  admin: ReturnType<typeof createAdminClient>,
+  target: Target,
+  shipperRef: string,
+): Promise<{ id: string; ref: string } | null> {
+  const key = refKey(shipperRef);
+  if (key.length < 3) return null;
+  const since = new Date(Date.now() - 120 * 86_400_000).toISOString();
+  const { data, error } = await admin
+    .from('orders')
+    .select('id, ref, shipper_ref, created_at')
+    .eq(target.kind === 'CARRIER' ? 'assigned_company_id' : 'shipper_company_id', target.company_id)
+    .in('status', [...AMENDABLE])
+    .not('shipper_ref', 'is', null)
+    .gte('created_at', since)
+    .order('created_at', { ascending: false })
+    .limit(500);
+  if (error) {
+    console.error('inbound: поиск рейса для поправки:', error.message);
+    return null;
+  }
+  const hit = (data ?? []).find((o) => refKey(o.shipper_ref) === key);
+  return hit ? { id: hit.id, ref: hit.ref } : null;
+}
+
 export async function processInbound(accepted: Accepted, apiKey: string): Promise<void> {
   const admin = createAdminClient();
   const { draftId, emailId, target } = accepted;
   const carrier = target.kind === 'CARRIER';
 
-  const finish = (status: 'PARSED' | 'FAILED', draft: Json | null = null) =>
+  const finish = (status: 'PARSED' | 'FAILED', draft: Json | null = null, amendsOrderId: string | null = null) =>
     admin
       .from('order_email_drafts')
-      .update({ status, draft, updated_at: new Date().toISOString() })
+      .update({ status, draft, amends_order_id: amendsOrderId, updated_at: new Date().toISOString() })
       .eq('id', draftId)
       .eq('status', 'PENDING');
 
   let parsed = false;
+  let amends: { id: string; ref: string } | null = null;
   /* Пока домен отправителя не проверен, письма как бы нет: ни черновика, ни ответа. */
   let authenticated = false;
   try {
@@ -208,7 +244,8 @@ export async function processInbound(accepted: Accepted, apiKey: string): Promis
         : ({ ok: false, reason: 'empty' } as const);
       if (result.ok) {
         parsed = true;
-        await finish('PARSED', result.draft as unknown as Json);
+        amends = await amendedOrder(admin, target, result.draft.shipperRef);
+        await finish('PARSED', result.draft as unknown as Json, amends?.id ?? null);
       } else {
         console.warn('inbound: разбор не удался:', result.reason, emailId);
         await finish('FAILED');
@@ -226,14 +263,15 @@ export async function processInbound(accepted: Accepted, apiKey: string): Promis
 
   /* Подтверждение отправителю — с ссылкой прямо на форму. */
   const locale = isLocale(target.language ?? '') ? (target.language as string) : 'fi';
-  const path = carrier ? 'carrier/own' : 'shipper/orders';
+  const path = amends ? `email-changes/${draftId}` : carrier ? 'carrier/own' : 'shipper/orders';
   await sendEmail(
     orderEmailReceivedEmail({
       to: accepted.from,
       locale: emailLocaleOf(target.language),
       subject: accepted.subject,
       parsed,
-      link: `${siteUrl()}/${locale}/${path}?new=1&email=${draftId}`,
+      amendsRef: amends?.ref ?? null,
+      link: amends ? `${siteUrl()}/${locale}/${path}` : `${siteUrl()}/${locale}/${path}?new=1&email=${draftId}`,
       operatorEmail: operatorInbox(),
       companyId: target.company_id,
     }),

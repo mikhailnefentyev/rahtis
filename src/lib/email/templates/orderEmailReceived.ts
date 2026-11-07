@@ -12,6 +12,8 @@ export function orderEmailReceivedEmail(input: {
   locale: EmailLocale;
   subject: string;
   parsed: boolean;
+  /** Письмо — поправка к этому рейсу (тот же номер заказа клиента). */
+  amendsRef?: string | null;
   link: string;
   operatorEmail: string;
   companyId: string;
@@ -20,7 +22,12 @@ export function orderEmailReceivedEmail(input: {
   const fi = input.locale === 'fi';
   const subjectLine = input.subject || (fi ? '(ei aihetta)' : '(no subject)');
 
-  const heading = input.parsed
+  const amends = input.parsed && input.amendsRef ? input.amendsRef : null;
+  const heading = amends
+    ? fi
+      ? `Muutoksia keikkaan ${amends}`
+      : `Changes to trip ${amends}`
+    : input.parsed
     ? fi
       ? 'Tilausluonnos sähköpostista on valmis'
       : 'Order draft from your email is ready'
@@ -32,7 +39,11 @@ export function orderEmailReceivedEmail(input: {
     { kind: 'text', value: t.greeting },
     {
       kind: 'text',
-      value: input.parsed
+      value: amends
+        ? fi
+          ? `välittämäsi viesti koskee keikkaa ${amends} (sama tilausnumero). Vertaa nykyisiä tietoja viestin tietoihin ja hyväksy muutokset – mitään ei muuteta ilman sinua.`
+          : `the message you forwarded concerns trip ${amends} (same order number). Compare the current details with the message and accept the changes – nothing is changed without you.`
+        : input.parsed
         ? fi
           ? 'välittämäsi viestin perusteella on tehty tilausluonnos. Tarkista tiedot ja julkaise tilaus – luonnosta ei julkaista ilman sinua.'
           : 'an order draft has been made from the message you forwarded. Check the details and publish the order – the draft is not published without you.'
@@ -41,7 +52,11 @@ export function orderEmailReceivedEmail(input: {
           : 'the message you forwarded was received, but no order could be read from it. You can fill in the order yourself.',
     },
     { kind: 'facts', rows: [[fi ? 'Viesti' : 'Message', subjectLine]] },
-    { kind: 'button', label: fi ? 'Avaa tilauslomake' : 'Open the order form', href: input.link },
+    {
+      kind: 'button',
+      label: amends ? (fi ? 'Tarkista muutokset' : 'Review the changes') : fi ? 'Avaa tilauslomake' : 'Open the order form',
+      href: input.link,
+    },
   ];
 
   return {

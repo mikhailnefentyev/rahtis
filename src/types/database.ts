@@ -3746,6 +3746,7 @@ export type Database = {
       }
       order_email_drafts: {
         Row: {
+          amends_order_id: string | null
           company_id: string
           created_at: string
           draft: Json | null
@@ -3760,6 +3761,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          amends_order_id?: string | null
           company_id: string
           created_at?: string
           draft?: Json | null
@@ -3774,6 +3776,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          amends_order_id?: string | null
           company_id?: string
           created_at?: string
           draft?: Json | null
@@ -7750,6 +7753,7 @@ export type Database = {
         Args: { p_id: string; p_order_id?: string }
         Returns: undefined
       }
+      detach_order_email_draft: { Args: { p_id: string }; Returns: undefined }
       comment_claim: {
         Args: { p_body: string; p_claim_id: string }
         Returns: number

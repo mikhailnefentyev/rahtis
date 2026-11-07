@@ -1,5 +1,8 @@
 'use server';
 
+import { redirect } from 'next/navigation';
+import { loadEmailChanges } from '@/lib/inbound/changesLoad';
+import { selectedPatches } from '@/lib/inbound/changes';
 import { revalidateOrder } from '@/lib/orders/revalidate';
 import { getViewer } from '@/lib/auth/viewer';
 import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
@@ -529,4 +532,84 @@ export async function dismissChangeRequestAction(formData: FormData): Promise<vo
   });
   await flashFailure(locale, error);
   revalidateOrder(locale);
+}
+
+/* ── Поправка к рейсу из письма (7.11.2026) ───────────────────── */
+
+/**
+ * Человек отметил, что из письма принять. Сравнение считается заново
+ * (форма только выбирает строки), каждая точка — одна правка amend_stop
+ * с причиной «из письма …», машина — change_trip_assignment. Потом
+ * черновик закрывается и человек уходит к рейсу.
+ *
+ * Частичный успех возможен (точку успели пройти, пока форма была
+ * открыта): применённое остаётся, черновик не закрывается, человек видит
+ * обновлённое сравнение с тем, что не прошло.
+ */
+export async function applyEmailChangesAction(_previous: AmendState, formData: FormData): Promise<AmendState> {
+  const locale = toLocale(formData.get('locale'));
+  const t = await getDictionary(locale);
+  const viewer = await getViewer();
+  if (viewer.status !== 'ready' || (viewer.role !== 'SHIPPER' && viewer.role !== 'CARRIER')) {
+    return { error: t.error.forbidden, saved: false };
+  }
+
+  const draftId = str(formData, 'draft_id');
+  const loaded = await loadEmailChanges(draftId, locale, viewer.role);
+  if (!loaded.ok) return { error: t.emailChanges.gone, saved: false };
+  const { order, changes, subject, from } = loaded.value;
+
+  const chosen = new Set(formData.getAll('c').map(String));
+  const patches = selectedPatches(changes, chosen);
+  const vehicle = chosen.has('vehicle') && loaded.value.canChangeVehicle ? changes.vehicle?.vehicleId ?? null : null;
+  if (patches.length === 0 && !vehicle) return { error: t.emailChanges.pickSome, saved: false };
+
+  const reason = t.emailChanges.reason.replace('{subject}', subject || '—').replace('{from}', from);
+  const supabase = await createClient();
+  let failed = false;
+  let moved = false;
+
+  for (const { stopId, patch, address } of patches) {
+    const { data, error } = await supabase.rpc('amend_stop', { p_stop_id: stopId, p_patch: patch });
+    if (error) {
+      console.warn('поправка из письма: точка не изменена:', error.code, error.message);
+      failed = true;
+      continue;
+    }
+    if (data?.changes) {
+      await annotate(supabase, data.id, reason);
+      if (address) moved = true;
+    }
+  }
+  if (moved) await refreshRoute(supabase, order.id, locale);
+
+  if (vehicle) {
+    const { error } = await supabase.rpc('change_trip_assignment', {
+      p_order_id: order.id,
+      p_vehicle_id: vehicle,
+      p_reason: reason.slice(0, 500),
+    });
+    if (error) {
+      console.warn('поправка из письма: машина не сменилась:', error.code, error.message);
+      failed = true;
+    }
+  }
+
+  revalidateOrder(locale);
+  if (failed) return { error: t.emailChanges.partial, saved: false };
+
+  await supabase.rpc('close_order_email_draft', { p_id: draftId, p_order_id: order.id });
+  redirect(viewer.role === 'CARRIER' ? `/${locale}/carrier/desk` : `/${locale}/shipper/orders#order-${order.id}`);
+}
+
+/** «Это не изменение»: письмо открывается как новый заказ (черновик остаётся). */
+export async function emailChangesAsNewAction(formData: FormData): Promise<void> {
+  const locale = toLocale(formData.get('locale'));
+  const viewer = await getViewer();
+  if (viewer.status !== 'ready' || (viewer.role !== 'SHIPPER' && viewer.role !== 'CARRIER')) return;
+  const draftId = str(formData, 'draft_id');
+  if (!/^[0-9a-f-]{36}$/i.test(draftId)) return;
+  const { error } = await (await createClient()).rpc('detach_order_email_draft', { p_id: draftId });
+  if (error) console.error('черновик из письма не отвязан от рейса:', error.message);
+  redirect(viewer.role === 'CARRIER' ? `/${locale}/carrier/own?new=1&email=${draftId}` : `/${locale}/shipper/orders?new=1&email=${draftId}`);
 }

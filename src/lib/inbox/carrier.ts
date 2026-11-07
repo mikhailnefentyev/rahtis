@@ -66,7 +66,7 @@ export const loadCarrierInbox = cache(async (locale: Locale): Promise<InboxResul
     /* Догрузы: до миграции функций нет — пункты просто не появляются. */
     loadCarrierCapacity(),
     supabase.rpc('capacity_requests_for_carrier'),
-    emailDraftItems(supabase, (id) => `${base}/own?new=1&email=${id}`),
+    emailDraftItems(supabase, (id) => `${base}/own?new=1&email=${id}`, (id) => `/${locale}/email-changes/${id}`),
   ]);
 
   const items: InboxItem[] = [
