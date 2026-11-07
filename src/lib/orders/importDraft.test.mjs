@@ -205,3 +205,26 @@ test('код страны не съедает сам номер', () => {
   assert.deepEqual(plateCandidates('S-AB 123'), ['SAB123']);
   assert.deepEqual(plateCandidates('S AB 123'), ['SAB123', 'AB123']);
 });
+
+test('другие страны ЕС: форматы, коды стран, греческие и болгарские буквы', () => {
+  const fleet = [
+    { id: 'it', plate: 'AB 123 CD' },
+    { id: 'es', plate: '1234 BCD' },
+    { id: 'nl', plate: '12-ABC-3' },
+    { id: 'ie', plate: '191-D-12345' },
+    { id: 'gr', plate: 'IKB-1234' },
+    { id: 'bg', plate: 'CA 1234 BH' },
+    { id: 'si', plate: 'LJ AB-123' },
+    { id: 'hr', plate: 'ZG 1234-AB' },
+  ];
+  const hit = (s) => matchPlate(s, fleet)?.id ?? null;
+  assert.equal(hit('I AB123CD'), 'it');
+  assert.equal(hit('E 1234BCD'), 'es');
+  assert.equal(hit('NL 12ABC3'), 'nl');
+  assert.equal(hit('IRL 191 D 12345'), 'ie');
+  assert.equal(hit('GR ΙΚΒ-1234'), 'gr'); // греческие буквы
+  assert.equal(hit('ικβ 1234'), 'gr');
+  assert.equal(hit('BG СА 1234 ВН'), 'bg'); // кириллица на болгарском номере
+  assert.equal(hit('SLO LJ AB-123'), 'si');
+  assert.equal(hit('HR ZG1234AB'), 'hr');
+});
