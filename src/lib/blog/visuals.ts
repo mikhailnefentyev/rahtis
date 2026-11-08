@@ -7,8 +7,8 @@
  * адресе, заголовке и ключевых словах; не нашлось — по адресу, чтобы
  * соседние статьи не были одинаковыми.
  *
- * Подписи («мин чтения», «Содержание») — на языке статьи: статьи финские,
- * английская рамка над ними выглядела чужой.
+ * Подписи («мин чтения», «Содержание»), заголовок и описание блога — на
+ * языке страницы: у каждого из девяти языков сайта свой блог (08.11.2026).
  */
 
 export type Vehicle = { file: string; label: string };
@@ -54,6 +54,9 @@ export const vehicleSrc = (v: Vehicle, ext: 'webp' | 'png' = 'webp') =>
 
 const LABELS = {
   en: {
+    title: 'RAHTIS blog: transport management and freight exchange',
+    description: 'Practical articles for hauliers and shippers: consignment notes, working time, return loads, quotes, invoicing and earthworks.',
+    intro: 'Practical guides for hauliers and shippers – from consignment notes and working time to invoicing and return loads.',
     heading: 'Guides for the transport trade',
     signIn: 'Sign in',
     read: 'Read',
@@ -69,6 +72,9 @@ const LABELS = {
     faq: 'FAQ',
   },
   fi: {
+    title: 'RAHTIS-blogi: kuljetusten hallinta ja rahtipörssi',
+    description: 'Käytännön artikkeleita kuljetusyrityksille ja rahdinantajille: rahtikirjat, työajat, palautuskuormat, tarjoukset, laskutus ja maansiirto.',
+    intro: 'Käytännön oppaita kuljetusyrittäjille ja rahdinantajille – rahtikirjoista ja työajoista laskutukseen ja palautuskuormiin.',
     heading: 'Oppaita kuljetusalalle',
     signIn: 'Kirjaudu',
     read: 'Lue',
@@ -84,6 +90,9 @@ const LABELS = {
     faq: 'Usein kysyttyä',
   },
   sv: {
+    title: 'RAHTIS-bloggen: transportledning och fraktbörs',
+    description: 'Praktiska artiklar för åkerier och transportköpare: fraktsedlar, arbetstid, returlaster, offerter, fakturering och markarbeten.',
+    intro: 'Praktiska guider för åkerier och transportköpare – från fraktsedlar och arbetstid till fakturering och returlaster.',
     heading: 'Guider för transportbranschen',
     signIn: 'Logga in',
     read: 'Läs',
@@ -99,6 +108,9 @@ const LABELS = {
     faq: 'Vanliga frågor',
   },
   et: {
+    title: 'RAHTIS blogi: veokorraldus ja veobörs',
+    description: 'Praktilised artiklid vedajatele ja veotellijatele: saatelehed, tööaeg, tagasikoormad, hinnapakkumised, arveldus ja pinnasetööd.',
+    intro: 'Praktilised juhendid vedajatele ja veotellijatele – saatelehtedest ja tööajast arvelduse ja tagasikoormateni.',
     heading: 'Juhendid veondusele',
     signIn: 'Logi sisse',
     read: 'Loe',
@@ -113,7 +125,82 @@ const LABELS = {
     takeaways: 'Põhipunktid',
     faq: 'Korduma kippuvad küsimused',
   },
+  lv: {
+    title: 'RAHTIS blogs: pārvadājumu vadība un kravu birža',
+    description: 'Praktiski raksti pārvadātājiem un kravu nosūtītājiem: pavadzīmes, darba laiks, atpakaļkravas, piedāvājumi, rēķini un zemes darbi.',
+    intro: 'Praktiski ceļveži pārvadātājiem un kravu nosūtītājiem – no pavadzīmēm un darba laika līdz rēķiniem un atpakaļkravām.',
+    heading: 'Ceļveži kravu pārvadājumu nozarei',
+    signIn: 'Pieslēgties',
+    read: 'Lasīt',
+    all: 'Visi raksti',
+    min: 'min lasīšanai',
+    toc: 'Saturs',
+    blog: 'Blogs',
+    empty: 'Rakstu vēl nav.',
+    chart: 'Zemāk esošās tabulas diagramma',
+    join: 'Pieteikties',
+    privacy: 'Privātuma politika',
+    takeaways: 'Galvenais īsumā',
+    faq: 'Biežāk uzdotie jautājumi',
+  },
+  lt: {
+    title: 'RAHTIS tinklaraštis: transporto valdymas ir krovinių birža',
+    description: 'Praktiški straipsniai vežėjams ir krovinių siuntėjams: važtaraščiai, darbo laikas, grįžtamieji kroviniai, pasiūlymai, sąskaitos ir žemės darbai.',
+    intro: 'Praktiški gidai vežėjams ir krovinių siuntėjams – nuo važtaraščių ir darbo laiko iki sąskaitų ir grįžtamųjų krovinių.',
+    heading: 'Gidai krovinių vežimo verslui',
+    signIn: 'Prisijungti',
+    read: 'Skaityti',
+    all: 'Visi straipsniai',
+    min: 'min skaitymo',
+    toc: 'Turinys',
+    blog: 'Tinklaraštis',
+    empty: 'Straipsnių dar nėra.',
+    chart: 'Žemiau pateiktos lentelės diagrama',
+    join: 'Paraiška',
+    privacy: 'Privatumo politika',
+    takeaways: 'Svarbiausia',
+    faq: 'Dažniausiai užduodami klausimai',
+  },
+  pl: {
+    title: 'Blog RAHTIS: zarządzanie transportem i giełda ładunków',
+    description: 'Praktyczne artykuły dla przewoźników i zleceniodawców: listy przewozowe, czas pracy, ładunki powrotne, oferty, fakturowanie i roboty ziemne.',
+    intro: 'Praktyczne poradniki dla przewoźników i zleceniodawców – od listów przewozowych i czasu pracy po fakturowanie i ładunki powrotne.',
+    heading: 'Poradniki dla branży transportowej',
+    signIn: 'Zaloguj się',
+    read: 'Czytaj',
+    all: 'Wszystkie artykuły',
+    min: 'min czytania',
+    toc: 'Spis treści',
+    blog: 'Blog',
+    empty: 'Nie ma jeszcze artykułów.',
+    chart: 'Wykres do tabeli poniżej',
+    join: 'Dołącz',
+    privacy: 'Polityka prywatności',
+    takeaways: 'Najważniejsze',
+    faq: 'Najczęstsze pytania',
+  },
+  de: {
+    title: 'RAHTIS-Blog: Transportmanagement und Frachtenbörse',
+    description: 'Praxisartikel für Transportunternehmen und Verlader: Frachtbriefe, Arbeitszeit, Rückladungen, Angebote, Abrechnung und Erdbau.',
+    intro: 'Praxisratgeber für Transportunternehmen und Verlader – von Frachtbrief und Arbeitszeit bis zu Abrechnung und Rückladungen.',
+    heading: 'Ratgeber für die Transportbranche',
+    signIn: 'Anmelden',
+    read: 'Lesen',
+    all: 'Alle Artikel',
+    min: 'Min. Lesezeit',
+    toc: 'Inhalt',
+    blog: 'Blog',
+    empty: 'Noch keine Artikel.',
+    chart: 'Diagramm zur Tabelle unten',
+    join: 'Registrieren',
+    privacy: 'Datenschutzerklärung',
+    takeaways: 'Das Wichtigste in Kürze',
+    faq: 'Häufige Fragen',
+  },
   ru: {
+    title: 'Блог RAHTIS: управление перевозками и биржа грузов',
+    description: 'Практические статьи для перевозчиков и грузовладельцев: накладные CMR, рабочее время, обратные загрузки, расчёт цены, счета и земляные работы.',
+    intro: 'Практические руководства для перевозчиков и грузовладельцев – от накладных и рабочего времени до счетов и обратных загрузок.',
     heading: 'Статьи для перевозчиков',
     signIn: 'Войти',
     read: 'Читать',

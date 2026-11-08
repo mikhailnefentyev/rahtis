@@ -1,3 +1,4 @@
+import { blogPath } from '@/lib/blog/paths';
 import Image from 'next/image';
 import { Registered } from '@/components/layout/Registered';
 import { ConsentSettingsLink } from '@/components/layout/AnalyticsConsent';
@@ -728,7 +729,7 @@ Rahtis-Event: order.stop_arrived`}</code>
                 { href: signInPath(locale), label: l.menuSignIn },
                 { href: `/${locale}/api-docs`, label: l.footerApiDocs },
                 { href: earthworksPath(locale), label: ew.footerLink },
-                ...(showBlog ? [{ href: '/blog', label: t.site.blog }] : []),
+                ...(showBlog ? [{ href: blogPath(locale), label: t.site.blog }] : []),
               ],
             },
             {

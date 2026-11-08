@@ -1,5 +1,6 @@
 'use client';
 
+import { blogPath } from '@/lib/blog/paths';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -99,7 +100,7 @@ export function SiteHeader({ showBlog = false }: { showBlog?: boolean }) {
     { href: '#pricing', label: t.landing.menuPricing },
     { href: '#assistant', label: t.landing.menuAssistant },
     { href: '#api', label: t.landing.footerApi },
-    ...(showBlog ? [{ href: '/blog', label: t.site.blog }] : []),
+    ...(showBlog ? [{ href: blogPath(locale), label: t.site.blog }] : []),
   ];
 
   const home = `/${locale}`;

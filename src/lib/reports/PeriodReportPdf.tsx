@@ -155,11 +155,16 @@ export function PeriodReportPdf(input: PeriodPdfInput) {
           ))}
         </View>
 
-        <Text style={s.section}>{ansi(input.tripsTitle)}</Text>
-        {input.tripRows.length === 0 ? (
-          <Text style={s.empty}>{ansi(input.empty)}</Text>
-        ) : (
-          <Table columns={input.tripColumns} rows={input.tripRows} />
+        {/* Пустой блок рейсов прежней модели не печатается, когда все рейсы — по прямому договору. */}
+        {input.tripRows.length === 0 && input.own && input.own.rows.length > 0 ? null : (
+          <>
+            <Text style={s.section}>{ansi(input.tripsTitle)}</Text>
+            {input.tripRows.length === 0 ? (
+              <Text style={s.empty}>{ansi(input.empty)}</Text>
+            ) : (
+              <Table columns={input.tripColumns} rows={input.tripRows} />
+            )}
+          </>
         )}
 
         {input.own && input.own.rows.length > 0 ? (

@@ -78,7 +78,8 @@ export async function OverviewBody({ locale, role }: { locale: Locale; role: Rol
   const weeks = fillWeeks(
     (weekly ?? []).map((w) => ({
       week: w.week,
-      cents: Number(carrier ? (w.payout_cents ?? 0) : (w.rate_cents ?? 0)),
+      /* С 6.11.2026 договор прямой, без удержания: перевозчик получает цену рейса. */
+      cents: Number(w.rate_cents ?? 0),
       trips: Number(w.orders_count ?? 0),
       km: Number(w.distance_km ?? 0),
     })),

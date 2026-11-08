@@ -1,6 +1,7 @@
 import { locales, type Locale } from '@/lib/i18n/config';
 import { SITE_URL } from '@/lib/seo';
 import { listArticles } from '@/lib/blog/heycatch';
+import { blogPath, languagesOf } from '@/lib/blog/translations';
 
 /**
  * Карта сайта: только то, что имеет смысл открывать из поиска.
@@ -62,22 +63,37 @@ function entries(): Entry[] {
 }
 
 /*
- * Блог (статьи HeyCatch) — по адресу /blog без языка и без переводов;
+ * Блог (статьи HeyCatch): у каждого языка свой — /blog (финский), /en/blog,
+ * /de/blog… (08.11.2026). Статья попадает в карту на тех языках, на которых
+ * она есть (оригинал или перевод), со ссылками hreflang друг на друга;
  * lastmod — updated статьи. Карта пересобирается раз в 5 минут, как и
  * сам блог, чтобы новая статья попала в неё без выкладки.
  */
 async function blogEntries(): Promise<Entry[]> {
   const articles = await listArticles();
   const newest = articles.map((a) => a.updated || a.published).sort().at(-1) ?? ROOT_UPDATED;
-  return [
-    { loc: `${SITE_URL}/blog`, lastmod: newest.slice(0, 10), priority: 0.6, links: {} },
-    ...articles.map((a) => ({
-      loc: `${SITE_URL}/blog/${encodeURIComponent(a.slug)}`,
-      lastmod: (a.updated || a.published).slice(0, 10),
-      priority: 0.5,
-      links: {},
-    })),
-  ];
+  const indexLinks: Record<string, string> = Object.fromEntries([
+    ...locales.map((l) => [l, `${SITE_URL}${blogPath(l)}`]),
+    ['x-default', `${SITE_URL}/blog`],
+  ]);
+  const list: Entry[] = locales.map((l) => ({
+    loc: `${SITE_URL}${blogPath(l)}`,
+    lastmod: newest.slice(0, 10),
+    priority: 0.6,
+    links: indexLinks,
+  }));
+  for (const a of articles) {
+    const langs = await languagesOf(a);
+    const main = langs.includes('fi') ? 'fi' : langs[0];
+    const links: Record<string, string> = Object.fromEntries([
+      ...langs.map((l) => [l, `${SITE_URL}${blogPath(l, a.slug)}`]),
+      ...(main ? [['x-default', `${SITE_URL}${blogPath(main, a.slug)}`]] : []),
+    ]);
+    for (const l of langs) {
+      list.push({ loc: `${SITE_URL}${blogPath(l, a.slug)}`, lastmod: (a.updated || a.published).slice(0, 10), priority: 0.5, links });
+    }
+  }
+  return list;
 }
 
 export const revalidate = 300;

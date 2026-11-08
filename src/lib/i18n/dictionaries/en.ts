@@ -1379,10 +1379,10 @@ export const en = {
   done: {
     titleCarrier: 'Jobs driven',
     titleShipper: 'Completed orders',
-    titleAdmin: 'Invoicing and payouts',
+    titleAdmin: 'Invoicing',
     subtitleCarrier: 'Jobs driven during the week and their prices.',
     subtitleShipper: 'Jobs completed during the week and their prices.',
-    subtitleAdmin: 'Invoices to shippers, payouts to carriers.',
+    subtitleAdmin: 'Monthly fees from carriers.',
     /*
      * Two tax lines, not one.
      *
@@ -1407,8 +1407,8 @@ export const en = {
     commission: 'Service fee',
     payout: 'Payout',
     margin: 'Margin',
-    clients: 'Shippers · invoicing',
-    carriers: 'Carriers · payouts',
+    clients: 'Shippers',
+    carriers: 'Carriers',
     company: 'Company',
     trips: 'Jobs',
     distance: 'Distance',
@@ -1968,7 +1968,7 @@ export const en = {
   },
 
   billingDesk: {
-    title: 'Invoicing and payouts',
+    title: 'Invoicing',
     subtitle:
       'A period is half a month: the 1st to the 15th, and the 16th to the end of the month. Invoices go to customers automatically when the period ends. You record incoming payments and payouts to carriers.',
     statAwaiting: 'Awaiting customer payment',
@@ -2000,9 +2000,9 @@ export const en = {
     trendTitle: 'Trend',
     trendTurnover: 'Value of jobs',
     trendRevenue: 'Our share',
-    trendHint: 'Weeks run Monday to Sunday, amounts excl. VAT. Our share comes only from orders published before 6 November 2026 under the former model (3% from the carrier and 5% from the shipper, at least €15 together); direct contracts and monthly fees aren’t included.',
+    trendHint: 'Weeks run Monday to Sunday, amounts excl. VAT.',
     subsTitle: 'Monthly fees',
-    subsLede: 'The monthly fee is invoiced after the month ends for the vehicles that drove. If a carrier still has payouts from former-model orders, the fee is deducted from those first.',
+    subsLede: 'The monthly fee is invoiced after the month ends for the vehicles that drove.',
     subsColMonth: 'Month',
     subsColVehicles: 'Vehicles',
     subsColTotal: 'Incl. VAT',
@@ -2395,7 +2395,7 @@ export const en = {
   },
 
   report: {
-    weeklyPayouts: 'Weekly payouts to carriers',
+    weeklyPayouts: 'Weekly jobs by carrier',
     dailyInvoices: 'Daily summary by shipper',
     byMachine: 'Breakdown by vehicle',
   },
@@ -2411,7 +2411,7 @@ export const en = {
     reference: 'Reference',
     carrierTitle: 'Weekly report · jobs driven',
     shipperTitle: 'Weekly report · completed orders',
-    adminTitle: 'Weekly report · invoicing and payouts',
+    adminTitle: 'Weekly report · invoicing',
     period: 'Week {week} · {from}–{to}',
     /*
      * Period documents. A separate title because they say something
@@ -2428,7 +2428,7 @@ export const en = {
     feeLine: "Monthly fee {month}: {count} billable vehicles × {unit} (first vehicle free) + VAT {vat}",
     feeLineAnnual: "Annual fee (paid {month}): {count} billable vehicles × 12 months −10% + VAT {vat}",
     ownTitle: 'Own jobs and direct orders',
-    ownNote: 'No service fee. Prices for reference only, not included in the total above.',
+    ownNote: 'Contract of carriage directly between shipper and carrier. Prices for reference only, not included in the total above.',
     colClient: 'Customer',
     colCarrier: 'Carrier',
     subTitle: 'Monthly fee',
@@ -2652,7 +2652,7 @@ export const en = {
     summary: 'Summary',
     titleShipper: 'Order report',
     titleCarrier: 'Haulage report',
-    titleAdmin: 'Billing and payout report',
+    titleAdmin: 'Invoicing report',
     basis:
       'A job counts in the period of the day it was completed (Finnish time).',
     colDate: 'Completed',
@@ -4537,7 +4537,7 @@ export const en = {
     awaiting: 'Awaiting confirmation',
     week: 'This week',
     trips: 'jobs',
-    payout: 'payout',
+    payout: 'earnings',
     spend: 'cost',
     quick: 'Quick actions',
     openDesk: 'Open the board',

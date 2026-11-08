@@ -31,10 +31,6 @@ const percent = (bps: number | null) => (bps == null ? null : bps / 100);
 
 export function tripColumns(report: PeriodReport, t: Dictionary): Column<ReportLine>[] {
   const p = t.periodReport;
-  /* Удержание с перевозчика — оператору и перевозчику, у которого оно было. Плата заказчика — заказчику и оператору. */
-  const fees = report.showsCommission;
-  const shipperFee = report.role !== 'CARRIER';
-
   return [
     { header: p.colDate, kind: 'date', get: (l) => l.closedOn, width: 12 },
     { header: p.colRef, kind: 'text', get: (l) => l.ref, width: 14 },
@@ -73,38 +69,7 @@ export function tripColumns(report: PeriodReport, t: Dictionary): Column<ReportL
     ...(report.lines.some((l) => l.currency !== 'EUR')
       ? [{ header: t.orderForm.currency, kind: 'text' as const, get: (l: ReportLine) => l.currency, width: 8 }]
       : []),
-    ...(shipperFee
-      ? [
-          {
-            header: report.role === 'ADMIN' ? p.colShipperFee : p.colCommission,
-            kind: 'money' as const,
-            get: (l: ReportLine) => euros(l.fee),
-            width: 12,
-          },
-        ]
-      : []),
-    ...(fees
-      ? [
-          {
-            header: p.colCommissionRate,
-            kind: 'percent' as const,
-            get: (l: ReportLine) => percent(l.commissionBps),
-            width: 10,
-          },
-          {
-            header: p.colCommission,
-            kind: 'money' as const,
-            get: (l: ReportLine) => euros(l.commission),
-            width: 12,
-          },
-          {
-            header: p.colPayout,
-            kind: 'money' as const,
-            get: (l: ReportLine) => euros(l.payout),
-            width: 12,
-          },
-        ]
-      : []),
+    /* Плата заказчика, удержание и выплата прежней модели (до 6.11.2026) убраны 08.11.2026. */
     {
       header: p.colVatRate,
       kind: 'percent',
@@ -222,12 +187,6 @@ export function summaryRows(report: PeriodReport, t: Dictionary): Array<[string,
     [p.rowDistance, s.km, 'int'],
     [p.rowRate, s.rate, 'money'],
   ];
-  if (s.fee != null) rows.push([p.rowCommission, s.fee, 'money']);
-  if (report.role === 'CARRIER' && report.showsCommission) {
-    rows.push([p.rowCommission, s.commission ?? 0, 'money']);
-  }
-  if (report.showsCommission && s.payout != null) rows.push([p.rowPayout, s.payout, 'money']);
-  if (report.role === 'ADMIN') rows.push([p.rowMargin, (s.fee ?? 0) + (s.commission ?? 0), 'money']);
   rows.push([p.rowVat, s.vat, 'money'], [p.rowGross, s.gross, 'money']);
   rows.push([p.rowClaims, s.claims, 'int'], [p.rowClaimed, s.claimed, 'money']);
   return rows;
@@ -276,13 +235,20 @@ export async function periodXlsx(report: PeriodReport, t: Dictionary): Promise<B
     ]),
   ];
 
+  /* Пустой лист рейсов прежней модели не нужен, когда все рейсы — по прямому договору. */
+  const withTrips = report.lines.length > 0 || report.own.lines.length === 0;
+
   const blob = await writeExcelFile([
-    {
-      data: sheet(trips, report.lines),
-      sheet: t.periodReport.sheetTrips,
-      columns: trips.map((c) => ({ width: c.width ?? 12 })),
-      stickyRowsCount: 1,
-    },
+    ...(withTrips
+      ? [
+          {
+            data: sheet(trips, report.lines),
+            sheet: t.periodReport.sheetTrips,
+            columns: trips.map((c) => ({ width: c.width ?? 12 })),
+            stickyRowsCount: 1,
+          },
+        ]
+      : []),
     /* Свои рейсы — своим листом: в расчёт и итоги они не входят. */
     ...(report.own.lines.length
       ? [

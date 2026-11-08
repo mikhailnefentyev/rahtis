@@ -39,7 +39,6 @@ import {
   orderStatusTone,
   vehicleAccessTone,
 } from '@/components/ui';
-import { COMMISSION_BPS, commissionCents, payoutCents } from '@/lib/config';
 import { useI18n } from '@/lib/i18n/provider';
 
 /*
@@ -72,9 +71,7 @@ export function UiKitShowcase({ deadlines }: { deadlines: DemoDeadlines }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [rating, setRating] = useState<number | null>(null);
 
-  const commissionRate = COMMISSION_BPS / 10_000;
-
-  const payouts = [
+  const carriers = [
     { carrier: 'Nieminen Kuljetus Oy', trips: 7, gross: 324_000, rating: 4.7 },
     { carrier: 'Koskinen Transport', trips: 4, gross: 198_000, rating: 4.3 },
     { carrier: 'Virtanen Logistics', trips: 2, gross: 76_000, rating: 4.0 },
@@ -138,7 +135,7 @@ export function UiKitShowcase({ deadlines }: { deadlines: DemoDeadlines }) {
                   <Kv k="Дата" v={f.date('2026-11-12T06:00:00Z')} mono />
                   <Kv k="Время" v={f.time('2026-11-12T06:00:00Z')} mono />
                   <Kv k="Дробное" v={f.decimal(4.7)} mono />
-                  <Kv k="Проценты" v={f.percent(commissionRate)} mono />
+                  <Kv k="Проценты" v={f.percent(0.255)} mono />
                 </div>
               </Labelled>
 
@@ -240,12 +237,7 @@ export function UiKitShowcase({ deadlines }: { deadlines: DemoDeadlines }) {
           <StatRow>
             <Stat label={t.moderation.queue} value={f.number(3)} tone="warn" />
             <Stat label={t.money.revenue} value={f.eur(211_000)} tone="info" />
-            <Stat label={t.money.payout} value={f.eur(204_670)} tone="live" />
-            <Stat
-              label={m('money.marginRate', { rate: commissionRate })}
-              value={f.eur(6_330)}
-              tone="ok"
-            />
+            <Stat label={t.order.trips} value={f.number(13)} tone="live" />
           </StatRow>
         </Section>
 
@@ -430,7 +422,7 @@ export function UiKitShowcase({ deadlines }: { deadlines: DemoDeadlines }) {
 
         <Section title="Таблица-документ">
           <TableFrame
-            caption={t.report.weeklyPayouts}
+            caption={t.done.carriers}
             actions={<Button size="sm">{t.action.export}</Button>}
           >
             <Table>
@@ -439,27 +431,19 @@ export function UiKitShowcase({ deadlines }: { deadlines: DemoDeadlines }) {
                   <Th>{t.role.CARRIER}</Th>
                   <Th>{t.vehicle.rating}</Th>
                   <Th numeric>{t.order.trips}</Th>
-                  <Th numeric>{t.money.gross}</Th>
-                  <Th numeric>{m('money.commissionRate', { rate: commissionRate })}</Th>
-                  <Th numeric>{t.money.payout}</Th>
+                  <Th numeric>{t.done.rate}</Th>
                 </tr>
               </thead>
               <tbody>
-                {payouts.map((row) => (
+                {carriers.map((row) => (
                   <Tr key={row.carrier} interactive>
                     <Td>{row.carrier}</Td>
                     <Td>
                       <Stars value={row.rating} />
                     </Td>
                     <Td numeric>{f.number(row.trips)}</Td>
-                    <Td numeric className="text-ink-muted">
+                    <Td numeric className="font-bold">
                       {f.eur(row.gross)}
-                    </Td>
-                    <Td numeric className="text-ok">
-                      −{f.eur(commissionCents(row.gross))}
-                    </Td>
-                    <Td numeric className="font-bold text-live">
-                      {f.eur(payoutCents(row.gross))}
                     </Td>
                   </Tr>
                 ))}

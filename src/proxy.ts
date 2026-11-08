@@ -48,16 +48,15 @@ export async function proxy(request: NextRequest) {
   /*
    * Блог — по адресу /blog без языка (24.10.2026): так его проверяет
    * HeyCatch и так ведёт читателей на статьи. Внутри это /fi/blog
-   * (08.11.2026: статьи почти все финские, страница должна быть lang="fi";
-   * у английской статьи свой lang на <article>); языковые варианты
-   * (/fi/blog) уводятся на единственный адрес.
+   * (08.11.2026: /blog — финский блог), /fi/blog уводится на /blog.
+   * У остальных языков свой блог с переводами статей: /de/blog и т. д.
    */
   if (first === 'blog') {
     const url = request.nextUrl.clone();
     url.pathname = `/fi${pathname}`;
     return NextResponse.rewrite(url);
   }
-  if (isLocale(first) && second === 'blog') {
+  if (first === 'fi' && second === 'blog') {
     const url = request.nextUrl.clone();
     url.pathname = pathname.slice(first.length + 1);
     return NextResponse.redirect(url, 308);

@@ -206,7 +206,8 @@ export async function PeriodReportCabinet({
           </section>
 
           <section className="mt-6">
-            {report.lines.length === 0 ? (
+            {/* Пустая таблица рейсов прежней модели не нужна, когда все рейсы — по прямому договору ниже. */}
+            {report.lines.length === 0 && report.own.lines.length > 0 ? null : report.lines.length === 0 ? (
               <EmptyState title={t.periodReport.empty} />
             ) : (
               <TableFrame
@@ -224,17 +225,6 @@ export async function PeriodReportCabinet({
                         <Th>{t.periodReport.colVehicle}</Th>
                         <Th className="text-right">{t.periodReport.colKm}</Th>
                         <Th className="text-right">{t.periodReport.colRate}</Th>
-                        {role !== 'CARRIER' && (
-                          <Th className="text-right">
-                            {role === 'ADMIN' ? t.periodReport.colShipperFee : t.periodReport.colCommission}
-                          </Th>
-                        )}
-                        {role === 'CARRIER' && report.showsCommission && (
-                          <Th className="text-right">{t.periodReport.colCommission}</Th>
-                        )}
-                        {report.showsCommission && (
-                          <Th className="text-right">{t.periodReport.colPayout}</Th>
-                        )}
                         <Th className="text-right">{t.periodReport.colVat}</Th>
                         <Th className="text-right">{t.periodReport.colGross}</Th>
                         <Th>{t.periodReport.colClaims}</Th>
@@ -261,21 +251,6 @@ export async function PeriodReportCabinet({
                           <Td className="text-right">
                             <Mono>{f.money(line.rate, line.currency)}</Mono>
                           </Td>
-                          {role !== 'CARRIER' && (
-                            <Td className="text-right">
-                              <Mono>{line.fee != null ? f.money(line.fee, line.currency) : '—'}</Mono>
-                            </Td>
-                          )}
-                          {role === 'CARRIER' && report.showsCommission && (
-                            <Td className="text-right">
-                              <Mono>{line.commission != null ? f.money(line.commission, line.currency) : '—'}</Mono>
-                            </Td>
-                          )}
-                          {report.showsCommission && (
-                            <Td className="text-right">
-                              <Mono>{line.payout != null ? f.money(line.payout, line.currency) : '—'}</Mono>
-                            </Td>
-                          )}
                           <Td className="text-right">
                             <Mono>{f.money(line.vat, line.currency)}</Mono>
                           </Td>

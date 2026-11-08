@@ -1447,10 +1447,10 @@ export const fi = {
   done: {
     titleCarrier: 'Ajetut kuljetukset',
     titleShipper: 'Valmiit kuljetukset',
-    titleAdmin: 'Laskutus ja tilitykset',
+    titleAdmin: 'Laskutus',
     subtitleCarrier: 'Viikon aikana ajetut kuljetukset ja niiden summat.',
     subtitleShipper: 'Viikon aikana valmistuneet kuljetukset ja niiden summat.',
-    subtitleAdmin: 'Tilaajien laskut ja kuljetusliikkeiden tilitykset.',
+    subtitleAdmin: 'Kuljetusliikkeiden kuukausimaksut.',
     /*
      * Примечание про НДС различается по роли: заказчику выставляют счёт,
      * перевозчику платят. Одна общая фраза заставляла бы каждого читать
@@ -1480,8 +1480,8 @@ export const fi = {
     commission: 'Palvelumaksu',
     payout: 'Tilitys',
     margin: 'Kate',
-    clients: 'Tilaajat · laskutus',
-    carriers: 'Kuljetusliikkeet · tilitykset',
+    clients: 'Tilaajat',
+    carriers: 'Kuljetusliikkeet',
     company: 'Yritys',
     trips: 'Kuljetuksia',
     distance: 'Matka',
@@ -2056,7 +2056,7 @@ export const fi = {
   },
 
   billingDesk: {
-    title: 'Laskutus ja tilitykset',
+    title: 'Laskutus',
     subtitle:
       'Kausi on puoli kuukautta: 1.–15. ja 16. päivästä kuun loppuun. Laskut lähtevät asiakkaille automaattisesti kauden päätyttyä. Sinä kirjaat saapuneet maksut ja tilitykset kuljetusliikkeille.',
     statAwaiting: 'Odottaa asiakkaiden maksua',
@@ -2088,9 +2088,9 @@ export const fi = {
     trendTitle: 'Kehitys',
     trendTurnover: 'Kuljetusten arvo',
     trendRevenue: 'Meidän osuutemme',
-    trendHint: 'Viikot maanantaista sunnuntaihin, summat ilman alv:tä. Osuus sisältää vain vanhan mallin palvelumaksut ennen 6.11.2026 julkaistuista tilauksista; suorat sopimukset ja kuukausimaksut eivät ole mukana.',
+    trendHint: 'Viikot maanantaista sunnuntaihin, summat ilman alv:tä.',
     subsTitle: 'Kuukausimaksut',
-    subsLede: 'Kuukausimaksu laskutetaan kuukauden päätyttyä ajaneista autoista. Jos kuljetusliikkeellä on vielä tilityksiä aiemman mallin tilauksista, maksu vähennetään ensin niistä.',
+    subsLede: 'Kuukausimaksu laskutetaan kuukauden päätyttyä ajaneista autoista.',
     subsColMonth: 'Kuukausi',
     subsColVehicles: 'Autoja',
     subsColTotal: 'Sis. alv',
@@ -2497,7 +2497,7 @@ export const fi = {
   },
 
   report: {
-    weeklyPayouts: 'Viikkotilitykset kuljetusliikkeille',
+    weeklyPayouts: 'Viikon kuljetukset kuljetusliikkeittäin',
     dailyInvoices: 'Päivittäinen yhteenveto tilaajittain',
     byMachine: 'Erittely ajoneuvoittain',
   },
@@ -2505,7 +2505,7 @@ export const fi = {
   report_: {
     carrierTitle: 'Viikkoraportti · ajetut kuljetukset',
     shipperTitle: 'Viikkoraportti · valmiit kuljetukset',
-    adminTitle: 'Viikkoraportti · laskutus ja tilitykset',
+    adminTitle: 'Viikkoraportti · laskutus',
     period: 'Viikko {week} · {from}–{to}',
     /*
      * Kauden asiakirjat. Erillinen otsikko, koska ne kertovat eri asian
@@ -2520,7 +2520,7 @@ export const fi = {
     feeLine: "Kuukausimaksu {month}: {count} maksullista autoa × {unit} (ensimmäinen auto maksuton) + alv {vat}",
     feeLineAnnual: "Vuosimaksu (maksettu {month}): {count} maksullista autoa × 12 kk −10 % + alv {vat}",
     ownTitle: 'Omat keikat ja suorat tilaukset',
-    ownNote: 'Ilman palvelumaksua. Hinnat tiedoksi, eivät sisälly yllä olevaan summaan.',
+    ownNote: 'Kuljetussopimus suoraan tilaajan ja kuljetusliikkeen välillä. Hinnat tiedoksi, eivät sisälly yllä olevaan summaan.',
     colClient: 'Asiakas',
     colCarrier: 'Kuljetusliike',
     subTitle: 'Kuukausimaksu',
@@ -2760,7 +2760,7 @@ export const fi = {
     summary: 'Yhteenveto',
     titleShipper: 'Kuljetusraportti',
     titleCarrier: 'Ajoraportti',
-    titleAdmin: 'Laskutus- ja tilitysraportti',
+    titleAdmin: 'Laskutusraportti',
     /*
       * Perusrivi ei väitä verokantaa: se riippuu vastapuolen maasta, ja
       * «vero lisätään laskulle» oli väärin ulkomaiselle yritykselle,

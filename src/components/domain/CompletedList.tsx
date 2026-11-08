@@ -29,8 +29,9 @@ import type { CompletedOrder, OrderStop, TripDocument, WeeklyTotal } from '@/typ
  * Выполненные рейсы, собранные по неделям (ТЗ §11).
  *
  * Компонент намеренно ничего не знает о ролях. База уже решила, что
- * каждой из них видно: заказчику комиссия приходит пустой, перевозчику —
- * имя заказчика заполненным, оператору — обе стороны. Здесь показывается
+ * каждой из них видно: перевозчику — имя заказчика заполненным,
+ * оператору — обе стороны. Плата платформе и выплаты прежней модели
+ * (до 6.11.2026) здесь больше не показываются. Здесь показывается
  * то, что пришло, и добавить условие «если перевозчик» тут значило бы
  * завести второе место, где решается тот же вопрос.
  *
@@ -88,21 +89,6 @@ export function CompletedList({
   return (
     <div className="flex flex-col gap-8">
       {weeks.map(([week, list]) => {
-        /*
-         * Рейсы по договору перевозчика с клиентом — свои рейсы и прямые
-         * заказы подписчика — своей группой ниже и без итогов недели:
-         * цену выставляет перевозчик, это не наша выплата и не наш счёт.
-         */
-        const ownList = list.filter((o) => o.contract_party === 'CARRIER');
-        const paidList = list.filter((o) => o.contract_party !== 'CARRIER');
-        /* Рейсы RAHTIS — всегда в евро: итог по строкам, без пересчёта. */
-        const paidRate = paidList.reduce((acc, o) => acc + (o.rate_cents ?? 0), 0);
-        const commissionRows = paidList.filter((o) => o.commission_cents != null);
-        const paidCommission = commissionRows.reduce((acc, o) => acc + (o.commission_cents ?? 0), 0);
-        const payoutRows = paidList.filter((o) => o.payout_cents != null);
-        const paidPayout = payoutRows.reduce((acc, o) => acc + (o.payout_cents ?? 0), 0);
-        const paidApprox = f.approx(payoutRows.length > 0 ? paidPayout : paidRate);
-
         return (
           <section key={week}>
             <div className="mb-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-line pb-2">
@@ -112,39 +98,18 @@ export function CompletedList({
 
               <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1 text-[13px]">
                 <span className="text-ink-muted">
-                  {m('order.tripsCount', { count: paidList.length })}
+                  {m('order.tripsCount', { count: list.length })}
                 </span>
 
                 {/*
-                 * Ставка — то, что заказчик платит оператору. Перевозчику
-                 * она тоже видна: это цена, о которой он договорился, и
-                 * прятать её, показывая только выплату, значило бы просить
-                 * поверить в вычитание на слово.
+                 * С 6.11.2026 договор перевозки — напрямую между заказчиком и
+                 * перевозчиком, без платы платформе: итог недели — просто сумма
+                 * цен, по валютам («12 000 kr + 480 €»).
                  */}
                 <span className="text-ink-muted">
                   {t.done.rate}{' '}
-                  <span className="font-semibold text-ink">
-                    {f.eur(paidRate)}
-                  </span>
+                  <span className="font-semibold text-ink">{byCurrency(list)}</span>
                 </span>
-
-                {commissionRows.length > 0 && (
-                  <span className="text-ink-dim">
-                    {t.done.commission} {f.eur(paidCommission)}
-                  </span>
-                )}
-
-                {payoutRows.length > 0 && (
-                  <span className="text-ink-muted">
-                    {t.done.payout}{' '}
-                    <span className="font-semibold text-ok">
-                      {f.eur(paidPayout)}
-                    </span>
-                  </span>
-                )}
-
-                {/* Справка в валюте компании: расчёты с RAHTIS остаются в евро. */}
-                {paidApprox && <span className="text-ink-dim">{paidApprox}</span>}
 
                 {/* Все числа выше нетто — налог добавляется в счёте. */}
                 <span className="text-ink-dim">{t.money.addVat}</span>
@@ -152,9 +117,8 @@ export function CompletedList({
             </div>
 
             <div className="flex flex-col gap-2">
-              {[...paidList, ...ownList].map((order, index) => {
+              {list.map((order) => {
                 const open = opened === order.id;
-                const own = order.contract_party === 'CARRIER';
                 const stops = (order.stops ?? []) as unknown as OrderStop[];
                 const documents = (order.documents ?? []) as unknown as TripDocument[];
                 const first = stops[0];
@@ -162,14 +126,6 @@ export function CompletedList({
 
                 return (
                   <Fragment key={order.id}>
-                    {index === paidList.length && (
-                      <p className="mt-3 text-[13px] text-ink-muted">
-                        <span className="font-semibold text-ink">{t.report_.ownTitle}</span>
-                        {' · '}
-                        {m('order.tripsCount', { count: ownList.length })} · {byCurrency(ownList)}
-                        <span className="block text-xs text-ink-dim">{t.report_.ownNote}</span>
-                      </p>
-                    )}
                     <Card id={`done-${order.id}`} className="scroll-mt-24" stripe={open ? 'ok' : 'neutral'}>
                       <CardBody>
                         <div className="flex flex-wrap items-start justify-between gap-3">
@@ -214,15 +170,6 @@ export function CompletedList({
                               {f.money(order.rate_cents ?? 0, order.currency)}
                             </span>
   
-                            {!own && order.payout_cents != null && (
-                              <span className="text-xs text-ink-muted">
-                                {t.done.payout}{' '}
-                                <span className="font-semibold text-ok">
-                                  {f.money(order.payout_cents, order.currency)}
-                                </span>
-                              </span>
-                            )}
-  
                             {/*
                              * Оценка видна и в свёрнутой строке: заказчик
                              * ищет глазами неоценённые рейсы, а перевозчик —
@@ -259,21 +206,6 @@ export function CompletedList({
                                   </Mono>
                                 }
                               />
-                              {order.commission_cents != null && (
-                                <Kv
-                                  k={t.done.commission}
-                                  v={
-                                    <Mono>
-                                      {f.money(order.commission_cents, order.currency)}
-                                      {order.commission_bps != null &&
-                                        ` · ${m('done.bps', { rate: order.commission_bps / 10000 })}`}
-                                    </Mono>
-                                  }
-                                />
-                              )}
-                              {!own && order.payout_cents != null && (
-                                <Kv k={t.done.payout} v={<Mono>{f.money(order.payout_cents, order.currency)}</Mono>} />
-                              )}
                             </div>
   
                             {stops.length > 0 && (

@@ -99,6 +99,8 @@ export function cleanArticleHtml(html: string, lang = 'fi'): string {
     allowedTags: ['h2', 'h3', 'h4', 'p', 'ul', 'ol', 'li', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'a', 'blockquote', 'strong', 'em', 'b', 'i', 'code', 'pre', 'br', 'hr'],
     allowedAttributes: { h2: ['id'], h3: ['id'], a: ['href', 'title'], th: ['colspan', 'rowspan'], td: ['colspan', 'rowspan'] },
     allowedSchemes: ['https', 'http', 'mailto'],
+    // Адрес сайта, написанный в тексте (не ссылкой), — тоже на язык статьи.
+    textFilter: (text) => text.replace(new RegExp(`(?:www\\.)?rahtis\\.eu/(?:${SITE_LOCALES})(?![a-z])`, 'g'), `www.rahtis.eu/${own}`).replace(/\brahtis\.com\b/g, 'rahtis.eu'),
     transformTags: {
       a: (tagName, attribs) => {
         const href = attribs.href ?? '';

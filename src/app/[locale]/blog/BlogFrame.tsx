@@ -5,6 +5,7 @@ import { buttonClass } from '@/components/ui';
 import { signInPath } from '@/lib/auth/paths';
 import { APP } from '@/lib/config';
 import { blogLabels } from '@/lib/blog/visuals';
+import { blogPath, isBlogLocale } from '@/lib/blog/translations';
 
 /** Ширина разделов блога — как на странице maansiirto. */
 export const BLOG_SECTION = 'mx-auto w-full max-w-5xl px-5';
@@ -12,13 +13,13 @@ export const BLOG_SECTION = 'mx-auto w-full max-w-5xl px-5';
 /**
  * Рамка страниц блога: шапка и подвал в стиле сайта (как у страницы
  * maansiirto): марка, «Блог», «Войти», главная кнопка «Подать заявку».
- * Блог живёт по адресу /blog без языка (так его ищет HeyCatch). Статьи в
- * основном финские (08.11.2026), поэтому рамка говорит на языке статьи
- * (или большинства статей в списке). Разделы страницы задают сами страницы.
+ * У каждого языка сайта свой блог (08.11.2026): финский — /blog (так его
+ * ищет HeyCatch), остальные — /de/blog и т. д.; рамка говорит на языке
+ * страницы. Разделы страницы задают сами страницы.
  */
 export function BlogFrame({ children, lang = 'fi' }: { children: React.ReactNode; lang?: string }) {
   const t = blogLabels(lang);
-  const site = lang === 'en' ? 'en' : 'fi';
+  const site = isBlogLocale(lang) ? lang : 'fi';
   return (
     <div className="flex min-h-full flex-1 flex-col">
       <header className="border-b border-line bg-surface">
@@ -27,7 +28,7 @@ export function BlogFrame({ children, lang = 'fi' }: { children: React.ReactNode
             <Image src="/logo-header.png" alt="RAHTIS" width={954} height={240} sizes="96px" className="h-6 w-auto" priority />
           </Link>
           <nav className="flex items-center gap-4 text-[14px]">
-            <Link href="/blog" className="hidden text-ink-muted hover:text-ink sm:inline">
+            <Link href={blogPath(site)} className="hidden text-ink-muted hover:text-ink sm:inline">
               {t.blog}
             </Link>
             <Link href={signInPath(site)} className="hidden text-ink-muted hover:text-ink sm:inline">
@@ -49,7 +50,7 @@ export function BlogFrame({ children, lang = 'fi' }: { children: React.ReactNode
             <Link href={`/${site}`} className="hover:text-ink">
               RAHTIS
             </Link>
-            <Link href={site === 'fi' ? '/fi/tietosuoja' : '/en/privacy'} className="hover:text-ink">
+            <Link href={site === 'fi' ? '/fi/tietosuoja' : `/${site}/privacy`} className="hover:text-ink">
               {t.privacy}
             </Link>
             <ConsentSettingsLink className="hover:text-ink" />
