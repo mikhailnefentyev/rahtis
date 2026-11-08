@@ -32,7 +32,7 @@ export const sv = {
     tripTrailer: 'Körningens släp',
     setTrailer: 'Spara släp',
     title: 'Ekipage',
-    lede: 'Bygg ekipage av egna fordon och släp: dragbil ensam för trailerbyten, dragbil + tipptrailer, nuppi + lågbädd, lastbil + kapellsläp… Laglig vikt (SKAL), lastförmåga, flakmeter och volym räknas automatiskt. Ekipaget väljs när du tar en beställning.',
+    lede: 'Bygg ekipage av egna fordon och släp: dragbil ensam för trailerbyten, dragbil + tipptrailer, tippbil + lågbäddssläp, lastbil + kapellsläp… Tillåten bruttovikt, lastförmåga, flakmeter och volym räknas automatiskt. Ekipaget väljs när du tar en beställning.',
     add: 'Nytt ekipage',
     motor: 'Fordon',
     trailer: 'Släp',
@@ -41,10 +41,10 @@ export const sv = {
     delete: 'Ta bort',
     recalc: 'Räkna om',
     empty: 'Inga ekipage ännu. Lägg till fordon och släp och bygg sedan ett ekipage.',
-    invalid: 'Det här ekipaget går inte att bygga: påhängsvagn till dragbil, släp till lastbil eller nuppi, skåpbil utan släp.',
+    invalid: 'Det här ekipaget går inte att bygga: påhängsvagn till dragbil, släpvagn till lastbil eller tippbil, inget släp till skåpbil.',
     legal: 'Laglig gräns',
     payload: 'Lastförmåga',
-    kinds: { TRACTOR_SOLO: 'Dragbil (trailerbyte)', SEMI: 'Påhängsekipage', PUOLIKAS: 'Puolikas (dragbil + tipptrailer)', NUPPI: 'Nuppi', KASETTI: 'Kassett (nuppi + tippsläp)', TRUCK: 'Lastbil', TRUCK_TRAILER: 'TPV (släpvagnsekipage)', VAN: 'Skåpbil' },
+    kinds: { TRACTOR_SOLO: 'Dragbil (trailerbyte)', SEMI: 'Påhängsekipage', PUOLIKAS: 'Tipptrailer (dragbil + tipptrailer)', NUPPI: 'Tippbil (solo)', KASETTI: 'Kassettbil (tippbil + tippsläp)', TRUCK: 'Lastbil', TRUCK_TRAILER: 'Lastbil med släp', VAN: 'Skåpbil' },
   },
 
   /* Прицепы, сцепки и разрешённая масса (src/lib/fleet/mass.ts). */
@@ -497,7 +497,7 @@ export const sv = {
     noTrailer: 'Inget släp',
     arrivedAt: 'Ankomst',
     newLoad: 'Nytt lass',
-    material: 'Last',
+    material: 'Material',
     scale: 'Våg / mottagningsplats',
     scaleNone: 'Ingen vägning',
     nearest: 'närmast',
@@ -541,7 +541,7 @@ export const sv = {
     registrationsSaved: 'Registreringarna sparade',
     link: 'Avfall (bilaga VII)',
     title: 'Avfallstransport',
-    lede: 'Markera lasten som avfall om det gäller kartong, plastfilm, burkar eller trasiga pallar. Avfall som går över gränsen kräver ett dokument enligt bilaga VII till EU:s förordning om transport av avfall, och det följer med fraktsedeln (CMR).',
+    lede: 'Markera lasten som avfall om det gäller kartong, plastfilm, burkar eller trasiga pallar. Avfall som transporteras över en gräns kräver ett dokument enligt bilaga VII till EU:s förordning om transport av avfall, och det följer med fraktsedeln (CMR).',
     isWaste: 'Lasten är avfall',
     procedure: 'Förfarande',
     procedures: {
@@ -610,7 +610,7 @@ export const sv = {
     pricing: 'Prissättning',
     rate: 'Pris (€, exkl. moms)',
     rateHint: 'Per timme, lass eller ton enligt valet.',
-    material: 'Last som standard',
+    material: 'Standardmaterial',
     receivingSite: 'Mottagningsplats som standard',
     receivingNone: '—',
     buffer: 'Marginal till dagens slut (min)',
@@ -640,7 +640,7 @@ export const sv = {
     notApproved: 'väntar',
     loads: 'Lass',
     colTime: 'Tid',
-    colMaterial: 'Last',
+    colMaterial: 'Material',
     colScale: 'Våg',
     colGross: 'Brutto',
     colTare: 'Tara',
@@ -722,7 +722,7 @@ export const sv = {
       'GPS från ditt eget spårningssystem via API-nyckel: Wialon, Mapon, Navirec, Ruptela, Navixy, Samsara, Webfleet, ABAX',
       'Lönsamhet per fordon; leverantörer av reservdelar, däck och bärgning i nio länder',
       'Egna kunder och direktorder, spårningslänk till kunden',
-      'Lastbörs (anbudstavla) för trailerbyten, containrar och expresstransporter',
+      'Lastbörs för trailerbyten, containrar och expresstransporter',
       'Markarbeten och tippbilar: vägda lass, finska transportdokument för avfall, timmar och fakturor från arbetsplatsen',
       'Förarapp på 10 språk, fungerar offline',
       'Arbetstid och uppskattad lön: per kilometer, procentlön, fast timlön eller kollektivavtal',
@@ -743,7 +743,7 @@ export const sv = {
     /* Единица цены абонемента в разметке: за машину в месяц, без налога. */
     priceUnit: 'fordon / månad, exkl. moms',
     homeDescription:
-      'RAHTIS är en plattform för transportledning och en lastbörs för åkerier. Hantera flotta, förare, arbetstid och fraktsedlar på ett ställe, ta emot order direkt från egna kunder och fyll tomma bilar från anbudstavlan. Trailerbyten, containrar och expresstransporter i Finland, Norden, Baltikum, Polen och Tyskland – uppdragsgivaren publicerar en gång och följer uppdraget steg för steg. För markarbeten: tippbilarnas lass, vägning, timmar och fakturor från arbetsplatsen.',
+      'RAHTIS är en plattform för transportledning och en lastbörs för åkerier. Hantera flotta, förare, arbetstid och fraktsedlar på ett ställe, ta emot order direkt från egna kunder och fyll tomma bilar från lastbörsen. Trailerbyten, containrar och expresstransporter i Finland, Norden, Baltikum, Polen och Tyskland – uppdragsgivaren publicerar en gång och följer uppdraget steg för steg. För markarbeten: tippbilarnas lass, vägning, timmar och fakturor från arbetsplatsen.',
     termsDescription:
       'Användarvillkor för RAHTIS: parternas ansvar, hur ett uppdrag genomförs, betalningar och avräkningar samt avtalets giltighetstid.',
     privacyDescription:
@@ -908,7 +908,7 @@ export const sv = {
     partnership: 'Hur du använder tjänsten',
     partnershipSub: 'Plattformen mot månadsavgift',
     partnershipSubText:
-      'Första fordonet är gratis, därefter 14,90 € (exkl. moms) i månaden per fordon som har kört under månaden. Vi tar ingen procent på något uppdrag: varken på egna kunder, direktorder eller uppdrag från anbudstavlan. Betala ett år i förväg: −10 %. Från 100 fordon: pris på begäran.',
+      'Första fordonet är gratis, därefter 14,90 € (exkl. moms) i månaden per fordon som har kört under månaden. Vi tar ingen procent på något uppdrag: varken på egna kunder, direktorder eller uppdrag från lastbörsen. Betala ett år i förväg: −10 %. Från 100 fordon: pris på begäran.',
     freeUntil: 'Avgiftsfritt till {date}',
     feeOpen: 'Obetald månadsavgift {amount}',
     feesFrom: 'Månadsavgiften debiteras från och med {date}.',
@@ -1062,7 +1062,7 @@ export const sv = {
     helpEyebrow: 'Vad RAHTIS gör',
     helpTitle: 'Vi håller godset i rörelse och bilarna i arbete',
     helpLede:
-      'RAHTIS är tre saker i en: en driftplattform där åkerier hanterar egen flotta, egna förare och kunder; en anbudstavla – en lastbörs – där åkerier hittar uppdrag och uppdragsgivare hittar en transportör; och en direktlinje mellan uppdragsgivare och åkeri. Vi ersätter inte speditören, trafikledaren eller åkeriet – vi tar bort letandet, telefonsamtalen, samma fråga ställd många gånger och de utspridda dokumenten.',
+      'RAHTIS är tre saker i en: en driftplattform där åkerier hanterar egen flotta, egna förare och kunder; en lastbörs där åkerier hittar uppdrag och uppdragsgivare hittar en transportör; och en direktlinje mellan uppdragsgivare och åkeri. Vi ersätter inte speditören, trafikledaren eller åkeriet – vi tar bort letandet, telefonsamtalen, samma fråga ställd många gånger och de utspridda dokumenten.',
     helpCargo: 'För speditörer och operatörer',
     helpCargoTitle: 'Ordern kommer snabbt iväg',
     helpCargoText:
@@ -1107,7 +1107,7 @@ export const sv = {
     own3: 'En karta över rast-, tvätt- och serviceplatser i Norden, Baltikum, Polen och Tyskland.',
     own4: 'Din kund skickar ordern direkt till ditt fordon, eller så lägger du in uppdraget själv och ger det till ditt eget fordon. Kunden kan få en spårningslänk. Hela priset är ditt, och uppdraget hamnar i din veckorapport.',
     own5: 'Första bilen är gratis, därefter betalar du 14,90 € i månaden per bil som har kört. En bil som står still kostar ingenting.',
-    own6: 'Anbudstavlan finns kvar när ett fordon blir ledigt.',
+    own6: 'När en bil blir ledig finns lastbörsen ändå till hands.',
 
     stepsEyebrow: 'Så går ett uppdrag till',
     stepsTitle: 'Från ansökan till slutfört uppdrag i fyra steg',
@@ -1246,7 +1246,7 @@ export const sv = {
     finalEyebrow: 'Kom igång',
     finalTitle: 'Berätta om ditt företag – vi sköter resten',
     finalLede: 'Vi behöver företagets namn, FO-nummer (Y-tunnus) och en e-postadress; av åkerier även trafiktillstånd och försäkring.',
-    finalLede2: 'Vi kontrollerar företaget i PRH:s och YTJ:s register och skickar inloggningsuppgifter när det är godkänt.',
+    finalLede2: 'Vi kontrollerar företaget i de officiella registren (i Finland PRS och FODS) och skickar inloggningsuppgifter när det är godkänt.',
     applyShipper: 'Ansökan för speditör',
     applyCarrier: 'Ansökan för åkeri',
     footerCountry: 'Finland',
@@ -1260,15 +1260,15 @@ export const sv = {
     comboAxles: "Axlar",
     comboEu: "EU",
     comboNote: "Exempel med ett vanligt antal axlar. Den exakta gränsen räknas fram ur dina fordon: registrerade vikter, tjänstevikt och avståndet mellan första och sista axeln.",
-    comboPpv: "PPV · dragbil + påhängsvagn",
+    comboPpv: "Trailerekipage · dragbil + påhängsvagn",
     comboPpvText: "Kapell, skåp eller kyl: 13,6 m, 33 EUR-pallar.",
-    comboPuolikas: "Puolikas · dragbil + tipptrailer",
+    comboPuolikas: "Tippekipage · dragbil + tipptrailer",
     comboPuolikasText: "Sand, grus och jord: körningar på arbetsplatser, med vägning.",
     comboTral: "Lågbädd · dragbil + lågbäddstrailer",
     comboTralText: "Maskiner och specialtransporter: grävmaskiner, vältar, pålar.",
     comboKasetti: "Kassett · tippbil + kassettsläp",
     comboKasettiText: "Det finska ekipaget upp till 76 t: släpets flak skjuts över på bilen, tippas och förs tillbaka.",
-    comboTpv: "TPV · lastbil + släp",
+    comboTpv: "Bil och släp · lastbil + släpvagn",
     comboTpvText: "Lastbil med släpvagn: kapell, flak eller lågbädd.",
     comboKonttiText: "20–45-fotscontainrar till och från hamnar och terminaler, tomma eller lastade.",
     comboKontti: "Container · dragbil + containerchassi",
@@ -1369,11 +1369,11 @@ export const sv = {
       unitState: 'Gods',
     },
     TIPPER: {
-      stopPickup: 'Hämtning av gods',
-      stopReturn: 'Leverans',
-      pickupSection: 'Var godset hämtas',
-      dropSection: 'Var godset levereras',
-      unitState: 'Gods',
+      stopPickup: 'Lastning',
+      stopReturn: 'Lossning',
+      pickupSection: 'Var lasset lastas',
+      dropSection: 'Var lasset lossas',
+      unitState: 'Last',
     },
   },
 
@@ -1391,7 +1391,7 @@ export const sv = {
     trailerTitle: 'Utrustning (påhängsvagn)',
     tooHeavy: 'Ett påhängsekipage tar högst 30 000 kg.',
     trailerLdm: 'Flakmeter',
-    features: { MEGA: 'MEGA', SIDE_LOADING: 'Sidolastning', TOP_LOADING: 'Topplastning', LIFTING_ROOF: 'Lyftbart tak' },
+    features: { MEGA: 'MEGA', SIDE_LOADING: 'Sidlastning', TOP_LOADING: 'Topplastning', LIFTING_ROOF: 'Lyftbart tak' },
   },
 
   /* Закрытие самосвального заказа (src/app/[locale]/carrier/desk/TipperClosingPanel.tsx). */
@@ -1411,9 +1411,9 @@ export const sv = {
 
   /* Стройка: самосвальный заказ (haul_kind TIPPER, src/lib/orders/haul.ts). */
   tipper: {
-    hint: 'Schakt mäts i ton och kubikmeter och betalas per timme, lass eller ton. Priset är en uppskattning: slutsumman räknas från förarens registreringar (ankomst, lass med vikter, dagens slut).',
+    hint: 'Massor mäts i ton och kubikmeter och betalas per timme, lass eller ton. Priset är en uppskattning: slutsumman räknas från förarens registreringar (ankomst, lass med vikter, dagens slut).',
     config: 'Fordon',
-    configs: { TRUCK: 'Nuppi (tippbil) 3–5 axlar', CASSETTE: 'Kassett: nuppi + tippsläp 3–5 axlar (flaket flyttas till bilen för tippning)', SEMI: 'Dragbil + tipptrailer' },
+    configs: { TRUCK: 'Tippbil 3–5 axlar', CASSETTE: 'Kassettbil: tippbil + tippsläp 3–5 axlar (släpets flak flyttas över på bilen för tippning)', SEMI: 'Dragbil + tipptrailer' },
     volume: 'Volym, m³',
     pricing: 'Prissättning',
     unitRate: { HOUR: 'Timpris, € (exkl. moms)', LOAD: 'Pris per lass, € (exkl. moms)', TONNE: 'Pris per ton, € (exkl. moms)' },
@@ -1427,14 +1427,14 @@ export const sv = {
     VAN: 'Skåpbil',
     TRUCK: 'Lastbil',
     SEMI: 'Påhängsekipage 13,6 m',
-    TIPPER: 'Schakt (tipp)',
+    TIPPER: 'Masstransport (tippbil)',
   },
 
   vehicleClass: {
     TRACTOR: 'Dragbil',
     VAN: 'Skåpbil · upp till 3,5 t',
     TRUCK: 'Lastbil · upp till 26 t',
-    TIPPER: 'Nuppi (tippbil) · 3–5 axlar',
+    TIPPER: 'Tippbil · 3–5 axlar',
   },
 
   amendKind: {
@@ -2566,7 +2566,7 @@ export const sv = {
     adrNo: 'Inget ADR-tillstånd',
     capacity: 'Lastförmåga',
     capacityHint: 'En tvåaxlig dragbil tar 25 t, en treaxlig 32 t.',
-    tipperAxlesHint: 'Vikt efter axlar (Finland): 3 axlar 28 t, 4 – 35 t, 5 – 42 t. En kassettbil med släp tar mer – lägg till släpet under Släpvagnar.',
+    tipperAxlesHint: 'Vikt efter axlar (Finland): 3 axlar 28 t, 4 – 35 t, 5 – 42 t. En kassettbil med släp tar mer – lägg till släpet under Släp.',
     containerFeet: 'Containerchassi',
     containerFeetHint:
       'Vilka containerlängder ekipaget kan ta. Tomt betyder att det inte kör containrar.',
@@ -2634,8 +2634,8 @@ export const sv = {
       ACCIDENT_INSURANCE: 'Olycksfallsförsäkring',
     },
     itemHints: {
-      REGISTERS: 'Hämtas automatiskt från PRS öppna data. Enskild näringsidkare: ladda upp ett utdrag från FODS.',
-      TRADE_REGISTER: 'Hämtas automatiskt från PRS öppna data. Enskild näringsidkare: ladda upp ett utdrag från FODS.',
+      REGISTERS: 'Hämtas automatiskt från PRS:s öppna data. Enskild näringsidkare: ladda upp ett utdrag från FODS.',
+      TRADE_REGISTER: 'Hämtas automatiskt från PRS:s öppna data. Enskild näringsidkare: ladda upp ett utdrag från FODS.',
       TAX_DEBT: 'Skatteskuldsintyg från MinSkatt, högst 3 månader gammalt.',
       PENSION: 'Pensionsbolagets intyg om försäkringen och betalda avgifter, högst 3 månader gammalt.',
       COLLECTIVE_AGREEMENT: 'Tillämpligt kollektivavtal (t.ex. för lastbilsbranschen) eller en redogörelse för de centrala anställningsvillkoren.',
@@ -2649,7 +2649,7 @@ export const sv = {
       MISSING: 'Saknas',
     },
     validUntilDate: 'Giltig till {date}',
-    fromPrh: 'Från PRS uppgifter',
+    fromPrh: 'Från PRS:s uppgifter',
     fromDocument: 'Från dokument',
     registryTitle: 'Registeruppgifter (PRS)',
     company: 'Företag',
@@ -2666,7 +2666,7 @@ export const sv = {
     refresh: 'Uppdatera från PRS',
     refreshing: 'Uppdaterar…',
     refreshTooSoon: 'Uppgifterna uppdaterades nyss. Försök igen om 10 minuter.',
-    refreshFailed: 'PRS register svarade inte. Försök igen om en stund.',
+    refreshFailed: 'PRS:s register svarade inte. Försök igen om en stund.',
     packageTitle: 'Utredningar',
     upload: 'Ladda upp utredning',
     uploading: 'Laddar upp…',
@@ -3548,9 +3548,9 @@ export const sv = {
           t: 'Axlar',
           d: 'Icke drivande axel 10 t, drivaxel 11,5 t. Tvåaxlig boggi 19–21 t beroende på konstruktion.',
         },
-        { t: 'Lastbil', d: '2 axlar 18 t, 3 axlar 28 t, 4 axlar 35 t.' },
-        { t: 'Ekipage', d: '5 axlar 44 t, 6 axlar 53 t, 7 axlar 60 t, 9 axlar upp till 76 t.' },
-        { t: 'Mått', d: 'Ekipagets längd högst 34,5 m. Bredd 2,55 m, höjd 4,40 m.' },
+        { t: 'Lastbil (Finland)', d: '2 axlar 18 t, 3 axlar 28 t, 4 axlar 35 t.' },
+        { t: 'Ekipage (Finland)', d: '5 axlar 44 t, 6 axlar 53 t, 7 axlar 60 t, 9 axlar upp till 76 t. I Sverige högst 74 t på BK4-vägar.' },
+        { t: 'Mått (Finland)', d: 'Ekipagets längd högst 34,5 m. Bredd 2,55 m, höjd 4,40 m.' },
         {
           t: 'Dellossning',
           d: 'Lossar du bakifrån hamnar resten närmare vändskivan: drivaxeln kan bli överlastad fast totalvikten minskar.',
@@ -4065,7 +4065,7 @@ export const sv = {
     revoke: 'Dra tillbaka',
     none: 'Inga körda transporter än',
     anonymitySubscriber:
-      'En kund som du har tillåtit att skicka direktorder ser ditt företagsnamn, FO-nummer och kontonummer samt förarens kontaktuppgifter, och du ser kundens namn. På anbudstavlan visas kunder med en kod tills du har tagit uppdraget; därefter ser båda parter varandras namn för faktureringen.',
+      'En kund som du har tillåtit att skicka direktorder ser ditt företagsnamn, FO-nummer och kontonummer samt förarens kontaktuppgifter, och du ser kundens namn. På lastbörsen visas kunder med en kod tills du har tagit uppdraget; därefter ser båda parter varandras namn för faktureringen.',
     anonymity:
       'Kunder visas med en kod, inte med namn. Uppdragsgivaren ser fordonets registreringsnummer, betyg och, för kontakt, förarens namn, telefonnummer och e-post, men inte ditt företagsnamn.',
   },
@@ -5228,7 +5228,7 @@ export const sv = {
     'driverApp.welcome': 'Välkommen, {name}',
     'driverApp.breakTotal': 'Raster {minutes} min',
     'driverApp.stopOf': 'Stopp {n}/{total}',
-    'driverApp.arrivedAt': 'Du kom kl. {time}',
+    'driverApp.arrivedAt': 'Framme kl. {time}',
     'driverApp.queued': '{count, plural, one {# notering väntar på att skickas} other {# noteringar väntar på att skickas}}',
     'driverApp.rejected': '{count, plural, one {En notering godkändes inte} other {# noteringar godkändes inte}} – kontrollera uppdraget. Tryck för att stänga.',
     'driverApp.pendingSignOut': '{count, plural, one {# notering har inte skickats ännu} other {# noteringar har inte skickats ännu}}. Loggar du ut nu försvinner de.',

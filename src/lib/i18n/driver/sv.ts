@@ -283,7 +283,7 @@ export const sv = {
     noTrailer: 'Inget släp',
     arrivedAt: 'Ankomst',
     newLoad: 'Nytt lass',
-    material: 'Last',
+    material: 'Material',
     scale: 'Våg / mottagningsplats',
     scaleNone: 'Ingen vägning',
     nearest: 'närmast',
@@ -378,7 +378,7 @@ export const sv = {
     VAN: 'Skåpbil',
     TRUCK: 'Lastbil',
     SEMI: 'Påhängsekipage 13,6 m',
-    TIPPER: 'Schakt (tipp)',
+    TIPPER: 'Masstransport (tippbil)',
   },
   payDisclaimer:
     'Beräkningen är vägledande. Den slutliga lönen bestäms av arbetsgivaren och anställnings- eller kollektivavtalet.',
@@ -400,7 +400,7 @@ export const sv = {
     'driverApp.welcome': 'Välkommen, {name}',
     'driverApp.breakTotal': 'Raster {minutes} min',
     'driverApp.stopOf': 'Stopp {n}/{total}',
-    'driverApp.arrivedAt': 'Du kom kl. {time}',
+    'driverApp.arrivedAt': 'Framme kl. {time}',
     'driverApp.queued':
       '{count, plural, one {# notering väntar på att skickas} other {# noteringar väntar på att skickas}}',
     'driverApp.rejected':

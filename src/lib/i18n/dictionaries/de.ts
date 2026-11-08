@@ -32,7 +32,7 @@ export const de = {
     tripTrailer: 'Anhänger der Fahrt',
     setTrailer: 'Anhänger speichern',
     title: 'Kombinationen',
-    lede: 'Stellen Sie Kombinationen aus eigenen Fahrzeugen und Anhängern zusammen: Sattelzugmaschine allein für Trailertausch, Zugmaschine + Kippauflieger, Nuppi + Tieflader, Lkw + Planenanhänger… Gesetzliche Masse (SKAL), Nutzlast, Lademeter und Volumen werden automatisch berechnet. Die Kombination wählen Sie bei der Auftragsannahme.',
+    lede: 'Stellen Sie Kombinationen aus eigenen Fahrzeugen und Anhängern zusammen: Sattelzugmaschine allein für Trailertausch, Zugmaschine + Kippauflieger, Nuppi + Tieflader, Lkw + Planenanhänger… Zulässige Gesamtmasse (SKAL), Nutzlast, Lademeter und Volumen werden automatisch berechnet. Die Kombination wählen Sie bei der Auftragsannahme.',
     add: 'Neue Kombination',
     motor: 'Fahrzeug',
     trailer: 'Anhänger',
@@ -646,7 +646,7 @@ export const de = {
     colTare: 'Tara',
     colNet: 'Netto',
     colTicket: 'Wiegeschein',
-    transferDoc: 'Finnischer Begleitschein (siirtoasiakirja)',
+    transferDoc: 'Finnisches Transportdokument (siirtoasiakirja)',
     overload: 'Überladung',
     totals: 'Summe',
     amount: 'Betrag (ohne MwSt.)',
@@ -712,7 +712,7 @@ export const de = {
     homeTitle: 'Frachtenbörse und TMS: Trailertausch und Container',
     /* Описание для выдачи поиска: до 160 знаков, иначе обрезается. Длинное homeDescription — для разметки. */
     homeMeta: 'Frachtenbörse und Transportmanagement für Transportunternehmen: Fuhrpark, Fahrer, Frachtbriefe und Direktaufträge. Trailertausch, Container und Expressfahrten.',
-    applyTitle: 'Als Fuhrunternehmen oder Auftraggeber registrieren',
+    applyTitle: 'Als Transportunternehmen oder Auftraggeber registrieren',
     termsTitle: 'Nutzungsbedingungen für Transportunternehmen und Auftraggeber',
     privacyTitle: 'Datenschutzhinweise: Umgang mit personenbezogenen Daten',
     features: [
@@ -723,7 +723,7 @@ export const de = {
       'Rentabilität jedes Fahrzeugs; Lieferanten für Ersatzteile, Reifen und Pannenhilfe in neun Ländern',
       'Eigene Kunden und Direktaufträge, Tracking-Link für den Kunden',
       'Frachtenbörse für Trailertausch, Container und Expressfahrten',
-      'Erdbau und Kipper: gewogene Ladungen, finnische Abfall-Begleitscheine, Stunden und Rechnungen von der Baustelle',
+      'Erdbau und Kipper: gewogene Fuhren, finnische Abfall-Transportdokumente, Stunden und Rechnungen von der Baustelle',
       'Fahrer-App in 10 Sprachen, funktioniert offline',
       'Arbeitszeit und voraussichtlicher Lohn: pro Kilometer, Prozent vom Auftrag, fester Stundenlohn oder Tarifvertrag',
       'Elektronischer Frachtbrief, Fotos und Unterschrift',
@@ -743,14 +743,14 @@ export const de = {
     /* Единица цены абонемента в разметке: за машину в месяц, без налога. */
     priceUnit: 'Fahrzeug / Monat, zzgl. MwSt.',
     homeDescription:
-      'RAHTIS ist die Arbeitsplattform und Frachtenbörse für Transportunternehmen. Verwalten Sie Fuhrpark, Fahrer, Arbeitszeit und Frachtbriefe an einem Ort, nehmen Sie Aufträge direkt von Ihren eigenen Kunden an und füllen Sie freie Lkw über die Frachtenbörse. Trailertausch, Container und Expressfahrten in Finnland, den nordischen Ländern, dem Baltikum, Polen und Deutschland — der Auftraggeber findet mit einer einzigen Veröffentlichung einen Fahrer und sieht den Transport Schritt für Schritt. Für den Erdbau: Kipperladungen, Wiegungen, Stunden und Rechnungen von der Baustelle.',
+      'RAHTIS ist die Arbeitsplattform und Frachtenbörse für Transportunternehmen. Verwalten Sie Fuhrpark, Fahrer, Arbeitszeit und Frachtbriefe an einem Ort, nehmen Sie Aufträge direkt von Ihren eigenen Kunden an und lasten Sie freie Lkw über die Frachtenbörse aus. Trailertausch, Container und Expressfahrten in Finnland, den nordischen Ländern, dem Baltikum, Polen und Deutschland — der Auftraggeber stellt die Fracht einmal ein, findet einen Frachtführer und verfolgt den Transport Schritt für Schritt. Für den Erdbau: Kipperladungen, Wiegungen, Stunden und Rechnungen von der Baustelle.',
     termsDescription:
       'Nutzungsbedingungen von RAHTIS: Pflichten der Parteien, Ablauf eines Auftrags, Zahlungen und Abrechnungen sowie Vertragslaufzeit.',
     privacyDescription:
       'Wie RAHTIS personenbezogene Daten verarbeitet: was erhoben wird, wofür es genutzt wird, wie lange es gespeichert wird und welche Rechte die betroffene Person hat.',
     signinDescription: 'Bei RAHTIS als Auftraggeber oder Transportunternehmen anmelden.',
     applyDescription:
-      'Bei RAHTIS bewerben. Wir prüfen Y-tunnus und Firmendaten in den Registern, bei Transportunternehmen auch Güterkraftverkehrslizenz und Versicherung.',
+      'Bei RAHTIS registrieren. Wir prüfen Unternehmenskennung und Firmendaten in den Registern, bei Transportunternehmen auch Güterkraftverkehrserlaubnis bzw. EU-Lizenz und Versicherung.',
     forgotDescription: 'Vergessenes RAHTIS-Passwort zurücksetzen.',
   },
 
@@ -810,7 +810,7 @@ export const de = {
     export: 'Exportieren',
     retry: 'Erneut versuchen',
     closeTrip: 'Auftrag abschließen',
-    submitApplication: 'Bewerbung senden',
+    submitApplication: 'Registrierung senden',
     addVehicle: 'Fahrzeug hinzufügen',
   },
 
@@ -821,7 +821,7 @@ export const de = {
 
   auth: {
     signInTitle: 'Anmelden',
-    signInSubtitle: 'Eine freie Registrierung gibt es nicht. RAHTIS schaltet den Zugang nach einer Prüfung frei.',
+    signInSubtitle: 'Ein Konto lässt sich nicht einfach selbst anlegen: RAHTIS schaltet den Zugang nach einer Prüfung frei.',
     email: 'E-Mail',
     password: 'Passwort',
     submit: 'Anmelden',
@@ -831,8 +831,8 @@ export const de = {
     tooManyAttempts: 'Zu viele Anmeldeversuche. Warten Sie 15 Minuten oder setzen Sie Ihr Passwort über „Passwort vergessen?“ zurück.',
     serviceDown: 'Der Dienst antwortet gerade nicht. Versuchen Sie es gleich noch einmal — Ihr Passwort ist in Ordnung.',
     invalidCredentials: 'E-Mail oder Passwort stimmt nicht',
-    noApplicationYet: 'Noch nicht beworben?',
-    applyLink: 'Bewerbung senden',
+    noApplicationYet: 'Noch nicht registriert?',
+    applyLink: 'Jetzt registrieren',
 
     noAccessTitle: 'Ihr Konto ist nicht verfügbar',
     driverSessionTitle: 'Sie sind als Fahrer angemeldet',
@@ -845,7 +845,7 @@ export const de = {
     frozenText:
       'Der Zugang dieses Unternehmens wurde gesperrt. Daten und Transporthistorie bleiben erhalten. Wenden Sie sich an den RAHTIS-Support, wir klären das.',
     rejectedText:
-      'Die Bewerbung Ihres Unternehmens wurde abgelehnt. Wenden Sie sich an den RAHTIS-Support — wir nennen Ihnen den Grund, und Sie können sich erneut bewerben.',
+      'Die Registrierung Ihres Unternehmens wurde abgelehnt. Wenden Sie sich an den RAHTIS-Support — wir nennen Ihnen den Grund, und Sie können sich erneut registrieren.',
   },
 
   onboardingAdmin: {
@@ -879,8 +879,8 @@ export const de = {
     activateText: 'Die Adresse holen wir aus dem YTJ (finnisches Handelsregister), wenn sie dort hinterlegt ist. Kontonummer ergänzen und Bedingungen akzeptieren — etwa 2 Minuten.',
     activateTextShipper: 'Die Adresse holen wir aus dem YTJ (finnisches Handelsregister), wenn sie dort hinterlegt ist. Rechnungsdaten prüfen und Bedingungen akzeptieren — etwa 2 Minuten.',
     activateAction: 'Ausfüllen',
-    docs: 'Güterkraftverkehrslizenz und Versicherung',
-    docsText: 'Laden Sie eine gültige Güterkraftverkehrslizenz und die Kfz-Versicherung hoch. Ein Foto oder PDF genügt.',
+    docs: 'Güterkraftverkehrserlaubnis und Versicherung',
+    docsText: 'Laden Sie eine gültige Güterkraftverkehrserlaubnis und die Kfz-Versicherung hoch. Ein Foto oder PDF genügt.',
     docsAction: 'Hochladen',
     vehicle: 'Erstes Fahrzeug',
     vehicleText: 'Fügen Sie ein Fahrzeug per Kennzeichen hinzu. Wir prüfen jedes Fahrzeug einzeln.',
@@ -902,7 +902,7 @@ export const de = {
     businessId: 'Y-tunnus',
     yourRole: 'Ihre Rolle',
     approvedCarrierHint:
-      'Ihr Unternehmen ist freigegeben. Laden Sie Güterkraftverkehrslizenz und Versicherung hoch und fügen Sie Ihre Fahrzeuge hinzu, dann sehen Sie die offenen Aufträge. Wir prüfen jedes Fahrzeug einzeln.',
+      'Ihr Unternehmen ist freigegeben. Laden Sie Güterkraftverkehrserlaubnis und Versicherung hoch und fügen Sie Ihre Fahrzeuge hinzu, dann sehen Sie die offenen Aufträge. Wir prüfen jedes Fahrzeug einzeln.',
     approvedShipperHint:
       'Ihr Unternehmen ist freigegeben. Ergänzen Sie die Firmendaten, dann können Sie Transporte veröffentlichen.',
     partnership: 'So nutzen Sie den Service',
@@ -1015,14 +1015,14 @@ export const de = {
     titleA: 'Trailer, Container, Ladung.',
     titleB: 'Alles fährt pünktlich los.',
     titleC: 'Unnötige Anrufe fallen weg.',
-    lede: 'Transportunternehmen verwalten Fuhrpark, Fahrer und eigene Kunden an einem Ort und füllen freie Lkw über die Frachtenbörse. Auftraggeber veröffentlichen einen Transport einmal und verfolgen ihn Schritt für Schritt, mit Fotos und Dokumenten.',
+    lede: 'Transportunternehmen verwalten Fuhrpark, Fahrer und eigene Kunden an einem Ort und lasten freie Lkw über die Frachtenbörse aus. Auftraggeber stellen einen Transport einmal ein und verfolgen ihn Schritt für Schritt, mit Fotos und Dokumenten.',
     highlight1: 'Fuhrpark, Fahrer und Kunden an einem Ort',
     highlight2: 'Wir drücken keine Preise',
     highlight3: 'Dokumente und Berichte elektronisch',
     asShipper: 'Für Speditionen und Logistikdienstleister',
     asCarrier: 'Für Transportunternehmen',
     signIn: 'Anmelden',
-    apply: 'Bewerbung senden',
+    apply: 'Jetzt registrieren',
     fleetLabel: 'freigegebene Fahrzeuge',
         regionsLabel: 'Orte',
     regions: 'Einsatzgebiete',
@@ -1110,10 +1110,10 @@ export const de = {
     own6: 'Die Frachtenbörse steht Ihnen trotzdem offen, wenn ein Fahrzeug frei wird.',
 
     stepsEyebrow: 'So läuft ein Auftrag',
-    stepsTitle: 'Von der Bewerbung zum abgeschlossenen Auftrag in vier Schritten',
+    stepsTitle: 'Von der Registrierung zum abgeschlossenen Auftrag in vier Schritten',
     step1: 'Firmenprüfung',
     step1Text:
-      'Wir prüfen die Y-tunnus und die Firmendaten anhand der Register. Bei Transportunternehmen prüfen wir außerdem Güterkraftverkehrslizenz und Versicherung.',
+      'Wir prüfen die Y-tunnus und die Firmendaten anhand der Register. Bei Transportunternehmen prüfen wir außerdem Güterkraftverkehrserlaubnis und Versicherung.',
     step2: 'Fahrzeugfreigabe',
     step2Text:
       'Jedes Fahrzeug wird einzeln freigegeben. Offene Aufträge sind nur für freigegebene Fahrzeuge sichtbar.',
@@ -1237,7 +1237,7 @@ export const de = {
     apiExampleNote: 'Den Schlüssel erstellen Sie im Portal im Reiter API. Die OpenAPI-Beschreibung funktioniert direkt in Postman und in Client-Generatoren.',
     apiDocs: 'API-Dokumentation lesen',
     footerApi: 'API',
-    menuApply: 'Bewerben',
+    menuApply: 'Registrieren',
     footerApiDocs: 'API-Dokumentation',
     footerTagline: "Eine Plattform für Transportunternehmen und Auftraggeber in Nordeuropa: Fuhrpark und Fahrer, Frachtenbörse, Trailertausch, Container, Expressfahrten und Kipper.",
     footerService: 'Service',
@@ -1245,10 +1245,10 @@ export const de = {
     footerDocuments: 'Dokumente',
     finalEyebrow: 'So geht es los',
     finalTitle: 'Erzählen Sie uns von Ihrem Unternehmen — den Rest erledigen wir',
-    finalLede: 'Wir brauchen den Firmennamen, die Y-tunnus und eine E-Mail-Adresse; von Transportunternehmen zusätzlich Güterkraftverkehrslizenz und Versicherung.',
+    finalLede: 'Wir brauchen den Firmennamen, die Y-tunnus und eine E-Mail-Adresse; von Transportunternehmen zusätzlich Güterkraftverkehrserlaubnis und Versicherung.',
     finalLede2: 'Wir prüfen die Angaben in den Registern von PRH und YTJ und schalten den Zugang nach der Freigabe frei.',
-    applyShipper: 'Bewerbung als Spedition',
-    applyCarrier: 'Bewerbung als Transportunternehmen',
+    applyShipper: 'Als Auftraggeber registrieren',
+    applyCarrier: 'Als Transportunternehmen registrieren',
     footerCountry: 'Finnland',
     menuFleet: "Fuhrpark",
     menuPricing: "Preise",
@@ -1290,7 +1290,7 @@ export const de = {
     pricingLede: "Keine Einrichtungsgebühr und keine mehrjährige Vertragsbindung. Ein Fahrzeug, das im Monat nicht gefahren ist, kostet nichts.",
     priceOwnEyebrow: "Eigene Kunden · Abonnement",
     priceOwnTitle: "Je Fahrzeug und Monat",
-    priceOwnText: 'Erstes Fahrzeug kostenlos, jedes weitere 14,90 € im Monat. Nur für Fahrzeuge mit mindestens einem abgeschlossenen Auftrag im Monat, auf Aufträge fallen keine Provisionen an. Erster Monat kostenlos, alle Preise zzgl. MwSt.',
+    priceOwnText: 'Erstes Fahrzeug kostenlos, jedes weitere 14,90 € im Monat. Berechnet werden nur Fahrzeuge mit mindestens einem abgeschlossenen Auftrag im Monat; auf Aufträge fallen keine Provisionen an. Erster Monat kostenlos, alle Preise zzgl. MwSt.',
     priceVehicles: "Fahrzeuge",
     pricePerVehicle: "€ / Fahrzeug",
     priceOnRequest: "auf Anfrage",
@@ -1826,7 +1826,7 @@ export const de = {
     closedNoVehicle:
       'Offene Aufträge erscheinen, sobald Ihr Unternehmen mindestens ein freigegebenes Fahrzeug und gültige Dokumente hat. Fügen Sie ein Fahrzeug hinzu, dann prüfen wir es.',
     closedExpired:
-      'Offene Aufträge erscheinen, sobald Ihr Unternehmen mindestens ein freigegebenes Fahrzeug und gültige Dokumente hat. Laden Sie eine erneuerte Güterkraftverkehrslizenz oder Versicherung hoch.',
+      'Offene Aufträge erscheinen, sobald Ihr Unternehmen mindestens ein freigegebenes Fahrzeug und gültige Dokumente hat. Laden Sie eine erneuerte Güterkraftverkehrserlaubnis oder Versicherung hoch.',
     openFleet: 'Fuhrpark',
     contactsHidden: 'Die Kontaktdaten des Empfängers erscheinen, sobald Sie den Auftrag übernehmen.',
     details: 'Auftragsdetails',
@@ -2045,7 +2045,7 @@ export const de = {
     partnershipSubHint: 'Erstes Fahrzeug kostenlos, jedes weitere gefahrene Fahrzeug 14,90 € im Monat. Keine Provision auf Aufträge; jeder Auftrag ist ein Direktvertrag zwischen Auftraggeber und Transportunternehmen.',
     testHint: 'Aufträge eines Testunternehmens kommen weder in Rechnungen noch in Abrechnungen.',
     queue: 'Prüfwarteschlange',
-    applications: 'Bewerbungen',
+    applications: 'Registrierungen',
     vehicles: 'Fahrzeuge zur Freigabe',
     approveAndInvite: 'Freigeben und Einladung senden',
     invitedBy: 'Eingeladen von',
@@ -2064,7 +2064,7 @@ export const de = {
     registryYes: 'ja',
     registryNo: 'nein',
     registryRecheck: 'Erneut prüfen',
-    registryPeople: 'Verantwortliche Personen sind nicht in den offenen Daten: Ob der Bewerber das Unternehmen vertreten darf, wird von Hand geprüft.',
+    registryPeople: 'Verantwortliche Personen sind nicht in den offenen Daten: Ob der Antragsteller das Unternehmen vertreten darf, wird von Hand geprüft.',
     rejectWithReason: 'Ablehnen',
     reasonLabel: 'Ablehnungsgrund',
     reasonPlaceholder: 'Die Y-tunnus ist nicht im PRH-Register',
@@ -2078,7 +2078,7 @@ export const de = {
     noUsersYet: 'Keine Einladung gesendet',
     inviteNotOpened: 'Einladung nicht geöffnet',
     signedIn: 'Angemeldet',
-    recent: 'Bearbeitete Bewerbungen',
+    recent: 'Bearbeitete Registrierungen',
     decidedAt: 'Entscheidung',
     freeze: 'Sperren',
     unfreeze: 'Zugang wiederherstellen',
@@ -2097,28 +2097,28 @@ export const de = {
   apply: {
     ytjHint: 'Bei finnischen Firmen wird der Name aus YTJ übernommen',
     ytjFound: 'Name aus YTJ übernommen',
-    title: 'Bewerbung',
+    title: 'Registrierung',
     subtitle:
-      'Eine freie Registrierung gibt es nicht. Wir prüfen jedes Unternehmen im Register und schicken die Zugangsdaten an die angegebene Adresse.',
+      'Ein Konto lässt sich nicht einfach selbst anlegen. Wir prüfen jedes Unternehmen im Register und schicken die Zugangsdaten an die angegebene Adresse.',
     howTitle: 'Preis',
     howSub: 'Plattform gegen Monatsgebühr',
     howSubText:
       'Sie verwalten Ihren Fuhrpark und Ihre eigenen Kunden und übernehmen Aufträge aus der Frachtenbörse. Jeder Auftrag ist ein Vertrag direkt mit dem Auftraggeber, eine Provision fällt nicht an. Das erste Fahrzeug ist kostenlos, jedes weitere, das im Monat gefahren ist, kostet 14,90 € im Monat.',
     iAmCarrier: 'Transportunternehmen',
     iAmShipper: 'Auftraggeber',
-    submit: 'Bewerbung senden',
+    submit: 'Registrierung senden',
     submitting: 'Wird gesendet…',
     carrierNote:
-      'Nach der Freigabe: Anmeldung, Güterkraftverkehrslizenz und Versicherung, Fahrzeugdaten. Wir prüfen jedes Fahrzeug einzeln.',
+      'Nach der Freigabe: Anmeldung, Güterkraftverkehrserlaubnis und Versicherung, Fahrzeugdaten. Wir prüfen jedes Fahrzeug einzeln.',
     shipperNote: 'Nach der Freigabe: Anmeldung, Firmendaten, Aufträge veröffentlichen.',
-    sentTitle: 'Bewerbung gesendet',
-    duplicate: 'Für diese Y-tunnus gibt es schon eine Bewerbung, die läuft oder freigegeben ist.',
-    invitedBy: '{carrier} hat Sie eingeladen. Die Daten sind ausgefüllt — prüfen Sie sie und senden Sie die Bewerbung. Nach der Freigabe können Sie Direktaufträge an deren Fahrzeuge senden.',
-    invitedByCarrier: '{carrier} hat Ihr Transportunternehmen eingeladen. Die Daten sind ausgefüllt — prüfen Sie sie und senden Sie die Bewerbung.',
-    invitedByRahtis: 'Die Daten sind aus der Einladung übernommen — prüfen Sie sie und senden Sie die Bewerbung.',
-    tooMany: 'Zu viele Bewerbungen in kurzer Zeit. Versuchen Sie es in einer Stunde erneut oder schreiben Sie an admin@rahtis.eu.',
+    sentTitle: 'Registrierung gesendet',
+    duplicate: 'Für diese Y-tunnus gibt es schon eine Registrierung, die in Prüfung oder freigegeben ist.',
+    invitedBy: '{carrier} hat Sie eingeladen. Die Daten sind ausgefüllt — prüfen Sie sie und senden Sie die Registrierung ab. Nach der Freigabe können Sie Direktaufträge an deren Fahrzeuge senden.',
+    invitedByCarrier: '{carrier} hat Ihr Transportunternehmen eingeladen. Die Daten sind ausgefüllt — prüfen Sie sie und senden Sie die Registrierung ab.',
+    invitedByRahtis: 'Die Daten sind aus der Einladung übernommen — prüfen Sie sie und senden Sie die Registrierung ab.',
+    tooMany: 'Zu viele Registrierungen in kurzer Zeit. Versuchen Sie es in einer Stunde erneut oder schreiben Sie an admin@rahtis.eu.',
     failed: 'Senden hat nicht geklappt. Versuchen Sie es noch einmal.',
-    registryManual: 'Wir prüfen die Firmendaten von Hand und melden uns per E-Mail, sobald die Bewerbung bearbeitet ist.',
+    registryManual: 'Wir prüfen die Firmendaten von Hand und melden uns per E-Mail, sobald die Registrierung bearbeitet ist.',
   },
 
   requisites: {
@@ -2566,7 +2566,7 @@ export const de = {
     adrNo: 'Keine ADR-Zulassung',
     capacity: 'Nutzlast',
     capacityHint: 'Eine 2-achsige Zugmaschine nimmt 25 t, eine 3-achsige 32 t.',
-    tipperAxlesHint: 'Masse nach Achsen (Finnland): 3 Achsen 28 t, 4 – 35 t, 5 – 42 t. Ein Kassettenfahrzeug mit Anhänger lädt mehr – Anhänger unter Anhänger hinzufügen.',
+    tipperAxlesHint: 'Zulässige Gesamtmasse nach Achszahl (Finnland): 3 Achsen 28 t, 4 Achsen 35 t, 5 Achsen 42 t. Ein Kassettenfahrzeug mit Anhänger lädt mehr – Anhänger unter Anhänger hinzufügen.',
     containerFeet: 'Container-Chassis',
     containerFeetHint:
       'Welche Containerlängen diese Kombination aufnimmt. Leer heißt: Das Fahrzeug fährt keine Container.',
@@ -2603,7 +2603,7 @@ export const de = {
     rejectedHint: 'Nicht freigegeben. Beheben Sie den Hinweis und senden Sie es erneut.',
     canTakeOrders: 'Sie können Aufträge übernehmen',
     cannotTakeOrders: 'Offene Aufträge sind nicht sichtbar',
-    whyClosedNoDocs: 'Laden Sie eine gültige Güterkraftverkehrslizenz und Versicherung hoch.',
+    whyClosedNoDocs: 'Laden Sie eine gültige Güterkraftverkehrserlaubnis und Versicherung hoch.',
     whyClosedNoVehicle: 'Mindestens ein freigegebenes Fahrzeug ist nötig.',
     whyClosedExpired: 'Die Dokumente sind abgelaufen, die Freigabe gilt nicht mehr.',
     languagesHint: 'In welchen Sprachen sich der Fahrer verständigen kann',
@@ -2734,8 +2734,8 @@ export const de = {
 
   documents: {
     title: 'Firmendokumente',
-    subtitle: 'Güterkraftverkehrslizenz und Versicherung prüfen wir zusammen mit den Fahrzeugen.',
-    CARRIER_LICENSE: 'Güterkraftverkehrslizenz',
+    subtitle: 'Güterkraftverkehrserlaubnis und Versicherung prüfen wir zusammen mit den Fahrzeugen.',
+    CARRIER_LICENSE: 'Güterkraftverkehrserlaubnis',
     INSURANCE: 'Versicherung (CMR / Haftpflicht)',
     FORWARDER_INSURANCE: 'Verkehrshaftungsversicherung des Spediteurs',
     FORWARDER_LICENSE: 'Vermittlungslizenz (Polen)',
@@ -2775,7 +2775,7 @@ export const de = {
     roleSave: 'Speichern',
     roleSaved: 'Gespeichert.',
     roleError: 'Speichern fehlgeschlagen. Bitte erneut versuchen.',
-    roleOwnerOnly: 'Ändern kann dies der Hauptnutzer des Unternehmens.',
+    roleOwnerOnly: 'Ändern kann dies der Hauptbenutzer des Unternehmens.',
     applyRoleTitle: 'Was macht Ihr Unternehmen?',
     insuranceTitle: 'Verkehrshaftungsversicherung des Spediteurs',
     insuranceIntro: 'Freiwillig. Reichen Sie Ihre Verkehrshaftungsversicherung des Spediteurs zur Prüfung ein, dann sehen Transportunternehmen, dass sie geprüft ist und bis wann sie gilt. Ohne sie können Sie Aufträge wie gewohnt veröffentlichen; Transportunternehmen sehen dann, dass die Versicherung nicht bestätigt ist.',
@@ -2973,7 +2973,7 @@ export const de = {
     country: 'Land',
     vatNumber: 'USt-IdNr. (EU VAT)',
     vatNumberHint: 'Wir prüfen sie im EU-Register VIES.',
-    license: 'Güterkraftverkehrslizenz',
+    license: 'Güterkraftverkehrserlaubnis',
     insurance: 'Versicherung (CMR / Haftpflicht)',
   },
 
@@ -3247,7 +3247,7 @@ export const de = {
     routeChangedTitle: 'Route geändert',
     routeChangedHint: 'Prüfen Sie die Änderungen, bevor Sie weiterfahren.',
     routeChangedSeen: 'Gesehen',
-    routeAdded: 'Neuer Stopp',
+    routeAdded: 'Neue Station',
     routeChanged: 'Geändert',
     routeRemoved: 'Entfernt',
     routeFieldAddress: 'Adresse',
@@ -3258,7 +3258,7 @@ export const de = {
     routeReason: 'Grund: {reason}',
     reportAddress: 'Andere Adresse melden',
     reportAddressHint: 'Zum Beispiel: Die Adresse im Auftrag ist falsch, oder der Empfänger ist an einem anderen Tor. Ihr Disponent und der Auftraggeber erhalten die Nachricht und ändern den Auftrag in RAHTIS.',
-    reportStop: 'Welcher Stopp?',
+    reportStop: 'Welche Station?',
     reportMessage: 'Was ist anders?',
     reportNewAddress: 'Richtige Adresse (optional)',
     reportUsePosition: 'Meinen aktuellen Standort hinzufügen',
@@ -3551,7 +3551,7 @@ export const de = {
         { t: 'Tägliche Ruhezeit', d: '11 Std. oder 3 + 9 Std. Reduziert 9 Std. höchstens 3-mal zwischen zwei wöchentlichen Ruhezeiten.' },
         { t: 'Wöchentliche Ruhezeit', d: '45 Std.; reduziert mindestens 24 Std., die Differenz bis Ende der dritten Woche ausgleichen. Beginnt spätestens nach sechs Tagen. Eine regelmäßige wöchentliche Ruhezeit wird nicht in der Kabine verbracht.' },
         { t: 'Heimkehr', d: 'Der Arbeitgeber organisiert alle vier Wochen eine Rückkehr zum Standort oder nach Hause.' },
-        { t: 'Straßenkontrolle', d: 'Aufzeichnungen des laufenden Tages und der vorangegangenen 56. Fahrerkarte alle 28 Tage auslesen.' },
+        { t: 'Straßenkontrolle', d: 'Aufzeichnungen des laufenden Tages und der vorangegangenen 56 Tage vorweisen. Fahrerkarte alle 28 Tage auslesen.' },
         { t: 'Kartendefekt', d: 'Melden und innerhalb von 7 Tagen eine neue Karte beantragen. Bis zu 15 Tage mit Ausdrucken zu Beginn und Ende der Schicht.' },
         { t: 'Grenze', d: 'Ländersymbol am ersten möglichen Halteplatz nach der Grenze, falls der Fahrtenschreiber es nicht selbst erfasst.' },
       ],
@@ -4069,7 +4069,7 @@ export const de = {
     inviteKindShipperHint: 'Nach der Freigabe kann der Kunde Direktaufträge an Ihre Fahrzeuge senden.',
     inviteKindCarrierHint: 'Das Transportunternehmen bekommt Aufträge aus der Frachtenbörse und eine eigene Arbeitsplattform; Sie erfahren es, sobald es freigegeben ist.',
     inviteText:
-      'Das eingeladene Unternehmen bekommt eine E-Mail mit fertig ausgefüllter Bewerbung. Wir prüfen die Bewerbung, bevor die Zugangsdaten rausgehen.',
+      'Das eingeladene Unternehmen bekommt eine E-Mail mit fertig ausgefüllter Registrierung. Wir prüfen die Registrierung, bevor die Zugangsdaten rausgehen.',
     inviteName: 'Firmenname',
     inviteBusinessId: 'Y-tunnus',
     inviteEmail: 'E-Mail',
@@ -4081,7 +4081,7 @@ export const de = {
     inviteFailed: 'Die Einladung konnte nicht gesendet werden. Versuchen Sie es gleich noch einmal.',
     invitesTitle: 'Gesendete Einladungen',
     inviteStatusSent: 'Gesendet',
-    inviteStatusApplied: 'Bewerbung eingereicht',
+    inviteStatusApplied: 'Registrierung eingereicht',
     inviteStatusApproved: 'Freigegeben',
     subtitle:
       'Auftraggeber, deren Transporte Sie gefahren sind. Sie können ihnen erlauben, Transporte direkt an Ihre Fahrzeuge zu schicken — an der gemeinsamen Börse vorbei.',
@@ -4385,7 +4385,7 @@ export const de = {
     openDesk: 'Börse öffnen',
     newOwn: 'Neuer eigener Auftrag',
     inviteClient: 'Kunden einladen',
-    inviteClientText: 'Eine vorausgefüllte Bewerbung per E-Mail',
+    inviteClientText: 'Eine vorausgefüllte Registrierung per E-Mail',
     reports: 'Berichte',
     reportsText: 'Wochenberichte und Zeitraumdokumente',
     company: 'Unternehmen und Servicemodell',
@@ -4449,7 +4449,7 @@ export const de = {
   empty: {
     noOrders: 'Keine offenen Aufträge in dieser Region.',
     noOrdersHint: 'Wählen Sie eine andere Region oder warten Sie auf neue Aufträge.',
-    noApplications: 'Keine neuen Bewerbungen.',
+    noApplications: 'Keine neuen Registrierungen.',
     noVehicles: 'Keine Fahrzeuge in Prüfung.',
     noTrips: 'Keine Aufträge diese Woche.',
     noMessages: 'Keine Nachrichten vom Fahrer.',
@@ -5025,7 +5025,7 @@ export const de = {
     'vehicle.axlesCount': '{count, plural, one {# Achse} other {# Achsen}}',
     'vehicle.accessGranted': 'Fahrzeug {plate} ist freigegeben.',
 
-    'moderation.queued': '{count, plural, one {# Bewerbung} other {# Bewerbungen}} in der Warteschlange',
+    'moderation.queued': '{count, plural, one {# Registrierung} other {# Registrierungen}} in der Warteschlange',
 
     'rating.summary': 'Bewertung {value}',
     'rating.summaryWithCount':
@@ -5045,11 +5045,11 @@ export const de = {
     'validation.businessIdFor': 'Prüfen Sie: {label}. Beispiel: {example}',
     'signup.submitted':
       'Wir prüfen {company} ({businessId}) anhand des Registers und senden die Zugangsdaten an {email}.',
-    'apply.registryOk': 'Y-tunnus im Register gefunden: {name}. Die Bewerbung wartet auf Prüfung durch unser Team.',
+    'apply.registryOk': 'Y-tunnus im Register gefunden: {name}. Die Registrierung wartet auf Prüfung durch unser Team.',
     'apply.registryOther':
-      'Im Register steht unter dieser Y-tunnus „{name}“. Ist die Y-tunnus falsch, antworten Sie auf die Bestätigungs-E-Mail, wir korrigieren es. Die Bewerbung wartet auf Prüfung durch unser Team.',
+      'Im Register steht unter dieser Y-tunnus „{name}“. Ist die Y-tunnus falsch, antworten Sie auf die Bestätigungs-E-Mail, wir korrigieren es. Die Registrierung wartet auf Prüfung durch unser Team.',
     'moderation.pendingCount':
-      '{count, plural, =0 {Keine neuen Bewerbungen} one {# Bewerbung wartet} other {# Bewerbungen warten}}',
+      '{count, plural, =0 {Keine neuen Registrierungen} one {# Registrierung wartet} other {# Registrierungen warten}}',
     'moderation.invitedTo': 'Einladung an {email} gesendet',
     'moderation.decidedBy': 'Entschieden am {date}',
 

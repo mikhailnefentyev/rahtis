@@ -353,7 +353,7 @@ export const lt = {
         { t: 'Kritimai', d: 'Trys atramos taškai lipant į kabiną ar krovinio skyrių. Nešok.' },
         {
           t: 'Technika zonoje',
-          d: 'Krautuvai ir portaliniai krautuvai: prieš eidamas jiems kelyje, susižvelk su vairuotoju.',
+          d: 'Krautuvai ir portaliniai krautuvai: prieš eidamas jų keliu, užmegzk akių kontaktą su vairuotoju.',
         },
         {
           t: 'Pranešimas',

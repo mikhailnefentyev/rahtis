@@ -95,7 +95,7 @@ const LABELS = {
     chart: 'Diagram över tabellen nedan',
     join: 'Ansök',
     privacy: 'Integritetspolicy',
-    takeaways: 'Viktigaste punkterna',
+    takeaways: 'Det viktigaste i korthet',
     faq: 'Vanliga frågor',
   },
   et: {

@@ -231,11 +231,11 @@ const en: DocsText = {
   intro:
     'The API runs the whole life of an order from your own ERP or TMS: create the order, choose an offer or assign a known vehicle, follow the trip with arrivals, stop confirmations and photos, amend the route in progress, rate the carrier, handle claims, and get a notification at your own URL whenever something changes. Responses and error codes are in English so your program can branch on them.',
   openapi: 'Machine-readable description (OpenAPI 3.1) for Postman, Insomnia or a client generator:',
-  cabinet: 'Keys and webhooks are created in the cabinet, on the API tab.',
+  cabinet: 'Keys and webhooks are created in the dashboard, on the API tab.',
   start: {
     title: 'Getting started',
     paragraphs: [
-      'Create a key in the cabinet. The key is shown once — store it in your secret manager. A read key is enough to follow orders; every change (creating, choosing, assigning, route changes, rating, claims) needs write access.',
+      'Create a key in the dashboard. The key is shown once — store it in your secret manager. A read key is enough to follow orders; every change (creating, choosing, assigning, route changes, rating, claims) needs write access.',
       'A key of a test company starts with rhs_test_ and only sees test orders; responses then carry Rahtis-Environment: test. A key of a live company starts with rhs_live_.',
       'Send the key in every request as Authorization: Bearer.',
     ],
@@ -243,8 +243,8 @@ const en: DocsText = {
   access: {
     title: 'Access, times and money',
     paragraphs: [
-      'The API is for approved shipper companies: apply at rahtis.eu/en/apply, and once the company is approved and its details are filled in, keys are created on the API tab of the cabinet. Using the API is free.',
-      'Times: API timestamps (created_at, arrival.at, eta.at …) are UTC in ISO 8601. A stop\'s scheduled_date and scheduled_time are local time in the stop\'s country (Finland, Sweden, Norway, Denmark) — the same the driver sees.',
+      'The API is for approved shipper companies: apply at rahtis.eu/en/apply, and once the company is approved and its details are filled in, keys are created on the API tab of the dashboard. Using the API is free.',
+      'Times: API timestamps (created_at, arrival.at, eta.at …) are UTC in ISO 8601. A stop\'s scheduled_date and scheduled_time are local time in the stop\'s country — the same as the driver sees.',
       'Money: all amounts are euros excluding VAT (vat_included: false). VAT is added on the invoice according to the country.',
     ],
   },
@@ -256,24 +256,24 @@ const en: DocsText = {
     ],
   },
   statuses: {
-    OPEN: 'on the offer table, waiting for offers (at most three)',
+    OPEN: 'on the load board, waiting for offers (at most three)',
     REQUESTED: 'offers have arrived — choose one (POST …/offers/{id}/choose) before deadline_at',
     AWAIT_DRIVER: 'a vehicle is chosen or assigned and waits for the carrier or driver to confirm',
     IN_PROGRESS: 'confirmed, the trip is under way: stops are being confirmed',
-    DONE: 'the trip has ended: fees and the waiting surcharge are fixed, documents are available',
-    CANCELLED: 'withdrawn (POST …/withdraw or in the cabinet)',
-    DRAFT: 'a draft in the cabinet, not published — an order created through the API is published at once',
+    DONE: 'the trip has ended: the price and any waiting charge are final, documents are available',
+    CANCELLED: 'withdrawn (POST …/withdraw or in the dashboard)',
+    DRAFT: 'a draft in the dashboard, not published — an order created through the API is published at once',
   },
   types: {
     title: 'Order types and stops',
     paragraphs: [
       'haul_kind says what is moved: TRAILER (semi-trailer) and CONTAINER (container_feet required) move a numbered unit, and trailer_plate (trailer registration or ISO 6346 container number) is required. VAN and TRUCK are express transport inside the vehicle: ldm (loading metres) and cargo_weight_kg on at least one stop are required.',
       'Stops are given in driving order (2–20). Every order has one PICKUP. The table shows what each type requires; a missing stop returns 422 with the reason in details.',
-      'Send the contract in the contract field: RAHTIS (default) — the RAHTIS service, service fee 5 % of the price, at least 15 € per job together with the carrier fee; DIRECT — a direct contract with a carrier on the monthly plan, no service fee, and only such carriers see the order. contract is also returned with the order.',
+      'The contract field: DIRECT (default) — the contract of carriage is made directly between you and the carrier; no service fee, and the carrier invoices you. Since 6 November 2026 every new order is DIRECT; the value RAHTIS is still accepted as an alias for older integrations. In responses, RAHTIS marks only orders made before that date with Aivomaa Oy as the contracting party.',
     ],
   },
   typeRows: {
-    'TRAILER_SWAP (TRAILER, CONTAINER)': 'Trailer or container swap: PICKUP (collect the unit) → at least one DELIVERY, EXTRA_LOAD or EXTRA_UNLOAD → TRAILER_RETURN (where the unit is left). A transfer run is PICKUP → TRAILER_RETURN with nothing in between: the unit is only moved, and the job is closed with a handover photo instead of a waybill.',
+    'TRAILER_SWAP (TRAILER, CONTAINER)': 'Trailer or container swap: PICKUP (collect the unit) → at least one DELIVERY, EXTRA_LOAD or EXTRA_UNLOAD → TRAILER_RETURN (where the unit is left). A transfer run is PICKUP → TRAILER_RETURN with nothing in between: the unit is only moved, and the job is closed with a handover photo instead of a CMR note.',
     'ONE_WAY (TRAILER, CONTAINER)': 'The unit is collected and delivered: PICKUP → at least one DELIVERY, EXTRA_LOAD or EXTRA_UNLOAD; TRAILER_RETURN optional.',
     'ROUND_TRIP (TRAILER, CONTAINER)': 'Like ONE_WAY, but the unit comes back — end with TRAILER_RETURN.',
     'ONE_WAY (VAN, TRUCK)': 'Express: PICKUP (loading) → DELIVERY (unloading), with EXTRA_LOAD / EXTRA_UNLOAD in between if needed. order_type is always ONE_WAY.',
@@ -306,7 +306,7 @@ const en: DocsText = {
   create: {
     title: 'Creating an order',
     paragraphs: [
-      'POST /orders publishes the order to the desk under the same rules as the order form. Every stop needs a precise location: send location { lat, lon }, or an address with a house number that the geocoder recognises exactly in the given city. Otherwise the answer is 422 asking for coordinates — we do not guess the neighbouring town.',
+      'POST /orders publishes the order to the load board under the same rules as the order form. Every stop needs a precise location: send location { lat, lon }, or an address with a house number that the geocoder recognises exactly in the given city. Otherwise the answer is 422 asking for coordinates — we do not guess the neighbouring town.',
       'Distance is calculated as a truck route. The rate is in euros, VAT excluded.',
       'Send an Idempotency-Key header (e.g. your own order number or a UUID). If the connection drops and you retry with the same key, you get the first order back instead of creating a second one. The key is remembered for 24 hours.',
     ],
@@ -328,7 +328,7 @@ const en: DocsText = {
     paragraphs: [
       'GET /orders/{ref}/offers shows the vehicles offered by carriers, with driver and rating. POST /orders/{ref}/offers/{id}/choose chooses an offer.',
       'A known vehicle can be assigned directly: GET /vehicles lists the vehicles that have driven for you, and POST /orders/{ref}/assign { "vehicle_id" } assigns one to an order that has no offers yet. The carrier and the driver are notified.',
-      'POST /orders/{ref}/unassign cancels the assignment before the trip starts, and the order returns to the desk.',
+      'POST /orders/{ref}/unassign cancels the assignment before the trip starts, and the order returns to the load board.',
     ],
   },
   amend: {
@@ -343,15 +343,15 @@ const en: DocsText = {
     title: 'Claims',
     paragraphs: [
       'GET /claims lists the claims filed by your company and against it; GET /claims/{ref} shows messages and attachments (links valid for 5 minutes).',
-      'POST /claims { "order_ref", "kind", "description", "stop_sequence"?, "amount"? } files a claim for a trip in progress or completed. POST /claims/{ref}/comments adds a message and POST /claims/{ref}/attachments a file (multipart/form-data: file and note; PDF, JPEG, PNG or WebP up to 10 MB). The other party and the operator are notified by email, as when filing from the cabinet.',
+      'POST /claims { "order_ref", "kind", "description", "stop_sequence"?, "amount"? } files a claim for a trip in progress or completed. POST /claims/{ref}/comments adds a message and POST /claims/{ref}/attachments a file (multipart/form-data: file and note; PDF, JPEG, PNG or WebP up to 10 MB). The other party and RAHTIS support are notified by email, as when filing from the dashboard.',
     ],
   },
   webhooks: {
     title: 'Webhooks',
     paragraphs: [
-      'In the cabinet, enter an https URL and choose the events. The signing secret is shown once. The URL must be public (port 443); redirects are not followed.',
+      'In the dashboard, enter an https URL and choose the events. The signing secret is shown once. The URL must be public (port 443); redirects are not followed.',
       'A notification carries the order number and what changed — fetch GET /orders/{ref} for the full order when you need it.',
-      'Answer 2xx within 10 seconds and do the work afterwards. Otherwise the delivery is retried after 1, 5, 15 and 60 minutes, then 3, 6, 12 and 24 hours. The same notification can arrive twice: recognise it by id. Notifications are sent in parallel and may arrive out of order — order them by created_at. The Send test button in the cabinet sends a ping event.',
+      'Answer 2xx within 10 seconds and do the work afterwards. Otherwise the delivery is retried after 1, 5, 15 and 60 minutes, then 3, 6, 12 and 24 hours. The same notification can arrive twice: recognise it by id. Notifications are sent in parallel and may arrive out of order — order them by created_at. The Send test button in the dashboard sends a ping event.',
     ],
   },
   verify: {

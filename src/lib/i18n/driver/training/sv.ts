@@ -1,6 +1,6 @@
 import type { TrainingPack } from './index';
 
-/** Svenska: utbildning och behörigheter. TODO: tarkistettava — behöver granskas av modersmålstalare. */
+/** Svenska: utbildning och behörigheter. Granskad av svensk fackgranskare 8.11.2026. */
 export const sv = {
   training: {
     title: 'Utbildning',
@@ -279,9 +279,9 @@ export const sv = {
           t: 'Axlar',
           d: 'Icke drivande axel 10 t, drivaxel 11,5 t. Tvåaxlig boggi 19–21 t beroende på konstruktion.',
         },
-        { t: 'Lastbil', d: '2 axlar 18 t, 3 axlar 28 t, 4 axlar 35 t.' },
-        { t: 'Ekipage', d: '5 axlar 44 t, 6 axlar 53 t, 7 axlar 60 t, 9 axlar upp till 76 t.' },
-        { t: 'Mått', d: 'Ekipagets längd högst 34,5 m. Bredd 2,55 m, höjd 4,40 m.' },
+        { t: 'Lastbil (Finland)', d: '2 axlar 18 t, 3 axlar 28 t, 4 axlar 35 t.' },
+        { t: 'Ekipage (Finland)', d: '5 axlar 44 t, 6 axlar 53 t, 7 axlar 60 t, 9 axlar upp till 76 t. I Sverige högst 74 t på BK4-vägar.' },
+        { t: 'Mått (Finland)', d: 'Ekipagets längd högst 34,5 m. Bredd 2,55 m, höjd 4,40 m.' },
         {
           t: 'Dellossning',
           d: 'Lossar du bakifrån hamnar resten närmare vändskivan: drivaxeln kan bli överlastad fast totalvikten minskar.',

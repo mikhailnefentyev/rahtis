@@ -94,7 +94,7 @@ export const nb = {
     inboxEmpty: 'Ingen meldinger.',
     markRead: 'Merk som lest',
     failed: 'Det gikk ikke. Prøv igjen.',
-    arrive: 'Ankommet',
+    arrive: 'Fremme',
     inspection: 'Kontroll og bilder',
     inspectionHint: 'Ta bilde av hver side. Ser du en ny skade, merk den før du tar bilde.',
     angle: {
@@ -351,10 +351,10 @@ export const nb = {
     },
   },
   stopKind: {
-    PICKUP: 'Henting av henger',
+    PICKUP: 'Henting av trailer',
     EXTRA_LOAD: 'Lasting',
     EXTRA_UNLOAD: 'Lossing',
-    TRAILER_RETURN: 'Retur av henger',
+    TRAILER_RETURN: 'Levering av trailer',
     DELIVERY: 'Lossing',
     CONTINUATION: 'Videretransport',
   },
@@ -373,12 +373,12 @@ export const nb = {
     CANCELLED: 'Kansellert',
   },
   haulKind: {
-    TRAILER: 'Henger',
+    TRAILER: 'Trailer',
     CONTAINER: 'Container',
     VAN: 'Varebil',
     TRUCK: 'Lastebil',
     SEMI: 'Semitrailer 13,6 m',
-    TIPPER: 'Masseflytting (tipp)',
+    TIPPER: 'Massetransport (tippbil)',
   },
   payDisclaimer:
     'Beregningen er veiledende. Endelig lønn bestemmes av arbeidsgiveren og arbeids- eller tariffavtalen.',
@@ -400,7 +400,7 @@ export const nb = {
     'driverApp.welcome': 'Velkommen, {name}',
     'driverApp.breakTotal': 'Pauser {minutes} min',
     'driverApp.stopOf': 'Stopp {n}/{total}',
-    'driverApp.arrivedAt': 'Du ankom kl. {time}',
+    'driverApp.arrivedAt': 'Fremme kl. {time}',
     'driverApp.queued':
       '{count, plural, one {# registrering venter på å bli sendt} other {# registreringer venter på å bli sendt}}',
     'driverApp.rejected':

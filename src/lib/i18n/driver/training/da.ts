@@ -1,6 +1,6 @@
 import type { TrainingPack } from './index';
 
-/** Dansk: uddannelse og beviser. TODO: tarkistettava — skal gennemgås af en modersmålstaler. */
+/** Dansk: uddannelse og beviser. Gennemgået af skandinavisk fagkorrektur 8.11.2026. */
 export const da = {
   training: {
     title: 'Uddannelse',
@@ -249,14 +249,14 @@ export const da = {
         shovel: 'Skovl',
         drainSeal: 'Afløbsdæksel',
         container: 'Opsamlingsbeholder',
-        instructions: 'Skriftlige anvisninger',
+        instructions: 'Skriftlige instruktioner',
         towRope: 'Slæbetov',
         jumpCables: 'Startkabler',
         snowChains: 'Snekæder',
         fireBlanket: 'Brandtæppe',
       },
       check: 'Kontrollér udstyret',
-      model: 'Udstyret følger ADR 8.1.4 og 8.1.5. Stof- og køretøjsspecifikke krav kontrolleres altid i de skriftlige anvisninger og transportdokumenterne.',
+      model: 'Udstyret følger ADR 8.1.4 og 8.1.5. Stof- og køretøjsspecifikke krav kontrolleres altid i de skriftlige instruktioner og transportdokumenterne.',
       newHint: 'Start med grundudstyret, som hver transportenhed skal have, og tilføj så det, godsets klasse kræver.',
     },
     rules: {
@@ -285,9 +285,9 @@ export const da = {
           t: 'Aksler',
           d: 'Ikke-trækkende aksel 10 t, drivaksel 11,5 t. Toakslet boggi 19–21 t afhængigt af konstruktion.',
         },
-        { t: 'Lastbil', d: '2 aksler 18 t, 3 aksler 28 t, 4 aksler 35 t.' },
-        { t: 'Vogntog', d: '5 aksler 44 t, 6 aksler 53 t, 7 aksler 60 t, 9 aksler op til 76 t.' },
-        { t: 'Mål', d: 'Vogntogets længde højst 34,5 m. Bredde 2,55 m, højde 4,40 m.' },
+        { t: 'Lastbil (Finland)', d: '2 aksler 18 t, 3 aksler 28 t, 4 aksler 35 t.' },
+        { t: 'Vogntog (Finland)', d: '5 aksler 44 t, 6 aksler 53 t, 7 aksler 60 t, 9 aksler op til 76 t.' },
+        { t: 'Mål (Finland)', d: 'Vogntogets længde højst 34,5 m. Bredde 2,55 m, højde 4,40 m. I Danmark gælder egne grænser, bl.a. modulvogntog højst 25,25 m og 60 t.' },
         {
           t: 'Delaflæsning',
           d: 'Aflæsser du bagfra, ligger resten tættere på skamlen: drivakslen kan blive overlæsset, selvom totalvægten falder.',

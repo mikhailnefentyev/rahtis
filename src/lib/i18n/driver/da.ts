@@ -94,7 +94,7 @@ export const da = {
     inboxEmpty: 'Ingen beskeder.',
     markRead: 'Marker som læst',
     failed: 'Det lykkedes ikke. Prøv igen.',
-    arrive: 'Ankommet',
+    arrive: 'Fremme',
     inspection: 'Kontrol og billeder',
     inspectionHint: 'Tag billede af hver side. Ser du en ny skade, så marker den, før du tager billedet.',
     angle: {
@@ -378,7 +378,7 @@ export const da = {
     VAN: 'Varevogn',
     TRUCK: 'Lastbil',
     SEMI: 'Sættevognstog 13,6 m',
-    TIPPER: 'Jordarbejde (tip)',
+    TIPPER: 'Jordkørsel (tipbil)',
   },
   payDisclaimer:
     'Beregningen er vejledende. Den endelige løn fastsættes af arbejdsgiveren og ansættelses- eller overenskomstaftalen.',
@@ -400,7 +400,7 @@ export const da = {
     'driverApp.welcome': 'Velkommen, {name}',
     'driverApp.breakTotal': 'Pauser {minutes} min',
     'driverApp.stopOf': 'Stop {n}/{total}',
-    'driverApp.arrivedAt': 'Du ankom kl. {time}',
+    'driverApp.arrivedAt': 'Fremme kl. {time}',
     'driverApp.queued':
       '{count, plural, one {# registrering venter på at blive sendt} other {# registreringer venter på at blive sendt}}',
     'driverApp.rejected':

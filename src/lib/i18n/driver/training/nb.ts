@@ -1,6 +1,6 @@
 import type { TrainingPack } from './index';
 
-/** Norsk (bokmål): opplæring og kompetansebevis. TODO: tarkistettava — må kontrolleres av morsmålsbruker. */
+/** Norsk (bokmål): opplæring og kompetansebevis. Gjennomgått av skandinavisk fagkorrektur 8.11.2026. */
 export const nb = {
   training: {
     title: 'Opplæring',
@@ -282,9 +282,9 @@ export const nb = {
           t: 'Aksler',
           d: 'Ikke-drivende aksel 10 t, drivaksel 11,5 t. Toakslet boggi 19–21 t avhengig av konstruksjon.',
         },
-        { t: 'Lastebil', d: '2 aksler 18 t, 3 aksler 28 t, 4 aksler 35 t.' },
-        { t: 'Vogntog', d: '5 aksler 44 t, 6 aksler 53 t, 7 aksler 60 t, 9 aksler opptil 76 t.' },
-        { t: 'Mål', d: 'Vogntogets lengde høyst 34,5 m. Bredde 2,55 m, høyde 4,40 m.' },
+        { t: 'Lastebil (Finland)', d: '2 aksler 18 t, 3 aksler 28 t, 4 aksler 35 t.' },
+        { t: 'Vogntog (Finland)', d: '5 aksler 44 t, 6 aksler 53 t, 7 aksler 60 t, 9 aksler opptil 76 t.' },
+        { t: 'Mål (Finland)', d: 'Vogntogets lengde høyst 34,5 m. Bredde 2,55 m, høyde 4,40 m. I Norge gjelder egne grenser, bl.a. modulvogntog høyst 25,25 m og 60 t.' },
         {
           t: 'Dellossing',
           d: 'Losser du bakfra, havner resten nærmere skjøten: drivakselen kan bli overlastet selv om totalvekten går ned.',

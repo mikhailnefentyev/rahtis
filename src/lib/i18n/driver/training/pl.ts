@@ -1,6 +1,6 @@
 import type { TrainingPack } from './index';
 
-/** Polski: szkolenie i uprawnienia. TODO: tarkistettava — wymaga sprawdzenia przez native speakera. */
+/** Polski: szkolenie i uprawnienia. Sprawdzone 8.11.2026 (terminologia: ADR, 561/2006, EN 12195-1). */
 export const pl = {
   training: {
     title: 'Szkolenie',
@@ -435,7 +435,7 @@ export const pl = {
     'training.inspect.score': 'Znaleziono usterek: {found} z {total}.',
     'training.inspect.missedStop': 'Przeoczono usterkę, z którą nie wolno ruszać.',
     'training.adr.missing': 'Brakuje: {items}.',
-    'training.adr.extinguishers': 'Gaśnic {total} kg, wymagane co najmniej {required} kg: 2 kg do kabiny i dodatkowo gaśnica co najmniej {additional} kg.',
+    'training.adr.extinguishers': 'Gaśnice łącznie {total} kg, wymagane co najmniej {required} kg: 2 kg do kabiny i dodatkowo gaśnica co najmniej {additional} kg.',
     'training.adr.notAdr': 'To nie wyposażenie ADR: {items}. Można wozić, ale nie zastępuje obowiązkowego.',
     'training.adr.extra': 'Niewymagane w tym przewozie: {items}.',
     'training.adr.ok': 'Wyposażenie kompletne.',

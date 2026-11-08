@@ -75,7 +75,7 @@ export const pl = {
     sent: 'Wiadomość wysłana do przewoźnika.',
     notLinked: 'Aplikacja nie jest jeszcze powiązana',
     notLinkedHint:
-      'Otwórz link od przewoźnika albo zaloguj się poniżej numerem telefonu i kodem. Zaproszenie jest ważne dobę.',
+      'Otwórz link od przewoźnika albo zaloguj się poniżej numerem telefonu i kodem. Zaproszenie jest ważne przez dobę.',
     inviteCompany: 'Przewoźnik',
     inviteButton: 'Zacznij',
     inviteInvalid: 'Link wygasł lub został już użyty. Poproś przewoźnika o nowy link.',

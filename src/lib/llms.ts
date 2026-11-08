@@ -48,7 +48,7 @@ function ladderLines(): string[] {
   });
 }
 
-const SUMMARY = `> RAHTIS (${SITE_URL}) is a transport management system (TMS) and freight exchange (load board) for road carriers and shippers in ${COUNTRIES}. Carriers run their fleet, drivers, fuel, working time, consignment notes (CMR) and their own customers in one place and fill empty trucks from the load board; shippers and freight forwarders publish trailer swaps, container haulage and express jobs once and follow them step by step. An earthworks module covers dump trucks (tippers) on construction sites. Operated by ${APP.operator.legalName}, Finland (business ID ${APP.operator.businessId}).`;
+const SUMMARY = `> RAHTIS (${SITE_URL}) is a transport management system (TMS) and freight exchange (load board) for road carriers and shippers in ${COUNTRIES}. Carriers run their fleet, drivers, fuel, working time, consignment notes (CMR) and their own customers in one place and fill empty trucks from the load board; shippers and freight forwarders publish trailer swaps, container haulage and express jobs once and follow them step by step. An earthworks module covers tipper trucks on construction sites. Operated by ${APP.operator.legalName}, Finland (business ID ${APP.operator.businessId}).`;
 
 function pricing(): string {
   return `## Pricing (all prices excl. VAT)
@@ -58,7 +58,7 @@ ${ladderLines().join('\n')}
   - from ${ON_REQUEST_FROM} vehicles: price on request
 - Paying a year in advance: ${pct(ANNUAL_DISCOUNT_BPS)} off. First month free for new companies. No set-up fee, no multi-year contract.
 - No percentage on any job: own customers, direct orders and load-board jobs alike.
-- Shippers and forwarders: free. Every load-board job and direct order is a contract of carriage made directly between the shipper and the carrier; the carrier invoices the shipper. ${APP.operator.legalName} is not a party to the transport.
+- Shippers and forwarders: free. Every load-board job and direct order is a contract of carriage made directly between the shipper and the carrier; the carrier invoices the shipper.
 - API: free (no monthly fee, no price per call).`;
 }
 
@@ -70,7 +70,7 @@ function links(): string {
   return `## Pages
 
 - Home: ${home}
-- Earthworks and dump trucks: ${earth}
+- Earthworks and tipper trucks: ${earth}
 - Apply as a carrier or shipper: ${apply}
 - Platform rules — what it costs, how loads are ordered on the board, what each side sees, how companies are checked, complaints: ${rules}
 - [Driver training](${SITE_URL}/en/driver/training): quizzes and practice on the tachograph, cargo securing, weights, daily check, ADR and safety
@@ -83,7 +83,7 @@ function links(): string {
 const CARRIER = `## For carriers (TMS)
 
 - Fleet: tractor units, rigids and trailers, each vehicle approved separately; equipment such as ADR, reefer and tail lift.
-- Vehicle combinations: PPV (tractor unit + semi-trailer), puolikas (tractor unit + tipper semi-trailer), lowbed (low-loader), kasetti (tipper truck + drawbar tipper trailer, Finland's 76-tonne combination), TPV (rigid + drawbar trailer) and container chassis; the maximum permitted weight per country and the payload are calculated from the carrier's own vehicles.
+- Vehicle combinations: PPV (tractor unit + semi-trailer), puolikas (tractor unit + tipper semi-trailer), low-loader (tractor unit + low-loader semi-trailer), kasetti (tipper truck + drawbar tipper trailer, Finland's 76-tonne combination), TPV (rigid + drawbar trailer) and container chassis; the maximum permitted weight per country and the payload are calculated from the carrier's own vehicles.
 - Fuel from three sources — fuel card report, driver entries and GPS — on one chart; export to PDF and CSV.
 - GPS from the carrier's own tracking system via an API key: ${GPS}.
 - Profitability per vehicle and for the whole fleet: job revenue minus fuel, driver pay, leasing or depreciation, insurance, vehicle tax, repairs and tyres; PDF and CSV export.
@@ -107,7 +107,7 @@ const DRIVER = `## Driver app
 
 const EXCHANGE = `## Freight exchange (load board) and direct orders
 
-- A shipper publishes a job once; it reaches approved, suitable vehicles in the area. Up to three offers; the shipper chooses on price, equipment and ratings. No downward price auction. The contract of carriage is made directly between the shipper and the carrier; before taking a job the carrier sees the shipper's payment information (company age, register status, other carriers' payment reports, checked company documents, forwarder's insurance if checked).
+- A shipper publishes a job once; it reaches approved, suitable vehicles in the area. Up to three offers; the shipper chooses on price, equipment and ratings. No downward price auction. The contract of carriage is made directly between the shipper and the carrier; before taking a job the carrier sees the shipper's payment record (company age, register status, other carriers' payment reports, checked company documents, forwarder's insurance if checked).
 - If a vehicle cancels or does not confirm within 15 minutes, the job returns to the board and goes to the next suitable vehicles automatically.
 - Direct orders: a shipper sends a job straight to a known vehicle, or first to its own carriers and then to the board.
 - Freight: trailer swaps between ports, terminals and customers; container haulage (20, 30, 40, 45 ft) to and from ports; express transport by van (up to 3.5 t) or truck (up to 26 t), with tail lift, side loading or refrigeration.
@@ -117,13 +117,13 @@ const EXCHANGE = `## Freight exchange (load board) and direct orders
 - One-tap take: a carrier takes a matching job from the board with its best-fitting own truck.
 - Shipper API: REST + signed webhooks, OpenAPI 3.1, key created in the dashboard.`;
 
-const EARTH = `## Earthworks and dump trucks
+const EARTH = `## Earthworks and tipper trucks
 
 - Worksite module for carriers running tippers on construction and earthworks sites.
-- Each load logged with material, receiving site or weighbridge, gross, tare, net and weigh ticket number; overload warning against the combination's legal maximum weight per country (Finland 76 t).
+- Each load logged with material, receiving site or weighbridge, gross, tare, net and weighbridge ticket number; overload warning against the combination's legal maximum weight per country (Finland 76 t).
 - Hours from arrival on site to the last unload + 30 minutes (buffer set per site).
 - The customer's foreman approves each day from a link without logging in; prices are not shown to the foreman.
-- Weigh ticket photo: the driver photographs the weighbridge ticket and the weights are read into the load form for checking.
+- Weighbridge ticket photo: the driver photographs the weighbridge ticket and the weights are read into the load form for checking.
 - Sites in Finland: waste transfer document (siirtoasiakirja) under section 121 of the Finnish Waste Act, with waste codes, for construction waste and contaminated soil. A site is marked as contaminated (PIMA, above the lower guideline values of Government Decree 214/2007); its 17 05 04 and 17 05 03* loads then get the document. Clean soil needs no transfer document and gets a load record instead. National waste e-systems of other countries are not supported yet.
 - Invoices to the customer in the carrier's own name (business ID, bank account, own number series, Finnish reference number, VAT): on demand, weekly or every other week; by the hour, per load or per tonne.`;
 
@@ -148,7 +148,7 @@ ${SUMMARY}
 
 - Carriers: TMS with fleet, vehicle combinations and legal weights, fuel, GPS integration (${GPS}), profitability per vehicle, drivers and pay by country, own customers, orders from forwarded emails, return loads, driver app.
 - Shippers and forwarders: freight exchange and direct orders for trailer swaps, containers and express transport; free space in trucks already on the way; tracking link with live ETA and proof of delivery; free REST API.
-- Earthworks: dump-truck loads with weighings (also read from a photo of the weigh ticket), hours, foreman approval by link, Finnish waste transfer documents for construction waste and contaminated soil, invoices in the carrier's name.
+- Earthworks: tipper loads with weights (also read from a photo of the weighbridge ticket), hours, foreman approval by link, Finnish waste transfer documents for construction waste and contaminated soil, invoices in the carrier's name.
 
 ${pricing()}
 
