@@ -2112,41 +2112,7 @@
 .blog-toc ol { margin: 0; font-size: 14px; }
 
 
-/* ── Блог: обложки и графики (src/components/blog, src/lib/blog/charts.ts) ── */
-.blog-cover {
-  background:
-    radial-gradient(60% 80% at 85% 10%, color-mix(in srgb, var(--color-accent-bright) 26%, transparent), transparent 70%),
-    radial-gradient(50% 70% at 10% 0%, color-mix(in srgb, var(--color-accent) 14%, transparent), transparent 70%),
-    linear-gradient(180deg, var(--color-accent-wash) 0%, #ffffff 100%);
-  box-shadow: 0 1px 2px rgba(12, 22, 38, 0.06), 0 14px 32px -18px rgba(13, 100, 127, 0.35);
-}
-.blog-cover::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background-image: linear-gradient(rgba(13, 100, 127, 0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(13, 100, 127, 0.07) 1px, transparent 1px);
-  background-size: 28px 28px;
-  mask-image: linear-gradient(180deg, #000 0%, transparent 75%);
-}
-.blog-cover::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 12%;
-  height: 2px;
-  z-index: -1;
-  background: repeating-linear-gradient(90deg, rgba(13, 100, 127, 0.35) 0 22px, transparent 22px 40px);
-}
-.blog-cover-truck {
-  filter: drop-shadow(0 10px 12px rgba(12, 22, 38, 0.18));
-  transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
-}
-a:hover .blog-cover-truck {
-  transform: translateX(3%);
-}
-
+/* ── Блог: графики из таблиц (src/lib/blog/charts.ts) ── */
 .blog-chart {
   margin: 1.75rem 0 1rem;
   padding: 1.1rem 1.25rem 1.2rem;
@@ -2189,6 +2155,21 @@ a:hover .blog-cover-truck {
   font-variant-numeric: tabular-nums;
   font-weight: 600;
   white-space: nowrap;
+}
+/* На телефоне подпись и число в строку, полоса — на всю ширину под ними: иначе на полосу остаётся 50 px. */
+@media (max-width: 639px) {
+  .blog-chart {
+    padding: 0.9rem 1rem 1rem;
+  }
+  .blog-chart-row {
+    grid-template-columns: 1fr auto;
+    gap: 0.2rem 0.75rem;
+    padding: 0.4rem 0;
+  }
+  .blog-chart-track {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
 }
 @media (prefers-reduced-motion: no-preference) {
   .blog-chart-bar {

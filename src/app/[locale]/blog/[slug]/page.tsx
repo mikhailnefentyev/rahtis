@@ -111,7 +111,7 @@ export default async function BlogArticle({ params }: Params) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
       <article lang={language} dir={RTL.includes(language) ? 'rtl' : undefined}>
         <header className="border-b border-line bg-surface">
-          <div className="mx-auto w-full max-w-3xl px-5 py-12 sm:py-14">
+          <div className="mx-auto w-full max-w-3xl px-5 py-8 sm:py-14">
             <Link href="/blog" className="label-micro hover:underline" data-accent>
               ← {t.all}
             </Link>
@@ -122,8 +122,8 @@ export default async function BlogArticle({ params }: Params) {
           </div>
         </header>
 
-        <div className="mx-auto w-full max-w-3xl px-5 py-10 sm:py-12">
-          <div className="rounded-card border border-line bg-surface p-6 shadow-card sm:p-10">
+        <div className="mx-auto w-full max-w-3xl px-3 py-6 sm:px-5 sm:py-12">
+          <div className="rounded-card border border-line bg-surface px-4 py-6 shadow-card sm:p-10">
             {image && /^https:\/\//.test(image) && (
               // eslint-disable-next-line @next/next/no-img-element -- адрес картинки задаёт HeyCatch, домен заранее неизвестен
               <img src={image} alt="" className="mb-8 w-full rounded-lg border border-line" />
@@ -145,7 +145,7 @@ export default async function BlogArticle({ params }: Params) {
               <div dangerouslySetInnerHTML={{ __html: body }} />
             </div>
           </div>
-          <div className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-card border border-line bg-surface p-6 shadow-card">
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-card border border-line bg-surface px-4 py-5 shadow-card sm:mt-8 sm:p-6">
             <Link href="/blog" className="text-[14px] font-medium text-ink-muted hover:text-ink">
               ← {t.all}
             </Link>

@@ -69,7 +69,7 @@ export default async function BlogIndex() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
       <section className="border-b border-line bg-surface">
         {/* Текст слева, справа — грузовик без прицепа: блог про всю отрасль, самосвал — только на /maansiirto. */}
-        <div className={`${BLOG_SECTION} grid items-center gap-8 py-14 sm:py-16 lg:grid-cols-[1.15fr_1fr]`}>
+        <div className={`${BLOG_SECTION} grid items-center gap-6 py-8 sm:gap-8 sm:py-16 lg:grid-cols-[1.15fr_1fr]`}>
           <div>
             <p className="label-micro" data-accent lang={lang}>
               {t.blog}
@@ -86,12 +86,12 @@ export default async function BlogIndex() {
             width={420}
             height={202}
             priority
-            sizes="420px"
-            className="rise mx-auto hidden w-full max-w-[420px] lg:block"
+            sizes="(min-width: 1024px) 420px, 300px"
+            className="rise mx-auto w-full max-w-[300px] lg:max-w-[420px]"
           />
         </div>
       </section>
-      <section className={`${BLOG_SECTION} py-14`}>
+      <section className={`${BLOG_SECTION} py-8 sm:py-14`}>
         {articles.length === 0 ? (
           <p className="text-[15px] text-ink-muted">{t.empty}</p>
         ) : (
