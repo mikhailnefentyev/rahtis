@@ -54,6 +54,10 @@ export const vehicleSrc = (v: Vehicle, ext: 'webp' | 'png' = 'webp') =>
 
 const LABELS = {
   en: {
+    heading: 'Guides for the transport trade',
+    signIn: 'Sign in',
+    read: 'Read',
+    all: 'All articles',
     min: 'min read',
     toc: 'Table of contents',
     blog: 'Blog',
@@ -65,6 +69,10 @@ const LABELS = {
     faq: 'FAQ',
   },
   fi: {
+    heading: 'Oppaita kuljetusalalle',
+    signIn: 'Kirjaudu',
+    read: 'Lue',
+    all: 'Kaikki artikkelit',
     min: 'min lukuaika',
     toc: 'Sisällys',
     blog: 'Blogi',
@@ -76,6 +84,10 @@ const LABELS = {
     faq: 'Usein kysyttyä',
   },
   sv: {
+    heading: 'Guider för transportbranschen',
+    signIn: 'Logga in',
+    read: 'Läs',
+    all: 'Alla artiklar',
     min: 'min läsning',
     toc: 'Innehåll',
     blog: 'Blogg',
@@ -87,6 +99,10 @@ const LABELS = {
     faq: 'Vanliga frågor',
   },
   et: {
+    heading: 'Juhendid veondusele',
+    signIn: 'Logi sisse',
+    read: 'Loe',
+    all: 'Kõik artiklid',
     min: 'min lugemist',
     toc: 'Sisukord',
     blog: 'Blogi',
@@ -98,6 +114,10 @@ const LABELS = {
     faq: 'Korduma kippuvad küsimused',
   },
   ru: {
+    heading: 'Статьи для перевозчиков',
+    signIn: 'Войти',
+    read: 'Читать',
+    all: 'Все статьи',
     min: 'мин чтения',
     toc: 'Содержание',
     blog: 'Блог',

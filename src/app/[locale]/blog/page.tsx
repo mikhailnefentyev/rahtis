@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { listArticles } from '@/lib/blog/heycatch';
 import { blogLabels, fixText, mainLanguage } from '@/lib/blog/visuals';
 import { SITE_URL } from '@/lib/seo';
-import { BlogFrame, formatDate } from './BlogFrame';
+import { BLOG_SECTION, BlogFrame, formatDate } from './BlogFrame';
 
 /* Список обновляется сам: раз в 5 минут, без выкладки. */
 export const revalidate = 300;
@@ -37,9 +37,9 @@ export const metadata: Metadata = {
 };
 
 /**
- * /blog — все статьи HeyCatch, новые первыми, простым списком: заголовок,
- * дата, время чтения. Справа от заголовка блога — одна картинка самосвала
- * (как на /maansiirto); у статей своих картинок нет — так решил владелец. Без выдержек — так требует
+ * /blog — в стиле сайта: вверху заголовок и одна картинка самосвала (как на
+ * /maansiirto), ниже — карточки статей HeyCatch, новые первыми: дата, время
+ * чтения, заголовок. Картинок у статей нет — так решил владелец (08.11.2026). Без выдержек — так требует
  * HeyCatch (описание только для поиска). Подписи — на языке большинства
  * статей. Пусто — короткая строка и ответ 200.
  */
@@ -67,40 +67,55 @@ export default async function BlogIndex() {
   return (
     <BlogFrame lang={lang}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
-      <div className="flex items-center justify-between gap-6">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight" lang={lang}>
-            {t.blog}
-          </h1>
-          {lang === 'fi' && <p className="mt-2 max-w-[46ch] text-[15px] text-ink-muted">{INTRO}</p>}
+      <section className="border-b border-line bg-surface">
+        {/* Текст слева, справа — самосвал без прицепа, как на /maansiirto. */}
+        <div className={`${BLOG_SECTION} grid items-center gap-8 py-14 sm:py-16 lg:grid-cols-[1.15fr_1fr]`}>
+          <div>
+            <p className="label-micro" data-accent lang={lang}>
+              {t.blog}
+            </p>
+            <h1 className="mt-3 max-w-[22ch] text-[clamp(30px,4.2vw,46px)] leading-[1.08] font-semibold tracking-tight text-balance" lang={lang}>
+              {t.heading}
+            </h1>
+            {lang === 'fi' && <p className="mt-4 max-w-[56ch] text-[17px] leading-relaxed text-ink-muted">{INTRO}</p>}
+          </div>
+          <Image
+            src="/media/kippiauto.webp"
+            alt=""
+            aria-hidden
+            width={926}
+            height={445}
+            priority
+            sizes="(min-width: 1024px) 440px, 100vw"
+            className="rise mx-auto hidden w-full max-w-[480px] mix-blend-multiply lg:block"
+          />
         </div>
-        <Image
-          src="/media/kippiauto.webp"
-          alt=""
-          aria-hidden
-          width={926}
-          height={445}
-          priority
-          sizes="260px"
-          className="hidden w-[260px] shrink-0 mix-blend-multiply sm:block"
-        />
-      </div>
-      {articles.length === 0 ? (
-        <p className="mt-6 text-[15px] text-ink-muted">{t.empty}</p>
-      ) : (
-        <ul className="mt-8 flex flex-col divide-y divide-line border-y border-line">
-          {articles.map((article) => (
-            <li key={article.slug} className="py-5" lang={article.language || 'en'}>
-              <Link href={`/blog/${encodeURIComponent(article.slug)}`} className="text-[17px] leading-snug font-semibold text-ink hover:underline">
-                {fixText(article.title, article.language)}
-              </Link>
-              <p className="mt-1.5 text-[13px] text-ink-faint">
-                <time dateTime={article.published}>{formatDate(article.published, article.language)}</time> · {article.read_time} {blogLabels(article.language).min}
-              </p>
-            </li>
-          ))}
-        </ul>
-      )}
+      </section>
+      <section className={`${BLOG_SECTION} py-14`}>
+        {articles.length === 0 ? (
+          <p className="text-[15px] text-ink-muted">{t.empty}</p>
+        ) : (
+          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {articles.map((article) => (
+              <li key={article.slug} lang={article.language || 'en'} className="flex">
+                <Link
+                  href={`/blog/${encodeURIComponent(article.slug)}`}
+                  className="group flex w-full flex-col rounded-card border border-line bg-surface p-5 shadow-card transition-[transform,box-shadow,border-color] duration-150 hover:-translate-y-0.5 hover:border-accent-line hover:shadow-lift"
+                >
+                  <span className="text-[13px] text-ink-faint">
+                    <time dateTime={article.published}>{formatDate(article.published, article.language)}</time> · {article.read_time}{' '}
+                    {blogLabels(article.language).min}
+                  </span>
+                  <span className="mt-2 block text-[17px] leading-snug font-semibold text-ink text-pretty">{fixText(article.title, article.language)}</span>
+                  <span className="mt-auto pt-4 text-[14px] font-medium text-accent">
+                    {blogLabels(article.language).read} <span className="inline-block transition-transform group-hover:translate-x-0.5">→</span>
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
     </BlogFrame>
   );
 }

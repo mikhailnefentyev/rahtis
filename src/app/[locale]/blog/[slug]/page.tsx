@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { buttonClass } from '@/components/ui';
 import { cleanArticleHtml, getArticle, splitAfterTakeaways, tableOfContents } from '@/lib/blog/heycatch';
 import { withCharts } from '@/lib/blog/charts';
 import { blogLabels, fixText } from '@/lib/blog/visuals';
@@ -108,31 +110,49 @@ export default async function BlogArticle({ params }: Params) {
     <BlogFrame lang={language}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
       <article lang={language} dir={RTL.includes(language) ? 'rtl' : undefined}>
-        <h1 className="text-[28px] leading-tight font-semibold tracking-tight">{title}</h1>
-        <p className="mt-2 text-[13px] text-ink-faint">
-          <time dateTime={article.published}>{formatDate(article.published, language)}</time> · {article.read_time} {t.min}
-        </p>
+        <header className="border-b border-line bg-surface">
+          <div className="mx-auto w-full max-w-3xl px-5 py-12 sm:py-14">
+            <Link href="/blog" className="label-micro hover:underline" data-accent>
+              ← {t.all}
+            </Link>
+            <h1 className="mt-3 text-[clamp(28px,3.6vw,40px)] leading-[1.1] font-semibold tracking-tight text-balance">{title}</h1>
+            <p className="mt-3 text-[14px] text-ink-faint">
+              <time dateTime={article.published}>{formatDate(article.published, language)}</time> · {article.read_time} {t.min}
+            </p>
+          </div>
+        </header>
 
-        {image && /^https:\/\//.test(image) && (
-          // eslint-disable-next-line @next/next/no-img-element -- адрес картинки задаёт HeyCatch, домен заранее неизвестен
-          <img src={image} alt="" className="mt-6 w-full rounded-lg border border-line" />
-        )}
-
-        <div className="blog-article mt-8">
-          {takeaways && <div dangerouslySetInnerHTML={{ __html: takeaways }} />}
-          {toc.length > 0 && (
-            <nav aria-labelledby="toc" className="blog-toc">
-              <h2 id="toc">{t.toc}</h2>
-              <ol>
-                {toc.map((item) => (
-                  <li key={item.id}>
-                    <a href={`#${item.id}`}>{item.text}</a>
-                  </li>
-                ))}
-              </ol>
-            </nav>
-          )}
-          <div dangerouslySetInnerHTML={{ __html: body }} />
+        <div className="mx-auto w-full max-w-3xl px-5 py-10 sm:py-12">
+          <div className="rounded-card border border-line bg-surface p-6 shadow-card sm:p-10">
+            {image && /^https:\/\//.test(image) && (
+              // eslint-disable-next-line @next/next/no-img-element -- адрес картинки задаёт HeyCatch, домен заранее неизвестен
+              <img src={image} alt="" className="mb-8 w-full rounded-lg border border-line" />
+            )}
+            <div className="blog-article">
+              {takeaways && <div dangerouslySetInnerHTML={{ __html: takeaways }} />}
+              {toc.length > 0 && (
+                <nav aria-labelledby="toc" className="blog-toc">
+                  <h2 id="toc">{t.toc}</h2>
+                  <ol>
+                    {toc.map((item) => (
+                      <li key={item.id}>
+                        <a href={`#${item.id}`}>{item.text}</a>
+                      </li>
+                    ))}
+                  </ol>
+                </nav>
+              )}
+              <div dangerouslySetInnerHTML={{ __html: body }} />
+            </div>
+          </div>
+          <div className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-card border border-line bg-surface p-6 shadow-card">
+            <Link href="/blog" className="text-[14px] font-medium text-ink-muted hover:text-ink">
+              ← {t.all}
+            </Link>
+            <Link href={`/${language === 'en' ? 'en' : 'fi'}/apply`} className={buttonClass({ variant: 'primary' })}>
+              {t.join}
+            </Link>
+          </div>
         </div>
       </article>
     </BlogFrame>
