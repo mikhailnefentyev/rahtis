@@ -37,8 +37,8 @@ export const metadata: Metadata = {
 };
 
 /**
- * /blog — в стиле сайта: вверху заголовок и одна картинка самосвала (как на
- * /maansiirto), ниже — карточки статей HeyCatch, новые первыми: дата, время
+ * /blog — в стиле сайта: вверху заголовок и один грузовик без прицепа (не
+ * самосвал: блог про всю отрасль), ниже — карточки статей HeyCatch, новые первыми: дата, время
  * чтения, заголовок. Картинок у статей нет — так решил владелец (08.11.2026). Без выдержек — так требует
  * HeyCatch (описание только для поиска). Подписи — на языке большинства
  * статей. Пусто — короткая строка и ответ 200.
@@ -68,7 +68,7 @@ export default async function BlogIndex() {
     <BlogFrame lang={lang}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
       <section className="border-b border-line bg-surface">
-        {/* Текст слева, справа — самосвал без прицепа, как на /maansiirto. */}
+        {/* Текст слева, справа — грузовик без прицепа: блог про всю отрасль, самосвал — только на /maansiirto. */}
         <div className={`${BLOG_SECTION} grid items-center gap-8 py-14 sm:py-16 lg:grid-cols-[1.15fr_1fr]`}>
           <div>
             <p className="label-micro" data-accent lang={lang}>
@@ -80,14 +80,14 @@ export default async function BlogIndex() {
             {lang === 'fi' && <p className="mt-4 max-w-[56ch] text-[17px] leading-relaxed text-ink-muted">{INTRO}</p>}
           </div>
           <Image
-            src="/media/kippiauto.webp"
+            src="/media/cutout/kuorma-auto.webp"
             alt=""
             aria-hidden
-            width={926}
-            height={445}
+            width={420}
+            height={202}
             priority
-            sizes="(min-width: 1024px) 440px, 100vw"
-            className="rise mx-auto hidden w-full max-w-[480px] mix-blend-multiply lg:block"
+            sizes="420px"
+            className="rise mx-auto hidden w-full max-w-[420px] lg:block"
           />
         </div>
       </section>
