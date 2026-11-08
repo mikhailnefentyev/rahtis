@@ -272,7 +272,7 @@ const fi: Texts = {
     preheader: 'Kalusto, kuljettajat ja omat asiakkaat yhdessä paikassa — ja keikkoja tarjouspöydältä.',
     body: (carrier) => `${carrier} käyttää RAHTIS-palvelua ja kutsuu kuljetusliikkeenne mukaan.`,
     points: [
-      'Keikkoja tarjouspöydältä: perävaunujen vaihdot, kontit ja pikakuljetukset satamissa ja koko Suomessa.',
+      'Keikkoja tarjouspöydältä: perävaunujen vaihdot, kontit ja pikakuljetukset Suomessa, Pohjoismaissa, Baltiassa, Puolassa ja Saksassa.',
       'Kuljettajan sovellus kymmenellä kielellä: saapumiset, kuvat ja rahtikirjat ilman paperia.',
       'Omat asiakkaat samaan paikkaan: ensimmäinen auto maksutta, jokainen seuraava ajossa ollut auto 14,90 € kuukaudessa. Ensimmäinen kuukausi maksutta.',
     ],

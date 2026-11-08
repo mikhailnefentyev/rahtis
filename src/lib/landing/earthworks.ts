@@ -75,7 +75,7 @@ const fi: EarthworksCopy = {
     { title: 'Sovellus kuskin kielellä', text: 'Kuljettajan sovellus kymmenellä kielellä, myös viroksi, venäjäksi ja puolaksi. Toimii ilman verkkoa ja lähettää merkinnät, kun yhteys palaa.' },
   ],
   priceTitle: 'Hinta',
-  priceText: 'Ensimmäinen auto maksutta, jokainen seuraava 14,90 € (alv 0 %) kuukaudessa – vain niistä autoista, jotka ajoivat kuussa. Omista asiakkaista ja työmaista ei prosenttia. Ensimmäinen kuukausi ilmaiseksi.',
+  priceText: 'Ensimmäinen auto maksutta, jokainen seuraava 14,90 € (alv 0 %) kuukaudessa – vain niistä autoista, jotka ajoivat kuussa. Keikoista ei peritä prosenttia. Ensimmäinen kuukausi ilmaiseksi.',
   faqTitle: 'Kysyttyä',
   faq: [
     { q: 'Tarvitseeko työnjohtaja tunnukset?', a: 'Ei. Työnjohtaja saa kohteen linkin, näkee siitä päivät, kuormat ja tunnit ja hyväksyy päivän nimellään. Hintoja hän ei näe.' },
@@ -135,7 +135,7 @@ const en: EarthworksCopy = {
     { title: 'App in the driver’s language', text: 'The driver app works in ten languages, including Estonian, Russian and Polish. It works offline and sends entries when the connection is back.' },
   ],
   priceTitle: 'Price',
-  priceText: 'First truck free, each further truck €14.90 (excl. VAT) a month – only for trucks that drove that month. No percentage on your own customers and worksites. First month free.',
+  priceText: 'First truck free, each further truck €14.90 (excl. VAT) a month – only for trucks that drove that month. No percentage on any job. First month free.',
   faqTitle: 'FAQ',
   faq: [
     { q: 'Does the foreman need a login?', a: 'No. The foreman gets the site link, sees the days, loads and hours there and approves the day with their name. Prices are not shown.' },
@@ -195,7 +195,7 @@ const sv: EarthworksCopy = {
     { title: 'Appen på förarens språk', text: 'Förarappen finns på tio språk, även estniska, ryska och polska. Den fungerar utan nät och skickar uppgifterna när anslutningen är tillbaka.' },
   ],
   priceTitle: 'Pris',
-  priceText: 'Första bilen gratis, varje ytterligare bil 14,90 € (exkl. moms) i månaden – bara för bilar som har kört under månaden. Ingen procent på dina egna kunder och arbetsplatser. Första månaden gratis.',
+  priceText: 'Första bilen gratis, varje ytterligare bil 14,90 € (exkl. moms) i månaden – bara för bilar som har kört under månaden. Ingen procentavgift på uppdragen. Första månaden gratis.',
   faqTitle: 'Vanliga frågor',
   faq: [
     { q: 'Behöver arbetsledaren ett konto?', a: 'Nej. Arbetsledaren får arbetsplatsens länk, ser dagar, lass och timmar där och godkänner dagen med sitt namn. Priserna ser arbetsledaren inte.' },
@@ -255,7 +255,7 @@ const et: EarthworksCopy = {
     { title: 'Rakendus juhi keeles', text: 'Juhi rakendus töötab kümnes keeles, sh eesti, vene ja poola keeles. See töötab ka ilma võrguta ja saadab kanded, kui ühendus taastub.' },
   ],
   priceTitle: 'Hind',
-  priceText: 'Esimene auto tasuta, iga järgmine 14,90 € (km-ta) kuus – ainult nende autode eest, mis kuu jooksul sõitsid. Oma klientidelt ja objektidelt protsenti ei võeta. Esimene kuu tasuta.',
+  priceText: 'Esimene auto tasuta, iga järgmine 14,90 € (km-ta) kuus – ainult nende autode eest, mis kuu jooksul sõitsid. Vedudelt protsenti ei võeta. Esimene kuu tasuta.',
   faqTitle: 'Korduma kippuvad küsimused',
   faq: [
     { q: 'Kas töödejuhataja vajab kasutajakontot?', a: 'Ei. Töödejuhataja saab objekti lingi, näeb sealt päevi, koormaid ja tunde ning kinnitab päeva oma nimega. Hindu ta ei näe.' },
@@ -315,7 +315,7 @@ const lv: EarthworksCopy = {
     { title: 'Lietotne vadītāja valodā', text: 'Vadītāja lietotne darbojas desmit valodās, arī igauņu, krievu un poļu valodā. Tā strādā bez interneta un nosūta ierakstus, kad savienojums atjaunojas.' },
   ],
   priceTitle: 'Cena',
-  priceText: 'Pirmais auto bez maksas, katrs nākamais 14,90 € (bez PVN) mēnesī – tikai par tiem auto, kas mēneša laikā brauca. Nekādu procentu no jūsu pašu klientiem un objektiem. Pirmais mēnesis bez maksas.',
+  priceText: 'Pirmais auto bez maksas, katrs nākamais 14,90 € (bez PVN) mēnesī – tikai par tiem auto, kas mēneša laikā brauca. Nekādu procentu no reisiem. Pirmais mēnesis bez maksas.',
   faqTitle: 'Biežāk uzdotie jautājumi',
   faq: [
     { q: 'Vai darbu vadītājam vajag kontu?', a: 'Nē. Darbu vadītājs saņem objekta saiti, tur redz dienas, kravas un stundas un apstiprina dienu ar savu vārdu. Cenas viņš neredz.' },
@@ -375,7 +375,7 @@ const lt: EarthworksCopy = {
     { title: 'Programėlė vairuotojo kalba', text: 'Vairuotojo programėlė veikia dešimčia kalbų, tarp jų lietuvių, rusų ir lenkų. Ji veikia be interneto ir išsiunčia įrašus, kai ryšys grįžta.' },
   ],
   priceTitle: 'Kaina',
-  priceText: 'Pirmas sunkvežimis nemokamai, už kiekvieną kitą – 14,90 € (be PVM) per mėnesį, tik jei jis tą mėnesį važiavo. Jokių procentų nuo jūsų pačių klientų ir objektų. Pirmas mėnuo nemokamai.',
+  priceText: 'Pirmas sunkvežimis nemokamai, už kiekvieną kitą – 14,90 € (be PVM) per mėnesį, tik jei jis tą mėnesį važiavo. Jokių procentų nuo reisų. Pirmas mėnuo nemokamai.',
   faqTitle: 'Dažni klausimai',
   faq: [
     { q: 'Ar darbų vadovui reikia paskyros?', a: 'Ne. Darbų vadovas gauna objekto nuorodą, mato joje dienas, krovinius ir valandas ir patvirtina dieną savo vardu. Kainų jis nemato.' },
@@ -435,7 +435,7 @@ const pl: EarthworksCopy = {
     { title: 'Aplikacja w języku kierowcy', text: 'Aplikacja kierowcy działa w dziesięciu językach, także po estońsku, rosyjsku i polsku. Działa bez zasięgu i wysyła wpisy, gdy połączenie wróci.' },
   ],
   priceTitle: 'Cena',
-  priceText: 'Pierwsze auto gratis, za każde kolejne 14,90 € netto (bez VAT) miesięcznie – tylko za auta, które w danym miesiącu jeździły. Bez prowizji od własnych klientów i budów. Pierwszy miesiąc za darmo.',
+  priceText: 'Pierwsze auto gratis, za każde kolejne 14,90 € netto (bez VAT) miesięcznie – tylko za auta, które w danym miesiącu jeździły. Bez prowizji od przewozów. Pierwszy miesiąc za darmo.',
   faqTitle: 'Częste pytania',
   faq: [
     { q: 'Czy kierownik robót potrzebuje konta?', a: 'Nie. Kierownik robót dostaje link do budowy, widzi w nim dni, kursy i godziny i zatwierdza dzień swoim nazwiskiem. Cen nie widzi.' },
@@ -495,7 +495,7 @@ const de: EarthworksCopy = {
     { title: 'App in der Sprache des Fahrers', text: 'Die Fahrer-App gibt es in zehn Sprachen, auch auf Estnisch, Russisch und Polnisch. Sie funktioniert ohne Netz und sendet die Einträge, sobald die Verbindung wieder da ist.' },
   ],
   priceTitle: 'Preis',
-  priceText: 'Erster Lkw kostenlos, jeder weitere 14,90 € (zzgl. MwSt.) im Monat – nur für Lkw, die in dem Monat gefahren sind. Keine Prozente auf Ihre eigenen Kunden und Baustellen. Erster Monat kostenlos.',
+  priceText: 'Erster Lkw kostenlos, jeder weitere 14,90 € (zzgl. MwSt.) im Monat – nur für Lkw, die in dem Monat gefahren sind. Keine Prozente auf Aufträge. Erster Monat kostenlos.',
   faqTitle: 'Häufige Fragen',
   faq: [
     { q: 'Braucht der Bauleiter Zugangsdaten?', a: 'Nein. Der Bauleiter bekommt den Link zur Baustelle, sieht dort Tage, Fuhren und Stunden und gibt den Tag mit seinem Namen frei. Preise sieht er nicht.' },
@@ -555,7 +555,7 @@ const ru: EarthworksCopy = {
     { title: 'Приложение на языке водителя', text: 'Приложение водителя работает на десяти языках, в том числе на эстонском, русском и польском. Оно работает без сети и отправляет записи, когда связь появится.' },
   ],
   priceTitle: 'Цена',
-  priceText: 'Первая машина бесплатно, каждая следующая — 14,90 € (без НДС) в месяц, и только если она в этом месяце работала. Никаких процентов с ваших собственных заказчиков и объектов. Первый месяц бесплатно.',
+  priceText: 'Первая машина бесплатно, каждая следующая — 14,90 € (без НДС) в месяц, и только если она в этом месяце работала. Никаких процентов с рейсов. Первый месяц бесплатно.',
   faqTitle: 'Вопросы и ответы',
   faq: [
     { q: 'Нужна ли прорабу учётная запись?', a: 'Нет. Прораб получает ссылку на объект, видит там дни, рейсы и часы и подтверждает день своим именем. Цен он не видит.' },

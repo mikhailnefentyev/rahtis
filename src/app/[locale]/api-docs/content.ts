@@ -92,7 +92,7 @@ const fi: DocsText = {
     paragraphs: [
       'haul_kind kertoo, mitä kuljetetaan: TRAILER (puoliperävaunu), CONTAINER (kontti; container_feet pakollinen) — näissä kuljetusyksikkö on numeroitu, ja trailer_plate (perävaunun rekisterinumero tai ISO 6346 -konttinumero) on pakollinen. VAN ja TRUCK ovat pikakuljetuksia autossa: ldm (lastausmetrit) ja vähintään yhden pisteen cargo_weight_kg ovat pakollisia.',
       'Pisteet annetaan ajojärjestyksessä (2–20). Jokaisessa tilauksessa on yksi PICKUP. Alla, mitä kukin tyyppi vaatii; puuttuvasta pisteestä tulee 422 ja selitys kentässä details.',
-      'Lähetä kontrakti kentässä contract: RAHTIS (oletus) — RAHTIS-palvelu, palvelumaksu 5 % hinnasta, vähintään 15 € keikalta yhdessä kuljetusliikkeen maksun kanssa; DIRECT — suora sopimus kuukausimaksua käyttävän kuljetusliikkeen kanssa, ei palvelumaksua, ja tilauksen näkevät vain tällaiset kuljetusliikkeet. Kenttä contract näkyy myös tilauksen tiedoissa.',
+      'Kenttä contract: DIRECT (oletus) — kuljetussopimus syntyy suoraan sinun ja kuljetusliikkeen välille, palvelumaksua ei ole, ja kuljetusliike laskuttaa sinua. 6.11.2026 alkaen jokainen uusi tilaus on DIRECT; arvo RAHTIS hyväksytään vielä vanhojen integraatioiden vuoksi. Vastauksissa RAHTIS tarkoittaa vain ennen tätä päivää tehtyjä tilauksia, joissa Aivomaa Oy oli sopimuskumppani.',
     ],
   },
   typeRows: {

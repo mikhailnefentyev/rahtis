@@ -88,7 +88,7 @@ const CARRIER = `## For carriers (TMS)
 - GPS from the carrier's own tracking system via an API key: ${GPS}.
 - Profitability per vehicle and for the whole fleet: job revenue minus fuel, driver pay, leasing or depreciation, insurance, vehicle tax, repairs and tyres; PDF and CSV export.
 - Parts, tyre and breakdown suppliers in nine countries; a purchase goes straight into the vehicle's profitability.
-- Drivers: invited by link or code; shifts and breaks from the driver app; estimated pay under four schemes — per kilometre, percentage of job value, flat hourly rate or the Finnish collective agreement (TES: basic hours plus overtime, evening, night and Sunday premiums). The driver sees it in the app.
+- Drivers: invited by link or code; shifts and breaks from the driver app; estimated pay per kilometre, as a percentage of job value, per hour, under the Finnish collective agreement (TES: basic hours plus overtime, evening, night and Sunday premiums) or as an agreed net pay per day, month or trip. The driver sees it in the app.
 - Own customers: add a job and give it to your own vehicle, or let your customer order straight to your vehicle; tracking link for the customer; the whole price is the carrier's.
 - Orders from email: each company gets its own forwarding address. A customer's order email (text, PDF or photo attachments) becomes an order draft to check under "Needs your action", matched to the vehicle named in the order by its registration plate (plate formats of EU and EEA countries). A later email with the same order number is shown as a change to accept or reject. An order can also be pasted as text or uploaded as a PDF or photo.
 - Return loads: load-board jobs near each drop-off with the empty kilometres to the pickup; saved lanes send an alert when a matching job is posted.
@@ -96,7 +96,7 @@ const CARRIER = `## For carriers (TMS)
 - Own currency per company: EUR, SEK, NOK, DKK or PLN.
 - Driver pay by country: templates for Finland, Sweden, Norway, Denmark, Estonia, Latvia, Lithuania and Poland with per diems by the country of each day; an agreed net pay per day, month or trip is shown with its lawful structure (base salary, per diems, taxable part) and the employer cost.
 - Verified badge: company checks and Finnish contractor's liability reports (tilaajavastuu) in one package; shippers see it in RAHTIS or through a share link. The badge disappears by itself when a report expires.
-- Weekly report of jobs, earnings and documents; claims handled per job.`;
+- Weekly report of jobs, earnings and documents.`;
 
 const DRIVER = `## Driver app
 

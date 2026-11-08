@@ -518,7 +518,7 @@ export async function LandingSections({ locale, showBlog = false }: { locale: Lo
                 {l.serviceLive}
               </span>
               <h3 className="text-[20px] font-semibold tracking-tight">
-                {l.service2} <Mono className="text-[0.72em] text-ink-faint">20 · 40 · 45</Mono>
+                {l.service2} <Mono className="text-[0.72em] text-ink-faint">20 · 30 · 40 · 45</Mono>
               </h3>
               <p className="text-[16px] text-ink-muted">{l.service2Text}</p>
               <p className="text-[16px] text-ink-muted">{l.service2Text2}</p>

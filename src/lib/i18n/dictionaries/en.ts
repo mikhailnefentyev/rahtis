@@ -742,10 +742,10 @@ export const en = {
       'Freight exchange (load board) for trailer swaps, containers and express transport',
       'Earthworks and tipper trucks: weighed loads, Finnish waste transfer documents, hours and invoices from the worksite',
       'Driver app in 10 languages, works offline',
-      'Working time and estimated pay: per kilometre, percentage of job value, flat hourly rate or collective agreement (TES)',
+      'Working time and estimated pay: per kilometre, percentage of job value, hourly rate, collective agreement (TES) or agreed net pay',
       'Electronic consignment note (CMR), photos and signature',
       'Step-by-step job tracking with delay and waiting-time alerts',
-      'Weekly report and claims per job',
+      'Weekly report per job: jobs, earnings and documents',
       'Orders from email, PDF or photo: forward the customer’s order email and a draft is created for the truck named in the order',
       'Tracking link for the customer: ETA from GPS, stages, proof of delivery and road conditions on the route',
       'Return loads near the drop-off and alerts for saved lanes',
@@ -1184,7 +1184,7 @@ export const en = {
     faultsTitle: 'Things go wrong in logistics. So there’s a set way to handle that too.',
     faultsLede:
       'If the schedule moves, a driver drops out or damage turns up at pickup, the news doesn’t hang on a phone call or a single message. The event is recorded on the job and everyone involved sees it.',
-    fault1: 'The driver doesn’t confirm within 15 minutes',
+    fault1: 'The carrier doesn’t confirm within 15 minutes',
     fault1Text:
       'The job goes back on the board automatically and out to the next suitable trucks. It doesn’t sit waiting for a confirmation that never comes.',
     fault2: 'The port moved the slot or the warehouse closed',
@@ -1293,7 +1293,7 @@ export const en = {
     apiAllEyebrow: 'All in one',
     apiAllTitle: 'The whole job through one interface',
     apiAllText:
-      'The order, offers or a direct vehicle, tracking with arrivals, confirmations and geotagged photos, CMR, route changes on the way, waiting time, rating and claims.',
+      'The order, offers or a direct vehicle, tracking with arrivals, confirmations and geotagged photos, CMR, route changes on the way, waiting time and rating.',
     apiSafeEyebrow: 'Safe',
     apiSafeTitle: 'Signed notifications',
     apiSafeText:
@@ -1317,8 +1317,8 @@ export const en = {
      * not — that you cannot sign up directly, and which registers we
      * check. They live here now, and the footnote is gone.
      */
-    finalLede2: 'We check the company against the PRH and YTJ registers and set up your login once you’re approved.',
-    applyShipper: 'Forwarder application',
+    finalLede2: 'We check the company against the business registers (PRH/YTJ in Finland, VIES for other EU countries, Brønnøysund in Norway) and set up your login once you’re approved.',
+    applyShipper: 'Shipper application',
     applyCarrier: 'Carrier application',
     footerCountry: 'Finland',
     menuFleet: "Fleet",
@@ -1352,14 +1352,14 @@ export const en = {
     toolParts: "Parts and tyres",
     toolPartsText: "Parts, tyre and breakdown suppliers in nine countries. A purchase goes straight into the vehicle's profitability.",
     toolDrivers: "Drivers and working time",
-    toolDriversText: "Shifts and breaks from the driver app. Estimated pay under four pay schemes, which the driver can also see in the app.",
+    toolDriversText: "Shifts and breaks from the driver app. Estimated pay per kilometre, as a share of the job price, per hour, by the collective agreement (TES) or as agreed net pay, which the driver can also see in the app.",
     toolDriversTes: "basic hours plus overtime, evening, night and Sunday premiums",
     toolSites: "Worksites and tippers",
     toolSitesText: "Loads with weights, hours on site and sign-off by the site manager via a link. The invoice goes to the customer in your company's name.",
     pricingEyebrow: "Pricing",
     pricingTitle: "You only pay for trucks that drive",
     pricingLede: "No set-up fee and no multi-year contract. A vehicle that stays parked all month costs nothing.",
-    priceOwnEyebrow: "Your own customers · subscription",
+    priceOwnEyebrow: "For carriers · subscription",
     priceOwnTitle: "Per vehicle per month",
     priceOwnText: 'The first vehicle is free, each additional one €14.90 a month. Charged only for vehicles that completed a job during the month, and no percentage is taken from any job. First month free, prices exclude VAT.',
     priceVehicles: "Vehicles",
@@ -1380,8 +1380,8 @@ export const en = {
     titleCarrier: 'Jobs driven',
     titleShipper: 'Completed orders',
     titleAdmin: 'Invoicing and payouts',
-    subtitleCarrier: 'Jobs driven during the week and the payouts due on them.',
-    subtitleShipper: 'Jobs completed during the week and the amounts to be invoiced.',
+    subtitleCarrier: 'Jobs driven during the week and their prices.',
+    subtitleShipper: 'Jobs completed during the week and their prices.',
     subtitleAdmin: 'Invoices to shippers, payouts to carriers.',
     /*
      * Two tax lines, not one.
@@ -2002,7 +2002,7 @@ export const en = {
     trendRevenue: 'Our share',
     trendHint: 'Weeks run Monday to Sunday, amounts excl. VAT. Our share comes only from orders published before 6 November 2026 under the former model (3% from the carrier and 5% from the shipper, at least €15 together); direct contracts and monthly fees aren’t included.',
     subsTitle: 'Monthly fees',
-    subsLede: 'The monthly fee is charged to carriers on the monthly plan for the vehicles that drove. It’s deducted from the payout first; whatever is left over is invoiced.',
+    subsLede: 'The monthly fee is invoiced after the month ends for the vehicles that drove. If a carrier still has payouts from former-model orders, the fee is deducted from those first.',
     subsColMonth: 'Month',
     subsColVehicles: 'Vehicles',
     subsColTotal: 'Incl. VAT',
@@ -2296,7 +2296,7 @@ export const en = {
     bankSection: 'Bank details',
     iban: 'IBAN',
     ibanHint: 'The account printed on your invoices to customers',
-    ibanHintShipper: 'The account we pay any refunds into',
+    ibanHintShipper: 'Account for any refunds',
     ibanInvalid: 'That IBAN doesn’t check out. Check the digits.',
     bic: 'BIC / SWIFT',
     bicHint: 'Not needed for Finnish accounts',
@@ -2355,9 +2355,9 @@ export const en = {
     title: 'Your details',
     currencyTitle: 'Company currency',
     currencyHintCarrier:
-      'Your own jobs, costs, fuel, wages and your own worksites are recorded in this currency, and so are orders agreed directly with shippers if they choose it. The monthly fee and invoices from Aivomaa Oy are always in euros. Earlier amounts keep their own currency, and totals are converted at the ECB rate.',
+      'Your own jobs, costs, fuel, wages and your own worksites are recorded in this currency, and so are orders agreed directly with shippers if they choose it. The monthly fee and RAHTIS invoices are always in euros. Earlier amounts keep their own currency, and totals are converted at the ECB rate.',
     currencyHintShipper:
-      'Default currency for your orders; you agree the price directly with the carrier. Earlier orders with Aivomaa Oy as the contracting party stay in euros.',
+      'Default currency for your orders; you agree the price directly with the carrier. Orders made under the former terms before 6 November 2026 stay in euros.',
     currencyLabel: 'Currency',
     currencySave: 'Save',
     currencySaved: 'Currency saved.',
@@ -2524,12 +2524,12 @@ export const en = {
   claims: {
     title: 'Claims',
     subtitle:
-      'Damage, shortages, waiting times and deviations, job by job. RAHTIS reviews every claim and mediates between the parties.',
+      'Damage, shortages, waiting times and deviations, job by job. RAHTIS passes the claim to the other party; compensation is agreed between the shipper and the carrier.',
     subtitleAdmin: 'All claims. Open and in-review first.',
     directDeal:
       'This is a direct contract between you and the carrier, so you sort out claims directly with each other. You can both see the job’s documents and photos.',
     none: 'No claims',
-    noneHint: 'You can file a claim from the card of a completed or running job.',
+    noneHint: 'A claim can be filed from the card of an order published before 6 November 2026. On direct orders, contact the other party directly.',
     all: 'All',
     back: 'Claims',
     file: 'File a claim',
@@ -3016,7 +3016,7 @@ export const en = {
     prepaymentYes: 'in the prepayment register',
     prepaymentNo: 'not in the prepayment register',
     checkedAt: 'checked {date}',
-    aivomaa: 'Invoices from Aivomaa Oy (12 mo)',
+    aivomaa: 'RAHTIS invoices (12 mo)',
     aivomaaOpen: 'Invoices: {count}, none due yet',
     aivomaaLine: 'Paid on time {pct}% · invoices: {count}',
     aivomaaLate: 'late: {count}, on average {days} d',
@@ -5132,7 +5132,7 @@ export const en = {
     contents: 'Contents',
     priceTitle: 'What the service costs',
     priceShippers: 'Shippers and forwarders use RAHTIS free of charge: publishing loads, direct orders, tracking, documents and payment reminders.',
-    priceCarriers: 'Carriers pay a subscription. The first active vehicle is free; each further active vehicle costs €14.90 excl. VAT per month. A vehicle is active in a month if it completed at least one transport in that calendar month. The first month is free.',
+    priceCarriers: 'Carriers pay a subscription. The first active vehicle is free; each further active vehicle costs €14.90 excl. VAT per month. A vehicle is active in a month if it completed at least one transport in that calendar month. Paying a year in advance: 10% off. For fleets over 100 vehicles the price is agreed separately. The first month is free.',
     priceFormer: 'Carriers who worked under the former subcontracting model were moved to the subscription on 6 November 2026. For them the subscription is charged from 1 January 2027.',
     priceNoCommission: 'RAHTIS takes no commission on freight and charges no fee per order to either side.',
     partyTitle: 'RAHTIS is not a party to your transport contract',
