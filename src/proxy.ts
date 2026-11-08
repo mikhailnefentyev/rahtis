@@ -26,8 +26,11 @@ import { updateSession } from '@/lib/supabase/middleware';
  * уязвимость с обходом middleware, поэтому доступ к строкам защищает RLS,
  * а здесь решается только навигация.
  */
-/** Языки, которые были и ушли. Ссылки на них не должны упираться в 404. */
-const RETIRED_LOCALES = ['ru'];
+/**
+ * Языки, которые были и ушли. Ссылки на них не должны упираться в 404.
+ * Сейчас пусто: русский снимали, но он вернулся и снова живая локаль.
+ */
+const RETIRED_LOCALES: string[] = [];
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -44,12 +47,14 @@ export async function proxy(request: NextRequest) {
    */
   /*
    * Блог — по адресу /blog без языка (24.10.2026): так его проверяет
-   * HeyCatch и так ведёт читателей на статьи. Внутри это /en/blog;
-   * языковые варианты (/fi/blog) уводятся на единственный адрес.
+   * HeyCatch и так ведёт читателей на статьи. Внутри это /fi/blog
+   * (08.11.2026: статьи почти все финские, страница должна быть lang="fi";
+   * у английской статьи свой lang на <article>); языковые варианты
+   * (/fi/blog) уводятся на единственный адрес.
    */
   if (first === 'blog') {
     const url = request.nextUrl.clone();
-    url.pathname = `/en${pathname}`;
+    url.pathname = `/fi${pathname}`;
     return NextResponse.rewrite(url);
   }
   if (isLocale(first) && second === 'blog') {

@@ -691,7 +691,7 @@ Rahtis-Event: order.stop_arrived`}</code>
           <div className="max-w-[34ch]">
             {/* Та же марка, что в шапке: подвал и шапка — одна витрина. */}
             <Registered className="text-ink">
-              <Image src="/logo-header.png" alt={t.brand.name} width={954} height={240} className="h-[22px] w-auto" />
+              <Image src="/logo-header.png" alt={t.brand.name} width={954} height={240} sizes="88px" className="h-[22px] w-auto" />
             </Registered>
             <p className="mt-3 text-[14px] leading-relaxed text-ink-muted">{l.footerTagline}</p>
             <address className="mt-5 text-[13px] leading-relaxed text-ink-faint not-italic">

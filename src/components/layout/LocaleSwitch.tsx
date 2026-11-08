@@ -87,6 +87,24 @@ function Switch({ current, search }: { current: Locale; search: URLSearchParams 
 }
 
 /**
+ * Страницы, у которых финский адрес свой (см. earthworksPath и fiOrEnPath).
+ * Без этой таблицы /fi/maansiirto вёл бы на /en/maansiirto — рабочий,
+ * но неканонический дубль /en/earthworks.
+ */
+type Slug = { fi: string; other: string; fiOrEnOnly?: true };
+const EARTHWORKS: Slug = { fi: 'maansiirto', other: 'earthworks' };
+const TERMS: Slug = { fi: 'kayttoehdot', other: 'terms', fiOrEnOnly: true };
+const PRIVACY: Slug = { fi: 'tietosuoja', other: 'privacy', fiOrEnOnly: true };
+const LOCALIZED_SLUGS = new Map<string, Slug>([
+  ['maansiirto', EARTHWORKS],
+  ['earthworks', EARTHWORKS],
+  ['kayttoehdot', TERMS],
+  ['terms', TERMS],
+  ['tietosuoja', PRIVACY],
+  ['privacy', PRIVACY],
+]);
+
+/**
  * Меняет первый сегмент пути.
  *
  * Путь всегда начинается с языка: без префикса запрос не доходит до
@@ -97,6 +115,15 @@ function swapLocale(pathname: string, locale: Locale): string {
   const parts = pathname.split('/');
   if ((locales as readonly string[]).includes(parts[1] ?? '')) {
     parts[1] = locale;
+    const slug = LOCALIZED_SLUGS.get(parts[2] ?? '');
+    if (slug) {
+      /*
+       * Условия и политика есть только на финском и английском: прочие
+       * языки сводятся canonical к /en, туда и ведём, без дубля.
+       */
+      if (slug.fiOrEnOnly && locale !== 'fi') parts[1] = 'en';
+      parts[2] = locale === 'fi' ? slug.fi : slug.other;
+    }
     return parts.join('/');
   }
   return `/${locale}${pathname === '/' ? '' : pathname}`;

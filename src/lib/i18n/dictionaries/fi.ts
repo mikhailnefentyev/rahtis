@@ -5245,7 +5245,7 @@ export const fi = {
 
   rules: {
     title: 'Palvelun säännöt',
-    metaDescription: 'Mitä RAHTIS maksaa, missä järjestyksessä kuormat näkyvät tarjouspöydällä, mitä osapuolet näkevät toisistaan, miten yritykset tarkastetaan ja miten palautteet käsitellään.',
+    metaDescription: 'Mitä RAHTIS maksaa, missä järjestyksessä kuormat näkyvät tarjouspöydällä, mitä kumpikin näkee toisesta, miten yritykset tarkastetaan ja palautteet käsitellään.',
     lead: 'RAHTIS on Aivomaa Oy:n ylläpitämä ohjelmisto ja rahtipörssi. Tällä sivulla kerromme selkokielellä, miten palvelu toimii. Sitovat ehdot ovat käyttöehdoissa; jos tekstit eroavat, käyttöehdot ratkaisevat.',
     updated: 'Päivitetty {date}',
     termsLink: 'Käyttöehdot',

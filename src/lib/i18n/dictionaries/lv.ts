@@ -1013,7 +1013,7 @@ export const lv = {
     menuSignIn: 'Pieslēgties',
     eyebrow: 'Transporta vadība · kravu birža · tiešie pasūtījumi',
     titleA: 'Piekabe, konteiners, krava.',
-    titleB: 'Katra izbrauc laikā.',
+    titleB: 'Viss izbrauc laikā.',
     titleC: 'Liekie zvani paliek pagātnē.',
     lede: 'Pārvadātājs vienuviet pārvalda autoparku, vadītājus un savus klientus un noslogo brīvās mašīnas ar reisiem no biržas. Pasūtītājs publicē pārvadājumu vienreiz un redz to soli pa solim — ar foto un dokumentiem.',
     highlight1: 'Autoparks, vadītāji un klienti vienuviet',

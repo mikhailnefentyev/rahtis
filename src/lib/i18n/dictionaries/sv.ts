@@ -1015,7 +1015,7 @@ export const sv = {
     titleA: 'Trailer, container, last.',
     titleB: 'Varje lass går i tid.',
     titleC: 'Inga onödiga samtal.',
-    lede: 'Åkerier hanterar flotta, förare och egna kunder på ett ställe och fyller tomma bilar från anbudstavlan. Uppdragsgivare publicerar ett uppdrag en gång och följer det steg för steg, med foton och dokument bifogade.',
+    lede: 'Åkerier hanterar flotta, förare och egna kunder på ett ställe och fyller tomma bilar från lastbörsen. Uppdragsgivare publicerar ett uppdrag en gång och följer det steg för steg, med foton och dokument bifogade.',
     highlight1: 'Flotta, förare och kunder på ett ställe',
     highlight2: 'Vi pressar inte priset med auktioner',
     highlight3: 'Dokument och rapporter elektroniskt',
@@ -2103,7 +2103,7 @@ export const sv = {
     howTitle: 'Pris',
     howSub: 'Plattformen mot månadsavgift',
     howSubText:
-      'Du sköter din flotta och dina egna kunder och tar uppdrag från anbudstavlan. Varje uppdrag är ett avtal direkt med uppdragsgivaren, och vi tar ingen procent. Första bilen är gratis, därefter 14,90 € i månaden för varje bil som har kört under månaden.',
+      'Du sköter din flotta och dina egna kunder och tar uppdrag från lastbörsen. Varje uppdrag är ett avtal direkt med uppdragsgivaren, och vi tar ingen procent. Första bilen är gratis, därefter 14,90 € i månaden för varje bil som har kört under månaden.',
     iAmCarrier: 'Åkeri',
     iAmShipper: 'Uppdragsgivare',
     submit: 'Skicka ansökan',
@@ -4041,7 +4041,7 @@ export const sv = {
     inviteKindShipper: 'Kund',
     inviteKindCarrier: 'Åkeri',
     inviteKindShipperHint: 'När kunden är godkänd kan den skicka direktorder till dina fordon.',
-    inviteKindCarrierHint: 'Åkeriet får uppdrag från anbudstavlan och ett eget verktyg för sin trafik; du får besked när det är godkänt.',
+    inviteKindCarrierHint: 'Åkeriet får uppdrag från lastbörsen och ett eget verktyg för sin trafik; du får besked när det är godkänt.',
     inviteText:
       'Det inbjudna företaget får ett e-postmeddelande med ansökan redan ifylld. Ansökan kontrolleras innan inloggningsuppgifter skickas.',
     inviteName: 'Företagsnamn',

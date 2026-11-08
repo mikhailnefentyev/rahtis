@@ -712,7 +712,7 @@ export const de = {
     homeTitle: 'Frachtenbörse und TMS: Trailertausch und Container',
     /* Описание для выдачи поиска: до 160 знаков, иначе обрезается. Длинное homeDescription — для разметки. */
     homeMeta: 'Frachtenbörse und Transportmanagement für Transportunternehmen: Fuhrpark, Fahrer, Frachtbriefe und Direktaufträge. Trailertausch, Container und Expressfahrten.',
-    applyTitle: 'Als Transportunternehmen oder Auftraggeber registrieren',
+    applyTitle: 'Als Fuhrunternehmen oder Auftraggeber registrieren',
     termsTitle: 'Nutzungsbedingungen für Transportunternehmen und Auftraggeber',
     privacyTitle: 'Datenschutzhinweise: Umgang mit personenbezogenen Daten',
     features: [
@@ -4961,7 +4961,7 @@ export const de = {
 
   rules: {
     title: 'Regeln der Plattform',
-    metaDescription: 'Was RAHTIS kostet, wie Ladungen in der Frachtenbörse angezeigt werden, was jede Seite über die andere sieht, wie Unternehmen geprüft und Beschwerden bearbeitet werden.',
+    metaDescription: 'Was RAHTIS kostet, wie Ladungen in der Frachtenbörse erscheinen, was jede Seite über die andere sieht, wie Firmen geprüft und Beschwerden bearbeitet werden.',
     lead: 'RAHTIS ist eine Software und Frachtenbörse der Aivomaa Oy. Auf dieser Seite erklären wir in einfachen Worten, wie die Plattform funktioniert. Verbindlich sind die Nutzungsbedingungen; weichen die Texte voneinander ab, gelten die Nutzungsbedingungen.',
     updated: 'Stand: {date}',
     termsLink: 'Nutzungsbedingungen',

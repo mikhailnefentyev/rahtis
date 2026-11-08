@@ -87,7 +87,7 @@ export async function CabinetShell({
           {/* На телефоне панели нет — марка в строке сверху. */}
           <Link href={home} className="cab-top__brand">
             <Registered>
-              <Image src="/logo-header.png" alt={t.brand.name} width={954} height={240} className="h-5 w-auto" />
+              <Image src="/logo-header.png" alt={t.brand.name} width={954} height={240} sizes="80px" className="h-5 w-auto" />
             </Registered>
           </Link>
 

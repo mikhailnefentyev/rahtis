@@ -1013,7 +1013,7 @@ export const pl = {
     menuSignIn: 'Zaloguj się',
     eyebrow: 'Zarządzanie transportem · giełda ładunków · zlecenia bezpośrednie',
     titleA: 'Naczepa, kontener, ładunek.',
-    titleB: 'Każde wyjeżdża na czas.',
+    titleB: 'Wszystko wyjeżdża na czas.',
     titleC: 'Bez zbędnych telefonów.',
     lede: 'Przewoźnik prowadzi flotę, kierowców i własnych klientów w jednym miejscu, a wolne auta zapełnia z giełdy. Zleceniodawca publikuje przewóz raz i śledzi go krok po kroku, ze zdjęciami i dokumentami.',
     highlight1: 'Flota, kierowcy i klienci w jednym miejscu',
@@ -4960,7 +4960,7 @@ export const pl = {
 
   rules: {
     title: 'Zasady platformy',
-    metaDescription: 'Ile kosztuje RAHTIS, w jakiej kolejności ładunki są pokazywane na giełdzie, co strony widzą o sobie nawzajem, jak weryfikujemy firmy i jak rozpatrujemy reklamacje.',
+    metaDescription: 'Ile kosztuje RAHTIS, w jakiej kolejności ładunki są pokazywane na giełdzie, co strony widzą o sobie nawzajem, jak weryfikujemy firmy i rozpatrujemy reklamacje.',
     lead: 'RAHTIS to oprogramowanie i giełda ładunków prowadzone przez Aivomaa Oy. Na tej stronie prostym językiem wyjaśniamy, jak działa platforma. Wiążący jest regulamin; w razie rozbieżności pierwszeństwo ma regulamin.',
     updated: 'Aktualizacja: {date}',
     termsLink: 'Regulamin',

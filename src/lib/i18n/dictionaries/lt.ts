@@ -1013,7 +1013,7 @@ export const lt = {
     menuSignIn: 'Prisijungti',
     eyebrow: 'Transporto valdymas · krovinių birža · tiesioginiai užsakymai',
     titleA: 'Priekaba, konteineris, krovinys.',
-    titleB: 'Kiekvienas išvyksta laiku.',
+    titleB: 'Viskas išvyksta laiku.',
     titleC: 'Be nereikalingų skambučių.',
     lede: 'Vežėjas vienoje vietoje valdo transportą, vairuotojus ir savus klientus, o laisvus sunkvežimius užpildo kroviniais iš biržos. Užsakovas paskelbia pervežimą vieną kartą ir mato jį etapais – su nuotraukomis ir dokumentais.',
     highlight1: 'Transportas, vairuotojai ir klientai vienoje vietoje',

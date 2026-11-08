@@ -108,9 +108,9 @@ const fi: EarthworksCopy = {
 };
 
 const en: EarthworksCopy = {
-  metaTitle: 'Earthworks and dump trucks: loads, hours and invoices',
+  metaTitle: 'Earthworks and dump trucks: loads, hours, invoices',
   metaDescription:
-    'Worksite app for dump trucks: weighed loads, Finnish waste transfer documents, hours (last unload + 30 min), foreman approval by link and invoices to your customer.',
+    'Worksite app for dump trucks: weighed loads, Finnish waste transfer documents, hours (last unload + 30 min), foreman approval and invoices to your customer.',
   eyebrow: 'Earthworks and dump trucks',
   title: 'Worksite loads, hours and invoices in one place',
   lede:
@@ -168,7 +168,7 @@ const en: EarthworksCopy = {
 };
 
 const sv: EarthworksCopy = {
-  metaTitle: 'Masstransporter och tippbilar: lass, timmar, fakturor',
+  metaTitle: 'Masstransport och tippbilar: lass, timmar, fakturor',
   metaDescription:
     'Arbetsplatsapp för tippbilar: vägda lass, finska transportdokument för avfall, timmar (sista tömning + 30 min), arbetsledarens godkännande och fakturor.',
   eyebrow: 'Masstransporter och tippbilar',
@@ -295,8 +295,8 @@ const lv: EarthworksCopy = {
   title: 'Objekta kravas, stundas un rēķini vienuviet',
   lede:
     'Vadītājs telefonā atzīmē ierašanos, kravas un svēršanas. Darbu vadītājs apstiprina dienu caur saiti. Rēķins klientam aiziet jūsu uzņēmuma vārdā – ar vienu pogu, katru nedēļu vai reizi divās nedēļās.',
-  ctaApply: 'Pievienoties',
-  ctaSignIn: 'Ienākt',
+  ctaApply: 'Pieteikties',
+  ctaSignIn: 'Pieslēgties',
   dayTitle: 'Kā paiet diena',
   day: [
     { title: 'No rīta uz objektu', text: 'Vadītājs lietotnē nospiež „Esmu objektā“. Laiks un vieta saglabājas, auto un piekabi izvēlas vienreiz dienā.' },
@@ -348,9 +348,9 @@ const lv: EarthworksCopy = {
 };
 
 const lt: EarthworksCopy = {
-  metaTitle: 'Žemės darbai ir savivarčiai: kroviniai, valandos, sąskaitos',
+  metaTitle: 'Žemės darbai ir savivarčiai: kroviniai ir sąskaitos',
   metaDescription:
-    'Programėlė savivarčiams objekte: pasverti kroviniai, Suomijos atliekų lydraščiai, valandos (paskutinis iškrovimas + 30 min), darbų vadovo patvirtinimas ir sąskaitos.',
+    'Programėlė savivarčiams: pasverti kroviniai, Suomijos atliekų lydraščiai, valandos (paskutinis iškrovimas + 30 min), darbų vadovo patvirtinimas ir sąskaitos.',
   eyebrow: 'Žemės darbai ir savivarčiai',
   title: 'Objekto kroviniai, valandos ir sąskaitos vienoje vietoje',
   lede:
@@ -470,7 +470,7 @@ const pl: EarthworksCopy = {
 const de: EarthworksCopy = {
   metaTitle: 'Erdbau und Kipper: Fuhren, Stunden und Rechnungen',
   metaDescription:
-    'Baustellen-App für Kipper: gewogene Fuhren, finnische Abfall-Transportdokumente, Stunden (letzte Entladung + 30 Min.), Freigabe durch den Bauleiter und Rechnungen.',
+    'Baustellen-App für Kipper: gewogene Fuhren, finnische Abfall-Transportdokumente, Stunden (letzte Entladung + 30 Min.), Freigabe vom Bauleiter und Rechnungen.',
   eyebrow: 'Erdbau und Kipper',
   title: 'Fuhren, Stunden und Rechnungen der Baustelle an einem Ort',
   lede:

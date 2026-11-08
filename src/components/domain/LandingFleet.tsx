@@ -100,8 +100,9 @@ export async function LandingFleet({ locale }: { locale: Locale }) {
                     <dl className="mt-auto grid grid-cols-3 gap-2 pt-4">
                       {[
                         [l.comboAxles, `${combo.motor.axles}+${combo.trailer.axles}`],
-                        [finland, `≤ ${tonnes.format(fi / 1000)} t`],
-                        [l.comboEu, `${tonnes.format(eu / 1000)} t`],
+                        /* Единица из словаря: по-русски «т», на прочих языках «t». */
+                        [finland, `≤ ${tonnes.format(fi / 1000)} ${t.siteWork.tonnes}`],
+                        [l.comboEu, `${tonnes.format(eu / 1000)} ${t.siteWork.tonnes}`],
                       ].map(([k, v]) => (
                         <div key={k} className="border-t border-line pt-2">
                           <dt className="label-micro">{k}</dt>

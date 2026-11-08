@@ -84,15 +84,29 @@ export async function getArticle(slug: string): Promise<Article | null> {
  * Чистка HTML статьи: заголовки, абзацы, списки, таблицы, ссылки,
  * цитаты, выделение, код. id остаётся только у h2/h3 — на них ведёт
  * оглавление. Скрипты, стили, iframe, on*-атрибуты и javascript: — прочь.
+ *
+ * Ссылки (08.11.2026): HeyCatch ставит ссылки на RAHTIS на случайный язык
+ * (/lv/apply из финской статьи) и иногда без www — ведём их на язык статьи
+ * и на www. Ссылки на мусорные «источники» (снимки чужих форумов) снимаем,
+ * текст остаётся.
  */
-export function cleanArticleHtml(html: string): string {
+const SITE_LOCALES = 'fi|en|sv|et|lv|lt|pl|de|ru';
+const JUNK_LINKS = /sentinel-team\.org/i;
+
+export function cleanArticleHtml(html: string, lang = 'fi'): string {
+  const own = lang === 'en' ? 'en' : SITE_LOCALES.split('|').includes(lang) ? lang : 'fi';
   return sanitizeHtml(html, {
     allowedTags: ['h2', 'h3', 'h4', 'p', 'ul', 'ol', 'li', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'a', 'blockquote', 'strong', 'em', 'b', 'i', 'code', 'pre', 'br', 'hr'],
     allowedAttributes: { h2: ['id'], h3: ['id'], a: ['href', 'title'], th: ['colspan', 'rowspan'], td: ['colspan', 'rowspan'] },
     allowedSchemes: ['https', 'http', 'mailto'],
     transformTags: {
       a: (tagName, attribs) => {
-        const external = /^https?:\/\//.test(attribs.href ?? '') && !attribs.href!.startsWith('https://www.rahtis.eu');
+        const href = attribs.href ?? '';
+        // span не разрешён — санитайзер выбросит тег и оставит текст ссылки.
+        if (JUNK_LINKS.test(href)) return { tagName: 'span', attribs: {} };
+        const ours = href.match(new RegExp(`^https?://(?:www\\.)?rahtis\\.eu(?:/(?:${SITE_LOCALES}))?(/.*)?$`));
+        if (ours) return { tagName, attribs: { ...attribs, href: `https://www.rahtis.eu/${own}${ours[1] && ours[1] !== '/' ? ours[1] : ''}` } };
+        const external = /^https?:\/\//.test(href);
         return { tagName, attribs: external ? { ...attribs, rel: 'noopener', target: '_blank' } : attribs };
       },
     },

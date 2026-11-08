@@ -2,13 +2,17 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ConsentSettingsLink } from '@/components/layout/AnalyticsConsent';
 import { APP } from '@/lib/config';
+import { blogLabels } from '@/lib/blog/visuals';
 
 /**
  * Рамка страниц блога: марка, ссылки на список и заявку, подвал.
- * Блог живёт по адресу /blog без языка (так его ищет HeyCatch), статьи —
- * по-английски, поэтому и рамка английская.
+ * Блог живёт по адресу /blog без языка (так его ищет HeyCatch). Статьи в
+ * основном финские (08.11.2026), поэтому рамка говорит на языке статьи
+ * (или большинства статей в списке) и ведёт на заявку и политику на нём.
  */
-export function BlogFrame({ children }: { children: React.ReactNode }) {
+export function BlogFrame({ children, lang = 'fi' }: { children: React.ReactNode; lang?: string }) {
+  const t = blogLabels(lang);
+  const site = lang === 'en' ? 'en' : 'fi';
   return (
     <div className="flex min-h-full flex-1 flex-col">
       <header className="border-b border-line bg-surface">
@@ -18,10 +22,10 @@ export function BlogFrame({ children }: { children: React.ReactNode }) {
           </Link>
           <nav className="flex items-center gap-4 text-[13px]">
             <Link href="/blog" className="text-ink-muted hover:text-ink">
-              Blog
+              {t.blog}
             </Link>
-            <Link href="/en/apply" className="font-medium text-ink hover:underline">
-              Join RAHTIS
+            <Link href={`/${site}/apply`} className="font-medium text-ink hover:underline">
+              {t.join}
             </Link>
           </nav>
         </div>
@@ -33,8 +37,8 @@ export function BlogFrame({ children }: { children: React.ReactNode }) {
             © {new Date().getFullYear()} {APP.operator.legalName} · {APP.operator.businessId}
           </span>
           <span className="flex gap-3">
-            <Link href="/en/privacy" className="hover:text-ink">
-              Privacy notice
+            <Link href={site === 'fi' ? '/fi/tietosuoja' : '/en/privacy'} className="hover:text-ink">
+              {t.privacy}
             </Link>
             <ConsentSettingsLink className="hover:text-ink" />
           </span>
@@ -44,9 +48,9 @@ export function BlogFrame({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function formatDate(iso: string): string {
+export function formatDate(iso: string, lang = 'fi'): string {
   const date = new Date(iso);
   return Number.isNaN(date.getTime())
     ? iso
-    : date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Europe/Helsinki' });
+    : date.toLocaleDateString(lang === 'en' ? 'en-GB' : lang, { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Europe/Helsinki' });
 }

@@ -143,6 +143,7 @@ export function SiteHeader({ showBlog = false }: { showBlog?: boolean }) {
             alt={t.brand.name}
             width={954}
             height={240}
+            sizes="88px"
             priority
             className="site-head__logo site-head__logo--light"
           />
@@ -152,6 +153,7 @@ export function SiteHeader({ showBlog = false }: { showBlog?: boolean }) {
             aria-hidden="true"
             width={954}
             height={240}
+            sizes="88px"
             className="site-head__logo site-head__logo--dark"
           />
           {/* Словесный знак RAHTIS зарегистрирован в PRH. */}
