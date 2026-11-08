@@ -23,18 +23,19 @@ const VEHICLES = {
   tral: { file: 'tral', label: 'Lavettikuljetus' },
 } satisfies Record<string, Vehicle>;
 
-/* Слово в тексте → машина. Первое совпадение выигрывает. */
+/*
+ * Слово в тексте → машина, только когда тема прямо про неё (земляные работы,
+ * контейнеры, спецтехника, перецепы). Остальные статьи (водители, документы,
+ * счета…) получают машину по адресу статьи — иначе подряд шли одинаковые.
+ */
 const TOPICS: [RegExp, keyof typeof VEHICLES][] = [
   [/maansiirt|kippi|massa|sora|murske|maa-aines|työmaa|earthwork|dump/i, 'kippi'],
-  [/kontti|container|satama|port/i, 'kontti'],
-  [/lavetti|kone|erikoiskulj|oversize|excavat/i, 'tral'],
-  [/satulast|swap|vaihtokori|perävaunu|trailer/i, 'puoli'],
-  [/cmr|rahtikirj|consignment|tarjous|lasku|invoice|quote/i, 'puoli'],
-  [/palautus|paluukuorm|tyhjä|return|empty/i, 'tays'],
-  [/kuljettaj|palkka|työaika|ajopäiväkirj|driver|working time/i, 'kasetti'],
+  [/kontti|container|satama/i, 'kontti'],
+  [/lavetti|työkone|erikoiskulj|oversize|excavat/i, 'tral'],
+  [/satulast|swap|vaihtokori/i, 'puoli'],
 ];
 
-const ROTATION: (keyof typeof VEHICLES)[] = ['puoli', 'kasetti', 'tays', 'kontti', 'ppv', 'kippi', 'tral'];
+const ROTATION: (keyof typeof VEHICLES)[] = ['puoli', 'kasetti', 'tays', 'kontti', 'ppv', 'tral'];
 
 function hash(s: string): number {
   let h = 0;
