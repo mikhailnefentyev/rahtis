@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { BlogCover } from '@/components/blog/BlogCover';
+import Image from 'next/image';
 import { listArticles } from '@/lib/blog/heycatch';
-import { blogLabels, fixText, mainLanguage, vehicleFor } from '@/lib/blog/visuals';
+import { blogLabels, fixText, mainLanguage } from '@/lib/blog/visuals';
 import { SITE_URL } from '@/lib/seo';
 import { BlogFrame, formatDate } from './BlogFrame';
 
@@ -37,8 +37,9 @@ export const metadata: Metadata = {
 };
 
 /**
- * /blog — все статьи HeyCatch, новые первыми, карточками: обложка с машиной
- * по теме, заголовок, дата, время чтения. Без выдержек — так требует
+ * /blog — все статьи HeyCatch, новые первыми, простым списком: заголовок,
+ * дата, время чтения. Справа от заголовка блога — одна картинка самосвала
+ * (как на /maansiirto); у статей своих картинок нет — так решил владелец. Без выдержек — так требует
  * HeyCatch (описание только для поиска). Подписи — на языке большинства
  * статей. Пусто — короткая строка и ответ 200.
  */
@@ -66,23 +67,36 @@ export default async function BlogIndex() {
   return (
     <BlogFrame lang={lang}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
-      <h1 className="text-2xl font-semibold tracking-tight" lang={lang}>
-        {t.blog}
-      </h1>
-      {lang === 'fi' && <p className="mt-2 max-w-[60ch] text-[15px] text-ink-muted">{INTRO}</p>}
+      <div className="flex items-center justify-between gap-6">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight" lang={lang}>
+            {t.blog}
+          </h1>
+          {lang === 'fi' && <p className="mt-2 max-w-[46ch] text-[15px] text-ink-muted">{INTRO}</p>}
+        </div>
+        <Image
+          src="/media/kippiauto.webp"
+          alt=""
+          aria-hidden
+          width={926}
+          height={445}
+          priority
+          sizes="260px"
+          className="hidden w-[260px] shrink-0 mix-blend-multiply sm:block"
+        />
+      </div>
       {articles.length === 0 ? (
         <p className="mt-6 text-[15px] text-ink-muted">{t.empty}</p>
       ) : (
-        <ul className="mt-8 grid gap-6 sm:grid-cols-2">
-          {articles.map((article, i) => (
-            <li key={article.slug} lang={article.language || 'en'}>
-              <Link href={`/blog/${encodeURIComponent(article.slug)}`} className="group block">
-                <BlogCover vehicle={vehicleFor(article)} small priority={i < 2} />
-                <span className="mt-3 block text-[17px] leading-snug font-semibold text-ink group-hover:underline">{fixText(article.title, article.language)}</span>
-                <span className="mt-1.5 block text-[13px] text-ink-faint">
-                  <time dateTime={article.published}>{formatDate(article.published, article.language)}</time> · {article.read_time} {blogLabels(article.language).min}
-                </span>
+        <ul className="mt-8 flex flex-col divide-y divide-line border-y border-line">
+          {articles.map((article) => (
+            <li key={article.slug} className="py-5" lang={article.language || 'en'}>
+              <Link href={`/blog/${encodeURIComponent(article.slug)}`} className="text-[17px] leading-snug font-semibold text-ink hover:underline">
+                {fixText(article.title, article.language)}
               </Link>
+              <p className="mt-1.5 text-[13px] text-ink-faint">
+                <time dateTime={article.published}>{formatDate(article.published, article.language)}</time> · {article.read_time} {blogLabels(article.language).min}
+              </p>
             </li>
           ))}
         </ul>

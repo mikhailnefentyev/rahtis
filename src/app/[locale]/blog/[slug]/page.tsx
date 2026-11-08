@@ -1,9 +1,8 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { cleanArticleHtml, getArticle, splitAfterTakeaways, tableOfContents } from '@/lib/blog/heycatch';
-import { BlogCover } from '@/components/blog/BlogCover';
 import { withCharts } from '@/lib/blog/charts';
-import { blogLabels, fixText, vehicleFor } from '@/lib/blog/visuals';
+import { blogLabels, fixText } from '@/lib/blog/visuals';
 import { SITE_URL } from '@/lib/seo';
 import { BlogFrame, formatDate } from '../BlogFrame';
 
@@ -114,11 +113,6 @@ export default async function BlogArticle({ params }: Params) {
           <time dateTime={article.published}>{formatDate(article.published, language)}</time> · {article.read_time} {t.min}
         </p>
 
-        {!(image && /^https:\/\//.test(image)) && (
-          <div className="mt-6">
-            <BlogCover vehicle={vehicleFor(article)} priority />
-          </div>
-        )}
         {image && /^https:\/\//.test(image) && (
           // eslint-disable-next-line @next/next/no-img-element -- адрес картинки задаёт HeyCatch, домен заранее неизвестен
           <img src={image} alt="" className="mt-6 w-full rounded-lg border border-line" />
