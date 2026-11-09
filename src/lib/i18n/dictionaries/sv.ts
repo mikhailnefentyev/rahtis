@@ -735,7 +735,7 @@ export const sv = {
       'Ledigt utrymme på vägen: plats i bilar som redan kör, erbjuds till uppdragsgivare med transportörens samtycke',
       'Märket Kontrollerad och finska beställaransvarsrapporter (tilaajavastuu) i ett paket',
       'Egen valuta (EUR, SEK, NOK, DKK, PLN) och förarlön per land med traktamenten',
-      'Tvåstegsinloggning med autentiseringsapp',
+      'Avisering vid inloggning från en ny enhet',
       'API (REST och webhooks) för uppdragsgivarens eget system',
     ],
     /* Род программы для schema.org (applicationSubCategory). */

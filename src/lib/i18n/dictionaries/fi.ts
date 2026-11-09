@@ -759,7 +759,7 @@ export const fi = {
       'Vapaata tilaa matkalla: tila jo liikkeellä olevissa autoissa rahdinantajille kuljetusliikkeen luvalla',
       'Tarkastettu-merkki ja tilaajavastuuraportit yhtenä pakettina',
       'Oma valuutta (EUR, SEK, NOK, DKK, PLN) ja kuljettajan palkka maittain päivärahoineen',
-      'Kaksivaiheinen kirjautuminen todennussovelluksella',
+      'Ilmoitus kirjautumisesta uudelta laitteelta',
       'Rajapinta (REST ja webhookit) tilaajan järjestelmään',
     ],
     /* Род программы для schema.org (applicationSubCategory). */

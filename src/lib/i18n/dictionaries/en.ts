@@ -752,7 +752,7 @@ export const en = {
       'Free space in trucks already on the way, offered to shippers with the carrier’s consent',
       'Verified badge and Finnish contractor’s liability reports (tilaajavastuu) in one package',
       'Own currency (EUR, SEK, NOK, DKK, PLN) and driver pay by country with per diems',
-      'Two-step sign-in with an authenticator app',
+      'Alert on sign-in from a new device',
       'API (REST and webhooks) for the shipper\'s own system',
     ],
     /* Род программы для schema.org (applicationSubCategory). */

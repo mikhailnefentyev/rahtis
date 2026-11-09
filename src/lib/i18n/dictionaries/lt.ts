@@ -735,7 +735,7 @@ export const lt = {
       'Laisva vieta kelyje: vieta jau važiuojančiuose automobiliuose, siūloma užsakovams vežėjo sutikimu',
       'Ženklas „Patikrintas“ ir Suomijos užsakovo atsakomybės ataskaitos (tilaajavastuu) viename pakete',
       'Sava valiuta (EUR, SEK, NOK, DKK, PLN) ir vairuotojo darbo užmokestis pagal šalis su dienpinigiais',
-      'Dviejų veiksmų prisijungimas su autentifikavimo programėle',
+      'Pranešimas apie prisijungimą iš naujo įrenginio',
       'API (REST ir webhook) užsakovo sistemai',
     ],
     /* Род программы для schema.org (applicationSubCategory). */

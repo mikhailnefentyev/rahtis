@@ -735,7 +735,7 @@ export const lv = {
       'Brīvā vieta ceļā: vieta jau braucošās automašīnās, ko ar pārvadātāja piekrišanu piedāvā pasūtītājiem',
       'Zīme „Pārbaudīts” un Somijas pasūtītāja atbildības pārskati (tilaajavastuu) vienā paketē',
       'Sava valūta (EUR, SEK, NOK, DKK, PLN) un vadītāja alga pa valstīm ar dienas naudu',
-      'Divpakāpju pieteikšanās ar autentifikācijas lietotni',
+      'Paziņojums par pieslēgšanos no jaunas ierīces',
       'API (REST un webhooks) pasūtītāja sistēmai',
     ],
     /* Род программы для schema.org (applicationSubCategory). */

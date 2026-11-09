@@ -114,8 +114,9 @@ export function expiresWithin(date: string | null | undefined, days: number, now
  * записи — главный способ увести груз. Совет, не требование: «позже» на 30 суток.
  */
 export function twoStepItem(input: { owner: boolean; enabled: boolean; href: string }): InboxItem[] {
-  if (!input.owner || input.enabled) return [];
-  return [{ key: 'two-step', kind: 'twoStepOwner', urgency: 2, at: null, href: input.href, snooze: 30 }];
+  // Двухэтапный вход убран 09.11.2026 — совет подключить его не показываем.
+  void input;
+  return [];
 }
 
 /* ── Пункты по счетам прямых рейсов — чистые, их проверяют тесты ── */

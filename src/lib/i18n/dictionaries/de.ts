@@ -735,7 +735,7 @@ export const de = {
       'Freier Laderaum unterwegs: Platz in Fahrzeugen, die bereits fahren, für Auftraggeber mit Zustimmung des Frachtführers',
       'Abzeichen „Geprüft“ und finnische Nachweise zur Auftraggeberhaftung (tilaajavastuu) in einem Paket',
       'Eigene Währung (EUR, SEK, NOK, DKK, PLN) und Fahrerlohn je Land mit Spesen',
-      'Zwei-Faktor-Anmeldung mit Authenticator-App',
+      'Hinweis bei Anmeldung von einem neuen Gerät',
       'Schnittstelle (REST und Webhooks) zum System des Auftraggebers',
     ],
     /* Род программы для schema.org (applicationSubCategory). */

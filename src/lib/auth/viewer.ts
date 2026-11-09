@@ -1,7 +1,6 @@
 import { cache } from 'react';
 import { createClient } from '@/lib/supabase/server';
 import type { Company, PartyRole, Profile } from '@/types/db';
-import { aalOf, pendingStep } from './twoStep';
 
 /**
  * Кто смотрит на страницу.
@@ -56,19 +55,11 @@ export const getViewer = cache(async (): Promise<Viewer> => {
   if (!user) return { status: 'guest' };
 
   /*
-   * Двухэтапный вход. Факторы — из getUser (ответ сервера Supabase), уровень
-   * сессии — из того же токена, который getUser только что проверил.
-   * Код не введён — дальше не идём: профиль при aal1 база и не отдаст
-   * (политики mfa_required, 20261106190000_two_step).
+   * Двухэтапный вход убран 09.11.2026 по решению владельца: вход только по
+   * паролю. Кода не спрашиваем ни при входе, ни перед важными действиями
+   * (миграция 20261109000000_password_only).
    */
-  const twoStep = (user.factors ?? []).some((f) => f.status === 'verified');
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  const aal = aalOf(session?.access_token);
-  if (pendingStep({ enabled: twoStep, aal, admin: false }) === 'code') {
-    return { status: 'mfa', step: 'code', userId: user.id, email: user.email ?? null };
-  }
+  const twoStep = false;
 
   /*
    * Компания подтягивается вместе с профилем одним запросом. Связь
@@ -87,11 +78,6 @@ export const getViewer = cache(async (): Promise<Viewer> => {
   }
 
   const { company, ...profile } = data as Profile & { company: Company | null };
-
-  /* Оператор без двухэтапного входа — сначала подключить, потом админка. */
-  if (pendingStep({ enabled: twoStep, aal, admin: profile.role === 'ADMIN' }) === 'enrol') {
-    return { status: 'mfa', step: 'enrol', userId: user.id, email: user.email ?? null };
-  }
 
   return {
     status: 'ready',

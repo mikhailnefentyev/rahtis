@@ -135,11 +135,7 @@ test('QR: разметка SVG в адрес data:', () => {
   assert.equal(qrDataUrl(svg), url);
 });
 
-test('«Требует действия»: совет главному без двухэтапного входа', () => {
+test('«Требует действия»: совета подключить двухэтапный вход нет (убран 9.11.2026)', () => {
   assert.deepEqual(twoStepItem({ owner: false, enabled: false, href: '/fi/account#two-step' }), []);
-  assert.deepEqual(twoStepItem({ owner: true, enabled: true, href: '/fi/account#two-step' }), []);
-  const [item] = twoStepItem({ owner: true, enabled: false, href: '/fi/account#two-step' });
-  assert.equal(item.kind, 'twoStepOwner');
-  assert.equal(item.snooze, 30);
-  assert.equal(item.href, '/fi/account#two-step');
+  assert.deepEqual(twoStepItem({ owner: true, enabled: false, href: '/fi/account#two-step' }), []);
 });

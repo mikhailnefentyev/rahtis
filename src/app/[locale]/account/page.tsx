@@ -27,8 +27,6 @@ import { ShipperTrustDetails } from '@/components/domain/ShipperTrust';
 import { loadCompanyTrust } from '@/lib/trust/status';
 import { parseRegistrations } from '@/lib/waste/registrations';
 import { getViewerI18n } from '@/lib/i18n/viewer';
-import { TwoStepPanel } from '@/components/domain/TwoStep';
-import { APP } from '@/lib/config';
 
 export async function generateMetadata({
   params,
@@ -73,30 +71,20 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
    */
   const security = viewer.status === 'ready' || viewer.status === 'mfa';
   const sessionClient = await createClient();
-  const [factorAt, devices] = security
-    ? await Promise.all([
-        sessionClient.auth
-          .getUser()
-          .then(({ data }) => (data.user?.factors ?? []).find((x) => x.status === 'verified')?.created_at ?? null),
-        sessionClient
-          .from('sign_in_devices')
-          .select('id, label, country, last_seen')
-          .order('last_seen', { ascending: false })
-          .limit(5)
-          .then((r) => r.data ?? []),
-      ])
-    : [null, []];
-  const twoStepCard = security && (
+  const devices = security
+    ? await sessionClient
+        .from('sign_in_devices')
+        .select('id, label, country, last_seen')
+        .order('last_seen', { ascending: false })
+        .limit(5)
+        .then((r) => r.data ?? [])
+    : [];
+  /* Двухэтапный вход убран 09.11.2026 — остался список устройств входа. */
+  const twoStepCard = security && devices.length > 0 && (
     <Card id="two-step" className="scroll-mt-24">
       <CardBody className="flex flex-col gap-5">
-        <TwoStepPanel
-          enabled={viewer.status === 'ready' && viewer.twoStep}
-          enabledAt={factorAt}
-          required={viewer.status === 'mfa' || (viewer.status === 'ready' && viewer.role === 'ADMIN')}
-          support={APP.operator.email}
-        />
         {devices.length > 0 && (
-          <div className="flex flex-col gap-2 border-t border-line pt-4">
+          <div className="flex flex-col gap-2">
             <h3 className="label-micro">{t.twoStep.devicesTitle}</h3>
             <ul className="flex flex-col gap-1 text-[13px]">
               {devices.map((d) => (

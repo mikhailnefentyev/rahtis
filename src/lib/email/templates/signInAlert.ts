@@ -45,8 +45,8 @@ export function signInAlertEmail(input: {
     {
       kind: 'note',
       value: fi
-        ? `Jos se et ollut sinä, vaihda salasana heti ja ota yhteyttä RAHTIS-tukeen: ${input.support}. Ota myös kaksivaiheinen kirjautuminen käyttöön.`
-        : `If it wasn't you, change your password now and contact RAHTIS support: ${input.support}. Also turn on two-step sign-in.`,
+        ? `Jos se et ollut sinä, vaihda salasana heti ja ota yhteyttä RAHTIS-tukeen: ${input.support}.`
+        : `If it wasn't you, change your password now and contact RAHTIS support: ${input.support}.`,
     },
     { kind: 'button', label: fi ? 'Avaa tilin asetukset' : 'Open account settings', href: input.link },
   ];

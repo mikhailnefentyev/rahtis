@@ -735,7 +735,7 @@ export const pl = {
       'Wolne miejsce w trasie: miejsce w pojazdach, które już jadą, oferowane zleceniodawcom za zgodą przewoźnika',
       'Odznaka „Zweryfikowany” i fińskie raporty odpowiedzialności zamawiającego (tilaajavastuu) w jednym pakiecie',
       'Własna waluta (EUR, SEK, NOK, DKK, PLN) i wynagrodzenie kierowcy według kraju z dietami',
-      'Logowanie dwuetapowe z aplikacją uwierzytelniającą',
+      'Powiadomienie o logowaniu z nowego urządzenia',
       'API (REST i webhooki) dla systemu zleceniodawcy',
     ],
     /* Род программы для schema.org (applicationSubCategory). */

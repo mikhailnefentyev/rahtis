@@ -134,7 +134,7 @@ const ABOUT = `## Company
 - Load board order: loads are listed by publication time, newest first — no paid placement and no ranking by price, rating or subscription. A load is shown to carriers with an approved vehicle suitable for that transport type; a shipper can first offer it to a chosen group of vehicles for a limited time. Up to three carriers can offer; the chosen carrier confirms within 15 minutes or the load returns to the board.
 - Company checks: public registers at registration (PRH/YTJ, EU VIES, Brønnøysund for Norway), repeated weekly for shippers ordering directly; contractor documents and liability insurance checked by staff; each vehicle approved before it can take loads.
 - Complaints about the platform (account decisions, removed payment reports, document checks, technical problems) go to ${APP.operator.email}, are handled in order of arrival and answered in writing with reasons. Rules: ${SITE_URL}/en/rules.
-- Account security: two-step sign-in with an authenticator app, alerts on sign-in from a new device, and notices to the other party when a company's bank details change.`;
+- Account security: alerts on sign-in from a new device, and notices to the other party when a company's bank details change.`;
 
 const FI = `## Suomeksi
 

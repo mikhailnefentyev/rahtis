@@ -12,15 +12,12 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { clientIp, throttleAllowed } from './throttle';
 import {
-  aalOf,
   cityName,
   countryCode,
   describeDevice,
   deviceFingerprint,
   ipPrefix,
-  lastCodeAt,
   shouldAlert,
-  stepUpNeeded,
 } from './twoStep';
 import type { Viewer } from './viewer';
 
@@ -70,13 +67,9 @@ export async function verifyCode(code: string, factorId?: string | null): Promis
  * как раньше, пароль уже проверен входом.
  */
 export async function stepUpRequired(viewer: Viewer): Promise<boolean> {
-  if (viewer.status !== 'ready' || !viewer.twoStep) return false;
-  const supabase = await createClient();
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  const token = session?.access_token;
-  return stepUpNeeded({ enabled: true, aal: aalOf(token), codeAt: lastCodeAt(token) });
+  // Двухэтапный вход убран 09.11.2026: важные действия — по паролю входа.
+  void viewer;
+  return false;
 }
 
 /**

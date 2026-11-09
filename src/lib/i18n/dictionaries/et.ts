@@ -735,7 +735,7 @@ export const et = {
       'Vaba ruum teel: ruum juba sõitvates autodes, mida pakutakse tellijatele vedaja nõusolekul',
       'Märk Kontrollitud ja Soome tellija vastutuse aruanded (tilaajavastuu) ühes paketis',
       'Oma valuuta (EUR, SEK, NOK, DKK, PLN) ja juhi palk riigiti koos päevarahadega',
-      'Kaheastmeline sisselogimine autentimisrakendusega',
+      'Teavitus sisselogimisest uuest seadmest',
       'API (REST ja webhookid) tellija oma süsteemi jaoks',
     ],
     /* Род программы для schema.org (applicationSubCategory). */
