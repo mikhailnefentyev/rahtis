@@ -182,6 +182,21 @@ export function ownColumns(report: PeriodReport, t: Dictionary): Column<ReportLi
 export function summaryRows(report: PeriodReport, t: Dictionary): Array<[string, number, Kind]> {
   const p = t.periodReport;
   const s = report.totals;
+  /*
+   * Только прямые рейсы (с 6.11.2026 — все новые): итоги по ним — рейсы,
+   * километры и цена (если она в евро; иначе цена — в блоке ниже, в своей
+   * валюте). Налог и сумма с налогом — в счёте перевозчика, не здесь.
+   */
+  if (report.lines.length === 0 && report.own.lines.length > 0) {
+    const own = report.own;
+    return [
+      [p.rowTrips, own.lines.length, 'int'],
+      [p.rowDistance, own.km, 'int'],
+      ...(own.currency === 'EUR' ? [[p.rowRate, own.rate, 'money'] as [string, number, Kind]] : []),
+      [p.rowClaims, s.claims, 'int'],
+      [p.rowClaimed, s.claimed, 'money'],
+    ];
+  }
   const rows: Array<[string, number, Kind]> = [
     [p.rowTrips, s.trips, 'int'],
     [p.rowDistance, s.km, 'int'],

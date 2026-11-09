@@ -628,15 +628,24 @@ async function issue(
     company.billing_reference ? `${t.report_.reference} ${company.billing_reference}` : null,
   ].filter((line): line is string => Boolean(line && line.trim()));
 
+  /*
+   * Aivomaa — плательщик или продавец только по рейсам прежней модели, где
+   * она была стороной договора. С 6.11.2026 все рейсы прямые: документ —
+   * отчёт о работе компании, без «Maksaja: Aivomaa Oy» и без строки про
+   * налог в счёте (09.11.2026).
+   */
+  const legacy = paidOrders.length > 0;
   const texts: ReportTexts = {
-    parties: [
-      { label: carrier ? t.report_.payer : t.report_.seller, lines: operatorLines(operator, ids) },
-      { label: carrier ? t.report_.payee : t.report_.customer, lines: recipient },
-    ],
+    parties: legacy
+      ? [
+          { label: carrier ? t.report_.payer : t.report_.seller, lines: operatorLines(operator, ids) },
+          { label: carrier ? t.report_.payee : t.report_.customer, lines: recipient },
+        ]
+      : [{ label: carrier ? t.report_.colCarrier : t.report_.colClient, lines: recipient }],
     title,
     period: `${period} · ${company.name}`,
     due,
-    vatNote: vatBps > 0 ? t.done.vatNoteDomestic : t.done.vatNoteReverse,
+    vatNote: legacy ? (vatBps > 0 ? t.done.vatNoteDomestic : t.done.vatNoteReverse) : '',
     colRef: t.report_.colRef,
     colDate: t.report_.colDate,
     colRoute: t.report_.colRoute,
@@ -779,10 +788,9 @@ async function issue(
             `${texts.title}, ${texts.period}.`,
             '',
             `${t.report_.emailTrips}: ${orders.length}`,
-            `${t.report_.total}: ${f.eur(deducted > 0 ? payable : net)}`,
+            ...(legacy ? [`${t.report_.total}: ${f.eur(deducted > 0 ? payable : net)}`] : []),
             ...(due ? ['', due] : []),
-            '',
-            texts.vatNote,
+            ...(texts.vatNote ? ['', texts.vatNote] : []),
             '',
             t.report_.emailWhere,
             '',

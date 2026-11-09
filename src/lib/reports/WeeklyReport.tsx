@@ -218,7 +218,7 @@ export function WeeklyReport({
         <Text style={s.title}>{texts.title}</Text>
         <Text style={s.period}>{texts.period}</Text>
         {texts.due ? <Text style={s.due}>{texts.due}</Text> : null}
-        <Text style={s.vat}>{texts.vatNote}</Text>
+        {texts.vatNote ? <Text style={s.vat}>{texts.vatNote}</Text> : null}
 
         {rows.length === 0 ? (
           <Text style={s.empty}>{texts.empty}</Text>

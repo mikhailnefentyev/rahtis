@@ -11,6 +11,9 @@ import type { Article, ArticleSummary } from './heycatch';
  * собираются в src/lib/blog/i18n/<язык>.json (scripts/blog-i18n-build.mjs).
  *
  * Статья есть на языке, если она на нём написана или для неё есть перевод.
+ * Файл на языке оригинала — исправленная редакция (09.11.2026: в статьях
+ * HeyCatch были ошибки — графы CMR, номера законов, сроки хранения): он
+ * заменяет текст HeyCatch, пока статью не перепишут там.
  * Новая статья HeyCatch без перевода видна только на своём языке, пока
  * перевод не добавят.
  */
@@ -42,17 +45,16 @@ export { blogPath } from './paths';
 export async function articlesIn(locale: Locale, articles: ArticleSummary[]): Promise<ArticleSummary[]> {
   const own = await table(locale);
   return articles.flatMap((a) => {
-    if ((a.language || 'en') === locale) return [a];
     const t = own[a.slug];
-    return t ? [{ ...a, title: t.title, meta_description: t.description, language: locale }] : [];
+    if (t) return [{ ...a, title: t.title, meta_description: t.description, language: locale }];
+    return (a.language || 'en') === locale ? [a] : [];
   });
 }
 
 /** Статья на языке: своя или переведённая; null — на этом языке её нет. */
 export async function articleIn(locale: Locale, article: Article): Promise<Article | null> {
-  if ((article.language || 'en') === locale) return article;
   const t = (await table(locale))[article.slug];
-  if (!t) return null;
+  if (!t) return (article.language || 'en') === locale ? article : null;
   return { ...article, title: t.title, meta_description: t.description, content_html: t.html, language: locale, jsonLd: null };
 }
 
