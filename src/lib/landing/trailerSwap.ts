@@ -20,7 +20,7 @@ const fi: LandingCopy = {
     "Irtoperien vaihtoon: satamien keikat tarjouspöydältä, omat asiakkaat, kuljettajan sovellus 10 kielellä ja rahtikirjat. Ensimmäinen auto maksutta.",
   eyebrow: "Perävaunun vaihto satamissa",
   title: "Irtoperät satamasta asiakkaalle ilman paperisotaa",
-  lede: "Ota vaihtokeikat Vuosaaresta, Hangosta, Turusta, Naantalista ja HaminaKotkasta tarjouspöydältä, aja omien asiakkaiden keikat ja pidä autot, kuskit ja paperit samassa paikassa. Keikoista ei peritä prosenttia.",
+  lede: "Ota vaihtokeikat tarjouspöydältä satamista kuten Vuosaari, Muuga, Kapellskär, Travemünde ja Gdynia, aja omien asiakkaiden keikat ja pidä autot, kuskit ja paperit samassa paikassa. Keikoista ei peritä prosenttia.",
   ctaApply: "Hae mukaan",
   ctaSignIn: "Kirjaudu",
   dayTitle: "Näin vaihto kulkee",
@@ -50,7 +50,7 @@ const fi: LandingCopy = {
   features: [
     {
       title: "Keikat satamista",
-      text: "Tarjouspöytä näyttää avoimet keikat siellä, missä autosi ovat, tyhjien kilometrien mukaan. Satamat: Helsinki (Vuosaari, Länsisatama, Eteläsatama, Katajanokka), Hanko, Turku, Naantali, Rauma, Pori, HaminaKotka, Vaasa, Kokkola, Oulu ja Kemi.",
+      text: "Tarjouspöytä näyttää avoimet keikat siellä, missä autosi ovat, tyhjien kilometrien mukaan. Satamia on koko toiminta-alueella, esimerkiksi Vuosaari ja Turku, Muuga ja Paldiski, Riika, Klaipėda, Kapellskär ja Göteborg, Oslo, Kööpenhamina, Gdynia, Travemünde ja Rostock.",
     },
     {
       title: "Omat asiakkaat",
@@ -80,7 +80,7 @@ const fi: LandingCopy = {
   faq: [
     {
       q: "Mitkä satamat RAHTIS tuntee?",
-      a: "Suomessa Helsingin Vuosaari, Länsisatama, Eteläsatama ja Katajanokka, Hanko, Turku, Naantali, Rauma, Pori (Mäntyluoto), Hamina, Kotkan Hietanen, Vaasa, Kokkola, Oulu (Oritkari) ja Kemi (Ajos). Lisäksi lautta- ja konttiterminaaleja Ruotsissa, Norjassa, Tanskassa, Virossa, Latviassa, Liettuassa, Puolassa ja Saksassa.",
+      a: "Kaikissa yhdeksässä maassa. Esimerkiksi Suomessa Helsingin Vuosaari, Hanko, Turku ja HaminaKotka, Virossa Muuga ja Paldiski, Latviassa Riika ja Ventspils, Liettuassa Klaipėda, Ruotsissa Kapellskär, Tukholma ja Göteborg, Norjassa Oslo, Tanskassa Kööpenhamina ja Esbjerg, Puolassa Gdynia ja Świnoujście sekä Saksassa Travemünde, Rostock, Kiel ja Hampurin konttiterminaalit.",
     },
     {
       q: "Otetaanko keikoista prosenttia?",
@@ -130,7 +130,7 @@ const en: LandingCopy = {
     "For trailer-swap carriers: port jobs from the load board, your own customers, a driver app in 10 languages, CMR notes and combinations. First truck free.",
   eyebrow: "Trailer swaps in ports",
   title: "Trailers from port to customer, without the paperwork",
-  lede: "Take swap jobs in Vuosaari, Hanko, Turku, Naantali and HaminaKotka from the load board, run your own customers’ jobs and keep trucks, drivers and papers in one place. No percentage on any job.",
+  lede: "Take swap jobs from the load board in ports such as Vuosaari, Muuga, Kapellskär, Travemünde and Gdynia, run your own customers’ jobs and keep trucks, drivers and papers in one place. No percentage on any job.",
   ctaApply: "Join RAHTIS",
   ctaSignIn: "Sign in",
   dayTitle: "How a swap works",
@@ -160,7 +160,7 @@ const en: LandingCopy = {
   features: [
     {
       title: "Jobs in the ports",
-      text: "The load board shows open jobs where your trucks are, by empty kilometres. Ports: Helsinki (Vuosaari, West Harbour, South Harbour, Katajanokka), Hanko, Turku, Naantali, Rauma, Pori, HaminaKotka, Vaasa, Kokkola, Oulu and Kemi.",
+      text: "The load board shows open jobs where your trucks are, by empty kilometres. Ports across the whole operating area, for example Vuosaari and Turku, Muuga and Paldiski, Riga, Klaipėda, Kapellskär and Gothenburg, Oslo, Copenhagen, Gdynia, Travemünde and Rostock.",
     },
     {
       title: "Your own customers",
@@ -190,7 +190,7 @@ const en: LandingCopy = {
   faq: [
     {
       q: "Which ports does RAHTIS know?",
-      a: "In Finland: Helsinki Vuosaari, West Harbour, South Harbour and Katajanokka, Hanko, Turku, Naantali, Rauma, Pori (Mäntyluoto), Hamina, Kotka Hietanen, Vaasa, Kokkola, Oulu (Oritkari) and Kemi (Ajos). Also ferry and container terminals in Sweden, Norway, Denmark, Estonia, Latvia, Lithuania, Poland and Germany.",
+      a: "In all nine countries. For example in Finland Helsinki Vuosaari, Hanko, Turku and HaminaKotka; in Estonia Muuga and Paldiski; in Latvia Riga and Ventspils; in Lithuania Klaipėda; in Sweden Kapellskär, Stockholm and Gothenburg; in Norway Oslo; in Denmark Copenhagen and Esbjerg; in Poland Gdynia and Świnoujście; and in Germany Travemünde, Rostock, Kiel and the Hamburg container terminals.",
     },
     {
       q: "Do you take a percentage of jobs?",
@@ -240,7 +240,7 @@ const sv: LandingCopy = {
     "För trailerbyten: hamnuppdrag från lastbörsen, egna kunder, förarapp på 10 språk och fraktsedlar. Första bilen gratis.",
   eyebrow: "Trailerbyten i hamnar",
   title: "Trailrar från hamn till kund utan pappersexercis",
-  lede: "Ta trailerbyten i Nordsjö (Vuosaari), Hangö, Åbo, Nådendal och HaminaKotka från lastbörsen, kör dina egna kunders uppdrag och håll bilar, förare och papper på ett ställe. Ingen procentavgift på uppdragen.",
+  lede: "Ta trailerbyten från lastbörsen i hamnar som Nordsjö (Vuosaari), Muuga, Kapellskär, Travemünde och Gdynia, kör dina egna kunders uppdrag och håll bilar, förare och papper på ett ställe. Ingen procentavgift på uppdragen.",
   ctaApply: "Ansök nu",
   ctaSignIn: "Logga in",
   dayTitle: "Så går ett trailerbyte till",
@@ -270,7 +270,7 @@ const sv: LandingCopy = {
   features: [
     {
       title: "Uppdrag i hamnarna",
-      text: "Lastbörsen visar öppna uppdrag där dina bilar finns, sorterade efter tomkörda kilometer. Hamnar: Helsingfors (Nordsjö, Västra hamnen, Södra hamnen, Skatudden), Hangö, Åbo, Nådendal, Raumo, Björneborg, HaminaKotka, Vasa, Karleby, Uleåborg och Kemi.",
+      text: "Lastbörsen visar öppna uppdrag där dina bilar finns, sorterade efter tomkörda kilometer. Hamnar i hela verksamhetsområdet, till exempel Nordsjö och Åbo, Muuga och Paldiski, Riga, Klaipėda, Kapellskär och Göteborg, Oslo, Köpenhamn, Gdynia, Travemünde och Rostock.",
     },
     {
       title: "Egna kunder",
@@ -300,7 +300,7 @@ const sv: LandingCopy = {
   faq: [
     {
       q: "Vilka hamnar känner RAHTIS till?",
-      a: "I Finland: Helsingfors Nordsjö (Vuosaari), Västra hamnen, Södra hamnen och Skatudden, Hangö, Åbo, Nådendal, Raumo, Björneborg (Mäntyluoto), Fredrikshamn, Kotka (Hietanen), Vasa, Karleby, Uleåborg (Oritkari) och Kemi (Ajos). Dessutom färje- och containerterminaler i Sverige, Norge, Danmark, Estland, Lettland, Litauen, Polen och Tyskland.",
+      a: "I alla nio länder. Till exempel i Finland Helsingfors Nordsjö (Vuosaari), Hangö, Åbo och HaminaKotka, i Estland Muuga och Paldiski, i Lettland Riga och Ventspils, i Litauen Klaipėda, i Sverige Kapellskär, Stockholm och Göteborg, i Norge Oslo, i Danmark Köpenhamn och Esbjerg, i Polen Gdynia och Świnoujście samt i Tyskland Travemünde, Rostock, Kiel och containerterminalerna i Hamburg.",
     },
     {
       q: "Tar ni procent på uppdragen?",
@@ -350,7 +350,7 @@ const et: LandingCopy = {
     "Haagisevahetuseks: sadamavedud veobörsilt, omad kliendid, juhi rakendus 10 keeles ja veoselehed. Esimene auto tasuta.",
   eyebrow: "Haagisevahetus sadamates",
   title: "Haagised sadamast kliendini ilma paberimajanduseta",
-  lede: "Võta veobörsilt haagisevahetusi Vuosaarest, Hangost, Turust, Naantalist ja HaminaKotkast, sõida oma klientide vedusid ning hoia autod, juhid ja paberid ühes kohas. Vedudelt protsenti ei võeta.",
+  lede: "Võta veobörsilt haagisevahetusi sellistest sadamatest nagu Vuosaari, Muuga, Kapellskär, Travemünde ja Gdynia, sõida oma klientide vedusid ning hoia autod, juhid ja paberid ühes kohas. Vedudelt protsenti ei võeta.",
   ctaApply: "Liitu",
   ctaSignIn: "Logi sisse",
   dayTitle: "Nii vahetus kulgeb",
@@ -380,7 +380,7 @@ const et: LandingCopy = {
   features: [
     {
       title: "Veod sadamatest",
-      text: "Veobörs näitab avatud vedusid seal, kus sinu autod on, tühisõidu kilomeetrite järgi. Sadamad: Helsingi (Vuosaari, Länsisatama, Eteläsatama, Katajanokka), Hanko, Turku, Naantali, Rauma, Pori, HaminaKotka, Vaasa, Kokkola, Oulu ja Kemi.",
+      text: "Veobörs näitab avatud vedusid seal, kus sinu autod on, tühisõidu kilomeetrite järgi. Sadamaid on kogu tegevuspiirkonnas, näiteks Vuosaari ja Turu, Muuga ja Paldiski, Riia, Klaipėda, Kapellskär ja Göteborg, Oslo, Kopenhaagen, Gdynia, Travemünde ja Rostock.",
     },
     {
       title: "Omad kliendid",
@@ -410,7 +410,7 @@ const et: LandingCopy = {
   faq: [
     {
       q: "Milliseid sadamaid RAHTIS tunneb?",
-      a: "Soomes Helsingi Vuosaari, Länsisatama, Eteläsatama ja Katajanokka, Hanko, Turku, Naantali, Rauma, Pori (Mäntyluoto), Hamina, Kotka Hietanen, Vaasa, Kokkola, Oulu (Oritkari) ja Kemi (Ajos). Lisaks parvlaeva- ja konteinerterminalid Rootsis, Norras, Taanis, Eestis, Lätis, Leedus, Poolas ja Saksamaal.",
+      a: "Kõigis üheksas riigis. Näiteks Soomes Helsingi Vuosaari, Hanko, Turu ja HaminaKotka, Eestis Muuga ja Paldiski, Lätis Riia ja Ventspils, Leedus Klaipėda, Rootsis Kapellskär, Stockholm ja Göteborg, Norras Oslo, Taanis Kopenhaagen ja Esbjerg, Poolas Gdynia ja Świnoujście ning Saksamaal Travemünde, Rostock, Kiel ja Hamburgi konteinerterminalid.",
     },
     {
       q: "Kas vedudelt võetakse protsenti?",
@@ -460,7 +460,7 @@ const lv: LandingCopy = {
     "Piekabju maiņai: ostu reisi no kravu biržas, savi klienti, vadītāja lietotne 10 valodās un CMR pavadzīmes. Pirmais auto bez maksas.",
   eyebrow: "Piekabju maiņa ostās",
   title: "Puspiekabes no ostas līdz klientam bez papīru kalniem",
-  lede: "Ņemiet maiņas reisus Vuosaari, Hanko, Turku, Naantali un HaminaKotka ostās no kravu biržas, veiciet savu klientu reisus un turiet auto, vadītājus un dokumentus vienuviet. Nekādu procentu no reisiem.",
+  lede: "Ņemiet maiņas reisus no kravu biržas tādās ostās kā Vuosāri, Mūga, Kapelšēra, Travemünde un Gdiņa, veiciet savu klientu reisus un turiet auto, vadītājus un dokumentus vienuviet. Nekādu procentu no reisiem.",
   ctaApply: "Pieteikties",
   ctaSignIn: "Pieslēgties",
   dayTitle: "Kā notiek maiņa",
@@ -490,7 +490,7 @@ const lv: LandingCopy = {
   features: [
     {
       title: "Reisi no ostām",
-      text: "Kravu birža rāda atvērtos reisus tur, kur atrodas jūsu auto, pēc tukšbrauciena kilometriem. Ostas: Helsinki (Vuosaari, Länsisatama, Eteläsatama, Katajanokka), Hanko, Turku, Naantali, Rauma, Pori, HaminaKotka, Vaasa, Kokkola, Oulu un Kemi.",
+      text: "Kravu birža rāda atvērtos reisus tur, kur atrodas jūsu auto, pēc tukšbrauciena kilometriem. Ostas visā darbības teritorijā, piemēram, Vuosāri un Turku, Mūga un Paldiski, Rīga, Klaipēda, Kapelšēra un Gēteborga, Oslo, Kopenhāgena, Gdiņa, Travemünde un Rostoka.",
     },
     {
       title: "Savi klienti",
@@ -520,7 +520,7 @@ const lv: LandingCopy = {
   faq: [
     {
       q: "Kuras ostas RAHTIS pazīst?",
-      a: "Somijā: Helsinku Vuosaari, Länsisatama, Eteläsatama un Katajanokka, Hanko, Turku, Naantali, Rauma, Pori (Mäntyluoto), Hamina, Kotkas Hietanen, Vaasa, Kokkola, Oulu (Oritkari) un Kemi (Ajos). Kā arī prāmju un konteineru termināļi Zviedrijā, Norvēģijā, Dānijā, Igaunijā, Latvijā, Lietuvā, Polijā un Vācijā.",
+      a: "Visās deviņās valstīs. Piemēram, Somijā Helsinku Vuosāri, Hanko, Turku un HaminaKotka, Igaunijā Mūga un Paldiski, Latvijā Rīga un Ventspils, Lietuvā Klaipēda, Zviedrijā Kapelšēra, Stokholma un Gēteborga, Norvēģijā Oslo, Dānijā Kopenhāgena un Esbjerga, Polijā Gdiņa un Świnoujście, bet Vācijā Travemünde, Rostoka, Ķīle un Hamburgas konteineru termināļi.",
     },
     {
       q: "Vai no reisiem tiek ņemti procenti?",
@@ -570,7 +570,7 @@ const lt: LandingCopy = {
     "Priekabų keitimui: uostų reisai iš krovinių biržos, savi klientai, vairuotojo programėlė 10 kalbų ir CMR važtaraščiai. Pirmas sunkvežimis nemokamai.",
   eyebrow: "Priekabų keitimas uostuose",
   title: "Puspriekabės iš uosto klientui be popierių kalnų",
-  lede: "Imkite keitimo reisus Vuosaari, Hanko, Turku, Naantali ir HaminaKotka uostuose iš krovinių biržos, vykdykite savo klientų reisus ir laikykite sunkvežimius, vairuotojus ir dokumentus vienoje vietoje. Jokių procentų nuo reisų.",
+  lede: "Imkite keitimo reisus iš krovinių biržos tokiuose uostuose kaip Vuosaris, Mūga, Kapelšeras, Travemiundė ir Gdynė, vykdykite savo klientų reisus ir laikykite sunkvežimius, vairuotojus ir dokumentus vienoje vietoje. Jokių procentų nuo reisų.",
   ctaApply: "Pateikti paraišką",
   ctaSignIn: "Prisijungti",
   dayTitle: "Kaip vyksta keitimas",
@@ -600,7 +600,7 @@ const lt: LandingCopy = {
   features: [
     {
       title: "Reisai iš uostų",
-      text: "Krovinių birža rodo atvirus reisus ten, kur yra jūsų sunkvežimiai, pagal tuščią ridą. Uostai: Helsinkis (Vuosaari, Länsisatama, Eteläsatama, Katajanokka), Hanko, Turku, Naantali, Rauma, Pori, HaminaKotka, Vaasa, Kokkola, Oulu ir Kemi.",
+      text: "Krovinių birža rodo atvirus reisus ten, kur yra jūsų sunkvežimiai, pagal tuščią ridą. Uostai visoje veiklos teritorijoje, pavyzdžiui, Vuosaris ir Turku, Mūga ir Paldiskis, Ryga, Klaipėda, Kapelšeras ir Geteborgas, Oslas, Kopenhaga, Gdynė, Travemiundė ir Rostokas.",
     },
     {
       title: "Savi klientai",
@@ -630,7 +630,7 @@ const lt: LandingCopy = {
   faq: [
     {
       q: "Kokius uostus žino RAHTIS?",
-      a: "Suomijoje: Helsinkio Vuosaari, Länsisatama, Eteläsatama ir Katajanokka, Hanko, Turku, Naantali, Rauma, Pori (Mäntyluoto), Hamina, Kotkos Hietanen, Vaasa, Kokkola, Oulu (Oritkari) ir Kemi (Ajos). Taip pat keltų ir konteinerių terminalai Švedijoje, Norvegijoje, Danijoje, Estijoje, Latvijoje, Lietuvoje, Lenkijoje ir Vokietijoje.",
+      a: "Visose devyniose šalyse. Pavyzdžiui, Suomijoje Helsinkio Vuosaris, Hanko, Turku ir HaminaKotka, Estijoje Mūga ir Paldiskis, Latvijoje Ryga ir Ventspilis, Lietuvoje Klaipėda, Švedijoje Kapelšeras, Stokholmas ir Geteborgas, Norvegijoje Oslas, Danijoje Kopenhaga ir Esbjergas, Lenkijoje Gdynė ir Svinouiscis, o Vokietijoje Travemiundė, Rostokas, Kylis ir Hamburgo konteinerių terminalai.",
     },
     {
       q: "Ar imami procentai nuo reisų?",
@@ -680,7 +680,7 @@ const pl: LandingCopy = {
     "Do wymian naczep: zlecenia z portów z giełdy ładunków, własni klienci, aplikacja kierowcy w 10 językach i listy przewozowe. Pierwszy pojazd gratis.",
   eyebrow: "Wymiana naczep w portach",
   title: "Naczepy z portu do klienta bez papierologii",
-  lede: "Bierz z giełdy ładunków zlecenia wymiany naczep z Vuosaari, Hanko, Turku, Naantali i HaminaKotka, obsługuj zlecenia własnych klientów i trzymaj pojazdy, kierowców i dokumenty w jednym miejscu. Bez prowizji od przewozów.",
+  lede: "Bierz z giełdy ładunków zlecenia wymiany naczep w portach takich jak Vuosaari, Muuga, Kapellskär, Travemünde i Gdynia, obsługuj zlecenia własnych klientów i trzymaj pojazdy, kierowców i dokumenty w jednym miejscu. Bez prowizji od przewozów.",
   ctaApply: "Dołącz",
   ctaSignIn: "Zaloguj się",
   dayTitle: "Tak przebiega wymiana",
@@ -710,7 +710,7 @@ const pl: LandingCopy = {
   features: [
     {
       title: "Zlecenia z portów",
-      text: "Giełda ładunków pokazuje otwarte zlecenia tam, gdzie są Twoje pojazdy, według pustych kilometrów. Porty: Helsinki (Vuosaari, Länsisatama, Eteläsatama, Katajanokka), Hanko, Turku, Naantali, Rauma, Pori, HaminaKotka, Vaasa, Kokkola, Oulu i Kemi.",
+      text: "Giełda ładunków pokazuje otwarte zlecenia tam, gdzie są Twoje pojazdy, według pustych kilometrów. Porty na całym obszarze działania, np. Vuosaari i Turku, Muuga i Paldiski, Ryga, Kłajpeda, Kapellskär i Göteborg, Oslo, Kopenhaga, Gdynia, Travemünde i Rostock.",
     },
     {
       title: "Własni klienci",
@@ -740,7 +740,7 @@ const pl: LandingCopy = {
   faq: [
     {
       q: "Jakie porty zna RAHTIS?",
-      a: "W Finlandii: Vuosaari, Länsisatama, Eteläsatama i Katajanokka w Helsinkach, Hanko, Turku, Naantali, Rauma, Pori (Mäntyluoto), Hamina, Kotka (Hietanen), Vaasa, Kokkola, Oulu (Oritkari) i Kemi (Ajos). Ponadto terminale promowe i kontenerowe w Szwecji, Norwegii, Danii i Estonii, na Łotwie i Litwie oraz w Polsce i Niemczech.",
+      a: "We wszystkich dziewięciu krajach. Na przykład w Finlandii Vuosaari w Helsinkach, Hanko, Turku i HaminaKotka, w Estonii Muuga i Paldiski, na Łotwie Ryga i Windawa, na Litwie Kłajpeda, w Szwecji Kapellskär, Sztokholm i Göteborg, w Norwegii Oslo, w Danii Kopenhaga i Esbjerg, w Polsce Gdynia i Świnoujście, a w Niemczech Travemünde, Rostock, Kilonia i terminale kontenerowe w Hamburgu.",
     },
     {
       q: "Czy pobieracie procent od przewozów?",
@@ -790,7 +790,7 @@ const de: LandingCopy = {
     "Für den Trailertausch: Hafenaufträge aus der Frachtenbörse, eigene Kunden, Fahrer-App in 10 Sprachen und Frachtbriefe. Erster Lkw kostenlos.",
   eyebrow: "Trailertausch in Häfen",
   title: "Auflieger vom Hafen zum Kunden – ohne Papierkram",
-  lede: "Übernehmen Sie Tauschaufträge in Vuosaari, Hanko, Turku, Naantali und HaminaKotka aus der Frachtenbörse, fahren Sie die Aufträge Ihrer eigenen Kunden und behalten Sie Lkw, Fahrer und Papiere an einem Ort. Keine Prozente auf Aufträge.",
+  lede: "Übernehmen Sie Tauschaufträge aus der Frachtenbörse in Häfen wie Vuosaari, Muuga, Kapellskär, Travemünde und Gdynia, fahren Sie die Aufträge Ihrer eigenen Kunden und behalten Sie Lkw, Fahrer und Papiere an einem Ort. Keine Prozente auf Aufträge.",
   ctaApply: "Jetzt registrieren",
   ctaSignIn: "Anmelden",
   dayTitle: "So läuft ein Tausch",
@@ -820,7 +820,7 @@ const de: LandingCopy = {
   features: [
     {
       title: "Aufträge in den Häfen",
-      text: "Die Frachtenbörse zeigt offene Aufträge dort, wo Ihre Lkw sind, sortiert nach Leerkilometern. Häfen: Helsinki (Vuosaari, Westhafen, Südhafen, Katajanokka), Hanko, Turku, Naantali, Rauma, Pori, HaminaKotka, Vaasa, Kokkola, Oulu und Kemi.",
+      text: "Die Frachtenbörse zeigt offene Aufträge dort, wo Ihre Lkw sind, sortiert nach Leerkilometern. Häfen im gesamten Einsatzgebiet, zum Beispiel Vuosaari und Turku, Muuga und Paldiski, Riga, Klaipėda, Kapellskär und Göteborg, Oslo, Kopenhagen, Gdynia, Travemünde und Rostock.",
     },
     {
       title: "Eigene Kunden",
@@ -850,7 +850,7 @@ const de: LandingCopy = {
   faq: [
     {
       q: "Welche Häfen kennt RAHTIS?",
-      a: "In Finnland: Helsinki Vuosaari, Westhafen, Südhafen und Katajanokka, Hanko, Turku, Naantali, Rauma, Pori (Mäntyluoto), Hamina, Kotka Hietanen, Vaasa, Kokkola, Oulu (Oritkari) und Kemi (Ajos). Außerdem Fähr- und Containerterminals in Schweden, Norwegen, Dänemark, Estland, Lettland, Litauen, Polen und Deutschland.",
+      a: "In allen neun Ländern. Zum Beispiel in Finnland Helsinki-Vuosaari, Hanko, Turku und HaminaKotka, in Estland Muuga und Paldiski, in Lettland Riga und Ventspils, in Litauen Klaipėda, in Schweden Kapellskär, Stockholm und Göteborg, in Norwegen Oslo, in Dänemark Kopenhagen und Esbjerg, in Polen Gdynia und Świnoujście sowie in Deutschland Travemünde, Rostock, Kiel und die Hamburger Containerterminals.",
     },
     {
       q: "Nehmen Sie Prozente auf Aufträge?",
@@ -900,7 +900,7 @@ const ru: LandingCopy = {
     "Для перецепки полуприцепов: рейсы из портов с биржи грузов, свои клиенты, приложение водителя на 10 языках и накладные CMR. Первая машина бесплатно.",
   eyebrow: "Перецепка полуприцепов в портах",
   title: "Полуприцепы из порта к клиенту без бумажной волокиты",
-  lede: "Берите с биржи рейсы на перецепку из Вуосаари, Ханко, Турку, Наантали и порта ХаминаКотка, возите заказы своих клиентов и держите машины, водителей и документы в одном месте. Никаких процентов с рейсов.",
+  lede: "Берите с биржи рейсы на перецепку в портах Вуосаари, Мууга, Капелльшер, Травемюнде, Гдыня и других, возите заказы своих клиентов и держите машины, водителей и документы в одном месте. Никаких процентов с рейсов.",
   ctaApply: "Подключиться",
   ctaSignIn: "Войти",
   dayTitle: "Как проходит перецепка",
@@ -930,7 +930,7 @@ const ru: LandingCopy = {
   features: [
     {
       title: "Рейсы из портов",
-      text: "Биржа показывает открытые рейсы там, где ваши машины, с учётом порожнего пробега. Порты: Хельсинки (Вуосаари, Западный порт, Южный порт, Катаянокка), Ханко, Турку, Наантали, Раума, Пори, ХаминаКотка, Вааса, Коккола, Оулу и Кеми.",
+      text: "Биржа показывает открытые рейсы там, где ваши машины, с учётом порожнего пробега. Порты по всему региону работы, например Вуосаари и Турку, Мууга и Палдиски, Рига, Клайпеда, Капелльшер и Гётеборг, Осло, Копенгаген, Гдыня, Травемюнде и Росток.",
     },
     {
       title: "Свои клиенты",
@@ -960,7 +960,7 @@ const ru: LandingCopy = {
   faq: [
     {
       q: "Какие порты знает RAHTIS?",
-      a: "В Финляндии: Вуосаари, Западный порт, Южный порт и Катаянокка в Хельсинки, Ханко, Турку, Наантали, Раума, Пори (Мянтюлуото), Хамина, Котка (Хиетанен), Вааса, Коккола, Оулу (Ориткари) и Кеми (Айос). Кроме того, паромные и контейнерные терминалы в Швеции, Норвегии, Дании, Эстонии, Латвии, Литве, Польше и Германии.",
+      a: "Во всех девяти странах. Например, в Финляндии Вуосаари в Хельсинки, Ханко, Турку и ХаминаКотка, в Эстонии Мууга и Палдиски, в Латвии Рига и Вентспилс, в Литве Клайпеда, в Швеции Капелльшер, Стокгольм и Гётеборг, в Норвегии Осло, в Дании Копенгаген и Эсбьерг, в Польше Гдыня и Свиноуйсьце, в Германии Травемюнде, Росток, Киль и контейнерные терминалы Гамбурга.",
     },
     {
       q: "Берёте ли вы процент с рейсов?",

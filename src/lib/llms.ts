@@ -145,7 +145,7 @@ const FORWARDERS_SECTION = `## For freight forwarders
 const TRAILER_SWAP_SECTION = `## Trailer swaps in ports (for carriers)
 
 - Page: ${SITE_URL}${trailerSwapPath('en')} (${SITE_URL}${trailerSwapPath('fi')}).
-- For carriers doing unaccompanied semi-trailer swaps between ports, terminals and customers. Finnish ports in the place list: Helsinki (Vuosaari, West Harbour, South Harbour, Katajanokka), Hanko, Turku, Naantali, Rauma, Pori (Mäntyluoto), HaminaKotka (Hamina), Kotka Hietanen, Vaasa, Kokkola, Oulu (Oritkari), Kemi (Ajos); plus ferry and container terminals in Sweden, Norway, Denmark, Estonia, Latvia, Lithuania, Poland and Germany.
+- For carriers doing unaccompanied semi-trailer swaps between ports, terminals and customers. Ports and ferry/container terminals in all nine countries, for example Helsinki Vuosaari, Turku and HaminaKotka (FI), Muuga and Paldiski (EE), Riga and Ventspils (LV), Klaipėda (LT), Kapellskär, Stockholm and Gothenburg (SE), Oslo (NO), Copenhagen and Esbjerg (DK), Gdynia and Świnoujście (PL), Travemünde, Rostock, Kiel and Hamburg (DE).
 - Load-board jobs near the carrier's trucks ranked by empty kilometres; own customers' jobs with a tracking link; order e-mails become drafts for the truck named in the order.
 - Driver app in 10 languages with stops, arrival, photos, signature, CMR scanner, offline mode; trailers and combinations with maximum weights by country; GPS and fuel integrations; working time, driver pay and profit per truck.
 - Price: the carrier subscription above — first active vehicle free, no percentage on any job.`;
