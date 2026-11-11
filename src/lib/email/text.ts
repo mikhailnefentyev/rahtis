@@ -294,16 +294,16 @@ const fi: Texts = {
 
   operatorInvite: {
     SHIPPER: {
-      subject: 'RAHTIS — rahtipörssi ja suorat tilaukset omille kuljetusliikkeillenne, rahdinantajalle maksuton',
-      heading: 'Perävaunu, kontti tai kuorma: julkaisette kerran ja seuraatte joka vaihetta',
-      preheader: 'Yksi julkaisu alueen hyväksytyille kuljetusliikkeille tai suoraan tutulle autolle — tarjoukset, eteneminen, kuvat ja rahtikirja yhdessä näkymässä.',
-      body: 'RAHTIS on kuljetusten hallintajärjestelmä ja rahtipörssi, joka toimii Pohjoismaissa, Baltiassa, Puolassa ja Saksassa. Julkaisette kuljetuksen kerran, ja se menee suoraan alueen hyväksytyille kuljetusliikkeille — tai lähetätte sen suoraan tutulle autolle. Perävaunujen vaihdot, kontit sekä pakettiauto- ja kuorma-autokuljetukset.',
+      subject: 'RAHTIS huolitsijoille — kuljetusliikkeet ja kuormat samassa järjestelmässä, maksuton',
+      heading: 'Löydätte kuljetusliikkeen ja myytte kuorman yhdellä julkaisulla',
+      preheader: 'Julkaisette kuljetuksen alueen hyväksytyille kuljetusliikkeille tai suoraan omille kumppaneillenne — tarjoukset, eteneminen, kuvat ja rahtikirja samassa näkymässä.',
+      body: 'RAHTIS on kuljetusten hallintajärjestelmä kuljetusliikkeille ja huolitsijoille Pohjoismaissa, Baltiassa, Puolassa ja Saksassa. Huolitsijana julkaisette asiakkaidenne kuljetukset kerran: ne menevät alueen hyväksytyille kuljetusliikkeille tai suoraan omille kuljetuskumppaneillenne. Perävaunujen vaihdot, kontit sekä pakettiauto- ja kuorma-autokuljetukset.',
       points: [
-        'Enintään kolme tarjousta samassa näkymässä — valitsette hinnan, kaluston ja arvioiden perusteella. Hintaa ei huutokaupata alas.',
-        'Jos auto peruu tai ei vahvista, kuljetus palaa tarjouspöydälle automaattisesti ja menee heti seuraaville sopiville autoille.',
-        'Muutokset menevät suoraan kuljetusliikkeelle ja kuljettajalle; kuvat ja rahtikirja tulevat, kun kuljetus on perillä.',
-        'Viikkoraportti ja maksuton rajapinta (API) omaan ERP- tai TMS-järjestelmäänne.',
-        'Rahdinantajalle palvelu on maksuton: kuljetussopimus tehdään suoraan kuljetusliikkeen kanssa, ja se laskuttaa teitä itse.',
+        'Tarjoukset samassa näkymässä — valitsette kuljetusliikkeen hinnan, kaluston ja arvioiden perusteella. Hintaa ei huutokaupata alas.',
+        'Omat kumppanit mukaan: lisäätte tuttujen kuljetusliikkeiden autot omiksenne ja annatte keikat suoraan heille.',
+        'Tilaukset myös sähköpostista tai PDF:stä; muutokset, kuvat ja rahtikirja välittyvät kuljetusliikkeelle, kuljettajalle ja teille.',
+        'Viikkoraportti ja maksuton rajapinta (API) omaan TMS- tai ERP-järjestelmäänne.',
+        'Huolitsijalle RAHTIS on maksuton, eikä kuljetuksista peritä prosenttia.',
       ],
       button: 'Hae mukaan',
     },
@@ -532,16 +532,16 @@ const en: Texts = {
 
   operatorInvite: {
     SHIPPER: {
-      subject: 'RAHTIS — freight exchange and direct orders to your own carriers, free for shippers',
-      heading: 'Trailer, container or load: post it once, follow every step',
-      preheader: 'One posting to approved carriers in the area, or straight to a truck you know — offers, progress, photos and consignment note in one view.',
-      body: 'RAHTIS is a transport management system and freight exchange covering the Nordics, the Baltics, Poland and Germany. You post a job once and it goes straight to approved carriers in the area — or you send it directly to a truck you know. Trailer swaps, containers, and van and truck loads.',
+      subject: 'RAHTIS for freight forwarders — carriers and loads in one system, free of charge',
+      heading: 'Find carriers and sell your loads with one posting',
+      preheader: 'Post a job to approved carriers in the area or straight to your own partners — offers, progress, photos and consignment note in one view.',
+      body: 'RAHTIS is a transport management system for carriers and freight forwarders in the Nordics, the Baltics, Poland and Germany. As a forwarder you post your customers’ transports once: they go to approved carriers in the area or straight to your own transport partners. Trailer swaps, containers, and van and truck loads.',
       points: [
-        'Up to three offers in one view — you choose on price, equipment and ratings. No auctions driving the price down.',
-        'If a truck cancels or doesn’t confirm, the job goes back on the load board automatically and reaches the next suitable trucks straight away.',
-        'Changes go straight to the carrier and the driver; photos and the consignment note arrive when the delivery is done.',
-        'A weekly report and a free API for your own ERP or TMS.',
-        'Free for shippers: the contract of carriage is made directly with the carrier, who invoices you.',
+        'Offers in one view — you choose the carrier on price, equipment and ratings. No auctions driving the price down.',
+        'Bring your own partners: add the trucks of carriers you work with and give them jobs directly.',
+        'Orders also from e-mail or PDF; changes, photos and the consignment note reach the carrier, the driver and you.',
+        'A weekly report and a free API for your own TMS or ERP.',
+        'RAHTIS is free for forwarders, and no commission is taken on transports.',
       ],
       button: 'Apply',
     },
