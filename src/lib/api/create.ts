@@ -17,6 +17,7 @@ import { isCalendarDate, isObj, locationOf, oneOf, sameAddress, streetOf, text, 
 import { getOrder } from './orders';
 import { translateRule } from './rules';
 import { HAUL_MAX_CARGO_KG, isSemiFeature } from '@/lib/orders/haul';
+import { DOCS_GATE_API_MESSAGE, isDocsGateError } from '@/lib/forwarders/docsGate';
 
 /**
  * Создание заказа через API.
@@ -261,6 +262,8 @@ async function prepare(body: unknown): Promise<Prepared> {
 function explain(error: { code?: string; message?: string }): ApiError {
   const msg = error.message ?? '';
   if (error.code === '55009') return new ApiError('forbidden', 'The current terms must be accepted in the RAHTIS cabinet first.');
+  /* 55018 — экспедитору нужны принятые выписка и полис (forwarder_docs_gate). */
+  if (isDocsGateError(error)) return new ApiError('forbidden', DOCS_GATE_API_MESSAGE);
   if (error.code === '42501') return new ApiError('forbidden', 'This key cannot create orders.');
   if (error.code === '55000') return new ApiError('forbidden', 'The company account must be active with billing details filled in.');
   if (error.code === '23514') {

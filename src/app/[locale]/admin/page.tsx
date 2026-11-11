@@ -33,6 +33,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { handleSupportAction } from '@/lib/support/actions';
 import { ApplicationCard } from './ApplicationCard';
+import { loadDocsGates } from '@/lib/forwarders/docsGateServer';
 import { DeleteOrderButton } from './DeleteOrderButton';
 import { NoticeForm } from './NoticeForm';
 import { VehicleCard } from './VehicleCard';
@@ -212,6 +213,8 @@ export default async function AdminPage({
   );
 
   const queue = pending ?? [];
+  /* Экспедитор, не подтверждённый реестром: после одобрения работа — только с документами (11.11.2026). */
+  const docsGates = await loadDocsGates(queueIds);
   const history = decided ?? [];
   const all = roster ?? [];
   const active = all.filter((c) => c.status === 'ACTIVE').length;
@@ -256,6 +259,7 @@ export default async function AdminPage({
                 key={company.id}
                 company={company}
                 invitedBy={invitedBy.get(company.id) ?? null}
+                docsRequired={docsGates[company.id]?.required ?? false}
                 /* Реестр страны (YTJ, Äriregister…) или VIES — оператор сверяет номер вручную (ТЗ §3). */
                 ytjUrl={registryLink(company.country, company.business_id)}
               />

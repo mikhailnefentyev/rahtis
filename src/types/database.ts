@@ -8627,6 +8627,17 @@ export type Database = {
           vehicles: number
         }[]
       }
+      forwarder_docs_status: {
+        Args: { p_company_ids?: string[] }
+        Returns: {
+          company_id: string
+          insurance: string
+          ok: boolean
+          overall: string
+          register_extract: string
+          required: boolean
+        }[]
+      }
       forwarder_policies: {
         Args: { p_company_ids: string[] }
         Returns: {

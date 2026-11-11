@@ -3,6 +3,7 @@
 import { useActionState } from 'react';
 import { Button } from '@/components/ui';
 import { requestCapacityAction, type CapacityRequestState } from '@/lib/capacity/actions';
+import { useDocsBlocked } from '@/lib/forwarders/DocsGateProvider';
 import { useI18n } from '@/lib/i18n/provider';
 
 export type RequestOrderOption = { id: string; label: string; price: number | null; currency: string; date: string | null };
@@ -27,6 +28,8 @@ export function RequestForm({
   const { t, locale } = useI18n();
   const c = t.capacity;
   const [state, action, pending] = useActionState<CapacityRequestState, FormData>(requestCapacityAction, { error: null, done: false });
+  /* Запрос места закрыт экспедитору без принятых документов (11.11.2026). */
+  const docsBlocked = useDocsBlocked();
 
   if (state.done) return <p className="text-[13px] font-semibold text-ok">{c.requestSent}</p>;
 
@@ -84,10 +87,12 @@ export function RequestForm({
       </div>
       <input name="description" maxLength={500} placeholder={c.descriptionPlaceholder} aria-label={c.description} className={field} />
       <div className="flex flex-wrap items-center gap-3">
-        <Button type="submit" size="sm" variant="primary" disabled={pending}>
+        <Button type="submit" size="sm" variant="primary" disabled={pending || docsBlocked}>
           {c.sendRequest}
         </Button>
-        <span className="text-[12px] text-ink-faint">{c.requestHint}</span>
+        <span className={docsBlocked ? 'text-[12px] text-warn' : 'text-[12px] text-ink-faint'}>
+          {docsBlocked ? t.docsGate.blockedShort : c.requestHint}
+        </span>
       </div>
       {state.error && <p className="text-xs text-danger">{state.error}</p>}
       <p className="text-[12px] text-ink-faint">

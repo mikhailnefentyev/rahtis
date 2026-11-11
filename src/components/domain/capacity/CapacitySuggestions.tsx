@@ -3,6 +3,8 @@ import { Button, Card, CardBody } from '@/components/ui';
 import { VerifiedBadge } from '@/components/domain/VerifiedBadge';
 import { quickCapacityRequestAction } from '@/lib/capacity/actions';
 import { isPartialLoad } from '@/lib/capacity/compute';
+import { gateBlocked } from '@/lib/forwarders/docsGate';
+import { loadOwnDocsGate } from '@/lib/forwarders/docsGateServer';
 import type { Locale } from '@/lib/i18n';
 import { getViewerI18n } from '@/lib/i18n/viewer';
 import { createClient } from '@/lib/supabase/server';
@@ -28,7 +30,9 @@ export async function CapacitySuggestions({ locale, orders }: { locale: Locale; 
   const partial = orders.filter((o) => (o.status === 'OPEN' || o.status === 'DRAFT') && isPartialLoad(o.haul_kind, o.ldm === null ? null : Number(o.ldm)));
   if (partial.length === 0) return null;
 
-  const [{ t, m, f }, supabase] = await Promise.all([getViewerI18n(locale), createClient()]);
+  const [{ t, m, f }, supabase, gate] = await Promise.all([getViewerI18n(locale), createClient(), loadOwnDocsGate()]);
+  /* Запрос места закрыт экспедитору без принятых документов (11.11.2026). */
+  const docsBlocked = gateBlocked(gate);
   const { data, error } = await supabase.rpc('capacity_suggestions', { p_order_ids: partial.slice(0, 50).map((o) => o.id) });
   if (error || !data?.length) return null;
 
@@ -78,7 +82,13 @@ export async function CapacitySuggestions({ locale, orders }: { locale: Locale; 
                               <input type="hidden" name="locale" value={locale} />
                               <input type="hidden" name="offer_id" value={s.offer_id} />
                               <input type="hidden" name="order_id" value={o.id} />
-                              <Button type="submit" size="sm" variant="primary">
+                              <Button
+                                type="submit"
+                                size="sm"
+                                variant="primary"
+                                disabled={docsBlocked}
+                                title={docsBlocked ? t.docsGate.blockedShort : undefined}
+                              >
                                 {c.quickRequest.replace('{price}', f.money(o.rate_cents, o.currency))}
                               </Button>
                             </form>

@@ -23,6 +23,8 @@ import { ExchangeConnections } from '@/components/domain/ExchangeConnections';
 import type { ExchangeRow } from '@/lib/exchanges/model';
 import { SHIPPER_DOC_KINDS } from '@/lib/shipper-docs/model';
 import { loadForwarderState } from '@/lib/forwarders/status';
+import { loadOwnDocsGate } from '@/lib/forwarders/docsGateServer';
+import { ForwarderDocsBanner } from '@/components/domain/ForwarderDocsBanner';
 import { ShipperTrustDetails } from '@/components/domain/ShipperTrust';
 import { loadCompanyTrust } from '@/lib/trust/status';
 import { parseRegistrations } from '@/lib/waste/registrations';
@@ -159,6 +161,8 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
     : [null, []];
   /* Что видят о заказчике перевозчики в прямом режиме — та же сводка, без имён отметивших. */
   const trust = shipper ? await loadCompanyTrust() : null;
+  /* Экспедитор, не подтверждённый реестром: выписка и полис нужны до публикации (11.11.2026). */
+  const docsGate = shipper ? await loadOwnDocsGate() : null;
   /* Адрес пересылки заказов (6.11.2026): только когда приём писем настроен. */
   const orderInbox = company && company.status === 'ACTIVE' && !company.client_of ? await loadInboxAddress() : null;
   /* Подключённые биржи (7.11.2026): работающим компаниям, не клиентам перевозчика. До миграции таблицы нет — блок не показывается. */
@@ -223,6 +227,12 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
 
         {exchangeKind && exchanges && <ExchangeConnections rows={exchanges} kind={exchangeKind} />}
 
+        {shipper && docsGate && (
+          <div id="documents" className="scroll-mt-24">
+            <ForwarderDocsBanner locale={locale} t={t} gate={docsGate} onDocuments />
+          </div>
+        )}
+
         {shipper && (
           <ForwarderPanel
             role={shipper.shipper_role ?? 'FORWARDER'}
@@ -230,6 +240,7 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
             status={forwarder?.status ?? null}
             insurance={forwarderDocs.find((d) => d.kind === 'FORWARDER_INSURANCE') ?? null}
             license={forwarderDocs.find((d) => d.kind === 'FORWARDER_LICENSE') ?? null}
+            docsRequired={docsGate?.required ?? false}
           />
         )}
 
@@ -238,6 +249,7 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
           <ShipperDocumentsPanel
             country={shipper.country ?? null}
             documents={forwarderDocs.filter((d) => (SHIPPER_DOC_KINDS as readonly string[]).includes(d.kind))}
+            required={docsGate?.required ? ['REGISTER_EXTRACT'] : []}
           />
         )}
 

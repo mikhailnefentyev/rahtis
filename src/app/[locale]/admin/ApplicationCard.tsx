@@ -93,9 +93,12 @@ export function ApplicationCard({
   company,
   ytjUrl,
   invitedBy = null,
+  docsRequired = false,
 }: {
   company: Company;
   ytjUrl: string;
+  /** Экспедитор без подтверждения реестром: работа после выписки и полиса (11.11.2026). */
+  docsRequired?: boolean;
   /** Перевозчик, пригласивший заказчика: после одобрения связь с ним сразу активна. */
   invitedBy?: string | null;
 }) {
@@ -145,6 +148,7 @@ export function ApplicationCard({
               {invitedBy && <Kv k={t.moderation.invitedBy} v={invitedBy} />}
               <Kv k={t.moderation.decidedAt} v={<Mono>{f.dateTime(company.created_at)}</Mono>} />
             </div>
+            {docsRequired && <p className="mt-2 max-w-xl text-[13px] leading-relaxed text-warn">{t.docsGate.adminApplication}</p>}
           </div>
 
           {!rejecting && (

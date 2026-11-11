@@ -7,6 +7,7 @@ import { APP, MATCHING } from '@/lib/config';
 import { businessIdLabelByShape } from '@/lib/country';
 import { EURO_LABEL } from '@/lib/fleet/labels';
 import { cancelOrderAction, chooseOfferAction } from '@/lib/orders/matching';
+import { useDocsBlocked } from '@/lib/forwarders/DocsGateProvider';
 import { useI18n } from '@/lib/i18n/provider';
 import { VerifiedBadge } from '@/components/domain/VerifiedBadge';
 import { BankChangedNote } from '@/components/domain/BankChanged';
@@ -69,6 +70,8 @@ function VehicleLine({ offer, badge }: { offer: ShipperOffer; badge?: React.Reac
 export function OffersPanel({ order, offers }: { order: ShipperOrder; offers: ShipperOffer[] }) {
   const { t, m, locale } = useI18n();
   const [chooseState, chooseAction, choosing] = useActionState(chooseOfferAction, { error: null });
+  /* Выбор отклика — назначение: у экспедитора без принятых документов закрыт (11.11.2026). */
+  const docsBlocked = useDocsBlocked();
 
   const awaiting = order.status === 'AWAIT_DRIVER';
 
@@ -99,6 +102,7 @@ export function OffersPanel({ order, offers }: { order: ShipperOrder; offers: Sh
       {!awaiting && offers.length > 0 && (
         <p className="mb-2.5 text-[13px] text-ink-muted">{t.matching.chooseCarrier}</p>
       )}
+      {docsBlocked && !awaiting && <p className="mb-2.5 text-[13px] text-warn">{t.docsGate.blockedShort}</p>}
       {chooseState.error && (
         <p role="alert" className="mb-2.5 text-[13px] text-danger">
           {chooseState.error}
@@ -120,7 +124,13 @@ export function OffersPanel({ order, offers }: { order: ShipperOrder; offers: Sh
               <form action={chooseAction}>
                 <input type="hidden" name="locale" value={locale} />
                 <input type="hidden" name="offer_id" value={offer.offer_id} />
-                <Button type="submit" variant="primary" size="sm" disabled={choosing}>
+                <Button
+                  type="submit"
+                  variant="primary"
+                  size="sm"
+                  disabled={choosing || docsBlocked}
+                  title={docsBlocked ? t.docsGate.blockedShort : undefined}
+                >
                   {t.matching.choose}
                 </Button>
               </form>

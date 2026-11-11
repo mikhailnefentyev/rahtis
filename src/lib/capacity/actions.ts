@@ -8,6 +8,7 @@ import { defaultLocale, getDictionary, isLocale, type Locale } from '@/lib/i18n'
 import { createClient } from '@/lib/supabase/server';
 import { correctFree, worthOffering } from './compute';
 import { explainCapacityError as explain } from './explain';
+import { isDocsGateError } from '@/lib/forwarders/docsGate';
 import { loadCarrierCapacity, offerInsert, syncCapacity } from './load';
 
 /*
@@ -158,7 +159,8 @@ export async function decideCapacityRequestAction(formData: FormData): Promise<v
     p_accept: accept,
     p_reason: text(formData, 'reason').slice(0, 300) || undefined,
   });
-  if (error) await flashError(explain(t, error));
+  /* Заказчик — экспедитор без принятых документов: перевозчику своя фраза. */
+  if (error) await flashError(isDocsGateError(error) ? t.docsGate.carrierError : explain(t, error));
   else if (accept) {
     const companyId = viewer.company!.id;
     after(() => syncCapacity([companyId]).then(() => undefined, (e: unknown) => console.error('capacity sync:', e)));

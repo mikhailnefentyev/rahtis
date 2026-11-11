@@ -22,8 +22,11 @@ const day = (d: string) => `${d}T12:00:00Z`;
 export function ShipperDocumentsPanel({
   country,
   documents,
+  required = [],
 }: {
   country: string | null;
+  /** Нужны до публикации (11.11.2026): выписка у экспедитора, не подтверждённого реестром. */
+  required?: readonly ShipperDocKind[];
   /** Последние загруженные документы этих видов (любой статус), новые первыми. */
   documents: CompanyDocument[];
 }) {
@@ -35,7 +38,9 @@ export function ShipperDocumentsPanel({
       <CardBody className="flex flex-col gap-4">
         <div>
           <h2 className="text-[15px] font-semibold tracking-tight">{sd.title}</h2>
-          <p className="mt-1 max-w-xl text-[13px] leading-relaxed text-ink-muted">{sd.intro}</p>
+          <p className="mt-1 max-w-xl text-[13px] leading-relaxed text-ink-muted">
+            {required.length > 0 ? t.docsGate.shipperDocsIntro : sd.intro}
+          </p>
         </div>
         {SHIPPER_DOC_KINDS.map((kind) => (
           <KindBlock
@@ -43,6 +48,7 @@ export function ShipperDocumentsPanel({
             kind={kind}
             country={country}
             document={documents.find((d) => d.kind === kind) ?? null}
+            required={required.includes(kind)}
           />
         ))}
       </CardBody>
@@ -56,10 +62,12 @@ function KindBlock({
   kind,
   country,
   document,
+  required,
 }: {
   kind: ShipperDocKind;
   country: string | null;
   document: CompanyDocument | null;
+  required: boolean;
 }) {
   const { t, locale } = useI18n();
   const sd = t.shipperDocs;
@@ -72,9 +80,17 @@ function KindBlock({
     <section className="flex flex-col gap-2.5 border-t border-line pt-4">
       <div>
         <h3 className="text-[14px] font-semibold">
-          {t.documents[kind]} <span className="font-normal text-ink-dim">· {sd.optional}</span>
+          {t.documents[kind]}{' '}
+          {required ? (
+            <span className="font-normal text-warn">· {t.docsGate.required}</span>
+          ) : (
+            <span className="font-normal text-ink-dim">· {sd.optional}</span>
+          )}
         </h3>
         <p className="mt-1 max-w-xl text-[13px] leading-relaxed text-ink-muted">{sd[`hint${kind}`]}</p>
+        {required && kind === 'REGISTER_EXTRACT' && (
+          <p className="mt-1 max-w-xl text-[13px] leading-relaxed text-ink-muted">{t.docsGate.registerHint}</p>
+        )}
         {example && (
           <p className="mt-1 text-[13px] text-ink-muted">{sd.countryExample.replace('{name}', example)}</p>
         )}

@@ -25,6 +25,8 @@ import { AdminVerification } from './AdminVerification';
 import { ForwarderReview } from '../../forwarders/ForwarderReview';
 import { SHIPPER_DOC_KINDS } from '@/lib/shipper-docs/model';
 import { AdminPaymentReports } from './AdminPaymentReports';
+import { loadDocsGates } from '@/lib/forwarders/docsGateServer';
+import { pendingKinds } from '@/lib/forwarders/docsGate';
 
 /**
  * Карточка компании глазами оператора.
@@ -117,6 +119,8 @@ export default async function AdminCompanyPage({
       ])
     : [{ data: [] }, { data: [] }, { data: [] }];
   const forwarder = forwarderRows?.[0] ?? null;
+  /* Документы до работы (11.11.2026): только у экспедитора без подтверждения реестром. */
+  const docsGate = shipper ? ((await loadDocsGates([id]))[id] ?? null) : null;
 
   const asShipper = Number(counts?.[0]?.as_shipper ?? 0);
   const asCarrier = Number(counts?.[0]?.as_carrier ?? 0);
@@ -284,6 +288,22 @@ export default async function AdminCompanyPage({
               </>
             )}
           </p>
+          {docsGate?.required && (
+            <div className="mb-3 flex flex-col gap-1.5 rounded-control border border-line bg-sunken p-3 text-[13px]">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="label-micro">{t.docsGate.adminTitle}</span>
+                <Badge tone={docsGate.overall === 'OK' ? 'ok' : docsGate.overall === 'REVIEW' ? 'info' : 'warn'}>
+                  {t.docsGate[`admin${docsGate.overall}`]}
+                </Badge>
+              </div>
+              <p className="text-ink-muted">{t.docsGate.adminHint}</p>
+              {pendingKinds(docsGate).map(({ kind, state }) => (
+                <p key={kind}>
+                  {t.docsGate[`doc${kind}`]}: <span className="font-semibold">{t.docsGate[`state${state}`]}</span>
+                </p>
+              ))}
+            </div>
+          )}
           <ForwarderReview
             locale={locale}
             documents={forwarderDocs ?? []}

@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/server';
 import { flashError } from '@/lib/forms/flash';
 import { after } from 'next/server';
 import { syncCapacity } from '@/lib/capacity/load';
+import { isDocsGateError } from '@/lib/forwarders/docsGate';
 
 export type MatchingState = { error: string | null };
 
@@ -27,6 +28,8 @@ async function explain(locale: Locale, code: string | undefined, message: string
   const t = await getDictionary(locale);
 
   if (code === '23505') return t.matching.alreadyTaken;
+  /* 55018 — заказчику-экспедитору нужны принятые выписка и полис (forwarder_docs_gate). */
+  if (isDocsGateError({ code })) return t.docsGate.error;
   /* 55009 — есть непринятая новая редакция условий (миграция legal_reaccept). */
   if (code === '55009') return t.legal.reacceptNeeded;
   /*
@@ -123,7 +126,12 @@ export async function groupTakeAction(
    * всплывающим сообщением, которое переживает перерисовку.
    */
   await flashError(
-    error.code === '55000' ? (await getDictionary(locale)).direct.groupGone : await explain(locale, error.code, error.message),
+    error.code === '55000'
+      ? (await getDictionary(locale)).direct.groupGone
+      : /* Заказчик — экспедитор без принятых документов: объясняем перевозчику, а не «заказчику». */
+        isDocsGateError(error)
+        ? (await getDictionary(locale)).docsGate.carrierError
+        : await explain(locale, error.code, error.message),
   );
   return { error: null };
 }
@@ -230,7 +238,9 @@ export async function directAssignAction(
 
   if (error) {
     const message =
-      error.code === '55009'
+      isDocsGateError(error)
+        ? t.docsGate.error
+        : error.code === '55009'
         ? t.legal.reacceptNeeded
         : error.code === '42501'
           ? t.direct.notKnown

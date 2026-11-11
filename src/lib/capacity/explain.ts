@@ -10,6 +10,9 @@ export function explainCapacityError(t: Dictionary, error: { code?: string; mess
       return c.vehicleIdle;
     case '55009':
       return c.termsChanged;
+    /* Заказчику-экспедитору нужны принятые выписка и полис (forwarder_docs_gate). */
+    case '55018':
+      return t.docsGate.error;
     case '23505':
       return c.alreadyRequested;
     case '42501':

@@ -30,6 +30,7 @@ export function ForwarderPanel({
   status,
   insurance,
   license,
+  docsRequired = false,
 }: {
   role: ShipperRole;
   canEditRole: boolean;
@@ -37,13 +38,15 @@ export function ForwarderPanel({
   /** Последние загруженные документы (любой статус). */
   insurance: CompanyDocument | null;
   license: CompanyDocument | null;
+  /** Полис нужен до публикации: экспедитор не подтверждён реестром (11.11.2026). */
+  docsRequired?: boolean;
 }) {
   const forwarder = role === 'FORWARDER';
   return (
     <>
       <RoleCard role={role} canEdit={canEditRole} />
       {forwarder && (
-        <InsuranceCard status={status} document={insurance} />
+        <InsuranceCard status={status} document={insurance} required={docsRequired} />
       )}
       {forwarder && status?.needs_license && <LicenseCard document={license} ok={status.license_ok} />}
     </>
@@ -157,7 +160,15 @@ function DocumentSummary({ document }: { document: CompanyDocument }) {
 
 const uploadIdle: ForwarderUploadState = { error: null, done: 0 };
 
-function InsuranceCard({ status, document }: { status: ForwarderStatus | null; document: CompanyDocument | null }) {
+function InsuranceCard({
+  status,
+  document,
+  required,
+}: {
+  status: ForwarderStatus | null;
+  document: CompanyDocument | null;
+  required: boolean;
+}) {
   const { t, locale } = useI18n();
   const fw = t.forwarder;
   const [state, action, pending] = useActionState(uploadForwarderDocumentAction, uploadIdle);
@@ -167,7 +178,7 @@ function InsuranceCard({ status, document }: { status: ForwarderStatus | null; d
       <CardBody className="flex flex-col gap-3">
         <div>
           <h2 className="text-[15px] font-semibold tracking-tight">{fw.insuranceTitle}</h2>
-          <p className="mt-1 max-w-xl text-[13px] leading-relaxed text-ink-muted">{fw.insuranceIntro}</p>
+          <p className="mt-1 max-w-xl text-[13px] leading-relaxed text-ink-muted">{required ? t.docsGate.insuranceIntro : fw.insuranceIntro}</p>
         </div>
 
         <DirectLine status={status} />

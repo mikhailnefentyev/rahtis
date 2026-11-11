@@ -14,6 +14,8 @@ import { createClient } from '@/lib/supabase/server';
 import { isShipperDocKind } from '@/lib/shipper-docs/model';
 import { isForwarderTerms, parseAmountCents } from './policy';
 import { notifyForwarder } from './reminders';
+import { isDocsGateError } from './docsGate';
+import { loadDocsGates } from './docsGateServer';
 
 const BUCKET = 'company-docs';
 /* Как у документов перевозчика (src/lib/fleet/actions.ts): совпадает с бакетом. */
@@ -153,7 +155,8 @@ export async function setShipperRoleAction(_previous: ShipperRoleState, formData
 
   const supabase = await createClient();
   const { error } = await supabase.from('companies').update({ shipper_role: role }).eq('id', viewer.company.id);
-  if (error) return { error: t.forwarder.roleError, saved: false };
+  /* 55018 — в грузовладельцы до проверки документов переводит оператор (forwarder_docs_gate). */
+  if (error) return { error: isDocsGateError(error) ? t.docsGate.roleLocked : t.forwarder.roleError, saved: false };
 
   revalidateForwarder(locale);
   return { error: null, saved: true };
@@ -179,6 +182,18 @@ export async function reviewForwarderDocumentAction(formData: FormData): Promise
   const back = String(formData.get('back') ?? '');
   const returnTo = back.startsWith(`/${locale}/admin`) ? back : `/${locale}/admin`;
 
+  /*
+   * Была ли работа экспедитора закрыта до решения: если это решение её
+   * открывает (второй документ принят), компании — отдельное письмо
+   * «можно публиковать» (11.11.2026). Состояние считает база.
+   */
+  const { data: before } = await createAdminClient()
+    .from('company_documents')
+    .select('company_id')
+    .eq('id', documentId)
+    .maybeSingle();
+  const gateBefore = before ? (await loadDocsGates([before.company_id], true))[before.company_id] : undefined;
+
   const supabase = await createClient();
   const { data: doc, error } = await supabase.rpc('review_company_document', {
     p_document_id: documentId,
@@ -193,7 +208,32 @@ export async function reviewForwarderDocumentAction(formData: FormData): Promise
   }
 
   await announceReview(doc.company_id, doc.kind, decision, doc.review_note);
+  if (decision === 'APPROVED' && gateBefore?.required && !gateBefore.ok) {
+    const gateAfter = (await loadDocsGates([doc.company_id], true))[doc.company_id];
+    if (gateAfter?.ok) await announceUnlocked(doc.company_id);
+  }
   redirect(returnTo);
+}
+
+/** Выписка и полис приняты — публикация и назначение открыты. */
+async function announceUnlocked(companyId: string) {
+  const { data: company } = await createAdminClient()
+    .from('companies')
+    .select('id, language, contact_email')
+    .eq('id', companyId)
+    .maybeSingle();
+  if (!company) return;
+
+  const t = await getDictionary(emailLocaleOf(company.language));
+  await notifyForwarder({
+    companyId: company.id,
+    language: company.language,
+    contactEmail: company.contact_email,
+    template: 'forwarder.unlocked',
+    title: t.docsGate.unlockedTitle,
+    lead: t.docsGate.unlockedBody,
+    button: t.forwarder.openAccount,
+  });
 }
 
 async function announceReview(companyId: string, kind: string, decision: 'APPROVED' | 'REJECTED', note: string | null) {

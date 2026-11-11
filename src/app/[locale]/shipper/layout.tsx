@@ -2,7 +2,11 @@ import { notFound } from 'next/navigation';
 import { CabinetShell } from '@/components/layout/CabinetShell';
 import { FlashNotice } from '@/components/layout/FlashNotice';
 import { requireRole } from '@/lib/auth/guard';
-import { isLocale } from '@/lib/i18n';
+import { getDictionary, isLocale } from '@/lib/i18n';
+import { ForwarderDocsBanner } from '@/components/domain/ForwarderDocsBanner';
+import { DocsGateProvider } from '@/lib/forwarders/DocsGateProvider';
+import { gateBlocked } from '@/lib/forwarders/docsGate';
+import { loadOwnDocsGate } from '@/lib/forwarders/docsGateServer';
 import { TimeZoneProvider } from '@/lib/i18n/provider';
 import { viewerMoney } from '@/lib/i18n/viewer';
 import { stopTimeZone } from '@/lib/country';
@@ -23,6 +27,15 @@ export default async function ShipperLayout({
   if (!isLocale(locale)) notFound();
 
   const viewer = await requireRole(locale, 'SHIPPER');
+  /*
+   * Экспедитор без принятых выписки и полиса (11.11.2026): смотрит всё,
+   * но публикует и назначает только после проверки. Плашка над каждой
+   * страницей, кнопки гаснут через DocsGateProvider; запрет — в базе.
+   */
+  const [gate, t] = await Promise.all([
+    viewer.company?.status === 'ACTIVE' ? loadOwnDocsGate() : null,
+    getDictionary(locale),
+  ]);
 
   return (
     /* Время в кабинете — по стране компании (src/lib/i18n/viewer). */
@@ -33,7 +46,13 @@ export default async function ShipperLayout({
     >
       <CabinetShell locale={locale} role="SHIPPER" company={viewer.company}>
         <FlashNotice />
-        {children}
+        {gate && gateBlocked(gate) && (
+          /* Тот же левый край и ширина, что у .cab-page под ней. */
+          <div className="w-full max-w-[1180px] px-5 pt-6 sm:px-8">
+            <ForwarderDocsBanner locale={locale} t={t} gate={gate} />
+          </div>
+        )}
+        <DocsGateProvider blocked={gate ? gateBlocked(gate) : false}>{children}</DocsGateProvider>
       </CabinetShell>
     </TimeZoneProvider>
   );

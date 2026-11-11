@@ -7,6 +7,7 @@ import { useI18n } from '@/lib/i18n/provider';
 import { cancelOrderAction, directAssignAction, type DirectState } from '@/lib/orders/matching';
 import { vehicleClassFits, type HaulKind } from '@/lib/orders/haul';
 import type { KnownVehicle } from '@/types/db';
+import { useDocsBlocked } from '@/lib/forwarders/DocsGateProvider';
 
 /**
  * Прямое назначение знакомой машине — у заказчика.
@@ -223,6 +224,8 @@ export function SendDirect({
   const [state, action, pending] = useActionState(directAssignAction, idle);
   const fitting = fittingVehicles(vehicles, haulKind);
   const [vehicleId, setVehicleId] = useState('');
+  /* Прямое назначение закрыто экспедитору без принятых документов (11.11.2026). */
+  const docsBlocked = useDocsBlocked();
 
   if (fitting.length === 0) return null;
   const chosen = fitting.find((v) => v.vehicle_id === vehicleId) ?? null;
@@ -244,10 +247,17 @@ export function SendDirect({
             <VehicleOptions vehicles={fitting} />
           </Select>
         </label>
-        <Button type="submit" size="sm" variant="primary" disabled={pending || !vehicleId}>
+        <Button
+          type="submit"
+          size="sm"
+          variant="primary"
+          disabled={pending || !vehicleId || docsBlocked}
+          title={docsBlocked ? t.docsGate.blockedShort : undefined}
+        >
           {t.direct.sendDirect}
         </Button>
       </div>
+      {docsBlocked && <p className="text-xs text-warn">{t.docsGate.blockedShort}</p>}
       {chosen?.busy && <p className="text-xs text-warn">{t.direct.busyWarn}</p>}
       {state.error && (
         <p role="alert" className="text-xs text-danger">

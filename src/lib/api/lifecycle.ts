@@ -15,6 +15,7 @@ import { ApiError, type ApiContext } from './handler';
 import { isCalendarDate, isObj, locationOf, oneOf, text } from './input';
 import { findOrder, getOrder } from './orders';
 import { translateRule } from './rules';
+import { DOCS_GATE_API_MESSAGE, isDocsGateError } from '@/lib/forwarders/docsGate';
 
 /**
  * Действия заказчика с заказом через API — всё, что умеет кабинет:
@@ -61,6 +62,8 @@ async function explain(action: Action, error: { code?: string; message?: string 
   const code = error.code ?? '';
   const msg = error.message ?? '';
 
+  /* 55018 — экспедитору нужны принятые выписка и полис (forwarder_docs_gate). */
+  if (isDocsGateError(error)) return new ApiError('forbidden', DOCS_GATE_API_MESSAGE);
   if (action === 'direct_assign_order' && DIRECT_CODES[code]) {
     const [c, m] = DIRECT_CODES[code];
     return new ApiError(c, m);

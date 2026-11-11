@@ -40,6 +40,7 @@ import type { EmailDraftInfo } from '@/lib/inbound/load';
 import { OrderImport } from './OrderImport';
 import type { DraftStop, OrderDraft } from '@/lib/orders/importDraft';
 import { cn } from '@/lib/cn';
+import { useDocsBlocked } from '@/lib/forwarders/DocsGateProvider';
 import { asCurrency, CURRENCIES, type Currency } from '@/lib/money/currency';
 
 const initial: PublishState = { error: null, ref: null };
@@ -198,6 +199,12 @@ function OrderFormInner({
   onDraft,
 }: OrderFormProps & { draft: OrderDraft | null; onDraft: (draft: OrderDraft) => void }) {
   const { t, m, f, locale } = useI18n();
+  /*
+   * Экспедитор без принятых документов (11.11.2026): форма сохраняет
+   * черновик вместо публикации. Свой рейс перевозчика и запрос места —
+   * своими путями.
+   */
+  const docsBlocked = useDocsBlocked() && !own && !capacityOfferId;
   /* Что заполнил разбор письма — подсвечивается. */
   const aiFilled = useMemo(() => new Set(draft?.filled ?? []), [draft]);
   const ai = (key: string) => (aiFilled.has(key) ? 'ai-filled' : undefined);
@@ -561,7 +568,7 @@ function OrderFormInner({
     return (
       <Card stripe="ok">
         <CardBody className="flex flex-wrap items-center gap-3">
-          <Badge tone="ok">{own ? t.own.sent : t.orderForm.published}</Badge>
+          <Badge tone="ok">{own ? t.own.sent : state.draft ? t.docsGate.draftSaved : t.orderForm.published}</Badge>
           <Mono className="text-[13px]">{state.ref}</Mono>
           {onNew && (
             <Button size="sm" variant="primary" onClick={onNew} className="ml-auto">
@@ -652,6 +659,7 @@ function OrderFormInner({
       <input type="hidden" name="locale" value={locale} />
       {emailDraft && <input type="hidden" name="email_draft_id" value={emailDraft.id} />}
       {capacityOfferId && <input type="hidden" name="capacity_offer_id" value={capacityOfferId} />}
+      {docsBlocked && <input type="hidden" name="save_draft" value="1" />}
 
       {/*
        * Кэш маршрута уезжает вместе с заказом: пересчитывать его при
@@ -1333,6 +1341,9 @@ function OrderFormInner({
           ) : capacityOfferId ? (
             /* Под свободное место: не на стол и не другой машине — только запрос этому месту. */
             <p className="text-[13px] leading-relaxed text-ink-muted">{t.capacity.holdNotice}</p>
+          ) : docsBlocked ? (
+            /* Публикация закрыта до документов: куда отправить, выбирать пока нечего. */
+            <p className="text-[13px] leading-relaxed text-ink-muted">{t.docsGate.draftNotice}</p>
           ) : (
             <DispatchPicker
               vehicles={knownVehicles}
@@ -1379,6 +1390,8 @@ function OrderFormInner({
               ? t.orderForm.publishing
               : capacityOfferId
                 ? t.capacity.holdSubmit
+                : docsBlocked
+                ? t.docsGate.saveDraft
                 : direct
                 ? t.orderForm.publishDirect
                 : t.orderForm.publish}

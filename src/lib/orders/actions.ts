@@ -22,12 +22,15 @@ import { routeLabel } from '@/lib/orders/route';
 import { siteUrl } from '@/lib/config';
 import { isCurrency, type Currency } from '@/lib/money/currency';
 import { explainCapacityError } from '@/lib/capacity/explain';
+import { isDocsGateError } from '@/lib/forwarders/docsGate';
 
 export type PublishState = {
   error: string | null;
   ref: string | null;
   /** Сохранён черновиком под запрос свободного места; requestError — запрос не ушёл. */
   held?: { orderId: string; requestError: string | null };
+  /** Сохранён черновиком: работа экспедитора закрыта до документов (11.11.2026). */
+  draft?: boolean;
 };
 
 function toLocale(value: FormDataEntryValue | null): Locale {
@@ -270,6 +273,8 @@ function haulKind(value: string): HaulKind {
  * не подходит заказу. Коды те же, что у отклика со стола.
  */
 function explainPublish(t: Dictionary, code: string | undefined, message: string | undefined): string {
+  /* 55018 — экспедитору нужны принятые выписка и полис (forwarder_docs_gate). */
+  if (isDocsGateError({ code })) return t.docsGate.error;
   if (code === '55009') return t.legal.reacceptNeeded;
   if (code === '55000' && message?.includes('реквизиты')) return t.orderForm.needActive;
   if (code === '42501') return t.direct.notKnown;
@@ -467,9 +472,15 @@ export async function publishOrderAction(
     return { error: t.capacity.holdOnlyExpress, ref: null };
   }
 
-  const direct = !hold && str(formData, 'dispatch') === 'DIRECT';
+  /*
+   * Только черновик (11.11.2026): экспедитору без принятых документов
+   * форма предлагает сохранить заказ, а не публиковать — база публикацию
+   * всё равно не пропустит (forwarder_docs_gate).
+   */
+  const saveDraft = !hold && str(formData, 'save_draft') === '1';
+  const direct = !hold && !saveDraft && str(formData, 'dispatch') === 'DIRECT';
   /* Группа своих машин: первые минуты заказ видят и берут только они. */
-  const group = !hold && str(formData, 'dispatch') === 'GROUP';
+  const group = !hold && !saveDraft && str(formData, 'dispatch') === 'GROUP';
   const groupVehicles = group ? formData.getAll('group_vehicle_ids').map(String).filter(Boolean) : [];
   if (group && groupVehicles.length < 2) {
     return { error: t.direct.groupPickTwo, ref: null };
@@ -504,13 +515,18 @@ export async function publishOrderAction(
       currency,
     },
     p_stops: form.stops,
-    p_publish: !hold,
+    p_publish: !hold && !saveDraft,
   });
 
   if (error || !data) {
     return { error: explainPublish(t, error?.code, error?.message), ref: null };
   }
   await closeEmailDraft(supabase, formData, data.id);
+
+  if (saveDraft) {
+    revalidatePath(`/${locale}/shipper`, 'layout');
+    return { error: null, ref: data.ref, draft: true };
+  }
 
   /* Черновик готов — запрос перевозчику места по ставке заказа (цену и даты можно поменять на странице места). */
   if (hold) {
