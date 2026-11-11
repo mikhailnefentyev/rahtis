@@ -220,7 +220,7 @@ type Texts = {
 const fi: Texts = {
   signature: 'RAHTIS-tiimi',
   neverAsk: 'Emme koskaan kysy salasanaanne sähköpostitse emmekä puhelimitse.',
-  brandTagline: 'Irtoperät ja kontit · Pohjois-Eurooppa',
+  brandTagline: 'Kuljetusten hallinta ja rahtipörssi · Pohjois-Eurooppa',
 
   greeting: 'Hei,',
 
@@ -368,7 +368,7 @@ const fi: Texts = {
     preheader: 'Hakemus on kirjattu ja odottaa tarkistusta.',
     thanks:
       'Kiitos hakemuksesta. Se on kirjattu ja odottaa tarkistusta: ' +
-      'käymme yrityksenne tiedot läpi PRH:n ja YTJ:n rekistereistä.',
+      'käymme yrityksenne tiedot läpi yritysrekisteristä.',
     next:
       'Kun hakemus on hyväksytty, lähetämme tähän samaan osoitteeseen linkin, ' +
       'jolla asetatte salasanan ja pääsette kirjautumaan sisään. Sitä ennen ' +
@@ -459,7 +459,7 @@ const fi: Texts = {
 const en: Texts = {
   signature: 'The RAHTIS team',
   neverAsk: 'We never ask for your password by email or over the phone.',
-  brandTagline: 'Trailers and containers · Northern Europe',
+  brandTagline: 'Transport management and freight exchange · Northern Europe',
 
   greeting: 'Hello,',
 
@@ -606,7 +606,7 @@ const en: Texts = {
     preheader: 'Your application is logged and waiting for review.',
     thanks:
       'Thank you for your application. It has been logged and is waiting for review: ' +
-      'we check your company details against the Finnish PRH and YTJ registers.',
+      'we check your company details in the business register of your country.',
     next:
       'Once the application is approved, we will send a link to this same address ' +
       'where you can set a password and sign in. Until then, you ' +

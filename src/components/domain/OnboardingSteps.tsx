@@ -33,6 +33,8 @@ export async function OnboardingSteps({ locale, company }: { locale: Locale; com
   const o = t.onboarding;
   const supabase = await createClient();
   const active = company.status === 'ACTIVE';
+  /* Название и адрес из YTJ подставляются только финской компании (account/page.tsx). */
+  const finnish = (company.country ?? 'FI') === 'FI';
 
   let steps: Step[];
 
@@ -52,7 +54,7 @@ export async function OnboardingSteps({ locale, company }: { locale: Locale; com
     const desk = Boolean(r?.can_take_orders);
 
     steps = [
-      { key: 'activate', title: o.activate, text: o.activateText, state: active ? 'done' : 'now', href: accountPath(locale), action: o.activateAction },
+      { key: 'activate', title: o.activate, text: finnish ? o.activateTextFi : o.activateText, state: active ? 'done' : 'now', href: accountPath(locale), action: o.activateAction },
       {
         key: 'docs',
         title: o.docs,
@@ -92,7 +94,7 @@ export async function OnboardingSteps({ locale, company }: { locale: Locale; com
       .select('id', { count: 'exact', head: true })
       .eq('shipper_company_id', company.id);
     steps = [
-      { key: 'activate', title: o.activate, text: o.activateTextShipper, state: active ? 'done' : 'now', href: accountPath(locale), action: o.activateAction },
+      { key: 'activate', title: o.activate, text: finnish ? o.activateTextShipperFi : o.activateTextShipper, state: active ? 'done' : 'now', href: accountPath(locale), action: o.activateAction },
       {
         key: 'order',
         title: o.firstOrder,

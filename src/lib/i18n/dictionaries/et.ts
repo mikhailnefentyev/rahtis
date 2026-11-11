@@ -219,7 +219,7 @@ export const et = {
     nav: "Tellimus",
     title: "Tellimus",
     lede: "Maksate ainult autode eest, mis kuu jooksul sõitsid. Esimene auto on tasuta, iga järgmine maksab 14,90 € kuus. Aasta ette makstes saate 10 % allahindlust.",
-    feesFrom: 'Läksite alltöövõtult üle kuutasule: teie ettevõtte kuutasu arvestatakse alates {date}. Seni on teenus tasuta.',
+    feesFrom: 'Teie ettevõtte kuutasu arvestatakse alates {date}. Seni on teenus tasuta.',
     activeNow: "Sel kuul sõitnud autod",
     activeHint: "Lõpetatud veoga autod",
     estimateNow: "Hinnang selleks kuuks",
@@ -744,8 +744,7 @@ export const et = {
     priceUnit: 'auto / kuu, km-ta',
     homeDescription:
       'RAHTIS on veokorralduse platvorm ja veobörs vedajatele. Halda autoparki, juhte, tööaega ja veoselehti ühes kohas, võta tellimusi otse oma klientidelt ja leia vabadele autodele tööd veobörsilt. Haagisevahetused, konteinerid ja ekspressveod Soomes, Põhjamaades, Baltikumis, Poolas ja Saksamaal — tellija leiab vedaja ühe avaldusega ja näeb veo kulgu samm-sammult. Pinnasetöödeks: kallurite koormad, kaalumised, tunnid ja arved objektilt.',
-    termsDescription:
-      'RAHTISe kasutustingimused: poolte vastutus, veo kulg, maksed ja arveldused ning lepingu kehtivus.',
+    termsDescription: 'RAHTISe kasutustingimused: poolte vastutus, veo kulg, kuutasu ja lepingu kehtivus.',
     privacyDescription:
       'Kuidas RAHTIS töötleb isikuandmeid: mida kogutakse, milleks neid kasutatakse, kui kaua neid säilitatakse ja millised õigused on andmesubjektil.',
     signinDescription: 'Logi RAHTISesse sisse tellija või vedajana.',
@@ -876,8 +875,10 @@ export const et = {
     progress: '{done}/{total} tehtud',
     waiting: 'ootab kontrolli',
     activate: 'Ettevõtte andmed ja tingimused',
-    activateText: 'Aadress täidetakse äriregistrist, kui see seal olemas on. Lisa oma kontonumber ja nõustu tingimustega — umbes 2 minutit.',
-    activateTextShipper: 'Aadress täidetakse äriregistrist, kui see seal olemas on. Kontrolli arveldusandmeid ja nõustu tingimustega — umbes 2 minutit.',
+    activateText: 'Kontrolli ettevõtte nime ja aadressi, lisa kontonumber ja nõustu tingimustega — umbes 2 minutit.',
+    activateTextShipper: 'Kontrolli ettevõtte nime, aadressi ja arveldusandmeid ning nõustu tingimustega — umbes 2 minutit.',
+    activateTextFi: 'Nimi ja aadress täidetakse Soome äriregistrist (YTJ), kui need seal olemas on. Lisa oma kontonumber ja nõustu tingimustega — umbes 2 minutit.',
+    activateTextShipperFi: 'Nimi ja aadress täidetakse Soome äriregistrist (YTJ), kui need seal olemas on. Kontrolli arveldusandmeid ja nõustu tingimustega — umbes 2 minutit.',
     activateAction: 'Täida',
     docs: 'Tegevusluba ja kindlustus',
     docsText: 'Laadi üles kehtiv tegevusluba (ühenduse luba) ja liikluskindlustus. Piisab fotost või PDF-ist.',
@@ -1094,8 +1095,7 @@ export const et = {
     carrierTitle: 'Hoia auto töös ka vedude vahel.',
     carrier3: 'Leiad tagasikoorma piirkonnast, kus eelmine vedu lõpeb.',
     carrier4: 'Iga auto kinnitatakse eraldi.',
-    carrier5:
-      'Iga vedu on leping otse tellijaga: arve esitad ise ja protsenti ei võeta. Enne veo võtmist näed tellija makseteavet.',
+    carrier5: 'Vedudest protsenti ei võeta: kokkulepitud hind on täielikult sinu. Enne veo võtmist näed tellija makseteavet.',
     carrier6: 'Nädalaaruandest näed sõidetud vedusid ja teenistust.',
     carrier7:
       'Juhi rakendus on hinna sees: veod, tööaeg, koorma fotod, veoseleht, kohtade kaart ja juhi oma keel.',
@@ -1112,8 +1112,7 @@ export const et = {
     stepsEyebrow: 'Nii vedu kulgeb',
     stepsTitle: 'Taotlusest lõpetatud veoni neljas sammus',
     step1: 'Ettevõtte kontroll',
-    step1Text:
-      'Kontrollime registrikoodi ja ettevõtte andmeid registritest. Vedajatel kontrollime ka tegevusluba ja kindlustust.',
+    step1Text: 'Kontrollime ettevõtte andmeid äriregistrist ja iga taotluse kinnitab meie töötaja. Vedajatel kontrollime ka tegevusluba ja kindlustust.',
     step2: 'Autode kinnitamine',
     step2Text:
       'Iga auto kinnitatakse eraldi. Avatud vedusid näeb ainult kinnitatud tehnika.',
@@ -1219,8 +1218,7 @@ export const et = {
       'Ühenda oma ERP või TMS RAHTISega: tellimus läheb börsile või sinu oma autole ilma käsitsi ümber trükkimata ja tead iga sammu kohe, kui see toimub.',
     apiFreeEyebrow: 'Tasuta',
     apiFreeTitle: 'Kuutasu pole, päringutasu pole',
-    apiFreeText:
-      'API kasutamine ei maksa midagi, nagu ka veod: pole teenustasu, kuutasu ega päringupõhist hinda. Veoleping sõlmitakse otse vedajaga, kes esitab sulle arve.',
+    apiFreeText: 'API on tasuta ja RAHTIS ei võta tellijalt ka vedude eest midagi: pole teenustasu, kuutasu ega päringupõhist hinda.',
     apiFastEyebrow: 'Kiire',
     apiFastTitle: 'Tellimus sekunditega, muudatus minutiga',
     apiFastText:
@@ -1299,10 +1297,10 @@ export const et = {
     priceYear: "Aasta ette makstes −10 %",
     priceSubEyebrow: 'Veobörs vedajale',
     priceSubTitle: '0 % veo hinnast',
-    priceSubText: 'Võtate vedusid veobörsilt lepinguga otse tellijaga ja esitate arve ise. Vahendustasu pole; ülal olev kuutasu katab kõik.',
+    priceSubText: 'Veobörsi vedudelt pole vahendustasu ega veopõhiseid tasusid: kokkulepitud hind on täielikult sinu. Ülal olev kuutasu katab kõik.',
     priceShipEyebrow: "Tellijale",
     priceShipTitle: 'Tasuta',
-    priceShipText: 'Vedude avaldamine, otsetellimused oma vedajatele ja API on tellijale tasuta. Veoleping sõlmitakse otse vedajaga, kes esitab teile arve.',
+    priceShipText: 'Vedude avaldamine, vedajate pakkumised, otsetellimused oma vedajatele ja API on tellijale tasuta. Leping sõlmitakse otse vedajaga ja RAHTIS ei võta veotasust protsenti.',
   },
 
   done: {
@@ -1620,7 +1618,7 @@ export const et = {
   orderForm: {
     requiredBody: 'Kere',
     anyBody: 'Ükskõik milline',
-    feeHint: 'Teenustasu pole: veoleping sõlmitakse otse vedajaga, kes esitab teile arve.',
+    feeHint: '· vedaja saab kogu hinna, RAHTIS ei lisa sellele midagi',
     /* Валюта цены: не евро — только у прямого договора и своих рейсов. */
     currency: 'Valuuta',
     currencyErrorDirect: 'Muu valuuta kui euro on võimalik ainult otselepingu puhul vedajaga. Veobörsil on hind eurodes.',
@@ -2124,7 +2122,7 @@ export const et = {
   requisites: {
     ytjRefresh: 'Võta nimi ja aadress YTJ-st',
     title: 'Ettevõtte andmed',
-    subtitleShipper: 'Vajame neid arveldamiseks. Pärast salvestamist on ettevõte kasutusel.',
+    subtitleShipper: 'Neid arveldusandmeid näevad vedajad, kellega koostööd teed. Pärast salvestamist on ettevõte kasutusel.',
     subtitleCarrier: 'Kliendid näevad neid otselepingute arveldamiseks ja meie kasutame neid kuutasu jaoks. Pärast salvestamist on ettevõte kasutusel.',
 
     legalSection: 'Registriandmed',
@@ -2138,13 +2136,13 @@ export const et = {
     language: 'Kirjavahetuse keel',
     languageHint:
       'Keel, milles saadame kutsed, arved ja aruanded. Liidese keele valib igaüks ise ülaribal.',
-    vatHint: 'Tuletatud Y-tunnusest. Paranda, kui kasutad käibemaksugrupi numbrit',
+    vatHint: 'Tuletatud registrikoodist. Paranda, kui kasutad käibemaksugrupi numbrit',
     vatInvalid: 'Vorming: riigikood ja 2–12 märki, näiteks FI12345678',
 
     billingSection: 'Arveldus',
     billingSameAsLegal: 'Arve aadress on sama mis registriaadress',
     billingEmail: 'Arvete e-post',
-    billingEmailHint: 'Sinna saadame arved',
+    billingEmailHint: 'Arved ja maksemeeldetuletused tulevad sellele aadressile',
     billingReference: 'Viide arvel',
     billingReferenceHint: 'Sinu viide või kulukoht, mida soovid arvele',
 
@@ -2634,8 +2632,8 @@ export const et = {
       ACCIDENT_INSURANCE: 'Tööõnnetuskindlustus',
     },
     itemHints: {
-      REGISTERS: 'Võetakse automaatselt Soome PRH avaandmetest. FIE: laadige üles väljavõte YTJ-st.',
-      TRADE_REGISTER: 'Võetakse automaatselt Soome PRH avaandmetest. FIE: laadige üles väljavõte YTJ-st.',
+      REGISTERS: 'Soome ettevõtte puhul võetakse automaatselt PRH avaandmetest; FIE laadib üles väljavõtte YTJ-st. Teiste riikide ettevõtted: laadige üles vastav tõend maksuametist.',
+      TRADE_REGISTER: 'Soome ja Norra ettevõtte puhul võetakse automaatselt registrist (PRH, Brønnøysund); Soome FIE laadib üles väljavõtte YTJ-st. Teiste riikide ettevõtted: laadige üles äriregistri väljavõte.',
       TAX_DEBT: 'Maksuvõla tõend Soome maksuameti OmaVero teenusest, kuni 3 kuud vana.',
       PENSION: 'Pensionikindlustusseltsi tõend kindlustuse ja makstud maksete kohta, kuni 3 kuud vana.',
       COLLECTIVE_AGREEMENT: 'Kohalduv kollektiivleping (nt veoautoveo valdkonnas) või ülevaade peamistest töötingimustest.',
@@ -2649,9 +2647,9 @@ export const et = {
       MISSING: 'Puudub',
     },
     validUntilDate: 'Kehtib kuni {date}',
-    fromPrh: 'PRH andmetest',
+    fromPrh: 'Registriandmetest',
     fromDocument: 'Dokumendist',
-    registryTitle: 'Registriandmed (PRH)',
+    registryTitle: 'Registriandmed',
     company: 'Ettevõte',
     businessId: 'Y-tunnus',
     prepayment: 'Ettemaksuregister',
@@ -2663,10 +2661,10 @@ export const et = {
     unknown: 'Andmed puuduvad',
     checkedAt: 'Kontrollitud {date}',
     noRegistry: 'Registriandmeid pole veel päritud.',
-    refresh: 'Uuenda PRH-st',
+    refresh: 'Uuenda registrist',
     refreshing: 'Uuendatakse…',
     refreshTooSoon: 'Andmed uuendati just. Proovige uuesti 10 minuti pärast.',
-    refreshFailed: 'PRH register ei vastanud. Proovige veidi aja pärast uuesti.',
+    refreshFailed: 'Register ei vastanud. Proovige veidi aja pärast uuesti.',
     packageTitle: 'Tõendid',
     upload: 'Laadi tõend üles',
     uploading: 'Laaditakse üles…',
@@ -2691,7 +2689,7 @@ export const et = {
     issued: 'Välja antud {date}',
     shareTitle: 'Jagamislingid',
     shareHint:
-      'Saatke link tellijale, kes RAHTISt ei kasuta. Lingil on ettevõtte nimi, Y-tunnus, märk ja kehtivad tõendid. Linki saab igal ajal tühistada.',
+      'Saatke link tellijale, kes RAHTISt ei kasuta. Lingil on ettevõtte nimi, registrikood, märk ja kehtivad tõendid. Linki saab igal ajal tühistada.',
     shareLabel: 'Kellele (valikuline)',
     shareExpires: 'Kehtib kuni (valikuline)',
     shareCreate: 'Loo link',
@@ -2727,8 +2725,7 @@ export const et = {
     reminderTitle: '{item}: kehtib kuni {date}',
     reminderLead:
       'Tellija vastutuse tõend „{item}“ aegub {date}. Laadige üles uus tõend, et pakett jääks kehtima ja märk „Kontrollitud“ säiliks.',
-    reminderLeadPrh:
-      'Registriandmete („{item}“) PRH-kontroll aegub {date}. Uuendage andmed ühe klõpsuga, et märk „Kontrollitud“ säiliks.',
+    reminderLeadPrh: 'Registriandmete („{item}“) kontroll aegub {date}. Uuendage andmed registrist ühe klõpsuga, et märk „Kontrollitud“ säiliks.',
     reminderButton: 'Uuenda tõendeid',
   },
 
@@ -4139,7 +4136,8 @@ export const et = {
 
   known: {
     directBilling: 'Otseleping',
-    directBillingHint: 'Teenustasu pole, vedu läheb sinu nädalaaruandesse.',
+    directBillingHint: 'RAHTIS ei lisa hinnale midagi ja vedu läheb sinu nädalaaruandesse.',
+    carrierBusinessId: 'Registrikood',
     carrierAccount: 'Kontonumber',
     title: 'Minu autod',
     subtitle:
@@ -4300,8 +4298,8 @@ export const et = {
     groupGone: 'Teine auto jõudis veo enne võtta või pakkumise aeg sai läbi.',
     groupOnly: 'Vedu pakutakse praegu ainult tellija oma autodele.',
     contractRahtis: 'Lepingupool Aivomaa Oy (varasemad tingimused)',
-    contractCarrierHint: 'Veoleping sõlmitakse otse vedajaga, kelle pakkumise vastu võtate. Teenustasu pole; arve esitab teile vedaja.',
-    deskDirectShipper: 'Otseleping tellimuse võtva vedajaga: teenustasu pole, arve esitab teile vedaja.',
+    contractCarrierHint: 'Vedu avaldatakse veobörsil sobivatele vedajatele. RAHTIS ei võta selle eest midagi.',
+    deskDirectShipper: 'Veo võtnud vedaja saab kogu hinna; RAHTIS ei lisa sellele midagi.',
     hasOffers: 'Sellele veole on juba pakkumisi tulnud — vali nende hulgast.',
   },
 
@@ -4947,7 +4945,7 @@ export const et = {
     seeShipper: 'Vedaja kohta näeb tellija autot ja selle andmeid, hinnanguid, õigeaegsust ja märki „kontrollitud“ vedaja tellija vastutuse tõendite kohta; vedajate puhul, kellelt ta tellib otse, ka tõendite paketti.',
     seeBank: 'Kui ettevõte on viimase 30 päeva jooksul pangakontot muutnud, näevad tema lepingupartnerid teadet „Pangaandmeid muudeti N päeva tagasi“ – mitte kunagi andmeid endid. Enne maksmist kinnitage uus konto üle kontakti kaudu, mida te juba tunnete.',
     verifyTitle: 'Kuidas ettevõtteid kontrollitakse',
-    verifyRegistry: 'Registreerimisel kontrollime ettevõtet avalikest registritest: Soome kaubandusregistrist (PRH/YTJ), EL-i käibemaksuregistrist (VIES) ja Norra ettevõtete puhul Brønnøysundi registritest. Otse tellivate tellijate puhul korratakse registrikontrolli iga nädal.',
+    verifyRegistry: 'Registreerimisel kontrollime ettevõtet avalikest registritest: Soome ettevõtteid PRH avaandmetest (YTJ), Norra ettevõtteid Brønnøysundi registritest ja teiste ELi riikide ettevõtteid ELi käibemaksukohustuslaste registrist (VIES). Kui automaatset kontrolli pole, kontrollime ettevõtet käsitsi selle riigi registrist. Iga taotluse kinnitab meie meeskond; registrikanne näitab, et ettevõte on olemas, mitte seda, et taotleja seda esindab. Otse tellivate tellijate puhul korratakse registrikontrolli iga nädal.',
     verifyDocs: 'Vedajad esitavad tellija vastutuse tõendid (äriregistri väljavõte, maksu- ja pensionikindlustuse tõendid, kindlustus). Tellijad saavad esitada äriregistri väljavõtte, maksutõendid ja allkirjaõiguse tõendi. Meie töötajad kontrollivad iga dokumenti ja märgivad, milleni kontroll kehtib.',
     verifyInsurance: 'Vedajate ja ekspediitorite vastutuskindlustust kontrollitakse poliisi dokumentide järgi. Ekspediitori kindlustus on teave vedajatele, mitte tellimise tingimus.',
     verifyVehicles: 'Meie töötajad kinnitavad iga auto, enne kui see saab vedusid võtta.',
@@ -5005,7 +5003,7 @@ export const et = {
     'validation.businessIdFor': 'Kontrolli: {label}. Näide: {example}',
     'signup.submitted':
       'Kontrollime ettevõtte {company} ({businessId}) andmed registrist ja saadame konto andmed aadressile {email}.',
-    'apply.registryOk': 'Registrikood leiti registrist: {name}. Taotlus ootab meie kontrolli.',
+    'apply.registryOk': 'Ettevõte leiti registrist: {name}. Taotlus ootab meie kontrolli.',
     'apply.registryOther':
       'Registris on selle registrikoodi all „{name}“. Kui registrikood on vale, vasta kinnituskirjale, siis parandame selle. Taotlus ootab meie kontrolli.',
     'moderation.pendingCount':

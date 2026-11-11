@@ -1,3 +1,4 @@
+import { businessIdLabel } from '@/lib/country';
 import { renderEmail, renderText, type EmailBlock } from '../layout';
 import { emailText, type EmailLocale } from '../text';
 import type { EmailMessage } from '../types';
@@ -41,6 +42,8 @@ export function applicationReceivedEmail(input: {
   companyName: string;
   companyId: string;
   businessId: string;
+  /** Страна компании: у не финской номер подписан по-своему (NIP, CVR…), а не «Y-tunnus». */
+  country: string | null;
   role: string;
   operatorEmail: string;
   locale: EmailLocale;
@@ -55,7 +58,7 @@ export function applicationReceivedEmail(input: {
       kind: 'facts',
       rows: [
         [t.application.fieldCompany, input.companyName],
-        [t.application.fieldBusinessId, input.businessId],
+        [businessIdLabel(input.country, t.application.fieldBusinessId), input.businessId],
         [t.application.fieldRole, input.role],
         [t.application.fieldEmail, input.to],
       ],
@@ -102,6 +105,7 @@ export function applicationRejectedEmail(input: {
   companyName: string;
   companyId: string;
   businessId: string;
+  country: string | null;
   reason: string;
   operatorEmail: string;
   locale: EmailLocale;
@@ -119,7 +123,7 @@ export function applicationRejectedEmail(input: {
       kind: 'facts',
       rows: [
         [t.application.fieldCompany, input.companyName],
-        [t.application.fieldBusinessId, input.businessId],
+        [businessIdLabel(input.country, t.application.fieldBusinessId), input.businessId],
       ],
     },
     { kind: 'note', value: t.rejected.note(input.operatorEmail) },

@@ -398,6 +398,28 @@ export function registryLink(country: string, businessId: string): string {
   return pack.registryUrl?.(businessId) ?? 'https://ec.europa.eu/taxation_customs/vies/#/vat-validation';
 }
 
+/**
+ * Подпись к номеру компании. Финской — переведённая подпись из словаря
+ * («Y-tunnus», «Business ID (Y-tunnus)»…), остальным — как номер
+ * называется в их стране (NIP, CVR-nummer…): «Y-tunnus» у польской
+ * компании был бы неправдой. Пустая или неизвестная страна — финская,
+ * как в countryPack.
+ */
+export function businessIdLabel(country: string | null | undefined, finnishLabel: string): string {
+  const pack = countryPack(country);
+  return pack.code === 'FI' ? finnishLabel : pack.businessId.label;
+}
+
+/**
+ * Подпись к номеру чужой компании, когда страны под рукой нет (выдача
+ * known_vehicles_for_shipper отдаёт только номер). Финский номер хранится
+ * ровно как 1234567-8 (app.business_id_ok), номера других стран в таком
+ * виде не хранятся — по виду и решаем: «Y-tunnus» или общая подпись.
+ */
+export function businessIdLabelByShape(businessId: string, genericLabel: string): string {
+  return /^\d{7}-\d$/.test(businessId) ? COUNTRY_PACKS.FI.businessId.label : genericLabel;
+}
+
 /** Название реестра, с которым сверялась заявка, — в письме и карточке оператора. */
 export function registryName(country: string): string {
   const pack = countryPack(country);

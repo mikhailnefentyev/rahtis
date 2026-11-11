@@ -219,7 +219,7 @@ export const lv = {
     nav: "Abonements",
     title: "Abonements",
     lede: "Jūs maksājat tikai par automašīnām, kas mēnesī brauca. Pirmā automašīna ir bez maksas, katra nākamā maksā 14,90 € mēnesī. Samaksājot gadu uz priekšu, saņemsiet 10 % atlaidi.",
-    feesFrom: 'Jūs pārgājāt no apakšuzņēmuma modeļa uz abonementu: ikmēneša maksu jūsu uzņēmumam aprēķina no {date}. Līdz tam abonements ir bez maksas.',
+    feesFrom: 'Ikmēneša maksu jūsu uzņēmumam aprēķina no {date}. Līdz tam abonements ir bez maksas.',
     activeNow: "Šomēnes braukušās automašīnas",
     activeHint: "Automašīnas ar pabeigtu pārvadājumu",
     estimateNow: "Aplēse šim mēnesim",
@@ -744,8 +744,7 @@ export const lv = {
     priceUnit: 'automašīna / mēnesī, bez PVN',
     homeDescription:
       'RAHTIS ir transporta vadības platforma un kravu birža pārvadātājiem. Pārvaldiet autoparku, vadītājus, darba laiku un pavadzīmes vienuviet, saņemiet pasūtījumus tieši no saviem klientiem un noslogojiet brīvās mašīnas ar reisiem no biržas. Piekabju maiņa, konteineri un ekspresa pārvadājumi Somijā, Ziemeļvalstīs, Baltijā, Polijā un Vācijā — pasūtītājs vienā publikācijā atrod izpildītāju un redz pārvadājumu soli pa solim. Zemes darbiem: pašizgāzēju kravas, svēršana, stundas un rēķini no objekta.',
-    termsDescription:
-      'RAHTIS lietošanas noteikumi: pušu atbildība, kā noris pārvadājums, maksājumi un norēķini, līguma termiņš.',
+    termsDescription: 'RAHTIS lietošanas noteikumi: pušu atbildība, kā noris pārvadājums, abonēšanas maksa, līguma termiņš.',
     privacyDescription:
       'Kā RAHTIS apstrādā personas datus: kādus datus vāc, kam tos izmanto, cik ilgi tos glabā un kādas tiesības ir datu subjektam.',
     signinDescription: 'Pieslēdzieties RAHTIS kā pasūtītājs vai pārvadātājs.',
@@ -876,8 +875,10 @@ export const lv = {
     progress: '{done}/{total} gatavi',
     waiting: 'gaida pārbaudi',
     activate: 'Uzņēmuma dati un noteikumi',
-    activateText: 'Adresi ielasām no uzņēmumu reģistra (YTJ), ja tā tur ir. Ievadiet konta numuru un pieņemiet noteikumus — apmēram 2 minūtes.',
-    activateTextShipper: 'Adresi ielasām no uzņēmumu reģistra (YTJ), ja tā tur ir. Pārbaudiet rēķinu rekvizītus un pieņemiet noteikumus — apmēram 2 minūtes.',
+    activateText: 'Pārbaudiet uzņēmuma nosaukumu un adresi, ievadiet konta numuru un pieņemiet noteikumus — apmēram 2 minūtes.',
+    activateTextShipper: 'Pārbaudiet uzņēmuma nosaukumu, adresi un rēķinu rekvizītus un pieņemiet noteikumus — apmēram 2 minūtes.',
+    activateTextFi: 'Nosaukumu un adresi ielasām no Somijas uzņēmumu reģistra (YTJ), ja tie tur ir. Ievadiet konta numuru un pieņemiet noteikumus — apmēram 2 minūtes.',
+    activateTextShipperFi: 'Nosaukumu un adresi ielasām no Somijas uzņēmumu reģistra (YTJ), ja tie tur ir. Pārbaudiet rēķinu rekvizītus un pieņemiet noteikumus — apmēram 2 minūtes.',
     activateAction: 'Aizpildīt',
     docs: 'Pārvadājumu licence un apdrošināšana',
     docsText: 'Augšupielādējiet derīgu pārvadājumu licenci un OCTA polisi. Pietiek ar foto vai PDF.',
@@ -1094,8 +1095,7 @@ export const lv = {
     carrierTitle: 'Lai mašīna strādā arī starp reisiem.',
     carrier3: 'Atpakaļkravu varat atrast reģionā, kur beidzas iepriekšējais reiss.',
     carrier4: 'Katru auto platformā apstiprina atsevišķi.',
-    carrier5:
-      'Katrs reiss ir līgums tieši ar pasūtītāju: rēķinu izrakstāt paši, un mēs neņemam nekādus procentus. Pirms reisa paņemšanas redzat pasūtītāja maksājumu informāciju.',
+    carrier5: 'Mēs neņemam procentus no reisiem: norunātā cena ir pilnībā jūsu. Pirms reisa paņemšanas redzat pasūtītāja maksājumu informāciju.',
     carrier6: 'Nedēļas atskaitē redzat nobrauktos reisus un ienākumus.',
     carrier7:
       'Vadītāja lietotne ir iekļauta: reisi, darba laiks, kravas foto, pavadzīme, vietu karte un vadītāja valoda.',
@@ -1112,8 +1112,7 @@ export const lv = {
     stepsEyebrow: 'Kā noris reiss',
     stepsTitle: 'No pieteikuma līdz izpildītam reisam četros soļos',
     step1: 'Uzņēmuma pārbaude',
-    step1Text:
-      'Pārbaudām Y-tunnus un uzņēmuma datus reģistros. Pārvadātājiem pārbaudām arī pārvadājumu licenci un apdrošināšanu.',
+    step1Text: 'Pārbaudām uzņēmuma datus komercreģistrā, un katru pieteikumu apstiprina mūsu darbinieks. Pārvadātājiem pārbaudām arī pārvadājumu licenci un apdrošināšanu.',
     step2: 'Auto apstiprināšana',
     step2Text:
       'Katru auto apstiprina atsevišķi. Atvērtos reisus redz tikai apstiprināta tehnika.',
@@ -1219,8 +1218,7 @@ export const lv = {
       'Pieslēdziet savu ERP vai TMS pie RAHTIS: pasūtījums aiziet uz biržu vai jūsu auto bez pārrakstīšanas, un par katru soli uzzināt uzreiz, kad tas notiek.',
     apiFreeEyebrow: 'Bez maksas',
     apiFreeTitle: 'Bez ikmēneša maksas un maksas par pieprasījumiem',
-    apiFreeText:
-      'API lietošana neko nemaksā, tāpat kā pārvadājumi: nav ne pakalpojuma maksas, ne ikmēneša maksas, ne maksas par pieprasījumu. Pārvadājuma līgumu slēdz tieši ar pārvadātāju, kas jums izraksta rēķinu.',
+    apiFreeText: 'API ir bez maksas, un RAHTIS neiekasē no pasūtītāja neko arī par pārvadājumiem: nav ne pakalpojuma maksas, ne ikmēneša maksas, ne maksas par pieprasījumu.',
     apiFastEyebrow: 'Ātri',
     apiFastTitle: 'Pasūtījums sekundēs, izmaiņas minūtē',
     apiFastText:
@@ -1245,7 +1243,7 @@ export const lv = {
     footerDocuments: 'Dokumenti',
     finalEyebrow: 'Kā sākt',
     finalTitle: 'Pastāstiet par savu uzņēmumu — pārējo mēs nokārtosim',
-    finalLede: 'Mums vajag uzņēmuma nosaukumu, Y-tunnus un e-pasta adresi; no pārvadātājiem arī pārvadājumu licenci un apdrošināšanu.',
+    finalLede: 'Mums vajag uzņēmuma nosaukumu, reģistrācijas numuru un e-pasta adresi; no pārvadātājiem arī pārvadājumu licenci un apdrošināšanu.',
     finalLede2: 'Pārbaudām uzņēmuma datus komercreģistros (Somijā PRH/YTJ, citās ES valstīs VIES, Norvēģijā Brønnøysund) un pēc apstiprināšanas atveram piekļuvi.',
     applyShipper: 'Pasūtītāja pieteikums',
     applyCarrier: 'Pārvadātāja pieteikums',
@@ -1299,10 +1297,10 @@ export const lv = {
     priceYear: "Maksājot par gadu uz priekšu: −10 %",
     priceSubEyebrow: 'Kravu birža pārvadātājiem',
     priceSubTitle: '0 % no reisa cenas',
-    priceSubText: 'Jūs ņemat reisus no kravu biržas ar līgumu tieši ar pasūtītāju un paši izrakstāt rēķinu. Komisijas nav; augstāk norādītā abonēšanas maksa sedz visu.',
+    priceSubText: 'No biržas reisiem nav ne komisijas, ne maksas par reisu: norunātā cena ir pilnībā jūsu. Augstāk norādītā abonēšanas maksa sedz visu.',
     priceShipEyebrow: "Pasūtītājam",
     priceShipTitle: 'Bez maksas',
-    priceShipText: 'Pārvadājumu publicēšana, tiešie pasūtījumi saviem pārvadātājiem un API pasūtītājam ir bez maksas. Pārvadājuma līgumu slēdz tieši ar pārvadātāju, kas jums izraksta rēķinu.',
+    priceShipText: 'Pārvadājumu publicēšana, pārvadātāju piedāvājumi, tiešie pasūtījumi saviem pārvadātājiem un API pasūtītājam ir bez maksas. Līgumu slēdzat tieši ar pārvadātāju, un RAHTIS neņem procentus no pārvadājuma cenas.',
   },
 
   done: {
@@ -1620,7 +1618,7 @@ export const lv = {
   orderForm: {
     requiredBody: 'Virsbūve',
     anyBody: 'Jebkura',
-    feeHint: 'Pakalpojuma maksas nav: pārvadājuma līgumu slēdz tieši ar pārvadātāju, kas jums izraksta rēķinu.',
+    feeHint: '· pārvadātājs saņem visu cenu, RAHTIS tai neko nepieskaita',
     /* Валюта цены: не евро — только у прямого договора и своих рейсов. */
     currency: 'Valūta',
     currencyErrorDirect: 'Cenu citā valūtā, nevis eiro, var noteikt tikai tiešā līgumā ar pārvadātāju. Piedāvājumu tabulā cena ir eiro.',
@@ -2112,7 +2110,7 @@ export const lv = {
       'Pēc apstiprināšanas: pieslēgšanās, licence un apdrošināšana, auto dati. Katru auto apstiprinām atsevišķi.',
     shipperNote: 'Pēc apstiprināšanas: pieslēgšanās, uzņēmuma dati, pasūtījumu publicēšana.',
     sentTitle: 'Pieteikums nosūtīts',
-    duplicate: 'Ar šo Y-tunnus jau ir pieteikums — izskatīšanā vai apstiprināts.',
+    duplicate: 'Ar šo reģistrācijas numuru jau ir pieteikums — izskatīšanā vai apstiprināts.',
     invitedBy: '{carrier} jūs uzaicināja. Dati jau aizpildīti — pārbaudiet tos un nosūtiet pieteikumu. Pēc apstiprināšanas varēsiet sūtīt tiešos pasūtījumus viņu auto.',
     invitedByCarrier: '{carrier} uzaicināja jūsu pārvadājumu uzņēmumu. Dati jau aizpildīti — pārbaudiet tos un nosūtiet pieteikumu.',
     invitedByRahtis: 'Dati aizpildīti pēc ielūguma — pārbaudiet tos un nosūtiet pieteikumu.',
@@ -2124,7 +2122,7 @@ export const lv = {
   requisites: {
     ytjRefresh: 'Ņemt nosaukumu un adresi no YTJ',
     title: 'Uzņēmuma rekvizīti',
-    subtitleShipper: 'Tie vajadzīgi rēķiniem. Pēc saglabāšanas uzņēmums ir aktīvs.',
+    subtitleShipper: 'Šos rēķinu rekvizītus redz pārvadātāji, ar kuriem strādājat. Pēc saglabāšanas uzņēmums ir aktīvs.',
     subtitleCarrier: 'Klienti tos redz rēķinu apmaksai tiešajos līgumos, un mēs tos izmantojam ikmēneša maksai. Pēc saglabāšanas uzņēmums ir aktīvs.',
 
     legalSection: 'Juridiskie dati',
@@ -2138,13 +2136,13 @@ export const lv = {
     language: 'Saziņas valoda',
     languageHint:
       'Valoda, kurā sūtām ielūgumus, rēķinus un atskaites. Saskarnes valodu katrs izvēlas pats augšējā joslā.',
-    vatHint: 'Izveidots no Y-tunnus. Labojiet, ja izmantojat PVN grupas numuru',
+    vatHint: 'Izveidots no reģistrācijas numura. Labojiet, ja izmantojat PVN grupas numuru',
     vatInvalid: 'Formāts: valsts kods un 2–12 rakstzīmes, piemēram, FI12345678',
 
     billingSection: 'Rēķini',
     billingSameAsLegal: 'Rēķinu adrese sakrīt ar juridisko adresi',
     billingEmail: 'E-pasts rēķiniem',
-    billingEmailHint: 'Uz šo adresi sūtām rēķinus',
+    billingEmailHint: 'Rēķini un maksājumu atgādinājumi tiek sūtīti uz šo adresi',
     billingReference: 'Atsauce rēķinā',
     billingReferenceHint: 'Jūsu atsauce vai izmaksu centrs, ko vēlaties redzēt rēķinā',
 
@@ -2634,8 +2632,8 @@ export const lv = {
       ACCIDENT_INSURANCE: 'Nelaimes gadījumu apdrošināšana darbā',
     },
     itemHints: {
-      REGISTERS: 'Tiek iegūts automātiski no Somijas PRH atvērtajiem datiem. Individuālajam komersantam: augšupielādējiet izrakstu no YTJ.',
-      TRADE_REGISTER: 'Tiek iegūts automātiski no Somijas PRH atvērtajiem datiem. Individuālajam komersantam: augšupielādējiet izrakstu no YTJ.',
+      REGISTERS: 'Somijas uzņēmumam tiek iegūts automātiski no PRH atvērtajiem datiem; individuālais komersants augšupielādē izrakstu no YTJ. Citu valstu uzņēmumi: augšupielādējiet līdzvērtīgu izziņu no nodokļu iestādes.',
+      TRADE_REGISTER: 'Somijas un Norvēģijas uzņēmumiem tiek iegūts automātiski no reģistra (PRH, Brønnøysund); Somijas individuālais komersants augšupielādē izrakstu no YTJ. Citu valstu uzņēmumi: augšupielādējiet komercreģistra izrakstu.',
       TAX_DEBT: 'Izziņa par nodokļu parādiem no Somijas nodokļu dienesta OmaVero, ne vecāka par 3 mēnešiem.',
       PENSION: 'Pensiju apdrošinātāja izziņa par apdrošināšanu un samaksātajām iemaksām, ne vecāka par 3 mēnešiem.',
       COLLECTIVE_AGREEMENT: 'Piemērojamais darba koplīgums (piem., kravas autopārvadājumu nozarē) vai pārskats par galvenajiem darba nosacījumiem.',
@@ -2649,9 +2647,9 @@ export const lv = {
       MISSING: 'Trūkst',
     },
     validUntilDate: 'Derīga līdz {date}',
-    fromPrh: 'No PRH datiem',
+    fromPrh: 'No reģistra datiem',
     fromDocument: 'No dokumenta',
-    registryTitle: 'Reģistra dati (PRH)',
+    registryTitle: 'Reģistra dati',
     company: 'Uzņēmums',
     businessId: 'Y-tunnus',
     prepayment: 'Avansa nodokļa reģistrs',
@@ -2663,10 +2661,10 @@ export const lv = {
     unknown: 'Nav datu',
     checkedAt: 'Pārbaudīts {date}',
     noRegistry: 'Reģistra dati vēl nav iegūti.',
-    refresh: 'Atjaunināt no PRH',
+    refresh: 'Atjaunināt no reģistra',
     refreshing: 'Atjaunina…',
     refreshTooSoon: 'Dati tikko atjaunināti. Mēģiniet vēlreiz pēc 10 minūtēm.',
-    refreshFailed: 'PRH reģistrs neatbildēja. Mēģiniet vēlreiz pēc brīža.',
+    refreshFailed: 'Reģistrs neatbildēja. Mēģiniet vēlreiz pēc brīža.',
     packageTitle: 'Izziņas',
     upload: 'Augšupielādēt izziņu',
     uploading: 'Augšupielādē…',
@@ -2691,7 +2689,7 @@ export const lv = {
     issued: 'Izsniegta {date}',
     shareTitle: 'Kopīgošanas saites',
     shareHint:
-      'Nosūtiet saiti pasūtītājam, kurš neizmanto RAHTIS. Saitē redzams uzņēmuma nosaukums, Y-tunnus, zīme un derīgās izziņas. Saiti var atsaukt jebkurā laikā.',
+      'Nosūtiet saiti pasūtītājam, kurš neizmanto RAHTIS. Saitē redzams uzņēmuma nosaukums, reģistrācijas numurs, zīme un derīgās izziņas. Saiti var atsaukt jebkurā laikā.',
     shareLabel: 'Kam (pēc izvēles)',
     shareExpires: 'Derīga līdz (pēc izvēles)',
     shareCreate: 'Izveidot saiti',
@@ -2727,8 +2725,7 @@ export const lv = {
     reminderTitle: '{item}: derīga līdz {date}',
     reminderLead:
       'Pasūtītāja atbildības izziņas „{item}” derīgums beidzas {date}. Augšupielādējiet jaunu izziņu, lai pakete paliktu derīga un zīme „Pārbaudīts” saglabātos.',
-    reminderLeadPrh:
-      'Reģistra datu („{item}”) PRH pārbaudes derīgums beidzas {date}. Atjauniniet tos ar vienu klikšķi, lai zīme „Pārbaudīts” saglabātos.',
+    reminderLeadPrh: 'Reģistra datu („{item}”) pārbaudes derīgums beidzas {date}. Atjauniniet tos no reģistra ar vienu klikšķi, lai zīme „Pārbaudīts” saglabātos.',
     reminderButton: 'Atjaunināt izziņas',
   },
 
@@ -4076,7 +4073,7 @@ export const lv = {
     inviteLanguage: 'Ziņas valoda',
     inviteSend: 'Nosūtīt ielūgumu',
     inviteSent: 'Ielūgums nosūtīts uz {email}.',
-    inviteInvalid: 'Pārbaudiet nosaukumu, Y-tunnus un e-pastu.',
+    inviteInvalid: 'Pārbaudiet nosaukumu, reģistrācijas numuru un e-pastu.',
     inviteTooMany: 'Ne vairāk kā 20 ielūgumu diennaktī.',
     inviteFailed: 'Ielūgumu neizdevās nosūtīt. Mēģiniet vēlreiz pēc brīža.',
     invitesTitle: 'Nosūtītie ielūgumi',
@@ -4091,7 +4088,7 @@ export const lv = {
     revoke: 'Atsaukt atļauju',
     none: 'Veiktu pārvadājumu vēl nav',
     anonymitySubscriber:
-      'Klients, kuram esat atļāvuši tiešos pasūtījumus, redz jūsu uzņēmuma nosaukumu, Y-tunnus, konta numuru un vadītāja kontaktus, un jūs redzat viņa nosaukumu. Biržā klienti redzami ar kodu, līdz reiss ir jūsu; pēc tam rēķinu izrakstīšanai redzat viens otra nosaukumus.',
+      'Klients, kuram esat atļāvuši tiešos pasūtījumus, redz jūsu uzņēmuma nosaukumu, reģistrācijas numuru, konta numuru un vadītāja kontaktus, un jūs redzat viņa nosaukumu. Biržā klienti redzami ar kodu, līdz reiss ir jūsu; pēc tam rēķinu izrakstīšanai redzat viens otra nosaukumus.',
     anonymity:
       'Klienti redzami ar kodu, nevis nosaukumu. Pasūtītājs redz jūsu auto reģistrācijas numuru, vērtējumu un saziņai vadītāja vārdu, tālruni un e-pastu, bet ne jūsu uzņēmuma nosaukumu.',
   },
@@ -4179,7 +4176,8 @@ export const lv = {
 
   known: {
     directBilling: 'Tiešais līgums',
-    directBillingHint: 'Bez pakalpojuma maksas, reiss nonāk jūsu nedēļas atskaitē.',
+    directBillingHint: 'RAHTIS cenai neko nepieskaita, un reiss nonāk jūsu nedēļas atskaitē.',
+    carrierBusinessId: 'Reģistrācijas numurs',
     carrierAccount: 'Konta numurs',
     title: 'Mani auto',
     subtitle:
@@ -4224,7 +4222,7 @@ export const lv = {
     rateLabel: 'Cena',
     rateHint: 'Bez PVN. Redzama tikai jūsu atskaitē.',
     clientRequired: 'Izvēlieties klientu vai ierakstiet jauna klienta nosaukumu.',
-    clientInvalid: 'Pārbaudiet klienta Y-tunnus un e-pastu.',
+    clientInvalid: 'Pārbaudiet klienta reģistrācijas numuru un e-pastu.',
     subscriptionOnly:
       'Savi reisi ietilpst ikmēneša maksā: pirmais auto bez maksas, par katru nākamo, kas brauca, – 14,90 € mēnesī, bez procentiem. Pirmais mēnesis bez maksas.',
     trackLink: 'Izsekošanas saite klientam',
@@ -4234,7 +4232,7 @@ export const lv = {
     clientEdit: 'Rediģēt',
     clientDelete: 'Dzēst',
     clientDeleteConfirm: 'Dzēst šo klientu?',
-    clientDuplicate: 'Klients ar tādu pašu nosaukumu vai Y-tunnus jau ir.',
+    clientDuplicate: 'Klients ar tādu pašu nosaukumu vai reģistrācijas numuru jau ir.',
     clientHasJobs: 'Klientam ir reisi, tāpēc to nevar dzēst.',
     carrierHint:
       'Jūsu savs reiss gaida vadītāja apstiprinājumu. Termiņa nav. Ja vadītājs atsakās, reiss tiek atcelts — kopējā biržā tas nenonāk.',
@@ -4340,8 +4338,8 @@ export const lv = {
     groupGone: 'Cits auto paņēma pārvadājumu pirmais, vai piedāvājuma laiks beidzās.',
     groupOnly: 'Pārvadājums pašlaik piedāvāts tikai pasūtītāja paša auto.',
     contractRahtis: 'Līgumslēdzēja puse Aivomaa Oy (iepriekšējie noteikumi)',
-    contractCarrierHint: 'Pārvadājuma līgumu slēdz tieši ar pārvadātāju, kura piedāvājumu pieņemat. Pakalpojuma maksas nav; rēķinu jums izraksta pārvadātājs.',
-    deskDirectShipper: 'Tiešais līgums ar pārvadātāju, kas paņem pasūtījumu: pakalpojuma maksas nav, rēķinu jums izraksta pārvadātājs.',
+    contractCarrierHint: 'Pārvadājums tiek publicēts kravu biržā piemērotiem pārvadātājiem. RAHTIS par to neko neiekasē.',
+    deskDirectShipper: 'Pārvadātājs, kas paņem reisu, saņem visu cenu; RAHTIS tai neko nepieskaita.',
     hasOffers: 'Šim pārvadājumam jau ir pienākuši piedāvājumi — izvēlieties no tiem.',
   },
 
@@ -4987,7 +4985,7 @@ export const lv = {
     seeShipper: 'Par pārvadātāju pasūtītājs redz automašīnu un tās datus, vērtējumus, savlaicīguma rādītājus un atzīmi „pārbaudīts“ par pārvadātāja apakšuzņēmēja dokumentiem; pārvadātājiem, kam pasūtītājs pasūta tieši, arī pašu dokumentu paketi.',
     seeBank: 'Ja uzņēmums pēdējo 30 dienu laikā ir mainījis bankas kontu, tā līgumpartneri redz „Bankas rekvizīti mainīti pirms N dienām“ — nekad pašus rekvizītus. Pirms maksājat, pārliecinieties par jauno kontu, izmantojot kontaktu, ko jau zināt.',
     verifyTitle: 'Kā tiek pārbaudīti uzņēmumi',
-    verifyRegistry: 'Reģistrējoties mēs pārbaudām uzņēmumu publiskajos reģistros: Somijas komercreģistrā (PRH/YTJ), ES PVN reģistrā (VIES) un Norvēģijas uzņēmumiem — Brønnøysund reģistros. Pasūtītājiem, kas pasūta tieši, reģistru pārbaudi atkārtojam katru nedēļu.',
+    verifyRegistry: 'Reģistrējoties mēs pārbaudām uzņēmumu publiskajos reģistros: Somijas uzņēmumus PRH atvērtajos datos (YTJ), Norvēģijas uzņēmumus Brønnøysund reģistros un citu ES valstu uzņēmumus ES PVN maksātāju reģistrā (VIES). Ja automātiskas pārbaudes nav, uzņēmumu pārbaudām manuāli tā valsts reģistrā. Katru pieteikumu apstiprina mūsu komanda; ieraksts reģistrā apliecina, ka uzņēmums pastāv, nevis to, ka pieteicējs to pārstāv. Pasūtītājiem, kas pasūta tieši, reģistru pārbaudi atkārtojam katru nedēļu.',
     verifyDocs: 'Pārvadātāji iesniedz apakšuzņēmēja dokumentus (komercreģistra izrakstu, nodokļu un pensiju iemaksu izziņas, apdrošināšanu). Pasūtītāji var iesniegt komercreģistra izrakstu, nodokļu izziņas un paraksta tiesību apliecinājumu. Mūsu darbinieki pārbauda katru dokumentu un ieraksta datumu, līdz kuram pārbaude ir spēkā.',
     verifyInsurance: 'Pārvadātāju un ekspeditoru civiltiesiskās atbildības apdrošināšanu pārbaudām pēc polises dokumentiem. Ekspeditora apdrošināšana ir informācija pārvadātājiem, nevis nosacījums pasūtīšanai.',
     verifyVehicles: 'Katru automašīnu apstiprina mūsu darbinieki, pirms tā var pieņemt kravas.',
@@ -5045,9 +5043,8 @@ export const lv = {
     'validation.businessIdFor': 'Pārbaudiet: {label}. Piemērs: {example}',
     'signup.submitted':
       'Pārbaudīsim uzņēmuma {company} ({businessId}) datus reģistrā un nosūtīsim piekļuves datus uz {email}.',
-    'apply.registryOk': 'Y-tunnus atrasts reģistrā: {name}. Pieteikums gaida mūsu komandas pārbaudi.',
-    'apply.registryOther':
-      'Reģistrā ar šo Y-tunnus ir „{name}“. Ja Y-tunnus ir nepareizs, atbildiet uz apstiprinājuma e-pastu, un mēs to izlabosim. Pieteikums gaida mūsu komandas pārbaudi.',
+    'apply.registryOk': 'Uzņēmums atrasts reģistrā: {name}. Pieteikums gaida mūsu komandas pārbaudi.',
+    'apply.registryOther': 'Reģistrā ar šo reģistrācijas numuru ir „{name}“. Ja numurs ir nepareizs, atbildiet uz apstiprinājuma e-pastu, un mēs to izlabosim. Pieteikums gaida mūsu komandas pārbaudi.',
     'moderation.pendingCount':
       '{count, plural, =0 {Nav jaunu pieteikumu} zero {# pieteikumi gaida} one {# pieteikums gaida} other {# pieteikumi gaida}}',
     'moderation.invitedTo': 'Ielūgums nosūtīts uz {email}',

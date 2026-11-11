@@ -271,6 +271,7 @@ async function announceApplication(input: {
       companyName: input.companyName,
       companyId: input.companyId,
       businessId: input.businessId,
+      country: input.country,
       role: forApplicant.role[input.kind],
       operatorEmail: emailReplyTo(),
       locale: input.locale,
@@ -395,7 +396,7 @@ export async function rejectCompanyAction(formData: FormData): Promise<void> {
   if (!error && reason) {
     const { data: company } = await supabase
       .from('companies')
-      .select('name, business_id, contact_email, language')
+      .select('name, business_id, country, contact_email, language')
       .eq('id', companyId)
       .single();
     if (company?.contact_email) {
@@ -405,6 +406,7 @@ export async function rejectCompanyAction(formData: FormData): Promise<void> {
           companyName: company.name,
           companyId,
           businessId: company.business_id,
+          country: company.country,
           reason,
           operatorEmail: emailReplyTo(),
           locale: emailLocaleOf(company.language),

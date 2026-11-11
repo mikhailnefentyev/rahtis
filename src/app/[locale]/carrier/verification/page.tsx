@@ -4,6 +4,7 @@ import { Badge, Button, Card, CardBody, Mono } from '@/components/ui';
 import { VerifiedBadge } from '@/components/domain/VerifiedBadge';
 import { requireRole } from '@/lib/auth/guard';
 import { siteUrl } from '@/lib/config';
+import { businessIdLabel } from '@/lib/country';
 import { daysUntil, todayInHelsinki } from '@/lib/dates';
 import { isLocale } from '@/lib/i18n';
 import { getViewerI18n } from '@/lib/i18n/viewer';
@@ -113,7 +114,7 @@ export default async function VerificationPage({ params }: { params: Promise<{ l
           <CardBody className="flex flex-wrap items-start justify-between gap-4">
             <div className="grid min-w-0 gap-x-6 gap-y-1 text-[13px] sm:grid-cols-2">
               <p>
-                <span className="text-ink-faint">{v.businessId}: </span>
+                <span className="text-ink-faint">{businessIdLabel(company.country, v.businessId)}: </span>
                 <Mono>{company.business_id}</Mono>
               </p>
               <p>

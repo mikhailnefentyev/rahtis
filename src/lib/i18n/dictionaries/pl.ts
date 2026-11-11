@@ -219,7 +219,7 @@ export const pl = {
     nav: "Abonament",
     title: "Abonament",
     lede: "Płacisz tylko za pojazdy, które jeździły w danym miesiącu. Pierwszy pojazd jest bezpłatny, każdy kolejny kosztuje 14,90 € miesięcznie. Płacąc za rok z góry, otrzymasz 10 % rabatu.",
-    feesFrom: 'Twoja firma przeszła z podwykonawstwa na abonament: opłaty abonamentowe naliczamy od {date}. Do tego czasu abonament jest bezpłatny.',
+    feesFrom: 'Opłaty abonamentowe dla Twojej firmy naliczamy od {date}. Do tego czasu abonament jest bezpłatny.',
     activeNow: "Pojazdy, które jeździły w tym miesiącu",
     activeHint: "Pojazdy z zakończonym kursem",
     estimateNow: "Szacunek na ten miesiąc",
@@ -744,8 +744,7 @@ export const pl = {
     priceUnit: 'pojazd / miesiąc, netto',
     homeDescription:
       'RAHTIS to platforma do zarządzania transportem i giełda ładunków dla przewoźników. Flota, kierowcy, czas pracy i listy przewozowe w jednym miejscu, zlecenia prosto od własnych klientów, a wolne auta zapełnisz z giełdy. Wymiany naczep, kontenery i transport ekspresowy w Finlandii, Skandynawii, krajach bałtyckich, Polsce i Niemczech — zleceniodawca publikuje zlecenie raz i śledzi przewóz krok po kroku. Do robót ziemnych: kursy wywrotek, ważenia, godziny i faktury z budowy.',
-    termsDescription:
-      'Regulamin RAHTIS: obowiązki stron, przebieg przewozu, płatności i rozliczenia oraz okres obowiązywania umowy.',
+    termsDescription: 'Regulamin RAHTIS: obowiązki stron, przebieg przewozu, abonament oraz okres obowiązywania umowy.',
     privacyDescription:
       'Jak RAHTIS przetwarza dane osobowe: co jest zbierane, w jakim celu, jak długo jest przechowywane i jakie prawa ma osoba, której dane dotyczą.',
     signinDescription: 'Zaloguj się do RAHTIS jako zleceniodawca lub przewoźnik.',
@@ -876,8 +875,10 @@ export const pl = {
     progress: '{done}/{total} gotowe',
     waiting: 'czeka na weryfikację',
     activate: 'Dane firmy i regulamin',
-    activateText: 'Adres pobierzemy z fińskiego rejestru firm YTJ, jeśli tam jest. Dodaj numer konta i zaakceptuj regulamin — zajmie to około 2 minut.',
-    activateTextShipper: 'Adres pobierzemy z fińskiego rejestru firm YTJ, jeśli tam jest. Sprawdź dane do faktur i zaakceptuj regulamin — zajmie to około 2 minut.',
+    activateText: 'Sprawdź nazwę i adres firmy, dodaj numer konta i zaakceptuj regulamin — zajmie to około 2 minut.',
+    activateTextShipper: 'Sprawdź nazwę i adres firmy oraz dane do faktur i zaakceptuj regulamin — zajmie to około 2 minut.',
+    activateTextFi: 'Nazwę i adres pobierzemy z fińskiego rejestru firm YTJ, jeśli tam są. Dodaj numer konta i zaakceptuj regulamin — zajmie to około 2 minut.',
+    activateTextShipperFi: 'Nazwę i adres pobierzemy z fińskiego rejestru firm YTJ, jeśli tam są. Sprawdź dane do faktur i zaakceptuj regulamin — zajmie to około 2 minut.',
     activateAction: 'Uzupełnij',
     docs: 'Licencja transportowa i ubezpieczenie',
     docsText: 'Prześlij ważną licencję transportową i polisę OC komunikacyjnego. Wystarczy zdjęcie lub PDF.',
@@ -1094,8 +1095,7 @@ export const pl = {
     carrierTitle: 'Niech auto pracuje także między zleceniami.',
     carrier3: 'Ładunek powrotny znajdziesz w regionie, w którym kończy się ostatni przewóz.',
     carrier4: 'Każdy pojazd zatwierdzamy osobno.',
-    carrier5:
-      'Każdy przewóz to umowa zawierana bezpośrednio ze zleceniodawcą: fakturę wystawiasz samodzielnie, bez prowizji. Zanim weźmiesz zlecenie, widzisz informacje o płatnościach zleceniodawcy.',
+    carrier5: 'Nie pobieramy prowizji od przewozów: uzgodniona cena jest w całości Twoja. Zanim weźmiesz zlecenie, widzisz informacje o płatnościach zleceniodawcy.',
     carrier6: 'Raport tygodniowy pokazuje wykonane przewozy i zarobki.',
     carrier7:
       'Aplikacja kierowcy w cenie: przewozy, czas pracy, zdjęcia ładunku, list przewozowy i mapa miejsc — w języku kierowcy.',
@@ -1112,8 +1112,7 @@ export const pl = {
     stepsEyebrow: 'Jak przebiega przewóz',
     stepsTitle: 'Od wniosku do zakończonego przewozu w czterech krokach',
     step1: 'Weryfikacja firmy',
-    step1Text:
-      'Sprawdzamy numer identyfikacyjny (Y-tunnus) i dane firmy w rejestrach. U przewoźników sprawdzamy także licencję transportową i ubezpieczenie.',
+    step1Text: 'Sprawdzamy dane firmy w rejestrze, a każdy wniosek zatwierdza nasz pracownik. U przewoźników sprawdzamy także licencję transportową i ubezpieczenie.',
     step2: 'Zatwierdzenie pojazdu',
     step2Text:
       'Każdy pojazd zatwierdzamy osobno. Otwarte przewozy widzą tylko zatwierdzone pojazdy.',
@@ -1219,8 +1218,7 @@ export const pl = {
       'Połącz swój ERP lub TMS z RAHTIS: zlecenie trafia na giełdę lub do Twojego pojazdu bez przepisywania, a o każdym kroku wiesz w chwili, gdy się dzieje.',
     apiFreeEyebrow: 'Bezpłatnie',
     apiFreeTitle: 'Bez abonamentu, bez opłat za wywołanie',
-    apiFreeText:
-      'Korzystanie z API nic nie kosztuje, podobnie jak same przewozy: bez opłaty serwisowej, bez abonamentu i bez opłat za wywołanie. Umowę przewozu zawierasz bezpośrednio z przewoźnikiem, który wystawia Ci fakturę.',
+    apiFreeText: 'API jest bezpłatne, a RAHTIS nie pobiera od zleceniodawcy nic również za przewozy: bez opłaty serwisowej, bez abonamentu i bez opłat za wywołanie.',
     apiFastEyebrow: 'Szybko',
     apiFastTitle: 'Zlecenie w kilka sekund, zmiana w minutę',
     apiFastText:
@@ -1245,7 +1243,7 @@ export const pl = {
     footerDocuments: 'Dokumenty',
     finalEyebrow: 'Na start',
     finalTitle: 'Opowiedz nam o swojej firmie — resztą zajmiemy się my',
-    finalLede: 'Potrzebujemy nazwy firmy, Y-tunnus i adresu e-mail; od przewoźników także licencji transportowej i ubezpieczenia.',
+    finalLede: 'Potrzebujemy nazwy firmy, jej numeru identyfikacyjnego (w Polsce NIP) i adresu e-mail; od przewoźników także licencji transportowej i ubezpieczenia.',
     finalLede2: 'Sprawdzamy firmę w rejestrach (w Finlandii PRH/YTJ, w pozostałych krajach UE VIES, w Norwegii Brønnøysund) i po zatwierdzeniu wydajemy dane logowania.',
     applyShipper: 'Wniosek zleceniodawcy',
     applyCarrier: 'Wniosek przewoźnika',
@@ -1299,10 +1297,10 @@ export const pl = {
     priceYear: "Płatność za rok z góry: −10 %",
     priceSubEyebrow: 'Giełda dla przewoźników',
     priceSubTitle: '0 % prowizji od kursu',
-    priceSubText: 'Bierzesz zlecenia z giełdy na podstawie umowy zawieranej bezpośrednio ze zleceniodawcą i samodzielnie wystawiasz fakturę. Bez prowizji; wszystko obejmuje abonament opisany wyżej.',
+    priceSubText: 'Od zleceń z giełdy nie pobieramy prowizji ani opłat za zlecenie: uzgodniona cena jest w całości Twoja. Wszystko obejmuje abonament opisany wyżej.',
     priceShipEyebrow: "Dla zleceniodawcy",
     priceShipTitle: 'Bezpłatnie',
-    priceShipText: 'Publikowanie zleceń, zlecenia bezpośrednie dla własnych przewoźników i API są dla zleceniodawców bezpłatne. Umowę przewozu zawierasz bezpośrednio z przewoźnikiem, który wystawia Ci fakturę.',
+    priceShipText: 'Publikowanie zleceń, oferty przewoźników, zlecenia bezpośrednie dla własnych przewoźników i API są dla zleceniodawców bezpłatne. Umowę zawierasz bezpośrednio z przewoźnikiem, a RAHTIS nie pobiera prowizji od frachtu.',
   },
 
   done: {
@@ -1619,7 +1617,7 @@ export const pl = {
   orderForm: {
     requiredBody: 'Zabudowa',
     anyBody: 'Dowolna',
-    feeHint: 'Bez opłaty serwisowej: umowę przewozu zawierasz bezpośrednio z przewoźnikiem, który wystawia Ci fakturę.',
+    feeHint: '· przewoźnik dostaje całą cenę, RAHTIS nic do niej nie dolicza',
     /* Валюта цены: не евро — только у прямого договора и своих рейсов. */
     currency: 'Waluta',
     currencyErrorDirect: 'Cenę w walucie innej niż euro można ustalić tylko w umowie bezpośredniej z przewoźnikiem.',
@@ -2111,7 +2109,7 @@ export const pl = {
       'Po zatwierdzeniu: logowanie, licencja i ubezpieczenie, dane pojazdów. Każdy pojazd zatwierdzamy osobno.',
     shipperNote: 'Po zatwierdzeniu: logowanie, dane firmy, publikowanie zleceń.',
     sentTitle: 'Wniosek wysłany',
-    duplicate: 'Dla tego numeru Y-tunnus złożono już wniosek, który czeka na rozpatrzenie lub został zatwierdzony.',
+    duplicate: 'Dla tego numeru identyfikacyjnego złożono już wniosek, który czeka na rozpatrzenie lub został zatwierdzony.',
     invitedBy: '{carrier} zaprasza Cię. Dane są już uzupełnione — sprawdź je i wyślij wniosek. Po zatwierdzeniu możesz wysyłać zlecenia bezpośrednie do aut tej firmy.',
     invitedByCarrier: '{carrier} zaprasza Twoją firmę transportową. Dane są uzupełnione — sprawdź je i wyślij wniosek.',
     invitedByRahtis: 'Dane są uzupełnione z zaproszenia — sprawdź je i wyślij wniosek.',
@@ -2123,7 +2121,7 @@ export const pl = {
   requisites: {
     ytjRefresh: 'Pobierz nazwę i adres z YTJ',
     title: 'Dane firmy',
-    subtitleShipper: 'Potrzebujemy ich do fakturowania. Po zapisaniu firma zostaje aktywowana.',
+    subtitleShipper: 'Te dane do faktur widzą przewoźnicy, z którymi współpracujesz. Po zapisaniu firma zostaje aktywowana.',
     subtitleCarrier: 'Klienci widzą je przy fakturowaniu umów bezpośrednich, a my używamy ich do naliczania abonamentu. Po zapisaniu firma zostaje aktywowana.',
 
     legalSection: 'Dane rejestrowe',
@@ -2137,13 +2135,13 @@ export const pl = {
     language: 'Język korespondencji',
     languageHint:
       'Język, w którym wysyłamy zaproszenia, faktury i raporty. Język interfejsu każdy wybiera sam na górnym pasku.',
-    vatHint: 'Wyliczony z Y-tunnus. Popraw, jeśli używasz numeru grupy VAT',
+    vatHint: 'Wyliczony z numeru identyfikacyjnego firmy. Popraw, jeśli używasz numeru grupy VAT',
     vatInvalid: 'Format: kod kraju i 2–12 znaków, np. FI12345678',
 
     billingSection: 'Fakturowanie',
     billingSameAsLegal: 'Adres do faktur jest taki sam jak rejestrowy',
     billingEmail: 'E-mail do faktur',
-    billingEmailHint: 'Tu wysyłamy faktury',
+    billingEmailHint: 'Na ten adres przychodzą faktury i przypomnienia o płatności',
     billingReference: 'Numer referencyjny na fakturze',
     billingReferenceHint: 'Numer zamówienia lub centrum kosztów, które chcesz mieć na fakturze',
 
@@ -2633,8 +2631,8 @@ export const pl = {
       ACCIDENT_INSURANCE: 'Ubezpieczenie od wypadków przy pracy',
     },
     itemHints: {
-      REGISTERS: 'Pobierane automatycznie z otwartych danych fińskiego PRH. Jednoosobowa działalność: prześlij odpis z YTJ.',
-      TRADE_REGISTER: 'Pobierane automatycznie z otwartych danych fińskiego PRH. Jednoosobowa działalność: prześlij odpis z YTJ.',
+      REGISTERS: 'Dla fińskiej firmy pobierane automatycznie z otwartych danych PRH; jednoosobowa działalność przesyła odpis z YTJ. Firmy z innych krajów: prześlij odpowiednie zaświadczenie z urzędu skarbowego.',
+      TRADE_REGISTER: 'Dla firm z Finlandii i Norwegii pobierane automatycznie z rejestru (PRH, Brønnøysund); fińska jednoosobowa działalność przesyła odpis z YTJ. Firmy z innych krajów: prześlij odpis z rejestru (KRS lub CEIDG).',
       TAX_DEBT: 'Zaświadczenie z fińskiego serwisu podatkowego OmaVero, nie starsze niż 3 miesiące.',
       PENSION: 'Zaświadczenie ubezpieczyciela emerytalnego o ubezpieczeniu i opłaconych składkach, nie starsze niż 3 miesiące.',
       COLLECTIVE_AGREEMENT: 'Obowiązujący układ zbiorowy (np. w transporcie drogowym) lub opis podstawowych warunków zatrudnienia.',
@@ -2648,9 +2646,9 @@ export const pl = {
       MISSING: 'Brak',
     },
     validUntilDate: 'Ważny do {date}',
-    fromPrh: 'Z danych PRH',
+    fromPrh: 'Z danych rejestrowych',
     fromDocument: 'Z dokumentu',
-    registryTitle: 'Dane rejestrowe (PRH)',
+    registryTitle: 'Dane rejestrowe',
     company: 'Firma',
     businessId: 'Y-tunnus',
     prepayment: 'Rejestr zaliczek na podatek',
@@ -2662,10 +2660,10 @@ export const pl = {
     unknown: 'Brak danych',
     checkedAt: 'Sprawdzono {date}',
     noRegistry: 'Dane rejestrowe nie zostały jeszcze pobrane.',
-    refresh: 'Odśwież z PRH',
+    refresh: 'Odśwież z rejestru',
     refreshing: 'Odświeżanie…',
     refreshTooSoon: 'Dane zostały właśnie odświeżone. Spróbuj ponownie za 10 minut.',
-    refreshFailed: 'Rejestr PRH nie odpowiedział. Spróbuj ponownie za chwilę.',
+    refreshFailed: 'Rejestr nie odpowiedział. Spróbuj ponownie za chwilę.',
     packageTitle: 'Dokumenty',
     upload: 'Prześlij dokument',
     uploading: 'Przesyłanie…',
@@ -2690,7 +2688,7 @@ export const pl = {
     issued: 'Wystawiono {date}',
     shareTitle: 'Linki do udostępnienia',
     shareHint:
-      'Wyślij link zleceniodawcy, który nie korzysta z RAHTIS. Link pokazuje nazwę firmy, Y-tunnus, znak i ważne dokumenty. Możesz go unieważnić w dowolnym momencie.',
+      'Wyślij link zleceniodawcy, który nie korzysta z RAHTIS. Link pokazuje nazwę firmy, numer identyfikacyjny, znak i ważne dokumenty. Możesz go unieważnić w dowolnym momencie.',
     shareLabel: 'Dla kogo (opcjonalnie)',
     shareExpires: 'Ważny do (opcjonalnie)',
     shareCreate: 'Utwórz link',
@@ -2726,8 +2724,7 @@ export const pl = {
     reminderTitle: '{item}: ważny do {date}',
     reminderLead:
       'Dokument „{item}” traci ważność {date}. Prześlij nowe zaświadczenie, aby pakiet pozostał ważny, a znak „Zweryfikowany” został zachowany.',
-    reminderLeadPrh:
-      'Sprawdzenie danych rejestrowych („{item}”) w PRH traci ważność {date}. Odśwież je jednym kliknięciem, aby zachować znak „Zweryfikowany”.',
+    reminderLeadPrh: 'Sprawdzenie danych rejestrowych („{item}”) traci ważność {date}. Odśwież je z rejestru jednym kliknięciem, aby zachować znak „Zweryfikowany”.',
     reminderButton: 'Zaktualizuj dokumenty',
   },
 
@@ -4075,7 +4072,7 @@ export const pl = {
     inviteLanguage: 'Język wiadomości',
     inviteSend: 'Wyślij zaproszenie',
     inviteSent: 'Zaproszenie wysłane na {email}.',
-    inviteInvalid: 'Sprawdź nazwę, Y-tunnus i e-mail.',
+    inviteInvalid: 'Sprawdź nazwę, numer identyfikacyjny i e-mail.',
     inviteTooMany: 'Najwyżej 20 zaproszeń dziennie.',
     inviteFailed: 'Nie udało się wysłać zaproszenia. Spróbuj za chwilę.',
     invitesTitle: 'Wysłane zaproszenia',
@@ -4090,7 +4087,7 @@ export const pl = {
     revoke: 'Cofnij',
     none: 'Brak wykonanych przewozów',
     anonymitySubscriber:
-      'Klient, któremu zezwolono na zlecenia bezpośrednie, widzi nazwę Twojej firmy, Y-tunnus i numer konta oraz dane kontaktowe kierowcy, a Ty widzisz jego nazwę. Na giełdzie klienci są pokazywani pod kodem, dopóki nie weźmiesz zlecenia; potem obie strony widzą swoje nazwy na potrzeby fakturowania.',
+      'Klient, któremu zezwolono na zlecenia bezpośrednie, widzi nazwę Twojej firmy, jej numer identyfikacyjny i numer konta oraz dane kontaktowe kierowcy, a Ty widzisz jego nazwę. Na giełdzie klienci są pokazywani pod kodem, dopóki nie weźmiesz zlecenia; potem obie strony widzą swoje nazwy na potrzeby fakturowania.',
     anonymity:
       'Klienci są pokazywani pod kodem, nie z nazwy. Zleceniodawca widzi numer rejestracyjny Twojego pojazdu, ocenę oraz, do kontaktu, imię i nazwisko, telefon i e-mail kierowcy, ale nie nazwę Twojej firmy.',
   },
@@ -4178,7 +4175,8 @@ export const pl = {
 
   known: {
     directBilling: 'Wystawia Ci fakturę bezpośrednio',
-    directBillingHint: 'Bezpośrednia umowa z przewoźnikiem: bez opłaty serwisowej, a przewóz trafia do Twojego raportu tygodniowego.',
+    directBillingHint: 'RAHTIS nic nie dolicza do ceny, a przewóz trafia do Twojego raportu tygodniowego.',
+    carrierBusinessId: 'Numer identyfikacyjny',
     carrierAccount: 'Numer konta',
     title: 'Moje pojazdy',
     subtitle:
@@ -4223,7 +4221,7 @@ export const pl = {
     rateLabel: 'Cena',
     rateHint: 'Netto (bez VAT). Widać ją tylko w Twoim raporcie.',
     clientRequired: 'Wybierz klienta lub wpisz nazwę nowego.',
-    clientInvalid: 'Sprawdź Y-tunnus i e-mail klienta.',
+    clientInvalid: 'Sprawdź numer identyfikacyjny i e-mail klienta.',
     subscriptionOnly:
       'Własne przewozy są częścią abonamentu: pierwszy pojazd gratis, każdy kolejny, który jeździł, 14,90 € miesięcznie, bez prowizji. Pierwszy miesiąc jest bezpłatny.',
     trackLink: 'Link do śledzenia dla klienta',
@@ -4233,7 +4231,7 @@ export const pl = {
     clientEdit: 'Edytuj',
     clientDelete: 'Usuń',
     clientDeleteConfirm: 'Usunąć tego klienta?',
-    clientDuplicate: 'Klient o tej samej nazwie lub Y-tunnus już istnieje.',
+    clientDuplicate: 'Klient o tej samej nazwie lub numerze identyfikacyjnym już istnieje.',
     clientHasJobs: 'Ten klient ma przewozy i nie można go usunąć.',
     carrierHint:
       'Twój własny przewóz czeka na potwierdzenie kierowcy. Nie ma terminu. Odrzucenie anuluje przewóz — nie trafia on na wspólną giełdę.',
@@ -4339,8 +4337,8 @@ export const pl = {
     groupGone: 'Inne auto wzięło przewóz pierwsze albo czas na ofertę minął.',
     groupOnly: 'Przewóz jest obecnie oferowany tylko własnym pojazdom zleceniodawcy.',
     contractRahtis: 'Aivomaa Oy jako strona umowy (wcześniejsze warunki)',
-    contractCarrierHint: 'Umowę przewozu zawierasz bezpośrednio z przewoźnikiem, którego ofertę przyjmiesz. Bez opłaty serwisowej; fakturę wystawia Ci przewoźnik.',
-    deskDirectShipper: 'Umowa bezpośrednia z przewoźnikiem, który weźmie zlecenie: bez opłaty serwisowej, fakturę wystawia przewoźnik.',
+    contractCarrierHint: 'Zlecenie trafia na giełdę do pasujących przewoźników. RAHTIS nic za to nie pobiera.',
+    deskDirectShipper: 'Przewoźnik, który weźmie zlecenie, dostaje całą cenę; RAHTIS nic do niej nie dolicza.',
     hasOffers: 'Na ten przewóz są już oferty — wybierz spośród nich.',
   },
 
@@ -4986,7 +4984,7 @@ export const pl = {
     seeShipper: 'O przewoźniku zleceniodawca widzi pojazd i jego dane, oceny, statystykę terminowości oraz znacznik „sprawdzone” przy dokumentach podwykonawcy; w przypadku przewoźników, którym zleca bezpośrednio, także pakiet dokumentów.',
     seeBank: 'Jeśli firma zmieniła rachunek bankowy w ciągu ostatnich 30 dni, jej kontrahenci widzą komunikat „Dane bankowe zmienione N dni temu” — nigdy samych danych. Zanim zapłacisz, potwierdź nowy rachunek przez znany Ci już kontakt.',
     verifyTitle: 'Jak weryfikujemy firmy',
-    verifyRegistry: 'Przy rejestracji sprawdzamy firmę w rejestrach publicznych: fińskim rejestrze handlowym (PRH/YTJ), unijnym rejestrze VAT (VIES), a w przypadku firm norweskich — w rejestrach Brønnøysund. U zleceniodawców zlecających bezpośrednio sprawdzenie w rejestrach powtarzamy co tydzień.',
+    verifyRegistry: 'Przy rejestracji sprawdzamy firmę w rejestrach publicznych: firmy fińskie w otwartych danych PRH (YTJ), norweskie w rejestrach Brønnøysund, a firmy z pozostałych krajów UE w unijnym systemie VIES. Gdy automatyczne sprawdzenie nie jest możliwe, sprawdzamy firmę ręcznie w rejestrze jej kraju. Każdy wniosek zatwierdza nasz zespół; wpis w rejestrze potwierdza, że firma istnieje, a nie to, że wnioskodawca ją reprezentuje. U zleceniodawców zlecających bezpośrednio sprawdzenie w rejestrach powtarzamy co tydzień.',
     verifyDocs: 'Przewoźnicy przesyłają dokumenty podwykonawcy (odpis z rejestru handlowego, zaświadczenia podatkowe i emerytalne, ubezpieczenia). Zleceniodawcy mogą przesłać odpis z rejestru handlowego, zaświadczenia podatkowe i dokument potwierdzający prawo do reprezentacji. Nasi pracownicy sprawdzają każdy dokument i zapisują datę, do której weryfikacja jest ważna.',
     verifyInsurance: 'Ubezpieczenie OC przewoźników i spedytorów sprawdzamy na podstawie dokumentów polisy. Ubezpieczenie spedytora jest informacją dla przewoźników, a nie warunkiem składania zleceń.',
     verifyVehicles: 'Każdy pojazd musi zostać zatwierdzony przez naszych pracowników, zanim będzie mógł przyjmować ładunki.',
@@ -5044,9 +5042,8 @@ export const pl = {
     'validation.businessIdFor': 'Sprawdź pole {label}. Przykład: {example}',
     'signup.submitted':
       'Sprawdzimy {company} ({businessId}) w rejestrze i wyślemy dane logowania na {email}.',
-    'apply.registryOk': 'Y-tunnus znaleziony w rejestrze: {name}. Wniosek czeka na weryfikację przez nasz zespół.',
-    'apply.registryOther':
-      'Pod tym Y-tunnus w rejestrze figuruje „{name}”. Jeśli Y-tunnus jest błędny, odpowiedz na e-mail z potwierdzeniem, a poprawimy go. Wniosek czeka na weryfikację przez nasz zespół.',
+    'apply.registryOk': 'Firma znaleziona w rejestrze: {name}. Wniosek czeka na weryfikację przez nasz zespół.',
+    'apply.registryOther': 'Pod tym numerem w rejestrze figuruje „{name}”. Jeśli numer jest błędny, odpowiedz na e-mail z potwierdzeniem, a poprawimy go. Wniosek czeka na weryfikację przez nasz zespół.',
     'moderation.pendingCount':
       '{count, plural, =0 {Brak nowych wniosków} one {# wniosek czeka} few {# wnioski czekają} many {# wniosków czeka} other {# wniosku czeka}}',
     'moderation.invitedTo': 'Zaproszenie wysłane na {email}',

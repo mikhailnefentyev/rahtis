@@ -6,6 +6,7 @@ import { VerifiedBadge } from '@/components/domain/VerifiedBadge';
 import { BankChangedNote } from '@/components/domain/BankChanged';
 import { bankChangeMarks } from '@/lib/trust/sensitive';
 import { requireRole } from '@/lib/auth/guard';
+import { businessIdLabelByShape } from '@/lib/country';
 import { EURO_LABEL } from '@/lib/fleet/labels';
 import { isLocale, type Locale } from '@/lib/i18n';
 import { formatIban } from '@/lib/operator/profile';
@@ -143,7 +144,7 @@ async function VehicleList({
                       {v.carrier_name}
                       {v.carrier_business_id && (
                         <span className="ml-2 font-normal text-ink-muted">
-                          Y-tunnus <Mono>{v.carrier_business_id}</Mono>
+                          {businessIdLabelByShape(v.carrier_business_id, t.known.carrierBusinessId)} <Mono>{v.carrier_business_id}</Mono>
                         </span>
                       )}
                     </p>

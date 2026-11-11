@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useActionState } from 'react';
 import { Badge, Button, Countdown, Kv, Plate, Stars } from '@/components/ui';
 import { APP, MATCHING } from '@/lib/config';
+import { businessIdLabelByShape } from '@/lib/country';
 import { EURO_LABEL } from '@/lib/fleet/labels';
 import { cancelOrderAction, chooseOfferAction } from '@/lib/orders/matching';
 import { useI18n } from '@/lib/i18n/provider';
@@ -181,7 +182,7 @@ export function AssignedCarrier({
 
         {direct && (
           <div className="mb-2.5 flex flex-col gap-1">
-            <Kv k="Y-tunnus" v={direct.businessId} />
+            <Kv k={businessIdLabelByShape(direct.businessId, t.known.carrierBusinessId)} v={direct.businessId} />
             {direct.iban && <Kv k={t.known.carrierAccount} v={direct.iban} />}
             <BankChangedNote at={direct.bankChangedAt} hint className="text-xs" />
             <p className="text-xs text-ink-muted">{t.known.directBillingHint}</p>

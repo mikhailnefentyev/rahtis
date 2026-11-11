@@ -219,7 +219,7 @@ export const sv = {
     nav: "Abonnemang",
     title: "Abonnemang",
     lede: "Du betalar bara för fordon som körde under månaden. Första fordonet är gratis, varje ytterligare fordon kostar 14,90 € i månaden. Betala ett år i förväg och få 10 % rabatt.",
-    feesFrom: 'Du har gått över från underentreprenad till abonnemang: månadsavgifter för ditt företag debiteras från och med {date}. Fram till dess är abonnemanget kostnadsfritt.',
+    feesFrom: 'Månadsavgifterna för ditt företag debiteras från och med {date}. Fram till dess är abonnemanget kostnadsfritt.',
     activeNow: "Fordon som kört denna månad",
     activeHint: "Fordon med en slutförd körning",
     estimateNow: "Uppskattning för månaden",
@@ -744,8 +744,7 @@ export const sv = {
     priceUnit: 'fordon / månad, exkl. moms',
     homeDescription:
       'RAHTIS är en plattform för transportledning och en lastbörs för åkerier. Hantera flotta, förare, arbetstid och fraktsedlar på ett ställe, ta emot order direkt från egna kunder och fyll tomma bilar från lastbörsen. Trailerbyten, containrar och expresstransporter i Finland, Norden, Baltikum, Polen och Tyskland – uppdragsgivaren publicerar en gång och följer uppdraget steg för steg. För markarbeten: tippbilarnas lass, vägning, timmar och fakturor från arbetsplatsen.',
-    termsDescription:
-      'Användarvillkor för RAHTIS: parternas ansvar, hur ett uppdrag genomförs, betalningar och avräkningar samt avtalets giltighetstid.',
+    termsDescription: 'Användarvillkor för RAHTIS: parternas ansvar, hur ett uppdrag genomförs, abonnemanget samt avtalets giltighetstid.',
     privacyDescription:
       'Hur RAHTIS behandlar personuppgifter: vad som samlas in, vad det används till, hur länge det sparas och vilka rättigheter den registrerade har.',
     signinDescription: 'Logga in på RAHTIS som uppdragsgivare eller som åkeri.',
@@ -876,8 +875,10 @@ export const sv = {
     progress: '{done}/{total} klara',
     waiting: 'väntar på granskning',
     activate: 'Företagsuppgifter och villkor',
-    activateText: 'Vi hämtar adressen från FODS (YTJ) om den finns där. Lägg till kontonummer och godkänn villkoren – cirka 2 minuter.',
-    activateTextShipper: 'Vi hämtar adressen från FODS (YTJ) om den finns där. Kontrollera faktureringsuppgifterna och godkänn villkoren – cirka 2 minuter.',
+    activateText: 'Kontrollera företagets namn och adress, lägg till kontonummer och godkänn villkoren – cirka 2 minuter.',
+    activateTextShipper: 'Kontrollera företagets namn, adress och faktureringsuppgifter och godkänn villkoren – cirka 2 minuter.',
+    activateTextFi: 'Vi hämtar namn och adress från FODS (YTJ) om de finns där. Lägg till kontonummer och godkänn villkoren – cirka 2 minuter.',
+    activateTextShipperFi: 'Vi hämtar namn och adress från FODS (YTJ) om de finns där. Kontrollera faktureringsuppgifterna och godkänn villkoren – cirka 2 minuter.',
     activateAction: 'Fyll i',
     docs: 'Trafiktillstånd och försäkring',
     docsText: 'Ladda upp ett giltigt trafiktillstånd och trafikförsäkring. Ett foto eller en PDF räcker.',
@@ -1094,8 +1095,7 @@ export const sv = {
     carrierTitle: 'Håll bilen i arbete även mellan uppdragen.',
     carrier3: 'Du kan hitta en returlast i området där det senaste uppdraget slutar.',
     carrier4: 'Varje fordon godkänns separat på plattformen.',
-    carrier5:
-      'Varje uppdrag är ett avtal direkt med uppdragsgivaren: du fakturerar själv, och vi tar ingen procent. Innan du tar ett uppdrag ser du uppdragsgivarens betalningsuppgifter.',
+    carrier5: 'Vi tar ingen procent av uppdragen: det avtalade priset är helt ditt. Innan du tar ett uppdrag ser du uppdragsgivarens betalningsuppgifter.',
     carrier6: 'Veckorapporten visar körda uppdrag och intäkter.',
     carrier7:
       'Förarappen ingår: uppdrag, arbetstid, lastfoton, fraktsedeln, platskartan och förarens eget språk.',
@@ -1112,8 +1112,7 @@ export const sv = {
     stepsEyebrow: 'Så går ett uppdrag till',
     stepsTitle: 'Från ansökan till slutfört uppdrag i fyra steg',
     step1: 'Kontroll av företaget',
-    step1Text:
-      'Vi kontrollerar FO-numret och företagsuppgifterna mot registren. För åkerier kontrollerar vi även trafiktillstånd och försäkring.',
+    step1Text: 'Vi kontrollerar företaget i företagsregistret, och varje ansökan godkänns av en medarbetare. För åkerier kontrollerar vi även trafiktillstånd och försäkring.',
     step2: 'Godkännande av fordon',
     step2Text:
       'Varje fordon godkänns separat. Öppna uppdrag syns bara för godkänd utrustning.',
@@ -1219,8 +1218,7 @@ export const sv = {
       'Koppla ditt ERP eller TMS till RAHTIS: ordern går till börsen eller till ditt eget fordon utan att skrivas in igen, och du vet om varje steg i samma stund som det sker.',
     apiFreeEyebrow: 'Gratis',
     apiFreeTitle: 'Ingen månadsavgift, inget pris per anrop',
-    apiFreeText:
-      'Att använda API:et kostar ingenting, och inte heller transporterna: ingen serviceavgift, ingen månadsavgift och inget pris per anrop. Transportavtalet ingås direkt med åkeriet, som fakturerar dig.',
+    apiFreeText: 'API:et kostar ingenting, och RAHTIS tar inte heller betalt av uppdragsgivare för transporterna: ingen serviceavgift, ingen månadsavgift och inget pris per anrop.',
     apiFastEyebrow: 'Snabbt',
     apiFastTitle: 'En order på sekunder, en ändring inom en minut',
     apiFastText:
@@ -1245,7 +1243,7 @@ export const sv = {
     footerDocuments: 'Dokument',
     finalEyebrow: 'Kom igång',
     finalTitle: 'Berätta om ditt företag – vi sköter resten',
-    finalLede: 'Vi behöver företagets namn, FO-nummer (Y-tunnus) och en e-postadress; av åkerier även trafiktillstånd och försäkring.',
+    finalLede: 'Vi behöver företagets namn, organisationsnummer och en e-postadress; av åkerier även trafiktillstånd och försäkring.',
     finalLede2: 'Vi kontrollerar företaget i företagsregistren (PRS/FODS i Finland, VIES för övriga EU-länder, Brønnøysundregistren i Norge) och skickar inloggningsuppgifter när det är godkänt.',
     applyShipper: 'Ansökan för uppdragsgivare',
     applyCarrier: 'Ansökan för åkeri',
@@ -1299,10 +1297,10 @@ export const sv = {
     priceYear: "Betala ett år i förskott: −10 %",
     priceSubEyebrow: 'Lastbörs för åkerier',
     priceSubTitle: '0 % per uppdrag',
-    priceSubText: 'Du tar uppdrag från lastbörsen med avtal direkt med uppdragsgivaren och fakturerar själv. Ingen provision; abonnemanget ovan täcker allt.',
+    priceSubText: 'Ingen provision och inga avgifter per uppdrag på lastbörsen: det avtalade priset är helt ditt. Abonnemanget ovan täcker allt.',
     priceShipEyebrow: "För transportköpare",
     priceShipTitle: 'Gratis',
-    priceShipText: 'Att publicera uppdrag, skicka direktorder till egna åkerier och använda API:t är gratis för uppdragsgivare. Transportavtalet ingås direkt med åkeriet, som fakturerar dig.',
+    priceShipText: 'Att publicera uppdrag, ta emot anbud från åkerier, skicka direktorder till egna åkerier och använda API:t är gratis för uppdragsgivare. Avtalet ingås direkt med åkeriet, och RAHTIS tar ingen procent av frakten.',
   },
 
   done: {
@@ -1620,7 +1618,7 @@ export const sv = {
   orderForm: {
     requiredBody: 'Påbyggnad',
     anyBody: 'Vilken som helst',
-    feeHint: 'Ingen serviceavgift: transportavtalet ingås direkt med åkeriet, som fakturerar dig.',
+    feeHint: '· åkeriet får hela priset, RAHTIS lägger inte till något',
     /* Валюта цены: не евро — только у прямого договора и своих рейсов. */
     currency: 'Valuta',
     currencyErrorDirect: 'Bara ett direktavtal med åkeriet kan prissättas i annan valuta än euro. I lastbörsen anges priset i euro.',
@@ -2112,7 +2110,7 @@ export const sv = {
       'Efter godkännande: inloggning, trafiktillstånd och försäkring, fordonsuppgifter. Vi godkänner varje fordon för sig.',
     shipperNote: 'Efter godkännande: inloggning, företagsuppgifter, publicering av order.',
     sentTitle: 'Ansökan skickad',
-    duplicate: 'Det finns redan en ansökan för det här FO-numret, under behandling eller godkänd.',
+    duplicate: 'Det finns redan en ansökan för det här organisationsnumret, under behandling eller godkänd.',
     invitedBy: '{carrier} bjöd in dig. Uppgifterna är ifyllda – kontrollera dem och skicka ansökan. När den är godkänd kan du skicka direktorder till deras fordon.',
     invitedByCarrier: '{carrier} bjöd in ditt åkeri. Uppgifterna är ifyllda – kontrollera dem och skicka ansökan.',
     invitedByRahtis: 'Uppgifterna är ifyllda från inbjudan – kontrollera dem och skicka ansökan.',
@@ -2124,7 +2122,7 @@ export const sv = {
   requisites: {
     ytjRefresh: 'Hämta namn och adress från YTJ',
     title: 'Företagsuppgifter',
-    subtitleShipper: 'Vi behöver dem för faktureringen. När de är sparade blir företaget aktivt.',
+    subtitleShipper: 'Åkerier som du arbetar med ser dessa faktureringsuppgifter. När de är sparade blir företaget aktivt.',
     subtitleCarrier: 'Kunderna ser dem för fakturering vid direktavtal, och vi använder dem för månadsavgiften. När de är sparade blir företaget aktivt.',
 
     legalSection: 'Registrerade uppgifter',
@@ -2138,13 +2136,13 @@ export const sv = {
     language: 'Korrespondensspråk',
     languageHint:
       'Språket vi skickar inbjudningar, fakturor och rapporter på. Var och en väljer gränssnittets språk själv i övre fältet.',
-    vatHint: 'Bildat av FO-numret. Rätta det om du har ett momsgruppsnummer',
+    vatHint: 'Bildat av organisationsnumret. Rätta det om du har ett momsgruppsnummer',
     vatInvalid: 'Format: landskod plus 2–12 tecken, till exempel FI12345678',
 
     billingSection: 'Fakturering',
     billingSameAsLegal: 'Faktureringsadressen är samma som den registrerade',
     billingEmail: 'E-post för fakturor',
-    billingEmailHint: 'Hit skickar vi fakturorna',
+    billingEmailHint: 'Fakturor och betalningspåminnelser kommer till den här adressen',
     billingReference: 'Fakturareferens',
     billingReferenceHint: 'Ordernummer eller kostnadsställe du vill ha på fakturan',
 
@@ -2634,8 +2632,8 @@ export const sv = {
       ACCIDENT_INSURANCE: 'Olycksfallsförsäkring',
     },
     itemHints: {
-      REGISTERS: 'Hämtas automatiskt från PRS:s öppna data. Enskild näringsidkare: ladda upp ett utdrag från FODS.',
-      TRADE_REGISTER: 'Hämtas automatiskt från PRS:s öppna data. Enskild näringsidkare: ladda upp ett utdrag från FODS.',
+      REGISTERS: 'För ett finländskt företag hämtas uppgifterna automatiskt från PRS öppna data; enskilda näringsidkare laddar upp ett utdrag från FODS. Företag från andra länder: ladda upp motsvarande intyg från skattemyndigheten.',
+      TRADE_REGISTER: 'För finländska och norska företag hämtas uppgifterna automatiskt från registret (PRS, Brønnøysundregistren); finländska enskilda näringsidkare laddar upp ett utdrag från FODS. Företag från andra länder: ladda upp ett handelsregisterutdrag.',
       TAX_DEBT: 'Skatteskuldsintyg från MinSkatt, högst 3 månader gammalt.',
       PENSION: 'Pensionsbolagets intyg om försäkringen och betalda avgifter, högst 3 månader gammalt.',
       COLLECTIVE_AGREEMENT: 'Tillämpligt kollektivavtal (t.ex. för lastbilsbranschen) eller en redogörelse för de centrala anställningsvillkoren.',
@@ -2649,9 +2647,9 @@ export const sv = {
       MISSING: 'Saknas',
     },
     validUntilDate: 'Giltig till {date}',
-    fromPrh: 'Från PRS:s uppgifter',
+    fromPrh: 'Från registeruppgifter',
     fromDocument: 'Från dokument',
-    registryTitle: 'Registeruppgifter (PRS)',
+    registryTitle: 'Registeruppgifter',
     company: 'Företag',
     businessId: 'FO-nummer',
     prepayment: 'Förskottsuppbördsregistret',
@@ -2663,10 +2661,10 @@ export const sv = {
     unknown: 'Uppgift saknas',
     checkedAt: 'Kontrollerat {date}',
     noRegistry: 'Registeruppgifterna har inte hämtats ännu.',
-    refresh: 'Uppdatera från PRS',
+    refresh: 'Uppdatera från registret',
     refreshing: 'Uppdaterar…',
     refreshTooSoon: 'Uppgifterna uppdaterades nyss. Försök igen om 10 minuter.',
-    refreshFailed: 'PRS:s register svarade inte. Försök igen om en stund.',
+    refreshFailed: 'Registret svarade inte. Försök igen om en stund.',
     packageTitle: 'Utredningar',
     upload: 'Ladda upp utredning',
     uploading: 'Laddar upp…',
@@ -2691,7 +2689,7 @@ export const sv = {
     issued: 'Utfärdad {date}',
     shareTitle: 'Delningslänkar',
     shareHint:
-      'Skicka en länk till en beställare som inte använder RAHTIS. Länken visar företagets namn, FO-nummer, märket och de giltiga utredningarna. Du kan återkalla länken när som helst.',
+      'Skicka en länk till en beställare som inte använder RAHTIS. Länken visar företagets namn, organisationsnummer, märket och de giltiga utredningarna. Du kan återkalla länken när som helst.',
     shareLabel: 'Till vem (frivilligt)',
     shareExpires: 'Giltig till (frivilligt)',
     shareCreate: 'Skapa länk',
@@ -2727,8 +2725,7 @@ export const sv = {
     reminderTitle: '{item}: giltig till {date}',
     reminderLead:
       'Utredningen ”{item}” enligt beställaransvarslagen går ut {date}. Ladda upp ett nytt intyg så att paketet förblir giltigt och märket Kontrollerad kvarstår.',
-    reminderLeadPrh:
-      'Kontrollen av registeruppgifterna (”{item}”) hos PRS går ut {date}. Uppdatera dem med ett klick så att märket Kontrollerad kvarstår.',
+    reminderLeadPrh: 'Kontrollen av registeruppgifterna (”{item}”) går ut {date}. Uppdatera dem från registret med ett klick så att märket Kontrollerad kvarstår.',
     reminderButton: 'Uppdatera utredningarna',
   },
 
@@ -4050,7 +4047,7 @@ export const sv = {
     inviteLanguage: 'Meddelandets språk',
     inviteSend: 'Skicka inbjudan',
     inviteSent: 'Inbjudan skickad till {email}.',
-    inviteInvalid: 'Kontrollera namn, FO-nummer och e-post.',
+    inviteInvalid: 'Kontrollera namn, organisationsnummer och e-post.',
     inviteTooMany: 'Högst 20 inbjudningar per dag.',
     inviteFailed: 'Inbjudan kunde inte skickas. Försök igen om en stund.',
     invitesTitle: 'Skickade inbjudningar',
@@ -4065,7 +4062,7 @@ export const sv = {
     revoke: 'Dra tillbaka',
     none: 'Inga körda transporter än',
     anonymitySubscriber:
-      'En kund som du har tillåtit att skicka direktorder ser ditt företagsnamn, FO-nummer och kontonummer samt förarens kontaktuppgifter, och du ser kundens namn. På lastbörsen visas kunder med en kod tills du har tagit uppdraget; därefter ser båda parter varandras namn för faktureringen.',
+      'En kund som du har tillåtit att skicka direktorder ser ditt företagsnamn, organisationsnummer och kontonummer samt förarens kontaktuppgifter, och du ser kundens namn. På lastbörsen visas kunder med en kod tills du har tagit uppdraget; därefter ser båda parter varandras namn för faktureringen.',
     anonymity:
       'Kunder visas med en kod, inte med namn. Uppdragsgivaren ser fordonets registreringsnummer, betyg och, för kontakt, förarens namn, telefonnummer och e-post, men inte ditt företagsnamn.',
   },
@@ -4153,7 +4150,8 @@ export const sv = {
 
   known: {
     directBilling: 'Direktavtal',
-    directBillingHint: 'Ingen serviceavgift, uppdraget kommer med i din veckorapport.',
+    directBillingHint: 'RAHTIS lägger inte till något på priset, och uppdraget kommer med i din veckorapport.',
+    carrierBusinessId: 'Organisationsnummer',
     carrierAccount: 'Kontonummer',
     title: 'Mina fordon',
     subtitle:
@@ -4198,7 +4196,7 @@ export const sv = {
     rateLabel: 'Pris',
     rateHint: 'Moms 0 %. Visas bara i din rapport.',
     clientRequired: 'Välj en kund eller skriv namnet på en ny.',
-    clientInvalid: 'Kontrollera kundens FO-nummer och e-post.',
+    clientInvalid: 'Kontrollera kundens organisationsnummer och e-post.',
     subscriptionOnly:
       'Egna uppdrag ingår i månadsplanen: första bilen gratis, därefter 14,90 € i månaden per bil som har kört, ingen procent. Första månaden är gratis.',
     trackLink: 'Spårningslänk till kunden',
@@ -4208,7 +4206,7 @@ export const sv = {
     clientEdit: 'Redigera',
     clientDelete: 'Radera',
     clientDeleteConfirm: 'Radera kunden?',
-    clientDuplicate: 'En kund med samma namn eller FO-nummer finns redan.',
+    clientDuplicate: 'En kund med samma namn eller organisationsnummer finns redan.',
     clientHasJobs: 'Kunden har uppdrag och kan inte raderas.',
     carrierHint:
       'Ditt eget uppdrag väntar på förarens bekräftelse. Det finns ingen tidsgräns. Tackar föraren nej avbokas uppdraget – det flyttas inte till den gemensamma börsen.',
@@ -4314,8 +4312,8 @@ export const sv = {
     groupGone: 'Ett annat fordon tog transporten först, eller så har erbjudandet stängt.',
     groupOnly: 'Transporten erbjuds just nu bara uppdragsgivarens egna fordon.',
     contractRahtis: 'Aivomaa Oy som avtalspart (tidigare villkor)',
-    contractCarrierHint: 'Transportavtalet ingås direkt med det åkeri vars anbud du godkänner. Ingen serviceavgift; åkeriet fakturerar dig.',
-    deskDirectShipper: 'Direktavtal med åkeriet som tar ordern: ingen serviceavgift, åkeriet fakturerar dig.',
+    contractCarrierHint: 'Uppdraget publiceras på lastbörsen för lämpliga åkerier. RAHTIS tar inget betalt för det.',
+    deskDirectShipper: 'Åkeriet som tar uppdraget får hela priset; RAHTIS lägger inte till något.',
     hasOffers: 'Det har redan kommit anbud på transporten – välj bland dem.',
   },
 
@@ -4961,7 +4959,7 @@ export const sv = {
     seeShipper: 'Om åkeriet ser uppdragsgivaren fordonet och dess uppgifter, betyg, punktlighet och en ”kontrollerad”-markering för åkeriets underleverantörsdokument; för åkerier som uppdragsgivaren beställer direkt av även själva dokumentpaketet.',
     seeBank: 'Om ett företag har ändrat sitt kontonummer de senaste 30 dagarna ser dess avtalsparter ”Bankuppgifterna ändrades för N dagar sedan” – aldrig själva uppgifterna. Bekräfta ett nytt konto via en kontakt du redan känner innan du betalar.',
     verifyTitle: 'Hur företag kontrolleras',
-    verifyRegistry: 'Vid registreringen kontrollerar vi företaget i offentliga register: det finska handelsregistret (PRH/YTJ), EU:s momsregister (VIES) och, för norska företag, Brønnøysundregistren. För uppdragsgivare som beställer direkt görs registerkontrollen om varje vecka.',
+    verifyRegistry: 'Vid registreringen kontrollerar vi företaget i offentliga register: finländska företag i PRS öppna data (FODS), norska företag i Brønnøysundregistren och företag från övriga EU-länder i EU:s momsregister (VIES). Där det inte finns någon automatisk kontroll kontrollerar vi företaget för hand i landets register. Varje ansökan godkänns av vårt team; en träff i registret visar att företaget finns, inte att sökanden företräder det. För uppdragsgivare som beställer direkt görs registerkontrollen om varje vecka.',
     verifyDocs: 'Åkerier lämnar in sina underleverantörsdokument (registerutdrag, skatte- och pensionsintyg, försäkring). Uppdragsgivare kan lämna in registerutdrag, skatteintyg och bevis på firmateckningsrätt. Vår personal granskar varje dokument och antecknar till vilket datum granskningen gäller.',
     verifyInsurance: 'Åkeriers och speditörers ansvarsförsäkring kontrolleras mot försäkringsbreven. En speditörs försäkring är information till åkerierna, inte ett villkor för att beställa.',
     verifyVehicles: 'Varje fordon godkänns av vår personal innan det kan ta uppdrag.',
@@ -5019,9 +5017,8 @@ export const sv = {
     'validation.businessIdFor': 'Kontrollera {label}. Exempel: {example}',
     'signup.submitted':
       'Vi kontrollerar {company} ({businessId}) mot registret och skickar inloggningsuppgifterna till {email}.',
-    'apply.registryOk': 'FO-numret hittades i registret: {name}. Ansökan väntar på granskning av vårt team.',
-    'apply.registryOther':
-      'Registret har ”{name}” under det här FO-numret. Om FO-numret är fel, svara på bekräftelsemejlet så rättar vi det. Ansökan väntar på granskning av vårt team.',
+    'apply.registryOk': 'Företaget hittades i registret: {name}. Ansökan väntar på granskning av vårt team.',
+    'apply.registryOther': 'Registret har ”{name}” under det här organisationsnumret. Om numret är fel, svara på bekräftelsemejlet så rättar vi det. Ansökan väntar på granskning av vårt team.',
     'moderation.pendingCount':
       '{count, plural, =0 {Inga nya ansökningar} one {# ansökan väntar} other {# ansökningar väntar}}',
     'moderation.invitedTo': 'Inbjudan skickad till {email}',

@@ -7,7 +7,7 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { checkBusinessId, COUNTRY_PACKS, countryPack, stopTimeZone, vatNumberFor } from './index.ts';
+import { businessIdLabel, businessIdLabelByShape, checkBusinessId, COUNTRY_PACKS, countryPack, stopTimeZone, vatNumberFor } from './index.ts';
 
 const REAL = {
   FI: ['3592993-6', '0112038-9'], // Aivomaa Oy, Nokia Oyj
@@ -89,5 +89,21 @@ test('номер любой страны в виде хранения прохо
       const { normalized } = checkBusinessId(country, id);
       assert.match(normalized, new RegExp(country === 'FI' ? fi : other), `${country} ${id} → ${normalized}`);
     }
+  }
+});
+
+test('подпись номера: финской компании — из словаря, остальным — название номера в их стране', () => {
+  assert.equal(businessIdLabel('FI', 'Business ID (Y-tunnus)'), 'Business ID (Y-tunnus)');
+  assert.equal(businessIdLabel(null, 'Y-tunnus'), 'Y-tunnus');
+  assert.equal(businessIdLabel('PL', 'Y-tunnus'), 'NIP');
+  assert.equal(businessIdLabel('se', 'Y-tunnus'), 'Organisationsnummer');
+  assert.equal(businessIdLabel('NO', 'Y-tunnus'), 'Organisasjonsnummer');
+});
+
+test('подпись номера по его виду: финский 1234567-8 — Y-tunnus, остальные — общая подпись', () => {
+  assert.equal(businessIdLabelByShape('3592993-6', 'Business ID'), 'Y-tunnus');
+  for (const [country, ids] of Object.entries(REAL)) {
+    if (country === 'FI') continue;
+    for (const id of ids) assert.equal(businessIdLabelByShape(checkBusinessId(country, id).normalized, 'Business ID'), 'Business ID', `${country} ${id}`);
   }
 });

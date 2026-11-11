@@ -1,4 +1,5 @@
 import { Badge, Card, CardBody, Mono } from '@/components/ui';
+import { businessIdLabel } from '@/lib/country';
 import type { I18n } from '@/lib/i18n';
 import { itemStatusTone } from '@/lib/verification/items';
 import type { PackageView } from '@/lib/verification/package';
@@ -35,7 +36,7 @@ export function VerificationPackageView({
             <span className="text-[15px] font-semibold tracking-tight">{pkg.company.name}</span>
             {pkg.verified && <VerifiedBadge label={v.badge} hint={v.badgeHint} />}
             <span className="text-[13px] text-ink-muted">
-              {v.businessId} <Mono>{pkg.company.business_id}</Mono>
+              {businessIdLabel(pkg.company.country, v.businessId)} <Mono>{pkg.company.business_id}</Mono>
             </span>
           </CardBody>
         </Card>

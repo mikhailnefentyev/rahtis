@@ -219,7 +219,7 @@ export const de = {
     nav: "Abonnement",
     title: "Abonnement",
     lede: "Sie zahlen nur für Fahrzeuge, die im Monat gefahren sind. Das erste Fahrzeug ist kostenlos, jedes weitere kostet 14,90 € im Monat. Bei Zahlung für ein Jahr im Voraus 10 % Rabatt.",
-    feesFrom: 'Sie sind vom Subunternehmer-Modell zum Abonnement gewechselt: Monatsgebühren für Ihr Unternehmen werden ab {date} berechnet. Bis dahin ist das Abonnement kostenlos.',
+    feesFrom: 'Monatsgebühren für Ihr Unternehmen werden ab {date} berechnet. Bis dahin ist das Abonnement kostenlos.',
     activeNow: "In diesem Monat gefahrene Fahrzeuge",
     activeHint: "Fahrzeuge mit abgeschlossenem Auftrag",
     estimateNow: "Schätzung für diesen Monat",
@@ -744,8 +744,7 @@ export const de = {
     priceUnit: 'Fahrzeug / Monat, zzgl. MwSt.',
     homeDescription:
       'RAHTIS ist die Arbeitsplattform und Frachtenbörse für Transportunternehmen. Verwalten Sie Fuhrpark, Fahrer, Arbeitszeit und Frachtbriefe an einem Ort, nehmen Sie Aufträge direkt von Ihren eigenen Kunden an und lasten Sie freie Lkw über die Frachtenbörse aus. Trailertausch, Container und Expressfahrten in Finnland, den nordischen Ländern, dem Baltikum, Polen und Deutschland — der Auftraggeber stellt die Fracht einmal ein, findet einen Frachtführer und verfolgt den Transport Schritt für Schritt. Für den Erdbau: Kipperladungen, Wiegungen, Stunden und Rechnungen von der Baustelle.',
-    termsDescription:
-      'Nutzungsbedingungen von RAHTIS: Pflichten der Parteien, Ablauf eines Auftrags, Zahlungen und Abrechnungen sowie Vertragslaufzeit.',
+    termsDescription: 'Nutzungsbedingungen von RAHTIS: Pflichten der Parteien, Ablauf eines Auftrags, das Abonnement sowie Vertragslaufzeit.',
     privacyDescription:
       'Wie RAHTIS personenbezogene Daten verarbeitet: was erhoben wird, wofür es genutzt wird, wie lange es gespeichert wird und welche Rechte die betroffene Person hat.',
     signinDescription: 'Bei RAHTIS als Auftraggeber oder Transportunternehmen anmelden.',
@@ -876,8 +875,10 @@ export const de = {
     progress: '{done}/{total} erledigt',
     waiting: 'wartet auf Prüfung',
     activate: 'Firmendaten und Bedingungen',
-    activateText: 'Die Adresse holen wir aus dem YTJ (finnisches Handelsregister), wenn sie dort hinterlegt ist. Kontonummer ergänzen und Bedingungen akzeptieren — etwa 2 Minuten.',
-    activateTextShipper: 'Die Adresse holen wir aus dem YTJ (finnisches Handelsregister), wenn sie dort hinterlegt ist. Rechnungsdaten prüfen und Bedingungen akzeptieren — etwa 2 Minuten.',
+    activateText: 'Firmenname und Adresse prüfen, Kontonummer ergänzen und Bedingungen akzeptieren — etwa 2 Minuten.',
+    activateTextShipper: 'Firmenname, Adresse und Rechnungsdaten prüfen und Bedingungen akzeptieren — etwa 2 Minuten.',
+    activateTextFi: 'Name und Adresse holen wir aus dem YTJ (finnisches Handelsregister), wenn sie dort hinterlegt sind. Kontonummer ergänzen und Bedingungen akzeptieren — etwa 2 Minuten.',
+    activateTextShipperFi: 'Name und Adresse holen wir aus dem YTJ (finnisches Handelsregister), wenn sie dort hinterlegt sind. Rechnungsdaten prüfen und Bedingungen akzeptieren — etwa 2 Minuten.',
     activateAction: 'Ausfüllen',
     docs: 'Güterkraftverkehrserlaubnis und Versicherung',
     docsText: 'Laden Sie eine gültige Güterkraftverkehrserlaubnis und die Kfz-Versicherung hoch. Ein Foto oder PDF genügt.',
@@ -1094,8 +1095,7 @@ export const de = {
     carrierTitle: 'Halten Sie den Lkw auch zwischen den Aufträgen im Einsatz.',
     carrier3: 'Sie können eine Rückladung in der Region finden, in der der letzte Transport endet.',
     carrier4: 'Jedes Fahrzeug wird einzeln für die Plattform freigegeben.',
-    carrier5:
-      'Jeder Auftrag ist ein Vertrag direkt mit dem Auftraggeber: Sie stellen die Rechnung selbst, eine Provision fällt nicht an. Bevor Sie einen Auftrag übernehmen, sehen Sie die Zahlungsinformationen des Auftraggebers.',
+    carrier5: 'Auf Aufträge fällt keine Provision an: Der vereinbarte Preis gehört komplett Ihnen. Bevor Sie einen Auftrag übernehmen, sehen Sie die Zahlungsinformationen des Auftraggebers.',
     carrier6: 'Im Wochenbericht sehen Sie gefahrene Aufträge und Verdienst.',
     carrier7:
       'Die Fahrer-App ist dabei: Aufträge, Arbeitszeit, Ladungsfotos, Frachtbrief, Karte mit Rast- und Serviceplätzen und die Sprache des Fahrers.',
@@ -1112,8 +1112,7 @@ export const de = {
     stepsEyebrow: 'So läuft ein Auftrag',
     stepsTitle: 'Von der Registrierung zum abgeschlossenen Auftrag in vier Schritten',
     step1: 'Firmenprüfung',
-    step1Text:
-      'Wir prüfen die Y-tunnus und die Firmendaten anhand der Register. Bei Transportunternehmen prüfen wir außerdem Güterkraftverkehrserlaubnis und Versicherung.',
+    step1Text: 'Wir prüfen die Firmendaten im Unternehmensregister, und jede Registrierung wird von einem Mitarbeiter freigegeben. Bei Transportunternehmen prüfen wir außerdem Güterkraftverkehrserlaubnis und Versicherung.',
     step2: 'Fahrzeugfreigabe',
     step2Text:
       'Jedes Fahrzeug wird einzeln freigegeben. Offene Aufträge sind nur für freigegebene Fahrzeuge sichtbar.',
@@ -1219,8 +1218,7 @@ export const de = {
       'Verbinden Sie Ihr ERP oder TMS mit RAHTIS: Der Auftrag geht ohne Abtippen in die Börse oder an Ihr eigenes Fahrzeug, und Sie erfahren jeden Schritt sofort, wenn er passiert.',
     apiFreeEyebrow: 'Kostenlos',
     apiFreeTitle: 'Keine Monatsgebühr, keine Kosten pro Aufruf',
-    apiFreeText:
-      'Die Schnittstelle kostet nichts, und die Transporte auch nicht: keine Servicegebühr, keine Monatsgebühr, kein Preis pro Abruf. Der Frachtvertrag kommt direkt mit dem Transportunternehmen zustande, das Ihnen die Rechnung stellt.',
+    apiFreeText: 'Die Schnittstelle ist kostenlos, und auch für Transporte berechnet RAHTIS Auftraggebern nichts: keine Servicegebühr, keine Monatsgebühr, kein Preis pro Abruf.',
     apiFastEyebrow: 'Schnell',
     apiFastTitle: 'Auftrag in Sekunden, Änderung in einer Minute',
     apiFastText:
@@ -1245,7 +1243,7 @@ export const de = {
     footerDocuments: 'Dokumente',
     finalEyebrow: 'So geht es los',
     finalTitle: 'Erzählen Sie uns von Ihrem Unternehmen — den Rest erledigen wir',
-    finalLede: 'Wir brauchen den Firmennamen, die Y-tunnus und eine E-Mail-Adresse; von Transportunternehmen zusätzlich Güterkraftverkehrserlaubnis und Versicherung.',
+    finalLede: 'Wir brauchen den Firmennamen, die Unternehmenskennung (in Deutschland die USt-IdNr.) und eine E-Mail-Adresse; von Transportunternehmen zusätzlich Güterkraftverkehrserlaubnis und Versicherung.',
     finalLede2: 'Wir prüfen das Unternehmen in den Unternehmensregistern (PRH/YTJ in Finnland, VIES für die übrigen EU-Länder, Brønnøysund in Norwegen) und schalten den Zugang nach der Freigabe frei.',
     applyShipper: 'Als Auftraggeber registrieren',
     applyCarrier: 'Als Transportunternehmen registrieren',
@@ -1299,10 +1297,10 @@ export const de = {
     priceYear: "Bei jährlicher Vorauszahlung: −10 %",
     priceSubEyebrow: 'Frachtenbörse für Transportunternehmen',
     priceSubTitle: '0 % pro Auftrag',
-    priceSubText: 'Sie übernehmen Aufträge aus der Frachtenbörse per Vertrag direkt mit dem Auftraggeber und stellen die Rechnung selbst. Keine Provision; das oben genannte Abonnement deckt alles ab.',
+    priceSubText: 'Keine Provision und keine Gebühren pro Auftrag aus der Frachtenbörse: Der vereinbarte Preis gehört komplett Ihnen. Das oben genannte Abonnement deckt alles ab.',
     priceShipEyebrow: "Für Auftraggeber",
     priceShipTitle: 'Kostenlos',
-    priceShipText: 'Aufträge veröffentlichen, Direktaufträge an eigene Transportunternehmen und die API sind für Auftraggeber kostenlos. Der Frachtvertrag kommt direkt mit dem Transportunternehmen zustande, das Ihnen die Rechnung stellt.',
+    priceShipText: 'Aufträge veröffentlichen, Angebote von Transportunternehmen, Direktaufträge an eigene Transportunternehmen und die API sind für Auftraggeber kostenlos. Der Vertrag kommt direkt mit dem Transportunternehmen zustande, und RAHTIS nimmt keine Provision auf die Fracht.',
   },
 
   done: {
@@ -1620,7 +1618,7 @@ export const de = {
   orderForm: {
     requiredBody: 'Aufbau',
     anyBody: 'Beliebig',
-    feeHint: 'Keine Servicegebühr: Der Frachtvertrag kommt direkt mit dem Transportunternehmen zustande, das Ihnen die Rechnung stellt.',
+    feeHint: '· das Transportunternehmen erhält den vollen Preis, RAHTIS schlägt nichts auf',
     /* Валюта цены: не евро — только у прямого договора и своих рейсов. */
     currency: 'Währung',
     currencyErrorDirect: 'Eine andere Währung als Euro ist nur bei einem Direktvertrag mit dem Transportunternehmen möglich. In der Frachtenbörse gilt der Preis in Euro.',
@@ -2112,7 +2110,7 @@ export const de = {
       'Nach der Freigabe: Anmeldung, Güterkraftverkehrserlaubnis und Versicherung, Fahrzeugdaten. Wir prüfen jedes Fahrzeug einzeln.',
     shipperNote: 'Nach der Freigabe: Anmeldung, Firmendaten, Aufträge veröffentlichen.',
     sentTitle: 'Registrierung gesendet',
-    duplicate: 'Für diese Y-tunnus gibt es schon eine Registrierung, die in Prüfung oder freigegeben ist.',
+    duplicate: 'Für diese Unternehmenskennung gibt es schon eine Registrierung, die in Prüfung oder freigegeben ist.',
     invitedBy: '{carrier} hat Sie eingeladen. Die Daten sind ausgefüllt — prüfen Sie sie und senden Sie die Registrierung ab. Nach der Freigabe können Sie Direktaufträge an deren Fahrzeuge senden.',
     invitedByCarrier: '{carrier} hat Ihr Transportunternehmen eingeladen. Die Daten sind ausgefüllt — prüfen Sie sie und senden Sie die Registrierung ab.',
     invitedByRahtis: 'Die Daten sind aus der Einladung übernommen — prüfen Sie sie und senden Sie die Registrierung ab.',
@@ -2124,7 +2122,7 @@ export const de = {
   requisites: {
     ytjRefresh: 'Name und Adresse aus YTJ holen',
     title: 'Firmendaten',
-    subtitleShipper: 'Die brauchen wir für die Rechnungen. Nach dem Speichern ist Ihr Unternehmen aktiv.',
+    subtitleShipper: 'Diese Rechnungsdaten sehen die Transportunternehmen, mit denen Sie arbeiten. Nach dem Speichern ist Ihr Unternehmen aktiv.',
     subtitleCarrier: 'Kunden sehen sie für die Rechnungsstellung bei Direktverträgen, und wir nutzen sie für die Monatsgebühr. Nach dem Speichern ist Ihr Unternehmen aktiv.',
 
     legalSection: 'Offizielle Daten',
@@ -2138,13 +2136,13 @@ export const de = {
     language: 'Korrespondenzsprache',
     languageHint:
       'Die Sprache, in der wir Einladungen, Rechnungen und Berichte senden. Die Oberflächensprache wählt jeder selbst in der oberen Leiste.',
-    vatHint: 'Aus der Y-tunnus gebildet. Korrigieren Sie sie, wenn Sie die Nummer einer MwSt.-Gruppe verwenden',
+    vatHint: 'Aus der Unternehmenskennung gebildet. Korrigieren Sie sie, wenn Sie die Nummer einer MwSt.-Gruppe verwenden',
     vatInvalid: 'Format: Ländercode plus 2–12 Zeichen, zum Beispiel FI12345678',
 
     billingSection: 'Rechnungsstellung',
     billingSameAsLegal: 'Rechnungsadresse wie offizielle Adresse',
     billingEmail: 'E-Mail für Rechnungen',
-    billingEmailHint: 'Hierhin senden wir die Rechnungen',
+    billingEmailHint: 'An diese Adresse gehen Rechnungen und Zahlungserinnerungen',
     billingReference: 'Rechnungsreferenz',
     billingReferenceHint: 'Ihre Referenz oder Kostenstelle für die Rechnung',
 
@@ -2634,8 +2632,8 @@ export const de = {
       ACCIDENT_INSURANCE: 'Arbeitsunfallversicherung',
     },
     itemHints: {
-      REGISTERS: 'Wird automatisch aus den offenen Daten des finnischen PRH abgerufen. Einzelunternehmer: Auszug aus YTJ hochladen.',
-      TRADE_REGISTER: 'Wird automatisch aus den offenen Daten des finnischen PRH abgerufen. Einzelunternehmer: Auszug aus YTJ hochladen.',
+      REGISTERS: 'Bei finnischen Unternehmen automatisch aus den offenen Daten des PRH; Einzelunternehmer laden einen Auszug aus YTJ hoch. Unternehmen aus anderen Ländern: entsprechende Bescheinigung des Finanzamts hochladen.',
+      TRADE_REGISTER: 'Bei finnischen und norwegischen Unternehmen automatisch aus dem Register (PRH, Brønnøysund); finnische Einzelunternehmer laden einen Auszug aus YTJ hoch. Unternehmen aus anderen Ländern: Handelsregisterauszug hochladen.',
       TAX_DEBT: 'Bescheinigung aus dem finnischen Steuerportal OmaVero, höchstens 3 Monate alt.',
       PENSION: 'Bescheinigung des Rentenversicherers über Versicherung und gezahlte Beiträge, höchstens 3 Monate alt.',
       COLLECTIVE_AGREEMENT: 'Der anwendbare Tarifvertrag (z. B. Güterkraftverkehr) oder eine Darstellung der wesentlichen Arbeitsbedingungen.',
@@ -2649,9 +2647,9 @@ export const de = {
       MISSING: 'Fehlt',
     },
     validUntilDate: 'Gültig bis {date}',
-    fromPrh: 'Aus PRH-Daten',
+    fromPrh: 'Aus Registerdaten',
     fromDocument: 'Aus Dokument',
-    registryTitle: 'Registerdaten (PRH)',
+    registryTitle: 'Registerdaten',
     company: 'Unternehmen',
     businessId: 'Y-tunnus',
     prepayment: 'Vorauszahlungsregister',
@@ -2663,10 +2661,10 @@ export const de = {
     unknown: 'Keine Angabe',
     checkedAt: 'Geprüft am {date}',
     noRegistry: 'Die Registerdaten wurden noch nicht abgerufen.',
-    refresh: 'Aus PRH aktualisieren',
+    refresh: 'Aus dem Register aktualisieren',
     refreshing: 'Wird aktualisiert…',
     refreshTooSoon: 'Die Daten wurden gerade aktualisiert. Bitte in 10 Minuten erneut versuchen.',
-    refreshFailed: 'Das PRH-Register hat nicht geantwortet. Bitte gleich erneut versuchen.',
+    refreshFailed: 'Das Register hat nicht geantwortet. Bitte gleich erneut versuchen.',
     packageTitle: 'Nachweise',
     upload: 'Nachweis hochladen',
     uploading: 'Wird hochgeladen…',
@@ -2691,7 +2689,7 @@ export const de = {
     issued: 'Ausgestellt am {date}',
     shareTitle: 'Freigabelinks',
     shareHint:
-      'Senden Sie einen Link an einen Auftraggeber, der RAHTIS nicht nutzt. Der Link zeigt Firmenname, Y-tunnus, das Siegel und die gültigen Nachweise. Sie können ihn jederzeit widerrufen.',
+      'Senden Sie einen Link an einen Auftraggeber, der RAHTIS nicht nutzt. Der Link zeigt Firmenname, Unternehmenskennung, das Siegel und die gültigen Nachweise. Sie können ihn jederzeit widerrufen.',
     shareLabel: 'Für wen (optional)',
     shareExpires: 'Gültig bis (optional)',
     shareCreate: 'Link erstellen',
@@ -2727,8 +2725,7 @@ export const de = {
     reminderTitle: '{item}: gültig bis {date}',
     reminderLead:
       'Der Nachweis „{item}“ zur Auftraggeberhaftung läuft am {date} ab. Laden Sie eine neue Bescheinigung hoch, damit das Paket gültig bleibt und das Siegel „Geprüft“ erhalten bleibt.',
-    reminderLeadPrh:
-      'Die PRH-Prüfung Ihrer Registerdaten („{item}“) läuft am {date} ab. Aktualisieren Sie sie mit einem Klick, damit das Siegel „Geprüft“ erhalten bleibt.',
+    reminderLeadPrh: 'Die Registerprüfung Ihrer Firmendaten („{item}“) läuft am {date} ab. Aktualisieren Sie sie mit einem Klick, damit das Siegel „Geprüft“ erhalten bleibt.',
     reminderButton: 'Nachweise aktualisieren',
   },
 
@@ -4076,7 +4073,7 @@ export const de = {
     inviteLanguage: 'Sprache der Nachricht',
     inviteSend: 'Einladung senden',
     inviteSent: 'Einladung an {email} gesendet.',
-    inviteInvalid: 'Prüfen Sie Name, Y-tunnus und E-Mail.',
+    inviteInvalid: 'Prüfen Sie Name, Unternehmenskennung und E-Mail.',
     inviteTooMany: 'Höchstens 20 Einladungen pro Tag.',
     inviteFailed: 'Die Einladung konnte nicht gesendet werden. Versuchen Sie es gleich noch einmal.',
     invitesTitle: 'Gesendete Einladungen',
@@ -4091,7 +4088,7 @@ export const de = {
     revoke: 'Erlaubnis zurückziehen',
     none: 'Noch keine Transporte gefahren',
     anonymitySubscriber:
-      'Ein Kunde, dem Sie Direktaufträge erlaubt haben, sieht Ihren Firmennamen, Ihre Y-tunnus und Kontonummer sowie die Kontaktdaten des Fahrers, und Sie sehen seinen Namen. In der Frachtenbörse erscheinen Kunden mit einem Code, bis Sie den Auftrag übernommen haben; danach sehen beide Seiten die Namen für die Rechnungsstellung.',
+      'Ein Kunde, dem Sie Direktaufträge erlaubt haben, sieht Ihren Firmennamen, Ihre Unternehmenskennung und Kontonummer sowie die Kontaktdaten des Fahrers, und Sie sehen seinen Namen. In der Frachtenbörse erscheinen Kunden mit einem Code, bis Sie den Auftrag übernommen haben; danach sehen beide Seiten die Namen für die Rechnungsstellung.',
     anonymity:
       'Kunden werden mit einem Code angezeigt, nicht mit Namen. Der Auftraggeber sieht das Kennzeichen Ihres Fahrzeugs, die Bewertung und für den Kontakt Name, Telefonnummer und E-Mail des Fahrers, aber nicht Ihren Firmennamen.',
   },
@@ -4179,7 +4176,8 @@ export const de = {
 
   known: {
     directBilling: 'Rechnet direkt mit Ihnen ab',
-    directBillingHint: 'Direktvertrag mit dem Transportunternehmen: keine Servicegebühr, und der Auftrag landet in Ihrem Wochenbericht.',
+    directBillingHint: 'RAHTIS schlägt nichts auf den Preis auf, und der Auftrag landet in Ihrem Wochenbericht.',
+    carrierBusinessId: 'Unternehmenskennung',
     carrierAccount: 'Kontonummer',
     title: 'Meine Fahrzeuge',
     subtitle:
@@ -4224,7 +4222,7 @@ export const de = {
     rateLabel: 'Preis',
     rateHint: 'MwSt. 0 %. Nur in Ihrem Bericht angezeigt.',
     clientRequired: 'Wählen Sie einen Kunden oder geben Sie den Namen eines neuen ein.',
-    clientInvalid: 'Prüfen Sie Y-tunnus und E-Mail des Kunden.',
+    clientInvalid: 'Prüfen Sie Unternehmenskennung und E-Mail des Kunden.',
     subscriptionOnly:
       'Eigene Aufträge gehören zum Monatsmodell: erstes Fahrzeug kostenlos, jedes weitere gefahrene Fahrzeug 14,90 € im Monat, kein Prozentsatz. Der erste Monat ist kostenlos.',
     trackLink: 'Tracking-Link für den Kunden',
@@ -4234,7 +4232,7 @@ export const de = {
     clientEdit: 'Bearbeiten',
     clientDelete: 'Löschen',
     clientDeleteConfirm: 'Diesen Kunden löschen?',
-    clientDuplicate: 'Es gibt schon einen Kunden mit diesem Namen oder dieser Y-tunnus.',
+    clientDuplicate: 'Es gibt schon einen Kunden mit diesem Namen oder dieser Unternehmenskennung.',
     clientHasJobs: 'Dieser Kunde hat Aufträge und kann nicht gelöscht werden.',
     carrierHint:
       'Ihr eigener Auftrag wartet auf die Bestätigung des Fahrers. Es gibt keine Frist. Lehnt der Fahrer ab, wird der Auftrag storniert — er geht nicht in die gemeinsame Börse.',
@@ -4340,8 +4338,8 @@ export const de = {
     groupGone: 'Ein anderes Fahrzeug war schneller, oder die Angebotszeit ist abgelaufen.',
     groupOnly: 'Der Transport wird derzeit nur den eigenen Fahrzeugen des Auftraggebers angeboten.',
     contractRahtis: 'Aivomaa Oy als Vertragspartner (frühere Bedingungen)',
-    contractCarrierHint: 'Der Frachtvertrag kommt direkt mit dem Transportunternehmen zustande, dessen Angebot Sie annehmen. Keine Servicegebühr; das Transportunternehmen stellt Ihnen die Rechnung.',
-    deskDirectShipper: 'Direktvertrag mit dem Transportunternehmen, das den Auftrag übernimmt: keine Servicegebühr, die Rechnung stellt das Transportunternehmen.',
+    contractCarrierHint: 'Der Auftrag wird in der Frachtenbörse für passende Transportunternehmen veröffentlicht. RAHTIS berechnet dafür nichts.',
+    deskDirectShipper: 'Das Transportunternehmen, das den Auftrag übernimmt, erhält den vollen Preis; RAHTIS schlägt nichts auf.',
     hasOffers: 'Für diesen Transport sind bereits Angebote eingegangen — wählen Sie daraus.',
   },
 
@@ -4987,7 +4985,7 @@ export const de = {
     seeShipper: 'Über das Transportunternehmen sieht ein Auftraggeber das Fahrzeug und seine Angaben, die Bewertungen, die Pünktlichkeit und ein Prüfsiegel für die Nachweise des Transportunternehmens; bei Transportunternehmen, die er direkt beauftragt, auch das Nachweispaket.',
     seeBank: 'Hat ein Unternehmen sein Bankkonto in den letzten 30 Tagen geändert, sehen seine Vertragspartner den Hinweis „Bankverbindung vor N Tagen geändert“ – nie die Bankdaten selbst. Lassen Sie sich ein neues Konto vor der Zahlung über einen Ihnen bereits bekannten Kontakt bestätigen.',
     verifyTitle: 'Wie Unternehmen geprüft werden',
-    verifyRegistry: 'Bei der Registrierung prüfen wir das Unternehmen in öffentlichen Registern: im finnischen Handelsregister (PRH/YTJ), im MwSt-Informationsaustauschsystem der EU (VIES) und bei norwegischen Unternehmen in den Brønnøysund-Registern. Bei Auftraggebern mit Direktaufträgen wird die Registerprüfung jede Woche wiederholt.',
+    verifyRegistry: 'Bei der Registrierung prüfen wir das Unternehmen in öffentlichen Registern: finnische Unternehmen in den offenen Daten des PRH (YTJ), norwegische in den Brønnøysund-Registern und Unternehmen aus den übrigen EU-Ländern im MwSt-Informationsaustauschsystem der EU (VIES). Wo keine automatische Prüfung möglich ist, prüfen wir das Unternehmen von Hand im Register seines Landes. Jede Registrierung wird von unserem Team freigegeben; ein Treffer im Register belegt, dass das Unternehmen existiert, nicht dass die antragstellende Person es vertritt. Bei Auftraggebern mit Direktaufträgen wird die Registerprüfung jede Woche wiederholt.',
     verifyDocs: 'Transportunternehmen reichen ihre Nachweise zur Auftraggeberhaftung ein (Handelsregisterauszug, Steuer- und Rentenversicherungsbescheinigungen, Versicherung). Auftraggeber können einen Handelsregisterauszug, Steuerbescheinigungen und einen Nachweis der Zeichnungsberechtigung einreichen. Unsere Mitarbeiter prüfen jedes Dokument und erfassen, bis wann die Prüfung gilt.',
     verifyInsurance: 'Die Haftpflichtversicherung von Transportunternehmen und Spediteuren wird anhand der Policen geprüft. Die Versicherung eines Spediteurs ist eine Information für Transportunternehmen, keine Voraussetzung für Aufträge.',
     verifyVehicles: 'Jedes Fahrzeug wird von unseren Mitarbeitern freigegeben, bevor es Ladungen übernehmen kann.',
@@ -5045,9 +5043,8 @@ export const de = {
     'validation.businessIdFor': 'Prüfen Sie: {label}. Beispiel: {example}',
     'signup.submitted':
       'Wir prüfen {company} ({businessId}) anhand des Registers und senden die Zugangsdaten an {email}.',
-    'apply.registryOk': 'Y-tunnus im Register gefunden: {name}. Die Registrierung wartet auf Prüfung durch unser Team.',
-    'apply.registryOther':
-      'Im Register steht unter dieser Y-tunnus „{name}“. Ist die Y-tunnus falsch, antworten Sie auf die Bestätigungs-E-Mail, wir korrigieren es. Die Registrierung wartet auf Prüfung durch unser Team.',
+    'apply.registryOk': 'Unternehmen im Register gefunden: {name}. Die Registrierung wartet auf Prüfung durch unser Team.',
+    'apply.registryOther': 'Im Register steht unter dieser Nummer „{name}“. Ist die Nummer falsch, antworten Sie auf die Bestätigungs-E-Mail, wir korrigieren sie. Die Registrierung wartet auf Prüfung durch unser Team.',
     'moderation.pendingCount':
       '{count, plural, =0 {Keine neuen Registrierungen} one {# Registrierung wartet} other {# Registrierungen warten}}',
     'moderation.invitedTo': 'Einladung an {email} gesendet',

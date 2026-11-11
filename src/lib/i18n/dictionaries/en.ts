@@ -235,7 +235,7 @@ export const en = {
     nav: "Subscription",
     title: "Subscription",
     lede: "You pay only for vehicles that drove during the month. The first vehicle is free, and each additional one costs €14.90 a month. Pay a year in advance and get 10% off.",
-    feesFrom: 'Your company has moved from the former subcontracting model to the subscription: monthly fees are charged from {date}. Until then the subscription is free of charge.',
+    feesFrom: 'Monthly fees for your company start on {date}. Until then the subscription is free of charge.',
     activeNow: "Vehicles that drove this month",
     activeHint: "Vehicles with a completed job",
     estimateNow: "Estimate for this month",
@@ -761,8 +761,7 @@ export const en = {
     priceUnit: 'vehicle / month, excl. VAT',
     homeDescription:
       'RAHTIS is a transport management platform and freight exchange for carriers. Run your fleet, drivers, working time and CMR notes in one place, take orders directly from your own customers and fill empty trucks from the load board. Trailer swaps, containers and express transport in Finland, the Nordics, the Baltics, Poland and Germany — shippers publish once and follow the job step by step. For earthworks: tipper loads, weighbridge tickets, hours and invoices from the worksite.',
-    termsDescription:
-      'Terms of service for RAHTIS: responsibilities of the parties, how a job runs, payments and payouts, and the term of the agreement.',
+    termsDescription: 'Terms of service for RAHTIS: responsibilities of the parties, how a job runs, the subscription and the term of the agreement.',
     privacyDescription:
       'How RAHTIS handles personal data: what is collected, what it is used for, how long it is kept and what rights the data subject has.',
     signinDescription: 'Sign in to RAHTIS as a shipper or as a carrier.',
@@ -893,8 +892,10 @@ export const en = {
     progress: '{done}/{total} done',
     waiting: 'waiting for review',
     activate: 'Company details and terms',
-    activateText: 'We fill in the address from the trade register (YTJ) if it’s there. Add your account number and accept the terms — about 2 minutes.',
-    activateTextShipper: 'We fill in the address from the trade register (YTJ) if it’s there. Check the billing details and accept the terms — about 2 minutes.',
+    activateText: 'Check your company name and address, add your account number and accept the terms — about 2 minutes.',
+    activateTextShipper: 'Check your company name, address and billing details and accept the terms — about 2 minutes.',
+    activateTextFi: 'We fill in the name and address from the Finnish trade register (YTJ) if they’re there. Add your account number and accept the terms — about 2 minutes.',
+    activateTextShipperFi: 'We fill in the name and address from the Finnish trade register (YTJ) if they’re there. Check the billing details and accept the terms — about 2 minutes.',
     activateAction: 'Fill in',
     docs: 'Operating licence and insurance',
     docsText: 'Upload a valid operating licence and motor insurance certificate. A photo or PDF is enough.',
@@ -1150,8 +1151,7 @@ export const en = {
     carrierTitle: 'Keep the truck working between jobs too.',
     carrier3: 'You can find a return load in the area where the last job ends.',
     carrier4: 'Every vehicle is approved onto the platform separately.',
-    carrier5:
-      'Every job is a contract directly with the shipper: you invoice it yourself, and no percentage is taken. Before taking a job you see the shipper’s payment record.',
+    carrier5: 'No percentage is taken from any job: the agreed price is all yours. Before taking a job you see the shipper’s payment record.',
     carrier6: 'The weekly report shows jobs driven and earnings.',
     carrier7:
       'The driver app is included: jobs, working time, load photos, the CMR note, a map of useful places and the driver’s own language.',
@@ -1168,8 +1168,7 @@ export const en = {
     stepsEyebrow: 'How a job runs',
     stepsTitle: 'From application to completed job in four steps',
     step1: 'Company check',
-    step1Text:
-      'We check the business ID (Y-tunnus) and the company details against the registers. For carriers we also check the operating licence and insurance.',
+    step1Text: 'We check the company in the business register, and every application is approved by a person. For carriers we also check the operating licence and insurance.',
     step2: 'Vehicle approval',
     step2Text:
       'Every vehicle is approved separately. Only approved vehicles see open jobs.',
@@ -1284,8 +1283,7 @@ export const en = {
       'Connect your ERP or TMS to RAHTIS: the order goes to the load board or to your own truck without retyping, and you know about every step the moment it happens.',
     apiFreeEyebrow: 'Free',
     apiFreeTitle: 'No monthly fee, no price per call',
-    apiFreeText:
-      'Using the API costs nothing, and neither do the jobs: no service fee, no monthly fee, no price per call. The contract of carriage is made directly with the carrier, who invoices you.',
+    apiFreeText: 'The API costs nothing, and RAHTIS charges shippers nothing for jobs either: no service fee, no monthly fee, no price per call.',
     apiFastEyebrow: 'Fast',
     apiFastTitle: 'An order in seconds, a change within a minute',
     apiFastText:
@@ -1310,7 +1308,7 @@ export const en = {
     footerDocuments: 'Documents',
     finalEyebrow: 'Getting started',
     finalTitle: 'Tell us about your company — we’ll handle the rest',
-    finalLede: 'We need the company name, the business ID (Y-tunnus) and an email address; from carriers also the operating licence and insurance.',
+    finalLede: 'We need the company name, the business ID and an email address; from carriers also the operating licence and insurance.',
     /*
      * The same fact used to stand twice: here and as a footnote on the
      * first screen. The footnote also carried two things this line did
@@ -1370,10 +1368,10 @@ export const en = {
     priceYear: "Pay a year in advance: 10% off",
     priceSubEyebrow: 'Load board for carriers',
     priceSubTitle: '0% per job',
-    priceSubText: 'You take jobs from the load board under a contract directly with the shipper and invoice it yourself. No commission; the subscription above covers everything.',
+    priceSubText: 'No commission and no per-job fees on load-board jobs: the agreed price is all yours. The subscription above covers everything.',
     priceShipEyebrow: "For shippers",
     priceShipTitle: 'Free',
-    priceShipText: 'Publishing jobs, direct orders to your own carriers and the API cost shippers nothing. The contract of carriage is made directly with the carrier, who invoices you.',
+    priceShipText: 'Publishing jobs, offers from carriers, direct orders to your own carriers and the API cost shippers nothing. You contract directly with the carrier, and RAHTIS takes no percentage of the freight.',
   },
 
   done: {
@@ -1735,7 +1733,7 @@ export const en = {
   orderForm: {
     requiredBody: 'Body',
     anyBody: 'Any',
-    feeHint: 'No service fee: the contract of carriage is made directly with the carrier, who invoices you.',
+    feeHint: '· the carrier gets the full price, RAHTIS adds nothing on top',
     /* Валюта цены: не евро — только у прямого договора и своих рейсов. */
     currency: 'Currency',
     currencyErrorDirect: 'Only a direct contract with the carrier can be priced in a currency other than the euro.',
@@ -2259,7 +2257,7 @@ export const en = {
   requisites: {
     ytjRefresh: 'Get name and address from YTJ',
     title: 'Company details',
-    subtitleShipper: 'We need these for invoicing. Once saved, the company goes live.',
+    subtitleShipper: 'Carriers you work with see these billing details. Once saved, the company goes live.',
     subtitleCarrier: 'Customers see these for invoicing on direct contracts, and we use them for the monthly fee. Once saved, the company goes live.',
 
     legalSection: 'Registered details',
@@ -2273,13 +2271,13 @@ export const en = {
     language: 'Language of correspondence',
     languageHint:
       'The language we use for invitations, invoices and reports. Everyone picks their own screen language in the top bar.',
-    vatHint: 'Derived from the Y-tunnus. Correct it if you use a VAT group number',
+    vatHint: 'Derived from the business ID. Correct it if you use a VAT group number',
     vatInvalid: 'Format: country code plus 2–12 characters, for example FI12345678',
 
     billingSection: 'Invoicing',
     billingSameAsLegal: 'The invoicing address is the same as the registered one',
     billingEmail: 'Invoicing email',
-    billingEmailHint: 'This is where we send invoices',
+    billingEmailHint: 'Invoices and payment reminders arrive at this address',
     billingReference: 'Invoice reference',
     billingReferenceHint: 'Order number or cost centre you want on the invoice',
 
@@ -2783,8 +2781,8 @@ export const en = {
       ACCIDENT_INSURANCE: 'Workers’ compensation insurance',
     },
     itemHints: {
-      REGISTERS: 'Retrieved automatically from the PRH open data. Sole traders: upload an extract from YTJ.',
-      TRADE_REGISTER: 'Retrieved automatically from the PRH open data. Sole traders: upload an extract from YTJ.',
+      REGISTERS: 'For a Finnish company, retrieved automatically from the PRH open data; sole traders upload an extract from YTJ. Companies from other countries: upload the equivalent certificate from the tax authority.',
+      TRADE_REGISTER: 'For Finnish and Norwegian companies, retrieved automatically from the register (PRH, Brønnøysund); Finnish sole traders upload an extract from YTJ. Companies from other countries: upload a trade register extract.',
       TAX_DEBT: 'Tax debt certificate from MyTax (OmaVero), no older than 3 months.',
       PENSION: 'Certificate of the pension insurance and paid premiums from your pension insurer, no older than 3 months.',
       COLLECTIVE_AGREEMENT: 'The applicable collective agreement (e.g. for road haulage) or a statement of the key terms of employment.',
@@ -2798,9 +2796,9 @@ export const en = {
       MISSING: 'Missing',
     },
     validUntilDate: 'Valid until {date}',
-    fromPrh: 'From PRH data',
+    fromPrh: 'From register data',
     fromDocument: 'From document',
-    registryTitle: 'Register data (PRH)',
+    registryTitle: 'Register data',
     company: 'Company',
     businessId: 'Business ID',
     prepayment: 'Prepayment register',
@@ -2812,10 +2810,10 @@ export const en = {
     unknown: 'No data',
     checkedAt: 'Checked {date}',
     noRegistry: 'Register data has not been retrieved yet.',
-    refresh: 'Refresh from PRH',
+    refresh: 'Refresh from the register',
     refreshing: 'Refreshing…',
     refreshTooSoon: 'The data was just refreshed. Try again in 10 minutes.',
-    refreshFailed: 'The PRH register did not respond. Try again shortly.',
+    refreshFailed: 'The register did not respond. Try again shortly.',
     packageTitle: 'Reports',
     upload: 'Upload report',
     uploading: 'Uploading…',
@@ -2876,8 +2874,7 @@ export const en = {
     reminderTitle: '{item}: valid until {date}',
     reminderLead:
       'The contractor’s liability report “{item}” expires on {date}. Upload a new certificate to keep the package valid and the Verified badge in place.',
-    reminderLeadPrh:
-      'The PRH check of your register data (“{item}”) expires on {date}. Refresh it with one click to keep the Verified badge.',
+    reminderLeadPrh: 'The register check of your company data (“{item}”) expires on {date}. Refresh it with one click to keep the Verified badge.',
     reminderButton: 'Update reports',
   },
 
@@ -4330,7 +4327,8 @@ export const en = {
 
   known: {
     directBilling: 'Invoices you directly',
-    directBillingHint: 'Direct contract with the carrier: no service fee, and the job goes into your weekly report.',
+    directBillingHint: 'RAHTIS adds nothing to the price, and the job goes into your weekly report.',
+    carrierBusinessId: 'Business ID',
     carrierAccount: 'Account number',
     title: 'My vehicles',
     subtitle:
@@ -4491,8 +4489,8 @@ export const en = {
     groupGone: 'Another truck took the job first, or the offer time has run out.',
     groupOnly: 'Right now the order is offered only to the shipper’s own trucks.',
     contractRahtis: 'Aivomaa Oy as contracting party (earlier terms)',
-    contractCarrierHint: 'The contract of carriage is made directly with the carrier whose offer you accept. No service fee; the carrier invoices you.',
-    deskDirectShipper: 'Direct contract with the carrier who takes the order: no service fee, the carrier invoices you.',
+    contractCarrierHint: 'The job is published on the load board to suitable carriers. RAHTIS charges nothing for it.',
+    deskDirectShipper: 'The carrier who takes the job gets the full price; RAHTIS adds nothing on top.',
     hasOffers: 'Offers have already come in for this order — pick one of them.',
   },
 
@@ -5150,7 +5148,7 @@ export const en = {
     seeShipper: 'About the carrier, a shipper sees the vehicle and its details, ratings, the on-time record and a “checked” badge for the carrier’s contractor documents; for carriers it orders from directly, also the document package.',
     seeBank: 'If a company has changed its bank account in the last 30 days, its contracting parties see “Bank details changed N days ago” — never the details themselves. Confirm a new account through a contact you already know before paying.',
     verifyTitle: 'How companies are checked',
-    verifyRegistry: 'At registration we check the company in public registers: the Finnish Trade Register (PRH/YTJ), the EU VAT register (VIES) and, for Norwegian companies, the Brønnøysund registers. For shippers ordering directly, the register check is repeated every week.',
+    verifyRegistry: 'At registration we check the company in public registers: Finnish companies in the PRH open data (YTJ), Norwegian companies in the Brønnøysund registers and companies from other EU countries in the EU VAT register (VIES). Where no automatic check is available, we check the company by hand in its national register. Every application is approved by our team; a register match shows that the company exists, not that the applicant represents it. For shippers ordering directly, the register check is repeated every week.',
     verifyDocs: 'Carriers submit their contractor documents (trade register extract, tax and pension certificates, insurance). Shippers can submit a trade register extract, tax certificates and proof of signatory authority. Our staff check each document and record the date until which the check is valid.',
     verifyInsurance: 'Carriers’ and forwarders’ liability insurance is checked against the policy documents. A forwarder’s insurance is information for carriers, not a condition for ordering.',
     verifyVehicles: 'Each vehicle is approved by our staff before it can take loads.',
@@ -5208,7 +5206,7 @@ export const en = {
     'validation.businessIdFor': 'Check the {label}. Example: {example}',
     'signup.submitted':
       'We’ll check {company} ({businessId}) against the register and send the login details to {email}.',
-    'apply.registryOk': 'Business ID found in the register: {name}. The application is waiting for review by our team.',
+    'apply.registryOk': 'Company found in the register: {name}. The application is waiting for review by our team.',
     'apply.registryOther':
       'The register has “{name}” under this business ID. If the business ID is wrong, reply to the confirmation email and we’ll fix it. The application is waiting for review by our team.',
     'moderation.pendingCount':

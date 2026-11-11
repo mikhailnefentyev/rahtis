@@ -1,4 +1,5 @@
 import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
+import { businessIdLabelByShape } from '@/lib/country';
 import { PDF_FONT } from '@/lib/reports/pdfFont';
 import { ansi } from '@/lib/reports/PeriodReportPdf';
 
@@ -27,6 +28,9 @@ export type SiteInvoicePdfInput = {
   total: string;
   note: string;
 };
+
+/* Y-tunnus — только у финского номера; у компании другой страны общая подпись (номер хранится в своём виде). */
+const idLabel = (businessId: string) => businessIdLabelByShape(businessId, 'Yritystunnus / Business ID');
 
 const s = StyleSheet.create({
   page: { fontFamily: PDF_FONT, paddingTop: 36, paddingBottom: 48, paddingHorizontal: 40, fontSize: 9, color: '#0c1626' },
@@ -72,7 +76,7 @@ export function SiteInvoicePdf(input: SiteInvoicePdfInput) {
             <Text style={s.seller}>{ansi(input.seller.name)}</Text>
             <Text style={s.muted}>{ansi(input.seller.address)}</Text>
             <Text style={s.muted}>
-              {ansi(`Y-tunnus ${input.seller.businessId}${input.seller.vatId ? ` · ALV ${input.seller.vatId}` : ''}`)}
+              {ansi(`${idLabel(input.seller.businessId)} ${input.seller.businessId}${input.seller.vatId ? ` · ALV ${input.seller.vatId}` : ''}`)}
             </Text>
             <Text style={s.muted}>{ansi(input.seller.email)}</Text>
           </View>
@@ -86,7 +90,7 @@ export function SiteInvoicePdf(input: SiteInvoicePdfInput) {
             <Text style={s.label}>{ansi('Asiakas / Customer')}</Text>
             <Text style={s.bold}>{ansi(input.customer.name)}</Text>
             <Text>{ansi(input.customer.address)}</Text>
-            {input.customer.businessId ? <Text>{ansi(`Y-tunnus ${input.customer.businessId}`)}</Text> : null}
+            {input.customer.businessId ? <Text>{ansi(`${idLabel(input.customer.businessId)} ${input.customer.businessId}`)}</Text> : null}
             {input.customer.vatId ? <Text>{ansi(`ALV ${input.customer.vatId}`)}</Text> : null}
           </View>
           <View style={s.col}>
@@ -145,7 +149,7 @@ export function SiteInvoicePdf(input: SiteInvoicePdfInput) {
         <Text style={[s.small, { marginTop: 14 }]}>{ansi(input.note)}</Text>
 
         <Text style={s.footer} fixed>
-          {ansi(`${input.seller.name} · Y-tunnus ${input.seller.businessId} · Lasku on laadittu RAHTIS-palvelussa`)}
+          {ansi(`${input.seller.name} · ${idLabel(input.seller.businessId)} ${input.seller.businessId} · Lasku on laadittu RAHTIS-palvelussa`)}
         </Text>
       </Page>
     </Document>

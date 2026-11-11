@@ -219,7 +219,7 @@ export const lt = {
     nav: "Prenumerata",
     title: "Prenumerata",
     lede: "Mokate tik už transporto priemones, kurios važiavo per mėnesį. Pirma transporto priemonė nemokama, kiekviena kita kainuoja 14,90 € per mėnesį. Sumokėję metams iš anksto gausite 10 % nuolaidą.",
-    feesFrom: 'Perėjote nuo subrangos modelio prie prenumeratos: mėnesinis mokestis jūsų įmonei skaičiuojamas nuo {date}. Iki tol prenumerata nemokama.',
+    feesFrom: 'Mėnesinis mokestis jūsų įmonei skaičiuojamas nuo {date}. Iki tol prenumerata nemokama.',
     activeNow: "Šį mėnesį važiavusios transporto priemonės",
     activeHint: "Transporto priemonės su užbaigtu pervežimu",
     estimateNow: "Šio mėnesio įvertis",
@@ -744,8 +744,7 @@ export const lt = {
     priceUnit: 'transporto priemonė / mėn., be PVM',
     homeDescription:
       'RAHTIS – transporto valdymo platforma ir krovinių birža vežėjams. Valdykite transportą, vairuotojus, darbo laiką ir važtaraščius vienoje vietoje, priimkite užsakymus tiesiai iš savo klientų, o laisvus sunkvežimius užpildykite kroviniais iš biržos. Priekabos, konteineriai ir skubūs pervežimai Suomijoje, Šiaurės šalyse, Baltijos šalyse, Lenkijoje ir Vokietijoje – užsakovas vienu skelbimu randa vežėją ir mato pervežimą etapais. Žemės darbams: savivarčių kroviniai, svėrimai, valandos ir sąskaitos iš objekto.',
-    termsDescription:
-      'RAHTIS naudojimo sąlygos: šalių atsakomybė, pervežimo eiga, mokėjimai ir atsiskaitymai, sutarties galiojimas.',
+    termsDescription: 'RAHTIS naudojimo sąlygos: šalių atsakomybė, pervežimo eiga, mėnesinis mokestis, sutarties galiojimas.',
     privacyDescription:
       'Kaip RAHTIS tvarko asmens duomenis: kas renkama, kam naudojama, kiek laiko saugoma ir kokias teises turi duomenų subjektas.',
     signinDescription: 'Prisijunkite prie RAHTIS kaip užsakovas arba vežėjas.',
@@ -876,8 +875,10 @@ export const lt = {
     progress: 'Atlikta {done}/{total}',
     waiting: 'laukia peržiūros',
     activate: 'Įmonės duomenys ir sąlygos',
-    activateText: 'Adresą užpildysime iš Suomijos įmonių registro (YTJ), jei jis ten yra. Pridėkite banko sąskaitą ir priimkite sąlygas – užtruks apie 2 minutes.',
-    activateTextShipper: 'Adresą užpildysime iš Suomijos įmonių registro (YTJ), jei jis ten yra. Patikrinkite sąskaitų rekvizitus ir priimkite sąlygas – užtruks apie 2 minutes.',
+    activateText: 'Patikrinkite įmonės pavadinimą ir adresą, pridėkite banko sąskaitą ir priimkite sąlygas – užtruks apie 2 minutes.',
+    activateTextShipper: 'Patikrinkite įmonės pavadinimą, adresą ir sąskaitų rekvizitus ir priimkite sąlygas – užtruks apie 2 minutes.',
+    activateTextFi: 'Pavadinimą ir adresą užpildysime iš Suomijos įmonių registro (YTJ), jei jie ten yra. Pridėkite banko sąskaitą ir priimkite sąlygas – užtruks apie 2 minutes.',
+    activateTextShipperFi: 'Pavadinimą ir adresą užpildysime iš Suomijos įmonių registro (YTJ), jei jie ten yra. Patikrinkite sąskaitų rekvizitus ir priimkite sąlygas – užtruks apie 2 minutes.',
     activateAction: 'Užpildyti',
     docs: 'Transporto licencija ir draudimas',
     docsText: 'Įkelkite galiojančią transporto licenciją ir transporto priemonės draudimą. Pakanka nuotraukos arba PDF.',
@@ -1094,8 +1095,7 @@ export const lt = {
     carrierTitle: 'Tegul sunkvežimis važiuoja ir tarp reisų.',
     carrier3: 'Grįžtamąjį krovinį galite rasti ten, kur baigiasi paskutinis reisas.',
     carrier4: 'Kiekviena transporto priemonė tvirtinama atskirai.',
-    carrier5:
-      'Kiekvienas reisas – sutartis tiesiogiai su užsakovu: sąskaitą išrašote patys, procento neimame. Prieš imdami reisą matote užsakovo mokėjimų informaciją.',
+    carrier5: 'Iš reisų procento neimame: sutarta kaina visa jūsų. Prieš imdami reisą matote užsakovo mokėjimų informaciją.',
     carrier6: 'Savaitės ataskaitoje matote atliktus reisus ir uždarbį.',
     carrier7:
       'Vairuotojo programėlė įskaičiuota: reisai, darbo laikas, krovinio nuotraukos, važtaraštis, vietų žemėlapis ir vairuotojo gimtoji kalba.',
@@ -1112,8 +1112,7 @@ export const lt = {
     stepsEyebrow: 'Kaip vyksta reisas',
     stepsTitle: 'Nuo paraiškos iki atlikto pervežimo – keturi žingsniai',
     step1: 'Įmonės patikra',
-    step1Text:
-      'Įmonės kodą ir duomenis tikriname registruose. Vežėjų dar tikriname transporto licenciją ir draudimą.',
+    step1Text: 'Įmonės duomenis tikriname registre, o kiekvieną paraišką tvirtina mūsų darbuotojas. Vežėjų dar tikriname transporto licenciją ir draudimą.',
     step2: 'Transporto priemonės patvirtinimas',
     step2Text:
       'Kiekviena transporto priemonė tvirtinama atskirai. Laisvi reisai matomi tik patvirtintai technikai.',
@@ -1219,8 +1218,7 @@ export const lt = {
       'Prijunkite savo ERP ar TMS prie RAHTIS: užsakymas patenka į biržą ar jūsų mašinai be rankinio įvedimo, o apie kiekvieną žingsnį sužinote tą pačią akimirką.',
     apiFreeEyebrow: 'Nemokama',
     apiFreeTitle: 'Be mėnesinio mokesčio, be kainos už užklausą',
-    apiFreeText:
-      'API naudojimas nieko nekainuoja, kaip ir patys pervežimai: nėra nei paslaugos mokesčio, nei mėnesinio mokesčio, nei mokesčio už užklausą. Vežimo sutartis sudaroma tiesiogiai su vežėju, kuris jums išrašo sąskaitą.',
+    apiFreeText: 'API nemokama, o RAHTIS ir už pervežimus iš užsakovo nieko neima: nėra nei paslaugos mokesčio, nei mėnesinio mokesčio, nei mokesčio už užklausą.',
     apiFastEyebrow: 'Greita',
     apiFastTitle: 'Užsakymas per sekundes, pakeitimas per minutę',
     apiFastText:
@@ -1299,10 +1297,10 @@ export const lt = {
     priceYear: "Metams iš anksto: −10 %",
     priceSubEyebrow: 'Krovinių birža vežėjams',
     priceSubTitle: '0 % reiso kainos',
-    priceSubText: 'Imate reisus iš krovinių biržos pagal sutartį tiesiogiai su užsakovu ir sąskaitą išrašote patys. Komisinio mokesčio nėra; viską apima aukščiau nurodytas mėnesinis mokestis.',
+    priceSubText: 'Už reisus iš krovinių biržos nėra nei komisinio, nei mokesčio už reisą: sutarta kaina visa jūsų. Viską apima aukščiau nurodytas mėnesinis mokestis.',
     priceShipEyebrow: "Užsakovui",
     priceShipTitle: 'Nemokamai',
-    priceShipText: 'Pervežimų skelbimas, tiesioginiai užsakymai savo vežėjams ir API užsakovui nemokami. Vežimo sutartis sudaroma tiesiogiai su vežėju, kuris jums išrašo sąskaitą.',
+    priceShipText: 'Pervežimų skelbimas, vežėjų pasiūlymai, tiesioginiai užsakymai savo vežėjams ir API užsakovui nemokami. Sutartis sudaroma tiesiogiai su vežėju, o RAHTIS neima procento nuo pervežimo kainos.',
   },
 
   done: {
@@ -1620,7 +1618,7 @@ export const lt = {
   orderForm: {
     requiredBody: 'Kėbulas',
     anyBody: 'Bet koks',
-    feeHint: 'Paslaugos mokesčio nėra: vežimo sutartis sudaroma tiesiogiai su vežėju, kuris jums išrašo sąskaitą.',
+    feeHint: '· vežėjas gauna visą kainą, RAHTIS prie jos nieko neprideda',
     /* Валюта цены: не евро — только у прямого договора и своих рейсов. */
     currency: 'Valiuta',
     currencyErrorDirect: 'Kita valiuta nei euras galima tik pagal tiesioginę sutartį su vežėju. Krovinių biržoje kaina nurodoma eurais.',
@@ -2124,7 +2122,7 @@ export const lt = {
   requisites: {
     ytjRefresh: 'Paimti pavadinimą ir adresą iš YTJ',
     title: 'Įmonės duomenys',
-    subtitleShipper: 'Jų reikia sąskaitoms išrašyti. Išsaugojus įmonės paskyra aktyvuojama.',
+    subtitleShipper: 'Šiuos sąskaitų rekvizitus mato vežėjai, su kuriais dirbate. Išsaugojus įmonės paskyra aktyvuojama.',
     subtitleCarrier: 'Klientai juos mato, kad apmokėtų sąskaitas pagal tiesiogines sutartis, o mes juos naudojame mėnesiniam mokesčiui. Išsaugojus įmonės paskyra aktyvuojama.',
 
     legalSection: 'Registro duomenys',
@@ -2144,7 +2142,7 @@ export const lt = {
     billingSection: 'Sąskaitos',
     billingSameAsLegal: 'Adresas sąskaitoms toks pat kaip registruotas',
     billingEmail: 'El. paštas sąskaitoms',
-    billingEmailHint: 'Čia siunčiame sąskaitas',
+    billingEmailHint: 'Sąskaitos ir mokėjimo priminimai siunčiami šiuo adresu',
     billingReference: 'Nuoroda sąskaitoje',
     billingReferenceHint: 'Jūsų nuoroda arba išlaidų centras, kurį norite matyti sąskaitoje',
 
@@ -2634,8 +2632,8 @@ export const lt = {
       ACCIDENT_INSURANCE: 'Nelaimingų atsitikimų darbe draudimas',
     },
     itemHints: {
-      REGISTERS: 'Gaunama automatiškai iš Suomijos PRH atvirųjų duomenų. Individualiai įmonei: įkelkite išrašą iš YTJ.',
-      TRADE_REGISTER: 'Gaunama automatiškai iš Suomijos PRH atvirųjų duomenų. Individualiai įmonei: įkelkite išrašą iš YTJ.',
+      REGISTERS: 'Suomijos įmonei gaunama automatiškai iš PRH atvirųjų duomenų; individuali įmonė įkelia išrašą iš YTJ. Kitų šalių įmonės: įkelkite atitinkamą mokesčių administratoriaus pažymą.',
+      TRADE_REGISTER: 'Suomijos ir Norvegijos įmonėms gaunama automatiškai iš registro (PRH, Brønnøysund); Suomijos individuali įmonė įkelia išrašą iš YTJ. Kitų šalių įmonės: įkelkite registrų centro išrašą.',
       TAX_DEBT: 'Pažyma iš Suomijos mokesčių administratoriaus sistemos OmaVero, ne senesnė nei 3 mėnesių.',
       PENSION: 'Pensijų draudiko pažyma apie draudimą ir sumokėtas įmokas, ne senesnė nei 3 mėnesių.',
       COLLECTIVE_AGREEMENT: 'Taikoma kolektyvinė sutartis (pvz., krovininio transporto sektoriaus) arba pagrindinių darbo sąlygų aprašas.',
@@ -2649,9 +2647,9 @@ export const lt = {
       MISSING: 'Trūksta',
     },
     validUntilDate: 'Galioja iki {date}',
-    fromPrh: 'Iš PRH duomenų',
+    fromPrh: 'Iš registro duomenų',
     fromDocument: 'Iš dokumento',
-    registryTitle: 'Registro duomenys (PRH)',
+    registryTitle: 'Registro duomenys',
     company: 'Įmonė',
     businessId: 'Įmonės kodas (Y-tunnus)',
     prepayment: 'Išankstinio mokesčio registras',
@@ -2663,10 +2661,10 @@ export const lt = {
     unknown: 'Duomenų nėra',
     checkedAt: 'Patikrinta {date}',
     noRegistry: 'Registro duomenys dar negauti.',
-    refresh: 'Atnaujinti iš PRH',
+    refresh: 'Atnaujinti iš registro',
     refreshing: 'Atnaujinama…',
     refreshTooSoon: 'Duomenys ką tik atnaujinti. Bandykite dar kartą po 10 minučių.',
-    refreshFailed: 'PRH registras neatsakė. Bandykite dar kartą šiek tiek vėliau.',
+    refreshFailed: 'Registras neatsakė. Bandykite dar kartą šiek tiek vėliau.',
     packageTitle: 'Pažymos',
     upload: 'Įkelti pažymą',
     uploading: 'Įkeliama…',
@@ -2727,8 +2725,7 @@ export const lt = {
     reminderTitle: '{item}: galioja iki {date}',
     reminderLead:
       'Užsakovo atsakomybės pažyma „{item}“ galioja tik iki {date}. Įkelkite naują pažymą, kad paketas liktų galiojantis ir ženklas „Patikrintas“ išliktų.',
-    reminderLeadPrh:
-      'Registro duomenų („{item}“) PRH patikrinimas galioja iki {date}. Atnaujinkite juos vienu paspaudimu, kad ženklas „Patikrintas“ išliktų.',
+    reminderLeadPrh: 'Registro duomenų („{item}“) patikrinimas galioja iki {date}. Atnaujinkite juos iš registro vienu paspaudimu, kad ženklas „Patikrintas“ išliktų.',
     reminderButton: 'Atnaujinti pažymas',
   },
 
@@ -4181,7 +4178,8 @@ export const lt = {
 
   known: {
     directBilling: 'Tiesioginė sutartis',
-    directBillingHint: 'Paslaugos mokesčio nėra, reisas patenka į jūsų savaitės ataskaitą.',
+    directBillingHint: 'RAHTIS prie kainos nieko neprideda, o reisas patenka į jūsų savaitės ataskaitą.',
+    carrierBusinessId: 'Įmonės kodas',
     carrierAccount: 'Banko sąskaita',
     title: 'Mano mašinos',
     subtitle:
@@ -4342,8 +4340,8 @@ export const lt = {
     groupGone: 'Kita mašina paėmė pervežimą pirma arba pasiūlymo laikas baigėsi.',
     groupOnly: 'Pervežimas dabar siūlomas tik užsakovo savoms mašinoms.',
     contractRahtis: 'Sutarties šalis – Aivomaa Oy (ankstesnės sąlygos)',
-    contractCarrierHint: 'Vežimo sutartis sudaroma tiesiogiai su vežėju, kurio pasiūlymą priimate. Paslaugos mokesčio nėra; sąskaitą jums išrašo vežėjas.',
-    deskDirectShipper: 'Tiesioginė sutartis su vežėju, kuris paims užsakymą: paslaugos mokesčio nėra, sąskaitą jums išrašo vežėjas.',
+    contractCarrierHint: 'Pervežimas skelbiamas krovinių biržoje tinkamiems vežėjams. RAHTIS už tai nieko neima.',
+    deskDirectShipper: 'Reisą paėmęs vežėjas gauna visą kainą; RAHTIS prie jos nieko neprideda.',
     hasOffers: 'Šiam pervežimui jau gauta pasiūlymų – rinkitės iš jų.',
   },
 
@@ -4989,7 +4987,7 @@ export const lt = {
     seeShipper: 'Apie vežėją užsakovas mato transporto priemonę ir jos duomenis, įvertinimus, punktualumo rodiklį ir žymą „Patikrintas“ prie vežėjo užsakovo atsakomybės pažymų; vežėjų, kuriems užsako tiesiogiai, – ir patį dokumentų paketą.',
     seeBank: 'Jei įmonė per paskutines 30 dienų pakeitė banko sąskaitą, jos sutarčių partneriai mato „Banko rekvizitai pakeisti prieš N d.“ – niekada ne pačius rekvizitus. Prieš mokėdami pasitikrinkite naują sąskaitą per kontaktą, kurį jau žinote.',
     verifyTitle: 'Kaip tikrinamos įmonės',
-    verifyRegistry: 'Registruodamiesi įmonę tikriname viešuosiuose registruose: Suomijos prekybos registre (PRH/YTJ), ES PVM registre (VIES), o Norvegijos įmones – Brønnøysund registruose. Tiesiogiai užsakančius užsakovus registruose tikriname kas savaitę.',
+    verifyRegistry: 'Registruodamiesi įmonę tikriname viešuosiuose registruose: Suomijos įmones – PRH atviruosiuose duomenyse (YTJ), Norvegijos įmones – Brønnøysund registruose, kitų ES šalių įmones – ES PVM mokėtojų registre (VIES). Jei automatinio patikrinimo nėra, įmonę ranka tikriname jos šalies registre. Kiekvieną paraišką tvirtina mūsų komanda; įrašas registre rodo, kad įmonė egzistuoja, bet ne tai, kad pareiškėjas jai atstovauja. Tiesiogiai užsakančius užsakovus registruose tikriname kas savaitę.',
     verifyDocs: 'Vežėjai pateikia užsakovo atsakomybės pažymas (prekybos registro išrašą, mokesčių ir pensijų įmokų pažymas, draudimą). Užsakovai gali pateikti prekybos registro išrašą, mokesčių pažymas ir parašo teisę patvirtinantį dokumentą. Mūsų darbuotojai patikrina kiekvieną dokumentą ir įrašo datą, iki kurios patikra galioja.',
     verifyInsurance: 'Vežėjų ir ekspeditorių civilinės atsakomybės draudimą tikriname pagal poliso dokumentus. Ekspeditoriaus draudimas – tai informacija vežėjams, o ne užsakymo sąlyga.',
     verifyVehicles: 'Kiekvieną transporto priemonę mūsų darbuotojai patvirtina, prieš jai pradedant imti krovinius.',
@@ -5047,9 +5045,8 @@ export const lt = {
     'validation.businessIdFor': 'Patikrinkite: {label}. Pavyzdys: {example}',
     'signup.submitted':
       'Patikrinsime įmonės {company} ({businessId}) duomenis registre ir atsiųsime prisijungimo duomenis adresu {email}.',
-    'apply.registryOk': 'Y-tunnus rastas registre: {name}. Paraišką netrukus patikrins RAHTIS administracija.',
-    'apply.registryOther':
-      'Registre šiuo Y-tunnus įregistruota „{name}“. Jei Y-tunnus neteisingas, atsakykite į patvirtinimo laišką – pataisysime. Paraišką netrukus patikrins RAHTIS administracija.',
+    'apply.registryOk': 'Įmonė rasta registre: {name}. Paraišką netrukus patikrins RAHTIS administracija.',
+    'apply.registryOther': 'Registre šiuo įmonės kodu įregistruota „{name}“. Jei kodas neteisingas, atsakykite į patvirtinimo laišką – pataisysime. Paraišką netrukus patikrins RAHTIS administracija.',
     'moderation.pendingCount':
       '{count, plural, =0 {Naujų paraiškų nėra} one {Laukia # paraiška} few {Laukia # paraiškos} many {Laukia # paraiškos} other {Laukia # paraiškų}}',
     'moderation.invitedTo': 'Kvietimas išsiųstas adresu {email}',

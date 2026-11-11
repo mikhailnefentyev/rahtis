@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { stopTimeZone } from '@/lib/country';
+import { businessIdLabel, stopTimeZone } from '@/lib/country';
 import { stopTime } from '@/lib/orders/stopTime';
 import { renderToBuffer } from '@react-pdf/renderer';
 import { COMMISSION_BPS, commissionCents, payoutCents, vatBpsFor, withVat } from '@/lib/config';
@@ -620,7 +620,7 @@ async function issue(
     company.legal_name ?? company.name,
     [street, city, company.billing_country ?? company.legal_country].filter(Boolean).join(', '),
     [
-      company.business_id ? `Y-tunnus ${company.business_id}` : null,
+      company.business_id ? `${businessIdLabel(company.country, 'Y-tunnus')} ${company.business_id}` : null,
       company.vat_number ? `${t.report_.vatNumber} ${company.vat_number}` : null,
     ]
       .filter(Boolean)
@@ -915,7 +915,7 @@ async function issueSubscriptionInvoices(
               company.legal_name ?? company.name,
               [street, city, company.billing_country ?? company.legal_country].filter(Boolean).join(', '),
               [
-                company.business_id ? `Y-tunnus ${company.business_id}` : null,
+                company.business_id ? `${businessIdLabel(company.country, 'Y-tunnus')} ${company.business_id}` : null,
                 company.vat_number ? `${t.report_.vatNumber} ${company.vat_number}` : null,
               ]
                 .filter(Boolean)

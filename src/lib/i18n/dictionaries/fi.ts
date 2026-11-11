@@ -242,7 +242,7 @@ export const fi = {
     nav: "Tilaus",
     title: "Tilaus",
     lede: "Maksat vain autoista, jotka ajoivat kuukauden aikana. Ensimmäinen auto on maksuton, jokainen seuraava maksaa 14,90 € kuukaudessa. Vuoden etukäteen maksamalla saat 10 % alennuksen.",
-    feesFrom: 'Yrityksesi siirrettiin alihankintamallista kuukausimaksuun: kuukausimaksut alkavat {date}. Siihen asti palvelu on maksuton.',
+    feesFrom: 'Yrityksesi kuukausimaksut alkavat {date}. Siihen asti palvelu on maksuton.',
     activeNow: "Ajaneita autoja tässä kuussa",
     activeHint: "Autot, joilla on valmistunut keikka",
     estimateNow: "Arvio tältä kuulta",
@@ -773,8 +773,7 @@ export const fi = {
     privacyDescription:
       'Miten RAHTIS käsittelee henkilötietoja: mitä tietoja kerätään, mihin niitä käytetään, kuinka kauan niitä säilytetään ja mitkä ovat rekisteröidyn oikeudet.',
     signinDescription: 'Kirjaudu RAHTIS-palveluun tilaajana tai kuljetusliikkeenä.',
-    applyDescription:
-      'Hae RAHTIS-palveluun. Tarkistamme Y-tunnuksen ja yrityksen tiedot rekistereistä, kuljetusliikkeiltä lisäksi liikenneluvan ja vakuutuksen.',
+    applyDescription: 'Hae RAHTIS-palveluun. Tarkistamme yritystunnuksen ja yrityksen tiedot rekistereistä, kuljetusliikkeiltä lisäksi liikenneluvan ja vakuutuksen.',
     forgotDescription: 'Palauta unohtunut salasana RAHTIS-palveluun.',
   },
 
@@ -900,8 +899,11 @@ export const fi = {
     progress: '{done}/{total} valmiina',
     waiting: 'odottaa tarkastusta',
     activate: 'Yritystiedot ja ehdot',
-    activateText: 'Haemme osoitteen valmiiksi YTJ:stä, jos se löytyy sieltä. Lisää tilinumero ja hyväksy ehdot — noin 2 minuuttia.',
-    activateTextShipper: 'Haemme osoitteen valmiiksi YTJ:stä, jos se löytyy sieltä. Tarkista laskutustiedot ja hyväksy ehdot — noin 2 minuuttia.',
+    activateText: 'Tarkista yrityksen nimi ja osoite, lisää tilinumero ja hyväksy ehdot — noin 2 minuuttia.',
+    activateTextShipper: 'Tarkista yrityksen nimi, osoite ja laskutustiedot ja hyväksy ehdot — noin 2 minuuttia.',
+    /* Только финской компании: название и адрес подставляются из YTJ (account/page.tsx). */
+    activateTextFi: 'Haemme nimen ja osoitteen valmiiksi YTJ:stä, jos ne löytyvät sieltä. Lisää tilinumero ja hyväksy ehdot — noin 2 minuuttia.',
+    activateTextShipperFi: 'Haemme nimen ja osoitteen valmiiksi YTJ:stä, jos ne löytyvät sieltä. Tarkista laskutustiedot ja hyväksy ehdot — noin 2 minuuttia.',
     activateAction: 'Täytä',
     docs: 'Liikennelupa ja vakuutus',
     docsText: 'Lataa voimassa oleva liikennelupa ja liikennevakuutus. Kuva tai PDF riittää.',
@@ -1194,8 +1196,7 @@ export const fi = {
     carrierTitle: 'Pidä auto ajossa myös keikkojen välillä.',
     carrier3: 'Voit löytää paluukeikan alueelta, jossa edellinen kuljetus päättyy.',
     carrier4: 'Jokainen auto hyväksytään palveluun erikseen.',
-    carrier5:
-      'Jokainen keikka on sopimus suoraan tilaajan kanssa: laskutat itse, eikä keikasta mene prosenttia. Ennen keikan ottamista näet tilaajan maksuhistorian.',
+    carrier5: 'Keikoista ei mene prosenttia: sovittu hinta on kokonaan sinun. Ennen keikan ottamista näet tilaajan maksuhistorian.',
     carrier6: 'Viikkoraportista näet ajetut keikat ja ansiot.',
     carrier7:
       'Kuljettajan sovellus kuuluu mukaan: keikat, työaika, kuormakuvat, rahtikirja, paikkakartta ja kuljettajan oma kieli.',
@@ -1216,8 +1217,7 @@ export const fi = {
     stepsEyebrow: 'Näin keikka etenee',
     stepsTitle: 'Hakemuksesta valmiiseen kuljetukseen neljässä vaiheessa',
     step1: 'Yrityksen tarkastus',
-    step1Text:
-      'Tarkistamme Y-tunnuksen ja yrityksen tiedot rekistereistä. Kuljetusliikkeiltä tarkistamme lisäksi liikenneluvan ja vakuutuksen.',
+    step1Text: 'Tarkistamme yrityksen tiedot yritysrekisteristä, ja jokaisen hakemuksen käy läpi ihminen. Kuljetusliikkeiltä tarkistamme lisäksi liikenneluvan ja vakuutuksen.',
     step2: 'Autojen hyväksyntä',
     step2Text:
       'Jokainen auto hyväksytään palveluun erikseen. Avoimet keikat näkyvät vain hyväksytylle kalustolle.',
@@ -1351,8 +1351,7 @@ export const fi = {
       'Liitä toiminnanohjauksesi tai TMS:si RAHTIKSEEN: tilaus lähtee pöydälle tai omalle autolle ilman käsin kirjoittamista, ja tiedät jokaisen vaiheen heti, kun se tapahtuu.',
     apiFreeEyebrow: 'Maksuton',
     apiFreeTitle: 'Ei kuukausimaksua, ei kutsuhintaa',
-    apiFreeText:
-      'Rajapinta on maksuton, eikä RAHTIS veloita tilaajalta kuljetuksistakaan mitään: ei palvelumaksua, ei kuukausimaksua eikä kutsukohtaista hintaa. Kuljetussopimus tehdään suoraan kuljetusliikkeen kanssa, ja kuljetusliike laskuttaa sinua.',
+    apiFreeText: 'Rajapinta on maksuton, eikä RAHTIS veloita tilaajalta kuljetuksistakaan mitään: ei palvelumaksua, ei kuukausimaksua eikä kutsukohtaista hintaa.',
     apiFastEyebrow: 'Nopea',
     apiFastTitle: 'Tilaus sekunneissa, muutos minuutissa',
     apiFastText:
@@ -1377,7 +1376,7 @@ export const fi = {
     footerDocuments: 'Asiakirjat',
     finalEyebrow: 'Näin pääset alkuun',
     finalTitle: 'Kerro yrityksestäsi – me hoidamme loput',
-    finalLede: 'Tarvitsemme yrityksen nimen, Y-tunnuksen ja sähköpostin, kuljetusliikkeiltä myös liikenneluvan ja vakuutuksen.',
+    finalLede: 'Tarvitsemme yrityksen nimen, yritystunnuksen ja sähköpostin, kuljetusliikkeiltä myös liikenneluvan ja vakuutuksen.',
     /*
      * Sama asia seisoi aiemmin kahdesti: tässä ja ensimmäisen ruudun
      * alahuomautuksena. Huomautus kertoi lisäksi kaksi asiaa, joita tämä
@@ -1438,10 +1437,10 @@ export const fi = {
     priceYear: "Vuosi etukäteen: −10 %",
     priceSubEyebrow: 'Tarjouspöytä kuljetusliikkeelle',
     priceSubTitle: '0 % keikasta',
-    priceSubText: 'Otat keikkoja tarjouspöydältä sopimuksella suoraan tilaajan kanssa ja laskutat itse. Ei provisiota; yllä oleva kuukausimaksu kattaa kaiken.',
+    priceSubText: 'Tarjouspöydän keikoista ei peritä provisiota eikä keikkakohtaisia maksuja: sovittu hinta on kokonaan sinun. Yllä oleva kuukausimaksu kattaa kaiken.',
     priceShipEyebrow: "Toimeksiantajalle",
     priceShipTitle: 'Maksuton',
-    priceShipText: 'Keikkojen julkaisu, suorat tilaukset omille kuljetusliikkeille ja rajapinta ovat toimeksiantajalle maksuttomia. Kuljetussopimus tehdään suoraan kuljetusliikkeen kanssa, ja kuljetusliike laskuttaa sinua.',
+    priceShipText: 'Keikkojen julkaisu, kuljetusliikkeiden tarjoukset, suorat tilaukset omille kuljetusliikkeille ja rajapinta ovat toimeksiantajalle maksuttomia. Sopimus tehdään suoraan kuljetusliikkeen kanssa, eikä RAHTIS ota rahdista prosenttia.',
   },
 
   done: {
@@ -1824,7 +1823,7 @@ export const fi = {
   orderForm: {
     requiredBody: 'Kori',
     anyBody: 'Mikä tahansa',
-    feeHint: 'Ei palvelumaksua: kuljetussopimus tehdään suoraan kuljetusliikkeen kanssa, ja kuljetusliike laskuttaa sinua.',
+    feeHint: '· kuljetusliike saa koko hinnan, RAHTIS ei lisää siihen mitään',
     /* Валюта цены: не евро — только у прямого договора и своих рейсов. */
     currency: 'Valuutta',
     currencyErrorDirect: 'Muu valuutta kuin euro vain suoralla sopimuksella kuljetusliikkeen kanssa. Tarjouspöydällä hinta on euroina.',
@@ -2342,7 +2341,7 @@ export const fi = {
       'Hyväksynnän jälkeen: kirjautuminen, liikennelupa ja vakuutus, ajoneuvojen tiedot. Hyväksymme jokaisen ajoneuvon erikseen.',
     shipperNote: 'Hyväksynnän jälkeen: kirjautuminen, yritystiedot, kuljetusten julkaisu.',
     sentTitle: 'Hakemus lähetetty',
-    duplicate: 'Tällä Y-tunnuksella on jo hakemus vireillä tai hyväksytty.',
+    duplicate: 'Tällä yritystunnuksella on jo hakemus vireillä tai hyväksytty.',
     invitedBy: '{carrier} kutsui sinut. Tiedot on täytetty valmiiksi — tarkista ne ja lähetä hakemus. Hyväksynnän jälkeen voit lähettää suoria tilauksia heidän autoilleen.',
     invitedByCarrier: '{carrier} kutsui kuljetusliikkeesi. Tiedot on täytetty valmiiksi — tarkista ne ja lähetä hakemus.',
     invitedByRahtis: 'Tiedot on täytetty kutsun perusteella — tarkista ne ja lähetä hakemus.',
@@ -2355,7 +2354,7 @@ export const fi = {
   requisites: {
     ytjRefresh: 'Hae nimi ja osoite YTJ:stä',
     title: 'Yritystiedot',
-    subtitleShipper: 'Tarvitsemme nämä laskutusta varten. Tallennuksen jälkeen yritys on käytössä.',
+    subtitleShipper: 'Laskutustiedot näkyvät kuljetusliikkeille, joiden kanssa teet kuljetuksia. Tallennuksen jälkeen yritys on käytössä.',
     subtitleCarrier: 'Asiakkaat näkevät nämä suorien sopimusten laskutusta varten, ja käytämme niitä kuukausimaksussa. Tallennuksen jälkeen yritys on käytössä.',
 
     legalSection: 'Viralliset tiedot',
@@ -2369,13 +2368,13 @@ export const fi = {
     language: 'Viestinnän kieli',
     languageHint:
       'Millä kielellä lähetämme kutsut, laskut ja raportit. Käyttöliittymän kielen jokainen valitsee itse yläpalkista.',
-    vatHint: 'Muodostettu Y-tunnuksesta. Korjaa, jos käytät arvonlisäveroryhmän tunnistetta',
+    vatHint: 'Muodostettu yritystunnuksesta. Korjaa, jos käytät arvonlisäveroryhmän tunnistetta',
     vatInvalid: 'Muoto: maatunnus ja 2–12 merkkiä, esimerkiksi FI12345678',
 
     billingSection: 'Laskutus',
     billingSameAsLegal: 'Laskutusosoite on sama kuin virallinen',
     billingEmail: 'Laskutuksen sähköposti',
-    billingEmailHint: 'Tänne lähetämme laskut',
+    billingEmailHint: 'Laskut ja maksumuistutukset tulevat tähän osoitteeseen',
     billingReference: 'Viite laskulle',
     billingReferenceHint: 'Viitteesi tai kustannuspaikka, jonka haluat laskulle',
 
@@ -2897,8 +2896,8 @@ export const fi = {
       ACCIDENT_INSURANCE: 'Työtapaturmavakuutus',
     },
     itemHints: {
-      REGISTERS: 'Haetaan automaattisesti PRH:n avoimesta datasta. Toiminimi: lataa ote YTJ:stä.',
-      TRADE_REGISTER: 'Haetaan automaattisesti PRH:n avoimesta datasta. Toiminimi: lataa ote YTJ:stä.',
+      REGISTERS: 'Suomalaiselle yritykselle haetaan automaattisesti PRH:n avoimesta datasta; toiminimi lataa otteen YTJ:stä. Muiden maiden yritykset: lataa vastaava todistus veroviranomaiselta.',
+      TRADE_REGISTER: 'Suomalaiselle ja norjalaiselle yritykselle haetaan automaattisesti rekisteristä (PRH, Brønnøysund); toiminimi lataa otteen YTJ:stä. Muiden maiden yritykset: lataa ote kaupparekisteristä.',
       TAX_DEBT: 'Verovelkatodistus OmaVerosta, enintään 3 kuukautta vanha.',
       PENSION: 'Eläkevakuutusyhtiön todistus vakuutuksesta ja maksuista, enintään 3 kuukautta vanha.',
       COLLECTIVE_AGREEMENT: 'Sovellettava TES (esim. kuorma-autoalan TES) tai selvitys keskeisistä työehdoista.',
@@ -2912,9 +2911,9 @@ export const fi = {
       MISSING: 'Puuttuu',
     },
     validUntilDate: 'Voimassa {date} asti',
-    fromPrh: 'PRH:n tiedoista',
+    fromPrh: 'Rekisterin tiedoista',
     fromDocument: 'Asiakirjasta',
-    registryTitle: 'Rekisteritiedot (PRH)',
+    registryTitle: 'Rekisteritiedot',
     company: 'Yritys',
     businessId: 'Y-tunnus',
     prepayment: 'Ennakkoperintärekisteri',
@@ -2926,10 +2925,10 @@ export const fi = {
     unknown: 'Ei tietoa',
     checkedAt: 'Tarkistettu {date}',
     noRegistry: 'Rekisteritietoja ei ole vielä haettu.',
-    refresh: 'Päivitä PRH:sta',
+    refresh: 'Päivitä rekisteristä',
     refreshing: 'Päivitetään…',
     refreshTooSoon: 'Tiedot päivitettiin juuri. Yritä uudelleen 10 minuutin kuluttua.',
-    refreshFailed: 'PRH:n rekisteri ei vastannut. Yritä hetken kuluttua uudelleen.',
+    refreshFailed: 'Rekisteri ei vastannut. Yritä hetken kuluttua uudelleen.',
     packageTitle: 'Selvitykset',
     upload: 'Lataa selvitys',
     uploading: 'Ladataan…',
@@ -2954,7 +2953,7 @@ export const fi = {
     issued: 'Annettu {date}',
     shareTitle: 'Jakolinkit',
     shareHint:
-      'Lähetä linkki tilaajalle, joka ei käytä RAHTIS-palvelua. Linkki näyttää yrityksen nimen, Y-tunnuksen, merkin ja voimassa olevat selvitykset. Voit perua linkin milloin tahansa.',
+      'Lähetä linkki tilaajalle, joka ei käytä RAHTIS-palvelua. Linkki näyttää yrityksen nimen, yritystunnuksen, merkin ja voimassa olevat selvitykset. Voit perua linkin milloin tahansa.',
     shareLabel: 'Kenelle (vapaaehtoinen)',
     shareExpires: 'Voimassa asti (vapaaehtoinen)',
     shareCreate: 'Luo linkki',
@@ -2990,8 +2989,7 @@ export const fi = {
     reminderTitle: '{item}: voimassa {date} asti',
     reminderLead:
       'Tilaajavastuuselvitys ”{item}” vanhenee {date}. Lataa uusi todistus, jotta paketti pysyy voimassa ja Tarkastettu-merkki säilyy.',
-    reminderLeadPrh:
-      'Rekisteritietojen (”{item}”) tarkistus PRH:sta vanhenee {date}. Päivitä tiedot yhdellä painalluksella, jotta Tarkastettu-merkki säilyy.',
+    reminderLeadPrh: 'Rekisteritietojen (”{item}”) tarkistus vanhenee {date}. Päivitä tiedot rekisteristä yhdellä painalluksella, jotta Tarkastettu-merkki säilyy.',
     reminderButton: 'Päivitä selvitykset',
   },
 
@@ -4334,7 +4332,7 @@ export const fi = {
     inviteLanguage: 'Viestin kieli',
     inviteSend: 'Lähetä kutsu',
     inviteSent: 'Kutsu lähetetty osoitteeseen {email}.',
-    inviteInvalid: 'Tarkista nimi, Y-tunnus ja sähköposti.',
+    inviteInvalid: 'Tarkista nimi, yritystunnus ja sähköposti.',
     inviteTooMany: 'Enintään 20 kutsua vuorokaudessa.',
     inviteFailed: 'Kutsua ei voitu lähettää. Yritä hetken kuluttua uudelleen.',
     invitesTitle: 'Lähetetyt kutsut',
@@ -4349,7 +4347,7 @@ export const fi = {
     revoke: 'Peru lupa',
     none: 'Ei vielä ajettuja kuljetuksia',
     anonymitySubscriber:
-      'Asiakas, jolle olet sallinut suorat tilaukset, näkee yrityksesi nimen, Y-tunnuksen ja tilinumeron sekä kuljettajan yhteystiedot, ja sinä näet hänen nimensä. Tarjouspöydällä asiakkaat näkyvät koodilla siihen asti, kun keikka on sinun; sen jälkeen näette toistenne nimet laskutusta varten.',
+      'Asiakas, jolle olet sallinut suorat tilaukset, näkee yrityksesi nimen, yritystunnuksen ja tilinumeron sekä kuljettajan yhteystiedot, ja sinä näet hänen nimensä. Tarjouspöydällä asiakkaat näkyvät koodilla siihen asti, kun keikka on sinun; sen jälkeen näette toistenne nimet laskutusta varten.',
     anonymity:
       'Asiakkaat näkyvät koodilla, ei nimellä. Tilaaja näkee autosi rekisterinumeron, arvosanan sekä kuljettajan nimen, puhelinnumeron ja sähköpostin yhteydenpitoa varten, mutta ei yrityksesi nimeä.',
   },
@@ -4437,7 +4435,9 @@ export const fi = {
 
   known: {
     directBilling: 'Suora sopimus',
-    directBillingHint: 'Ei palvelumaksua, keikka tulee viikkoraporttiisi.',
+    directBillingHint: 'RAHTIS ei lisää hintaan mitään, ja keikka tulee viikkoraporttiisi.',
+    /* Номер перевозчика не финского формата: страны компании в выдаче нет, поэтому подпись общая. */
+    carrierBusinessId: 'Yritystunnus',
     carrierAccount: 'Tilinumero',
     title: 'Omat autot',
     subtitle:
@@ -4492,7 +4492,7 @@ export const fi = {
     clientEdit: 'Muokkaa',
     clientDelete: 'Poista',
     clientDeleteConfirm: 'Poistetaanko asiakas?',
-    clientDuplicate: 'Samanniminen tai saman Y-tunnuksen asiakas on jo olemassa.',
+    clientDuplicate: 'Samanniminen tai saman yritystunnuksen asiakas on jo olemassa.',
     clientHasJobs: 'Asiakkaalla on keikkoja, joten sitä ei voi poistaa.',
     carrierHint:
       'Oma keikkasi odottaa kuljettajan vahvistusta. Määräaikaa ei ole. Kieltäytyminen peruu keikan — sitä ei siirretä yhteiselle pöydälle.',
@@ -4599,8 +4599,8 @@ export const fi = {
     groupGone: 'Toinen auto ehti ottaa kuljetuksen, tai tarjousaika päättyi.',
     groupOnly: 'Kuljetus on nyt tarjolla vain tilaajan omille autoille.',
     contractRahtis: 'Sopimuskumppanina Aivomaa Oy (aiemmat ehdot)',
-    contractCarrierHint: 'Kuljetussopimus tehdään suoraan sen kuljetusliikkeen kanssa, jonka tarjouksen hyväksyt. Ei palvelumaksua; kuljetusliike laskuttaa sinua.',
-    deskDirectShipper: 'Suora sopimus tilauksen ottavan kuljetusliikkeen kanssa: ei palvelumaksua, kuljetusliike laskuttaa sinua.',
+    contractCarrierHint: 'Keikka julkaistaan tarjouspöydälle sopiville kuljetusliikkeille. RAHTIS ei veloita siitä mitään.',
+    deskDirectShipper: 'Keikan ottava kuljetusliike saa koko hinnan; RAHTIS ei lisää siihen mitään.',
   },
 
   money: {
@@ -5266,12 +5266,12 @@ export const fi = {
     boardFilter: 'Kuljetusliike voi rajata tarjouspöydän noutopaikkakunnan mukaan. Ennen toimeksiantoa tarjouspöydällä näkyvät paikkakunnat, ajat, kuorman tiedot ja likimääräinen alue, mutta ei tarkkoja osoitteita eikä tilaajan nimeä.',
     boardOffers: 'Kuormaan voi tarjota enintään kolme kuljetusliikettä. Tilaaja valitsee tarjouksen, ja kuljetusliike vahvistaa sen 15 minuutin kuluessa; muuten kuorma palaa tarjouspöydälle.',
     seeTitle: 'Mitä osapuolet näkevät toisistaan',
-    seeContract: 'Kun sopimus on syntynyt, osapuolet näkevät toistensa nimen, Y-tunnuksen ja laskutukseen tarvittavat tiedot, myös kuljetusliikkeen tilinumeron.',
+    seeContract: 'Kun sopimus on syntynyt, osapuolet näkevät toistensa nimen, yritystunnuksen ja laskutukseen tarvittavat tiedot, myös kuljetusliikkeen tilinumeron.',
     seeCarrier: 'Suorissa tilauksissa kuljetusliike näkee tilaajasta: yrityksen iän, tilan julkisissa rekistereissä, yhteenvedon kuljetusliikkeiden maksuilmoituksista, maksutäsmällisyyden RAHTIS-palveluun merkityissä kuljetusliikkeiden laskuissa, toteutuneiden kuljetusten määrän sekä tarkastusmerkinnät tilaajan toimittamista asiakirjoista. Näkyvissä ovat vain päivämäärät ja merkinnät, ei koskaan itse tiedostoja.',
     seeShipper: 'Kuljetusliikkeestä tilaaja näkee ajoneuvon ja sen tiedot, arvosanat, täsmällisyyshistorian ja tilaajavastuuasiakirjojen ”Tarkastettu”-merkinnän; kuljetusliikkeistä, joilta se tilaa suoraan, myös asiakirjapaketin.',
     seeBank: 'Jos yritys on muuttanut tilinumeroaan viimeisen 30 päivän aikana, sen sopimuskumppanit näkevät merkinnän ”Tilitiedot muutettu N päivää sitten” – eivät koskaan itse tietoja. Varmista uusi tilinumero jo tuntemasi yhteystiedon kautta ennen maksamista.',
     verifyTitle: 'Miten yritykset tarkastetaan',
-    verifyRegistry: 'Rekisteröinnin yhteydessä tarkastamme yrityksen julkisista rekistereistä: kaupparekisteristä (PRH/YTJ), EU:n ALV-rekisteristä (VIES) ja norjalaisten yritysten osalta Brønnøysundin rekistereistä. Suoraan tilaavien tilaajien rekisteritiedot tarkastetaan uudelleen viikoittain.',
+    verifyRegistry: 'Rekisteröinnin yhteydessä tarkastamme yrityksen julkisista rekistereistä: suomalaiset yritykset PRH:n avoimesta datasta (YTJ), norjalaiset Brønnøysundin rekistereistä ja muiden EU-maiden yritykset EU:n ALV-rekisteristä (VIES). Jos automaattista tarkistusta ei ole, tarkastamme yrityksen käsin maan omasta rekisteristä. Jokaisen hakemuksen hyväksyy ylläpito; rekisterimerkintä osoittaa, että yritys on olemassa, ei sitä, että hakija edustaa sitä. Suoraan tilaavien tilaajien rekisteritiedot tarkastetaan uudelleen viikoittain.',
     verifyDocs: 'Kuljetusliikkeet toimittavat tilaajavastuuasiakirjansa (kaupparekisteriote, vero- ja eläkevakuutustodistukset, vakuutus). Tilaajat voivat toimittaa kaupparekisteriotteen, verotodistukset ja selvityksen nimenkirjoitusoikeudesta. Henkilöstömme tarkastaa jokaisen asiakirjan ja kirjaa päivän, johon asti tarkastus on voimassa.',
     verifyInsurance: 'Kuljetusliikkeiden ja huolitsijoiden vastuuvakuutukset tarkastetaan vakuutusasiakirjoista. Huolitsijan vakuutus on tieto kuljetusliikkeille, ei tilaamisen edellytys.',
     verifyVehicles: 'Henkilöstömme hyväksyy jokaisen ajoneuvon ennen kuin sillä voi ottaa kuormia.',
@@ -5335,9 +5335,8 @@ export const fi = {
      * se, löytyikö Y-tunnus ja millä nimellä: huomautukset (ennakkoperintä,
      * ALV) käsittelee ylläpito, eivätkä ne ole hylkäys.
      */
-    'apply.registryOk': 'Y-tunnus löytyi rekisteristä: {name}. Hakemus odottaa ylläpidon tarkastusta.',
-    'apply.registryOther':
-      'Tällä Y-tunnuksella rekisterissä on ”{name}”. Jos Y-tunnus on väärin, vastaa vahvistusviestiin, niin korjaamme sen. Hakemus odottaa ylläpidon tarkastusta.',
+    'apply.registryOk': 'Yritys löytyi rekisteristä: {name}. Hakemus odottaa ylläpidon tarkastusta.',
+    'apply.registryOther': 'Tällä yritystunnuksella rekisterissä on ”{name}”. Jos tunnus on väärin, vastaa vahvistusviestiin, niin korjaamme sen. Hakemus odottaa ylläpidon tarkastusta.',
     'moderation.pendingCount':
       '{count, plural, =0 {Ei uusia hakemuksia} one {# hakemus odottaa} other {# hakemusta odottaa}}',
     'moderation.invitedTo': 'Kutsu lähetetty osoitteeseen {email}',

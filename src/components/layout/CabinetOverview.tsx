@@ -12,6 +12,7 @@ import { Badge, buttonClass, Card, CardBody, Kv, Mono } from '@/components/ui';
 import { companyStatusTone } from '@/components/ui/tone';
 import { accountPath } from '@/lib/auth/paths';
 import { freeUntil } from '@/lib/config';
+import { businessIdLabel } from '@/lib/country';
 import { todayInHelsinki } from '@/lib/dates';
 import { type Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
@@ -196,7 +197,7 @@ export async function CabinetOverview({
                   </Badge>
                 </div>
                 <div className="mt-1 flex flex-col gap-1.5">
-                  <Kv k={t.cabinet.businessId} v={<Mono>{company.business_id}</Mono>} />
+                  <Kv k={businessIdLabel(company.country, t.cabinet.businessId)} v={<Mono>{company.business_id}</Mono>} />
                   <Kv k={t.company.email} v={company.contact_email} />
                   <Kv k={t.cabinet.yourRole} v={t.role[role]} />
                   {company.approved_at && (
