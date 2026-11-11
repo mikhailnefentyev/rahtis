@@ -315,6 +315,7 @@ const fi: Texts = {
       points: [
         'Omat asiakkaat ja omat keikat: asiakas tilaa suoraan autollenne ja saa seurantalinkin. Ensimmäinen auto maksutta, jokainen seuraava ajossa ollut auto 14,90 € kuukaudessa, ei prosenttia.',
         'Kuljettajan sovellus kymmenellä kielellä: saapumiset, kuvat, työaika ja rahtikirja skannattuna PDF:ksi.',
+        'Tilaukset sähköpostista: välitätte asiakkaan tilausviestin, PDF:n tai kuvan, ja RAHTIS tekee siitä keikkaluonnoksen oikealle autolle — ei käsin kirjoittamista.',
         'Keikkoja tarjouspöydältä satamista ja koko toiminta-alueelta. Kuljetussopimus tehdään suoraan rahdinantajan kanssa, eikä keikoista peritä prosenttia.',
       ],
       button: 'Hae mukaan',
@@ -553,6 +554,7 @@ const en: Texts = {
       points: [
         'Your own customers and your own jobs: the customer books your truck directly and gets a tracking link. First truck free, each further truck on the road €14.90 a month, no percentage.',
         'A driver app in ten languages: arrivals, photos, working hours and the consignment note scanned to PDF.',
+        'Orders from e-mail: forward your customer’s order message, PDF or photo, and RAHTIS turns it into a draft job for the right truck — no retyping.',
         'Jobs from the load board, from ports and across your whole operating area. The contract of carriage is made directly with the shipper, and no percentage is taken from any job.',
       ],
       button: 'Apply',
