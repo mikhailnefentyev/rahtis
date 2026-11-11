@@ -91,28 +91,36 @@ export default async function BlogIndex({ params }: Params) {
   return (
     <BlogFrame lang={lang}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
-      <section className="border-b border-line bg-surface">
-        {/* Текст слева, справа — грузовик без прицепа: блог про всю отрасль, самосвал — только на /maansiirto. */}
-        <div className={`${BLOG_SECTION} grid items-center gap-6 py-8 sm:gap-8 sm:py-16 lg:grid-cols-[1.15fr_1fr]`}>
-          <div>
-            <p className="label-micro" data-accent lang={lang}>
-              {t.blog}
-            </p>
-            <h1 className="mt-3 max-w-[22ch] text-[clamp(30px,4.2vw,46px)] leading-[1.08] font-semibold tracking-tight text-balance" lang={lang}>
-              {t.heading}
-            </h1>
-            <p className="mt-4 max-w-[56ch] text-[17px] leading-relaxed text-ink-muted">{t.intro}</p>
-          </div>
+      {/*
+        Тёмный баннер: ночное фото (грузовик RAHTIS.EU + телефон) справа растворяется
+        в фирменном тёмно-синем, текст белый. На светлом фоне фото выглядело вставкой.
+        На телефоне фото — приглушённый фон под текстом.
+      */}
+      <section className="relative isolate overflow-hidden bg-ink text-white">
+        <div
+          aria-hidden
+          className="absolute inset-y-0 right-0 -z-10 w-full opacity-30 lg:w-[56%] lg:opacity-100 lg:[mask-image:linear-gradient(to_right,transparent_0%,black_38%)]"
+        >
           <Image
             src="/media/blog-hero.webp"
             alt=""
-            aria-hidden
-            width={1122}
-            height={900}
+            fill
             priority
-            sizes="(min-width: 1024px) 440px, 90vw"
-            className="rise mx-auto w-full max-w-[420px] rounded-2xl shadow-[0_24px_60px_-20px_rgba(15,23,42,0.45)] ring-1 ring-black/5 lg:max-w-[440px]"
+            sizes="(min-width: 1024px) 62vw, 100vw"
+            className="object-cover object-[70%_center] lg:object-[center_8%]"
           />
+        </div>
+        <div aria-hidden className="absolute inset-0 -z-10 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />
+        <div className={`${BLOG_SECTION} py-14 sm:py-24 lg:py-32`}>
+          <div className="max-w-[30rem]">
+            <p className="label-micro text-accent-bright" lang={lang}>
+              {t.blog}
+            </p>
+            <h1 className="mt-3 max-w-[22ch] text-[clamp(30px,4.2vw,46px)] leading-[1.08] font-semibold tracking-tight text-balance text-white" lang={lang}>
+              {t.heading}
+            </h1>
+            <p className="mt-4 max-w-[56ch] text-[17px] leading-relaxed text-white/75">{t.intro}</p>
+          </div>
         </div>
       </section>
       <section className={`${BLOG_SECTION} py-8 sm:py-14`}>
