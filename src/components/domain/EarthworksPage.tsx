@@ -94,36 +94,46 @@ export async function EarthworksPage({ locale }: { locale: string }) {
       </header>
 
       <main className="flex-1">
-        <section className="border-b border-line bg-surface">
-          {/* Текст слева, справа — самосвал (из картинок сочетаний, без прицепа); белый фон картинки растворяется в фоне раздела. */}
-          <div className={`${section} grid items-center gap-8 py-16 sm:py-20 lg:grid-cols-[1.15fr_1fr]`}>
-            <div>
-              <p className="label-micro" data-accent>
-                {c.eyebrow}
-              </p>
-              <h1 className="mt-3 max-w-[24ch] text-[clamp(30px,4.2vw,46px)] leading-[1.08] font-semibold tracking-tight text-balance">
+        {/*
+          Тёмный баннер, как в блоге: фото самосвала на карьере справа растворяется
+          в фирменном тёмно-синем, текст белый. На телефоне фото — приглушённый фон.
+        */}
+        <section className="relative isolate overflow-hidden bg-ink text-white">
+          <div
+            aria-hidden
+            className="absolute inset-y-0 right-0 -z-10 w-full opacity-30 lg:w-[62%] lg:opacity-100 lg:[mask-image:linear-gradient(to_right,transparent_0%,black_50%)]"
+          >
+            <Image
+              src="/media/maansiirto-hero.webp"
+              alt=""
+              fill
+              priority
+              sizes="(min-width: 1024px) 62vw, 100vw"
+              className="object-cover object-[60%_center] brightness-[0.82] lg:object-[62%_center]"
+            />
+          </div>
+          {/* Небо на фото светлее фона: затемнение слева и сверху прячет шов. */}
+          <div aria-hidden className="absolute inset-0 -z-10 hidden bg-[radial-gradient(120%_90%_at_100%_70%,transparent_35%,var(--color-ink)_85%)] lg:block" />
+          <div aria-hidden className="absolute inset-0 -z-10 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />
+          <div className={`${section} py-16 sm:py-24 lg:py-28`}>
+            <div className="max-w-[34rem]">
+              <p className="label-micro text-accent-bright">{c.eyebrow}</p>
+              <h1 className="mt-3 max-w-[24ch] text-[clamp(30px,4.2vw,46px)] leading-[1.08] font-semibold tracking-tight text-balance text-white">
                 {c.title}
               </h1>
-              <p className="mt-4 max-w-[62ch] text-[17px] leading-relaxed text-ink-muted">{c.lede}</p>
+              <p className="mt-4 max-w-[62ch] text-[17px] leading-relaxed text-white/75">{c.lede}</p>
               <div className="mt-7 flex flex-wrap gap-3">
                 <Link href={`/${locale}/apply`} className={buttonClass({ variant: 'primary', size: 'lg', className: 'h-12 text-[15px]' })}>
                   {c.ctaApply}
                 </Link>
-                <Link href={signInPath(locale)} className={buttonClass({ size: 'lg', className: 'h-12 text-[15px]' })}>
+                <Link
+                  href={signInPath(locale)}
+                  className="inline-flex h-12 items-center gap-2 rounded-control border border-white/30 px-5 text-[15px] font-semibold text-white transition-colors hover:bg-white/10"
+                >
                   {c.ctaSignIn}
                 </Link>
               </div>
             </div>
-            <Image
-              src="/media/kippiauto.webp"
-              alt=""
-              aria-hidden
-              width={926}
-              height={445}
-              priority
-              sizes="(min-width: 1024px) 440px, 100vw"
-              className="rise mx-auto hidden w-full max-w-[520px] mix-blend-multiply lg:block"
-            />
           </div>
         </section>
 
