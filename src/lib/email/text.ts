@@ -299,8 +299,8 @@ const fi: Texts = {
       preheader: 'Julkaisette kuljetuksen alueen hyväksytyille kuljetusliikkeille tai suoraan omille kumppaneillenne — tarjoukset, eteneminen, kuvat ja rahtikirja samassa näkymässä.',
       body: 'RAHTIS on kuljetusten hallintajärjestelmä kuljetusliikkeille ja huolitsijoille Pohjoismaissa, Baltiassa, Puolassa ja Saksassa. Huolitsijana julkaisette asiakkaidenne kuljetukset kerran: ne menevät alueen hyväksytyille kuljetusliikkeille tai suoraan omille kuljetuskumppaneillenne. Perävaunujen vaihdot, kontit sekä pakettiauto- ja kuorma-autokuljetukset.',
       points: [
-        'Tarjoukset samassa näkymässä — valitsette kuljetusliikkeen hinnan, kaluston ja arvioiden perusteella. Hintaa ei huutokaupata alas.',
-        'Omat kumppanit mukaan: lisäätte tuttujen kuljetusliikkeiden autot omiksenne ja annatte keikat suoraan heille.',
+        'Hinnan asetatte itse, ja enintään kolme kuljetusliikettä tekee tarjouksen — valitsette kaluston, arvioiden ja toteutuneiden keikkojen perusteella. Ei huutokauppaa.',
+        'Vakituiset kumppanit: kun kuljetusliike on ajanut teille ja sallii suorat tilaukset, annatte keikat suoraan sen autoille.',
         'Tilaukset myös sähköpostista tai PDF:stä; muutokset, kuvat ja rahtikirja välittyvät kuljetusliikkeelle, kuljettajalle ja teille.',
         'Viestit kuljetusliikkeen ja kuljettajan kanssa kääntyvät automaattisesti: kukin kirjoittaa ja lukee omalla kielellään.',
         'Viikkoraportti ja maksuton rajapinta (API) omaan TMS- tai ERP-järjestelmäänne.',
@@ -540,8 +540,8 @@ const en: Texts = {
       preheader: 'Post a job to approved carriers in the area or straight to your own partners — offers, progress, photos and consignment note in one view.',
       body: 'RAHTIS is a transport management system for carriers and freight forwarders in the Nordics, the Baltics, Poland and Germany. As a forwarder you post your customers’ transports once: they go to approved carriers in the area or straight to your own transport partners. Trailer swaps, containers, and van and truck loads.',
       points: [
-        'Offers in one view — you choose the carrier on price, equipment and ratings. No auctions driving the price down.',
-        'Bring your own partners: add the trucks of carriers you work with and give them jobs directly.',
+        'You set the price, and up to three carriers make an offer — you choose on equipment, ratings and track record. No auction.',
+        'Regular partners: once a carrier has driven for you and allows direct orders, you give jobs straight to its trucks.',
         'Orders also from e-mail or PDF; changes, photos and the consignment note reach the carrier, the driver and you.',
         'Messages with the carrier and the driver are translated automatically: everyone writes and reads in their own language.',
         'A weekly report and a free API for your own TMS or ERP.',

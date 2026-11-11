@@ -113,12 +113,12 @@ const DRIVER = `## Driver app
 
 const EXCHANGE = `## Freight exchange (load board) and direct orders
 
-- A shipper publishes a job once; it reaches approved, suitable vehicles in the area. Up to three offers; the shipper chooses on price, equipment and ratings. No downward price auction. The contract of carriage is made directly between the shipper and the carrier; before taking a job the carrier sees the shipper's payment record (company age, register status, other carriers' payment reports, checked company documents, forwarder's insurance if checked).
+- A shipper publishes a job once; it reaches approved, suitable vehicles in the area. The shipper sets the price; up to three carriers offer, and the shipper chooses on equipment, ratings and track record. No price auction. The contract of carriage is made directly between the shipper and the carrier; before taking a job the carrier sees the shipper's payment record (company age, register status, other carriers' payment reports, checked company documents, forwarder's insurance if checked).
 - If a vehicle cancels or does not confirm within 15 minutes, the job returns to the board and goes to the next suitable vehicles automatically.
 - Direct orders: a shipper sends a job straight to a known vehicle, or first to its own carriers and then to the board.
 - Freight: trailer swaps between ports, terminals and customers; container haulage (20, 30, 40, 45 ft) to and from ports; express transport by van (up to 3.5 t) or truck (up to 26 t), with tail lift, side loading or refrigeration.
 - Live status for everyone on a job: arrivals, stops, ETA, delay and waiting-time alerts, photos and CMR in one place; messages per job with automatic translation, and quick questions such as "Where is the truck?" answered from GPS without a call.
-- Tracking link for the consignee or end customer: ETA from live GPS, stage timeline, proof of delivery and traffic and road conditions on the route.
+- On carriers' own customer jobs, a tracking link for the consignee or end customer: ETA from live GPS, stage timeline, proof of delivery and traffic and road conditions on the route.
 - Vehicle check at pickup: whether the assigned truck is the one at the pickup is confirmed from independent GPS evidence.
 - One-tap take: a carrier takes a matching job from the board with its best-fitting own truck.
 - Shipper API: REST + signed webhooks, OpenAPI 3.1, key created in the dashboard.`;
@@ -170,7 +170,7 @@ export function llmsTxt(): string {
 ${SUMMARY}
 
 - Carriers: TMS with fleet, vehicle combinations and legal weights, fuel, GPS integration (${GPS}), profitability per vehicle, drivers and pay by country, own customers, orders from forwarded emails, return loads, driver app.
-- Shippers and forwarders: freight exchange and direct orders for trailer swaps, containers and express transport; free space in trucks already on the way; tracking link with live ETA and proof of delivery; free REST API.
+- Shippers and forwarders: freight exchange and direct orders for trailer swaps, containers and express transport; free space in trucks already on the way; live status, photos and proof of delivery for every job; free REST API.
 - For freight forwarders (${SITE_URL}${forwardersPath('en')}): find carriers and publish loads once; free, no commission, agreement directly with the carrier.
 - Trailer swaps in ports (${SITE_URL}${trailerSwapPath('en')}): load-board jobs in Finnish ports, own customers, driver app with CMR scanner; first truck free.
 - Earthworks: tipper loads with weights (also read from a photo of the weighbridge ticket), hours, foreman approval by link, Finnish waste transfer documents for construction waste and contaminated soil, invoices in the carrier's name.
