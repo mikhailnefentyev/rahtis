@@ -75,8 +75,10 @@ export function pageMetadata(input: {
    * видит семь копий английского документа.
    */
   textLocales?: readonly Locale[];
+  /** Своя картинка превью вместо марки: фото посадочной страницы. */
+  image?: { url: string; width: number; height: number; alt: string };
 }): Metadata {
-  const { locale, paths, title, description, noindex, canonical, xDefault, textLocales = locales } = input;
+  const { locale, paths, title, description, noindex, canonical, xDefault, textLocales = locales, image = OG_IMAGE } = input;
 
   const url = (l: Locale) => `${SITE_URL}/${l}${paths[l]}`;
 
@@ -106,13 +108,13 @@ export function pageMetadata(input: {
       locale: OG_LOCALE[locale],
       /* Остальные настоящие переводы страницы — то же, что hreflang, для og-читателей. */
       alternateLocale: textLocales.filter((l) => l !== locale).map((l) => OG_LOCALE[l]),
-      images: [OG_IMAGE],
+      images: [image],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
-      images: [OG_IMAGE.url],
+      images: [image.url],
     },
     ...(noindex ? { robots: { index: false, follow: true } } : {}),
   };

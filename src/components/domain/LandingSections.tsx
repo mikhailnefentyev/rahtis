@@ -10,6 +10,8 @@ import { APP } from '@/lib/config';
 import { getI18n, LOCALE_NAMES, locales, type Locale } from '@/lib/i18n';
 import { placeCountries } from '@/lib/routing/places';
 import { EARTHWORKS, earthworksPath } from '@/lib/landing/earthworks';
+import { FORWARDERS, forwardersPath } from '@/lib/landing/forwarders';
+import { TRAILER_SWAP, trailerSwapPath } from '@/lib/landing/trailerSwap';
 import { LandingFleet, LandingPricing } from './LandingFleet';
 
 /**
@@ -27,6 +29,8 @@ export async function LandingSections({ locale, showBlog = false }: { locale: Lo
   const { t } = await getI18n(locale);
   const l = t.landing;
   const ew = EARTHWORKS[locale];
+  const fw = FORWARDERS[locale];
+  const ts = TRAILER_SWAP[locale];
 
   return (
     <>
@@ -155,23 +159,33 @@ export async function LandingSections({ locale, showBlog = false }: { locale: Lo
           </div>
 
           {/*
-            * Третье направление — самосвалы на объектах. Не третья
-            * карточка: это не груз с биржи, а работа перевозчика у своего
-            * клиента, и рассказ о ней живёт на своей странице.
+            * «Для кого»: три посадочные страницы — экспедитору, перевозчику
+            * на смене прицепов в портах и самосвалам на объектах. Не
+            * карточки веток: это рассказ для своей аудитории, и живёт он
+            * на своей странице.
             */}
-          <Link
-            href={earthworksPath(locale)}
-            className="group mt-4 flex flex-col gap-3 rounded-card border border-line bg-surface p-5 transition-colors hover:border-accent-line sm:flex-row sm:items-center sm:justify-between"
-          >
-            <span className="min-w-0">
-              <span className="label-micro" data-accent>
-                {ew.teaserEyebrow}
-              </span>
-              <span className="mt-1.5 block text-[18px] leading-snug font-semibold tracking-tight">{ew.teaserTitle}</span>
-              <span className="mt-1 block max-w-[70ch] text-[15px] text-ink-muted">{ew.teaserText}</span>
-            </span>
-            <span className="shrink-0 text-[15px] font-semibold text-accent group-hover:underline">{ew.teaserCta} →</span>
-          </Link>
+          <div className="mt-4 grid gap-4 md:grid-cols-3">
+            {[
+              { href: forwardersPath(locale), copy: fw },
+              { href: trailerSwapPath(locale), copy: ts },
+              { href: earthworksPath(locale), copy: ew },
+            ].map(({ href, copy }) => (
+              <Link
+                key={href}
+                href={href}
+                className="group flex flex-col gap-3 rounded-card border border-line bg-surface p-5 transition-colors hover:border-accent-line"
+              >
+                <span className="min-w-0">
+                  <span className="label-micro" data-accent>
+                    {copy.teaserEyebrow}
+                  </span>
+                  <span className="mt-1.5 block text-[18px] leading-snug font-semibold tracking-tight text-balance">{copy.teaserTitle}</span>
+                  <span className="mt-1 block text-[15px] text-ink-muted">{copy.teaserText}</span>
+                </span>
+                <span className="mt-auto text-[15px] font-semibold text-accent group-hover:underline">{copy.teaserCta} →</span>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -728,6 +742,8 @@ Rahtis-Event: order.stop_arrived`}</code>
                 { href: `/${locale}/apply`, label: l.applyCarrier },
                 { href: signInPath(locale), label: l.menuSignIn },
                 { href: `/${locale}/api-docs`, label: l.footerApiDocs },
+                { href: forwardersPath(locale), label: fw.footerLink },
+                { href: trailerSwapPath(locale), label: ts.footerLink },
                 { href: earthworksPath(locale), label: ew.footerLink },
                 ...(showBlog ? [{ href: blogPath(locale), label: t.site.blog }] : []),
               ],

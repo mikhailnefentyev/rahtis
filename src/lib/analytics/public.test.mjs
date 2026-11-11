@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { cleanUrl, isPublicPath, scrubProperties } from './public.ts';
 
 test('аналитика: открытые страницы — только витрина', () => {
-  for (const p of ['/', '/en', '/fi/apply', '/fi/tietosuoja', '/en/api-docs', '/blog', '/blog/some-post']) assert.equal(isPublicPath(p), true, p);
+  for (const p of ['/', '/en', '/fi/apply', '/fi/tietosuoja', '/en/api-docs', '/blog', '/blog/some-post', '/fi/maansiirto', '/en/earthworks', '/fi/huolitsijoille', '/en/forwarders', '/fi/peravaunun-vaihto', '/de/trailer-swap', '/en/rules']) assert.equal(isPublicPath(p), true, p);
   for (const p of ['/fi/carrier/desk', '/en/track/abc123', '/fi/driver', '/en/signin', '/fi/admin/legal', '/blog/a/b']) assert.equal(isPublicPath(p), false, p);
 });
 

@@ -93,11 +93,17 @@ function Switch({ current, search }: { current: Locale; search: URLSearchParams 
  */
 type Slug = { fi: string; other: string; fiOrEnOnly?: true };
 const EARTHWORKS: Slug = { fi: 'maansiirto', other: 'earthworks' };
+const FORWARDERS: Slug = { fi: 'huolitsijoille', other: 'forwarders' };
+const TRAILER_SWAP: Slug = { fi: 'peravaunun-vaihto', other: 'trailer-swap' };
 const TERMS: Slug = { fi: 'kayttoehdot', other: 'terms', fiOrEnOnly: true };
 const PRIVACY: Slug = { fi: 'tietosuoja', other: 'privacy', fiOrEnOnly: true };
 const LOCALIZED_SLUGS = new Map<string, Slug>([
   ['maansiirto', EARTHWORKS],
   ['earthworks', EARTHWORKS],
+  ['huolitsijoille', FORWARDERS],
+  ['forwarders', FORWARDERS],
+  ['peravaunun-vaihto', TRAILER_SWAP],
+  ['trailer-swap', TRAILER_SWAP],
   ['kayttoehdot', TERMS],
   ['terms', TERMS],
   ['tietosuoja', PRIVACY],

@@ -1,6 +1,8 @@
 import { ANNUAL_DISCOUNT_BPS, APP, ON_REQUEST_FROM, SUBSCRIPTION_LADDER } from '@/lib/config';
 import { locales, type Locale } from '@/lib/i18n/config';
 import { EARTHWORKS, earthworksPath } from '@/lib/landing/earthworks';
+import { forwardersPath } from '@/lib/landing/forwarders';
+import { trailerSwapPath } from '@/lib/landing/trailerSwap';
 import { SITE_URL } from '@/lib/seo';
 
 /**
@@ -65,11 +67,15 @@ ${ladderLines().join('\n')}
 function links(): string {
   const home = locales.map((l) => `[${LANG_NAME[l]}](${SITE_URL}/${l})`).join(' · ');
   const earth = locales.map((l) => `[${LANG_NAME[l]}](${SITE_URL}${earthworksPath(l)})`).join(' · ');
+  const fwd = locales.map((l) => `[${LANG_NAME[l]}](${SITE_URL}${forwardersPath(l)})`).join(' · ');
+  const swap = locales.map((l) => `[${LANG_NAME[l]}](${SITE_URL}${trailerSwapPath(l)})`).join(' · ');
   const apply = locales.map((l) => `[${LANG_NAME[l]}](${SITE_URL}/${l}/apply)`).join(' · ');
   const rules = locales.map((l) => `[${LANG_NAME[l]}](${SITE_URL}/${l}/rules)`).join(' · ');
   return `## Pages
 
 - Home: ${home}
+- For freight forwarders (find carriers, publish loads; free, no commission): ${fwd}
+- Trailer swaps in ports (carriers doing unaccompanied trailer swaps): ${swap}
 - Earthworks and tipper trucks: ${earth}
 - Apply as a carrier or shipper: ${apply}
 - Platform rules — what it costs, how loads are ordered on the board, what each side sees, how companies are checked, complaints: ${rules}
@@ -127,6 +133,23 @@ const EARTH = `## Earthworks and tipper trucks
 - Sites in Finland: waste transfer document (siirtoasiakirja) under section 121 of the Finnish Waste Act, with waste codes, for construction waste and contaminated soil. A site is marked as contaminated (PIMA, above the lower guideline values of Government Decree 214/2007); its 17 05 04 and 17 05 03* loads then get the document. Clean soil needs no transfer document and gets a load record instead. National waste e-systems of other countries are not supported yet.
 - Invoices to the customer in the carrier's own name (business ID, bank account, own number series, Finnish reference number, VAT): on demand, weekly or every other week; by the hour, per load or per tonne.`;
 
+const FORWARDERS_SECTION = `## For freight forwarders
+
+- Page: ${SITE_URL}${forwardersPath('en')} (${SITE_URL}${forwardersPath('fi')}).
+- For forwarders RAHTIS is a way to find carriers and publish loads. Every job is an agreement made directly between the forwarder and the carrier; RAHTIS takes no commission and is free for forwarders (no monthly fee, free API).
+- Publish a trailer swap, container (20, 30, 40, 45 ft, container number checked) or express job once: to the load board for carriers with a suitable approved vehicle, straight to one of the forwarder's regular vehicles (trucks that have driven for it and whose carrier allows direct orders), or first to a group of 2–10 own vehicles and then to the board.
+- Up to three carriers offer; the forwarder sees ratings, the Verified badge, trips, on-time rate, vehicle and driver languages. The price is the one the forwarder set — no auction.
+- Order drafts from a forwarded order e-mail, pasted text, PDF or photo; step-by-step status, CMR and photos on the job; messages with the carrier and driver translated automatically; weekly report; REST API and signed webhooks.
+- All parties are checked: carriers by register, operating licence and insurance, each vehicle approved by a person; forwarders against the Finnish Trade Register, and those not found there automatically upload a register extract and forwarder's liability insurance before publishing.`;
+
+const TRAILER_SWAP_SECTION = `## Trailer swaps in ports (for carriers)
+
+- Page: ${SITE_URL}${trailerSwapPath('en')} (${SITE_URL}${trailerSwapPath('fi')}).
+- For carriers doing unaccompanied semi-trailer swaps between ports, terminals and customers. Finnish ports in the place list: Helsinki (Vuosaari, West Harbour, South Harbour, Katajanokka), Hanko, Turku, Naantali, Rauma, Pori (Mäntyluoto), HaminaKotka (Hamina), Kotka Hietanen, Vaasa, Kokkola, Oulu (Oritkari), Kemi (Ajos); plus ferry and container terminals in Sweden, Norway, Denmark, Estonia, Latvia, Lithuania, Poland and Germany.
+- Load-board jobs near the carrier's trucks ranked by empty kilometres; own customers' jobs with a tracking link; order e-mails become drafts for the truck named in the order.
+- Driver app in 10 languages with stops, arrival, photos, signature, CMR scanner, offline mode; trailers and combinations with maximum weights by country; GPS and fuel integrations; working time, driver pay and profit per truck.
+- Price: the carrier subscription above — first active vehicle free, no percentage on any job.`;
+
 const ABOUT = `## Company
 
 - Platform name: RAHTIS. Legal entity: ${APP.operator.legalName}, Finland, business ID (Y-tunnus) ${APP.operator.businessId}.
@@ -138,7 +161,7 @@ const ABOUT = `## Company
 
 const FI = `## Suomeksi
 
-RAHTIS on kuljetusten hallintajärjestelmä (TMS) ja rahtipörssi kuljetusliikkeille ja rahdinantajille: Suomi, Ruotsi, Norja, Tanska, Viro, Latvia, Liettua, Puola ja Saksa. Kuljetusliike hallitsee samassa paikassa kalustoa ja ajoneuvoyhdistelmiä, kuljettajia, polttoainetta, GPS-seurantaa, kannattavuutta, työaikaa, rahtikirjoja ja omia asiakkaitaan. Tarjouspöydältä eli rahtipörssistä hyväksytyt kuljetusliikkeet ottavat irtoperien vaihtoja, konttikuljetuksia ja pikakuljetuksia. Asiakkaan tilaussähköpostista syntyy tilausluonnos tilauksessa mainitulle autolle. Maansiirtoon kippiautoilla: kuormat punnituksineen, siirtoasiakirjat rakennusjätteelle ja pilaantuneelle maa-ainekselle, tunnit ja laskut työmaalta (${SITE_URL}/fi/maansiirto). Kuljetussopimus syntyy aina suoraan rahdinantajan ja kuljetusliikkeen välillä, eikä keikoista peritä prosenttia; rahdinantajalle palvelu on maksuton. Kuljetusliikkeen kuukausimaksu vain ajaneista autoista: ensimmäinen auto maksutta, jokainen seuraava ${euroFi(SUBSCRIPTION_LADDER[SUBSCRIPTION_LADDER.length - 1].cents)} € kuukaudessa (alv 0 %), ${ON_REQUEST_FROM} autosta alkaen tarjouksen mukaan; vuosi etukäteen −${ANNUAL_DISCOUNT_BPS / 100} %, ensimmäinen kuukausi maksutta. Ylläpitäjä ${APP.operator.legalName} (Y-tunnus ${APP.operator.businessId}).`;
+RAHTIS on kuljetusten hallintajärjestelmä (TMS) ja rahtipörssi kuljetusliikkeille ja rahdinantajille: Suomi, Ruotsi, Norja, Tanska, Viro, Latvia, Liettua, Puola ja Saksa. Kuljetusliike hallitsee samassa paikassa kalustoa ja ajoneuvoyhdistelmiä, kuljettajia, polttoainetta, GPS-seurantaa, kannattavuutta, työaikaa, rahtikirjoja ja omia asiakkaitaan. Tarjouspöydältä eli rahtipörssistä hyväksytyt kuljetusliikkeet ottavat irtoperien vaihtoja, konttikuljetuksia ja pikakuljetuksia. Asiakkaan tilaussähköpostista syntyy tilausluonnos tilauksessa mainitulle autolle. Maansiirtoon kippiautoilla: kuormat punnituksineen, siirtoasiakirjat rakennusjätteelle ja pilaantuneelle maa-ainekselle, tunnit ja laskut työmaalta (${SITE_URL}/fi/maansiirto). Huolitsijoille: ${SITE_URL}${forwardersPath('fi')}. Perävaunun vaihto satamissa: ${SITE_URL}${trailerSwapPath('fi')}. Kuljetussopimus syntyy aina suoraan rahdinantajan ja kuljetusliikkeen välillä, eikä keikoista peritä prosenttia; rahdinantajalle palvelu on maksuton. Kuljetusliikkeen kuukausimaksu vain ajaneista autoista: ensimmäinen auto maksutta, jokainen seuraava ${euroFi(SUBSCRIPTION_LADDER[SUBSCRIPTION_LADDER.length - 1].cents)} € kuukaudessa (alv 0 %), ${ON_REQUEST_FROM} autosta alkaen tarjouksen mukaan; vuosi etukäteen −${ANNUAL_DISCOUNT_BPS / 100} %, ensimmäinen kuukausi maksutta. Ylläpitäjä ${APP.operator.legalName} (Y-tunnus ${APP.operator.businessId}).`;
 
 /** Короткая справка: суть, цены, ссылки на каждый язык. */
 export function llmsTxt(): string {
@@ -148,6 +171,8 @@ ${SUMMARY}
 
 - Carriers: TMS with fleet, vehicle combinations and legal weights, fuel, GPS integration (${GPS}), profitability per vehicle, drivers and pay by country, own customers, orders from forwarded emails, return loads, driver app.
 - Shippers and forwarders: freight exchange and direct orders for trailer swaps, containers and express transport; free space in trucks already on the way; tracking link with live ETA and proof of delivery; free REST API.
+- For freight forwarders (${SITE_URL}${forwardersPath('en')}): find carriers and publish loads once; free, no commission, agreement directly with the carrier.
+- Trailer swaps in ports (${SITE_URL}${trailerSwapPath('en')}): load-board jobs in Finnish ports, own customers, driver app with CMR scanner; first truck free.
 - Earthworks: tipper loads with weights (also read from a photo of the weighbridge ticket), hours, foreman approval by link, Finnish waste transfer documents for construction waste and contaminated soil, invoices in the carrier's name.
 
 ${pricing()}
@@ -174,6 +199,10 @@ ${CARRIER}
 ${DRIVER}
 
 ${EXCHANGE}
+
+${FORWARDERS_SECTION}
+
+${TRAILER_SWAP_SECTION}
 
 ${EARTH}
 

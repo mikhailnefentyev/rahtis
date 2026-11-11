@@ -1,14 +1,17 @@
 /**
  * Где разрешена аналитика HeyCatch и что из адреса можно отдавать.
  *
- * Только витрина: главная, блог, заявка, условия, политика, описание API.
+ * Только витрина: главная, блог, заявка, условия, политика, описание API,
+ * правила площадки и посадочные страницы (maansiirto, huolitsijoille,
+ * peravaunun-vaihto — 11.11.2026).
  * В кабинетах, приложении водителя и на ссылках отслеживания на экране
  * адреса, имена и номера машин — оттуда не уходит ни одно событие, даже
  * если посетитель согласился (решение 24.10.2026).
  */
 export const CONSENT_KEY = 'rahtis-analytics';
 
-const PUBLIC_PAGES = /^\/[a-z]{2}(\/(apply|terms|privacy|kayttoehdot|tietosuoja|api-docs|blog(\/[^/]+)?))?\/?$/;
+const PUBLIC_PAGES =
+  /^\/[a-z]{2}(\/(apply|terms|privacy|kayttoehdot|tietosuoja|api-docs|rules|maansiirto|earthworks|huolitsijoille|forwarders|peravaunun-vaihto|trailer-swap|blog(\/[^/]+)?))?\/?$/;
 
 export function isPublicPath(pathname: string): boolean {
   if (pathname === '/' || pathname === '/blog' || /^\/blog\/[^/]+\/?$/.test(pathname)) return true;

@@ -1,4 +1,5 @@
 import type { Locale } from '@/lib/i18n/config';
+import type { LandingCopy } from './types';
 
 /**
  * Витрина «Maansiirto ja kippiautot» — страница для поиска и ответчиков
@@ -12,39 +13,11 @@ import type { Locale } from '@/lib/i18n/config';
  * весовых (mScales и т. п.) и отправка в реестр SIIRTO ещё не готовы —
  * их здесь нет, пока они не заработают.
  */
-export type EarthworksCopy = {
-  /** Заголовок вкладки и поисковой выдачи (≤ 60 знаков, без «· RAHTIS»). */
-  metaTitle: string;
-  /** Описание для выдачи (≤ 160 знаков). */
-  metaDescription: string;
-  eyebrow: string;
-  title: string;
-  lede: string;
-  ctaApply: string;
-  ctaSignIn: string;
-  dayTitle: string;
-  day: { title: string; text: string }[];
-  featuresTitle: string;
-  features: { title: string; text: string }[];
-  priceTitle: string;
-  priceText: string;
-  faqTitle: string;
-  faq: { q: string; a: string }[];
-  finalTitle: string;
-  finalText: string;
-  /** Ссылка с главной и из подвала. */
-  teaserEyebrow: string;
-  teaserTitle: string;
-  teaserText: string;
-  teaserCta: string;
-  footerLink: string;
+export type EarthworksCopy = LandingCopy & {
   /** Карточка в блоке «как растёт сервис» на главной. */
   serviceTitle: string;
   serviceText: string;
   serviceText2: string;
-  /** Для разметки schema.org. */
-  serviceType: string;
-  features_ld: string[];
 };
 
 const fi: EarthworksCopy = {
