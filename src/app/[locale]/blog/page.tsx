@@ -104,14 +104,14 @@ export default async function BlogIndex({ params }: Params) {
             <p className="mt-4 max-w-[56ch] text-[17px] leading-relaxed text-ink-muted">{t.intro}</p>
           </div>
           <Image
-            src="/media/cutout/kuorma-auto.webp"
+            src="/media/blog-hero.webp"
             alt=""
             aria-hidden
-            width={420}
-            height={202}
+            width={1122}
+            height={900}
             priority
-            sizes="(min-width: 1024px) 420px, 300px"
-            className="rise mx-auto w-full max-w-[300px] lg:max-w-[420px]"
+            sizes="(min-width: 1024px) 440px, 90vw"
+            className="rise mx-auto w-full max-w-[420px] rounded-2xl shadow-[0_24px_60px_-20px_rgba(15,23,42,0.45)] ring-1 ring-black/5 lg:max-w-[440px]"
           />
         </div>
       </section>
