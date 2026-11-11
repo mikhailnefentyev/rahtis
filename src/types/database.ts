@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.18"
+    PostgrestVersion: "14.15"
   }
   graphql_public: {
     Tables: {
@@ -2398,6 +2398,47 @@ export type Database = {
           },
         ]
       }
+      exchange_connections: {
+        Row: {
+          company_id: string
+          connected_at: string | null
+          created_at: string
+          external_account: string | null
+          provider: string
+          requested_by: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          connected_at?: string | null
+          created_at?: string
+          external_account?: string | null
+          provider: string
+          requested_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          connected_at?: string | null
+          created_at?: string
+          external_account?: string | null
+          provider?: string
+          requested_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exchange_connections_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       forwarder_reminders: {
         Row: {
           company_id: string
@@ -3744,39 +3785,6 @@ export type Database = {
           },
         ]
       }
-      exchange_connections: {
-        Row: {
-          company_id: string
-          connected_at: string | null
-          created_at: string
-          external_account: string | null
-          provider: string
-          requested_by: string | null
-          status: string
-          updated_at: string
-        }
-        Insert: {
-          company_id: string
-          connected_at?: string | null
-          created_at?: string
-          external_account?: string | null
-          provider: string
-          requested_by?: string | null
-          status?: string
-          updated_at?: string
-        }
-        Update: {
-          company_id?: string
-          connected_at?: string | null
-          created_at?: string
-          external_account?: string | null
-          provider?: string
-          requested_by?: string | null
-          status?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
       order_email_drafts: {
         Row: {
           amends_order_id: string | null
@@ -3824,6 +3832,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "order_email_drafts_amends_order_id_fkey"
+            columns: ["amends_order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "order_email_drafts_company_id_fkey"
             columns: ["company_id"]
@@ -4773,7 +4788,15 @@ export type Database = {
           updated_at?: string
           updated_by?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "scale_site_receivers_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: true
+            referencedRelation: "scale_sites"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       scale_sites: {
         Row: {
@@ -5068,11 +5091,14 @@ export type Database = {
           address: string | null
           buffer_minutes: number
           company_id: string
+          contaminated: boolean
           country: string
           created_at: string
           currency: string
           customer_business_id: string | null
           customer_city: string | null
+          customer_contact_name: string | null
+          customer_contact_phone: string | null
           customer_country: string
           customer_email: string | null
           customer_name: string
@@ -5080,6 +5106,8 @@ export type Database = {
           customer_street: string | null
           customer_vat_id: string | null
           foreman_token: string
+          hazard_codes: string[]
+          hazard_composition: string | null
           id: string
           invoice_schedule: string
           lat: number | null
@@ -5092,23 +5120,21 @@ export type Database = {
           rate_cents: number
           receiving_site_id: string | null
           status: string
-          updated_at: string
-          contaminated: boolean
-          customer_contact_name: string | null
-          customer_contact_phone: string | null
           treatment_code: string | null
-          hazard_codes: string[]
-          hazard_composition: string | null
+          updated_at: string
         }
         Insert: {
           address?: string | null
           buffer_minutes?: number
           company_id: string
+          contaminated?: boolean
           country?: string
           created_at?: string
           currency: string
           customer_business_id?: string | null
           customer_city?: string | null
+          customer_contact_name?: string | null
+          customer_contact_phone?: string | null
           customer_country?: string
           customer_email?: string | null
           customer_name: string
@@ -5116,6 +5142,8 @@ export type Database = {
           customer_street?: string | null
           customer_vat_id?: string | null
           foreman_token?: string
+          hazard_codes?: string[]
+          hazard_composition?: string | null
           id?: string
           invoice_schedule?: string
           lat?: number | null
@@ -5128,23 +5156,21 @@ export type Database = {
           rate_cents?: number
           receiving_site_id?: string | null
           status?: string
-          updated_at?: string
-          contaminated?: boolean
-          customer_contact_name?: string | null
-          customer_contact_phone?: string | null
           treatment_code?: string | null
-          hazard_codes?: string[]
-          hazard_composition?: string | null
+          updated_at?: string
         }
         Update: {
           address?: string | null
           buffer_minutes?: number
           company_id?: string
+          contaminated?: boolean
           country?: string
           created_at?: string
           currency?: string
           customer_business_id?: string | null
           customer_city?: string | null
+          customer_contact_name?: string | null
+          customer_contact_phone?: string | null
           customer_country?: string
           customer_email?: string | null
           customer_name?: string
@@ -5152,6 +5178,8 @@ export type Database = {
           customer_street?: string | null
           customer_vat_id?: string | null
           foreman_token?: string
+          hazard_codes?: string[]
+          hazard_composition?: string | null
           id?: string
           invoice_schedule?: string
           lat?: number | null
@@ -5164,13 +5192,8 @@ export type Database = {
           rate_cents?: number
           receiving_site_id?: string | null
           status?: string
-          updated_at?: string
-          contaminated?: boolean
-          customer_contact_name?: string | null
-          customer_contact_phone?: string | null
           treatment_code?: string | null
-          hazard_codes?: string[]
-          hazard_composition?: string | null
+          updated_at?: string
         }
         Relationships: [
           {
@@ -5208,12 +5231,12 @@ export type Database = {
           material_code: string
           net_kg: number | null
           scale_site_id: string | null
+          siirto_document_id: string | null
+          siirto_error: string | null
+          siirto_sent_at: string | null
           tare_kg: number | null
           ticket_no: string | null
           unloaded_at: string
-          siirto_document_id: string | null
-          siirto_sent_at: string | null
-          siirto_error: string | null
         }
         Insert: {
           company_id: string
@@ -5226,12 +5249,12 @@ export type Database = {
           material_code: string
           net_kg?: number | null
           scale_site_id?: string | null
+          siirto_document_id?: string | null
+          siirto_error?: string | null
+          siirto_sent_at?: string | null
           tare_kg?: number | null
           ticket_no?: string | null
           unloaded_at: string
-          siirto_document_id?: string | null
-          siirto_sent_at?: string | null
-          siirto_error?: string | null
         }
         Update: {
           company_id?: string
@@ -5244,12 +5267,12 @@ export type Database = {
           material_code?: string
           net_kg?: number | null
           scale_site_id?: string | null
+          siirto_document_id?: string | null
+          siirto_error?: string | null
+          siirto_sent_at?: string | null
           tare_kg?: number | null
           ticket_no?: string | null
           unloaded_at?: string
-          siirto_document_id?: string | null
-          siirto_sent_at?: string | null
-          siirto_error?: string | null
         }
         Relationships: [
           {
@@ -7849,21 +7872,6 @@ export type Database = {
         Args: { p_id: string; p_order_id?: string }
         Returns: undefined
       }
-      detach_order_email_draft: { Args: { p_id: string }; Returns: undefined }
-      request_exchange_connection: { Args: { p_provider: string }; Returns: undefined }
-      update_scale_site_receiver: {
-        Args: {
-          p_contact_name: string
-          p_contact_phone: string
-          p_operator_business_id: string
-          p_operator_name: string
-          p_postal_code: string
-          p_site_id: string
-          p_treatment_code: string
-        }
-        Returns: undefined
-      }
-      withdraw_exchange_connection: { Args: { p_provider: string }; Returns: undefined }
       comment_claim: {
         Args: { p_body: string; p_claim_id: string }
         Returns: number
@@ -8298,6 +8306,7 @@ export type Database = {
         }[]
       }
       detach_driver_login: { Args: { p_driver_id: string }; Returns: string }
+      detach_order_email_draft: { Args: { p_id: string }; Returns: undefined }
       direct_assign_order: {
         Args: { p_order_id: string; p_vehicle_id: string }
         Returns: {
@@ -9501,6 +9510,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      request_exchange_connection: {
+        Args: { p_provider: string }
+        Returns: undefined
+      }
       resolve_change_request: {
         Args: { p_amendment_id?: number; p_id: string; p_resolution: string }
         Returns: undefined
@@ -10361,6 +10374,18 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      update_scale_site_receiver: {
+        Args: {
+          p_contact_name: string
+          p_contact_phone: string
+          p_operator_business_id: string
+          p_operator_name: string
+          p_postal_code: string
+          p_site_id: string
+          p_treatment_code: string
+        }
+        Returns: undefined
+      }
       vehicle_check_evidence: { Args: { p_stop_id: string }; Returns: Json }
       verification_badges_for_known: {
         Args: never
@@ -10415,6 +10440,10 @@ export type Database = {
         Returns: Json
       }
       weigh_ticket_context: { Args: { p_job_id: string }; Returns: Json }
+      withdraw_exchange_connection: {
+        Args: { p_provider: string }
+        Returns: undefined
+      }
       withdraw_order: {
         Args: { p_order_id: string; p_reason?: string }
         Returns: {
