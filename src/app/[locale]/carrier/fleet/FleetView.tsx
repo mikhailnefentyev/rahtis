@@ -25,7 +25,7 @@ export function FleetView({
   /** Считается на сервере: рендер обязан быть чистым, а часы клиента могут врать. */
   today: string;
   /** Обслуживание машины: худший срок плана и открытые дефекты (src/lib/maintenance/load.ts). */
-  service?: Record<string, { state: string; items: number; openDefects: number; unsafe: boolean }>;
+  service?: Record<string, { state: string; items: number; openDefects: number; unsafe: boolean; out: string | null }>;
 }) {
   const { t, m, locale } = useI18n();
   const [editing, setEditing] = useState<Vehicle | null | 'new'>(null);
@@ -213,7 +213,7 @@ function ServiceLink({
   summary,
 }: {
   href: string;
-  summary?: { state: string; items: number; openDefects: number; unsafe: boolean };
+  summary?: { state: string; items: number; openDefects: number; unsafe: boolean; out: string | null };
 }) {
   const { t, m } = useI18n();
   const s = t.maintenance;
@@ -223,7 +223,9 @@ function ServiceLink({
       <a href={href} className="text-[12px] text-accent hover:underline">
         {s.fleetLink} ›
       </a>
-      {summary?.unsafe ? (
+      {/* Вне работы — главный значок: машина сейчас не выходит на рейсы. */}
+      {summary?.out && <Badge tone="danger">{`${s.downtime.outNow} · ${s.downtime.reasons[summary.out as keyof typeof s.downtime.reasons] ?? ''}`}</Badge>}
+      {summary?.out ? null : summary?.unsafe ? (
         <Badge tone="danger">{s.defects.severities.UNSAFE}</Badge>
       ) : summary && summary.openDefects > 0 ? (
         <Badge tone="warn">{m('maintenance.defectCount', { count: summary.openDefects })}</Badge>

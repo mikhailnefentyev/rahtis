@@ -6220,6 +6220,63 @@ export type Database = {
           },
         ]
       }
+      vehicle_downtime: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string | null
+          defect_id: string | null
+          due_on: string | null
+          end_kind: string | null
+          end_note: string | null
+          ended_at: string | null
+          ended_by: string | null
+          ends_on: string | null
+          id: string
+          item_id: string | null
+          note: string | null
+          reason: string
+          starts_on: string
+          vehicle_id: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          defect_id?: string | null
+          due_on?: string | null
+          end_kind?: string | null
+          end_note?: string | null
+          ended_at?: string | null
+          ended_by?: string | null
+          ends_on?: string | null
+          id?: string
+          item_id?: string | null
+          note?: string | null
+          reason: string
+          starts_on?: string
+          vehicle_id: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          defect_id?: string | null
+          due_on?: string | null
+          end_kind?: string | null
+          end_note?: string | null
+          ended_at?: string | null
+          ended_by?: string | null
+          ends_on?: string | null
+          id?: string
+          item_id?: string | null
+          note?: string | null
+          reason?: string
+          starts_on?: string
+          vehicle_id?: string
+        }
+        Relationships: []
+      }
       vehicle_drivers: {
         Row: {
           assigned_by: string | null
@@ -7851,6 +7908,10 @@ export type Database = {
         }
         Returns: string
       }
+      carrier_downtime_end: {
+        Args: { p_id: string; p_note?: string }
+        Returns: undefined
+      }
       carrier_maintenance_done: { Args: { p_data: Json }; Returns: string }
       carrier_own_vehicles: {
         Args: never
@@ -8747,6 +8808,7 @@ export type Database = {
           invite_id: string
         }[]
       }
+      driver_vehicle_downtime: { Args: never; Returns: Json }
       driver_maintenance_state: { Args: never; Returns: Json }
       driver_me: { Args: never; Returns: Json }
       driver_push_subscribe: {
@@ -9226,6 +9288,16 @@ export type Database = {
           section_title: string
           title: string
           version: number
+        }[]
+      }
+      maintenance_sync_downtime: {
+        Args: never
+        Returns: {
+          company_id: string
+          downtime_id: string
+          due_on: string
+          plate: string
+          vehicle_id: string
         }[]
       }
       maintenance_due_candidates: {

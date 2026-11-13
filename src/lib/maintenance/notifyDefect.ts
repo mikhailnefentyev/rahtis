@@ -57,13 +57,16 @@ export async function notifyCarrierOfDefect(defectId: string): Promise<void> {
       ],
     },
     { kind: 'button', label: s.defects.open, href: `${siteUrl()}/${locale}${link}` },
+    /* Дефект «ехать нельзя» на машине сам снимает её с рейсов (vehicle_downtime). */
+    ...(unsafe && defect.vehicle_id ? [{ kind: 'note' as const, value: s.downtime.defectBlockedNote }] : []),
   ];
 
   await notify({
     companyId: company.id,
     kind: 'FLEET',
     title,
-    body: `${who}: ${defect.description}`.slice(0, 1000),
+    body: `${who}: ${defect.description}${unsafe && defect.vehicle_id ? `
+${s.downtime.defectBlockedNote}` : ''}`.slice(0, 1000),
     link,
     email: company.contact_email
       ? {

@@ -9,6 +9,7 @@ import { getViewerI18n } from '@/lib/i18n/viewer';
 import { loadFleetMaintenance } from '@/lib/maintenance/load';
 import { createClient } from '@/lib/supabase/server';
 import { DefectCard } from './DefectCard';
+import { DowntimeCard } from './DowntimeCard';
 import { dueParts, dueTone, itemLabel } from './format';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
@@ -43,6 +44,7 @@ export default async function MaintenancePage({ params }: { params: Promise<{ lo
   const overdue = urgent.filter((i) => i.status.state === 'OVERDUE').length;
   const unsafe = data.defects.filter((d) => d.severity === 'UNSAFE').length;
   const plateOf = new Map(data.assets.map((a) => [a.id, a.plate]));
+  const outNow = new Set(data.downtime.filter((d) => d.current).map((d) => d.vehicle_id)).size;
 
   return (
     <main className="cab-page">
@@ -53,7 +55,7 @@ export default async function MaintenancePage({ params }: { params: Promise<{ lo
         <Stat label={s.statOverdue} value={overdue} tone={overdue > 0 ? 'danger' : 'neutral'} />
         <Stat label={s.statSoon} value={urgent.length - overdue} tone={urgent.length - overdue > 0 ? 'warn' : 'neutral'} />
         <Stat label={s.statDefects} value={data.defects.length} tone={data.defects.length > 0 ? 'warn' : 'neutral'} />
-        <Stat label={s.statUnsafe} value={unsafe} tone={unsafe > 0 ? 'danger' : 'neutral'} />
+        <Stat label={s.statOut} value={outNow} tone={outNow > 0 ? 'danger' : 'neutral'} hint={unsafe > 0 ? `${s.statUnsafe}: ${unsafe}` : undefined} />
       </StatRow>
 
       {data.assets.length === 0 ? (
@@ -67,6 +69,18 @@ export default async function MaintenancePage({ params }: { params: Promise<{ lo
         />
       ) : (
         <>
+          {/* Машины вне работы — первым: они прямо сейчас не выходят на рейсы. */}
+          {data.downtime.length > 0 && (
+            <section className="mb-8">
+              <h2 className="mb-3 border-b border-line pb-2 text-[13px] font-semibold tracking-tight text-ink-faint">{s.downtime.title}</h2>
+              <div className="grid gap-3 lg:grid-cols-2">
+                {data.downtime.map((d) => (
+                  <DowntimeCard key={d.id} downtime={d} plate={plateOf.get(d.vehicle_id) ?? '—'} />
+                ))}
+              </div>
+            </section>
+          )}
+
           <section className="mb-8">
             <h2 className="mb-3 border-b border-line pb-2 text-[13px] font-semibold tracking-tight text-ink-faint">{s.defectsTitle}</h2>
             {data.defects.length === 0 ? (
@@ -119,9 +133,9 @@ export default async function MaintenancePage({ params }: { params: Promise<{ lo
           <section>
             <h2 className="mb-3 border-b border-line pb-2 text-[13px] font-semibold tracking-tight text-ink-faint">{s.fleetTitle}</h2>
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-              {[...data.summaries.values()].map(({ asset, state, items, openDefects, unsafe: assetUnsafe }) => (
+              {[...data.summaries.values()].map(({ asset, state, items, openDefects, unsafe: assetUnsafe, outOfService }) => (
                 <Link key={asset.id} href={`/${locale}/carrier/maintenance/${asset.id}`} className="block">
-                  <Card stripe={assetUnsafe ? 'danger' : state === 'OVERDUE' ? 'danger' : state === 'SOON' || openDefects > 0 ? 'warn' : items > 0 ? 'ok' : undefined}>
+                  <Card stripe={outOfService || assetUnsafe ? 'danger' : state === 'OVERDUE' ? 'danger' : state === 'SOON' || openDefects > 0 ? 'warn' : items > 0 ? 'ok' : undefined}>
                     <CardBody className="flex flex-col gap-1.5">
                       <div className="flex flex-wrap items-center gap-2">
                         <Plate className="text-[15px]">{asset.plate}</Plate>
@@ -133,6 +147,7 @@ export default async function MaintenancePage({ params }: { params: Promise<{ lo
                         ) : (
                           <Badge tone={dueTone[state]}>{s.state[state]}</Badge>
                         )}
+                        {outOfService && <Badge tone="danger">{s.downtime.outNow}</Badge>}
                         {openDefects > 0 && <Badge tone={assetUnsafe ? 'danger' : 'warn'}>{m('maintenance.defectCount', { count: openDefects })}</Badge>}
                       </div>
                       <p className="text-[12px] text-ink-muted">

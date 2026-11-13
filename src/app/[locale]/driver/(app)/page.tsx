@@ -34,12 +34,15 @@ export default async function DriverHome({
   if (!isLocale(locale)) notFound();
 
   const supabase = await createClient();
-  const [driver, tasks, { t }, { data: siteData }] = await Promise.all([
+  const [driver, tasks, { t }, { data: siteData }, { data: outData }] = await Promise.all([
     getDriver(),
     getDriverTasks(),
     getDriverI18n(locale),
     supabase.rpc('driver_site_state'),
+    /* Машина вне работы (сервис, дефект «ехать нельзя», просроченный katsastus). */
+    supabase.rpc('driver_vehicle_downtime'),
   ]);
+  const outOfService = outData as unknown as { reason: 'SERVICE' | 'DEFECT' | 'INSPECTION' } | null;
   /* Прицеп рейса перевозчика (конструктор сцепок) — водитель видит, что цеплять. */
   const { data: tripTrailerRows } = await supabase.rpc('driver_trip_trailers');
   const ownTrailer = new Map((tripTrailerRows ?? []).map((r) => [r.order_id, r.plate]));
@@ -64,6 +67,15 @@ export default async function DriverHome({
 
       {/* Что ждёт водителя помимо карточек: правки маршрута, незакрытая смена. Пусто — блока нет. */}
       <DriverInbox locale={locale} />
+
+      {outOfService && (
+        <Link
+          href={`/${locale}/driver/defect`}
+          className="rounded-card border border-danger/40 bg-danger/10 px-4 py-3 text-[15px] font-semibold text-danger"
+        >
+          {t.defectDriver.outOfService[outOfService.reason]}
+        </Link>
+      )}
 
       {/* Порядок — как идёт день: смена, быстрые действия, работа. */}
       <div id="shift" className="scroll-mt-4">

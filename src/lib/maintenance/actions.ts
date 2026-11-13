@@ -38,6 +38,8 @@ function int(value: string, min: number, max: number): number | null | undefined
 function revalidate(locale: Locale) {
   revalidatePath(`/${locale}/carrier/maintenance`, 'layout');
   revalidatePath(`/${locale}/carrier/fleet`);
+  /* Дефект «ехать нельзя», сервис и katsastus меняют, какие машины предлагает стол. */
+  revalidatePath(`/${locale}/carrier/desk`);
 }
 
 export type MaintenanceFormState = { error: string | null; done: boolean };
@@ -248,6 +250,48 @@ export async function resolveDefectAction(formData: FormData): Promise<void> {
   const { error } = await supabase.rpc('carrier_defect_resolve', {
     p_id: str(formData, 'id'),
     p_status: status,
+    p_note: str(formData, 'note') || undefined,
+  });
+  if (error) await flashError((await getDictionary(locale)).maintenance.errGeneric);
+  revalidate(locale);
+}
+
+/* ── Машина вне работы ──────────────────────────────────────────── */
+
+/** Сервис по датам: машина не выходит на рейсы с первого дня по последний включительно. */
+export async function scheduleServiceAction(_prev: MaintenanceFormState, formData: FormData): Promise<MaintenanceFormState> {
+  const locale = toLocale(formData.get('locale'));
+  const t = (await getDictionary(locale)).maintenance;
+  const viewer = await requireRole(locale, 'CARRIER');
+
+  const vehicleId = str(formData, 'vehicle_id');
+  const startsOn = date(str(formData, 'starts_on'));
+  const endsOn = date(str(formData, 'ends_on'));
+  if (!UUID.test(vehicleId) || !startsOn) return { error: t.errDate, done: false };
+  if (endsOn && endsOn < startsOn) return { error: t.downtime.errDates, done: false };
+
+  const supabase = await createClient();
+  const { error } = await supabase.from('vehicle_downtime').insert({
+    company_id: viewer.company!.id,
+    vehicle_id: vehicleId,
+    reason: 'SERVICE',
+    starts_on: startsOn,
+    ends_on: endsOn,
+    note: str(formData, 'note').slice(0, 300) || null,
+  });
+  if (error) return { error: t.errGeneric, done: false };
+
+  revalidate(locale);
+  return { error: null, done: true };
+}
+
+/** «Palauta ajoon»: снять ограничение (или отменить будущий сервис). Дефект и срок остаются как есть. */
+export async function endDowntimeAction(formData: FormData): Promise<void> {
+  const locale = toLocale(formData.get('locale'));
+  await requireRole(locale, 'CARRIER');
+  const supabase = await createClient();
+  const { error } = await supabase.rpc('carrier_downtime_end', {
+    p_id: str(formData, 'id'),
     p_note: str(formData, 'note') || undefined,
   });
   if (error) await flashError((await getDictionary(locale)).maintenance.errGeneric);

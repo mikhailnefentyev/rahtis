@@ -22,8 +22,12 @@ export default async function DriverDefect({ params }: { params: Promise<{ local
   if (!driver) return null;
 
   const supabase = await createClient();
-  const { data } = await supabase.rpc('driver_maintenance_state');
+  const [{ data }, { data: out }] = await Promise.all([
+    supabase.rpc('driver_maintenance_state'),
+    supabase.rpc('driver_vehicle_downtime'),
+  ]);
   const state = data as unknown as DefectState | null;
+  const outOfService = out as unknown as { reason: 'SERVICE' | 'DEFECT' | 'INSPECTION'; ends_on: string | null } | null;
 
   return (
     <main className="flex flex-col gap-4 pb-6">
@@ -31,6 +35,12 @@ export default async function DriverDefect({ params }: { params: Promise<{ local
         ← {t.driverApp.back}
       </Link>
       <h1 className="text-2xl font-semibold tracking-tight">{t.defectDriver.title}</h1>
+      {/* Машина вне работы — водитель видит это первым и не едет; снять может только перевозчик. */}
+      {outOfService && (
+        <p className="rounded-card border border-danger/40 bg-danger/10 px-4 py-3 text-[15px] font-semibold text-danger">
+          {t.defectDriver.outOfService[outOfService.reason]}
+        </p>
+      )}
       {state && (state.vehicle || state.trailers.length > 0) ? (
         <DefectScreen state={state} />
       ) : (

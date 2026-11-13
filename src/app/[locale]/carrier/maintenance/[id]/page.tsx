@@ -10,6 +10,7 @@ import { deleteMaintenanceRecordAction } from '@/lib/maintenance/actions';
 import { loadFleetMaintenance } from '@/lib/maintenance/load';
 import { createClient } from '@/lib/supabase/server';
 import { DefectCard } from '../DefectCard';
+import { DowntimeCard } from '../DowntimeCard';
 import { itemLabel } from '../format';
 import { AssetActions, PlanItemCard } from './AssetForms';
 
@@ -59,6 +60,7 @@ export default async function AssetMaintenancePage({ params }: { params: Promise
   const openDefects = data.defects.filter((d) => d.status === 'OPEN');
   const closedDefects = data.defects.filter((d) => d.status !== 'OPEN');
   const trailer = asset.type === 'TRAILER';
+  const downtime = data.downtime.filter((d) => d.vehicle_id === id);
 
   return (
     <main className="cab-page">
@@ -74,6 +76,15 @@ export default async function AssetMaintenancePage({ params }: { params: Promise
       <p className="mb-6 text-[13px] text-ink-muted">
         {trailer ? s.trailerNoKm : asset.odometer != null ? `${s.odometerNow}: ${f.number(asset.odometer)} km` : s.odometerUnknown}
       </p>
+
+      {/* Вне работы — самое важное на странице машины: она сейчас не выходит на рейсы. */}
+      {downtime.length > 0 && (
+        <section className="mb-8 flex flex-col gap-3">
+          {downtime.map((d) => (
+            <DowntimeCard key={d.id} downtime={d} />
+          ))}
+        </section>
+      )}
 
       {openDefects.length > 0 && (
         <section className="mb-8">

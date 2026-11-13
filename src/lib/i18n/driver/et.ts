@@ -260,6 +260,11 @@ export const et = {
     none: 'Rikketeateid pole.',
     queued: 'ootab saatmist',
     byOther: 'teatas teine juht',
+    outOfService: {
+      SERVICE: 'Sinu auto on hoolduses. Ära sõitu alusta enne, kui vedaja on selle uuesti kasutusele võtnud.',
+      DEFECT: 'Sinu autol on rike, millega sõita ei tohi. Oota vedaja juhiseid.',
+      INSPECTION: 'Sinu auto tehnoülevaatus on üle tähtaja. Sellega ei tohi sõita enne ülevaatust.',
+    },
     statuses: { OPEN: 'Avatud', FIXED: 'Parandatud', DISMISSED: 'Suletud' },
     areas: {
       BRAKES: 'Pidurid',

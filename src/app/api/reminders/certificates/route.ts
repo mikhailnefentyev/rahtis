@@ -83,6 +83,7 @@ export async function POST(request: Request) {
       checked: 0,
       sent: 0,
       companies: 0,
+      blocked: 0,
       errors: [error instanceof Error ? error.message : String(error)],
     })),
   ]);

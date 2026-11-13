@@ -13,6 +13,7 @@ import {
 import type { ItemWithStatus } from '@/lib/maintenance/load';
 import { DEFAULT_MONTHS, DEFECT_AREAS, MAINTENANCE_KINDS, TRAILER_KINDS, type MaintenanceKind } from '@/lib/maintenance/status';
 import { CURRENCIES, type Currency } from '@/lib/money/currency';
+import { ServiceForm } from '../DowntimeCard';
 import { dueParts, dueTone, intervalText, itemLabel } from '../format';
 
 const initial: MaintenanceFormState = { error: null, done: false };
@@ -115,7 +116,7 @@ export function AssetActions({
 }) {
   const { t } = useI18n();
   const s = t.maintenance;
-  const [mode, setMode] = useState<'none' | 'item' | 'repair' | 'defect'>('none');
+  const [mode, setMode] = useState<'none' | 'item' | 'repair' | 'defect' | 'service'>('none');
   const close = () => setMode('none');
 
   return (
@@ -130,6 +131,11 @@ export function AssetActions({
         <Button size="sm" variant={mode === 'defect' ? 'primary' : 'default'} onClick={() => setMode(mode === 'defect' ? 'none' : 'defect')}>
           {s.defects.report}
         </Button>
+        {asset.type === 'VEHICLE' && (
+          <Button size="sm" variant={mode === 'service' ? 'primary' : 'default'} onClick={() => setMode(mode === 'service' ? 'none' : 'service')}>
+            {s.downtime.button}
+          </Button>
+        )}
       </div>
       {mode !== 'none' && (
         <Card className="mt-3">
@@ -137,6 +143,7 @@ export function AssetActions({
             {mode === 'item' && <ItemForm asset={asset} item={null} onClose={close} />}
             {mode === 'repair' && <DoneForm asset={asset} item={null} openDefects={openDefects} today={today} costsOpen={costsOpen} onClose={close} />}
             {mode === 'defect' && <DefectForm asset={asset} onClose={close} />}
+            {mode === 'service' && <ServiceForm vehicleId={asset.id} today={today} onClose={close} />}
           </CardBody>
         </Card>
       )}

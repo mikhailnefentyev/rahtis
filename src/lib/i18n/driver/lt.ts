@@ -260,6 +260,11 @@ export const lt = {
     none: 'Pranešimų apie gedimus nėra.',
     queued: 'laukia siuntimo',
     byOther: 'pranešė kitas vairuotojas',
+    outOfService: {
+      SERVICE: 'Tavo automobilis servise. Nepradėk važiuoti, kol vežėjas negrąžins jo į eksploataciją.',
+      DEFECT: 'Tavo automobilis turi gedimą, su kuriuo važiuoti negalima. Lauk vežėjo nurodymų.',
+      INSPECTION: 'Tavo automobilio techninė apžiūra pavėluota. Iki apžiūros juo važiuoti negalima.',
+    },
     statuses: { OPEN: 'Atviras', FIXED: 'Sutaisyta', DISMISSED: 'Uždaryta' },
     areas: {
       BRAKES: 'Stabdžiai',

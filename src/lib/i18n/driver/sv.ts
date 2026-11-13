@@ -260,6 +260,11 @@ export const sv = {
     none: 'Inga felanmälningar.',
     queued: 'väntar på att skickas',
     byOther: 'anmäld av en annan förare',
+    outOfService: {
+      SERVICE: 'Ditt fordon är på service. Kör inte iväg förrän åkeriet har tagit det i drift igen.',
+      DEFECT: 'Ditt fordon har ett fel och får inte köras. Vänta på besked från åkeriet.',
+      INSPECTION: 'Ditt fordons besiktning är försenad. Det får inte köras före besiktningen.',
+    },
     statuses: { OPEN: 'Öppen', FIXED: 'Åtgärdad', DISMISSED: 'Stängd' },
     areas: {
       BRAKES: 'Bromsar',

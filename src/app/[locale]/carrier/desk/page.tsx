@@ -249,6 +249,25 @@ export default async function DeskPage({
   const { data: ownFleet } = (vehicles ?? []).length ? await supabase.rpc('carrier_own_vehicles') : { data: [] };
   const ready = new Set((ownFleet ?? []).filter((v) => v.available).map((v) => v.vehicle_id));
   const deskVehicles = (vehicles ?? []).filter((v) => ready.has(v.id));
+  /*
+   * Машины вне работы (сервис, дефект «ехать нельзя», просроченный
+   * katsastus) стол не предлагает — без подсказки перевозчик искал бы,
+   * куда пропала машина.
+   */
+  const { data: outRows } = await supabase
+    .from('vehicle_downtime')
+    .select('vehicle_id, starts_on, ends_on')
+    .eq('company_id', company.id)
+    .is('ended_at', null);
+  const todayHel = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Helsinki' }).format(new Date());
+  const outPlates = [
+    ...new Set(
+      (outRows ?? [])
+        .filter((d) => d.starts_on <= todayHel && (!d.ends_on || d.ends_on >= todayHel))
+        .map((d) => (vehicles ?? []).find((v) => v.id === d.vehicle_id)?.plate)
+        .filter((p): p is string => Boolean(p)),
+    ),
+  ];
   /* Сцепки из конструктора — только с машинами, которые выходят на рейсы. */
   const { data: comboRows } = await supabase
     .from('vehicle_combos')
@@ -390,6 +409,14 @@ export default async function DeskPage({
           <p className="label-micro mb-4">
             {m('desk.ordersCount', { count: (orders ?? []).length })}
           </p>
+          {outPlates.length > 0 && (
+            <p className="mb-4 text-[13px] text-warn">
+              {m('maintenance.deskOut', { plates: outPlates.join(', ') })}{' '}
+              <Link href={`/${locale}/carrier/maintenance`} className="text-accent hover:underline">
+                {t.maintenance.nav} →
+              </Link>
+            </p>
+          )}
 
           <DeskList
             orders={orders ?? []}

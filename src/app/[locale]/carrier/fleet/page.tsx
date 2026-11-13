@@ -83,9 +83,9 @@ export default async function FleetPage({ params }: { params: Promise<{ locale: 
 
   /* Значок обслуживания на карточке машины: худший срок и открытые дефекты. */
   const maintenance = await loadFleetMaintenance(supabase, { companyId: company.id, today });
-  const service: Record<string, { state: string; items: number; openDefects: number; unsafe: boolean }> = {};
+  const service: Record<string, { state: string; items: number; openDefects: number; unsafe: boolean; out: string | null }> = {};
   for (const [id, sum] of maintenance.summaries) {
-    service[id] = { state: sum.state, items: sum.items, openDefects: sum.openDefects, unsafe: sum.unsafe };
+    service[id] = { state: sum.state, items: sum.items, openDefects: sum.openDefects, unsafe: sum.unsafe, out: sum.outOfService?.reason ?? null };
   }
 
   const byKind = (kind: CompanyDocument['kind']) =>

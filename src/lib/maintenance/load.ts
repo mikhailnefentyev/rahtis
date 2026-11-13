@@ -15,6 +15,11 @@ export type VehicleDefect = Database['public']['Tables']['vehicle_defects']['Row
   driver_name: string | null;
 };
 
+export type Downtime = Database['public']['Tables']['vehicle_downtime']['Row'] & {
+  /** Действует сегодня (а не запланирован на будущие даты). */
+  current: boolean;
+};
+
 export type Asset = {
   id: string;
   type: 'VEHICLE' | 'TRAILER';
@@ -26,13 +31,23 @@ export type Asset = {
 
 export type ItemWithStatus = MaintenanceItem & { status: DueStatus; asset: Asset };
 
-export type AssetSummary = { asset: Asset; state: DueState; items: number; openDefects: number; unsafe: boolean };
+export type AssetSummary = {
+  asset: Asset;
+  state: DueState;
+  items: number;
+  openDefects: number;
+  unsafe: boolean;
+  /** Машина сейчас вне работы — первая действующая причина. */
+  outOfService: Downtime | null;
+};
 
 export type FleetMaintenance = {
   today: string;
   assets: Asset[];
   items: ItemWithStatus[];
   defects: VehicleDefect[];
+  /** Незакрытые периоды вне работы: действующие и запланированные. */
+  downtime: Downtime[];
   summaries: Map<string, AssetSummary>;
 };
 
@@ -57,7 +72,7 @@ export async function loadFleetMaintenance(
   if (!input.withClosed) defectsQuery = defectsQuery.eq('status', 'OPEN');
   if (input.assetId) defectsQuery = defectsQuery.or(`vehicle_id.eq.${input.assetId},trailer_id.eq.${input.assetId}`);
 
-  const [{ data: vehicles }, { data: trailers }, { data: items }, { data: odometers }, { data: defects }, { data: drivers }] =
+  const [{ data: vehicles }, { data: trailers }, { data: items }, { data: odometers }, { data: defects }, { data: drivers }, { data: downtimeRows }] =
     await Promise.all([
       supabase.from('vehicles').select('id, plate, make').eq('company_id', input.companyId).order('plate'),
       supabase.from('trailers').select('id, plate, kind').eq('company_id', input.companyId).order('plate'),
@@ -65,7 +80,17 @@ export async function loadFleetMaintenance(
       supabase.rpc('fleet_odometers'),
       defectsQuery,
       supabase.from('drivers').select('id, full_name').eq('company_id', input.companyId),
+      supabase
+        .from('vehicle_downtime')
+        .select('*')
+        .eq('company_id', input.companyId)
+        .is('ended_at', null)
+        .order('starts_on'),
     ]);
+
+  const downtime: Downtime[] = (downtimeRows ?? [])
+    .filter((d) => !d.ends_on || d.ends_on >= input.today)
+    .map((d) => ({ ...d, current: d.starts_on <= input.today }));
 
   const km = new Map((odometers ?? []).map((row) => [row.vehicle_id, row.km ?? null]));
   const assets: Asset[] = [
@@ -111,8 +136,9 @@ export async function loadFleetMaintenance(
       items: own.length,
       openDefects: open.length,
       unsafe: open.some((d) => d.severity === 'UNSAFE'),
+      outOfService: asset.type === 'VEHICLE' ? (downtime.find((d) => d.current && d.vehicle_id === asset.id) ?? null) : null,
     });
   }
 
-  return { today: input.today, assets, items: withStatus, defects: defectRows, summaries };
+  return { today: input.today, assets, items: withStatus, defects: defectRows, downtime, summaries };
 }

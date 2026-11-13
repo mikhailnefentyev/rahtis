@@ -260,6 +260,11 @@ export const lv = {
     none: 'Ziņojumu par defektiem nav.',
     queued: 'gaida nosūtīšanu',
     byOther: 'ziņoja cits vadītājs',
+    outOfService: {
+      SERVICE: 'Tava automašīna ir servisā. Nesāc braukt, kamēr pārvadātājs to nav atgriezis ekspluatācijā.',
+      DEFECT: 'Tavai automašīnai ir defekts, ar kuru nedrīkst braukt. Gaidi pārvadātāja norādījumus.',
+      INSPECTION: 'Tavai automašīnai ir nokavēta tehniskā apskate. Līdz apskatei ar to nedrīkst braukt.',
+    },
     statuses: { OPEN: 'Atvērts', FIXED: 'Novērsts', DISMISSED: 'Slēgts' },
     areas: {
       BRAKES: 'Bremzes',

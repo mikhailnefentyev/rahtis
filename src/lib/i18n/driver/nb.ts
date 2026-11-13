@@ -260,6 +260,11 @@ export const nb = {
     none: 'Ingen feilmeldinger.',
     queued: 'venter på sending',
     byOther: 'meldt av en annen sjåfør',
+    outOfService: {
+      SERVICE: 'Kjøretøyet ditt er på service. Ikke kjør før transportfirmaet har satt det i drift igjen.',
+      DEFECT: 'Kjøretøyet ditt har en feil og må ikke kjøres. Vent på beskjed fra transportfirmaet.',
+      INSPECTION: 'Fristen for EU-kontroll av kjøretøyet ditt har gått ut. Det må ikke kjøres før EU-kontrollen er gjennomført.',
+    },
     statuses: { OPEN: 'Åpen', FIXED: 'Utbedret', DISMISSED: 'Lukket' },
     areas: {
       BRAKES: 'Bremser',

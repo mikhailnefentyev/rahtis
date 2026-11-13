@@ -260,6 +260,11 @@ export const da = {
     none: 'Ingen fejlmeldinger.',
     queued: 'venter på at blive sendt',
     byOther: 'meldt af en anden chauffør',
+    outOfService: {
+      SERVICE: 'Dit køretøj er til service. Kør ikke, før vognmanden har sat det i drift igen.',
+      DEFECT: 'Dit køretøj har en fejl og må ikke køre. Vent på besked fra vognmanden.',
+      INSPECTION: 'Fristen for syn af dit køretøj er overskredet. Det må ikke køre, før det er synet.',
+    },
     statuses: { OPEN: 'Åben', FIXED: 'Udbedret', DISMISSED: 'Lukket' },
     areas: {
       BRAKES: 'Bremser',

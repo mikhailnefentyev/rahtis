@@ -260,6 +260,11 @@ export const pl = {
     none: 'Brak zgłoszeń usterek.',
     queued: 'czeka na wysłanie',
     byOther: 'zgłosił inny kierowca',
+    outOfService: {
+      SERVICE: 'Twój pojazd jest w serwisie. Nie ruszaj w trasę, dopóki przewoźnik nie przywróci go do eksploatacji.',
+      DEFECT: 'Twój pojazd ma usterkę i nie wolno nim jechać. Czekaj na instrukcje od przewoźnika.',
+      INSPECTION: 'Badanie techniczne Twojego pojazdu jest po terminie. Do czasu badania nie wolno nim jechać.',
+    },
     statuses: { OPEN: 'Otwarta', FIXED: 'Naprawiona', DISMISSED: 'Zamknięta' },
     areas: {
       BRAKES: 'Hamulce',
