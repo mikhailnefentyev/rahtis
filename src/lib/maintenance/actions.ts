@@ -141,10 +141,14 @@ export async function recordMaintenanceAction(_prev: MaintenanceFormState, formD
   if (!itemId && !(kind === 'REPAIR' || isMaintenanceKind(kind))) return { error: t.errGeneric, done: false };
   if (!itemId && (kind === 'OTHER' || kind === 'REPAIR') && title.length < 2) return { error: t.errTitle, done: false };
 
-  /* Подпись строки расходов — на языке кабинета: в доходности видно, за что сумма. */
-  const label = str(formData, 'label') || (kind in t.kinds ? t.kinds[kind as keyof typeof t.kinds] : '');
+  /*
+   * Подпись строки расходов — на языке кабинета: в доходности видно, за
+   * что сумма. У пункта плана вид — его (форма шлёт готовую подпись), у
+   * разового ремонта — выбранный. Мастерская идёт в «поставщика», не сюда.
+   */
+  const label = str(formData, 'label').slice(0, 120) || (kind in t.kinds ? t.kinds[kind as keyof typeof t.kinds] : '');
   const workshop = str(formData, 'workshop').slice(0, 120);
-  const costNote = [label, title && title !== label ? title : '', workshop].filter(Boolean).join(' · ').slice(0, 200);
+  const costNote = [label, title && title !== label ? title : ''].filter(Boolean).join(' · ').slice(0, 200);
 
   const defectIds = formData.getAll('defect_ids').map(String).filter((id) => UUID.test(id));
 

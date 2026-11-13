@@ -3281,44 +3281,6 @@ export type Database = {
         }
         Relationships: []
       }
-      messages: {
-        Row: {
-          attachments: Json
-          body: string
-          conversation_id: string
-          created_at: string
-          id: string
-          sender: Database["public"]["Enums"]["chat_sender"]
-          sender_user_id: string | null
-        }
-        Insert: {
-          attachments?: Json
-          body: string
-          conversation_id: string
-          created_at?: string
-          id?: string
-          sender: Database["public"]["Enums"]["chat_sender"]
-          sender_user_id?: string | null
-        }
-        Update: {
-          attachments?: Json
-          body?: string
-          conversation_id?: string
-          created_at?: string
-          id?: string
-          sender?: Database["public"]["Enums"]["chat_sender"]
-          sender_user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "messages_conversation_id_fkey"
-            columns: ["conversation_id"]
-            isOneToOne: false
-            referencedRelation: "conversations"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       maintenance_items: {
         Row: {
           company_id: string
@@ -3371,7 +3333,29 @@ export type Database = {
           updated_at?: string
           vehicle_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "maintenance_items_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_items_trailer_id_fkey"
+            columns: ["trailer_id"]
+            isOneToOne: false
+            referencedRelation: "trailers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_items_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       maintenance_records: {
         Row: {
@@ -3428,7 +3412,43 @@ export type Database = {
           vehicle_id?: string | null
           workshop?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "maintenance_records_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_records_cost_id_fkey"
+            columns: ["cost_id"]
+            isOneToOne: false
+            referencedRelation: "vehicle_costs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_records_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "maintenance_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_records_trailer_id_fkey"
+            columns: ["trailer_id"]
+            isOneToOne: false
+            referencedRelation: "trailers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_records_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       maintenance_reminders: {
         Row: {
@@ -3449,7 +3469,53 @@ export type Database = {
           sent_at?: string
           stage?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "maintenance_reminders_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "maintenance_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          attachments: Json
+          body: string
+          conversation_id: string
+          created_at: string
+          id: string
+          sender: Database["public"]["Enums"]["chat_sender"]
+          sender_user_id: string | null
+        }
+        Insert: {
+          attachments?: Json
+          body: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          sender: Database["public"]["Enums"]["chat_sender"]
+          sender_user_id?: string | null
+        }
+        Update: {
+          attachments?: Json
+          body?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          sender?: Database["public"]["Enums"]["chat_sender"]
+          sender_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       notifications: {
         Row: {
@@ -6116,7 +6182,43 @@ export type Database = {
           trailer_id?: string | null
           vehicle_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_defects_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_defects_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_defects_record_id_fkey"
+            columns: ["record_id"]
+            isOneToOne: false
+            referencedRelation: "maintenance_records"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_defects_trailer_id_fkey"
+            columns: ["trailer_id"]
+            isOneToOne: false
+            referencedRelation: "trailers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_defects_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       vehicle_drivers: {
         Row: {
@@ -7705,6 +7807,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      carrier_defect_resolve: {
+        Args: { p_id: string; p_note?: string; p_status: string }
+        Returns: undefined
+      }
       carrier_delete_client: {
         Args: { p_client_id: string }
         Returns: undefined
@@ -7745,6 +7851,7 @@ export type Database = {
         }
         Returns: string
       }
+      carrier_maintenance_done: { Args: { p_data: Json }; Returns: string }
       carrier_own_vehicles: {
         Args: never
         Returns: {
@@ -8620,47 +8727,11 @@ export type Database = {
           last_country: string
         }[]
       }
-      driver_earnings: { Args: { p_from: string; p_to: string }; Returns: Json }
-      carrier_defect_resolve: {
-        Args: { p_id: string; p_note?: string; p_status: string }
-        Returns: undefined
-      }
-      carrier_maintenance_done: { Args: { p_data: Json }; Returns: string }
       driver_defect_add: {
         Args: { p_at?: string; p_data: Json; p_event_id?: string }
         Returns: string
       }
-      driver_maintenance_state: { Args: never; Returns: Json }
-      fleet_odometers: {
-        Args: never
-        Returns: {
-          km: number
-          vehicle_id: string
-        }[]
-      }
-      maintenance_due_candidates: {
-        Args: { p_days?: number; p_km?: number }
-        Returns: {
-          company_id: string
-          current_km: number
-          driver_id: string
-          item_id: string
-          kind: string
-          next_due_km: number
-          next_due_on: string
-          plate: string
-          title: string
-          trailer_id: string
-          vehicle_id: string
-        }[]
-      }
-      retention_defect_candidates: {
-        Args: { p_limit?: number }
-        Returns: {
-          id: string
-          storage_path: string
-        }[]
-      }
+      driver_earnings: { Args: { p_from: string; p_to: string }; Returns: Json }
       driver_fuel_add: {
         Args: { p_at?: string; p_data: Json; p_event_id?: string }
         Returns: undefined
@@ -8676,6 +8747,7 @@ export type Database = {
           invite_id: string
         }[]
       }
+      driver_maintenance_state: { Args: never; Returns: Json }
       driver_me: { Args: never; Returns: Json }
       driver_push_subscribe: {
         Args: {
@@ -8861,6 +8933,13 @@ export type Database = {
           city: string
           free_local: string
           source: string
+          vehicle_id: string
+        }[]
+      }
+      fleet_odometers: {
+        Args: never
+        Returns: {
+          km: number
           vehicle_id: string
         }[]
       }
@@ -9147,6 +9226,22 @@ export type Database = {
           section_title: string
           title: string
           version: number
+        }[]
+      }
+      maintenance_due_candidates: {
+        Args: { p_days?: number; p_km?: number }
+        Returns: {
+          company_id: string
+          current_km: number
+          driver_id: string
+          item_id: string
+          kind: string
+          next_due_km: number
+          next_due_on: string
+          plate: string
+          title: string
+          trailer_id: string
+          vehicle_id: string
         }[]
       }
       mark_freight_invoice_paid: {
@@ -9758,6 +9853,13 @@ export type Database = {
         Returns: undefined
       }
       restore_driver: { Args: { p_driver_id: string }; Returns: undefined }
+      retention_defect_candidates: {
+        Args: { p_limit?: number }
+        Returns: {
+          id: string
+          storage_path: string
+        }[]
+      }
       retention_fuel_candidates: {
         Args: { p_limit?: number }
         Returns: {

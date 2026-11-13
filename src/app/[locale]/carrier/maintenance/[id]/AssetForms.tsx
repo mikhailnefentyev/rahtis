@@ -264,7 +264,8 @@ function DoneForm({
   costsOpen: boolean;
   onClose: () => void;
 }) {
-  const { t, f } = useI18n();
+  const i18n = useI18n();
+  const { t, f } = i18n;
   const s = t.maintenance;
   const [state, action, pending] = useActionState(recordMaintenanceAction, initial);
   useCloseOnDone(state, onClose);
@@ -277,6 +278,7 @@ function DoneForm({
     <form action={action} className="flex flex-col gap-3">
       <AssetFields asset={asset} />
       {item && <input type="hidden" name="item_id" value={item.id} />}
+      {item && <input type="hidden" name="label" value={itemLabel(i18n, item)} />}
       {needsKm && <input type="hidden" name="needs_km" value="1" />}
       <h3 className="text-[13px] font-semibold">{item ? `${s.done.title}: ${s.kinds[item.kind as MaintenanceKind] ?? ''}` : s.repair.title}</h3>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
