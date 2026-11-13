@@ -233,6 +233,61 @@ export const pl = {
     queued: 'czeka na wysłanie',
     products: { DIESEL: 'Olej napędowy', HVO: 'HVO100', ADBLUE: 'AdBlue', PETROL: 'Benzyna', LNG: 'LNG', LBG: 'LBG (biogaz)', CNG: 'CNG', CBG: 'CBG (biogaz)', OTHER: 'Inne' },
   },
+  /* Приложение водителя: дефект машины или прицепа и сроки обслуживания своей машины. */
+  defectDriver: {
+    entry: 'Usterka / serwis',
+    title: 'Usterki i serwis',
+    noVehicle: 'Nie jesteś przypisany do pojazdu. Poproś przewoźnika o przypisanie, aby zgłaszać usterki.',
+    dueTitle: 'Terminy Twojego pojazdu',
+    dueHint: 'Serwis umawia przewoźnik. Uzgodnij z nim, kiedy pojazd jedzie do warsztatu.',
+    target: 'Gdzie jest usterka',
+    vehicle: 'Pojazd',
+    trailer: 'Przyczepa',
+    area: 'Co jest uszkodzone',
+    severity: 'Czy pojazdem można jechać',
+    canDrive: 'Można jechać',
+    unsafe: 'Nie jechać',
+    unsafeHint: 'Nie ruszaj w trasę. Przewoźnik od razu dostaje powiadomienie – zadzwoń też do niego.',
+    description: 'Opis',
+    descriptionPlaceholder: 'Co zauważyłeś? Np. nie świeci lewe tylne światło.',
+    odometer: 'Stan licznika (km), opcjonalnie',
+    photo: 'Zrób zdjęcie',
+    photoRetake: 'Zrób nowe zdjęcie',
+    required: 'Wybierz, co jest uszkodzone i czy można jechać, oraz napisz krótki opis.',
+    save: 'Wyślij zgłoszenie usterki',
+    saved: 'Zgłoszenie usterki wysłane do przewoźnika.',
+    recent: 'Zgłoszenia usterek',
+    none: 'Brak zgłoszeń usterek.',
+    queued: 'czeka na wysłanie',
+    byOther: 'zgłosił inny kierowca',
+    statuses: { OPEN: 'Otwarta', FIXED: 'Naprawiona', DISMISSED: 'Zamknięta' },
+    areas: {
+      BRAKES: 'Hamulce',
+      TYRES: 'Opony',
+      LIGHTS: 'Światła',
+      ENGINE: 'Silnik',
+      LEAK: 'Wyciek',
+      ELECTRICAL: 'Elektryka',
+      COUPLING: 'Sprzęg / siodło',
+      HYDRAULICS: 'Hydraulika',
+      BODY: 'Zabudowa / przestrzeń ładunkowa',
+      TACHOGRAPH: 'Tachograf',
+      OTHER: 'Inne',
+    },
+    kinds: {
+      SERVICE: 'Przegląd serwisowy',
+      INSPECTION: 'Badanie techniczne',
+      TACHOGRAPH: 'Legalizacja tachografu',
+      TYRES: 'Opony',
+      BRAKES: 'Kontrola hamulców',
+      AC: 'Serwis klimatyzacji',
+      REEFER: 'Serwis agregatu chłodniczego',
+      LIFT: 'Przegląd żurawia lub windy załadowczej',
+      ADR: 'Świadectwo ADR',
+      FIRE: 'Przegląd gaśnic',
+      OTHER: 'Inne',
+    },
+  },
 
   /* Работа на объекте: самосвалы, весы, часы (src/lib/sites/work.ts). */
   /* Весовой талон по фото: чтение, проверки, рейс по талону (src/lib/weighTicket). */
@@ -383,6 +438,10 @@ export const pl = {
   payDisclaimer:
     'Wyliczenie ma charakter orientacyjny. Ostateczne wynagrodzenie ustalają pracodawca oraz umowa o pracę lub układ zbiorowy.',
   msg: {
+    'driverEvent.maintenance.due':
+      '{plate}: {kind, select, SERVICE {przegląd serwisowy} INSPECTION {badanie techniczne} TACHOGRAPH {legalizacja tachografu} TYRES {opony} BRAKES {kontrola hamulców} AC {serwis klimatyzacji} REEFER {serwis agregatu chłodniczego} LIFT {przegląd żurawia} ADR {świadectwo ADR} FIRE {przegląd gaśnic} other {{title}}} – zbliża się termin: {when}',
+    'driverEvent.maintenance.overdue':
+      '{plate}: {kind, select, SERVICE {przegląd serwisowy} INSPECTION {badanie techniczne} TACHOGRAPH {legalizacja tachografu} TYRES {opony} BRAKES {kontrola hamulców} AC {serwis klimatyzacji} REEFER {serwis agregatu chłodniczego} LIFT {przegląd żurawia} ADR {świadectwo ADR} FIRE {przegląd gaśnic} other {{title}}} – minął termin: {when}',
     /* Уведомления водителя: входящие в приложении и push. */
     'driverEvent.order.direct': 'Nowe zlecenie bezpośrednie {ref} dla {plate}',
     'driverEvent.offer.chosen': 'Zlecenie {ref} dla {plate} — potwierdź w ciągu {minutes} min',

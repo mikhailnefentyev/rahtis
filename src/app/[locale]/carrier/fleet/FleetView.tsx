@@ -15,6 +15,7 @@ export function FleetView({
   driverByVehicle,
   documentsOk,
   today,
+  service = {},
 }: {
   vehicles: Vehicle[];
   drivers: Pick<Driver, 'id' | 'full_name' | 'phone'>[];
@@ -23,6 +24,8 @@ export function FleetView({
   documentsOk: boolean;
   /** Считается на сервере: рендер обязан быть чистым, а часы клиента могут врать. */
   today: string;
+  /** Обслуживание машины: худший срок плана и открытые дефекты (src/lib/maintenance/load.ts). */
+  service?: Record<string, { state: string; items: number; openDefects: number; unsafe: boolean }>;
 }) {
   const { t, m, locale } = useI18n();
   const [editing, setEditing] = useState<Vehicle | null | 'new'>(null);
@@ -78,6 +81,8 @@ export function FleetView({
                     <a href={`/${locale}/carrier/economics/${vehicle.id}`} className="text-[12px] text-accent hover:underline">
                       {t.economics.vehicleLink} ›
                     </a>
+                    {/* Обслуживание: просрочено, скоро, дефекты — видно в списке парка, не открывая машину. */}
+                    <ServiceLink href={`/${locale}/carrier/maintenance/${vehicle.id}`} summary={service[vehicle.id]} />
                   </div>
 
                   {/*
@@ -200,5 +205,30 @@ export function FleetView({
         </div>
       )}
     </section>
+  );
+}
+
+function ServiceLink({
+  href,
+  summary,
+}: {
+  href: string;
+  summary?: { state: string; items: number; openDefects: number; unsafe: boolean };
+}) {
+  const { t, m } = useI18n();
+  const s = t.maintenance;
+  const state = summary?.state as keyof typeof s.state | undefined;
+  return (
+    <>
+      <a href={href} className="text-[12px] text-accent hover:underline">
+        {s.fleetLink} ›
+      </a>
+      {summary?.unsafe ? (
+        <Badge tone="danger">{s.defects.severities.UNSAFE}</Badge>
+      ) : summary && summary.openDefects > 0 ? (
+        <Badge tone="warn">{m('maintenance.defectCount', { count: summary.openDefects })}</Badge>
+      ) : null}
+      {(state === 'OVERDUE' || state === 'SOON') && <Badge tone={state === 'OVERDUE' ? 'danger' : 'warn'}>{s.state[state]}</Badge>}
+    </>
   );
 }

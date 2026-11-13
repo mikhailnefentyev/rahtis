@@ -15,6 +15,7 @@ import { TrailersMass } from './TrailersMass';
 import { CombosView } from './CombosView';
 import { CapacitySettings } from '@/components/domain/capacity/CapacitySettings';
 import { getViewerI18n } from '@/lib/i18n/viewer';
+import { loadFleetMaintenance } from '@/lib/maintenance/load';
 
 export async function generateMetadata({
   params,
@@ -78,6 +79,13 @@ export default async function FleetPage({ params }: { params: Promise<{ locale: 
   const driverByVehicle: Record<string, string> = {};
   for (const row of assignments ?? []) {
     if (String(row.during).endsWith(',)')) driverByVehicle[row.vehicle_id] = row.driver_id;
+  }
+
+  /* Значок обслуживания на карточке машины: худший срок и открытые дефекты. */
+  const maintenance = await loadFleetMaintenance(supabase, { companyId: company.id, today });
+  const service: Record<string, { state: string; items: number; openDefects: number; unsafe: boolean }> = {};
+  for (const [id, sum] of maintenance.summaries) {
+    service[id] = { state: sum.state, items: sum.items, openDefects: sum.openDefects, unsafe: sum.unsafe };
   }
 
   const byKind = (kind: CompanyDocument['kind']) =>
@@ -168,6 +176,7 @@ export default async function FleetPage({ params }: { params: Promise<{ locale: 
         driverByVehicle={driverByVehicle}
         documentsOk={state?.documents_ok ?? false}
         today={new Date().toISOString().slice(0, 10)}
+        service={service}
       />
 
       <TrailersMass vehicles={vehicles ?? []} trailers={trailers ?? []} />

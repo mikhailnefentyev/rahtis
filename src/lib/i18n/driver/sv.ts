@@ -233,6 +233,61 @@ export const sv = {
     queued: 'väntar på att skickas',
     products: { DIESEL: 'Diesel', HVO: 'HVO100', ADBLUE: 'AdBlue', PETROL: 'Bensin', LNG: 'LNG', LBG: 'LBG (biogas)', CNG: 'CNG', CBG: 'CBG (biogas)', OTHER: 'Övrigt' },
   },
+  /* Приложение водителя: дефект машины или прицепа и сроки обслуживания своей машины. */
+  defectDriver: {
+    entry: 'Fel / service',
+    title: 'Fel och service',
+    noVehicle: 'Du är inte kopplad till något fordon. Be åkeriet koppla dig till ett fordon, så kan du anmäla fel.',
+    dueTitle: 'Ditt fordons tidsfrister',
+    dueHint: 'Åkeriet bokar service. Kom överens med dem om när fordonet ska till verkstaden.',
+    target: 'Var är felet',
+    vehicle: 'Fordon',
+    trailer: 'Släp',
+    area: 'Vad är fel',
+    severity: 'Kan fordonet köras',
+    canDrive: 'Kan köras',
+    unsafe: 'Får inte köras',
+    unsafeHint: 'Kör inte iväg. Åkeriet får besked direkt – ring dem också.',
+    description: 'Beskrivning',
+    descriptionPlaceholder: 'Vad märkte du? T.ex. vänster baklykta lyser inte.',
+    odometer: 'Mätarställning (km), frivilligt',
+    photo: 'Ta en bild',
+    photoRetake: 'Ta ny bild',
+    required: 'Välj var felet är och om fordonet kan köras, och skriv en kort beskrivning.',
+    save: 'Skicka felanmälan',
+    saved: 'Felanmälan skickad till åkeriet.',
+    recent: 'Felanmälningar',
+    none: 'Inga felanmälningar.',
+    queued: 'väntar på att skickas',
+    byOther: 'anmäld av en annan förare',
+    statuses: { OPEN: 'Öppen', FIXED: 'Åtgärdad', DISMISSED: 'Stängd' },
+    areas: {
+      BRAKES: 'Bromsar',
+      TYRES: 'Däck',
+      LIGHTS: 'Belysning',
+      ENGINE: 'Motor',
+      LEAK: 'Läckage',
+      ELECTRICAL: 'El',
+      COUPLING: 'Koppling / vändskiva',
+      HYDRAULICS: 'Hydraulik',
+      BODY: 'Påbyggnad / lastutrymme',
+      TACHOGRAPH: 'Färdskrivare',
+      OTHER: 'Övrigt',
+    },
+    kinds: {
+      SERVICE: 'Service',
+      INSPECTION: 'Besiktning',
+      TACHOGRAPH: 'Färdskrivarkontroll',
+      TYRES: 'Däck',
+      BRAKES: 'Bromskontroll',
+      AC: 'AC-service',
+      REEFER: 'Service av kylaggregat',
+      LIFT: 'Kontroll av kran eller bakgavellyft',
+      ADR: 'ADR-godkännande',
+      FIRE: 'Kontroll av brandsläckare',
+      OTHER: 'Övrigt',
+    },
+  },
 
   /* Работа на объекте: самосвалы, весы, часы (src/lib/sites/work.ts). */
   /* Весовой талон по фото: чтение, проверки, рейс по талону (src/lib/weighTicket). */
@@ -383,6 +438,10 @@ export const sv = {
   payDisclaimer:
     'Beräkningen är vägledande. Den slutliga lönen bestäms av arbetsgivaren och anställnings- eller kollektivavtalet.',
   msg: {
+    'driverEvent.maintenance.due':
+      '{plate}: {kind, select, SERVICE {service} INSPECTION {besiktning} TACHOGRAPH {färdskrivarkontroll} TYRES {däck} BRAKES {bromskontroll} AC {AC-service} REEFER {service av kylaggregat} LIFT {kontroll av kran} ADR {ADR-godkännande} FIRE {kontroll av brandsläckare} other {{title}}} närmar sig – {when}',
+    'driverEvent.maintenance.overdue':
+      '{plate}: {kind, select, SERVICE {service} INSPECTION {besiktning} TACHOGRAPH {färdskrivarkontroll} TYRES {däck} BRAKES {bromskontroll} AC {AC-service} REEFER {service av kylaggregat} LIFT {kontroll av kran} ADR {ADR-godkännande} FIRE {kontroll av brandsläckare} other {{title}}} är försenad – {when}',
     /* Уведомления водителя: входящие в приложении и push. */
     'driverEvent.order.direct': 'Nytt direktuppdrag {ref} till {plate}',
     'driverEvent.offer.chosen': 'Körning {ref} till {plate} – bekräfta inom {minutes} minuter',

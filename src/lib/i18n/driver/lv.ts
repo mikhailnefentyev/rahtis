@@ -233,6 +233,61 @@ export const lv = {
     queued: 'gaida nosūtīšanu',
     products: { DIESEL: 'Dīzelis', HVO: 'HVO100', ADBLUE: 'AdBlue', PETROL: 'Benzīns', LNG: 'LNG', LBG: 'LBG (biogāze)', CNG: 'CNG', CBG: 'CBG (biogāze)', OTHER: 'Cits' },
   },
+  /* Приложение водителя: дефект машины или прицепа и сроки обслуживания своей машины. */
+  defectDriver: {
+    entry: 'Defekts / apkope',
+    title: 'Defekti un apkope',
+    noVehicle: 'Tu neesi piesaistīts automašīnai. Palūdz pārvadātājam tevi piesaistīt, lai varētu ziņot par defektiem.',
+    dueTitle: 'Tavas automašīnas termiņi',
+    dueHint: 'Apkopi piesaka pārvadātājs. Vienojies ar viņiem, kad automašīnu vest uz servisu.',
+    target: 'Kur ir defekts',
+    vehicle: 'Automašīna',
+    trailer: 'Piekabe',
+    area: 'Kas ir bojāts',
+    severity: 'Vai ar automašīnu drīkst braukt',
+    canDrive: 'Drīkst braukt',
+    unsafe: 'Nedrīkst braukt',
+    unsafeHint: 'Nesāc braukt. Pārvadātājs saņem paziņojumu uzreiz – piezvani arī viņiem.',
+    description: 'Apraksts',
+    descriptionPlaceholder: 'Ko pamanīji? Piem., nedeg kreisais aizmugurējais lukturis.',
+    odometer: 'Odometra rādījums (km), nav obligāts',
+    photo: 'Nofotografēt',
+    photoRetake: 'Uzņemt jaunu foto',
+    required: 'Izvēlies, kas ir bojāts un vai drīkst braukt, un uzraksti īsu aprakstu.',
+    save: 'Nosūtīt ziņojumu par defektu',
+    saved: 'Ziņojums par defektu nosūtīts pārvadātājam.',
+    recent: 'Ziņojumi par defektiem',
+    none: 'Ziņojumu par defektiem nav.',
+    queued: 'gaida nosūtīšanu',
+    byOther: 'ziņoja cits vadītājs',
+    statuses: { OPEN: 'Atvērts', FIXED: 'Novērsts', DISMISSED: 'Slēgts' },
+    areas: {
+      BRAKES: 'Bremzes',
+      TYRES: 'Riepas',
+      LIGHTS: 'Lukturi',
+      ENGINE: 'Dzinējs',
+      LEAK: 'Noplūde',
+      ELECTRICAL: 'Elektroinstalācija',
+      COUPLING: 'Sakabe / seglu sakabe',
+      HYDRAULICS: 'Hidraulika',
+      BODY: 'Virsbūve / kravas nodalījums',
+      TACHOGRAPH: 'Tahogrāfs',
+      OTHER: 'Cits',
+    },
+    kinds: {
+      SERVICE: 'Kārtējā apkope',
+      INSPECTION: 'Tehniskā apskate',
+      TACHOGRAPH: 'Tahogrāfa pārbaude',
+      TYRES: 'Riepas',
+      BRAKES: 'Bremžu pārbaude',
+      AC: 'Kondicioniera apkope',
+      REEFER: 'Saldēšanas agregāta apkope',
+      LIFT: 'Krāna vai hidrauliskā borta pārbaude',
+      ADR: 'ADR apstiprinājums',
+      FIRE: 'Ugunsdzēsības aparātu pārbaude',
+      OTHER: 'Cits',
+    },
+  },
 
   /* Работа на объекте: самосвалы, весы, часы (src/lib/sites/work.ts). */
   /* Весовой талон по фото: чтение, проверки, рейс по талону (src/lib/weighTicket). */
@@ -383,6 +438,10 @@ export const lv = {
   payDisclaimer:
     'Aprēķins ir orientējošs. Galīgo samaksu nosaka darba devējs un darba vai koplīgums.',
   msg: {
+    'driverEvent.maintenance.due':
+      '{plate}: {kind, select, SERVICE {kārtējā apkope} INSPECTION {tehniskā apskate} TACHOGRAPH {tahogrāfa pārbaude} TYRES {riepas} BRAKES {bremžu pārbaude} AC {kondicioniera apkope} REEFER {saldēšanas agregāta apkope} LIFT {krāna pārbaude} ADR {ADR apstiprinājums} FIRE {ugunsdzēsības aparātu pārbaude} other {{title}}} – termiņš tuvojas: {when}',
+    'driverEvent.maintenance.overdue':
+      '{plate}: {kind, select, SERVICE {kārtējā apkope} INSPECTION {tehniskā apskate} TACHOGRAPH {tahogrāfa pārbaude} TYRES {riepas} BRAKES {bremžu pārbaude} AC {kondicioniera apkope} REEFER {saldēšanas agregāta apkope} LIFT {krāna pārbaude} ADR {ADR apstiprinājums} FIRE {ugunsdzēsības aparātu pārbaude} other {{title}}} – termiņš nokavēts: {when}',
     /* Уведомления водителя: входящие в приложении и push. */
     'driverEvent.order.direct': 'Jauns tiešais reiss {ref} mašīnai {plate}',
     'driverEvent.offer.chosen': 'Reiss {ref} mašīnai {plate} — apstiprini {minutes} minūšu laikā',

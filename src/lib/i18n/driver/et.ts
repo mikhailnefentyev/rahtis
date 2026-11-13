@@ -233,6 +233,61 @@ export const et = {
     queued: 'ootab saatmist',
     products: { DIESEL: 'Diisel', HVO: 'HVO100', ADBLUE: 'AdBlue', PETROL: 'Bensiin', LNG: 'LNG', LBG: 'LBG (biogaas)', CNG: 'CNG', CBG: 'CBG (biogaas)', OTHER: 'Muu' },
   },
+  /* Приложение водителя: дефект машины или прицепа и сроки обслуживания своей машины. */
+  defectDriver: {
+    entry: 'Rike / hooldus',
+    title: 'Rikked ja hooldus',
+    noVehicle: 'Sind pole autoga seotud. Palu vedajal siduda sind autoga, et saaksid rikkeid teatada.',
+    dueTitle: 'Sinu auto tähtajad',
+    dueHint: 'Hoolduse broneerib vedaja. Lepi nendega kokku, millal auto töökotta viiakse.',
+    target: 'Kus rike on',
+    vehicle: 'Auto',
+    trailer: 'Haagis',
+    area: 'Mis on rikkis',
+    severity: 'Kas autoga tohib sõita',
+    canDrive: 'Võib sõita',
+    unsafe: 'Sõita ei tohi',
+    unsafeHint: 'Ära sõitu alusta. Vedaja saab teate kohe – helista neile ka.',
+    description: 'Kirjeldus',
+    descriptionPlaceholder: 'Mida märkasid? Nt vasak tagatuli ei põle.',
+    odometer: 'Odomeetri näit (km), pole kohustuslik',
+    photo: 'Tee pilt',
+    photoRetake: 'Tee uus pilt',
+    required: 'Vali rikke asukoht ja kas tohib sõita ning kirjuta lühike kirjeldus.',
+    save: 'Saada rikketeade',
+    saved: 'Rikketeade saadetud vedajale.',
+    recent: 'Rikketeated',
+    none: 'Rikketeateid pole.',
+    queued: 'ootab saatmist',
+    byOther: 'teatas teine juht',
+    statuses: { OPEN: 'Avatud', FIXED: 'Parandatud', DISMISSED: 'Suletud' },
+    areas: {
+      BRAKES: 'Pidurid',
+      TYRES: 'Rehvid',
+      LIGHTS: 'Tuled',
+      ENGINE: 'Mootor',
+      LEAK: 'Leke',
+      ELECTRICAL: 'Elektrisüsteem',
+      COUPLING: 'Haakeseade / sadulhaakeseade',
+      HYDRAULICS: 'Hüdraulika',
+      BODY: 'Kere / veoruum',
+      TACHOGRAPH: 'Sõidumeerik',
+      OTHER: 'Muu',
+    },
+    kinds: {
+      SERVICE: 'Korraline hooldus',
+      INSPECTION: 'Tehnoülevaatus',
+      TACHOGRAPH: 'Sõidumeeriku kontroll',
+      TYRES: 'Rehvid',
+      BRAKES: 'Pidurite kontroll',
+      AC: 'Kliimaseadme hooldus',
+      REEFER: 'Külmaagregaadi hooldus',
+      LIFT: 'Kraana või tagaluuktõstuki kontroll',
+      ADR: 'ADR-heakskiit',
+      FIRE: 'Tulekustutite kontroll',
+      OTHER: 'Muu',
+    },
+  },
 
   /* Работа на объекте: самосвалы, весы, часы (src/lib/sites/work.ts). */
   /* Весовой талон по фото: чтение, проверки, рейс по талону (src/lib/weighTicket). */
@@ -383,6 +438,10 @@ export const et = {
   payDisclaimer:
     'Kalkulaator annab ligikaudse summa. Lõpliku palga määravad tööandja ning töö- või kollektiivleping.',
   msg: {
+    'driverEvent.maintenance.due':
+      '{plate}: {kind, select, SERVICE {korraline hooldus} INSPECTION {tehnoülevaatus} TACHOGRAPH {sõidumeeriku kontroll} TYRES {rehvid} BRAKES {pidurite kontroll} AC {kliimaseadme hooldus} REEFER {külmaagregaadi hooldus} LIFT {kraana kontroll} ADR {ADR-heakskiit} FIRE {tulekustutite kontroll} other {{title}}} – tähtaeg läheneb, {when}',
+    'driverEvent.maintenance.overdue':
+      '{plate}: {kind, select, SERVICE {korraline hooldus} INSPECTION {tehnoülevaatus} TACHOGRAPH {sõidumeeriku kontroll} TYRES {rehvid} BRAKES {pidurite kontroll} AC {kliimaseadme hooldus} REEFER {külmaagregaadi hooldus} LIFT {kraana kontroll} ADR {ADR-heakskiit} FIRE {tulekustutite kontroll} other {{title}}} – tähtaeg ületatud, {when}',
     /* Уведомления водителя: входящие в приложении и push. */
     'driverEvent.order.direct': 'Uus otsevedu {ref} autole {plate}',
     'driverEvent.offer.chosen': 'Vedu {ref} autole {plate} — kinnita {minutes} minuti jooksul',

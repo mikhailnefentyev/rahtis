@@ -6,6 +6,7 @@ import { refreshShipperRegistry } from '@/lib/trust/status';
 import { deliverSensitiveChanges } from '@/lib/trust/sensitive';
 import { sendInvoiceReminders } from '@/lib/invoices/reminders';
 import { syncCapacity } from '@/lib/capacity/load';
+import { sendMaintenanceReminders } from '@/lib/maintenance/reminders';
 
 /* Перепроверка реестра идёт по одной компании с паузой — нужен запас (pg_net ждёт 60 с). */
 export const maxDuration = 60;
@@ -36,6 +37,9 @@ export const maxDuration = 60;
  * И ночной расчёт догрузов (src/lib/capacity/load.ts): истёкшее место
  * снимается, в режиме «автоматически» новое публикуется. Его ошибки
  * статус ответа не портят — расчёт повторится при заходе перевозчика.
+ *
+ * С 13.11.2026 им же — напоминания о сроках обслуживания машин и
+ * прицепов (src/lib/maintenance/reminders.ts): ТО, katsastus, тахограф.
  */
 export async function POST(request: Request) {
   const expected = process.env.REPORTS_CRON_SECRET?.trim();
@@ -49,7 +53,7 @@ export async function POST(request: Request) {
     return Response.json({ error: 'forbidden' }, { status: 401 });
   }
 
-  const [result, verification, forwarder, registry, invoices, sensitive, capacity] = await Promise.all([
+  const [result, verification, forwarder, registry, invoices, sensitive, capacity, maintenance] = await Promise.all([
     sendCertificateReminders(),
     sendVerificationReminders(),
     sendForwarderReminders(),
@@ -75,12 +79,19 @@ export async function POST(request: Request) {
       closed: 0,
       errors: [error instanceof Error ? error.message : String(error)],
     })),
+    sendMaintenanceReminders().catch((error: unknown) => ({
+      checked: 0,
+      sent: 0,
+      companies: 0,
+      errors: [error instanceof Error ? error.message : String(error)],
+    })),
   ]);
   const failed =
     result.errors.length > 0 ||
     verification.errors.length > 0 ||
     forwarder.errors.length > 0 ||
     invoices.errors.length > 0 ||
-    sensitive.errors.length > 0;
-  return Response.json({ ...result, verification, forwarder, registry, invoices, sensitive, capacity }, { status: failed ? 207 : 200 });
+    sensitive.errors.length > 0 ||
+    maintenance.errors.length > 0;
+  return Response.json({ ...result, verification, forwarder, registry, invoices, sensitive, capacity, maintenance }, { status: failed ? 207 : 200 });
 }

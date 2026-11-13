@@ -177,6 +177,7 @@ function navigation(
           items: [
             { href: `/${locale}/carrier/fleet`, label: t.fleet.title, icon: 'fleet' },
             { href: `/${locale}/carrier/drivers`, label: t.drivers.title, icon: 'drivers' },
+            { href: `/${locale}/carrier/maintenance`, label: t.maintenance.nav, icon: 'maintenance' },
             { href: `/${locale}/carrier/fuel`, label: t.fuel.nav, icon: 'fuel' },
             { href: `/${locale}/carrier/economics`, label: t.economics.nav, icon: 'economics' },
             { href: `/${locale}/carrier/gps`, label: t.gps.nav, icon: 'gps' },

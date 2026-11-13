@@ -48,6 +48,8 @@ export type DriverPack = {
   siteWork: Dictionary['siteWork'];
   /** Заправка: одометр, литры, AdBlue, чек. */
   fuelDriver: Dictionary['fuelDriver'];
+  /** Дефект машины и сроки обслуживания своей машины. */
+  defectDriver: Dictionary['defectDriver'];
   stopKind: Dictionary['stopKind'];
   /*
    * Забор и возврат зависят от того, что везут: общий stopKind называет их
@@ -84,6 +86,7 @@ function packOf(dictionary: Dictionary): DriverPack {
     weighTicket: dictionary.weighTicket,
     siteWork: dictionary.siteWork,
     fuelDriver: dictionary.fuelDriver,
+    defectDriver: dictionary.defectDriver,
     stopKind: dictionary.stopKind,
     haulStops: {
       CONTAINER: { pickup: dictionary.haul.CONTAINER.stopPickup, return: dictionary.haul.CONTAINER.stopReturn },
@@ -145,6 +148,7 @@ export async function driverDictionary(
     weighTicket: pack.weighTicket,
     siteWork: pack.siteWork,
     fuelDriver: pack.fuelDriver,
+    defectDriver: pack.defectDriver,
     stopKind: pack.stopKind,
     /*
      * Забор и возврат по виду перевозки: страницы водителя зовут тот же

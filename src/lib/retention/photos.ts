@@ -104,3 +104,42 @@ export async function purgeExpiredFuel(): Promise<PhotoRetentionResult> {
 
   return result;
 }
+
+/**
+ * Закрытые дефекты машин старше 24 месяцев с закрытия: сначала фото в
+ * fleet-docs, потом строки. Открытые не трогаются — они ещё не исправлены.
+ */
+export async function purgeExpiredDefects(): Promise<PhotoRetentionResult> {
+  const admin = createAdminClient();
+  const result: PhotoRetentionResult = { candidates: 0, removed: 0, errors: [] };
+
+  for (let round = 0; round < MAX_ROUNDS; round += 1) {
+    const { data: rows, error } = await admin.rpc('retention_defect_candidates', { p_limit: BATCH });
+    if (error) {
+      result.errors.push(error.message);
+      break;
+    }
+    if (!rows || rows.length === 0) break;
+    result.candidates += rows.length;
+
+    const paths = rows.map((row) => row.storage_path).filter((path): path is string => Boolean(path));
+    if (paths.length > 0) {
+      const { error: storageError } = await admin.storage.from('fleet-docs').remove(paths);
+      if (storageError) {
+        result.errors.push(storageError.message);
+        break;
+      }
+    }
+
+    const { error: deleteError } = await admin.from('vehicle_defects').delete().in('id', rows.map((row) => row.id));
+    if (deleteError) {
+      result.errors.push(deleteError.message);
+      break;
+    }
+    result.removed += rows.length;
+
+    if (rows.length < BATCH) break;
+  }
+
+  return result;
+}

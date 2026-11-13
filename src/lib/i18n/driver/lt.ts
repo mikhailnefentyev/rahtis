@@ -233,6 +233,61 @@ export const lt = {
     queued: 'laukia siuntimo',
     products: { DIESEL: 'Dyzelinas', HVO: 'HVO100', ADBLUE: 'AdBlue', PETROL: 'Benzinas', LNG: 'LNG', LBG: 'LBG (biodujos)', CNG: 'CNG', CBG: 'CBG (biodujos)', OTHER: 'Kita' },
   },
+  /* Приложение водителя: дефект машины или прицепа и сроки обслуживания своей машины. */
+  defectDriver: {
+    entry: 'Gedimas / aptarnavimas',
+    title: 'Gedimai ir aptarnavimas',
+    noVehicle: 'Nesi priskirtas automobiliui. Paprašyk vežėjo tave priskirti, kad galėtum pranešti apie gedimus.',
+    dueTitle: 'Tavo automobilio terminai',
+    dueHint: 'Aptarnavimą užsako vežėjas. Susitark su juo, kada automobilį vežti į servisą.',
+    target: 'Kur gedimas',
+    vehicle: 'Automobilis',
+    trailer: 'Priekaba',
+    area: 'Kas sugedo',
+    severity: 'Ar automobiliu galima važiuoti',
+    canDrive: 'Galima važiuoti',
+    unsafe: 'Važiuoti negalima',
+    unsafeHint: 'Nepradėk važiuoti. Vežėjas gauna pranešimą iškart – dar ir paskambink jam.',
+    description: 'Aprašymas',
+    descriptionPlaceholder: 'Ką pastebėjai? Pvz., nedega kairysis galinis žibintas.',
+    odometer: 'Odometro rodmuo (km), neprivaloma',
+    photo: 'Fotografuoti',
+    photoRetake: 'Fotografuoti iš naujo',
+    required: 'Pasirink, kas sugedo ir ar galima važiuoti, ir parašyk trumpą aprašymą.',
+    save: 'Siųsti pranešimą apie gedimą',
+    saved: 'Pranešimas apie gedimą išsiųstas vežėjui.',
+    recent: 'Pranešimai apie gedimus',
+    none: 'Pranešimų apie gedimus nėra.',
+    queued: 'laukia siuntimo',
+    byOther: 'pranešė kitas vairuotojas',
+    statuses: { OPEN: 'Atviras', FIXED: 'Sutaisyta', DISMISSED: 'Uždaryta' },
+    areas: {
+      BRAKES: 'Stabdžiai',
+      TYRES: 'Padangos',
+      LIGHTS: 'Žibintai',
+      ENGINE: 'Variklis',
+      LEAK: 'Nuotėkis',
+      ELECTRICAL: 'Elektros sistema',
+      COUPLING: 'Sukabinimas / balnas',
+      HYDRAULICS: 'Hidraulika',
+      BODY: 'Kėbulas / krovinių skyrius',
+      TACHOGRAPH: 'Tachografas',
+      OTHER: 'Kita',
+    },
+    kinds: {
+      SERVICE: 'Planinis aptarnavimas',
+      INSPECTION: 'Techninė apžiūra',
+      TACHOGRAPH: 'Tachografo patikra',
+      TYRES: 'Padangos',
+      BRAKES: 'Stabdžių patikra',
+      AC: 'Kondicionieriaus aptarnavimas',
+      REEFER: 'Šaldymo agregato aptarnavimas',
+      LIFT: 'Krano ar hidraulinio borto patikra',
+      ADR: 'ADR patvirtinimas',
+      FIRE: 'Gesintuvų patikra',
+      OTHER: 'Kita',
+    },
+  },
 
   /* Работа на объекте: самосвалы, весы, часы (src/lib/sites/work.ts). */
   /* Весовой талон по фото: чтение, проверки, рейс по талону (src/lib/weighTicket). */
@@ -383,6 +438,10 @@ export const lt = {
   payDisclaimer:
     'Skaičiavimas orientacinis. Galutinį atlygį nustato darbdavys ir darbo arba kolektyvinė sutartis.',
   msg: {
+    'driverEvent.maintenance.due':
+      '{plate}: {kind, select, SERVICE {planinis aptarnavimas} INSPECTION {techninė apžiūra} TACHOGRAPH {tachografo patikra} TYRES {padangos} BRAKES {stabdžių patikra} AC {kondicionieriaus aptarnavimas} REEFER {šaldymo agregato aptarnavimas} LIFT {krano patikra} ADR {ADR patvirtinimas} FIRE {gesintuvų patikra} other {{title}}} – artėja terminas: {when}',
+    'driverEvent.maintenance.overdue':
+      '{plate}: {kind, select, SERVICE {planinis aptarnavimas} INSPECTION {techninė apžiūra} TACHOGRAPH {tachografo patikra} TYRES {padangos} BRAKES {stabdžių patikra} AC {kondicionieriaus aptarnavimas} REEFER {šaldymo agregato aptarnavimas} LIFT {krano patikra} ADR {ADR patvirtinimas} FIRE {gesintuvų patikra} other {{title}}} – praleistas terminas: {when}',
     /* Уведомления водителя: входящие в приложении и push. */
     'driverEvent.order.direct': 'Naujas tiesioginis reisas {ref} mašinai {plate}',
     'driverEvent.offer.chosen': 'Reisas {ref} mašinai {plate} — patvirtink per {minutes} min.',

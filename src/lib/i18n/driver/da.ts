@@ -233,6 +233,61 @@ export const da = {
     queued: 'venter på at blive sendt',
     products: { DIESEL: 'Diesel', HVO: 'HVO100', ADBLUE: 'AdBlue', PETROL: 'Benzin', LNG: 'LNG', LBG: 'LBG (biogas)', CNG: 'CNG', CBG: 'CBG (biogas)', OTHER: 'Andet' },
   },
+  /* Приложение водителя: дефект машины или прицепа и сроки обслуживания своей машины. */
+  defectDriver: {
+    entry: 'Fejl / service',
+    title: 'Fejl og service',
+    noVehicle: 'Du er ikke tilknyttet et køretøj. Bed vognmanden tilknytte dig, så du kan melde fejl.',
+    dueTitle: 'Dit køretøjs frister',
+    dueHint: 'Vognmanden bestiller service. Aftal med dem, hvornår køretøjet skal på værksted.',
+    target: 'Hvor er fejlen',
+    vehicle: 'Køretøj',
+    trailer: 'Anhænger',
+    area: 'Hvad er galt',
+    severity: 'Kan køretøjet køre',
+    canDrive: 'Kan køre',
+    unsafe: 'Må ikke køre',
+    unsafeHint: 'Kør ikke. Vognmanden får besked med det samme — ring også til dem.',
+    description: 'Beskrivelse',
+    descriptionPlaceholder: 'Hvad lagde du mærke til? F.eks. venstre baglygte lyser ikke.',
+    odometer: 'Kilometertal (km), valgfrit',
+    photo: 'Tag et billede',
+    photoRetake: 'Tag nyt billede',
+    required: 'Vælg hvad der er galt, og om køretøjet kan køre, og skriv en kort beskrivelse.',
+    save: 'Send fejlmelding',
+    saved: 'Fejlmeldingen er sendt til vognmanden.',
+    recent: 'Fejlmeldinger',
+    none: 'Ingen fejlmeldinger.',
+    queued: 'venter på at blive sendt',
+    byOther: 'meldt af en anden chauffør',
+    statuses: { OPEN: 'Åben', FIXED: 'Udbedret', DISMISSED: 'Lukket' },
+    areas: {
+      BRAKES: 'Bremser',
+      TYRES: 'Dæk',
+      LIGHTS: 'Lys',
+      ENGINE: 'Motor',
+      LEAK: 'Lækage',
+      ELECTRICAL: 'El',
+      COUPLING: 'Kobling / skammel',
+      HYDRAULICS: 'Hydraulik',
+      BODY: 'Opbygning / lastrum',
+      TACHOGRAPH: 'Fartskriver',
+      OTHER: 'Andet',
+    },
+    kinds: {
+      SERVICE: 'Periodisk service',
+      INSPECTION: 'Syn',
+      TACHOGRAPH: 'Eftersyn af fartskriver',
+      TYRES: 'Dæk',
+      BRAKES: 'Bremsekontrol',
+      AC: 'Service af aircondition',
+      REEFER: 'Service af køleaggregat',
+      LIFT: 'Eftersyn af kran eller bagsmækslift',
+      ADR: 'ADR-godkendelse',
+      FIRE: 'Eftersyn af brandslukkere',
+      OTHER: 'Andet',
+    },
+  },
 
   /* Работа на объекте: самосвалы, весы, часы (src/lib/sites/work.ts). */
   /* Весовой талон по фото: чтение, проверки, рейс по талону (src/lib/weighTicket). */
@@ -383,6 +438,10 @@ export const da = {
   payDisclaimer:
     'Beregningen er vejledende. Den endelige løn fastsættes af arbejdsgiveren og ansættelses- eller overenskomstaftalen.',
   msg: {
+    'driverEvent.maintenance.due':
+      '{plate}: {kind, select, SERVICE {periodisk service} INSPECTION {syn} TACHOGRAPH {eftersyn af fartskriver} TYRES {dæk} BRAKES {bremsekontrol} AC {service af aircondition} REEFER {service af køleaggregat} LIFT {eftersyn af kran} ADR {ADR-godkendelse} FIRE {eftersyn af brandslukkere} other {{title}}} nærmer sig — {when}',
+    'driverEvent.maintenance.overdue':
+      '{plate}: {kind, select, SERVICE {periodisk service} INSPECTION {syn} TACHOGRAPH {eftersyn af fartskriver} TYRES {dæk} BRAKES {bremsekontrol} AC {service af aircondition} REEFER {service af køleaggregat} LIFT {eftersyn af kran} ADR {ADR-godkendelse} FIRE {eftersyn af brandslukkere} other {{title}}} er overskredet — {when}',
     /* Уведомления водителя: входящие в приложении и push. */
     'driverEvent.order.direct': 'Ny direkte opgave {ref} til {plate}',
     'driverEvent.offer.chosen': 'Opgave {ref} til {plate} — bekræft inden for {minutes} minutter',

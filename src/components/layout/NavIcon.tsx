@@ -8,6 +8,7 @@ export type NavIconName =
   | 'own'
   | 'sites'
   | 'fuel'
+  | 'maintenance'
   | 'gps'
   | 'parts'
   | 'economics'
@@ -87,6 +88,8 @@ const PATHS: Record<NavIconName, React.ReactNode> = {
       <path d="M14 10h2a2 2 0 0 1 2 2v5a1.5 1.5 0 0 0 3 0V8l-3-3" />
     </>
   ),
+  /* Обслуживание: гаечный ключ. */
+  maintenance: <path d="M14.7 6.3a4 4 0 0 0 5 5L21 13l-8 8a2.8 2.8 0 0 1-4-4l8-8-1.3-1.3a4 4 0 0 0-5-5L13 5z" />,
   done: <path d="m5 12 5 5L20 7" />,
   fleet: (
     <>

@@ -3319,6 +3319,138 @@ export type Database = {
           },
         ]
       }
+      maintenance_items: {
+        Row: {
+          company_id: string
+          created_at: string
+          id: string
+          interval_km: number | null
+          interval_months: number | null
+          kind: string
+          last_done_km: number | null
+          last_done_on: string | null
+          next_due_km: number | null
+          next_due_on: string | null
+          note: string | null
+          title: string | null
+          trailer_id: string | null
+          updated_at: string
+          vehicle_id: string | null
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          id?: string
+          interval_km?: number | null
+          interval_months?: number | null
+          kind: string
+          last_done_km?: number | null
+          last_done_on?: string | null
+          next_due_km?: number | null
+          next_due_on?: string | null
+          note?: string | null
+          title?: string | null
+          trailer_id?: string | null
+          updated_at?: string
+          vehicle_id?: string | null
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          id?: string
+          interval_km?: number | null
+          interval_months?: number | null
+          kind?: string
+          last_done_km?: number | null
+          last_done_on?: string | null
+          next_due_km?: number | null
+          next_due_on?: string | null
+          note?: string | null
+          title?: string | null
+          trailer_id?: string | null
+          updated_at?: string
+          vehicle_id?: string | null
+        }
+        Relationships: []
+      }
+      maintenance_records: {
+        Row: {
+          amount_cents: number | null
+          company_id: string
+          cost_id: string | null
+          created_at: string
+          created_by: string | null
+          currency: string | null
+          done_on: string
+          id: string
+          item_id: string | null
+          kind: string
+          note: string | null
+          odometer_km: number | null
+          title: string | null
+          trailer_id: string | null
+          vehicle_id: string | null
+          workshop: string | null
+        }
+        Insert: {
+          amount_cents?: number | null
+          company_id: string
+          cost_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string | null
+          done_on: string
+          id?: string
+          item_id?: string | null
+          kind: string
+          note?: string | null
+          odometer_km?: number | null
+          title?: string | null
+          trailer_id?: string | null
+          vehicle_id?: string | null
+          workshop?: string | null
+        }
+        Update: {
+          amount_cents?: number | null
+          company_id?: string
+          cost_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string | null
+          done_on?: string
+          id?: string
+          item_id?: string | null
+          kind?: string
+          note?: string | null
+          odometer_km?: number | null
+          title?: string | null
+          trailer_id?: string | null
+          vehicle_id?: string | null
+          workshop?: string | null
+        }
+        Relationships: []
+      }
+      maintenance_reminders: {
+        Row: {
+          due_key: string
+          item_id: string
+          sent_at: string
+          stage: string
+        }
+        Insert: {
+          due_key: string
+          item_id: string
+          sent_at?: string
+          stage: string
+        }
+        Update: {
+          due_key?: string
+          item_id?: string
+          sent_at?: string
+          stage?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           body: string | null
@@ -5923,6 +6055,69 @@ export type Database = {
           },
         ]
       }
+      vehicle_defects: {
+        Row: {
+          area: string
+          company_id: string
+          description: string
+          driver_id: string | null
+          event_id: string | null
+          id: string
+          odometer_km: number | null
+          photo_path: string | null
+          record_id: string | null
+          reported_at: string
+          reported_by: string | null
+          resolution_note: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: string
+          status: string
+          trailer_id: string | null
+          vehicle_id: string | null
+        }
+        Insert: {
+          area: string
+          company_id: string
+          description: string
+          driver_id?: string | null
+          event_id?: string | null
+          id?: string
+          odometer_km?: number | null
+          photo_path?: string | null
+          record_id?: string | null
+          reported_at?: string
+          reported_by?: string | null
+          resolution_note?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          status?: string
+          trailer_id?: string | null
+          vehicle_id?: string | null
+        }
+        Update: {
+          area?: string
+          company_id?: string
+          description?: string
+          driver_id?: string | null
+          event_id?: string | null
+          id?: string
+          odometer_km?: number | null
+          photo_path?: string | null
+          record_id?: string | null
+          reported_at?: string
+          reported_by?: string | null
+          resolution_note?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          status?: string
+          trailer_id?: string | null
+          vehicle_id?: string | null
+        }
+        Relationships: []
+      }
       vehicle_drivers: {
         Row: {
           assigned_by: string | null
@@ -8426,6 +8621,46 @@ export type Database = {
         }[]
       }
       driver_earnings: { Args: { p_from: string; p_to: string }; Returns: Json }
+      carrier_defect_resolve: {
+        Args: { p_id: string; p_note?: string; p_status: string }
+        Returns: undefined
+      }
+      carrier_maintenance_done: { Args: { p_data: Json }; Returns: string }
+      driver_defect_add: {
+        Args: { p_at?: string; p_data: Json; p_event_id?: string }
+        Returns: string
+      }
+      driver_maintenance_state: { Args: never; Returns: Json }
+      fleet_odometers: {
+        Args: never
+        Returns: {
+          km: number
+          vehicle_id: string
+        }[]
+      }
+      maintenance_due_candidates: {
+        Args: { p_days?: number; p_km?: number }
+        Returns: {
+          company_id: string
+          current_km: number
+          driver_id: string
+          item_id: string
+          kind: string
+          next_due_km: number
+          next_due_on: string
+          plate: string
+          title: string
+          trailer_id: string
+          vehicle_id: string
+        }[]
+      }
+      retention_defect_candidates: {
+        Args: { p_limit?: number }
+        Returns: {
+          id: string
+          storage_path: string
+        }[]
+      }
       driver_fuel_add: {
         Args: { p_at?: string; p_data: Json; p_event_id?: string }
         Returns: undefined
@@ -10601,6 +10836,7 @@ export type Database = {
         | "CLAIM"
         | "DRIVER"
         | "SECURITY"
+        | "FLEET"
       offer_origin: "DESK" | "DIRECT"
       order_status:
         | "DRAFT"
@@ -10869,6 +11105,7 @@ export const Constants = {
         "CLAIM",
         "DRIVER",
         "SECURITY",
+        "FLEET",
       ],
       offer_origin: ["DESK", "DIRECT"],
       order_status: [

@@ -7,6 +7,7 @@ import { getDriverI18n } from '@/lib/driverApp/i18n';
 import { FLASH_COOKIE, flashError } from '@/lib/forms/flash';
 import { isLocale, type Locale, defaultLocale } from '@/lib/i18n';
 import { cancelOrderAction } from '@/lib/orders/matching';
+import { notifyCarrierOfDefect } from '@/lib/maintenance/notifyDefect';
 import { refineEtaAfter } from '@/lib/orders/eta';
 import { recordVehicleCheck } from '@/lib/orders/vehicleCheckServer';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -342,6 +343,9 @@ export async function applyDriverEventAction(formData: FormData): Promise<EventR
     case 'FUEL':
       result = await addFuel(formData);
       break;
+    case 'DEFECT':
+      result = await addDefect(formData);
+      break;
     default:
       result = { status: 'rejected' };
   }
@@ -489,6 +493,72 @@ async function addFuel(formData: FormData): Promise<EventResult> {
   /* Убираем только файл, который положил этот запрос: чужой (прежний) чек не трогаем. */
   if (result.status === 'rejected' && receipt && created) await createAdminClient().storage.from('fuel-docs').remove([receipt]);
   return result;
+}
+
+/**
+ * Дефект машины или прицепа от водителя: фото (по желанию) в fleet-docs,
+ * строка — функцией базы под сессией водителя. Та же схема, что у
+ * заправки: файл без перезаписи, имя — идентификатор действия.
+ *
+ * Новый дефект сразу уходит перевозчику (кабинет и письмо): «ехать
+ * нельзя» нельзя откладывать до утренней сводки. Повтор из очереди база
+ * узнаёт и возвращает null — второго уведомления нет.
+ */
+async function addDefect(formData: FormData): Promise<EventResult> {
+  const eventId = str(formData, 'event_id');
+  if (!/^[0-9a-f-]{36}$/i.test(eventId)) return { status: 'rejected' };
+
+  let data: Record<string, unknown> = {};
+  try {
+    data = JSON.parse(str(formData, 'data') || '{}');
+  } catch {
+    return { status: 'rejected' };
+  }
+
+  const supabase = await createClient();
+  const file = formData.get('file');
+  let photo: string | null = null;
+  let created = false;
+
+  if (file instanceof File && file.size > 0) {
+    if (file.size > 10 * 1024 * 1024 || !PHOTO_TYPES.includes(file.type)) return { status: 'rejected' };
+    const { data: state, error: stateError } = await supabase.rpc('driver_maintenance_state');
+    if (stateError) return outcome(stateError);
+    const company = (state as { company_id?: string } | null)?.company_id;
+    if (!company) return { status: 'rejected' };
+
+    const ext = file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
+    photo = `${company}/defects/${eventId}.${ext}`;
+    const { error: uploadError } = await createAdminClient()
+      .storage.from('fleet-docs')
+      .upload(photo, file, { contentType: file.type, upsert: false });
+    if (uploadError) {
+      const exists = /exists|duplicate/i.test(uploadError.message) || (uploadError as { statusCode?: string }).statusCode === '409';
+      if (!exists) return { status: 'retry' };
+    } else {
+      created = true;
+    }
+  }
+
+  const { data: defectId, error } = await supabase.rpc('driver_defect_add', {
+    p_data: { ...data, photo_path: photo } as Json,
+    p_at: str(formData, 'pressed_at') || undefined,
+    p_event_id: eventId,
+  });
+
+  const result = outcome(error);
+  if (result.status === 'rejected' && photo && created) await createAdminClient().storage.from('fleet-docs').remove([photo]);
+  if (result.status === 'ok' && defectId) await notifyDefect(defectId);
+  return result;
+}
+
+/** Уведомление перевозчику о новом дефекте. Сбой письма не отменяет дефект: он уже в базе и виден в кабинете. */
+async function notifyDefect(defectId: string): Promise<void> {
+  try {
+    await notifyCarrierOfDefect(defectId);
+  } catch (error) {
+    console.error('уведомление о дефекте не ушло:', error instanceof Error ? error.message : error);
+  }
 }
 
 /* ── Push-уведомления ───────────────────────────────────────────── */

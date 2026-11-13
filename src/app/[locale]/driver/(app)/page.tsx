@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { cn } from '@/lib/cn';
 import { addressWithCity } from '@/lib/orders/stopTime';
 import { notFound } from 'next/navigation';
 import { acceptTaskAction } from '@/lib/driverApp/actions';
@@ -76,7 +77,9 @@ export default async function DriverHome({
       */}
       <div className="grid grid-cols-2 gap-3">
         <QuickTile href={`/${locale}/driver/fuel`} icon={<FuelIcon />} label={t.fuelDriver.entry} />
-        <QuickTile href={`/${locale}/driver/training`} icon={<GaugeIcon />} label={t.training.title} />
+        {/* Дефект машины — у машины, одной кнопкой: перевозчик узнаёт сразу, а не на следующей смене. */}
+        <QuickTile href={`/${locale}/driver/defect`} icon={<WrenchIcon />} label={t.defectDriver.entry} />
+        <QuickTile href={`/${locale}/driver/training`} icon={<GaugeIcon />} label={t.training.title} className="col-span-2" />
       </div>
 
       <TaskTabs showDone={showDone} />
@@ -215,15 +218,24 @@ async function SiteJobCard({ job, locale }: { job: SiteState['jobs'][number]; lo
 }
 
 /** Плитка быстрого действия: значок и подпись, во всю высоту под палец. */
-function QuickTile({ href, icon, label }: { href: string; icon: React.ReactNode; label: string }) {
+function QuickTile({ href, icon, label, className }: { href: string; icon: React.ReactNode; label: string; className?: string }) {
   return (
     <Link
       href={href}
-      className="flex min-h-20 flex-col items-start justify-between gap-2 rounded-card border border-line bg-surface px-4 py-3"
+      className={cn('flex min-h-20 flex-col items-start justify-between gap-2 rounded-card border border-line bg-surface px-4 py-3', className)}
     >
       <span className="flex size-10 items-center justify-center rounded-control bg-accent-wash text-accent">{icon}</span>
       <span className="text-[16px] leading-tight font-semibold">{label}</span>
     </Link>
+  );
+}
+
+/** Дефект и обслуживание: гаечный ключ. */
+function WrenchIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden className="size-6">
+      <path d="M14.7 6.3a4 4 0 0 0 5 5L21 13l-8 8a2.8 2.8 0 0 1-4-4l8-8-1.3-1.3a4 4 0 0 0-5-5L13 5z" />
+    </svg>
   );
 }
 
