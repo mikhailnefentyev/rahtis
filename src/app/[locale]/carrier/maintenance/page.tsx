@@ -44,7 +44,7 @@ export default async function MaintenancePage({ params }: { params: Promise<{ lo
   const overdue = urgent.filter((i) => i.status.state === 'OVERDUE').length;
   const unsafe = data.defects.filter((d) => d.severity === 'UNSAFE').length;
   const plateOf = new Map(data.assets.map((a) => [a.id, a.plate]));
-  const outNow = new Set(data.downtime.filter((d) => d.current).map((d) => d.vehicle_id)).size;
+  const outNow = new Set(data.downtime.filter((d) => d.current).map((d) => d.vehicle_id ?? d.trailer_id)).size;
 
   return (
     <main className="cab-page">
@@ -75,7 +75,7 @@ export default async function MaintenancePage({ params }: { params: Promise<{ lo
               <h2 className="mb-3 border-b border-line pb-2 text-[13px] font-semibold tracking-tight text-ink-faint">{s.downtime.title}</h2>
               <div className="grid gap-3 lg:grid-cols-2">
                 {data.downtime.map((d) => (
-                  <DowntimeCard key={d.id} downtime={d} plate={plateOf.get(d.vehicle_id) ?? '—'} />
+                  <DowntimeCard key={d.id} downtime={d} plate={plateOf.get(d.vehicle_id ?? d.trailer_id ?? '') ?? '—'} />
                 ))}
               </div>
             </section>

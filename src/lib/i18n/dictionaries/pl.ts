@@ -5247,6 +5247,11 @@ export const pl = {
       untilResolved: 'do odwołania',
       dueWas: 'termin badania upłynął',
       effect: 'Pojazd nie jest oferowany na Giełdzie ładunków i nie można go wybrać do zleceń bezpośrednich ani własnych przewozów.',
+      effectFrom: 'Od pierwszego dnia pojazd nie jest oferowany do zleceń.',
+      effectDates: 'Zleceń przypadających na te dni nie można przyjąć tym pojazdem. W pozostałe dni pojazd jest dostępny.',
+      ordersTitle: 'Zlecenia w te dni',
+      ordersHint: 'Zlecenia nie są przenoszone automatycznie. Zmień pojazd albo uzgodnij zlecenie z klientem.',
+      orderConflict: 'Pojazd lub przyczepa jest poza eksploatacją w dniach tego zlecenia (serwis lub usterka). Wybierz inny pojazd albo przywróć go do eksploatacji na stronie „Serwis”.',
       lift: 'Przywróć do eksploatacji',
       liftConfirm: 'Przywróć do eksploatacji teraz',
       cancel: 'Anuluj serwis',
@@ -5289,6 +5294,7 @@ export const pl = {
     'maintenance.defectUnsafeTitle': '{plate}: NIE JECHAĆ – {area}',
     'maintenance.deskOut': 'Poza eksploatacją, nieoferowane do zleceń: {plates}.',
     'maintenance.inspectionBlockedTitle': '{plates}: badanie techniczne po terminie – pojazd poza eksploatacją',
+    'maintenance.downtimeOrders': 'Zlecenia w te dni: {refs}',
     'driverEvent.maintenance.due':
       '{plate}: {kind, select, SERVICE {przegląd serwisowy} INSPECTION {badanie techniczne} TACHOGRAPH {legalizacja tachografu} TYRES {opony} BRAKES {kontrola hamulców} AC {serwis klimatyzacji} REEFER {serwis agregatu chłodniczego} LIFT {przegląd żurawia} ADR {świadectwo ADR} FIRE {przegląd gaśnic} other {{title}}} – zbliża się termin: {when}',
     'driverEvent.maintenance.overdue':

@@ -18,6 +18,10 @@ export type VehicleDefect = Database['public']['Tables']['vehicle_defects']['Row
 export type Downtime = Database['public']['Tables']['vehicle_downtime']['Row'] & {
   /** Действует сегодня (а не запланирован на будущие даты). */
   current: boolean;
+  /** Бессрочно (дефект, katsastus, сервис без конца) — снимает с рейсов целиком; с датами — только заказы на эти дни. */
+  blocking: boolean;
+  /** Рейсы машины или прицепа, уже назначенные на эти дни. */
+  orders: { order_id: string; ref: string; first_day: string }[];
 };
 
 export type Asset = {
@@ -88,9 +92,16 @@ export async function loadFleetMaintenance(
         .order('starts_on'),
     ]);
 
-  const downtime: Downtime[] = (downtimeRows ?? [])
-    .filter((d) => !d.ends_on || d.ends_on >= input.today)
-    .map((d) => ({ ...d, current: d.starts_on <= input.today }));
+  const openDowntime = (downtimeRows ?? []).filter((d) => !d.ends_on || d.ends_on >= input.today);
+  const { data: affected } = openDowntime.length ? await supabase.rpc('fleet_downtime_orders') : { data: [] };
+  const downtime: Downtime[] = openDowntime.map((d) => ({
+    ...d,
+    current: d.starts_on <= input.today,
+    blocking: !d.ends_on,
+    orders: (affected ?? [])
+      .filter((o) => o.downtime_id === d.id)
+      .map((o) => ({ order_id: o.order_id, ref: o.ref, first_day: o.first_day })),
+  }));
 
   const km = new Map((odometers ?? []).map((row) => [row.vehicle_id, row.km ?? null]));
   const assets: Asset[] = [
@@ -136,7 +147,7 @@ export async function loadFleetMaintenance(
       items: own.length,
       openDefects: open.length,
       unsafe: open.some((d) => d.severity === 'UNSAFE'),
-      outOfService: asset.type === 'VEHICLE' ? (downtime.find((d) => d.current && d.vehicle_id === asset.id) ?? null) : null,
+      outOfService: downtime.find((d) => d.current && (d.vehicle_id ?? d.trailer_id) === asset.id) ?? null,
     });
   }
 

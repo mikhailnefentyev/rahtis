@@ -1,5 +1,6 @@
 'use server';
 
+import { isDowntimeConflict } from '@/lib/maintenance/conflict';
 import { dispatchPublishedOrder, notifyDirectOrder, wasPublished } from '@/lib/orders/dispatch';
 import { revalidateOrder } from '@/lib/orders/revalidate';
 import { getViewer } from '@/lib/auth/viewer';
@@ -50,6 +51,8 @@ async function explain(locale: Locale, code: string | undefined, message: string
    * код по той же причине: перевозчику нужно понять, что дело в машине,
    * а не в занятом заказе, и выбрать другую.
    */
+  /* «Вне работы» приходит тем же 55003 — узнаём по тексту: машина в сервисе или с дефектом, а не «не тот кузов». */
+  if (code === '55003' && isDowntimeConflict({ message })) return t.maintenance.downtime.orderConflict;
   if (code === '55003') return t.matching.wrongClass;
   /* 55005 — окно группы машин заказчика ещё открыто (take_order). */
   if (code === '55005') return t.direct.groupOnly;
@@ -246,6 +249,8 @@ export async function directAssignAction(
           ? t.direct.notKnown
           : error.code === '55004'
             ? t.direct.unavailable
+            : isDowntimeConflict(error)
+              ? t.maintenance.downtime.orderConflict
             : error.code === '55001' || error.code === '55002' || error.code === '55003'
               ? t.direct.notFit
               : error.code === '55000'

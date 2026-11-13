@@ -1,5 +1,6 @@
 'use server';
 
+import { isDowntimeConflict } from '@/lib/maintenance/conflict';
 import { perKmTotal } from './routePricing';
 import { flashError } from '@/lib/forms/flash';
 
@@ -279,6 +280,7 @@ function explainPublish(t: Dictionary, code: string | undefined, message: string
   if (code === '55000' && message?.includes('реквизиты')) return t.orderForm.needActive;
   if (code === '42501') return t.direct.notKnown;
   if (code === '55004') return t.direct.unavailable;
+  if (code === '55003' && isDowntimeConflict({ message })) return t.maintenance.downtime.orderConflict;
   if (code === '55001' || code === '55002' || code === '55003') return t.direct.notFit;
   if (code === '55000') return t.orderForm.needActive;
   if (code === '22023' && message?.includes('групп')) return t.direct.groupPickTwo;
@@ -653,7 +655,14 @@ export async function ownOrderAction(_previous: PublishState, formData: FormData
   const trailerId = str(formData, 'own_trailer_id');
   if (trailerId) {
     const { error: trailerError } = await supabase.rpc('carrier_set_trip_trailer', { p_order_id: data.id, p_trailer_id: trailerId });
-    if (trailerError) await flashError(trailerError.code === '55003' ? t.matching.wrongClass : t.error.generic);
+    if (trailerError)
+      await flashError(
+        isDowntimeConflict(trailerError)
+          ? t.maintenance.downtime.orderConflict
+          : trailerError.code === '55003'
+            ? t.matching.wrongClass
+            : t.error.generic,
+      );
   }
 
   if (data.track_token) await sendOwnTrack(data.id, data.ref, data.track_token, viewer.company.id);

@@ -6237,7 +6237,8 @@ export type Database = {
           note: string | null
           reason: string
           starts_on: string
-          vehicle_id: string
+          trailer_id: string | null
+          vehicle_id: string | null
         }
         Insert: {
           company_id: string
@@ -6255,7 +6256,8 @@ export type Database = {
           note?: string | null
           reason: string
           starts_on?: string
-          vehicle_id: string
+          trailer_id?: string | null
+          vehicle_id: string | null
         }
         Update: {
           company_id?: string
@@ -6273,7 +6275,8 @@ export type Database = {
           note?: string | null
           reason?: string
           starts_on?: string
-          vehicle_id?: string
+          trailer_id?: string | null
+          vehicle_id?: string | null
         }
         Relationships: [
           {
@@ -8817,6 +8820,14 @@ export type Database = {
           last_country: string
         }[]
       }
+      downtime_orders_of: {
+        Args: { p_downtime_id: string }
+        Returns: {
+          first_day: string
+          order_id: string
+          ref: string
+        }[]
+      }
       driver_defect_add: {
         Args: { p_at?: string; p_data: Json; p_event_id?: string }
         Returns: string
@@ -9025,6 +9036,16 @@ export type Database = {
           free_local: string
           source: string
           vehicle_id: string
+        }[]
+      }
+      fleet_downtime_orders: {
+        Args: never
+        Returns: {
+          downtime_id: string
+          first_day: string
+          order_id: string
+          ref: string
+          status: Database["public"]["Enums"]["order_status"]
         }[]
       }
       fleet_odometers: {

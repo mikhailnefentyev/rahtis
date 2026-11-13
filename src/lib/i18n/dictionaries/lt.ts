@@ -5250,6 +5250,11 @@ export const lt = {
       untilResolved: 'neribotam laikui',
       dueWas: 'apžiūros terminas buvo',
       effect: 'Automobilis nesiūlomas Krovinių biržoje, jo negalima pasirinkti tiesioginiams užsakymams ar saviems reisams.',
+      effectFrom: 'Nuo pirmosios dienos automobilis nesiūlomas pervežimams.',
+      effectDates: 'Šiomis dienomis vykdomų pervežimų su šiuo automobiliu priimti negalima. Kitomis dienomis automobilį galima naudoti.',
+      ordersTitle: 'Pervežimai šiomis dienomis',
+      ordersHint: 'Pervežimai automatiškai neperkeliami. Pakeiskite automobilį arba dėl pervežimo susitarkite su užsakovu.',
+      orderConflict: 'Pervežimo dienomis automobilis arba priekaba neeksploatuojami (servisas arba gedimas). Pasirinkite kitą automobilį arba grąžinkite jį į eksploataciją puslapyje „Priežiūra“.',
       lift: 'Grąžinti į eksploataciją',
       liftConfirm: 'Grąžinti į eksploataciją dabar',
       cancel: 'Atšaukti servisą',
@@ -5292,6 +5297,7 @@ export const lt = {
     'maintenance.defectUnsafeTitle': '{plate}: VAŽIUOTI NEGALIMA – {area}',
     'maintenance.deskOut': 'Neeksploatuojami, nesiūlomi pervežimams: {plates}.',
     'maintenance.inspectionBlockedTitle': '{plates}: pavėluota techninė apžiūra – automobilis išimtas iš eksploatacijos',
+    'maintenance.downtimeOrders': 'Pervežimai šiomis dienomis: {refs}',
     'driverEvent.maintenance.due':
       '{plate}: {kind, select, SERVICE {planinis aptarnavimas} INSPECTION {techninė apžiūra} TACHOGRAPH {tachografo patikra} TYRES {padangos} BRAKES {stabdžių patikra} AC {kondicionieriaus aptarnavimas} REEFER {šaldymo agregato aptarnavimas} LIFT {krano patikra} ADR {ADR patvirtinimas} FIRE {gesintuvų patikra} other {{title}}} – artėja terminas: {when}',
     'driverEvent.maintenance.overdue':

@@ -5208,6 +5208,11 @@ export const et = {
       untilResolved: 'kuni edasiseni',
       dueWas: 'ülevaatuse tähtaeg oli',
       effect: 'Autot ei pakuta veobörsil ja seda ei saa valida otsetellimusteks ega omadeks vedudeks.',
+      effectFrom: 'Alates esimesest päevast autot vedudeks ei pakuta.',
+      effectDates: 'Nendele päevadele jäävaid vedusid ei saa selle autoga võtta. Teistel päevadel on auto kasutatav.',
+      ordersTitle: 'Veod nendel päevadel',
+      ordersHint: 'Vedusid ei tõsteta automaatselt ümber. Vahetage auto või leppige veo osas tellijaga kokku.',
+      orderConflict: 'Auto või haagis on veo päevadel kasutusest väljas (hooldus või rike). Valige teine auto või võtke see lehel Hooldus uuesti kasutusele.',
       lift: 'Võta uuesti kasutusele',
       liftConfirm: 'Võta kohe kasutusele',
       cancel: 'Tühista hooldus',
@@ -5250,6 +5255,7 @@ export const et = {
     'maintenance.defectUnsafeTitle': '{plate}: SÕITA EI TOHI – {area}',
     'maintenance.deskOut': 'Kasutusest väljas, vedudeks ei pakuta: {plates}.',
     'maintenance.inspectionBlockedTitle': '{plates}: tehnoülevaatus üle tähtaja – auto kasutusest väljas',
+    'maintenance.downtimeOrders': 'Veod nendel päevadel: {refs}',
     'driverEvent.maintenance.due':
       '{plate}: {kind, select, SERVICE {korraline hooldus} INSPECTION {tehnoülevaatus} TACHOGRAPH {sõidumeeriku kontroll} TYRES {rehvid} BRAKES {pidurite kontroll} AC {kliimaseadme hooldus} REEFER {külmaagregaadi hooldus} LIFT {kraana kontroll} ADR {ADR-heakskiit} FIRE {tulekustutite kontroll} other {{title}}} – tähtaeg läheneb, {when}',
     'driverEvent.maintenance.overdue':

@@ -5222,6 +5222,11 @@ export const sv = {
       untilResolved: 'tills vidare',
       dueWas: 'besiktningen förföll',
       effect: 'Fordonet erbjuds inte i lastbörsen och kan inte väljas för direktorder eller egna uppdrag.',
+      effectFrom: 'Från första dagen erbjuds fordonet inte för uppdrag.',
+      effectDates: 'Uppdrag som infaller dessa dagar kan inte tas med det här fordonet. Övriga dagar är fordonet tillgängligt.',
+      ordersTitle: 'Uppdrag dessa dagar',
+      ordersHint: 'Uppdrag flyttas inte automatiskt. Byt fordon eller kom överens om uppdraget med kunden.',
+      orderConflict: 'Fordonet eller släpet är ur drift under uppdragets dagar (service eller fel). Välj ett annat fordon eller ta det i drift igen på sidan Underhåll.',
       lift: 'Ta i drift igen',
       liftConfirm: 'Ta i drift nu',
       cancel: 'Avbryt service',
@@ -5264,6 +5269,7 @@ export const sv = {
     'maintenance.defectUnsafeTitle': '{plate}: FÅR INTE KÖRAS – {area}',
     'maintenance.deskOut': 'Ur drift, erbjuds inte för uppdrag: {plates}.',
     'maintenance.inspectionBlockedTitle': '{plates}: besiktning försenad – fordonet ur drift',
+    'maintenance.downtimeOrders': 'Uppdrag dessa dagar: {refs}',
     'driverEvent.maintenance.due':
       '{plate}: {kind, select, SERVICE {service} INSPECTION {besiktning} TACHOGRAPH {färdskrivarkontroll} TYRES {däck} BRAKES {bromskontroll} AC {AC-service} REEFER {service av kylaggregat} LIFT {kontroll av kran} ADR {ADR-godkännande} FIRE {kontroll av brandsläckare} other {{title}}} närmar sig – {when}',
     'driverEvent.maintenance.overdue':

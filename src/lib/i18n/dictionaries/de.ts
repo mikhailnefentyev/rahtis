@@ -5248,6 +5248,11 @@ export const de = {
       untilResolved: 'bis auf Weiteres',
       dueWas: 'HU war fällig',
       effect: 'Das Fahrzeug wird in der Frachtenbörse nicht angeboten und kann nicht für Direktaufträge oder eigene Aufträge gewählt werden.',
+      effectFrom: 'Ab dem ersten Tag wird das Fahrzeug nicht für Aufträge angeboten.',
+      effectDates: 'Aufträge an diesen Tagen können mit diesem Fahrzeug nicht übernommen werden. An den übrigen Tagen ist das Fahrzeug verfügbar.',
+      ordersTitle: 'Aufträge an diesen Tagen',
+      ordersHint: 'Aufträge werden nicht automatisch umgeplant. Wechseln Sie das Fahrzeug oder stimmen Sie den Auftrag mit dem Auftraggeber ab.',
+      orderConflict: 'Das Fahrzeug oder der Anhänger ist an den Tagen dieses Auftrags außer Betrieb (Wartung oder Mangel). Wählen Sie ein anderes Fahrzeug oder nehmen Sie es auf der Seite Wartung wieder in Betrieb.',
       lift: 'Wieder in Betrieb nehmen',
       liftConfirm: 'Jetzt wieder in Betrieb nehmen',
       cancel: 'Wartung abbrechen',
@@ -5290,6 +5295,7 @@ export const de = {
     'maintenance.defectUnsafeTitle': '{plate}: NICHT FAHRBEREIT – {area}',
     'maintenance.deskOut': 'Außer Betrieb, nicht für Aufträge angeboten: {plates}.',
     'maintenance.inspectionBlockedTitle': '{plates}: HU überfällig – Fahrzeug außer Betrieb',
+    'maintenance.downtimeOrders': 'Aufträge an diesen Tagen: {refs}',
     'driverEvent.maintenance.due':
       '{plate}: {kind, select, SERVICE {Inspektion} INSPECTION {Hauptuntersuchung} TACHOGRAPH {Tachographenprüfung} TYRES {Reifen} BRAKES {Bremsenprüfung} AC {Klimaservice} REEFER {Wartung Kühlaggregat} LIFT {Kranprüfung} ADR {ADR-Zulassung} FIRE {Feuerlöscherprüfung} other {{title}}} bald fällig – {when}',
     'driverEvent.maintenance.overdue':

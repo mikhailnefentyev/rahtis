@@ -5535,6 +5535,11 @@ export const fi = {
       untilResolved: 'toistaiseksi',
       dueWas: 'katsastus erääntyi',
       effect: 'Autoa ei tarjota keikkapöydällä, eikä sitä voi valita suoriin tai omiin keikkoihin.',
+      effectFrom: 'Alkupäivästä alkaen autoa ei tarjota keikoille.',
+      effectDates: 'Näille päiville osuvia keikkoja ei voi ottaa tälle autolle. Muina päivinä auto on käytettävissä.',
+      ordersTitle: 'Keikat näinä päivinä',
+      ordersHint: 'Keikkoja ei siirretä automaattisesti. Vaihda auto tai sovi keikasta tilaajan kanssa.',
+      orderConflict: 'Auto tai perävaunu on pois ajosta keikan päivinä (huolto tai vika). Valitse toinen auto tai palauta se ajoon Huolto-sivulla.',
       lift: 'Palauta ajoon',
       liftConfirm: 'Palauta ajoon nyt',
       cancel: 'Peru huolto',
@@ -5577,6 +5582,7 @@ export const fi = {
     'maintenance.defectUnsafeTitle': '{plate}: EI SAA AJAA – {area}',
     'maintenance.deskOut': 'Pois ajosta, ei tarjota keikoille: {plates}.',
     'maintenance.inspectionBlockedTitle': '{plates}: katsastus myöhässä – auto pois ajosta',
+    'maintenance.downtimeOrders': 'Keikat näinä päivinä: {refs}',
     'driverEvent.maintenance.due':
       '{plate}: {kind, select, SERVICE {määräaikaishuolto} INSPECTION {katsastus} TACHOGRAPH {ajopiirturin tarkastus} TYRES {renkaat} BRAKES {jarrujen tarkastus} AC {ilmastointihuolto} REEFER {kylmäkoneen huolto} LIFT {nosturin tarkastus} ADR {ADR-hyväksyntä} FIRE {sammuttimien tarkastus} other {{title}}} lähestyy – {when}',
     'driverEvent.maintenance.overdue':

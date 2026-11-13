@@ -265,15 +265,18 @@ export async function scheduleServiceAction(_prev: MaintenanceFormState, formDat
   const viewer = await requireRole(locale, 'CARRIER');
 
   const vehicleId = str(formData, 'vehicle_id');
+  const trailerId = str(formData, 'trailer_id');
+  const isTrailer = UUID.test(trailerId);
   const startsOn = date(str(formData, 'starts_on'));
   const endsOn = date(str(formData, 'ends_on'));
-  if (!UUID.test(vehicleId) || !startsOn) return { error: t.errDate, done: false };
+  if ((!isTrailer && !UUID.test(vehicleId)) || !startsOn) return { error: t.errDate, done: false };
   if (endsOn && endsOn < startsOn) return { error: t.downtime.errDates, done: false };
 
   const supabase = await createClient();
   const { error } = await supabase.from('vehicle_downtime').insert({
     company_id: viewer.company!.id,
-    vehicle_id: vehicleId,
+    vehicle_id: isTrailer ? null : vehicleId,
+    trailer_id: isTrailer ? trailerId : null,
     reason: 'SERVICE',
     starts_on: startsOn,
     ends_on: endsOn,

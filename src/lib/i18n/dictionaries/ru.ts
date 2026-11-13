@@ -5247,6 +5247,11 @@ export const ru = {
       untilResolved: 'бессрочно',
       dueWas: 'срок техосмотра был',
       effect: 'Машина не предлагается на бирже грузов, и её нельзя выбрать для прямых заказов или своих рейсов.',
+      effectFrom: 'С первого дня машина не предлагается для заказов.',
+      effectDates: 'Заказы, приходящиеся на эти дни, нельзя взять на эту машину. В остальные дни машина доступна.',
+      ordersTitle: 'Заказы в эти дни',
+      ordersHint: 'Заказы не переносятся автоматически. Замените машину или договоритесь о заказе с заказчиком.',
+      orderConflict: 'Машина или прицеп вне работы в дни этого заказа (сервис или дефект). Выберите другую машину или верните её в работу на странице ТО.',
       lift: 'Вернуть в работу',
       liftConfirm: 'Вернуть в работу сейчас',
       cancel: 'Отменить сервис',
@@ -5289,6 +5294,7 @@ export const ru = {
     'maintenance.defectUnsafeTitle': '{plate}: ЕХАТЬ НЕЛЬЗЯ — {area}',
     'maintenance.deskOut': 'Вне работы, не предлагаются для заказов: {plates}.',
     'maintenance.inspectionBlockedTitle': '{plates}: техосмотр просрочен — машина вне работы',
+    'maintenance.downtimeOrders': 'Заказы в эти дни: {refs}',
     'driverEvent.maintenance.due':
       '{plate}: {kind, select, SERVICE {плановое ТО} INSPECTION {техосмотр} TACHOGRAPH {проверка тахографа} TYRES {шины} BRAKES {проверка тормозов} AC {обслуживание кондиционера} REEFER {ТО рефрижераторной установки} LIFT {проверка крана} ADR {допуск ADR} FIRE {проверка огнетушителей} other {{title}}} — подходит срок: {when}',
     'driverEvent.maintenance.overdue':

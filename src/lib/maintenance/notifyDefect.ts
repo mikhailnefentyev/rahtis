@@ -44,6 +44,16 @@ export async function notifyCarrierOfDefect(defectId: string): Promise<void> {
   const who = driver?.full_name ?? '—';
   const link = `/carrier/maintenance/${assetId}`;
 
+  /* Рейсы, уже назначенные на машину или прицеп, — перевозчику решать, менять ли машину. */
+  let affected: { ref: string; first_day: string }[] = [];
+  if (unsafe) {
+    const { data: block } = await admin.from('vehicle_downtime').select('id').eq('defect_id', defect.id).is('ended_at', null).maybeSingle();
+    if (block) affected = (await admin.rpc('downtime_orders_of', { p_downtime_id: block.id })).data ?? [];
+  }
+  const ordersLine = affected.length
+    ? m('maintenance.downtimeOrders', { refs: affected.map((o) => `${o.ref} (${f.date(`${o.first_day}T12:00:00Z`)})`).join(', ') })
+    : null;
+
   const mail = emailText(locale);
   const blocks: EmailBlock[] = [
     { kind: 'text', value: mail.greeting },
@@ -58,15 +68,15 @@ export async function notifyCarrierOfDefect(defectId: string): Promise<void> {
     },
     { kind: 'button', label: s.defects.open, href: `${siteUrl()}/${locale}${link}` },
     /* Дефект «ехать нельзя» на машине сам снимает её с рейсов (vehicle_downtime). */
-    ...(unsafe && defect.vehicle_id ? [{ kind: 'note' as const, value: s.downtime.defectBlockedNote }] : []),
+    ...(unsafe ? [{ kind: 'note' as const, value: s.downtime.defectBlockedNote }] : []),
+    ...(ordersLine ? [{ kind: 'text' as const, value: ordersLine }] : []),
   ];
 
   await notify({
     companyId: company.id,
     kind: 'FLEET',
     title,
-    body: `${who}: ${defect.description}${unsafe && defect.vehicle_id ? `
-${s.downtime.defectBlockedNote}` : ''}`.slice(0, 1000),
+    body: [`${who}: ${defect.description}`, unsafe ? s.downtime.defectBlockedNote : null, ordersLine].filter(Boolean).join('\n').slice(0, 1000),
     link,
     email: company.contact_email
       ? {

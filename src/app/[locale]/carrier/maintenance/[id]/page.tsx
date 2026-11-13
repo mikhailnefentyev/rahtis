@@ -60,7 +60,7 @@ export default async function AssetMaintenancePage({ params }: { params: Promise
   const openDefects = data.defects.filter((d) => d.status === 'OPEN');
   const closedDefects = data.defects.filter((d) => d.status !== 'OPEN');
   const trailer = asset.type === 'TRAILER';
-  const downtime = data.downtime.filter((d) => d.vehicle_id === id);
+  const downtime = data.downtime.filter((d) => (d.vehicle_id ?? d.trailer_id) === id);
 
   return (
     <main className="cab-page">

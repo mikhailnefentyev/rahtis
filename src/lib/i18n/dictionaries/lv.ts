@@ -5248,6 +5248,11 @@ export const lv = {
       untilResolved: 'uz nenoteiktu laiku',
       dueWas: 'apskates termiņš bija',
       effect: 'Automašīna netiek piedāvāta Kravu biržā, un to nevar izvēlēties tiešajiem pasūtījumiem vai saviem reisiem.',
+      effectFrom: 'No pirmās dienas automašīna netiek piedāvāta pārvadājumiem.',
+      effectDates: 'Pārvadājumus, kas iekrīt šajās dienās, ar šo automašīnu nevar uzņemties. Citās dienās automašīna ir pieejama.',
+      ordersTitle: 'Pārvadājumi šajās dienās',
+      ordersHint: 'Pārvadājumi netiek pārcelti automātiski. Nomainiet automašīnu vai vienojieties par pārvadājumu ar pasūtītāju.',
+      orderConflict: 'Automašīna vai piekabe pārvadājuma dienās nav ekspluatācijā (serviss vai defekts). Izvēlieties citu automašīnu vai atgrieziet to ekspluatācijā lapā “Apkope”.',
       lift: 'Atgriezt ekspluatācijā',
       liftConfirm: 'Atgriezt ekspluatācijā tagad',
       cancel: 'Atcelt servisu',
@@ -5290,6 +5295,7 @@ export const lv = {
     'maintenance.defectUnsafeTitle': '{plate}: NEDRĪKST BRAUKT – {area}',
     'maintenance.deskOut': 'Nav ekspluatācijā, netiek piedāvātas pārvadājumiem: {plates}.',
     'maintenance.inspectionBlockedTitle': '{plates}: nokavēta tehniskā apskate – automašīna nav ekspluatācijā',
+    'maintenance.downtimeOrders': 'Pārvadājumi šajās dienās: {refs}',
     'driverEvent.maintenance.due':
       '{plate}: {kind, select, SERVICE {kārtējā apkope} INSPECTION {tehniskā apskate} TACHOGRAPH {tahogrāfa pārbaude} TYRES {riepas} BRAKES {bremžu pārbaude} AC {kondicioniera apkope} REEFER {saldēšanas agregāta apkope} LIFT {krāna pārbaude} ADR {ADR apstiprinājums} FIRE {ugunsdzēsības aparātu pārbaude} other {{title}}} – termiņš tuvojas: {when}',
     'driverEvent.maintenance.overdue':

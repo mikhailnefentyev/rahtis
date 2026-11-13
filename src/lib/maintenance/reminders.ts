@@ -174,12 +174,20 @@ async function blockOverdueInspections(): Promise<{ count: number; errors: strin
     const [{ f, m }, t] = await Promise.all([getI18n(locale), getDictionary(locale)]);
     const s = t.maintenance.downtime;
     const plates = own.map((r) => r.plate).join(', ');
+    /* Рейсы этих машин, уже назначенные с сегодняшнего дня, — сами не снимаются. */
+    const affected = (
+      await Promise.all(own.map(async (r) => (await admin.rpc('downtime_orders_of', { p_downtime_id: r.downtime_id })).data ?? []))
+    ).flat();
+    const ordersLine = affected.length
+      ? m('maintenance.downtimeOrders', { refs: affected.map((o) => `${o.ref} (${f.date(`${o.first_day}T12:00:00Z`)})`).join(', ') })
+      : null;
     const title = m('maintenance.inspectionBlockedTitle', { plates });
     const mail = emailText(locale);
     const blocks: EmailBlock[] = [
       { kind: 'text', value: mail.greeting },
       { kind: 'text', value: s.inspectionBlockedLead },
       { kind: 'facts', rows: own.map((r) => [r.plate, `${s.dueWas} ${f.date(`${r.due_on}T12:00:00Z`)}`] as [string, string]) },
+      ...(ordersLine ? [{ kind: 'text' as const, value: ordersLine }] : []),
       { kind: 'button', label: t.maintenance.reminderButton, href: `${siteUrl()}/${locale}/carrier/maintenance` },
       { kind: 'note', value: s.inspectionBlockedNote },
     ];
@@ -187,7 +195,7 @@ async function blockOverdueInspections(): Promise<{ count: number; errors: strin
       companyId: company.id,
       kind: 'FLEET',
       title,
-      body: s.inspectionBlockedLead,
+      body: [s.inspectionBlockedLead, ordersLine].filter(Boolean).join('\n'),
       link: '/carrier/maintenance',
       email: company.contact_email
         ? {

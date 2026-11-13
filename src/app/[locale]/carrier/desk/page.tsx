@@ -256,25 +256,28 @@ export default async function DeskPage({
    */
   const { data: outRows } = await supabase
     .from('vehicle_downtime')
-    .select('vehicle_id, starts_on, ends_on')
+    .select('vehicle_id, trailer_id, starts_on, ends_on')
     .eq('company_id', company.id)
     .is('ended_at', null);
   const todayHel = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Helsinki' }).format(new Date());
+  /* Целиком вне работы — только бессрочно; сервис по датам закрывает лишь заказы на эти дни (база отвечает при отклике). */
+  const blockingNow = (outRows ?? []).filter((d) => d.starts_on <= todayHel && !d.ends_on);
   const outPlates = [
     ...new Set(
-      (outRows ?? [])
-        .filter((d) => d.starts_on <= todayHel && (!d.ends_on || d.ends_on >= todayHel))
+      blockingNow
         .map((d) => (vehicles ?? []).find((v) => v.id === d.vehicle_id)?.plate)
         .filter((p): p is string => Boolean(p)),
     ),
   ];
+  const blockedTrailers = new Set(blockingNow.map((d) => d.trailer_id).filter(Boolean));
   /* Сцепки из конструктора — только с машинами, которые выходят на рейсы. */
   const { data: comboRows } = await supabase
     .from('vehicle_combos')
-    .select('id, vehicle_id, kind, name')
+    .select('id, vehicle_id, trailer_id, kind, name')
     .eq('company_id', company.id)
     .order('created_at', { ascending: true });
-  const deskCombos = (comboRows ?? []).filter((c) => ready.has(c.vehicle_id));
+  /* Сцепка с прицепом вне работы (дефект «ехать нельзя», бессрочный сервис) стол не предлагает. */
+  const deskCombos = (comboRows ?? []).filter((c) => ready.has(c.vehicle_id) && !(c.trailer_id && blockedTrailers.has(c.trailer_id)));
 
   /*
    * «Беру одним нажатием»: лучшая своя машина у каждого заказа. Нет функции

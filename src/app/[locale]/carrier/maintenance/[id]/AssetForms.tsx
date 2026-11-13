@@ -131,11 +131,9 @@ export function AssetActions({
         <Button size="sm" variant={mode === 'defect' ? 'primary' : 'default'} onClick={() => setMode(mode === 'defect' ? 'none' : 'defect')}>
           {s.defects.report}
         </Button>
-        {asset.type === 'VEHICLE' && (
-          <Button size="sm" variant={mode === 'service' ? 'primary' : 'default'} onClick={() => setMode(mode === 'service' ? 'none' : 'service')}>
-            {s.downtime.button}
-          </Button>
-        )}
+        <Button size="sm" variant={mode === 'service' ? 'primary' : 'default'} onClick={() => setMode(mode === 'service' ? 'none' : 'service')}>
+          {s.downtime.button}
+        </Button>
       </div>
       {mode !== 'none' && (
         <Card className="mt-3">
@@ -143,7 +141,7 @@ export function AssetActions({
             {mode === 'item' && <ItemForm asset={asset} item={null} onClose={close} />}
             {mode === 'repair' && <DoneForm asset={asset} item={null} openDefects={openDefects} today={today} costsOpen={costsOpen} onClose={close} />}
             {mode === 'defect' && <DefectForm asset={asset} onClose={close} />}
-            {mode === 'service' && <ServiceForm vehicleId={asset.id} today={today} onClose={close} />}
+            {mode === 'service' && <ServiceForm assetId={asset.id} trailer={asset.type === 'TRAILER'} today={today} onClose={close} />}
           </CardBody>
         </Card>
       )}

@@ -5411,6 +5411,11 @@ export const en = {
       untilResolved: 'until further notice',
       dueWas: 'test was due',
       effect: 'The vehicle is not offered on the order desk and cannot be chosen for direct or own orders.',
+      effectFrom: 'From the first day, the vehicle is not offered for orders.',
+      effectDates: 'Orders falling on these days cannot be taken with this vehicle. On other days the vehicle is available.',
+      ordersTitle: 'Orders on these days',
+      ordersHint: 'Orders are not moved automatically. Change the vehicle or agree on the order with the customer.',
+      orderConflict: 'The vehicle or trailer is out of service on the days of this order (service or defect). Choose another vehicle or return it to service on the Maintenance page.',
       lift: 'Return to service',
       liftConfirm: 'Return to service now',
       cancel: 'Cancel service',
@@ -5453,6 +5458,7 @@ export const en = {
     'maintenance.defectUnsafeTitle': '{plate}: DO NOT DRIVE – {area}',
     'maintenance.deskOut': 'Out of service, not offered for orders: {plates}.',
     'maintenance.inspectionBlockedTitle': '{plates}: roadworthiness test overdue – vehicle out of service',
+    'maintenance.downtimeOrders': 'Orders on these days: {refs}',
     'driverEvent.maintenance.due':
       '{plate}: {kind, select, SERVICE {scheduled service} INSPECTION {roadworthiness test} TACHOGRAPH {tachograph inspection} TYRES {tyres} BRAKES {brake inspection} AC {air conditioning service} REEFER {reefer unit service} LIFT {crane inspection} ADR {ADR approval} FIRE {fire extinguisher inspection} other {{title}}} due – {when}',
     'driverEvent.maintenance.overdue':

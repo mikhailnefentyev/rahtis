@@ -26,7 +26,7 @@ export function DowntimeCard({ downtime, plate }: { downtime: Downtime; plate?: 
       <CardBody className="flex flex-col gap-2">
         <div className="flex flex-wrap items-center gap-2">
           {plate && (
-            <Link href={`/${locale}/carrier/maintenance/${downtime.vehicle_id}`} className="hover:underline">
+            <Link href={`/${locale}/carrier/maintenance/${downtime.vehicle_id ?? downtime.trailer_id}`} className="hover:underline">
               <Plate>{plate}</Plate>
             </Link>
           )}
@@ -38,7 +38,25 @@ export function DowntimeCard({ downtime, plate }: { downtime: Downtime; plate?: 
           {downtime.reason === 'INSPECTION' && downtime.due_on && ` · ${s.dueWas} ${f.date(`${downtime.due_on}T12:00:00Z`)}`}
         </p>
         {downtime.note && <p className="text-[12px] text-ink-muted">{downtime.note}</p>}
-        {downtime.current && <p className="text-[12px] text-ink-muted">{s.effect}</p>}
+        {/* Бессрочно — машина не выходит на рейсы совсем; с датами — нельзя взять заказ на эти дни. */}
+        <p className="text-[12px] text-ink-muted">{downtime.blocking ? (downtime.current ? s.effect : s.effectFrom) : s.effectDates}</p>
+        {/* Рейсы, уже назначенные на эти дни, — сами не снимаются: решает перевозчик. */}
+        {downtime.orders.length > 0 && (
+          <div className="rounded-control border border-warn/40 bg-warn/10 px-3 py-2 text-[13px]">
+            <p className="font-semibold text-warn">{s.ordersTitle}</p>
+            <ul className="mt-1 flex flex-wrap gap-x-3 gap-y-1">
+              {downtime.orders.map((o) => (
+                <li key={o.order_id}>
+                  <Link href={`/${locale}/carrier`} className="font-mono hover:underline">
+                    {o.ref}
+                  </Link>{' '}
+                  <span className="text-ink-muted">{f.date(`${o.first_day}T12:00:00Z`)}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-1 text-[12px] text-ink-muted">{s.ordersHint}</p>
+          </div>
+        )}
 
         {!confirm ? (
           <div>
@@ -68,7 +86,17 @@ export function DowntimeCard({ downtime, plate }: { downtime: Downtime; plate?: 
 }
 
 /** Сервис по датам: первый и последний день вне работы, пометка (мастерская, что делают). */
-export function ServiceForm({ vehicleId, today, onClose }: { vehicleId: string; today: string; onClose: () => void }) {
+export function ServiceForm({
+  assetId,
+  trailer,
+  today,
+  onClose,
+}: {
+  assetId: string;
+  trailer: boolean;
+  today: string;
+  onClose: () => void;
+}) {
   const { t, locale } = useI18n();
   const s = t.maintenance;
   const [state, action, pending] = useActionState(scheduleServiceAction, { error: null, done: false } as MaintenanceFormState);
@@ -79,7 +107,7 @@ export function ServiceForm({ vehicleId, today, onClose }: { vehicleId: string; 
   return (
     <form action={action} className="flex flex-col gap-3">
       <input type="hidden" name="locale" value={locale} />
-      <input type="hidden" name="vehicle_id" value={vehicleId} />
+      <input type="hidden" name={trailer ? 'trailer_id' : 'vehicle_id'} value={assetId} />
       <h3 className="text-[13px] font-semibold">{s.downtime.formTitle}</h3>
       <p className="text-[12px] text-ink-muted">{s.downtime.formHint}</p>
       <div className="grid gap-3 sm:grid-cols-3">
