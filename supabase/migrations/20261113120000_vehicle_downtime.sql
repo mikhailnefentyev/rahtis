@@ -59,9 +59,31 @@ create index vehicle_downtime_company_idx on public.vehicle_downtime (company_id
 create unique index vehicle_downtime_item_due_key on public.vehicle_downtime (item_id, due_on) where item_id is not null;
 create unique index vehicle_downtime_defect_open_key on public.vehicle_downtime (defect_id) where defect_id is not null and ended_at is null;
 
+/*
+ * Своя проверка, не app.fleet_asset_check: та читает new.trailer_id, а
+ * прицепов в этой таблице нет — общая функция роняла бы любую вставку,
+ * и вместе с ней дефект «ехать нельзя» (блокировку ставит его триггер в
+ * той же транзакции).
+ */
+create or replace function app.vehicle_downtime_check()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  if not exists (select 1 from public.vehicles where id = new.vehicle_id and company_id = new.company_id) then
+    raise exception 'Машина другой компании.' using errcode = '42501';
+  end if;
+  return new;
+end;
+$$;
+
+revoke all on function app.vehicle_downtime_check() from public, anon, authenticated;
+
 create trigger vehicle_downtime_check
   before insert or update of vehicle_id, company_id on public.vehicle_downtime
-  for each row execute function app.fleet_asset_check();
+  for each row execute function app.vehicle_downtime_check();
 
 alter table public.vehicle_downtime enable row level security;
 
