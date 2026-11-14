@@ -1,8 +1,11 @@
 import type { Dictionary } from '@/lib/i18n';
+import { isDowntimeConflict } from '@/lib/maintenance/conflict';
 
 /** Отказ базы → текст. */
 export function explainCapacityError(t: Dictionary, error: { code?: string; message?: string } | null): string {
   const c = t.capacity;
+  /* Машина или прицеп рейса вне работы в дни заказа (обслуживание, дефект). */
+  if (isDowntimeConflict(error)) return t.maintenance.downtime.orderConflict;
   switch (error?.code) {
     case '55000':
       return c.unavailable;
