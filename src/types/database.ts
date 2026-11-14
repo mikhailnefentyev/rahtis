@@ -6257,7 +6257,7 @@ export type Database = {
           reason: string
           starts_on?: string
           trailer_id?: string | null
-          vehicle_id: string | null
+          vehicle_id?: string | null
         }
         Update: {
           company_id?: string
@@ -6298,6 +6298,13 @@ export type Database = {
             columns: ["item_id"]
             isOneToOne: false
             referencedRelation: "maintenance_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_downtime_trailer_id_fkey"
+            columns: ["trailer_id"]
+            isOneToOne: false
+            referencedRelation: "trailers"
             referencedColumns: ["id"]
           },
           {
@@ -8785,6 +8792,14 @@ export type Database = {
           valid_until: string
         }[]
       }
+      downtime_orders_of: {
+        Args: { p_downtime_id: string }
+        Returns: {
+          first_day: string
+          order_id: string
+          ref: string
+        }[]
+      }
       driver_ack_route_changes: {
         Args: { p_order_id: string }
         Returns: number
@@ -8818,14 +8833,6 @@ export type Database = {
           day: string
           driver_id: string
           last_country: string
-        }[]
-      }
-      downtime_orders_of: {
-        Args: { p_downtime_id: string }
-        Returns: {
-          first_day: string
-          order_id: string
-          ref: string
         }[]
       }
       driver_defect_add: {
@@ -9028,16 +9035,6 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      fleet_free_points: {
-        Args: never
-        Returns: {
-          after_ref: string
-          city: string
-          free_local: string
-          source: string
-          vehicle_id: string
-        }[]
-      }
       fleet_downtime_orders: {
         Args: never
         Returns: {
@@ -9046,6 +9043,16 @@ export type Database = {
           order_id: string
           ref: string
           status: Database["public"]["Enums"]["order_status"]
+        }[]
+      }
+      fleet_free_points: {
+        Args: never
+        Returns: {
+          after_ref: string
+          city: string
+          free_local: string
+          source: string
+          vehicle_id: string
         }[]
       }
       fleet_odometers: {
