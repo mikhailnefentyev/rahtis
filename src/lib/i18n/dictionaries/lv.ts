@@ -5150,7 +5150,7 @@ export const lv = {
   maintenance: {
     nav: 'Apkope',
     title: 'Apkope un defekti',
-    lede: 'Apkopes plāns, tehniskā apskate, tahogrāfa pārbaude un vadītāju ziņojumi par defektiem vienuviet. Atgādinām par termiņiem 30, 7 un 1 dienu vai 2000 un 500 km iepriekš – jums pa e-pastu, automašīnas vadītājam lietotnē. Odometra rādījums tiek atjaunināts no uzpildēm, maiņām un apkopes ierakstiem.',
+    lede: 'Apkopes plāns, tehniskā apskate, tahogrāfa pārbaude un vadītāju ziņojumi par defektiem vienuviet. Atgādinām par termiņiem 30, 7 un 1 dienu vai 2000 un 500 km iepriekš – jums pa e-pastu, automašīnas vadītājam lietotnē. Odometra rādījums tiek atjaunināts no uzpildēm, maiņām, pirmsbrauciena pārbaudēm un apkopes ierakstiem.',
     statOverdue: 'Nokavēts',
     statSoon: 'Tuvojas',
     statDefects: 'Atvērtie defekti',

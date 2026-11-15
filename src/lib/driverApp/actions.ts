@@ -234,8 +234,8 @@ export async function markReadAction(formData: FormData): Promise<void> {
 export type EventResult = { status: 'ok' | 'rejected' | 'retry' };
 
 /* Коды, при которых повтор ничего не изменит. */
-/* 22P02 — число не разобралось (кривое поле с телефона): повтор пришлёт то же самое. */
-const FINAL = new Set(['55000', '42501', '22023', 'P0002', '23514', '23P01', '22P02']);
+/* 22P02 — число не разобралось, 22003 — число вне диапазона (кривое поле с телефона): повтор пришлёт то же самое. */
+const FINAL = new Set(['55000', '42501', '22023', 'P0002', '23514', '23P01', '22P02', '22003']);
 
 const outcome = (error: { code?: string } | null): EventResult => ({
   status: !error ? 'ok' : error.code && FINAL.has(error.code) ? 'rejected' : 'retry',

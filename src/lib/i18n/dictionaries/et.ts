@@ -5110,7 +5110,7 @@ export const et = {
   maintenance: {
     nav: 'Hooldus',
     title: 'Hooldus ja rikked',
-    lede: 'Hooldusplaan, tehnoülevaatus, sõidumeeriku kontroll ja juhtide rikketeated ühes kohas. Tuletame tähtaegu meelde 30, 7 ja 1 päev või 2000 ja 500 km ette – teile e-postiga ja auto juhile rakenduses. Odomeetri näit uueneb tankimistest, töövahetustest ja hoolduskannetest.',
+    lede: 'Hooldusplaan, tehnoülevaatus, sõidumeeriku kontroll ja juhtide rikketeated ühes kohas. Tuletame tähtaegu meelde 30, 7 ja 1 päev või 2000 ja 500 km ette – teile e-postiga ja auto juhile rakenduses. Odomeetri näit uueneb tankimistest, töövahetustest, sõidueelsetest kontrollidest ja hoolduskannetest.',
     statOverdue: 'Üle tähtaja',
     statSoon: 'Läheneb',
     statDefects: 'Avatud rikked',

@@ -79,10 +79,12 @@ export function DefectScreen({ state }: { state: DefectState }) {
         {
           data: JSON.stringify({
             trailer_id: onTrailer ? target : null,
+            /* Машина на экране в момент нажатия: без связи дефект уйдёт позже, а водителя могут пересадить. */
+            vehicle_id: onTrailer ? null : (state.vehicle?.id ?? null),
             area,
             severity,
             description: description.trim().slice(0, 1000),
-            odometer_km: !onTrailer && Number.isFinite(km) && km > 0 ? km : null,
+            odometer_km: !onTrailer && Number.isFinite(km) && km > 0 && km <= 9_999_999 ? km : null,
           }),
         },
         photo ?? undefined,

@@ -5313,7 +5313,7 @@ export const en = {
   maintenance: {
     nav: 'Maintenance',
     title: 'Maintenance and defects',
-    lede: 'Service schedule, roadworthiness test, tachograph inspection and driver defect reports in one place. We remind you 30, 7 and 1 days or 2,000 and 500 km before a due date – you by email and the vehicle’s driver in the app. The odometer reading is updated from refuelling, shifts and service entries.',
+    lede: 'Service schedule, roadworthiness test, tachograph inspection and driver defect reports in one place. We remind you 30, 7 and 1 days or 2,000 and 500 km before a due date – you by email and the vehicle’s driver in the app. The odometer reading is updated from refuelling, shifts, pre-trip inspections and service entries.',
     statOverdue: 'Overdue',
     statSoon: 'Due soon',
     statDefects: 'Open defects',

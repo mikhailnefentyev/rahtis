@@ -23,10 +23,18 @@ export default async function DriverInbox({ params }: { params: Promise<{ locale
     .order('created_at', { ascending: false })
     .limit(50);
 
+  /* Номер рейса RS-2026-0418 не рвётся на две строки: после дефиса — соединитель слов (U+2060, невидим). */
+  const unbreakable = (params: unknown) =>
+    Object.fromEntries(
+      Object.entries((params ?? {}) as Record<string, string | number>).map(([k, v]) => [
+        k,
+        typeof v === 'string' && /^[A-Z]{1,4}-\d{4}-\d+$/.test(v) ? v.replace(/-/g, '-⁠') : v,
+      ]),
+    );
   const text = (code: string, params: unknown) => {
     const key = `driverEvent.${code}` as Parameters<typeof m>[0];
     try {
-      return m(key, (params ?? {}) as Record<string, string | number>);
+      return m(key, unbreakable(params));
     } catch {
       return code;
     }

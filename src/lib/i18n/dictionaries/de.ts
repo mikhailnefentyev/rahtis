@@ -5150,7 +5150,7 @@ export const de = {
   maintenance: {
     nav: 'Wartung',
     title: 'Wartung und Mängel',
-    lede: 'Wartungsplan, Hauptuntersuchung, Tachographenprüfung und Mängelmeldungen der Fahrer an einem Ort. Wir erinnern 30, 7 und 1 Tag oder 2.000 und 500 km vor dem Termin – Sie per E-Mail und den Fahrer des Fahrzeugs in der App. Der Kilometerstand wird aus Tankvorgängen, Schichten und Wartungseinträgen aktualisiert.',
+    lede: 'Wartungsplan, Hauptuntersuchung, Tachographenprüfung und Mängelmeldungen der Fahrer an einem Ort. Wir erinnern 30, 7 und 1 Tag oder 2.000 und 500 km vor dem Termin – Sie per E-Mail und den Fahrer des Fahrzeugs in der App. Der Kilometerstand wird aus Tankvorgängen, Schichten, Abfahrtskontrollen und Wartungseinträgen aktualisiert.',
     statOverdue: 'Überfällig',
     statSoon: 'Bald fällig',
     statDefects: 'Offene Mängel',

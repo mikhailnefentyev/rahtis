@@ -22,6 +22,7 @@ import { createClient } from '@/lib/supabase/server';
 import { FuelEntryForm } from './FuelEntryForm';
 import { FuelUpload } from './FuelUpload';
 import { SourceLines } from './SourceLines';
+import { upperFirst } from '@/lib/format';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -126,7 +127,7 @@ export default async function FuelPage({
         <Link href={monthHref(prev)} className="text-[13px] text-accent" aria-label={s.prevMonth}>
           ‹ {label(prev)}
         </Link>
-        <h2 className="text-[15px] font-semibold capitalize">{monthLong.format(new Date(`${month}-15T00:00:00Z`))}</h2>
+        <h2 className="text-[15px] font-semibold">{upperFirst(monthLong.format(new Date(`${month}-15T00:00:00Z`)))}</h2>
         {month < current && (
           <Link href={monthHref(nextMonth(month))} className="text-[13px] text-accent" aria-label={s.nextMonth}>
             {label(nextMonth(month))} ›

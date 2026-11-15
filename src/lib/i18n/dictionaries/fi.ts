@@ -5437,7 +5437,7 @@ export const fi = {
   maintenance: {
     nav: 'Huolto',
     title: 'Huolto ja viat',
-    lede: 'Huolto-ohjelma, katsastus, ajopiirturin tarkastus ja kuljettajien vikailmoitukset yhdessä paikassa. Muistutamme määräajoista 30, 7 ja 1 päivää tai 2 000 ja 500 km ennen – sinulle sähköpostilla ja auton kuljettajalle sovelluksessa. Mittarilukema päivittyy tankkauksista, työvuoroista ja huoltomerkinnöistä.',
+    lede: 'Huolto-ohjelma, katsastus, ajopiirturin tarkastus ja kuljettajien vikailmoitukset yhdessä paikassa. Muistutamme määräajoista 30, 7 ja 1 päivää tai 2 000 ja 500 km ennen – sinulle sähköpostilla ja auton kuljettajalle sovelluksessa. Mittarilukema päivittyy tankkauksista, työvuoroista, lähtötarkastuksista ja huoltomerkinnöistä.',
     statOverdue: 'Myöhässä',
     statSoon: 'Lähestyy',
     statDefects: 'Avoimet viat',

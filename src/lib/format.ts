@@ -286,3 +286,12 @@ export function isValidBusinessId(value: string): boolean {
 
   return Number(id[8]) === (rest === 0 ? 0 : 11 - rest);
 }
+
+/**
+ * Заглавная только первая буква: «Ноябрь 2026 г.», а не «Ноябрь 2026 Г.».
+ * CSS text-transform: capitalize поднимает каждое слово — у названий
+ * месяцев из Intl это ломало «г.», «gada», «m.» (обход 15.11.2026).
+ */
+export function upperFirst(value: string, locale?: string): string {
+  return value ? value.charAt(0).toLocaleUpperCase(locale) + value.slice(1) : value;
+}

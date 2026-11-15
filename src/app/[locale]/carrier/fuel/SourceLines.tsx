@@ -123,7 +123,12 @@ export function SourceLines({ days, unit, lines, intl, labels, vehicles, vehicle
         ))}
       </ul>
 
-      <div ref={box} className="relative w-full">
+      {/*
+        min-w-0 и overflow-x-clip: стартовая ширина 720 не должна раздвигать
+        контейнер — иначе ResizeObserver мерил сам рисунок, а не место под
+        ним, и на телефоне страница ехала вбок на 360 px (обход 15.11.2026).
+      */}
+      <div ref={box} className="relative w-full min-w-0 overflow-x-clip">
         <svg width={width} height={HEIGHT} role="img" aria-label={labels.title}>
           {ticks.map((tick) => (
             <g key={tick}>

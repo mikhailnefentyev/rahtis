@@ -10,6 +10,7 @@ import { isLocale } from '@/lib/i18n';
 import { getViewerI18n } from '@/lib/i18n/viewer';
 import { createClient } from '@/lib/supabase/server';
 import { EmployerCostForm } from './EmployerCostForm';
+import { upperFirst } from '@/lib/format';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -89,7 +90,7 @@ export default async function EconomicsPage({
         <Link href={`${base}?month=${prev}`} className="text-[13px] text-accent">
           ‹ {label(prev)}
         </Link>
-        <h2 className="text-[15px] font-semibold capitalize">{monthLong.format(new Date(`${month}-15T00:00:00Z`))}</h2>
+        <h2 className="text-[15px] font-semibold">{upperFirst(monthLong.format(new Date(`${month}-15T00:00:00Z`)))}</h2>
         {month < current && (
           <Link href={`${base}?month=${nextMonth(month)}`} className="text-[13px] text-accent">
             {label(nextMonth(month))} ›

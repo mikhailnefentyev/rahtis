@@ -5124,7 +5124,7 @@ export const sv = {
   maintenance: {
     nav: 'Underhåll',
     title: 'Underhåll och fel',
-    lede: 'Serviceprogram, besiktning, färdskrivarkontroll och förarnas felanmälningar på ett ställe. Vi påminner 30, 7 och 1 dag eller 2 000 och 500 km före – dig per e-post och fordonets förare i appen. Mätarställningen uppdateras från tankningar, arbetspass och serviceanteckningar.',
+    lede: 'Serviceprogram, besiktning, färdskrivarkontroll och förarnas felanmälningar på ett ställe. Vi påminner 30, 7 och 1 dag eller 2 000 och 500 km före – dig per e-post och fordonets förare i appen. Mätarställningen uppdateras från tankningar, arbetspass, avgångskontroller och serviceanteckningar.',
     statOverdue: 'Försenat',
     statSoon: 'Snart',
     statDefects: 'Öppna fel',

@@ -5,6 +5,7 @@ import { getDriverEarnings, monthOf, shiftMonth } from '@/lib/driverApp/earnings
 import { getDriver } from '@/lib/driverApp/session';
 import { isLocale } from '@/lib/i18n';
 import { getDriverI18n } from '@/lib/driverApp/i18n';
+import { upperFirst } from '@/lib/format';
 
 /**
  * Ansiot — сколько водитель заработал.
@@ -56,7 +57,7 @@ export default async function DriverEarnings({
           >
             ‹
           </Link>
-          <span className="min-w-32 text-center text-[15px] font-semibold capitalize">{monthName}</span>
+          <span className="min-w-32 text-center text-[15px] font-semibold">{upperFirst(monthName)}</span>
           {month < current ? (
             <Link
               href={`${base}?month=${shiftMonth(month, 1)}`}
@@ -99,8 +100,8 @@ export default async function DriverEarnings({
               <li key={day.date} className="overflow-hidden rounded-card border border-line bg-surface">
                 <div className="flex items-baseline justify-between gap-3 px-4 pt-3.5">
                   <div>
-                    <p className="text-[17px] font-semibold capitalize">
-                      {dayName.format(noon)} {f.date(noon)}
+                    <p className="text-[17px] font-semibold">
+                      {upperFirst(dayName.format(noon))} {f.date(noon)}
                     </p>
                     <p className="text-[14px] text-ink-muted">
                       {day.workMinutes > 0 && hours(day.workMinutes)}

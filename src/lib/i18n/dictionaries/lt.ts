@@ -5152,7 +5152,7 @@ export const lt = {
   maintenance: {
     nav: 'Priežiūra',
     title: 'Priežiūra ir gedimai',
-    lede: 'Aptarnavimo planas, techninė apžiūra, tachografo patikra ir vairuotojų pranešimai apie gedimus vienoje vietoje. Apie terminus primename prieš 30, 7 ir 1 dieną arba prieš 2000 ir 500 km – jums el. paštu, automobilio vairuotojui programėlėje. Odometro rodmuo atnaujinamas pagal kuro pylimus, pamainas ir aptarnavimo įrašus.',
+    lede: 'Aptarnavimo planas, techninė apžiūra, tachografo patikra ir vairuotojų pranešimai apie gedimus vienoje vietoje. Apie terminus primename prieš 30, 7 ir 1 dieną arba prieš 2000 ir 500 km – jums el. paštu, automobilio vairuotojui programėlėje. Odometro rodmuo atnaujinamas pagal kuro pylimus, pamainas, patikras prieš kelionę ir aptarnavimo įrašus.',
     statOverdue: 'Pavėluota',
     statSoon: 'Artėja',
     statDefects: 'Atviri gedimai',

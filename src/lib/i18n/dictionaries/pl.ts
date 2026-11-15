@@ -5149,7 +5149,7 @@ export const pl = {
   maintenance: {
     nav: 'Serwis',
     title: 'Serwis i usterki',
-    lede: 'Plan serwisowy, badanie techniczne, legalizacja tachografu i zgłoszenia usterek od kierowców w jednym miejscu. Przypominamy o terminach 30, 7 i 1 dzień albo 2000 i 500 km wcześniej – Tobie e-mailem, a kierowcy pojazdu w aplikacji. Stan licznika aktualizuje się na podstawie tankowań, zmian i wpisów serwisowych.',
+    lede: 'Plan serwisowy, badanie techniczne, legalizacja tachografu i zgłoszenia usterek od kierowców w jednym miejscu. Przypominamy o terminach 30, 7 i 1 dzień albo 2000 i 500 km wcześniej – Tobie e-mailem, a kierowcy pojazdu w aplikacji. Stan licznika aktualizuje się na podstawie tankowań, zmian, kontroli przed wyjazdem i wpisów serwisowych.',
     statOverdue: 'Po terminie',
     statSoon: 'Zbliża się',
     statDefects: 'Otwarte usterki',
