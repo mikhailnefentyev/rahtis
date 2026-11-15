@@ -6206,6 +6206,7 @@ export type Database = {
           driver_id: string | null
           event_id: string | null
           id: string
+          inspection_id: string | null
           odometer_km: number | null
           photo_path: string | null
           record_id: string | null
@@ -6226,6 +6227,7 @@ export type Database = {
           driver_id?: string | null
           event_id?: string | null
           id?: string
+          inspection_id?: string | null
           odometer_km?: number | null
           photo_path?: string | null
           record_id?: string | null
@@ -6246,6 +6248,7 @@ export type Database = {
           driver_id?: string | null
           event_id?: string | null
           id?: string
+          inspection_id?: string | null
           odometer_km?: number | null
           photo_path?: string | null
           record_id?: string | null
@@ -6296,6 +6299,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      vehicle_inspections: {
+        Row: {
+          company_id: string
+          created_at: string
+          defects: number
+          driver_id: string | null
+          event_id: string | null
+          id: string
+          inspected_at: string
+          inspected_by: string | null
+          odometer_km: number | null
+          results: Json
+          vehicle_id: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          defects?: number
+          driver_id?: string | null
+          event_id?: string | null
+          id?: string
+          inspected_at?: string
+          inspected_by?: string | null
+          odometer_km?: number | null
+          results: Json
+          vehicle_id: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          defects?: number
+          driver_id?: string | null
+          event_id?: string | null
+          id?: string
+          inspected_at?: string
+          inspected_by?: string | null
+          odometer_km?: number | null
+          results?: Json
+          vehicle_id?: string
+        }
+        Relationships: []
       }
       vehicle_downtime: {
         Row: {
@@ -8932,6 +8977,11 @@ export type Database = {
           invite_id: string
         }[]
       }
+      driver_inspection_add: {
+        Args: { p_at?: string; p_data: Json; p_event_id?: string }
+        Returns: Json
+      }
+      driver_inspection_state: { Args: never; Returns: Json }
       driver_maintenance_state: { Args: never; Returns: Json }
       driver_me: { Args: never; Returns: Json }
       driver_push_subscribe: {
@@ -10074,6 +10124,10 @@ export type Database = {
           id: string
           storage_path: string
         }[]
+      }
+      retention_purge_inspections: {
+        Args: { p_limit?: number }
+        Returns: number
       }
       retention_fleet_orphans: {
         Args: { p_limit?: number }

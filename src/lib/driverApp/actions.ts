@@ -346,6 +346,9 @@ export async function applyDriverEventAction(formData: FormData): Promise<EventR
     case 'DEFECT':
       result = await addDefect(formData);
       break;
+    case 'INSPECTION':
+      result = await addInspection(formData);
+      break;
     default:
       result = { status: 'rejected' };
   }
@@ -549,6 +552,36 @@ async function addDefect(formData: FormData): Promise<EventResult> {
   const result = outcome(error);
   if (result.status === 'rejected' && photo && created) await createAdminClient().storage.from('fleet-docs').remove([photo]);
   if (result.status === 'ok' && defectId) await notifyDefect(defectId);
+  return result;
+}
+
+/**
+ * Ежедневный осмотр машины: пункты и пробег — функцией базы под сессией
+ * водителя; каждое «не в порядке» база заводит дефектом, и перевозчик
+ * получает о нём уведомление, как о дефекте с экрана «Vika / huolto».
+ * Повтор из очереди база узнаёт и возвращает null — уведомлений нет.
+ */
+async function addInspection(formData: FormData): Promise<EventResult> {
+  const eventId = str(formData, 'event_id');
+  if (!/^[0-9a-f-]{36}$/i.test(eventId)) return { status: 'rejected' };
+
+  let data: Record<string, unknown> = {};
+  try {
+    data = JSON.parse(str(formData, 'data') || '{}');
+  } catch {
+    return { status: 'rejected' };
+  }
+
+  const supabase = await createClient();
+  const { data: saved, error } = await supabase.rpc('driver_inspection_add', {
+    p_data: data as Json,
+    p_at: str(formData, 'pressed_at') || undefined,
+    p_event_id: eventId,
+  });
+
+  const result = outcome(error);
+  const defectIds = (saved as { defect_ids?: string[] } | null)?.defect_ids ?? [];
+  if (result.status === 'ok') for (const id of defectIds) await notifyDefect(id);
   return result;
 }
 

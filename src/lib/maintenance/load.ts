@@ -43,6 +43,8 @@ export type AssetSummary = {
   unsafe: boolean;
   /** Машина сейчас вне работы — первая действующая причина. */
   outOfService: Downtime | null;
+  /** Последний осмотр водителем за неделю (только машины). */
+  lastInspection: { inspected_at: string; defects: number } | null;
 };
 
 export type FleetMaintenance = {
@@ -76,8 +78,17 @@ export async function loadFleetMaintenance(
   if (!input.withClosed) defectsQuery = defectsQuery.eq('status', 'OPEN');
   if (input.assetId) defectsQuery = defectsQuery.or(`vehicle_id.eq.${input.assetId},trailer_id.eq.${input.assetId}`);
 
-  const [{ data: vehicles }, { data: trailers }, { data: items }, { data: odometers }, { data: defects }, { data: drivers }, { data: downtimeRows }] =
-    await Promise.all([
+  const weekAgo = new Date(Date.parse(`${input.today}T00:00:00Z`) - 7 * 86_400_000).toISOString();
+  const [
+    { data: vehicles },
+    { data: trailers },
+    { data: items },
+    { data: odometers },
+    { data: defects },
+    { data: drivers },
+    { data: downtimeRows },
+    { data: inspections },
+  ] = await Promise.all([
       supabase.from('vehicles').select('id, plate, make').eq('company_id', input.companyId).order('plate'),
       supabase.from('trailers').select('id, plate, kind').eq('company_id', input.companyId).order('plate'),
       supabase.from('maintenance_items').select('*').eq('company_id', input.companyId),
@@ -90,7 +101,16 @@ export async function loadFleetMaintenance(
         .eq('company_id', input.companyId)
         .is('ended_at', null)
         .order('starts_on'),
+      supabase
+        .from('vehicle_inspections')
+        .select('vehicle_id, inspected_at, defects')
+        .eq('company_id', input.companyId)
+        .gte('inspected_at', weekAgo)
+        .order('inspected_at', { ascending: false })
+        .limit(1000),
     ]);
+  const lastInspection = new Map<string, { inspected_at: string; defects: number }>();
+  for (const row of inspections ?? []) if (!lastInspection.has(row.vehicle_id)) lastInspection.set(row.vehicle_id, row);
 
   const openDowntime = (downtimeRows ?? []).filter((d) => !d.ends_on || d.ends_on >= input.today);
   const { data: affected } = openDowntime.length ? await supabase.rpc('fleet_downtime_orders') : { data: [] };
@@ -148,6 +168,7 @@ export async function loadFleetMaintenance(
       openDefects: open.length,
       unsafe: open.some((d) => d.severity === 'UNSAFE'),
       outOfService: downtime.find((d) => d.current && (d.vehicle_id ?? d.trailer_id) === asset.id) ?? null,
+      lastInspection: lastInspection.get(asset.id) ?? null,
     });
   }
 

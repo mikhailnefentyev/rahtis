@@ -34,14 +34,18 @@ export default async function DriverHome({
   if (!isLocale(locale)) notFound();
 
   const supabase = await createClient();
-  const [driver, tasks, { t }, { data: siteData }, { data: outData }] = await Promise.all([
+  const [driver, tasks, { t, f }, { data: siteData }, { data: outData }, { data: inspectionData }] = await Promise.all([
     getDriver(),
     getDriverTasks(),
     getDriverI18n(locale),
     supabase.rpc('driver_site_state'),
     /* Машина вне работы (сервис, дефект «ехать нельзя», просроченный katsastus). */
     supabase.rpc('driver_vehicle_downtime'),
+    /* Осмотрена ли машина сегодня — плитка осмотра показывает это без захода на экран. */
+    supabase.rpc('driver_inspection_state'),
   ]);
+  const inspection = inspectionData as unknown as { vehicle: { id: string } | null; today: { inspected_at: string }[] } | null;
+  const inspectedAt = inspection?.today[0]?.inspected_at ?? null;
   const outOfService = outData as unknown as { reason: 'SERVICE' | 'DEFECT' | 'INSPECTION' } | null;
   /* Прицеп рейса перевозчика (конструктор сцепок) — водитель видит, что цеплять. */
   const { data: tripTrailerRows } = await supabase.rpc('driver_trip_trailers');
@@ -88,10 +92,20 @@ export default async function DriverHome({
         Задания и смена остаются главным на экране.
       */}
       <div className="grid grid-cols-2 gap-3">
+        {/* Осмотр перед выездом — первым: с него начинается день. Смена идёт, а осмотра нет — плитка подсвечена. */}
+        {inspection?.vehicle && (
+          <QuickTile
+            href={`/${locale}/driver/inspection`}
+            icon={<CheckIcon />}
+            label={t.defectDriver.inspection.entry}
+            note={inspectedAt ? `${t.defectDriver.inspection.doneAt} ${f.time(inspectedAt)}` : t.defectDriver.inspection.notToday}
+            attention={!inspectedAt && !!driver.shift}
+          />
+        )}
         <QuickTile href={`/${locale}/driver/fuel`} icon={<FuelIcon />} label={t.fuelDriver.entry} />
         {/* Дефект машины — у машины, одной кнопкой: перевозчик узнаёт сразу, а не на следующей смене. */}
         <QuickTile href={`/${locale}/driver/defect`} icon={<WrenchIcon />} label={t.defectDriver.entry} />
-        <QuickTile href={`/${locale}/driver/training`} icon={<GaugeIcon />} label={t.training.title} className="col-span-2" />
+        <QuickTile href={`/${locale}/driver/training`} icon={<GaugeIcon />} label={t.training.title} className={inspection?.vehicle ? undefined : 'col-span-2'} />
       </div>
 
       <TaskTabs showDone={showDone} />
@@ -229,16 +243,48 @@ async function SiteJobCard({ job, locale }: { job: SiteState['jobs'][number]; lo
   );
 }
 
-/** Плитка быстрого действия: значок и подпись, во всю высоту под палец. */
-function QuickTile({ href, icon, label, className }: { href: string; icon: React.ReactNode; label: string; className?: string }) {
+/** Плитка быстрого действия: значок и подпись, во всю высоту под палец; note — строка состояния под подписью. */
+function QuickTile({
+  href,
+  icon,
+  label,
+  note,
+  attention,
+  className,
+}: {
+  href: string;
+  icon: React.ReactNode;
+  label: string;
+  note?: string;
+  attention?: boolean;
+  className?: string;
+}) {
   return (
     <Link
       href={href}
-      className={cn('flex min-h-20 flex-col items-start justify-between gap-2 rounded-card border border-line bg-surface px-4 py-3', className)}
+      className={cn(
+        'flex min-h-20 flex-col items-start justify-between gap-2 rounded-card border bg-surface px-4 py-3',
+        attention ? 'border-warn/60 bg-warn/5' : 'border-line',
+        className,
+      )}
     >
-      <span className="flex size-10 items-center justify-center rounded-control bg-accent-wash text-accent">{icon}</span>
-      <span className="text-[16px] leading-tight font-semibold">{label}</span>
+      <span className={cn('flex size-10 items-center justify-center rounded-control', attention ? 'bg-warn/15 text-warn' : 'bg-accent-wash text-accent')}>{icon}</span>
+      <span className="flex flex-col gap-0.5">
+        <span className="text-[16px] leading-tight font-semibold">{label}</span>
+        {note && <span className={cn('text-[13px] leading-tight', attention ? 'font-semibold text-warn' : 'text-ink-muted')}>{note}</span>}
+      </span>
     </Link>
+  );
+}
+
+/** Осмотр перед выездом: планшет с галочкой. */
+function CheckIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden className="size-6">
+      <rect x="5" y="4" width="14" height="17" rx="2" />
+      <path d="M9 4.5V3h6v1.5" />
+      <path d="m9 13 2 2 4-4" />
+    </svg>
   );
 }
 

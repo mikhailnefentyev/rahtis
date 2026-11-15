@@ -139,7 +139,7 @@ export default async function MaintenancePage({ params }: { params: Promise<{ lo
           <section>
             <h2 className="mb-3 border-b border-line pb-2 text-[13px] font-semibold tracking-tight text-ink-faint">{s.fleetTitle}</h2>
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-              {[...data.summaries.values()].map(({ asset, state, items, openDefects, unsafe: assetUnsafe, outOfService }) => (
+              {[...data.summaries.values()].map(({ asset, state, items, openDefects, unsafe: assetUnsafe, outOfService, lastInspection }) => (
                 <Link key={asset.id} href={`/${locale}/carrier/maintenance/${asset.id}`} className="block">
                   <Card stripe={outOfService || assetUnsafe ? 'danger' : state === 'OVERDUE' ? 'danger' : state === 'SOON' || openDefects > 0 ? 'warn' : items > 0 ? 'ok' : undefined}>
                     <CardBody className="flex flex-col gap-1.5">
@@ -160,6 +160,14 @@ export default async function MaintenancePage({ params }: { params: Promise<{ lo
                         {items > 0 ? m('maintenance.planCount', { count: items }) : s.addPlanHint}
                         {asset.odometer != null && ` · ${f.number(asset.odometer)} km`}
                       </p>
+                      {/* Осмотр водителем: сегодня — время, раньше — дата; у прицепа осмотра нет (он в осмотре машины). */}
+                      {asset.type === 'VEHICLE' && (
+                        <p className={`text-[12px] ${(lastInspection ? todayInHelsinki(new Date(lastInspection.inspected_at)) : null) === data.today ? 'text-ink-muted' : 'text-warn'}`}>
+                          {lastInspection
+                            ? `${s.inspections.last}: ${todayInHelsinki(new Date(lastInspection.inspected_at)) === data.today ? `${s.inspections.today} ${f.time(lastInspection.inspected_at)}` : f.date(lastInspection.inspected_at)}${lastInspection.defects > 0 ? ` · ${m('maintenance.defectCount', { count: lastInspection.defects })}` : ''}`
+                            : s.inspections.noneWeek}
+                        </p>
+                      )}
                     </CardBody>
                   </Card>
                 </Link>

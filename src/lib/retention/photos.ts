@@ -174,3 +174,12 @@ export async function purgeFleetOrphans(): Promise<PhotoRetentionResult> {
 
   return result;
 }
+
+/**
+ * Осмотры машин водителями старше 24 месяцев (политика, «Kaluston huolto ja
+ * vikailmoitukset»). Файлов у осмотра нет — удаляет сама база пачкой.
+ */
+export async function purgeOldInspections(): Promise<{ removed: number; errors: string[] }> {
+  const { data, error } = await createAdminClient().rpc('retention_purge_inspections', { p_limit: 2000 });
+  return { removed: data ?? 0, errors: error ? [error.message] : [] };
+}

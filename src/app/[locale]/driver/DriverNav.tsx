@@ -39,7 +39,8 @@ export function DriverNav({ unread }: { unread: number }) {
         pathname.startsWith(`${base}/task`) ||
         pathname.startsWith(`${base}/site`) ||
         pathname.startsWith(`${base}/fuel`) ||
-        pathname.startsWith(`${base}/defect`),
+        pathname.startsWith(`${base}/defect`) ||
+        pathname.startsWith(`${base}/inspection`),
     },
     { href: `${base}/earnings`, label: t.driverApp.nav.earnings, icon: EarningsIcon, active: pathname.startsWith(`${base}/earnings`) },
     { href: `${base}/map`, label: t.driverApp.nav.map, icon: MapIcon, active: pathname.startsWith(`${base}/map`) },

@@ -13,8 +13,9 @@
 /**
  * SITE — работа на объекте: прибытие, рейс, конец дня, новый пункт приёмки.
  * FUEL — заправка (с фото чека). DEFECT — дефект машины или прицепа (с фото).
+ * INSPECTION — ежедневный осмотр машины перед выездом.
  */
-export type OutboxKind = 'SHIFT' | 'ARRIVE' | 'COMPLETE' | 'UPLOAD' | 'SITE' | 'FUEL' | 'DEFECT';
+export type OutboxKind = 'SHIFT' | 'ARRIVE' | 'COMPLETE' | 'UPLOAD' | 'SITE' | 'FUEL' | 'DEFECT' | 'INSPECTION';
 
 export type OutboxEvent = {
   /** Идентификатор действия: по нему сервер отличает повтор от нового. */

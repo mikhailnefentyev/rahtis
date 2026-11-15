@@ -1,12 +1,13 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { Button, Plate, Table, TableFrame, Td, Th, Tr } from '@/components/ui';
+import { Badge, Button, Plate, Table, TableFrame, Td, Th, Tr } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
 import { todayInHelsinki } from '@/lib/dates';
 import { isLocale } from '@/lib/i18n';
 import { getViewerI18n } from '@/lib/i18n/viewer';
 import { deleteMaintenanceRecordAction } from '@/lib/maintenance/actions';
+import { INSPECTION_ITEMS } from '@/lib/maintenance/inspection';
 import { loadAssetDocuments, loadFleetMaintenance } from '@/lib/maintenance/load';
 import { createClient } from '@/lib/supabase/server';
 import { DefectCard } from '../DefectCard';
@@ -36,7 +37,7 @@ export default async function AssetMaintenancePage({ params }: { params: Promise
   const { t, f } = i18n;
   const s = t.maintenance;
 
-  const [data, { data: records }, { data: access }, documents] = await Promise.all([
+  const [data, { data: records }, { data: access }, documents, { data: inspections }, { data: drivers }] = await Promise.all([
     loadFleetMaintenance(supabase, {
       companyId: viewer.company!.id,
       today: todayInHelsinki(),
@@ -53,7 +54,17 @@ export default async function AssetMaintenancePage({ params }: { params: Promise
       .limit(200),
     supabase.rpc('own_orders_access'),
     loadAssetDocuments(supabase, { companyId: viewer.company!.id, assetId: id }),
+    supabase
+      .from('vehicle_inspections')
+      .select('id, inspected_at, odometer_km, results, defects, driver_id')
+      .eq('company_id', viewer.company!.id)
+      .eq('vehicle_id', id)
+      .order('inspected_at', { ascending: false })
+      .limit(30),
+    supabase.from('drivers').select('id, full_name').eq('company_id', viewer.company!.id),
   ]);
+  const driverName = new Map((drivers ?? []).map((d) => [d.id, d.full_name]));
+  const itemNames = t.defectDriver.inspection.items;
 
   const asset = data.assets.find((a) => a.id === id);
   if (!asset) notFound();
@@ -191,6 +202,55 @@ export default async function AssetMaintenancePage({ params }: { params: Promise
           </TableFrame>
         )}
       </section>
+
+      {/* Осмотры водителем перед выездом — только у машин: прицеп осматривается вместе с машиной (сцепка). */}
+      {!trailer && (
+        <section className="mb-8">
+          <h2 className="mb-3 border-b border-line pb-2 text-[13px] font-semibold tracking-tight text-ink-faint">{s.inspections.title}</h2>
+          {(inspections ?? []).length === 0 ? (
+            <p className="text-[13px] text-ink-muted">{s.inspections.empty}</p>
+          ) : (
+            <TableFrame>
+              <Table>
+                <thead>
+                  <tr>
+                    <Th>{s.inspections.when}</Th>
+                    <Th>{s.inspections.driver}</Th>
+                    <Th className="text-right">km</Th>
+                    <Th>{s.inspections.result}</Th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(inspections ?? []).map((row) => {
+                    const results = (row.results ?? {}) as Record<string, string>;
+                    const bad = INSPECTION_ITEMS.filter((k) => results[k] === 'DEFECT');
+                    return (
+                      <Tr key={row.id}>
+                        <Td className="whitespace-nowrap">{f.dateTime(row.inspected_at)}</Td>
+                        <Td>{row.driver_id ? (driverName.get(row.driver_id) ?? '—') : '—'}</Td>
+                        <Td className="text-right font-mono">{row.odometer_km != null ? f.number(row.odometer_km) : '—'}</Td>
+                        <Td>
+                          {bad.length === 0 ? (
+                            <Badge tone="ok">{s.inspections.allOk}</Badge>
+                          ) : (
+                            <span className="flex flex-wrap gap-1">
+                              {bad.map((k) => (
+                                <Badge key={k} tone="warn">
+                                  {itemNames[k]}
+                                </Badge>
+                              ))}
+                            </span>
+                          )}
+                        </Td>
+                      </Tr>
+                    );
+                  })}
+                </tbody>
+              </Table>
+            </TableFrame>
+          )}
+        </section>
+      )}
 
       <DocumentsSection
         asset={{ id: asset.id, type: asset.type }}
