@@ -290,6 +290,22 @@ begin
     v_trailer := nullif(p_data ->> 'trailer_id', '')::uuid;
     v_kind := coalesce(nullif(p_data ->> 'kind', ''), 'REPAIR');
     v_title := nullif(left(btrim(coalesce(p_data ->> 'title', '')), 80), '');
+
+    /*
+     * Машина или прицеп — ровно одно и своей компании, до любой записи.
+     * Триггер fleet_asset_check на книжке и так откатил бы чужую машину,
+     * но строка расходов пишется раньше книжки — проверка здесь не
+     * держится на порядке вставок.
+     */
+    if num_nonnulls(v_vehicle, v_trailer) <> 1 then
+      raise exception 'Укажите машину или прицеп.' using errcode = '22023';
+    end if;
+    if v_vehicle is not null and not exists (select 1 from public.vehicles where id = v_vehicle and company_id = v_company) then
+      raise exception 'Машина не найдена.' using errcode = 'P0002';
+    end if;
+    if v_trailer is not null and not exists (select 1 from public.trailers where id = v_trailer and company_id = v_company) then
+      raise exception 'Прицеп не найден.' using errcode = 'P0002';
+    end if;
   end if;
 
   if v_trailer is not null then
