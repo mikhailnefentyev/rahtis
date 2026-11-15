@@ -143,3 +143,34 @@ export async function purgeExpiredDefects(): Promise<PhotoRetentionResult> {
 
   return result;
 }
+
+/**
+ * Файлы fleet-docs без строки: документы удалённой машины (строки ушли
+ * каскадом), фото дефекта, который так и не записался, оборванная
+ * загрузка. Кого — решает база (retention_fleet_orphans), с сутками
+ * запаса на загрузки в пути.
+ */
+export async function purgeFleetOrphans(): Promise<PhotoRetentionResult> {
+  const admin = createAdminClient();
+  const result: PhotoRetentionResult = { candidates: 0, removed: 0, errors: [] };
+
+  for (let round = 0; round < MAX_ROUNDS; round += 1) {
+    const { data: rows, error } = await admin.rpc('retention_fleet_orphans', { p_limit: BATCH });
+    if (error) {
+      result.errors.push(error.message);
+      break;
+    }
+    if (!rows || rows.length === 0) break;
+    result.candidates += rows.length;
+
+    const { error: storageError } = await admin.storage.from('fleet-docs').remove(rows.map((row) => row.name));
+    if (storageError) {
+      result.errors.push(storageError.message);
+      break;
+    }
+    result.removed += rows.length;
+    if (rows.length < BATCH) break;
+  }
+
+  return result;
+}

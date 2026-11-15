@@ -1,5 +1,5 @@
 import { bearerMatches } from '@/lib/auth/bearer';
-import { purgeExpiredDefects, purgeExpiredFuel, purgeExpiredTripPhotos } from '@/lib/retention/photos';
+import { purgeExpiredDefects, purgeExpiredFuel, purgeExpiredTripPhotos, purgeFleetOrphans } from '@/lib/retention/photos';
 import { purgeOldEmailDrafts, purgeOldSignInDevices } from '@/lib/retention/signIns';
 
 /**
@@ -28,10 +28,12 @@ export async function POST(request: Request) {
   const fuel = await purgeExpiredFuel();
   /* Закрытые дефекты с фото — 24 месяца после закрытия (политика, «Kaluston huolto ja vikailmoitukset»). */
   const defects = await purgeExpiredDefects();
+  /* Документы и фото fleet-docs без строки (удалённая машина, оборванная загрузка), 15.11.2026. */
+  const fleetOrphans = await purgeFleetOrphans();
   /* Устройства входа старше 12 месяцев — тем же ежедневным запуском (6.11.2026). */
   const signIns = await purgeOldSignInDevices();
   /* Черновики из писем старше 30 дней (6.11.2026). */
   const emailDrafts = await purgeOldEmailDrafts();
-  const failed = result.errors.length > 0 || fuel.errors.length > 0 || defects.errors.length > 0 || signIns.errors.length > 0 || emailDrafts.errors.length > 0;
-  return Response.json({ ...result, fuel, defects, signIns, emailDrafts }, { status: failed ? 207 : 200 });
+  const failed = result.errors.length > 0 || fuel.errors.length > 0 || defects.errors.length > 0 || fleetOrphans.errors.length > 0 || signIns.errors.length > 0 || emailDrafts.errors.length > 0;
+  return Response.json({ ...result, fuel, defects, fleetOrphans, signIns, emailDrafts }, { status: failed ? 207 : 200 });
 }

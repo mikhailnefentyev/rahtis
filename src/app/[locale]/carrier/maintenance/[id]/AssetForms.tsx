@@ -14,6 +14,7 @@ import type { ItemWithStatus } from '@/lib/maintenance/load';
 import { DEFAULT_MONTHS, DEFECT_AREAS, MAINTENANCE_KINDS, TRAILER_KINDS, type MaintenanceKind } from '@/lib/maintenance/status';
 import { CURRENCIES, type Currency } from '@/lib/money/currency';
 import { ServiceForm } from '../DowntimeCard';
+import { FILE_ACCEPT, FILE_INPUT_CLASS } from './Documents';
 import { dueParts, dueTone, intervalText, itemLabel } from '../format';
 
 const initial: MaintenanceFormState = { error: null, done: false };
@@ -347,6 +348,9 @@ function DoneForm({
         )}
       </div>
       <Field label={s.done.note}>{(p) => <Textarea {...p} name="note" maxLength={500} rows={2} />}</Field>
+      <Field label={s.docs.attachFile} hint={s.docs.fileHint}>
+        {(p) => <input {...p} type="file" name="file" accept={FILE_ACCEPT} className={FILE_INPUT_CLASS} />}
+      </Field>
       {openDefects.length > 0 && (
         <fieldset className="flex flex-col gap-1.5">
           <legend className="label-micro mb-1">{s.done.defects}</legend>

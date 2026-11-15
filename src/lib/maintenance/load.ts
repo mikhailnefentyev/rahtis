@@ -153,3 +153,33 @@ export async function loadFleetMaintenance(
 
   return { today: input.today, assets, items: withStatus, defects: defectRows, downtime, summaries };
 }
+
+export type MaintenanceDocument = Database['public']['Tables']['maintenance_documents']['Row'] & {
+  /** Подписанная ссылка на час: файлы в закрытом хранилище. */
+  url: string | null;
+};
+
+/**
+ * Документы одной машины или прицепа, новые сверху. Строки — под сессией
+ * (RLS), ссылки подписывает служебный ключ только для них.
+ */
+export async function loadAssetDocuments(supabase: Supabase, input: { companyId: string; assetId: string }): Promise<MaintenanceDocument[]> {
+  const { data: rows } = await supabase
+    .from('maintenance_documents')
+    .select('*')
+    .eq('company_id', input.companyId)
+    .or(`vehicle_id.eq.${input.assetId},trailer_id.eq.${input.assetId}`)
+    .order('created_at', { ascending: false })
+    .limit(300);
+  if (!rows || rows.length === 0) return [];
+
+  const signed = new Map<string, string>();
+  const { data } = await createAdminClient()
+    .storage.from('fleet-docs')
+    .createSignedUrls(
+      rows.map((r) => r.storage_path),
+      3600,
+    );
+  for (const row of data ?? []) if (row.path && row.signedUrl) signed.set(row.path, row.signedUrl);
+  return rows.map((r) => ({ ...r, url: signed.get(r.storage_path) ?? null }));
+}

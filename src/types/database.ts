@@ -3357,6 +3357,54 @@ export type Database = {
           },
         ]
       }
+      maintenance_documents: {
+        Row: {
+          id: string
+          company_id: string
+          vehicle_id: string | null
+          trailer_id: string | null
+          record_id: string | null
+          kind: string
+          title: string | null
+          file_name: string
+          mime_type: string
+          size_bytes: number
+          storage_path: string
+          uploaded_by: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          company_id: string
+          vehicle_id?: string | null
+          trailer_id?: string | null
+          record_id?: string | null
+          kind: string
+          title?: string | null
+          file_name: string
+          mime_type: string
+          size_bytes: number
+          storage_path: string
+          uploaded_by?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          company_id?: string
+          vehicle_id?: string | null
+          trailer_id?: string | null
+          record_id?: string | null
+          kind?: string
+          title?: string | null
+          file_name?: string
+          mime_type?: string
+          size_bytes?: number
+          storage_path?: string
+          uploaded_by?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
       maintenance_records: {
         Row: {
           amount_cents: number | null
@@ -9982,6 +10030,12 @@ export type Database = {
         Returns: undefined
       }
       restore_driver: { Args: { p_driver_id: string }; Returns: undefined }
+      retention_fleet_orphans: {
+        Args: { p_limit?: number }
+        Returns: {
+          name: string
+        }[]
+      }
       retention_defect_candidates: {
         Args: { p_limit?: number }
         Returns: {

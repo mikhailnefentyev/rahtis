@@ -7,12 +7,13 @@ import { todayInHelsinki } from '@/lib/dates';
 import { isLocale } from '@/lib/i18n';
 import { getViewerI18n } from '@/lib/i18n/viewer';
 import { deleteMaintenanceRecordAction } from '@/lib/maintenance/actions';
-import { loadFleetMaintenance } from '@/lib/maintenance/load';
+import { loadAssetDocuments, loadFleetMaintenance } from '@/lib/maintenance/load';
 import { createClient } from '@/lib/supabase/server';
 import { DefectCard } from '../DefectCard';
 import { DowntimeCard } from '../DowntimeCard';
 import { itemLabel } from '../format';
 import { AssetActions, PlanItemCard } from './AssetForms';
+import { DocumentsSection, type DocumentView } from './Documents';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -23,8 +24,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 
 /**
  * Обслуживание одной машины или прицепа: открытые дефекты, план со
- * сроками и отметкой «сделано», разовый ремонт, сервисная книжка и
- * закрытые дефекты.
+ * сроками и отметкой «сделано», разовый ремонт, сервисная книжка,
+ * документы (счета, протоколы, свидетельства) и закрытые дефекты.
  */
 export default async function AssetMaintenancePage({ params }: { params: Promise<{ locale: string; id: string }> }) {
   const { locale, id } = await params;
@@ -35,7 +36,7 @@ export default async function AssetMaintenancePage({ params }: { params: Promise
   const { t, f } = i18n;
   const s = t.maintenance;
 
-  const [data, { data: records }, { data: access }] = await Promise.all([
+  const [data, { data: records }, { data: access }, documents] = await Promise.all([
     loadFleetMaintenance(supabase, {
       companyId: viewer.company!.id,
       today: todayInHelsinki(),
@@ -51,6 +52,7 @@ export default async function AssetMaintenancePage({ params }: { params: Promise
       .order('done_on', { ascending: false })
       .limit(200),
     supabase.rpc('own_orders_access'),
+    loadAssetDocuments(supabase, { companyId: viewer.company!.id, assetId: id }),
   ]);
 
   const asset = data.assets.find((a) => a.id === id);
@@ -61,6 +63,21 @@ export default async function AssetMaintenancePage({ params }: { params: Promise
   const closedDefects = data.defects.filter((d) => d.status !== 'OPEN');
   const trailer = asset.type === 'TRAILER';
   const downtime = data.downtime.filter((d) => (d.vehicle_id ?? d.trailer_id) === id);
+
+  /* Строки книжки — подписью «дата · работа»: для выбора в форме и для документа, приложенного к строке. */
+  const recordLabel = new Map((records ?? []).map((r) => [r.id, `${f.date(`${r.done_on}T12:00:00Z`)} · ${itemLabel(i18n, r)}`]));
+  const docViews: DocumentView[] = documents.map((d) => ({
+    id: d.id,
+    kind: d.kind,
+    title: d.title,
+    file_name: d.file_name,
+    mime_type: d.mime_type,
+    created_at: d.created_at,
+    url: d.url,
+    record: d.record_id ? (recordLabel.get(d.record_id) ?? null) : null,
+  }));
+  const docsByRecord = new Map<string, typeof documents>();
+  for (const d of documents) if (d.record_id) docsByRecord.set(d.record_id, [...(docsByRecord.get(d.record_id) ?? []), d]);
 
   return (
     <main className="cab-page">
@@ -146,6 +163,14 @@ export default async function AssetMaintenancePage({ params }: { params: Promise
                     <Td>
                       <span className="font-semibold">{itemLabel(i18n, r)}</span>
                       {r.note && <span className="block text-[12px] text-ink-muted">{r.note}</span>}
+                      {(docsByRecord.get(r.id) ?? []).map((d) =>
+                        d.url ? (
+                          <a key={d.id} href={d.url} target="_blank" rel="noopener noreferrer" className="mr-3 inline-flex items-center gap-1 text-[12px] text-accent hover:underline">
+                            <ClipIcon />
+                            {d.title ?? s.docs.kinds[d.kind as keyof typeof s.docs.kinds] ?? d.file_name}
+                          </a>
+                        ) : null,
+                      )}
                     </Td>
                     {!trailer && <Td className="text-right font-mono">{r.odometer_km != null ? f.number(r.odometer_km) : '—'}</Td>}
                     <Td>{r.workshop ?? '—'}</Td>
@@ -167,6 +192,12 @@ export default async function AssetMaintenancePage({ params }: { params: Promise
         )}
       </section>
 
+      <DocumentsSection
+        asset={{ id: asset.id, type: asset.type }}
+        documents={docViews}
+        records={(records ?? []).map((r) => ({ id: r.id, label: recordLabel.get(r.id) ?? r.done_on }))}
+      />
+
       {closedDefects.length > 0 && (
         <section>
           <h2 className="mb-3 border-b border-line pb-2 text-[13px] font-semibold tracking-tight text-ink-faint">{s.defects.closedTitle}</h2>
@@ -178,5 +209,14 @@ export default async function AssetMaintenancePage({ params }: { params: Promise
         </section>
       )}
     </main>
+  );
+}
+
+/** Скрепка у строки книжки: к записи приложен файл. */
+function ClipIcon() {
+  return (
+    <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M13.5 7.5 8 13a3.5 3.5 0 0 1-5-5l5.8-5.8a2.3 2.3 0 0 1 3.3 3.3L6.3 11.3a1.2 1.2 0 0 1-1.7-1.7L10 4.2" />
+    </svg>
   );
 }
