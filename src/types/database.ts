@@ -3281,6 +3281,83 @@ export type Database = {
         }
         Relationships: []
       }
+      maintenance_documents: {
+        Row: {
+          company_id: string
+          created_at: string
+          file_name: string
+          id: string
+          kind: string
+          mime_type: string
+          record_id: string | null
+          size_bytes: number
+          storage_path: string
+          title: string | null
+          trailer_id: string | null
+          uploaded_by: string | null
+          vehicle_id: string | null
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          file_name: string
+          id?: string
+          kind: string
+          mime_type: string
+          record_id?: string | null
+          size_bytes: number
+          storage_path: string
+          title?: string | null
+          trailer_id?: string | null
+          uploaded_by?: string | null
+          vehicle_id?: string | null
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          file_name?: string
+          id?: string
+          kind?: string
+          mime_type?: string
+          record_id?: string | null
+          size_bytes?: number
+          storage_path?: string
+          title?: string | null
+          trailer_id?: string | null
+          uploaded_by?: string | null
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maintenance_documents_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_documents_record_id_fkey"
+            columns: ["record_id"]
+            isOneToOne: false
+            referencedRelation: "maintenance_records"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_documents_trailer_id_fkey"
+            columns: ["trailer_id"]
+            isOneToOne: false
+            referencedRelation: "trailers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_documents_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       maintenance_items: {
         Row: {
           company_id: string
@@ -3356,54 +3433,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      maintenance_documents: {
-        Row: {
-          id: string
-          company_id: string
-          vehicle_id: string | null
-          trailer_id: string | null
-          record_id: string | null
-          kind: string
-          title: string | null
-          file_name: string
-          mime_type: string
-          size_bytes: number
-          storage_path: string
-          uploaded_by: string | null
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          company_id: string
-          vehicle_id?: string | null
-          trailer_id?: string | null
-          record_id?: string | null
-          kind: string
-          title?: string | null
-          file_name: string
-          mime_type: string
-          size_bytes: number
-          storage_path: string
-          uploaded_by?: string | null
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          company_id?: string
-          vehicle_id?: string | null
-          trailer_id?: string | null
-          record_id?: string | null
-          kind?: string
-          title?: string | null
-          file_name?: string
-          mime_type?: string
-          size_bytes?: number
-          storage_path?: string
-          uploaded_by?: string | null
-          created_at?: string
-        }
-        Relationships: []
       }
       maintenance_records: {
         Row: {
@@ -10030,17 +10059,17 @@ export type Database = {
         Returns: undefined
       }
       restore_driver: { Args: { p_driver_id: string }; Returns: undefined }
-      retention_fleet_orphans: {
-        Args: { p_limit?: number }
-        Returns: {
-          name: string
-        }[]
-      }
       retention_defect_candidates: {
         Args: { p_limit?: number }
         Returns: {
           id: string
           storage_path: string
+        }[]
+      }
+      retention_fleet_orphans: {
+        Args: { p_limit?: number }
+        Returns: {
+          name: string
         }[]
       }
       retention_fuel_candidates: {
