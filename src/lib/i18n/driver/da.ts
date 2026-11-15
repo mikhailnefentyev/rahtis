@@ -58,6 +58,8 @@ export const da = {
     ref: 'Reference',
     note: 'Bemærkning',
     markDone: 'Marker som udført',
+    noPhotosConfirm: 'Du har ikke taget nogen billeder. Billeder er dit bevis, hvis der opstår uenighed om trailer eller gods. Tag billederne ovenfor, eller markér punktet som udført uden billeder.',
+    noPhotosDone: 'Markér som udført uden billeder',
     /* Сверка машины на первой погрузке (6.11.2026). */
     vehiclePlates: 'Nummerplader',
     vehicleTruck: 'Lastbil',

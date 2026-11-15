@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useI18n } from '@/lib/i18n/provider';
 import { askPosition } from '@/lib/orders/position';
 import { useOutbox } from '../../../OutboxProvider';
+import { useQueuedPhotos } from './PhotoCapture';
 
 /**
  * Отметка точки водителем.
@@ -16,8 +17,14 @@ import { useOutbox } from '../../../OutboxProvider';
 export function StopDone({
   stopId,
   plates = null,
+  photosExpected = false,
+  photosTaken = 0,
 }: {
   stopId: string;
+  /** На точке положен осмотр со снимками (забор, сдача, возврат). */
+  photosExpected?: boolean;
+  /** Снимков этой точки уже на сервере. */
+  photosTaken?: number;
   /** Первая погрузка: номера, которые водитель подтверждает (заполнены из рейса). */
   plates?: { truck: string | null; trailer: string | null } | null;
 }) {
@@ -28,6 +35,15 @@ export function StopDone({
   const [truck, setTruck] = useState(plates?.truck ?? '');
   const [trailer, setTrailer] = useState(plates?.trailer ?? '');
   const [editing, setEditing] = useState(false);
+  /*
+   * Ни одного снимка там, где положен осмотр, — сначала переспросить.
+   * Не запрет: камера может не работать, рейс не должен вставать. Но
+   * случайно закрыть точку без доказательств для спора о повреждении
+   * одним нажатием больше нельзя (обход 15.11.2026).
+   */
+  const queued = useQueuedPhotos(stopId);
+  const [confirmNoPhotos, setConfirmNoPhotos] = useState(false);
+  const noPhotos = photosExpected && photosTaken + queued.length === 0;
 
   async function submit() {
     setBusy(true);
@@ -102,13 +118,24 @@ export function StopDone({
         />
       </label>
 
+      {confirmNoPhotos && noPhotos && (
+        <p role="alert" className="rounded-control border border-warn/40 bg-warn/10 px-3 py-2 text-[15px] font-semibold text-warn">
+          {t.driverApp.noPhotosConfirm}
+        </p>
+      )}
       <button
         type="button"
-        onClick={submit}
+        onClick={() => {
+          if (noPhotos && !confirmNoPhotos) {
+            setConfirmNoPhotos(true);
+            return;
+          }
+          void submit();
+        }}
         disabled={busy}
         className="h-14 rounded-control bg-accent text-[17px] font-semibold text-accent-ink disabled:opacity-60"
       >
-        {busy ? t.driverApp.locating : `✓ ${t.driverApp.markDone}`}
+        {busy ? t.driverApp.locating : confirmNoPhotos && noPhotos ? t.driverApp.noPhotosDone : `✓ ${t.driverApp.markDone}`}
       </button>
     </div>
   );

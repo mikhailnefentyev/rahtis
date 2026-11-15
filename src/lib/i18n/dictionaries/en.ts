@@ -3414,6 +3414,8 @@ export const en = {
     ref: 'Reference',
     note: 'Note',
     markDone: 'Mark as done',
+    noPhotosConfirm: 'You have not taken any photos. Photos are your evidence if there is a dispute about the trailer or the cargo. Take the photos above or mark the stop done without photos.',
+    noPhotosDone: 'Mark done without photos',
     /* Сверка машины на первой погрузке (6.11.2026). */
     vehiclePlates: 'Registrations',
     vehicleTruck: 'Truck',

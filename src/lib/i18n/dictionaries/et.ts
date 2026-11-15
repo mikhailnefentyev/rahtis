@@ -3265,6 +3265,8 @@ export const et = {
     ref: 'Viide',
     note: 'Märkus',
     markDone: 'Märgi tehtuks',
+    noPhotosConfirm: 'Sa ei ole ühtegi fotot teinud. Fotod on tõend, kui haagise või veose üle tekib vaidlus. Tee fotod ülal või märgi punkt tehtuks ilma fotodeta.',
+    noPhotosDone: 'Märgi tehtuks ilma fotodeta',
     /* Сверка машины на первой погрузке (6.11.2026). */
     vehiclePlates: 'Numbrimärgid',
     vehicleTruck: 'Veok',

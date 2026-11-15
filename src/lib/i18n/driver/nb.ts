@@ -58,6 +58,8 @@ export const nb = {
     ref: 'Referanse',
     note: 'Merknad',
     markDone: 'Merk som utført',
+    noPhotosConfirm: 'Du har ikke tatt noen bilder. Bilder er beviset ditt hvis det blir tvist om tilhengeren eller lasten. Ta bildene over, eller merk punktet som utført uten bilder.',
+    noPhotosDone: 'Merk som utført uten bilder',
     /* Сверка машины на первой погрузке (6.11.2026). */
     vehiclePlates: 'Registreringsnummer',
     vehicleTruck: 'Bil',

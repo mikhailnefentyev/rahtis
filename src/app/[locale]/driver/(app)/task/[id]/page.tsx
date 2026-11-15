@@ -336,7 +336,12 @@ async function StopItem({
                     <CmrReminder orderId={task.id} stopId={stop.id} hasCmr={hasCmr} withScan={!confirmation} />
                   )}
 
-                  <StopDone stopId={stop.id} plates={plates} />
+                  <StopDone
+                    stopId={stop.id}
+                    plates={plates}
+                    photosExpected={INSPECT.has(stop.role)}
+                    photosTaken={photos.filter((photo) => photo.stopId === stop.id).length}
+                  />
                 </StopGate>
               </div>
             </StopGate>

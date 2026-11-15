@@ -58,6 +58,8 @@ export const pl = {
     ref: 'Numer',
     note: 'Uwaga',
     markDone: 'Oznacz jako wykonane',
+    noPhotosConfirm: 'Nie zrobiłeś żadnego zdjęcia. Zdjęcia są dowodem w razie sporu o naczepę lub ładunek. Zrób zdjęcia powyżej albo oznacz punkt jako wykonany bez zdjęć.',
+    noPhotosDone: 'Oznacz jako wykonany bez zdjęć',
     /* Сверка машины на первой погрузке (6.11.2026). */
     vehiclePlates: 'Numery rejestracyjne',
     vehicleTruck: 'Pojazd',

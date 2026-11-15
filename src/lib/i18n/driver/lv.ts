@@ -58,6 +58,8 @@ export const lv = {
     ref: 'Atsauce',
     note: 'Piezīme',
     markDone: 'Atzīmēt kā izpildītu',
+    noPhotosConfirm: 'Jūs neesat uzņēmis nevienu fotoattēlu. Foto ir pierādījums, ja rodas strīds par piekabi vai kravu. Uzņemiet foto augstāk vai atzīmējiet punktu kā izpildītu bez foto.',
+    noPhotosDone: 'Atzīmēt kā izpildītu bez foto',
     /* Сверка машины на первой погрузке (6.11.2026). */
     vehiclePlates: 'Numura zīmes',
     vehicleTruck: 'Auto',

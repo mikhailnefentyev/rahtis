@@ -58,6 +58,8 @@ export const sv = {
     ref: 'Referens',
     note: 'Notering',
     markDone: 'Markera som klar',
+    noPhotosConfirm: 'Du har inte tagit några foton. Foton är ditt bevis om det blir tvist om släpet eller lasten. Ta fotona ovan eller markera punkten som klar utan foton.',
+    noPhotosDone: 'Markera klar utan foton',
     /* Сверка машины на первой погрузке (6.11.2026). */
     vehiclePlates: 'Registreringsnummer',
     vehicleTruck: 'Bil',

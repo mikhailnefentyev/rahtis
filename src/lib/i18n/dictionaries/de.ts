@@ -3264,6 +3264,8 @@ export const de = {
     ref: 'Referenz',
     note: 'Hinweis',
     markDone: 'Als erledigt markieren',
+    noPhotosConfirm: 'Sie haben noch kein Foto gemacht. Fotos sind Ihr Nachweis, falls es Streit um den Auflieger oder die Ladung gibt. Machen Sie die Fotos oben oder markieren Sie den Punkt ohne Fotos als erledigt.',
+    noPhotosDone: 'Ohne Fotos als erledigt markieren',
     /* Сверка машины на первой погрузке (6.11.2026). */
     vehiclePlates: 'Kennzeichen',
     vehicleTruck: 'Lkw',

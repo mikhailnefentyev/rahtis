@@ -3530,6 +3530,8 @@ export const fi = {
     ref: 'Viite',
     note: 'Huomio',
     markDone: 'Merkitse tehdyksi',
+    noPhotosConfirm: 'Et ole ottanut yhtään kuvaa. Kuvat ovat todiste, jos vaunusta tai lastista tulee riitaa. Ota kuvat yllä tai merkitse kohta tehdyksi ilman kuvia.',
+    noPhotosDone: 'Merkitse tehdyksi ilman kuvia',
     /* Сверка машины на первой погрузке (6.11.2026). */
     vehiclePlates: 'Rekisterinumerot',
     vehicleTruck: 'Auto',

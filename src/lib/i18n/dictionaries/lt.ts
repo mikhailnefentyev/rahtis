@@ -3265,6 +3265,8 @@ export const lt = {
     ref: 'Užsakymo nr.',
     note: 'Pastaba',
     markDone: 'Pažymėti atliktu',
+    noPhotosConfirm: 'Nepadarėte nė vienos nuotraukos. Nuotraukos yra įrodymas, jei kiltų ginčas dėl priekabos ar krovinio. Nufotografuokite aukščiau arba pažymėkite punktą atliktu be nuotraukų.',
+    noPhotosDone: 'Pažymėti atliktu be nuotraukų',
     /* Сверка машины на первой погрузке (6.11.2026). */
     vehiclePlates: 'Valstybiniai numeriai',
     vehicleTruck: 'Vilkikas',
