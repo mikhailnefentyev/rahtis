@@ -121,8 +121,8 @@
      Данные — только моноширинным: номера машин, суммы, время, километры
      должны выстраиваться в колонку. */
   --font-sans:
-    var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, 'Cascadia Mono', Consolas, monospace;
+    var(--font-ui-sans), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: var(--font-ui-mono), ui-monospace, 'Cascadia Mono', Consolas, monospace;
 
   --text-micro: 0.625rem; /* 10px — надписи капсом над данными */
   --text-micro--line-height: 1.2;
@@ -737,7 +737,7 @@
   font-weight: 600;
   color: var(--color-accent);
 }
-.app-head__ref { font-family: var(--font-geist-mono), monospace; color: var(--color-ink); font-weight: 700; }
+.app-head__ref { font-family: var(--font-ui-mono), monospace; color: var(--color-ink); font-weight: 700; }
 
 .app-banner {
   margin: 0 12px;
@@ -947,7 +947,7 @@
    * разрядка ужата: три утверждения должны стоять тремя плотными
    * строками, как надпись на борту, а не растекаться по экрану.
    */
-  font-family: var(--font-display), var(--font-geist-sans), system-ui, sans-serif;
+  font-family: var(--font-display), var(--font-ui-sans), system-ui, sans-serif;
   /*
    * Кегль меньше прежнего, хотя шрифт сменился на более крупный по
    * рисунку: Archivo шире Geist на знак, и на прежних 52 пунктах третья
@@ -1133,7 +1133,7 @@
 .locale-switch a {
   padding: 3px 9px;
   border-radius: var(--radius-pill);
-  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-family: var(--font-ui-mono), ui-monospace, monospace;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.06em;
@@ -1157,7 +1157,7 @@
 .locale-menu > summary > span[data-on] {
   padding: 3px 9px;
   border-radius: var(--radius-pill);
-  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-family: var(--font-ui-mono), ui-monospace, monospace;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.06em;
@@ -1193,7 +1193,7 @@
 .locale-list a[data-on] { color: var(--color-ink); font-weight: 600; }
 .locale-code {
   width: 1.8rem;
-  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-family: var(--font-ui-mono), ui-monospace, monospace;
   font-size: 11px;
   letter-spacing: 0.06em;
   color: var(--color-ink-faint);
@@ -1228,7 +1228,7 @@
   border-radius: var(--radius-pill);
   background: var(--color-accent);
   color: #ffffff;
-  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-family: var(--font-ui-mono), ui-monospace, monospace;
   font-size: 11px;
   font-weight: 700;
   line-height: 1;
@@ -1321,7 +1321,7 @@
 
 .pulse-bars__label {
   text-align: center;
-  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-family: var(--font-ui-mono), ui-monospace, monospace;
   font-size: 10px;
   letter-spacing: 0.02em;
   color: var(--color-ink-faint);
@@ -2103,7 +2103,7 @@
 .blog-article a:hover { color: var(--color-ink-muted); }
 .blog-article strong, .blog-article b { font-weight: 600; }
 .blog-article blockquote { margin: 1.2em 0; padding: 0.2em 0 0.2em 1em; border-inline-start: 3px solid var(--color-line-strong); color: var(--color-ink-muted); }
-.blog-article code { font-family: var(--font-geist-mono), monospace; font-size: 0.9em; }
+.blog-article code { font-family: var(--font-ui-mono), monospace; font-size: 0.9em; }
 .blog-article table { display: block; overflow-x: auto; width: 100%; margin: 1.2em 0; border-collapse: collapse; font-size: 14px; line-height: 1.5; }
 .blog-article th, .blog-article td { padding: 8px 10px; border: 1px solid var(--color-line); text-align: start; vertical-align: top; }
 .blog-article th { background: var(--color-sunken); font-weight: 600; }

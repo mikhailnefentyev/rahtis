@@ -15,10 +15,13 @@ import { useI18n } from '@/lib/i18n/provider';
  * вкладок нет — они учат водителя не нажимать на них. Цели — во
  * всю высоту полосы, под большой палец и перчатку.
  *
- * Значок над подписью и «таблетка» за значком активного пункта: одни
- * слова в полосе читались как текст, а не как кнопки. Активный пункт
- * отличается не только цветом — таблетка видна и на солнце, и тому, кто
- * плохо различает цвета.
+ * Значок над подписью: одни слова в полосе читались как текст, а не как
+ * кнопки. Полоса тёмная, как у навигаторов и приложений водителя
+ * Samsara и Webfleet (15.11.2026, вместо светлой с «таблеткой» за
+ * значком — «выглядит как игрушечное и несерьёзное»): ночью в кабине не
+ * слепит и отделяет управление от содержимого экрана. Активный пункт
+ * отличается не только цветом — яркая линия сверху и белые значок с
+ * подписью видны и на солнце, и тому, кто плохо различает цвета.
  */
 export function DriverNav({ unread }: { unread: number }) {
   const { t, locale } = useI18n();
@@ -62,7 +65,7 @@ export function DriverNav({ unread }: { unread: number }) {
     <nav
       aria-hidden={typing || undefined}
       className={cn(
-        'relative z-20 shrink-0 border-t border-line bg-surface pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_16px_rgb(0_0_0/0.06)]',
+        'relative z-20 shrink-0 border-t border-night-line bg-night pb-[env(safe-area-inset-bottom)]',
         typing && 'hidden',
       )}
     >
@@ -73,27 +76,30 @@ export function DriverNav({ unread }: { unread: number }) {
               href={href}
               aria-current={active ? 'page' : undefined}
               className={cn(
-                'flex h-[68px] flex-col items-center justify-center gap-1',
-                active ? 'text-accent' : 'text-ink-muted',
+                'relative flex h-[64px] flex-col items-center justify-center gap-1 transition-colors duration-150',
+                active ? 'text-night-ink' : 'text-night-muted active:text-night-ink',
               )}
             >
+              {/* Метка активного пункта — линия по верхнему краю полосы. */}
               <span
+                aria-hidden="true"
                 className={cn(
-                  'relative flex h-8 w-14 items-center justify-center rounded-pill transition-colors duration-200',
-                  active && 'bg-accent-wash',
+                  'absolute inset-x-3 top-0 h-[3px] rounded-b-sm bg-accent-bright transition-opacity duration-150',
+                  active ? 'opacity-100' : 'opacity-0',
                 )}
-              >
+              />
+              <span className="relative flex h-7 items-center justify-center">
                 <Icon />
                 {badge ? (
-                  <span className="absolute -top-1 right-1.5 inline-flex h-5 min-w-5 items-center justify-center rounded-pill bg-danger px-1 text-[11px] leading-none font-bold text-surface ring-2 ring-surface">
+                  <span className="absolute -top-1.5 left-[calc(50%+6px)] inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-sm bg-danger px-1 font-mono text-[11px] leading-none font-semibold text-white ring-2 ring-night">
                     {badge > 99 ? '99+' : badge}
                   </span>
                 ) : null}
               </span>
               <span
                 className={cn(
-                  'max-w-full truncate text-[12px] leading-tight tracking-tight',
-                  active ? 'font-bold' : 'font-semibold',
+                  'max-w-full truncate px-1 text-[11.5px] leading-tight',
+                  active ? 'font-semibold' : 'font-medium',
                 )}
               >
                 {label}
@@ -132,12 +138,12 @@ function useTyping(): boolean {
   return typing;
 }
 
-/* Значки: встроенный SVG, штрих 2 px, как в тренажёре. Скрыты от чтения с экрана — рядом подпись. */
+/* Значки: встроенный SVG, штрих 1,75 px — строже, чем 2 px. Скрыты от чтения с экрана — рядом подпись. */
 const base = {
   viewBox: '0 0 24 24',
   fill: 'none',
   stroke: 'currentColor',
-  strokeWidth: 2,
+  strokeWidth: 1.75,
   strokeLinecap: 'round' as const,
   strokeLinejoin: 'round' as const,
   'aria-hidden': true,

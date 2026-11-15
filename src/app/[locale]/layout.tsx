@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { Archivo, Geist, Geist_Mono } from 'next/font/google';
+import { Archivo, IBM_Plex_Mono, IBM_Plex_Sans } from 'next/font/google';
 import { APP } from '@/lib/config';
 import { SITE_URL } from '@/lib/seo';
 import { getDictionary, isLocale, locales } from '@/lib/i18n';
@@ -23,25 +23,32 @@ import '../globals.css';
  * В CSS next/font всё равно объявляет все поднаборы шрифта (latin-ext,
  * cyrillic…) с unicode-range, и браузер скачивает их сам, когда на
  * странице есть такие буквы: польские, балтийские и русские страницы
- * набраны тем же Geist, а не запасным шрифтом. Предзагружаем одну
- * латиницу, чтобы не тянуть лишние файлы на каждую страницу.
+ * набраны тем же шрифтом, а не запасным. Предзагружаем одну латиницу,
+ * чтобы не тянуть лишние файлы на каждую страницу.
+ *
+ * IBM Plex Sans (15.11.2026, вместо Geist; выбор пользователя: «выглядит
+ * как игрушечное и несерьёзное»): технический гротеск промышленных и
+ * логистических интерфейсов — чёткие цифры, открытые формы, читается в
+ * кабине и на солнце. Вариативный — один файл на все начертания. Plex
+ * Mono — номера, суммы, коды: то же семейство, тот же характер.
  */
-const sans = Geist({
-  variable: '--font-geist-sans',
+const sans = IBM_Plex_Sans({
+  variable: '--font-ui-sans',
   subsets: ['latin'],
   display: 'swap',
 });
 
-const mono = Geist_Mono({
-  variable: '--font-geist-mono',
+const mono = IBM_Plex_Mono({
+  variable: '--font-ui-mono',
   subsets: ['latin'],
+  weight: ['400', '500', '600'],
   display: 'swap',
 });
 
 /*
  * Шрифт заголовка первого экрана — и только его.
  *
- * Geist хорош в тексте и ровно тем плох в заголовке: он нейтрален.
+ * Шрифт текста хорош в тексте и ровно тем плох в заголовке: он нейтрален.
  * Три коротких утверждения поверх съёмки порта должны звучать как
  * надпись на борту, а не как подпись к абзацу.
  *
