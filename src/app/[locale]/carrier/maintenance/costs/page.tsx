@@ -129,11 +129,15 @@ export default async function MaintenanceCostsPage({ params }: { params: Promise
         <>
           <section className="mb-8">
             <h2 className="mb-3 border-b border-line pb-2 text-[13px] font-semibold tracking-tight text-ink-faint">{s.chartTitle}</h2>
-            <Card>
-              <CardBody>
-                <MonthlyChart months={chartMonths} />
-              </CardBody>
-            </Card>
+            {summary.total > 0 ? (
+              <Card>
+                <CardBody>
+                  <MonthlyChart months={chartMonths} />
+                </CardBody>
+              </Card>
+            ) : (
+              <p className="text-[13px] text-ink-muted">{s.empty}</p>
+            )}
           </section>
 
           <section className="mb-8">

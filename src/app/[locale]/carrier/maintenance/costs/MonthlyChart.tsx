@@ -24,10 +24,11 @@ export function MonthlyChart({ months }: { months: ChartMonth[] }) {
   const [active, setActive] = useState<number | null>(null);
   const [table, setTable] = useState(false);
   const max = Math.max(1, ...months.map((m) => m.planned + m.repairs));
-  /* Шкала: круглый верх, три линии сетки. */
+  /* Шкала: круглый шаг (1, 2 или 5 × 10ⁿ), верх — ближайшее кратное над максимумом; линии на каждом шаге (≤ 3). */
   const step = niceStep(max / 3);
-  const top = step * Math.ceil(max / step);
-  const grid = [top, (top * 2) / 3, top / 3];
+  const steps = Math.max(1, Math.ceil(max / step));
+  const top = step * steps;
+  const grid = Array.from({ length: steps }, (_, i) => step * (steps - i));
   const current = active != null ? months[active] : null;
 
   return (
@@ -45,7 +46,7 @@ export function MonthlyChart({ months }: { months: ChartMonth[] }) {
         <div className="pointer-events-none absolute inset-x-0 top-0 h-40">
           {grid.map((g, i) => (
             <div key={i} className="absolute inset-x-0 border-t border-line" style={{ top: `${(1 - g / top) * 100}%` }}>
-              <span className="absolute -top-2 left-0 bg-surface pr-1 font-mono text-[10px] text-ink-dim">{f.money(Math.round(g / 100) * 100)}</span>
+              <span className="absolute -top-2 left-0 bg-surface pr-1 font-mono text-[10px] text-ink-dim">{f.money(g)}</span>
             </div>
           ))}
           <div className="absolute inset-x-0 bottom-0 border-t border-line-strong" />
@@ -88,7 +89,7 @@ export function MonthlyChart({ months }: { months: ChartMonth[] }) {
 
         {current && (
           <div
-            className="pointer-events-none absolute top-0 z-10 min-w-40 rounded-control border border-line bg-surface px-3 py-2 text-[12px] shadow-md"
+            className="pointer-events-none absolute top-0 z-10 min-w-52 rounded-control border border-line bg-surface px-3 py-2 text-[12px] shadow-md"
             style={{
               left: `calc(3.5rem + (100% - 3.5rem) * ${(active! + 0.5) / months.length})`,
               transform: active! > months.length / 2 ? 'translateX(calc(-100% - 12px))' : 'translateX(12px)',
@@ -144,7 +145,7 @@ function Legend({ color, label }: { color: string; label: string }) {
 function Row({ color, label, value }: { color: string; label: string; value: string }) {
   return (
     <p className="flex items-center justify-between gap-4 text-ink-muted">
-      <span className="inline-flex items-center gap-1.5">
+      <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
         <span className="inline-block size-2 rounded-sm" style={{ background: color }} aria-hidden="true" />
         {label}
       </span>
