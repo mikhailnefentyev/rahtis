@@ -442,7 +442,7 @@ $$;
 revoke all on function public.driver_maintenance_state() from public, anon;
 grant execute on function public.driver_maintenance_state() to authenticated;
 
-create or replace function public.maintenance_due_candidates(p_days integer, p_km integer)
+create or replace function public.maintenance_due_candidates(p_days integer default 30, p_km integer default 2000)
 returns table (
   item_id uuid,
   company_id uuid,
