@@ -9132,6 +9132,15 @@ export type Database = {
           vehicle_id: string
         }[]
       }
+      fleet_km_span: {
+        Args: { p_from: string }
+        Returns: {
+          km_end: number | null
+          km_start: number | null
+          readings: number
+          vehicle_id: string
+        }[]
+      }
       fleet_odometers: {
         Args: never
         Returns: {

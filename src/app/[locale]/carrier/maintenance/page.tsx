@@ -48,7 +48,13 @@ export default async function MaintenancePage({ params }: { params: Promise<{ lo
 
   return (
     <main className="cab-page">
-      <h1 className="page-title">{s.title}</h1>
+      <div className="flex flex-wrap items-baseline justify-between gap-3">
+        <h1 className="page-title">{s.title}</h1>
+        {/* Расходы за 12 месяцев — отдельной страницей: здесь то, что требует действия. */}
+        <Link href={`/${locale}/carrier/maintenance/costs`} className="text-[13px] font-semibold text-accent hover:underline">
+          {s.costs.open} →
+        </Link>
+      </div>
       <p className="mt-2 mb-6 max-w-3xl text-[13px] leading-relaxed text-ink-muted">{s.lede}</p>
 
       <StatRow className="mb-8">
