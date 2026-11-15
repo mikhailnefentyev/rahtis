@@ -6278,6 +6278,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "vehicle_defects_inspection_id_fkey"
+            columns: ["inspection_id"]
+            isOneToOne: false
+            referencedRelation: "vehicle_inspections"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "vehicle_defects_record_id_fkey"
             columns: ["record_id"]
             isOneToOne: false
@@ -6299,48 +6306,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      vehicle_inspections: {
-        Row: {
-          company_id: string
-          created_at: string
-          defects: number
-          driver_id: string | null
-          event_id: string | null
-          id: string
-          inspected_at: string
-          inspected_by: string | null
-          odometer_km: number | null
-          results: Json
-          vehicle_id: string
-        }
-        Insert: {
-          company_id: string
-          created_at?: string
-          defects?: number
-          driver_id?: string | null
-          event_id?: string | null
-          id?: string
-          inspected_at?: string
-          inspected_by?: string | null
-          odometer_km?: number | null
-          results: Json
-          vehicle_id: string
-        }
-        Update: {
-          company_id?: string
-          created_at?: string
-          defects?: number
-          driver_id?: string | null
-          event_id?: string | null
-          id?: string
-          inspected_at?: string
-          inspected_by?: string | null
-          odometer_km?: number | null
-          results?: Json
-          vehicle_id?: string
-        }
-        Relationships: []
       }
       vehicle_downtime: {
         Row: {
@@ -6585,6 +6550,70 @@ export type Database = {
             foreignKeyName: "vehicle_finance_vehicle_id_fkey"
             columns: ["vehicle_id"]
             isOneToOne: true
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vehicle_inspections: {
+        Row: {
+          company_id: string
+          created_at: string
+          defects: number
+          driver_id: string | null
+          event_id: string | null
+          id: string
+          inspected_at: string
+          inspected_by: string | null
+          odometer_km: number | null
+          results: Json
+          vehicle_id: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          defects?: number
+          driver_id?: string | null
+          event_id?: string | null
+          id?: string
+          inspected_at?: string
+          inspected_by?: string | null
+          odometer_km?: number | null
+          results: Json
+          vehicle_id: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          defects?: number
+          driver_id?: string | null
+          event_id?: string | null
+          id?: string
+          inspected_at?: string
+          inspected_by?: string | null
+          odometer_km?: number | null
+          results?: Json
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_inspections_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_inspections_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_inspections_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
             referencedRelation: "vehicles"
             referencedColumns: ["id"]
           },
@@ -8967,6 +8996,11 @@ export type Database = {
         Returns: undefined
       }
       driver_fuel_state: { Args: never; Returns: Json }
+      driver_inspection_add: {
+        Args: { p_at?: string; p_data: Json; p_event_id?: string }
+        Returns: Json
+      }
+      driver_inspection_state: { Args: never; Returns: Json }
       driver_invite_lookup: {
         Args: { p_code?: string; p_phone?: string; p_token?: string }
         Returns: {
@@ -8977,11 +9011,6 @@ export type Database = {
           invite_id: string
         }[]
       }
-      driver_inspection_add: {
-        Args: { p_at?: string; p_data: Json; p_event_id?: string }
-        Returns: Json
-      }
-      driver_inspection_state: { Args: never; Returns: Json }
       driver_maintenance_state: { Args: never; Returns: Json }
       driver_me: { Args: never; Returns: Json }
       driver_push_subscribe: {
@@ -10125,10 +10154,6 @@ export type Database = {
           storage_path: string
         }[]
       }
-      retention_purge_inspections: {
-        Args: { p_limit?: number }
-        Returns: number
-      }
       retention_fleet_orphans: {
         Args: { p_limit?: number }
         Returns: {
@@ -10149,6 +10174,10 @@ export type Database = {
           id: string
           storage_path: string
         }[]
+      }
+      retention_purge_inspections: {
+        Args: { p_limit?: number }
+        Returns: number
       }
       review_company_document: {
         Args: { p_decision: string; p_document_id: string; p_note?: string }
