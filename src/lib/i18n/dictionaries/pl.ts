@@ -1576,7 +1576,7 @@ export const pl = {
     cancelled: 'To zlecenie zostało anulowane',
     notAllowed: 'Nie masz uprawnień do tej czynności.',
     reasonNeeded: 'Wpisz powód. Zleceniodawca go zobaczy.',
-    started: 'Przewóz już się rozpoczął i nie można go anulować. Skontaktuj się z dyspozytorem.',
+    started: 'Przewóz już się rozpoczął i nie można go anulować. Zmiany uzgodnij z drugą stroną w Wiadomościach.',
     noLowering: 'Po przypisaniu przewoźnika ceny nie można obniżyć. Można ją tylko podnieść.',
     notFound: 'Nie znaleziono zlecenia.',
     failed: 'Nie udało się. Odśwież stronę i spróbuj ponownie.',

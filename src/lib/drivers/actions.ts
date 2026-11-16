@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { requireRole } from '@/lib/auth/guard';
 import { operationsLocalToIso } from '@/lib/dates';
 import { stopTimeZone } from '@/lib/country';
-import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
+import { getDictionary, getI18n, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
 import { siteUrl } from '@/lib/config';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
@@ -750,7 +750,25 @@ export async function copyAllowanceTemplateAction(formData: FormData): Promise<v
 
 /* ── Приложение водителя ────────────────────────────────────────── */
 
-export type InviteState = { error: string | null; link: string | null; code: string | null };
+export type InviteState = {
+  error: string | null;
+  link: string | null;
+  code: string | null;
+  /** Готовый текст SMS — на языке водителя, а не перевозчика. */
+  sms?: string | null;
+};
+
+/*
+ * Язык приглашения — первый язык водителя: эстонцу у финского
+ * перевозчика первое сообщение приходило по-фински (16.11.2026). Норвежский
+ * и датский есть только в приложении, не на сайте — для них английский.
+ */
+function inviteLocale(languages: readonly string[] | null | undefined, fallback: Locale): Locale {
+  const first = languages?.[0]?.toLowerCase();
+  if (!first) return fallback;
+  if (isLocale(first)) return first;
+  return first === 'nb' || first === 'no' || first === 'da' ? 'en' : fallback;
+}
 
 /**
  * Приглашение в приложение: одноразовая ссылка на сутки.
@@ -768,17 +786,24 @@ export async function createInviteAction(
   await requireCarrier(locale);
 
   const supabase = await createClient();
-  const { data, error } = await supabase.rpc('create_driver_invite', {
-    p_driver_id: str(formData, 'driver_id'),
-  });
+  const driverId = str(formData, 'driver_id');
+  const [{ data, error }, { data: driver }] = await Promise.all([
+    supabase.rpc('create_driver_invite', { p_driver_id: driverId }),
+    supabase.from('drivers').select('languages').eq('id', driverId ?? '').maybeSingle(),
+  ]);
   const invite = data?.[0];
 
   if (error || !invite) return { error: t.error.generic, link: null, code: null };
 
+  const lang = inviteLocale(driver?.languages, locale);
+  const link = `${siteUrl()}/${lang}/driver-invite/${invite.token}`;
+  const { m } = await getI18n(lang);
+
   return {
     error: null,
-    link: `${siteUrl()}/${locale}/driver-invite/${invite.token}`,
+    link,
     code: invite.code,
+    sms: m('drivers.smsBody', { link, code: invite.code ?? '' }),
   };
 }
 

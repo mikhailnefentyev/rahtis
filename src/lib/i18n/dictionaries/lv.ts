@@ -1576,7 +1576,7 @@ export const lv = {
     cancelled: 'Pasūtījums ir atcelts',
     notAllowed: 'Jums nav tiesību to darīt.',
     reasonNeeded: 'Uzrakstiet iemeslu. Pasūtītājs to redzēs.',
-    started: 'Pārvadājums jau ir sācies, to vairs nevar atcelt. Sazinieties ar dispečeru.',
+    started: 'Pārvadājums jau ir sācies, to vairs nevar atcelt. Par izmaiņām vienojieties ar otru pusi sadaļā “Ziņas”.',
     noLowering: 'Kad pārvadātājs jau ir izvēlēts, cenu nevar samazināt — tikai palielināt.',
     notFound: 'Pasūtījums nav atrasts.',
     failed: 'Darbība neizdevās. Atsvaidziniet lapu un mēģiniet vēlreiz.',

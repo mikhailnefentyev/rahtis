@@ -1576,7 +1576,7 @@ export const et = {
     cancelled: 'Vedu on tühistatud',
     notAllowed: 'Sul pole selleks õigust.',
     reasonNeeded: 'Kirjuta põhjus. Tellija näeb seda.',
-    started: 'Vedu on juba alanud ja seda ei saa enam tühistada. Võta ühendust dispetšeriga.',
+    started: 'Vedu on juba alanud ja seda ei saa enam tühistada. Leppige muudatustes teise osapoolega kokku sõnumites.',
     noLowering: 'Kui vedaja on juba valitud, ei saa hinda alandada, ainult tõsta.',
     notFound: 'Vedu ei leitud.',
     failed: 'Ei õnnestunud. Värskenda lehte ja proovi uuesti.',

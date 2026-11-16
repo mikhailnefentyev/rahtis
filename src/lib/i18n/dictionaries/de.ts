@@ -1576,7 +1576,7 @@ export const de = {
     cancelled: 'Dieser Auftrag wurde storniert',
     notAllowed: 'Dazu sind Sie nicht berechtigt.',
     reasonNeeded: 'Geben Sie den Grund an. Der Auftraggeber sieht ihn.',
-    started: 'Der Transport läuft schon und lässt sich nicht mehr stornieren. Melden Sie sich bei der Disposition.',
+    started: 'Der Transport läuft schon und lässt sich nicht mehr stornieren. Stimmen Sie Änderungen mit der anderen Seite unter „Nachrichten“ ab.',
     noLowering: 'Ist das Transportunternehmen schon gewählt, lässt sich der Preis nicht mehr senken, nur erhöhen.',
     notFound: 'Auftrag nicht gefunden.',
     failed: 'Das hat nicht geklappt. Laden Sie die Seite neu und versuchen Sie es noch einmal.',

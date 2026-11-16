@@ -1772,7 +1772,7 @@ export const fi = {
     cancelled: 'Kuljetus on peruutettu',
     notAllowed: 'Sinulla ei ole oikeutta tähän toimenpiteeseen.',
     reasonNeeded: 'Kirjoita syy. Tilaaja näkee sen.',
-    started: 'Kuljetus on jo aloitettu, eikä sitä voi enää perua. Ota yhteys ajojärjestelyyn.',
+    started: 'Kuljetus on jo aloitettu, eikä sitä voi enää perua. Sopikaa muutoksista toisen osapuolen kanssa Viesteissä.',
     noLowering: 'Hintaa ei voi laskea, kun kuljetusliike on jo valittu. Hintaa voi vain korottaa.',
     notFound: 'Kuljetusta ei löytynyt.',
     failed: 'Toimenpide ei mennyt läpi. Päivitä sivu ja yritä uudelleen.',

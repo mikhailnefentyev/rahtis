@@ -1576,7 +1576,7 @@ export const lt = {
     cancelled: 'Pervežimas atšauktas',
     notAllowed: 'Neturite teisės to daryti.',
     reasonNeeded: 'Nurodykite priežastį. Užsakovas ją matys.',
-    started: 'Pervežimas jau prasidėjo, atšaukti nebegalima. Susisiekite su dispečeriu.',
+    started: 'Pervežimas jau prasidėjo, atšaukti nebegalima. Dėl pakeitimų susitarkite su kita šalimi skiltyje „Žinutės“.',
     noLowering: 'Kai vežėjas jau pasirinktas, kainos sumažinti negalima – tik padidinti.',
     notFound: 'Pervežimas nerastas.',
     failed: 'Nepavyko. Atnaujinkite puslapį ir bandykite dar kartą.',

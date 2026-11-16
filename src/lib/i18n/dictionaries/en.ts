@@ -1683,7 +1683,7 @@ export const en = {
     cancelled: 'This order has been cancelled',
     notAllowed: 'You don’t have permission to do this.',
     reasonNeeded: 'Write the reason. The shipper will see it.',
-    started: 'The job has already started and can’t be cancelled. Call dispatch.',
+    started: 'The job has already started and can’t be cancelled. Agree on any changes with the other party in Messages.',
     noLowering: 'Once a carrier is chosen, the price can only go up, not down.',
     notFound: 'Order not found.',
     failed: 'That didn’t go through. Refresh the page and try again.',

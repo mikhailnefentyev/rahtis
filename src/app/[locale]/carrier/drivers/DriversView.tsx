@@ -444,7 +444,7 @@ function InvitePanel({ driver }: { driver: Driver }) {
   const [copied, setCopied] = useState(false);
 
   const smsHref = state.link
-    ? `sms:${driver.phone}?&body=${encodeURIComponent(m('drivers.smsBody', { link: state.link, code: state.code ?? '' }))}`
+    ? `sms:${driver.phone}?&body=${encodeURIComponent(state.sms ?? m('drivers.smsBody', { link: state.link, code: state.code ?? '' }))}`
     : null;
 
   return (

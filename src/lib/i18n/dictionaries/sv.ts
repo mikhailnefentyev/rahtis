@@ -1576,7 +1576,7 @@ export const sv = {
     cancelled: 'Ordern har avbokats',
     notAllowed: 'Du har inte behörighet att göra detta.',
     reasonNeeded: 'Skriv orsaken. Uppdragsgivaren ser den.',
-    started: 'Transporten har redan startat och kan inte längre avbokas. Kontakta trafikledningen.',
+    started: 'Transporten har redan startat och kan inte längre avbokas. Kom överens om ändringar med den andra parten under Meddelanden.',
     noLowering: 'Priset kan inte sänkas när ett åkeri har tilldelats. Det kan bara höjas.',
     notFound: 'Ordern hittades inte.',
     failed: 'Det gick inte igenom. Uppdatera sidan och försök igen.',

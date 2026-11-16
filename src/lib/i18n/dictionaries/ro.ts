@@ -1678,7 +1678,7 @@ export const ro = {
     cancelled: 'Această comandă a fost anulată',
     notAllowed: 'Nu aveți permisiunea pentru această acțiune.',
     reasonNeeded: 'Scrieți motivul. Expeditorul îl va vedea.',
-    started: 'Comanda a început deja și nu mai poate fi anulată. Sunați la dispecerat.',
+    started: 'Comanda a început deja și nu mai poate fi anulată. Stabiliți modificările cu cealaltă parte în secțiunea Mesaje.',
     noLowering: 'După alegerea transportatorului, prețul poate doar să crească, nu să scadă.',
     notFound: 'Comanda nu a fost găsită.',
     failed: 'Operațiunea nu a reușit. Reîncărcați pagina și încercați din nou.',
