@@ -2973,7 +2973,7 @@ export const lt = {
     saveDraft: 'Išsaugoti juodraštį',
     draftSaved: 'Išsaugota kaip juodraštis',
     required: 'reikalinga užsakymams skelbti',
-    registerHint: 'Tinka registro išrašas arba lygiavertis oficialus šalies, kurioje įregistruota įmonė, išrašas – pavyzdžiui, Vokietijoje Handelsregisterauszug arba Gewerbeanmeldung, Lenkijoje odpis z KRS arba wydruk z CEIDG, Švedijoje registreringsbevis, Norvegijoje firmaattest.',
+    registerHint: 'Tinka registro išrašas arba lygiavertis oficialus šalies, kurioje įregistruota įmonė, išrašas – pavyzdžiui, Vokietijoje Handelsregisterauszug arba Gewerbeanmeldung, Lenkijoje odpis z KRS arba wydruk z CEIDG, Švedijoje registreringsbevis, Norvegijoje firmaattest. Rumunijoje tinka certificat constatator (ONRC).',
     insuranceIntro: 'Reikalinga prieš skelbiant užsakymus. Atsiųskite ekspeditoriaus civilinės atsakomybės draudimo liudijimą patikrinti. Vežėjai mato patikrintą draudimą ir jo galiojimo pabaigą.',
     adminTitle: 'Skelbimas ir pervežimų perdavimas',
     adminOK: 'Dokumentai tvarkingi',

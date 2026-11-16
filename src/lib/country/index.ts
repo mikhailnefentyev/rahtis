@@ -18,7 +18,7 @@
  * только справочно).
  */
 
-export type CountryCode = 'FI' | 'SE' | 'NO' | 'DK' | 'EE' | 'LV' | 'LT' | 'PL' | 'DE';
+export type CountryCode = 'FI' | 'SE' | 'NO' | 'DK' | 'EE' | 'LV' | 'LT' | 'PL' | 'DE' | 'RO';
 
 export type RegistryKind =
   /** Финский PRH/YTJ: открытые данные, название, ALV, ennakkoperintä. */
@@ -37,7 +37,7 @@ export type CountryPack = {
   /** Часовой пояс точек маршрута в этой стране (простой, опоздания, «сегодня» у точки). */
   timeZone: string;
   /** Местная валюта — справочно: деньги на платформе в евро. */
-  currency: 'EUR' | 'SEK' | 'NOK' | 'DKK' | 'PLN';
+  currency: 'EUR' | 'SEK' | 'NOK' | 'DKK' | 'PLN' | 'RON';
   /** Обычная ставка НДС страны, базисные пункты — справочно, для подсказок и отчётов. */
   vatStandardBps: number;
   /** Номер компании, по которому она уникальна на платформе. */
@@ -144,6 +144,21 @@ function validDeUstId(s: string): boolean {
   }
   const check = (11 - p) % 10;
   return check === Number(s[8]);
+}
+
+/**
+ * Румынский CUI (cod de identificare fiscală): 2–10 цифр, последняя —
+ * контрольная. Без неё номер дополняется нулями слева до 9 цифр, сумма
+ * произведений на ключ 7,5,3,2,1,7,5,3,2 умножается на 10, остаток по 11
+ * (10 → 0) и есть контрольная цифра. Сверено на действующих компаниях
+ * (eMAG 14399840, Petrom 1590082, Dacia 160796).
+ */
+function validRoCui(s: string): boolean {
+  if (!/^\d{2,10}$/.test(s)) return false;
+  const body = s.slice(0, -1).padStart(9, '0');
+  let r = (weighted(body, [7, 5, 3, 2, 1, 7, 5, 3, 2]) * 10) % 11;
+  if (r === 10) r = 0;
+  return r === Number(s[s.length - 1]);
 }
 
 export const COUNTRY_PACKS: Record<CountryCode, CountryPack> = {
@@ -360,6 +375,36 @@ export const COUNTRY_PACKS: Record<CountryCode, CountryPack> = {
     marketed: true,
     driverLanguage: 'DE',
     sample: { plate: 'HH-AB 1234', city: 'Hamburg', address: 'Waltershofer Damm, 21129 Hamburg', place: 'Hamburg, Burchardkai', person: 'Max Mustermann', email: 'max@beispiel.de' },
+  },
+  /*
+   * Румыния (16.11.2026): первый клиент оттуда попросил регистрацию.
+   * Заявки и адреса — да; на витрине как зона работы пока не названа.
+   * Интерфейса на румынском нет: кабинет и приложение водителя — на
+   * английском, пока клиентов не станет больше.
+   */
+  RO: {
+    code: 'RO',
+    eu: true,
+    timeZone: 'Europe/Bucharest',
+    currency: 'RON',
+    vatStandardBps: 2100,
+    businessId: {
+      /* CUI — он же cod fiscal; у плательщика НДС в VIES тот же номер с приставкой RO. */
+      label: 'CUI (cod fiscal)',
+      example: '14399840',
+      isValid: validRoCui,
+      normalize: (raw) => digits(raw.replace(/^\s*RO/i, '')),
+    },
+    /* Не всякая румынская фирма — плательщик НДС; если нет, VIES ответит «не найден», и оператор проверит в ONRC сам. */
+    vatFromBusinessId: (id) => `RO${id}`,
+    registry: 'VIES',
+    registryUrl: null,
+    phonePrefix: '+40',
+    postcode: /\b\d{6}\b/,
+    enabled: true,
+    marketed: false,
+    driverLanguage: 'EN',
+    sample: { plate: 'B 123 ABC', city: 'Constanța', address: 'Incinta Port, 900900 Constanța', place: 'Port Constanța, Terminal Sud', person: 'Andrei Popescu', email: 'andrei@exemplu.ro' },
   },
 };
 

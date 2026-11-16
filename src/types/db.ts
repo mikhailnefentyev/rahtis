@@ -207,6 +207,7 @@ export const DRIVER_LANGUAGES = [
   'PL',
   'LT',
   'LV',
+  'RO',
 ] as const;
 
 /** Роли, у которых есть компания. У ADMIN её нет. */

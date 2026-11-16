@@ -2972,7 +2972,7 @@ export const ru = {
     saveDraft: 'Сохранить черновик',
     draftSaved: 'Сохранено как черновик',
     required: 'нужно для публикации заказов',
-    registerHint: 'Подойдёт выписка из торгового реестра или аналогичный официальный документ страны, где зарегистрирована компания, — например, в Германии Handelsregisterauszug или Gewerbeanmeldung, в Польше odpis z KRS или wydruk z CEIDG, в Швеции registreringsbevis, в Норвегии firmaattest.',
+    registerHint: 'Подойдёт выписка из торгового реестра или аналогичный официальный документ страны, где зарегистрирована компания, — например, в Германии Handelsregisterauszug или Gewerbeanmeldung, в Польше odpis z KRS или wydruk z CEIDG, в Швеции registreringsbevis, в Норвегии firmaattest. В Румынии подойдёт certificat constatator (ONRC).',
     insuranceIntro: 'Нужно до публикации заказов. Отправьте на проверку страховой сертификат по страхованию ответственности экспедитора. Перевозчики видят проверенный полис и срок его действия.',
     adminTitle: 'Публикация и передача перевозок',
     adminOK: 'Документы в порядке',

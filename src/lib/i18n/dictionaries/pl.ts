@@ -2972,7 +2972,7 @@ export const pl = {
     saveDraft: 'Zapisz szkic',
     draftSaved: 'Zapisano jako szkic',
     required: 'potrzebne do publikowania zleceń',
-    registerHint: 'Akceptujemy odpis z KRS, wydruk z CEIDG lub równoważny urzędowy dokument z kraju, w którym firma jest zarejestrowana – na przykład w Niemczech Handelsregisterauszug lub Gewerbeanmeldung, w Szwecji registreringsbevis, a w Norwegii firmaattest.',
+    registerHint: 'Akceptujemy odpis z KRS, wydruk z CEIDG lub równoważny urzędowy dokument z kraju, w którym firma jest zarejestrowana – na przykład w Niemczech Handelsregisterauszug lub Gewerbeanmeldung, w Szwecji registreringsbevis, a w Norwegii firmaattest. W Rumunii wystarczy certificat constatator (ONRC).',
     insuranceIntro: 'Potrzebne przed publikowaniem zleceń. Prześlij do weryfikacji polisę lub certyfikat ubezpieczenia OC spedytora. Przewoźnicy widzą sprawdzone ubezpieczenie i datę jego ważności.',
     adminTitle: 'Publikowanie i przekazywanie przewozów',
     adminOK: 'Dokumenty w porządku',

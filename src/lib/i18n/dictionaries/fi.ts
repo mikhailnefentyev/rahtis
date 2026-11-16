@@ -3238,7 +3238,7 @@ export const fi = {
     saveDraft: 'Tallenna luonnos',
     draftSaved: 'Tallennettu luonnoksena',
     required: 'tarvitaan tilausten julkaisemiseen',
-    registerHint: 'Kelpaa kaupparekisteriote tai sen maan vastaava virallinen ote, jossa yrityksesi on rekisteröity – esimerkiksi Saksassa Handelsregisterauszug tai Gewerbeanmeldung, Puolassa odpis z KRS tai wydruk z CEIDG, Ruotsissa registreringsbevis ja Norjassa firmaattest.',
+    registerHint: 'Kelpaa kaupparekisteriote tai sen maan vastaava virallinen ote, jossa yrityksesi on rekisteröity – esimerkiksi Saksassa Handelsregisterauszug tai Gewerbeanmeldung, Puolassa odpis z KRS tai wydruk z CEIDG, Ruotsissa registreringsbevis ja Norjassa firmaattest. Romaniassa kelpaa certificat constatator (ONRC).',
     insuranceIntro: 'Tarvitaan ennen tilausten julkaisemista. Lähetä huolitsijan vastuuvakuutuksen vakuutustodistus tarkastettavaksi. Kuljetusliikkeet näkevät tarkastetun vakuutuksen ja sen voimassaolopäivän.',
     adminTitle: 'Julkaiseminen ja kuljetusten antaminen',
     adminOK: 'Asiakirjat kunnossa',

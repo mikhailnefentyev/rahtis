@@ -11,7 +11,7 @@
  * (таблица fx_rates). Модуль общий для сервера и браузера.
  */
 
-export const CURRENCIES = ['EUR', 'SEK', 'NOK', 'DKK', 'PLN'] as const;
+export const CURRENCIES = ['EUR', 'SEK', 'NOK', 'DKK', 'PLN', 'RON'] as const;
 
 export type Currency = (typeof CURRENCIES)[number];
 
@@ -36,6 +36,8 @@ export function countryCurrency(country: string | null | undefined): Currency {
       return 'DKK';
     case 'PL':
       return 'PLN';
+    case 'RO':
+      return 'RON';
     default:
       return 'EUR';
   }

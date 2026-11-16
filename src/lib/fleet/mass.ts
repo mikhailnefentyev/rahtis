@@ -34,8 +34,8 @@
  *   PL, LT, LV, EE — пока по директиве; национальные исключения не проверены.
  */
 
-export type MassCountry = 'FI' | 'SE' | 'NO' | 'DK' | 'DE' | 'PL' | 'LT' | 'LV' | 'EE';
-export const MASS_COUNTRIES: readonly MassCountry[] = ['FI', 'SE', 'NO', 'DK', 'DE', 'PL', 'LT', 'LV', 'EE'];
+export type MassCountry = 'FI' | 'SE' | 'NO' | 'DK' | 'DE' | 'PL' | 'LT' | 'LV' | 'EE' | 'RO';
+export const MASS_COUNTRIES: readonly MassCountry[] = ['FI', 'SE', 'NO', 'DK', 'DE', 'PL', 'LT', 'LV', 'EE', 'RO'];
 
 /** Класс дороги там, где он меняет предел: SE BK1/BK4, NO сеть 50/60 т, DK обычная/модульная. */
 export type RoadClass = 'BK1' | 'BK4' | 'NET50' | 'NET60' | 'STANDARD' | 'EMS';
@@ -187,7 +187,7 @@ export function legalMassKg(
     case 'DE':
       return { kg: solo ? rigid(EU_RIGID, motor.axles) : euCombination(totalAxles), basis: 'exact' };
     default:
-      /* PL, LT, LV, EE: директива ЕС; национальные исключения не проверены. */
+      /* PL, LT, LV, EE, RO: директива ЕС 96/53 (5+ осей — 40 т); национальные исключения не проверены. */
       return { kg: solo ? rigid(EU_RIGID, motor.axles) : euCombination(totalAxles), basis: 'upper' };
   }
 }

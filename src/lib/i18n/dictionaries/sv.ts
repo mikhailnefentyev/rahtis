@@ -2973,7 +2973,7 @@ export const sv = {
     saveDraft: 'Spara utkast',
     draftSaved: 'Sparat som utkast',
     required: 'behövs för att publicera ordrar',
-    registerHint: 'Registreringsbevis eller motsvarande officiellt utdrag från det land där företaget är registrerat godtas – till exempel Handelsregisterauszug eller Gewerbeanmeldung i Tyskland, odpis z KRS eller wydruk z CEIDG i Polen och firmaattest i Norge.',
+    registerHint: 'Registreringsbevis eller motsvarande officiellt utdrag från det land där företaget är registrerat godtas – till exempel Handelsregisterauszug eller Gewerbeanmeldung i Tyskland, odpis z KRS eller wydruk z CEIDG i Polen och firmaattest i Norge. I Rumänien godtas ett certificat constatator (ONRC).',
     insuranceIntro: 'Behövs innan du publicerar ordrar. Skicka försäkringsbeviset för speditörens ansvarsförsäkring för granskning. Åkerierna ser den granskade försäkringen och dess giltighetstid.',
     adminTitle: 'Publicering och tilldelning av transporter',
     adminOK: 'Dokumenten i ordning',

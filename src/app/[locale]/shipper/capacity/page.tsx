@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return { title: t.capacity.shipperTitle };
 }
 
-const COUNTRIES = ['FI', 'SE', 'NO', 'DK', 'EE', 'LV', 'LT', 'PL', 'DE'];
+const COUNTRIES = ['FI', 'SE', 'NO', 'DK', 'EE', 'LV', 'LT', 'PL', 'DE', 'RO'];
 
 /**
  * «Свободное место по пути» у заказчика и экспедитора: опубликованное

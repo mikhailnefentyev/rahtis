@@ -2973,7 +2973,7 @@ export const et = {
     saveDraft: 'Salvesta mustand',
     draftSaved: 'Salvestatud mustandina',
     required: 'vajalik vedude avaldamiseks',
-    registerHint: 'Sobib äriregistri väljavõte või selle riigi samaväärne ametlik väljavõte, kus ettevõte on registreeritud – näiteks Saksamaal Handelsregisterauszug või Gewerbeanmeldung, Poolas odpis z KRS või wydruk z CEIDG, Rootsis registreringsbevis ja Norras firmaattest.',
+    registerHint: 'Sobib äriregistri väljavõte või selle riigi samaväärne ametlik väljavõte, kus ettevõte on registreeritud – näiteks Saksamaal Handelsregisterauszug või Gewerbeanmeldung, Poolas odpis z KRS või wydruk z CEIDG, Rootsis registreringsbevis ja Norras firmaattest. Rumeenias sobib certificat constatator (ONRC).',
     insuranceIntro: 'Vajalik enne vedude avaldamist. Saada ekspediitori vastutuskindlustuse kindlustustõend kontrollimiseks. Vedajad näevad kontrollitud kindlustust ja selle kehtivuse lõppu.',
     adminTitle: 'Avaldamine ja vedude andmine',
     adminOK: 'Dokumendid korras',

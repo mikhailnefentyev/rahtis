@@ -3122,7 +3122,7 @@ export const en = {
     saveDraft: 'Save draft',
     draftSaved: 'Saved as a draft',
     required: 'needed for publishing orders',
-    registerHint: 'We accept a trade register extract or the equivalent official extract of the country where your company is registered – for example a Handelsregisterauszug or Gewerbeanmeldung in Germany, an odpis z KRS or wydruk z CEIDG in Poland, a registreringsbevis in Sweden or a firmaattest in Norway.',
+    registerHint: 'We accept a trade register extract or the equivalent official extract of the country where your company is registered – for example a Handelsregisterauszug or Gewerbeanmeldung in Germany, an odpis z KRS or wydruk z CEIDG in Poland, a registreringsbevis in Sweden or a firmaattest in Norway. In Romania, a certificat constatator (ONRC) is accepted.',
     insuranceIntro: 'Needed before publishing orders. Send the insurance certificate of your freight forwarder\'s liability insurance for review. Carriers see the checked insurance and its expiry date.',
     adminTitle: 'Publishing and giving transports',
     adminOK: 'Documents in order',

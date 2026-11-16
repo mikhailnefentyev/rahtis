@@ -474,8 +474,8 @@ const text = (value: unknown, max: number): string | null => {
 export function parseNumber(value: unknown): number | null {
   if (typeof value === 'number') return Number.isFinite(value) ? value : null;
   if (typeof value !== 'string') return null;
-  /* Знаки валют числу не мешают: «312,4 €», «1 450,50 kr», «890 zł», «PLN 890». */
-  let s = value.replace(/[\s €]|zł|kr\.?|[A-Z]{3}/gi, '');
+  /* Знаки валют числу не мешают: «312,4 €», «1 450,50 kr», «890 zł», «PLN 890», «1.250,00 lei». */
+  let s = value.replace(/[\s €]|zł|lei|kr\.?|[A-Z]{3}/gi, '');
   if (s.includes(',') && s.includes('.')) {
     /* Последний разделитель — дробный: «1.234,56» и «1,234.56». */
     s = s.lastIndexOf(',') > s.lastIndexOf('.') ? s.replace(/\./g, '').replace(',', '.') : s.replace(/,/g, '');
@@ -513,7 +513,7 @@ export function parseTime(value: unknown): string | null {
 }
 
 /* Валюты сумм — как CURRENCIES в src/lib/money/currency.ts (и домен currency_code в базе). */
-const REPORT_CURRENCIES: readonly string[] = ['EUR', 'SEK', 'NOK', 'DKK', 'PLN'];
+const REPORT_CURRENCIES: readonly string[] = ['EUR', 'SEK', 'NOK', 'DKK', 'PLN', 'RON'];
 
 /** Валюта строки отчёта: код ISO из разбора; пусто или незнакомо — валюта компании. */
 export function reportCurrency(value: unknown, fallback: string): string {

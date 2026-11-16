@@ -2973,7 +2973,7 @@ export const de = {
     saveDraft: 'Entwurf speichern',
     draftSaved: 'Als Entwurf gespeichert',
     required: 'für das Veröffentlichen von Aufträgen erforderlich',
-    registerHint: 'Wir akzeptieren einen Handelsregisterauszug, eine Gewerbeanmeldung oder einen gleichwertigen amtlichen Nachweis des Landes, in dem Ihr Unternehmen eingetragen ist – zum Beispiel in Polen odpis z KRS oder wydruk z CEIDG, in Schweden registreringsbevis und in Norwegen firmaattest.',
+    registerHint: 'Wir akzeptieren einen Handelsregisterauszug, eine Gewerbeanmeldung oder einen gleichwertigen amtlichen Nachweis des Landes, in dem Ihr Unternehmen eingetragen ist – zum Beispiel in Polen odpis z KRS oder wydruk z CEIDG, in Schweden registreringsbevis und in Norwegen firmaattest. In Rumänien genügt ein certificat constatator (ONRC).',
     insuranceIntro: 'Erforderlich, bevor Sie Aufträge veröffentlichen. Senden Sie die Versicherungsbestätigung Ihrer Verkehrshaftungsversicherung zur Prüfung. Transportunternehmen sehen die geprüfte Versicherung und deren Ablaufdatum.',
     adminTitle: 'Veröffentlichen und Vergabe von Transporten',
     adminOK: 'Unterlagen in Ordnung',

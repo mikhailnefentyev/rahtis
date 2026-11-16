@@ -2973,7 +2973,7 @@ export const lv = {
     saveDraft: 'Saglabāt melnrakstu',
     draftSaved: 'Saglabāts kā melnraksts',
     required: 'nepieciešams pasūtījumu publicēšanai',
-    registerHint: 'Der uzņēmumu reģistra izziņa vai tās valsts līdzvērtīgs oficiāls izraksts, kurā uzņēmums ir reģistrēts, – piemēram, Vācijā Handelsregisterauszug vai Gewerbeanmeldung, Polijā odpis z KRS vai wydruk z CEIDG, Zviedrijā registreringsbevis un Norvēģijā firmaattest.',
+    registerHint: 'Der uzņēmumu reģistra izziņa vai tās valsts līdzvērtīgs oficiāls izraksts, kurā uzņēmums ir reģistrēts, – piemēram, Vācijā Handelsregisterauszug vai Gewerbeanmeldung, Polijā odpis z KRS vai wydruk z CEIDG, Zviedrijā registreringsbevis un Norvēģijā firmaattest. Rumānijā der certificat constatator (ONRC).',
     insuranceIntro: 'Nepieciešams pirms pasūtījumu publicēšanas. Nosūtiet pārbaudei ekspeditora civiltiesiskās atbildības apdrošināšanas apliecību. Pārvadātāji redz pārbaudīto apdrošināšanu un tās derīguma termiņu.',
     adminTitle: 'Publicēšana un pārvadājumu nodošana',
     adminOK: 'Dokumenti kārtībā',
