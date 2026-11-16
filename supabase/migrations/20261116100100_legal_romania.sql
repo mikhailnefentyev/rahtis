@@ -3,9 +3,10 @@
 --
 -- Под поведение 20261116100000_romania: компания может выбрать румынский
 -- лей своей валютой, заказчик — валютой цены. Пункты о валютах в TERMS
--- (разд. 8), CARRIER_AGREEMENT и SHIPPER_AGREEMENT (разд. 2) перечисляют
--- валюты поимённо — дополняются леем. Черновики; активация — решение
--- пользователя.
+-- (разд. 8) и SHIPPER_AGREEMENT (разд. 2) перечисляют валюты поимённо —
+-- дополняются леем. CARRIER_AGREEMENT валют не перечисляет (ссылается на
+-- условия использования) — его не трогаем. Черновики; активация —
+-- решение пользователя.
 -- ═══════════════════════════════════════════════════════════════════
 
 create or replace function pg_temp.draft_of(p_kind public.legal_kind)
@@ -42,7 +43,7 @@ declare
   v_kind public.legal_kind;
   v_doc uuid;
 begin
-  foreach v_kind in array array['TERMS', 'CARRIER_AGREEMENT', 'SHIPPER_AGREEMENT']::public.legal_kind[] loop
+  foreach v_kind in array array['TERMS', 'SHIPPER_AGREEMENT']::public.legal_kind[] loop
     v_doc := pg_temp.draft_of(v_kind);
 
     update public.legal_clauses
