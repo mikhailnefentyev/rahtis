@@ -153,7 +153,7 @@ function navigation(
   t: Dictionary,
   actions = 0,
 ): { groups: NavGroup[]; primary: NavItem[] } {
-  const overview: NavItem = { href: home, label: t.nav.overview, icon: 'home', count: actions };
+  const overview: NavItem = { href: home, label: t.nav.overview, short: t.nav.overviewShort, icon: 'home', count: actions };
 
   if (role === 'CARRIER') {
     const desk: NavItem = { href: `/${locale}/carrier/desk`, label: t.desk.title, short: t.nav.deskShort, icon: 'desk' };

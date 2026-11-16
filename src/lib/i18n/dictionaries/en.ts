@@ -893,6 +893,7 @@ export const en = {
 
   nav: {
     overview: 'Overview',
+    overviewShort: 'Overview',
     desk: 'Load board',
     fleet: 'Fleet',
     orders: 'My orders',

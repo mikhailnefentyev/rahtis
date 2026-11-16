@@ -1,7 +1,7 @@
 import type { AutoFacts } from './autoAnswer';
 
 /** Языки переписки: кабинет (fi, en) и приложение водителя. */
-export const CHAT_LANGS = ['fi', 'en', 'sv', 'nb', 'da', 'et', 'lv', 'lt', 'pl', 'ru'] as const;
+export const CHAT_LANGS = ['fi', 'en', 'sv', 'nb', 'da', 'et', 'lv', 'lt', 'pl', 'ru', 'ro'] as const;
 export type ChatLang = (typeof CHAT_LANGS)[number];
 
 /** Быстрые ответы: код хранится в сообщении, текст — на языке читателя. */

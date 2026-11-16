@@ -15,7 +15,7 @@ export const ASK_KINDS = ['WHERE', 'WHEN', 'LOADED'] as const;
 export type AskKind = (typeof ASK_KINDS)[number];
 
 /** Языки шаблонов — языки кабинета. */
-export const AUTO_LANGS = ['fi', 'en', 'sv', 'et', 'lv', 'lt', 'pl', 'de', 'ru'] as const;
+export const AUTO_LANGS = ['fi', 'en', 'sv', 'et', 'lv', 'lt', 'pl', 'de', 'ru', 'ro'] as const;
 export type AutoLang = (typeof AUTO_LANGS)[number];
 
 /** Язык ответа: язык спросившего, «ru-RU» → «ru», чужой — английский. */

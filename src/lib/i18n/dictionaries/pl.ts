@@ -876,6 +876,7 @@ export const pl = {
 
   nav: {
     overview: 'Przegląd',
+    overviewShort: 'Przegląd',
     desk: 'Giełda ładunków',
     fleet: 'Flota',
     orders: 'Moje zlecenia',

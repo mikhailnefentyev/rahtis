@@ -35,6 +35,7 @@ const loaders: Record<Locale, () => Promise<Dictionary>> = {
   pl: () => import('./pl').then((m) => m.pl),
   de: () => import('./de').then((m) => m.de),
   ru: () => import('./ru').then((m) => m.ru),
+  ro: () => import('./ro').then((m) => m.ro),
 };
 
 export async function getDictionary(locale: Locale): Promise<Dictionary> {

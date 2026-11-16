@@ -403,7 +403,7 @@ export const COUNTRY_PACKS: Record<CountryCode, CountryPack> = {
     postcode: /\b\d{6}\b/,
     enabled: true,
     marketed: false,
-    driverLanguage: 'EN',
+    driverLanguage: 'RO',
     sample: { plate: 'B 123 ABC', city: 'Constanța', address: 'Incinta Port, 900900 Constanța', place: 'Port Constanța, Terminal Sud', person: 'Andrei Popescu', email: 'andrei@exemplu.ro' },
   },
 };

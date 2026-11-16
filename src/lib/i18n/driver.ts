@@ -119,6 +119,9 @@ async function loadPack(locale: DriverLocale): Promise<DriverPack> {
       return (await import('./driver/da')).da;
     case 'en':
       return packOf(await getDictionary('en'));
+    /* Румынский — язык платформы: срез из его словаря, отдельного пакета нет. */
+    case 'ro':
+      return packOf(await getDictionary('ro'));
     default:
       return packOf(await getDictionary('fi'));
   }

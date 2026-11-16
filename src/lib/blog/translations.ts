@@ -31,6 +31,8 @@ const LOADERS: Record<Locale, () => Promise<{ default: Table }>> = {
   pl: () => import('./i18n/pl.json'),
   de: () => import('./i18n/de.json'),
   ru: () => import('./i18n/ru.json'),
+  /* Румынских переводов статей пока нет: статья без перевода видна только на своём языке. */
+  ro: () => import('./i18n/ro.json'),
 };
 
 async function table(locale: Locale): Promise<Table> {

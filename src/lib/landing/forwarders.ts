@@ -1021,6 +1021,117 @@ const ru: LandingCopy = {
 };
 
 /* Остальные языки — перевод с финского (смысл) и английского (помощь). */
+const ro: LandingCopy = {
+  metaTitle: "Pentru casele de expediții: un transportator pentru fiecare încărcătură",
+  metaDescription:
+    "Publicați o singură dată o comandă de schimb de semiremorci, de container sau expres, alegeți din oferte un transportator verificat și urmăriți comanda pas cu pas. Gratuit pentru casele de expediții.",
+  eyebrow: "RAHTIS pentru casele de expediții",
+  title: "Un transportator pentru fiecare încărcătură – gratuit",
+  lede: "Publicați o singură dată o comandă de schimb de semiremorci, de container sau expres. Transportatorii aprobați trimit oferte, dumneavoastră alegeți vehiculul și urmăriți comanda pas cu pas. Contractul se încheie direct cu transportatorul, iar RAHTIS nu percepe comision.",
+  ctaApply: "Înscrieți-vă în RAHTIS",
+  ctaSignIn: "Conectați-vă",
+  dayTitle: "Cum decurge o comandă",
+  day: [
+    {
+      title: "Comanda intră",
+      text: "Introduceți comanda sau redirecționați către RAHTIS e-mailul, PDF-ul sau fotografia cu comanda clientului. Din ea se creează o ciornă de comandă, pe care o verificați înainte de publicare.",
+    },
+    {
+      title: "Publicați o singură dată",
+      text: "Pe bursa de transport, pentru transportatorii cu un vehicul aprobat potrivit, direct către unul dintre vehiculele dumneavoastră de încredere sau mai întâi către 2–10 vehicule proprii și abia apoi pe bursă.",
+    },
+    {
+      title: "Alegeți o ofertă",
+      text: "Până la trei transportatori pot trimite oferte. Vedeți evaluările, insigna Verificat, numărul de curse, rata de punctualitate, vehiculul și limbile vorbite de șofer. Fără licitație: prețul este cel stabilit de dumneavoastră.",
+    },
+    {
+      title: "Urmăriți fiecare etapă",
+      text: "Sosiri, încărcare, descărcare și alerte de întârziere într-o singură vizualizare. Mesajele către transportator și șofer sunt traduse – fiecare citește în limba sa.",
+    },
+    {
+      title: "Livrat",
+      text: "Scrisoarea de trăsură CMR și fotografiile de la încărcare, descărcare și ale eventualelor daune sunt atașate comenzii. Un raport săptămânal cu toate comenzile și rapoarte în PDF, Excel și CSV.",
+    },
+  ],
+  featuresTitle: "Ce primiți",
+  features: [
+    {
+      title: "Schimb de semiremorci, containere, expres",
+      text: "Schimb de semiremorci între porturi, terminale și clienți. Transport de containere de 20, 30, 40 și 45 ft, cu verificarea numărului containerului. Comenzi expres cu duba sau camionul.",
+    },
+    {
+      title: "Vehiculele dumneavoastră de încredere",
+      text: "Un camion care a mai efectuat curse pentru dumneavoastră și al cărui transportator acceptă comenzi directe poate fi adăugat la vehiculele de încredere. Trimiteți-i o comandă direct sau oferiți-o mai întâi vehiculelor proprii.",
+    },
+    {
+      title: "Comenzi din e-mail",
+      text: "Firma dumneavoastră primește o adresă proprie, către care redirecționați e-mailurile cu comenzi de la clienți. Puteți și să lipiți textul sau să încărcați un PDF ori o fotografie. Comanda devine ciornă – nimic nu se publică fără dumneavoastră.",
+    },
+    {
+      title: "Fiecare în limba sa",
+      text: "Mesajele dintr-o comandă, între dumneavoastră, transportator și șofer, sunt traduse automat. O casă de expediții finlandeză, un transportator estonian și un șofer polonez se înțeleg fără probleme.",
+    },
+    {
+      title: "Transportatori verificați",
+      text: "Fiecare transportator este verificat înainte de prima comandă: registrul comerțului, licența de transport și asigurarea, iar fiecare vehicul este aprobat separat. Insigna Verificat arată că rapoartele privind răspunderea contractantului sunt valabile.",
+    },
+    {
+      title: "API și webhookuri",
+      text: "Conectați TMS-ul sau ERP-ul dumneavoastră: API REST și webhookuri semnate, descrise în OpenAPI 3.1, cu cheia generată din contul dumneavoastră. Gratuit – fără abonament lunar și fără cost per apel.",
+    },
+  ],
+  priceTitle: "Preț",
+  priceText:
+    "Pentru casele de expediții, RAHTIS este gratuit: fără abonament lunar, fără procent din comenzi și fără taxă pentru API. Transportatorul vă facturează direct la prețul comenzii.",
+  faqTitle: "Întrebări frecvente",
+  faq: [
+    {
+      q: "Cât costă RAHTIS pentru o casă de expediții?",
+      a: "Nimic. Fără abonament lunar, fără procent din comenzi, iar API-ul este gratuit. Transportatorii plătesc un abonament lunar pentru vehiculele care au efectuat curse.",
+    },
+    {
+      q: "Cu cine se încheie contractul?",
+      a: "Direct cu transportatorul care preia comanda. Transportatorul vă facturează, iar RAHTIS nu percepe comision.",
+    },
+    {
+      q: "Pot lucra cu propriii transportatori?",
+      a: "Da. Camioanele care au efectuat curse pentru dumneavoastră pot fi adăugate la vehiculele de încredere, dacă transportatorul lor acceptă comenzi directe. Trimiteți o comandă direct unui camion sau mai întâi unui grup de 2–10 camioane și apoi pe bursa de transport.",
+    },
+    {
+      q: "Cum sunt verificate firmele?",
+      a: "Fiecare parte este verificată. Transportatorii: registrul comerțului, licența de transport și asigurarea, iar fiecare vehicul este aprobat de o persoană. Casele de expediții sunt căutate în Registrul Comerțului din Finlanda; dacă firma nu este găsită automat acolo, înainte de publicarea primei comenzi se încarcă un extras de registru și asigurarea de răspundere a casei de expediții. Astfel, transportatorul știe pentru cine efectuează cursa.",
+    },
+    {
+      q: "Ce se întâmplă dacă nu vine nicio ofertă sau un camion anulează?",
+      a: "Dacă transportatorul ales nu confirmă în 15 minute sau anulează, comanda revine pe bursă și ajunge la următoarele vehicule potrivite. Dacă nu vin oferte, primiți o notificare și puteți mări prețul sau trimite comanda direct unui camion cunoscut.",
+    },
+    {
+      q: "Putem conecta RAHTIS la propriul nostru sistem?",
+      a: "Da. Prin API-ul REST creați și urmăriți comenzi, iar webhookurile semnate raportează schimbările de stare. API-ul este descris în OpenAPI 3.1 în documentația API, iar cheia se creează din contul dumneavoastră.",
+    },
+  ],
+  finalTitle: "Publicați prima comandă",
+  finalText:
+    "Înregistrați firma, publicați o comandă și alegeți din oferte. Gratuit pentru casele de expediții.",
+  teaserEyebrow: "Pentru casele de expediții",
+  teaserTitle: "Transportatori pentru încărcăturile dumneavoastră – gratuit",
+  teaserText:
+    "Publicați o singură dată comenzi de schimb de semiremorci, de containere și expres, alegeți din ofertele transportatorilor verificați și urmăriți fiecare comandă pas cu pas. Fără comision.",
+  teaserCta: "Aflați mai multe",
+  footerLink: "RAHTIS pentru casele de expediții",
+  serviceType: "Bursă de transport pentru casele de expediții",
+  features_ld: [
+    "Schimb de semiremorci, transport de containere (20–45 ft) și transport expres",
+    "Publicare pe bursa de transport, direct către un vehicul de încredere sau mai întâi către vehiculele proprii",
+    "Până la trei oferte, alese după evaluări și echipament",
+    "Ciornă de comandă din e-mail, PDF sau fotografie",
+    "Urmărire pas cu pas, scrisoare de trăsură CMR și fotografii",
+    "Mesaje traduse automat cu transportatorul și șoferul",
+    "Raport săptămânal",
+    "API REST gratuit și webhookuri semnate",
+  ],
+};
+
 export const FORWARDERS: Record<Locale, LandingCopy> = {
   fi,
   en,
@@ -1031,6 +1142,7 @@ export const FORWARDERS: Record<Locale, LandingCopy> = {
   pl,
   de,
   ru,
+  ro,
 };
 
 /** Адрес страницы: финский слаг у финского, английский у остальных. */

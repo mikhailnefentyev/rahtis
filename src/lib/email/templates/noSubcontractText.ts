@@ -360,7 +360,8 @@ const lt: NoticeTexts = {
   questions: 'Klausimų? Tiesiog atsakykite į šį laišką.',
 };
 
-const TEXTS: Record<NoticeLocale, NoticeTexts> = { fi, en, sv, ru, pl, de, et, lv, lt };
+/* Румынским компаниям (с 16.11.2026) уведомление 6.11 не отправлялось — английский текст на случай повторной рассылки. */
+const TEXTS: Record<NoticeLocale, NoticeTexts> = { fi, en, sv, ru, pl, de, et, lv, lt, ro: en };
 
 /** Всё, из чего layout собирает письмо: тема, шапка, блоки, подвал. */
 export type NoticeContent = {

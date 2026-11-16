@@ -876,6 +876,7 @@ export const sv = {
 
   nav: {
     overview: 'Översikt',
+    overviewShort: 'Översikt',
     desk: 'Lastbörs',
     fleet: 'Flotta',
     orders: 'Mina order',

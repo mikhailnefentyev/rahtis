@@ -14,7 +14,7 @@
  * (`driver.test.mjs`), а сборка словаря живёт в `driver.ts`.
  */
 
-export const DRIVER_LOCALES = ['fi', 'en', 'et', 'ru', 'sv', 'lv', 'lt', 'pl', 'nb', 'da'] as const;
+export const DRIVER_LOCALES = ['fi', 'en', 'et', 'ru', 'sv', 'lv', 'lt', 'pl', 'nb', 'da', 'ro'] as const;
 
 export type DriverLocale = (typeof DRIVER_LOCALES)[number];
 
@@ -30,6 +30,7 @@ export const DRIVER_LOCALE_NAMES: Record<DriverLocale, string> = {
   pl: 'Polski',
   nb: 'Norsk',
   da: 'Dansk',
+  ro: 'Română',
 };
 
 export function isDriverLocale(value: string | null | undefined): value is DriverLocale {

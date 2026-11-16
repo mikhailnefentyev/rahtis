@@ -876,6 +876,7 @@ export const lt = {
 
   nav: {
     overview: 'Apžvalga',
+    overviewShort: 'Apžvalga',
     desk: 'Laisvi pervežimai',
     fleet: 'Transportas',
     orders: 'Mano pervežimai',

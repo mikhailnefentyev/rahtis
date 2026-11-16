@@ -52,7 +52,7 @@ export function fiOrEnPath(fi: string, en: string): LocalePaths {
 
 /* Код Open Graph: язык_СТРАНА. */
 const OG_LOCALE: Record<Locale, string> = {
-  fi: 'fi_FI', en: 'en_GB', sv: 'sv_SE', et: 'et_EE', lv: 'lv_LV', lt: 'lt_LT', pl: 'pl_PL', de: 'de_DE', ru: 'ru_RU',
+  fi: 'fi_FI', en: 'en_GB', sv: 'sv_SE', et: 'et_EE', lv: 'lv_LV', lt: 'lt_LT', pl: 'pl_PL', de: 'de_DE', ru: 'ru_RU', ro: 'ro_RO',
 };
 
 export function pageMetadata(input: {

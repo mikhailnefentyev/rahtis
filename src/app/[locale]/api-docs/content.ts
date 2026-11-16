@@ -402,4 +402,4 @@ const en: DocsText = {
 };
 
 /* Документация API — финская и английская; прочие языки читают английскую. */
-export const DOCS: Record<Locale, DocsText> = { fi, en, sv: en, et: en, lv: en, lt: en, pl: en, de: en, ru: en };
+export const DOCS: Record<Locale, DocsText> = { fi, en, sv: en, et: en, lv: en, lt: en, pl: en, de: en, ru: en, ro: en };

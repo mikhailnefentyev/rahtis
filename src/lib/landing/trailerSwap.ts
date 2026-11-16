@@ -1005,6 +1005,116 @@ const ru: LandingCopy = {
 };
 
 /* Остальные языки — перевод с финского (смысл) и английского (помощь). */
+const ro: LandingCopy = {
+  metaTitle: "Schimb de semiremorci în porturi: comenzi, șoferi, flotă",
+  metaDescription:
+    "Pentru transportatorii care fac schimb de semiremorci: comenzi în porturi de pe bursa de transport, clienți proprii, aplicație pentru șoferi în 10 limbi, CMR și ansambluri. Primul camion este gratuit.",
+  eyebrow: "Schimb de semiremorci în porturi",
+  title: "Semiremorci din port la client, fără hârtii",
+  lede: "Preluați de pe bursa de transport comenzi de schimb de semiremorci în porturi precum Vuosaari, Muuga, Kapellskär, Travemünde și Gdynia, gestionați comenzile clienților proprii și țineți camioanele, șoferii și documentele într-un singur loc. Fără procent din nicio comandă.",
+  ctaApply: "Înscrieți-vă în RAHTIS",
+  ctaSignIn: "Conectați-vă",
+  dayTitle: "Cum decurge un schimb",
+  day: [
+    {
+      title: "Comanda intră",
+      text: "De pe bursa de transport, în apropierea camioanelor dumneavoastră, de la un client propriu sau dintr-un e-mail cu comanda. O comandă primită pe e-mail devine ciornă pentru camionul al cărui număr de înmatriculare apare în ea.",
+    },
+    {
+      title: "La șofer",
+      text: "Punctele de oprire, în ordine, în aplicația pentru șoferi, cu numărul de înmatriculare al semiremorcii. Mesajele din comandă sunt traduse în limba șoferului.",
+    },
+    {
+      title: "Preluare în port",
+      text: "Șoferul marchează sosirea, fotografiază semiremorca și scanează scrisoarea de trăsură. Aplicația funcționează și fără conexiune în zona portului.",
+    },
+    {
+      title: "Livrare",
+      text: "Sosire, descărcare, semnătură și, la nevoie, fotografii ale daunelor. Clientul propriu urmărește comanda printr-un link de urmărire.",
+    },
+    {
+      title: "Comandă încheiată",
+      text: "Timpul de lucru și salariul estimat pentru șofer, veniturile și costurile în profitabilitatea camionului. Un raport săptămânal cu comenzile, câștigurile și documentele.",
+    },
+  ],
+  featuresTitle: "Ce primiți",
+  features: [
+    {
+      title: "Comenzi în porturi",
+      text: "Bursa de transport afișează comenzile disponibile acolo unde se află camioanele dumneavoastră, ordonate după kilometrii parcurși în gol. Porturi din toată zona de operare, de exemplu Vuosaari și Turku, Muuga și Paldiski, Riga, Klaipėda, Kapellskär și Göteborg, Oslo, Copenhaga, Gdynia, Travemünde și Rostock.",
+    },
+    {
+      title: "Clienții proprii",
+      text: "Adăugați comanda unui client la propriul camion sau lăsați clientul să comande direct către acesta. Un e-mail cu comanda devine ciornă pentru camionul menționat în comandă. Întregul preț rămâne la dumneavoastră.",
+    },
+    {
+      title: "Aplicație pentru șoferi în 10 limbi",
+      text: "Finlandeză, engleză, suedeză, norvegiană, daneză, estonă, letonă, lituaniană, poloneză și rusă. Puncte de oprire, sosire, fotografii, semnătură și scaner CMR – și fără conexiune.",
+    },
+    {
+      title: "Semiremorci și ansambluri",
+      text: "Capete tractor, semiremorci și șasiuri portcontainer. Masa maximă a ansamblului pe țară și sarcina utilă se calculează pe baza vehiculelor proprii, iar fiecare comandă este verificată în raport cu ansamblul.",
+    },
+    {
+      title: "GPS și combustibil",
+      text: "Poziția din propriul sistem de monitorizare: Wialon, Mapon, Navirec, Ruptela, Navixy, Samsara, Webfleet sau ABAX. Combustibilul din raportul cardului de combustibil, din înregistrările șoferului și din GPS.",
+    },
+    {
+      title: "Timp de lucru, salariu și profit",
+      text: "Ture și pauze din aplicație; salariu pe kilometru, pe oră, conform contractului colectiv de muncă finlandez sau ca salariu net convenit. Profit pe camion: venituri minus combustibil, salarii și costuri fixe.",
+    },
+  ],
+  priceTitle: "Preț",
+  priceText:
+    "Primul camion este gratuit, fiecare camion în plus costă {price} (fără TVA) pe lună – doar pentru camioanele care au circulat în luna respectivă. Fără procent din comenzile de pe bursă sau din comenzile clienților proprii. Prima lună este gratuită.",
+  faqTitle: "Întrebări frecvente",
+  faq: [
+    {
+      q: "Ce porturi cunoaște RAHTIS?",
+      a: "În toate cele nouă țări. De exemplu, în Finlanda: Helsinki Vuosaari, Hanko, Turku și HaminaKotka; în Estonia: Muuga și Paldiski; în Letonia: Riga și Ventspils; în Lituania: Klaipėda; în Suedia: Kapellskär, Stockholm și Göteborg; în Norvegia: Oslo; în Danemarca: Copenhaga și Esbjerg; în Polonia: Gdynia și Świnoujście; iar în Germania: Travemünde, Rostock, Kiel și terminalele de containere din Hamburg.",
+    },
+    {
+      q: "Percepeți un procent din comenzi?",
+      a: "Nu. Nici din comenzile de pe bursă, nici din comenzile clienților proprii. Contractul se încheie direct cu expeditorul, care vă plătește pe dumneavoastră.",
+    },
+    {
+      q: "În ce limbă lucrează șoferul?",
+      a: "În limba sa: aplicația funcționează în zece limbi, iar mesajele din comandă sunt traduse automat în limba șoferului.",
+    },
+    {
+      q: "Funcționează aplicația în port fără conexiune?",
+      a: "Da. Sosirea, punctele de oprire, fotografiile și semnătura se salvează pe telefon și se trimit când revine conexiunea. Scanarea scrisorii de trăsură este transformată în PDF pe telefon.",
+    },
+    {
+      q: "Poate un client să comande direct către camionul meu?",
+      a: "Da. Firma dumneavoastră are o adresă de e-mail proprie pentru comenzi: e-mailul cu comanda clientului (text, PDF sau fotografie) devine ciornă pentru camionul menționat în comandă. Un e-mail ulterior cu același număr de comandă apare ca modificare, pe care o acceptați sau o respingeți.",
+    },
+    {
+      q: "Cât costă?",
+      a: "Primul camion este gratuit. Fiecare camion în plus costă {price} (fără TVA) pe lună, doar dacă a circulat. De la {from} camioane, prețul se stabilește la cerere. Reducere de {discount}% la plata anticipată pe un an. Prima lună este gratuită.",
+    },
+  ],
+  finalTitle: "Faceți primul schimb",
+  finalText:
+    "Adăugați un camion și un șofer și vedeți comenzile din porturi. Prima lună este gratuită.",
+  teaserEyebrow: "Schimb de semiremorci",
+  teaserTitle: "Schimb de semiremorci în porturi",
+  teaserText:
+    "Comenzi de schimb în porturi de pe bursa de transport, clienți proprii, aplicație pentru șoferi în 10 limbi cu scaner CMR, ansambluri și timp de lucru. Fără procent din comenzi.",
+  teaserCta: "Aflați mai multe",
+  footerLink: "Schimb de semiremorci în porturi",
+  serviceType: "Platformă pentru transportatorii care fac schimb de semiremorci",
+  features_ld: [
+    "Comenzi de pe bursa de transport în porturi și în apropierea camioanelor dumneavoastră",
+    "Comenzi ale clienților proprii și link de urmărire pentru client",
+    "Ciornă de comandă din e-mail pentru camionul identificat după numărul de înmatriculare",
+    "Aplicație pentru șoferi în 10 limbi: puncte de oprire, fotografii, semnătură, scaner CMR, funcționează fără conexiune",
+    "Semiremorci, ansambluri și mase maxime pe țări",
+    "Integrări GPS și de combustibil",
+    "Timp de lucru, salariul șoferului și profit pe camion",
+  ],
+};
+
 export const TRAILER_SWAP: Record<Locale, LandingCopy> = {
   fi,
   en,
@@ -1015,6 +1125,7 @@ export const TRAILER_SWAP: Record<Locale, LandingCopy> = {
   pl,
   de,
   ru,
+  ro,
 };
 
 /** Адрес страницы: финский слаг у финского, английский у остальных. */

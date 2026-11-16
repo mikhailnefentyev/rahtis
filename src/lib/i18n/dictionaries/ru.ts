@@ -876,6 +876,7 @@ export const ru = {
 
   nav: {
     overview: 'Обзор',
+    overviewShort: 'Обзор',
     desk: 'Биржа грузов',
     fleet: 'Автопарк',
     orders: 'Мои заказы',

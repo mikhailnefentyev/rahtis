@@ -40,6 +40,7 @@ const LANG_NAME: Record<Locale, string> = {
   pl: 'Polski',
   de: 'Deutsch',
   ru: 'Русский',
+  ro: 'Română',
 };
 
 function ladderLines(): string[] {

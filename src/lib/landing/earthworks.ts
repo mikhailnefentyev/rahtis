@@ -561,6 +561,66 @@ const ru: EarthworksCopy = {
 };
 
 /* Остальные языки — перевод с финского (смысл) и английского (помощь). */
+const ro: EarthworksCopy = {
+  metaTitle: 'Lucrări de terasament și basculante: transporturi, ore, facturi',
+  metaDescription:
+    'Aplicație de șantier pentru basculante: transporturi cântărite, documente finlandeze de transfer al deșeurilor, ore (ultima descărcare + 30 min), aprobare de către șeful de șantier și facturi către clientul dumneavoastră.',
+  eyebrow: 'Lucrări de terasament și basculante',
+  title: 'Transporturile, orele și facturile de pe șantier într-un singur loc',
+  lede:
+    'Șoferii înregistrează pe telefon sosirea, transporturile și greutățile. Șeful de șantier aprobă ziua printr-un link. Factura ajunge la client în numele firmei dumneavoastră – la apăsarea unui buton, săptămânal sau o dată la două săptămâni.',
+  ctaApply: 'Înscrieți-vă în RAHTIS',
+  ctaSignIn: 'Conectați-vă',
+  dayTitle: 'Cum decurge o zi',
+  day: [
+    { title: 'Dimineața: pe șantier', text: 'Șoferul apasă „Am ajuns pe șantier”. Ora și locul se salvează, iar camionul și remorca se aleg o singură dată pe zi.' },
+    { title: 'Transporturi peste cântar', text: 'Pentru fiecare transport: materialul, locul de descărcare, greutatea brută, tara și numărul bonului de cântar. Greutatea netă se calculează automat și primiți avertizare la supraîncărcare.' },
+    { title: 'Seara: ziua încheiată', text: 'Ziua se încheie la ultima descărcare + 30 de minute, așa cum o notează oricum șoferii. Marja se setează pentru fiecare șantier.' },
+    { title: 'Șeful de șantier aprobă', text: 'Șeful de șantier deschide un link fără autentificare, vede zilele, transporturile și orele și aprobă. Prețurile nu sunt afișate. La nevoie, firma dumneavoastră aprobă singură ziua.' },
+    { title: 'Factura către client', text: 'Zilele aprobate se facturează o singură dată: o factură PDF cu număr de referință și TVA ajunge pe e-mailul clientului, în numele firmei dumneavoastră.' },
+  ],
+  featuresTitle: 'Ce primiți',
+  features: [
+    { title: 'Transporturi și greutăți', text: 'Greutate brută, tară, greutate netă și bon de cântar pentru fiecare transport. Cântarele și locurile de descărcare se aleg dintr-o listă, iar șoferul poate adăuga unul nou direct de pe șantier. Șoferul poate și să fotografieze bonul de cântar, iar valorile sunt preluate în formular.' },
+    { title: 'Document finlandez de transfer al deșeurilor', text: 'Pentru șantierele din Finlanda, documentul de transfer (siirtoasiakirja) cerut de Legea finlandeză privind deșeurile (§ 121) se generează din transport atunci când este necesar: deșeuri din construcții și sol contaminat (PIMA), pe care le marcați la nivelul șantierului. Pentru solul curat se întocmește în schimb o fișă de transport – nu este nevoie de document de transfer.' },
+    { title: 'Ore fără hârtii', text: 'Sosirea dimineața, ultima descărcare + 30 min seara. Fără foi de pontaj scrise de mână și fără estimări făcute ulterior.' },
+    { title: 'Sarcini pe axe și supraîncărcare', text: 'Camion, remorcă și masa maximă a ansamblului pe țară (Finlanda 76 t, Suedia, Norvegia, Danemarca, Estonia, Germania…). Avertizare la supraîncărcare direct la cântar.' },
+    { title: 'Facturare în nume propriu', text: 'Facturi cu codul fiscal, contul bancar și seria de numerotare proprie. Pe oră, pe transport sau pe tonă. Trimise la apăsarea unui buton, săptămânal sau o dată la două săptămâni.' },
+    { title: 'Aplicație în limba șoferului', text: 'Aplicația pentru șoferi funcționează în zece limbi, printre care estonă, rusă și poloneză. Merge și fără conexiune și trimite înregistrările când aceasta revine.' },
+  ],
+  priceTitle: 'Preț',
+  priceText: 'Primul camion este gratuit, fiecare camion în plus costă 14,90 € (fără TVA) pe lună – doar pentru camioanele care au circulat în luna respectivă. Fără procent din nicio comandă. Prima lună este gratuită.',
+  faqTitle: 'Întrebări frecvente',
+  faq: [
+    { q: 'Are nevoie șeful de șantier de cont?', a: 'Nu. Șeful de șantier primește linkul șantierului, vede acolo zilele, transporturile și orele și aprobă ziua cu numele său. Prețurile nu sunt afișate.' },
+    { q: 'Cum se calculează orele?', a: 'Ziua începe când șoferul marchează sosirea pe șantier și se încheie la ultima descărcare + marjă (implicit 30 min). Dacă șoferul încheie ziua mai târziu, se ia în calcul ora mai târzie.' },
+    { q: 'Pe numele cui este factura?', a: 'Pe numele transportatorului: codul fiscal, contul bancar, numărul facturii și numărul de referință sunt ale firmei dumneavoastră. RAHTIS întocmește factura din zilele aprobate și o trimite clientului pe e-mail, în format PDF.' },
+    { q: 'Primesc document de transfer al deșeurilor?', a: 'Da, pentru șantierele din Finlanda, atunci când este necesar: pentru deșeurile din construcții și solul contaminat (marcat ca PIMA la nivelul șantierului) se emite un siirtoasiakirja conform Legii finlandeze privind deșeurile, cu coduri de deșeuri, iar acestea sunt marcate pentru raportare în registrul documentelor de transfer. Solul curat nu necesită document de transfer – pentru transport se întocmește în schimb o fișă de transport. Pentru șantierele din afara Finlandei, cerințele naționale și sistemele electronice de stat se adaugă treptat, țară cu țară — deocamdată nu sunt disponibile.' },
+    { q: 'Funcționează aplicația într-o carieră fără semnal?', a: 'Da. Înregistrările se salvează pe telefon și se trimit când revine conexiunea. Ora înregistrată este cea la care a apăsat șoferul, nu cea a trimiterii.' },
+    { q: 'Cât costă?', a: 'Un camion este gratuit. Fiecare camion în plus costă 14,90 € (fără TVA) pe lună, doar dacă a circulat în luna respectivă. De la 100 de camioane, prețul se stabilește la cerere. Reducere de 10% la plata anticipată pe un an. Prima lună este gratuită.' },
+  ],
+  finalTitle: 'Încercați pe propriul șantier',
+  finalText: 'Adăugați un șantier, invitați un șofer și trimiteți linkul șefului de șantier. Prima lună este gratuită.',
+  teaserEyebrow: 'Nou: lucrări de terasament',
+  teaserTitle: 'Basculante pe șantier: transporturi, ore și facturi',
+  teaserText: 'Transporturi cântărite, documente finlandeze de transfer al deșeurilor, ore până la ultima descărcare + 30 min și aprobare de către șeful de șantier prin link. Factura către client în numele firmei dumneavoastră.',
+  teaserCta: 'Aflați mai multe',
+  footerLink: 'Lucrări de terasament și basculante',
+  serviceTitle: 'Lucrări de terasament și basculante',
+  serviceText: 'O basculantă lucrează o zi întreagă pe șantier: șoferul înregistrează sosirea și fiecare transport, cu greutatea și locul de descărcare. Orele se socotesc până la ultima descărcare + 30 de minute.',
+  serviceText2: 'Șeful de șantier aprobă ziua printr-un link, fără autentificare, iar factura ajunge la client în numele transportatorului.',
+  serviceType: 'Aplicație de șantier pentru transportul cu basculante la lucrări de terasament',
+  features_ld: [
+    'Transporturi și greutăți (brut, tară, net, bon de cântar)',
+    'Document finlandez de transfer al deșeurilor (siirtoasiakirja) pentru șantierele din Finlanda: deșeuri din construcții și sol contaminat (PIMA)',
+    'Bon de cântar citit dintr-o fotografie',
+    'Ore: de la sosire până la ultima descărcare + 30 min',
+    'Aprobare de către șeful de șantier prin link',
+    'Facturi către client în numele transportatorului',
+    'Sarcini pe axe și avertizare la supraîncărcare pe țări',
+  ],
+};
+
 export const EARTHWORKS: Record<Locale, EarthworksCopy> = {
   fi,
   en,
@@ -571,6 +631,7 @@ export const EARTHWORKS: Record<Locale, EarthworksCopy> = {
   pl,
   de,
   ru,
+  ro,
 };
 
 /** Адрес страницы: финский слаг у финского, английский у остальных. */

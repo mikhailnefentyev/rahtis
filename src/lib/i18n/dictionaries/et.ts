@@ -876,6 +876,7 @@ export const et = {
 
   nav: {
     overview: 'Ülevaade',
+    overviewShort: 'Ülevaade',
     desk: 'Veobörs',
     fleet: 'Autopark',
     orders: 'Minu veod',

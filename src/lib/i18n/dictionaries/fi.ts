@@ -900,6 +900,7 @@ export const fi = {
 
   nav: {
     overview: 'Yleiskuva',
+    overviewShort: 'Yleiskuva',
     desk: 'Avoimet kuljetukset',
     fleet: 'Kalusto',
     orders: 'Omat kuljetukset',

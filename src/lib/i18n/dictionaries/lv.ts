@@ -876,6 +876,7 @@ export const lv = {
 
   nav: {
     overview: 'Pārskats',
+    overviewShort: 'Pārskats',
     desk: 'Kravu birža',
     fleet: 'Autoparks',
     orders: 'Mani pasūtījumi',
