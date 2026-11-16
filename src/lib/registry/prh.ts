@@ -128,6 +128,9 @@ const FORM_PHRASES = [
   'spółka komandytowa', 'spółka jawna', 'sp z o o', 'sp k', 'sp j',
   'sabiedrība ar ierobežotu atbildību', 'akciju sabiedrība',
   'uždaroji akcinė bendrovė', 'akcinė bendrovė', 'mažoji bendrija', 'individuali įmonė',
+  // RO: «S.R.L.» после замены точек — «s r l»; приставка «S.C.» у старых названий
+  'societate cu răspundere limitată', 'societate cu raspundere limitata', 'societate pe acțiuni', 'societate pe actiuni',
+  's r l d', 's r l', 'srl d', 's c', 'p f a',
   'gesellschaft mit beschränkter haftung', 'aktiengesellschaft', 'co kg',
   'as oy', 'asunto oy', 'a s', 's a',
   'representative of vat group',
@@ -141,6 +144,8 @@ const FORM_WORDS = new Set([
   'oü', 'ou', 'aktsiaselts', 'osaühing', 'fie', 'sia', 'uab', 'mb', 'vši',
   // PL, DE
   'sa', 'gmbh', 'ag', 'kg', 'ug', 'ohg', 'gbr', 'mbh',
+  // RO
+  'srl', 'srld', 'pfa', 'sc', 'snc', 'scs',
   // общие
   'ltd', 'limited', 'plc', 'inc', 'llc',
 ]);

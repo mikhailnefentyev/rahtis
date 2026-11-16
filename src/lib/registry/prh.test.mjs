@@ -31,6 +31,9 @@ test('название сравнивается без формы и знако�
   assert.equal(matchName('Aivomaa', ['Aivomaa Oy']), 'EXACT');
   assert.equal(matchName('Aivomaa Logistics', ['Aivomaa Oy']), 'SIMILAR');
   assert.equal(matchName('Mäkelä Oy', ['Makela Oy']), 'DIFFERENT');
+  /* Румынская форма с точками и без (EXPRESS CHARGE SRL против VIES «EXPRESS CHARGE S.R.L.», 16.11.2026). */
+  assert.equal(matchName('EXPRESS CHARGE SRL', ['EXPRESS CHARGE S.R.L.']), 'EXACT');
+  assert.equal(matchName('S.C. Transport Ion SRL-D', ['TRANSPORT ION S.R.L.-D.']), 'EXACT');
 });
 
 test('всё совпало — OK, без замечаний', () => {
