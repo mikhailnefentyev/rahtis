@@ -2116,6 +2116,8 @@ export const sv = {
 
     missing: 'Dokumentet har inte publicerats än.',
     clauseLink: 'Kopiera en länk till denna punkt',
+    /* Над текстом договора на других языках: пункты только fi/en. */
+    englishText: 'Dokumentet finns på finska och engelska. Nedan visas den engelska versionen.',
 
     accept: 'Jag godkänner följande dokument:',
     ownDocuments: 'Dina dokument',

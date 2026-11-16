@@ -2115,6 +2115,8 @@ export const pl = {
 
     missing: 'Ten dokument nie został jeszcze opublikowany.',
     clauseLink: 'Skopiuj link do tego punktu',
+    /* Над текстом договора на других языках: пункты только fi/en. */
+    englishText: 'Dokument jest dostępny w języku fińskim i angielskim. Poniżej wyświetlana jest wersja angielska.',
 
     accept: 'Akceptuję następujące dokumenty:',
     ownDocuments: 'Twoje dokumenty',

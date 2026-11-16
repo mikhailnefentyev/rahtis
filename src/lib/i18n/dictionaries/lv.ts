@@ -2116,6 +2116,8 @@ export const lv = {
 
     missing: 'Šis dokuments vēl nav publicēts.',
     clauseLink: 'Kopēt saiti uz šo punktu',
+    /* Над текстом договора на других языках: пункты только fi/en. */
+    englishText: 'Dokuments ir pieejams somu un angļu valodā. Zemāk redzama versija angļu valodā.',
 
     accept: 'Es pieņemu šādus dokumentus:',
     ownDocuments: 'Jūsu dokumenti',

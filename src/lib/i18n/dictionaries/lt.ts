@@ -2116,6 +2116,8 @@ export const lt = {
 
     missing: 'Šis dokumentas dar nepaskelbtas.',
     clauseLink: 'Kopijuoti nuorodą į šį punktą',
+    /* Над текстом договора на других языках: пункты только fi/en. */
+    englishText: 'Dokumentas pateikiamas suomių ir anglų kalbomis. Žemiau pateikiama versija anglų kalba.',
 
     accept: 'Sutinku su šiais dokumentais:',
     ownDocuments: 'Jūsų dokumentai',

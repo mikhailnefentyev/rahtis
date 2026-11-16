@@ -2116,6 +2116,8 @@ export const et = {
 
     missing: 'Seda dokumenti pole veel avaldatud.',
     clauseLink: 'Kopeeri link sellele punktile',
+    /* Над текстом договора на других языках: пункты только fi/en. */
+    englishText: 'Dokument on saadaval soome ja inglise keeles. Allpool on ingliskeelne versioon.',
 
     accept: 'Nõustun järgmiste dokumentidega:',
     ownDocuments: 'Sinu dokumendid',

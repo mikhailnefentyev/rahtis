@@ -2251,6 +2251,8 @@ export const en = {
 
     missing: 'This document hasn’t been published yet.',
     clauseLink: 'Copy a link to this clause',
+    /* Над текстом договора на других языках: пункты только fi/en. */
+    englishText: 'This document is available in Finnish and English.',
 
     accept: 'I accept the following documents:',
     ownDocuments: 'Your documents',

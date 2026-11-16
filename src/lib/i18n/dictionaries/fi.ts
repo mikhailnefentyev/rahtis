@@ -2340,6 +2340,8 @@ export const fi = {
 
     missing: 'Asiakirjaa ei ole vielä julkaistu.',
     clauseLink: 'Kopioi linkki kohtaan',
+    /* Над текстом договора на других языках: пункты только fi/en. */
+    englishText: 'Asiakirja on saatavilla suomeksi ja englanniksi. Alla on englanninkielinen versio.',
 
     accept: 'Hyväksyn seuraavat asiakirjat:',
     ownDocuments: 'Omat asiakirjat',

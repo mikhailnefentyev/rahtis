@@ -2245,6 +2245,8 @@ export const ro = {
 
     missing: 'Acest document nu a fost încă publicat.',
     clauseLink: 'Copiați linkul către această clauză',
+    /* Над текстом договора на других языках: пункты только fi/en. */
+    englishText: 'Documentul este disponibil în limbile finlandeză și engleză. Mai jos este afișată versiunea în limba engleză.',
 
     accept: 'Accept următoarele documente:',
     ownDocuments: 'Documentele dumneavoastră',

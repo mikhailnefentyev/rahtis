@@ -41,6 +41,9 @@ export async function LegalDocument({ locale, kind }: { locale: Locale; kind: Ki
   }
 
   const list = document.clauses;
+  const textLocale = documentLocale(locale);
+  /* Шведу, эстонцу, румыну… — сказать, почему дальше английский (16.11.2026). */
+  const foreign = textLocale !== locale;
 
   return (
     <>
@@ -49,7 +52,13 @@ export async function LegalDocument({ locale, kind }: { locale: Locale; kind: Ki
         {m('legal.effective', { date: f.date(document.effective_from) })}
       </p>
 
-      <div className="mt-6 flex flex-col gap-5">
+      {foreign && (
+        <p className="mt-3 rounded-control border border-line bg-raised px-3 py-2 text-[13px] text-ink-muted">
+          {t.legal.englishText}
+        </p>
+      )}
+
+      <div className="mt-6 flex flex-col gap-5" lang={foreign ? textLocale : undefined}>
         {list.map((clause) => {
           /* Глубина адреса решает всё: {5} — раздел, {5,2} и глубже — пункт. */
           const section = clause.path.length === 1;
