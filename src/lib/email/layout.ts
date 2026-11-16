@@ -56,9 +56,10 @@ const LEGAL = 'Aivomaa Oy · Y-tunnus 3592993-6';
  * Поэтому язык приезжает параметрами, а умолчание остаётся финским:
  * скрипт вызывает рендер без них и получает то же письмо, что и раньше.
  */
-const SIGNATURE = 'Rahtis Team';
-const TAGLINE = 'Irtoperät ja kontit · Skandinavia';
-const NEVER_ASK = 'Emme koskaan kysy salasanaasi sähköpostitse emmekä puhelimessa.';
+const SIGNATURE = 'RAHTIS-tiimi';
+/* Как brand.tagline в словаре: прежнее «Irtoperät ja kontit · Skandinavia» осталось в письмах без своего языка (16.11.2026). */
+const TAGLINE = 'Kuljetusten hallinta ja rahtipörssi · Pohjois-Eurooppa';
+const NEVER_ASK = 'Emme koskaan kysy salasanaanne sähköpostitse emmekä puhelimitse.';
 
 export type EmailBlock =
   | { kind: 'text'; value: string }
@@ -74,15 +75,25 @@ function escape(value: string): string {
     .replace(/"/g, '&quot;');
 }
 
+/*
+ * Адреса в живом тексте — ссылками: оператор пишет «войдите на
+ * https://www.rahtis.eu/…», и в письме это должно нажиматься. Точка или
+ * запятая в конце предложения в ссылку не входит. Вызывается после
+ * escape: в адресе уже нет «<» и кавычек.
+ */
+function linkify(escaped: string): string {
+  return escaped.replace(/https?:\/\/[^\s<]+[^\s<.,;:!?)»”]/g, (url) => `<a href="${url}" style="color:${ACCENT};">${url}</a>`);
+}
+
 function block(item: EmailBlock): string {
   switch (item.kind) {
     case 'text':
       /* Переносы строк сохраняются: текст оператора (отказ) уходит как написан. */
-      return `<p style="margin:0 0 14px;font:400 15px/1.55 ${FONT};color:${INK_MUTED};">${escape(item.value).replace(/\r?\n/g, '<br>')}</p>`;
+      return `<p style="margin:0 0 14px;font:400 15px/1.55 ${FONT};color:${INK_MUTED};">${linkify(escape(item.value)).replace(/\r?\n/g, '<br>')}</p>`;
 
     /* Мелкая строка под основным текстом: предупреждение, срок, оговорка. */
     case 'note':
-      return `<p style="margin:18px 0 0;font:400 13px/1.5 ${FONT};color:${INK_FAINT};">${escape(item.value)}</p>`;
+      return `<p style="margin:18px 0 0;font:400 13px/1.5 ${FONT};color:${INK_FAINT};">${linkify(escape(item.value))}</p>`;
 
     /*
      * Кнопка таблицей, а не ссылкой с padding: Outlook игнорирует

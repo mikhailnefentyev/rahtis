@@ -1794,7 +1794,22 @@
   .cab-top__brand { display: flex; }
   .cab-top__desktop,
   .cab-top__status { display: none; }
-  .cab-terms span { display: none; }
+  /*
+   * Плашка новых условий на телефоне — отдельной строкой под шапкой, с
+   * текстом и ссылками на документы: раньше текст прятался, и перевозчик
+   * мог только нажать «Hyväksyn», не видя, что принимает (16.11.2026).
+   */
+  .cab-top { flex-wrap: wrap; }
+  .cab-terms {
+    order: 10;
+    flex: 1 1 100%;
+    max-width: none;
+    border-radius: var(--radius-control);
+    padding: 8px 8px 8px 12px;
+  }
+  .cab-terms span.truncate { white-space: normal; overflow: visible; line-height: 1.4; }
+  .cab-terms > span { flex: 1 1 auto; }
+  .cab-terms__btn { white-space: nowrap; padding: 6px 12px; }
   .cab-content { padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px)); }
 
   .cab-tabbar {

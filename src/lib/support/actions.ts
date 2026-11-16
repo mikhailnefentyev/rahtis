@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { getViewer } from '@/lib/auth/viewer';
 import { operatorInbox, sendEmail } from '@/lib/email';
 import { operatorNoticeEmail, supportEmail } from '@/lib/email/templates/operator';
+import { emailLocaleOf, emailText } from '@/lib/email/text';
 import { defaultLocale, getDictionary, isLocale, type Locale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import { flashFailure } from '@/lib/forms/flash';
@@ -121,11 +122,13 @@ export async function sendNoticeAction(
 
   const { data: company } = await supabase
     .from('companies')
-    .select('contact_email')
+    .select('contact_email, language')
     .eq('id', companyId)
     .single();
 
   if (company?.contact_email) {
+    /* Шапка и подвал на языке компании: латышской компании финский подвал «Emme koskaan…» ни к чему (16.11.2026). */
+    const mail = emailText(emailLocaleOf(company.language));
     await sendEmail(
       operatorNoticeEmail({
         to: company.contact_email,
@@ -133,6 +136,7 @@ export async function sendNoticeAction(
         subject,
         body,
         operatorEmail: operatorInbox(),
+        chrome: { tagline: mail.brandTagline, neverAsk: mail.neverAsk, signature: mail.signature },
       }),
     );
   }

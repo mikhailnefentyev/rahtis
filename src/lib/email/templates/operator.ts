@@ -8,6 +8,8 @@ export function operatorNoticeEmail(input: {
   subject: string;
   body: string;
   operatorEmail: string;
+  /** Шапка, подпись и подвал на языке компании (emailText): текст — как написал оператор. */
+  chrome?: { tagline: string; neverAsk: string; signature: string };
 }): EmailMessage {
   /*
    * Оператор пишет живым текстом, и абзацы в нём настоящие. Разбираем по
@@ -25,12 +27,20 @@ export function operatorNoticeEmail(input: {
     to: input.to,
     replyTo: input.operatorEmail,
     subject: `RAHTIS · ${input.subject}`,
-    text: renderText({ heading: input.subject, blocks, operatorEmail: input.operatorEmail }),
+    text: renderText({
+      heading: input.subject,
+      blocks,
+      operatorEmail: input.operatorEmail,
+      signature: input.chrome?.signature,
+      neverAsk: input.chrome?.neverAsk,
+    }),
     html: renderEmail({
       heading: input.subject,
       preheader: input.body.slice(0, 120),
       blocks,
       operatorEmail: input.operatorEmail,
+      tagline: input.chrome?.tagline,
+      neverAsk: input.chrome?.neverAsk,
     }),
     companyId: input.companyId,
   };
