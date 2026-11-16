@@ -430,7 +430,8 @@ export default async function AdminPage({
       <NoticeForm
         locale={locale}
         companies={all
-          .filter((c) => c.status === 'ACTIVE' && !c.frozen_at)
+          /* И одобренные, но не дошедшие до реквизитов: им-то и пишут «остался один шаг» (16.11.2026). */
+          .filter((c) => (c.status === 'ACTIVE' || c.status === 'APPROVED') && !c.frozen_at)
           .map((c) => ({ id: c.id, name: c.name, kind: c.kind }))}
       />
 
