@@ -2196,6 +2196,7 @@ export const pl = {
     remove: 'Usuń firmę',
     removeConfirm: 'Usunąć tę firmę na stałe? Tego nie da się cofnąć.',
     removeBlocked: 'Tej firmy nie można usunąć: ma przewozy. Historia przewozów nigdy nie jest usuwana.',
+    reviewNoteRequired: 'Wpisz powód odrzucenia – firma zobaczy go w wiadomości.',
     removed: 'Firma usunięta',
     inviteNotSent: 'Nie udało się wysłać zaproszenia. Sprawdź ustawienia e-mail i wyślij ponownie.',
   },

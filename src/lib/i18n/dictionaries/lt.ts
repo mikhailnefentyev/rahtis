@@ -2197,6 +2197,7 @@ export const lt = {
     remove: 'Ištrinti įmonę',
     removeConfirm: 'Visam laikui ištrinti šią įmonę? To atšaukti negalima.',
     removeBlocked: 'Šios įmonės ištrinti negalima: ji turi pervežimų. Pervežimų istorija netrinama.',
+    reviewNoteRequired: 'Įrašykite atmetimo priežastį – įmonė ją matys pranešime.',
     removed: 'Įmonė ištrinta',
     inviteNotSent: 'Kvietimo išsiųsti nepavyko. Patikrinkite el. pašto nustatymus ir siųskite dar kartą.',
   },

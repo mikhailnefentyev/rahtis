@@ -158,6 +158,8 @@ export default async function AdminPage({
     .select('*, company:companies(name, country, business_id)')
     .in('kind', ['FORWARDER_INSURANCE', 'FORWARDER_LICENSE'])
     .eq('review_status', 'PENDING')
+    /* Заменённая новой версия решения не ждёт: в очереди — только текущая (16.11.2026). */
+    .eq('is_current', true)
     .order('uploaded_at', { ascending: true })
     .limit(50);
 
@@ -167,6 +169,7 @@ export default async function AdminPage({
     .select('*, company:companies(name, country, business_id)')
     .in('kind', [...SHIPPER_DOC_KINDS])
     .eq('review_status', 'PENDING')
+    .eq('is_current', true)
     .order('uploaded_at', { ascending: true })
     .limit(50);
 

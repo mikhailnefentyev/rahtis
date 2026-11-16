@@ -2197,6 +2197,7 @@ export const de = {
     remove: 'Unternehmen löschen',
     removeConfirm: 'Unternehmen endgültig löschen? Das lässt sich nicht rückgängig machen.',
     removeBlocked: 'Das Unternehmen lässt sich nicht löschen: Es hat Transporte. Der Transportverlauf wird nicht gelöscht.',
+    reviewNoteRequired: 'Geben Sie den Ablehnungsgrund ein – das Unternehmen sieht ihn in der Nachricht.',
     removed: 'Unternehmen gelöscht',
     inviteNotSent: 'Die Einladung konnte nicht gesendet werden. Prüfen Sie die E-Mail-Einstellungen und senden Sie sie erneut.',
   },

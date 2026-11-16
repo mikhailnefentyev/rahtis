@@ -11,6 +11,7 @@ import {
   Stars,
 } from '@/components/ui';
 import { companyStatusTone, vehicleAccessTone } from '@/components/ui/tone';
+import { AdminError } from '@/components/layout/AdminError';
 import { requireRole } from '@/lib/auth/guard';
 import { setCompanyTestAction } from '@/lib/companies/actions';
 import { adminResetTwoStepAction } from '@/lib/auth/twoStepActions';
@@ -47,10 +48,12 @@ import { pendingKinds } from '@/lib/forwarders/docsGate';
  */
 export default async function AdminCompanyPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string; id: string }>;
+  searchParams: Promise<{ error?: string }>;
 }) {
-  const { locale, id } = await params;
+  const [{ locale, id }, { error: failure }] = await Promise.all([params, searchParams]);
   if (!isLocale(locale)) notFound();
 
   await requireRole(locale, 'ADMIN');
@@ -163,6 +166,13 @@ export default async function AdminCompanyPage({
           ← {t.role.ADMIN}
         </Link>
       </nav>
+
+      {/*
+        Решения по документам с этой карточки возвращаются сюда же с
+        ?error=… — без полосы отказ был невидим: «отклонить» без причины
+        просто перезагружал страницу, и документ «не удалялся» (16.11.2026).
+      */}
+      <AdminError locale={locale} code={failure} />
 
       <header className="flex flex-wrap items-start justify-between gap-4 border-b border-line pb-4">
         <div className="min-w-0">

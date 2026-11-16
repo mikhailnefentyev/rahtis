@@ -2197,6 +2197,7 @@ export const sv = {
     remove: 'Radera företaget',
     removeConfirm: 'Radera företaget permanent? Det går inte att ångra.',
     removeBlocked: 'Företaget kan inte raderas: det har transporter. Transporthistorik raderas aldrig.',
+    reviewNoteRequired: 'Skriv orsaken till avslaget – företaget ser den i meddelandet.',
     removed: 'Företaget raderat',
     inviteNotSent: 'Inbjudan kunde inte skickas. Kontrollera e-postinställningarna och skicka den igen.',
   },

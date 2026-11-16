@@ -2197,6 +2197,7 @@ export const lv = {
     remove: 'Dzēst uzņēmumu',
     removeConfirm: 'Neatgriezeniski dzēst uzņēmumu? To nevarēs atsaukt.',
     removeBlocked: 'Uzņēmumu nevar dzēst: tam ir pārvadājumi. Pārvadājumu vēsturi nedzēš.',
+    reviewNoteRequired: 'Ierakstiet noraidīšanas iemeslu – uzņēmums to redzēs paziņojumā.',
     removed: 'Uzņēmums dzēsts',
     inviteNotSent: 'Ielūgumu neizdevās nosūtīt. Pārbaudiet e-pasta iestatījumus un nosūtiet vēlreiz.',
   },

@@ -182,6 +182,9 @@ export async function reviewForwarderDocumentAction(formData: FormData): Promise
   const back = String(formData.get('back') ?? '');
   const returnTo = back.startsWith(`/${locale}/admin`) ? back : `/${locale}/admin`;
 
+  /* Отказ — только с причиной: она уходит компании в письме. Без неё база откажет, и оператор должен увидеть почему. */
+  if (decision === 'REJECTED' && !note) redirect(withAdminError(returnTo, 'reviewNoteRequired'));
+
   /*
    * Была ли работа экспедитора закрыта до решения: если это решение её
    * открывает (второй документ принят), компании — отдельное письмо

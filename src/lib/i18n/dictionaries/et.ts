@@ -2197,6 +2197,7 @@ export const et = {
     remove: 'Kustuta ettevõte',
     removeConfirm: 'Kas kustutada see ettevõte jäädavalt? Seda ei saa tagasi võtta.',
     removeBlocked: 'Seda ettevõtet ei saa kustutada: tal on vedusid. Veoajalugu ei kustutata kunagi.',
+    reviewNoteRequired: 'Kirjutage tagasilükkamise põhjus – ettevõte näeb seda teates.',
     removed: 'Ettevõte kustutatud',
     inviteNotSent: 'Kutset ei õnnestunud saata. Kontrolli e-posti seadeid ja saada uuesti.',
   },

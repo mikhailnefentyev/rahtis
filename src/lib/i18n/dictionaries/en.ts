@@ -2332,6 +2332,7 @@ export const en = {
     remove: 'Delete company',
     removeConfirm: 'Delete this company for good? This can’t be undone.',
     removeBlocked: 'This company can’t be deleted because it has jobs. Job history is never deleted.',
+    reviewNoteRequired: 'Write the reason for the rejection – the company sees it in the message.',
     removed: 'Company deleted',
     inviteNotSent: 'Couldn’t send the invite. Check the email settings and send it again.',
   },

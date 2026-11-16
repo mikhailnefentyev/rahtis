@@ -24,6 +24,7 @@ export type AdminErrorCode =
   | 'notDone'
   | 'inviteNotSent'
   | 'noClauses'
+  | 'reviewNoteRequired'
   | 'generic';
 
 const BY_SQLSTATE: Record<string, AdminErrorCode> = {

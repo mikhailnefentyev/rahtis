@@ -2428,6 +2428,7 @@ export const fi = {
     remove: 'Poista yritys',
     removeConfirm: 'Poistetaanko yritys pysyvästi? Tätä ei voi perua.',
     removeBlocked: 'Yritystä ei voi poistaa: sillä on kuljetuksia. Kuljetushistoriaa ei poisteta.',
+    reviewNoteRequired: 'Kirjoita hylkäyksen syy – yritys näkee sen viestissä.',
     removed: 'Yritys poistettu',
     inviteNotSent: 'Kutsua ei saatu lähetettyä. Tarkista sähköpostiasetukset ja lähetä uudelleen.',
   },

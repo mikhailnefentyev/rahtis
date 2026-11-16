@@ -2326,6 +2326,7 @@ export const ro = {
     remove: 'Ștergeți firma',
     removeConfirm: 'Ștergeți definitiv această firmă? Operațiunea nu poate fi anulată.',
     removeBlocked: 'Această firmă nu poate fi ștearsă deoarece are comenzi. Istoricul comenzilor nu se șterge niciodată.',
+    reviewNoteRequired: 'Scrieți motivul respingerii – firma îl va vedea în mesaj.',
     removed: 'Firma a fost ștearsă',
     inviteNotSent: 'Invitația nu a putut fi trimisă. Verificați setările de e-mail și trimiteți-o din nou.',
   },
