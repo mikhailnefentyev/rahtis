@@ -80,9 +80,16 @@ function escape(value: string): string {
  * https://www.rahtis.eu/…», и в письме это должно нажиматься. Точка или
  * запятая в конце предложения в ссылку не входит. Вызывается после
  * escape: в адресе уже нет «<» и кавычек.
+ *
+ * Только наш домен: в text/note попадает и текст пользователей (заметки,
+ * сообщения), и чужой адрес не должен становиться нажимаемой ссылкой в
+ * письме от RAHTIS (фишинг). «rahtis.eu.evil.com» не подходит — после
+ * домена должен быть конец адреса или «/ ? #» (security review 16.11.2026).
  */
+const OWN_URL = /https:\/\/(?:www\.)?rahtis\.eu(?:[/?#][^\s<]*[^\s<.,;:!?)»”])?(?![\w-]|\.[\w-])/g;
+
 function linkify(escaped: string): string {
-  return escaped.replace(/https?:\/\/[^\s<]+[^\s<.,;:!?)»”]/g, (url) => `<a href="${url}" style="color:${ACCENT};">${url}</a>`);
+  return escaped.replace(OWN_URL, (url) => `<a href="${url}" style="color:${ACCENT};">${url}</a>`);
 }
 
 function block(item: EmailBlock): string {
