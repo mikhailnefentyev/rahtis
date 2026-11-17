@@ -200,13 +200,14 @@ export function applicationFiledEmail(input: {
   const yes = (value: boolean | null) => (value === null ? '–' : value ? 'kyllä' : 'EI');
 
   /* VIES знает только название и действующий ли номер НДС — остальные строки PRH там пустые. */
-  const registryRows: Array<[string, string]> = !r.officialName
-    ? []
-    : input.registryName !== 'PRH'
-      ? [
-          ['Nimi rekisterissä', r.officialName],
-          ['ALV-numero voimassa', yes(r.vat)],
-        ]
+  /* Германия и др. имя в VIES не отдают — строка «номер действует» нужна и без него (17.11.2026). */
+  const registryRows: Array<[string, string]> = input.registryName !== 'PRH'
+    ? [
+        ...(r.officialName ? [['Nimi rekisterissä', r.officialName] as [string, string]] : []),
+        ...(r.vat !== null ? [['ALV-numero voimassa', yes(r.vat)] as [string, string]] : []),
+      ]
+    : !r.officialName
+      ? []
       : [
         ['Nimi rekisterissä', r.officialName],
         ['Yhtiömuoto', r.form ?? '–'],

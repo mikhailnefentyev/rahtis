@@ -53,13 +53,19 @@ export function RegistryBlock({ company }: { company: Company }) {
         </form>
       </div>
 
-      {r?.officialName && (
+      {r && (r.officialName || r.vat !== null) && (
         <div className="flex flex-col gap-1">
-          <Kv
-            k={t.moderation.registryName}
-            v={`${r.officialName}${r.form ? ` · ${r.form}` : ''}`}
-          />
-          {/* VIES отвечает только про НДС; ennakkoperintä и работодатель — финские реестры. */}
+          {r.officialName && (
+            <Kv
+              k={t.moderation.registryName}
+              v={`${r.officialName}${r.form ? ` · ${r.form}` : ''}`}
+            />
+          )}
+          {/*
+            * VIES отвечает только про НДС; ennakkoperintä и работодатель — финские реестры.
+            * Строка НДС — и без названия: Германия, Испания и др. имя в VIES не отдают,
+            * и без неё карточка выглядела так, будто сверки не было (17.11.2026).
+            */}
           {registryName(company.country) === 'PRH' ? (
             <Kv
               k={`${t.moderation.registryPrepayment} · ${t.moderation.registryVat} · ${t.moderation.registryEmployer}`}
