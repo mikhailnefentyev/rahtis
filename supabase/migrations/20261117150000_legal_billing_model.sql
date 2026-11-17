@@ -474,8 +474,8 @@ begin
     'tilitykset ja', 'settlements and consignment', 'tilitystiedot', 'settlement data',
     'tilitysasiakirjat', 'settlement documents', 'tai tilitykset', 'or settlement may',
     'välittämään kuljetusliikkeelle', 'pass on to the carrier any',
-    'tavanomaisin maksuehdoin', 'on the usual payment terms',
-    'joka toinen viikko', 'every other week'
+    'tavanomaisin maksuehdoin', 'on the usual payment terms'
+    /* «joka toinen viikko» больше не признак старого текста: это вариант периодичности счёта (20261117160000). */
   ]) as m(phrase)
   where d.id in (
     pg_temp.draft_of('TERMS'), pg_temp.draft_of('SHIPPER_AGREEMENT'),

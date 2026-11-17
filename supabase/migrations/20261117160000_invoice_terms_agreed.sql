@@ -64,7 +64,7 @@ set search_path = ''
 as $$
 declare
   v_me uuid := (select app.current_company_id());
-  v_kind public.company_kind;
+  v_kind public.party_role;
 begin
   if v_me is null then
     raise exception 'Нет компании.' using errcode = '42501';
