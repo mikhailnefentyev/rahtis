@@ -2504,6 +2504,25 @@ export const ro = {
     notifyRejectedTitle: '{name} a respins condițiile de facturare propuse',
   },
 
+  /* Счета заказчику от перевозчиков (17.11.2026). */
+  shipperInvoices: {
+    title: 'Facturi',
+    subtitle: 'Facturile trimise de transportatori. Factura este a transportatorului, iar plata se face direct către acesta.',
+    openTotal: 'Total de plată',
+    sentTitle: 'Facturile transportatorilor prin RAHTIS',
+    empty: 'Încă nu există facturi.',
+    period: 'Transporturi {from}–{to}',
+    issued: 'Data facturii {date}',
+    due: 'Scadență {date}',
+    statusPaid: 'Plătită {date}',
+    statusOpen: 'Deschisă',
+    statusOverdue: 'Restantă',
+    payTo: 'Plată în contul',
+    reference: 'referință',
+    pdf: 'Deschide PDF',
+    payNote: 'Plătiți direct transportatorului în contul de pe factură, cu numărul de referință. RAHTIS și Aivomaa Oy nu primesc plăți. Factura este marcată ca plătită după ce transportatorul înregistrează plata.',
+  },
+
   invite: {
     title: 'Setați o parolă',
     subtitle: 'Invitația a fost acceptată. Alegeți o parolă pentru autentificare.',

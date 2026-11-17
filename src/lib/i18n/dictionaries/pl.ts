@@ -2374,6 +2374,25 @@ export const pl = {
     notifyRejectedTitle: '{name} odrzucił proponowane warunki fakturowania',
   },
 
+  /* Счета заказчику от перевозчиков (17.11.2026). */
+  shipperInvoices: {
+    title: 'Faktury',
+    subtitle: 'Faktury, które przesłali Ci przewoźnicy. Faktura jest przewoźnika, a płacisz bezpośrednio przewoźnikowi.',
+    openTotal: 'Do zapłaty łącznie',
+    sentTitle: 'Faktury przewoźników przez RAHTIS',
+    empty: 'Brak faktur.',
+    period: 'Przewozy {from}–{to}',
+    issued: 'Data faktury {date}',
+    due: 'Termin płatności {date}',
+    statusPaid: 'Zapłacono {date}',
+    statusOpen: 'Otwarta',
+    statusOverdue: 'Po terminie',
+    payTo: 'Zapłać na rachunek',
+    reference: 'tytuł/referencja',
+    pdf: 'Otwórz PDF',
+    payNote: 'Płać bezpośrednio przewoźnikowi na rachunek z faktury, podając numer referencyjny. RAHTIS ani Aivomaa Oy nie przyjmują płatności. Faktura zostaje oznaczona jako zapłacona, gdy przewoźnik odnotuje płatność.',
+  },
+
   invite: {
     title: 'Ustaw hasło',
     subtitle: 'Zaproszenie przyjęte. Wybierz hasło do logowania.',

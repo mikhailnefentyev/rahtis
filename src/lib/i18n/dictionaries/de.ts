@@ -2375,6 +2375,25 @@ export const de = {
     notifyRejectedTitle: '{name} hat die vorgeschlagenen Rechnungsbedingungen abgelehnt',
   },
 
+  /* Счета заказчику от перевозчиков (17.11.2026). */
+  shipperInvoices: {
+    title: 'Rechnungen',
+    subtitle: 'Rechnungen, die Transportunternehmen Ihnen gesendet haben. Die Rechnung ist die des Transportunternehmens, Sie zahlen direkt an dieses.',
+    openTotal: 'Offen gesamt',
+    sentTitle: 'Rechnungen der Transportunternehmen über RAHTIS',
+    empty: 'Noch keine Rechnungen.',
+    period: 'Transporte {from}–{to}',
+    issued: 'Rechnungsdatum {date}',
+    due: 'Fällig {date}',
+    statusPaid: 'Bezahlt {date}',
+    statusOpen: 'Offen',
+    statusOverdue: 'Überfällig',
+    payTo: 'Zahlung an Konto',
+    reference: 'Referenz',
+    pdf: 'PDF öffnen',
+    payNote: 'Zahlen Sie direkt an das Transportunternehmen auf das Konto der Rechnung mit der Referenznummer. RAHTIS und Aivomaa Oy nehmen keine Zahlungen entgegen. Die Rechnung wird als bezahlt markiert, sobald das Transportunternehmen die Zahlung erfasst hat.',
+  },
+
   invite: {
     title: 'Passwort festlegen',
     subtitle: 'Ihre Einladung ist angenommen. Wählen Sie ein Passwort für die Anmeldung.',

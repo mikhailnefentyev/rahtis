@@ -2375,6 +2375,25 @@ export const lt = {
     notifyRejectedTitle: '{name} atmetė pasiūlytas sąskaitų sąlygas',
   },
 
+  /* Счета заказчику от перевозчиков (17.11.2026). */
+  shipperInvoices: {
+    title: 'Sąskaitos',
+    subtitle: 'Vežėjų jums atsiųstos sąskaitos. Sąskaita yra vežėjo, ir mokate tiesiogiai vežėjui.',
+    openTotal: 'Iš viso neapmokėta',
+    sentTitle: 'Vežėjų sąskaitos per RAHTIS',
+    empty: 'Sąskaitų dar nėra.',
+    period: 'Pervežimai {from}–{to}',
+    issued: 'Sąskaitos data {date}',
+    due: 'Apmokėti iki {date}',
+    statusPaid: 'Apmokėta {date}',
+    statusOpen: 'Atvira',
+    statusOverdue: 'Pradelsta',
+    payTo: 'Mokėti į sąskaitą',
+    reference: 'įmokos kodas',
+    pdf: 'Atidaryti PDF',
+    payNote: 'Mokėkite tiesiogiai vežėjui į sąskaitoje nurodytą sąskaitą su įmokos kodu. RAHTIS ir Aivomaa Oy mokėjimų nepriima. Sąskaita pažymima apmokėta, kai vežėjas užregistruoja mokėjimą.',
+  },
+
   invite: {
     title: 'Nustatykite slaptažodį',
     subtitle: 'Kvietimas priimtas. Susigalvokite prisijungimo slaptažodį.',

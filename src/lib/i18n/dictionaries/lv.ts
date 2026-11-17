@@ -2375,6 +2375,25 @@ export const lv = {
     notifyRejectedTitle: '{name} noraidīja ierosinātos rēķinu noteikumus',
   },
 
+  /* Счета заказчику от перевозчиков (17.11.2026). */
+  shipperInvoices: {
+    title: 'Rēķini',
+    subtitle: 'Pārvadātāju jums nosūtītie rēķini. Rēķins ir pārvadātāja, un jūs maksājat tieši pārvadātājam.',
+    openTotal: 'Neapmaksāts kopā',
+    sentTitle: 'Pārvadātāju rēķini caur RAHTIS',
+    empty: 'Rēķinu vēl nav.',
+    period: 'Pārvadājumi {from}–{to}',
+    issued: 'Rēķina datums {date}',
+    due: 'Apmaksas termiņš {date}',
+    statusPaid: 'Apmaksāts {date}',
+    statusOpen: 'Atvērts',
+    statusOverdue: 'Nokavēts',
+    payTo: 'Maksāt uz kontu',
+    reference: 'atsauce',
+    pdf: 'Atvērt PDF',
+    payNote: 'Maksājiet tieši pārvadātājam uz rēķinā norādīto kontu ar atsauces numuru. RAHTIS un Aivomaa Oy maksājumus nepieņem. Rēķins tiek atzīmēts kā apmaksāts, kad pārvadātājs ir reģistrējis maksājumu.',
+  },
+
   invite: {
     title: 'Iestatīt paroli',
     subtitle: 'Ielūgums pieņemts. Izvēlieties paroli pieslēgšanai.',

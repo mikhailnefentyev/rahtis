@@ -218,7 +218,12 @@ function navigation(
         },
         {
           label: t.nav.groupDocuments,
-          items: [reports, { href: `/${locale}/shipper/claims`, label: t.claims.title, icon: 'claims' }],
+          items: [
+            /* Счета перевозчиков, выставленные заказчику (17.11.2026). */
+            { href: `/${locale}/shipper/invoices`, label: t.shipperInvoices.title, icon: 'billing' },
+            reports,
+            { href: `/${locale}/shipper/claims`, label: t.claims.title, icon: 'claims' },
+          ],
         },
       ],
       primary: [overview, orders, done, reports],

@@ -2510,6 +2510,25 @@ export const en = {
     notifyRejectedTitle: '{name} rejected the proposed invoicing terms',
   },
 
+  /* Счета заказчику от перевозчиков (17.11.2026). */
+  shipperInvoices: {
+    title: 'Invoices',
+    subtitle: 'Invoices carriers have sent you. The invoice is the carrier\'s, and you pay the carrier directly.',
+    openTotal: 'Open in total',
+    sentTitle: 'Carrier invoices sent through RAHTIS',
+    empty: 'No invoices yet.',
+    period: 'Transports {from}–{to}',
+    issued: 'Invoice date {date}',
+    due: 'Due {date}',
+    statusPaid: 'Paid {date}',
+    statusOpen: 'Open',
+    statusOverdue: 'Overdue',
+    payTo: 'Pay to account',
+    reference: 'reference',
+    pdf: 'Open PDF',
+    payNote: 'Pay the carrier directly to the account on the invoice with the reference number. RAHTIS and Aivomaa Oy do not receive payments. The invoice is marked paid once the carrier has recorded the payment.',
+  },
+
   invite: {
     title: 'Set a password',
     subtitle: 'Your invite is accepted. Choose a password for signing in.',

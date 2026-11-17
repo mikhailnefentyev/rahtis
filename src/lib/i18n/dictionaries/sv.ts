@@ -2375,6 +2375,25 @@ export const sv = {
     notifyRejectedTitle: '{name} avvisade de föreslagna faktureringsvillkoren',
   },
 
+  /* Счета заказчику от перевозчиков (17.11.2026). */
+  shipperInvoices: {
+    title: 'Fakturor',
+    subtitle: 'Fakturor som åkerier har skickat till er. Fakturan är åkeriets, och ni betalar direkt till åkeriet.',
+    openTotal: 'Öppet totalt',
+    sentTitle: 'Åkeriernas fakturor via RAHTIS',
+    empty: 'Inga fakturor ännu.',
+    period: 'Transporter {from}–{to}',
+    issued: 'Fakturadatum {date}',
+    due: 'Förfallodag {date}',
+    statusPaid: 'Betald {date}',
+    statusOpen: 'Öppen',
+    statusOverdue: 'Förfallen',
+    payTo: 'Betala till konto',
+    reference: 'referens',
+    pdf: 'Öppna PDF',
+    payNote: 'Betala direkt till åkeriet till kontot på fakturan med referensnumret. RAHTIS och Aivomaa Oy tar inte emot betalningar. Fakturan markeras som betald när åkeriet har registrerat betalningen.',
+  },
+
   invite: {
     title: 'Välj ett lösenord',
     subtitle: 'Din inbjudan är godkänd. Välj ett lösenord för inloggning.',

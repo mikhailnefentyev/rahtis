@@ -2608,6 +2608,25 @@ export const fi = {
     notifyRejectedTitle: '{name} hylkäsi ehdotetut laskutusehdot',
   },
 
+  /* Счета заказчику от перевозчиков (17.11.2026). */
+  shipperInvoices: {
+    title: 'Laskut',
+    subtitle: 'Kuljetusliikkeiden sinulle lähettämät laskut. Lasku on kuljetusliikkeen, ja maksu suoritetaan suoraan sille.',
+    openTotal: 'Avoinna yhteensä',
+    sentTitle: 'Kuljetusliikkeiden laskut RAHTIS-palvelun kautta',
+    empty: 'Laskuja ei vielä ole.',
+    period: 'Kuljetukset {from}–{to}',
+    issued: 'Laskun pvm {date}',
+    due: 'Eräpäivä {date}',
+    statusPaid: 'Maksettu {date}',
+    statusOpen: 'Avoin',
+    statusOverdue: 'Erääntynyt',
+    payTo: 'Maksu tilille',
+    reference: 'viite',
+    pdf: 'Avaa PDF',
+    payNote: 'Maksa suoraan kuljetusliikkeelle laskun tilinumeroon ja viitenumerolla. RAHTIS tai Aivomaa Oy eivät vastaanota maksuja. Maksetuksi lasku merkitään, kun kuljetusliike on kirjannut maksun.',
+  },
+
   invite: {
     title: 'Aseta salasana',
     subtitle: 'Kutsu on hyväksytty. Valitse salasana kirjautumista varten.',

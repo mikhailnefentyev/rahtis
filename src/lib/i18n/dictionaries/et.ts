@@ -2375,6 +2375,25 @@ export const et = {
     notifyRejectedTitle: '{name} lükkas pakutud arveldustingimused tagasi',
   },
 
+  /* Счета заказчику от перевозчиков (17.11.2026). */
+  shipperInvoices: {
+    title: 'Arved',
+    subtitle: 'Vedajate teile saadetud arved. Arve on vedaja oma ja maksate otse vedajale.',
+    openTotal: 'Tasumata kokku',
+    sentTitle: 'Vedajate arved RAHTISe kaudu',
+    empty: 'Arveid veel pole.',
+    period: 'Veod {from}–{to}',
+    issued: 'Arve kuupäev {date}',
+    due: 'Maksetähtaeg {date}',
+    statusPaid: 'Makstud {date}',
+    statusOpen: 'Avatud',
+    statusOverdue: 'Tähtaeg ületatud',
+    payTo: 'Maksa kontole',
+    reference: 'viitenumber',
+    pdf: 'Ava PDF',
+    payNote: 'Makske otse vedajale arvel olevale kontole viitenumbriga. RAHTIS ega Aivomaa Oy makseid vastu ei võta. Arve märgitakse makstuks, kui vedaja on makse kirja pannud.',
+  },
+
   invite: {
     title: 'Määra parool',
     subtitle: 'Kutse on vastu võetud. Vali parool, millega sisse logida.',
