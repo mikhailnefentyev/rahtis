@@ -69,6 +69,10 @@ begin
   if v_me is null then
     raise exception 'Нет компании.' using errcode = '42501';
   end if;
+  /* Условие договора, а не рейса: согласует главный в компании, не диспетчер (security review 17.11.2026). */
+  if not (select app.is_company_owner()) then
+    raise exception 'Условия счёта согласует главный в компании.' using errcode = '42501';
+  end if;
   select kind into v_kind from public.companies where id = v_me;
 
   if v_kind = 'CARRIER' then
