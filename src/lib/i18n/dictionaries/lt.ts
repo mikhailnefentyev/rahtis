@@ -2437,6 +2437,11 @@ export const lt = {
     vatLine: 'PVM {rate}',
     totalWithVat: 'Iš viso su PVM',
     empty: 'Šią savaitę atliktų pervežimų nėra.',
+    sitesTitle: 'Objektai',
+    sitesNote: 'Savaitės dienos objektuose: valandos, kroviniai ir pasvertos tonos. Darbas objekte apmokamas pagal objekto sąskaitą.',
+    colSite: 'Objektas',
+    colWork: 'Kroviniai · t',
+    colHours: 'val.',
     closingNote:
       'Pervežimas priskiriamas tai savaitei, kurią jis baigėsi. Penktadienį pradėtas ir pirmadienį iškrautas pervežimas bus kitos savaitės ataskaitoje.',
     periodClosingNote:

@@ -117,6 +117,11 @@ export type OwnSection = {
   title: string;
   note: string;
   colClient: string;
+  /** Свои подписи столбцов — у блока «Объекты» (17.11.2026); по умолчанию — как у рейсов. */
+  colRef?: string;
+  colRoute?: string;
+  colDistance?: string;
+  colGross?: string;
   total: string;
   rows: OwnRow[];
   distance: string;
@@ -162,10 +167,13 @@ export function WeeklyReport({
   totals,
   withCommission,
   own,
+  sites,
 }: {
   texts: ReportTexts;
   rows: ReportRow[];
   own?: OwnSection | null;
+  /** Дни на объектах за неделю (17.11.2026). */
+  sites?: OwnSection | null;
   totals: {
     gross: string;
     commission: string | null;
@@ -335,21 +343,21 @@ export function WeeklyReport({
           </>
         )}
 
-        {own && own.rows.length > 0 ? (
-          <View style={s.ownBlock}>
-            <Text style={s.ownTitle}>{own.title}</Text>
-            <Text style={s.vat}>{own.note}</Text>
+        {[own, sites].map((section, i) => section && section.rows.length > 0 ? (
+          <View key={i} style={s.ownBlock}>
+            <Text style={s.ownTitle}>{section.title}</Text>
+            <Text style={s.vat}>{section.note}</Text>
             <View style={s.head}>
-              <Text style={[s.th, { width: 68 }]}>{texts.colRef}</Text>
+              <Text style={[s.th, { width: 68 }]}>{section.colRef ?? texts.colRef}</Text>
               <Text style={[s.th, { width: 58 }]}>{texts.colDate}</Text>
-              <Text style={[s.th, { width: 96 }]}>{own.colClient}</Text>
-              <Text style={[s.th, { flex: 1 }]}>{texts.colRoute}</Text>
+              <Text style={[s.th, { width: 96 }]}>{section.colClient}</Text>
+              <Text style={[s.th, { flex: 1 }]}>{section.colRoute ?? texts.colRoute}</Text>
               <Text style={[s.th, { width: 52 }]}>{texts.colVehicle}</Text>
-              <Text style={[s.th, s.right, { width: 36 }]}>{texts.colDistance}</Text>
-              <Text style={[s.th, s.right, { width: 62 }]}>{texts.colGross}</Text>
+              <Text style={[s.th, s.right, { width: 36 }]}>{section.colDistance ?? texts.colDistance}</Text>
+              <Text style={[s.th, s.right, { width: 62 }]}>{section.colGross ?? texts.colGross}</Text>
             </View>
-            {own.rows.map((row) => (
-              <View key={row.ref} style={s.row} wrap={false}>
+            {section.rows.map((row) => (
+              <View key={`${row.ref}-${row.closedAt}-${row.vehicle}`} style={s.row} wrap={false}>
                 <Text style={[s.cell, { width: 68 }]}>{row.ref}</Text>
                 <Text style={[s.cell, { width: 58 }]}>{row.closedAt}</Text>
                 <Text style={[s.cell, { width: 96 }]}>{row.client}</Text>
@@ -360,12 +368,12 @@ export function WeeklyReport({
               </View>
             ))}
             <View style={s.totals}>
-              <Text style={[s.totalLabel, { flex: 1 }]}>{own.total}</Text>
-              <Text style={[s.totalLabel, s.right, { width: 36 }]}>{own.distance}</Text>
-              <Text style={[s.totalLabel, s.right, { width: 62 }]}>{own.price}</Text>
+              <Text style={[s.totalLabel, { flex: 1 }]}>{section.total}</Text>
+              <Text style={[s.totalLabel, s.right, { width: 36 }]}>{section.distance}</Text>
+              <Text style={[s.totalLabel, s.right, { width: 62 }]}>{section.price}</Text>
             </View>
           </View>
-        ) : null}
+        ) : null)}
 
         <Text style={s.note}>{texts.closingNote}</Text>
 

@@ -2437,6 +2437,11 @@ export const lv = {
     vatLine: 'PVN {rate}',
     totalWithVat: 'Kopā ar PVN',
     empty: 'Šonedēļ neviens pārvadājums netika pabeigts.',
+    sitesTitle: 'Objekti',
+    sitesNote: 'Nedēļas dienas objektos: stundas, kravas un nosvērtās tonnas. Darbs objektā tiek rēķināts ar objekta rēķinu.',
+    colSite: 'Objekts',
+    colWork: 'Kravas · t',
+    colHours: 'h',
     closingNote:
       'Pārvadājums pieder nedēļai, kurā tas beidzās. Piektdien sākts un pirmdien izkrauts pārvadājums būs nākamās nedēļas atskaitē.',
     periodClosingNote:

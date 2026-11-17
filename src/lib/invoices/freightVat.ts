@@ -41,7 +41,9 @@ export function freightVat(
   }
 
   if (EU.has(seller) && EU.has(buyer)) {
-    if (!buyerVatNumber || !buyerVatNumber.trim()) return { ok: false, reason: 'NO_BUYER_VAT' };
+    /* Номер НДС покупателя — его страны: «DE…» у немецкой фирмы, не чужой. */
+    const vatId = (buyerVatNumber ?? '').replace(/\s+/g, '').toUpperCase();
+    if (!vatId || !vatId.startsWith(buyer)) return { ok: false, reason: 'NO_BUYER_VAT' };
     return { ok: true, vatBps: 0, note: REVERSE_CHARGE_NOTE };
   }
 

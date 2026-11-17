@@ -2437,6 +2437,11 @@ export const de = {
     vatLine: 'MwSt. {rate}',
     totalWithVat: 'Summe inkl. MwSt.',
     empty: 'Diese Woche wurden keine Transporte abgeschlossen.',
+    sitesTitle: 'Baustellen',
+    sitesNote: 'Tage auf Baustellen in dieser Woche: Stunden, Fuhren und gewogene Tonnen. Die Baustellenarbeit wird mit der Baustellenrechnung abgerechnet.',
+    colSite: 'Baustelle',
+    colWork: 'Fuhren · t',
+    colHours: 'Std.',
     closingNote:
       'Ein Transport zählt zu der Woche, in der er endet. Ein Transport, der am Freitag beginnt und am Montag entladen wird, erscheint im Bericht der Folgewoche.',
     periodClosingNote:

@@ -33,3 +33,8 @@ test('вне ЕС (Норвегия) — 0 % с пометкой', () => {
 test('нет ставки для страны продавца', () => {
   assert.deepEqual(freightVat('US', 'US', null), { ok: false, reason: 'NO_VAT_RATE' });
 });
+
+test('номер НДС покупателя должен быть его страны', () => {
+  assert.deepEqual(freightVat('FI', 'DE', 'FI34297631'), { ok: false, reason: 'NO_BUYER_VAT' });
+  assert.deepEqual(freightVat('FI', 'DE', 'de 300536616'), { ok: true, vatBps: 0, note: REVERSE_CHARGE_NOTE });
+});

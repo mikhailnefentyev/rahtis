@@ -2436,6 +2436,11 @@ export const pl = {
     vatLine: 'VAT {rate}',
     totalWithVat: 'Razem brutto',
     empty: 'W tym tygodniu nie zakończono żadnych przewozów.',
+    sitesTitle: 'Budowy',
+    sitesNote: 'Dni na budowach w tygodniu: godziny, kursy i zważone tony. Praca na budowie jest fakturowana fakturą za budowę.',
+    colSite: 'Budowa',
+    colWork: 'Kursy · t',
+    colHours: 'godz.',
     closingNote:
       'Przewóz należy do tygodnia, w którym się zakończył. Przewóz rozpoczęty w piątek i rozładowany w poniedziałek pojawi się w raporcie z następnego tygodnia.',
     periodClosingNote:

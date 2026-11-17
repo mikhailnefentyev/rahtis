@@ -2580,6 +2580,11 @@ export const ro = {
     vatLine: 'TVA {rate}',
     totalWithVat: 'Total cu TVA',
     empty: 'Nicio comandă nu a fost finalizată săptămâna aceasta.',
+    sitesTitle: 'Șantiere',
+    sitesNote: 'Zilele pe șantiere din această săptămână: ore, curse și tone cântărite. Lucrul pe șantier se facturează prin factura șantierului.',
+    colSite: 'Șantier',
+    colWork: 'Curse · t',
+    colHours: 'ore',
     closingNote:
       'O comandă se contabilizează în săptămâna în care s-a finalizat. Una începută vineri și descărcată luni apare în raportul săptămânii următoare.',
     periodClosingNote:

@@ -14,6 +14,7 @@ import { notify } from '@/lib/notify';
 import { getOperatorProfile, operatorLines } from '@/lib/operator/profile';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { asCurrency } from '@/lib/money/currency';
+import { dayMinutes } from '@/lib/sites/work';
 import { loadFxHistory } from '@/lib/money/fx';
 import { WeeklyReport, type OwnRow, type OwnSection, type ReportRow, type ReportTexts } from './WeeklyReport';
 
@@ -315,21 +316,46 @@ async function run(span: Span): Promise<GenerateResult> {
   const documented = span.kind === 'PERIOD' ? list.filter((o) => o.contract_party !== 'CARRIER') : list;
 
   /*
-   * Клиент перевозчика отчётов не получает: это запись справочника для
-   * своих рейсов перевозчика, а не участник платформы. Рейс входит в
-   * отчёт перевозчика; клиент следит за ним по ссылке.
+   * Кому какие рейсы. Одна и та же строка попадает в два отчёта разными
+   * числами. С 17.11.2026 недельный отчёт получают все стороны, в том
+   * числе клиенты, заведённые перевозчиком (client_of), — прежде они его
+   * не получали. Документы старой схемы (PERIOD) — по-прежнему без них.
    */
   const shipperIds = [...new Set(documented.map((o) => o.shipper_company_id))];
-  const { data: carrierClients } = shipperIds.length
-    ? await admin.from('companies').select('id').in('id', shipperIds).not('client_of', 'is', null)
-    : { data: [] };
+  const { data: carrierClients } =
+    span.kind === 'PERIOD' && shipperIds.length
+      ? await admin.from('companies').select('id').in('id', shipperIds).not('client_of', 'is', null)
+      : { data: [] };
   const clientOfCarrier = new Set((carrierClients ?? []).map((c) => c.id));
 
-  /* Кому какие рейсы. Одна и та же строка попадает в два отчёта разными числами. */
   const byCompany = new Map<string, { role: 'CARRIER' | 'SHIPPER'; orders: OrderRow[] }>();
   for (const order of documented) {
     if (!clientOfCarrier.has(order.shipper_company_id)) push(byCompany, order.shipper_company_id, 'SHIPPER', order);
     if (order.assigned_company_id) push(byCompany, order.assigned_company_id, 'CARRIER', order);
+  }
+
+  /*
+   * Неделя (17.11.2026): дни на объектах — перевозчику объекта и заказчику
+   * заказа, из которого объект создан; и отчёт «за неделю рейсов нет» —
+   * каждой действующей компании платформы, у которой работы не было.
+   */
+  const sitesByCompany = span.kind === 'WEEK' ? await loadSiteWeek(admin, target, span.end) : new Map<string, SiteDay[]>();
+  if (span.kind === 'WEEK') {
+    for (const key of sitesByCompany.keys()) {
+      const role = key.split(':')[1] as 'CARRIER' | 'SHIPPER';
+      if (!byCompany.has(key)) byCompany.set(key, { role, orders: [] });
+    }
+    const { data: active } = await admin
+      .from('companies')
+      .select('id, kind')
+      .eq('status', 'ACTIVE')
+      .is('client_of', null)
+      .in('kind', ['CARRIER', 'SHIPPER']);
+    for (const company of active ?? []) {
+      const role = company.kind as 'CARRIER' | 'SHIPPER';
+      const key = `${company.id}:${role}`;
+      if (!byCompany.has(key)) byCompany.set(key, { role, orders: [] });
+    }
   }
 
   let reports = 0;
@@ -337,7 +363,7 @@ async function run(span: Span): Promise<GenerateResult> {
 
   for (const [companyId, entry] of byCompany) {
     try {
-      const sent = await issue(admin, span, companyId, entry.role, entry.orders, route, plate);
+      const sent = await issue(admin, span, companyId, entry.role, entry.orders, route, plate, sitesByCompany.get(companyId) ?? []);
       reports += 1;
       if (sent) emails += 1;
     } catch (cause) {
@@ -351,6 +377,86 @@ async function run(span: Span): Promise<GenerateResult> {
 function uniformBps(orders: OrderRow[]): number | null {
   const rates = new Set(orders.map((o) => o.commission_bps ?? COMMISSION_BPS));
   return rates.size === 1 ? [...rates][0]! : null;
+}
+
+/** День на объекте для недельного отчёта (17.11.2026). */
+type SiteDay = {
+  day: string;
+  job: string;
+  customer: string;
+  plate: string;
+  minutes: number;
+  loads: number;
+  netKg: number;
+};
+
+/**
+ * Дни на объектах за неделю: ключ `компания:роль` → дни. Перевозчику —
+ * дни его объектов; заказчику — дни объектов, созданных из его заказа.
+ * Клиент объекта, записанный текстом (не компания платформы), отчёта не
+ * получает: ему уходят счета по объекту.
+ */
+async function loadSiteWeek(
+  admin: ReturnType<typeof createAdminClient>,
+  start: string,
+  end: string,
+): Promise<Map<string, SiteDay[]>> {
+  const out = new Map<string, SiteDay[]>();
+  const { data: days } = await admin
+    .from('site_days')
+    .select('id, day, job_id, vehicle_id, trailer_id, arrived_at, ended_at, buffer_minutes')
+    .gte('day', start)
+    .lte('day', end)
+    .order('day');
+  if (!days?.length) return out;
+
+  const jobIds = [...new Set(days.map((d) => d.job_id))];
+  const dayIds = days.map((d) => d.id);
+  const [{ data: jobs }, { data: loads }] = await Promise.all([
+    admin.from('site_jobs').select('id, name, company_id, customer_name, order_id').in('id', jobIds),
+    admin.from('site_loads').select('day_id, unloaded_at, net_kg').in('day_id', dayIds),
+  ]);
+  const jobById = new Map((jobs ?? []).map((j) => [j.id, j]));
+  const orderIds = [...new Set((jobs ?? []).map((j) => j.order_id).filter((id): id is string => Boolean(id)))];
+  const { data: orders } = orderIds.length
+    ? await admin.from('orders').select('id, shipper_company_id').in('id', orderIds)
+    : { data: [] as { id: string; shipper_company_id: string }[] };
+  const shipperOf = new Map((orders ?? []).map((o) => [o.id, o.shipper_company_id]));
+
+  const unitIds = [...new Set(days.flatMap((d) => [d.vehicle_id, d.trailer_id]).filter((id): id is string => Boolean(id)))];
+  const [{ data: vehicles }, { data: trailers }] = unitIds.length
+    ? await Promise.all([
+        admin.from('vehicles').select('id, plate').in('id', unitIds),
+        admin.from('trailers').select('id, plate').in('id', unitIds),
+      ])
+    : [{ data: [] as { id: string; plate: string }[] }, { data: [] as { id: string; plate: string }[] }];
+  const plateOf = new Map([...(vehicles ?? []), ...(trailers ?? [])].map((v) => [v.id, v.plate]));
+
+  const add = (key: string, row: SiteDay) => {
+    const list = out.get(key) ?? [];
+    list.push(row);
+    out.set(key, list);
+  };
+
+  for (const d of days) {
+    const job = jobById.get(d.job_id);
+    if (!job) continue;
+    const dl = (loads ?? []).filter((l) => l.day_id === d.id);
+    const row: SiteDay = {
+      day: d.day,
+      job: job.name,
+      customer: job.customer_name ?? '',
+      plate: [d.vehicle_id && plateOf.get(d.vehicle_id), d.trailer_id && plateOf.get(d.trailer_id)].filter(Boolean).join(' + '),
+      minutes:
+        dayMinutes({ arrivedAt: d.arrived_at, endedAt: d.ended_at, bufferMinutes: d.buffer_minutes, unloads: dl.map((l) => l.unloaded_at) }) ?? 0,
+      loads: dl.length,
+      netKg: dl.reduce((sum, l) => sum + (l.net_kg ?? 0), 0),
+    };
+    add(`${job.company_id}:CARRIER`, row);
+    const shipper = job.order_id ? shipperOf.get(job.order_id) : undefined;
+    if (shipper) add(`${shipper}:SHIPPER`, row);
+  }
+  return out;
 }
 
 function push(
@@ -373,6 +479,8 @@ async function issue(
   orders: OrderRow[],
   route: Map<string, string>,
   plate: Map<string, string>,
+  /** Дни на объектах за неделю (только недельный отчёт). */
+  siteDays: SiteDay[] = [],
 ): Promise<boolean> {
   const companyId = key.split(':')[0]!;
   const week = span.start;
@@ -609,6 +717,35 @@ async function issue(
       }
     : null;
 
+  /* Дни на объектах — отдельным блоком (17.11.2026): часы, кузова и тонны, без денег — их считает счёт по объекту. */
+  let siteMinutes = 0;
+  const sites: OwnSection | null = siteDays.length
+    ? {
+        title: t.report_.sitesTitle,
+        note: t.report_.sitesNote,
+        colRef: t.report_.colSite,
+        colClient: t.report_.colClient,
+        colRoute: t.report_.colWork,
+        colDistance: t.report_.colHours,
+        colGross: '',
+        total: t.report_.total,
+        rows: siteDays.map((d) => {
+          siteMinutes += d.minutes;
+          return {
+            ref: d.job,
+            closedAt: f.date(d.day),
+            client: d.customer || '—',
+            route: `${d.loads} · ${(d.netKg / 1000).toLocaleString(t.meta.intl, { maximumFractionDigits: 1 })} t`,
+            vehicle: d.plate || '—',
+            distance: (d.minutes / 60).toLocaleString(t.meta.intl, { maximumFractionDigits: 1 }),
+            price: '',
+          };
+        }),
+        distance: (siteMinutes / 60).toLocaleString(t.meta.intl, { maximumFractionDigits: 1 }),
+        price: '',
+      }
+    : null;
+
   const payable = payGross - deducted;
 
   /*
@@ -695,6 +832,7 @@ async function issue(
       },
       withCommission: withFee,
       own,
+      sites,
     }),
   );
 

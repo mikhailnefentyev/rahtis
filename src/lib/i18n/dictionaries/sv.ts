@@ -2437,6 +2437,11 @@ export const sv = {
     vatLine: 'Moms {rate}',
     totalWithVat: 'Summa inkl. moms',
     empty: 'Inga transporter slutfördes denna vecka.',
+    sitesTitle: 'Arbetsplatser',
+    sitesNote: 'Dagar på arbetsplatser under veckan: timmar, lass och vägda ton. Arbetet faktureras med arbetsplatsens faktura.',
+    colSite: 'Arbetsplats',
+    colWork: 'Lass · t',
+    colHours: 'h',
     closingNote:
       'En transport hör till den vecka den avslutades. En som startade på fredag och lossades på måndag visas i följande veckas rapport.',
     periodClosingNote:

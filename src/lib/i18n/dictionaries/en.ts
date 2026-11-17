@@ -2586,6 +2586,11 @@ export const en = {
     vatLine: 'VAT {rate}',
     totalWithVat: 'Total incl. VAT',
     empty: 'No jobs were completed this week.',
+    sitesTitle: 'Worksites',
+    sitesNote: 'Days on worksites this week: hours, loads and weighed tonnes. Worksite work is invoiced with the worksite invoice.',
+    colSite: 'Worksite',
+    colWork: 'Loads · t',
+    colHours: 'h',
     closingNote:
       'A job counts in the week it finished. One started on Friday and unloaded on Monday shows up in the next week’s report.',
     periodClosingNote:

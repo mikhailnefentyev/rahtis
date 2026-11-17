@@ -97,13 +97,22 @@ export async function runWeeklyFreightInvoices(now: Date = new Date()): Promise<
   );
   if (orders.length === 0) return out;
 
-  /* Счёт, внесённый перевозчиком вручную, — этот рейс уже выставлен. */
-  const { data: manual } = await admin.from('freight_invoices').select('order_id').in('order_id', orders.map((o) => o.id));
-  const manualIds = new Set((manual ?? []).map((m) => m.order_id));
+  /*
+   * Уже выставлено другим путём — второго счёта за тот же рейс быть не должно:
+   *   · счёт, внесённый перевозчиком вручную (freight_invoices);
+   *   · заказ, из которого создан объект: его работу выставляет счёт по
+   *     объекту за подтверждённые дни (security review 17.11.2026).
+   */
+  const orderIds = orders.map((o) => o.id);
+  const [{ data: manual }, { data: siteJobs }] = await Promise.all([
+    admin.from('freight_invoices').select('order_id').in('order_id', orderIds),
+    admin.from('site_jobs').select('order_id').in('order_id', orderIds),
+  ]);
+  const skipIds = new Set([...(manual ?? []), ...(siteJobs ?? [])].map((m) => m.order_id));
 
   const groups = new Map<string, OrderRow[]>();
   for (const order of orders) {
-    if (manualIds.has(order.id)) continue;
+    if (skipIds.has(order.id)) continue;
     const key = `${order.assigned_company_id}|${order.shipper_company_id}|${asCurrency(order.currency)}`;
     (groups.get(key) ?? groups.set(key, []).get(key)!).push(order);
   }
@@ -149,7 +158,13 @@ async function createFreightInvoice(orders: OrderRow[]): Promise<FreightInvoiceS
   const changedAt = await lastIbanChange(seller.id);
   if (changedAt && ibanHoldActive(changedAt)) return 'IBAN_RECENT';
 
-  const buyerCountry = buyer.billing_country ?? buyer.legal_country ?? buyer.country;
+  /*
+   * НДС — по стране регистрации (companies.country): её проверяют при
+   * заявке (PRH/VIES), и менять её пользователь не может. Платёжный адрес
+   * и номер НДС он правит сам — по ним финская фирма объявила бы себя
+   * немецкой и получала бы счета без налога (security review 17.11.2026).
+   */
+  const buyerCountry = buyer.country;
   const vat = freightVat(seller.country, buyerCountry, buyer.vat_number, standardVatBps(seller.country));
   if (!vat.ok) return vat.reason;
 

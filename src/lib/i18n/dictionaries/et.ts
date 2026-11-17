@@ -2437,6 +2437,11 @@ export const et = {
     vatLine: 'Käibemaks {rate}',
     totalWithVat: 'Kokku km-ga',
     empty: 'Sel nädalal ei lõpetatud ühtegi vedu.',
+    sitesTitle: 'Objektid',
+    sitesNote: 'Nädala päevad objektidel: tunnid, koormad ja kaalutud tonnid. Objektitöö eest esitatakse objekti arve.',
+    colSite: 'Objekt',
+    colWork: 'Koormad · t',
+    colHours: 'h',
     closingNote:
       'Vedu läheb selle nädala alla, mil see lõppes. Reedel alanud ja esmaspäeval maha laaditud vedu on järgmise nädala aruandes.',
     periodClosingNote:

@@ -2679,6 +2679,11 @@ export const fi = {
     vatLine: 'Alv {rate}',
     totalWithVat: 'Yhteensä sis. alv',
     empty: 'Tällä viikolla ei valmistunut kuljetuksia.',
+    sitesTitle: 'Työmaat',
+    sitesNote: 'Työmaapäivät viikolla: tunnit, kuormat ja punnitut tonnit. Työmaatyö laskutetaan työmaan laskulla.',
+    colSite: 'Työmaa',
+    colWork: 'Kuormat · t',
+    colHours: 'h',
     closingNote:
       'Kuljetus kuuluu sille viikolle, jona se päättyi. Perjantaina aloitettu ja maanantaina purettu kuljetus näkyy seuraavan viikon raportissa.',
     periodClosingNote:

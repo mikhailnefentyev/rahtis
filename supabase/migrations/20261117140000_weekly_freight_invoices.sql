@@ -54,3 +54,6 @@ alter table public.site_jobs alter column invoice_schedule set default 'WEEKLY';
 alter table public.site_jobs drop constraint site_jobs_invoice_schedule;
 alter table public.site_jobs add constraint site_jobs_invoice_schedule
   check (invoice_schedule in ('MANUAL', 'WEEKLY'));
+
+/* Настройку меняет сам перевозчик из кабинета: права на колонки выдаются поштучно. */
+grant update (weekly_invoicing) on public.companies to authenticated;
