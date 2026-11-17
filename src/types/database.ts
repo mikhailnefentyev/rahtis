@@ -805,6 +805,8 @@ export type Database = {
       }
       carrier_invoices: {
         Row: {
+          kind: string
+          customer_company_id: string | null
           collection_hint_at: string | null
           company_id: string
           created_at: string
@@ -833,6 +835,8 @@ export type Database = {
           vat_cents: number
         }
         Insert: {
+          kind?: string
+          customer_company_id?: string | null
           collection_hint_at?: string | null
           company_id: string
           created_at?: string
@@ -861,6 +865,8 @@ export type Database = {
           vat_cents: number
         }
         Update: {
+          kind?: string
+          customer_company_id?: string | null
           collection_hint_at?: string | null
           company_id?: string
           created_at?: string
@@ -1205,6 +1211,7 @@ export type Database = {
       }
       companies: {
         Row: {
+          weekly_invoicing: boolean
           activated_at: string | null
           approved_at: string | null
           bic: string | null
@@ -1252,6 +1259,7 @@ export type Database = {
           waste_registrations: Json
         }
         Insert: {
+          weekly_invoicing?: boolean
           activated_at?: string | null
           approved_at?: string | null
           bic?: string | null
@@ -1299,6 +1307,7 @@ export type Database = {
           waste_registrations?: Json
         }
         Update: {
+          weekly_invoicing?: boolean
           activated_at?: string | null
           approved_at?: string | null
           bic?: string | null
@@ -4636,6 +4645,7 @@ export type Database = {
       }
       orders: {
         Row: {
+          carrier_invoice_id: string | null
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null
@@ -4699,6 +4709,7 @@ export type Database = {
           waiting_cents: number
         }
         Insert: {
+          carrier_invoice_id?: string | null
           assigned_company_id?: string | null
           assigned_driver_id?: string | null
           assigned_trailer_id?: string | null
@@ -4762,6 +4773,7 @@ export type Database = {
           waiting_cents?: number
         }
         Update: {
+          carrier_invoice_id?: string | null
           assigned_company_id?: string | null
           assigned_driver_id?: string | null
           assigned_trailer_id?: string | null
@@ -10265,6 +10277,7 @@ export type Database = {
           p_order_id: string
         }
         Returns: {
+          carrier_invoice_id: string | null
           assigned_company_id: string | null
           assigned_driver_id: string | null
           assigned_trailer_id: string | null

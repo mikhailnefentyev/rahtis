@@ -200,8 +200,9 @@ export function SiteJobForm({
           </Field>
           <Field label={t.siteInvoice.schedule} hint={t.siteInvoice.scheduleHint}>
             {(p) => (
-              <Select {...p} name="invoice_schedule" defaultValue={job?.invoice_schedule ?? 'BIWEEKLY'}>
-                {(['MANUAL', 'WEEKLY', 'BIWEEKLY'] as const).map((k) => (
+              <Select {...p} name="invoice_schedule" defaultValue={job?.invoice_schedule === 'MANUAL' ? 'MANUAL' : 'WEEKLY'}>
+                {/* Счета между участниками — раз в неделю (17.11.2026); «по кнопке» — для своей бухгалтерии. */}
+                {(['WEEKLY', 'MANUAL'] as const).map((k) => (
                   <option key={k} value={k}>
                     {t.siteInvoice.schedules[k]}
                   </option>

@@ -86,6 +86,7 @@ export const STANDARD_VAT_BPS: Readonly<Record<string, number>> = {
   LT: 2100,
   PL: 2300,
   DE: 1900,
+  RO: 2100,
 };
 
 export function standardVatBps(country: string | null | undefined): number | null {

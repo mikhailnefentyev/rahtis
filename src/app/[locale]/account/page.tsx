@@ -15,6 +15,7 @@ import { ChangePasswordForm } from './form';
 import { MembersPanel } from './MembersPanel';
 import { WasteRegistrationsForm } from './WasteRegistrationsForm';
 import { CurrencyForm } from './CurrencyForm';
+import { InvoicingForm } from './InvoicingForm';
 import { ForwarderPanel } from './ForwarderPanel';
 import { ShipperDocumentsPanel } from './ShipperDocumentsPanel';
 import { OrderInboxSettings } from '@/components/domain/OrderInboxAddress';
@@ -221,6 +222,11 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
         {/* Рабочая валюта компании (5.11.2026): деньги RAHTIS остаются в евро. */}
         {company && company.status === 'ACTIVE' && (company.kind === 'CARRIER' || company.kind === 'SHIPPER') && (
           <CurrencyForm currency={company.currency} kind={company.kind} canEdit={isOwner} />
+        )}
+
+        {/* Недельный счёт заказчику от имени перевозчика (17.11.2026). */}
+        {company && company.status === 'ACTIVE' && company.kind === 'CARRIER' && (
+          <InvoicingForm enabled={company.weekly_invoicing} canEdit={isOwner} />
         )}
 
         {orderInbox && <OrderInboxSettings address={orderInbox.address} senders={orderInbox.senders} canManage={isOwner} />}

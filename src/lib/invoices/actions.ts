@@ -42,6 +42,14 @@ export async function saveFreightInvoiceAction(_previous: InvoiceFormState, form
   }
 
   const supabase = await createClient();
+  /* Рейс уже в недельном счёте RAHTIS (17.11.2026) — второй счёт за него был бы двойным. */
+  const { data: order } = await supabase
+    .from('orders')
+    .select('carrier_invoice_id')
+    .eq('id', String(formData.get('order_id') ?? ''))
+    .maybeSingle();
+  if (order?.carrier_invoice_id) return { error: tw.alreadyWeekly, saved: false };
+
   const { error } = await supabase.rpc('save_freight_invoice', {
     p_order_id: String(formData.get('order_id') ?? ''),
     p_number: parsed.number,

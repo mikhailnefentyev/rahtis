@@ -245,7 +245,11 @@ export async function createSiteInvoice(
   return { status: mail.sent ? 'SENT' : 'CREATED', invoiceId: invoice.id, number };
 }
 
-/** Понедельник: счета по объектам с расписанием WEEKLY/BIWEEKLY — за дни до вчерашнего включительно. */
+/**
+ * Понедельник: счета по объектам с расписанием WEEKLY — за дни до
+ * вчерашнего включительно. С 17.11.2026 и объекты из прямых заказов:
+ * createSiteInvoice сама отсекает заказы старой схемы (PLATFORM_ORDER).
+ */
 export async function runScheduledSiteInvoices(): Promise<{ sent: number; skipped: number; errors: string[] }> {
   const { invoiceDue } = await import('./invoice');
   const admin = createAdminClient();
@@ -253,7 +257,7 @@ export async function runScheduledSiteInvoices(): Promise<{ sent: number; skippe
   const yesterday = addDays(today, -1);
   const out = { sent: 0, skipped: 0, errors: [] as string[] };
 
-  const { data: jobs } = await admin.from('site_jobs').select('id, invoice_schedule').neq('invoice_schedule', 'MANUAL').is('order_id', null);
+  const { data: jobs } = await admin.from('site_jobs').select('id, invoice_schedule').neq('invoice_schedule', 'MANUAL');
   for (const job of jobs ?? []) {
     if (!invoiceDue(job.invoice_schedule, today)) continue;
     try {
