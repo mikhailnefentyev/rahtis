@@ -92,7 +92,14 @@ export async function answerInvoiceTermsAction(formData: FormData): Promise<void
   const accept = decision === 'ACCEPT';
 
   const supabase = await createClient();
-  const { error } = await supabase.rpc('answer_invoice_terms', { p_counterparty: counterparty, p_accept: accept });
+  /* Принимаются те условия, что человек видел на экране: подменённое предложение база отклонит. */
+  const seenSchedule = String(formData.get('schedule') ?? '');
+  const seenTerm = Number(formData.get('term_days'));
+  const { error } = await supabase.rpc('answer_invoice_terms', {
+    p_counterparty: counterparty,
+    p_accept: accept,
+    ...(accept ? { p_schedule: seenSchedule, p_term_days: seenTerm } : {}),
+  });
   if (error) {
     console.error('ответ на условия счёта не записан:', error.message);
     return;

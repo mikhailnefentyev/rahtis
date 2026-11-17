@@ -123,8 +123,18 @@ begin
 end;
 $$;
 
-/* Ответить на предложение другой стороны. Своё предложение принять нельзя, отозвать — можно (p_accept = false). */
-create or replace function public.answer_invoice_terms(p_counterparty uuid, p_accept boolean)
+/*
+ * Ответить на предложение другой стороны. Своё предложение принять нельзя,
+ * отозвать — можно (p_accept = false). Принимаются ровно те условия,
+ * которые человек видел (p_schedule, p_term_days): если предложение успели
+ * заменить, принятие отклоняется (security review 17.11.2026).
+ */
+create or replace function public.answer_invoice_terms(
+  p_counterparty uuid,
+  p_accept boolean,
+  p_schedule text default null,
+  p_term_days integer default null
+)
 returns void
 language plpgsql
 security definer
@@ -146,6 +156,12 @@ begin
   end if;
   if p_accept and v_row.proposed_by = v_me then
     raise exception 'Своё предложение принимает другая сторона.' using errcode = '42501';
+  end if;
+  if p_accept and (
+    v_row.proposed_schedule is distinct from p_schedule
+    or v_row.proposed_term_days is distinct from p_term_days
+  ) then
+    raise exception 'Предложение изменилось — посмотрите новые условия.' using errcode = '40001';
   end if;
 
   update public.invoice_agreements
@@ -207,10 +223,10 @@ as $$
 $$;
 
 revoke all on function public.propose_invoice_terms(uuid, text, integer) from public, anon;
-revoke all on function public.answer_invoice_terms(uuid, boolean) from public, anon;
+revoke all on function public.answer_invoice_terms(uuid, boolean, text, integer) from public, anon;
 revoke all on function public.invoice_counterparties() from public, anon;
 grant execute on function public.propose_invoice_terms(uuid, text, integer) to authenticated;
-grant execute on function public.answer_invoice_terms(uuid, boolean) to authenticated;
+grant execute on function public.answer_invoice_terms(uuid, boolean, text, integer) to authenticated;
 grant execute on function public.invoice_counterparties() to authenticated;
 
 -- ── Ежедневное задание счетов за перевозки ─────────────────────────

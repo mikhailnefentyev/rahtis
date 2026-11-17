@@ -9514,7 +9514,7 @@ export type Database = {
         Returns: undefined
       }
       answer_invoice_terms: {
-        Args: { p_accept: boolean; p_counterparty: string }
+        Args: { p_accept: boolean; p_counterparty: string; p_schedule?: string; p_term_days?: number }
         Returns: undefined
       }
       invoice_subscription_fees: { Args: { p_month: string }; Returns: number }

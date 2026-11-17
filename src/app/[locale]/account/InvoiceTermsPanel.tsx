@@ -72,6 +72,9 @@ function TermsRow({ row, canEdit }: { row: CounterpartyTerms; canEdit: boolean }
             <form action={answerInvoiceTermsAction} className="flex gap-2">
               <input type="hidden" name="locale" value={locale} />
               <input type="hidden" name="counterparty" value={row.counterparty_id} />
+              {/* Что человек видел — то и принимает: подменённое предложение база отклонит. */}
+              <input type="hidden" name="schedule" value={row.proposed_schedule ?? ''} />
+              <input type="hidden" name="term_days" value={row.proposed_term_days ?? ''} />
               <Button type="submit" name="decision" value="ACCEPT" variant="primary" size="sm">
                 {it.accept}
               </Button>
