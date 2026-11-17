@@ -1,21 +1,19 @@
 import { bearerMatches } from '@/lib/auth/bearer';
-import { generatePeriodSettlement } from '@/lib/reports/generate';
+import { generateMonthlyFees } from '@/lib/reports/generate';
 
 /**
- * Выпуск документов расчётного периода.
+ * Месячный счёт Aivomaa за подписку (с 17.11.2026).
  *
- * Отдельный маршрут рядом с недельным, а не флаг у него: у задания
- * планировщика своё расписание — первое и шестнадцатое число, — и общий
- * адрес с ветвлением по телу запроса означал бы, что ошибка в теле
- * выпустит не тот документ молча.
+ * Адрес исторический: прежде здесь выпускались документы расчётного
+ * периода «полмесяца» старой схемы, где Aivomaa была стороной перевозки.
+ * Адрес записан в app.runtime_config (settlement_url), и задание
+ * планировщика rahtis-monthly-fees зовёт его 1-го числа. Документы
+ * старой схемы оператор выпускает вручную из пульта.
  *
- * Защита тем же общим секретом, что у недельных отчётов: это одно и то
- * же право — выпустить платёжные документы, — и разводить его на два
- * секрета значило бы завести второй, который однажды забудут повернуть.
+ * Защита тем же общим секретом, что у недельных отчётов.
  *
- * Момент задаётся явно только для повторного выпуска и проверки: по
- * умолчанию берётся вчерашний день, то есть последний день только что
- * закрывшегося периода.
+ * ?month=YYYY-MM-01 — повторный выпуск за конкретный месяц; по умолчанию
+ * прошлый месяц по Хельсинки.
  */
 export async function POST(request: Request) {
   const expected = process.env.REPORTS_CRON_SECRET?.trim();
@@ -30,9 +28,9 @@ export async function POST(request: Request) {
   }
 
   const url = new URL(request.url);
-  const moment = url.searchParams.get('moment') ?? undefined;
+  const month = url.searchParams.get('month') ?? undefined;
 
-  const result = await generatePeriodSettlement(moment);
+  const result = await generateMonthlyFees(month);
 
   return Response.json(result, { status: result.errors.length > 0 ? 207 : 200 });
 }

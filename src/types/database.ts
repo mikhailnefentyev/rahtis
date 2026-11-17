@@ -10495,6 +10495,17 @@ export type Database = {
           samples: number
         }[]
       }
+      shipper_order_carriers: {
+        Args: { p_order_ids: string[] }
+        Returns: {
+          carrier_bic: string
+          carrier_business_id: string
+          carrier_iban: string
+          carrier_id: string
+          carrier_name: string
+          order_id: string
+        }[]
+      }
       shipper_trip_trailers: {
         Args: { p_order_ids: string[] }
         Returns: {

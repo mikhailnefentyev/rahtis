@@ -173,9 +173,12 @@ export type DirectCarrier = {
 export function AssignedCarrier({
   offer,
   direct = null,
+  legacy = false,
 }: {
   offer: ShipperOffer;
   direct?: DirectCarrier | null;
+  /** Заказ старой схемы (до 6.11.2026), где стороной была Aivomaa. */
+  legacy?: boolean;
 }) {
   const { t, m, locale } = useI18n();
 
@@ -186,7 +189,8 @@ export function AssignedCarrier({
       <div className="rounded-control border border-line bg-sunken px-3 py-2.5">
         <div className="mb-2.5 flex flex-wrap items-center gap-2.5">
           {offer.plate && <Plate>{offer.plate}</Plate>}
-          <Badge tone="ok">{direct ? direct.name : APP.operator.legalName}</Badge>
+          {/* Aivomaa в перевозках не участвует: её имя — только у заказов старой схемы. */}
+          {direct ? <Badge tone="ok">{direct.name}</Badge> : legacy && <Badge tone="ok">{APP.operator.legalName}</Badge>}
           {offer.verified && <VerifiedBadge label={t.verification.badge} hint={t.verification.badgeHint} />}
         </div>
 

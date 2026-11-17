@@ -46,7 +46,7 @@ export function mondayOf(date: Date): string {
   return d.toISOString().slice(0, 10);
 }
 
-/** Прошлая неделя: воскресное задание отчитывается за только что законченную. */
+/** Прошлая неделя: понедельничное задание отчитывается за только что законченную. */
 export function lastWeek(now: Date = new Date()): string {
   const d = new Date(`${mondayOf(now)}T00:00:00Z`);
   d.setUTCDate(d.getUTCDate() - 7);
@@ -173,47 +173,56 @@ export async function generatePeriodSettlement(moment?: string): Promise<Generat
    * не знает. От конца периода её знают оба.
    */
   /*
-   * Конец месяца — начисляется месячный сбор перевозчиков за активные
-   * машины. До выпуска документов: отчёт за 16–конец удерживает его из
-   * выплаты. Повторный запуск ничего не дублирует.
+   * Только заказы старой схемы (до 6.11.2026, Aivomaa — сторона): их
+   * документы выпускаются из пульта оператора вручную. По расписанию это
+   * больше не идёт, а месячный сбор — отдельное задание
+   * generateMonthlyFees (17.11.2026).
    */
-  const monthEnd = new Date(`${period.period_end}T00:00:00Z`);
-  monthEnd.setUTCDate(monthEnd.getUTCDate() + 1);
-  const month = monthEnd.getUTCDate() === 1 ? `${period.period_end.slice(0, 7)}-01` : null;
-
-  if (month) {
-    const { error: feeError } = await admin.rpc('issue_monthly_subscriptions', { p_month: month });
-    if (feeError) {
-      return { week: period.period_start, reports: 0, emails: 0, errors: [`сбор: ${feeError.message}`] };
-    }
-  }
-
-  const result = await run({
+  return run({
     kind: 'PERIOD',
     start: period.period_start,
     end: period.period_end,
     due: { shipper: period.invoice_due, carrier: period.payout_due },
   });
+}
 
-  /*
-   * Месяц закрыт расчётами — что не ушло удержанием, уходит счётом.
-   * Порядок важен: выписывать до выплат значило бы требовать деньги,
-   * которые через минуту сами удержатся.
-   */
-  if (month) {
-    const { error: invoiceError } = await admin.rpc('invoice_subscription_fees', { p_month: month });
-    if (invoiceError) {
-      result.errors.push(`счёт за сбор: ${invoiceError.message}`);
-      return result;
-    }
+/**
+ * Счёт Aivomaa за подписку — раз в месяц, 1-го числа за прошлый месяц
+ * (17.11.2026).
+ *
+ * Прежде шёл внутри расчёта за полмесяца — то есть зависел от задания
+ * старой схемы, где Aivomaa была стороной перевозки. Теперь своё задание:
+ * начислить сбор за активные машины, выписать счёт и разослать.
+ * Повторный запуск ничего не дублирует: начисление и счёт идемпотентны в
+ * базе.
+ *
+ * month — первый день месяца (YYYY-MM-01); по умолчанию прошлый месяц по
+ * Хельсинки.
+ */
+export async function generateMonthlyFees(month?: string): Promise<GenerateResult> {
+  const admin = createAdminClient();
+  const target = month ?? previousMonth();
 
-    const sent = await issueSubscriptionInvoices(admin, month, period.invoice_due);
-    result.reports += sent.reports;
-    result.emails += sent.emails;
-    result.errors.push(...sent.errors);
+  if (!/^\d{4}-\d{2}-01$/.test(target)) {
+    return { week: target, reports: 0, emails: 0, errors: ['month must be YYYY-MM-01'] };
   }
 
-  return result;
+  const { error: feeError } = await admin.rpc('issue_monthly_subscriptions', { p_month: target });
+  if (feeError) return { week: target, reports: 0, emails: 0, errors: [`сбор: ${feeError.message}`] };
+
+  const { error: invoiceError } = await admin.rpc('invoice_subscription_fees', { p_month: target });
+  if (invoiceError) return { week: target, reports: 0, emails: 0, errors: [`счёт за сбор: ${invoiceError.message}`] };
+
+  return issueSubscriptionInvoices(admin, target, null);
+}
+
+/** Первый день прошлого месяца по Хельсинки. */
+export function previousMonth(now: Date = new Date()): string {
+  const today = helsinkiDate(now.toISOString());
+  const year = Number(today.slice(0, 4));
+  const monthIndex = Number(today.slice(5, 7)) - 1;
+  const prev = new Date(Date.UTC(year, monthIndex - 1, 1));
+  return prev.toISOString().slice(0, 10);
 }
 
 async function run(span: Span): Promise<GenerateResult> {
@@ -895,15 +904,15 @@ async function issueSubscriptionInvoices(
         .filter(Boolean)
         .join(' ');
 
-      /* Срок тот же, что у счёта заказчику: 15 дней после конца периода. */
       /*
        * Срок считается от дня выставления, а не от расчётного периода.
        *
        * Репетиция показала, зачем: счёт за август, выписанный в сентябре,
        * получил срок 15.09 — то есть уже прошедший. У сбора нет периода
-       * поставки, есть месяц и обычные условия оплаты: пятнадцать дней.
+       * поставки, есть месяц и срок оплаты из договора перевозчика (п. 3.5):
+       * четырнадцать дней (прежде здесь стояло 15 — расходилось с договором).
        */
-      const dueDay = new Date(Date.now() + 15 * 24 * 3600 * 1000).toISOString().slice(0, 10);
+      const dueDay = new Date(Date.now() + 14 * 24 * 3600 * 1000).toISOString().slice(0, 10);
       const dueLine = t.report_.dueShipper.replace('{date}', f.date(dueDay));
 
       const texts: ReportTexts = {

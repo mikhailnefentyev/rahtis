@@ -25,7 +25,7 @@ import { AmendPanel } from './AmendPanel';
 import { ChangeRequests, PricingNote, VehicleCheckMark, type OrderChangesData } from '@/components/domain/OrderChanges';
 import { OrderChat } from '@/components/domain/OrderChat';
 import { DirectWaiting, SendDirect } from './DirectPanel';
-import { AssignedCarrier, OffersPanel } from './OffersPanel';
+import { AssignedCarrier, OffersPanel, type DirectCarrier } from './OffersPanel';
 import { OrderTrouble } from './OrderTrouble';
 
 /**
@@ -46,9 +46,12 @@ export function OrderCard({
   amendments,
   changes,
   knownVehicles,
+  carrier = null,
   documents,
   onRepeat,
 }: {
+  /** Перевозчик — сторона договора по этому заказу (прямой договор, 17.11.2026). */
+  carrier?: DirectCarrier | null;
   /** Режим цены, пробег по маршруту, сообщения водителя. */
   changes?: OrderChangesData;
   /** Номер прицепа назначенного рейса. */
@@ -73,6 +76,7 @@ export function OrderCard({
     order.contract_party === 'CARRIER' && assigned?.plate
       ? knownVehicles.find((v) => v.plate === assigned.plate && v.direct_billing)
       : undefined;
+  /* Реквизиты по самому заказу — и у нового перевозчика, которого нет среди знакомых. */
   const directCarrier = directVehicle
     ? {
         name: directVehicle.carrier_name,
@@ -81,7 +85,9 @@ export function OrderCard({
         id: directVehicle.carrier_id ?? null,
         bankChangedAt: directVehicle.carrier_bank_changed_at ?? null,
       }
-    : null;
+    : order.contract_party === 'CARRIER'
+      ? carrier
+      : null;
   /*
    * Прямое назначение ждёт без срока: AWAIT_DRIVER с пустым deadline_at.
    * Выбор отклика со стола срок ставит всегда.
@@ -227,7 +233,7 @@ export function OrderCard({
 
               {/* Рейс идёт — выбирать не из чего, важно кто везёт. */}
               {order.status === 'IN_PROGRESS' && assigned && (
-                <AssignedCarrier offer={assigned} direct={directCarrier} />
+                <AssignedCarrier offer={assigned} direct={directCarrier} legacy={order.contract_party === 'RAHTIS'} />
               )}
               {/* Прицеп рейса перевозчика — рядом с машиной, как номер на воротах. */}
               {tripTrailer && (order.status === 'IN_PROGRESS' || order.status === 'AWAIT_DRIVER') && (

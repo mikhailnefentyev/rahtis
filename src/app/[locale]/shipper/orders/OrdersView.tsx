@@ -19,6 +19,7 @@ import type {
 import type { OrderChangesData } from '@/components/domain/OrderChanges';
 import type { EmailDraftInfo } from '@/lib/inbound/load';
 import { OrderCard } from './OrderCard';
+import type { DirectCarrier } from './OffersPanel';
 
 /**
  * Список заказов заказчика.
@@ -117,6 +118,7 @@ export function OrdersView({
   amendmentsByOrder,
   changesByOrder = {},
   knownVehicles,
+  carrierByOrder = {},
   documentsByOrder,
   startNew = false,
   emailDraft = null,
@@ -132,6 +134,8 @@ export function OrdersView({
   startNew?: boolean;
   orders: ShipperOrder[];
   knownVehicles: KnownVehicle[];
+  /** Сторона договора по назначенным заказам (shipper_order_carriers). */
+  carrierByOrder?: Record<string, DirectCarrier>;
   documentsByOrder: Record<string, TripDocument[]>;
   stopsByOrder: Record<string, OrderStop[]>;
   offersByOrder: Record<string, ShipperOffer[]>;
@@ -274,6 +278,7 @@ export function OrdersView({
         amendments={amendmentsByOrder[order.id] ?? []}
         changes={changesByOrder[order.id]}
         knownVehicles={knownVehicles}
+        carrier={carrierByOrder[order.id] ?? null}
         documents={documentsByOrder[order.id] ?? []}
         onRepeat={() => startComposing({ order, stops: stopsByOrder[order.id] ?? [] })}
       />

@@ -14,6 +14,7 @@ import { loadOrderChanges } from '@/lib/orders/changes';
 import { CapacitySuggestions } from '@/components/domain/capacity/CapacitySuggestions';
 import { OrderInboxLine } from '@/components/domain/OrderInboxAddress';
 import { loadEmailDraft, loadInboxAddress } from '@/lib/inbound/load';
+import type { DirectCarrier } from './OffersPanel';
 
 export async function generateMetadata({
   params,
@@ -159,7 +160,29 @@ export default async function OrdersPage({
   const verifiedOffers = new Set((badges ?? []).filter((b) => b.verified).map((b) => b.offer_id));
   const badgeByVehicle = new Map((knownBadges ?? []).map((b) => [b.vehicle_id, b]));
   /* Перевозчики, известные заказчику по имени (прямые машины): отметка о смене счёта за 30 дней. */
-  const bankMarks = await bankChangeMarks((knownBadges ?? []).map((b) => b.carrier_id));
+  /*
+   * Сторона договора по каждому назначенному заказу — и по первому рейсу
+   * нового перевозчика, которого нет среди «знакомых машин» (17.11.2026).
+   */
+  const { data: orderCarrierRows } = withCarrierIds.length
+    ? await supabase.rpc('shipper_order_carriers', { p_order_ids: withCarrierIds })
+    : { data: [] as { order_id: string; carrier_id: string; carrier_name: string; carrier_business_id: string; carrier_iban: string; carrier_bic: string }[] };
+  const bankMarks = await bankChangeMarks([
+    ...(knownBadges ?? []).map((b) => b.carrier_id),
+    ...(orderCarrierRows ?? []).map((r) => r.carrier_id),
+  ]);
+  const carrierByOrder: Record<string, DirectCarrier> = Object.fromEntries(
+    (orderCarrierRows ?? []).map((r) => [
+      r.order_id,
+      {
+        id: r.carrier_id,
+        name: r.carrier_name,
+        businessId: r.carrier_business_id,
+        iban: r.carrier_iban || null,
+        bankChangedAt: bankMarks[r.carrier_id] ?? null,
+      },
+    ]),
+  );
   const knownVehicles = (known ?? []).map((v) => {
     const carrierId = badgeByVehicle.get(v.vehicle_id)?.carrier_id ?? null;
     return {
@@ -235,6 +258,7 @@ export default async function OrdersPage({
           amendmentsByOrder={amendmentsByOrder}
           changesByOrder={changesByOrder}
           knownVehicles={knownVehicles}
+          carrierByOrder={carrierByOrder}
           documentsByOrder={documentsByOrder}
           startNew={startNew}
           emailDraft={emailDraft}
