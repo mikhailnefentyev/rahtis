@@ -2570,7 +2570,7 @@ export const fi = {
     currencySave: 'Tallenna',
     currencySaved: 'Valuutta tallennettu.',
     invoicingTitle: 'Viikkolasku asiakkaalle',
-    invoicingHint: 'RAHTIS kokoaa joka maanantai edellisen viikon valmiit suorat kuljetukset yhdeksi laskuksi kullekin asiakkaalle ja lähettää sen yrityksesi nimissä ja tilinumerolla. Maksu tulee suoraan sinulle. Jos laskutat omasta taloushallinnostasi, poista valinta, jotta asiakas ei saa kahta laskua.',
+    invoicingHint: 'RAHTIS kokoaa valmiit suorat kuljetukset laskuksi kullekin asiakkaalle sovitulla laskutusvälillä ja lähettää sen yrityksesi nimissä ja tilinumerolla. Maksu tulee suoraan sinulle. Jos laskutat omasta taloushallinnostasi, poista valinta, jotta asiakas ei saa kahta laskua.',
     invoicingLabel: 'RAHTIS lähettää viikkolaskut yrityksemme nimissä',
     currencyError: 'Valuuttaa ei voitu tallentaa.',
     passwordTitle: 'Salasanan vaihto',
@@ -2583,6 +2583,29 @@ export const fi = {
     saved: 'Salasana vaihdettu',
     wrongCurrent: 'Nykyinen salasana ei täsmää',
     sameAsOld: 'Uusi salasana on sama kuin nykyinen',
+  },
+
+  /* Периодичность счёта и срок оплаты по согласию сторон (17.11.2026). */
+  invoiceTerms: {
+    title: 'Laskutusväli ja maksuaika',
+    hint: 'Laskutusvälin ja maksuajan sovitte kunkin kumppanin kanssa: toinen osapuoli ehdottaa, toinen hyväksyy. Kunnes toisin sovitaan, lasku lähtee kerran viikossa ja maksuaika on 14 päivää.',
+    empty: 'Kumppanit näkyvät tässä ensimmäisen yhteisen kuljetuksen jälkeen.',
+    schedule: 'Laskutusväli',
+    term: 'Maksuaika',
+    days: '{n} pv',
+    schedules: { PER_TRIP: 'Heti kuljetuksen jälkeen', WEEKLY: 'Kerran viikossa (ma)', BIWEEKLY: 'Joka toinen viikko (ma)', MONTHLY: 'Kerran kuukaudessa (1. pv)' },
+    propose: 'Ehdota',
+    proposed: 'Ehdotus lähetetty. Ehdot tulevat voimaan, kun kumppani hyväksyy ne.',
+    proposalFromThem: 'Kumppani ehdottaa: {terms}',
+    proposalMine: 'Ehdotuksesi odottaa hyväksyntää: {terms}',
+    accept: 'Hyväksy',
+    reject: 'Hylkää',
+    withdraw: 'Peru ehdotus',
+    error: 'Ehdotusta ei voitu tallentaa. Yritä uudelleen.',
+    notifyProposalTitle: '{name} ehdottaa laskutusehtoja',
+    notifyProposalBody: '{schedule}, maksuaika {days} pv. Hyväksy tai hylkää Omat tiedot -sivulla.',
+    notifyAcceptedTitle: '{name} hyväksyi laskutusehdot',
+    notifyRejectedTitle: '{name} hylkäsi ehdotetut laskutusehdot',
   },
 
   invite: {

@@ -2337,7 +2337,7 @@ export const sv = {
     currencySave: 'Spara',
     currencySaved: 'Valutan har sparats.',
     invoicingTitle: 'Veckofaktura till kunder',
-    invoicingHint: 'Varje måndag sammanställer RAHTIS förra veckans slutförda direkta transporter till en faktura per kund och skickar den i ert företags namn med ert kontonummer. Kunden betalar direkt till er. Om ni fakturerar från ert eget ekonomisystem, avmarkera detta så att kunden inte får två fakturor.',
+    invoicingHint: 'RAHTIS sammanställer slutförda direkta transporter till en faktura per kund med det överenskomna faktureringsintervallet och skickar den i ert företags namn med ert kontonummer. Kunden betalar direkt till er. Om ni fakturerar från ert eget ekonomisystem, avmarkera detta så att kunden inte får två fakturor.',
     invoicingLabel: 'RAHTIS skickar veckofakturor i vårt företags namn',
     currencyError: 'Valutan kunde inte sparas.',
     passwordTitle: 'Byt lösenord',
@@ -2350,6 +2350,29 @@ export const sv = {
     saved: 'Lösenordet bytt',
     wrongCurrent: 'Det nuvarande lösenordet stämmer inte',
     sameAsOld: 'Det nya lösenordet är detsamma som det nuvarande',
+  },
+
+  /* Периодичность счёта и срок оплаты по согласию сторон (17.11.2026). */
+  invoiceTerms: {
+    title: 'Faktureringsintervall och betalningsvillkor',
+    hint: 'Faktureringsintervall och betalningsvillkor kommer ni överens om med varje partner: den ena parten föreslår, den andra godkänner. Tills annat avtalats skickas fakturan en gång i veckan med 14 dagars betalningsvillkor.',
+    empty: 'Partner visas här efter er första gemensamma transport.',
+    schedule: 'Faktureringsintervall',
+    term: 'Betalningsvillkor',
+    days: '{n} dagar',
+    schedules: { PER_TRIP: 'Direkt efter varje transport', WEEKLY: 'En gång i veckan (mån)', BIWEEKLY: 'Varannan vecka (mån)', MONTHLY: 'En gång i månaden (den 1:a)' },
+    propose: 'Föreslå',
+    proposed: 'Förslaget har skickats. Villkoren gäller när partnern har godkänt dem.',
+    proposalFromThem: 'Partnern föreslår: {terms}',
+    proposalMine: 'Ert förslag väntar på godkännande: {terms}',
+    accept: 'Godkänn',
+    reject: 'Avvisa',
+    withdraw: 'Dra tillbaka förslaget',
+    error: 'Förslaget kunde inte sparas. Försök igen.',
+    notifyProposalTitle: '{name} föreslår faktureringsvillkor',
+    notifyProposalBody: '{schedule}, betalningsvillkor {days} dagar. Godkänn eller avvisa på sidan Mina uppgifter.',
+    notifyAcceptedTitle: '{name} godkände faktureringsvillkoren',
+    notifyRejectedTitle: '{name} avvisade de föreslagna faktureringsvillkoren',
   },
 
   invite: {

@@ -1,14 +1,13 @@
 import { bearerMatches } from '@/lib/auth/bearer';
-import { runWeeklyFreightInvoices } from '@/lib/invoices/weekly';
 import { runScheduledSiteInvoices } from '@/lib/sites/invoicing';
 
 /**
- * Понедельник утром (app.run_site_invoices через pg_net): недельные счета
- * перевозчиков — по объектам и по прямым заказам прошлой недели
- * (17.11.2026). Счёт выставляет перевозчик; Aivomaa в нём не сторона.
- * Защита — общий секрет планировщика REPORTS_CRON_SECRET.
+ * Счета по объектам по расписанию: понедельник утром (app.run_site_invoices
+ * через pg_net). Счета за прямые перевозки — свой ежедневный маршрут
+ * /api/invoices/freight (17.11.2026). Защита — общий секрет планировщика
+ * REPORTS_CRON_SECRET.
  */
-export const maxDuration = 120;
+export const maxDuration = 60;
 
 export async function POST(request: Request) {
   const expected = process.env.REPORTS_CRON_SECRET?.trim();
@@ -16,8 +15,6 @@ export async function POST(request: Request) {
   if (!bearerMatches(request.headers.get('authorization'), expected)) {
     return Response.json({ error: 'forbidden' }, { status: 401 });
   }
-  const sites = await runScheduledSiteInvoices();
-  const freight = await runWeeklyFreightInvoices();
-  const errors = [...sites.errors, ...freight.errors];
-  return Response.json({ sites, freight }, { status: errors.length > 0 ? 207 : 200 });
+  const result = await runScheduledSiteInvoices();
+  return Response.json(result, { status: result.errors.length > 0 ? 207 : 200 });
 }

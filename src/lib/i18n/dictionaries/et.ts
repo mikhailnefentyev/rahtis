@@ -2337,7 +2337,7 @@ export const et = {
     currencySave: 'Salvesta',
     currencySaved: 'Valuuta salvestatud.',
     invoicingTitle: 'Iganädalane arve kliendile',
-    invoicingHint: 'Igal esmaspäeval koondab RAHTIS eelmise nädala lõpetatud otseveod iga kliendi kohta üheks arveks ja saadab selle teie ettevõtte nimel ja teie arveldusarvega. Klient maksab otse teile. Kui esitate arveid oma raamatupidamisprogrammist, eemaldage märge, et klient ei saaks kahte arvet.',
+    invoicingHint: 'RAHTIS koondab lõpetatud otseveod iga kliendi kohta arveks kokkulepitud arveldusperioodi järgi ja saadab selle teie ettevõtte nimel ja teie arveldusarvega. Klient maksab otse teile. Kui esitate arveid oma raamatupidamisprogrammist, eemaldage märge, et klient ei saaks kahte arvet.',
     invoicingLabel: 'RAHTIS saadab nädala arved meie ettevõtte nimel',
     currencyError: 'Valuutat ei õnnestunud salvestada.',
     passwordTitle: 'Muuda parooli',
@@ -2350,6 +2350,29 @@ export const et = {
     saved: 'Parool muudetud',
     wrongCurrent: 'Praegune parool ei klapi',
     sameAsOld: 'Uus parool on sama mis praegune',
+  },
+
+  /* Периодичность счёта и срок оплаты по согласию сторон (17.11.2026). */
+  invoiceTerms: {
+    title: 'Arveldusperiood ja maksetähtaeg',
+    hint: 'Arveldusperioodi ja maksetähtaja lepite kokku iga partneriga: üks pool teeb ettepaneku, teine kinnitab. Kuni pole teisiti kokku lepitud, saadetakse arve kord nädalas ja maksetähtaeg on 14 päeva.',
+    empty: 'Partnerid ilmuvad siia pärast esimest ühist vedu.',
+    schedule: 'Arveldusperiood',
+    term: 'Maksetähtaeg',
+    days: '{n} päeva',
+    schedules: { PER_TRIP: 'Kohe pärast iga vedu', WEEKLY: 'Kord nädalas (E)', BIWEEKLY: 'Üle nädala (E)', MONTHLY: 'Kord kuus (1. kuupäeval)' },
+    propose: 'Tee ettepanek',
+    proposed: 'Ettepanek on saadetud. Tingimused kehtivad, kui partner need kinnitab.',
+    proposalFromThem: 'Partner teeb ettepaneku: {terms}',
+    proposalMine: 'Teie ettepanek ootab kinnitust: {terms}',
+    accept: 'Kinnita',
+    reject: 'Lükka tagasi',
+    withdraw: 'Võta ettepanek tagasi',
+    error: 'Ettepanekut ei õnnestunud salvestada. Proovige uuesti.',
+    notifyProposalTitle: '{name} teeb ettepaneku arveldustingimuste kohta',
+    notifyProposalBody: '{schedule}, maksetähtaeg {days} päeva. Kinnitage või lükake tagasi lehel Minu andmed.',
+    notifyAcceptedTitle: '{name} kinnitas arveldustingimused',
+    notifyRejectedTitle: '{name} lükkas pakutud arveldustingimused tagasi',
   },
 
   invite: {

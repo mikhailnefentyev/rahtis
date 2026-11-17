@@ -2472,7 +2472,7 @@ export const en = {
     currencySave: 'Save',
     currencySaved: 'Currency saved.',
     invoicingTitle: 'Weekly invoice to customers',
-    invoicingHint: 'Every Monday RAHTIS combines the previous week\'s completed direct transports into one invoice per customer and sends it in your company\'s name with your bank account. The customer pays you directly. If you invoice from your own accounting system, untick this so the customer does not get two invoices.',
+    invoicingHint: 'RAHTIS combines completed direct transports into an invoice per customer at the agreed invoicing interval and sends it in your company\'s name with your bank account. The customer pays you directly. If you invoice from your own accounting system, untick this so the customer does not get two invoices.',
     invoicingLabel: 'RAHTIS sends weekly invoices in our company\'s name',
     currencyError: 'The currency could not be saved.',
     passwordTitle: 'Change password',
@@ -2485,6 +2485,29 @@ export const en = {
     saved: 'Password changed',
     wrongCurrent: 'The current password is wrong',
     sameAsOld: 'The new password is the same as the current one',
+  },
+
+  /* Периодичность счёта и срок оплаты по согласию сторон (17.11.2026). */
+  invoiceTerms: {
+    title: 'Invoicing interval and payment term',
+    hint: 'You agree the invoicing interval and payment term with each partner: one party proposes, the other accepts. Until agreed otherwise, invoices go out once a week with a 14-day payment term.',
+    empty: 'Partners appear here after your first transport together.',
+    schedule: 'Invoicing interval',
+    term: 'Payment term',
+    days: '{n} days',
+    schedules: { PER_TRIP: 'Right after each transport', WEEKLY: 'Once a week (Mon)', BIWEEKLY: 'Every other week (Mon)', MONTHLY: 'Once a month (1st)' },
+    propose: 'Propose',
+    proposed: 'Proposal sent. The terms apply once the partner accepts them.',
+    proposalFromThem: 'Partner proposes: {terms}',
+    proposalMine: 'Your proposal awaits acceptance: {terms}',
+    accept: 'Accept',
+    reject: 'Reject',
+    withdraw: 'Withdraw proposal',
+    error: 'The proposal could not be saved. Please try again.',
+    notifyProposalTitle: '{name} proposes invoicing terms',
+    notifyProposalBody: '{schedule}, payment term {days} days. Accept or reject on the Your details page.',
+    notifyAcceptedTitle: '{name} accepted the invoicing terms',
+    notifyRejectedTitle: '{name} rejected the proposed invoicing terms',
   },
 
   invite: {

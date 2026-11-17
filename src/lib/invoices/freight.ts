@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { renderToBuffer } from '@react-pdf/renderer';
-import { todayInHelsinki, weeksAgoMonday } from '@/lib/dates';
+import { todayInHelsinki } from '@/lib/dates';
 import { sendEmail } from '@/lib/email';
 import { createFormat } from '@/lib/format';
 import { asCurrency } from '@/lib/money/currency';
@@ -11,16 +11,20 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { ibanHoldActive } from '@/lib/trust/changes';
 import { lastIbanChange } from '@/lib/trust/sensitive';
 import { freightVat } from './freightVat';
+import { DEFAULT_SCHEDULE, DEFAULT_TERM_DAYS, invoiceCutoff, isSchedule } from './terms';
 
 /**
- * Недельный счёт перевозчика заказчику (17.11.2026).
+ * Счёт перевозчика заказчику за прямые перевозки (17.11.2026).
  *
  * Aivomaa Oy в перевозках не участвует: счёт выставляет перевозчик — его
  * имя, Y-tunnus, IBAN и серия номеров (та же, что у счетов по объектам).
- * RAHTIS по понедельникам составляет его из прямых заказов
- * (contract_party CARRIER), завершённых до этого понедельника, один счёт
- * на пару «перевозчик — заказчик — валюта», и отправляет заказчику с PDF;
- * ответ — на почту перевозчика. Деньги идут перевозчику напрямую.
+ * Периодичность и срок оплаты согласуют стороны (invoice_agreements,
+ * правило — terms.ts); без согласования — раз в неделю и 14 дней.
+ * Задание идёт каждое утро: по каждой паре, у которой сегодня срок,
+ * RAHTIS составляет счёт из прямых заказов (contract_party CARRIER) —
+ * один на пару «перевозчик — заказчик — валюта», а при «сразу после
+ * рейса» один на рейс — и отправляет заказчику с PDF; ответ — на почту
+ * перевозчика. Деньги идут перевозчику напрямую.
  *
  * Не попадают:
  *   · заказы, по которым перевозчик уже внёс свой счёт вручную
@@ -35,8 +39,6 @@ import { freightVat } from './freightVat';
 const BUCKET = 'reports';
 /** С какой даты закрытия заказы идут в недельный счёт: первая неделя новой схемы. */
 export const START = '2026-11-16';
-/** Срок оплаты, дней. Как у счетов по объектам по умолчанию. */
-const PAYMENT_TERM_DAYS = 14;
 
 type OrderRow = {
   id: string;
@@ -75,11 +77,10 @@ const fiDate = (iso: string) => {
   return `${Number(d)}.${Number(m)}.${y}`;
 };
 
-/** Понедельник: недельные счета по всем парам «перевозчик — заказчик». */
-export async function runWeeklyFreightInvoices(now: Date = new Date()): Promise<{ sent: number; skipped: number; errors: string[] }> {
+/** Каждое утро: счета по парам, у которых по согласованной периодичности сегодня срок. */
+export async function runFreightInvoices(now: Date = new Date()): Promise<{ sent: number; skipped: number; errors: string[] }> {
   const admin = createAdminClient();
-  /* Граница — этот понедельник по Хельсинки: в счёт идёт всё, что закрыто раньше. */
-  const monday = weeksAgoMonday(0, now);
+  const today = todayInHelsinki(now);
   const out = { sent: 0, skipped: 0, errors: [] as string[] };
 
   const { data: rows, error } = await admin
@@ -93,7 +94,7 @@ export async function runWeeklyFreightInvoices(now: Date = new Date()): Promise<
   if (error) return { ...out, errors: [error.message] };
 
   const orders = ((rows ?? []) as OrderRow[]).filter(
-    (o) => o.closed_at && helsinkiDate(o.closed_at) >= START && helsinkiDate(o.closed_at) < monday && (o.rate_cents ?? 0) > 0,
+    (o) => o.closed_at && helsinkiDate(o.closed_at) >= START && helsinkiDate(o.closed_at) < today && (o.rate_cents ?? 0) > 0,
   );
   if (orders.length === 0) return out;
 
@@ -104,22 +105,37 @@ export async function runWeeklyFreightInvoices(now: Date = new Date()): Promise<
    *     объекту за подтверждённые дни (security review 17.11.2026).
    */
   const orderIds = orders.map((o) => o.id);
-  const [{ data: manual }, { data: siteJobs }] = await Promise.all([
+  const carrierIds = [...new Set(orders.map((o) => o.assigned_company_id!))];
+  const [{ data: manual }, { data: siteJobs }, { data: agreements }] = await Promise.all([
     admin.from('freight_invoices').select('order_id').in('order_id', orderIds),
     admin.from('site_jobs').select('order_id').in('order_id', orderIds),
+    admin
+      .from('invoice_agreements')
+      .select('carrier_company_id, shipper_company_id, schedule, payment_term_days')
+      .in('carrier_company_id', carrierIds),
   ]);
   const skipIds = new Set([...(manual ?? []), ...(siteJobs ?? [])].map((m) => m.order_id));
+  const terms = new Map((agreements ?? []).map((a) => [`${a.carrier_company_id}|${a.shipper_company_id}`, a]));
 
-  const groups = new Map<string, OrderRow[]>();
+  const groups = new Map<string, { orders: OrderRow[]; termDays: number }>();
   for (const order of orders) {
     if (skipIds.has(order.id)) continue;
-    const key = `${order.assigned_company_id}|${order.shipper_company_id}|${asCurrency(order.currency)}`;
-    (groups.get(key) ?? groups.set(key, []).get(key)!).push(order);
+    const pair = `${order.assigned_company_id}|${order.shipper_company_id}`;
+    const agreed = terms.get(pair);
+    const schedule = agreed && isSchedule(agreed.schedule) ? agreed.schedule : DEFAULT_SCHEDULE;
+    /* Сегодня не срок этой пары — или рейс закрыт сегодня и войдёт в следующий счёт. */
+    const cutoff = invoiceCutoff(schedule, today);
+    if (!cutoff || helsinkiDate(order.closed_at!) >= cutoff) continue;
+    /* «Сразу после рейса» — счёт на каждый рейс; иначе один на пару и валюту. */
+    const key = schedule === 'PER_TRIP' ? `${pair}|${order.id}` : `${pair}|${asCurrency(order.currency)}`;
+    const group = groups.get(key) ?? { orders: [], termDays: agreed?.payment_term_days ?? DEFAULT_TERM_DAYS };
+    group.orders.push(order);
+    groups.set(key, group);
   }
 
-  for (const list of groups.values()) {
+  for (const { orders: list, termDays } of groups.values()) {
     try {
-      const status = await createFreightInvoice(list);
+      const status = await createFreightInvoice(list, termDays);
       if (status === 'SENT' || status === 'CREATED') out.sent++;
       else out.skipped++;
     } catch (cause) {
@@ -130,7 +146,7 @@ export async function runWeeklyFreightInvoices(now: Date = new Date()): Promise<
 }
 
 /** Один счёт: перевозчик → заказчик за переданные заказы (одна валюта). */
-async function createFreightInvoice(orders: OrderRow[]): Promise<FreightInvoiceStatus> {
+async function createFreightInvoice(orders: OrderRow[], termDays: number): Promise<FreightInvoiceStatus> {
   const admin = createAdminClient();
   const carrierId = orders[0].assigned_company_id!;
   const shipperId = orders[0].shipper_company_id;
@@ -201,7 +217,7 @@ async function createFreightInvoice(orders: OrderRow[]): Promise<FreightInvoiceS
   const totalCents = netCents + vatCents;
 
   const issuedOn = todayInHelsinki();
-  const dueOn = addDays(issuedOn, PAYMENT_TERM_DAYS);
+  const dueOn = addDays(issuedOn, termDays);
   const periodFrom = lines[0].date;
   const periodTo = lines[lines.length - 1].date;
 

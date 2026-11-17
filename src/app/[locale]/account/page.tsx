@@ -16,6 +16,7 @@ import { MembersPanel } from './MembersPanel';
 import { WasteRegistrationsForm } from './WasteRegistrationsForm';
 import { CurrencyForm } from './CurrencyForm';
 import { InvoicingForm } from './InvoicingForm';
+import { InvoiceTermsPanel } from './InvoiceTermsPanel';
 import { ForwarderPanel } from './ForwarderPanel';
 import { ShipperDocumentsPanel } from './ShipperDocumentsPanel';
 import { OrderInboxSettings } from '@/components/domain/OrderInboxAddress';
@@ -175,6 +176,12 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
         .then((r) => (r.error ? null : ((r.data ?? []) as ExchangeRow[])))
     : null;
 
+  /* Условия счёта с контрагентами (17.11.2026): у кого есть заказы — тем и согласовывать. */
+  const invoiceTerms =
+    company && company.status === 'ACTIVE' && !company.client_of && (company.kind === 'CARRIER' || company.kind === 'SHIPPER')
+      ? await (await createClient()).rpc('invoice_counterparties').then((r) => (r.error ? null : (r.data ?? [])))
+      : null;
+
   const content = (
     <main className="cab-page cab-page--narrow">
       <h1 className="page-title">{t.account.title}</h1>
@@ -228,6 +235,8 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
         {company && company.status === 'ACTIVE' && company.kind === 'CARRIER' && (
           <InvoicingForm enabled={company.weekly_invoicing} canEdit={isOwner} />
         )}
+
+        {invoiceTerms && <InvoiceTermsPanel rows={invoiceTerms} canEdit={isOwner} />}
 
         {orderInbox && <OrderInboxSettings address={orderInbox.address} senders={orderInbox.senders} canManage={isOwner} />}
 

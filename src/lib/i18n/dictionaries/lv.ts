@@ -2337,7 +2337,7 @@ export const lv = {
     currencySave: 'Saglabāt',
     currencySaved: 'Valūta saglabāta.',
     invoicingTitle: 'Iknedēļas rēķins klientam',
-    invoicingHint: 'Katru pirmdienu RAHTIS apkopo iepriekšējās nedēļas pabeigtos tiešos pārvadājumus vienā rēķinā katram klientam un nosūta to jūsu uzņēmuma vārdā ar jūsu konta numuru. Klients maksā tieši jums. Ja rēķinus izrakstāt savā grāmatvedības sistēmā, noņemiet atzīmi, lai klients nesaņemtu divus rēķinus.',
+    invoicingHint: 'RAHTIS apkopo pabeigtos tiešos pārvadājumus rēķinā katram klientam pēc saskaņotā rēķinu izrakstīšanas biežuma un nosūta to jūsu uzņēmuma vārdā ar jūsu konta numuru. Klients maksā tieši jums. Ja rēķinus izrakstāt savā grāmatvedības sistēmā, noņemiet atzīmi, lai klients nesaņemtu divus rēķinus.',
     invoicingLabel: 'RAHTIS sūta nedēļas rēķinus mūsu uzņēmuma vārdā',
     currencyError: 'Valūtu neizdevās saglabāt.',
     passwordTitle: 'Mainīt paroli',
@@ -2350,6 +2350,29 @@ export const lv = {
     saved: 'Parole nomainīta',
     wrongCurrent: 'Pašreizējā parole nesakrīt',
     sameAsOld: 'Jaunā parole ir tāda pati kā pašreizējā',
+  },
+
+  /* Периодичность счёта и срок оплаты по согласию сторон (17.11.2026). */
+  invoiceTerms: {
+    title: 'Rēķinu biežums un apmaksas termiņš',
+    hint: 'Rēķinu biežumu un apmaksas termiņu jūs saskaņojat ar katru partneri: viena puse ierosina, otra apstiprina. Kamēr nav vienots citādi, rēķins tiek nosūtīts reizi nedēļā un apmaksas termiņš ir 14 dienas.',
+    empty: 'Partneri šeit parādīsies pēc pirmā kopīgā pārvadājuma.',
+    schedule: 'Rēķinu biežums',
+    term: 'Apmaksas termiņš',
+    days: '{n} dienas',
+    schedules: { PER_TRIP: 'Uzreiz pēc katra pārvadājuma', WEEKLY: 'Reizi nedēļā (pirmdienā)', BIWEEKLY: 'Reizi divās nedēļās (pirmdienā)', MONTHLY: 'Reizi mēnesī (1. datumā)' },
+    propose: 'Ierosināt',
+    proposed: 'Priekšlikums nosūtīts. Noteikumi stāsies spēkā, kad partneris tos apstiprinās.',
+    proposalFromThem: 'Partneris ierosina: {terms}',
+    proposalMine: 'Jūsu priekšlikums gaida apstiprinājumu: {terms}',
+    accept: 'Apstiprināt',
+    reject: 'Noraidīt',
+    withdraw: 'Atsaukt priekšlikumu',
+    error: 'Priekšlikumu neizdevās saglabāt. Mēģiniet vēlreiz.',
+    notifyProposalTitle: '{name} ierosina rēķinu noteikumus',
+    notifyProposalBody: '{schedule}, apmaksas termiņš {days} dienas. Apstipriniet vai noraidiet lapā Mani dati.',
+    notifyAcceptedTitle: '{name} apstiprināja rēķinu noteikumus',
+    notifyRejectedTitle: '{name} noraidīja ierosinātos rēķinu noteikumus',
   },
 
   invite: {

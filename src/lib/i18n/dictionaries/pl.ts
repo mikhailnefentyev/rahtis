@@ -2336,7 +2336,7 @@ export const pl = {
     currencySave: 'Zapisz',
     currencySaved: 'Waluta została zapisana.',
     invoicingTitle: 'Faktura tygodniowa dla klientów',
-    invoicingHint: 'W każdy poniedziałek RAHTIS łączy zakończone w poprzednim tygodniu przewozy bezpośrednie w jedną fakturę dla każdego klienta i wysyła ją w imieniu Twojej firmy, z Twoim numerem rachunku. Klient płaci bezpośrednio Tobie. Jeśli wystawiasz faktury we własnym systemie księgowym, odznacz tę opcję, aby klient nie dostał dwóch faktur.',
+    invoicingHint: 'RAHTIS łączy zakończone przewozy bezpośrednie w fakturę dla każdego klienta zgodnie z uzgodnioną częstotliwością fakturowania i wysyła ją w imieniu Twojej firmy, z Twoim numerem rachunku. Klient płaci bezpośrednio Tobie. Jeśli wystawiasz faktury we własnym systemie księgowym, odznacz tę opcję, aby klient nie dostał dwóch faktur.',
     invoicingLabel: 'RAHTIS wysyła faktury tygodniowe w imieniu naszej firmy',
     currencyError: 'Nie udało się zapisać waluty.',
     passwordTitle: 'Zmiana hasła',
@@ -2349,6 +2349,29 @@ export const pl = {
     saved: 'Hasło zmienione',
     wrongCurrent: 'Obecne hasło się nie zgadza',
     sameAsOld: 'Nowe hasło jest takie samo jak obecne',
+  },
+
+  /* Периодичность счёта и срок оплаты по согласию сторон (17.11.2026). */
+  invoiceTerms: {
+    title: 'Częstotliwość fakturowania i termin płatności',
+    hint: 'Częstotliwość fakturowania i termin płatności uzgadniasz z każdym partnerem: jedna strona proponuje, druga akceptuje. Dopóki nie uzgodnicie inaczej, faktura wychodzi raz w tygodniu z 14-dniowym terminem płatności.',
+    empty: 'Partnerzy pojawią się tutaj po pierwszym wspólnym przewozie.',
+    schedule: 'Częstotliwość fakturowania',
+    term: 'Termin płatności',
+    days: '{n} dni',
+    schedules: { PER_TRIP: 'Zaraz po każdym przewozie', WEEKLY: 'Raz w tygodniu (pon.)', BIWEEKLY: 'Co dwa tygodnie (pon.)', MONTHLY: 'Raz w miesiącu (1. dnia)' },
+    propose: 'Zaproponuj',
+    proposed: 'Propozycja wysłana. Warunki zaczną obowiązywać, gdy partner je zaakceptuje.',
+    proposalFromThem: 'Partner proponuje: {terms}',
+    proposalMine: 'Twoja propozycja czeka na akceptację: {terms}',
+    accept: 'Akceptuj',
+    reject: 'Odrzuć',
+    withdraw: 'Wycofaj propozycję',
+    error: 'Nie udało się zapisać propozycji. Spróbuj ponownie.',
+    notifyProposalTitle: '{name} proponuje warunki fakturowania',
+    notifyProposalBody: '{schedule}, termin płatności {days} dni. Zaakceptuj lub odrzuć na stronie Moje dane.',
+    notifyAcceptedTitle: '{name} zaakceptował warunki fakturowania',
+    notifyRejectedTitle: '{name} odrzucił proponowane warunki fakturowania',
   },
 
   invite: {

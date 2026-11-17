@@ -2337,7 +2337,7 @@ export const lt = {
     currencySave: 'Išsaugoti',
     currencySaved: 'Valiuta išsaugota.',
     invoicingTitle: 'Savaitinė sąskaita klientui',
-    invoicingHint: 'Kiekvieną pirmadienį RAHTIS sujungia praėjusios savaitės įvykdytus tiesioginius pervežimus į vieną sąskaitą kiekvienam klientui ir išsiunčia ją jūsų įmonės vardu su jūsų sąskaitos numeriu. Klientas moka tiesiogiai jums. Jei sąskaitas išrašote savo apskaitos sistemoje, nuimkite žymėjimą, kad klientas negautų dviejų sąskaitų.',
+    invoicingHint: 'RAHTIS sujungia įvykdytus tiesioginius pervežimus į sąskaitą kiekvienam klientui pagal sutartą sąskaitų išrašymo periodiškumą ir išsiunčia ją jūsų įmonės vardu su jūsų sąskaitos numeriu. Klientas moka tiesiogiai jums. Jei sąskaitas išrašote savo apskaitos sistemoje, nuimkite žymėjimą, kad klientas negautų dviejų sąskaitų.',
     invoicingLabel: 'RAHTIS siunčia savaitines sąskaitas mūsų įmonės vardu',
     currencyError: 'Valiutos išsaugoti nepavyko.',
     passwordTitle: 'Keisti slaptažodį',
@@ -2350,6 +2350,29 @@ export const lt = {
     saved: 'Slaptažodis pakeistas',
     wrongCurrent: 'Dabartinis slaptažodis neteisingas',
     sameAsOld: 'Naujas slaptažodis sutampa su dabartiniu',
+  },
+
+  /* Периодичность счёта и срок оплаты по согласию сторон (17.11.2026). */
+  invoiceTerms: {
+    title: 'Sąskaitų periodiškumas ir mokėjimo terminas',
+    hint: 'Sąskaitų periodiškumą ir mokėjimo terminą suderinate su kiekvienu partneriu: viena šalis pasiūlo, kita patvirtina. Kol nesutarta kitaip, sąskaita siunčiama kartą per savaitę, mokėjimo terminas – 14 dienų.',
+    empty: 'Partneriai čia atsiras po pirmojo bendro pervežimo.',
+    schedule: 'Sąskaitų periodiškumas',
+    term: 'Mokėjimo terminas',
+    days: '{n} d.',
+    schedules: { PER_TRIP: 'Iš karto po kiekvieno pervežimo', WEEKLY: 'Kartą per savaitę (pirm.)', BIWEEKLY: 'Kas antrą savaitę (pirm.)', MONTHLY: 'Kartą per mėnesį (1 d.)' },
+    propose: 'Pasiūlyti',
+    proposed: 'Pasiūlymas išsiųstas. Sąlygos įsigalios, kai partneris jas patvirtins.',
+    proposalFromThem: 'Partneris siūlo: {terms}',
+    proposalMine: 'Jūsų pasiūlymas laukia patvirtinimo: {terms}',
+    accept: 'Patvirtinti',
+    reject: 'Atmesti',
+    withdraw: 'Atšaukti pasiūlymą',
+    error: 'Pasiūlymo išsaugoti nepavyko. Bandykite dar kartą.',
+    notifyProposalTitle: '{name} siūlo sąskaitų sąlygas',
+    notifyProposalBody: '{schedule}, mokėjimo terminas {days} d. Patvirtinkite arba atmeskite puslapyje Mano duomenys.',
+    notifyAcceptedTitle: '{name} patvirtino sąskaitų sąlygas',
+    notifyRejectedTitle: '{name} atmetė pasiūlytas sąskaitų sąlygas',
   },
 
   invite: {

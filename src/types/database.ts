@@ -3028,6 +3028,45 @@ export type Database = {
         }
         Relationships: []
       }
+      invoice_agreements: {
+        Row: {
+          carrier_company_id: string
+          shipper_company_id: string
+          schedule: string
+          payment_term_days: number
+          proposed_schedule: string | null
+          proposed_term_days: number | null
+          proposed_by: string | null
+          proposed_at: string | null
+          agreed_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          carrier_company_id: string
+          shipper_company_id: string
+          schedule?: string
+          payment_term_days?: number
+          proposed_schedule?: string | null
+          proposed_term_days?: number | null
+          proposed_by?: string | null
+          proposed_at?: string | null
+          agreed_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          carrier_company_id?: string
+          shipper_company_id?: string
+          schedule?: string
+          payment_term_days?: number
+          proposed_schedule?: string | null
+          proposed_term_days?: number | null
+          proposed_by?: string | null
+          proposed_at?: string | null
+          agreed_at?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       invoices: {
         Row: {
           company_id: string
@@ -9457,6 +9496,27 @@ export type Database = {
       }
       handle_support_message: { Args: { p_id: number }; Returns: undefined }
       inbound_order_target: { Args: { p_token: string }; Returns: Json }
+      invoice_counterparties: {
+        Args: never
+        Returns: {
+          agreed_at: string
+          counterparty_id: string
+          counterparty_name: string
+          payment_term_days: number
+          proposed_by_me: boolean
+          proposed_schedule: string
+          proposed_term_days: number
+          schedule: string
+        }[]
+      }
+      propose_invoice_terms: {
+        Args: { p_counterparty: string; p_schedule: string; p_term_days: number }
+        Returns: undefined
+      }
+      answer_invoice_terms: {
+        Args: { p_accept: boolean; p_counterparty: string }
+        Returns: undefined
+      }
       invoice_subscription_fees: { Args: { p_month: string }; Returns: number }
       issue_monthly_subscriptions: {
         Args: { p_month: string }

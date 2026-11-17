@@ -2466,7 +2466,7 @@ export const ro = {
     currencySave: 'Salvați',
     currencySaved: 'Moneda a fost salvată.',
     invoicingTitle: 'Factură săptămânală către clienți',
-    invoicingHint: 'În fiecare luni, RAHTIS grupează transporturile directe finalizate în săptămâna anterioară într-o singură factură pentru fiecare client și o trimite în numele firmei dumneavoastră, cu contul dumneavoastră bancar. Clientul plătește direct către dumneavoastră. Dacă facturați din propriul program de contabilitate, debifați opțiunea, ca să nu primească clientul două facturi.',
+    invoicingHint: 'RAHTIS grupează transporturile directe finalizate într-o factură pentru fiecare client, la intervalul de facturare convenit, și o trimite în numele firmei dumneavoastră, cu contul dumneavoastră bancar. Clientul plătește direct către dumneavoastră. Dacă facturați din propriul program de contabilitate, debifați opțiunea, ca să nu primească clientul două facturi.',
     invoicingLabel: 'RAHTIS trimite facturile săptămânale în numele firmei noastre',
     currencyError: 'Moneda nu a putut fi salvată.',
     passwordTitle: 'Schimbați parola',
@@ -2479,6 +2479,29 @@ export const ro = {
     saved: 'Parola a fost schimbată',
     wrongCurrent: 'Parola actuală este greșită',
     sameAsOld: 'Parola nouă este identică cu cea actuală',
+  },
+
+  /* Периодичность счёта и срок оплаты по согласию сторон (17.11.2026). */
+  invoiceTerms: {
+    title: 'Intervalul de facturare și termenul de plată',
+    hint: 'Intervalul de facturare și termenul de plată le stabiliți cu fiecare partener: o parte propune, cealaltă acceptă. Până la o altă înțelegere, factura se trimite o dată pe săptămână, cu termen de plată de 14 zile.',
+    empty: 'Partenerii apar aici după primul transport efectuat împreună.',
+    schedule: 'Interval de facturare',
+    term: 'Termen de plată',
+    days: '{n} zile',
+    schedules: { PER_TRIP: 'Imediat după fiecare transport', WEEKLY: 'O dată pe săptămână (luni)', BIWEEKLY: 'La două săptămâni (luni)', MONTHLY: 'O dată pe lună (pe 1)' },
+    propose: 'Propune',
+    proposed: 'Propunerea a fost trimisă. Condițiile se aplică după ce partenerul le acceptă.',
+    proposalFromThem: 'Partenerul propune: {terms}',
+    proposalMine: 'Propunerea dumneavoastră așteaptă acceptarea: {terms}',
+    accept: 'Acceptă',
+    reject: 'Respinge',
+    withdraw: 'Retrage propunerea',
+    error: 'Propunerea nu a putut fi salvată. Încercați din nou.',
+    notifyProposalTitle: '{name} propune condiții de facturare',
+    notifyProposalBody: '{schedule}, termen de plată {days} zile. Acceptați sau respingeți pe pagina Datele mele.',
+    notifyAcceptedTitle: '{name} a acceptat condițiile de facturare',
+    notifyRejectedTitle: '{name} a respins condițiile de facturare propuse',
   },
 
   invite: {

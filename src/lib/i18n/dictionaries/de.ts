@@ -2337,7 +2337,7 @@ export const de = {
     currencySave: 'Speichern',
     currencySaved: 'Währung gespeichert.',
     invoicingTitle: 'Wöchentliche Rechnung an Kunden',
-    invoicingHint: 'Jeden Montag fasst RAHTIS die in der Vorwoche abgeschlossenen direkten Transporte zu einer Rechnung je Kunde zusammen und versendet sie im Namen Ihres Unternehmens mit Ihrer Bankverbindung. Der Kunde zahlt direkt an Sie. Wenn Sie aus Ihrer eigenen Buchhaltung abrechnen, entfernen Sie das Häkchen, damit der Kunde keine zwei Rechnungen erhält.',
+    invoicingHint: 'RAHTIS fasst abgeschlossene direkte Transporte im vereinbarten Rechnungsintervall zu einer Rechnung je Kunde zusammen und versendet sie im Namen Ihres Unternehmens mit Ihrer Bankverbindung. Der Kunde zahlt direkt an Sie. Wenn Sie aus Ihrer eigenen Buchhaltung abrechnen, entfernen Sie das Häkchen, damit der Kunde keine zwei Rechnungen erhält.',
     invoicingLabel: 'RAHTIS versendet Wochenrechnungen im Namen unseres Unternehmens',
     currencyError: 'Die Währung konnte nicht gespeichert werden.',
     passwordTitle: 'Passwort ändern',
@@ -2350,6 +2350,29 @@ export const de = {
     saved: 'Passwort geändert',
     wrongCurrent: 'Das aktuelle Passwort stimmt nicht',
     sameAsOld: 'Das neue Passwort ist dasselbe wie das aktuelle',
+  },
+
+  /* Периодичность счёта и срок оплаты по согласию сторон (17.11.2026). */
+  invoiceTerms: {
+    title: 'Rechnungsintervall und Zahlungsziel',
+    hint: 'Rechnungsintervall und Zahlungsziel vereinbaren Sie mit jedem Partner: Eine Seite schlägt vor, die andere stimmt zu. Solange nichts anderes vereinbart ist, geht die Rechnung einmal pro Woche mit 14 Tagen Zahlungsziel hinaus.',
+    empty: 'Partner erscheinen hier nach Ihrem ersten gemeinsamen Transport.',
+    schedule: 'Rechnungsintervall',
+    term: 'Zahlungsziel',
+    days: '{n} Tage',
+    schedules: { PER_TRIP: 'Direkt nach jedem Transport', WEEKLY: 'Einmal pro Woche (Mo)', BIWEEKLY: 'Alle zwei Wochen (Mo)', MONTHLY: 'Einmal im Monat (am 1.)' },
+    propose: 'Vorschlagen',
+    proposed: 'Vorschlag gesendet. Die Bedingungen gelten, sobald der Partner zustimmt.',
+    proposalFromThem: 'Der Partner schlägt vor: {terms}',
+    proposalMine: 'Ihr Vorschlag wartet auf Zustimmung: {terms}',
+    accept: 'Zustimmen',
+    reject: 'Ablehnen',
+    withdraw: 'Vorschlag zurückziehen',
+    error: 'Der Vorschlag konnte nicht gespeichert werden. Bitte erneut versuchen.',
+    notifyProposalTitle: '{name} schlägt Rechnungsbedingungen vor',
+    notifyProposalBody: '{schedule}, Zahlungsziel {days} Tage. Zustimmen oder ablehnen auf der Seite Meine Daten.',
+    notifyAcceptedTitle: '{name} hat den Rechnungsbedingungen zugestimmt',
+    notifyRejectedTitle: '{name} hat die vorgeschlagenen Rechnungsbedingungen abgelehnt',
   },
 
   invite: {
