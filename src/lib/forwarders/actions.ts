@@ -14,7 +14,6 @@ import { createClient } from '@/lib/supabase/server';
 import { isShipperDocKind } from '@/lib/shipper-docs/model';
 import { isForwarderTerms, parseAmountCents } from './policy';
 import { notifyForwarder } from './reminders';
-import { isDocsGateError } from './docsGate';
 import { loadDocsGates } from './docsGateServer';
 
 const BUCKET = 'company-docs';
@@ -155,8 +154,8 @@ export async function setShipperRoleAction(_previous: ShipperRoleState, formData
 
   const supabase = await createClient();
   const { error } = await supabase.from('companies').update({ shipper_role: role }).eq('id', viewer.company.id);
-  /* 55018 — в грузовладельцы до проверки документов переводит оператор (forwarder_docs_gate). */
-  if (error) return { error: isDocsGateError(error) ? t.docsGate.roleLocked : t.forwarder.roleError, saved: false };
+  /* Запрета на смену роли больше нет: документы нужны при любой роли (17.11.2026). */
+  if (error) return { error: t.forwarder.roleError, saved: false };
 
   revalidateForwarder(locale);
   return { error: null, saved: true };
@@ -242,20 +241,24 @@ async function announceUnlocked(companyId: string) {
 async function announceReview(companyId: string, kind: string, decision: 'APPROVED' | 'REJECTED', note: string | null) {
   const { data: company } = await createAdminClient()
     .from('companies')
-    .select('id, language, contact_email')
+    .select('id, language, contact_email, shipper_role')
     .eq('id', companyId)
     .maybeSingle();
   if (!company) return;
 
   const t = await getDictionary(emailLocaleOf(company.language));
   const fw = t.forwarder;
+  /* У грузовладельца тот же вид документа — полис общей ответственности (17.11.2026). */
+  const owner = company.shipper_role === 'CARGO_OWNER';
   /* Документ заказчика — свой текст: про прямой режим и полис там ни слова. */
   const shipperDoc = isShipperDocKind(kind);
   const what = shipperDoc
     ? t.documents[kind]
     : kind === 'FORWARDER_LICENSE'
       ? fw.licenseTitle
-      : fw.insuranceTitle;
+      : owner
+        ? fw.insuranceTitleOwner
+        : fw.insuranceTitle;
   const approvedBody = shipperDoc ? t.shipperDocs.approvedBody : fw.approvedBody;
   const rejectedBody = shipperDoc ? t.shipperDocs.rejectedBody : fw.rejectedBody;
 

@@ -1,10 +1,12 @@
 /**
- * Документы экспедитора до работы (11.11.2026).
+ * Документы заказчика до работы (экспедитор — 11.11.2026, грузовладелец — 17.11.2026).
  *
- * Экспедитор, которого реестр не подтвердил автоматически (не финский
+ * Заказчик, которого реестр не подтвердил автоматически (не финский
  * или не найден PRH), после одобрения входит и смотрит всё, но
  * публикует, назначает и принимает перевозки только когда оператор
- * принял выписку из реестра и полис экспедитора. Правило и запрет —
+ * принял выписку из реестра и полис ответственности (у экспедитора —
+ * полис экспедитора, у грузовладельца — общей ответственности; вид
+ * документа один, FORWARDER_INSURANCE). Правило и запрет —
  * в базе (миграция forwarder_docs_gate: app.forwarder_docs_required,
  * app.forwarder_docs_ok, триггер orders_zz_forwarder_docs_guard); здесь
  * только то, чем интерфейс объясняет её ответ.
@@ -17,7 +19,7 @@ export const DOCS_GATE_CODE = '55018';
 
 /** Ответ API (по-английски, как остальные ответы /api/v1). */
 export const DOCS_GATE_API_MESSAGE =
-  "Publishing orders and giving transports become available once RAHTIS has checked the company documents (trade register extract and freight forwarder's liability insurance). Upload them in the RAHTIS cabinet, page Your details.";
+  "Publishing orders and giving transports become available once RAHTIS has checked the company documents (trade register extract and liability insurance: freight forwarder's liability insurance for a forwarder, general business liability insurance for a cargo owner). Upload them in the RAHTIS cabinet, page Your details.";
 
 export function isDocsGateError(error: { code?: string | null } | null | undefined): boolean {
   return error?.code === DOCS_GATE_CODE;

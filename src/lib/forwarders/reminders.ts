@@ -109,7 +109,9 @@ export async function sendForwarderReminders(now: Date = new Date()): Promise<Fo
 
   for (const row of rows) {
     const company = byId.get(row.company_id);
-    if (!company || company.status !== 'ACTIVE' || company.shipper_role !== 'FORWARDER' || !row.valid_until) continue;
+    /* И грузовладельцу: его полис ответственности тоже открывает публикацию (17.11.2026). */
+    if (!company || company.status !== 'ACTIVE' || !row.valid_until) continue;
+    const owner = company.shipper_role === 'CARGO_OWNER';
     if ((latestDate.get(row.company_id) ?? '') > row.valid_until) continue;
 
     const daysLeft = Math.round((Date.parse(`${row.valid_until}T00:00:00Z`) - Date.parse(`${today}T00:00:00Z`)) / 86_400_000);
@@ -135,8 +137,8 @@ export async function sendForwarderReminders(now: Date = new Date()): Promise<Fo
       language: company.language,
       contactEmail: company.contact_email,
       template: 'forwarder.expiring',
-      title: t.forwarder.reminderTitle.replace('{date}', date),
-      lead: t.forwarder.reminderLead.replace('{date}', date),
+      title: (owner ? t.forwarder.reminderTitleOwner : t.forwarder.reminderTitle).replace('{date}', date),
+      lead: (owner ? t.forwarder.reminderLeadOwner : t.forwarder.reminderLead).replace('{date}', date),
       button: t.forwarder.reminderButton,
     });
     result.sent += 1;

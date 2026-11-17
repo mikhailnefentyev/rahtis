@@ -18,8 +18,11 @@ export function ForwarderPolicyNote({ info, className }: { info: ForwarderPolicy
   const { t, f } = useI18n();
   if (!info) return null;
   const fw = t.forwarder;
+  /* Грузовладелец с принятым полисом ответственности — и то и другое (17.11.2026). */
   const label = info.cargoOwner
-    ? fw.cargoOwnerNote
+    ? info.until
+      ? `${fw.cargoOwnerNote} · ${fw.policyCheckedOwner.replace('{date}', f.date(`${info.until}T12:00:00Z`))}`
+      : fw.cargoOwnerNote
     : info.until
       ? fw.policyChecked.replace('{date}', f.date(`${info.until}T12:00:00Z`))
       : fw.policyNotChecked;

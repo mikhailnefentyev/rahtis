@@ -45,8 +45,9 @@ export function ForwarderPanel({
   return (
     <>
       <RoleCard role={role} canEdit={canEditRole} />
-      {forwarder && (
-        <InsuranceCard status={status} document={insurance} required={docsRequired} />
+      {/* Грузовладельцу — полис общей ответственности: обязателен без подтверждения PRH (17.11.2026). */}
+      {(forwarder || docsRequired || insurance) && (
+        <InsuranceCard status={status} document={insurance} required={docsRequired} owner={!forwarder} />
       )}
       {forwarder && status?.needs_license && <LicenseCard document={license} ok={status.license_ok} />}
     </>
@@ -164,10 +165,13 @@ function InsuranceCard({
   status,
   document,
   required,
+  owner,
 }: {
   status: ForwarderStatus | null;
   document: CompanyDocument | null;
   required: boolean;
+  /** Грузовладелец: полис общей ответственности, без требований про экспедирование и CMR. */
+  owner: boolean;
 }) {
   const { t, locale } = useI18n();
   const fw = t.forwarder;
@@ -177,8 +181,12 @@ function InsuranceCard({
     <Card stripe={status?.policy_until ? 'ok' : 'warn'}>
       <CardBody className="flex flex-col gap-3">
         <div>
-          <h2 className="text-[15px] font-semibold tracking-tight">{fw.insuranceTitle}</h2>
-          <p className="mt-1 max-w-xl text-[13px] leading-relaxed text-ink-muted">{required ? t.docsGate.insuranceIntro : fw.insuranceIntro}</p>
+          <h2 className="text-[15px] font-semibold tracking-tight">{owner ? fw.insuranceTitleOwner : fw.insuranceTitle}</h2>
+          <p className="mt-1 max-w-xl text-[13px] leading-relaxed text-ink-muted">
+            {owner
+              ? required ? t.docsGate.insuranceIntroOwner : fw.insuranceIntroOwner
+              : required ? t.docsGate.insuranceIntro : fw.insuranceIntro}
+          </p>
         </div>
 
         <DirectLine status={status} />
@@ -188,9 +196,9 @@ function InsuranceCard({
           <ul className="list-disc space-y-0.5 pl-5 text-[13px] leading-relaxed text-ink-muted">
             <li>{fw.reqLimits}</li>
             <li>{fw.reqTerritory}</li>
-            <li>{fw.reqActivity}</li>
-            <li>{fw.reqCmr}</li>
-            {status?.needs_license && <li>{fw.reqLicensePl}</li>}
+            <li>{owner ? fw.reqActivityOwner : fw.reqActivity}</li>
+            {!owner && <li>{fw.reqCmr}</li>}
+            {!owner && status?.needs_license && <li>{fw.reqLicensePl}</li>}
           </ul>
         </div>
 
@@ -242,24 +250,29 @@ function InsuranceCard({
             <Field label={fw.territory}>
               {(p) => <Input {...p} name="territory" maxLength={300} placeholder={fw.territoryPlaceholder} />}
             </Field>
-            <Field label={fw.terms}>
-              {(p) => (
-                <Select {...p} name="terms" defaultValue="">
-                  <option value="">—</option>
-                  {FORWARDER_TERMS.map((v) => (
-                    <option key={v} value={v}>
-                      {fw[`terms${v}`]}
-                    </option>
-                  ))}
-                </Select>
-              )}
-            </Field>
+            {/* Условия NSAB/ADSp и CMR — про экспедирование; у грузовладельца их нет. */}
+            {!owner && (
+              <Field label={fw.terms}>
+                {(p) => (
+                  <Select {...p} name="terms" defaultValue="">
+                    <option value="">—</option>
+                    {FORWARDER_TERMS.map((v) => (
+                      <option key={v} value={v}>
+                        {fw[`terms${v}`]}
+                      </option>
+                    ))}
+                  </Select>
+                )}
+              </Field>
+            )}
           </div>
 
-          <label className="flex items-start gap-2 text-[13px]">
-            <input type="checkbox" name="cmr_covered" value="1" className="mt-0.5 size-4 accent-[var(--color-accent)]" />
-            <span>{fw.cmrCovered}</span>
-          </label>
+          {!owner && (
+            <label className="flex items-start gap-2 text-[13px]">
+              <input type="checkbox" name="cmr_covered" value="1" className="mt-0.5 size-4 accent-[var(--color-accent)]" />
+              <span>{fw.cmrCovered}</span>
+            </label>
+          )}
 
           {state.error && (
             <p role="alert" className="text-[13px] text-danger">

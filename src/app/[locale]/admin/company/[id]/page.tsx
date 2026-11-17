@@ -297,6 +297,13 @@ export default async function AdminCompanyPage({
                   : t.forwarder.policyNotChecked}
               </>
             )}
+            {/* Грузовладелец: полис общей ответственности (17.11.2026). */}
+            {company.shipper_role === 'CARGO_OWNER' && forwarder?.policy_until && (
+              <>
+                {' · '}
+                {t.forwarder.policyCheckedOwner.replace('{date}', f.date(`${forwarder.policy_until}T12:00:00Z`))}
+              </>
+            )}
           </p>
           {docsGate?.required && (
             <div className="mb-3 flex flex-col gap-1.5 rounded-control border border-line bg-sunken p-3 text-[13px]">
