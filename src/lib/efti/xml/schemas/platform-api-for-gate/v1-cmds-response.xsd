@@ -1,0 +1,24 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:efti-cr="http://efti.fi/v1/platform/cmds-response"
+            xmlns:efti-fti010="urn:eu:move:eFTI:data:standard:ReusableAggregateBusinessInformationEntity:34"
+            targetNamespace="http://efti.fi/v1/platform/cmds-response"
+            elementFormDefault="qualified">
+
+    <xsd:import
+            namespace="urn:eu:move:eFTI:data:standard:ReusableAggregateBusinessInformationEntity:34"
+            schemaLocation="../move.eu/semantic/FTI010/FTI010s_urn_eu_move_eFTI_data_standard_ReusableAggregateBusinessInformationEntity_34.xsd"/>
+
+    <xsd:element name="cmdsResponse" type="efti-cr:CMDSResponse"/>
+
+    <xsd:complexType name="CMDSResponse">
+        <xsd:annotation>
+            <xsd:documentation>
+                Response payload to the cmds request.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="consignment" type="efti-fti010:SupplyChainConsignmentType" minOccurs="1" maxOccurs="1"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+</xsd:schema>

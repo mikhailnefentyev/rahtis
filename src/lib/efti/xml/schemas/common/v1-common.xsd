@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://efti.fi/v1/common"
+            elementFormDefault="qualified">
+    <xsd:include schemaLocation="./v1-uil.xsd"/>
+    <xsd:include schemaLocation="./v1-uuid.xsd"/>
+</xsd:schema>

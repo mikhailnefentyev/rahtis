@@ -1,0 +1,16 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:efti-c="http://efti.fi/v1/common"
+            targetNamespace="http://efti.fi/v1/common"
+            elementFormDefault="qualified">
+
+    <xsd:include schemaLocation="./v1-uuid.xsd"/>
+
+    <xsd:complexType name="UIL">
+        <xsd:sequence>
+            <xsd:element name="gateId" type="xsd:token"/>
+            <xsd:element name="platformId" type="xsd:token"/>
+            <xsd:element name="datasetId" type="efti-c:UUID"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+</xsd:schema>

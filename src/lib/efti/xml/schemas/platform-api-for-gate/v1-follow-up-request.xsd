@@ -1,0 +1,24 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:efti-fr="http://efti.fi/v1/platform/follow-up-request"
+            xmlns:efti-fti025="urn:eu:move:eFTI:data:standard:ReusableAggregateBusinessInformationEntity:34"
+            targetNamespace="http://efti.fi/v1/platform/follow-up-request"
+            elementFormDefault="qualified">
+
+    <xsd:import
+            namespace="urn:eu:move:eFTI:data:standard:ReusableAggregateBusinessInformationEntity:34"
+            schemaLocation="../move.eu/semantic/FTI025/FTI025s_urn_eu_move_eFTI_data_standard_ReusableAggregateBusinessInformationEntity_34.xsd"/>
+
+    <xsd:element name="followUpRequest" type="efti-fr:FollowUpRequest"/>
+
+    <xsd:complexType name="FollowUpRequest">
+        <xsd:annotation>
+            <xsd:documentation>
+                Response payload to the followup request.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="message" type="efti-fti025:MessageInformationType" minOccurs="1" maxOccurs="1"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+</xsd:schema>

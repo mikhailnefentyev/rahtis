@@ -3028,6 +3028,108 @@ export type Database = {
         }
         Relationships: []
       }
+      efti_datasets: {
+        Row: {
+          id: string
+          order_id: string
+          status: string
+          gate_id: string | null
+          platform_id: string | null
+          uploaded_at: string | null
+          delivery_uploaded_at: string | null
+          last_error: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          order_id: string
+          status?: string
+          gate_id?: string | null
+          platform_id?: string | null
+          uploaded_at?: string | null
+          delivery_uploaded_at?: string | null
+          last_error?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          order_id?: string
+          status?: string
+          gate_id?: string | null
+          platform_id?: string | null
+          uploaded_at?: string | null
+          delivery_uploaded_at?: string | null
+          last_error?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      efti_follow_ups: {
+        Row: {
+          id: string
+          dataset_id: string
+          query_request_id: string | null
+          requester_country: string | null
+          message: string
+          received_at: string
+          read_at: string | null
+        }
+        Insert: {
+          id?: string
+          dataset_id: string
+          query_request_id?: string | null
+          requester_country?: string | null
+          message: string
+          received_at?: string
+          read_at?: string | null
+        }
+        Update: {
+          id?: string
+          dataset_id?: string
+          query_request_id?: string | null
+          requester_country?: string | null
+          message?: string
+          received_at?: string
+          read_at?: string | null
+        }
+        Relationships: []
+      }
+      efti_requests: {
+        Row: {
+          id: number
+          dataset_id: string | null
+          kind: string
+          request_id: string | null
+          requester_country: string | null
+          subset_ids: string[] | null
+          http_status: number
+          created_at: string
+        }
+        Insert: {
+          id?: number
+          dataset_id?: string | null
+          kind: string
+          request_id?: string | null
+          requester_country?: string | null
+          subset_ids?: string[] | null
+          http_status: number
+          created_at?: string
+        }
+        Update: {
+          id?: number
+          dataset_id?: string | null
+          kind?: string
+          request_id?: string | null
+          requester_country?: string | null
+          subset_ids?: string[] | null
+          http_status?: number
+          created_at?: string
+        }
+        Relationships: []
+      }
       invoice_agreements: {
         Row: {
           carrier_company_id: string

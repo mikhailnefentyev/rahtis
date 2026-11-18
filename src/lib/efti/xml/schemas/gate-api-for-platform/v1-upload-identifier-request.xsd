@@ -1,0 +1,30 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:efti-c="http://efti.fi/v1/common"
+            xmlns:uir="http://efti.fi/v1/platform/upload-identifiers-request"
+            xmlns:efti-fti004="urn:eu:move:eFTI:data:standard:ReusableAggregateBusinessInformationEntity:34"
+            targetNamespace="http://efti.fi/v1/platform/upload-identifiers-request"
+            elementFormDefault="qualified">
+
+    <xsd:import namespace="http://efti.fi/v1/common"
+                schemaLocation="../common/v1-common.xsd"/>
+
+    <xsd:import
+            namespace="urn:eu:move:eFTI:data:standard:ReusableAggregateBusinessInformationEntity:34"
+            schemaLocation="../move.eu/semantic/FTI004/FTI004s_urn_eu_move_eFTI_data_standard_ReusableAggregateBusinessInformationEntity_34.xsd"/>
+
+    <xsd:element name="uploadIdentifierRequest" type="uir:UploadIdentifierRequest"/>
+    <xsd:element name="uploadIdentifierResponse" type="uir:UploadIdentifierResponse"/>
+
+    <xsd:complexType name="UploadIdentifierRequest">
+        <xsd:sequence>
+            <xsd:element name="message" type="efti-fti004:IDSetCriteriaType" minOccurs="1" maxOccurs="1"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="UploadIdentifierResponse">
+        <xsd:sequence>
+            <xsd:element name="uil" type="efti-c:UIL" minOccurs="1" maxOccurs="1"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+</xsd:schema>
