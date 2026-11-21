@@ -45,7 +45,8 @@ type Party = { name: string; businessId: string; address: string; vatRegistered:
 
 const s = StyleSheet.create({
   page: { fontFamily: PDF_FONT, paddingTop: 36, paddingBottom: 48, paddingHorizontal: 44, fontSize: 8.6, lineHeight: 1.35, color: '#111' },
-  title: { fontSize: 20, fontWeight: 'bold' },
+  title: { fontSize: 20, fontWeight: 'bold', lineHeight: 1.2 },
+  annex: { fontSize: 14, fontWeight: 'bold', lineHeight: 1.25, marginBottom: 4 },
   notice: { marginTop: 10, padding: 8, borderWidth: 1.2, borderColor: '#111', fontSize: 12.5, fontWeight: 'bold' },
   meta: { marginTop: 6, color: '#333' },
   h: { fontSize: 10, fontWeight: 'bold', marginTop: 12, marginBottom: 3 },
@@ -53,7 +54,7 @@ const s = StyleSheet.create({
   row: { flexDirection: 'row', gap: 16 },
   col: { flex: 1 },
   kv: { flexDirection: 'row', borderBottomWidth: 0.5, borderBottomColor: '#ccc', paddingVertical: 2 },
-  k: { width: 210, color: '#333' },
+  k: { width: 260, color: '#333' },
   v: { flex: 1 },
   bold: { fontWeight: 'bold' },
   sign: { marginTop: 26, flexDirection: 'row', gap: 30 },
@@ -228,7 +229,7 @@ export function ContractPdf(d: ContractPdfInput) {
       </Page>
 
       <Page size="A4" style={s.page}>
-        <Text style={s.title}>{ansi('Liite 1. Maksusuunnitelma')}</Text>
+        <Text style={s.annex}>{ansi('Liite 1. Maksusuunnitelma')}</Text>
         <Text style={s.meta}>{ansi(`Osamaksusopimus nro ${d.number} · ${d.vehicle.make} ${d.vehicle.plate}`)}</Text>
         <View style={{ marginTop: 10 }}>
           <View style={s.tRow}>
@@ -259,7 +260,7 @@ export function ContractPdf(d: ContractPdfInput) {
           {ansi('Maksuerät eivät sisällä arvonlisäveroa. Korko lasketaan maksusuunnitelman mukaisilla maksuilla; ennenaikainen maksu pienentää korkoa (kohta 4.6).')}
         </Text>
 
-        <Text style={[s.title, { marginTop: 22 }]}>{ansi('Liite 2. Luovutustarkastuspöytäkirja')}</Text>
+        <Text style={[s.annex, { marginTop: 22 }]}>{ansi('Liite 2. Luovutustarkastuspöytäkirja')}</Text>
         <P>{`Ajoneuvo ${d.vehicle.make} ${d.vehicle.plate} luovutettiin ostajalle ____.____.________ klo ____:____ sen jälkeen, kun osamaksusopimus nro ${d.number} oli allekirjoitettu.`}</P>
         <P>Matkamittarilukema luovutushetkellä: ______________ km</P>
         <P>Havaitut viat ja vauriot: ________________________________________________________________</P>
