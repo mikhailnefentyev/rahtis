@@ -27,6 +27,11 @@ export type SiteInvoicePdfInput = {
   vat: string;
   total: string;
   note: string;
+  /** Подписи полей вместо «Työmaa» и «Ajanjakso» (счёт по рассрочке, 22.11.2026). */
+  jobLabel?: [fi: string, en: string];
+  periodLabel?: [fi: string, en: string];
+  /** Сумма к оплате сейчас, если она не равна итогу (первый счёт рассрочки: взнос + весь НДС). */
+  payNow?: { label: [fi: string, en: string]; amount: string };
 };
 
 /* Y-tunnus — только у финского номера; у компании другой страны общая подпись (номер хранится в своём виде). */
@@ -101,8 +106,8 @@ export function SiteInvoicePdf(input: SiteInvoicePdfInput) {
         </View>
 
         <View style={s.box}>
-          {field('Työmaa', 'Worksite', input.job)}
-          {field('Ajanjakso', 'Period', input.period)}
+          {field(...(input.jobLabel ?? ['Työmaa', 'Worksite']), input.job)}
+          {field(...(input.periodLabel ?? ['Ajanjakso', 'Period']), input.period)}
         </View>
 
         <View style={s.table}>
@@ -134,16 +139,22 @@ export function SiteInvoicePdf(input: SiteInvoicePdfInput) {
             <Text>{ansi(input.vat)}</Text>
           </View>
           <View style={s.totalRow}>
-            <Text style={s.bold}>{ansi('Maksettava yhteensä / Total due')}</Text>
-            <Text style={s.bold}>{ansi(input.total)}</Text>
+            <Text style={input.payNow ? undefined : s.bold}>{ansi(input.payNow ? 'Yhteensä / Total' : 'Maksettava yhteensä / Total due')}</Text>
+            <Text style={input.payNow ? undefined : s.bold}>{ansi(input.total)}</Text>
           </View>
+          {input.payNow ? (
+            <View style={s.totalRow}>
+              <Text style={s.bold}>{ansi(`${input.payNow.label[0]} / ${input.payNow.label[1]}`)}</Text>
+              <Text style={s.bold}>{ansi(input.payNow.amount)}</Text>
+            </View>
+          ) : null}
         </View>
 
         <View style={s.pay}>
           {field('Tilinumero (IBAN)', 'Bank account', iban)}
           {field('Viitenumero', 'Reference', input.reference)}
           {field('Eräpäivä', 'Due date', input.dueOn)}
-          {field('Maksettava', 'Amount due', input.total)}
+          {field('Maksettava', 'Amount due', input.payNow?.amount ?? input.total)}
         </View>
 
         <Text style={[s.small, { marginTop: 14 }]}>{ansi(input.note)}</Text>

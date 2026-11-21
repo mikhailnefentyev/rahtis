@@ -7,6 +7,7 @@ import { deleteDraftVehicleAction, submitVehicleAction } from '@/lib/fleet/actio
 import { EURO_LABEL } from '@/lib/fleet/labels';
 import { useI18n } from '@/lib/i18n/provider';
 import { TruckPhoto } from '@/components/domain/TruckPhoto';
+import { installmentUiCopy } from '@/lib/installments/copy';
 import type { Driver, Vehicle } from '@/types/db';
 import { VehicleForm } from './VehicleForm';
 
@@ -96,6 +97,12 @@ export function FleetView({
                     </a>
                     {/* Обслуживание: просрочено, скоро, дефекты — видно в списке парка, не открывая машину. */}
                     <ServiceLink href={`/${locale}/carrier/maintenance/${vehicle.id}`} summary={service[vehicle.id]} />
+                    {/* Продать машину в рассрочку проверенному перевозчику (22.11.2026). */}
+                    {vehicle.access === 'APPROVED' && (
+                      <a href={`/${locale}/carrier/installments/new?vehicle=${vehicle.id}`} className="text-[12px] text-accent hover:underline">
+                        {installmentUiCopy(locale).sell} ›
+                      </a>
+                    )}
                   </div>
 
                   {/*

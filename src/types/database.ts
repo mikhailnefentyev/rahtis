@@ -3130,6 +3130,150 @@ export type Database = {
         }
         Relationships: []
       }
+      equipment_listings: {
+        Row: {
+          annual_rate_bps: number
+          created_at: string
+          currency: string
+          description: string
+          down_payment_cents: number
+          final_cents: number | null
+          id: string
+          months: number
+          odometer_km: number | null
+          price_cents: number
+          published_at: string | null
+          seller_company_id: string
+          status: string
+          updated_at: string
+          vat_bps: number
+          vat_mode: string
+          vehicle_id: string
+        }
+        Insert: {
+          annual_rate_bps?: number
+          created_at?: string
+          currency?: string
+          description?: string
+          down_payment_cents?: number
+          final_cents?: number | null
+          id?: string
+          months: number
+          odometer_km?: number | null
+          price_cents: number
+          published_at?: string | null
+          seller_company_id: string
+          status?: string
+          updated_at?: string
+          vat_bps: number
+          vat_mode?: string
+          vehicle_id: string
+        }
+        Update: {
+          annual_rate_bps?: number
+          created_at?: string
+          currency?: string
+          description?: string
+          down_payment_cents?: number
+          final_cents?: number | null
+          id?: string
+          months?: number
+          odometer_km?: number | null
+          price_cents?: number
+          published_at?: string | null
+          seller_company_id?: string
+          status?: string
+          updated_at?: string
+          vat_bps?: number
+          vat_mode?: string
+          vehicle_id?: string
+        }
+        Relationships: []
+      }
+      installment_deals: {
+        Row: {
+          parties_snapshot: Json | null
+          vehicle_snapshot: Json
+          agreed_at: string | null
+          annual_rate_bps: number
+          buyer_company_id: string
+          cancelled_at: string | null
+          cancelled_by: string | null
+          contract_number: string | null
+          created_at: string
+          down_payment_cents: number
+          final_cents: number | null
+          first_due_date: string
+          first_invoice_id: string | null
+          handover_date: string
+          id: string
+          listing_id: string
+          months: number
+          price_cents: number
+          proposed_at: string
+          proposed_by: string
+          seller_company_id: string
+          status: string
+          vat_bps: number
+          vat_mode: string
+          version: number
+        }
+        Insert: {
+          parties_snapshot?: Json | null
+          vehicle_snapshot?: Json
+          agreed_at?: string | null
+          annual_rate_bps: number
+          buyer_company_id: string
+          cancelled_at?: string | null
+          cancelled_by?: string | null
+          contract_number?: string | null
+          created_at?: string
+          down_payment_cents: number
+          final_cents?: number | null
+          first_due_date: string
+          first_invoice_id?: string | null
+          handover_date: string
+          id?: string
+          listing_id: string
+          months: number
+          price_cents: number
+          proposed_at?: string
+          proposed_by: string
+          seller_company_id: string
+          status?: string
+          vat_bps: number
+          vat_mode: string
+          version?: number
+        }
+        Update: {
+          parties_snapshot?: Json | null
+          vehicle_snapshot?: Json
+          agreed_at?: string | null
+          annual_rate_bps?: number
+          buyer_company_id?: string
+          cancelled_at?: string | null
+          cancelled_by?: string | null
+          contract_number?: string | null
+          created_at?: string
+          down_payment_cents?: number
+          final_cents?: number | null
+          first_due_date?: string
+          first_invoice_id?: string | null
+          handover_date?: string
+          id?: string
+          listing_id?: string
+          months?: number
+          price_cents?: number
+          proposed_at?: string
+          proposed_by?: string
+          seller_company_id?: string
+          status?: string
+          vat_bps?: number
+          vat_mode?: string
+          version?: number
+        }
+        Relationships: []
+      }
       invoice_agreements: {
         Row: {
           carrier_company_id: string
@@ -9609,6 +9753,57 @@ export type Database = {
           proposed_schedule: string
           proposed_term_days: number
           schedule: string
+        }[]
+      }
+      save_equipment_listing: {
+        Args: { p_id: string | null; p_vehicle_id: string; p_price_cents: number; p_vat_mode: string; p_down_payment_cents: number; p_months: number; p_final_cents: number | null; p_annual_rate_bps: number; p_odometer_km: number | null; p_description: string }
+        Returns: string
+      }
+      set_equipment_listing_status: { Args: { p_id: string; p_status: string }; Returns: undefined }
+      equipment_catalog: {
+        Args: never
+        Returns: {
+          listing_id: string
+          seller_name: string
+          seller_city: string | null
+          make: string
+          vehicle_class: string
+          plate: string
+          euro_class: string
+          axles: number
+          odometer_km: number | null
+          price_cents: number
+          currency: string
+          vat_mode: string
+          vat_bps: number
+          down_payment_cents: number
+          months: number
+          final_cents: number | null
+          annual_rate_bps: number
+          description: string
+          published_at: string
+          my_deal_id: string | null
+        }[]
+      }
+      start_installment_deal: { Args: { p_listing_id: string; p_price_cents: number; p_down_payment_cents: number; p_months: number; p_final_cents: number | null; p_annual_rate_bps: number; p_handover_date: string; p_first_due_date: string }; Returns: string }
+      propose_installment_terms: { Args: { p_deal_id: string; p_price_cents: number; p_down_payment_cents: number; p_months: number; p_final_cents: number | null; p_annual_rate_bps: number; p_handover_date: string; p_first_due_date: string }; Returns: number }
+      accept_installment_terms: { Args: { p_deal_id: string; p_version: number }; Returns: string }
+      cancel_installment_deal: { Args: { p_deal_id: string }; Returns: boolean }
+      my_installment_deals: {
+        Args: never
+        Returns: {
+          deal_id: string
+          role: string
+          counterparty_name: string
+          make: string
+          vehicle_class: string
+          plate: string
+          status: string
+          price_cents: number
+          months: number
+          proposed_by_me: boolean
+          contract_number: string | null
+          proposed_at: string
         }[]
       }
       propose_invoice_terms: {

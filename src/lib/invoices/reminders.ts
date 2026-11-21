@@ -173,6 +173,8 @@ async function siteReminders(admin: Admin, today: string, result: InvoiceReminde
     .is('paid_at', null)
     .not('sent_at', 'is', null)
     .lt('due_on', today)
+    /* Первый счёт рассрочки: к оплате не итог, а взнос + НДС; его оплату ведёт сделка (ревью 22.11.2026). */
+    .neq('kind', 'INSTALLMENT')
     .order('due_on')
     .limit(500);
   if (error) {

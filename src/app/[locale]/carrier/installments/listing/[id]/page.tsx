@@ -1,0 +1,84 @@
+import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import { TruckPhoto } from '@/components/domain/TruckPhoto';
+import { Card, CardBody } from '@/components/ui';
+import { requireRole } from '@/lib/auth/guard';
+import { addMonths, type VatMode } from '@/lib/installments/calc';
+import { installmentUiCopy } from '@/lib/installments/copy';
+import { isLocale } from '@/lib/i18n';
+import { installmentCopy } from '@/lib/landing/installment';
+import { createClient } from '@/lib/supabase/server';
+import { todayInHelsinki } from '@/lib/dates';
+import { OfferForm } from '../../DealForms';
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  if (!isLocale(locale)) return {};
+  return { title: installmentUiCopy(locale).catalog.open };
+}
+
+const euros = (cents: number | null) => (cents == null ? '' : String(cents / 100));
+
+/**
+ * Машина из каталога и предложение покупателя. Объявление читается через
+ * каталог (equipment_catalog): его видят только проверенные перевозчики.
+ */
+export default async function ListingPage({ params }: { params: Promise<{ locale: string; id: string }> }) {
+  const { locale, id } = await params;
+  if (!isLocale(locale)) notFound();
+  await requireRole(locale, 'CARRIER');
+  const ui = installmentUiCopy(locale);
+  const supabase = await createClient();
+  const { data: catalog } = await supabase.rpc('equipment_catalog');
+  const l = (catalog ?? []).find((x) => x.listing_id === id);
+  if (!l) notFound();
+
+  /* Передача — через две недели, первый взнос — через месяц после неё: черновик, покупатель меняет. */
+  const today = todayInHelsinki();
+  const d = new Date(`${today}T12:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + 14);
+  const handover = d.toISOString().slice(0, 10);
+
+  return (
+    <div className="flex flex-col gap-4">
+      <h1 className="text-2xl font-semibold tracking-tight">{l.make}</h1>
+      <Card>
+        <CardBody className="grid gap-5 md:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
+          <TruckPhoto make={l.make} vehicleClass={l.vehicle_class} plate={l.plate} sizes="(min-width: 768px) 420px, 100vw" />
+          <div className="text-[14px]">
+            <p>
+              {ui.catalog.seller}: <span className="font-semibold">{l.seller_name}</span>
+              {l.seller_city ? ` · ${l.seller_city}` : ''}
+            </p>
+            <p className="mt-1 text-ink-muted">
+              {[l.plate, l.euro_class, l.odometer_km != null ? `${l.odometer_km.toLocaleString('fi-FI')} km` : null].filter(Boolean).join(' · ')}
+            </p>
+            {l.description && <p className="mt-3 whitespace-pre-line">{l.description}</p>}
+          </div>
+        </CardBody>
+      </Card>
+      <Card>
+        <CardBody>
+          <h2 className="mb-4 text-[17px] font-semibold">{ui.deal.terms}</h2>
+          <OfferForm
+            locale={locale}
+            ui={ui}
+            calc={installmentCopy(locale)}
+            listingId={l.listing_id}
+            defaults={{
+              price: euros(l.price_cents),
+              vatMode: l.vat_mode as VatMode,
+              vatBps: l.vat_bps,
+              down: euros(l.down_payment_cents),
+              months: String(l.months),
+              final: euros(l.final_cents),
+              rate: String(l.annual_rate_bps / 100),
+              handover,
+              firstDue: addMonths(handover, 1),
+            }}
+          />
+        </CardBody>
+      </Card>
+    </div>
+  );
+}

@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { installmentUiCopy } from '@/lib/installments/copy';
 import { Registered } from '@/components/layout/Registered';
 import Link from 'next/link';
 import { LegalReaccept } from '@/components/layout/LegalReaccept';
@@ -180,6 +181,8 @@ function navigation(
             { href: `/${locale}/carrier/maintenance`, label: t.maintenance.nav, icon: 'maintenance' },
             { href: `/${locale}/carrier/fuel`, label: t.fuel.nav, icon: 'fuel' },
             { href: `/${locale}/carrier/economics`, label: t.economics.nav, icon: 'economics' },
+            /* Продажа и покупка техники в рассрочку (22.11.2026). */
+            { href: `/${locale}/carrier/installments`, label: installmentUiCopy(locale).nav, icon: 'billing' },
             { href: `/${locale}/carrier/gps`, label: t.gps.nav, icon: 'gps' },
             { href: `/${locale}/carrier/parts`, label: t.parts.nav, icon: 'parts' },
             { href: `/${locale}/carrier/partners`, label: t.partners.title, icon: 'clients' },
