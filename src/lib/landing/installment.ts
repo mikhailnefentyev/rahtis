@@ -1,4 +1,12 @@
-import type { Locale } from '@/lib/i18n/config';
+import { locales, type Locale } from '@/lib/i18n/config';
+import { calc as sv } from './installmentI18n/sv';
+import { calc as et } from './installmentI18n/et';
+import { calc as lv } from './installmentI18n/lv';
+import { calc as lt } from './installmentI18n/lt';
+import { calc as pl } from './installmentI18n/pl';
+import { calc as de } from './installmentI18n/de';
+import { calc as ru } from './installmentI18n/ru';
+import { calc as ro } from './installmentI18n/ro';
 
 /**
  * Открытая страница «Kuorma-auton osamaksukauppa» с калькулятором
@@ -11,7 +19,8 @@ import type { Locale } from '@/lib/i18n/config';
  * Методика и источники: docs/equipment-sale/laskentamalli.md.
  */
 
-export const INSTALLMENT_TEXT_LOCALES = ['fi', 'en'] as const satisfies readonly Locale[];
+/* С 21.11.2026 текст переведён на все языки сайта. */
+export const INSTALLMENT_TEXT_LOCALES = locales;
 
 export function installmentPath(locale: Locale): string {
   return locale === 'fi' ? '/kuorma-auto-osamaksulla' : '/truck-installment-sale';
@@ -341,7 +350,8 @@ const en: InstallmentCopy = {
   finalText: 'RAHTIS is a transport management system and freight exchange. Fleet, maintenance, drivers, fuel and truck profitability in one place.',
 };
 
-/** Финский и английский текст; остальные языки — английский. */
+const BY_LOCALE: Record<Locale, InstallmentCopy> = { fi, en, sv, et, lv, lt, pl, de, ru, ro };
+
 export function installmentCopy(locale: Locale): InstallmentCopy {
-  return locale === 'fi' ? fi : en;
+  return BY_LOCALE[locale] ?? en;
 }

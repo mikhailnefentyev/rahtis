@@ -51,7 +51,7 @@ export default async function ListingPage({ params }: { params: Promise<{ locale
               {l.seller_city ? ` · ${l.seller_city}` : ''}
             </p>
             <p className="mt-1 text-ink-muted">
-              {[l.plate, l.euro_class, l.odometer_km != null ? `${l.odometer_km.toLocaleString('fi-FI')} km` : null].filter(Boolean).join(' · ')}
+              {[l.plate, l.euro_class, l.odometer_km != null ? `${l.odometer_km.toLocaleString(locale === 'en' ? 'en-GB' : locale)} km` : null].filter(Boolean).join(' · ')}
             </p>
             {l.description && <p className="mt-3 whitespace-pre-line">{l.description}</p>}
           </div>

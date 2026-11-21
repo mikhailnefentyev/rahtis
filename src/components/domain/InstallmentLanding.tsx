@@ -20,7 +20,7 @@ export function InstallmentLanding({ locale }: { locale: string }) {
   if (!isLocale(locale)) notFound();
   const c = installmentCopy(locale);
   const url = `${SITE_URL}${installmentPath(locale)}`;
-  const lang = locale === 'fi' ? 'fi' : 'en';
+  const lang = locale;
 
   const ld = [
     {

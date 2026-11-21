@@ -1,8 +1,17 @@
 import type { Locale } from '@/lib/i18n/config';
+import { ui as sv } from './i18n/sv';
+import { ui as et } from './i18n/et';
+import { ui as lv } from './i18n/lv';
+import { ui as lt } from './i18n/lt';
+import { ui as pl } from './i18n/pl';
+import { ui as de } from './i18n/de';
+import { ui as ru } from './i18n/ru';
+import { ui as ro } from './i18n/ro';
 
 /**
  * Тексты раздела «Продажа техники в рассрочку» в кабинете (22.11.2026).
- * Пока только Финляндия: финский и английский, остальные языки — английский.
+ * Сделка — только между финскими компаниями, но интерфейс на всех языках
+ * кабинета (21.11.2026: русскоязычный перевозчик видел английский).
  * Договор всегда на финском — по финскому закону о рассрочке.
  */
 export type InstallmentUiCopy = typeof fi;
@@ -319,8 +328,10 @@ const en: InstallmentUiCopy = {
   },
 };
 
+const BY_LOCALE: Record<Locale, InstallmentUiCopy> = { fi, en, sv, et, lv, lt, pl, de, ru, ro };
+
 export function installmentUiCopy(locale: Locale | string): InstallmentUiCopy {
-  return locale === 'fi' ? fi : en;
+  return BY_LOCALE[locale as Locale] ?? en;
 }
 
 export const fill = (text: string, values: Record<string, string>) =>

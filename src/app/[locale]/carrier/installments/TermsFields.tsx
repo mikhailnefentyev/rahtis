@@ -49,7 +49,7 @@ export function TermsFields({
   const [firstDue, setFirstDue] = useState(defaults.firstDue ?? '');
 
   const money = useMemo(
-    () => new Intl.NumberFormat(locale === 'fi' ? 'fi-FI' : 'en-GB', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }),
+    () => new Intl.NumberFormat(locale === 'en' ? 'en-GB' : locale, { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }),
     [locale],
   );
   const eur = (cents: number) => money.format(cents / 100);

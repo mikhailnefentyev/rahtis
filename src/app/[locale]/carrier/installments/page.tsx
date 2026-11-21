@@ -58,7 +58,7 @@ export default async function InstallmentsPage({
     : { data: [] as { id: string; make: string; plate: string; vehicle_class: string }[] };
   const vehicleById = new Map((vehicles ?? []).map((v) => [v.id, v]));
 
-  const money = new Intl.NumberFormat(locale === 'fi' ? 'fi-FI' : 'en-GB', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
+  const money = new Intl.NumberFormat(locale === 'en' ? 'en-GB' : locale, { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
   const eur = (cents: number) => money.format(cents / 100);
   const tabs: { key: Tab; label: string; count?: number }[] = [
     { key: 'mine', label: ui.tabs.mine, count: listings?.length },
@@ -191,7 +191,7 @@ export default async function InstallmentsPage({
                     <p className="text-[13px] text-ink-muted">
                       {ui.catalog.seller}: {l.seller_name}
                       {l.seller_city ? ` · ${l.seller_city}` : ''}
-                      {l.odometer_km != null ? ` · ${l.odometer_km.toLocaleString('fi-FI')} km` : ''}
+                      {l.odometer_km != null ? ` · ${l.odometer_km.toLocaleString(locale === 'en' ? 'en-GB' : locale)} km` : ''}
                     </p>
                     <p className="mt-2 font-mono text-[15px] font-bold">{eur(l.price_cents)}</p>
                     <p className="font-mono text-[13px] text-ink-muted">

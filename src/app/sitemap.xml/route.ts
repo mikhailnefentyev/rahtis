@@ -34,7 +34,7 @@ const PAGES: { fi: string; en: string; priority: number; updated: string; docs?:
   { fi: '/huolitsijoille', en: '/forwarders', priority: 0.8, updated: '2026-11-11' },
   { fi: '/peravaunun-vaihto', en: '/trailer-swap', priority: 0.8, updated: '2026-11-11' },
   /* Калькулятор рассрочки техники: текст только fi и en (21.11.2026). */
-  { fi: '/kuorma-auto-osamaksulla', en: '/truck-installment-sale', priority: 0.7, updated: '2026-11-21', docs: true },
+  { fi: '/kuorma-auto-osamaksulla', en: '/truck-installment-sale', priority: 0.7, updated: '2026-11-21' },
   { fi: '/kayttoehdot', en: '/terms', priority: 0.3, updated: '2026-10-01', docs: true },
   { fi: '/tietosuoja', en: '/privacy', priority: 0.3, updated: '2026-10-08', docs: true },
   { fi: '/api-docs', en: '/api-docs', priority: 0.4, updated: '2026-09-29', docs: true },

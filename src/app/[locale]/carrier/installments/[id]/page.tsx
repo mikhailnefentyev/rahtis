@@ -64,7 +64,7 @@ export default async function DealPage({ params }: { params: Promise<{ locale: s
     handoverDate: deal.handover_date,
     firstDueDate: deal.first_due_date,
   });
-  const money = new Intl.NumberFormat(locale === 'fi' ? 'fi-FI' : 'en-GB', { style: 'currency', currency: 'EUR', minimumFractionDigits: 0, maximumFractionDigits: 2 });
+  const money = new Intl.NumberFormat(locale === 'en' ? 'en-GB' : locale, { style: 'currency', currency: 'EUR', minimumFractionDigits: 0, maximumFractionDigits: 2 });
   /* Целые суммы без копеек, дробные — с копейками (19 000 / 24 = 791,67 €). */
   const eur = (cents: number) => money.format(cents / 100);
   const limits = 'error' in schedule ? null : thresholds(schedule);
@@ -75,7 +75,7 @@ export default async function DealPage({ params }: { params: Promise<{ locale: s
     [ui.listing.down, eur(deal.down_payment_cents)],
     [ui.listing.months, String(deal.months)],
     [ui.listing.final, deal.final_cents != null ? eur(deal.final_cents) : '—'],
-    [ui.listing.rate, `${(deal.annual_rate_bps / 100).toLocaleString(locale === 'fi' ? 'fi-FI' : 'en-GB')} %`],
+    [ui.listing.rate, `${(deal.annual_rate_bps / 100).toLocaleString(locale === 'en' ? 'en-GB' : locale)} %`],
     [ui.deal.handover, fiDate(deal.handover_date)],
     [ui.deal.firstDue, fiDate(deal.first_due_date)],
   ];
@@ -376,7 +376,7 @@ export default async function DealPage({ params }: { params: Promise<{ locale: s
               {vs?.vehicle_access === 'DRAFT' || vs?.vehicle_access === 'PENDING' ? <p className="mt-1 text-warn">{ui.stage3.vehicleDraft}</p> : null}
               <dl className="mt-3 grid gap-1.5 sm:grid-cols-2">
                 {[
-                  [ui.stage3.vehicleOdometer, (vs?.odometer_km ?? deal.handover_odometer_km) != null ? `${(vs?.odometer_km ?? deal.handover_odometer_km)!.toLocaleString('fi-FI')} km` : ui.stage3.none],
+                  [ui.stage3.vehicleOdometer, (vs?.odometer_km ?? deal.handover_odometer_km) != null ? `${(vs?.odometer_km ?? deal.handover_odometer_km)!.toLocaleString(locale === 'en' ? 'en-GB' : locale)} km` : ui.stage3.none],
                   [ui.stage3.vehicleDefects, vs ? `${vs.open_defects}${vs.unsafe_defects ? ` (${ui.stage3.vehicleUnsafe} ${vs.unsafe_defects})` : ''}` : ui.stage3.none],
                   [ui.stage3.vehicleMaintenance, vs ? `${vs.maintenance_overdue} / ${vs.maintenance_soon}` : ui.stage3.none],
                   [ui.stage3.vehicleInspection, vs?.last_inspection_at ? dateOf(vs.last_inspection_at) : ui.stage3.none],

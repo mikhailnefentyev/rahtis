@@ -45,7 +45,7 @@ function firstOfNextMonth(): string {
 export function InstallmentCalculator({ copy, locale }: { copy: InstallmentCopy; locale: string }) {
   const c = copy;
   const money = useMemo(
-    () => new Intl.NumberFormat(locale === 'fi' ? 'fi-FI' : 'en-GB', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }),
+    () => new Intl.NumberFormat(locale === 'en' ? 'en-GB' : locale, { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }),
     [locale],
   );
   const eur = (cents: number) => money.format(cents / 100);
