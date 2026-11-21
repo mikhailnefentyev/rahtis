@@ -11,7 +11,7 @@ const fi = {
   nav: 'Kalusto osamaksulla',
   title: 'Kaluston osamaksukauppa',
   intro:
-    'Myy oma auto osamaksulla tarkastetulle kuljetusliikkeelle tai osta auto osamaksulla. Sopimus tehdään osamaksukauppalain mukaan, ja myyjä laskuttaa itse. RAHTIS ei ole kaupan osapuoli eikä välitä maksuja.',
+    'Myy oma auto osamaksulla tarkastetulle kuljetusliikkeelle tai osta auto osamaksulla. RAHTIS laatii osamaksukauppalain mukaisen sopimuksen, maksusuunnitelman ja laskut myyjän nimissä; ostaja maksaa suoraan myyjän tilille.',
   tabs: { mine: 'Omat myynnit', deals: 'Neuvottelut ja kaupat', catalog: 'Myynnissä' },
   calculatorLink: 'Laskuri',
   notAllowed: 'Osamaksukaupan voi tehdä yrityksen pääkäyttäjä, kun yrityksellä on voimassa oleva rekisteriote ja vakuutus.',
@@ -165,12 +165,12 @@ const fi = {
 
 const en: InstallmentUiCopy = {
   nav: 'Equipment instalments',
-  title: 'Equipment installment sales',
+  title: 'Equipment instalment sales',
   intro:
-    'Sell your own truck in instalments to a verified haulier, or buy one in instalments. The contract follows the Finnish Hire-Purchase Act and the seller invoices directly. RAHTIS is not a party to the sale and does not handle payments.',
+    'Sell your own truck in instalments to a verified haulier, or buy one in instalments. RAHTIS prepares the contract under the Finnish Hire-Purchase Act, the payment plan and the invoices in the seller’s name; the buyer pays straight to the seller’s account.',
   tabs: { mine: 'My sales', deals: 'Negotiations and deals', catalog: 'For sale' },
   calculatorLink: 'Calculator',
-  notAllowed: 'Installment sales are made by the company owner when the company has a valid register extract and insurance.',
+  notAllowed: 'Instalment sales are made by the company owner when the company has a valid register extract and insurance.',
   sell: 'Sell in instalments',
   emptyMine: 'No listings. Pick a truck in your fleet and press “Sell in instalments”.',
   emptyCatalog: 'No trucks for sale right now.',

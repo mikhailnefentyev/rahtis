@@ -198,8 +198,8 @@ export function AgentChatLive({
         method: 'DELETE',
       });
       if (!response.ok) {
-        const data = (await response.json().catch(() => null)) as { detail?: string } | null;
-        setError(data?.detail ?? t.chat.failed);
+        /* 409 — помощник ещё отвечает: переписку можно очистить после ответа. */
+        setError(response.status === 409 ? t.chat.thinking : t.chat.failed);
         return;
       }
       setMessages([]);

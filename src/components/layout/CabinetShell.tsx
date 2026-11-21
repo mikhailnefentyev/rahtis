@@ -46,7 +46,7 @@ export async function CabinetShell({
   ]);
 
   const home = cabinetPath(locale, role);
-  const { groups, primary } = navigation(locale, role, home, t, pending);
+  const { groups, primary } = navigation(locale, role, home, t, pending, company?.country === 'FI');
   const count = typeof unread === 'number' ? unread : 0;
 
   const signOut = (
@@ -153,6 +153,7 @@ function navigation(
   home: string,
   t: Dictionary,
   actions = 0,
+  finnish = false,
 ): { groups: NavGroup[]; primary: NavItem[] } {
   const overview: NavItem = { href: home, label: t.nav.overview, short: t.nav.overviewShort, icon: 'home', count: actions };
 
@@ -181,8 +182,8 @@ function navigation(
             { href: `/${locale}/carrier/maintenance`, label: t.maintenance.nav, icon: 'maintenance' },
             { href: `/${locale}/carrier/fuel`, label: t.fuel.nav, icon: 'fuel' },
             { href: `/${locale}/carrier/economics`, label: t.economics.nav, icon: 'economics' },
-            /* Продажа и покупка техники в рассрочку (22.11.2026). */
-            { href: `/${locale}/carrier/installments`, label: installmentUiCopy(locale).nav, icon: 'billing' },
+            /* Рассрочка техники (22.11.2026) — по финскому закону и только между финскими компаниями: другим пункт не нужен. */
+            ...(finnish ? [{ href: `/${locale}/carrier/installments`, label: installmentUiCopy(locale).nav, icon: 'billing' as const }] : []),
             { href: `/${locale}/carrier/gps`, label: t.gps.nav, icon: 'gps' },
             { href: `/${locale}/carrier/parts`, label: t.parts.nav, icon: 'parts' },
             { href: `/${locale}/carrier/partners`, label: t.partners.title, icon: 'clients' },

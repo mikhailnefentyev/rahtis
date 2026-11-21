@@ -33,6 +33,13 @@ export type Article = ArticleSummary & {
   jsonLd: Record<string, unknown> | null;
 };
 
+/**
+ * Статьи HeyCatch, которые сайт не показывает (21.11.2026, решение владельца):
+ * американская биржа DAT — не тема для перевозчиков Северных стран и Балтии.
+ * Пропадают из списков, sitemap и по прямой ссылке (404).
+ */
+const HIDDEN = new Set(['dat-load-board-pricing', 'dat-load-board-for-box-trucks-setup-guide']);
+
 function key(): string | null {
   return process.env.HEYCATCH_API_KEY?.trim() || null;
 }
@@ -62,8 +69,8 @@ export async function listArticles(): Promise<ArticleSummary[]> {
       offset: String(offset),
     });
     if (!data) break;
-    all.push(...data.articles);
-    if (all.length >= data.total || data.articles.length === 0) break;
+    all.push(...data.articles.filter((a) => !HIDDEN.has(a.slug)));
+    if (offset + data.articles.length >= data.total || data.articles.length === 0) break;
   }
   return all;
 }
@@ -76,6 +83,7 @@ export async function hasArticles(): Promise<boolean> {
 
 /** Одна статья; null — нет такой (или API недоступен). */
 export async function getArticle(slug: string): Promise<Article | null> {
+  if (HIDDEN.has(slug)) return null;
   const { data } = await get<{ article: Article }>(`/articles/${encodeURIComponent(slug)}`);
   return data?.article ?? null;
 }
@@ -90,7 +98,7 @@ export async function getArticle(slug: string): Promise<Article | null> {
  * и на www. Ссылки на мусорные «источники» (снимки чужих форумов) снимаем,
  * текст остаётся.
  */
-const SITE_LOCALES = 'fi|en|sv|et|lv|lt|pl|de|ru';
+const SITE_LOCALES = 'fi|en|sv|et|lv|lt|pl|de|ru|ro';
 const JUNK_LINKS = /sentinel-team\.org/i;
 
 export function cleanArticleHtml(html: string, lang = 'fi'): string {

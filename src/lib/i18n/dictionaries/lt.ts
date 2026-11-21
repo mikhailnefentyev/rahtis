@@ -1009,7 +1009,7 @@ export const lt = {
   cabinet: {
     company: 'Įmonė',
     status: 'Būsena',
-    businessId: 'Įmonės kodas',
+    businessId: 'Įmonės kodas (Y-tunnus)',
     yourRole: 'Jūsų vaidmuo',
     approvedCarrierHint:
       'Įmonė patvirtinta. Įkelkite transporto licenciją ir draudimą, pridėkite transporto priemones – ir pamatysite laisvus pervežimus. Kiekvieną transporto priemonę tvirtiname atskirai.',
@@ -2167,9 +2167,9 @@ export const lt = {
     },
     registryNone: 'Netikrinta',
     registryName: 'Pavadinimas registre',
-    registryPrepayment: 'Išankstinis mokesčių mokėjimas (ennakkoperintä)',
-    registryVat: 'PVM',
-    registryEmployer: 'Darbdavys',
+    registryPrepayment: 'Išankstinio mokesčio registras',
+    registryVat: 'PVM registras',
+    registryEmployer: 'Darbdavių registras',
     registryYes: 'taip',
     registryNo: 'ne',
     registryRecheck: 'Tikrinti dar kartą',
@@ -2391,7 +2391,7 @@ export const lt = {
     payTo: 'Mokėti į sąskaitą',
     reference: 'įmokos kodas',
     pdf: 'Atidaryti PDF',
-    payNote: 'Mokėkite tiesiogiai vežėjui į sąskaitoje nurodytą sąskaitą su įmokos kodu. RAHTIS ir Aivomaa Oy mokėjimų nepriima. Sąskaita pažymima apmokėta, kai vežėjas užregistruoja mokėjimą.',
+    payNote: 'Mokėkite tiesiogiai vežėjui į sąskaitoje nurodytą sąskaitą su įmokos kodu. Mokėjimai neina per RAHTIS. Sąskaita pažymima apmokėta, kai vežėjas užregistruoja mokėjimą.',
   },
 
   invite: {
@@ -3165,7 +3165,7 @@ export const lt = {
 
   company: {
     name: 'Įmonės pavadinimas',
-    businessId: 'Įmonės kodas',
+    businessId: 'Įmonės kodas (Y-tunnus)',
     email: 'El. paštas',
     emailHint: 'Čia atsiųsime prisijungimo duomenis',
     country: 'Šalis',
@@ -4073,7 +4073,7 @@ export const lt = {
     allowanceNone: 'Be dienpinigių',
     allowanceShort: 'dienpinigiai',
     noAllowances: 'Savų dienpinigių rinkinių dar neturite. Nusikopijuokite šabloną:',
-    warnOutput: 'ES vairuotojui negalima mokėti daugiausia pagal nuvažiuotą atstumą ar vežamų krovinių kiekį (Reglamentas (EB) Nr. 561/2006, 10 straipsnis). Mokėjimą už km ar procentą naudokite kaip premiją prie valandinio ar mėnesinio atlyginimo.',
+    warnOutput: 'ES vairuotojui negalima mokėti atlyginimo ar premijų, susijusių su nuvažiuotu atstumu ar vežamų krovinių kiekiu, jeigu toks atlyginimas kelia pavojų eismo saugumui arba skatina pažeisti vairavimo ir poilsio laiko taisykles (Reglamentas (EB) Nr. 561/2006, 10 straipsnis). Saugiausia mokėjimą už km ar procentą naudoti kaip premiją prie valandinio ar mėnesinio atlyginimo.',
     warnLegality: {
       GREY: 'Pasirinktas taisyklių rinkinys rizikingas: naudokite jį tik tada, kai visas atlyginimas eina per darbo užmokesčio žiniaraštį (mokesčiai ir įmokos).',
       NON_COMPLIANT: 'Pasirinktas taisyklių rinkinys neatitinka įstatymų. Skaičiavimas – tik informacijai.',
@@ -5173,7 +5173,7 @@ export const lt = {
     contents: 'Turinys',
     priceTitle: 'Kiek kainuoja paslauga',
     priceShippers: 'Užsakovai ir ekspeditoriai RAHTIS naudojasi nemokamai: krovinių skelbimas, tiesioginiai užsakymai, sekimas, dokumentai ir mokėjimų priminimai.',
-    priceCarriers: 'Vežėjai moka prenumeratą. Pirma aktyvi transporto priemonė nemokama; kiekviena kita aktyvi transporto priemonė kainuoja 14,90 € per mėnesį be PVM. Transporto priemonė mėnesį laikoma aktyvia, jei per tą kalendorinį mėnesį atliko bent vieną pervežimą. Sumokėjus už metus į priekį – 10 % nuolaida. Didesniam nei 100 transporto priemonių parkui kaina sutariama atskirai. Pirmas mėnuo nemokamas.',
+    priceCarriers: 'Vežėjai moka prenumeratą. Pirma aktyvi transporto priemonė nemokama; kiekviena kita aktyvi transporto priemonė kainuoja 14,90 € per mėnesį be PVM. Transporto priemonė mėnesį laikoma aktyvia, jei per tą kalendorinį mėnesį atliko bent vieną pervežimą. Sumokėjus už metus į priekį – 10 % nuolaida. Ne mažiau kaip 100 transporto priemonių parkui kaina sutariama atskirai. Pirmas mėnuo nemokamas.',
     priceFormer: 'Vežėjai, dirbę pagal ankstesnį subrangos modelį, 2026 m. lapkričio 6 d. perkelti į prenumeratą. Jiems prenumeratos mokestis skaičiuojamas nuo 2027 m. sausio 1 d.',
     priceNoCommission: 'RAHTIS neima komisinių nuo frachto ir neima mokesčio už užsakymą iš nė vienos šalies.',
     partyTitle: 'RAHTIS nėra jūsų vežimo sutarties šalis',
@@ -5662,7 +5662,7 @@ export const lt = {
     'dayPay.warn.EE_LATER_RATE': 'Estija: už {days, plural, one {# dieną} few {# dienas} other {# dienų}} taikoma mažesnė norma (40 €), nes 75 € limitas (pirmos 15 kelionės dienų, ne daugiau kaip 15 per mėnesį) išnaudotas.',
     'dayPay.warn.LV_CAP': 'Latvija, {month}: dienpinigiai viršija 70 % (darbo užmokestis + dienpinigiai) — {amount} apmokestinama.',
     'dayPay.warn.LT_TAXABLE': '{month}: sutartinis darbo užmokestis mažesnis nei 1,65 MMA, todėl neapmokestinami dienpinigiai — ne daugiau kaip 50 % darbo užmokesčio; {amount} apmokestinama.',
-    'dayPay.warn.OUTPUT_PAY': 'Darbo užmokestis tik už kilometrus arba kaip frachto procentas ES draudžiamas (Reglamentas 561/2006, 10 str.). Taikykite valandinį ar mėnesinį atlygį, o kilometrus — kaip premiją.',
+    'dayPay.warn.OUTPUT_PAY': 'Darbo užmokestis tik už kilometrus arba kaip frachto procentas ES yra rizika: Reglamentas 561/2006 (10 str.) jį draudžia, jeigu jis kelia pavojų eismo saugumui arba skatina pažeisti vairavimo ir poilsio laiką. Taikykite valandinį ar mėnesinį atlygį, o kilometrus — kaip premiją.',
     'dayPay.warn.BELOW_MINIMUM': '{month}: orientacinis darbo užmokestis {wage} mažesnis už šalies MMA {min} (dienpinigiai į MMA neįskaičiuojami).',
     'dayPay.warn.LEGALITY_GREY': 'Rinkinys {set} rizikingas: tinka tik tada, jei viskas mokama per darbo užmokesčio žiniaraštį.',
     'dayPay.warn.LEGALITY_NON_COMPLIANT': 'Rinkinys {set} neatitinka įstatymų — tik informacijai.',

@@ -191,7 +191,8 @@ export async function DELETE(request: Request) {
   if (error) {
     /* 55000 — помощник ещё отвечает: это не сбой, а «позже». */
     const status = error.code === '55000' ? 409 : error.code === '42501' ? 403 : 400;
-    return Response.json({ error: error.code ?? 'failed', detail: error.message }, { status });
+    /* Текст исключения базы — по-русски для разработчика; пользователю он не уходит, экран переводит по коду. */
+    return Response.json({ error: error.code ?? 'failed' }, { status });
   }
 
   return Response.json({ ok: true });

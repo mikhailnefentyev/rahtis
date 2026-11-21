@@ -109,7 +109,7 @@ export function FleetView({
                     {/* Обслуживание: просрочено, скоро, дефекты — видно в списке парка, не открывая машину. */}
                     <ServiceLink href={`/${locale}/carrier/maintenance/${vehicle.id}`} summary={service[vehicle.id]} />
                     {/* Продать машину в рассрочку проверенному перевозчику (22.11.2026). */}
-                    {vehicle.access === 'APPROVED' && (!vehicle.installment_role || vehicle.installment_role === 'OWNED') && (
+                    {country === 'FI' && vehicle.access === 'APPROVED' && (!vehicle.installment_role || vehicle.installment_role === 'OWNED') && (
                       <a href={`/${locale}/carrier/installments/new?vehicle=${vehicle.id}`} className="text-[12px] text-accent hover:underline">
                         {installmentUiCopy(locale).sell} ›
                       </a>

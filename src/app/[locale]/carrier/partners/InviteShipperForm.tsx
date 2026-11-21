@@ -54,11 +54,12 @@ export function InviteShipperForm({ homeCountry = 'FI' }: { homeCountry?: string
           {(p) => <InputMono {...p} name="business_id" required placeholder={pack.businessId.example} />}
         </Field>
         <Field label={t.partners.inviteEmail} required>
-          {(p) => <Input {...p} name="email" type="email" required placeholder="ops@asiakas.fi" />}
+          {(p) => <Input {...p} name="email" type="email" required placeholder={pack.sample.email} />}
         </Field>
         <Field label={t.partners.inviteLanguage}>
           {(p) => (
-            <Select {...p} name="language" defaultValue={locale}>
+            /* Письма — только fi/en: финскому клиенту по-фински, остальным по-английски (не язык интерфейса отправителя). */
+            <Select {...p} key={country} name="language" defaultValue={country === 'FI' ? 'fi' : 'en'}>
               <option value="fi">Suomi</option>
               <option value="en">English</option>
             </Select>
