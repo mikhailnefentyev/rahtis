@@ -67,7 +67,8 @@ export function InstallmentCalculator({ copy, locale }: { copy: InstallmentCopy;
 
   const result = useMemo(() => {
     const priceCents = eurosToCents(price);
-    const downCents = eurosToCents(down);
+    /* Пустой взнос — 0: закон минимума взноса между компаниями не ставит. */
+    const downCents = down.trim() ? eurosToCents(down) : 0;
     const finalCents = final.trim() ? eurosToCents(final) : null;
     const rateBps = percentToBps(rate);
     const input: DealInput = {
