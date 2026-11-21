@@ -35,10 +35,43 @@
   <body>
     <main>
       <img src="/icon.png" alt="" />
-      <h1>Ei yhteyttä</h1>
-      <p>Tarkista verkko ja yritä uudelleen.</p>
-      <p lang="en">No connection. Check the network and try again.</p>
-      <button type="button" onclick="location.reload()">Yritä uudelleen · Retry</button>
+      <h1 id="t">Ei yhteyttä</h1>
+      <p id="l">Tarkista verkko ja yritä uudelleen.</p>
+      <p id="en" lang="en">No connection. Check the network and try again.</p>
+      <button id="b" type="button" onclick="location.reload()">Yritä uudelleen · Retry</button>
     </main>
+    <script>
+      /* Язык телефона, как у приложения водителя (matchDriverLocale); без совпадения — финский с английской строкой. */
+      (function () {
+        var T = {
+          fi: ['Ei yhteyttä', 'Tarkista verkko ja yritä uudelleen.', 'Yritä uudelleen'],
+          en: ['No connection', 'Check the network and try again.', 'Try again'],
+          sv: ['Ingen anslutning', 'Kontrollera nätet och försök igen.', 'Försök igen'],
+          et: ['Ühendus puudub', 'Kontrolli võrku ja proovi uuesti.', 'Proovi uuesti'],
+          lv: ['Nav savienojuma', 'Pārbaudiet tīklu un mēģiniet vēlreiz.', 'Mēģināt vēlreiz'],
+          lt: ['Nėra ryšio', 'Patikrinkite tinklą ir bandykite dar kartą.', 'Bandyti dar kartą'],
+          pl: ['Brak połączenia', 'Sprawdź sieć i spróbuj ponownie.', 'Spróbuj ponownie'],
+          ru: ['Нет связи', 'Проверьте сеть и попробуйте ещё раз.', 'Повторить'],
+          nb: ['Ingen forbindelse', 'Sjekk nettet og prøv igjen.', 'Prøv igjen'],
+          da: ['Ingen forbindelse', 'Tjek netværket, og prøv igen.', 'Prøv igen'],
+          ro: ['Fără conexiune', 'Verificați rețeaua și încercați din nou.', 'Încercați din nou'],
+          de: ['Keine Verbindung', 'Prüfen Sie das Netz und versuchen Sie es erneut.', 'Erneut versuchen'],
+        };
+        var langs = navigator.languages || [navigator.language || ''];
+        for (var i = 0; i < langs.length; i++) {
+          var b = String(langs[i]).toLowerCase().split('-')[0];
+          if (b === 'no' || b === 'nn') b = 'nb';
+          if (T[b] && b !== 'fi') {
+            document.documentElement.lang = b;
+            document.getElementById('t').textContent = T[b][0];
+            document.getElementById('l').textContent = T[b][1];
+            document.getElementById('b').textContent = T[b][2];
+            document.getElementById('en').hidden = true;
+            return;
+          }
+          if (b === 'fi') return;
+        }
+      })();
+    </script>
   </body>
 </html>

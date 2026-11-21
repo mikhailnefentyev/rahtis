@@ -12,7 +12,7 @@
  * При выходе из приложения кэш стирается целиком (profile/SignOut) —
  * следующий на этом телефоне не увидит чужие задания.
  */
-const CACHE = 'rahtis-driver-v3';
+const CACHE = 'rahtis-driver-v4';
 const OFFLINE = '/driver-offline.html';
 const DRIVER_PAGE = /^\/[a-z]{2}\/driver(\/|$)/;
 

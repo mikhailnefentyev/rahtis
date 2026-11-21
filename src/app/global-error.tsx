@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useSyncExternalStore } from 'react';
+import { EMERGENCY_TEXT, emergencyLang } from '@/lib/i18n/emergency';
 import { reportRenderFailure } from '@/lib/incidents/action';
 import { errorClass, isStaleBundle, reloadOnce } from '@/lib/incidents/stale';
 
@@ -9,12 +10,16 @@ import { errorClass, isStaleBundle, reloadOnce } from '@/lib/incidents/stale';
  *
  * Этот файл заменяет собой всё дерево, включая <html> и провайдер языка.
  * Поэтому здесь нет ни словаря, ни компонентов кита, ни переменных темы —
- * ничего из того, что могло оказаться причиной падения. Текст по-фински
- * и вшит в разметку, стили заданы прямо на элементах.
+ * ничего из того, что могло оказаться причиной падения. Тексты на всех
+ * языках сайта вшиты сюда же (аудит 21.11.2026: был только финский), язык
+ * берётся из адреса после загрузки; стили заданы прямо на элементах.
  *
  * Выглядит это беднее остального сайта, и так и должно быть: страница
  * обязана нарисоваться, даже когда сломано всё остальное.
  */
+
+const noop = () => () => {};
+
 export default function GlobalError({
   error,
   reset,
@@ -22,6 +27,10 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  /* Язык из адреса; на сервере — финский, после гидратации — язык страницы. */
+  const lang = useSyncExternalStore(noop, emergencyLang, () => 'fi' as const);
+  const [title, lede, retry] = EMERGENCY_TEXT[lang];
+
   useEffect(() => {
     /* Старая сборка после выкладки: одна перезагрузка лечит, журнал не нужен. */
     if (isStaleBundle(error) && reloadOnce()) return;
@@ -29,7 +38,7 @@ export default function GlobalError({
   }, [error]);
 
   return (
-    <html lang="fi">
+    <html lang={lang}>
       <body
         style={{
           margin: 0,
@@ -56,10 +65,10 @@ export default function GlobalError({
             RAHTIS
           </p>
           <h1 style={{ margin: '10px 0 0', fontSize: 19, letterSpacing: '-0.01em' }}>
-            Palvelu ei juuri nyt vastaa
+            {title}
           </h1>
           <p style={{ margin: '10px 0 0', fontSize: 14, lineHeight: 1.55, color: '#44546b' }}>
-            Kuljetusten tiedot ovat tallessa. Yritä hetken kuluttua uudelleen.
+            {lede}
           </p>
 
           {error.digest && (
@@ -91,7 +100,7 @@ export default function GlobalError({
               cursor: 'pointer',
             }}
           >
-            Yritä uudelleen
+            {retry}
           </button>
         </div>
       </body>
