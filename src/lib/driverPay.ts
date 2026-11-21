@@ -275,6 +275,23 @@ function easter(year: number): string {
   return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 }
 
+/**
+ * Православная Пасха (Румыния): юлианская пасхалия (алгоритм Меёса) и
+ * перевод в григорианский календарь (+13 дней в 1900–2099).
+ * 2026 — 12 апреля, 2027 — 2 мая.
+ */
+function orthodoxEaster(year: number): string {
+  const a = year % 4;
+  const b = year % 7;
+  const c = year % 19;
+  const d = (19 * c + 15) % 30;
+  const e = (2 * a + 4 * b - d + 34) % 7;
+  const month = Math.floor((d + e + 114) / 31);
+  const day = ((d + e + 114) % 31) + 1;
+  const julian = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+  return addDays(julian, 13);
+}
+
 /** Первая суббота начиная с даты (Иванов день, День всех святых). */
 function saturdayFrom(year: number, month: number, from: number): string {
   const d = new Date(Date.UTC(year, month - 1, from));
@@ -335,7 +352,20 @@ const countryHolidayCache = new Map<string, Set<string>>();
  *   EE: Pühade ja tähtpäevade seadus § 2.
  *   LV: likums «Par svētku, atceres un atzīmējamām dienām» 1. p.
  *   LT: Darbo kodeksas 123 str.
- * Остальные страны — финский список (для FI) или пусто.
+ *   SE: lag (1989:253) om allmänna helgdagar 1 § (сверено с lagen.nu 21.11.2026).
+ *   NO: lov om helligdager og helligdagsfred (1995) § 2 + lov om 1. og 17. mai
+ *       som høgtidsdager (1947) § 1 (lovdata.no, 21.11.2026).
+ *   DK: folkekirkens helligdage; store bededag отменён с 2024 (lov nr. 214
+ *       af 06.03.2023, bek. nr. 270 af 07.03.2023). Grundlovsdag и juleaften
+ *       по закону не праздники — только по договорам.
+ *   DE: только дни, праздничные во всех землях (3.10 — Einigungsvertrag
+ *       Art. 2 Abs. 2; прочие — законы земель). Земельные (Fronleichnam,
+ *       Allerheiligen, Reformationstag…) не учтены.
+ *   RO: Codul muncii (Legea 53/2003) art. 139 alin. (1), с Legea 52/2023
+ *       (6 и 7 января); Пасха и Троица (Rusalii) — православные. Дни
+ *       нехристианских культов (последний пункт) — личные, не учтены.
+ * Воскресные праздники (Пасха, Троица) в списке — для надбавки за праздник.
+ * Прочие страны — пусто.
  */
 export function countryHolidays(country: string | null | undefined, year: number): Set<string> {
   const code = (country ?? 'FI').toUpperCase();
@@ -365,6 +395,29 @@ export function countryHolidays(country: string | null | undefined, year: number
         firstSunday(year, 6), `${y}-06-24`, `${y}-07-06`, `${y}-08-15`, `${y}-11-01`, `${y}-11-02`, `${y}-12-24`,
         `${y}-12-25`, `${y}-12-26`];
       break;
+    case 'SE':
+      days = [`${y}-01-01`, `${y}-01-06`, addDays(e, -2), e, addDays(e, 1), `${y}-05-01`, addDays(e, 39), addDays(e, 49),
+        `${y}-06-06`, saturdayFrom(year, 6, 20), saturdayFrom(year, 10, 31), `${y}-12-25`, `${y}-12-26`];
+      break;
+    case 'NO':
+      days = [`${y}-01-01`, addDays(e, -3), addDays(e, -2), e, addDays(e, 1), `${y}-05-01`, `${y}-05-17`, addDays(e, 39),
+        addDays(e, 49), addDays(e, 50), `${y}-12-25`, `${y}-12-26`];
+      break;
+    case 'DK':
+      days = [`${y}-01-01`, addDays(e, -3), addDays(e, -2), e, addDays(e, 1), ...(year < 2024 ? [addDays(e, 26)] : []),
+        addDays(e, 39), addDays(e, 49), addDays(e, 50), `${y}-12-25`, `${y}-12-26`];
+      break;
+    case 'DE':
+      days = [`${y}-01-01`, addDays(e, -2), addDays(e, 1), `${y}-05-01`, addDays(e, 39), addDays(e, 50), `${y}-10-03`,
+        `${y}-12-25`, `${y}-12-26`];
+      break;
+    case 'RO': {
+      const o = orthodoxEaster(year);
+      days = [`${y}-01-01`, `${y}-01-02`, ...(year >= 2024 ? [`${y}-01-06`, `${y}-01-07`] : []), `${y}-01-24`,
+        addDays(o, -2), o, addDays(o, 1), `${y}-05-01`, `${y}-06-01`, addDays(o, 49), addDays(o, 50), `${y}-08-15`,
+        `${y}-11-30`, `${y}-12-01`, `${y}-12-25`, `${y}-12-26`];
+      break;
+    }
     default:
       days = [];
   }

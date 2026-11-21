@@ -1,4 +1,5 @@
 import { WEBHOOK_EVENTS } from './events';
+import { CURRENCIES } from '@/lib/money/currency';
 
 /**
  * Описание API заказчиков в OpenAPI 3.1 — отдаётся по /api/v1/openapi.json.
@@ -547,7 +548,11 @@ export function openApi(serverUrl: string) {
           type: 'object',
           properties: {
             amount: { type: 'string', example: '300.00' },
-            currency: { const: 'EUR' },
+            currency: {
+              enum: [...CURRENCIES],
+              example: 'EUR',
+              description: 'Currency of the order rate: EUR, or the working currency of a direct order (SEK, NOK, DKK, PLN, RON).',
+            },
             vat_included: { const: false },
           },
         },

@@ -124,6 +124,8 @@ const NEIGHBOURS: Record<string, string[]> = {
   LT: ['LV', 'PL', 'EE'],
   PL: ['DE', 'CZ', 'SK', 'LT'],
   DE: ['PL', 'NL', 'DK', 'FR', 'AT', 'CZ'],
+  /* Румыния (аудит 21.11.2026, 2.19): рейсы в Венгрию, Болгарию, Молдову, Украину, Сербию. */
+  RO: ['HU', 'BG', 'MD', 'UA', 'RS'],
 };
 
 /** ЕС и ЕЭЗ. */
@@ -160,12 +162,20 @@ export const EU_EEA = [
   'LI',
 ];
 
-/** Выбор страны дня: страна компании, соседи, затем весь ЕС/ЕЭЗ (по коду; экран сортирует по названию). */
+/*
+ * Страны дня вне ЕС/ЕЭЗ (аудит 21.11.2026, 2.19): румынский водитель в
+ * рейсе в Молдову или Турцию должен отметить страну дня. В базе страна
+ * дня проверяется только по виду (driver_day_facts_country — две буквы),
+ * миграция не нужна.
+ */
+const BEYOND_EU_EEA = ['CH', 'GB', 'UA', 'MD', 'RS', 'TR', 'BA', 'MK', 'AL', 'ME'];
+
+/** Выбор страны дня: страна компании, соседи, затем ЕС/ЕЭЗ и соседние страны вне их (по коду; экран сортирует по названию). */
 export function countryChoices(home: string): {
   first: string[];
   rest: string[];
 } {
   const h = home.toUpperCase();
   const first = [h, ...(NEIGHBOURS[h] ?? [])].filter((c, i, a) => a.indexOf(c) === i);
-  return { first, rest: EU_EEA.filter((c) => !first.includes(c)) };
+  return { first, rest: [...EU_EEA, ...BEYOND_EU_EEA].filter((c) => !first.includes(c)) };
 }

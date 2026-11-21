@@ -61,6 +61,7 @@ export type FreightInvoiceStatus =
   | 'IBAN_RECENT'
   | 'NO_VAT_RATE'
   | 'NO_BUYER_VAT'
+  | 'NO_SELLER_VAT'
   | 'NO_CUSTOMER_EMAIL'
   | 'NOT_FOUND';
 
@@ -78,10 +79,11 @@ const fiDate = (iso: string) => {
 };
 
 /** Каждое утро: счета по парам, у которых по согласованной периодичности сегодня срок. */
-export async function runFreightInvoices(now: Date = new Date()): Promise<{ sent: number; skipped: number; errors: string[] }> {
+export async function runFreightInvoices(now: Date = new Date()): Promise<{ sent: number; skipped: number; reasons: Partial<Record<FreightInvoiceStatus, number>>; errors: string[] }> {
   const admin = createAdminClient();
   const today = todayInHelsinki(now);
-  const out = { sent: 0, skipped: 0, errors: [] as string[] };
+  /* reasons — почему пропущены (NO_BUYER_VAT, NO_SELLER_VAT…): видно в ответе планировщику. */
+  const out = { sent: 0, skipped: 0, reasons: {} as Partial<Record<FreightInvoiceStatus, number>>, errors: [] as string[] };
 
   const { data: rows, error } = await admin
     .from('orders')
@@ -137,7 +139,10 @@ export async function runFreightInvoices(now: Date = new Date()): Promise<{ sent
     try {
       const status = await createFreightInvoice(list, termDays);
       if (status === 'SENT' || status === 'CREATED') out.sent++;
-      else out.skipped++;
+      else {
+        out.skipped++;
+        out.reasons[status] = (out.reasons[status] ?? 0) + 1;
+      }
     } catch (cause) {
       out.errors.push(`${list[0].assigned_company_id}/${list[0].shipper_company_id}: ${cause instanceof Error ? cause.message : String(cause)}`);
     }
@@ -181,7 +186,7 @@ async function createFreightInvoice(orders: OrderRow[], termDays: number): Promi
    * немецкой и получала бы счета без налога (security review 17.11.2026).
    */
   const buyerCountry = buyer.country;
-  const vat = freightVat(seller.country, buyerCountry, buyer.vat_number, standardVatBps(seller.country));
+  const vat = freightVat(seller.country, buyerCountry, buyer.vat_number, standardVatBps(seller.country), seller.vat_number ?? null);
   if (!vat.ok) return vat.reason;
 
   const sendTo = (buyer.billing_email || buyer.contact_email || '').trim().toLowerCase();

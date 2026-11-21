@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { normalizeIntlPhone } from '@/lib/country';
 import { getDriverI18n } from '@/lib/driverApp/i18n';
 import { FLASH_COOKIE, flashError } from '@/lib/forms/flash';
 import { isLocale, type Locale, defaultLocale } from '@/lib/i18n';
@@ -72,10 +73,18 @@ export async function acceptCodeAction(_previous: CodeState, formData: FormData)
   const { t } = await getDriverI18n(locale);
 
   const admin = createAdminClient();
-  const { data, error } = await admin.rpc('driver_invite_lookup', {
-    p_phone: str(formData, 'phone').replace(/[\s()-]/g, ''),
-    p_code: str(formData, 'code').replace(/\s/g, ''),
-  });
+  const raw = str(formData, 'phone').replace(/[\s()-]/g, '');
+  const code = str(formData, 'code').replace(/\s/g, '');
+  /*
+   * Водитель дописывает к «+40» свой «0722…» (аудит 21.11.2026, 2.13):
+   * сначала номер без национального «0», затем — как введён (вдруг
+   * перевозчик сам записал номер с нулём).
+   */
+  const normalized = normalizeIntlPhone(raw);
+  let { data, error } = await admin.rpc('driver_invite_lookup', { p_phone: normalized, p_code: code });
+  if (!error && !data?.[0] && normalized !== raw) {
+    ({ data, error } = await admin.rpc('driver_invite_lookup', { p_phone: raw, p_code: code }));
+  }
 
   /* 54000 — пять попыток на номер за пятнадцать минут. */
   if (error?.code === '54000') return { error: t.driverApp.codeThrottled };

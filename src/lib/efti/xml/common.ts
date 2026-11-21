@@ -8,6 +8,7 @@
  */
 
 import { escapeAttr, escapeText, stripInvalidXmlChars } from './escape';
+import { COUNTRY_TZ } from '../../country/index';
 
 // ── Пространства имён ──────────────────────────────────────────────────
 
@@ -110,24 +111,11 @@ export function decimal(value: number, fraction = 3): string {
 
 // ── Даты (CL-020) ───────────────────────────────────────────────────────
 
-/**
+/*
  * Часовой пояс страны. eFTI требует даты «в часовом поясе места» (погрузки,
- * принятия, доставки), а RAHTIS хранит моменты в UTC. Для стран с
- * несколькими поясами берём основной (материковый).
+ * принятия, доставки), а RAHTIS хранит моменты в UTC. Таблица — общая
+ * с поясом точки маршрута: src/lib/country (COUNTRY_TZ).
  */
-const COUNTRY_TZ: Record<string, string> = {
-  AL: 'Europe/Tirane', AT: 'Europe/Vienna', BA: 'Europe/Sarajevo', BE: 'Europe/Brussels',
-  BG: 'Europe/Sofia', BY: 'Europe/Minsk', CH: 'Europe/Zurich', CY: 'Asia/Nicosia',
-  CZ: 'Europe/Prague', DE: 'Europe/Berlin', DK: 'Europe/Copenhagen', EE: 'Europe/Tallinn',
-  ES: 'Europe/Madrid', FI: 'Europe/Helsinki', FR: 'Europe/Paris', GB: 'Europe/London',
-  GR: 'Europe/Athens', HR: 'Europe/Zagreb', HU: 'Europe/Budapest', IE: 'Europe/Dublin',
-  IS: 'Atlantic/Reykjavik', IT: 'Europe/Rome', LI: 'Europe/Vaduz', LT: 'Europe/Vilnius',
-  LU: 'Europe/Luxembourg', LV: 'Europe/Riga', MD: 'Europe/Chisinau', ME: 'Europe/Podgorica',
-  MK: 'Europe/Skopje', MT: 'Europe/Malta', NL: 'Europe/Amsterdam', NO: 'Europe/Oslo',
-  PL: 'Europe/Warsaw', PT: 'Europe/Lisbon', RO: 'Europe/Bucharest', RS: 'Europe/Belgrade',
-  RU: 'Europe/Moscow', SE: 'Europe/Stockholm', SI: 'Europe/Ljubljana', SK: 'Europe/Bratislava',
-  TR: 'Europe/Istanbul', UA: 'Europe/Kyiv',
-};
 
 const ISO_DATE = /^(\d{4})-(\d{2})-(\d{2})$/;
 const ISO_DATETIME = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2})(?:\.\d+)?)?(Z|[+-]\d{2}:?\d{2})$/;

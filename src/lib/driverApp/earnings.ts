@@ -8,7 +8,8 @@ import {
   type ShiftInput,
 } from '@/lib/driverPay';
 import { tesRules } from '@/lib/drivers/report';
-import { todayInHelsinki } from '@/lib/dates';
+import { stopTimeZone } from '@/lib/country';
+import { dateInZone, todayInHelsinki } from '@/lib/dates';
 import { asCurrency, countryCurrency } from '@/lib/money/currency';
 import { loadFxHistory } from '@/lib/money/fx';
 import { createClient } from '@/lib/supabase/server';
@@ -140,6 +141,8 @@ export async function getDriverEarnings(month: string): Promise<DriverEarnings> 
 
   const [supabase, driver] = await Promise.all([createClient(), getDriver()]);
   const currency = asCurrency(driver?.company_currency, countryCurrency(driver?.company_country));
+  /* Ночь/вечер/выходные и граница суток — по поясу страны компании (аудит 21.11.2026, 2.10). */
+  const timeZone = stopTimeZone(driver?.company_country);
   const { data } = await supabase.rpc('driver_earnings', { p_from: from, p_to: to });
   const raw = (data ?? { shifts: [], trips: [], profiles: [] }) as unknown as {
     shifts: RawShift[];
@@ -193,13 +196,14 @@ export async function getDriverEarnings(month: string): Promise<DriverEarnings> 
     })),
     profiles,
     now: new Date().getTime(),
+    timeZone,
     currency,
     /* share_cents уже в валюте ставки — пересчитывать нечего. */
     payoutCurrency: null,
     fx,
   });
 
-  const dayOf = (iso: string) => todayInHelsinki(new Date(iso));
+  const dayOf = (iso: string) => dateInZone(new Date(iso), timeZone);
 
   /*
    * Договорённость «на руки». У driver_earnings нет страны дня и ночей вне

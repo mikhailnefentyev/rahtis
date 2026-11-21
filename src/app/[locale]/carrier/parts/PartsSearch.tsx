@@ -7,6 +7,7 @@ import { PurchaseForm } from './PurchaseForm';
 import {
   BREAKDOWN,
   PARTS_COUNTRIES,
+  PARTS_GENERAL,
   partsSources,
   quoteRequestText,
   quoteSubject,
@@ -105,7 +106,8 @@ export function PartsSearch({
             <Field label={s.country}>
               {(p) => (
                 <Select {...p} value={country} onChange={(e) => setCountry(e.target.value as PartsCountry)}>
-                  {PARTS_COUNTRIES.map((code) => (
+                  {/* «EU» — общеевропейские источники (страна без своего каталога, рейс за границей). */}
+                  {[...PARTS_COUNTRIES, PARTS_GENERAL].map((code) => (
                     <option key={code} value={code}>
                       {countryName(code)}
                     </option>

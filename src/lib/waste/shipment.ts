@@ -74,8 +74,12 @@ export function wasteIssues(procedure: WasteProcedure, ewc: string | null, count
  * scope: ALL — нужен на любой отход; HAZARDOUS — только опасный (и
  * в Финляндии ещё загрязнённый грунт и строительные отходы); NONE —
  * отдельного документа нет. В Эстонии с 01.01.2027 — на любой.
+ * UNKNOWN — требования страны в RAHTIS не заведены: ни «нужен», ни
+ * «не нужен» не утверждаем (аудит 21.11.2026, 2.14: в Румынии перевозку
+ * отходов сопровождает формуляр по HG 1061/2008 — не проверено, и
+ * «документа нет» вводило бы в заблуждение).
  */
-export type NationalSystem = { name: string; url: string; scope: 'ALL' | 'HAZARDOUS' | 'NONE' };
+export type NationalSystem = { name: string; url: string; scope: 'ALL' | 'HAZARDOUS' | 'NONE' | 'UNKNOWN' };
 
 export function nationalSystem(country: string, day: string): NationalSystem {
   switch (country) {
@@ -95,7 +99,10 @@ export function nationalSystem(country: string, day: string): NationalSystem {
       return { name: 'Avfallsregistret', url: 'https://www.naturvardsverket.se', scope: 'HAZARDOUS' };
     case 'NO':
       return { name: 'Avfallsdeklarering', url: 'https://avfallsdeklarering.miljodirektoratet.no', scope: 'HAZARDOUS' };
-    default:
+    case 'DK':
       return { name: '—', url: '', scope: 'NONE' };
+    default:
+      /* RO и любая другая страна — требования не заведены. */
+      return { name: '—', url: '', scope: 'UNKNOWN' };
   }
 }

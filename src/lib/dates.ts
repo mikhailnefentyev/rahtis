@@ -62,6 +62,11 @@ export function todayInHelsinki(now: Date = new Date()): string {
   return new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Helsinki' }).format(now);
 }
 
+/** Дата YYYY-MM-DD момента в заданном поясе (пояс компании — stopTimeZone(country)). */
+export function dateInZone(now: Date, timeZone: string): string {
+  return new Intl.DateTimeFormat('en-CA', { timeZone }).format(now);
+}
+
 /** Дата через столько-то дней от сегодняшней по Хельсинки. */
 export function daysFromToday(days: number, now: Date = new Date()): string {
   const d = new Date(`${todayInHelsinki(now)}T00:00:00Z`);

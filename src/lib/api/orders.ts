@@ -21,7 +21,7 @@ import { ApiError, type ApiContext } from './handler';
  */
 
 const ORDER_COLUMNS =
-  'id,ref,shipper_ref,order_type,haul_kind,container_feet,ldm,trailer,trailer_plate,distance_km,rate_cents,comment,status,dispatch_mode,contract_party,desk_contract,created_at,published_at,deadline_at,closed_at,updated_at,waiting_cents,waiting';
+  'id,ref,shipper_ref,order_type,haul_kind,container_feet,ldm,trailer,trailer_plate,distance_km,rate_cents,currency,comment,status,dispatch_mode,contract_party,desk_contract,created_at,published_at,deadline_at,closed_at,updated_at,waiting_cents,waiting';
 
 const STOP_COLUMNS =
   'order_id,sequence,role,place_name,company_name,address,city,country,lat,lon,scheduled_date,scheduled_time,eta_at,arrived_at,completed_at,trailer_loaded,cargo_weight_kg,consignee,contact_name,contact_phone,external_ref,seal_required,note,damage_note,arrived_lat,arrived_lon,completed_lat,completed_lon,completed_accuracy_m,eta_source,eta_updated_at';
@@ -38,6 +38,8 @@ type OrderRow = {
   trailer_plate: string | null;
   distance_km: number;
   rate_cents: number;
+  /* Валюта ставки (PLN, SEK, RON у прямых заказов в своей валюте) — аудит 21.11.2026, 2.16. */
+  currency: string | null;
   comment: string | null;
   status: string;
   dispatch_mode: string | null;
@@ -88,8 +90,8 @@ type StopRow = {
 
 const STATUSES = ['DRAFT', 'OPEN', 'REQUESTED', 'AWAIT_DRIVER', 'IN_PROGRESS', 'DONE', 'CANCELLED'] as const;
 
-function money(cents: number) {
-  return { amount: (cents / 100).toFixed(2), currency: 'EUR', vat_included: false };
+function money(cents: number, currency: string | null = 'EUR') {
+  return { amount: (cents / 100).toFixed(2), currency: currency || 'EUR', vat_included: false };
 }
 
 /**
@@ -155,7 +157,7 @@ function orderOut(o: OrderRow) {
     trailer: o.trailer,
     trailer_plate: o.trailer_plate,
     distance_km: o.distance_km,
-    rate: money(o.rate_cents),
+    rate: money(o.rate_cents, o.currency),
     comment: o.comment,
     dispatch: o.dispatch_mode,
     /* DIRECT — договор напрямую с перевозчиком (все новые с 6.11.2026), RAHTIS — старые заказы с Aivomaa как стороной. */

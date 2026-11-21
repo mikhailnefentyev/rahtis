@@ -7,6 +7,7 @@ import { lookupCustomerAction, saveSiteJobAction, type SiteJobState } from '@/li
 import { MATERIALS } from '@/lib/sites/work';
 import { HAZARD_CODES, TREATMENT_CODES } from '@/lib/siirto/document';
 import { SITE_COUNTRIES } from '@/lib/sites/wasteDocs';
+import { countryPack } from '@/lib/country';
 import { useI18n } from '@/lib/i18n/provider';
 import type { ScaleSite, SiteJob } from '@/types/db';
 
@@ -39,6 +40,13 @@ export function SiteJobForm({
   const asked = useRef(job?.customer_business_id ?? '');
   const [ytj, setYtj] = useState<'idle' | 'found' | 'missing'>('idle');
   const [looking, startLookup] = useTransition();
+  /*
+   * Страна клиента: от неё подпись номера («Y-tunnus» — только финскому,
+   * польскому — NIP…) и подсказка YTJ (поиск работает только для FI) —
+   * аудит 21.11.2026, 2.15, как в OwnClients.
+   */
+  const [customerCountry, setCustomerCountry] = useState(job?.customer_country ?? defaultCountry ?? 'FI');
+  const customerPack = countryPack(customerCountry);
 
   /* Y-tunnus введён — название и адрес клиента из открытых данных PRH/YTJ (только для FI). */
   function lookup(raw: string) {
@@ -106,13 +114,16 @@ export function SiteJobForm({
           <Field label={s.customer} required>
             {(p) => <Input {...p} name="customer_name" required defaultValue={job?.customer_name ?? ''} />}
           </Field>
-          <Field label={s.customerBusinessId} hint={ytjHint}>
+          <Field
+            label={customerPack.code === 'FI' ? s.customerBusinessId : customerPack.businessId.label}
+            hint={customerPack.code === 'FI' ? ytjHint : undefined}
+          >
             {(p) => (
               <InputMono
                 {...p}
                 name="customer_business_id"
                 defaultValue={job?.customer_business_id ?? ''}
-                placeholder="1234567-8"
+                placeholder={customerPack.code === 'FI' ? '1234567-8' : customerPack.businessId.example}
                 onBlur={(e) => lookup(e.currentTarget.value)}
                 onChange={(e) => {
                   if (/^\d{7}-\d$/.test(e.currentTarget.value.trim())) lookup(e.currentTarget.value);
@@ -189,7 +200,16 @@ export function SiteJobForm({
           </div>
           <Field label={t.siteInvoice.customerCountry}>
             {(p) => (
-              <Select {...p} name="customer_country" defaultValue={job?.customer_country ?? 'FI'}>
+              <Select
+                {...p}
+                name="customer_country"
+                value={customerCountry}
+                onChange={(e) => {
+                  setCustomerCountry(e.target.value);
+                  setYtj('idle');
+                  asked.current = '';
+                }}
+              >
                 {SITE_COUNTRIES.map((c) => (
                   <option key={c} value={c}>
                     {c}

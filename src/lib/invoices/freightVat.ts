@@ -33,7 +33,7 @@ export const OUTSIDE_EU_NOTE =
 
 export type FreightVat =
   | { ok: true; vatBps: number; note: string | null }
-  | { ok: false; reason: 'NO_VAT_RATE' | 'NO_BUYER_VAT' };
+  | { ok: false; reason: 'NO_VAT_RATE' | 'NO_BUYER_VAT' | 'NO_SELLER_VAT' };
 
 export function freightVat(
   sellerCountry: string | null | undefined,
@@ -41,6 +41,13 @@ export function freightVat(
   buyerVatNumber: string | null | undefined,
   /** Обычная ставка страны продавца, б. п.; null — неизвестна. */
   sellerStandardBps: number | null,
+  /*
+   * Номер НДС продавца (21.11.2026, аудит 2.7). Счёт с reverse charge обязан
+   * нести номера НДС обеих сторон (директива 2006/112/EC ст. 226 п. 3 и 4);
+   * у EE и LT он из номера компании не выводится и может быть пуст.
+   * undefined — не проверять (вызовы, где продавец заведомо известен).
+   */
+  sellerVatNumber?: string | null,
 ): FreightVat {
   const seller = (sellerCountry ?? '').toUpperCase();
   const buyer = (buyerCountry ?? seller).toUpperCase();
@@ -54,6 +61,7 @@ export function freightVat(
     /* Номер НДС покупателя — его страны: «DE…» у немецкой фирмы, не чужой. */
     const vatId = (buyerVatNumber ?? '').replace(/\s+/g, '').toUpperCase();
     if (!vatId || !vatId.startsWith(buyer)) return { ok: false, reason: 'NO_BUYER_VAT' };
+    if (sellerVatNumber !== undefined && !(sellerVatNumber ?? '').replace(/\s+/g, '')) return { ok: false, reason: 'NO_SELLER_VAT' };
     return { ok: true, vatBps: 0, note: seller === 'FI' ? REVERSE_CHARGE_NOTE : REVERSE_CHARGE_NOTE_EU };
   }
 

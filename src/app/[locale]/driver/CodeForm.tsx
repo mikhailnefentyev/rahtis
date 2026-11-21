@@ -4,6 +4,7 @@ import { useActionState } from 'react';
 import { acceptCodeAction, type CodeState } from '@/lib/driverApp/actions';
 import { useI18n } from '@/lib/i18n/provider';
 import { useKeepOnError } from '@/lib/forms/keepOnError';
+import { phonePrefixForLocale } from '@/lib/country';
 
 const idle: CodeState = { error: null };
 
@@ -29,7 +30,8 @@ export function CodeForm() {
           inputMode="tel"
           autoComplete="tel"
           required
-          defaultValue="+358"
+          /* Код страны по языку экрана (ro → +40), а не всегда финский. */
+          defaultValue={phonePrefixForLocale(locale)}
           className="h-14 rounded-control border border-line bg-surface px-4 font-mono text-[18px]"
         />
       </label>

@@ -38,3 +38,11 @@ test('номер НДС покупателя должен быть его стр
   assert.deepEqual(freightVat('FI', 'DE', 'FI34297631'), { ok: false, reason: 'NO_BUYER_VAT' });
   assert.deepEqual(freightVat('FI', 'DE', 'de 300536616'), { ok: true, vatBps: 0, note: REVERSE_CHARGE_NOTE });
 });
+
+test('reverse charge без номера НДС продавца — отказ NO_SELLER_VAT', () => {
+  assert.deepEqual(vat('EE', 'FI', 'FI34297631', 2400, null), { ok: false, reason: 'NO_SELLER_VAT' });
+  assert.deepEqual(vat('LT', 'FI', 'FI34297631', 2100, '  '), { ok: false, reason: 'NO_SELLER_VAT' });
+  assert.deepEqual(vat('EE', 'FI', 'FI34297631', 2400, 'EE100931558'), { ok: true, vatBps: 0, note: REVERSE_CHARGE_NOTE_EU });
+  /* Одна страна — номер продавца не нужен для этой проверки. */
+  assert.deepEqual(vat('EE', 'EE', null, 2400, null), { ok: true, vatBps: 2400, note: null });
+});

@@ -7,10 +7,28 @@ import { BREAKDOWN, PARTS_COUNTRIES, base64, normalTyreSize, parseTyreSize, part
 
 const find = (list, id) => list.find((s) => s.id === id);
 
-test('страна: известная — как есть, иначе Финляндия', () => {
+test('страна: известная — как есть, пустая — Финляндия, прочие — общеевропейские', () => {
   assert.equal(partsCountry('lt'), 'LT');
-  assert.equal(partsCountry('US'), 'FI');
+  assert.equal(partsCountry('RO'), 'EU');
+  assert.equal(partsCountry('US'), 'EU');
   assert.equal(partsCountry(null), 'FI');
+});
+
+test('Румыния и неизвестные страны: без финских дилеров и финских телефонов', () => {
+  const country = partsCountry('RO');
+  const parts = partsSources({ query: '21620181', make: 'Volvo FH', plate: null, country });
+  const tyres = partsSources({ query: '315/80R22.5', make: null, plate: null, country, mode: 'TYRES' });
+  for (const s of [...parts, ...tyres]) {
+    assert.doesNotMatch(s.url, /\.fi(\/|$)/, s.id);
+    assert.ok(!s.phone || !s.phone.startsWith('+358'), s.id);
+  }
+  assert.equal(find(parts, 'dealer-VOLVO').url, 'https://www.volvotrucks.com');
+  assert.ok(find(parts, 'web'));
+  for (const b of BREAKDOWN[country]) {
+    assert.ok(!b.phone.startsWith('+358'), b.name);
+    assert.doesNotMatch(b.url, /\.fi(\/|$)/, b.name);
+  }
+  assert.match(quoteRequestText({ query: '21620181', make: null, plate: null, company: 'SRL', note: '', country }), /^Request for quotation: 21620181/);
 });
 
 test('размер шины в любом написании', () => {

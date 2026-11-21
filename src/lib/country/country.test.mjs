@@ -7,7 +7,7 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { businessIdLabel, businessIdLabelByShape, checkBusinessId, COUNTRY_PACKS, countryPack, stopTimeZone, vatNumberFor } from './index.ts';
+import { ADDRESS_COUNTRIES, businessIdLabel, businessIdLabelByShape, checkBusinessId, COUNTRY_CODES, COUNTRY_PACKS, COUNTRY_TZ, countryPack, normalizeIntlPhone, phonePrefixForLocale, stopTimeZone, vatNumberFor } from './index.ts';
 
 const REAL = {
   FI: ['3592993-6', '0112038-9'], // Aivomaa Oy, Nokia Oyj
@@ -83,6 +83,10 @@ test('часовой пояс точки: по стране, пустая и н�
   assert.equal(stopTimeZone('DE'), 'Europe/Berlin');
   assert.equal(stopTimeZone('pl'), 'Europe/Warsaw');
   assert.equal(stopTimeZone('RO'), 'Europe/Bucharest');
+  /* Страны вне пакетов — по полной таблице, не Хельсинки (аудит 2.8). */
+  assert.equal(stopTimeZone('NL'), 'Europe/Amsterdam');
+  assert.equal(stopTimeZone('hu'), 'Europe/Budapest');
+  assert.equal(stopTimeZone('GB'), 'Europe/London');
   assert.equal(stopTimeZone(null), 'Europe/Helsinki');
   assert.equal(stopTimeZone('US'), 'Europe/Helsinki');
   assert.equal(countryPack('LV').currency, 'EUR');
@@ -93,12 +97,28 @@ test('индекс в адресе распознаётся по стране', 
   for (const [country, address] of Object.entries(cases)) assert.match(address, COUNTRY_PACKS[country].postcode, country);
 });
 
-test('часовые пояса в базе (app.stop_timezone) совпадают с пакетами', async () => {
+test('часовые пояса в базе (app.stop_timezone) совпадают с пакетами и полной таблицей', async () => {
   const sql = await latestSql('function app.stop_timezone');
   const inDb = Object.fromEntries([...sql.matchAll(/when '([A-Z]{2})' then '([^']+)'/g)].map((m) => [m[1], m[2]]));
   for (const pack of Object.values(COUNTRY_PACKS)) {
     if (pack.code === 'FI') continue; // FI — ветка else
     assert.equal(inDb[pack.code], pack.timeZone, pack.code);
+  }
+  for (const [code, zone] of Object.entries(COUNTRY_TZ)) {
+    if (code === 'FI') continue;
+    assert.equal(inDb[code], zone, code);
+  }
+  assert.match(sql, /else 'Europe\/Helsinki'/);
+});
+
+test('пакеты и полная таблица поясов не расходятся; страны заявок ищутся в адресах', () => {
+  for (const code of COUNTRY_CODES) {
+    assert.equal(COUNTRY_TZ[code], COUNTRY_PACKS[code].timeZone, code);
+    assert.ok(ADDRESS_COUNTRIES.includes(code), code);
+  }
+  for (const code of ADDRESS_COUNTRIES) assert.ok(COUNTRY_TZ[code], `пояс для ${code}`);
+  for (const zone of Object.values(COUNTRY_TZ)) {
+    assert.doesNotThrow(() => new Intl.DateTimeFormat('en', { timeZone: zone }), zone);
   }
 });
 
@@ -128,4 +148,19 @@ test('подпись номера по его виду: финский 1234567-8
     if (country === 'FI') continue;
     for (const id of ids) assert.equal(businessIdLabelByShape(checkBusinessId(country, id).normalized, 'Business ID'), 'Business ID', `${country} ${id}`);
   }
+});
+
+test('вход водителя по коду: код страны по языку, национальный «0» убирается', () => {
+  assert.equal(phonePrefixForLocale('ro'), '+40');
+  assert.equal(phonePrefixForLocale('pl'), '+48');
+  assert.equal(phonePrefixForLocale('sv'), '+46');
+  assert.equal(phonePrefixForLocale('nb'), '+47');
+  assert.equal(phonePrefixForLocale('fi'), '+358');
+  assert.equal(phonePrefixForLocale('en'), '+358');
+  assert.equal(normalizeIntlPhone('+40 0722 123 456'), '+40722123456');
+  assert.equal(normalizeIntlPhone('+3580401234567'), '+358401234567');
+  assert.equal(normalizeIntlPhone('00358 40 123 4567'), '+358401234567');
+  assert.equal(normalizeIntlPhone('+48 (601) 234-567'), '+48601234567');
+  /* Код вне пакетов — как введён (у Италии «0» — часть номера). */
+  assert.equal(normalizeIntlPhone('+39 06 1234567'), '+39061234567');
 });

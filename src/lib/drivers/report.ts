@@ -10,7 +10,8 @@ import {
   type TesRules,
 } from '@/lib/driverPay';
 import { getViewer } from '@/lib/auth/viewer';
-import { todayInHelsinki } from '@/lib/dates';
+import { stopTimeZone } from '@/lib/country';
+import { dateInZone } from '@/lib/dates';
 import { viewerMoney } from '@/lib/i18n/viewer';
 import { asCurrency } from '@/lib/money/currency';
 import { loadFxHistory } from '@/lib/money/fx';
@@ -258,6 +259,12 @@ export async function buildDriverReport(input: {
   const companyCountry =
     (viewer.status === 'ready' ? (viewer.company as { country?: string } | null)?.country : null)?.toUpperCase() ??
     'FI';
+  /*
+   * Ночь, вечер, выходные и граница суток — по поясу страны компании
+   * (аудит 21.11.2026, 2.10): польская смена 21:00–05:00 по Варшаве не
+   * должна считаться как 22:00–06:00 по Хельсинки.
+   */
+  const companyTimeZone = stopTimeZone(companyCountry);
 
   /* Наборы суточных, на которые ссылаются профили, — с их ставками по странам. */
   const usedSetIds = [
@@ -381,6 +388,7 @@ export async function buildDriverReport(input: {
         })),
       profiles: payProfiles,
       now,
+      timeZone: companyTimeZone,
       /* driver_trips отдаёт выплату уже в валюте компании. */
       currency,
       fx: convert,
@@ -461,7 +469,7 @@ export async function buildDriverReport(input: {
     const dayInputs = allowanceDayInputs({
       dates: days.map((d) => d.date),
       shifts: own.map((s) => ({ start: s.started_at, end: s.ended_at })),
-      dayOf: (iso) => todayInHelsinki(new Date(iso)),
+      dayOf: (iso) => dateInZone(new Date(iso), companyTimeZone),
       facts: ownFacts,
       auto,
       now,

@@ -89,4 +89,9 @@ test('питание и выбор стран', () => {
   assert.equal(first[0], 'PL');
   assert.ok(first.includes('DE'));
   assert.ok(!rest.includes('PL') && rest.includes('FI'));
+  /* Румыния: соседи первыми, страны вне ЕС/ЕЭЗ — в общем списке. */
+  const ro = countryChoices('RO');
+  assert.deepEqual(ro.first, ['RO', 'HU', 'BG', 'MD', 'UA', 'RS']);
+  for (const c of ['CH', 'GB', 'TR', 'BA', 'MK', 'AL', 'ME']) assert.ok(ro.rest.includes(c), c);
+  assert.ok(!ro.rest.includes('MD'));
 });

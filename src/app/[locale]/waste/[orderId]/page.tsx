@@ -114,7 +114,11 @@ export default async function WastePage({ params }: { params: Promise<{ locale: 
   );
 
   const national = first?.country ? nationalSystem(first.country, day) : null;
-  const nationalText = national && first?.country
+  /*
+   * UNKNOWN (Румыния и страны без записи) — молчим: «документа нет» было бы
+   * неправдой, а строки «требования не заведены» в словарях пока нет.
+   */
+  const nationalText = national && first?.country && national.scope !== 'UNKNOWN'
     ? (national.scope === 'ALL' ? w.nationalAll : national.scope === 'HAZARDOUS' ? w.nationalHazardous : w.nationalNone)
         .replace('{country}', countryName(first.country))
         .replace('{system}', national.name)

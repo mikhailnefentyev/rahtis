@@ -59,7 +59,7 @@ export type CountryPack = {
   phonePrefix: string;
   /** Индекс в адресе: по нему из строки адреса отделяется город. */
   postcode: RegExp;
-  /** Адреса ищутся в этой стране и компании из неё могут подать заявку. */
+  /** Компании из этой страны могут подать заявку (адреса ищутся шире — ADDRESS_COUNTRIES). */
   enabled: boolean;
   /** Страна названа на витрине как зона работы (лендинг, разметка). С 21.10.2026 — все страны пакетов: интерфейс есть на их языках. */
   marketed: boolean;
@@ -378,9 +378,9 @@ export const COUNTRY_PACKS: Record<CountryCode, CountryPack> = {
   },
   /*
    * Румыния (16.11.2026): первый клиент оттуда попросил регистрацию.
-   * Заявки и адреса — да; на витрине как зона работы пока не названа.
-   * Интерфейса на румынском нет: кабинет и приложение водителя — на
-   * английском, пока клиентов не станет больше.
+   * Заявки и адреса — да; на витрине как зона работы пока не названа
+   * (marketed: false). Кабинет и приложение водителя — на румынском
+   * (словарь ro: src/lib/i18n/config.ts, DRIVER_LOCALES в driverLocale.ts).
    */
   RO: {
     code: 'RO',
@@ -410,22 +410,106 @@ export const COUNTRY_PACKS: Record<CountryCode, CountryPack> = {
 
 export const COUNTRY_CODES = Object.keys(COUNTRY_PACKS) as CountryCode[];
 
+/*
+ * Часовые пояса и «страны адресов» Европы (аудит 21.11.2026, 2.8).
+ *
+ * Таблица жила в eFTI (src/lib/efti/xml/common.ts); теперь её читают и
+ * eFTI, и пояс точки маршрута (stopTimeZone) для стран вне пакетов, а SQL
+ * app.stop_timezone повторяет её (country.test.mjs сверяет). Для стран с
+ * несколькими поясами — основной (материковый).
+ */
+export const COUNTRY_TZ: Readonly<Record<string, string>> = {
+  AL: 'Europe/Tirane', AT: 'Europe/Vienna', BA: 'Europe/Sarajevo', BE: 'Europe/Brussels',
+  BG: 'Europe/Sofia', BY: 'Europe/Minsk', CH: 'Europe/Zurich', CY: 'Asia/Nicosia',
+  CZ: 'Europe/Prague', DE: 'Europe/Berlin', DK: 'Europe/Copenhagen', EE: 'Europe/Tallinn',
+  ES: 'Europe/Madrid', FI: 'Europe/Helsinki', FR: 'Europe/Paris', GB: 'Europe/London',
+  GR: 'Europe/Athens', HR: 'Europe/Zagreb', HU: 'Europe/Budapest', IE: 'Europe/Dublin',
+  IS: 'Atlantic/Reykjavik', IT: 'Europe/Rome', LI: 'Europe/Vaduz', LT: 'Europe/Vilnius',
+  LU: 'Europe/Luxembourg', LV: 'Europe/Riga', MD: 'Europe/Chisinau', ME: 'Europe/Podgorica',
+  MK: 'Europe/Skopje', MT: 'Europe/Malta', NL: 'Europe/Amsterdam', NO: 'Europe/Oslo',
+  PL: 'Europe/Warsaw', PT: 'Europe/Lisbon', RO: 'Europe/Bucharest', RS: 'Europe/Belgrade',
+  RU: 'Europe/Moscow', SE: 'Europe/Stockholm', SI: 'Europe/Ljubljana', SK: 'Europe/Bratislava',
+  TR: 'Europe/Istanbul', UA: 'Europe/Kyiv',
+};
+
+/** Пояс страны по таблице; неизвестная — null (решает вызывающий). */
+export function countryTimeZone(country: string | null | undefined): string | null {
+  return COUNTRY_TZ[(country ?? '').toUpperCase()] ?? null;
+}
+
+/**
+ * Страны, в которых ищутся адреса (TomTom countrySet) — шире, чем страны
+ * заявок (CountryPack.enabled): рейс RO→HU→AT→DE строится через страны,
+ * из которых компании на платформу не принимаются.
+ * ЕС + ЕЭЗ (IS, LI, NO) + CH, GB, UA, MD, RS, TR, BA, MK, AL, ME.
+ */
+export const ADDRESS_COUNTRIES: readonly string[] = [
+  // ЕС
+  'AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR', 'DE', 'GR', 'HU', 'IE',
+  'IT', 'LV', 'LT', 'LU', 'MT', 'NL', 'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE',
+  // ЕЭЗ вне ЕС
+  'IS', 'LI', 'NO',
+  // прочие страны рейсов
+  'CH', 'GB', 'UA', 'MD', 'RS', 'TR', 'BA', 'MK', 'AL', 'ME',
+];
+
+
 export const isCountryCode = (c: unknown): c is CountryCode => typeof c === 'string' && c in COUNTRY_PACKS;
 
-/** Пакет страны; неизвестная или пустая страна — финский (так было до пакетов). */
+/**
+ * Пакет страны; неизвестная или пустая страна — финский (так было до пакетов).
+ * Для пояса точки в стране вне пакетов — stopTimeZone, не countryPack(...).timeZone.
+ */
 export function countryPack(code: string | null | undefined): CountryPack {
   const c = (code ?? '').toUpperCase();
   return isCountryCode(c) ? COUNTRY_PACKS[c] : COUNTRY_PACKS.FI;
 }
 
-/** Страны, в которых ищутся адреса и из которых принимаются заявки. */
+/** Страны, из которых принимаются заявки (адреса ищутся шире — ADDRESS_COUNTRIES). */
 export const enabledCountries = (): CountryCode[] => COUNTRY_CODES.filter((c) => COUNTRY_PACKS[c].enabled);
 
 /** Страны, названные на витрине. */
 export const marketedCountries = (): CountryCode[] => COUNTRY_CODES.filter((c) => COUNTRY_PACKS[c].marketed);
 
-/** Часовой пояс точки маршрута по её стране — то же, что app.stop_timezone в базе. */
-export const stopTimeZone = (country: string | null | undefined) => countryPack(country).timeZone;
+/**
+ * Часовой пояс точки маршрута по её стране — то же, что app.stop_timezone в базе.
+ * Страна пакета — пояс пакета; другая европейская (HU, NL, CZ…) — по COUNTRY_TZ;
+ * пустая или неизвестная — Хельсинки, как было.
+ */
+export const stopTimeZone = (country: string | null | undefined): string => {
+  const c = (country ?? '').toUpperCase();
+  if (isCountryCode(c)) return COUNTRY_PACKS[c].timeZone;
+  return countryTimeZone(c) ?? COUNTRY_PACKS.FI.timeZone;
+};
+
+/**
+ * Телефонный код по языку экрана (вход водителя по коду, аудит 21.11.2026,
+ * 2.13): ro → +40, pl → +48… Язык без своей страны пакета (en, ru) — +358,
+ * как было: основные водители — у финских перевозчиков.
+ */
+export function phonePrefixForLocale(locale: string | null | undefined): string {
+  const two = (locale ?? '').slice(0, 2).toUpperCase();
+  /* Норвежский водитель — nb/nn, в пакете язык записан как NO. */
+  const lang = two === 'NB' || two === 'NN' ? 'NO' : two;
+  const code = COUNTRY_CODES.find((c) => COUNTRY_PACKS[c].driverLanguage === lang);
+  return code ? COUNTRY_PACKS[code].phonePrefix : COUNTRY_PACKS.FI.phonePrefix;
+}
+
+/**
+ * Номер в международном виде без национального «0» после кода страны:
+ * «+40 0722 123 456» → «+40722123456», «0035804012345» → «+3584012345».
+ * Только для кодов стран пакетов: у них «0» — префикс внутренней связи,
+ * в международном номере его нет. Пробелы, скобки, дефисы убираются.
+ */
+export function normalizeIntlPhone(raw: string): string {
+  let phone = raw.replace(/[\s().-]/g, '');
+  if (phone.startsWith('00')) phone = `+${phone.slice(2)}`;
+  for (const c of COUNTRY_CODES) {
+    const prefix = COUNTRY_PACKS[c].phonePrefix;
+    if (phone.startsWith(`${prefix}0`)) return prefix + phone.slice(prefix.length).replace(/^0+/, '');
+  }
+  return phone;
+}
 
 /** Номер компании в виде для хранения и признак, что он верен для страны. */
 export function checkBusinessId(country: string, raw: string): { normalized: string; valid: boolean } {

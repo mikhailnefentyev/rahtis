@@ -36,4 +36,7 @@ test('национальные системы: Польша на всё, Гер�
   assert.equal(nationalSystem('EE', '2026-12-31').scope, 'HAZARDOUS');
   assert.equal(nationalSystem('EE', '2027-01-01').scope, 'ALL');
   assert.equal(nationalSystem('DK', '2026-10-26').scope, 'NONE');
+  /* Румыния: требования не заведены — не утверждаем «документа нет». */
+  assert.equal(nationalSystem('RO', '2026-10-26').scope, 'UNKNOWN');
+  assert.equal(nationalSystem('HU', '2026-10-26').scope, 'UNKNOWN');
 });

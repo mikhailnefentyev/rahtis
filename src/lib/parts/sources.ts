@@ -17,7 +17,13 @@
  */
 
 export const PARTS_COUNTRIES = ['FI', 'SE', 'NO', 'DK', 'EE', 'LV', 'LT', 'PL', 'DE'] as const;
-export type PartsCountry = (typeof PARTS_COUNTRIES)[number];
+/*
+ * 'EU' — «общеевропейские источники» для страны без своего каталога
+ * (Румыния и любая неизвестная; аудит 21.11.2026, 2.9): раньше такая
+ * компания получала финских дилеров и финские телефоны шиномонтажа.
+ */
+export const PARTS_GENERAL = 'EU' as const;
+export type PartsCountry = (typeof PARTS_COUNTRIES)[number] | typeof PARTS_GENERAL;
 
 export type PartsMode = 'PARTS' | 'TYRES';
 
@@ -44,9 +50,11 @@ export type PartsSource = {
 /** Круглосуточная помощь при проколе шины в пути — номера опубликованы сетями. */
 export type Breakdown = { name: string; phone: string; url: string; contractOnly: boolean };
 
+/** Страна каталога: своя, если есть; пустая — финская (как до пакетов); прочие — общеевропейский. */
 export function partsCountry(value: string | null | undefined): PartsCountry {
   const v = String(value ?? '').toUpperCase();
-  return (PARTS_COUNTRIES as readonly string[]).includes(v) ? (v as PartsCountry) : 'FI';
+  if (!v) return 'FI';
+  return (PARTS_COUNTRIES as readonly string[]).includes(v) ? (v as PartsCountry) : PARTS_GENERAL;
 }
 
 /** Номер детали: буквы и цифры без пробелов, хотя бы одна цифра. */
@@ -224,6 +232,14 @@ const PARTS: Record<PartsCountry, Entry[]> = {
     { id: 'dba', name: 'DBA.dk', kind: 'USED', pricesPublic: true, direct: true, url: (c) => `https://www.dba.dk/recommerce/forsale/search?q=${enc(c.number ?? c.text)}` },
     { id: 'mascus-dk', name: 'Mascus', kind: 'USED', pricesPublic: true, direct: true, url: (c) => `https://www.mascus.dk/+/${enc(c.number ?? c.text)},1,relevance,search.html` },
   ],
+  /*
+   * Общеевропейские: без национальных телефонов и без поиска по адресу
+   * (страницы поиска Mascus закрыты от ботов — не проверить), только сайты.
+   */
+  EU: [
+    { id: 'partslink24', name: 'partslink24 (OEM)', kind: 'NEW', pricesPublic: false, direct: false, url: site('https://www.partslink24.com') },
+    { id: 'mascus-eu', name: 'Mascus', kind: 'USED', pricesPublic: true, direct: false, url: site('https://www.mascus.com') },
+  ],
 };
 
 const TYRES: Record<PartsCountry, Entry[]> = {
@@ -295,6 +311,8 @@ const TYRES: Record<PartsCountry, Entry[]> = {
     { id: 'sds', name: 'Super Dæk Service', kind: 'TYRES', pricesPublic: false, direct: false, mobile24: true, url: site('https://sds.dk/erhverv/'), phone: '76 15 30 00' },
     { id: 'dba-t', name: 'DBA.dk', kind: 'USED', pricesPublic: true, direct: true, url: (c) => `https://www.dba.dk/recommerce/forsale/search?q=${enc(c.size)}` },
   ],
+  /* Шинных сетей на всю Европу с открытым поиском нет — Google и круглосуточные номера ниже. */
+  EU: [],
 };
 
 /* Слово для поиска в Google на языке страны. */
@@ -308,6 +326,7 @@ const WEB_WORD: Record<PartsCountry, { parts: string; tyres: string }> = {
   SE: { parts: 'reservdel', tyres: 'lastbilsdäck' },
   NO: { parts: 'reservedel', tyres: 'lastebildekk' },
   DK: { parts: 'reservedel', tyres: 'lastbildæk' },
+  EU: { parts: 'truck spare part', tyres: 'truck tyre' },
 };
 
 /** Опубликованные номера круглосуточной помощи при проколе, проверены 29.10.2026. */
@@ -334,6 +353,11 @@ export const BREAKDOWN: Record<PartsCountry, Breakdown[]> = {
     { name: 'BestDrive 24-timers veihjelp', phone: '920 70 111', url: 'https://www.bestdrive.no/bedrift/veihjelp.html', contractOnly: true },
   ],
   DK: [{ name: 'Road Mobility Services', phone: '+45 75 55 45 45', url: 'https://www.roadmobilityservices.com/da', contractOnly: true }],
+  /* Только общеевропейские сервисы по договору — без финских номеров. */
+  EU: [
+    { name: 'Continental Conti360', phone: '+48 22 577 13 15', url: 'https://www.continental-tyres.co.uk/b2b/services-and-solutions/conti-360/breakdown-service', contractOnly: true },
+    { name: 'Road Mobility Services', phone: '+45 75 55 45 45', url: 'https://www.roadmobilityservices.com', contractOnly: true },
+  ],
 };
 
 export function partsSources(q: PartsQuery & { country?: PartsCountry; mode?: PartsMode }): PartsSource[] {
@@ -434,6 +458,14 @@ const QUOTE: Record<PartsCountry, { subject: string; vehicle: string; note: stri
     note: 'Øvrigt',
     ask: 'Vi beder om pris, leveringstid og om delen er original eller tilsvarende.',
     tyresAsk: 'Vi beder om pris, leveringstid, mærke og mønster (styre, træk, trailer) samt pris for montering.',
+  },
+  /* Общеевропейский поставщик — по-английски. */
+  EU: {
+    subject: 'Request for quotation',
+    vehicle: 'Vehicle',
+    note: 'Additional information',
+    ask: 'Please send the price, delivery time and whether the part is original or equivalent.',
+    tyresAsk: 'Please send the price, delivery time, brand and tread pattern (steer, drive, trailer) and the fitting price.',
   },
 };
 
