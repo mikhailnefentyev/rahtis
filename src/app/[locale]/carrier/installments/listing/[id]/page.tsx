@@ -40,8 +40,8 @@ export default async function ListingPage({ params }: { params: Promise<{ locale
   const handover = d.toISOString().slice(0, 10);
 
   return (
-    <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold tracking-tight">{l.make}</h1>
+    <main className="cab-page flex flex-col gap-4">
+      <h1 className="page-title">{l.make}</h1>
       <Card>
         <CardBody className="grid gap-5 md:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
           <TruckPhoto make={l.make} vehicleClass={l.vehicle_class} plate={l.plate} sizes="(min-width: 768px) 420px, 100vw" />
@@ -79,6 +79,6 @@ export default async function ListingPage({ params }: { params: Promise<{ locale
           />
         </CardBody>
       </Card>
-    </div>
+    </main>
   );
 }

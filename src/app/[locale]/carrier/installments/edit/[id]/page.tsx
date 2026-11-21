@@ -31,8 +31,8 @@ export default async function EditListingPage({ params }: { params: Promise<{ lo
   if (!listing || !vehicles || !['DRAFT', 'PUBLISHED'].includes(listing.status)) notFound();
 
   return (
-    <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold tracking-tight">{ui.listing.editTitle}</h1>
+    <main className="cab-page flex flex-col gap-4">
+      <h1 className="page-title">{ui.listing.editTitle}</h1>
       <Card>
         <CardBody>
           <ListingForm
@@ -56,6 +56,6 @@ export default async function EditListingPage({ params }: { params: Promise<{ lo
           />
         </CardBody>
       </Card>
-    </div>
+    </main>
   );
 }

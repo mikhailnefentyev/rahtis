@@ -67,10 +67,10 @@ export default async function InstallmentsPage({
   ];
 
   return (
-    <div className="flex flex-col gap-5">
+    <main className="cab-page flex flex-col gap-5">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">{ui.title}</h1>
+          <h1 className="page-title">{ui.title}</h1>
           <p className="mt-1 max-w-[70ch] text-[14px] text-ink-muted">{ui.intro}</p>
         </div>
         <Link href={`/${locale}${installmentPath(locale)}`} className="text-[13px] text-accent hover:underline">
@@ -209,6 +209,6 @@ export default async function InstallmentsPage({
             ))}
           </div>
         ))}
-    </div>
+    </main>
   );
 }

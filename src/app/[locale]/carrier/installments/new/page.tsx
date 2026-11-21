@@ -37,8 +37,8 @@ export default async function NewListingPage({
   const selected = vehicles.some((v) => v.id === vehicle) ? vehicle! : vehicles[0].id;
 
   return (
-    <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold tracking-tight">{ui.listing.newTitle}</h1>
+    <main className="cab-page flex flex-col gap-4">
+      <h1 className="page-title">{ui.listing.newTitle}</h1>
       <Card>
         <CardBody>
           <ListingForm
@@ -54,6 +54,6 @@ export default async function NewListingPage({
           />
         </CardBody>
       </Card>
-    </div>
+    </main>
   );
 }

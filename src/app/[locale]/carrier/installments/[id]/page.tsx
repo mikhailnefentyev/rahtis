@@ -127,10 +127,10 @@ export default async function DealPage({ params }: { params: Promise<{ locale: s
         : ui.invoiceReasons.IBAN_RECENT;
 
   return (
-    <div className="flex flex-col gap-4">
+    <main className="cab-page flex flex-col gap-4">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">
+          <h1 className="page-title">
             {ui.deal.title} · {vehicle.plate}
           </h1>
           <p className="mt-1 text-[14px] text-ink-muted">
@@ -463,6 +463,6 @@ export default async function DealPage({ params }: { params: Promise<{ locale: s
       <Link href={`/${locale}/carrier/installments?tab=deals`} className="text-[13px] text-accent hover:underline">
         ‹ {ui.tabs.deals}
       </Link>
-    </div>
+    </main>
   );
 }
