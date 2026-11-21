@@ -42,7 +42,7 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
 
   return (
     <main className="cab-page cab-page--narrow">
-      <h1 className="text-2xl font-semibold tracking-tight">{t.legal.SHIPPER_AGREEMENT}</h1>
+      <h1 className="page-title">{t.legal.SHIPPER_AGREEMENT}</h1>
       <LegalDocument locale={locale} kind="SHIPPER_AGREEMENT" />
     </main>
   );
