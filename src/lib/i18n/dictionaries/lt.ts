@@ -832,7 +832,7 @@ export const lt = {
       'Savi klientai ir tiesioginiai užsakymai, sekimo nuoroda klientui',
       'Krovinių birža priekaboms, konteineriams ir skubiems pervežimams',
       'Žemės darbai ir savivarčiai: pasverti kroviniai, Suomijos atliekų lydraščiai, valandos ir sąskaitos iš objekto',
-      'Vairuotojo programėlė 10 kalbų, veikia ir be ryšio',
+      'Vairuotojo programėlė 12 kalbų, veikia ir be ryšio',
       'Darbo laikas ir apytikslis darbo užmokestis: už kilometrą, procentas nuo reiso kainos, valandinis įkainis, kolektyvinė sutartis arba sutartas grynasis atlyginimas',
       'Elektroninis važtaraštis (CMR), nuotraukos ir parašas',
       'Pervežimo sekimas etapais, vėlavimo ir prastovos įspėjimai',
@@ -1295,7 +1295,7 @@ export const lt = {
       'Po reiso programėlė parodo, kiek už jį uždirbta ir kiek susidarė per mėnesį. Skaičiuojama pagal vežėjo pasirinktą modelį arba kolektyvinės sutarties lenteles.',
     ai9: 'Vairuotojo gimtoji kalba',
     ai9Text:
-      'Programėlė kalba telefono kalba: suomių, anglų, estų, rusų, švedų, latvių, lietuvių, lenkų, norvegų ir danų. Kalbą galima pasirinkti ir profilyje.',
+      'Programėlė kalba telefono kalba: suomių, anglų, estų, rusų, švedų, latvių, lietuvių, lenkų, norvegų, danų, rumunų ir vokiečių. Kalbą galima pasirinkti ir profilyje.',
 
     servicesEyebrow: 'Paslauga auga etapais',
     servicesTitle: "Priekabų keitimas, konteineriai, skubūs pervežimai ir savivarčiai – viskas jau veikia",
@@ -2092,6 +2092,9 @@ export const lt = {
   chat: {
     title: 'Klauskite asistento',
     hint: 'Asistentas žino jūsų pervežimus, dokumentus ir sutarties sąlygas.',
+    /* AI Act ст. 50(1): человек должен знать, что отвечает ИИ (21.11.2026). */
+    aiNotice: 'Asistentas yra dirbtinis intelektas. Atsakymuose gali būti klaidų – svarbią informaciją patikrinkite pervežime arba dokumentuose.',
+    aiTag: 'DI',
     placeholder: 'Įveskite klausimą…',
     send: 'Siųsti',
     sending: 'Siunčiama…',

@@ -215,7 +215,7 @@ export function AgentChatLive({
 
   const who: Record<string, string> = {
     USER: t.chat.you,
-    AGENT: t.chat.agent,
+    AGENT: `${t.chat.agent} · ${t.chat.aiTag}`,
     OPERATOR: t.chat.operator,
   };
 
@@ -231,6 +231,8 @@ export function AgentChatLive({
             return (
               <li
                 key={message.id}
+                /* Машиночитаемая пометка ответа ИИ (AI Act ст. 50(2)). */
+                data-ai-generated={message.sender === 'AGENT' ? 'true' : undefined}
                 className={own ? 'flex flex-col items-end' : 'flex flex-col items-start'}
               >
                 <span className="label-micro mb-1 text-ink-faint">

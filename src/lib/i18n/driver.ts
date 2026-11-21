@@ -122,6 +122,9 @@ async function loadPack(locale: DriverLocale): Promise<DriverPack> {
     /* Румынский — язык платформы: срез из его словаря, отдельного пакета нет. */
     case 'ro':
       return packOf(await getDictionary('ro'));
+    /* Немецкий (21.11.2026) — так же срез словаря платформы: перевод экранов водителя в de.ts уже был. */
+    case 'de':
+      return packOf(await getDictionary('de'));
     default:
       return packOf(await getDictionary('fi'));
   }

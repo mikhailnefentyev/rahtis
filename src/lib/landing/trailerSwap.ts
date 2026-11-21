@@ -17,7 +17,7 @@ import type { LandingCopy } from "./types";
 const fi: LandingCopy = {
   metaTitle: "Perävaunun vaihto satamissa: keikat, kuskit, kalusto",
   metaDescription:
-    "Irtoperien vaihtoon: satamien keikat tarjouspöydältä, omat asiakkaat, kuljettajan sovellus 10 kielellä ja rahtikirjat. Ensimmäinen auto maksutta.",
+    "Irtoperien vaihtoon: satamien keikat tarjouspöydältä, omat asiakkaat, kuljettajan sovellus 12 kielellä ja rahtikirjat. Ensimmäinen auto maksutta.",
   eyebrow: "Perävaunun vaihto satamissa",
   title: "Irtoperät satamasta asiakkaalle ilman paperisotaa",
   lede: "Ota vaihtokeikat tarjouspöydältä satamista kuten Vuosaari, Muuga, Kapellskär, Travemünde ja Gdynia, aja omien asiakkaiden keikat ja pidä autot, kuskit ja paperit samassa paikassa. Keikoista ei peritä prosenttia.",
@@ -57,8 +57,8 @@ const fi: LandingCopy = {
       text: "Lisää asiakkaan keikka omalle autolle tai anna asiakkaan tilata suoraan autollesi. Tilaussähköpostista tulee luonnos tilauksessa mainitulle autolle. Koko hinta on sinun.",
     },
     {
-      title: "Kuljettajan sovellus 10 kielellä",
-      text: "Suomi, englanti, ruotsi, norja, tanska, viro, latvia, liettua, puola ja venäjä. Pysähdykset, saapuminen, kuvat, allekirjoitus ja rahtikirjaskanneri – myös ilman verkkoa.",
+      title: "Kuljettajan sovellus 12 kielellä",
+      text: "Suomi, englanti, ruotsi, norja, tanska, viro, latvia, liettua, puola, venäjä, romania ja saksa. Pysähdykset, saapuminen, kuvat, allekirjoitus ja rahtikirjaskanneri – myös ilman verkkoa.",
     },
     {
       title: "Perävaunut ja yhdistelmät",
@@ -88,7 +88,7 @@ const fi: LandingCopy = {
     },
     {
       q: "Millä kielellä kuski käyttää sovellusta?",
-      a: "Omallaan: sovellus toimii kymmenellä kielellä, ja keikan viestit käännetään automaattisesti kuskin kielelle.",
+      a: "Omallaan: sovellus toimii 12 kielellä, ja keikan viestit käännetään automaattisesti kuskin kielelle.",
     },
     {
       q: "Toimiiko sovellus satamassa ilman verkkoa?",
@@ -109,7 +109,7 @@ const fi: LandingCopy = {
   teaserEyebrow: "Perävaunun vaihto",
   teaserTitle: "Irtoperät satamissa",
   teaserText:
-    "Vaihtokeikat satamista tarjouspöydältä, omat asiakkaat, kuljettajan sovellus 10 kielellä rahtikirjaskannerilla, yhdistelmät ja työajat. Ei prosenttia keikoista.",
+    "Vaihtokeikat satamista tarjouspöydältä, omat asiakkaat, kuljettajan sovellus 12 kielellä rahtikirjaskannerilla, yhdistelmät ja työajat. Ei prosenttia keikoista.",
   teaserCta: "Lue lisää",
   footerLink: "Perävaunun vaihto satamissa",
   serviceType: "Kuljetusliikkeen työalusta perävaunujen vaihtoon",
@@ -117,7 +117,7 @@ const fi: LandingCopy = {
     "Keikat satamista ja alueelta tarjouspöydältä",
     "Omien asiakkaiden keikat ja seurantalinkki asiakkaalle",
     "Tilausluonnos sähköpostista rekisterinumeron mukaiselle autolle",
-    "Kuljettajan sovellus 10 kielellä: pysähdykset, kuvat, allekirjoitus, rahtikirjaskanneri, toimii ilman verkkoa",
+    "Kuljettajan sovellus 12 kielellä: pysähdykset, kuvat, allekirjoitus, rahtikirjaskanneri, toimii ilman verkkoa",
     "Perävaunut, yhdistelmät ja suurimmat sallitut massat maittain",
     "GPS- ja polttoaineintegraatiot",
     "Työaika, palkka ja auton kannattavuus",
@@ -127,7 +127,7 @@ const fi: LandingCopy = {
 const en: LandingCopy = {
   metaTitle: "Trailer swaps in ports: jobs, drivers, fleet",
   metaDescription:
-    "For trailer-swap carriers: port jobs from the load board, your own customers, a driver app in 10 languages, CMR notes and combinations. First truck free.",
+    "For trailer-swap carriers: port jobs from the load board, your own customers, a driver app in 12 languages, CMR notes and combinations. First truck free.",
   eyebrow: "Trailer swaps in ports",
   title: "Trailers from port to customer, without the paperwork",
   lede: "Take swap jobs from the load board in ports such as Vuosaari, Muuga, Kapellskär, Travemünde and Gdynia, run your own customers’ jobs and keep trucks, drivers and papers in one place. No percentage on any job.",
@@ -167,8 +167,8 @@ const en: LandingCopy = {
       text: "Add a customer’s job to your own truck, or let the customer order straight to it. An order e-mail becomes a draft for the truck named in the order. The whole price is yours.",
     },
     {
-      title: "Driver app in 10 languages",
-      text: "Finnish, English, Swedish, Norwegian, Danish, Estonian, Latvian, Lithuanian, Polish and Russian. Stops, arrival, photos, signature and a CMR scanner – also offline.",
+      title: "Driver app in 12 languages",
+      text: "Finnish, English, Swedish, Norwegian, Danish, Estonian, Latvian, Lithuanian, Polish, Russian, Romanian and German. Stops, arrival, photos, signature and a CMR scanner – also offline.",
     },
     {
       title: "Trailers and combinations",
@@ -219,7 +219,7 @@ const en: LandingCopy = {
   teaserEyebrow: "Trailer swaps",
   teaserTitle: "Trailer swaps in ports",
   teaserText:
-    "Port swap jobs from the load board, your own customers, a driver app in 10 languages with a CMR scanner, combinations and working time. No percentage on jobs.",
+    "Port swap jobs from the load board, your own customers, a driver app in 12 languages with a CMR scanner, combinations and working time. No percentage on jobs.",
   teaserCta: "Read more",
   footerLink: "Trailer swaps in ports",
   serviceType: "Carrier platform for trailer swaps",
@@ -227,7 +227,7 @@ const en: LandingCopy = {
     "Load-board jobs in ports and near your trucks",
     "Own customers’ jobs and a tracking link for the customer",
     "Order draft from e-mail for the truck named by its registration plate",
-    "Driver app in 10 languages: stops, photos, signature, CMR scanner, works offline",
+    "Driver app in 12 languages: stops, photos, signature, CMR scanner, works offline",
     "Trailers, combinations and maximum weights by country",
     "GPS and fuel integrations",
     "Working time, driver pay and profit per truck",
@@ -237,7 +237,7 @@ const en: LandingCopy = {
 const sv: LandingCopy = {
   metaTitle: "Trailerbyten i hamnar: uppdrag, förare, fordon",
   metaDescription:
-    "För trailerbyten: hamnuppdrag från lastbörsen, egna kunder, förarapp på 10 språk och fraktsedlar. Första bilen gratis.",
+    "För trailerbyten: hamnuppdrag från lastbörsen, egna kunder, förarapp på 12 språk och fraktsedlar. Första bilen gratis.",
   eyebrow: "Trailerbyten i hamnar",
   title: "Trailrar från hamn till kund utan pappersexercis",
   lede: "Ta trailerbyten från lastbörsen i hamnar som Nordsjö (Vuosaari), Muuga, Kapellskär, Travemünde och Gdynia, kör dina egna kunders uppdrag och håll bilar, förare och papper på ett ställe. Ingen procentavgift på uppdragen.",
@@ -277,8 +277,8 @@ const sv: LandingCopy = {
       text: "Lägg in kundens uppdrag på din egen bil eller låt kunden beställa direkt till den. Ett ordermejl blir ett utkast för den bil som nämns i ordern. Hela priset är ditt.",
     },
     {
-      title: "Förarapp på 10 språk",
-      text: "Finska, engelska, svenska, norska, danska, estniska, lettiska, litauiska, polska och ryska. Stopp, ankomst, foton, signatur och fraktsedelsskanner – även utan nät.",
+      title: "Förarapp på 12 språk",
+      text: "Finska, engelska, svenska, norska, danska, estniska, lettiska, litauiska, polska, ryska, rumänska och tyska. Stopp, ankomst, foton, signatur och fraktsedelsskanner – även utan nät.",
     },
     {
       title: "Trailrar och ekipage",
@@ -308,7 +308,7 @@ const sv: LandingCopy = {
     },
     {
       q: "Vilket språk använder föraren i appen?",
-      a: "Sitt eget: appen finns på tio språk, och meddelanden i uppdraget översätts automatiskt till förarens språk.",
+      a: "Sitt eget: appen finns på 12 språk, och meddelanden i uppdraget översätts automatiskt till förarens språk.",
     },
     {
       q: "Fungerar appen i hamnen utan nät?",
@@ -329,7 +329,7 @@ const sv: LandingCopy = {
   teaserEyebrow: "Trailerbyten",
   teaserTitle: "Trailerbyten i hamnar",
   teaserText:
-    "Trailerbyten i hamnar från lastbörsen, egna kunder, förarapp på 10 språk med fraktsedelsskanner, ekipage och arbetstid. Ingen procentavgift på uppdragen.",
+    "Trailerbyten i hamnar från lastbörsen, egna kunder, förarapp på 12 språk med fraktsedelsskanner, ekipage och arbetstid. Ingen procentavgift på uppdragen.",
   teaserCta: "Läs mer",
   footerLink: "Trailerbyten i hamnar",
   serviceType: "Driftplattform för åkerier med trailerbyten",
@@ -337,7 +337,7 @@ const sv: LandingCopy = {
     "Uppdrag i hamnar och i området från lastbörsen",
     "Egna kunders uppdrag och spårningslänk till kunden",
     "Orderutkast från e-post till bilen med angivet registreringsnummer",
-    "Förarapp på 10 språk: stopp, foton, signatur, fraktsedelsskanner, fungerar utan nät",
+    "Förarapp på 12 språk: stopp, foton, signatur, fraktsedelsskanner, fungerar utan nät",
     "Trailrar, ekipage och högsta tillåtna bruttovikt per land",
     "GPS- och bränsleintegrationer",
     "Arbetstid, lön och bilens lönsamhet",
@@ -347,7 +347,7 @@ const sv: LandingCopy = {
 const et: LandingCopy = {
   metaTitle: "Haagisevahetus sadamates: veod, juhid, autopark",
   metaDescription:
-    "Haagisevahetuseks: sadamavedud veobörsilt, omad kliendid, juhi rakendus 10 keeles ja veoselehed. Esimene auto tasuta.",
+    "Haagisevahetuseks: sadamavedud veobörsilt, omad kliendid, juhi rakendus 12 keeles ja veoselehed. Esimene auto tasuta.",
   eyebrow: "Haagisevahetus sadamates",
   title: "Haagised sadamast kliendini ilma paberimajanduseta",
   lede: "Võta veobörsilt haagisevahetusi sellistest sadamatest nagu Vuosaari, Muuga, Kapellskär, Travemünde ja Gdynia, sõida oma klientide vedusid ning hoia autod, juhid ja paberid ühes kohas. Vedudelt protsenti ei võeta.",
@@ -387,8 +387,8 @@ const et: LandingCopy = {
       text: "Lisa kliendi vedu oma autole või lase kliendil tellida otse sinu autole. Tellimuse e-kirjast saab mustand tellimuses nimetatud autole. Kogu hind jääb sulle.",
     },
     {
-      title: "Juhi rakendus 10 keeles",
-      text: "Soome, inglise, rootsi, norra, taani, eesti, läti, leedu, poola ja vene keel. Peatused, saabumine, fotod, allkiri ja veoselehe skanner – ka ilma võrguta.",
+      title: "Juhi rakendus 12 keeles",
+      text: "Soome, inglise, rootsi, norra, taani, eesti, läti, leedu, poola, vene, rumeenia ja saksa keel. Peatused, saabumine, fotod, allkiri ja veoselehe skanner – ka ilma võrguta.",
     },
     {
       title: "Haagised ja autorongid",
@@ -418,7 +418,7 @@ const et: LandingCopy = {
     },
     {
       q: "Mis keeles juht rakendust kasutab?",
-      a: "Oma keeles: rakendus töötab kümnes keeles ja veo sõnumid tõlgitakse automaatselt juhi keelde.",
+      a: "Oma keeles: rakendus töötab 12 keeles ja veo sõnumid tõlgitakse automaatselt juhi keelde.",
     },
     {
       q: "Kas rakendus töötab sadamas ilma võrguta?",
@@ -439,7 +439,7 @@ const et: LandingCopy = {
   teaserEyebrow: "Haagisevahetus",
   teaserTitle: "Haagised sadamates",
   teaserText:
-    "Haagisevahetused sadamatest veobörsilt, omad kliendid, juhi rakendus 10 keeles koos veoselehe skanneriga, autorongid ja tööajad. Vedudelt protsenti ei võeta.",
+    "Haagisevahetused sadamatest veobörsilt, omad kliendid, juhi rakendus 12 keeles koos veoselehe skanneriga, autorongid ja tööajad. Vedudelt protsenti ei võeta.",
   teaserCta: "Loe edasi",
   footerLink: "Haagisevahetus sadamates",
   serviceType: "Vedaja tööplatvorm haagisevahetuseks",
@@ -447,7 +447,7 @@ const et: LandingCopy = {
     "Veod sadamatest ja piirkonnast veobörsilt",
     "Oma klientide veod ja jälgimislink kliendile",
     "Tellimuse mustand e-kirjast registreerimisnumbri järgi valitud autole",
-    "Juhi rakendus 10 keeles: peatused, fotod, allkiri, veoselehe skanner, töötab ilma võrguta",
+    "Juhi rakendus 12 keeles: peatused, fotod, allkiri, veoselehe skanner, töötab ilma võrguta",
     "Haagised, autorongid ja suurimad lubatud täismassid riigiti",
     "GPS- ja kütuseliidesed",
     "Tööaeg, palk ja auto tasuvus",
@@ -457,7 +457,7 @@ const et: LandingCopy = {
 const lv: LandingCopy = {
   metaTitle: "Piekabju maiņa ostās: reisi, vadītāji, autoparks",
   metaDescription:
-    "Piekabju maiņai: ostu reisi no kravu biržas, savi klienti, vadītāja lietotne 10 valodās un CMR pavadzīmes. Pirmais auto bez maksas.",
+    "Piekabju maiņai: ostu reisi no kravu biržas, savi klienti, vadītāja lietotne 12 valodās un CMR pavadzīmes. Pirmais auto bez maksas.",
   eyebrow: "Piekabju maiņa ostās",
   title: "Puspiekabes no ostas līdz klientam bez papīru kalniem",
   lede: "Ņemiet maiņas reisus no kravu biržas tādās ostās kā Vuosāri, Mūga, Kapelšēra, Travemünde un Gdiņa, veiciet savu klientu reisus un turiet auto, vadītājus un dokumentus vienuviet. Nekādu procentu no reisiem.",
@@ -497,8 +497,8 @@ const lv: LandingCopy = {
       text: "Pievienojiet klienta reisu savam auto vai ļaujiet klientam pasūtīt tieši jūsu auto. No pasūtījuma e-pasta top melnraksts pasūtījumā norādītajam auto. Visa cena ir jūsu.",
     },
     {
-      title: "Vadītāja lietotne 10 valodās",
-      text: "Somu, angļu, zviedru, norvēģu, dāņu, igauņu, latviešu, lietuviešu, poļu un krievu. Pieturas, ierašanās, foto, paraksts un CMR skeneris – arī bez interneta.",
+      title: "Vadītāja lietotne 12 valodās",
+      text: "Somu, angļu, zviedru, norvēģu, dāņu, igauņu, latviešu, lietuviešu, poļu, krievu, rumāņu un vācu. Pieturas, ierašanās, foto, paraksts un CMR skeneris – arī bez interneta.",
     },
     {
       title: "Puspiekabes un sastāvi",
@@ -528,7 +528,7 @@ const lv: LandingCopy = {
     },
     {
       q: "Kādā valodā vadītājs lieto lietotni?",
-      a: "Savā: lietotne darbojas desmit valodās, un reisa ziņas automātiski tiek tulkotas vadītāja valodā.",
+      a: "Savā: lietotne darbojas 12 valodās, un reisa ziņas automātiski tiek tulkotas vadītāja valodā.",
     },
     {
       q: "Vai lietotne ostā strādā bez interneta?",
@@ -549,7 +549,7 @@ const lv: LandingCopy = {
   teaserEyebrow: "Piekabju maiņa",
   teaserTitle: "Puspiekabes ostās",
   teaserText:
-    "Maiņas reisi no ostām kravu biržā, savi klienti, vadītāja lietotne 10 valodās ar CMR skeneri, sastāvi un darba laiks. Nekādu procentu no reisiem.",
+    "Maiņas reisi no ostām kravu biržā, savi klienti, vadītāja lietotne 12 valodās ar CMR skeneri, sastāvi un darba laiks. Nekādu procentu no reisiem.",
   teaserCta: "Lasīt vairāk",
   footerLink: "Piekabju maiņa ostās",
   serviceType: "Pārvadātāja darba platforma piekabju maiņai",
@@ -557,7 +557,7 @@ const lv: LandingCopy = {
     "Reisi no ostām un apkārtnes kravu biržā",
     "Savu klientu reisi un izsekošanas saite klientam",
     "Pasūtījuma melnraksts no e-pasta auto ar norādīto reģistrācijas numuru",
-    "Vadītāja lietotne 10 valodās: pieturas, foto, paraksts, CMR skeneris, strādā bez interneta",
+    "Vadītāja lietotne 12 valodās: pieturas, foto, paraksts, CMR skeneris, strādā bez interneta",
     "Puspiekabes, sastāvi un maksimālās pieļaujamās masas pa valstīm",
     "GPS un degvielas integrācijas",
     "Darba laiks, alga un auto rentabilitāte",
@@ -567,7 +567,7 @@ const lv: LandingCopy = {
 const lt: LandingCopy = {
   metaTitle: "Priekabų keitimas uostuose: reisai, vairuotojai, parkas",
   metaDescription:
-    "Priekabų keitimui: uostų reisai iš krovinių biržos, savi klientai, vairuotojo programėlė 10 kalbų ir CMR važtaraščiai. Pirmas sunkvežimis nemokamai.",
+    "Priekabų keitimui: uostų reisai iš krovinių biržos, savi klientai, vairuotojo programėlė 12 kalbų ir CMR važtaraščiai. Pirmas sunkvežimis nemokamai.",
   eyebrow: "Priekabų keitimas uostuose",
   title: "Puspriekabės iš uosto klientui be popierių kalnų",
   lede: "Imkite keitimo reisus iš krovinių biržos tokiuose uostuose kaip Vuosaris, Mūga, Kapelšeras, Travemiundė ir Gdynė, vykdykite savo klientų reisus ir laikykite sunkvežimius, vairuotojus ir dokumentus vienoje vietoje. Jokių procentų nuo reisų.",
@@ -607,8 +607,8 @@ const lt: LandingCopy = {
       text: "Įtraukite kliento reisą savo sunkvežimiui arba leiskite klientui užsakyti tiesiai jūsų sunkvežimiui. Iš užsakymo laiško sukuriamas juodraštis užsakyme nurodytam sunkvežimiui. Visa kaina – jūsų.",
     },
     {
-      title: "Vairuotojo programėlė 10 kalbų",
-      text: "Suomių, anglų, švedų, norvegų, danų, estų, latvių, lietuvių, lenkų ir rusų. Sustojimai, atvykimas, nuotraukos, parašas ir CMR skeneris – ir be ryšio.",
+      title: "Vairuotojo programėlė 12 kalbų",
+      text: "Suomių, anglų, švedų, norvegų, danų, estų, latvių, lietuvių, lenkų, rusų, rumunų ir vokiečių. Sustojimai, atvykimas, nuotraukos, parašas ir CMR skeneris – ir be ryšio.",
     },
     {
       title: "Puspriekabės ir junginiai",
@@ -659,7 +659,7 @@ const lt: LandingCopy = {
   teaserEyebrow: "Priekabų keitimas",
   teaserTitle: "Puspriekabės uostuose",
   teaserText:
-    "Keitimo reisai iš uostų krovinių biržoje, savi klientai, vairuotojo programėlė 10 kalbų su CMR skeneriu, junginiai ir darbo laikas. Jokių procentų nuo reisų.",
+    "Keitimo reisai iš uostų krovinių biržoje, savi klientai, vairuotojo programėlė 12 kalbų su CMR skeneriu, junginiai ir darbo laikas. Jokių procentų nuo reisų.",
   teaserCta: "Skaityti daugiau",
   footerLink: "Priekabų keitimas uostuose",
   serviceType: "Vežėjo darbo platforma priekabų keitimui",
@@ -667,7 +667,7 @@ const lt: LandingCopy = {
     "Reisai iš uostų ir apylinkių krovinių biržoje",
     "Savų klientų reisai ir sekimo nuoroda klientui",
     "Užsakymo juodraštis iš el. laiško sunkvežimiui pagal valstybinį numerį",
-    "Vairuotojo programėlė 10 kalbų: sustojimai, nuotraukos, parašas, CMR skeneris, veikia be ryšio",
+    "Vairuotojo programėlė 12 kalbų: sustojimai, nuotraukos, parašas, CMR skeneris, veikia be ryšio",
     "Puspriekabės, junginiai ir didžiausios leidžiamosios masės pagal šalį",
     "GPS ir kuro integracijos",
     "Darbo laikas, vairuotojo atlyginimas ir sunkvežimio pelningumas",
@@ -677,7 +677,7 @@ const lt: LandingCopy = {
 const pl: LandingCopy = {
   metaTitle: "Wymiana naczep w portach: zlecenia, kierowcy, flota",
   metaDescription:
-    "Do wymian naczep: zlecenia z portów z giełdy ładunków, własni klienci, aplikacja kierowcy w 10 językach i listy przewozowe. Pierwszy pojazd gratis.",
+    "Do wymian naczep: zlecenia z portów z giełdy ładunków, własni klienci, aplikacja kierowcy w 12 językach i listy przewozowe. Pierwszy pojazd gratis.",
   eyebrow: "Wymiana naczep w portach",
   title: "Naczepy z portu do klienta bez papierologii",
   lede: "Bierz z giełdy ładunków zlecenia wymiany naczep w portach takich jak Vuosaari, Muuga, Kapellskär, Travemünde i Gdynia, obsługuj zlecenia własnych klientów i trzymaj pojazdy, kierowców i dokumenty w jednym miejscu. Bez prowizji od przewozów.",
@@ -717,8 +717,8 @@ const pl: LandingCopy = {
       text: "Dodaj zlecenie klienta do własnego pojazdu albo pozwól klientowi zamawiać bezpośrednio do Twojego pojazdu. Z e-maila ze zleceniem powstaje szkic dla pojazdu wskazanego w zleceniu. Cała cena jest Twoja.",
     },
     {
-      title: "Aplikacja kierowcy w 10 językach",
-      text: "Fiński, angielski, szwedzki, norweski, duński, estoński, łotewski, litewski, polski i rosyjski. Punkty trasy, przyjazd, zdjęcia, podpis i skaner listów przewozowych – także bez zasięgu.",
+      title: "Aplikacja kierowcy w 12 językach",
+      text: "Fiński, angielski, szwedzki, norweski, duński, estoński, łotewski, litewski, polski, rosyjski, rumuński i niemiecki. Punkty trasy, przyjazd, zdjęcia, podpis i skaner listów przewozowych – także bez zasięgu.",
     },
     {
       title: "Naczepy i zestawy",
@@ -748,7 +748,7 @@ const pl: LandingCopy = {
     },
     {
       q: "W jakim języku kierowca korzysta z aplikacji?",
-      a: "We własnym: aplikacja działa w dziesięciu językach, a wiadomości dotyczące przewozu są automatycznie tłumaczone na język kierowcy.",
+      a: "We własnym: aplikacja działa w 12 językach, a wiadomości dotyczące przewozu są automatycznie tłumaczone na język kierowcy.",
     },
     {
       q: "Czy aplikacja działa w porcie bez zasięgu?",
@@ -769,7 +769,7 @@ const pl: LandingCopy = {
   teaserEyebrow: "Wymiana naczep",
   teaserTitle: "Naczepy w portach",
   teaserText:
-    "Zlecenia wymiany naczep w portach z giełdy ładunków, własni klienci, aplikacja kierowcy w 10 językach ze skanerem listów przewozowych, zestawy i czas pracy. Bez prowizji od przewozów.",
+    "Zlecenia wymiany naczep w portach z giełdy ładunków, własni klienci, aplikacja kierowcy w 12 językach ze skanerem listów przewozowych, zestawy i czas pracy. Bez prowizji od przewozów.",
   teaserCta: "Czytaj więcej",
   footerLink: "Wymiana naczep w portach",
   serviceType: "Platforma dla przewoźników do wymiany naczep",
@@ -777,7 +777,7 @@ const pl: LandingCopy = {
     "Zlecenia z portów i z okolicy z giełdy ładunków",
     "Zlecenia własnych klientów i link do śledzenia dla klienta",
     "Szkic zlecenia z e-maila dla pojazdu według numeru rejestracyjnego",
-    "Aplikacja kierowcy w 10 językach: punkty trasy, zdjęcia, podpis, skaner listów przewozowych, działa bez zasięgu",
+    "Aplikacja kierowcy w 12 językach: punkty trasy, zdjęcia, podpis, skaner listów przewozowych, działa bez zasięgu",
     "Naczepy, zestawy i dopuszczalne masy całkowite według kraju",
     "Integracje GPS i paliwowe",
     "Czas pracy, wynagrodzenie i rentowność pojazdu",
@@ -787,7 +787,7 @@ const pl: LandingCopy = {
 const de: LandingCopy = {
   metaTitle: "Trailertausch in Häfen: Aufträge, Fahrer, Fuhrpark",
   metaDescription:
-    "Für den Trailertausch: Hafenaufträge aus der Frachtenbörse, eigene Kunden, Fahrer-App in 10 Sprachen und Frachtbriefe. Erster Lkw kostenlos.",
+    "Für den Trailertausch: Hafenaufträge aus der Frachtenbörse, eigene Kunden, Fahrer-App in 12 Sprachen und Frachtbriefe. Erster Lkw kostenlos.",
   eyebrow: "Trailertausch in Häfen",
   title: "Auflieger vom Hafen zum Kunden – ohne Papierkram",
   lede: "Übernehmen Sie Tauschaufträge aus der Frachtenbörse in Häfen wie Vuosaari, Muuga, Kapellskär, Travemünde und Gdynia, fahren Sie die Aufträge Ihrer eigenen Kunden und behalten Sie Lkw, Fahrer und Papiere an einem Ort. Keine Prozente auf Aufträge.",
@@ -827,8 +827,8 @@ const de: LandingCopy = {
       text: "Legen Sie den Auftrag eines Kunden für Ihren eigenen Lkw an oder lassen Sie den Kunden direkt bei Ihrem Lkw bestellen. Aus einer Auftrags-E-Mail wird ein Entwurf für den im Auftrag genannten Lkw. Der volle Preis gehört Ihnen.",
     },
     {
-      title: "Fahrer-App in 10 Sprachen",
-      text: "Finnisch, Englisch, Schwedisch, Norwegisch, Dänisch, Estnisch, Lettisch, Litauisch, Polnisch und Russisch. Stopps, Ankunft, Fotos, Unterschrift und Frachtbrief-Scanner – auch offline.",
+      title: "Fahrer-App in 12 Sprachen",
+      text: "Finnisch, Englisch, Schwedisch, Norwegisch, Dänisch, Estnisch, Lettisch, Litauisch, Polnisch, Russisch, Rumänisch und Deutsch. Stopps, Ankunft, Fotos, Unterschrift und Frachtbrief-Scanner – auch offline.",
     },
     {
       title: "Auflieger und Kombinationen",
@@ -858,7 +858,7 @@ const de: LandingCopy = {
     },
     {
       q: "In welcher Sprache nutzt der Fahrer die App?",
-      a: "In seiner eigenen: Die App gibt es in zehn Sprachen, und Nachrichten zum Auftrag werden automatisch in die Sprache des Fahrers übersetzt.",
+      a: "In seiner eigenen: Die App gibt es in 12 Sprachen, und Nachrichten zum Auftrag werden automatisch in die Sprache des Fahrers übersetzt.",
     },
     {
       q: "Funktioniert die App im Hafen ohne Netz?",
@@ -879,7 +879,7 @@ const de: LandingCopy = {
   teaserEyebrow: "Trailertausch",
   teaserTitle: "Trailertausch in Häfen",
   teaserText:
-    "Tauschaufträge in Häfen aus der Frachtenbörse, eigene Kunden, Fahrer-App in 10 Sprachen mit Frachtbrief-Scanner, Kombinationen und Arbeitszeiten. Keine Prozente auf Aufträge.",
+    "Tauschaufträge in Häfen aus der Frachtenbörse, eigene Kunden, Fahrer-App in 12 Sprachen mit Frachtbrief-Scanner, Kombinationen und Arbeitszeiten. Keine Prozente auf Aufträge.",
   teaserCta: "Mehr erfahren",
   footerLink: "Trailertausch in Häfen",
   serviceType: "Arbeitsplattform für Transportunternehmen im Trailertausch",
@@ -887,7 +887,7 @@ const de: LandingCopy = {
     "Aufträge in Häfen und in der Umgebung aus der Frachtenbörse",
     "Aufträge eigener Kunden und Tracking-Link für den Kunden",
     "Auftragsentwurf aus E-Mail für den Lkw mit dem genannten Kennzeichen",
-    "Fahrer-App in 10 Sprachen: Stopps, Fotos, Unterschrift, Frachtbrief-Scanner, funktioniert offline",
+    "Fahrer-App in 12 Sprachen: Stopps, Fotos, Unterschrift, Frachtbrief-Scanner, funktioniert offline",
     "Auflieger, Kombinationen und zulässige Gesamtgewichte je Land",
     "GPS- und Kraftstoff-Integrationen",
     "Arbeitszeit, Fahrerlohn und Rentabilität je Lkw",
@@ -897,7 +897,7 @@ const de: LandingCopy = {
 const ru: LandingCopy = {
   metaTitle: "Перецепка полуприцепов в портах: рейсы, водители, парк",
   metaDescription:
-    "Для перецепки полуприцепов: рейсы из портов с биржи грузов, свои клиенты, приложение водителя на 10 языках и накладные CMR. Первая машина бесплатно.",
+    "Для перецепки полуприцепов: рейсы из портов с биржи грузов, свои клиенты, приложение водителя на 12 языках и накладные CMR. Первая машина бесплатно.",
   eyebrow: "Перецепка полуприцепов в портах",
   title: "Полуприцепы из порта к клиенту без бумажной волокиты",
   lede: "Берите с биржи рейсы на перецепку в портах Вуосаари, Мууга, Капелльшер, Травемюнде, Гдыня и других, возите заказы своих клиентов и держите машины, водителей и документы в одном месте. Никаких процентов с рейсов.",
@@ -937,8 +937,8 @@ const ru: LandingCopy = {
       text: "Добавьте рейс клиента на свою машину или дайте клиенту заказывать напрямую на вашу машину. Письмо с заказом превращается в черновик для машины, указанной в заказе. Вся цена — ваша.",
     },
     {
-      title: "Приложение водителя на 10 языках",
-      text: "Финский, английский, шведский, норвежский, датский, эстонский, латышский, литовский, польский и русский. Точки маршрута, прибытие, фото, подпись и сканер накладных — и без сети.",
+      title: "Приложение водителя на 12 языках",
+      text: "Финский, английский, шведский, норвежский, датский, эстонский, латышский, литовский, польский, русский, румынский и немецкий. Точки маршрута, прибытие, фото, подпись и сканер накладных — и без сети.",
     },
     {
       title: "Полуприцепы и сцепки",
@@ -968,7 +968,7 @@ const ru: LandingCopy = {
     },
     {
       q: "На каком языке водитель работает в приложении?",
-      a: "На своём: приложение работает на десяти языках, а сообщения по рейсу автоматически переводятся на язык водителя.",
+      a: "На своём: приложение работает на 12 языках, а сообщения по рейсу автоматически переводятся на язык водителя.",
     },
     {
       q: "Работает ли приложение в порту без сети?",
@@ -989,7 +989,7 @@ const ru: LandingCopy = {
   teaserEyebrow: "Перецепка полуприцепов",
   teaserTitle: "Полуприцепы в портах",
   teaserText:
-    "Рейсы на перецепку в портах с биржи, свои клиенты, приложение водителя на 10 языках со сканером накладных, сцепки и рабочее время. Никаких процентов с рейсов.",
+    "Рейсы на перецепку в портах с биржи, свои клиенты, приложение водителя на 12 языках со сканером накладных, сцепки и рабочее время. Никаких процентов с рейсов.",
   teaserCta: "Подробнее",
   footerLink: "Перецепка полуприцепов в портах",
   serviceType: "Рабочая платформа перевозчика для перецепки полуприцепов",
@@ -997,7 +997,7 @@ const ru: LandingCopy = {
     "Рейсы с биржи в портах и рядом с вашими машинами",
     "Рейсы своих клиентов и ссылка отслеживания для клиента",
     "Черновик заказа из письма для машины по госномеру",
-    "Приложение водителя на 10 языках: точки маршрута, фото, подпись, сканер накладных, работает без сети",
+    "Приложение водителя на 12 языках: точки маршрута, фото, подпись, сканер накладных, работает без сети",
     "Полуприцепы, сцепки и максимальные разрешённые массы по странам",
     "Интеграции GPS и топлива",
     "Рабочее время, зарплата и рентабельность машины",
@@ -1008,7 +1008,7 @@ const ru: LandingCopy = {
 const ro: LandingCopy = {
   metaTitle: "Schimb de semiremorci în porturi: comenzi, șoferi, flotă",
   metaDescription:
-    "Pentru transportatorii care fac schimb de semiremorci: comenzi în porturi de pe bursa de transport, clienți proprii, aplicație pentru șoferi în 10 limbi, CMR și ansambluri. Primul camion este gratuit.",
+    "Pentru transportatorii care fac schimb de semiremorci: comenzi în porturi de pe bursa de transport, clienți proprii, aplicație pentru șoferi în 12 limbi, CMR și ansambluri. Primul camion este gratuit.",
   eyebrow: "Schimb de semiremorci în porturi",
   title: "Semiremorci din port la client, fără hârtii",
   lede: "Preluați de pe bursa de transport comenzi de schimb de semiremorci în porturi precum Vuosaari, Muuga, Kapellskär, Travemünde și Gdynia, gestionați comenzile clienților proprii și țineți camioanele, șoferii și documentele într-un singur loc. Fără procent din nicio comandă.",
@@ -1048,8 +1048,8 @@ const ro: LandingCopy = {
       text: "Adăugați comanda unui client la propriul camion sau lăsați clientul să comande direct către acesta. Un e-mail cu comanda devine ciornă pentru camionul menționat în comandă. Întregul preț rămâne la dumneavoastră.",
     },
     {
-      title: "Aplicație pentru șoferi în 10 limbi",
-      text: "Finlandeză, engleză, suedeză, norvegiană, daneză, estonă, letonă, lituaniană, poloneză și rusă. Puncte de oprire, sosire, fotografii, semnătură și scaner CMR – și fără conexiune.",
+      title: "Aplicație pentru șoferi în 12 limbi",
+      text: "Finlandeză, engleză, suedeză, norvegiană, daneză, estonă, letonă, lituaniană, poloneză, rusă, română și germană. Puncte de oprire, sosire, fotografii, semnătură și scaner CMR – și fără conexiune.",
     },
     {
       title: "Semiremorci și ansambluri",
@@ -1079,7 +1079,7 @@ const ro: LandingCopy = {
     },
     {
       q: "În ce limbă lucrează șoferul?",
-      a: "În limba sa: aplicația funcționează în zece limbi, iar mesajele din comandă sunt traduse automat în limba șoferului.",
+      a: "În limba sa: aplicația funcționează în 12 limbi, iar mesajele din comandă sunt traduse automat în limba șoferului.",
     },
     {
       q: "Funcționează aplicația în port fără conexiune?",
@@ -1100,7 +1100,7 @@ const ro: LandingCopy = {
   teaserEyebrow: "Schimb de semiremorci",
   teaserTitle: "Schimb de semiremorci în porturi",
   teaserText:
-    "Comenzi de schimb în porturi de pe bursa de transport, clienți proprii, aplicație pentru șoferi în 10 limbi cu scaner CMR, ansambluri și timp de lucru. Fără procent din comenzi.",
+    "Comenzi de schimb în porturi de pe bursa de transport, clienți proprii, aplicație pentru șoferi în 12 limbi cu scaner CMR, ansambluri și timp de lucru. Fără procent din comenzi.",
   teaserCta: "Aflați mai multe",
   footerLink: "Schimb de semiremorci în porturi",
   serviceType: "Platformă pentru transportatorii care fac schimb de semiremorci",
@@ -1108,7 +1108,7 @@ const ro: LandingCopy = {
     "Comenzi de pe bursa de transport în porturi și în apropierea camioanelor dumneavoastră",
     "Comenzi ale clienților proprii și link de urmărire pentru client",
     "Ciornă de comandă din e-mail pentru camionul identificat după numărul de înmatriculare",
-    "Aplicație pentru șoferi în 10 limbi: puncte de oprire, fotografii, semnătură, scaner CMR, funcționează fără conexiune",
+    "Aplicație pentru șoferi în 12 limbi: puncte de oprire, fotografii, semnătură, scaner CMR, funcționează fără conexiune",
     "Semiremorci, ansambluri și mase maxime pe țări",
     "Integrări GPS și de combustibil",
     "Timp de lucru, salariul șoferului și profit pe camion",

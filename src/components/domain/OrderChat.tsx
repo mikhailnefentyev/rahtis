@@ -182,7 +182,11 @@ export function OrderChat({
                     <p className="text-[12px] text-ink-dim">
                       {message.mine ? c.chatYou : who} · {f.time(message.created_at)}
                     </p>
-                    <p className={cn('whitespace-pre-wrap break-words', driver ? 'text-[16px]' : 'text-[14px]')}>
+                    <p
+                      className={cn('whitespace-pre-wrap break-words', driver ? 'text-[16px]' : 'text-[14px]')}
+                      /* Машинный перевод — текст ИИ: машиночитаемая пометка (AI Act ст. 50(2)). */
+                      data-ai-generated={shown.translated && !showOriginal ? 'true' : undefined}
+                    >
                       {showOriginal ? message.body : shown.text}
                     </p>
                     {shown.translated && (

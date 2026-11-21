@@ -107,7 +107,7 @@ const CARRIER = `## For carriers (TMS)
 
 const DRIVER = `## Driver app
 
-- Progressive web app in 10 languages: Finnish, English, Swedish, Norwegian, Danish, Estonian, Latvian, Lithuanian, Polish, Russian.
+- Progressive web app in 12 languages: Finnish, English, Swedish, Norwegian, Danish, Estonian, Latvian, Lithuanian, Polish, Russian, Romanian, German.
 - Stops in order, navigation, arrival and completion with a tap, load and damage photos, signature, CMR scanned to PDF; works offline (ports, pits) and sends entries when back online.
 - Map of over 4,800 rest, wash, fuel and service places for truck drivers in the nine countries.
 - Training (${SITE_URL}/en/driver/training): short quizzes in the driver app's language on the tachograph and driving and rest times, cargo securing, weights and dimensions, the daily vehicle check, ADR, occupational safety, first aid and road safety; beginner and experienced levels, a cheat sheet per topic and practice exercises (plan a shift, secure a load, axle loads, spot defects on a truck, ADR plates and equipment). Open without signing in; for a driver, progress is saved to the account.`;
@@ -148,13 +148,13 @@ const TRAILER_SWAP_SECTION = `## Trailer swaps in ports (for carriers)
 - Page: ${SITE_URL}${trailerSwapPath('en')} (${SITE_URL}${trailerSwapPath('fi')}).
 - For carriers doing unaccompanied semi-trailer swaps between ports, terminals and customers. Ports and ferry/container terminals in all nine countries, for example Helsinki Vuosaari, Turku and HaminaKotka (FI), Muuga and Paldiski (EE), Riga and Ventspils (LV), Klaipėda (LT), Kapellskär, Stockholm and Gothenburg (SE), Oslo (NO), Copenhagen and Esbjerg (DK), Gdynia and Świnoujście (PL), Travemünde, Rostock, Kiel and Hamburg (DE).
 - Load-board jobs near the carrier's trucks ranked by empty kilometres; own customers' jobs with a tracking link; order e-mails become drafts for the truck named in the order.
-- Driver app in 10 languages with stops, arrival, photos, signature, CMR scanner, offline mode; trailers and combinations with maximum weights by country; GPS and fuel integrations; working time, driver pay and profit per truck.
+- Driver app in 12 languages with stops, arrival, photos, signature, CMR scanner, offline mode; trailers and combinations with maximum weights by country; GPS and fuel integrations; working time, driver pay and profit per truck.
 - Price: the carrier subscription above — first active vehicle free, no percentage on any job.`;
 
 const ABOUT = `## Company
 
 - Platform name: RAHTIS. Legal entity: ${APP.operator.legalName}, Finland, business ID (Y-tunnus) ${APP.operator.businessId}.
-- Web interface in 9 languages (Finnish, English, Swedish, Estonian, Latvian, Lithuanian, Polish, German, Russian). Companies are checked against registers: PRH/YTJ open data for Finland, the Brønnøysund registers for Norway, EU VIES (VAT number) for other EU countries, and by hand in the national register where no automatic check exists; carriers also by operating licence and insurance. Every application is approved by a person; a register match shows the company exists, not that the applicant represents it.
+- Web interface in 10 languages (Finnish, English, Swedish, Estonian, Latvian, Lithuanian, Polish, German, Russian, Romanian). Companies are checked against registers: PRH/YTJ open data for Finland, the Brønnøysund registers for Norway, EU VIES (VAT number) for other EU countries, and by hand in the national register where no automatic check exists; carriers also by operating licence and insurance. Every application is approved by a person; a register match shows the company exists, not that the applicant represents it.
 - Load board order: loads are listed by publication time, newest first — no paid placement and no ranking by price, rating or subscription. A load is shown to carriers with an approved vehicle suitable for that transport type; a shipper can first offer it to a chosen group of vehicles for a limited time. Up to three carriers can offer; the chosen carrier confirms within 15 minutes or the load returns to the board.
 - Company checks: public registers at registration (PRH/YTJ, EU VIES, Brønnøysund for Norway), repeated weekly for shippers ordering directly; contractor documents and liability insurance checked by staff; each vehicle approved before it can take loads.
 - Complaints about the platform (account decisions, removed payment reports, document checks, technical problems) go to ${APP.operator.email}, are handled in order of arrival and answered in writing with reasons. Rules: ${SITE_URL}/en/rules.

@@ -832,7 +832,7 @@ export const et = {
       'Omad kliendid ja otsetellimused, jälgimislink kliendile',
       'Veobörs haagisevahetusteks, konteineriteks ja ekspressvedudeks',
       'Pinnasetööd ja kallurid: kaalutud koormad, Soome jäätmeveo saatekirjad, tunnid ja arved objektilt',
-      'Juhi rakendus 10 keeles, töötab ka ilma võrguta',
+      'Juhi rakendus 12 keeles, töötab ka ilma võrguta',
       'Tööaeg ja hinnanguline palk: kilomeetritasu, protsent veo hinnast, tunnitasu, kollektiivleping (TES) või kokkulepitud netopalk',
       'Elektrooniline veoseleht (CMR), fotod ja allkiri',
       'Veo jälgimine samm-sammult, teavitused hilinemisest ja seisakust',
@@ -1295,7 +1295,7 @@ export const et = {
       'Pärast vedu näitab rakendus, kui palju sellega teenis ja kui suureks on kuu summa kasvanud. Arvestus tuleb vedaja valitud mudelist või kollektiivlepingu tabelitest.',
     ai9: 'Juhi oma keel',
     ai9Text:
-      'Rakendus räägib telefoni keelt: soome, inglise, eesti, vene, rootsi, läti, leedu, poola, norra ja taani. Keele saab valida ka profiilis.',
+      'Rakendus räägib telefoni keelt: soome, inglise, eesti, vene, rootsi, läti, leedu, poola, norra, taani, rumeenia ja saksa. Keele saab valida ka profiilis.',
 
     servicesEyebrow: 'Teenus kasvab etappide kaupa',
     servicesTitle: "Haagisevahetused, konteinerid, kiirveod ja kallurid — kõik juba töös",
@@ -2092,6 +2092,9 @@ export const et = {
   chat: {
     title: 'Küsi assistendilt',
     hint: 'Assistent teab sinu vedusid, dokumente ja lepingutingimusi.',
+    /* AI Act ст. 50(1): человек должен знать, что отвечает ИИ (21.11.2026). */
+    aiNotice: 'Assistent on tehisintellekt. Vastustes võib olla vigu – kontrolli olulisi andmeid veost või dokumentidest.',
+    aiTag: 'TI',
     placeholder: 'Kirjuta küsimus…',
     send: 'Saada',
     sending: 'Saadan…',

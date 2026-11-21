@@ -832,7 +832,7 @@ export const lv = {
       'Savi klienti un tiešie pasūtījumi, izsekošanas saite klientam',
       'Kravu birža (piedāvājumu tabula) piekabju maiņai, konteineriem un ekspresa pārvadājumiem',
       'Zemes darbi un pašizgāzēji: svērtās kravas, Somijas atkritumu pavadzīmes, stundas un rēķini no objekta',
-      'Vadītāja lietotne 10 valodās, darbojas bez interneta',
+      'Vadītāja lietotne 12 valodās, darbojas bez interneta',
       'Darba laiks un aptuvenā alga: par kilometru, procenti no reisa cenas, stundas likme, darba koplīgums vai norunāta neto alga',
       'Elektroniskā pavadzīme (CMR), foto un paraksts',
       'Reisa izsekošana pa posmiem ar brīdinājumiem par kavēšanos un gaidīšanu',
@@ -1295,7 +1295,7 @@ export const lv = {
       'Pēc reisa lietotne parāda, cik par to nopelnīts un cik sanāk mēnesī kopā. Aprēķins nāk no pārvadātāja izvēlētā modeļa vai darba koplīguma tabulām.',
     ai9: 'Vadītāja dzimtā valoda',
     ai9Text:
-      'Lietotne runā telefona valodā: somu, angļu, igauņu, krievu, zviedru, latviešu, lietuviešu, poļu, norvēģu un dāņu. Valodu var izvēlēties arī profilā.',
+      'Lietotne runā telefona valodā: somu, angļu, igauņu, krievu, zviedru, latviešu, lietuviešu, poļu, norvēģu, dāņu, rumāņu un vācu. Valodu var izvēlēties arī profilā.',
 
     servicesEyebrow: 'Pakalpojums aug pa posmiem',
     servicesTitle: "Piekabju maiņa, konteineri, steidzami pārvadājumi un pašizgāzēji – viss jau darbojas",
@@ -2092,6 +2092,9 @@ export const lv = {
   chat: {
     title: 'Jautāt asistentam',
     hint: 'Asistents zina jūsu pārvadājumus, dokumentus un līguma noteikumus.',
+    /* AI Act ст. 50(1): человек должен знать, что отвечает ИИ (21.11.2026). */
+    aiNotice: 'Asistents ir mākslīgais intelekts. Atbildēs var būt kļūdas – svarīgu informāciju pārbaudiet pārvadājumā vai dokumentos.',
+    aiTag: 'MI',
     placeholder: 'Ierakstiet jautājumu…',
     send: 'Nosūtīt',
     sending: 'Sūta…',

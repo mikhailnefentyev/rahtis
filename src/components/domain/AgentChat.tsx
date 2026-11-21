@@ -49,6 +49,7 @@ export async function AgentChat({
     return (
       <div className="flex flex-col gap-3">
         <p className="text-[13px] text-ink-muted">{t.chat.hint}</p>
+        <p className="text-[12px] text-ink-faint">{t.chat.aiNotice}</p>
         <AgentChatLive initial={(messages ?? []) as ChatMessage[]} conversationId={conversation?.id ?? null} />
       </div>
     );
@@ -60,6 +61,7 @@ export async function AgentChat({
         <div>
           <h2 className="text-[15px] font-semibold tracking-tight">{t.chat.title}</h2>
           <p className="mt-1 text-[13px] text-ink-muted">{t.chat.hint}</p>
+          <p className="mt-1 text-[12px] text-ink-faint">{t.chat.aiNotice}</p>
         </div>
 
         <AgentChatLive

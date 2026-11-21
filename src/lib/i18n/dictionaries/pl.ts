@@ -832,7 +832,7 @@ export const pl = {
       'Własni klienci i zlecenia bezpośrednie, link do śledzenia dla klienta',
       'Giełda ładunków (tablica ofert) dla wymian naczep, kontenerów i transportu ekspresowego',
       'Roboty ziemne i wywrotki: ważone kursy, fińskie dokumenty przewozu odpadów, godziny i faktury z budowy',
-      'Aplikacja kierowcy w 11 językach, działa offline',
+      'Aplikacja kierowcy w 12 językach, działa offline',
       'Czas pracy i szacunkowe wynagrodzenie: za kilometr, procent od frachtu, stawka godzinowa, układ zbiorowy pracy (TES) lub uzgodnione wynagrodzenie netto',
       'Elektroniczny list przewozowy (CMR), zdjęcia i podpis',
       'Śledzenie przewozu krok po kroku z alertami o opóźnieniach i czasie oczekiwania',
@@ -1295,7 +1295,7 @@ export const pl = {
       'Po przewozie aplikacja pokazuje, ile wyszło i jak wygląda bieżący miesiąc. Liczby pochodzą z modelu wybranego przez przewoźnika lub z tabel układu zbiorowego.',
     ai9: 'Język kierowcy',
     ai9Text:
-      'Aplikacja działa w języku ustawionym w telefonie: fińskim, angielskim, estońskim, rosyjskim, szwedzkim, łotewskim, litewskim, polskim, norweskim, duńskim i rumuńskim. Język można też wybrać w profilu.',
+      'Aplikacja działa w języku ustawionym w telefonie: fińskim, angielskim, estońskim, rosyjskim, szwedzkim, łotewskim, litewskim, polskim, norweskim, duńskim, rumuńskim i niemieckim. Język można też wybrać w profilu.',
 
     servicesEyebrow: 'Usługa rośnie etapami',
     servicesTitle: "Wymiany naczep, kontenery, przewozy ekspresowe i wywrotki — wszystko już działa",
@@ -2091,6 +2091,9 @@ export const pl = {
   chat: {
     title: 'Zapytaj asystenta',
     hint: 'Asystent zna Twoje przewozy, dokumenty i warunki umowy.',
+    /* AI Act ст. 50(1): человек должен знать, что отвечает ИИ (21.11.2026). */
+    aiNotice: 'Asystent to sztuczna inteligencja. Odpowiedzi mogą zawierać błędy – ważne informacje sprawdź w przewozie lub dokumentach.',
+    aiTag: 'AI',
     placeholder: 'Wpisz pytanie…',
     send: 'Wyślij',
     sending: 'Wysyłanie…',

@@ -832,7 +832,7 @@ export const de = {
       'Eigene Kunden und Direktaufträge, Tracking-Link für den Kunden',
       'Frachtenbörse für Trailertausch, Container und Expressfahrten',
       'Erdbau und Kipper: gewogene Fuhren, finnische Abfall-Transportdokumente, Stunden und Rechnungen von der Baustelle',
-      'Fahrer-App in 10 Sprachen, funktioniert offline',
+      'Fahrer-App in 12 Sprachen, funktioniert offline',
       'Arbeitszeit und voraussichtlicher Lohn: pro Kilometer, Prozent vom Auftragspreis, Stundenlohn, Tarifvertrag (TES) oder vereinbarter Nettolohn',
       'Elektronischer Frachtbrief, Fotos und Unterschrift',
       'Transport Schritt für Schritt verfolgen, Warnungen bei Verspätung und Standzeit',
@@ -1295,7 +1295,7 @@ export const de = {
       'Nach jedem Auftrag zeigt die App, was er eingebracht hat und wie hoch die Monatssumme inzwischen ist. Gerechnet wird nach dem Modell, das das Transportunternehmen gewählt hat, oder nach Tariftabelle.',
     ai9: 'Die eigene Sprache des Fahrers',
     ai9Text:
-      'Die App spricht die Sprache des Handys: Finnisch, Englisch, Estnisch, Russisch, Schwedisch, Lettisch, Litauisch, Polnisch, Norwegisch und Dänisch. Die Sprache lässt sich auch im Profil selbst wählen.',
+      'Die App spricht die Sprache des Handys: Finnisch, Englisch, Estnisch, Russisch, Schwedisch, Lettisch, Litauisch, Polnisch, Norwegisch, Dänisch, Rumänisch und Deutsch. Die Sprache lässt sich auch im Profil selbst wählen.',
 
     servicesEyebrow: 'Der Service wächst in Etappen',
     servicesTitle: "Trailertausch, Container, Expressfahrten und Kipper — alles in Betrieb",
@@ -2092,6 +2092,9 @@ export const de = {
   chat: {
     title: 'Den Assistenten fragen',
     hint: 'Der Assistent kennt Ihre Transporte, Dokumente und Vertragsbedingungen.',
+    /* AI Act ст. 50(1): человек должен знать, что отвечает ИИ (21.11.2026). */
+    aiNotice: 'Der Assistent ist eine KI. Antworten können Fehler enthalten – prüfen Sie wichtige Angaben im Transport oder in den Dokumenten.',
+    aiTag: 'KI',
     placeholder: 'Frage eingeben…',
     send: 'Senden',
     sending: 'Wird gesendet…',

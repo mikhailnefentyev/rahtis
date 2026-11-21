@@ -849,7 +849,7 @@ export const en = {
       'Own customers and direct orders, tracking link for the customer',
       'Freight exchange (load board) for trailer swaps, containers and express transport',
       'Earthworks and tipper trucks: weighed loads, Finnish waste transfer documents, hours and invoices from the worksite',
-      'Driver app in 10 languages, works offline',
+      'Driver app in 12 languages, works offline',
       'Working time and estimated pay: per kilometre, percentage of job value, hourly rate, collective agreement (TES) or agreed net pay',
       'Electronic consignment note (CMR), photos and signature',
       'Step-by-step job tracking with delay and waiting-time alerts',
@@ -1351,7 +1351,7 @@ export const en = {
       'After a job the app shows what it came to and where the month now stands. The figures come from the model the carrier chose or from the collective agreement tables.',
     ai9: 'The driver\'s own language',
     ai9Text:
-      'The app uses the phone’s language: Finnish, English, Estonian, Russian, Swedish, Latvian, Lithuanian, Polish, Norwegian and Danish. You can also pick the language in your profile.',
+      'The app uses the phone’s language: Finnish, English, Estonian, Russian, Swedish, Latvian, Lithuanian, Polish, Norwegian, Danish, Romanian and German. You can also pick the language in your profile.',
 
     servicesEyebrow: 'The service grows in stages',
     servicesTitle: "Trailer swaps, containers, express and tippers — all up and running",
@@ -2227,6 +2227,9 @@ export const en = {
   chat: {
     title: 'Ask the assistant',
     hint: 'The assistant knows your jobs, documents and contract terms.',
+    /* AI Act ст. 50(1): человек должен знать, что отвечает ИИ (21.11.2026). */
+    aiNotice: 'The assistant is an AI. Its answers may contain mistakes – check important details in the job or the documents.',
+    aiTag: 'AI',
     placeholder: 'Type a question…',
     send: 'Send',
     sending: 'Sending…',

@@ -845,7 +845,7 @@ export const ro = {
       'Clienți proprii și comenzi directe, link de urmărire pentru client',
       'Bursă de transport pentru schimburi de semiremorci, containere și transport expres',
       'Terasamente și camioane basculante: încărcături cântărite, documente finlandeze de transfer al deșeurilor, ore și facturi de pe șantier',
-      'Aplicație pentru șoferi în 11 limbi, funcționează și offline',
+      'Aplicație pentru șoferi în 12 limbi, funcționează și offline',
       'Timp de lucru și salariu estimat: pe kilometru, procent din valoarea comenzii, tarif orar, contract colectiv de muncă (TES) sau salariu net convenit',
       'Scrisoare de trăsură electronică (CMR), fotografii și semnătură',
       'Urmărirea comenzii pas cu pas, cu alerte de întârziere și de timp de așteptare',
@@ -1346,7 +1346,7 @@ export const ro = {
       'După o comandă, aplicația arată cât a ieșit și unde a ajuns luna. Cifrele provin din modelul ales de transportator sau din tabelele contractului colectiv de muncă.',
     ai9: 'Limba proprie a șoferului',
     ai9Text:
-      'Aplicația folosește limba telefonului: finlandeză, engleză, estonă, rusă, suedeză, letonă, lituaniană, poloneză, norvegiană, daneză și română. Puteți alege limba și din profil.',
+      'Aplicația folosește limba telefonului: finlandeză, engleză, estonă, rusă, suedeză, letonă, lituaniană, poloneză, norvegiană, daneză, română și germană. Puteți alege limba și din profil.',
 
     servicesEyebrow: 'Serviciul crește în etape',
     servicesTitle: "Schimburi de semiremorci, containere, transport expres și basculante — toate funcționează",
@@ -2221,6 +2221,9 @@ export const ro = {
   chat: {
     title: 'Întrebați asistentul',
     hint: 'Asistentul cunoaște comenzile, documentele și condițiile contractuale ale dumneavoastră.',
+    /* AI Act ст. 50(1): человек должен знать, что отвечает ИИ (21.11.2026). */
+    aiNotice: 'Asistentul este un sistem de inteligență artificială. Răspunsurile pot conține erori – verificați informațiile importante în comandă sau în documente.',
+    aiTag: 'IA',
     placeholder: 'Scrieți o întrebare…',
     send: 'Trimiteți',
     sending: 'Se trimite…',

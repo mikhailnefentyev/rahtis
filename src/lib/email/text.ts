@@ -273,7 +273,7 @@ const fi: Texts = {
     body: (carrier) => `${carrier} käyttää RAHTIS-palvelua ja kutsuu kuljetusliikkeenne mukaan.`,
     points: [
       'Keikkoja tarjouspöydältä: perävaunujen vaihdot, kontit ja pikakuljetukset Suomessa, Pohjoismaissa, Baltiassa, Puolassa ja Saksassa.',
-      'Kuljettajan sovellus kymmenellä kielellä: saapumiset, kuvat ja rahtikirjat ilman paperia.',
+      'Kuljettajan sovellus 12 kielellä: saapumiset, kuvat ja rahtikirjat ilman paperia.',
       'Omat asiakkaat samaan paikkaan: ensimmäinen auto maksutta, jokainen seuraava ajossa ollut auto 14,90 € kuukaudessa. Ensimmäinen kuukausi maksutta.',
     ],
     button: 'Hae mukaan — tiedot on täytetty valmiiksi',
@@ -315,7 +315,7 @@ const fi: Texts = {
       body: 'RAHTIS on kuljetusten hallintajärjestelmä ja rahtipörssi, joka toimii Pohjoismaissa, Baltiassa, Puolassa ja Saksassa. Hallitsette kalustoa, kuljettajia ja omia asiakkaitanne samassa paikassa ja saatte keikkoja tarjouspöydältä, kun auto on vapaana: perävaunujen vaihdot, kontit sekä pakettiauto- ja kuorma-autokuljetukset.',
       points: [
         'Omat asiakkaat ja omat keikat: asiakas tilaa suoraan autollenne ja saa seurantalinkin. Ensimmäinen auto maksutta, jokainen seuraava ajossa ollut auto 14,90 € kuukaudessa, ei prosenttia.',
-        'Kuljettajan sovellus kymmenellä kielellä: saapumiset, kuvat, työaika ja rahtikirja skannattuna PDF:ksi.',
+        'Kuljettajan sovellus 12 kielellä: saapumiset, kuvat, työaika ja rahtikirja skannattuna PDF:ksi.',
         'Tilaukset sähköpostista: välitätte asiakkaan tilausviestin, PDF:n tai kuvan, ja RAHTIS tekee siitä keikkaluonnoksen oikealle autolle — ei käsin kirjoittamista.',
         'Keikkachat kääntyy automaattisesti: ajojärjestelijä kirjoittaa suomeksi, kuljettaja lukee ja vastaa omalla kielellään.',
         'Keikkoja tarjouspöydältä satamista ja koko toiminta-alueelta. Kuljetussopimus tehdään suoraan rahdinantajan kanssa, eikä keikoista peritä prosenttia.',

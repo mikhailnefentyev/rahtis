@@ -856,7 +856,7 @@ export const fi = {
       'Omat asiakkaat ja suorat tilaukset, seurantalinkki asiakkaalle',
       'Rahtipörssi (tarjouspöytä) irtoperille, konteille ja pikakuljetuksille',
       'Maansiirto ja kippiautot: kuormat punnituksineen, siirtoasiakirjat, tunnit ja laskut työmaalta',
-      'Kuljettajan sovellus 10 kielellä, toimii ilman verkkoa',
+      'Kuljettajan sovellus 12 kielellä, toimii ilman verkkoa',
       'Työaika ja palkka-arvio: kilometripalkka, prosentti keikasta, tuntipalkka, TES tai sovittu nettopalkka',
       'Sähköinen rahtikirja, kuvat ja allekirjoitus',
       'Kuljetuksen seuranta vaihe vaiheelta, myöhästymis- ja seisontahälytykset',
@@ -1406,7 +1406,7 @@ export const fi = {
       'Keikan jälkeen sovellus näyttää, paljonko siitä kertyi ja mihin kuukauden summa on noussut. Laskenta tulee kuljetusliikkeen valitsemasta mallista tai työehtosopimuksen taulukoista.',
     ai9: 'Kuljettajan oma kieli',
     ai9Text:
-      'Sovellus puhuu puhelimen kieltä: suomi, englanti, viro, venäjä, ruotsi, latvia, liettua, puola, norja ja tanska. Kielen voi myös valita itse profiilista.',
+      'Sovellus puhuu puhelimen kieltä: suomi, englanti, viro, venäjä, ruotsi, latvia, liettua, puola, norja, tanska, romania ja saksa. Kielen voi myös valita itse profiilista.',
 
     servicesEyebrow: 'Palvelu laajenee vaiheittain',
     /*
@@ -2316,6 +2316,9 @@ export const fi = {
   chat: {
     title: 'Kysy avustajalta',
     hint: 'Avustaja tuntee kuljetuksesi, asiakirjat ja sopimusehdot.',
+    /* AI Act ст. 50(1): человек должен знать, что отвечает ИИ (21.11.2026). */
+    aiNotice: 'Avustaja on tekoäly. Vastauksissa voi olla virheitä – tarkista tärkeät tiedot kuljetuksesta tai asiakirjoista.',
+    aiTag: 'tekoäly',
     placeholder: 'Kirjoita kysymys…',
     send: 'Lähetä',
     sending: 'Lähetetään…',

@@ -832,7 +832,7 @@ export const sv = {
       'Egna kunder och direktorder, spårningslänk till kunden',
       'Lastbörs för trailerbyten, containrar och expresstransporter',
       'Markarbeten och tippbilar: vägda lass, finska transportdokument för avfall, timmar och fakturor från arbetsplatsen',
-      'Förarapp på 10 språk, fungerar offline',
+      'Förarapp på 12 språk, fungerar offline',
       'Arbetstid och uppskattad lön: per kilometer, procent av uppdragets pris, timlön, kollektivavtal (TES) eller avtalad nettolön',
       'Elektronisk fraktsedel (CMR), foton och signatur',
       'Uppföljning av uppdraget steg för steg med larm om förseningar och väntetid',
@@ -1295,7 +1295,7 @@ export const sv = {
       'Efter ett uppdrag visar appen vad det blev och var månaden står just nu. Siffrorna kommer från den modell åkeriet valt eller från kollektivavtalets tabeller.',
     ai9: 'Förarens eget språk',
     ai9Text:
-      'Appen talar telefonens språk: finska, engelska, estniska, ryska, svenska, lettiska, litauiska, polska, norska och danska. Språket kan också väljas i profilen.',
+      'Appen talar telefonens språk: finska, engelska, estniska, ryska, svenska, lettiska, litauiska, polska, norska, danska, rumänska och tyska. Språket kan också väljas i profilen.',
 
     servicesEyebrow: 'Tjänsten växer i etapper',
     servicesTitle: "Trailerbyten, containrar, expressfrakt och tippbilar — allt redan i drift",
@@ -2092,6 +2092,9 @@ export const sv = {
   chat: {
     title: 'Fråga assistenten',
     hint: 'Assistenten känner till dina transporter, dokument och avtalsvillkor.',
+    /* AI Act ст. 50(1): человек должен знать, что отвечает ИИ (21.11.2026). */
+    aiNotice: 'Assistenten är en AI. Svaren kan innehålla fel – kontrollera viktiga uppgifter i transporten eller dokumenten.',
+    aiTag: 'AI',
     placeholder: 'Skriv en fråga…',
     send: 'Skicka',
     sending: 'Skickar…',
