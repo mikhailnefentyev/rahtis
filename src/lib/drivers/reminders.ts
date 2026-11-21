@@ -93,6 +93,8 @@ export async function sendCertificateReminders(now: Date = new Date()): Promise<
       await notify({
         companyId: company.id,
         kind: 'DRIVER',
+        code: 'driver.certificate_expiring',
+        params: { driver: driver.full_name, type: row.type, date: row.expires_at.slice(0, 10) },
         title: `${driver.full_name}: ${typeLabel} — ${expires}`,
         link: `/carrier/drivers/${row.driver_id}`,
         email: company.contact_email

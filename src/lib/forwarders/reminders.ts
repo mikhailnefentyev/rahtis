@@ -22,6 +22,9 @@ export async function notifyForwarder(input: {
   language: string | null;
   contactEmail: string | null;
   template: string;
+  /** Код события кабинета и подстановки — фраза на языке читающего (notifications/text.ts). */
+  code: string;
+  params: Record<string, string>;
   title: string;
   lead: string;
   button: string;
@@ -39,6 +42,8 @@ export async function notifyForwarder(input: {
   await notify({
     companyId: input.companyId,
     kind: 'MODERATION',
+    code: input.code,
+    params: input.params,
     title: input.title,
     body: input.lead,
     link: '/account',
@@ -137,6 +142,8 @@ export async function sendForwarderReminders(now: Date = new Date()): Promise<Fo
       language: company.language,
       contactEmail: company.contact_email,
       template: 'forwarder.expiring',
+      code: 'forwarder.insurance_expiring',
+      params: { date: row.valid_until, owner: owner ? 'yes' : 'no' },
       title: (owner ? t.forwarder.reminderTitleOwner : t.forwarder.reminderTitle).replace('{date}', date),
       lead: (owner ? t.forwarder.reminderLeadOwner : t.forwarder.reminderLead).replace('{date}', date),
       button: t.forwarder.reminderButton,

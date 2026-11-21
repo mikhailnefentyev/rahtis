@@ -5,6 +5,7 @@ import { CabinetShell } from '@/components/layout/CabinetShell';
 import { LocaleSwitch } from '@/components/layout/LocaleSwitch';
 import { Button, Card, CardBody, EmptyState, Mono } from '@/components/ui';
 import { markAllReadAction } from '@/lib/notifications/actions';
+import { notificationText, type NotificationRow } from '@/lib/notifications/text';
 import { cabinetPath, noAccessPath, REPORTS_SEGMENT, signInPath } from '@/lib/auth/paths';
 import { getViewer } from '@/lib/auth/viewer';
 import { isLocale } from '@/lib/i18n';
@@ -40,7 +41,8 @@ export default async function NotificationsPage({
   const viewer = await getViewer();
   if (viewer.status === 'guest' || viewer.status === 'mfa') redirect(signInPath(locale, `/${locale}/notifications`));
 
-  const [{ t, m, f }, supabase] = await Promise.all([getViewerI18n(locale), createClient()]);
+  const [i18n, supabase] = await Promise.all([getViewerI18n(locale), createClient()]);
+  const { t, f } = i18n;
 
   const { data: rows } = await supabase
     .from('notifications')
@@ -55,23 +57,11 @@ export default async function NotificationsPage({
   /*
    * Текст события собирается здесь, а не хранится в базе.
    *
-   * В строке лежит код и подстановки — слово подбирает язык читающего.
-   * Свободные сообщения оператора кода не имеют и показываются как есть:
-   * их писал человек, и переводить их некому.
+   * В строке лежит код и подстановки — слово подбирает язык читающего
+   * (и заголовок, и тело). Свободные сообщения оператора кода не имеют и
+   * показываются как есть: их писал человек, и переводить их некому.
    */
-  const headline = (row: { code: string | null; params: unknown; title: string | null }) => {
-    if (!row.code) return row.title ?? '';
-
-    const key = `event.${row.code}` as Parameters<typeof m>[0];
-    const params = (row.params ?? {}) as Record<string, string | number>;
-
-    try {
-      return m(key, params);
-    } catch {
-      /* Неизвестный код — не повод показать пустую строку. */
-      return row.title ?? row.code;
-    }
-  };
+  const text = (row: NotificationRow) => notificationText(row, i18n);
 
   const ready = viewer.status === 'ready';
   const content = (
@@ -103,18 +93,20 @@ export default async function NotificationsPage({
         <EmptyState className="mt-6" title={t.notify.empty} description={t.notify.emptyHint} />
       ) : (
         <ul className="mt-6 flex flex-col gap-2.5">
-          {list.map((row) => (
+          {list.map((row) => {
+            const { title, body } = text(row);
+            return (
             <li key={row.id}>
               {/* Непрочитанное отличается полосой, а не цветом текста: цвет уже занят статусами. */}
               <Card stripe={row.read_at === null ? 'info' : 'neutral'}>
                 <CardBody className="flex flex-col gap-1.5">
                   <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                    <span className="text-[14px] font-semibold">{headline(row)}</span>
+                    <span className="text-[14px] font-semibold">{title}</span>
                     <Mono className="text-xs text-ink-faint">{f.dateTime(row.created_at)}</Mono>
                   </div>
 
-                  {row.body && (
-                    <p className="text-[13px] leading-relaxed text-ink-muted">{row.body}</p>
+                  {body && (
+                    <p className="whitespace-pre-line text-[13px] leading-relaxed text-ink-muted">{body}</p>
                   )}
 
                   {/*
@@ -136,7 +128,8 @@ export default async function NotificationsPage({
                 </CardBody>
               </Card>
             </li>
-          ))}
+            );
+          })}
         </ul>
       )}
     </main>

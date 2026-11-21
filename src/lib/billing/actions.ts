@@ -146,6 +146,8 @@ async function announce(order: Order, next: BillingStatus): Promise<void> {
   await notify({
     companyId,
     kind: 'BILLING',
+    code: invoiced ? 'billing.invoiced' : 'billing.settled',
+    params: { ref: order.ref, amountCents: cents },
     title: invoiced
       ? `${t.billing.INVOICED} · ${order.ref}`
       : `${t.billing.SETTLED} · ${order.ref}`,

@@ -124,6 +124,20 @@ export async function sendMaintenanceReminders(now: Date = new Date()): Promise<
     await notify({
       companyId: company.id,
       kind: 'FLEET',
+      code: overdue > 0 ? 'maintenance.overdue' : 'maintenance.due',
+      params: {
+        count: overdue > 0 ? overdue : list.length,
+        /* Сроки — данными, а не строками: «через 5 дней» и вид работ подставит язык читающего. */
+        items: list.slice(0, 30).map((d) => ({
+          plate: d.plate,
+          kind: d.kind,
+          title: d.kind === 'OTHER' ? d.title : null,
+          dueOn: d.next_due_on,
+          dueKm: d.next_due_km,
+          daysLeft: d.daysLeft,
+          kmLeft: d.kmLeft,
+        })),
+      },
       title,
       body: lines.join('\n').slice(0, 1000),
       link: '/carrier/maintenance',
@@ -194,6 +208,8 @@ async function blockOverdueInspections(): Promise<{ count: number; errors: strin
     await notify({
       companyId: company.id,
       kind: 'FLEET',
+      code: 'maintenance.inspection_blocked',
+      params: { plates, orders: affected.map((o) => ({ ref: o.ref, day: o.first_day })) },
       title,
       body: [s.inspectionBlockedLead, ordersLine].filter(Boolean).join('\n'),
       link: '/carrier/maintenance',

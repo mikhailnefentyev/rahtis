@@ -79,12 +79,26 @@ async function ready() {
 }
 
 /** Уведомление второй стороне — на её языке, со ссылкой на сделку. */
-async function tell(companyId: string, dealId: string, build: (c: ReturnType<typeof installmentUiCopy>) => { title: string; body: string }) {
+async function tell(
+  companyId: string,
+  dealId: string,
+  /* Код события и подстановки: в кабинете фраза на языке читающего; title/body — запасной текст fi/en. */
+  event: { code: string; params: Record<string, string | number> },
+  build: (c: ReturnType<typeof installmentUiCopy>) => { title: string; body: string },
+) {
   const { data: other } = await createAdminClient().from('companies').select('id, language').eq('id', companyId).maybeSingle();
   if (!other) return;
   const c = installmentUiCopy(emailLocaleOf(other.language));
   const { title, body } = build(c);
-  await notify({ companyId: other.id, kind: 'BILLING', title, body, link: `/carrier/installments/${dealId}` });
+  await notify({
+    companyId: other.id,
+    kind: 'BILLING',
+    code: `installment.${event.code}`,
+    params: event.params,
+    title,
+    body,
+    link: `/carrier/installments/${dealId}`,
+  });
 }
 
 async function dealParties(dealId: string) {
@@ -162,7 +176,7 @@ export async function setListingStatusAction(fd: FormData): Promise<void> {
   for (const deal of open ?? []) {
     const parties = await dealParties(deal.id);
     if (!parties) continue;
-    await tell(deal.buyer_company_id, deal.id, (cc) => ({
+    await tell(deal.buyer_company_id, deal.id, { code: 'withdrawn', params: { plate: parties.plate } }, (cc) => ({
       title: fill(cc.notify.cancelledTitle, { plate: parties.plate }),
       body: cc.notify.withdrawnBody,
     }));
@@ -199,7 +213,7 @@ export async function startDealAction(_prev: ActionState, fd: FormData): Promise
   }
   const parties = await dealParties(dealId);
   if (parties) {
-    await tell(parties.seller_company_id, dealId, (cc) => ({
+    await tell(parties.seller_company_id, dealId, { code: 'offer', params: { plate: parties.plate, name: viewer.company!.name } }, (cc) => ({
       title: fill(cc.notify.offerTitle, { plate: parties.plate }),
       body: fill(cc.notify.offerBody, { name: viewer.company!.name }),
     }));
@@ -236,7 +250,7 @@ export async function proposeTermsAction(_prev: ActionState, fd: FormData): Prom
   const parties = await dealParties(dealId);
   if (parties) {
     const other = parties.seller_company_id === viewer.company.id ? parties.buyer_company_id : parties.seller_company_id;
-    await tell(other, dealId, (cc) => ({
+    await tell(other, dealId, { code: 'counter', params: { plate: parties.plate, name: viewer.company!.name } }, (cc) => ({
       title: fill(cc.notify.counterTitle, { plate: parties.plate }),
       body: fill(cc.notify.counterBody, { name: viewer.company!.name }),
     }));
@@ -275,7 +289,7 @@ export async function acceptTermsAction(_prev: ActionState, fd: FormData): Promi
   const parties = await dealParties(dealId);
   if (parties) {
     const other = parties.seller_company_id === viewer.company.id ? parties.buyer_company_id : parties.seller_company_id;
-    await tell(other, dealId, (cc) => ({
+    await tell(other, dealId, { code: 'agreed', params: { plate: parties.plate, number } }, (cc) => ({
       title: fill(cc.notify.agreedTitle, { plate: parties.plate }),
       body: fill(cc.notify.agreedBody, { number }),
     }));
@@ -317,7 +331,7 @@ export async function cancelDealAction(fd: FormData): Promise<void> {
   const parties = changed ? await dealParties(dealId) : null;
   if (parties) {
     const other = parties.seller_company_id === viewer.company.id ? parties.buyer_company_id : parties.seller_company_id;
-    await tell(other, dealId, (cc) => ({
+    await tell(other, dealId, { code: 'cancelled', params: { plate: parties.plate, name: viewer.company!.name } }, (cc) => ({
       title: fill(cc.notify.cancelledTitle, { plate: parties.plate }),
       body: fill(cc.notify.cancelledBody, { name: viewer.company!.name }),
     }));
@@ -374,7 +388,7 @@ export async function confirmHandoverAction(_prev: ActionState, fd: FormData): P
     const parties = await dealParties(dealId);
     if (parties) {
       for (const company of [parties.seller_company_id, parties.buyer_company_id]) {
-        await tell(company, dealId, (cc) => ({
+        await tell(company, dealId, { code: 'handover', params: { plate: parties.plate } }, (cc) => ({
           title: fill(cc.notify.handoverTitle, { plate: parties.plate }),
           body: cc.notify.handoverBody,
         }));
@@ -404,7 +418,7 @@ export async function markPaidAction(fd: FormData): Promise<void> {
     const parties = await dealParties(dealId);
     if (parties) {
       for (const company of [parties.seller_company_id, parties.buyer_company_id]) {
-        await tell(company, dealId, (cc) => ({
+        await tell(company, dealId, { code: 'paid_off', params: { plate: parties.plate } }, (cc) => ({
           title: fill(cc.notify.paidOffTitle, { plate: parties.plate }),
           body: cc.notify.paidOffBody,
         }));
@@ -434,7 +448,7 @@ export async function cancelWithCreditAction(fd: FormData): Promise<void> {
   const parties = await dealParties(dealId);
   if (parties) {
     const other = parties.seller_company_id === viewer.company.id ? parties.buyer_company_id : parties.seller_company_id;
-    await tell(other, dealId, (cc) => ({
+    await tell(other, dealId, { code: 'cancelled', params: { plate: parties.plate, name: viewer.company!.name } }, (cc) => ({
       title: fill(cc.notify.cancelledTitle, { plate: parties.plate }),
       body: fill(cc.notify.cancelledBody, { name: viewer.company!.name }),
     }));

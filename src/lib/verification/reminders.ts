@@ -79,6 +79,8 @@ export async function sendVerificationReminders(): Promise<VerificationReminderR
     await notify({
       companyId: company.id,
       kind: 'MODERATION',
+      code: 'verification.expiring',
+      params: { item: row.item, date: row.valid_until, source: row.source === 'PRH' ? 'PRH' : 'OTHER' },
       title,
       body: lead,
       link: '/carrier/verification',

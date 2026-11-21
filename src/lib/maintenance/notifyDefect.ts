@@ -75,6 +75,14 @@ export async function notifyCarrierOfDefect(defectId: string): Promise<void> {
   await notify({
     companyId: company.id,
     kind: 'FLEET',
+    code: unsafe ? 'maintenance.defect_unsafe' : 'maintenance.defect',
+    params: {
+      plate,
+      area: defect.area,
+      who,
+      text: defect.description.slice(0, 900),
+      orders: affected.map((o) => ({ ref: o.ref, day: o.first_day })),
+    },
     title,
     body: [`${who}: ${defect.description}`, unsafe ? s.downtime.defectBlockedNote : null, ordersLine].filter(Boolean).join('\n').slice(0, 1000),
     link,

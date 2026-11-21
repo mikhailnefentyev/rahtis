@@ -37,6 +37,8 @@ async function ready(locale: Locale) {
 async function tell(
   counterparty: string,
   fromName: string,
+  /* Код события и подстановки: в кабинете фраза на языке читающего; title/body — запасной текст. */
+  event: { code: string; params: Record<string, string | number> },
   build: (t: Awaited<ReturnType<typeof getDictionary>>) => { title: string; body: string },
 ) {
   const { data: other } = await createAdminClient()
@@ -47,7 +49,15 @@ async function tell(
   if (!other) return;
   const t = await getDictionary(emailLocaleOf(other.language));
   const { title, body } = build(t);
-  await notify({ companyId: other.id, kind: 'BILLING', title: title.replace('{name}', fromName), body, link: '/account#invoice-terms' });
+  await notify({
+    companyId: other.id,
+    kind: 'BILLING',
+    code: event.code,
+    params: { name: fromName, ...event.params },
+    title: title.replace('{name}', fromName),
+    body,
+    link: '/account#invoice-terms',
+  });
 }
 
 export async function proposeInvoiceTermsAction(_previous: TermsState, formData: FormData): Promise<TermsState> {
@@ -71,7 +81,7 @@ export async function proposeInvoiceTermsAction(_previous: TermsState, formData:
     return { error: t.invoiceTerms.error, saved: false };
   }
 
-  await tell(counterparty, viewer.company.name, (tt) => ({
+  await tell(counterparty, viewer.company.name, { code: 'invoice.terms_proposed', params: { schedule, days: term } }, (tt) => ({
     title: tt.invoiceTerms.notifyProposalTitle,
     body: tt.invoiceTerms.notifyProposalBody
       .replace('{schedule}', tt.invoiceTerms.schedules[schedule])
@@ -107,7 +117,7 @@ export async function answerInvoiceTermsAction(formData: FormData): Promise<void
 
   /* Отзыв своего предложения — без уведомления: другой стороне отвечать уже не на что. */
   if (decision !== 'WITHDRAW') {
-    await tell(counterparty, viewer.company.name, (tt) => ({
+    await tell(counterparty, viewer.company.name, { code: accept ? 'invoice.terms_accepted' : 'invoice.terms_rejected', params: {} }, (tt) => ({
       title: accept ? tt.invoiceTerms.notifyAcceptedTitle : tt.invoiceTerms.notifyRejectedTitle,
       body: tt.invoiceTerms.hint,
     }));

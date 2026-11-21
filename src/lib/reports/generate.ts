@@ -902,6 +902,16 @@ async function issue(
   const result = await notify({
     companyId,
     kind: 'REPORT',
+    code: span.kind === 'WEEK' ? 'report.weekly' : 'report.period',
+    params: {
+      role: carrier ? 'carrier' : 'shipper',
+      week: isoWeekNumber(week),
+      number: invoice?.number ?? '',
+      from: week,
+      to: span.end,
+      count: orders.length,
+      amountCents: net,
+    },
     title: `${texts.title} · ${period}`,
     /* Словами: «2 kuljetusta · 450 €» вместо «2 · 450 €». */
     body: m('report.notice', { count: orders.length, amount: f.eur(net) }),
@@ -1171,6 +1181,15 @@ async function issueSubscriptionInvoices(
       const result = await notify({
         companyId: fee.carrier_company_id,
         kind: 'REPORT',
+        code: 'report.subscription',
+        params: {
+          number,
+          month: monthLabel,
+          annual: fee.kind === 'ANNUAL' ? 'yes' : 'no',
+          count: fee.active_vehicles,
+          unitCents: fee.unit_cents,
+          vatBps: fee.vat_bps,
+        },
         title: `${texts.title} · ${monthLabel}`,
         body: description,
         link: saved?.id ? `/reports/${saved.id}` : '/carrier/done',

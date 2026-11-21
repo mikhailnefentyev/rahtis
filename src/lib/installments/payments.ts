@@ -482,6 +482,8 @@ export async function runInstallments(options: { dealId?: string; today?: string
         await notify({
           companyId: deal.buyer_company_id,
           kind: 'BILLING',
+          code: 'installment.overdue',
+          params: { plate, n: row.n, date: row.due_date, days: late },
           title: fill(cb.notify.overdueTitle, { plate, n: String(row.n) }),
           body: fill(cb.notify.overdueBody, { days: String(late), date: fiDate(row.due_date) }),
           link: `/carrier/installments/${deal.id}`,
@@ -510,6 +512,8 @@ export async function runInstallments(options: { dealId?: string; today?: string
           await notify({
             companyId: deal.seller_company_id,
             kind: 'BILLING',
+            code: 'installment.threshold',
+            params: { plate },
             title: fill(cs.notify.thresholdTitle, { plate }),
             body: cs.notify.thresholdBody,
             link: `/carrier/installments/${deal.id}`,

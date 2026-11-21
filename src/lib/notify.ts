@@ -2,7 +2,7 @@ import 'server-only';
 
 import { sendEmail } from '@/lib/email';
 import { createAdminClient } from '@/lib/supabase/admin';
-import type { Database } from '@/types/database';
+import type { Database, Json } from '@/types/database';
 
 /**
  * Событие для стороны: в кабинет обязательно, на почту по возможности.
@@ -21,6 +21,15 @@ export type NotificationKind = Database['public']['Enums']['notification_kind'];
 type NotifyInput = {
   companyId: string;
   kind: NotificationKind;
+  /**
+   * Код события без приставки: 'installment.offer' → msg['event.installment.offer']
+   * (и msg['event.installment.offer.body'], если есть). Страница уведомлений
+   * собирает текст по коду на языке читающего — src/lib/notifications/text.ts.
+   */
+  code?: string | null;
+  /** Подстановки без языка: строки и числа, даты 'YYYY-MM-DD', суммы xxxCents. */
+  params?: Record<string, Json | undefined> | null;
+  /** Запасной текст (fi/en по языку компании): для неизвестного кода. В письмо не идёт. */
   title: string;
   body?: string | null;
   /** Куда вести в кабинете: относительный путь без языка, '/carrier/desk'. */
@@ -57,6 +66,8 @@ export async function notify(input: NotifyInput): Promise<NotifyResult> {
     .insert({
       company_id: input.companyId,
       kind: input.kind,
+      code: input.code ?? null,
+      params: (input.params ?? {}) as Json,
       title: input.title,
       body: input.body ?? null,
       link: input.link ?? null,
