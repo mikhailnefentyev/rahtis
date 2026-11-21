@@ -32,7 +32,8 @@ test('фото у тягача и фургона, у остальных клас
   assert.equal(truckPhoto('Ford Transit', 'VAN').src, '/media/vans/ford.webp');
   assert.equal(truckPhoto('Peugeot Boxer', 'VAN'), null);
   assert.equal(truckPhoto('Volvo FL', 'TRUCK').src, '/media/rigids/volvo.webp');
-  assert.equal(truckPhoto('Renault D', 'TRUCK'), null);
+  assert.equal(truckPhoto('Renault D', 'TRUCK').src, '/media/rigids/renault.webp');
+  assert.equal(truckPhoto('Sisu', 'TRUCK'), null);
   assert.equal(truckPhoto('Volvo FH', null), null);
 });
 
@@ -47,8 +48,9 @@ test('марка фургона по словам, не по частям сло
   assert.equal(truckPhoto('VW Transporter', 'VAN').src, '/media/vans/vw.webp');
 });
 
-test('самосвал: снимок 8×4 по марке, DAF без снимка', () => {
+test('самосвал: снимок 8×4 по марке', () => {
   assert.equal(truckPhoto('Scania R560', 'TIPPER').src, '/media/tippers/scania.webp');
   assert.equal(truckPhoto('Volvo FMX', 'TIPPER').src, '/media/tippers/volvo.webp');
-  assert.equal(truckPhoto('DAF CF', 'TIPPER'), null);
+  assert.equal(truckPhoto('DAF CF', 'TIPPER').src, '/media/tippers/daf.webp');
+  assert.equal(truckPhoto('Sisu Polar', 'TIPPER'), null);
 });

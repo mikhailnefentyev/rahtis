@@ -1,9 +1,9 @@
 /**
  * Фото машины по марке (21.11.2026). Тягачи — Volvo, Scania, MAN,
  * Mercedes-Benz, DAF, Iveco, Renault (public/media/trucks); самосвалы 8×4 —
- * Volvo, Scania, MAN, Mercedes-Benz, Iveco, Renault (public/media/tippers);
+ * Volvo, Scania, MAN, Mercedes-Benz, DAF, Iveco, Renault (public/media/tippers);
  * грузовики с фургонным кузовом — Volvo, Scania, MAN, Mercedes-Benz, DAF,
- * Iveco (public/media/rigids);
+ * Iveco, Renault (public/media/rigids);
  * фургоны — Ford, Citroën, Fiat, Volkswagen, Mercedes-Benz (public/media/vans). Снимки
  * приведены к одному виду: фон --color-ground, мордой вправо, один масштаб,
  * 960 × 600.
@@ -39,7 +39,7 @@ const PLATE: Record<TruckBrand, { x: number; y: number; w: number; skew: number 
   renault: { x: 665, y: 450, w: 40, skew: -1 },
 };
 
-/* Номер на бампере самосвала (кадр 960 × 600). DAF самосвала нет. */
+/* Номер на бампере самосвала (кадр 960 × 600). */
 const TIPPER_PLATE: Partial<Record<TruckBrand, { x: number; y: number; w: number; skew: number }>> = {
   renault: { x: 683, y: 447, w: 40, skew: -1 },
   iveco: { x: 667, y: 449, w: 44, skew: -1 },
@@ -47,9 +47,10 @@ const TIPPER_PLATE: Partial<Record<TruckBrand, { x: number; y: number; w: number
   man: { x: 683, y: 438, w: 30, skew: -1 },
   volvo: { x: 707, y: 467, w: 34, skew: -1 },
   scania: { x: 707, y: 457, w: 34, skew: -1 },
+  daf: { x: 677, y: 452, w: 38, skew: -1 },
 };
 
-/* Номер на бампере грузовика (кадр 960 × 600). Renault грузовика нет. */
+/* Номер на бампере грузовика (кадр 960 × 600). */
 const RIGID_PLATE: Partial<Record<TruckBrand, { x: number; y: number; w: number; skew: number }>> = {
   iveco: { x: 667, y: 447, w: 40, skew: -1 },
   daf: { x: 661, y: 467, w: 40, skew: -1 },
@@ -57,6 +58,7 @@ const RIGID_PLATE: Partial<Record<TruckBrand, { x: number; y: number; w: number;
   man: { x: 757, y: 445, w: 40, skew: -2 },
   scania: { x: 740, y: 477, w: 34, skew: -1 },
   volvo: { x: 697, y: 463, w: 40, skew: -1 },
+  renault: { x: 687, y: 467, w: 36, skew: -1 },
 };
 
 export type VanBrand = 'ford' | 'citroen' | 'fiat' | 'vw' | 'mercedes';
