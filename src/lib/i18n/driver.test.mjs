@@ -27,12 +27,13 @@ test('норвежские варианты сводятся к букмолу',
 });
 
 test('вес учитывается: первым берётся язык с наибольшим q', () => {
-  assert.equal(matchDriverLocale('de-DE,de;q=0.9,pl;q=0.8'), 'pl');
+  assert.equal(matchDriverLocale('es-ES,es;q=0.9,pl;q=0.8'), 'pl');
+  assert.equal(matchDriverLocale('de-DE,de;q=0.9,pl;q=0.8'), 'de');
   assert.equal(matchDriverLocale('en;q=0.5,et;q=0.9'), 'et');
 });
 
 test('непереведённый язык не подменяется соседним', () => {
-  for (const header of ['de-DE,de;q=0.9', 'es-ES', 'zh-CN', '', null, undefined]) {
+  for (const header of ['it-IT,it;q=0.9', 'es-ES', 'zh-CN', '', null, undefined]) {
     assert.equal(matchDriverLocale(header), null, String(header));
   }
 });
