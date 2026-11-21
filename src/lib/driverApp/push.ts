@@ -1,7 +1,8 @@
 import 'server-only';
 
 import webpush from 'web-push';
-import { getI18n, isLocale } from '@/lib/i18n';
+import { createI18n, isLocale } from '@/lib/i18n';
+import { driverDictionary, isDriverLocale } from '@/lib/i18n/driver';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 /**
@@ -49,11 +50,20 @@ export async function sendDriverPush(notificationId: number): Promise<PushResult
     .select('id, endpoint, p256dh, auth, locale')
     .eq('driver_id', note.driver_id);
 
+  /*
+   * Язык текста — выбор водителя в профиле (app_language), а не адрес
+   * страницы, с которой он подписался: норвежец и датчанин подписываются
+   * с /fi или /en, а читают на своём (аудит 21.11.2026).
+   */
+  const { data: driver } = await admin.from('drivers').select('app_language').eq('id', note.driver_id).maybeSingle();
+
   let sent = 0;
   let removed = 0;
 
   for (const sub of subscriptions ?? []) {
-    const { t, m } = await getI18n(isLocale(sub.locale) ? sub.locale : 'fi');
+    const site = isLocale(sub.locale) ? sub.locale : 'fi';
+    const own = driver?.app_language && isDriverLocale(driver.app_language) ? driver.app_language : isDriverLocale(site) ? site : 'fi';
+    const { t, m } = createI18n(site, await driverDictionary(site, own));
 
     let body: string;
     try {
