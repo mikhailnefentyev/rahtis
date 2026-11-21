@@ -190,7 +190,7 @@ export function SiteJobForm({
           <Field label={t.siteInvoice.customerCountry}>
             {(p) => (
               <Select {...p} name="customer_country" defaultValue={job?.customer_country ?? 'FI'}>
-                {['FI', 'SE', 'NO', 'DK', 'EE', 'LV', 'LT', 'PL', 'DE'].map((c) => (
+                {SITE_COUNTRIES.map((c) => (
                   <option key={c} value={c}>
                     {c}
                   </option>

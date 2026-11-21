@@ -19,8 +19,8 @@
  * законный документ.
  */
 
-export type SiteCountry = 'FI' | 'SE' | 'NO' | 'DK' | 'EE' | 'LV' | 'LT' | 'PL' | 'DE';
-export const SITE_COUNTRIES: readonly SiteCountry[] = ['FI', 'SE', 'NO', 'DK', 'EE', 'LV', 'LT', 'PL', 'DE'];
+export type SiteCountry = 'FI' | 'SE' | 'NO' | 'DK' | 'EE' | 'LV' | 'LT' | 'PL' | 'DE' | 'RO';
+export const SITE_COUNTRIES: readonly SiteCountry[] = ['FI', 'SE', 'NO', 'DK', 'EE', 'LV', 'LT', 'PL', 'DE', 'RO'];
 
 export function isSiteCountry(value: unknown): value is SiteCountry {
   return typeof value === 'string' && (SITE_COUNTRIES as readonly string[]).includes(value);
@@ -123,6 +123,13 @@ const LABELS: Record<SiteCountry, Labels> = {
     ticket: 'Kwit wagowy', pending: 'Czeka na potwierdzenie kierownika budowy',
     soil: 'Stan gleby i ziemi', contaminated: 'Zanieczyszczona gleba i ziemia', clean: 'Niezanieczyszczona gleba i ziemia',
   },
+  RO: {
+    holder: 'Deținătorul deșeurilor (producător)', carrier: 'Transportator', receiver: 'Destinatar', time: 'Data și ora transportului',
+    from: 'Locul de încărcare (șantier)', to: 'Locul de descărcare', waste: 'Codul și denumirea deșeului', quantity: 'Cantitate',
+    holderOk: 'Confirmarea deținătorului', carrierOk: 'Confirmarea transportatorului', receiverOk: 'Confirmarea destinatarului',
+    ticket: 'Bon de cântar', pending: 'Așteaptă confirmarea șefului de șantier',
+    soil: 'Starea pământului', contaminated: 'Pământ contaminat', clean: 'Pământ necontaminat',
+  },
   DE: {
     holder: 'Abfallerzeuger / Besitzer', carrier: 'Beförderer', receiver: 'Annahmestelle', time: 'Datum und Uhrzeit der Fuhre',
     from: 'Anfallstelle (Baustelle)', to: 'Verbleib (Annahmestelle)', waste: 'Abfallschlüssel und Bezeichnung', quantity: 'Menge',
@@ -219,6 +226,18 @@ export function wasteDocFor(country: SiteCountry, hazardous: boolean, day: strin
             local: 'Nicht gefährlicher Abfall: Nachweis der Verwertung für den Erzeuger. Wird Bodenmaterial als Ersatzbaustoff eingebaut, ist zusätzlich ein Lieferschein nach ErsatzbaustoffV § 25 (Anlage 7) mit Materialklasse nötig.',
             en: 'Non-hazardous waste: record for the producer. If soil is installed as a substitute building material, a delivery note under ErsatzbaustoffV § 25 with material class is also needed.',
           });
+    /*
+     * Румыния (21.11.2026): транспорт отходов по стране — HG 1061/2008
+     * (формуляры погрузки-разгрузки), режим отходов — OUG 92/2021. Применим
+     * ли формуляр к грунту и в какой редакции акт действует, по первоисточнику
+     * не подтверждено — поэтому печатаем запись о рейсе, а не «законный
+     * документ», и прямо говорим, что формуляр оформляется по местным правилам.
+     */
+    case 'RO':
+      return print('Fișă de cursă (evidența transportului)', 'Load record', 'OUG 92/2021; HG 1061/2008', {
+        local: 'Fișa înregistrează încărcătura, greutatea și destinatarul. Formularul de transport al deșeurilor (de exemplu formularul de încărcare-descărcare prevăzut de HG 1061/2008) se întocmește conform cerințelor în vigoare – verificați la agenția pentru protecția mediului (APM). Această fișă nu îl înlocuiește.',
+        en: 'This record shows the load, weight and receiver. The waste transport form required in Romania (e.g. the loading-unloading form under HG 1061/2008) is completed under the rules in force – check with the environmental protection agency (APM). This record does not replace it.',
+      });
     case 'PL':
       return state('Karta przekazania odpadów (KPO)', 'Waste transfer card (KPO)', 'Ustawa o odpadach, art. 67 i 69', SYSTEMS.PL,
         'KPO tworzy się wyłącznie w BDO przed rozpoczęciem transportu; wydruk z RAHTIS nie zastępuje karty. RAHTIS nie łączy się jeszcze z BDO – wpisz dane poniżej w BDO.',
