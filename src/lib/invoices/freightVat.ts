@@ -18,6 +18,16 @@ const EU = new Set(['FI', 'SE', 'DK', 'EE', 'LV', 'LT', 'PL', 'DE', 'RO']);
 export const REVERSE_CHARGE_NOTE =
   'Käännetty verovelvollisuus – ostaja on verovelvollinen (AVL 65 §, direktiivi 2006/112/EY 196 art.). / Reverse charge – VAT to be accounted for by the recipient (Art. 196 Directive 2006/112/EC).';
 
+/*
+ * Продавец не из Финляндии (21.11.2026, аудит): ссылка на финский AVL 65 § и
+ * финская фраза в его счёте неуместны. Пометка «Reverse charge» — та, что
+ * требует ст. 226(11a) директивы, со ссылкой на ст. 196.
+ */
+export const REVERSE_CHARGE_NOTE_EU =
+  'Reverse charge – VAT to be accounted for by the recipient (Art. 196 Directive 2006/112/EC).';
+
+export const OUTSIDE_EU_NOTE_EU = 'No VAT charged – VAT to be accounted for by the recipient in its own country.';
+
 export const OUTSIDE_EU_NOTE =
   'Ei Suomen/myyjämaan arvonlisäveroa – ostaja on verovelvollinen omassa maassaan. / No VAT charged – VAT to be accounted for by the recipient in its own country.';
 
@@ -44,8 +54,8 @@ export function freightVat(
     /* Номер НДС покупателя — его страны: «DE…» у немецкой фирмы, не чужой. */
     const vatId = (buyerVatNumber ?? '').replace(/\s+/g, '').toUpperCase();
     if (!vatId || !vatId.startsWith(buyer)) return { ok: false, reason: 'NO_BUYER_VAT' };
-    return { ok: true, vatBps: 0, note: REVERSE_CHARGE_NOTE };
+    return { ok: true, vatBps: 0, note: seller === 'FI' ? REVERSE_CHARGE_NOTE : REVERSE_CHARGE_NOTE_EU };
   }
 
-  return { ok: true, vatBps: 0, note: OUTSIDE_EU_NOTE };
+  return { ok: true, vatBps: 0, note: seller === 'FI' ? OUTSIDE_EU_NOTE : OUTSIDE_EU_NOTE_EU };
 }

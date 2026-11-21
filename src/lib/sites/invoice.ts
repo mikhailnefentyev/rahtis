@@ -21,6 +21,24 @@ export function finnishReference(base: string): string {
   return `${padded}${check}`;
 }
 
+/**
+ * Международная ссылка платежа RF (ISO 11649) из финской: «RF» + две
+ * контрольные цифры (mod 97, как у IBAN) + сама ссылка. Её понимают банки
+ * всех стран SEPA; финский viitenumero — только финские (аудит 21.11.2026).
+ */
+export function rfReference(base: string): string {
+  const ref = finnishReference(base);
+  /* «RF00» в конец, буквы → числа (R = 27, F = 15), остаток от деления на 97. */
+  let rest = 0;
+  for (const ch of `${ref}271500`) rest = (rest * 10 + Number(ch)) % 97;
+  return `RF${String(98 - rest).padStart(2, '0')}${ref}`;
+}
+
+/** Ссылка платежа по стране продавца: финскому — viitenumero, остальным — RF. */
+export function paymentReference(base: string, sellerCountry: string | null | undefined): string {
+  return (sellerCountry ?? 'FI').toUpperCase() === 'FI' ? finnishReference(base) : rfReference(base);
+}
+
 export type InvoiceDay = {
   day: string;
   driver: string;

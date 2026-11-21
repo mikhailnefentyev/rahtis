@@ -5,7 +5,7 @@ import { todayInHelsinki } from '@/lib/dates';
 import { sendEmail } from '@/lib/email';
 import { createFormat } from '@/lib/format';
 import { asCurrency } from '@/lib/money/currency';
-import { finnishReference, standardVatBps } from '@/lib/sites/invoice';
+import { paymentReference, standardVatBps } from '@/lib/sites/invoice';
 import { SiteInvoicePdf } from '@/lib/sites/SiteInvoicePdf';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { ibanHoldActive } from '@/lib/trust/changes';
@@ -286,7 +286,7 @@ async function createFreightInvoice(orders: OrderRow[], termDays: number): Promi
     await admin.from('carrier_invoices').delete().eq('id', invoice.id);
     throw new Error(`номер счёта: ${numberError?.message}`);
   }
-  const reference = finnishReference(number);
+  const reference = paymentReference(number, seller.country);
   await admin.from('carrier_invoices').update({ number, reference }).eq('id', invoice.id);
 
   const vatLabel = `${seller.country === 'FI' ? 'ALV / VAT' : 'VAT'} ${(vat.vatBps / 100).toLocaleString('fi-FI', { maximumFractionDigits: 1 })} %`;

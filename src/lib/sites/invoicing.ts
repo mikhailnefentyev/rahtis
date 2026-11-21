@@ -7,7 +7,7 @@ import { createFormat } from '@/lib/format';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { ibanHoldActive, maskIban } from '@/lib/trust/changes';
 import { lastIbanChange } from '@/lib/trust/sensitive';
-import { finnishReference, invoiceLines, invoiceTotals, standardVatBps, type InvoiceDay } from './invoice';
+import { paymentReference, invoiceLines, invoiceTotals, standardVatBps, type InvoiceDay } from './invoice';
 import { SiteInvoicePdf } from './SiteInvoicePdf';
 import { dayMinutes } from './work';
 
@@ -178,7 +178,7 @@ export async function createSiteInvoice(
     await admin.from('carrier_invoices').delete().eq('id', invoice.id);
     throw new Error(`номер счёта: ${numberError?.message}`);
   }
-  const reference = finnishReference(number);
+  const reference = paymentReference(number, seller.country);
   await admin.from('carrier_invoices').update({ number, reference }).eq('id', invoice.id);
 
   const unit = { h: 'h', kuorma: 'kuorma', t: 't' } as const;

@@ -116,11 +116,11 @@ export function SiteInvoicePdf(input: SiteInvoicePdfInput) {
 
         <View style={s.table}>
           <View style={s.head}>
-            <Text style={s.cDate}>{ansi('Pvm')}</Text>
+            <Text style={s.cDate}>{ansi('Pvm / Date')}</Text>
             <Text style={s.cText}>{ansi('Kuvaus / Description')}</Text>
-            <Text style={s.cQty}>{ansi('Määrä')}</Text>
-            <Text style={s.cPrice}>{ansi('À-hinta')}</Text>
-            <Text style={s.cAmount}>{ansi('Yhteensä')}</Text>
+            <Text style={s.cQty}>{ansi('Määrä / Qty')}</Text>
+            <Text style={s.cPrice}>{ansi('À-hinta / Unit')}</Text>
+            <Text style={s.cAmount}>{ansi('Yhteensä / Total')}</Text>
           </View>
           {input.lines.map((l, i) => (
             <View key={i} style={s.line} wrap={false}>
