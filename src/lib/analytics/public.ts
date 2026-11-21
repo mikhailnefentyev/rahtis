@@ -11,7 +11,7 @@
 export const CONSENT_KEY = 'rahtis-analytics';
 
 const PUBLIC_PAGES =
-  /^\/[a-z]{2}(\/(apply|terms|privacy|kayttoehdot|tietosuoja|api-docs|rules|maansiirto|earthworks|huolitsijoille|forwarders|peravaunun-vaihto|trailer-swap|blog(\/[^/]+)?))?\/?$/;
+  /^\/[a-z]{2}(\/(apply|terms|privacy|kayttoehdot|tietosuoja|api-docs|rules|maansiirto|earthworks|huolitsijoille|forwarders|peravaunun-vaihto|trailer-swap|kuorma-auto-osamaksulla|truck-installment-sale|blog(\/[^/]+)?))?\/?$/;
 
 export function isPublicPath(pathname: string): boolean {
   if (pathname === '/' || pathname === '/blog' || /^\/blog\/[^/]+\/?$/.test(pathname)) return true;
