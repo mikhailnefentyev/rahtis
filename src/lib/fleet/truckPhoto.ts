@@ -39,11 +39,11 @@ export type VanBrand = 'ford' | 'citroen' | 'fiat' | 'vw' | 'mercedes';
 
 /* Номер на бампере фургона (кадр 960 × 600). */
 const VAN_PLATE: Record<VanBrand, { x: number; y: number; w: number; skew: number }> = {
-  ford: { x: 714, y: 433, w: 66, skew: -2 },
-  citroen: { x: 740, y: 425, w: 94, skew: -3 },
-  fiat: { x: 796, y: 402, w: 92, skew: -2 },
-  vw: { x: 742, y: 390, w: 86, skew: -3 },
-  mercedes: { x: 788, y: 430, w: 82, skew: -3 },
+  ford: { x: 672, y: 448, w: 54, skew: -2 },
+  citroen: { x: 693, y: 441, w: 77, skew: -3 },
+  fiat: { x: 739, y: 423, w: 75, skew: -2 },
+  vw: { x: 695, y: 413, w: 71, skew: -3 },
+  mercedes: { x: 733, y: 445, w: 67, skew: -3 },
 };
 
 const VAN_PATTERNS: [VanBrand, RegExp][] = [
