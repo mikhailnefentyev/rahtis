@@ -2,14 +2,16 @@
  * Фото машины по марке (21.11.2026). Тягачи — Volvo, Scania, MAN,
  * Mercedes-Benz, DAF, Iveco, Renault (public/media/trucks); самосвалы 8×4 —
  * Volvo, Scania, MAN, Mercedes-Benz, Iveco, Renault (public/media/tippers);
+ * грузовики с фургонным кузовом — Volvo, Scania, MAN, Mercedes-Benz, DAF,
+ * Iveco (public/media/rigids);
  * фургоны — Ford, Citroën, Fiat, Volkswagen, Mercedes-Benz (public/media/vans). Снимки
  * приведены к одному виду: фон --color-ground, мордой вправо, один масштаб,
  * 960 × 600.
  *
  * Цвет по классу машины — решение владельца 21.11.2026: тягачи графитовые,
- * фургоны белые, самосвалы — светлая кабина и серый кузов; грузовики
- * (голубая кабина, белый кузов) — когда будут снимки. Самосвал любой
- * осности показывается снимком 8×4 — самого ходового в Финляндии. Класс без снимков и
+ * фургоны белые, самосвалы и грузовики — светлая кабина и серый кузов, как
+ * на снимках владельца. Самосвал любой осности показывается снимком 8×4,
+ * грузовик — снимком своей марки (у Iveco 4×2, у остальных 6×2). Класс без снимков и
  * марка не из списка — без фото: чужая машина на карточке вводила бы в
  * заблуждение.
  *
@@ -45,6 +47,16 @@ const TIPPER_PLATE: Partial<Record<TruckBrand, { x: number; y: number; w: number
   man: { x: 683, y: 438, w: 30, skew: -1 },
   volvo: { x: 707, y: 467, w: 34, skew: -1 },
   scania: { x: 707, y: 457, w: 34, skew: -1 },
+};
+
+/* Номер на бампере грузовика (кадр 960 × 600). Renault грузовика нет. */
+const RIGID_PLATE: Partial<Record<TruckBrand, { x: number; y: number; w: number; skew: number }>> = {
+  iveco: { x: 667, y: 447, w: 40, skew: -1 },
+  daf: { x: 661, y: 467, w: 40, skew: -1 },
+  mercedes: { x: 718, y: 467, w: 48, skew: -2 },
+  man: { x: 757, y: 445, w: 40, skew: -2 },
+  scania: { x: 740, y: 477, w: 34, skew: -1 },
+  volvo: { x: 697, y: 463, w: 40, skew: -1 },
 };
 
 export type VanBrand = 'ford' | 'citroen' | 'fiat' | 'vw' | 'mercedes';
@@ -100,13 +112,14 @@ export function truckPhoto(make: string | null | undefined, vehicleClass: string
       plate: { x: v.x / TRUCK_PHOTO_SIZE.width, y: v.y / TRUCK_PHOTO_SIZE.height, w: v.w / TRUCK_PHOTO_SIZE.width, skew: v.skew },
     };
   }
-  if (vehicleClass === 'TIPPER') {
+  if (vehicleClass === 'TIPPER' || vehicleClass === 'TRUCK') {
     const brand = truckBrand(make);
-    const t = brand ? TIPPER_PLATE[brand] : undefined;
+    const tipper = vehicleClass === 'TIPPER';
+    const t = brand ? (tipper ? TIPPER_PLATE : RIGID_PLATE)[brand] : undefined;
     if (!brand || !t) return null;
     return {
       brand,
-      src: `/media/tippers/${brand}.webp`,
+      src: `/media/${tipper ? 'tippers' : 'rigids'}/${brand}.webp`,
       plate: { x: t.x / TRUCK_PHOTO_SIZE.width, y: t.y / TRUCK_PHOTO_SIZE.height, w: t.w / TRUCK_PHOTO_SIZE.width, skew: t.skew },
     };
   }

@@ -31,7 +31,8 @@ test('фото у тягача и фургона, у остальных клас
   assert.equal(truckPhoto('Citroën Jumper', 'VAN').src, '/media/vans/citroen.webp');
   assert.equal(truckPhoto('Ford Transit', 'VAN').src, '/media/vans/ford.webp');
   assert.equal(truckPhoto('Peugeot Boxer', 'VAN'), null);
-  assert.equal(truckPhoto('Volvo FL', 'TRUCK'), null);
+  assert.equal(truckPhoto('Volvo FL', 'TRUCK').src, '/media/rigids/volvo.webp');
+  assert.equal(truckPhoto('Renault D', 'TRUCK'), null);
   assert.equal(truckPhoto('Volvo FH', null), null);
 });
 
