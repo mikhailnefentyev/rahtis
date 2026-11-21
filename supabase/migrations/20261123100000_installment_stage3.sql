@@ -339,8 +339,13 @@ begin
   if v_deal.status <> 'AGREED' or v_deal.first_invoice_id is null then
     raise exception 'Отмена с кредит-нотой — только согласованной сделки со счётом до передачи.' using errcode = '55000';
   end if;
-  if v_deal.handover_seller_at is not null and v_deal.handover_buyer_at is not null then
-    raise exception 'Машина уже передана.' using errcode = '55000';
+  /* Передачу начала хоть одна сторона — отмена уже не односторонняя (security review 23.11.2026). */
+  if v_deal.handover_seller_at is not null or v_deal.handover_buyer_at is not null then
+    raise exception 'Передача уже подтверждается — отмена только по договорённости сторон.' using errcode = '55000';
+  end if;
+  /* Первый счёт оплачен — деньги возвращает продавец, и кредит-ноту от его имени запускает только он. */
+  if v_deal.first_invoice_paid_at is not null and v_me <> v_deal.seller_company_id then
+    raise exception 'Счёт оплачен — отмену с кредит-нотой оформляет продавец.' using errcode = '42501';
   end if;
 
   update public.installment_deals set status = 'CANCELLED', cancelled_at = now(), cancelled_by = v_me where id = p_deal_id;

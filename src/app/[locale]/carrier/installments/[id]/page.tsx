@@ -253,7 +253,7 @@ export default async function DealPage({ params }: { params: Promise<{ locale: s
               </div>
             )}
             {/* После выставленного счёта отмена — только с кредит-нотой продавца. */}
-            {owner && invoice && !(deal.handover_seller_at && deal.handover_buyer_at) && (
+            {owner && invoice && !deal.handover_seller_at && !deal.handover_buyer_at && (isSeller || !deal.first_invoice_paid_at) && (
               <form action={cancelWithCreditAction}>
                 <input type="hidden" name="locale" value={locale} />
                 <input type="hidden" name="deal_id" value={deal.id} />
