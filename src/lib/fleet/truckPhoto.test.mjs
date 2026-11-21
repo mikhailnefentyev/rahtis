@@ -23,8 +23,14 @@ test('«man» внутри слова — не MAN', () => {
   assert.equal(truckBrand('Romania'), null);
 });
 
-test('фото только у тягача', () => {
+test('фото у тягача и фургона, у остальных классов нет', () => {
   assert.equal(truckPhoto('Volvo FH', 'TRACTOR').src, '/media/trucks/volvo.webp');
+  assert.equal(truckPhoto('Mercedes Sprinter', 'VAN').src, '/media/vans/mercedes.webp');
+  assert.equal(truckPhoto('VW Crafter', 'VAN').src, '/media/vans/vw.webp');
+  assert.equal(truckPhoto('Fiat Ducato', 'VAN').src, '/media/vans/fiat.webp');
+  assert.equal(truckPhoto('Citroën Jumper', 'VAN').src, '/media/vans/citroen.webp');
+  assert.equal(truckPhoto('Ford Transit', 'VAN').src, '/media/vans/ford.webp');
+  assert.equal(truckPhoto('Peugeot Boxer', 'VAN'), null);
   assert.equal(truckPhoto('Volvo FL', 'TRUCK'), null);
   assert.equal(truckPhoto('Volvo FH', null), null);
 });
@@ -33,4 +39,9 @@ test('код страны на знаке', () => {
   assert.equal(plateCountryCode('FI'), 'FIN');
   assert.equal(plateCountryCode('de'), 'D');
   assert.equal(plateCountryCode(null), null);
+});
+
+test('марка фургона по словам, не по частям слов', () => {
+  assert.equal(truckPhoto('Oxford Van', 'VAN'), null);
+  assert.equal(truckPhoto('VW Transporter', 'VAN').src, '/media/vans/vw.webp');
 });

@@ -1,10 +1,15 @@
 /**
- * Фото тягача по марке (21.11.2026): Volvo, Scania, MAN, Mercedes-Benz,
- * DAF, Iveco, Renault. Снимки приведены к одному виду (фон --color-ground,
- * кабина вправо, один масштаб, 960 × 600) и лежат в public/media/trucks.
+ * Фото машины по марке (21.11.2026). Тягачи — Volvo, Scania, MAN,
+ * Mercedes-Benz, DAF, Iveco, Renault (public/media/trucks); фургоны — Ford,
+ * Citroën, Fiat, Volkswagen, Mercedes-Benz (public/media/vans). Снимки
+ * приведены к одному виду: фон --color-ground, мордой вправо, один масштаб,
+ * 960 × 600.
  *
- * Фото — только для тягачей: остальных классов на снимках нет, и тягач на
- * карточке фургона или самосвала вводил бы в заблуждение.
+ * Цвет по классу машины — решение владельца 21.11.2026: тягачи графитовые,
+ * фургоны белые; самосвалы (светлая кабина, тёмно-серый кузов) и грузовики
+ * (голубая кабина, белый кузов) — когда будут снимки. Класс без снимков и
+ * марка не из списка — без фото: чужая машина на карточке вводила бы в
+ * заблуждение.
  *
  * plate — где на снимке номерной знак: центр, ширина (доли кадра) и наклон.
  * Без зависимостей: модуль читают компонент и тесты.
@@ -30,6 +35,31 @@ const PLATE: Record<TruckBrand, { x: number; y: number; w: number; skew: number 
   renault: { x: 665, y: 450, w: 40, skew: -1 },
 };
 
+export type VanBrand = 'ford' | 'citroen' | 'fiat' | 'vw' | 'mercedes';
+
+/* Номер на бампере фургона (кадр 960 × 600). */
+const VAN_PLATE: Record<VanBrand, { x: number; y: number; w: number; skew: number }> = {
+  ford: { x: 714, y: 433, w: 66, skew: -2 },
+  citroen: { x: 740, y: 425, w: 94, skew: -3 },
+  fiat: { x: 796, y: 402, w: 92, skew: -2 },
+  vw: { x: 742, y: 390, w: 86, skew: -3 },
+  mercedes: { x: 788, y: 430, w: 82, skew: -3 },
+};
+
+const VAN_PATTERNS: [VanBrand, RegExp][] = [
+  ['mercedes', /mercedes|benz|\bmb\b|sprinter|vito/i],
+  ['vw', /\bvw\b|volkswagen|crafter|transporter/i],
+  ['ford', /\bford\b|transit/i],
+  ['citroen', /citro[eë]n|jumper|relay/i],
+  ['fiat', /\bfiat\b|ducato/i],
+];
+
+export function vanBrand(make: string | null | undefined): VanBrand | null {
+  if (!make) return null;
+  for (const [brand, re] of VAN_PATTERNS) if (re.test(make)) return brand;
+  return null;
+}
+
 const PATTERNS: [TruckBrand, RegExp][] = [
   ['mercedes', /mercedes|benz|\bmb\b|actros|arocs|axor/i],
   ['scania', /scania/i],
@@ -48,6 +78,16 @@ export function truckBrand(make: string | null | undefined): TruckBrand | null {
 }
 
 export function truckPhoto(make: string | null | undefined, vehicleClass: string | null | undefined) {
+  if (vehicleClass === 'VAN') {
+    const van = vanBrand(make);
+    if (!van) return null;
+    const v = VAN_PLATE[van];
+    return {
+      brand: van,
+      src: `/media/vans/${van}.webp`,
+      plate: { x: v.x / TRUCK_PHOTO_SIZE.width, y: v.y / TRUCK_PHOTO_SIZE.height, w: v.w / TRUCK_PHOTO_SIZE.width, skew: v.skew },
+    };
+  }
   if (vehicleClass !== 'TRACTOR') return null;
   const brand = truckBrand(make);
   if (!brand) return null;
