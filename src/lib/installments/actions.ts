@@ -12,6 +12,7 @@ import { createClient } from '@/lib/supabase/server';
 import { buildSchedule, type VatMode } from './calc';
 import { fill, installmentUiCopy } from './copy';
 import { createFirstInvoice } from './firstInvoice';
+import { createCreditNote, ensureSchedule, runInstallments } from './payments';
 
 /**
  * Действия раздела «Продажа техники в рассрочку» (22.11.2026). Права и
@@ -325,3 +326,136 @@ export async function cancelDealAction(fd: FormData): Promise<void> {
   revalidatePath(`/${locale}/carrier/installments`);
 }
 
+// ── Этап 3: оплата первого счёта, передача, взносы, отмена с кредит-нотой ──
+
+/** Продавец отмечает оплату первого счёта (деньги пришли на его счёт). */
+export async function markFirstPaidAction(fd: FormData): Promise<void> {
+  const locale = toLocale(fd.get('locale'));
+  const { ok } = await ready();
+  if (!ok) return;
+  const dealId = str(fd, 'deal_id');
+  const supabase = await createClient();
+  const { error } = await supabase.rpc('mark_installment_first_paid', { p_deal_id: dealId });
+  if (error) console.error('оплата первого счёта:', error.message);
+  revalidatePath(`/${locale}/carrier/installments/${dealId}`);
+}
+
+/** Подтверждение передачи своей стороной; после второго — график и уведомление обеим сторонам. */
+export async function confirmHandoverAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
+  const locale = toLocale(fd.get('locale'));
+  const c = installmentUiCopy(locale);
+  const { viewer, ok } = await ready();
+  if (!ok || viewer.status !== 'ready' || !viewer.company) return { error: c.notAllowed, saved: false };
+  const dealId = str(fd, 'deal_id');
+  const checked = fd.getAll('check').length;
+  if (checked < c.stage3.checklist.length) return { error: c.listing.error, saved: false };
+  const kmRaw = str(fd, 'odometer').replace(/\s/g, '');
+  const km = kmRaw ? Number(kmRaw) : null;
+  if (km != null && (!Number.isInteger(km) || km < 0)) return { error: c.listing.error, saved: false };
+
+  const supabase = await createClient();
+  const { data: status, error } = await supabase.rpc('confirm_installment_handover', {
+    p_deal_id: dealId,
+    p_odometer_km: km,
+    p_notes: str(fd, 'notes').slice(0, 2000) || null,
+  });
+  if (error) {
+    console.error('передача:', error.message);
+    return { error: c.deal.error, saved: false };
+  }
+  if (status === 'ACTIVE') {
+    try {
+      await ensureSchedule(dealId);
+      /* Сразу выставить счета этой сделки, срок которых уже близко. */
+      await runInstallments({ dealId });
+    } catch (cause) {
+      console.error('график рассрочки:', cause instanceof Error ? cause.message : cause);
+    }
+    const parties = await dealParties(dealId);
+    if (parties) {
+      for (const company of [parties.seller_company_id, parties.buyer_company_id]) {
+        await tell(company, dealId, (cc) => ({
+          title: fill(cc.notify.handoverTitle, { plate: parties.plate }),
+          body: cc.notify.handoverBody,
+        }));
+      }
+    }
+  }
+  revalidatePath(`/${locale}/carrier/installments/${dealId}`);
+  revalidatePath(`/${locale}/carrier/fleet`);
+  return { error: null, saved: true };
+}
+
+/** Продавец отмечает оплату взноса; последний — сделка выплачена. */
+export async function markPaidAction(fd: FormData): Promise<void> {
+  const locale = toLocale(fd.get('locale'));
+  const { ok } = await ready();
+  if (!ok) return;
+  const dealId = str(fd, 'deal_id');
+  const n = Number(str(fd, 'n'));
+  if (!Number.isInteger(n) || n < 1) return;
+  const supabase = await createClient();
+  const { data: status, error } = await supabase.rpc('mark_installment_paid', { p_deal_id: dealId, p_n: n });
+  if (error) {
+    console.error('оплата взноса:', error.message);
+    return;
+  }
+  if (status === 'PAID_OFF') {
+    const parties = await dealParties(dealId);
+    if (parties) {
+      for (const company of [parties.seller_company_id, parties.buyer_company_id]) {
+        await tell(company, dealId, (cc) => ({
+          title: fill(cc.notify.paidOffTitle, { plate: parties.plate }),
+          body: cc.notify.paidOffBody,
+        }));
+      }
+    }
+  }
+  revalidatePath(`/${locale}/carrier/installments/${dealId}`);
+}
+
+/** Отмена согласованной сделки после первого счёта (до передачи) — с кредит-нотой продавца. */
+export async function cancelWithCreditAction(fd: FormData): Promise<void> {
+  const locale = toLocale(fd.get('locale'));
+  const { viewer, ok } = await ready();
+  if (!ok || viewer.status !== 'ready' || !viewer.company) return;
+  const dealId = str(fd, 'deal_id');
+  const supabase = await createClient();
+  const { error } = await supabase.rpc('cancel_installment_with_credit', { p_deal_id: dealId });
+  if (error) {
+    console.error('отмена с кредит-нотой:', error.message);
+    return;
+  }
+  try {
+    await createCreditNote(dealId);
+  } catch (cause) {
+    console.error('кредит-нота:', cause instanceof Error ? cause.message : cause);
+  }
+  const parties = await dealParties(dealId);
+  if (parties) {
+    const other = parties.seller_company_id === viewer.company.id ? parties.buyer_company_id : parties.seller_company_id;
+    await tell(other, dealId, (cc) => ({
+      title: fill(cc.notify.cancelledTitle, { plate: parties.plate }),
+      body: fill(cc.notify.cancelledBody, { name: viewer.company!.name }),
+    }));
+  }
+  revalidatePath(`/${locale}/carrier/installments/${dealId}`);
+  revalidatePath(`/${locale}/carrier/installments`);
+}
+
+/** Повторить кредит-ноту, если она не вышла сразу (только продавец). */
+export async function retryCreditNoteAction(fd: FormData): Promise<void> {
+  const locale = toLocale(fd.get('locale'));
+  const { viewer, ok } = await ready();
+  if (!ok || viewer.status !== 'ready' || !viewer.company) return;
+  const dealId = str(fd, 'deal_id');
+  const supabase = await createClient();
+  const { data } = await supabase.from('installment_deals').select('id, seller_company_id').eq('id', dealId).maybeSingle();
+  if (!data || data.seller_company_id !== viewer.company.id) return;
+  try {
+    await createCreditNote(dealId);
+  } catch (cause) {
+    console.error('кредит-нота:', cause instanceof Error ? cause.message : cause);
+  }
+  revalidatePath(`/${locale}/carrier/installments/${dealId}`);
+}

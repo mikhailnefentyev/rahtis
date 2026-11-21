@@ -3,16 +3,33 @@ import { getViewer } from '@/lib/auth/viewer';
 import { loadDeal } from '@/lib/installments/contract';
 import { createAdminClient } from '@/lib/supabase/admin';
 
-/** Первый счёт сделки (22.11.2026): сторонам сделки, подписанная ссылка на пять минут. */
-export async function GET(_request: Request, { params }: { params: Promise<{ locale: string; id: string }> }) {
+/**
+ * Счета сделки (22–23.11.2026): первый счёт, счета взносов, кредит-нота.
+ * Сделку видят только стороны (RLS в loadDeal); счёт должен принадлежать
+ * этой сделке. Подписанная ссылка на пять минут.
+ */
+export async function GET(request: Request, { params }: { params: Promise<{ locale: string; id: string }> }) {
   const { id } = await params;
   const viewer = await getViewer();
   if (viewer.status !== 'ready') return new NextResponse('Unauthorized', { status: 401 });
 
   const loaded = await loadDeal(id);
-  const path = loaded?.invoice?.file_path;
-  if (!path) return new NextResponse('Not found', { status: 404 });
-  const { data } = await createAdminClient().storage.from('reports').createSignedUrl(path, 300);
+  if (!loaded) return new NextResponse('Not found', { status: 404 });
+  const wanted = new URL(request.url).searchParams.get('inv') ?? loaded.deal.first_invoice_id;
+  if (!wanted) return new NextResponse('Not found', { status: 404 });
+
+  const admin = createAdminClient();
+  const { data: payments } = await admin.from('installment_payments').select('invoice_id').eq('deal_id', id);
+  const own = new Set(
+    [loaded.deal.first_invoice_id, loaded.deal.credit_note_id, ...(payments ?? []).map((p) => p.invoice_id)].filter(
+      (v): v is string => Boolean(v),
+    ),
+  );
+  if (!own.has(wanted)) return new NextResponse('Not found', { status: 404 });
+
+  const { data: invoice } = await admin.from('carrier_invoices').select('file_path').eq('id', wanted).maybeSingle();
+  if (!invoice?.file_path) return new NextResponse('Not found', { status: 404 });
+  const { data } = await admin.storage.from('reports').createSignedUrl(invoice.file_path, 300);
   if (!data?.signedUrl) return new NextResponse('Not found', { status: 404 });
   return NextResponse.redirect(data.signedUrl);
 }

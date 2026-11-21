@@ -131,7 +131,8 @@ async function storeUnits(connectionId: string, companyId: string, units: GpsUni
 
   /* Автопривязка: номер из профиля машины или из её названия. */
   const [{ data: vehicles }, { data: rows }, { data: taken }] = await Promise.all([
-    admin.from('vehicles').select('id, plate').eq('company_id', companyId),
+    /* Проданная в рассрочку запись не привязывается: машина ездит у покупателя (договор 8.2). */
+    admin.from('vehicles').select('id, plate').eq('company_id', companyId).or('installment_role.is.null,installment_role.neq.SOLD'),
     admin.from('gps_units').select('id, name, plate').eq('connection_id', connectionId).is('vehicle_id', null),
     admin.from('gps_units').select('vehicle_id').eq('company_id', companyId).not('vehicle_id', 'is', null),
   ]);

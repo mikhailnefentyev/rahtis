@@ -85,9 +85,20 @@ export function FleetView({
                          нет смысла ставить на такой заказ. */
                       <Badge tone="warn">{t.vehicle.adr}</Badge>
                     )}
-                    <Badge tone={vehicleAccessTone[vehicle.access]}>
-                      {t.vehicleAccess[vehicle.access]}
-                    </Badge>
+                    {vehicle.installment_role === 'SOLD' ? (
+                      /* Продана в рассрочку: работает у покупателя, здесь — только история. */
+                      <Badge tone="neutral">{installmentUiCopy(locale).stage3.soldBadge}</Badge>
+                    ) : (
+                      <Badge tone={vehicleAccessTone[vehicle.access]}>
+                        {t.vehicleAccess[vehicle.access]}
+                      </Badge>
+                    )}
+                    {vehicle.installment_role === 'HELD' && <Badge tone="info">{installmentUiCopy(locale).stage3.heldBadge}</Badge>}
+                    {vehicle.installment_deal_id && (
+                      <a href={`/${locale}/carrier/installments/${vehicle.installment_deal_id}`} className="text-[12px] text-accent hover:underline">
+                        {installmentUiCopy(locale).deal.title} ›
+                      </a>
+                    )}
                     <span className="font-mono text-xs text-ink-dim">
                       {EURO_LABEL[vehicle.euro_class]}
                     </span>
@@ -98,7 +109,7 @@ export function FleetView({
                     {/* Обслуживание: просрочено, скоро, дефекты — видно в списке парка, не открывая машину. */}
                     <ServiceLink href={`/${locale}/carrier/maintenance/${vehicle.id}`} summary={service[vehicle.id]} />
                     {/* Продать машину в рассрочку проверенному перевозчику (22.11.2026). */}
-                    {vehicle.access === 'APPROVED' && (
+                    {vehicle.access === 'APPROVED' && (!vehicle.installment_role || vehicle.installment_role === 'OWNED') && (
                       <a href={`/${locale}/carrier/installments/new?vehicle=${vehicle.id}`} className="text-[12px] text-accent hover:underline">
                         {installmentUiCopy(locale).sell} ›
                       </a>
@@ -192,7 +203,7 @@ export function FleetView({
                     {t.action.details}
                   </Button>
 
-                  {(vehicle.access === 'DRAFT' || vehicle.access === 'REJECTED') && (
+                  {(vehicle.access === 'DRAFT' || vehicle.access === 'REJECTED') && vehicle.installment_role !== 'SOLD' && (
                     <form action={submitVehicleAction}>
                       <input type="hidden" name="locale" value={locale} />
                       <input type="hidden" name="id" value={vehicle.id} />
@@ -209,7 +220,7 @@ export function FleetView({
                     </form>
                   )}
 
-                  {vehicle.access === 'DRAFT' && (
+                  {vehicle.access === 'DRAFT' && !vehicle.installment_role && (
                     <form action={deleteDraftVehicleAction}>
                       <input type="hidden" name="locale" value={locale} />
                       <input type="hidden" name="id" value={vehicle.id} />

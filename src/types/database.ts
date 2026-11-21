@@ -3192,6 +3192,16 @@ export type Database = {
       }
       installment_deals: {
         Row: {
+          credit_note_started_at: string | null
+          buyer_vehicle_id: string | null
+          credit_note_id: string | null
+          first_invoice_paid_at: string | null
+          handed_over_at: string | null
+          handover_buyer_at: string | null
+          handover_notes: string | null
+          handover_odometer_km: number | null
+          handover_seller_at: string | null
+          paid_off_at: string | null
           parties_snapshot: Json | null
           vehicle_snapshot: Json
           agreed_at: string | null
@@ -3219,6 +3229,16 @@ export type Database = {
           version: number
         }
         Insert: {
+          credit_note_started_at?: string | null
+          buyer_vehicle_id?: string | null
+          credit_note_id?: string | null
+          first_invoice_paid_at?: string | null
+          handed_over_at?: string | null
+          handover_buyer_at?: string | null
+          handover_notes?: string | null
+          handover_odometer_km?: number | null
+          handover_seller_at?: string | null
+          paid_off_at?: string | null
           parties_snapshot?: Json | null
           vehicle_snapshot?: Json
           agreed_at?: string | null
@@ -3246,6 +3266,16 @@ export type Database = {
           version?: number
         }
         Update: {
+          credit_note_started_at?: string | null
+          buyer_vehicle_id?: string | null
+          credit_note_id?: string | null
+          first_invoice_paid_at?: string | null
+          handed_over_at?: string | null
+          handover_buyer_at?: string | null
+          handover_notes?: string | null
+          handover_odometer_km?: number | null
+          handover_seller_at?: string | null
+          paid_off_at?: string | null
           parties_snapshot?: Json | null
           vehicle_snapshot?: Json
           agreed_at?: string | null
@@ -3271,6 +3301,54 @@ export type Database = {
           vat_bps?: number
           vat_mode?: string
           version?: number
+        }
+        Relationships: []
+      }
+      installment_payments: {
+        Row: {
+          invoicing_started_at: string | null
+          created_at: string
+          deal_id: string
+          due_date: string
+          id: string
+          interest_cents: number
+          invoice_id: string | null
+          n: number
+          paid_at: string | null
+          principal_cents: number
+          reminded_1_at: string | null
+          reminded_7_at: string | null
+          threshold_notified_at: string | null
+        }
+        Insert: {
+          invoicing_started_at?: string | null
+          created_at?: string
+          deal_id: string
+          due_date: string
+          id?: string
+          interest_cents?: number
+          invoice_id?: string | null
+          n: number
+          paid_at?: string | null
+          principal_cents: number
+          reminded_1_at?: string | null
+          reminded_7_at?: string | null
+          threshold_notified_at?: string | null
+        }
+        Update: {
+          invoicing_started_at?: string | null
+          created_at?: string
+          deal_id?: string
+          due_date?: string
+          id?: string
+          interest_cents?: number
+          invoice_id?: string | null
+          n?: number
+          paid_at?: string | null
+          principal_cents?: number
+          reminded_1_at?: string | null
+          reminded_7_at?: string | null
+          threshold_notified_at?: string | null
         }
         Relationships: []
       }
@@ -6918,6 +6996,8 @@ export type Database = {
       }
       vehicles: {
         Row: {
+          installment_deal_id: string | null
+          installment_role: string | null
           access: Database["public"]["Enums"]["vehicle_access"]
           adr: boolean
           approved_at: string | null
@@ -6959,6 +7039,8 @@ export type Database = {
           whatsapp: string | null
         }
         Insert: {
+          installment_deal_id?: string | null
+          installment_role?: string | null
           access?: Database["public"]["Enums"]["vehicle_access"]
           adr?: boolean
           approved_at?: string | null
@@ -7000,6 +7082,8 @@ export type Database = {
           whatsapp?: string | null
         }
         Update: {
+          installment_deal_id?: string | null
+          installment_role?: string | null
           access?: Database["public"]["Enums"]["vehicle_access"]
           adr?: boolean
           approved_at?: string | null
@@ -9804,6 +9888,23 @@ export type Database = {
           proposed_by_me: boolean
           contract_number: string | null
           proposed_at: string
+        }[]
+      }
+      mark_installment_first_paid: { Args: { p_deal_id: string }; Returns: undefined }
+      confirm_installment_handover: { Args: { p_deal_id: string; p_odometer_km: number | null; p_notes: string | null }; Returns: string }
+      mark_installment_paid: { Args: { p_deal_id: string; p_n: number }; Returns: string }
+      cancel_installment_with_credit: { Args: { p_deal_id: string }; Returns: string }
+      installment_vehicle_status: {
+        Args: { p_deal_id: string }
+        Returns: {
+          odometer_km: number | null
+          open_defects: number
+          unsafe_defects: number
+          maintenance_overdue: number
+          maintenance_soon: number
+          last_inspection_at: string | null
+          downtime_reason: string | null
+          vehicle_access: string | null
         }[]
       }
       propose_invoice_terms: {
