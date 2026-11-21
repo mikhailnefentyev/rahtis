@@ -1,14 +1,16 @@
 import Image from 'next/image';
 import { cn } from '@/lib/cn';
-import { PLATE_WIDTH, plateCountryCode, truckPhoto } from '@/lib/fleet/truckPhoto';
+import { plateCountryCode, truckPhoto } from '@/lib/fleet/truckPhoto';
 
 /**
  * Фото машины с её госномером на бампере (21.11.2026).
  *
- * Тягач известной марки — студийный снимок этой марки; номерной знак
- * стоит на месте номера и масштабируется вместе с кадром (размеры в
- * единицах контейнера). Для остальных — та же плитка со знаком по центру,
- * чтобы карточки парка выглядели одинаково.
+ * Тягач известной марки — студийный снимок этой марки. Номерной знак —
+ * часть снимка, а не наклейка поверх: настоящий размер на этом бампере,
+ * наклон бампера, освещение студии (верх светлее), чуть мягче резкости,
+ * без тени, финский шрифт номеров. Размеры — в единицах контейнера, знак
+ * масштабируется вместе с кадром. Для остальных машин — та же плитка со
+ * знаком по центру, чтобы карточки парка выглядели одинаково.
  *
  * Без хуков: подходит и серверным страницам (приложение водителя), и
  * клиентским (парк).
@@ -55,16 +57,16 @@ export function TruckPhoto({
             className="object-cover"
           />
           {plate && (
-            <PlateSign
+            <BumperPlate
               text={plate}
               code={code}
               style={{
                 left: `${photo.plate.x * 100}%`,
                 top: `${photo.plate.y * 100}%`,
-                width: `${PLATE_WIDTH * 100}%`,
-                fontSize: `${PLATE_WIDTH * 13.5}cqw`,
+                width: `${photo.plate.w * 100}%`,
+                fontSize: `${photo.plate.w * 16}cqw`,
+                transform: `translate(-50%, -50%) skewY(${photo.plate.skew}deg)`,
               }}
-              className="-translate-x-1/2 -translate-y-1/2"
             />
           )}
         </div>
@@ -84,7 +86,29 @@ export function TruckPhoto({
   );
 }
 
-/** Знак ЕС: белое поле, тонкая рамка, синяя полоса с кодом страны. */
+/**
+ * Знак на бампере. Шрифт — узкий гротеск, как у финских знаков (не
+ * моноширинный), поле не чисто белое, сверху светлее — как свет студии на
+ * остальном бампере; тонкая тёмная рамка держателя, лёгкая мягкость.
+ */
+function BumperPlate({ text, code, style }: { text: string; code: string | null; style: React.CSSProperties }) {
+  return (
+    <span
+      aria-label={text}
+      style={style}
+      className="absolute flex aspect-[46/10] items-stretch overflow-hidden rounded-[0.12em] bg-[linear-gradient(180deg,#f6f6f3_0%,#e4e4df_70%,#d2d2cc_100%)] leading-none opacity-[0.93] shadow-[inset_0_0_0_0.06em_rgb(30_30_30/0.85),0_0_0_0.05em_rgb(20_24_30/0.55)] blur-[0.012em]"
+    >
+      <span className="flex w-[12%] shrink-0 items-end justify-center bg-[linear-gradient(180deg,#2f55a8,#1b3a85)] pb-[0.1em] text-[0.34em] font-semibold text-white/90">
+        {code}
+      </span>
+      <span className="flex flex-1 items-center justify-center font-[Arial_Narrow,Roboto_Condensed,Helvetica_Neue,Arial,sans-serif] text-[0.78em] font-bold tracking-[0.02em] whitespace-nowrap text-[#1c1c1c] [font-stretch:condensed]">
+        {text}
+      </span>
+    </span>
+  );
+}
+
+/** Знак ЕС в плитке без фото: белое поле, тонкая рамка, синяя полоса с кодом страны. */
 function PlateSign({
   text,
   code,
