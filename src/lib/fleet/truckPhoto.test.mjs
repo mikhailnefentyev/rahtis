@@ -45,3 +45,9 @@ test('марка фургона по словам, не по частям сло
   assert.equal(truckPhoto('Oxford Van', 'VAN'), null);
   assert.equal(truckPhoto('VW Transporter', 'VAN').src, '/media/vans/vw.webp');
 });
+
+test('самосвал: снимок 8×4 по марке, DAF без снимка', () => {
+  assert.equal(truckPhoto('Scania R560', 'TIPPER').src, '/media/tippers/scania.webp');
+  assert.equal(truckPhoto('Volvo FMX', 'TIPPER').src, '/media/tippers/volvo.webp');
+  assert.equal(truckPhoto('DAF CF', 'TIPPER'), null);
+});

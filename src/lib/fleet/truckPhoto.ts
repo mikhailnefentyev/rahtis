@@ -1,13 +1,15 @@
 /**
  * Фото машины по марке (21.11.2026). Тягачи — Volvo, Scania, MAN,
- * Mercedes-Benz, DAF, Iveco, Renault (public/media/trucks); фургоны — Ford,
- * Citroën, Fiat, Volkswagen, Mercedes-Benz (public/media/vans). Снимки
+ * Mercedes-Benz, DAF, Iveco, Renault (public/media/trucks); самосвалы 8×4 —
+ * Volvo, Scania, MAN, Mercedes-Benz, Iveco, Renault (public/media/tippers);
+ * фургоны — Ford, Citroën, Fiat, Volkswagen, Mercedes-Benz (public/media/vans). Снимки
  * приведены к одному виду: фон --color-ground, мордой вправо, один масштаб,
  * 960 × 600.
  *
  * Цвет по классу машины — решение владельца 21.11.2026: тягачи графитовые,
- * фургоны белые; самосвалы (светлая кабина, тёмно-серый кузов) и грузовики
- * (голубая кабина, белый кузов) — когда будут снимки. Класс без снимков и
+ * фургоны белые, самосвалы — светлая кабина и серый кузов; грузовики
+ * (голубая кабина, белый кузов) — когда будут снимки. Самосвал любой
+ * осности показывается снимком 8×4 — самого ходового в Финляндии. Класс без снимков и
  * марка не из списка — без фото: чужая машина на карточке вводила бы в
  * заблуждение.
  *
@@ -33,6 +35,16 @@ const PLATE: Record<TruckBrand, { x: number; y: number; w: number; skew: number 
   daf: { x: 630, y: 457, w: 42, skew: -1 },
   iveco: { x: 665, y: 478.5, w: 36, skew: -1.5 },
   renault: { x: 665, y: 450, w: 40, skew: -1 },
+};
+
+/* Номер на бампере самосвала (кадр 960 × 600). DAF самосвала нет. */
+const TIPPER_PLATE: Partial<Record<TruckBrand, { x: number; y: number; w: number; skew: number }>> = {
+  renault: { x: 683, y: 447, w: 40, skew: -1 },
+  iveco: { x: 667, y: 449, w: 44, skew: -1 },
+  mercedes: { x: 717, y: 455, w: 46, skew: -2 },
+  man: { x: 683, y: 438, w: 30, skew: -1 },
+  volvo: { x: 707, y: 467, w: 34, skew: -1 },
+  scania: { x: 707, y: 457, w: 34, skew: -1 },
 };
 
 export type VanBrand = 'ford' | 'citroen' | 'fiat' | 'vw' | 'mercedes';
@@ -86,6 +98,16 @@ export function truckPhoto(make: string | null | undefined, vehicleClass: string
       brand: van,
       src: `/media/vans/${van}.webp`,
       plate: { x: v.x / TRUCK_PHOTO_SIZE.width, y: v.y / TRUCK_PHOTO_SIZE.height, w: v.w / TRUCK_PHOTO_SIZE.width, skew: v.skew },
+    };
+  }
+  if (vehicleClass === 'TIPPER') {
+    const brand = truckBrand(make);
+    const t = brand ? TIPPER_PLATE[brand] : undefined;
+    if (!brand || !t) return null;
+    return {
+      brand,
+      src: `/media/tippers/${brand}.webp`,
+      plate: { x: t.x / TRUCK_PHOTO_SIZE.width, y: t.y / TRUCK_PHOTO_SIZE.height, w: t.w / TRUCK_PHOTO_SIZE.width, skew: t.skew },
     };
   }
   if (vehicleClass !== 'TRACTOR') return null;
