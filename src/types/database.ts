@@ -3198,6 +3198,7 @@ export type Database = {
           first_invoice_paid_at: string | null
           handed_over_at: string | null
           handover_buyer_at: string | null
+          handover_buyer_notes: string | null
           handover_notes: string | null
           handover_odometer_km: number | null
           handover_seller_at: string | null
@@ -3235,6 +3236,7 @@ export type Database = {
           first_invoice_paid_at?: string | null
           handed_over_at?: string | null
           handover_buyer_at?: string | null
+          handover_buyer_notes?: string | null
           handover_notes?: string | null
           handover_odometer_km?: number | null
           handover_seller_at?: string | null
@@ -3272,6 +3274,7 @@ export type Database = {
           first_invoice_paid_at?: string | null
           handed_over_at?: string | null
           handover_buyer_at?: string | null
+          handover_buyer_notes?: string | null
           handover_notes?: string | null
           handover_odometer_km?: number | null
           handover_seller_at?: string | null

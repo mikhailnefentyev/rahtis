@@ -64,7 +64,8 @@ export default async function DealPage({ params }: { params: Promise<{ locale: s
     handoverDate: deal.handover_date,
     firstDueDate: deal.first_due_date,
   });
-  const money = new Intl.NumberFormat(locale === 'fi' ? 'fi-FI' : 'en-GB', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
+  const money = new Intl.NumberFormat(locale === 'fi' ? 'fi-FI' : 'en-GB', { style: 'currency', currency: 'EUR', minimumFractionDigits: 0, maximumFractionDigits: 2 });
+  /* Целые суммы без копеек, дробные — с копейками (19 000 / 24 = 791,67 €). */
   const eur = (cents: number) => money.format(cents / 100);
   const limits = 'error' in schedule ? null : thresholds(schedule);
 
@@ -288,7 +289,7 @@ export default async function DealPage({ params }: { params: Promise<{ locale: s
                 ui={ui}
                 dealId={deal.id}
                 odometer={deal.handover_odometer_km != null ? String(deal.handover_odometer_km) : ''}
-                notes={deal.handover_notes ?? ''}
+                notes={(isSeller ? deal.handover_notes : deal.handover_buyer_notes) ?? ''}
               />
             ) : (
               <p>{ui.stage3.waitingOther}</p>
@@ -300,6 +301,11 @@ export default async function DealPage({ params }: { params: Promise<{ locale: s
       {deal.status === 'CANCELLED' && invoice && (
         <Card>
           <CardBody className="flex flex-wrap items-center gap-3 text-[14px]">
+            {invoice.file_path && (
+              <a href={`/${locale}/carrier/installments/${deal.id}/invoice`} className={buttonClass({ size: 'sm' })}>
+                {ui.deal.invoice} · {invoice.number}
+              </a>
+            )}
             {credit?.file_path ? (
               <a href={`/${locale}/carrier/installments/${deal.id}/invoice?inv=${credit.id}`} className={buttonClass({ size: 'sm' })}>
                 {ui.stage3.creditNote} · {credit.number}
@@ -329,6 +335,37 @@ export default async function DealPage({ params }: { params: Promise<{ locale: s
               <CardBody className="text-[14px] font-semibold text-ok">{fill(ui.stage3.paidOff, { date: dateOf(deal.paid_off_at) })}</CardBody>
             </Card>
           )}
+          {/* Договор, первый счёт и протокол передачи остаются доступны весь срок рассрочки. */}
+          <Card>
+            <CardBody className="flex flex-col gap-3 text-[14px]">
+              <p className="font-semibold">
+                {fill(ui.deal.agreed, { date: deal.agreed_at ? fiDate(helsinkiDay(deal.agreed_at)) : '', number: deal.contract_number ?? '' })}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <a href={`/${locale}/carrier/installments/${deal.id}/contract`} className={buttonClass({ size: 'sm' })}>
+                  {ui.deal.contract}
+                </a>
+                {invoice?.file_path && (
+                  <a href={`/${locale}/carrier/installments/${deal.id}/invoice`} className={buttonClass({ size: 'sm' })}>
+                    {ui.deal.invoice} · {invoice.number}
+                  </a>
+                )}
+              </div>
+              {deal.handed_over_at && <p className="text-ok">{fill(ui.stage3.handedOver, { date: dateOf(deal.handed_over_at) })}</p>}
+              {deal.handover_notes && (
+                <div>
+                  <p className="text-ink-muted">{ui.stage3.handoverNotesSeller}</p>
+                  <p className="whitespace-pre-line">{deal.handover_notes}</p>
+                </div>
+              )}
+              {deal.handover_buyer_notes && (
+                <div>
+                  <p className="text-ink-muted">{ui.stage3.handoverNotesBuyer}</p>
+                  <p className="whitespace-pre-line">{deal.handover_buyer_notes}</p>
+                </div>
+              )}
+            </CardBody>
+          </Card>
           {remedy && isSeller && (
             <p className="rounded-card border border-danger/35 bg-danger/10 px-4 py-3 text-[14px] text-danger">{ui.stage3.remedy}</p>
           )}

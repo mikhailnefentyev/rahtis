@@ -32,6 +32,10 @@ export type SiteInvoicePdfInput = {
   periodLabel?: [fi: string, en: string];
   /** Сумма к оплате сейчас, если она не равна итогу (первый счёт рассрочки: взнос + весь НДС). */
   payNow?: { label: [fi: string, en: string]; amount: string };
+  /** Заголовок вместо «LASKU / INVOICE» (кредит-нота рассрочки). */
+  title?: string;
+  /** Подпись суммы в платёжном блоке вместо «Maksettava» (кредит-нота: «Palautetaan»). */
+  amountLabel?: [fi: string, en: string];
 };
 
 /* Y-tunnus — только у финского номера; у компании другой страны общая подпись (номер хранится в своём виде). */
@@ -74,7 +78,7 @@ export function SiteInvoicePdf(input: SiteInvoicePdfInput) {
   const iban = input.seller.iban.replace(/\s/g, '').replace(/(.{4})(?=.)/g, '$1 ');
 
   return (
-    <Document title={ansi(`Lasku ${input.number}`)} author={ansi(input.seller.name)}>
+    <Document title={ansi(`${input.title ? 'Hyvityslasku' : 'Lasku'} ${input.number}`)} author={ansi(input.seller.name)}>
       <Page size="A4" style={s.page}>
         <View style={s.row}>
           <View>
@@ -86,7 +90,7 @@ export function SiteInvoicePdf(input: SiteInvoicePdfInput) {
             <Text style={s.muted}>{ansi(input.seller.email)}</Text>
           </View>
           <View>
-            <Text style={s.title}>{ansi('LASKU / INVOICE')}</Text>
+            <Text style={s.title}>{ansi(input.title ?? 'LASKU / INVOICE')}</Text>
           </View>
         </View>
 
@@ -154,7 +158,7 @@ export function SiteInvoicePdf(input: SiteInvoicePdfInput) {
           {field('Tilinumero (IBAN)', 'Bank account', iban)}
           {field('Viitenumero', 'Reference', input.reference)}
           {field('Eräpäivä', 'Due date', input.dueOn)}
-          {field('Maksettava', 'Amount due', input.payNow?.amount ?? input.total)}
+          {field(...(input.amountLabel ?? ['Maksettava', 'Amount due']), input.payNow?.amount ?? input.total)}
         </View>
 
         <Text style={[s.small, { marginTop: 14 }]}>{ansi(input.note)}</Text>

@@ -49,7 +49,17 @@ const helsinkiDay = (iso: string) => new Intl.DateTimeFormat('en-CA', { timeZone
 
 type Party = { name: string; business_id: string | null; vat_id: string | null; iban?: string; address: string; email: string };
 type Mail = { template: string; subject: string; text: string };
-type Meta = { job: string; period: string; periodLabel: [string, string]; note: string; mail: Mail };
+type Meta = {
+  job: string;
+  period: string;
+  periodLabel: [string, string];
+  note: string;
+  mail: Mail;
+  /* Кредит-нота: свой заголовок и сумма возврата вместо «к оплате» (итог документа — минус весь счёт). */
+  title?: string;
+  payNow?: { label: [string, string]; cents: number };
+  amountLabel?: [string, string];
+};
 
 /**
  * График из согласованных условий — один раз. Если машину передали позже
@@ -223,6 +233,9 @@ export async function deliverInvoice(invoiceId: string): Promise<boolean> {
         vat: f.money(inv.vat_cents, 'EUR'),
         total: f.money(inv.total_cents, 'EUR'),
         note: meta.note,
+        title: meta.title,
+        payNow: meta.payNow ? { label: meta.payNow.label, amount: f.money(meta.payNow.cents, 'EUR') } : undefined,
+        amountLabel: meta.amountLabel,
       }),
     );
     path = `installment-invoices/${inv.company_id}/${inv.number}.pdf`;
@@ -358,6 +371,9 @@ export async function createCreditNote(dealId: string): Promise<IssueStatus> {
   if (!p) return 'NOT_FOUND';
   const originalLines = original.lines as { date: string; text: string; unitCents: number; amountCents: number }[];
   const issuedOn = todayInHelsinki();
+  /* Возвращается только уплаченное по первому счёту: взнос и весь НДС; не оплачен — возврата нет. */
+  const f = createFormat('fi-FI');
+  const refundCents = deal.first_invoice_paid_at ? deal.down_payment_cents + original.vat_cents : 0;
 
   const invoiceId = await createInvoiceRow({
     sellerId: deal.seller_company_id,
@@ -373,8 +389,11 @@ export async function createCreditNote(dealId: string): Promise<IssueStatus> {
       job: `${deal.contract_number} · peruttu / cancelled`,
       period: original.number,
       periodLabel: ['Hyvitettävä lasku', 'Credited invoice'],
+      title: 'HYVITYSLASKU / CREDIT NOTE',
+      payNow: { label: ['Palautetaan ostajalle', 'Refunded to the buyer'], cents: refundCents },
+      amountLabel: ['Palautetaan', 'Refund'],
       note: [
-        `HYVITYSLASKU / CREDIT NOTE. Hyvittää laskun nro ${original.number} (${fiDate(original.issued_on)}) kokonaisuudessaan, koska osamaksukauppa ${deal.contract_number} peruttiin ennen ajoneuvon luovutusta. Jo maksettu määrä palautetaan ostajalle. / Credits invoice ${original.number} in full because hire-purchase ${deal.contract_number} was cancelled before handover. Any amount already paid is refunded to the buyer.`,
+        `HYVITYSLASKU / CREDIT NOTE. Hyvittää laskun nro ${original.number} (${fiDate(original.issued_on)}) kokonaisuudessaan, koska osamaksukauppa ${deal.contract_number} peruttiin ennen ajoneuvon luovutusta. ${refundCents > 0 ? `Myyjä palauttaa ostajalle maksetun ${f.money(refundCents, 'EUR')}.` : 'Laskua ei ollut maksettu, joten palautettavaa ei ole.'} / Credits invoice ${original.number} in full because hire-purchase ${deal.contract_number} was cancelled before handover. ${refundCents > 0 ? `The seller refunds the ${f.money(refundCents, 'EUR')} paid to the buyer.` : 'The invoice was not paid, so nothing is refunded.'}`,
         'Laskuttaja on myyjä; RAHTIS (Aivomaa Oy) ei ole kaupan osapuoli. / Issued by the seller; RAHTIS (Aivomaa Oy) is not a party to the sale.',
       ].join('\n'),
       mail: {
