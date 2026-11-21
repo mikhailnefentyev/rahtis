@@ -14,6 +14,7 @@ import { PushSetup } from './PushSetup';
 import { ShiftBar } from './ShiftBar';
 import { DriverInbox } from './DriverInbox';
 import { TaskTabs } from './TaskTabs';
+import { TruckPhoto } from '@/components/domain/TruckPhoto';
 import { createClient } from '@/lib/supabase/server';
 import type { SiteState } from './site/SiteScreen';
 
@@ -65,6 +66,18 @@ export default async function DriverHome({
         {/* Не приветствие, а машина: водитель, пересевший на другую, видит это сразу. */}
         <span className="font-mono text-[17px] font-bold tracking-tight">{driver.plate ?? t.driverApp.noVehicle}</span>
       </header>
+
+      {/* Своя машина с её номером на бампере — узнаётся раньше, чем прочитан номер. */}
+      {driver.plate && (
+        <TruckPhoto
+          make={driver.vehicle_make}
+          vehicleClass={driver.vehicle_class}
+          plate={driver.plate}
+          country={driver.company_country}
+          sizes="(min-width: 640px) 560px, 100vw"
+          priority
+        />
+      )}
 
       {/* Без уведомлений прямой заказ водитель увидит, только открыв приложение. */}
       <PushSetup compact />

@@ -177,6 +177,7 @@ export default async function FleetPage({ params }: { params: Promise<{ locale: 
         documentsOk={state?.documents_ok ?? false}
         today={new Date().toISOString().slice(0, 10)}
         service={service}
+        country={company.country}
       />
 
       <TrailersMass vehicles={vehicles ?? []} trailers={trailers ?? []} />

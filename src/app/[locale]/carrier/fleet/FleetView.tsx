@@ -6,6 +6,7 @@ import { vehicleAccessTone } from '@/components/ui/tone';
 import { deleteDraftVehicleAction, submitVehicleAction } from '@/lib/fleet/actions';
 import { EURO_LABEL } from '@/lib/fleet/labels';
 import { useI18n } from '@/lib/i18n/provider';
+import { TruckPhoto } from '@/components/domain/TruckPhoto';
 import type { Driver, Vehicle } from '@/types/db';
 import { VehicleForm } from './VehicleForm';
 
@@ -16,6 +17,7 @@ export function FleetView({
   documentsOk,
   today,
   service = {},
+  country,
 }: {
   vehicles: Vehicle[];
   drivers: Pick<Driver, 'id' | 'full_name' | 'phone'>[];
@@ -26,6 +28,8 @@ export function FleetView({
   today: string;
   /** Обслуживание машины: худший срок плана и открытые дефекты (src/lib/maintenance/load.ts). */
   service?: Record<string, { state: string; items: number; openDefects: number; unsafe: boolean; out: string | null }>;
+  /** Страна перевозчика — код на номерном знаке фото. */
+  country?: string | null;
 }) {
   const { t, m, locale } = useI18n();
   const [editing, setEditing] = useState<Vehicle | null | 'new'>(null);
@@ -62,7 +66,16 @@ export function FleetView({
         <div className="flex flex-col gap-3">
           {vehicles.map((vehicle) => (
             <Card key={vehicle.id} stripe={vehicleAccessTone[vehicle.access]}>
-              <CardBody className="flex flex-wrap items-start justify-between gap-4">
+              <CardBody className="flex flex-col gap-4 sm:flex-row sm:items-start">
+                {/* Фото машины с её номером: парк узнаётся с первого взгляда. */}
+                <TruckPhoto
+                  make={vehicle.make}
+                  vehicleClass={vehicle.vehicle_class}
+                  plate={vehicle.plate}
+                  country={country}
+                  className="sm:w-[220px] sm:shrink-0"
+                />
+                <div className="flex min-w-0 flex-1 flex-wrap items-start justify-between gap-4">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2.5">
                     <Plate className="text-[15px]">{vehicle.plate}</Plate>
@@ -198,6 +211,7 @@ export function FleetView({
                       </Button>
                     </form>
                   )}
+                </div>
                 </div>
               </CardBody>
             </Card>

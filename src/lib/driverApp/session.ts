@@ -25,6 +25,9 @@ export type DriverMe = {
   company_currency?: string | null;
   vehicle_id: string | null;
   plate: string | null;
+  /** Марка и класс машины — для фото на главном экране (с 21.11.2026; до миграции — нет). */
+  vehicle_make?: string | null;
+  vehicle_class?: string | null;
   shift: {
     id: string;
     started_at: string;
