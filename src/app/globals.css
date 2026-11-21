@@ -2190,10 +2190,18 @@
   .blog-chart {
     padding: 0.9rem 1rem 1rem;
   }
+  /* minmax(0, …) и перенос: длинная латышская или литовская подпись и число с диапазоном не выталкивают строку за экран. */
   .blog-chart-row {
-    grid-template-columns: 1fr auto;
+    grid-template-columns: minmax(0, 1fr) auto;
     gap: 0.2rem 0.75rem;
     padding: 0.4rem 0;
+  }
+  .blog-chart-label {
+    overflow-wrap: anywhere;
+  }
+  .blog-chart-value {
+    white-space: normal;
+    text-align: right;
   }
   .blog-chart-track {
     grid-column: 1 / -1;

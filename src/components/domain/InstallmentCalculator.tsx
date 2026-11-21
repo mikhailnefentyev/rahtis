@@ -122,12 +122,12 @@ export function InstallmentCalculator({ copy, locale }: { copy: InstallmentCopy;
   const group = 'label-micro mb-3 text-ink-muted';
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
       <Card>
         <CardBody className="flex flex-col gap-6">
           <div>
             <p className={group}>{c.groups.deal}</p>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Field label={c.f.price} hint={c.f.priceHint}>
                 {(p) => <Input {...p} inputMode="decimal" value={price} onChange={(e) => setPrice(e.target.value)} />}
               </Field>
@@ -159,7 +159,7 @@ export function InstallmentCalculator({ copy, locale }: { copy: InstallmentCopy;
 
           <div>
             <p className={group}>{c.groups.assumptions}</p>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Field label={c.f.depreciation} hint={c.f.depreciationHint}>
                 {(p) => <Input {...p} inputMode="decimal" value={depreciation} onChange={(e) => setDepreciation(e.target.value)} />}
               </Field>
@@ -171,7 +171,7 @@ export function InstallmentCalculator({ copy, locale }: { copy: InstallmentCopy;
 
           <div>
             <p className={group}>{c.groups.seller}</p>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Field label={c.f.taxMethod}>
                 {(p) => (
                   <Select {...p} value={taxMethod} onChange={(e) => setTaxMethod(e.target.value as 'NONE' | 'POOL' | 'ITEM')}>
@@ -198,7 +198,7 @@ export function InstallmentCalculator({ copy, locale }: { copy: InstallmentCopy;
 
           <div>
             <p className={group}>{c.groups.buyer}</p>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Field label={c.f.revenue}>
                 {(p) => <Input {...p} inputMode="decimal" value={revenue} onChange={(e) => setRevenue(e.target.value)} />}
               </Field>
