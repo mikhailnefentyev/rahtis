@@ -1,0 +1,65 @@
+title: Kā klientam rādīt kravas pārvadājumu soli pa solim
+description: Kravas izsekošana klientam soli pa solim: izsekošanas saite bez pieteikšanās, posmi ar laika zīmogiem, paredzamais ierašanās laiks un piegādes apliecinājumi.
+updated: 2026-11-15
+---
+<h2>Key takeaways</h2>
+<ul><li>Klientam pietiek zināt, kurā posmā ir pārvadājums: apstiprināts, iekrauts, ceļā, galamērķī un piegādāts ar apstiprinājumu.</li><li>RAHTIS sistēmā klients atver izsekošanas lapu no saites bez sava konta un redz posmus ar laika zīmogiem, kā arī paredzamo ierašanās laiku.</li><li>Pēc piegādes tajā pašā lapā redzama pavadzīme, apstiprinātāja vārds un fotoattēli no izkraušanas vietas, tāpēc kvītis nav jāmeklē e-pastā.</li><li>Izsekošanas lapa nerāda automašīnas atrašanās vietu kartē, vadītāja tālruņa numuru vai frakts cenu; GPS datus izmanto tikai ierašanās laika aplēsei.</li><li>Kavējumus Jūs redzat kā brīdinājumus, un klients saitē redz atjaunināto ierašanās aplēsi; pasūtītājs ar savu sistēmu var saņemt notikumus caur API.</li></ul>
+<p>Klients grib zināt divas lietas: kurā posmā ir pārvadājums un kad krava būs galā. Kad vadītājs lietotnē apstiprina posmus, RAHTIS izsekošanas saite parāda tos klientam ar laika zīmogiem, tāpēc klientam nav jāzvana, lai uzzinātu, kur ir krava. Šajā rokasgrāmatā aplūkoti posmi un tas, kā izsekošanu kopīgot ar klientu.</p>
+<h2 id="miten-asiakas-tilaa-kuljetuksen-ja-saa-seurannan-kayttoonsa">Kā klients pasūta pārvadājumu un saņem izsekošanu?</h2>
+<p>Reiss RAHTIS sistēmā rodas, kad ievadāt sava klienta pasūtījumu vai pārsūtāt klienta pasūtījuma ziņu kā e-pastu, PDF vai attēlu, un sistēma no tā izveido melnrakstu. Kad ievadāt klienta e-pasta adresi, klients saņem ziņu, kurā norādīts, kas veiks pārvadājumu, un saiti uz izsekošanas lapu. Pēc tam klients saitē redz, kurā posmā ir pārvadājums, Jums nezvanot. Funkcijas apkopotas <a href="https://www.rahtis.eu/lv">RAHTIS tīmekļvietnē</a>.</p>
+<h3>Pasūtījuma apstiprinājums ir pirmais izsekošanas posms</h3>
+<p>Apstiprinājums nofiksē, ko pārvadā, kad krava tiek paņemta un kur tā tiek piegādāta. Rakstisku apstiprinājumu vērts dot vienmēr, un RAHTIS sistēmā katram reisam ir savs numurs, kas saglabājas visa pārvadājuma laikā. Izsekošanas lapā redzams, kad pārvadājums apstiprināts.</p>
+<h3>Kas klientam jānorāda, pasūtot</h3>
+<p>Vismaz iekraušanas un piegādes adrese, vēlamais laiks, kravas dati un kontaktpersona abos galos. Ja pārvadājumā ietilpst puspiekabes pārkabināšana vai konteiners, to vērts norādīt jau pasūtījumā, lai posmi būtu pareizi. Pavadzīmes datus labi saskaņot vienlaikus.</p>
+<h2 id="mita-tilan-vaiheita-kuorma-kay-lapi-rahtis-ssa">Kādiem posmiem iziet pārvadājums?</h2>
+<p>No klienta skatpunkta pārvadājumā ir pieci posmi: apstiprināts, iekrauts, ceļā, galamērķī un piegādāts. Katrs posms klientam pasaka vienu lietu: kur mēs esam un kad var gaidīt nākamo izmaiņu.</p>
+<h3>Posmi tabulā</h3>
+<table><thead><tr><th>Posms</th><th>Ko tas nozīmē</th><th>Klients izsekošanas lapā redz</th></tr></thead><tbody><tr><td>Apstiprināts</td><td>Pārvadātājs ir apstiprinājis reisu un norīkojis automašīnu</td><td>Pārvadātāju, maršrutu un plānotos laikus</td></tr><tr><td>Iekrauts</td><td>Vadītājs ir apstiprinājis iekraušanas vietu kā pabeigtu</td><td>Ierašanās un izbraukšanas laiku no iekraušanas vietas</td></tr><tr><td>Ceļā</td><td>Automašīna ir ceļā uz nākamo punktu</td><td>Paredzamo ierašanās laiku un tā pamatojumu</td></tr><tr><td>Galamērķī</td><td>Vadītājs ir ieradies izkraušanas vietā</td><td>Ierašanās laiku</td></tr><tr><td>Piegādāts</td><td>Izkraušana ir apstiprināta</td><td>Pavadzīmi, apstiprinātāja vārdu un fotoattēlus no izkraušanas vietas</td></tr></tbody></table>
+<h3>Kad posms mainās un kas to maina</h3>
+<p>Vadītājs apstiprina posmus RAHTIS vadītāja lietotnē: ierašanos un iekraušanu iekraušanas vietā, kā arī ierašanos un izkraušanu izkraušanas vietā, kur viņš iegūst saņēmēja parakstu un fotoattēlus. Izsekošanas lapa atjaunojas pēc apstiprinājumiem, un Jums informācija nav jāpārsūta.</p>
+<p>Izsekošanas saiti var pārsūtīt tālāk, un saites saņēmējs redz tikai šo vienu pārvadājumu. Izsekošanas lapa tiek rādīta saitē izvēlētajā valodā, un RAHTIS darbojas desmit valodās, tostarp zviedru, igauņu, latviešu un lietuviešu valodā.</p>
+<h2 id="miten-naen-kuorman-sijainnin-reaaliajassa">Vai klients redz kravas atrašanās vietu reāllaikā?</h2>
+<p>Ne kartē. RAHTIS izsekošanas lapa rāda ierašanās aplēsi, nevis automašīnas atrašanās vietu. Ja automašīnai ir pieslēgta GPS izsekošanas sistēma (piemēram, Wialon, Mapon, Webfleet vai ABAX ar API atslēgu), ierašanās aplēsi aprēķina no automašīnas nesenās atrašanās vietas un satiksmes situācijas. Citādi aplēse balstās uz maršruta plānu vai pārvadātāja norādīto laiku, un lapā norādīts, uz ko aplēse balstās.</p>
+<h3>Ko izsekošanas lapa rāda un ko ne</h3>
+<p>Lapā redzams pārvadātājs, maršruts, posmi ar laika zīmogiem, paredzamais ierašanās laiks, bet uz Somijas ceļiem arī satiksmes paziņojumi un laikapstākļi maršrutā. Automašīnas koordinātu, vadītāja tālruņa numura un frakts cenas lapā nav. Identificējama vadītāja vadītas automašīnas atrašanās vieta ir personas dati, tāpēc tās kopīgošanu ierobežo ES Vispārīgā datu aizsardzības regula.</p>
+<h3>Vadītāja loma</h3>
+<p>Vadītājam nav vajadzīga atsevišķa ierīce: viņš apstiprina posmus vadītāja lietotnē, kas darbojas arī bez interneta savienojuma un nosūta apstiprinājumus, kad savienojums atjaunojas. Nepārtrauktu atrašanās vietu lietotne nesūta; atrašanās vietas dati ierašanās aplēsei nāk no automašīnas pašas izsekošanas sistēmas, ja tāda ir pieslēgta.</p>
+<h2 id="miten-saan-ilmoituksen-kun-kuorma-on-perilla-tai-viivastyy">Kā tiek nodota informācija par piegādi un kavējumu?</h2>
+<h3>Piegāde un piegādes apliecinājumi tajā pašā lapā</h3>
+<p>Kad izkraušana ir apstiprināta, izsekošanas lapā parādās pavadzīme, apstiprinātāja vārds un fotoattēli no izkraušanas vietas. Vadītājs tos uzņem ar lietotni, tāpēc Jums nav jāsūta PDF faili kā e-pasta pielikumi. Klients uzreiz redz, kas un kad piegādāts. Tas pats reiss turpinās līdz rēķinam: kad izrakstāt rēķinu savam klientam, apstiprinājums un pavadzīme jau ir pie reisa.</p>
+<p>Tas novērš situāciju, kurā klients zvana un prasa apstiprinājumu, Jūs meklējat papīru kaudzi un pēc stundas nosūtāt attēlu ar WhatsApp.</p>
+<h3>Kavējums, pirms klients paspēj piezvanīt</h3>
+<p>Kad automašīna kavē plānoto laiku, Jūs to RAHTIS sistēmā redzat kā kavējuma brīdinājumu, un klients izsekošanas lapā redz atjaunināto ierašanās aplēsi. Pasūtītājs, kuram ir sava sistēma, var papildus saņemt no RAHTIS webhook paziņojumu, piemēram, kad mainās ierašanās aplēse vai automašīna kavē punktu vairāk nekā par 30 minūtēm. Ja kavējums ir būtisks, tomēr vērts klientam piezvanīt vai uzrakstīt pašam: personiska ziņa par jauno grafiku ir labāks serviss nekā tikai mainījies pulksteņa laiks.</p>
+<h2 id="miten-seuran-kuormaa-jossa-on-trailerin-vaihto-tai-kontti">Kā izsekot pārvadājumu ar puspiekabes pārkabināšanu vai konteineru?</h2>
+<p>Daudzposmu pārvadājums nav viens brauciens, bet ķēde: kravas paņemšana, pārkabināšana vai terminālis un gala pārvadājums. Ja katrs punkts reisā ir atsevišķs maršruta punkts, uzreiz redzat, kurā vietā ķēde atrodas.</p>
+<h3>Puspiekabes pārkabināšana izsekošanā</h3>
+<p>Kad puspiekabi pārkabina citam vilcējam, pārkabināšanas punktu maršrutā ievada kā atsevišķu punktu. Klients izsekošanā redz, ka puspiekabe atrodas pārkabināšanas punktā, un nedomā, ka tā pazudusi. Kad pārkabināšanas punkts apstiprināts, izsekošanas lapa atjaunojas bez atsevišķa zvana. Vairāk par puspiekabju pārkabināšanu lapā <a href="https://www.rahtis.eu/lv/trailer-swap">RAHTIS: puspiekabes pārkabināšana</a>.</p>
+<h3>Konteinera pārvadājums no ostas līdz galamērķim</h3>
+<p>Konteineru pārvadājumā tā pati loģika darbojas no paņemšanas punkta: konteinera paņemšana ostā, brauciens un piegāde ir atsevišķi posmi, kas redzami ar saviem laika zīmogiem. Varat kopīgot izsekošanas saiti ar klientu, kurš pats redz, vai konteiners vēl ir ostā vai jau ceļā.</p>
+<h2 id="miten-voin-jakaa-seurantatiedot-omalle-asiakkaalleni">Kā kopīgot izsekošanu ar savu klientu?</h2>
+<p>Izsekošanas informācija nepaliek tikai Jūsu ekrānā. Ievadiet reisā klienta e-pasta adresi, tad viņš saņems izsekošanas saiti, vai nosūtiet saiti pats. Klients redz posmus pats un nezvana, lai uzzinātu, kur ir krava.</p>
+<h3>Izsekošana bez e-pastu ķēdes</h3>
+<p>Tradicionāli ķēde darbojas tā, ka pasūtītājs zvana Jums, Jūs zvanāt vadītājam un informācija pa telefonu iet atpakaļ. Kad vadītājs apstiprina posmus lietotnē, informācija ir redzama izsekošanas lapā, un nevienam tā nav jānodod ar roku.</p>
+<h3>Kad arī Jūsu klienta klients grib izsekot</h3>
+<p>Ja braucat ekspeditoram vai lielākam pārvadātājam, arī viņu klients var vēlēties redzēt pārvadājuma statusu. Pasūtītājs var pārsūtīt izsekošanas saiti tālāk. Saites atvērējs redz tikai šo pārvadājumu, nevis pārējo Jūsu autoparku vai citus reisus. Atcerieties, ka saite darbojas ikvienam, kam tā pārsūtīta, tāpēc kopīgojiet to tikai tiem, kam jāredz pārvadājuma dati.</p>
+<h2 id="mita-teen-jos-seurantatiedot-eivat-paivity">Ko darīt, ja izsekošana neatjaunojas?</h2>
+<h3>Biežākie iemesli un ātri labojumi</h3>
+<p>Lielākā daļa pārtraukumu rodas trīs iemeslu dēļ: vadītājs vēl nav apstiprinājis posmu, vadītāja telefonam nav interneta savienojuma vai automašīnas izsekošanas ierīce nav nosūtījusi atrašanās vietu. Vispirms pārbaudiet reisa posmus: ja krava apstiprināta kā iekrauta, bet ierašanās aplēse neatjaunojas, iemesls parasti ir izsekošanas ierīcē vai tās savienojumā, un tad aplēse balstās uz maršruta plānu. Vadītāja lietotne saglabā apstiprinājumus arī bez tīkla un nosūta tos, kad savienojums atjaunojas, tāpēc īsa pārklājuma zona izsekošanu nepārtrauc.</p>
+<h3>Kad sazināties ar vadītāju</h3>
+<p>Zvaniet vadītājam, ja posms nav atjaunojies, kā gaidīts, vai klients jau jautā par kravu. Lūdziet apstiprinājumu un fotoattēlus uzreiz galamērķī, lai rēķins nepaliktu gaidām.</p>
+<h2 id="mita-seuranta-maksaa-ja-miten-se-liittyy-muuhun-kuljetusten-hall">Cik maksā izsekošana un kā tā saistīta ar pārējo pārvadājumu pārvaldību?</h2>
+<h3>Cena par automašīnu</h3>
+<p>RAHTIS cenu nosaka pēc automašīnu, nevis lietotāju skaita: pirmā automašīna ir bez maksas, un katra nākamā automašīna, kas mēneša laikā veikusi reisus, maksā 14,90 € mēnesī (bez PVN). Vadītāji lietotni izmanto bez atsevišķas maksas, un izsekošanas saite ir iekļauta cenā. Stāvoša automašīna neko nemaksā, un no reisiem netiek ņemti procenti. Autoparkam no 100 automašīnām cenu saskaņo ar piedāvājumu.</p>
+<h3>Izsekošana kā daļa no visas darba plūsmas</h3>
+<p>Izsekošana nav atsevišķs papildu pakalpojums, bet daļa no tā paša reisa: ievadīšana, iekraušana, brauciens, iespējamā pārkabināšana, piegāde un apstiprinājums. Kad apstiprinājums ir saglabāts, par reisu var izrakstīt rēķinu savam klientam, un maksājuma statusam seko tajā pašā vietā. Informācija plūst no pasūtījuma līdz apmaksai, un izsekošanas datus nav atsevišķi jākopē klientam vai grāmatvedim.</p>
+<h2 id="faq">FAQ</h2>
+<h3>Vai mans klients redz izsekošanu bez sava konta?</h3>
+<p>Redz. Klients atver izsekošanas lapu no saites bez pieteikšanās. Lapā redzami posmi ar laika zīmogiem, paredzamais ierašanās laiks un pēc piegādes – piegādes apliecinājumi. Saiti var pārsūtīt tālāk, un tās atvērējs redz tikai šo pārvadājumu.</p>
+<h3>Vai automašīna kartē redzama nepārtraukti?</h3>
+<p>Nē. Izsekošanas lapā nav kartes ar automašīnas atrašanās vietu. Ja automašīnai ir pieslēgta GPS izsekošanas sistēma, tās neseno atrašanās vietu izmanto ierašanās aplēses aprēķinam, un lapā redzams, kad aplēse atjaunināta. Bez izsekošanas ierīces aplēse balstās uz maršruta plānu vai pārvadātāja norādīto laiku.</p>
+<h3>Vai izsekošana darbojas arī pārvadājumā uz Zviedriju vai Baltiju?</h3>
+<p>Darbojas. Posmi un izsekošanas saite darbojas arī ārvalstu pārvadājumos, jo tie balstās uz vadītāja apstiprinājumiem. Satiksmes un laikapstākļu informācija tiek rādīta tikai par Somijas ceļiem. RAHTIS darbojas desmit valodās, tāpēc izsekošanas lapu var kopīgot ar klientu viņa valodā.</p>
+<h3>Vai klients saņem piegādes apliecinājumu kopā ar rēķinu vai atsevišķi?</h3>
+<p>Klients redz pavadzīmi, apstiprinātāja vārdu un izkraušanas vietas fotoattēlus izsekošanas lapā uzreiz pēc piegādes. Kad izrakstāt rēķinu, apstiprinājums un pavadzīme jau ir pie tā paša reisa, tāpēc nav jārakņājas pa PDF failiem vai WhatsApp attēliem.</p>
+<h3>Vai varu sekot vairākām kravām vienā skatā?</h3>
+<p>Varat. Visus aktīvos reisus un to posmus redzat vienā skatā, tāpēc uzreiz zināt, kas ir ceļā, kas pārkabināšanas punktā un kas gaida apstiprinājumu. Kavējuma un dīkstāves brīdinājumi parāda, kuram reisam pievērsties vispirms.</p>

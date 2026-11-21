@@ -1,0 +1,65 @@
+title: Kaip klientui sekti krovinį etapas po etapo
+description: Krovinio sekimas klientui etapas po etapo: stebėjimo nuoroda be prisijungimo, etapai su laiko žymomis, numatomas atvykimo laikas ir pristatymo įrodymai.
+updated: 2026-11-15
+---
+<h2>Key takeaways</h2>
+<ul><li>Klientui pakanka žinoti, kuriame etape yra vežimas: patvirtinta, pakrauta, kelyje, atvyko ir pristatyta su patvirtinimu.</li><li>RAHTIS sistemoje klientas atidaro stebėjimo puslapį per nuorodą be savo paskyros ir mato etapus su laiko žymomis bei numatomą atvykimo laiką.</li><li>Po pristatymo tame pačiame puslapyje matomi važtaraštis, patvirtinusio asmens vardas ir iškrovimo vietos nuotraukos, todėl kvitų nereikia ieškoti el. pašte.</li><li>Stebėjimo puslapis nerodo automobilio vietos žemėlapyje, vairuotojo telefono numerio ir frachto kainos; GPS duomenys naudojami tik atvykimo laikui įvertinti.</li><li>Vėlavimus patys matote kaip įspėjimus, o klientas nuorodoje mato atnaujintą numatomą atvykimo laiką; savo sistemą naudojantis užsakovas gali gauti įvykius per API.</li></ul>
+<p>Klientas nori žinoti du dalykus: kuriame etape yra vežimas ir kada krovinys bus vietoje. Kai vairuotojas patvirtina etapus programėlėje, RAHTIS stebėjimo nuoroda parodo juos klientui su laiko žymomis, todėl klientui nereikia skambinti klausiant, kur krovinys. Šiame vadove aptariami etapai ir tai, kaip pasidalyti stebėjimu su savo klientu.</p>
+<h2 id="miten-asiakas-tilaa-kuljetuksen-ja-saa-seurannan-kayttoonsa">Kaip klientas užsako vežimą ir gauna galimybę jį stebėti?</h2>
+<p>Reisas RAHTIS sistemoje atsiranda, kai įvedate savo kliento užsakymą arba persiunčiate kliento užsakymo laišką el. paštu, PDF ar nuotrauka – tada sistema iš jo sukuria juodraštį. Kai įvedate kliento el. pašto adresą, klientas gauna laišką, kuriame nurodyta, kas atlieka vežimą, ir nuorodą į stebėjimo puslapį. Po to klientas per nuorodą mato, kuriame etape yra vežimas, Jums neskambindamas. Funkcijos aprašytos <a href="https://www.rahtis.eu/lt">RAHTIS svetainėje</a>.</p>
+<h3>Užsakymo patvirtinimas – pirmasis stebėjimo etapas</h3>
+<p>Patvirtinimas užfiksuoja, kas vežama, kada paimama ir kur pristatoma. Rašytinį patvirtinimą verta pateikti visada, o RAHTIS sistemoje kiekvienas reisas turi savo numerį, kuris lydi visą vežimą. Stebėjimo puslapyje matyti, kada vežimas buvo patvirtintas.</p>
+<h3>Ką klientas turi nurodyti užsakydamas</h3>
+<p>Mažiausiai – paėmimo ir pristatymo adresą, pageidaujamą laiką, krovinio duomenis ir kontaktinį asmenį abiejuose galuose. Jei vežimas apima puspriekabės perkabinimą ar konteinerį, tai verta nurodyti jau užsakyme, kad etapai būtų teisingi. Kartu verta susitarti ir dėl važtaraščio duomenų.</p>
+<h2 id="mita-tilan-vaiheita-kuorma-kay-lapi-rahtis-ssa">Kokius etapus pereina vežimas?</h2>
+<p>Kliento požiūriu vežimas turi penkis etapus: patvirtinta, pakrauta, kelyje, atvyko ir pristatyta. Kiekvienas etapas klientui pasako vieną dalyką: kur esame ir kada galima tikėtis kito pasikeitimo.</p>
+<h3>Etapai lentelėje</h3>
+<table><thead><tr><th>Etapas</th><th>Ką tai reiškia</th><th>Ką klientas mato stebėjimo puslapyje</th></tr></thead><tbody><tr><td>Patvirtinta</td><td>Vežėjas patvirtino reisą ir paskyrė automobilį</td><td>Vežėją, maršrutą ir planuojamą laiką</td></tr><tr><td>Pakrauta</td><td>Vairuotojas patvirtino, kad pakrovimas atliktas</td><td>Atvykimo į pakrovimo vietą ir išvykimo iš jos laiką</td></tr><tr><td>Kelyje</td><td>Automobilis vyksta į kitą punktą</td><td>Numatomą atvykimo laiką ir informaciją, kuo jis grindžiamas</td></tr><tr><td>Atvyko</td><td>Vairuotojas atvyko į iškrovimo vietą</td><td>Atvykimo laiką</td></tr><tr><td>Pristatyta</td><td>Iškrovimas patvirtintas</td><td>Važtaraštį, patvirtinusio asmens vardą ir iškrovimo vietos nuotraukas</td></tr></tbody></table>
+<h3>Kada etapas keičiasi ir kas jį keičia</h3>
+<p>Vairuotojas etapus patvirtina RAHTIS vairuotojo programėlėje: atvykimą ir pakrovimą pakrovimo vietoje bei atvykimą ir iškrovimą iškrovimo vietoje, kai jis paima gavėjo parašą ir nuotraukas. Stebėjimo puslapis atsinaujina pagal patvirtinimus, ir Jums nereikia informacijos perduoti.</p>
+<p>Stebėjimo nuorodą galima persiųsti, o ją gavęs asmuo mato tik šį vieną vežimą. Stebėjimo puslapis rodomas nuorodoje pasirinkta kalba, o RAHTIS veikia dešimčia kalbų, įskaitant švedų, estų, latvių ir lietuvių.</p>
+<h2 id="miten-naen-kuorman-sijainnin-reaaliajassa">Ar klientas mato krovinio vietą realiuoju laiku?</h2>
+<p>Ne žemėlapyje. RAHTIS stebėjimo puslapis rodo numatomą atvykimo laiką, o ne automobilio vietą. Jei automobilis prijungtas prie GPS stebėjimo sistemos (pavyzdžiui, Wialon, Mapon, Webfleet ar ABAX per API raktą), numatomas atvykimo laikas skaičiuojamas pagal naujausią automobilio vietą ir eismo situaciją. Kitu atveju įvertinimas grindžiamas maršruto planu arba vežėjo nurodytu laiku, o puslapyje parašyta, kuo įvertinimas grindžiamas.</p>
+<h3>Ką stebėjimo puslapis rodo, o ko ne</h3>
+<p>Puslapyje matomi vežėjas, maršrutas, etapai su laiko žymomis, numatomas atvykimo laikas, o Suomijos keliuose – ir eismo pranešimai bei orai maršrute. Automobilio koordinačių, vairuotojo telefono numerio ir frachto kainos puslapyje nėra. Identifikuojamo vairuotojo vairuojamo automobilio vieta yra asmens duomenys, todėl jos atskleidimą riboja ES Bendrasis duomenų apsaugos reglamentas (BDAR).</p>
+<h3>Vairuotojo vaidmuo</h3>
+<p>Vairuotojui atskiro įrenginio nereikia: jis etapus patvirtina vairuotojo programėlėje, kuri veikia ir be interneto ryšio ir išsiunčia patvirtinimus, kai ryšys atsiranda. Nuolatinės vietos programėlė nesiunčia – vietos duomenys numatomam atvykimo laikui gaunami iš paties automobilio stebėjimo sistemos, jei ji prijungta.</p>
+<h2 id="miten-saan-ilmoituksen-kun-kuorma-on-perilla-tai-viivastyy">Kaip perduodama informacija apie pristatymą ir vėlavimą?</h2>
+<h3>Pristatymas ir pristatymo įrodymai tame pačiame puslapyje</h3>
+<p>Kai iškrovimas patvirtintas, stebėjimo puslapyje matomi važtaraštis, patvirtinusio asmens vardas ir iškrovimo vietos nuotraukos. Vairuotojas juos padaro programėle, todėl Jums nereikia siųsti PDF el. laiškų prieduose. Klientas iškart mato, kas ir kada buvo pristatyta. Tas pats reisas tęsiasi iki sąskaitos: kai išrašote sąskaitą savo klientui, patvirtinimas ir važtaraštis jau yra prie reiso.</p>
+<p>Taip išvengiama situacijos, kai klientas skambina ir prašo patvirtinimo, Jūs ieškote popierių krūvos ir po valandos siunčiate nuotrauką per WhatsApp.</p>
+<h3>Vėlavimas – dar prieš klientui spėjant paskambinti</h3>
+<p>Kai automobilis vėluoja nuo planuoto laiko, RAHTIS sistemoje tai matote kaip vėlavimo įspėjimą, o klientas stebėjimo puslapyje mato atnaujintą numatomą atvykimo laiką. Užsakovas, turintis savo sistemą, papildomai gali gauti RAHTIS webhook pranešimą, pavyzdžiui, kai pasikeičia numatomas atvykimo laikas arba automobilis į punktą vėluoja daugiau nei 30 minučių. Kai vėlavimas reikšmingas, vis tiek verta patiems paskambinti ar parašyti klientui: asmeninė žinutė apie naują grafiką – geresnis aptarnavimas nei vien pasikeitęs laikas.</p>
+<h2 id="miten-seuran-kuormaa-jossa-on-trailerin-vaihto-tai-kontti">Kaip sekti vežimą, kuriame yra puspriekabės perkabinimas ar konteineris?</h2>
+<p>Daugiaetapis vežimas – ne viena kelionė, o grandinė: paėmimas, perkabinimas ar terminalas ir galutinis pristatymas. Kai kiekvienas punktas yra atskiras reiso maršruto taškas, iškart matote, kurioje vietoje yra grandinė.</p>
+<h3>Puspriekabės perkabinimas stebėjimo puslapyje</h3>
+<p>Kai puspriekabė perkabinama prie kito vilkiko, perkabinimo vieta įrašoma į maršrutą kaip atskiras punktas. Klientas stebėjimo puslapyje mato, kad puspriekabė yra perkabinimo vietoje, ir nemano, kad ji dingo. Kai perkabinimo punktas patvirtinamas, stebėjimo puslapis atsinaujina be atskiro skambučio. Daugiau apie puspriekabių perkabinimą – puslapyje <a href="https://www.rahtis.eu/lt/trailer-swap">RAHTIS: puspriekabės perkabinimas</a>.</p>
+<h3>Konteinerio vežimas iš uosto iki gavėjo</h3>
+<p>Vežant konteinerį ta pati logika veikia nuo paėmimo punkto: konteinerio paėmimas uoste, kelionė ir pristatymas yra atskiri etapai, matomi su savo laiko žymomis. Stebėjimo nuorodą galite pasidalyti su savo klientu, kuris pats mato, ar konteineris dar uoste, ar jau kelyje.</p>
+<h2 id="miten-voin-jakaa-seurantatiedot-omalle-asiakkaalleni">Kaip pasidalyti stebėjimu su savo klientu?</h2>
+<p>Stebėjimo informacija nelieka vien Jūsų ekrane. Įveskite kliento el. pašto adresą prie reiso, ir jis gaus stebėjimo nuorodą, arba nuorodą išsiųskite patys. Klientas etapus mato pats ir neskambina klausdamas, kur krovinys.</p>
+<h3>Stebėjimas be el. laiškų grandinės</h3>
+<p>Tradiciškai grandinė veikia taip: užsakovas skambina Jums, Jūs skambinate vairuotojui, o informacija grįžta telefonu. Kai vairuotojas patvirtina etapus programėlėje, informacija matoma stebėjimo puslapyje, ir niekam nereikia jos perduoti rankomis.</p>
+<h3>Kai stebėti nori ir Jūsų kliento klientas</h3>
+<p>Jei vežate ekspeditoriui ar didesnei vežimo įmonei, vežimo būseną gali norėti matyti ir jų klientas. Užsakovas stebėjimo nuorodą gali persiųsti toliau. Nuorodą atidaręs asmuo mato tik šį vežimą, o ne kitą Jūsų parką ar kitus reisus. Atminkite, kad nuoroda veikia bet kam, kam ji persiunčiama, todėl dalykitės ja tik su tais, kurie turi matyti vežimo duomenis.</p>
+<h2 id="mita-teen-jos-seurantatiedot-eivat-paivity">Ką daryti, jei stebėjimo informacija neatsinaujina?</h2>
+<h3>Dažniausios priežastys ir greiti sprendimai</h3>
+<p>Dauguma trikdžių kyla dėl trijų dalykų: vairuotojas dar nepatvirtino etapo, vairuotojo telefonas be interneto ryšio arba automobilio stebėjimo įrenginys neišsiuntė vietos. Pirmiausia patikrinkite reiso etapus: jei krovinys patvirtintas kaip pakrautas, bet numatomas atvykimo laikas neatsinaujina, priežastis paprastai yra stebėjimo įrenginys ar jo ryšys, o įvertinimas tuomet grindžiamas maršruto planu. Vairuotojo programėlė išsaugo patvirtinimus ir be ryšio ir išsiunčia juos, kai ryšys atsiranda, todėl trumpa „mirusi zona“ stebėjimo nenutraukia.</p>
+<h3>Kada susisiekti su vairuotoju</h3>
+<p>Paskambinkite vairuotojui, jei etapas neatsinaujino, kaip tikėtasi, arba klientas jau klausia apie krovinį. Paprašykite patvirtinimo ir nuotraukų iškart atvykus, kad sąskaitos išrašymas neužstrigtų.</p>
+<h2 id="mita-seuranta-maksaa-ja-miten-se-liittyy-muuhun-kuljetusten-hall">Kiek kainuoja stebėjimas ir kaip jis susijęs su kitu vežimų valdymu?</h2>
+<h3>Kaina už automobilį</h3>
+<p>RAHTIS kaina skaičiuojama pagal automobilius, o ne pagal naudotojus: pirmas automobilis nemokamas, o kiekvienas kitas automobilis, važiavęs per mėnesį, kainuoja 14,90 € per mėnesį (be PVM). Vairuotojai programėle naudojasi be atskiro mokesčio, o stebėjimo nuoroda įeina į kainą. Už stovintį automobilį nemokama nieko, o procentų nuo reisų neimama. Ne mažesniam kaip 100 automobilių parkui kaina sutariama pagal pasiūlymą.</p>
+<h3>Stebėjimas kaip visos darbo eigos dalis</h3>
+<p>Stebėjimas nėra atskira papildoma paslauga – tai to paties reiso dalis: įvedimas, pakrovimas, kelionė, galimas perkabinimas, pristatymas ir patvirtinimas. Išsaugojus patvirtinimą, už reisą galima išrašyti sąskaitą savo klientui, o mokėjimo būsena stebima toje pačioje vietoje. Informacija keliauja nuo užsakymo iki apmokėjimo, ir stebėjimo duomenų nereikia atskirai kopijuoti klientui ar buhalteriui.</p>
+<h2 id="faq">FAQ</h2>
+<h3>Ar mano klientas mato stebėjimą be savo paskyros?</h3>
+<p>Mato. Klientas stebėjimo puslapį atidaro per nuorodą neprisijungdamas. Puslapyje matomi etapai su laiko žymomis, numatomas atvykimo laikas, o po pristatymo – pristatymo įrodymai. Nuorodą galima persiųsti toliau, o ją atidaręs asmuo mato tik šį vežimą.</p>
+<h3>Ar automobilis nuolat matomas žemėlapyje?</h3>
+<p>Ne. Stebėjimo puslapyje nėra automobilio vietos žemėlapio. Jei automobilis prijungtas prie GPS stebėjimo sistemos, jo naujausia vieta naudojama numatomam atvykimo laikui apskaičiuoti, o puslapyje matyti, kada įvertinimas atnaujintas. Be stebėjimo įrenginio įvertinimas grindžiamas maršruto planu arba vežėjo nurodytu laiku.</p>
+<h3>Ar stebėjimas veikia ir vežant Švedijoje ar Baltijos šalyse?</h3>
+<p>Veikia. Etapai ir stebėjimo nuoroda veikia ir užsienio vežimuose, nes jie grindžiami vairuotojo patvirtinimais. Eismo ir orų informacija rodoma tik Suomijos keliams. RAHTIS veikia dešimčia kalbų, todėl stebėjimo puslapiu galima pasidalyti su klientu jo kalba.</p>
+<h3>Ar klientas gauna pristatymo įrodymą kartu su sąskaita, ar atskirai?</h3>
+<p>Važtaraštį, patvirtinusio asmens vardą ir iškrovimo vietos nuotraukas klientas mato stebėjimo puslapyje iškart po pristatymo. Kai išrašote sąskaitą, patvirtinimas ir važtaraštis jau yra prie to paties reiso, todėl atskirai ieškoti PDF ar WhatsApp nuotraukų nereikia.</p>
+<h3>Ar galiu sekti kelis krovinius viename lange?</h3>
+<p>Galite. Visus vykdomus reisus ir jų etapus matote viename lange, todėl iškart žinote, kas kelyje, kas perkabinimo vietoje, o kas laukia patvirtinimo. Vėlavimo ir prastovos įspėjimai parodo, kuriuo reisu verta užsiimti pirmiausia.</p>

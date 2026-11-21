@@ -215,6 +215,24 @@ const LABELS = {
     takeaways: 'Главное',
     faq: 'Вопросы и ответы',
   },
+  ro: {
+    title: 'Blogul RAHTIS: managementul transporturilor și bursă de mărfuri',
+    description: 'Articole practice pentru transportatori și expeditori: scrisori de transport CMR, timp de lucru, curse de retur, oferte de preț, facturare și lucrări de terasamente.',
+    intro: 'Ghiduri practice pentru transportatori și expeditori – de la scrisorile de transport și timpul de lucru la facturare și curse de retur.',
+    heading: 'Ghiduri pentru transportatori',
+    signIn: 'Autentificare',
+    read: 'Citiți',
+    all: 'Toate articolele',
+    min: 'min de citit',
+    toc: 'Cuprins',
+    blog: 'Blog',
+    empty: 'Încă nu există articole.',
+    chart: 'Graficul tabelului de mai jos',
+    join: 'Înscrieți-vă în RAHTIS',
+    privacy: 'Politica de confidențialitate',
+    takeaways: 'Pe scurt',
+    faq: 'Întrebări frecvente',
+  },
 } as const;
 
 export type BlogLabels = (typeof LABELS)[keyof typeof LABELS];

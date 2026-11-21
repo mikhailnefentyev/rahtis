@@ -1,0 +1,65 @@
+title: Kuidas jälgida koormat kliendi jaoks samm-sammult
+description: Koorma jälgimine kliendi jaoks samm-sammult: jälgimislink ilma sisselogimiseta, etapid ajatemplitega, hinnanguline saabumisaeg ja kättetoimetamise tõendid.
+updated: 2026-11-15
+---
+<h2>Key takeaways</h2>
+<ul><li>Kliendile piisab teadmisest, millises etapis vedu on: kinnitatud, laaditud, teel, kohal ja kinnitusega kätte toimetatud.</li><li>RAHTIS-es avab klient jälgimislehe lingilt ilma oma kontota ning näeb etappe koos ajatemplitega ja hinnangulist saabumisaega.</li><li>Pärast kättetoimetamist on samal lehel näha saateleht, kinnitaja nimi ja mahalaadimiskoha fotod, seega ei pea kviitungeid e-postist otsima.</li><li>Jälgimisleht ei näita auto asukohta kaardil ega juhi telefoninumbrit või veotasu; GPS-andmeid kasutatakse ainult saabumisaja hindamiseks.</li><li>Hilinemisi näete ise hoiatustena ja klient näeb lingilt uuendatud saabumisaega; oma süsteemi kasutav tellija saab sündmused kätte ka API kaudu.</li></ul>
+<p>Klient tahab teada kahte asja: millises etapis vedu on ja millal see kohale jõuab. Kui juht kinnitab etapid rakenduses, näitab RAHTIS-e jälgimislink neid kliendile koos ajatemplitega, nii et klient ei pea helistama ja küsima, kus koorem on. See juhend käsitleb etappe ja seda, kuidas jälgimist kliendiga jagada.</p>
+<h2 id="miten-asiakas-tilaa-kuljetuksen-ja-saa-seurannan-kayttoonsa">Kuidas klient veo tellib ja jälgimise kätte saab?</h2>
+<p>Vedu tekib RAHTIS-esse, kui registreerite oma kliendi tellimuse või edastate kliendi tellimissõnumi e-kirja, PDF-i või pildina, mille põhjal süsteem koostab mustandi. Kui sisestate kliendi e-posti aadressi, saab klient sõnumi, kus öeldakse, kes veo teeb, ja lingi jälgimislehele. Pärast seda näeb klient lingilt, millises etapis vedu on, ilma teile helistamata. Funktsioonid on koondatud <a href="https://www.rahtis.eu/et">RAHTIS-e lehele</a>.</p>
+<h3>Tellimuse kinnitus on jälgimise esimene etapp</h3>
+<p>Kinnitus paneb paika, mida veetakse, millal peale võetakse ja kuhu toimetatakse. Kirjalik kinnitus tasub alati anda ning RAHTIS-es on igal veol oma number, mis liigub kaasas kogu veo vältel. Jälgimislehel on näha, millal vedu kinnitati.</p>
+<h3>Mida peab klient tellides teatama</h3>
+<p>Vähemalt pealevõtmis- ja kättetoimetamisaadress, soovitud aeg, kauba andmed ja kontaktisik mõlemas otsas. Kui veo juurde kuulub haagisevahetus või konteiner, tasub see juba tellimusse märkida, et etapid tuleksid õigesti. Saatelehe andmetes on hea samal ajal kokku leppida.</p>
+<h2 id="mita-tilan-vaiheita-kuorma-kay-lapi-rahtis-ssa">Milliseid etappe vedu läbib?</h2>
+<p>Kliendi vaatest on veol viis etappi: kinnitatud, laaditud, teel, kohal ja kätte toimetatud. Iga etapp ütleb kliendile üht asja: kus ollakse ja millal võib oodata järgmist muutust.</p>
+<h3>Etapid tabelina</h3>
+<table><thead><tr><th>Etapp</th><th>Mida see tähendab</th><th>Klient näeb jälgimislehel</th></tr></thead><tbody><tr><td>Kinnitatud</td><td>Vedaja on veo kinnitanud ja auto määranud</td><td>Vedaja, marsruudi ja planeeritud ajad</td></tr><tr><td>Laaditud</td><td>Juht on laadimiskoha tehtuks kinnitanud</td><td>Laadimiskohta saabumise ja sealt lahkumise aja</td></tr><tr><td>Teel</td><td>Auto on teel järgmisse punkti</td><td>Hinnangulise saabumisaja ja teabe selle aluse kohta</td></tr><tr><td>Kohal</td><td>Juht on jõudnud mahalaadimiskohta</td><td>Saabumisaja</td></tr><tr><td>Kätte toimetatud</td><td>Mahalaadimine on kinnitatud</td><td>Saatelehe, kinnitaja nime ja mahalaadimiskoha fotod</td></tr></tbody></table>
+<h3>Millal etapp vahetub ja kes seda vahetab</h3>
+<p>Juht kinnitab etapid RAHTIS-e juhirakenduses: saabumise ja laadimise laadimiskohas ning saabumise ja mahalaadimise mahalaadimiskohas, kus ta võtab kaubasaaja allkirja ja fotod. Jälgimisleht uueneb kinnituste järgi, ilma et peaksite infot edastama.</p>
+<p>Jälgimislingi saab edasi saata ja lingi saaja näeb ainult seda ühte vedu. Jälgimisleht kuvatakse lingis valitud keeles ning RAHTIS töötab kümnes keeles, sealhulgas rootsi, eesti, läti ja leedu keeles.</p>
+<h2 id="miten-naen-kuorman-sijainnin-reaaliajassa">Kas klient näeb koorma asukohta reaalajas?</h2>
+<p>Kaardil mitte. RAHTIS-e jälgimisleht näitab saabumisaja hinnangut, mitte auto asukohta. Kui autoga on ühendatud GPS-jälgimissüsteem (näiteks Wialon, Mapon, Webfleet või ABAX API-võtmega), arvutatakse saabumisaja hinnang auto värske asukoha ja liiklusolukorra põhjal. Muidu põhineb hinnang marsruudiplaanil või vedaja teatatud ajal ning lehel öeldakse, millel hinnang põhineb.</p>
+<h3>Mida jälgimisleht näitab ja mida mitte</h3>
+<p>Lehel on näha vedaja, marsruut, etapid ajatemplitega, hinnanguline saabumisaeg ning Soome teedel ka liiklusteated ja teeolud marsruudi ääres. Auto koordinaate, juhi telefoninumbrit ega veotasu lehel ei ole. Tuvastatava juhi juhitava auto asukoht on isikuandmed, seega piirab selle jagamist ELi isikuandmete kaitse üldmäärus.</p>
+<h3>Juhi roll</h3>
+<p>Juht ei vaja eraldi seadet: ta kinnitab etapid juhirakenduses, mis töötab ka võrguühenduseta ja saadab kinnitused, kui ühendus taastub. Pidevat asukohta rakendus ei saada, vaid saabumisaja hinnangu asukohaandmed tulevad auto enda jälgimissüsteemist, kui see on ühendatud.</p>
+<h2 id="miten-saan-ilmoituksen-kun-kuorma-on-perilla-tai-viivastyy">Kuidas liigub teave kättetoimetamise ja hilinemise kohta?</h2>
+<h3>Kättetoimetamine ja tõendid samal lehel</h3>
+<p>Kui mahalaadimine on kinnitatud, ilmuvad jälgimislehele saateleht, kinnitaja nimi ja mahalaadimiskoha fotod. Juht teeb need rakendusega, nii et te ei pea saatma PDF-e e-kirja manustena. Klient näeb kohe, mis ja millal kätte toimetati. Sama vedu jätkub arveldamisega: kui koostate arve oma kliendile, on kinnitus ja saateleht juba veo juures.</p>
+<p>See kõrvaldab olukorra, kus klient helistab ja küsib kinnitust, teie otsite paberipakki ja saadate tunni pärast pildi WhatsAppiga.</p>
+<h3>Hilinemine enne, kui klient jõuab helistada</h3>
+<p>Kui auto jääb planeeritud ajast maha, näete seda RAHTIS-es hilinemishoiatusena ja klient näeb jälgimislehelt uuendatud saabumisaega. Oma süsteemiga tellija võib lisaks saada RAHTIS-est webhook-teavituse näiteks siis, kui saabumisaja hinnang muutub või auto jääb punktist üle 30 minuti hiljaks. Kui hilinemine on märkimisväärne, tasub siiski kliendile ise helistada või kirjutada: isiklik sõnum uue ajakava kohta on parem teenindus kui pelgalt muutunud kellaaeg.</p>
+<h2 id="miten-seuran-kuormaa-jossa-on-trailerin-vaihto-tai-kontti">Kuidas jälgida vedu, kus on haagisevahetus või konteiner?</h2>
+<p>Mitmeetapiline vedu ei ole üks sõit, vaid ahel: pealevõtmine, vahetus või terminal ja lõppvedu. Kui iga punkt on veol oma teekonnapunktina, näete kohe, millises kohas ahel parasjagu on.</p>
+<h3>Haagisevahetus jälgimises</h3>
+<p>Kui lahtihaagis vahetab sadulveokit, märgitakse vahetuspunkt marsruudile eraldi punktina. Klient näeb jälgimises, et poolhaagis on vahetuspunktis, ega arva, et see on kadunud. Kui vahetuspunkt kinnitatakse, uueneb jälgimisleht ilma eraldi kõneta. Lisateavet haagisevahetuste kohta leiab lehelt <a href="https://www.rahtis.eu/et/trailer-swap">RAHTIS: haagisevahetus</a>.</p>
+<h3>Konteinervedu sadamast sihtkohta</h3>
+<p>Konteinerveol toimib sama loogika alates pealevõtmispunktist: konteineri pealevõtmine sadamast, sõit ja kättetoimetamine on eraldi etapid, millel on oma ajatemplid. Võite jagada jälgimislingi oma kliendiga, kes näeb ise, kas konteiner on veel sadamas või teel.</p>
+<h2 id="miten-voin-jakaa-seurantatiedot-omalle-asiakkaalleni">Kuidas jagada jälgimist oma kliendiga?</h2>
+<p>Jälgimisinfo ei jää ainult teie ekraanile. Sisestage kliendi e-posti aadress veo juurde, siis saab ta jälgimislingi, või saatke link ise. Klient näeb etappe ise ega helista küsima, kus koorem on.</p>
+<h3>Jälgimine ilma e-kirjade ahelata</h3>
+<p>Traditsiooniliselt toimib ahel nii, et tellija helistab teile, teie helistate juhile ja info liigub telefoni teel tagasi. Kui juht kinnitab etapid rakenduses, on info jälgimislehel näha, ilma et keegi peaks seda käsitsi edastama.</p>
+<h3>Kui ka teie kliendi klient tahab jälgida</h3>
+<p>Kui sõidate ekspediitorile või suuremale veofirmale, võib ka nende klient tahta veo seisu näha. Tellija võib jälgimislingi edasi saata. Lingi avaja näeb ainult seda vedu, mitte teie ülejäänud veeremit ega teisi vedusid. Pidage meeles, et link töötab igaühe jaoks, kellele see edastatakse, seega jagage seda ainult neile, kes peavad veo andmeid nägema.</p>
+<h2 id="mita-teen-jos-seurantatiedot-eivat-paivity">Mida teha, kui jälgimine ei uuene?</h2>
+<h3>Kõige sagedasemad põhjused ja kiired parandused</h3>
+<p>Enamik katkestusi tuleneb kolmest asjast: juht pole etappi veel kinnitanud, juhi telefon on võrguühenduseta või auto jälgimisseade pole asukohta saatnud. Kontrollige kõigepealt veo etappe: kui koorem on kinnitatud laadituks, kuid saabumisaja hinnang ei uuene, on põhjus tavaliselt jälgimisseadmes või selle ühenduses ja hinnang põhineb siis marsruudiplaanil. Juhirakendus salvestab kinnitused ka ilma võrguta ja saadab need, kui ühendus taastub, nii et lühike levita ala jälgimist ei katkesta.</p>
+<h3>Millal juhiga ühendust võtta</h3>
+<p>Helistage juhile, kui etapp pole oodatult uuenenud või klient juba koormat küsib. Paluge kinnitust ja fotosid kohe kohal, et arveldamine ei jääks ootama.</p>
+<h2 id="mita-seuranta-maksaa-ja-miten-se-liittyy-muuhun-kuljetusten-hall">Mida jälgimine maksab ja kuidas see seostub muu veohaldusega?</h2>
+<h3>Autopõhine hinnastamine</h3>
+<p>RAHTIS-e hind sõltub autodest, mitte kasutajatest: esimene auto on tasuta ja iga järgmine auto, mis on kuu jooksul sõitnud, maksab 14,90 € kuus (käibemaksuta). Juhid kasutavad rakendust ilma eraldi tasuta ja jälgimislink sisaldub hinnas. Seisev auto ei maksa midagi ja vedudelt protsenti ei võeta. Vähemalt 100 autoga veeremile lepitakse hind kokku pakkumisega.</p>
+<h3>Jälgimine osana kogu töövoost</h3>
+<p>Jälgimine ei ole eraldi lisateenus, vaid osa samast veost: registreerimine, laadimine, sõit, võimalik vahetus, kättetoimetamine ja kinnitus. Kui kinnitus on salvestatud, saab veo põhjal koostada arve oma kliendile ja makse olekut jälgitakse samas kohas. Info liigub tellimusest makseni, ilma et jälgimisandmeid peaks eraldi kliendile või raamatupidajale kopeerima.</p>
+<h2 id="faq">FAQ</h2>
+<h3>Kas mu klient näeb jälgimist ilma oma kontota?</h3>
+<p>Näeb. Klient avab jälgimislehe lingilt sisse logimata. Lehel on näha etapid ajatemplitega, hinnanguline saabumisaeg ja pärast kättetoimetamist kättetoimetamise tõendid. Lingi saab edasi saata ja selle avaja näeb ainult seda vedu.</p>
+<h3>Kas auto on pidevalt kaardil näha?</h3>
+<p>Ei. Jälgimislehel ei ole auto asukoha kaarti. Kui autoga on ühendatud GPS-jälgimissüsteem, kasutatakse selle värsket asukohta saabumisaja hinnangu arvutamiseks ja lehel on näha, millal hinnangut uuendati. Ilma jälgimisseadmeta põhineb hinnang marsruudiplaanil või vedaja teatatud ajal.</p>
+<h3>Kas jälgimine toimib ka Rootsis või Baltikumis tehtaval veol?</h3>
+<p>Toimib. Etapid ja jälgimislink töötavad ka välisvedudel, sest need põhinevad juhi kinnitustel. Liiklus- ja teeolude info kuvatakse ainult Soome teede kohta. RAHTIS töötab kümnes keeles, seega saab jälgimislehe kliendiga jagada tema keeles.</p>
+<h3>Kas klient saab kättetoimetamise tõendi koos arvega või eraldi?</h3>
+<p>Klient näeb saatelehte, kinnitaja nime ja mahalaadimiskoha fotosid jälgimislehelt kohe pärast kättetoimetamist. Kui koostate arve, on kinnitus ja saateleht juba samal veol, seega pole vaja eraldi PDF-e otsida ega WhatsAppi pilte saata.</p>
+<h3>Kas saan mitut koormat samas vaates jälgida?</h3>
+<p>Saate. Näete kõiki käimasolevaid vedusid ja nende etappe samas vaates, nii et teate kohe, mis on teel, mis vahetuspunktis ja mis ootab kinnitust. Hilinemis- ja seisakuhoiatused näitavad, millise veoga tasub esmalt tegeleda.</p>

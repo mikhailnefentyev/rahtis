@@ -75,6 +75,7 @@ const OG_LOCALE: Record<string, string> = {
   pl: 'pl_PL',
   de: 'de_DE',
   ru: 'ru_RU',
+  ro: 'ro_RO',
 };
 
 /* Вопросы раздела FAQ (h2 id="faq"): h3 — вопрос, текст до следующего h3 — ответ. Для разметки FAQPage. */

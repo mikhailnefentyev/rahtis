@@ -1,0 +1,65 @@
+title: Så låter du kunden följa lasten steg för steg
+description: Spårning av lasten för kunden steg för steg: spårningslänk utan inloggning, steg med tidsstämplar, beräknad ankomsttid och leveransbevis.
+updated: 2026-11-15
+---
+<h2>Key takeaways</h2>
+<ul><li>Kunden behöver veta i vilket steg transporten är: bekräftad, lastad, på väg, framme och levererad med kvittering.</li><li>I RAHTIS öppnar kunden spårningssidan via en länk utan eget konto och ser stegen med tidsstämplar samt beräknad ankomsttid.</li><li>Efter leveransen syns fraktsedeln, namnet på den som kvitterade och bilder från lossningsplatsen på samma sida, så kvitton behöver inte letas fram i mejlen.</li><li>Spårningssidan visar inte bilens position på en karta och inte heller förarens telefonnummer eller fraktpriset; GPS-uppgifter används bara för att beräkna ankomsttiden.</li><li>Förseningar ser du själv som larm, och kunden ser den uppdaterade ankomsttiden via länken; en beställare med eget system kan få händelserna via ett API.</li></ul>
+<p>Kunden vill veta två saker: i vilket steg transporten är och när den är framme. När föraren kvitterar stegen i appen visar RAHTIS spårningslänk dem för kunden med tidsstämplar, så kunden behöver inte ringa och fråga var lasten är. Den här guiden går igenom stegen och hur du delar spårningen med din kund.</p>
+<h2 id="miten-asiakas-tilaa-kuljetuksen-ja-saa-seurannan-kayttoonsa">Hur beställer kunden en transport och får tillgång till spårningen?</h2>
+<p>Uppdraget skapas i RAHTIS när du registrerar din egen kunds beställning eller vidarebefordrar kundens beställningsmeddelande som e-post, PDF eller bild, varvid systemet gör ett utkast av det. När du registrerar kundens e-postadress får kunden ett meddelande om vem som sköter transporten och en länk till spårningssidan. Därefter ser kunden via länken i vilket steg transporten är, utan att ringa dig. Funktionerna är samlade på <a href="https://www.rahtis.eu/fi">RAHTIS webbplats</a>.</p>
+<h3>Orderbekräftelsen är spårningens första steg</h3>
+<p>Bekräftelsen spikar vad som transporteras, när det hämtas och vart det levereras. Ge alltid en skriftlig bekräftelse, och i RAHTIS har varje uppdrag ett eget nummer som följer med under hela transporten. På spårningssidan syns när transporten bekräftades.</p>
+<h3>Vad kunden behöver uppge vid beställningen</h3>
+<p>Minst hämtnings- och leveransadress, önskad tid, uppgifter om godset och en kontaktperson i båda ändar. Om transporten omfattar trailerbyte eller en container, registrera det redan i beställningen så att stegen blir rätt. Fraktsedelns uppgifter är bra att komma överens om samtidigt.</p>
+<h2 id="mita-tilan-vaiheita-kuorma-kay-lapi-rahtis-ssa">Vilka steg går transporten igenom?</h2>
+<p>Ur kundens perspektiv har transporten fem steg: bekräftad, lastad, på väg, framme och levererad. Varje steg talar om en sak för kunden: var vi är och när nästa förändring kan väntas.</p>
+<h3>Stegen i en tabell</h3>
+<table><thead><tr><th>Steg</th><th>Vad det betyder</th><th>Kunden ser på spårningssidan</th></tr></thead><tbody><tr><td>Bekräftad</td><td>Åkeriet har bekräftat uppdraget och utsett en bil</td><td>Åkeri, rutt och planerade tider</td></tr><tr><td>Lastad</td><td>Föraren har kvitterat lastningsplatsen som klar</td><td>Ankomst- och avgångstid vid lastningsplatsen</td></tr><tr><td>På väg</td><td>Bilen är på väg till nästa destination</td><td>Beräknad ankomsttid och vad beräkningen bygger på</td></tr><tr><td>Framme</td><td>Föraren har kommit till lossningsplatsen</td><td>Ankomsttid</td></tr><tr><td>Levererad</td><td>Lossningen är kvitterad</td><td>Fraktsedel, namnet på den som kvitterade och bilder från lossningsplatsen</td></tr></tbody></table>
+<h3>När steget ändras och vem som ändrar det</h3>
+<p>Föraren kvitterar stegen i RAHTIS förarapp: ankomst och lastning på lastningsplatsen samt ankomst och lossning på lossningsplatsen, då hen också tar mottagarens signatur och bilder. Spårningssidan uppdateras efter kvitteringarna utan att du behöver förmedla informationen.</p>
+<p>Spårningslänken kan vidarebefordras, och den som får länken ser bara den här enda transporten. Spårningssidan visas på det språk som valts i länken, och RAHTIS fungerar på tio språk, bland annat svenska, estniska, lettiska och litauiska.</p>
+<h2 id="miten-naen-kuorman-sijainnin-reaaliajassa">Ser kunden lastens position i realtid?</h2>
+<p>Inte på en karta. RAHTIS spårningssida visar beräknad ankomsttid, inte bilens position. Om bilen är kopplad till ett GPS-spårningssystem (till exempel Wialon, Mapon, Webfleet eller ABAX med API-nyckel) beräknas ankomsttiden utifrån bilens senaste position och trafikläget. Annars bygger beräkningen på ruttplanen eller på den tid åkeriet har angett, och sidan anger vad beräkningen bygger på.</p>
+<h3>Vad spårningssidan visar och inte visar</h3>
+<p>Sidan visar åkeri, rutt, steg med tidsstämplar, beräknad ankomsttid och på finska vägar även trafikmeddelanden och väglag längs rutten. Bilens koordinater, förarens telefonnummer och fraktpriset finns inte på sidan. Positionen för en bil som körs av en identifierbar förare är en personuppgift, så delningen av den begränsas av EU:s allmänna dataskyddsförordning (GDPR).</p>
+<h3>Förarens roll</h3>
+<p>Föraren behöver ingen separat enhet: hen kvitterar stegen i förarappen, som fungerar även utan nätuppkoppling och skickar kvitteringarna när uppkopplingen är tillbaka. Appen skickar inte position kontinuerligt, utan positionsuppgiften för ankomstberäkningen kommer från bilens eget spårningssystem, om ett sådant är kopplat.</p>
+<h2 id="miten-saan-ilmoituksen-kun-kuorma-on-perilla-tai-viivastyy">Hur går informationen om leverans och försening fram?</h2>
+<h3>Leverans och leveransbevis på samma sida</h3>
+<p>När lossningen har kvitterats visas fraktsedeln, namnet på den som kvitterade och bilder från lossningsplatsen på spårningssidan. Föraren tar dem med appen, så du behöver inte skicka PDF:er som mejlbilagor. Kunden ser direkt vad som levererades och när. Samma uppdrag fortsätter till faktureringen: när du gör en faktura till din egen kund finns kvitteringen och fraktsedeln redan på uppdraget.</p>
+<p>Det tar bort situationen där kunden ringer och frågar efter kvitteringen, du letar i en pappersbunt och skickar en bild via WhatsApp en timme senare.</p>
+<h3>Förseningen innan kunden hinner ringa</h3>
+<p>När bilen är försenad i förhållande till planerad tid ser du det i RAHTIS som ett förseningslarm, och kunden ser den uppdaterade ankomsttiden på spårningssidan. En beställare med eget system kan dessutom få en webhook-avisering från RAHTIS, till exempel när den beräknade ankomsttiden ändras eller bilen är mer än 30 minuter sen till en punkt. När förseningen är betydande lönar det sig ändå att själv ringa eller skriva till kunden: ett personligt meddelande om den nya tidtabellen är bättre service än bara ett ändrat klockslag.</p>
+<h2 id="miten-seuran-kuormaa-jossa-on-trailerin-vaihto-tai-kontti">Hur följer jag en transport med trailerbyte eller container?</h2>
+<p>En transport i flera steg är inte en resa utan en kedja: hämtning, byte eller terminal och sluttransport. När varje punkt finns på uppdraget som en egen ruttpunkt ser du direkt var i kedjan transporten befinner sig.</p>
+<h3>Trailerbyte i spårningen</h3>
+<p>När en lös påhängsvagn byter dragbil registreras bytesplatsen som en egen destination på rutten. Kunden ser i spårningen att trailern är vid bytesplatsen och tror inte att den har försvunnit. När bytesplatsen kvitteras uppdateras spårningssidan utan något separat samtal. Mer om trailerbyten finns på sidan <a href="https://www.rahtis.eu/fi/trailer-swap">RAHTIS: trailerbyte</a>.</p>
+<h3>Containertransport från hamnen till destinationen</h3>
+<p>Vid containertransport fungerar samma logik från hämtningspunkten: hämtningen av containern i hamnen, resan och leveransen är separata steg som syns med egna tidsstämplar. Du kan dela spårningslänken med din kund, som själv ser om containern fortfarande är i hamnen eller på väg.</p>
+<h2 id="miten-voin-jakaa-seurantatiedot-omalle-asiakkaalleni">Hur delar jag spårningen med min egen kund?</h2>
+<p>Spårningsinformationen stannar inte bara på din skärm. Registrera kundens e-postadress på uppdraget, så får hen spårningslänken, eller skicka länken själv. Kunden ser stegen själv och ringer inte för att fråga var lasten är.</p>
+<h3>Spårning utan mejlkedja</h3>
+<p>Traditionellt fungerar kedjan så att beställaren ringer dig, du ringer föraren och informationen går tillbaka per telefon. När föraren kvitterar stegen i appen syns informationen på spårningssidan utan att någon behöver förmedla den för hand.</p>
+<h3>När din kunds kund också vill följa transporten</h3>
+<p>Om du kör för en speditör eller ett större åkeri kan även deras kund vilja se transportens status. Beställaren kan vidarebefordra spårningslänken. Den som öppnar länken ser bara den här transporten, inte resten av din fordonspark eller dina andra uppdrag. Kom ihåg att länken fungerar för vem som helst som den vidarebefordras till, så dela den bara med dem som ska se transportens uppgifter.</p>
+<h2 id="mita-teen-jos-seurantatiedot-eivat-paivity">Vad gör jag om spårningen inte uppdateras?</h2>
+<h3>De vanligaste orsakerna och snabba åtgärder</h3>
+<p>De flesta avbrott beror på tre saker: föraren har ännu inte kvitterat steget, förarens telefon saknar nätuppkoppling eller bilens spårningsenhet har inte skickat någon position. Kontrollera först uppdragets steg: om lasten är kvitterad som lastad men den beräknade ankomsttiden inte uppdateras, ligger orsaken oftast i spårningsenheten eller dess uppkoppling, och beräkningen bygger då på ruttplanen. Förarappen sparar kvitteringar även utan nät och skickar dem när uppkopplingen är tillbaka, så en kort skugga bryter inte spårningen.</p>
+<h3>När du ska kontakta föraren</h3>
+<p>Ring föraren om ett steg inte har uppdaterats som väntat eller om kunden redan frågar efter lasten. Be om kvittering och bilder direkt på plats, så att faktureringen inte blir väntande.</p>
+<h2 id="mita-seuranta-maksaa-ja-miten-se-liittyy-muuhun-kuljetusten-hall">Vad kostar spårningen och hur hänger den ihop med övrig transportledning?</h2>
+<h3>Prissättning per bil</h3>
+<p>RAHTIS prissätts per bil, inte per användare: den första bilen är gratis, och varje ytterligare bil som har kört under månaden kostar 14,90 € i månaden (exkl. moms). Förarna använder appen utan separat avgift, och spårningslänken ingår i priset. En bil som står still kostar ingenting, och ingen procentavgift tas ut på uppdragen. För en fordonspark med minst 100 bilar avtalas priset genom offert.</p>
+<h3>Spårningen som en del av hela arbetsflödet</h3>
+<p>Spårningen är ingen separat tilläggstjänst utan en del av samma uppdrag: registrering, lastning, resa, eventuellt byte, leverans och kvittering. När kvitteringen har sparats kan du göra en faktura till din egen kund från uppdraget, och betalningsstatusen följs på samma ställe. Informationen går från beställning till betalning utan att spårningsuppgifterna behöver kopieras separat till kunden eller bokföraren.</p>
+<h2 id="faq">FAQ</h2>
+<h3>Ser min kund spårningen utan eget konto?</h3>
+<p>Ja. Kunden öppnar spårningssidan via länken utan att logga in. På sidan syns stegen med tidsstämplar, beräknad ankomsttid och efter leveransen leveransbevisen. Länken kan vidarebefordras, och den som öppnar den ser bara den här transporten.</p>
+<h3>Syns bilen hela tiden på en karta?</h3>
+<p>Nej. Spårningssidan har ingen karta över bilens position. Om bilen är kopplad till ett GPS-spårningssystem används dess senaste position för att beräkna ankomsttiden, och sidan visar när beräkningen uppdaterades. Utan spårningsenhet bygger beräkningen på ruttplanen eller den tid åkeriet har angett.</p>
+<h3>Fungerar spårningen även för transporter i Sverige eller Baltikum?</h3>
+<p>Ja. Stegen och spårningslänken fungerar även vid utlandstransporter, eftersom de bygger på förarens kvitteringar. Trafik- och väglagsinformation visas bara för finska vägar. RAHTIS fungerar på tio språk, så spårningssidan kan delas med kunden på hens eget språk.</p>
+<h3>Får kunden leveransbeviset med fakturan eller separat?</h3>
+<p>Kunden ser fraktsedeln, namnet på den som kvitterade och bilderna från lossningsplatsen på spårningssidan direkt efter leveransen. När du gör fakturan finns kvitteringen och fraktsedeln redan på samma uppdrag, så du behöver inte leta fram PDF:er eller WhatsApp-bilder.</p>
+<h3>Kan jag följa flera laster i samma vy?</h3>
+<p>Ja. Du ser alla pågående uppdrag och deras steg i samma vy, så du vet direkt vad som är på väg, vad som står vid en bytesplats och vad som väntar på kvittering. Förseningslarm och stilleståndslarm visar vilket uppdrag du ska ta itu med först.</p>

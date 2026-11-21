@@ -24,6 +24,7 @@ const OG_LOCALE: Record<string, string> = {
   pl: 'pl_PL',
   de: 'de_DE',
   ru: 'ru_RU',
+  ro: 'ro_RO',
 };
 
 /** hreflang блога: у каждого языка свой список, x-default — финский /blog. */
