@@ -5,8 +5,7 @@
  * кабинеты. Путь без локали и с точкой — прокси такие пути пропускает, а
  * стартовый адрес /driver он сам переведёт на язык водителя по куке.
  *
- * Иконка — та же, что у сайта (512 и 180 px), чтобы на экране телефона
- * водитель узнавал RAHTIS.
+ * Иконки — свои, public/app-icon-*.png: буква R с полями.
  */
 export const dynamic = 'force-static';
 
@@ -24,8 +23,16 @@ export function GET() {
       background_color: '#050b16',
       theme_color: '#0d647f',
       icons: [
-        { src: '/icon.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
-        { src: '/apple-icon.png', sizes: '180x180', type: 'image/png' },
+        /*
+         * Свои иконки приложения (22.11.2026): буква R занимает около 60 %
+         * плитки, с полями, на светлом фоне. Прежняя /icon.png — буква во
+         * весь квадрат на прозрачном фоне: на экране телефона она упиралась
+         * в края плитки. maskable — для круглых и фигурных плиток Android,
+         * буква там ещё меньше, чтобы обрезка её не задела.
+         */
+        { src: '/app-icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+        { src: '/app-icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+        { src: '/app-icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
       ],
     },
     { headers: { 'Content-Type': 'application/manifest+json' } },

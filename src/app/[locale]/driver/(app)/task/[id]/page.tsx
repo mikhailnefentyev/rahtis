@@ -44,12 +44,16 @@ export default async function DriverTaskPage({
 
   const running = task.status === 'IN_PROGRESS';
   /* Снимки нужны только на идущем рейсе: там осмотр и сравнение сторон. */
-  const photos = running ? await getTripPhotos(task.id) : [];
   /* Правки маршрута, которых водитель ещё не отметил (только его рейс — решает база). */
   const active = running || task.status === 'AWAIT_DRIVER';
-  const { data: changeRows } = active
-    ? await (await createClient()).rpc('driver_route_changes', { p_order_id: task.id })
-    : { data: [] };
+  const checkStopId = task.stops.find((s) => s.role === 'PICKUP')?.id ?? null;
+  /* Три запроса разом, а не друг за другом (22.11.2026): экран рейса открывался втрое дольше, чем нужно. */
+  const supabase = await createClient();
+  const [photos, { data: changeRows }, { data: tripTrailers }] = await Promise.all([
+    running ? getTripPhotos(task.id) : Promise.resolve([]),
+    active ? supabase.rpc('driver_route_changes', { p_order_id: task.id }) : Promise.resolve({ data: [] }),
+    running && checkStopId ? supabase.rpc('driver_trip_trailers') : Promise.resolve({ data: [] }),
+  ]);
   const routeChanges: DriverRouteChange[] = (changeRows ?? []).map((r) => ({
     id: r.id,
     kind: r.kind,
@@ -63,8 +67,6 @@ export default async function DriverTaskPage({
    * Та ли машина: на первой погрузке водитель подтверждает номера —
    * тягача (его машина в рейсе) и прицепа (единица заказа или прицеп сцепки).
    */
-  const checkStopId = task.stops.find((s) => s.role === 'PICKUP')?.id ?? null;
-  const { data: tripTrailers } = running && checkStopId ? await (await createClient()).rpc('driver_trip_trailers') : { data: [] };
   const plates = {
     truck: task.plate,
     trailer: task.trailer_plate ?? (tripTrailers ?? []).find((r) => r.order_id === task.id)?.plate ?? null,

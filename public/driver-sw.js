@@ -12,9 +12,12 @@
  * При выходе из приложения кэш стирается целиком (profile/SignOut) —
  * следующий на этом телефоне не увидит чужие задания.
  */
-const CACHE = 'rahtis-driver-v5';
+const CACHE = 'rahtis-driver-v6';
 const CACHE_PREFIX = 'rahtis-driver-';
 const OFFLINE = '/driver-offline.html';
+/* Заставка запуска: отдаётся на /driver из кэша мгновенно, см. public/driver-boot.html. */
+const BOOT = '/driver-boot.html';
+const BOOT_MARK = '/splash/mark-dark.png';
 const DRIVER_PAGE = /^\/[a-z]{2}\/driver(\/|$)/;
 /* Главный экран приложения: /fi/driver, /ru/driver… */
 const DRIVER_HOME = /^\/[a-z]{2}\/driver\/?$/;
@@ -22,7 +25,7 @@ const DRIVER_HOME = /^\/[a-z]{2}\/driver\/?$/;
 const START = '/driver-start';
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll([OFFLINE, '/icon.png'])));
+  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll([OFFLINE, '/icon.png', BOOT, BOOT_MARK])));
   self.skipWaiting();
 });
 
@@ -113,6 +116,29 @@ async function networkFirst(request) {
   }
 }
 
+/*
+ * Запуск с иконки (22.11.2026): на /driver сразу отдаётся заставка из
+ * кэша — без неё экран был белым, пока сервер собирал первую страницу.
+ * Заставка сама открывает /driver?boot=1, и уже этот переход идёт в сеть.
+ */
+async function bootSplash(request) {
+  const cache = await caches.open(CACHE);
+  const boot = await cache.match(BOOT);
+  return boot || networkFirst(request);
+}
+
+/* Переход из заставки в приложение: сервер переводит /driver на язык водителя; без сети — на последний главный экран. */
+async function bootGo() {
+  try {
+    return await fetch('/driver', { redirect: 'manual', credentials: 'same-origin' });
+  } catch {
+    const cache = await caches.open(CACHE);
+    const start = await startPath(cache);
+    if (start) return Response.redirect(start, 302);
+    return cache.match(OFFLINE);
+  }
+}
+
 async function cacheFirst(request) {
   const cache = await caches.open(CACHE);
   const hit = await cache.match(request);
@@ -129,12 +155,17 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
-  if (request.mode === 'navigate' && (DRIVER_PAGE.test(url.pathname) || url.pathname === '/driver')) {
+  if (request.mode === 'navigate' && url.pathname === '/driver') {
+    event.respondWith(url.searchParams.has('boot') ? bootGo() : bootSplash(request));
+    return;
+  }
+
+  if (request.mode === 'navigate' && DRIVER_PAGE.test(url.pathname)) {
     event.respondWith(networkFirst(request));
     return;
   }
 
-  if (url.pathname.startsWith('/_next/static/') || url.pathname === '/icon.png') {
+  if (url.pathname.startsWith('/_next/static/') || url.pathname === '/icon.png' || url.pathname === BOOT_MARK) {
     event.respondWith(cacheFirst(request));
   }
 });
@@ -156,7 +187,7 @@ self.addEventListener('push', (event) => {
   event.waitUntil(
     self.registration.showNotification(data.title || 'RAHTIS', {
       body: data.body || '',
-      icon: '/icon.png',
+      icon: '/app-icon-192.png',
       badge: '/icon.png',
       tag: data.tag,
       renotify: Boolean(data.tag),

@@ -40,11 +40,13 @@ export type DriverMe = {
 export const getDriver = cache(async (): Promise<DriverMe | null> => {
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return null;
-
+  /*
+   * Без отдельного auth.getUser() (22.11.2026): это был лишний поход к
+   * серверу входа на каждом экране приложения. Токен уже проверен в proxy
+   * (updateSession), а driver_me выполняет база под этим же токеном:
+   * подпись проверяет она сама, и без входа или без привязанного водителя
+   * ответ пустой.
+   */
   const { data } = await supabase.rpc('driver_me');
   return (data as DriverMe | null) ?? null;
 });

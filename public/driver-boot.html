@@ -1,0 +1,40 @@
+<!doctype html>
+<!--
+  Заставка запуска приложения водителя (22.11.2026).
+
+  Нажатие на иконку открывает /driver. Раньше экран оставался белым, пока
+  сервер собирал первую страницу, и только потом на долю секунды мелькала
+  заставка. Теперь service worker отвечает на /driver этим файлом из кэша —
+  мгновенно, без сети, — а он тут же открывает само приложение. Браузер
+  держит заставку на экране, пока новая страница не нарисуется, а у неё
+  первым идёт тот же экран (.boot-splash) — шва не видно.
+
+  Всё встроено: ни стилей, ни скриптов извне, чтобы показаться первым кадром.
+-->
+<html lang="fi" style="background:#050b16">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#050b16" />
+    <meta name="robots" content="noindex" />
+    <title>RAHTIS</title>
+    <style>
+      html, body { height: 100%; margin: 0; }
+      body {
+        display: grid;
+        place-items: center;
+        background:
+          radial-gradient(circle at 50% 46%, rgb(31 143 196 / 0.45), rgb(15 79 122 / 0.18) 22%, transparent 42%),
+          linear-gradient(#050b16, #0a1830);
+      }
+      img { width: min(34vw, 160px); height: auto; margin-bottom: 8vh; }
+    </style>
+  </head>
+  <body>
+    <img src="/splash/mark-dark.png" alt="" width="512" height="521" />
+    <script>
+      /* boot=1 — знак service worker'у: это уже переход в приложение, отвечать сетью. */
+      location.replace('/driver?boot=1');
+    </script>
+  </body>
+</html>

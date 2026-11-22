@@ -35,7 +35,7 @@ export default async function DriverHome({
   if (!isLocale(locale)) notFound();
 
   const supabase = await createClient();
-  const [driver, tasks, { t, f }, { data: siteData }, { data: outData }, { data: inspectionData }] = await Promise.all([
+  const [driver, tasks, { t, f }, { data: siteData }, { data: outData }, { data: inspectionData }, { data: tripTrailerRows }] = await Promise.all([
     getDriver(),
     getDriverTasks(),
     getDriverI18n(locale),
@@ -44,12 +44,13 @@ export default async function DriverHome({
     supabase.rpc('driver_vehicle_downtime'),
     /* Осмотрена ли машина сегодня — плитка осмотра показывает это без захода на экран. */
     supabase.rpc('driver_inspection_state'),
+    /* Прицеп рейса перевозчика (конструктор сцепок) — тем же заходом, а не отдельным после (22.11.2026). */
+    supabase.rpc('driver_trip_trailers'),
   ]);
   const inspection = inspectionData as unknown as { vehicle: { id: string } | null; today: { inspected_at: string }[] } | null;
   const inspectedAt = inspection?.today[0]?.inspected_at ?? null;
   const outOfService = outData as unknown as { reason: 'SERVICE' | 'DEFECT' | 'INSPECTION' } | null;
   /* Прицеп рейса перевозчика (конструктор сцепок) — водитель видит, что цеплять. */
-  const { data: tripTrailerRows } = await supabase.rpc('driver_trip_trailers');
   const ownTrailer = new Map((tripTrailerRows ?? []).map((r) => [r.order_id, r.plate]));
   if (!driver) return null;
 
