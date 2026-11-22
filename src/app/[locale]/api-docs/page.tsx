@@ -161,7 +161,7 @@ def verify(header: str, raw_body: bytes, secret: str) -> bool:
       <p className="mt-3 text-[14px] leading-relaxed text-ink-muted">{d.intro}</p>
       <p className="mt-3 text-[14px] leading-relaxed text-ink-muted">
         {d.openapi}{' '}
-        <a href="/api/v1/openapi.json" className="font-mono text-[13px] text-ink underline underline-offset-2">
+        <a href="/api/v1/openapi.json" className="font-mono text-[13px] break-all text-ink underline underline-offset-2">
           {base}/openapi.json
         </a>
       </p>

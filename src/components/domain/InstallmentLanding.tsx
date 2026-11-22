@@ -62,7 +62,7 @@ export function InstallmentLanding({ locale }: { locale: string }) {
             <Link href={signInPath(locale)} className="hidden text-ink-muted hover:text-ink sm:inline">
               {c.ctaSignIn}
             </Link>
-            <Link href={`/${locale}/apply`} className={buttonClass({ variant: 'primary', size: 'sm' })}>
+            <Link href={`/${locale}/apply`} className={`${buttonClass({ variant: 'primary', size: 'sm' })} whitespace-nowrap`}>
               {c.ctaApply}
             </Link>
           </nav>

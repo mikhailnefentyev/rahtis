@@ -1507,7 +1507,18 @@
 .trip-cycle__label[data-on] { visibility: visible; }
 
 @media (max-width: 1000px) {
-  .hero-port__inner { grid-template-columns: 1fr; gap: 40px; padding-top: 84px; }
+  /*
+   * minmax(0, 1fr), а не 1fr (22.11.2026): колонка растягивалась под самый
+   * длинный бейдж стадии в карточке рейса (немецкий — 217 px), и на
+   * телефоне текст и кнопки первого экрана срезались справа.
+   */
+  .hero-port__inner { grid-template-columns: minmax(0, 1fr); gap: 40px; padding-top: 84px; }
+}
+@media (max-width: 480px) {
+  /* Узкий экран: бейдж стадии — отдельной строкой под заголовком рейса. */
+  .trip-preview__top { flex-wrap: wrap; }
+  .trip-preview__title { flex-basis: 100%; }
+  .trip-preview__badges { justify-items: start; max-width: 100%; }
 }
 
 /*

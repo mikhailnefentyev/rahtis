@@ -170,8 +170,8 @@ export function ApplyForm({
                 onClick={() => setKind(value)}
                 className={
                   kind === value
-                    ? 'cursor-pointer rounded-[4px] bg-accent px-3 py-2 text-[13px] font-semibold text-accent-ink'
-                    : 'cursor-pointer rounded-[4px] px-3 py-2 text-[13px] font-semibold text-ink-faint transition-colors duration-150 hover:text-ink'
+                    ? 'cursor-pointer rounded-[4px] bg-accent px-2 py-2 text-[13px] leading-tight font-semibold break-words hyphens-auto text-accent-ink sm:px-3'
+                    : 'cursor-pointer rounded-[4px] px-2 py-2 text-[13px] leading-tight font-semibold break-words hyphens-auto text-ink-faint transition-colors duration-150 hover:text-ink sm:px-3'
                 }
               >
                 {label}

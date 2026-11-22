@@ -34,7 +34,7 @@ export function BlogFrame({ children, lang = 'fi' }: { children: React.ReactNode
             <Link href={signInPath(site)} className="hidden text-ink-muted hover:text-ink sm:inline">
               {t.signIn}
             </Link>
-            <Link href={`/${site}/apply`} className={buttonClass({ variant: 'primary', size: 'sm' })}>
+            <Link href={`/${site}/apply`} className={`${buttonClass({ variant: 'primary', size: 'sm' })} whitespace-nowrap`}>
               {t.join}
             </Link>
           </nav>
