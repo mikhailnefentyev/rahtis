@@ -110,7 +110,7 @@ begin
    * в чужие сеансы и их запросы.
    */
   if v_flat ~ '(^|[^a-z0-9_])(query|table|cursor|schema|database)_to_xml'
-     or v_flat ~ '(^|[^a-z0-9_])pg_(ls|read|stat)_' then
+     or v_flat ~ '(^|[^a-z0-9_])pg_(ls|read|stat|advisory|try_advisory|sleep|notify|reload|rotate|switch|settings|largeobject|file_settings|hba_file)' then
     raise exception 'Запрос содержит запрещённую функцию.' using errcode = '42501';
   end if;
 
