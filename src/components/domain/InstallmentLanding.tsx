@@ -19,7 +19,8 @@ import { InstallmentCalculator } from './InstallmentCalculator';
 export function InstallmentLanding({ locale }: { locale: string }) {
   if (!isLocale(locale)) notFound();
   const c = installmentCopy(locale);
-  const url = `${SITE_URL}${installmentPath(locale)}`;
+  /* Тот же адрес, что canonical страницы (pageMetadata): с языком в пути (22.11.2026). */
+  const url = `${SITE_URL}/${locale}${installmentPath(locale)}`;
   const lang = locale;
 
   const ld = [

@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { Card, CardBody } from '@/components/ui';
+import { Card, CardBody, EmptyState } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
+import { installmentsAvailable, vehicleSellable } from '@/lib/installments/access';
 import { installmentUiCopy } from '@/lib/installments/copy';
 import { isLocale } from '@/lib/i18n';
 import { installmentCopy } from '@/lib/landing/installment';
@@ -25,15 +27,38 @@ export default async function NewListingPage({
   const [{ locale }, { vehicle }] = await Promise.all([params, searchParams]);
   if (!isLocale(locale)) notFound();
   const viewer = await requireRole(locale, 'CARRIER');
+  if (!installmentsAvailable(viewer.company!.country)) notFound();
   const ui = installmentUiCopy(locale);
   const supabase = await createClient();
-  const { data: vehicles } = await supabase
+  /*
+   * Только машины, которые база даст выставить (app.vehicle_sellable): одобренные и
+   * не купленные в рассрочку до выплаты. Раньше такая машина была в списке, а
+   * сохранение кончалось общей ошибкой (22.11.2026).
+   */
+  const { data: approved } = await supabase
     .from('vehicles')
-    .select('id, make, plate')
+    .select('id, make, plate, installment_role')
     .eq('company_id', viewer.company!.id)
     .eq('access', 'APPROVED')
     .order('plate');
-  if (!vehicles?.length) notFound();
+  const vehicles = (approved ?? []).filter((v) => vehicleSellable(v.installment_role));
+  /* Продавать нечего — объяснение вместо «страницы нет». */
+  if (!vehicles.length) {
+    return (
+      <main className="cab-page flex flex-col gap-4">
+        <h1 className="page-title">{ui.listing.newTitle}</h1>
+        <EmptyState
+          title={ui.listing.vehicle}
+          description={ui.listing.noVehicles}
+          action={
+            <Link href={`/${locale}/carrier/installments`} className="text-[13px] text-accent hover:underline">
+              ‹ {ui.title}
+            </Link>
+          }
+        />
+      </main>
+    );
+  }
   const selected = vehicles.some((v) => v.id === vehicle) ? vehicle! : vehicles[0].id;
 
   return (

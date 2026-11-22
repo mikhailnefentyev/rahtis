@@ -1,14 +1,14 @@
 import type { InstallmentCopy } from '../installment';
 
-/** Pirkimo išsimokėtinai skaičiuoklė ir puslapis, lietuvių kalba. Visi skaičiavimai ir nuorodos – pagal Suomijos teisę. */
+/** Pirkimo–pardavimo išsimokėtinai skaičiuoklė ir puslapis, lietuvių kalba. Visi skaičiavimai ir nuorodos – pagal Suomijos teisę. */
 export const calc: InstallmentCopy = {
   metaTitle: 'Sunkvežimio pardavimas išsimokėtinai tarp įmonių Suomijoje – skaičiuoklė',
   metaDescription:
-    'Parduokite arba pirkite naudotą sunkvežimį išsimokėtinai Suomijoje: įmokos, PVM, Suomijos pirkimo išsimokėtinai įstatymo ribos, susigrąžinimas ir pardavėjo mokestis vienoje skaičiuoklėje.',
-  eyebrow: 'Technikos pirkimas išsimokėtinai',
+    'Parduokite arba pirkite naudotą sunkvežimį išsimokėtinai Suomijoje: įmokos, PVM, Suomijos pirkimo–pardavimo išsimokėtinai įstatymo ribos, susigrąžinimas ir pardavėjo mokestis vienoje skaičiuoklėje.',
+  eyebrow: 'Technikos pardavimas išsimokėtinai',
   title: 'Parduokite savo sunkvežimį išsimokėtinai – apskaičiuokite prieš susitardami',
   lede:
-    'Į pensiją išeinantis verslininkas gauna gerą kainą už sunkvežimį, o naujas vežėjas gali pradėti be banko. Skaičiuoklė parodo įmokas, pirmąją sąskaitą su PVM, Suomijos pirkimo išsimokėtinai įstatymo (osamaksukauppalaki) ribas ir tai, kas nutinka, jei mokėjimai nutrūksta.',
+    'Į pensiją išeinantis verslininkas gauna gerą kainą už sunkvežimį, o naujas vežėjas gali pradėti be banko. Skaičiuoklė parodo įmokas, pirmąją sąskaitą su PVM, Suomijos pirkimo–pardavimo išsimokėtinai įstatymo (osamaksukauppalaki) ribas ir tai, kas nutinka, jei mokėjimai nutrūksta.',
   ctaApply: 'Pateikti paraišką',
   ctaSignIn: 'Prisijungti',
   calcTitle: 'Skaičiuoklė',
@@ -20,7 +20,7 @@ export const calc: InstallmentCopy = {
     vatMode: 'PVM',
     vatModes: {
       STANDARD: 'Suomijos standartinis tarifas 25,5 %',
-      MARGIN: 'Maržos schema (tik perpardavėjams)',
+      MARGIN: 'Maržos apmokestinimo schema (tik perpardavėjams)',
       EXEMPT: 'PVM neapmokestinamas pardavimas (Suomijos PVM įstatymas, AVL 61 §)',
       NONE: 'Pardavėjas nėra PVM mokėtojas',
     },
@@ -57,9 +57,9 @@ export const calc: InstallmentCopy = {
     finalPayment: 'Paskutinė įmoka',
     interestTotal: 'Palūkanos iš viso',
     priceWithVat: 'Kaina išsimokėtinai (su PVM)',
-    thresholdsTitle: 'Suomijos pirkimo išsimokėtinai įstatymo ribos (2 §)',
+    thresholdsTitle: 'Suomijos pirkimo–pardavimo išsimokėtinai įstatymo ribos (2 §)',
     thresholdsText:
-      'Pardavėjas gali susigrąžinti sunkvežimį arba reikalauti likusios sumos iš karto tik tada, kai mokėjimas vėluoja bent 14 dienų ir vėluoja bent {tenth} (viena įmoka) arba {twentieth} (dvi ar daugiau įmokų). Šiame sandoryje tai reiškia {needed} vėluojančias įmokas.',
+      'Pardavėjas gali susigrąžinti sunkvežimį arba reikalauti likusios sumos iš karto tik tada, kai mokėjimas vėluoja bent 14 dienų ir vėluoja bent {tenth} (viena įmoka) arba {twentieth} (dvi ar daugiau įmokų). Šiame sandoryje tam reikalingas vėluojančių įmokų skaičius: {needed}.',
     adviceTitle: 'Rekomenduojama pradinė įmoka',
     adviceProtection: 'Sunkvežimio vertės kritimas per 6 mėn. + susigrąžinimo išlaidos',
     adviceTax: 'Pardavėjo mokestis, kurio įmokos dar nepadengia',
@@ -68,12 +68,12 @@ export const calc: InstallmentCopy = {
     adviceLow: 'Pradinė įmoka mažesnė už rekomenduojamą.',
     taxTitle: 'Pardavėjo mokestis perdavimo metais',
     taxIncome: 'Apmokestinamosios pajamos',
-    taxAmount: 'Suomijos pelno mokestis (yhteisövero) 20 %',
+    taxAmount: 'Suomijos pelno mokestis (yhteisövero) 20 % (akcinė bendrovė, osakeyhtiö)',
     taxNone: 'Pardavimo kaina neviršija nenudėvėto likučio: apmokestinamųjų pajamų neatsiranda, tačiau būsimas nusidėvėjimas sumažėja.',
-    taxUnknown: 'Paklauskite buhalterio, kaip nudėvimas sunkvežimis ir koks nenudėvėtas likutis. Išsimokėtinai mokestis neatidedamas: visa kaina yra perdavimo metų pajamos.',
+    taxUnknown: 'Paklauskite buhalterio, kaip nudėvimas sunkvežimis ir koks nenudėvėtas likutis. Pardavimas išsimokėtinai mokesčio neatideda: visa kaina yra perdavimo metų pajamos. Individualaus verslininko (toiminimi) ir ūkinės bendrijos mokestis skaičiuojamas pagal paties verslininko mokesčio tarifą.',
     scenarioTitle: 'Jei mokėjimai nutrūksta',
     scenarioText:
-      'Pirkėjas sumoka už pirmuosius mėnesius ir nustoja. Pardavėjas susigrąžina sunkvežimį, kai pasiekiama įstatymo riba, o šalys atsiskaito: sunkvežimio vertė įskaitoma pirkėjo naudai (3–4 §).',
+      'Pirkėjas moka pirmuosius mėnesius ir nustoja mokėti. Pardavėjas susigrąžina sunkvežimį, kai pasiekiama įstatymo riba, o šalys atsiskaito: sunkvežimio vertė įskaitoma pirkėjo naudai (3–4 §).',
     colStop: 'Mokėjimai nutrūksta',
     colPaid: 'Pirkėjas sumokėjo',
     colValue: 'Sunkvežimio vertė',
@@ -98,24 +98,24 @@ export const calc: InstallmentCopy = {
     RATE: 'Palūkanos 0–50 %.',
     DATES: 'Patikrinkite datas.',
   },
-  howTitle: 'Kaip veikia pirkimas išsimokėtinai',
+  howTitle: 'Kaip veikia pirkimas–pardavimas išsimokėtinai',
   how: [
-    { title: 'Sutartis prieš perdavimą', text: 'Pirkimo išsimokėtinai sutartis sudaroma raštu ir pasirašoma prieš perduodant sunkvežimį. Nuosavybės išlaikymas turi būti sutartas prieš perdavimą, kitaip jis neapsaugo pardavėjo pirkėjo bankroto atveju.' },
-    { title: 'Pirmoji sąskaita', text: 'Viso pardavimo kainos PVM įtraukiamas į sąskaitą kartu su pradine įmoka prieš perdavimą. Pirkėjas PVM atskaito savo deklaracijoje, todėl pardavėjui nesusidaro pinigų srauto trūkumas.' },
+    { title: 'Sutartis prieš perdavimą', text: 'Pirkimo–pardavimo išsimokėtinai sutartis sudaroma raštu ir pasirašoma prieš perduodant sunkvežimį. Nuosavybės teisės išlaikymas turi būti sutartas prieš perdavimą, kitaip jis neapsaugo pardavėjo pirkėjo bankroto atveju.' },
+    { title: 'Pirmoji sąskaita', text: 'Visos pardavimo kainos PVM įtraukiamas į sąskaitą kartu su pradine įmoka prieš perdavimą. Pardavėjas PVM gauna anksčiau, nei turi jį sumokėti į biudžetą, todėl pinigų srauto trūkumo nesusidaro. Pirkėjas, kuris yra PVM mokėtojas, jį atskaito savo deklaracijoje.' },
     { title: 'Registras ir draudimas', text: 'Suomijos transporto priemonių registre pardavėjas lieka savininku, pirkėjas įregistruojamas valdytoju ir įtraukia sunkvežimį į savo licenciją. Privalomasis draudimas galioja nuo perdavimo dienos, o KASKO draudime pardavėjas nurodomas pavadinimu.' },
     { title: 'Mėnesio įmokos', text: 'Įmokos be PVM, palūkanos atskiroje eilutėje. Pirkėjas bet kada gali sumokėti likusią sumą.' },
-    { title: 'Paskutinė įmoka', text: 'Kai viskas sumokėta, pardavėjas pateikia pranešimą apie perleidimą, o pirkėjas įregistruojamas savininku.' },
+    { title: 'Paskutinė įmoka', text: 'Kai viskas sumokėta, pardavėjas pateikia pranešimą apie perleidimą, o pirkėjas įsiregistruoja savininku.' },
   ],
   faqTitle: 'Klausimai',
   faq: [
-    { q: 'Ar Suomijos pirkimo išsimokėtinai įstatymas taikomas sandoriams tarp įmonių?', a: 'Taip. Įstatymas netaikomas tik pardavimui, kai verslininkas parduoda vartotojui (1 a §). Nuo pirkėją saugančių nuostatų negalima nukrypti pirkėjo nenaudai (19 §).' },
+    { q: 'Ar Suomijos pirkimo–pardavimo išsimokėtinai įstatymas taikomas sandoriams tarp įmonių?', a: 'Taip. Įstatymas netaikomas tik pardavimui, kai pardavėjas yra verslininkas, o pirkėjas – vartotojas (1 a §). Pirkėjas negali iš anksto atsisakyti teisių, kurias jam suteikia įstatymas (19 §).' },
     { q: 'Kada pardavėjas gali susigrąžinti sunkvežimį?', a: 'Kai mokėjimas vėluoja bent 14 dienų ir vėluoja bent dešimtadalis kainos išsimokėtinai, dviejų ar daugiau įmokų atveju – dvidešimtadalis, arba visas likutis (2 §). Susigrąžinama per Suomijos antstolį arba susitarus, atliekant atsiskaitymą pagal sunkvežimio vertę.' },
-    { q: 'Ar pirkimas išsimokėtinai atideda pardavėjo mokestį?', a: 'Ne. Pardavimo kaina yra perdavimo metų pajamos. Jei sunkvežimis įtrauktas į nenudėvėtą likutį, kaina atimama iš likučio, o apmokestinama tik viršijanti dalis (Suomijos verslo pajamų apmokestinimo įstatymas, EVL 30 §).' },
-    { q: 'Ar pardavėjas gali užblokuoti sunkvežimio užvedimą, jei mokėjimai nutrūksta?', a: 'Ne skoloms išieškoti. Pagal įstatymą susigrąžinama per antstolį; savavališkas spaudimas Suomijoje gali būti baudžiama savivalė. Užvedimo blokavimą galima naudoti po vagystės kartu su policija arba pirkėjui sutikus.' },
+    { q: 'Ar pirkimas–pardavimas išsimokėtinai atideda pardavėjo mokestį?', a: 'Ne. Pardavimo kaina yra perdavimo metų pajamos. Jei sunkvežimis įtrauktas į nenudėvėtą likutį, kaina atimama iš likučio, o apmokestinama tik viršijanti dalis (Suomijos verslo pajamų apmokestinimo įstatymas, EVL 30 §).' },
+    { q: 'Ar pardavėjas gali užblokuoti sunkvežimio užvedimą, jei mokėjimai nutrūksta?', a: 'Ne skoloms išieškoti. Pagal įstatymą susigrąžinama per antstolį; savavališkas spaudimas Suomijoje gali būti baudžiamas savavaldžiavimas. Užvedimo blokavimą galima naudoti po vagystės kartu su policija arba pirkėjui sutikus.' },
     { q: 'Kas moka transporto priemonės mokestį ir draudimą?', a: 'Suomijos transporto priemonės mokestį moka registre nurodytas valdytojas, t. y. pirkėjas. Už privalomąjį draudimą savininkas ir valdytojas atsako solidariai; praktiškai jį sudaro pirkėjas.' },
   ],
   disclaimer:
-    'Skaičiuoklė orientacinė ir nepakeičia mokesčių ar teisinės konsultacijos. Šaltiniai: Suomijos pirkimo išsimokėtinai įstatymas (laki osamaksukaupasta 91/1966), PVM įstatymas (arvonlisäverolaki 1501/1993), Verslo pajamų apmokestinimo įstatymas (laki elinkeinotulon verottamisesta 360/1968) ir Suomijos mokesčių administracijos (Verohallinto) gairės.',
-  finalTitle: 'Vežimo įmonės sistema toje pačioje vietoje',
+    'Skaičiuoklė orientacinė ir nepakeičia mokesčių ar teisinės konsultacijos. Šaltiniai: Suomijos pirkimo–pardavimo išsimokėtinai įstatymas (laki osamaksukaupasta 91/1966), PVM įstatymas (arvonlisäverolaki 1501/1993), Verslo pajamų apmokestinimo įstatymas (laki elinkeinotulon verottamisesta 360/1968) ir Suomijos mokesčių administracijos (Verohallinto) gairės.',
+  finalTitle: 'Visa vežėjo įmonės sistema vienoje vietoje',
   finalText: 'RAHTIS – tai transporto valdymo sistema ir krovinių birža. Parkas, techninė priežiūra, vairuotojai, kuras ir sunkvežimio pelningumas vienoje vietoje.',
 };

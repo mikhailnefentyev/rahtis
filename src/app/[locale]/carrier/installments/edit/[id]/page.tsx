@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { Card, CardBody } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
 import type { VatMode } from '@/lib/installments/calc';
+import { installmentsAvailable, vehicleSellable } from '@/lib/installments/access';
 import { installmentUiCopy } from '@/lib/installments/copy';
 import { isLocale } from '@/lib/i18n';
 import { installmentCopy } from '@/lib/landing/installment';
@@ -22,13 +23,21 @@ export default async function EditListingPage({ params }: { params: Promise<{ lo
   const { locale, id } = await params;
   if (!isLocale(locale)) notFound();
   const viewer = await requireRole(locale, 'CARRIER');
+  if (!installmentsAvailable(viewer.company!.country)) notFound();
   const ui = installmentUiCopy(locale);
   const supabase = await createClient();
-  const [{ data: listing }, { data: vehicles }] = await Promise.all([
+  const [{ data: listing }, { data: approved }] = await Promise.all([
     supabase.from('equipment_listings').select('*').eq('id', id).maybeSingle(),
-    supabase.from('vehicles').select('id, make, plate').eq('company_id', viewer.company!.id).eq('access', 'APPROVED').order('plate'),
+    /* Как у нового объявления: без машин, купленных в рассрочку и ещё не выплаченных (22.11.2026). */
+    supabase
+      .from('vehicles')
+      .select('id, make, plate, installment_role')
+      .eq('company_id', viewer.company!.id)
+      .eq('access', 'APPROVED')
+      .order('plate'),
   ]);
-  if (!listing || !vehicles || !['DRAFT', 'PUBLISHED'].includes(listing.status)) notFound();
+  if (!listing || !approved || !['DRAFT', 'PUBLISHED'].includes(listing.status)) notFound();
+  const vehicles = approved.filter((v) => vehicleSellable(v.installment_role));
 
   return (
     <main className="cab-page flex flex-col gap-4">

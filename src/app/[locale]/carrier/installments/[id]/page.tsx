@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { TruckPhoto } from '@/components/domain/TruckPhoto';
-import { Badge, Button, Card, CardBody, buttonClass } from '@/components/ui';
+import { Badge, Card, CardBody, buttonClass } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
 import {
   cancelDealAction,
@@ -12,13 +12,14 @@ import {
   retryCreditNoteAction,
   retryFirstInvoiceAction,
 } from '@/lib/installments/actions';
-import { buildSchedule, daysBetween, payoffCents, remedyAllowed, thresholds, type VatMode } from '@/lib/installments/calc';
+import { buildSchedule, effectiveHandover, overduePayments, payoffCents, remedyAllowed, thresholds, type VatMode } from '@/lib/installments/calc';
 import { dealVehicle, helsinkiDay, loadDeal } from '@/lib/installments/contract';
 import { fill, installmentUiCopy } from '@/lib/installments/copy';
 import { todayInHelsinki } from '@/lib/dates';
 import { isLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import { installmentCopy } from '@/lib/landing/installment';
+import { ActionForm } from '../ActionForm';
 import { DealResponse } from '../DealForms';
 import { HandoverForm } from '../HandoverForm';
 
@@ -69,20 +70,6 @@ export default async function DealPage({ params }: { params: Promise<{ locale: s
   const eur = (cents: number) => money.format(cents / 100);
   const limits = 'error' in schedule ? null : thresholds(schedule);
 
-  const rows: [string, string][] = [
-    [ui.listing.price, eur(deal.price_cents)],
-    [ui.listing.vatMode, calc.f.vatModes[deal.vat_mode as VatMode]],
-    [ui.listing.down, eur(deal.down_payment_cents)],
-    [ui.listing.months, String(deal.months)],
-    [ui.listing.final, deal.final_cents != null ? eur(deal.final_cents) : '—'],
-    [ui.listing.rate, `${(deal.annual_rate_bps / 100).toLocaleString(locale === 'en' ? 'en-GB' : locale)} %`],
-    [ui.deal.handover, fiDate(deal.handover_date)],
-    [ui.deal.firstDue, fiDate(deal.first_due_date)],
-  ];
-  if (!('error' in schedule)) {
-    rows.push([calc.r.firstInvoice, eur(schedule.firstInvoiceCents)], [calc.r.priceWithVat, eur(schedule.installmentPriceCents)]);
-  }
-
   /* Этап 3: график, сводка по машине, кредит-нота. */
   const supabase = await createClient();
   const today = todayInHelsinki();
@@ -96,25 +83,56 @@ export default async function DealPage({ params }: { params: Promise<{ locale: s
   const { data: payInvoices } = (payments ?? []).some((p) => p.invoice_id)
     ? await supabase
         .from('carrier_invoices')
-        .select('id, number, file_path')
+        .select('id, number, file_path, sent_at')
         .in('id', (payments ?? []).map((p) => p.invoice_id).filter((v): v is string => Boolean(v)))
-    : { data: [] as { id: string; number: string; file_path: string | null }[] };
+    : { data: [] as { id: string; number: string; file_path: string | null; sent_at: string | null }[] };
   const invoiceById = new Map((payInvoices ?? []).map((i) => [i.id, i]));
   const unpaid = (payments ?? []).filter((p) => !p.paid_at);
-  const overdue = unpaid.filter((p) => p.due_date < today);
+  /*
+   * Просрочка — тем же правилом, что у ежедневного задания (calc.ts
+   * overduePayments, 22.11.2026): только по отправленному счёту и от срока
+   * или дня отправки, что позже. Раньше страница считала просроченным
+   * любой неоплаченный взнос после срока и показывала порог раньше задания.
+   */
+  const overdue = overduePayments(
+    (payments ?? []).map((p) => {
+      const sentAt = p.invoice_id ? invoiceById.get(p.invoice_id)?.sent_at : null;
+      return { ...p, dueDate: p.due_date, paid: Boolean(p.paid_at), invoiceSentDay: sentAt ? helsinkiDay(sentAt) : null };
+    }),
+    today,
+  );
+  const lateById = new Map(overdue.map((p) => [p.id, p.lateDays]));
   const priceGross = 'error' in schedule ? deal.price_cents : schedule.installmentPriceCents;
   const remedy =
     deal.status === 'ACTIVE' &&
     remedyAllowed(
-      overdue.map((p) => ({ dueDate: p.due_date, unpaidCents: p.principal_cents })),
+      overdue.map((p) => ({ dueDate: p.lateFrom, unpaidCents: p.principal_cents })),
       today,
       priceGross,
       unpaid.reduce((sum, p) => sum + p.principal_cents, 0),
     );
-  const lastPaid = (payments ?? []).filter((p) => p.paid_at).map((p) => p.due_date).sort().pop() ?? deal.handover_date;
+  /* Проценты идут с фактической передачи, если она позже согласованной, — как сдвинут график (payments.ts ensureSchedule). */
+  const interestFrom = effectiveHandover(deal.handover_date, deal.handed_over_at ? helsinkiDay(deal.handed_over_at) : null);
+  const lastPaid = (payments ?? []).filter((p) => p.paid_at).map((p) => p.due_date).sort().pop() ?? interestFrom;
   const payoff = payoffCents(unpaid.reduce((sum, p) => sum + p.principal_cents, 0), lastPaid < today ? lastPaid : today, today, deal.annual_rate_bps);
   const vs = vehicleStatus?.[0];
   const dateOf = (iso: string | null) => (iso ? fiDate(helsinkiDay(iso)) : '');
+
+  /* Срок первого взноса — фактический, как только график построен: при поздней передаче он сдвинут. */
+  const rows: [string, string][] = [
+    [ui.listing.price, eur(deal.price_cents)],
+    [ui.listing.vatMode, calc.f.vatModes[deal.vat_mode as VatMode]],
+    [ui.listing.down, eur(deal.down_payment_cents)],
+    [ui.listing.months, String(deal.months)],
+    [ui.listing.final, deal.final_cents != null ? eur(deal.final_cents) : '—'],
+    [ui.listing.rate, `${(deal.annual_rate_bps / 100).toLocaleString(locale === 'en' ? 'en-GB' : locale)} %`],
+    [ui.deal.handover, fiDate(deal.handover_date)],
+    [ui.deal.firstDue, fiDate(payments?.[0]?.due_date ?? deal.first_due_date)],
+  ];
+  if (!('error' in schedule)) {
+    rows.push([calc.r.firstInvoice, eur(schedule.firstInvoiceCents)], [calc.r.priceWithVat, eur(schedule.installmentPriceCents)]);
+  }
+  const hidden = { locale, deal_id: deal.id };
 
   /* Почему счёта нет или он не дошёл — те же проверки, что у создания (firstInvoice.ts). */
   const invoiceReady = Boolean(invoice?.file_path);
@@ -194,13 +212,7 @@ export default async function DealPage({ params }: { params: Promise<{ locale: s
                 firstDue: deal.first_due_date,
               }}
             />
-            <form action={cancelDealAction}>
-              <input type="hidden" name="locale" value={locale} />
-              <input type="hidden" name="deal_id" value={deal.id} />
-              <Button type="submit" size="sm" variant="danger">
-                {ui.deal.cancelConfirm}
-              </Button>
-            </form>
+            <ActionForm action={cancelDealAction} fields={hidden} label={ui.deal.cancelConfirm} variant="danger" />
           </CardBody>
         </Card>
       )}
@@ -226,13 +238,7 @@ export default async function DealPage({ params }: { params: Promise<{ locale: s
               <div className="rounded-card border border-warn/35 bg-warn/10 px-3 py-2 text-warn">
                 <p>{fill(ui.deal.invoiceMissing, { reason: invoiceReason })}</p>
                 {isSeller && owner && (
-                  <form action={retryFirstInvoiceAction} className="mt-2">
-                    <input type="hidden" name="locale" value={locale} />
-                    <input type="hidden" name="deal_id" value={deal.id} />
-                    <Button type="submit" size="sm">
-                      {ui.deal.invoice}
-                    </Button>
-                  </form>
+                  <ActionForm action={retryFirstInvoiceAction} fields={hidden} label={ui.deal.invoice} className="mt-2" />
                 )}
               </div>
             )}
@@ -243,35 +249,19 @@ export default async function DealPage({ params }: { params: Promise<{ locale: s
                   {deal.first_invoice_paid_at ? fill(ui.stage3.firstPaid, { date: dateOf(deal.first_invoice_paid_at) }) : ui.stage3.firstUnpaid}
                 </p>
                 {!deal.first_invoice_paid_at && isSeller && owner && (
-                  <form action={markFirstPaidAction}>
-                    <input type="hidden" name="locale" value={locale} />
-                    <input type="hidden" name="deal_id" value={deal.id} />
-                    <Button type="submit" size="sm" variant="primary">
-                      {ui.stage3.markFirstPaid}
-                    </Button>
-                  </form>
+                  <ActionForm action={markFirstPaidAction} fields={hidden} label={ui.stage3.markFirstPaid} variant="primary" />
                 )}
               </div>
             )}
-            {/* После выставленного счёта отмена — только с кредит-нотой продавца. */}
-            {owner && invoice && !deal.handover_seller_at && !deal.handover_buyer_at && (isSeller || !deal.first_invoice_paid_at) && (
-              <form action={cancelWithCreditAction}>
-                <input type="hidden" name="locale" value={locale} />
-                <input type="hidden" name="deal_id" value={deal.id} />
-                <Button type="submit" size="sm" variant="danger">
-                  {ui.stage3.cancelCredit}
-                </Button>
-              </form>
+            {/*
+              * После выставленного счёта отмена — только с кредит-нотой и только продавцом (22.11.2026):
+              * оплату отмечает он, и кредит-нота от его имени не должна выйти «ничего не оплачено»
+              * по кнопке покупателя.
+              */}
+            {owner && isSeller && invoice && !deal.handover_seller_at && !deal.handover_buyer_at && (
+              <ActionForm action={cancelWithCreditAction} fields={hidden} label={ui.stage3.cancelCredit} variant="danger" />
             )}
-            {owner && !invoice && (
-              <form action={cancelDealAction}>
-                <input type="hidden" name="locale" value={locale} />
-                <input type="hidden" name="deal_id" value={deal.id} />
-                <Button type="submit" size="sm" variant="danger">
-                  {ui.deal.cancel}
-                </Button>
-              </form>
-            )}
+            {owner && !invoice && <ActionForm action={cancelDealAction} fields={hidden} label={ui.deal.cancel} variant="danger" />}
           </CardBody>
         </Card>
       )}
@@ -314,13 +304,7 @@ export default async function DealPage({ params }: { params: Promise<{ locale: s
               <>
                 <p className="text-warn">{ui.stage3.creditMissing}</p>
                 {isSeller && owner && (
-                  <form action={retryCreditNoteAction}>
-                    <input type="hidden" name="locale" value={locale} />
-                    <input type="hidden" name="deal_id" value={deal.id} />
-                    <Button type="submit" size="sm">
-                      {ui.stage3.makeCredit}
-                    </Button>
-                  </form>
+                  <ActionForm action={retryCreditNoteAction} fields={hidden} label={ui.stage3.makeCredit} />
                 )}
               </>
             )}
@@ -412,7 +396,7 @@ export default async function DealPage({ params }: { params: Promise<{ locale: s
                   <tbody>
                     {(payments ?? []).map((p) => {
                       const inv = p.invoice_id ? invoiceById.get(p.invoice_id) : null;
-                      const late = !p.paid_at && p.due_date < today ? daysBetween(p.due_date, today) : 0;
+                      const late = lateById.get(p.id) ?? 0;
                       return (
                         <tr key={p.id} className="border-t border-line">
                           <td className="py-1.5 pr-3 font-mono">{p.n}</td>
@@ -437,14 +421,13 @@ export default async function DealPage({ params }: { params: Promise<{ locale: s
                                   {late > 0 ? fill(ui.stage3.overdue, { days: String(late) }) : ui.stage3.unpaid}
                                 </span>
                                 {isSeller && owner && deal.status === 'ACTIVE' && (
-                                  <form action={markPaidAction}>
-                                    <input type="hidden" name="locale" value={locale} />
-                                    <input type="hidden" name="deal_id" value={deal.id} />
-                                    <input type="hidden" name="n" value={p.n} />
-                                    <Button type="submit" size="sm">
-                                      {ui.stage3.markPaid}
-                                    </Button>
-                                  </form>
+                                  /* Отметку оплаты не отменить — сначала вопрос, потом отправка (22.11.2026). */
+                                  <ActionForm
+                                    action={markPaidAction}
+                                    fields={{ ...hidden, n: p.n }}
+                                    label={ui.stage3.markPaid}
+                                    confirm={{ text: fill(ui.stage3.markPaidConfirm, { n: String(p.n) }), cancel: ui.deal.cancel }}
+                                  />
                                 )}
                               </span>
                             )}

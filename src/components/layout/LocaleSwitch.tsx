@@ -97,7 +97,7 @@ const FORWARDERS: Slug = { fi: 'huolitsijoille', other: 'forwarders' };
 const TRAILER_SWAP: Slug = { fi: 'peravaunun-vaihto', other: 'trailer-swap' };
 const TERMS: Slug = { fi: 'kayttoehdot', other: 'terms', fiOrEnOnly: true };
 const PRIVACY: Slug = { fi: 'tietosuoja', other: 'privacy', fiOrEnOnly: true };
-const INSTALLMENT: Slug = { fi: 'kuorma-auto-osamaksulla', other: 'truck-installment-sale', fiOrEnOnly: true };
+const INSTALLMENT: Slug = { fi: 'kuorma-auto-osamaksulla', other: 'truck-installment-sale' };
 const LOCALIZED_SLUGS = new Map<string, Slug>([
   ['maansiirto', EARTHWORKS],
   ['earthworks', EARTHWORKS],

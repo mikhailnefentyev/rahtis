@@ -10,6 +10,10 @@ import {
   buildSchedule,
   buyerCheck,
   defaultScenario,
+  effectiveHandover,
+  lateDays,
+  lateFrom,
+  overduePayments,
   payoffCents,
   remedyAllowed,
   sellerTax,
@@ -210,4 +214,67 @@ test('проверка покупателя', () => {
     thin: true,
   });
   assert.equal(buyerCheck({ revenueCents: 1_000_000, costsCents: 1_000_000, paymentCents: 80_000, thinBps: 1500 }).negative, true);
+});
+
+/* Исправления по ревью 22.11.2026. */
+
+test('один взнос: отдельного последнего нет — как в базе (installment_terms_ok)', () => {
+  const one = { ...DAF, months: 1 };
+  const s = buildSchedule(one);
+  assert.equal(s.installments.length, 1);
+  assert.equal(s.installments[0].principalCents, 1_920_000);
+  // Раньше «последний = весь остаток» проходил расчёт, а сохранение база отклоняла.
+  assert.deepEqual(buildSchedule({ ...one, finalCents: 1_920_000 }), { error: 'FINAL' });
+  assert.deepEqual(buildSchedule({ ...one, finalCents: 500_000 }), { error: 'FINAL' });
+});
+
+test('просрочка: от срока или дня отправки счёта, что позже', () => {
+  const due = '2027-01-01';
+  // Счёт ушёл заранее — считаем от срока.
+  assert.equal(lateFrom({ dueDate: due, paid: false, invoiceSentDay: '2026-12-18' }), due);
+  assert.equal(lateDays({ dueDate: due, paid: false, invoiceSentDay: '2026-12-18' }, '2027-01-08'), 7);
+  // Счёт ушёл после срока — от дня отправки.
+  assert.equal(lateFrom({ dueDate: due, paid: false, invoiceSentDay: '2027-01-05' }), '2027-01-05');
+  assert.equal(lateDays({ dueDate: due, paid: false, invoiceSentDay: '2027-01-05' }, '2027-01-08'), 3);
+  // В день срока и до него просрочки нет.
+  assert.equal(lateDays({ dueDate: due, paid: false, invoiceSentDay: '2026-12-18' }, due), 0);
+  assert.equal(lateDays({ dueDate: due, paid: false, invoiceSentDay: '2026-12-18' }, '2026-12-25'), 0);
+});
+
+test('просрочка: без отправленного счёта и у оплаченного взноса её нет', () => {
+  assert.equal(lateFrom({ dueDate: '2027-01-01', paid: false, invoiceSentDay: null }), null);
+  assert.equal(lateDays({ dueDate: '2027-01-01', paid: false, invoiceSentDay: null }, '2027-03-01'), 0);
+  assert.equal(lateDays({ dueDate: '2027-01-01', paid: true, invoiceSentDay: '2026-12-18' }, '2027-03-01'), 0);
+});
+
+test('просроченные взносы: один список для страницы и задания, порядок и поля сохраняются', () => {
+  const rows = [
+    { n: 1, dueDate: '2027-01-01', paid: true, invoiceSentDay: '2026-12-18' },
+    { n: 2, dueDate: '2027-02-01', paid: false, invoiceSentDay: '2027-01-18' },
+    { n: 3, dueDate: '2027-03-01', paid: false, invoiceSentDay: '2027-03-10' },
+    { n: 4, dueDate: '2027-04-01', paid: false, invoiceSentDay: null },
+  ];
+  const overdue = overduePayments(rows, '2027-03-20');
+  assert.deepEqual(
+    overdue.map((r) => [r.n, r.lateFrom, r.lateDays]),
+    [
+      [2, '2027-02-01', 47],
+      [3, '2027-03-10', 10],
+    ],
+  );
+  // Порог OskL 2 § считает 14 дней от начала просрочки: у взноса 3 их ещё нет.
+  const allowed = (today) =>
+    remedyAllowed(overduePayments(rows, today).map((r) => ({ dueDate: r.lateFrom, unpaidCents: 80_000 })), today, 3_012_000, 1_760_000);
+  assert.equal(allowed('2027-03-20'), false);
+  assert.equal(allowed('2027-03-24'), true);
+});
+
+test('проценты идут с фактической передачи, если она позже согласованной', () => {
+  assert.equal(effectiveHandover('2026-12-01', null), '2026-12-01');
+  assert.equal(effectiveHandover('2026-12-01', '2026-11-28'), '2026-12-01');
+  assert.equal(effectiveHandover('2026-12-01', '2026-12-01'), '2026-12-01');
+  assert.equal(effectiveHandover('2026-12-01', '2026-12-11'), '2026-12-11');
+  // Досрочное погашение до первого оплаченного взноса: проценты за 20 дней, а не за 30.
+  const from = effectiveHandover('2026-12-01', '2026-12-11');
+  assert.equal(payoffCents(1_000_000, from, '2026-12-31', 600), 1_000_000 + Math.round((1_000_000 * 600 * 20) / 3_650_000));
 });

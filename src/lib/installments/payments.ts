@@ -11,7 +11,7 @@ import { SiteInvoicePdf } from '@/lib/sites/SiteInvoicePdf';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { ibanHoldActive } from '@/lib/trust/changes';
 import { lastIbanChange } from '@/lib/trust/sensitive';
-import { buildSchedule, daysBetween, remedyAllowed, type VatMode } from './calc';
+import { buildSchedule, daysBetween, effectiveHandover, overduePayments, remedyAllowed, type VatMode } from './calc';
 import { fill, installmentUiCopy } from './copy';
 
 /**
@@ -25,9 +25,11 @@ import { fill, installmentUiCopy } from './copy';
  * взносом или сделкой), потом PDF и письмо; не дошедшее — досылается.
  * Свежий IBAN продавца (48 часов) — счёт не выставляется, как у фрахта.
  *
- * Просрочка — только по взносам с отправленным счётом: напоминание
- * покупателю на 1-й и 7-й день, продавцу — один сигнал, когда выполнен
- * порог OskL 2 §. Машину задание не изымает и запуск не блокирует.
+ * Просрочка — только по взносам с отправленным счётом и от большего из
+ * двух дней: срока и дня отправки счёта (calc.ts overduePayments — то же
+ * правило у страницы сделки): напоминание покупателю на 1-й и 7-й день,
+ * продавцу — один сигнал, когда выполнен порог OskL 2 §. Машину задание
+ * не изымает и запуск не блокирует.
  */
 
 const BUCKET = 'reports';
@@ -72,8 +74,8 @@ export async function ensureSchedule(dealId: string): Promise<number> {
   if (!deal || (deal.status !== 'ACTIVE' && deal.status !== 'PAID_OFF') || !deal.handed_over_at) return 0;
   const { count } = await admin.from('installment_payments').select('id', { count: 'exact', head: true }).eq('deal_id', dealId);
   if ((count ?? 0) > 0) return count ?? 0;
-  const actual = helsinkiDay(deal.handed_over_at);
-  const delay = Math.max(0, daysBetween(deal.handover_date, actual));
+  const start = effectiveHandover(deal.handover_date, helsinkiDay(deal.handed_over_at));
+  const delay = Math.max(0, daysBetween(deal.handover_date, start));
   const schedule = buildSchedule({
     priceCents: deal.price_cents,
     vatMode: deal.vat_mode as VatMode,
@@ -82,7 +84,7 @@ export async function ensureSchedule(dealId: string): Promise<number> {
     months: deal.months,
     finalCents: deal.final_cents,
     annualRateBps: deal.annual_rate_bps,
-    handoverDate: delay > 0 ? actual : deal.handover_date,
+    handoverDate: start,
     firstDueDate: delay > 0 ? addDays(deal.first_due_date, delay) : deal.first_due_date,
   });
   if ('error' in schedule) throw new Error(`график: ${schedule.error}`);
@@ -138,11 +140,15 @@ async function parties(sellerId: string, buyerId: string) {
   return { seller: sellerParty, buyer: buyerParty, sellerId: seller.id, iban: seller.iban };
 }
 
-/** IBAN есть и не менялся последние 48 часов — иначе автоматический счёт не выставляется. */
-async function ibanReady(sellerId: string, iban: string | null): Promise<boolean> {
-  if (!iban) return false;
+/**
+ * IBAN есть и не менялся последние 48 часов — иначе автоматический счёт не
+ * выставляется. 'IBAN' — счёта у продавца нет совсем (сам не появится,
+ * продавцу нужен сигнал), 'IBAN_HOLD' — свежая смена, пройдёт сама.
+ */
+async function ibanBlock(sellerId: string, iban: string | null): Promise<'IBAN' | 'IBAN_HOLD' | null> {
+  if (!iban) return 'IBAN';
   const changedAt = await lastIbanChange(sellerId);
-  return !(changedAt && ibanHoldActive(changedAt));
+  return changedAt && ibanHoldActive(changedAt) ? 'IBAN_HOLD' : null;
 }
 
 /** Шаг 1: строка счёта с номером из серии продавца. Текст PDF и письма хранится со счётом. */
@@ -260,7 +266,7 @@ export async function deliverInvoice(invoiceId: string): Promise<boolean> {
   return mail.sent;
 }
 
-export type IssueStatus = 'SENT' | 'CREATED' | 'EXISTS' | 'IBAN' | 'NOT_FOUND';
+export type IssueStatus = 'SENT' | 'CREATED' | 'EXISTS' | 'IBAN' | 'IBAN_HOLD' | 'NOT_FOUND';
 
 /** Счёт взноса n (без НДС: весь НДС был в первом счёте). */
 export async function issuePaymentInvoice(paymentId: string): Promise<IssueStatus> {
@@ -272,7 +278,8 @@ export async function issuePaymentInvoice(paymentId: string): Promise<IssueStatu
   if (!deal || deal.status !== 'ACTIVE' || !deal.contract_number) return 'NOT_FOUND';
   const p = await parties(deal.seller_company_id, deal.buyer_company_id);
   if (!p) return 'NOT_FOUND';
-  if (!(await ibanReady(p.sellerId, p.iban))) return 'IBAN';
+  const blocked = await ibanBlock(p.sellerId, p.iban);
+  if (blocked) return blocked;
 
   /* Бронь строки графика: параллельный запуск не выставит второй счёт (бронь старше 10 минут — сорвавшаяся). */
   const staleBefore = new Date(Date.now() - 10 * 60_000).toISOString();
@@ -434,26 +441,44 @@ export async function runInstallments(options: { dealId?: string; today?: string
     try {
       await ensureSchedule(deal.id);
       const { data: rows } = await admin.from('installment_payments').select('*').eq('deal_id', deal.id).order('n');
+      let ibanMissing: number | null = null;
 
       for (const row of rows ?? []) {
         if (row.paid_at) continue;
         if (!row.invoice_id && row.due_date <= addDays(today, INVOICE_LEAD_DAYS)) {
           const status = await issuePaymentInvoice(row.id);
           if (status === 'SENT' || status === 'CREATED') result.invoices += 1;
+          /*
+           * Счёт не вышел из-за IBAN продавца — раньше задание молчало, и
+           * взнос оставался без счёта (22.11.2026). В итог задания — всегда;
+           * продавцу сигнал, когда счёта нет совсем (свежая смена пройдёт сама).
+           */
+          if (status === 'IBAN' || status === 'IBAN_HOLD') {
+            result.errors.push(`${deal.id}: взнос ${row.n} без счёта — ${status === 'IBAN' ? 'у продавца нет IBAN' : 'IBAN продавца изменён менее 48 часов назад'}`);
+            if (status === 'IBAN') ibanMissing ??= row.n;
+          }
         } else if (row.invoice_id) {
           /* Не дошедший счёт — дослать. */
           await deliverInvoice(row.invoice_id);
         }
       }
 
-      /* Просрочка — только по взносам, счёт которых отправлен покупателю. */
+      /* Просрочка — только по взносам, счёт которых отправлен покупателю, от срока или дня отправки (что позже). */
       const { data: fresh } = await admin.from('installment_payments').select('*').eq('deal_id', deal.id).order('n');
       const invoiceIds = (fresh ?? []).map((r) => r.invoice_id).filter((v): v is string => Boolean(v));
       const { data: invs } = invoiceIds.length
         ? await admin.from('carrier_invoices').select('id, sent_at').in('id', invoiceIds)
         : { data: [] as { id: string; sent_at: string | null }[] };
-      const sent = new Set((invs ?? []).filter((i) => i.sent_at).map((i) => i.id));
-      const overdue = (fresh ?? []).filter((r) => !r.paid_at && r.due_date < today && r.invoice_id && sent.has(r.invoice_id));
+      const sentDay = new Map((invs ?? []).filter((i) => i.sent_at).map((i) => [i.id, helsinkiDay(i.sent_at!)]));
+      const overdue = overduePayments(
+        (fresh ?? []).map((r) => ({
+          ...r,
+          dueDate: r.due_date,
+          paid: Boolean(r.paid_at),
+          invoiceSentDay: r.invoice_id ? (sentDay.get(r.invoice_id) ?? null) : null,
+        })),
+        today,
+      );
 
       const plate = ((deal.vehicle_snapshot ?? {}) as { plate?: string }).plate ?? '';
       const [{ data: buyer }, { data: seller }] = await Promise.all([
@@ -463,8 +488,32 @@ export async function runInstallments(options: { dealId?: string; today?: string
       const cb = installmentUiCopy(emailLocaleOf(buyer?.language ?? 'fi'));
       const cs = installmentUiCopy(emailLocaleOf(seller?.language ?? 'fi'));
 
+      /* Продавцу без IBAN — сигнал не чаще раза в неделю по сделке: задание идёт каждый день. */
+      if (ibanMissing != null) {
+        const link = `/carrier/installments/${deal.id}`;
+        const weekAgo = new Date(Date.now() - 7 * 86_400_000).toISOString();
+        const { count: recent } = await admin
+          .from('notifications')
+          .select('id', { count: 'exact', head: true })
+          .eq('company_id', deal.seller_company_id)
+          .eq('code', 'installment.no_iban')
+          .eq('link', link)
+          .gte('created_at', weekAgo);
+        if ((recent ?? 0) === 0) {
+          await notify({
+            companyId: deal.seller_company_id,
+            kind: 'BILLING',
+            code: 'installment.no_iban',
+            params: { plate, n: ibanMissing },
+            title: fill(cs.notify.noIbanTitle, { plate, n: String(ibanMissing) }),
+            body: cs.notify.noIbanBody,
+            link,
+          });
+        }
+      }
+
       for (const row of overdue) {
-        const late = daysBetween(row.due_date, today);
+        const late = row.lateDays;
         const column = late >= 7 && !row.reminded_7_at ? 'reminded_7_at' : late >= 1 && !row.reminded_1_at ? 'reminded_1_at' : null;
         if (!column) continue;
         /* Отметка до уведомления и «где пусто»: параллельный запуск не задвоит напоминание. */
@@ -495,7 +544,7 @@ export async function runInstallments(options: { dealId?: string; today?: string
         deal.price_cents + (deal.vat_mode === 'STANDARD' ? Math.round((deal.price_cents * deal.vat_bps) / 10_000) : 0);
       const remaining = (fresh ?? []).filter((r) => !r.paid_at).reduce((s, r) => s + r.principal_cents, 0);
       const allowed = remedyAllowed(
-        overdue.map((r) => ({ dueDate: r.due_date, unpaidCents: r.principal_cents })),
+        overdue.map((r) => ({ dueDate: r.lateFrom, unpaidCents: r.principal_cents })),
         today,
         priceGross,
         remaining,

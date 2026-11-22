@@ -119,7 +119,8 @@ export function buildSchedule(input: DealInput): Schedule | { error: ScheduleErr
   let last: number;
   let regular: number[];
   if (months === 1) {
-    if (finalCents != null && finalCents !== rest) return { error: 'FINAL' };
+    /* Как в базе (app.installment_terms_ok): при одном взносе отдельного последнего нет — расчёт и сохранение сходятся (22.11.2026). */
+    if (finalCents != null) return { error: 'FINAL' };
     last = rest;
     regular = [];
   } else {
@@ -202,6 +203,51 @@ export function remedyAllowed(
   const sum = late.reduce((s, o) => s + o.unpaidCents, 0);
   if (sum >= remainingDebtCents) return true;
   return late.length === 1 ? sum * 10 >= installmentPriceCents : sum * 20 >= installmentPriceCents;
+}
+
+/**
+ * Просрочка взноса — одно правило для страницы сделки и ежедневного
+ * задания (22.11.2026). Считается от большего из двух дней: срока взноса
+ * и дня, когда счёт ушёл покупателю (оба — ISO-дни по Хельсинки). Счёт
+ * не отправлен — просрочки нет: покупателю не по чему платить.
+ */
+export type PaymentState = {
+  dueDate: string;
+  paid: boolean;
+  /** День отправки счёта покупателю; null — счёта нет или он не дошёл. */
+  invoiceSentDay: string | null;
+};
+
+/** С какого дня взнос считается неоплаченным; null — ещё не с чего считать. */
+export function lateFrom(p: PaymentState): string | null {
+  if (p.paid || !p.invoiceSentDay) return null;
+  return p.invoiceSentDay > p.dueDate ? p.invoiceSentDay : p.dueDate;
+}
+
+/** Дней просрочки на сегодня; 0 — не просрочен. */
+export function lateDays(p: PaymentState, todayIso: string): number {
+  const from = lateFrom(p);
+  return from ? Math.max(0, daysBetween(from, todayIso)) : 0;
+}
+
+/** Просроченные взносы с днём начала и длиной просрочки — в исходном порядке. */
+export function overduePayments<T extends PaymentState>(rows: T[], todayIso: string): (T & { lateFrom: string; lateDays: number })[] {
+  const out: (T & { lateFrom: string; lateDays: number })[] = [];
+  for (const row of rows) {
+    const from = lateFrom(row);
+    const days = lateDays(row, todayIso);
+    if (from && days > 0) out.push({ ...row, lateFrom: from, lateDays: days });
+  }
+  return out;
+}
+
+/**
+ * День, с которого идут проценты: согласованная дата передачи или
+ * фактическая, если машину передали позже (ISO-дни по Хельсинки). То же
+ * правило у графика (payments.ts) и у суммы досрочного погашения.
+ */
+export function effectiveHandover(agreedIso: string, handedOverDay: string | null): string {
+  return handedOverDay && handedOverDay > agreedIso ? handedOverDay : agreedIso;
 }
 
 // ── Tilitys OskL 3–4 § ───────────────────────────────────────────────

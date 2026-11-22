@@ -19,9 +19,16 @@ import { createCreditNote, ensureSchedule, runInstallments } from './payments';
  * правила проверяет база (app.installment_party: главный в действующем
  * перевозчике с документами; условия — app.installment_terms_ok). Здесь —
  * разбор формы, та же проверка калькулятором и уведомления второй стороне.
+ *
+ * Каждое действие возвращает ActionState: отказ базы человек видит рядом
+ * с кнопкой (useActionState), а не молчаливо перерисованную страницу
+ * (22.11.2026).
  */
 
 export type ActionState = { error: string | null; saved: boolean };
+
+const done: ActionState = { error: null, saved: true };
+const failed = (error: string): ActionState => ({ error, saved: false });
 
 const VAT_MODES: VatMode[] = ['STANDARD', 'MARGIN', 'EXEMPT', 'NONE'];
 
@@ -155,12 +162,13 @@ export async function saveListingAction(_prev: ActionState, fd: FormData): Promi
   redirect(`/${locale}/carrier/installments`);
 }
 
-export async function setListingStatusAction(fd: FormData): Promise<void> {
+export async function setListingStatusAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
   const locale = toLocale(fd.get('locale'));
+  const c = installmentUiCopy(locale);
   const { ok } = await ready();
-  if (!ok) return;
+  if (!ok) return failed(c.notAllowed);
   const status = str(fd, 'status');
-  if (status !== 'PUBLISHED' && status !== 'WITHDRAWN') return;
+  if (status !== 'PUBLISHED' && status !== 'WITHDRAWN') return failed(c.deal.error);
   const supabase = await createClient();
   const id = str(fd, 'id');
   /* Кого предупредить, если объявление снимают: открытые переговоры закроются. */
@@ -171,7 +179,8 @@ export async function setListingStatusAction(fd: FormData): Promise<void> {
   const { error } = await supabase.rpc('set_equipment_listing_status', { p_id: id, p_status: status });
   if (error) {
     console.error('статус объявления:', error.message);
-    return;
+    /* 42501 — нет прав: не главный или у компании истекли документы. */
+    return failed(error.code === '42501' ? c.notAllowed : c.deal.error);
   }
   for (const deal of open ?? []) {
     const parties = await dealParties(deal.id);
@@ -182,6 +191,7 @@ export async function setListingStatusAction(fd: FormData): Promise<void> {
     }));
   }
   revalidatePath(`/${locale}/carrier/installments`);
+  return done;
 }
 
 // ── Сделка ───────────────────────────────────────────────────────────
@@ -300,33 +310,46 @@ export async function acceptTermsAction(_prev: ActionState, fd: FormData): Promi
 }
 
 /** Повторить первый счёт (например, после того как продавец указал IBAN). */
-export async function retryFirstInvoiceAction(fd: FormData): Promise<void> {
+export async function retryFirstInvoiceAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
   const locale = toLocale(fd.get('locale'));
+  const c = installmentUiCopy(locale);
   const { viewer, ok } = await ready();
-  if (!ok || viewer.status !== 'ready' || !viewer.company) return;
+  if (!ok || viewer.status !== 'ready' || !viewer.company) return failed(c.notAllowed);
   const dealId = str(fd, 'deal_id');
   /* Доступ — чтением под сессией (сделку видят только стороны); выставляет счёт только продавец. */
   const supabase = await createClient();
   const { data } = await supabase.from('installment_deals').select('id, seller_company_id').eq('id', dealId).maybeSingle();
-  if (!data || data.seller_company_id !== viewer.company.id) return;
+  if (!data || data.seller_company_id !== viewer.company.id) return failed(c.deal.error);
+  let result: ActionState = done;
   try {
-    await createFirstInvoice(dealId);
+    const status = await createFirstInvoice(dealId);
+    /* Причину, по которой счёт снова не вышел, называем прямо: её исправляет сам продавец или покупатель. */
+    if (status === 'NO_IBAN' || status === 'IBAN_RECENT' || status === 'NO_EMAIL') {
+      result = failed(fill(c.deal.invoiceMissing, { reason: c.invoiceReasons[status] }));
+    } else if (status === 'NOT_FOUND') {
+      result = failed(c.deal.error);
+    }
   } catch (cause) {
     console.error('первый счёт рассрочки сорвался:', cause instanceof Error ? cause.message : cause);
+    result = failed(c.deal.error);
   }
   revalidatePath(`/${locale}/carrier/installments/${dealId}`);
+  return result;
 }
 
-export async function cancelDealAction(fd: FormData): Promise<void> {
+export async function cancelDealAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
   const locale = toLocale(fd.get('locale'));
+  const c = installmentUiCopy(locale);
   const { viewer, ok } = await ready();
-  if (!ok || viewer.status !== 'ready' || !viewer.company) return;
+  if (!ok || viewer.status !== 'ready' || !viewer.company) return failed(c.notAllowed);
   const dealId = str(fd, 'deal_id');
   const supabase = await createClient();
   const { data: changed, error } = await supabase.rpc('cancel_installment_deal', { p_deal_id: dealId });
   if (error) {
     console.error('сделка не отменена:', error.message);
-    return;
+    /* Сделка могла измениться (счёт уже выставлен) — страницу обновляем, чтобы человек увидел нынешнее состояние. */
+    revalidatePath(`/${locale}/carrier/installments/${dealId}`);
+    return failed(error.code === '42501' ? c.notAllowed : c.deal.error);
   }
   const parties = changed ? await dealParties(dealId) : null;
   if (parties) {
@@ -338,20 +361,23 @@ export async function cancelDealAction(fd: FormData): Promise<void> {
   }
   revalidatePath(`/${locale}/carrier/installments/${dealId}`);
   revalidatePath(`/${locale}/carrier/installments`);
+  return done;
 }
 
 // ── Этап 3: оплата первого счёта, передача, взносы, отмена с кредит-нотой ──
 
 /** Продавец отмечает оплату первого счёта (деньги пришли на его счёт). */
-export async function markFirstPaidAction(fd: FormData): Promise<void> {
+export async function markFirstPaidAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
   const locale = toLocale(fd.get('locale'));
+  const c = installmentUiCopy(locale);
   const { ok } = await ready();
-  if (!ok) return;
+  if (!ok) return failed(c.notAllowed);
   const dealId = str(fd, 'deal_id');
   const supabase = await createClient();
   const { error } = await supabase.rpc('mark_installment_first_paid', { p_deal_id: dealId });
   if (error) console.error('оплата первого счёта:', error.message);
   revalidatePath(`/${locale}/carrier/installments/${dealId}`);
+  return error ? failed(c.deal.error) : done;
 }
 
 /** Подтверждение передачи своей стороной; после второго — график и уведомление обеим сторонам. */
@@ -401,18 +427,20 @@ export async function confirmHandoverAction(_prev: ActionState, fd: FormData): P
 }
 
 /** Продавец отмечает оплату взноса; последний — сделка выплачена. */
-export async function markPaidAction(fd: FormData): Promise<void> {
+export async function markPaidAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
   const locale = toLocale(fd.get('locale'));
+  const c = installmentUiCopy(locale);
   const { ok } = await ready();
-  if (!ok) return;
+  if (!ok) return failed(c.notAllowed);
   const dealId = str(fd, 'deal_id');
   const n = Number(str(fd, 'n'));
-  if (!Number.isInteger(n) || n < 1) return;
+  if (!Number.isInteger(n) || n < 1) return failed(c.deal.error);
   const supabase = await createClient();
   const { data: status, error } = await supabase.rpc('mark_installment_paid', { p_deal_id: dealId, p_n: n });
   if (error) {
     console.error('оплата взноса:', error.message);
-    return;
+    revalidatePath(`/${locale}/carrier/installments/${dealId}`);
+    return failed(c.deal.error);
   }
   if (status === 'PAID_OFF') {
     const parties = await dealParties(dealId);
@@ -426,20 +454,25 @@ export async function markPaidAction(fd: FormData): Promise<void> {
     }
   }
   revalidatePath(`/${locale}/carrier/installments/${dealId}`);
+  return done;
 }
 
-/** Отмена согласованной сделки после первого счёта (до передачи) — с кредит-нотой продавца. */
-export async function cancelWithCreditAction(fd: FormData): Promise<void> {
+/** Отмена согласованной сделки после первого счёта (до передачи) — с кредит-нотой; отменяет только продавец. */
+export async function cancelWithCreditAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
   const locale = toLocale(fd.get('locale'));
+  const c = installmentUiCopy(locale);
   const { viewer, ok } = await ready();
-  if (!ok || viewer.status !== 'ready' || !viewer.company) return;
+  if (!ok || viewer.status !== 'ready' || !viewer.company) return failed(c.notAllowed);
   const dealId = str(fd, 'deal_id');
   const supabase = await createClient();
   const { error } = await supabase.rpc('cancel_installment_with_credit', { p_deal_id: dealId });
   if (error) {
     console.error('отмена с кредит-нотой:', error.message);
-    return;
+    /* Вторая сторона могла начать передачу — страницу обновляем. */
+    revalidatePath(`/${locale}/carrier/installments/${dealId}`);
+    return failed(c.deal.error);
   }
+  /* Кредит-нота не вышла — сделка всё равно отменена: на странице останется «не выставлена» и кнопка повтора. */
   try {
     await createCreditNote(dealId);
   } catch (cause) {
@@ -455,21 +488,26 @@ export async function cancelWithCreditAction(fd: FormData): Promise<void> {
   }
   revalidatePath(`/${locale}/carrier/installments/${dealId}`);
   revalidatePath(`/${locale}/carrier/installments`);
+  return done;
 }
 
 /** Повторить кредит-ноту, если она не вышла сразу (только продавец). */
-export async function retryCreditNoteAction(fd: FormData): Promise<void> {
+export async function retryCreditNoteAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
   const locale = toLocale(fd.get('locale'));
+  const c = installmentUiCopy(locale);
   const { viewer, ok } = await ready();
-  if (!ok || viewer.status !== 'ready' || !viewer.company) return;
+  if (!ok || viewer.status !== 'ready' || !viewer.company) return failed(c.notAllowed);
   const dealId = str(fd, 'deal_id');
   const supabase = await createClient();
   const { data } = await supabase.from('installment_deals').select('id, seller_company_id').eq('id', dealId).maybeSingle();
-  if (!data || data.seller_company_id !== viewer.company.id) return;
+  if (!data || data.seller_company_id !== viewer.company.id) return failed(c.deal.error);
+  let result: ActionState = done;
   try {
-    await createCreditNote(dealId);
+    if ((await createCreditNote(dealId)) === 'NOT_FOUND') result = failed(c.deal.error);
   } catch (cause) {
     console.error('кредит-нота:', cause instanceof Error ? cause.message : cause);
+    result = failed(c.deal.error);
   }
   revalidatePath(`/${locale}/carrier/installments/${dealId}`);
+  return result;
 }

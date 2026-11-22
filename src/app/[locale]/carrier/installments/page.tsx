@@ -2,14 +2,16 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { TruckPhoto } from '@/components/domain/TruckPhoto';
-import { Badge, Button, Card, CardBody, EmptyState, buttonClass } from '@/components/ui';
+import { Badge, Card, CardBody, EmptyState, buttonClass } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
 import { cn } from '@/lib/cn';
+import { installmentsAvailable } from '@/lib/installments/access';
 import { setListingStatusAction } from '@/lib/installments/actions';
 import { fill, installmentUiCopy } from '@/lib/installments/copy';
 import { isLocale } from '@/lib/i18n';
 import { installmentPath } from '@/lib/landing/installment';
 import { createClient } from '@/lib/supabase/server';
+import { ActionForm } from './ActionForm';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -35,6 +37,8 @@ export default async function InstallmentsPage({
   if (!isLocale(locale)) notFound();
   const viewer = await requireRole(locale, 'CARRIER');
   const company = viewer.company!;
+  /* Раздел только для финских компаний: пункта в меню у остальных нет, по прямой ссылке — «страницы нет» (22.11.2026). */
+  if (!installmentsAvailable(company.country)) notFound();
   const ui = installmentUiCopy(locale);
   const tab: Tab = rawTab === 'deals' || rawTab === 'catalog' ? rawTab : 'mine';
   const supabase = await createClient();
@@ -124,14 +128,12 @@ export default async function InstallmentsPage({
                           <Link href={`/${locale}/carrier/installments/edit/${l.id}`} className={buttonClass({ size: 'sm' })}>
                             {ui.listing.editTitle}
                           </Link>
-                          <form action={setListingStatusAction}>
-                            <input type="hidden" name="locale" value={locale} />
-                            <input type="hidden" name="id" value={l.id} />
-                            <input type="hidden" name="status" value={l.status === 'DRAFT' ? 'PUBLISHED' : 'WITHDRAWN'} />
-                            <Button type="submit" size="sm" variant={l.status === 'DRAFT' ? 'primary' : 'default'}>
-                              {l.status === 'DRAFT' ? ui.listing.publish : ui.listing.withdraw}
-                            </Button>
-                          </form>
+                          <ActionForm
+                            action={setListingStatusAction}
+                            fields={{ locale, id: l.id, status: l.status === 'DRAFT' ? 'PUBLISHED' : 'WITHDRAWN' }}
+                            label={l.status === 'DRAFT' ? ui.listing.publish : ui.listing.withdraw}
+                            variant={l.status === 'DRAFT' ? 'primary' : 'default'}
+                          />
                         </div>
                       )}
                     </div>
@@ -163,7 +165,8 @@ export default async function InstallmentsPage({
                           {d.make} · {d.counterparty_name}
                         </p>
                         <p className="mt-1 font-mono text-[14px]">
-                          {eur(d.price_cents)} · {d.months} kk{d.contract_number ? ` · ${d.contract_number}` : ''}
+                          {eur(d.price_cents)} · {fill(ui.catalog.monthsShort, { months: String(d.months) })}
+                          {d.contract_number ? ` · ${d.contract_number}` : ''}
                         </p>
                       </div>
                       {d.status === 'NEGOTIATING' && (

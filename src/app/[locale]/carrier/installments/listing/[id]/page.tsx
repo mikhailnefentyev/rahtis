@@ -4,6 +4,7 @@ import { TruckPhoto } from '@/components/domain/TruckPhoto';
 import { Card, CardBody } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
 import { addMonths, type VatMode } from '@/lib/installments/calc';
+import { installmentsAvailable } from '@/lib/installments/access';
 import { installmentUiCopy } from '@/lib/installments/copy';
 import { isLocale } from '@/lib/i18n';
 import { installmentCopy } from '@/lib/landing/installment';
@@ -26,7 +27,8 @@ const euros = (cents: number | null) => (cents == null ? '' : String(cents / 100
 export default async function ListingPage({ params }: { params: Promise<{ locale: string; id: string }> }) {
   const { locale, id } = await params;
   if (!isLocale(locale)) notFound();
-  await requireRole(locale, 'CARRIER');
+  const viewer = await requireRole(locale, 'CARRIER');
+  if (!installmentsAvailable(viewer.company!.country)) notFound();
   const ui = installmentUiCopy(locale);
   const supabase = await createClient();
   const { data: catalog } = await supabase.rpc('equipment_catalog');

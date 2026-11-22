@@ -22,12 +22,16 @@ import { vatOf, type VatMode } from './calc';
  *
  * Два шага: строка счёта с номером (один раз — закрепление «где пусто»
  * и только у согласованной сделки), потом PDF и письмо. Если второй шаг
- * сорвался, повтор допечатывает и досылает уже выданный номер.
+ * сорвался, повтор допечатывает и досылает уже выданный номер. Если
+ * сорвалось между закреплением и номером (у счёта остался DRAFT-…),
+ * повтор сначала выдаёт номер (22.11.2026).
  *
  * Счёт от имени продавца, деньги идут продавцу; RAHTIS их не принимает.
  */
 
 const BUCKET = 'reports';
+/** Номер-заглушка строки счёта, пока настоящий номер не выдан. */
+const DRAFT_PREFIX = 'DRAFT-';
 
 export type FirstInvoiceStatus = 'SENT' | 'CREATED' | 'EXISTS' | 'NO_IBAN' | 'IBAN_RECENT' | 'NO_EMAIL' | 'NOT_FOUND';
 
@@ -58,11 +62,16 @@ export async function createFirstInvoice(dealId: string): Promise<FirstInvoiceSt
   if (deal.first_invoice_id) {
     const { data: existing } = await admin
       .from('carrier_invoices')
-      .select('id, file_path, sent_at')
+      .select('id, company_id, number, issued_on, file_path, sent_at')
       .eq('id', deal.first_invoice_id)
       .maybeSingle();
     if (!existing) return 'NOT_FOUND';
     if (existing.file_path && existing.sent_at) return 'EXISTS';
+    /*
+     * Процесс оборвался после закрепления счёта, но до номера: раньше
+     * повтор навсегда упирался в NOT_FOUND у deliver (22.11.2026).
+     */
+    if (existing.number.startsWith(DRAFT_PREFIX)) await assignNumber(existing.id, existing.company_id, existing.issued_on);
     return deliver(existing.id, deal);
   }
 
@@ -120,7 +129,7 @@ export async function createFirstInvoice(dealId: string): Promise<FirstInvoiceSt
       kind: 'INSTALLMENT',
       customer_company_id: buyer.id,
       job_id: null,
-      number: `DRAFT-${crypto.randomUUID()}`,
+      number: `${DRAFT_PREFIX}${crypto.randomUUID()}`,
       reference: '',
       issued_on: issuedOn,
       due_on: dueOn,
@@ -166,18 +175,36 @@ export async function createFirstInvoice(dealId: string): Promise<FirstInvoiceSt
     return 'EXISTS';
   }
 
-  const { data: number, error: numberError } = await admin.rpc('next_carrier_invoice_number', {
-    p_company_id: seller.id,
-    p_year: Number(issuedOn.slice(0, 4)),
-  });
-  if (numberError || !number) {
+  /* Номер не выдан или не записан — счёт без номера не оставляем: снять закрепление и удалить, повтор начнёт заново. */
+  try {
+    await assignNumber(invoice.id, seller.id, issuedOn);
+  } catch (cause) {
     await admin.from('installment_deals').update({ first_invoice_id: null }).eq('id', deal.id);
     await admin.from('carrier_invoices').delete().eq('id', invoice.id);
-    throw new Error(`номер счёта: ${numberError?.message}`);
+    throw cause;
   }
-  await admin.from('carrier_invoices').update({ number, reference: finnishReference(number) }).eq('id', invoice.id);
 
   return deliver(invoice.id, deal);
+}
+
+/**
+ * Номер из серии продавца — счёту, у которого его ещё нет. Запись «где
+ * ещё DRAFT-…»: параллельный повтор не перепишет уже выданный номер.
+ * Ошибка записи не глотается: без номера счёт не печатается.
+ */
+async function assignNumber(invoiceId: string, sellerId: string, issuedOn: string): Promise<void> {
+  const admin = createAdminClient();
+  const { data: number, error: numberError } = await admin.rpc('next_carrier_invoice_number', {
+    p_company_id: sellerId,
+    p_year: Number(issuedOn.slice(0, 4)),
+  });
+  if (numberError || !number) throw new Error(`номер счёта: ${numberError?.message}`);
+  const { error } = await admin
+    .from('carrier_invoices')
+    .update({ number, reference: finnishReference(number) })
+    .eq('id', invoiceId)
+    .like('number', `${DRAFT_PREFIX}%`);
+  if (error) throw new Error(`номер счёта не записан: ${error.message}`);
 }
 
 type Deal = {
@@ -196,7 +223,7 @@ async function deliver(invoiceId: string, deal: Deal): Promise<FirstInvoiceStatu
   const admin = createAdminClient();
   const f = createFormat('fi-FI');
   const { data: inv } = await admin.from('carrier_invoices').select('*').eq('id', invoiceId).maybeSingle();
-  if (!inv || inv.number.startsWith('DRAFT-')) return 'NOT_FOUND';
+  if (!inv || inv.number.startsWith(DRAFT_PREFIX)) return 'NOT_FOUND';
 
   const seller = inv.seller as { name: string; business_id: string; vat_id: string | null; iban: string; address: string; email: string };
   const customer = inv.customer as { name: string; business_id: string | null; vat_id: string | null; address: string; email: string };
