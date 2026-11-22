@@ -106,10 +106,11 @@ begin
   /*
    * Семейства целиком, а не по одному имени: любая *_to_xml* и
    * *_to_xmlschema* выполняет запрос или читает таблицу по имени из
-   * текста; pg_ls_* и pg_read_* смотрят в файлы сервера.
+   * текста; pg_ls_* и pg_read_* смотрят в файлы сервера, pg_stat_* —
+   * в чужие сеансы и их запросы.
    */
   if v_flat ~ '(^|[^a-z0-9_])(query|table|cursor|schema|database)_to_xml'
-     or v_flat ~ '(^|[^a-z0-9_])pg_(ls|read)_' then
+     or v_flat ~ '(^|[^a-z0-9_])pg_(ls|read|stat)_' then
     raise exception 'Запрос содержит запрещённую функцию.' using errcode = '42501';
   end if;
 
@@ -146,7 +147,8 @@ begin
   set local search_path = public;
 
   execute format(
-    'select coalesce(jsonb_agg(row_to_json(t)), ''[]''::jsonb) from (%s) t limit %s',
+    /* Предел строк — внутри: снаружи он резал одну строку итога и ничего не ограничивал. */
+    'select coalesce(jsonb_agg(row_to_json(t)), ''[]''::jsonb) from (select * from (%s) q limit %s) t',
     v_sql,
     greatest(1, least(coalesce(p_limit, 200), 1000))
   ) into v_rows;
