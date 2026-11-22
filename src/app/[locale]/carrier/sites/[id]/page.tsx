@@ -5,6 +5,7 @@ import { Badge, Button, Card, CardBody } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
 import { siteUrl } from '@/lib/config';
 import { combinationMass, isMassCountry } from '@/lib/fleet/mass';
+import { isoToOperationsLocal, todayInHelsinki } from '@/lib/dates';
 import { isLocale } from '@/lib/i18n';
 import { getViewerI18n } from '@/lib/i18n/viewer';
 import { dayEnd, dayMinutes, finnishTransferRequired, hoursLabel, material, siteAmountCents } from '@/lib/sites/work';
@@ -67,6 +68,22 @@ export default async function SiteJobPage({ params }: { params: Promise<{ locale
     list.push(load);
     loadsByDay.set(load.day_id, list);
   }
+
+  /*
+   * Время нового рейса от диспетчера (22.11.2026): в не сегодняшний день оно
+   * обязательно — без него база ставила «сейчас» и растягивала старый день, —
+   * и лежит в своём дне: до 06:00 следующих суток (ночная смена) или до
+   * отметки «закончил», если она позже. Те же границы проверяет
+   * carrier_site_load_save; день объекта — дата по Хельсинки.
+   */
+  const today = todayInHelsinki();
+  const loadWindow = (day: { day: string; ended_at: string | null }) => {
+    const next = new Date(`${day.day}T12:00:00Z`);
+    next.setUTCDate(next.getUTCDate() + 1);
+    const morning = `${next.toISOString().slice(0, 10)}T06:00`;
+    const ended = day.ended_at ? isoToOperationsLocal(day.ended_at, 'Europe/Helsinki').slice(0, 16) : '';
+    return { required: day.day !== today, min: `${day.day}T00:00`, max: ended > morning ? ended : morning };
+  };
 
   const rows = (days ?? []).map((day) => {
     const dayLoads = loadsByDay.get(day.id) ?? [];
@@ -200,6 +217,7 @@ export default async function SiteJobPage({ params }: { params: Promise<{ locale
                       expectedPlates={r.plates}
                       limitKg={r.limitKg}
                       comboTareKg={r.comboTareKg}
+                      time={loadWindow(r.day)}
                     />
                   </div>
                 )}
@@ -207,10 +225,11 @@ export default async function SiteJobPage({ params }: { params: Promise<{ locale
                   <form action={carrierApproveDayAction} className="flex flex-wrap items-center gap-3">
                     <input type="hidden" name="locale" value={locale} />
                     <input type="hidden" name="day_id" value={r.day.id} />
-                    <Button type="submit" size="sm">
+                    {/* Ни конца, ни рейсов — в счёт ушло бы 0 часов: подтверждать нечего, база тоже откажет (22.11.2026). */}
+                    <Button type="submit" size="sm" disabled={!r.end}>
                       {s.approveSelf}
                     </Button>
-                    <span className="text-xs text-ink-dim">{s.approveSelfHint}</span>
+                    <span className="text-xs text-ink-dim">{r.end ? s.approveSelfHint : s.approveNoEnd}</span>
                   </form>
                 )}
                 {r.loads.length > 0 && (

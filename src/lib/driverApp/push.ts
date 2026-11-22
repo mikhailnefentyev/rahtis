@@ -1,8 +1,9 @@
 import 'server-only';
 
 import webpush from 'web-push';
-import { createI18n, isLocale } from '@/lib/i18n';
-import { driverDictionary, isDriverLocale } from '@/lib/i18n/driver';
+import { createI18n, locales } from '@/lib/i18n';
+import { DRIVER_LOCALES, driverDictionary } from '@/lib/i18n/driver';
+import { eventValues, firstKnown, routeLocale } from './notice';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 /**
@@ -54,6 +55,11 @@ export async function sendDriverPush(notificationId: number): Promise<PushResult
    * Язык текста — выбор водителя в профиле (app_language), а не адрес
    * страницы, с которой он подписался: норвежец и датчанин подписываются
    * с /fi или /en, а читают на своём (аудит 21.11.2026).
+   *
+   * 22.11.2026: выбор в профиле пуст — приложение идёт по языку телефона,
+   * и он записан в подписке (раньше там были только fi и en, и такой
+   * водитель получал push по-фински). Адрес по нажатию строится с языком
+   * сайта: норвежского и датского среди маршрутов нет — им /en.
    */
   const { data: driver } = await admin.from('drivers').select('app_language').eq('id', note.driver_id).maybeSingle();
 
@@ -61,13 +67,17 @@ export async function sendDriverPush(notificationId: number): Promise<PushResult
   let removed = 0;
 
   for (const sub of subscriptions ?? []) {
-    const site = isLocale(sub.locale) ? sub.locale : 'fi';
-    const own = driver?.app_language && isDriverLocale(driver.app_language) ? driver.app_language : isDriverLocale(site) ? site : 'fi';
-    const { t, m } = createI18n(site, await driverDictionary(site, own));
+    const own = firstKnown([driver?.app_language, sub.locale], DRIVER_LOCALES, 'fi');
+    const site = routeLocale(own, locales, 'en');
+    const { t, m, f } = createI18n(site, await driverDictionary(site, own));
 
     let body: string;
     try {
-      body = m(`driverEvent.${note.code}` as Parameters<typeof m>[0], (note.params ?? {}) as Record<string, string>);
+      /* Даты в подстановках лежат как YYYY-MM-DD — в тексте они датой на языке водителя. */
+      body = m(
+        `driverEvent.${note.code}` as Parameters<typeof m>[0],
+        eventValues(note.params, (day) => f.date(`${day}T12:00:00Z`)),
+      );
     } catch {
       body = note.code;
     }
@@ -75,7 +85,7 @@ export async function sendDriverPush(notificationId: number): Promise<PushResult
     const payload = JSON.stringify({
       title: t.driverApp.title,
       body,
-      url: note.order_id ? `/${sub.locale}/driver/task/${note.order_id}` : `/${sub.locale}/driver/inbox`,
+      url: note.order_id ? `/${site}/driver/task/${note.order_id}` : `/${site}/driver/inbox`,
       tag: note.order_id ?? `note-${note.id}`,
     });
 

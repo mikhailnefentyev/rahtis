@@ -30,6 +30,9 @@ export async function POST(request: Request) {
   /* Неделя задаётся явно только для повторного выпуска и проверки. */
   const url = new URL(request.url);
   const week = url.searchParams.get('week') ?? undefined;
+  if (week && (!/^\d{4}-\d{2}-\d{2}$/.test(week) || Number.isNaN(Date.parse(`${week}T00:00:00Z`)))) {
+    return Response.json({ error: 'week must be a date YYYY-MM-DD' }, { status: 400 });
+  }
 
   const result = await generateWeeklyReports(week);
 

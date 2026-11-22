@@ -125,7 +125,8 @@ export async function requestPasswordReset(
       to: email,
       link,
       operatorEmail: operatorInbox(),
-      locale: emailLocaleOf(company?.language),
+      /* Компания по адресу не нашлась (диспетчер, не контактный адрес) — язык формы, а не всегда финский. */
+      locale: emailLocaleOf(company?.language ?? locale),
     }),
   );
 

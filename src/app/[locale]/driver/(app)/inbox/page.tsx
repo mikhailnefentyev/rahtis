@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { markReadAction } from '@/lib/driverApp/actions';
 import { isLocale } from '@/lib/i18n';
 import { getDriverI18n } from '@/lib/driverApp/i18n';
+import { eventValues } from '@/lib/driverApp/notice';
 import { createClient } from '@/lib/supabase/server';
 
 /**
@@ -24,9 +25,10 @@ export default async function DriverInbox({ params }: { params: Promise<{ locale
     .limit(50);
 
   /* Номер рейса RS-2026-0418 не рвётся на две строки: после дефиса — соединитель слов (U+2060, невидим). */
+  /* Даты лежат в подстановках как YYYY-MM-DD и становятся датой на языке водителя (22.11.2026: было «2026-12-01»). */
   const unbreakable = (params: unknown) =>
     Object.fromEntries(
-      Object.entries((params ?? {}) as Record<string, string | number>).map(([k, v]) => [
+      Object.entries(eventValues(params, (day) => f.date(`${day}T12:00:00Z`))).map(([k, v]) => [
         k,
         typeof v === 'string' && /^[A-Z]{1,4}-\d{4}-\d+$/.test(v) ? v.replace(/-/g, '-⁠') : v,
       ]),

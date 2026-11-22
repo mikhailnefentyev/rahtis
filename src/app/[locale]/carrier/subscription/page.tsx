@@ -5,14 +5,17 @@ import { requireRole } from '@/lib/auth/guard';
 import {
   ANNUAL_DISCOUNT_BPS,
   annualPlanStart,
+  freeUntil,
   ladderStepLabel,
   ON_REQUEST_FROM,
   SUBSCRIPTION_LADDER,
   subscriptionLadderCents,
   subscriptionMonthCharged,
 } from '@/lib/config';
+import { operationsInstant } from '@/lib/dates';
 import { isLocale } from '@/lib/i18n';
 import { getViewerI18n } from '@/lib/i18n/viewer';
+import { fetchAll } from '@/lib/money/paging';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { AnnualForm } from './AnnualForm';
@@ -46,17 +49,31 @@ export default async function SubscriptionPage({ params }: { params: Promise<{ l
   const monthStart = `${helsinki}-01`;
   const [y, m] = helsinki.split('-').map(Number);
   const nextMonth = `${m === 12 ? y + 1 : y}-${String(m === 12 ? 1 : m + 1).padStart(2, '0')}-01`;
+  /* Последний день месяца — граница, по которой база решает, покрыт ли месяц годом и бесплатным периодом. */
+  const monthEnd = new Date(Date.UTC(y, m, 0)).toISOString().slice(0, 10);
+  /*
+   * Полночь 1-го числа по Хельсинки (22.11.2026). Прежде стояло «+02:00» —
+   * зимнее смещение: с апреля по октябрь месяц начинался на час позже, и
+   * рейс, закрытый в первый час месяца, в счёт машин не попадал.
+   */
+  const monthStartInstant = operationsInstant(monthStart, '00:00', 'Europe/Helsinki');
+  const monthStartIso = monthStartInstant === null ? `${monthStart}T00:00:00+02:00` : new Date(monthStartInstant).toISOString();
 
   /* Заказы — служебным клиентом: колонки orders открыты перевозчику выборочно. Только свои. */
   const [{ data: orders }, { data: fees }, { data: plans }, { data: terms }] = await Promise.all([
-    admin
-      .from('orders')
-      .select('assigned_vehicle_id')
-      .eq('assigned_company_id', company.id)
-      .eq('status', 'DONE')
-      .gte('closed_at', `${monthStart}T00:00:00+02:00`)
-      .not('assigned_vehicle_id', 'is', null)
-      .limit(5000),
+    /* Страницами: `.limit(5000)` сервер обрезал до тысячи строк. */
+    fetchAll((a, b) =>
+      admin
+        .from('orders')
+        .select('assigned_vehicle_id')
+        .eq('assigned_company_id', company.id)
+        .eq('status', 'DONE')
+        .gte('closed_at', monthStartIso)
+        .not('assigned_vehicle_id', 'is', null)
+        .order('closed_at')
+        .order('id')
+        .range(a, b),
+    ),
     supabase
       .from('carrier_subscription_fees')
       .select('id, month, kind, active_vehicles, net_cents, gross_cents, vat_bps')
@@ -67,13 +84,35 @@ export default async function SubscriptionPage({ params }: { params: Promise<{ l
     admin.from('legal_documents').select('version').eq('kind', 'TERMS').eq('status', 'ACTIVE').maybeSingle(),
   ]);
 
-  const active = new Set((orders ?? []).map((o) => o.assigned_vehicle_id)).size;
-  const estimate = subscriptionLadderCents(active);
+  const active = new Set(orders.map((o) => o.assigned_vehicle_id)).size;
   /* Переведённым с подряда сбор — с 1.1.2027 (companies.subscription_fees_from); год вперёд — не раньше. */
   const feesFrom = company.subscription_fees_from ?? null;
   const pendingStart = feesFrom && !subscriptionMonthCharged(monthStart, feesFrom) ? feesFrom : null;
-  const annualStart = annualPlanStart(nextMonth, feesFrom);
   const plan = (plans ?? []).find((p) => !p.cancelled_at && p.ends_on >= monthStart) ?? null;
+
+  /*
+   * Экран повторяет базу (22.11.2026), а не считает по-своему.
+   *
+   * Сумма месяца — как в issue_monthly_subscriptions: машины, покрытые
+   * оплаченным годом (он должен покрывать месяц целиком), в сбор не входят;
+   * в бесплатный период и до начала начислений сбора нет. Прежде при годе
+   * на 5 машин и 5 работавших экран показывал 59,60 €, а начислялось 0.
+   *
+   * Начало года вперёд — как в carrier_annual_plan_create: следующий месяц,
+   * но после бесплатного периода и не раньше начала начислений. Прежде
+   * форма обещала год с 1.12, когда база начинала его с 1.1.
+   */
+  const free = freeUntil(company.approved_at ?? null);
+  const covering = (plans ?? []).find((p) => !p.cancelled_at && p.starts_on <= monthStart && p.ends_on >= monthEnd) ?? null;
+  const covered = Math.min(active, covering?.vehicles ?? 0);
+  const charged = subscriptionMonthCharged(monthStart, feesFrom) && !(free && free >= monthEnd);
+  const estimate = charged ? subscriptionLadderCents(active) - subscriptionLadderCents(covered) : 0;
+  const afterFree =
+    free && free >= nextMonth
+      ? new Date(Date.UTC(Number(free.slice(0, 4)), Number(free.slice(5, 7)), 1)).toISOString().slice(0, 10)
+      : nextMonth;
+  /* База переносит год на начало начислений, только когда оно позже; в середине месяца — на его первое число. */
+  const annualStart = feesFrom && feesFrom > afterFree ? annualPlanStart(afterFree, feesFrom) : afterFree;
   const annualOpen = (terms?.version ?? 0) >= ANNUAL_TERMS_VERSION;
   const date = (iso: string) => f.date(`${iso}T12:00:00Z`);
   const examples = [2, 5, 10, 20];

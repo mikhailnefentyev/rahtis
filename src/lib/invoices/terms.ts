@@ -8,9 +8,15 @@
  *
  *   · PER_TRIP — каждый день, за рейсы, закрытые до сегодня: счёт
  *     уходит наутро после рейса, по одному на рейс;
- *   · WEEKLY — по понедельникам, за прошлую неделю и раньше;
- *   · BIWEEKLY — по понедельникам чётных недель ISO;
- *   · MONTHLY — 1-го числа, за прошлый месяц и раньше.
+ *   · WEEKLY — за рейсы, закрытые до понедельника этой недели;
+ *   · BIWEEKLY — до понедельника «своей» недели (через одну, счёт недель
+ *     от BIWEEKLY_ANCHOR);
+ *   · MONTHLY — до 1-го числа этого месяца.
+ *
+ * Граница — последняя наступившая, в любой день (22.11.2026): запуск в
+ * понедельник не удался или не успел — счёт уйдёт на следующее утро, а не
+ * через неделю или месяц. Повтор безопасен: рейс, попавший в счёт,
+ * закреплён за ним (orders.carrier_invoice_id) и в выборку не вернётся.
  *
  * Без импортов из приложения: модуль читают сервер и тесты.
  */
@@ -43,20 +49,53 @@ export function isoWeekOf(dateIso: string): number {
 }
 
 /**
- * Пора ли сегодня (дата по Хельсинки) выставлять счёт по этой
- * периодичности. Да — дата, до которой (не включая) закрытые рейсы идут
- * в счёт; нет — null.
+ * Понедельник, от которого считаются «свои» недели BIWEEKLY (22.11.2026).
+ *
+ * Прежде брали чётность номера недели ISO, а в 2026 году 53 недели: после
+ * счёта 21.12.2026 (неделя 52) следующий вышел бы 11.01.2027 (неделя 2) —
+ * через три недели. Теперь — чётность числа недель от 5.1.2026 (неделя 2):
+ * в 2026 году расписание то же, дальше ровно через одну неделю.
+ * То же число — в sites/invoice.ts.
  */
-export function invoiceCutoff(schedule: InvoiceSchedule, todayIso: string): string | null {
-  const monday = new Date(`${todayIso}T12:00:00Z`).getUTCDay() === 1;
+export const BIWEEKLY_ANCHOR = '2026-01-05';
+
+const DAY_MS = 86_400_000;
+const noon = (iso: string) => new Date(`${iso}T12:00:00Z`);
+const isoOf = (d: Date) => d.toISOString().slice(0, 10);
+
+/** Понедельник недели, в которую входит дата. */
+export function mondayOfWeek(dateIso: string): string {
+  const d = noon(dateIso);
+  d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7));
+  return isoOf(d);
+}
+
+/** Выставляется ли счёт «раз в две недели» в неделю этого понедельника. */
+export function biweeklyDue(mondayIso: string): boolean {
+  const weeks = Math.round((noon(mondayIso).getTime() - noon(BIWEEKLY_ANCHOR).getTime()) / (7 * DAY_MS));
+  return Math.abs(weeks) % 2 === 0;
+}
+
+/**
+ * Дата (по Хельсинки), до которой (не включая) закрытые рейсы идут в счёт
+ * по этой периодичности: последняя наступившая граница. Запуск идёт
+ * каждое утро; в обычный день всё до границы уже в счетах, и выставлять
+ * нечего.
+ */
+export function invoiceCutoff(schedule: InvoiceSchedule, todayIso: string): string {
+  const monday = mondayOfWeek(todayIso);
   switch (schedule) {
     case 'PER_TRIP':
       return todayIso;
     case 'WEEKLY':
-      return monday ? todayIso : null;
-    case 'BIWEEKLY':
-      return monday && isoWeekOf(todayIso) % 2 === 0 ? todayIso : null;
+      return monday;
+    case 'BIWEEKLY': {
+      if (biweeklyDue(monday)) return monday;
+      const previous = noon(monday);
+      previous.setUTCDate(previous.getUTCDate() - 7);
+      return isoOf(previous);
+    }
     case 'MONTHLY':
-      return todayIso.endsWith('-01') ? todayIso : null;
+      return `${todayIso.slice(0, 7)}-01`;
   }
 }

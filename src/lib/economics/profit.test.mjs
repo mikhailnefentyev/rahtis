@@ -104,6 +104,10 @@ test('суммы из формы', async () => {
   assert.equal(eurosToCents('950 kr'), 95_000);
   assert.equal(eurosToCents('950 kr.'), 95_000);
   assert.equal(eurosToCents('1200 PLN'), 120_000);
+  /* Румыния (22.11.2026): «RON» и «lei» — тоже название валюты, а не ошибка. */
+  assert.equal(eurosToCents('1500 RON'), 150_000);
+  assert.equal(eurosToCents('1 500,50 lei'), 150_050);
+  assert.equal(eurosToCents('2500 Lei'), 250_000);
   assert.equal(centsToInput(1_250_050), '12500.50');
   assert.equal(centsToInput(8_500_000), '85000');
 });

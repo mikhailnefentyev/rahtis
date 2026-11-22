@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getViewer } from '@/lib/auth/viewer';
 import { acceptInviteAction } from '@/lib/driverApp/actions';
-import { getI18n, isLocale } from '@/lib/i18n';
+import { getDriverI18n } from '@/lib/driverApp/i18n';
+import { isLocale } from '@/lib/i18n';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 export const metadata: Metadata = {
@@ -30,7 +31,12 @@ export default async function DriverInvitePage({
   const [{ locale, token }, query] = await Promise.all([params, searchParams]);
   if (!isLocale(locale)) notFound();
 
-  const { t, m } = await getI18n(locale);
+  /*
+   * Язык приложения водителя, а не адреса (22.11.2026): ссылку шлёт перевозчик,
+   * и она несёт язык его кабинета. Гостю getDriverI18n отдаёт язык телефона
+   * (Accept-Language), вошедшему водителю — его выбор из профиля.
+   */
+  const { t, m } = await getDriverI18n(locale);
   const { data } = await createAdminClient().rpc('driver_invite_lookup', { p_token: token });
   const invite = data?.[0] ?? null;
 

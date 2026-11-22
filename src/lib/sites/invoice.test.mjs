@@ -3,7 +3,7 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { finnishReference, invoiceDue, invoiceLines, invoiceTotals, isoWeek, standardVatBps } from './invoice.ts';
+import { finnishReference, hoursText, invoiceDue, invoiceLines, invoiceTotals, isoWeek, quantityLabel, standardVatBps } from './invoice.ts';
 
 test('viitenumero: контрольная цифра по весам 7-3-1', () => {
   // Известные примеры: 1232 (основа 123), 12345672 (основа 1234567).
@@ -46,4 +46,24 @@ test('расписание: еженедельно и по чётным неде
   assert.equal(invoiceDue('BIWEEKLY', '2026-10-26'), true);
   assert.equal(invoiceDue('BIWEEKLY', '2026-11-02'), false);
   assert.equal(invoiceDue('MANUAL', '2026-10-26'), false);
+  // 2026 год — 53 недели ISO: после 21.12 следующий счёт 4.1.2027, без разрыва в три недели.
+  assert.equal(invoiceDue('BIWEEKLY', '2026-12-21'), true);
+  assert.equal(invoiceDue('BIWEEKLY', '2026-12-28'), false);
+  assert.equal(invoiceDue('BIWEEKLY', '2027-01-04'), true);
+  assert.equal(invoiceDue('BIWEEKLY', '2027-01-11'), false);
+});
+
+test('строка сходится с умножением: часы как ч:мм, тонны до килограмма', () => {
+  const [short] = invoiceLines('HOUR', 9500, [{ day: '2026-11-20', driver: 'Matti', plate: 'ABC-123', minutes: 50, loads: 0, netKg: 0 }]);
+  assert.equal(short.amountCents, 7917);
+  assert.equal(quantityLabel(short), '0:50');
+  assert.equal(hoursText(585), '9:45');
+  assert.equal(hoursText(0), '0:00');
+  const [tonnes] = invoiceLines('TONNE', 250, [{ day: '2026-11-20', driver: '', plate: '', minutes: 0, loads: 1, netKg: 12_345 }]);
+  assert.equal(tonnes.quantity, 12.345);
+  assert.equal(tonnes.amountCents, Math.round(tonnes.quantity * 250));
+  assert.equal(quantityLabel(tonnes), '12,345');
+  // Счёт, записанный до 22.11.2026 (без quantityText), печатается числом, как был.
+  assert.equal(quantityLabel({ quantity: 9.75 }), '9,75');
+  assert.equal(quantityLabel(invoiceLines('LOAD', 8000, days)[0]), '12');
 });

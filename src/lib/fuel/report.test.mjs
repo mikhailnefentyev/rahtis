@@ -3,7 +3,7 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { normalizeReport, parseDate, parseNumber, reportCurrency } from './fuel.ts';
+import { isAmbiguousAmount, normalizeReport, parseDate, parseNumber, parseWholeNumber, reportCurrency } from './fuel.ts';
 
 const vehicles = [
   { id: 'v1', plate: 'ABC-123' },
@@ -88,4 +88,47 @@ test('числа со знаком валюты', () => {
   assert.equal(parseNumber('1 450,50 kr.'), 1450.5);
   assert.equal(parseNumber('PLN 890'), 890);
   assert.equal(parseNumber('890 zł'), 890);
+});
+
+/* 22.11.2026: «245.300» в одометре читалось как 245 км, «1.250» в сумме — как 1,25. */
+test('целое поле: группы по три цифры — тысячи', () => {
+  assert.equal(parseWholeNumber('245.300'), 245300);
+  assert.equal(parseWholeNumber('245,300'), 245300);
+  assert.equal(parseWholeNumber('245 300'), 245300);
+  assert.equal(parseWholeNumber('245 300 km'), 245300);
+  assert.equal(parseWholeNumber('1.245.300'), 1245300);
+  assert.equal(parseWholeNumber('1.200'), 1200);
+  assert.equal(parseWholeNumber('245300'), 245300);
+  assert.equal(parseWholeNumber(245300.4), 245300);
+});
+
+test('целое поле: настоящая дробь округляется, мусор — null', () => {
+  assert.equal(parseWholeNumber('245300,5'), 245301);
+  assert.equal(parseWholeNumber('245.300,5'), 245301);
+  assert.equal(parseWholeNumber('12,5'), 13);
+  assert.equal(parseWholeNumber(''), null);
+  assert.equal(parseWholeNumber('abc'), null);
+  assert.equal(parseWholeNumber(null), null);
+});
+
+test('сумма «1.250» — не угадываем', () => {
+  assert.equal(isAmbiguousAmount('1.250'), true);
+  assert.equal(isAmbiguousAmount('1,250 €'), true);
+  assert.equal(isAmbiguousAmount('12.500 lei'), true);
+  assert.equal(isAmbiguousAmount('1.250,00'), false);
+  assert.equal(isAmbiguousAmount('1 250'), false);
+  assert.equal(isAmbiguousAmount('1250'), false);
+  assert.equal(isAmbiguousAmount('12,50'), false);
+  assert.equal(isAmbiguousAmount('1.2500'), false);
+  assert.equal(isAmbiguousAmount(1.25), false);
+});
+
+test('одометр отчёта «245.300» — тысячи', () => {
+  const rows = normalizeReport(
+    [{ date: '2026-11-02', product: 'DIESEL', quantity: '310,5', plate: 'ABC-123', odometer: '245.300' }],
+    vehicles,
+    cards,
+  );
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0].odometer_km, 245300);
 });

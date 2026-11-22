@@ -125,14 +125,21 @@ export async function deleteVehicleCostAction(formData: FormData): Promise<void>
 export async function saveEmployerCostAction(formData: FormData): Promise<void> {
   const locale = toLocale(formData.get('locale'));
   const viewer = await requireRole(locale, 'CARRIER');
-  const pct = Number(str(formData, 'employer_cost_pct').replace(',', '.'));
+  /* Пустое поле — не 0 %: Number('') даёт 0, и надбавка работодателя молча исчезала (22.11.2026). */
+  const rawPct = str(formData, 'employer_cost_pct').replace(',', '.').trim();
+  const pct = rawPct === '' ? Number.NaN : Number(rawPct);
   if (!Number.isFinite(pct) || pct < 0 || pct > 100) {
     await flashError((await getDictionary(locale)).economics.errPct);
     return;
   }
   const supabase = await createClient();
-  await supabase
+  const { error } = await supabase
     .from('company_economics')
     .upsert({ company_id: viewer.company!.id, employer_cost_bps: Math.round(pct * 100), updated_at: new Date().toISOString() }, { onConflict: 'company_id' });
+  if (error) {
+    console.error('saveEmployerCost:', error.message);
+    await flashError((await getDictionary(locale)).error.generic);
+    return;
+  }
   revalidatePath(`/${locale}/carrier/economics`, 'layout');
 }

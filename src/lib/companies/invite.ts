@@ -5,7 +5,7 @@ import { siteUrl } from '@/lib/config';
 import { operatorInbox, sendEmail } from '@/lib/email';
 import { inviteEmail } from '@/lib/email/templates/invite';
 import { emailLocaleOf } from '@/lib/email/text';
-import { defaultLocale } from '@/lib/i18n';
+import { defaultLocale, isLocale, type Locale } from '@/lib/i18n';
 import { createAdminClient } from '@/lib/supabase/admin';
 import type { CompanyRole } from '@/types/db';
 
@@ -35,7 +35,8 @@ export async function sendInvite(
 ): Promise<boolean> {
   const admin = createAdminClient();
   const site = siteUrl();
-  const l = defaultLocale;
+  /* Страница установки пароля — на языке компании, а не всегда по-фински (22.11.2026). */
+  const l = isLocale(language ?? '') ? (language as Locale) : defaultLocale;
 
   /*
    * generateLink вместо inviteUserByEmail.

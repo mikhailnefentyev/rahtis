@@ -699,6 +699,7 @@ export const lt = {
   sites: {
     approveSelf: 'Patvirtinti dieną savo vardu',
     approveSelfHint: 'Pagal vairuotojo iškrovimo duomenis. Bus pažymėta „vežėjas“.',
+    approveNoEnd: 'Diena neturi pabaigos laiko ir krovinių, todėl jos dar negalima patvirtinti. Palaukite, kol vairuotojas užbaigs dieną, arba pridėkite krovinį.',
     nav: 'Objektai',
     title: 'Objektai',
     lede: 'Statybvietės, kur dirbate savivarčiu ar kasetiniu sunkvežimiu: vairuotojas programėlėje pažymi atvykimą ir krovinius, valandos skaičiuojamos nuo atvykimo iki paskutinio iškrovimo + atsarga, o darbų vadovas dienas patvirtina per nuorodą.',
@@ -2395,6 +2396,12 @@ export const lt = {
     reference: 'įmokos kodas',
     pdf: 'Atidaryti PDF',
     payNote: 'Mokėkite tiesiogiai vežėjui į sąskaitoje nurodytą sąskaitą su įmokos kodu. Mokėjimai neina per RAHTIS. Sąskaita pažymima apmokėta, kai vežėjas užregistruoja mokėjimą.',
+  },
+
+  /* Счета перевозчика за прямые перевозки, отправленные RAHTIS от его имени (22.11.2026). */
+  carrierInvoices: {
+    title: 'Išsiųstos sąskaitos',
+    subtitle: 'Sąskaitos, kurias RAHTIS parengė ir išsiuntė jūsų klientams jūsų įmonės vardu už tiesioginius pervežimus. Klientas moka tiesiai į jūsų sąskaitą. Pažymėkite sąskaitą kaip apmokėtą, kai gausite pinigus, – kitaip klientas gaus mokėjimo priminimus.',
   },
 
   invite: {
@@ -5641,6 +5648,7 @@ export const lt = {
     'event.company.sensitive_changed': '{field, select, IBAN {Pakeista jūsų įmonės banko sąskaita} CONTACT_EMAIL {Pakeistas jūsų įmonės kontaktinis el. paštas} BILLING_EMAIL {Pakeistas jūsų įmonės el. paštas sąskaitoms} OWNER {Pakeistas jūsų įmonės pagrindinis naudotojas} other {Pakeisti jūsų įmonės duomenys}} – jei tai padarėte ne jūs, kreipkitės į klientų aptarnavimą',
     'event.invoice.paid_marked': 'Užsakovas pažymėjo sąskaitą {number} (užsakymas {ref}) kaip apmokėtą – patvirtinkite, kai gausite pinigus',
     'event.invoice.collection': 'Sąskaita {number} pradelsta 14 dienų. Apsvarstykite galimybę kreiptis į skolų išieškojimo bendrovę; jūsų mokėjimo pranešimas iš anksto užpildytas kaip „neapmokėta“.',
+    'event.invoice.issued': '{sent, select, yes {Sąskaita {number} išsiųsta klientui {customer}} other {Sąskaita {number} klientui {customer} parengta, bet el. laiškas neišsiųstas – atsisiųskite PDF ir išsiųskite patys}} · {total}, apmokėti iki {dueOn}',
     'event.trip.stop.done': 'Pervežimas {ref}: {place} pažymėta atlikta ({done}/{total})',
     'event.order.closed': 'Pervežimas {ref} baigtas, dokumentai jau matomi',
     'event.vehicle.approved': 'Transporto priemonė {plate} patvirtinta',
@@ -5814,7 +5822,7 @@ export const lt = {
     'event.installment.offer.body': "{name} siūlo pirkti išsimokėtinai.",
     'event.installment.counter': "Naujos sąlygos: {plate}",
     'event.installment.counter.body': "{name} siūlo pakeistas sąlygas.",
-    'event.installment.agreed': "Pirkimas išsimokėtinai suderintas: {plate}",
+    'event.installment.agreed': "Pirkimas–pardavimas išsimokėtinai suderintas: {plate}",
     'event.installment.agreed.body': "Sutartis {number} ir pirmoji sąskaita parengtos.",
     'event.installment.cancelled': "Derybos atšauktos: {plate}",
     'event.installment.cancelled.body': "{name} atšaukė derybas.",
@@ -5822,12 +5830,14 @@ export const lt = {
     'event.installment.withdrawn.body': "Pardavėjas išėmė transporto priemonę iš pardavimo.",
     'event.installment.handover': "Perdavimas patvirtintas: {plate}",
     'event.installment.handover.body': "Išsimokėjimo laikotarpis prasidėjo. Transporto priemonė dabar yra pirkėjo parke kaip juodraštis – pateikite ją tvirtinti.",
-    'event.installment.paid_off': "Pirkimas išsimokėtinai apmokėtas: {plate}",
-    'event.installment.paid_off.body': "Visos įmokos sumokėtos. Pardavėjas per 7 dienas pateikia Traficom pranešimą apie perleidimą, o pirkėjas įregistruojamas savininku.",
-    'event.installment.overdue': "Vėluoja {n} įmoka: {plate}",
+    'event.installment.paid_off': "Pirkimas–pardavimas išsimokėtinai apmokėtas: {plate}",
+    'event.installment.paid_off.body': "Visos įmokos sumokėtos. Pardavėjas nedelsdamas pateikia Traficom pranešimą apie perleidimą, o pirkėjas įsiregistruoja savininku per 7 dienas nuo perleidimo dienos (paskutinės įmokos diena).",
+    'event.installment.overdue': "Vėluoja įmoka Nr. {n}: {plate}",
     'event.installment.overdue.body': "Įmokos terminas buvo {date}, vėluojama {days, plural, one {# dieną} few {# dienas} many {# dienos} other {# dienų}}. Mokėkite tiesiai pardavėjui pagal sąskaitos rekvizitus.",
-    'event.installment.threshold': "Pasiekta pirkimo išsimokėtinai riba: {plate}",
-    'event.installment.threshold.body': "Pavėluotos įmokos pasiekia Suomijos pirkimo išsimokėtinai įstatymo (osamaksukauppalaki) 2 § ribą. Galite reikalauti likusios sumos iš karto arba pagal įstatymą susigrąžinti transporto priemonę atlikę atsiskaitymą. Variklio užvedimo blokavimas skoloms išieškoti nenaudojamas.",
+    'event.installment.threshold': "Pasiekta pirkimo–pardavimo išsimokėtinai riba: {plate}",
+    'event.installment.threshold.body': "Pavėluotos įmokos pasiekia Suomijos pirkimo–pardavimo išsimokėtinai įstatymo (osamaksukauppalaki) 2 § ribą. Galite reikalauti likusios sumos iš karto arba pagal įstatymą susigrąžinti transporto priemonę atlikę atsiskaitymą. Variklio užvedimo blokavimas skoloms išieškoti nenaudojamas.",
+    'event.installment.no_iban': "Įmokos {n} sąskaitos faktūros išrašyti nepavyko: {plate}",
+    'event.installment.no_iban.body': "Nenurodyta jūsų banko sąskaita (IBAN). Įrašykite ją skiltyje „Banko rekvizitai“ – tada sąskaita faktūra pirkėjui bus išsiųsta automatiškai.",
     'event.maintenance.defect': "{plate}: pranešimas apie gedimą – {area}",
     'event.maintenance.defect_unsafe': "{plate}: VAŽIUOTI NEGALIMA – {area}",
     'event.maintenance.due': "{count, plural, one {Priežiūra: artėja # terminas} few {Priežiūra: artėja # terminai} many {Priežiūra: artėja # termino} other {Priežiūra: artėja # terminų}}",

@@ -13,8 +13,10 @@ export async function GET(request: Request, { params }: { params: Promise<{ slug
   const { slug } = await params;
   // Сбой HeyCatch не должен ронять картинку: тогда она без заголовка статьи.
   const article = await getArticle(decodeURIComponent(slug)).catch(() => null);
-  const title = article?.title ?? 'RAHTIS';
-  const vehicle = vehicleFor(article ?? { slug, title });
+  /* Выдуманный адрес — не повод рисовать картинку. При сбое HeyCatch (catch выше) статьи тоже нет: картинку запросят снова. */
+  if (!article) return new Response(null, { status: 404 });
+  const title = article.title;
+  const vehicle = vehicleFor(article);
   const origin = new URL(request.url).origin;
   const truck = `${origin}${vehicleSrc(vehicle, 'png')}`;
   const kippi = vehicle.file === 'kippiauto';

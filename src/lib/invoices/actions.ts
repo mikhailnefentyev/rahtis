@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { requireRole } from '@/lib/auth/guard';
 import { getViewer } from '@/lib/auth/viewer';
 import { defaultLocale, getDictionary, isLocale, type Locale } from '@/lib/i18n';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { parseFreightInvoice } from './schedule';
 
@@ -26,7 +27,7 @@ const DATE = /^\d{4}-\d{2}-\d{2}$/;
 export async function saveFreightInvoiceAction(_previous: InvoiceFormState, formData: FormData): Promise<InvoiceFormState> {
   const locale = toLocale(formData.get('locale'));
   const tw = (await getDictionary(locale)).trustWins;
-  await requireRole(locale, 'CARRIER');
+  const viewer = await requireRole(locale, 'CARRIER');
 
   const parsed = parseFreightInvoice({
     number: formData.get('number'),
@@ -41,17 +42,30 @@ export async function saveFreightInvoiceAction(_previous: InvoiceFormState, form
     return { error: errors[parsed.error], saved: false };
   }
 
-  const supabase = await createClient();
-  /* Рейс уже в недельном счёте RAHTIS (17.11.2026) — второй счёт за него был бы двойным. */
-  const { data: order } = await supabase
+  const orderId = String(formData.get('order_id') ?? '');
+  /*
+   * Рейс уже в недельном счёте RAHTIS (17.11.2026) — второй счёт за него был
+   * бы двойным. Колонка orders.carrier_invoice_id перевозчику не выдана
+   * (права на orders поимённые): чтение под сессией падало с 42501, ошибку
+   * никто не смотрел, и проверка проходила всегда (22.11.2026). Читаем
+   * служебным ключом и только свой рейс; главная проверка — в самой
+   * save_freight_invoice (код 55006).
+   */
+  const { data: order, error: orderError } = await createAdminClient()
     .from('orders')
     .select('carrier_invoice_id')
-    .eq('id', String(formData.get('order_id') ?? ''))
+    .eq('id', orderId)
+    .eq('assigned_company_id', viewer.company?.id ?? '00000000-0000-0000-0000-000000000000')
     .maybeSingle();
+  if (orderError) {
+    console.error('счёт перевозчика: рейс не прочитан:', orderError.message);
+    return { error: tw.invoiceFailed, saved: false };
+  }
   if (order?.carrier_invoice_id) return { error: tw.alreadyWeekly, saved: false };
 
+  const supabase = await createClient();
   const { error } = await supabase.rpc('save_freight_invoice', {
-    p_order_id: String(formData.get('order_id') ?? ''),
+    p_order_id: orderId,
     p_number: parsed.number,
     p_amount_cents: parsed.amountCents,
     p_currency: parsed.currency,
@@ -61,6 +75,7 @@ export async function saveFreightInvoiceAction(_previous: InvoiceFormState, form
   });
   if (error) {
     console.error('счёт перевозчика не записан:', error.message);
+    if (error.code === '55006') return { error: tw.alreadyWeekly, saved: false };
     return { error: error.code === '42501' || error.code === '55000' ? tw.invoiceClosed : tw.invoiceFailed, saved: false };
   }
 
@@ -124,7 +139,7 @@ export async function confirmFreightPaidAction(formData: FormData): Promise<void
   revalidatePath(`/${locale}/carrier`);
 }
 
-/** Счёт объекта: перевозчик отмечает оплату (дата) или снимает отметку. */
+/** Счёт объекта или счёт за перевозки (carrier_invoices): перевозчик отмечает оплату (дата) или снимает отметку. */
 export async function markSiteInvoicePaidAction(formData: FormData): Promise<void> {
   const locale = toLocale(formData.get('locale'));
   await requireRole(locale, 'CARRIER');
@@ -139,5 +154,11 @@ export async function markSiteInvoicePaidAction(formData: FormData): Promise<voi
     p_paid_on: (clear ? null : paidOn) as string,
   });
   if (error) console.error('оплата счёта объекта не отмечена:', error.message);
-  revalidatePath(`/${locale}/carrier/sites/${String(formData.get('job_id') ?? '')}`);
+  /* Счёт за перевозки (без объекта) отмечают со страницы счетов перевозчика (22.11.2026). */
+  const jobId = String(formData.get('job_id') ?? '');
+  if (jobId) revalidatePath(`/${locale}/carrier/sites/${jobId}`);
+  else {
+    revalidatePath(`/${locale}/carrier/invoices`);
+    revalidatePath(`/${locale}/carrier/done`);
+  }
 }

@@ -486,6 +486,37 @@ export function parseNumber(value: unknown): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
+/*
+ * «245.300» и «1,250»: один разделитель и после него ровно три цифры
+ * (22.11.2026). parseNumber читает это дробью — одометр 245.300 становился
+ * 245 км, сумма 1.250 — 1,25. Что это, зависит от поля: у целого (одометр,
+ * килограммы) — тысячи, у суммы — неизвестно, и её лучше не принять вовсе.
+ */
+const loneGroup = (value: string): string | null => {
+  const s = value.replace(/[\s  ']/g, '');
+  return /^\d{1,3}[.,]\d{3}$/.test(s) ? s : null;
+};
+
+/** Сумма или ставка, где не понять, тысячи это или дробь: «1.250», «1,250 €». Форма такую не принимает. */
+export function isAmbiguousAmount(value: unknown): boolean {
+  if (typeof value !== 'string') return false;
+  return loneGroup(value.replace(/[€]|zł|lei|kr\.?|[A-Z]{3}/gi, '')) !== null;
+}
+
+/**
+ * Целое из ручного ввода или отчёта — одометр, килограммы: разделители по
+ * три цифры здесь всегда тысячи («245.300», «245,300», «1.245.300»,
+ * «245 300 km»), остальное читается как parseNumber и округляется.
+ */
+export function parseWholeNumber(value: unknown): number | null {
+  if (typeof value === 'number') return Number.isFinite(value) ? Math.round(value) : null;
+  if (typeof value !== 'string') return null;
+  const s = value.replace(/[\s  ']|km|kg/gi, '');
+  if (/^\d{1,3}(?:\.\d{3})+$/.test(s) || /^\d{1,3}(?:,\d{3})+$/.test(s)) return Number(s.replace(/[.,]/g, ''));
+  const n = parseNumber(s);
+  return n == null ? null : Math.round(n);
+}
+
 /** Дата: YYYY-MM-DD, DD.MM.YYYY или DD.MM.YY. */
 export function parseDate(value: unknown): string | null {
   const s = typeof value === 'string' ? value.trim() : '';
@@ -547,7 +578,8 @@ export function normalizeReport(
     const rowCurrency = reportCurrency(item.currency, currency);
     const named = typeof item.currency === 'string' ? item.currency.trim().toUpperCase() : '';
     const amount = named && named !== rowCurrency ? null : parseNumber(item.amount_gross);
-    const odometer = parseNumber(item.odometer);
+    /* Одометр — целое: «245.300» в отчёте — тысячи, а не 245 км (22.11.2026). */
+    const odometer = parseWholeNumber(item.odometer);
     const plate = text(item.plate, 16);
     const card = text(item.card, 40);
     const cardRef = card ? cardKey(card) : null;

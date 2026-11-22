@@ -15,6 +15,54 @@ function keyBytes(base64: string): Uint8Array<ArrayBuffer> {
   return bytes;
 }
 
+/* Когда подписку этого телефона последний раз сверяли с сервером (на загрузку страницы). */
+let syncedAt = 0;
+const SYNC_EVERY_MS = 10 * 60_000;
+
+/** Подписка браузера → форма для сохранения на сервере. */
+function subscriptionForm(subscription: PushSubscription, locale: string): FormData {
+  const json = subscription.toJSON();
+  const form = new FormData();
+  form.set('locale', locale);
+  form.set('endpoint', subscription.endpoint);
+  form.set('p256dh', json.keys?.p256dh ?? '');
+  form.set('auth', json.keys?.auth ?? '');
+  return form;
+}
+
+/**
+ * Подписка в браузере есть — есть ли она на сервере и у этого ли водителя?
+ *
+ * Раньше экран судил по одному браузеру: «уведомления включены», хотя
+ * сервер подписку не сохранил (сбой при включении) или она числится за
+ * прежним водителем этого телефона. Поэтому подписка отправляется на
+ * сервер ещё раз — сохранение там «вставь или обнови», и оно же
+ * переписывает водителя и язык (22.11.2026).
+ *
+ * Сервер ответил отказом — подписка в браузере снимается: экран честно
+ * покажет «выключены» и кнопку. Запрос не дошёл (нет сети) — ничего не
+ * меняем: сверим в следующий раз.
+ */
+async function syncSubscription(subscription: PushSubscription, locale: string): Promise<boolean> {
+  if (Date.now() - syncedAt < SYNC_EVERY_MS) return true;
+  let ok: boolean;
+  try {
+    ({ ok } = await pushSubscribeAction(subscriptionForm(subscription, locale)));
+  } catch {
+    return true;
+  }
+  if (ok) {
+    syncedAt = Date.now();
+    return true;
+  }
+  try {
+    await subscription.unsubscribe();
+  } catch {
+    /* Не снялась — всё равно показываем «выключены»: на сервере её нет. */
+  }
+  return false;
+}
+
 /**
  * Включить push-уведомления на этом телефоне.
  *
@@ -43,14 +91,14 @@ export function PushSetup({ compact = false }: { compact?: boolean }) {
       else {
         const registration = await navigator.serviceWorker.getRegistration();
         const subscription = await registration?.pushManager.getSubscription();
-        next = subscription ? 'on' : 'off';
+        next = subscription && (await syncSubscription(subscription, locale)) ? 'on' : 'off';
       }
       if (active) setState(next);
     })().catch(() => active && setState('unsupported'));
     return () => {
       active = false;
     };
-  }, []);
+  }, [locale]);
 
   async function enable() {
     setBusy(true);
@@ -70,14 +118,10 @@ export function PushSetup({ compact = false }: { compact?: boolean }) {
         userVisibleOnly: true,
         applicationServerKey: keyBytes(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!),
       });
-      const json = subscription.toJSON();
-
-      const form = new FormData();
-      form.set('locale', locale);
-      form.set('endpoint', subscription.endpoint);
-      form.set('p256dh', json.keys?.p256dh ?? '');
-      form.set('auth', json.keys?.auth ?? '');
-      const { ok } = await pushSubscribeAction(form);
+      const { ok } = await pushSubscribeAction(subscriptionForm(subscription, locale));
+      if (ok) syncedAt = Date.now();
+      /* Сервер не сохранил — подписка в браузере снимается, иначе при следующем открытии экран сказал бы «включены». */
+      else await subscription.unsubscribe().catch(() => {});
       setState(ok ? 'on' : 'off');
     } catch {
       setState('off');
@@ -97,6 +141,7 @@ export function PushSetup({ compact = false }: { compact?: boolean }) {
         await pushUnsubscribeAction(form);
         await subscription.unsubscribe();
       }
+      syncedAt = 0;
       setState('off');
     } finally {
       setBusy(false);

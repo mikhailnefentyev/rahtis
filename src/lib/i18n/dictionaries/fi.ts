@@ -722,6 +722,7 @@ export const fi = {
   sites: {
     approveSelf: 'Hyväksy päivä itse',
     approveSelfHint: 'Kuljettajan purkutietojen perusteella. Näkyy merkinnällä ”kuljetusliike”.',
+    approveNoEnd: 'Päivällä ei ole lopetusaikaa eikä kuormia, joten sitä ei voi vielä hyväksyä. Odota kuljettajan lopetusmerkintää tai lisää kuorma.',
     nav: 'Kohteet',
     title: 'Kohteet',
     lede: 'Työmaat, joille ajat kippiä tai kasettia: kuljettaja kirjaa saapumisen ja kuormat sovelluksessa, tunnit lasketaan saapumisesta viimeiseen purkuun + varaaika, työnjohtaja hyväksyy päivät linkistä.',
@@ -2628,6 +2629,12 @@ export const fi = {
     reference: 'viite',
     pdf: 'Avaa PDF',
     payNote: 'Maksa lasku suoraan kuljetusliikkeelle laskussa olevalle tilille ja käytä viitenumeroa. Maksut eivät kulje RAHTIKSEN kautta. Lasku merkitään maksetuksi, kun kuljetusliike on kirjannut maksun.',
+  },
+
+  /* Счета перевозчика за прямые перевозки, отправленные RAHTIS от его имени (22.11.2026). */
+  carrierInvoices: {
+    title: 'Lähetetyt laskut',
+    subtitle: 'Laskut, jotka RAHTIS on laatinut ja lähettänyt asiakkaillesi yrityksesi nimissä suorista kuljetuksista. Asiakas maksaa suoraan tilillesi. Merkitse lasku maksetuksi, kun rahat ovat tulleet – muuten asiakas saa maksumuistutuksia.',
   },
 
   invite: {
@@ -5946,6 +5953,7 @@ export const fi = {
     'event.company.sensitive_changed': '{field, select, IBAN {Yrityksesi tilinumero muutettiin} CONTACT_EMAIL {Yrityksesi yhteyssähköposti muutettiin} BILLING_EMAIL {Yrityksesi laskutussähköposti muutettiin} OWNER {Yrityksesi pääkäyttäjä vaihtui} other {Yrityksesi tietoja muutettiin}} – jos et tehnyt muutosta itse, ota yhteyttä tukeen',
     'event.invoice.paid_marked': 'Tilaaja merkitsi laskun {number} (kuljetus {ref}) maksetuksi – vahvista, kun maksu on tullut',
     'event.invoice.collection': 'Lasku {number} on ollut erääntyneenä 14 päivää. Harkitse perintätoimiston käyttöä; maksuilmoituksesi on esitäytetty tilaan maksamatta.',
+    'event.invoice.issued': '{sent, select, yes {Lasku {number} lähetetty asiakkaalle {customer}} other {Lasku {number} asiakkaalle {customer} on laadittu, mutta sähköposti ei lähtenyt – lataa PDF ja lähetä se itse}} · {total}, eräpäivä {dueOn}',
     'event.trip.stop.done': 'Kuljetus {ref}: {place} merkitty tehdyksi ({done}/{total})',
     'event.order.closed': 'Kuljetus {ref} on valmis, asiakirjat ovat saatavilla',
     'event.vehicle.approved': 'Ajoneuvo {plate} on hyväksytty',
@@ -6127,11 +6135,13 @@ export const fi = {
     'event.installment.handover': "Luovutus vahvistettu: {plate}",
     'event.installment.handover.body': "Osamaksukausi alkoi. Auto on nyt ostajan kalustossa luonnoksena – lähetä se hyväksyttäväksi.",
     'event.installment.paid_off': "Osamaksukauppa maksettu: {plate}",
-    'event.installment.paid_off.body': "Kaikki erät on maksettu. Myyjä tekee luovutusilmoituksen Traficomiin 7 päivän kuluessa, ja ostaja rekisteröi itsensä omistajaksi.",
+    'event.installment.paid_off.body': "Kaikki erät on maksettu. Myyjä tekee luovutusilmoituksen Traficomiin viipymättä, ja ostaja rekisteröi itsensä omistajaksi 7 päivän kuluessa luovutuspäivästä eli viimeisen maksun päivästä.",
     'event.installment.overdue': "Maksuerä {n} myöhässä: {plate}",
     'event.installment.overdue.body': "Erä erääntyi {date} ja on {days, plural, one {# päivän} other {# päivää}} myöhässä. Maksa suoraan myyjälle laskun tiedoilla.",
     'event.installment.threshold': "Osamaksukaupan raja täyttyy: {plate}",
-    'event.installment.threshold.body': "Myöhässä olevat erät täyttävät osamaksukauppalain 2 §:n rajan. Voit vaatia loput heti tai ottaa auton takaisin lain mukaisesti tilityksin. Käynnistyksenestoa ei käytetä perintään.",
+    'event.installment.threshold.body': "Myöhässä olevat erät täyttävät osamaksukauppalain 2 §:n rajan. Voit vaatia loput heti tai ottaa auton takaisin lain mukaisesti; takaisinotossa tehdään tilitys. Käynnistyksenestoa ei käytetä perintään.",
+    'event.installment.no_iban': "Maksuerän {n} laskua ei voitu muodostaa: {plate}",
+    'event.installment.no_iban.body': "Tilinumerosi (IBAN) puuttuu. Lisää se kohdassa Pankkiyhteys – sen jälkeen lasku lähtee ostajalle automaattisesti.",
     'event.maintenance.defect': "{plate}: vikailmoitus – {area}",
     'event.maintenance.defect_unsafe': "{plate}: EI SAA AJAA – {area}",
     'event.maintenance.due': "{count, plural, one {Huolto: # määräaika lähestyy} other {Huolto: # määräaikaa lähestyy}}",

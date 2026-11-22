@@ -62,8 +62,12 @@ export default async function TransferDocumentPage({ params }: { params: Promise
   const contaminated = isContaminated(load.material_code, job.contaminated);
   const fiRequired = finnishTransferRequired(load.material_code, job.contaminated);
   const doc = wasteDocFor(country, kind?.hazardous ?? false, day.day, fiRequired);
-  /* Реестр SIIRTO — только финский объект и только когда документ обязателен. */
-  const siirto = country === 'FI' && fiRequired ? await loadSiirto(load.id, company) : null;
+  /*
+   * Реестр SIIRTO — только финский объект и только когда документ обязателен.
+   * Уже отправленный документ остаётся на виду и после того, как рейс перестал
+   * его требовать (сменили груз, сняли «загрязнён»): иначе его не удалить (22.11.2026).
+   */
+  const siirto = (country === 'FI' && fiRequired) || load.siirto_document_id ? await loadSiirto(load.id, company) : null;
   const siirtoCfg = siirtoConfig();
   const L = doc.labels;
   const E = LABELS_EN;

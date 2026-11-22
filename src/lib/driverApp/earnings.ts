@@ -9,7 +9,7 @@ import {
 } from '@/lib/driverPay';
 import { tesRules } from '@/lib/drivers/report';
 import { stopTimeZone } from '@/lib/country';
-import { dateInZone, todayInHelsinki } from '@/lib/dates';
+import { dateInZone } from '@/lib/dates';
 import { asCurrency, countryCurrency } from '@/lib/money/currency';
 import { loadFxHistory } from '@/lib/money/fx';
 import { createClient } from '@/lib/supabase/server';
@@ -121,9 +121,19 @@ export type DriverEarnings = {
 
 const DATE = /^\d{4}-\d{2}$/;
 
-/** Месяц YYYY-MM: из адреса, если он правильный и не в будущем, иначе текущий. */
-export function monthOf(value: string | undefined): string {
-  const current = todayInHelsinki().slice(0, 7);
+/**
+ * Текущий месяц YYYY-MM по поясу компании водителя.
+ *
+ * Раньше — по Хельсинки: у румынской или польской компании в последний
+ * вечер месяца экран уже показывал следующий месяц (или ещё прошлый), а
+ * дни раскладываются по поясу компании (22.11.2026).
+ */
+export function currentMonth(companyCountry: string | null | undefined, now: Date = new Date()): string {
+  return dateInZone(now, stopTimeZone(companyCountry)).slice(0, 7);
+}
+
+/** Месяц YYYY-MM: из адреса, если он правильный и не в будущем, иначе текущий (current — currentMonth). */
+export function monthOf(value: string | undefined, current: string): string {
   return value && DATE.test(value) && value <= current ? value : current;
 }
 

@@ -699,6 +699,7 @@ export const sv = {
   sites: {
     approveSelf: 'Godkänn dagen själv',
     approveSelfHint: 'Utifrån förarens lossningsdata. Visas som godkänd av åkeriet.',
+    approveNoEnd: 'Dagen saknar sluttid och lass och kan därför inte godkännas ännu. Vänta tills föraren avslutar dagen eller lägg till ett lass.',
     nav: 'Objekt',
     title: 'Objekt',
     lede: 'Arbetsplatser du kör till med tipp- eller kassettbil: föraren registrerar ankomst och lass i appen, timmarna räknas från ankomst till sista lossning + marginal och arbetsledaren godkänner dagarna via en länk.',
@@ -2395,6 +2396,12 @@ export const sv = {
     reference: 'referens',
     pdf: 'Öppna PDF',
     payNote: 'Betala direkt till åkeriet till kontot på fakturan med referensnumret. Betalningarna går inte via RAHTIS. Fakturan markeras som betald när åkeriet har registrerat betalningen.',
+  },
+
+  /* Счета перевозчика за прямые перевозки, отправленные RAHTIS от его имени (22.11.2026). */
+  carrierInvoices: {
+    title: 'Skickade fakturor',
+    subtitle: 'Fakturor som RAHTIS har upprättat och skickat till dina kunder i ditt företags namn för direkta transporter. Kunden betalar direkt till ditt konto. Markera fakturan som betald när pengarna har kommit in – annars får kunden betalningspåminnelser.',
   },
 
   invite: {
@@ -5613,6 +5620,7 @@ export const sv = {
     'event.company.sensitive_changed': '{field, select, IBAN {Ditt företags kontonummer har ändrats} CONTACT_EMAIL {Ditt företags kontaktmejl har ändrats} BILLING_EMAIL {Ditt företags faktureringsmejl har ändrats} OWNER {Ditt företags huvudanvändare har ändrats} other {Ditt företags uppgifter har ändrats}} – om det inte var du, kontakta supporten',
     'event.invoice.paid_marked': 'Uppdragsgivaren har markerat faktura {number} (order {ref}) som betald – bekräfta när pengarna har kommit',
     'event.invoice.collection': 'Faktura {number} är 14 dagar försenad. Överväg att anlita en inkassobyrå; din betalningsrapport har förifyllts som obetald.',
+    'event.invoice.issued': '{sent, select, yes {Faktura {number} har skickats till {customer}} other {Faktura {number} till {customer} har skapats, men e-postmeddelandet gick inte iväg – ladda ner PDF-filen och skicka den själv}} · {total}, förfallodag {dueOn}',
     'event.trip.stop.done': 'Transport {ref}: {place} markerad som klar ({done}/{total})',
     'event.order.closed': 'Transport {ref} är slutförd, dokumenten finns tillgängliga',
     'event.vehicle.approved': 'Fordonet {plate} är godkänt',
@@ -5792,14 +5800,16 @@ export const sv = {
     'event.installment.cancelled.body': "{name} avbröt förhandlingen.",
     'event.installment.withdrawn': "Förhandlingen avbruten: {plate}",
     'event.installment.withdrawn.body': "Säljaren tog bort fordonet från försäljning.",
-    'event.installment.handover': "Överlåtelse bekräftad: {plate}",
+    'event.installment.handover': "Överlämnandet bekräftat: {plate}",
     'event.installment.handover.body': "Avbetalningstiden har börjat. Fordonet finns nu i köparens fordonspark som utkast – skicka det för godkännande.",
     'event.installment.paid_off': "Avbetalningsköpet är slutbetalt: {plate}",
-    'event.installment.paid_off.body': "Alla delbetalningar är betalda. Säljaren gör överlåtelseanmälan till Traficom inom 7 dagar och köparen registrerar sig som ägare.",
+    'event.installment.paid_off.body': "Alla delbetalningar är betalda. Säljaren gör överlåtelseanmälan till Traficom utan dröjsmål, och köparen registrerar sig som ägare inom 7 dagar från överlåtelsedagen (dagen för den sista betalningen).",
     'event.installment.overdue': "Delbetalning {n} försenad: {plate}",
-    'event.installment.overdue.body': "Delbetalningen förföll {date} och är {days, plural, one {# dag} other {# dagar}} försenad. Betala direkt till säljaren med uppgifterna på fakturan.",
-    'event.installment.threshold': "Gränsen för avbetalningsköp har nåtts: {plate}",
-    'event.installment.threshold.body': "De försenade delbetalningarna uppfyller gränsen i 2 § i den finska lagen om avbetalningsköp (osamaksukauppalaki). Du kan kräva resten genast eller ta tillbaka fordonet enligt lagen med avräkning. Startspärr används inte för indrivning.",
+    'event.installment.overdue.body': "Delbetalningen förföll {date} och är {days, plural, one {# dag} other {# dagar}} försenad. Betala direkt till säljaren enligt uppgifterna på fakturan.",
+    'event.installment.threshold': "Gränsen i lagen om avbetalningsköp har nåtts: {plate}",
+    'event.installment.threshold.body': "De försenade delbetalningarna når gränsen i 2 § i den finska lagen om avbetalningsköp (osamaksukauppalaki). Du kan kräva resten genast eller återta fordonet enligt lagen, med uppgörelse mellan parterna. Startspärr används inte för indrivning.",
+    'event.installment.no_iban': "Fakturan för delbetalning {n} kunde inte skapas: {plate}",
+    'event.installment.no_iban.body': "Ditt kontonummer (IBAN) saknas. Lägg till det under Bankuppgifter – därefter skickas fakturan automatiskt till köparen.",
     'event.maintenance.defect': "{plate}: felanmälan – {area}",
     'event.maintenance.defect_unsafe': "{plate}: FÅR INTE KÖRAS – {area}",
     'event.maintenance.due': "{count, plural, one {Underhåll: # tidsfrist närmar sig} other {Underhåll: # tidsfrister närmar sig}}",

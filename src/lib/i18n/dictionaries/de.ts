@@ -699,6 +699,7 @@ export const de = {
   sites: {
     approveSelf: 'Tag selbst bestätigen',
     approveSelfHint: 'Nach den Entladedaten des Fahrers. Wird mit dem Vermerk „Transportunternehmen“ angezeigt.',
+    approveNoEnd: 'Der Tag hat weder eine Endzeit noch Fuhren und kann daher noch nicht bestätigt werden. Warten Sie, bis der Fahrer den Tag beendet, oder fügen Sie eine Fuhre hinzu.',
     nav: 'Baustellen',
     title: 'Baustellen',
     lede: 'Baustellen, die Sie mit Kipper oder Kassettenfahrzeug anfahren. Der Fahrer erfasst Ankunft und Fuhren in der App. Die Stunden zählen von der Ankunft bis zur letzten Entladung plus Puffer. Der Bauleiter bestätigt die Tage über einen Link.',
@@ -2395,6 +2396,12 @@ export const de = {
     reference: 'Referenz',
     pdf: 'PDF öffnen',
     payNote: 'Zahlen Sie direkt an das Transportunternehmen auf das Konto der Rechnung mit der Referenznummer. Zahlungen laufen nicht über RAHTIS. Die Rechnung wird als bezahlt markiert, sobald das Transportunternehmen die Zahlung erfasst hat.',
+  },
+
+  /* Счета перевозчика за прямые перевозки, отправленные RAHTIS от его имени (22.11.2026). */
+  carrierInvoices: {
+    title: 'Versendete Rechnungen',
+    subtitle: 'Rechnungen, die RAHTIS im Namen Ihres Unternehmens für Direkttransporte erstellt und an Ihre Kunden gesendet hat. Der Kunde zahlt direkt auf Ihr Konto. Markieren Sie die Rechnung als bezahlt, sobald das Geld eingegangen ist – sonst erhält der Kunde Zahlungserinnerungen.',
   },
 
   invite: {
@@ -5639,6 +5646,7 @@ export const de = {
     'event.company.sensitive_changed': '{field, select, IBAN {Das Bankkonto Ihres Unternehmens wurde geändert} CONTACT_EMAIL {Die Kontakt-E-Mail Ihres Unternehmens wurde geändert} BILLING_EMAIL {Die Rechnungs-E-Mail Ihres Unternehmens wurde geändert} OWNER {Der Hauptbenutzer Ihres Unternehmens wurde geändert} other {Die Daten Ihres Unternehmens wurden geändert}} – falls Sie das nicht waren, wenden Sie sich an den Support',
     'event.invoice.paid_marked': 'Der Auftraggeber hat Rechnung {number} (Transport {ref}) als bezahlt markiert – bestätigen Sie, sobald das Geld eingegangen ist',
     'event.invoice.collection': 'Rechnung {number} ist seit 14 Tagen überfällig. Erwägen Sie ein Inkassounternehmen; Ihre Zahlungsmeldung wurde mit „unbezahlt“ vorausgefüllt.',
+    'event.invoice.issued': '{sent, select, yes {Rechnung {number} wurde an {customer} gesendet} other {Rechnung {number} für {customer} wurde erstellt, aber die E-Mail wurde nicht versendet – laden Sie das PDF herunter und senden Sie es selbst}} · {total}, fällig am {dueOn}',
     'event.trip.stop.done': 'Transport {ref}: {place} als erledigt markiert ({done}/{total})',
     'event.order.closed': 'Transport {ref} ist abgeschlossen, die Dokumente sind verfügbar',
     'event.vehicle.approved': 'Fahrzeug {plate} ist freigegeben',
@@ -5821,11 +5829,13 @@ export const de = {
     'event.installment.handover': "Übergabe bestätigt: {plate}",
     'event.installment.handover.body': "Die Ratenlaufzeit hat begonnen. Das Fahrzeug ist jetzt als Entwurf im Fuhrpark des Käufers – reichen Sie es zur Freigabe ein.",
     'event.installment.paid_off': "Ratenkauf abbezahlt: {plate}",
-    'event.installment.paid_off.body': "Alle Raten sind bezahlt. Der Verkäufer meldet die Veräußerung innerhalb von 7 Tagen bei Traficom, und der Käufer lässt sich als Eigentümer eintragen.",
+    'event.installment.paid_off.body': "Alle Raten sind bezahlt. Der Verkäufer meldet die Veräußerung unverzüglich bei Traficom, und der Käufer lässt sich innerhalb von 7 Tagen ab dem Übertragungsdatum (dem Tag der letzten Zahlung) als Eigentümer eintragen.",
     'event.installment.overdue': "Rate {n} überfällig: {plate}",
-    'event.installment.overdue.body': "Die Rate war am {date} fällig und ist {days, plural, one {# Tag} other {# Tage}} überfällig. Zahlen Sie direkt an den Verkäufer mit den Angaben auf der Rechnung.",
-    'event.installment.threshold': "Schwelle beim Ratenkauf erreicht: {plate}",
-    'event.installment.threshold.body': "Die überfälligen Raten erreichen die Schwelle nach § 2 des finnischen Abzahlungsgesetzes (osamaksukauppalaki). Sie können den Restbetrag sofort verlangen oder das Fahrzeug nach dem Gesetz gegen Abrechnung zurücknehmen. Eine Startsperre wird nicht zum Inkasso eingesetzt.",
+    'event.installment.overdue.body': "Die Rate war am {date} fällig und ist {days, plural, one {# Tag} other {# Tage}} überfällig. Zahlen Sie direkt an den Verkäufer – mit den Zahlungsdaten aus der Rechnung.",
+    'event.installment.threshold': "Gesetzliche Verzugsschwelle erreicht: {plate}",
+    'event.installment.threshold.body': "Die überfälligen Raten erreichen die Schwelle nach § 2 des finnischen Abzahlungsgesetzes (osamaksukauppalaki). Sie können den Restbetrag sofort verlangen oder das Fahrzeug nach dem Gesetz gegen Abrechnung zurücknehmen. Eine Wegfahrsperre wird nicht zur Eintreibung von Forderungen eingesetzt.",
+    'event.installment.no_iban': "Rechnung für Rate {n} konnte nicht erstellt werden: {plate}",
+    'event.installment.no_iban.body': "Ihre Kontonummer (IBAN) fehlt. Tragen Sie sie unter Bankverbindung ein – die Rechnung wird dann automatisch an den Käufer gesendet.",
     'event.maintenance.defect': "{plate}: Mangelmeldung – {area}",
     'event.maintenance.defect_unsafe': "{plate}: NICHT FAHRBEREIT – {area}",
     'event.maintenance.due': "{count, plural, one {Wartung: # Termin bald fällig} other {Wartung: # Termine bald fällig}}",

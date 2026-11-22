@@ -45,48 +45,58 @@ export async function sendMaintenanceReminders(now: Date = new Date()): Promise<
     .in('item_id', rows.map((r) => r.item_id));
   const sent = new Set((sentRows ?? []).map((r) => `${r.item_id}|${r.due_key}|${r.stage}`));
 
-  type Due = (typeof rows)[number] & { stages: ReminderStage[]; daysLeft: number | null; kmLeft: number | null; overdue: boolean };
+  type DriverNote = { driver_id: string; code: string; params: { plate: string; kind: string; title: string; when: string } };
+  type Due = (typeof rows)[number] & {
+    stages: ReminderStage[];
+    daysLeft: number | null;
+    kmLeft: number | null;
+    overdue: boolean;
+    driverNote?: DriverNote;
+  };
   const byCompany = new Map<string, Due[]>();
+
+  /*
+   * Компании — до журнала (22.11.2026). Раньше ступень сначала писалась в
+   * журнал, а замороженная компания отсеивалась уже после: напоминание
+   * считалось отправленным и после разморозки не приходило никогда.
+   */
+  const { data: companies, error: companiesError } = await admin
+    .from('companies')
+    .select('id, language, contact_email, frozen_at')
+    .in('id', [...new Set(rows.map((r) => r.company_id))]);
+  if (companiesError) {
+    result.errors.push(companiesError.message);
+    return result;
+  }
+  const active = new Set((companies ?? []).filter((c) => !c.frozen_at).map((c) => c.id));
 
   for (const row of rows) {
     const status = dueStatus(row, today, row.current_km ?? null);
     const key = dueKey(row);
     const fresh = reachedStages(status).filter((stage) => !sent.has(`${row.item_id}|${key}|${stage}`));
     if (fresh.length === 0) continue;
-
-    /* Сначала журнал: второй параллельный запуск упрётся в первичный ключ и ничего не отправит. */
-    const { error: logError } = await admin
-      .from('maintenance_reminders')
-      .insert(fresh.map((stage) => ({ item_id: row.item_id, due_key: key, stage })));
-    if (logError) {
-      if (logError.code !== '23505') result.errors.push(logError.message);
-      continue;
-    }
+    /* Замороженной компании ничего не шлём и в журнал не пишем: разморозят — ступень придёт. */
+    if (!active.has(row.company_id)) continue;
 
     const due: Due = { ...row, stages: fresh, daysLeft: status.daysLeft, kmLeft: status.kmLeft, overdue: status.state === 'OVERDUE' };
     byCompany.set(row.company_id, [...(byCompany.get(row.company_id) ?? []), due]);
 
-    /* Водителю — на его машину и только близкие ступени. */
+    /* Водителю — на его машину и только близкие ступени; уходит после сводки компании, вместе с журналом. */
     if (row.driver_id && row.vehicle_id && fresh.some((s) => DRIVER_STAGES.includes(s))) {
-      const when = [row.next_due_on ? fiDate(row.next_due_on) : null, row.next_due_km != null ? `${spaced(row.next_due_km)} km` : null]
+      /* Дата — YYYY-MM-DD: push и «Сообщения» показывают её на языке водителя (22.11.2026; была финская 1.12.2026). */
+      const when = [row.next_due_on ? row.next_due_on.slice(0, 10) : null, row.next_due_km != null ? `${spaced(row.next_due_km)} km` : null]
         .filter(Boolean)
         .join(' / ');
-      const { error: noteError } = await admin.from('driver_notifications').insert({
+      due.driverNote = {
         driver_id: row.driver_id,
         code: due.overdue ? 'maintenance.overdue' : 'maintenance.due',
         params: { plate: row.plate, kind: row.kind, title: row.title ?? '', when },
-      });
-      if (noteError) result.errors.push(noteError.message);
+      };
     }
-    result.sent += 1;
   }
 
   if (byCompany.size === 0) return result;
 
-  const { data: companies } = await admin
-    .from('companies')
-    .select('id, language, contact_email, frozen_at')
-    .in('id', [...byCompany.keys()]);
   const base = siteUrl();
   const operator = operatorInbox();
 
@@ -121,7 +131,7 @@ export async function sendMaintenanceReminders(now: Date = new Date()): Promise<
       { kind: 'note', value: s.reminderNote },
     ];
 
-    await notify({
+    const delivered = await notify({
       companyId: company.id,
       kind: 'FLEET',
       code: overdue > 0 ? 'maintenance.overdue' : 'maintenance.due',
@@ -158,6 +168,32 @@ export async function sendMaintenanceReminders(now: Date = new Date()): Promise<
           }
         : undefined,
     });
+
+    /*
+     * Журнал — только после того, как сводка легла в кабинет (22.11.2026):
+     * не записалась — ступени остаются неотправленными, и завтрашний запуск
+     * повторит. Письмо — по возможности (src/lib/notify.ts), его сбой
+     * ступень не возвращает. Первичный ключ журнала по-прежнему отсекает
+     * второй параллельный запуск от сообщений водителям.
+     */
+    if (delivered.notificationId === null) {
+      result.errors.push(`сводка обслуживания не записана: ${company.id}`);
+      continue;
+    }
+    for (const d of list) {
+      const { error: logError } = await admin
+        .from('maintenance_reminders')
+        .insert(d.stages.map((stage) => ({ item_id: d.item_id, due_key: dueKey(d), stage })));
+      if (logError) {
+        if (logError.code !== '23505') result.errors.push(logError.message);
+        continue;
+      }
+      if (d.driverNote) {
+        const { error: noteError } = await admin.from('driver_notifications').insert(d.driverNote);
+        if (noteError) result.errors.push(noteError.message);
+      }
+      result.sent += 1;
+    }
     result.companies += 1;
   }
 
@@ -225,12 +261,6 @@ async function blockOverdueInspections(): Promise<{ count: number; errors: strin
     });
   }
   return { count: rows.length, errors: [] };
-}
-
-/** Дата водителю — нейтрально, без языка: 20.11.2026. */
-function fiDate(iso: string): string {
-  const [y, mo, d] = iso.split('-');
-  return `${Number(d)}.${Number(mo)}.${y}`;
 }
 
 function spaced(n: number): string {

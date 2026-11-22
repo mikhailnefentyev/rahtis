@@ -699,6 +699,7 @@ export const pl = {
   sites: {
     approveSelf: 'Zatwierdź dzień samodzielnie',
     approveSelfHint: 'Na podstawie danych kierowcy o rozładunkach. Widoczne jako zatwierdzenie przewoźnika.',
+    approveNoEnd: 'Dzień nie ma godziny zakończenia ani kursów, więc nie można go jeszcze zatwierdzić. Poczekaj, aż kierowca zakończy dzień, lub dodaj kurs.',
     nav: 'Budowy',
     title: 'Budowy',
     lede: 'Budowy, na które jeździsz wywrotką lub autem z kasetą: kierowca rejestruje w aplikacji przyjazd i kursy, godziny liczą się od przyjazdu do ostatniego rozładunku + zapas, a kierownik budowy zatwierdza dni przez link.',
@@ -2394,6 +2395,12 @@ export const pl = {
     reference: 'tytuł/referencja',
     pdf: 'Otwórz PDF',
     payNote: 'Płać bezpośrednio przewoźnikowi na rachunek z faktury, podając numer referencyjny. Płatności nie przechodzą przez RAHTIS. Faktura zostaje oznaczona jako zapłacona, gdy przewoźnik odnotuje płatność.',
+  },
+
+  /* Счета перевозчика за прямые перевозки, отправленные RAHTIS от его имени (22.11.2026). */
+  carrierInvoices: {
+    title: 'Wysłane faktury',
+    subtitle: 'Faktury, które RAHTIS wystawił i wysłał Twoim klientom w imieniu Twojej firmy za przewozy bezpośrednie. Klient płaci bezpośrednio na Twoje konto. Oznacz fakturę jako opłaconą, gdy pieniądze wpłyną – w przeciwnym razie klient będzie otrzymywać przypomnienia o płatności.',
   },
 
   invite: {
@@ -5638,6 +5645,7 @@ export const pl = {
     'event.company.sensitive_changed': '{field, select, IBAN {Rachunek bankowy Twojej firmy został zmieniony} CONTACT_EMAIL {E-mail kontaktowy Twojej firmy został zmieniony} BILLING_EMAIL {E-mail do faktur Twojej firmy został zmieniony} OWNER {Główny użytkownik Twojej firmy został zmieniony} other {Dane Twojej firmy zostały zmienione}} — jeśli to nie Ty, skontaktuj się z pomocą RAHTIS',
     'event.invoice.paid_marked': 'Zleceniodawca oznaczył fakturę {number} (zlecenie {ref}) jako zapłaconą — potwierdź, gdy pieniądze wpłyną',
     'event.invoice.collection': 'Faktura {number} jest 14 dni po terminie. Rozważ przekazanie jej firmie windykacyjnej; Twoje zgłoszenie płatności zostało wstępnie wypełnione jako „Niezapłacone”.',
+    'event.invoice.issued': '{sent, select, yes {Faktura {number} została wysłana do {customer}} other {Faktura {number} dla {customer} została wystawiona, ale e-mail nie został wysłany – pobierz PDF i wyślij go samodzielnie}} · {total}, termin płatności {dueOn}',
     'event.trip.stop.done': 'Przewóz {ref}: {place} oznaczono jako wykonane ({done}/{total})',
     'event.order.closed': 'Przewóz {ref} zakończony, dokumenty są dostępne',
     'event.vehicle.approved': 'Pojazd {plate} jest zatwierdzony',
@@ -5814,17 +5822,19 @@ export const pl = {
     'event.installment.agreed': "Sprzedaż ratalna uzgodniona: {plate}",
     'event.installment.agreed.body': "Umowa {number} i pierwsza faktura są gotowe.",
     'event.installment.cancelled': "Negocjacje anulowane: {plate}",
-    'event.installment.cancelled.body': "{name} anulował negocjacje.",
+    'event.installment.cancelled.body': "Negocjacje anulowane przez: {name}.",
     'event.installment.withdrawn': "Negocjacje anulowane: {plate}",
     'event.installment.withdrawn.body': "Sprzedawca wycofał pojazd ze sprzedaży.",
     'event.installment.handover': "Wydanie potwierdzone: {plate}",
     'event.installment.handover.body': "Okres spłaty rat się rozpoczął. Pojazd jest teraz we flocie kupującego jako szkic – prześlij go do zatwierdzenia.",
     'event.installment.paid_off': "Sprzedaż ratalna spłacona: {plate}",
-    'event.installment.paid_off.body': "Wszystkie raty zostały zapłacone. Sprzedawca w ciągu 7 dni zgłasza zbycie pojazdu do Traficom, a kupujący rejestruje się jako właściciel.",
+    'event.installment.paid_off.body': "Wszystkie raty zostały zapłacone. Sprzedawca niezwłocznie zgłasza zbycie pojazdu do Traficom, a kupujący rejestruje się jako właściciel w ciągu 7 dni od dnia przeniesienia własności (dnia ostatniej płatności).",
     'event.installment.overdue': "Rata {n} po terminie: {plate}",
     'event.installment.overdue.body': "Termin płatności raty minął {date}, opóźnienie: {days, plural, one {# dzień} other {# dni}}. Zapłać bezpośrednio sprzedawcy według danych z faktury.",
-    'event.installment.threshold': "Osiągnięto próg sprzedaży ratalnej: {plate}",
+    'event.installment.threshold': "Osiągnięto ustawowy próg zaległości: {plate}",
     'event.installment.threshold.body': "Zaległe raty osiągają próg z § 2 fińskiej ustawy o sprzedaży ratalnej (osamaksukauppalaki). Możesz zażądać natychmiastowej zapłaty reszty albo odebrać pojazd zgodnie z ustawą, z rozliczeniem. Blokada uruchomienia silnika nie jest stosowana do windykacji.",
+    'event.installment.no_iban': "Nie udało się wystawić faktury za ratę {n}: {plate}",
+    'event.installment.no_iban.body': "Brak Twojego numeru konta (IBAN). Dodaj go w sekcji Dane bankowe – faktura zostanie wtedy automatycznie wysłana do kupującego.",
     'event.maintenance.defect': "{plate}: zgłoszenie usterki – {area}",
     'event.maintenance.defect_unsafe': "{plate}: NIE JECHAĆ – {area}",
     'event.maintenance.due': "{count, plural, one {Serwis: zbliża się # termin} few {Serwis: zbliżają się # terminy} many {Serwis: zbliża się # terminów} other {Serwis: zbliża się # terminu}}",

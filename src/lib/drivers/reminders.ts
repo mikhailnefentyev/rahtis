@@ -78,7 +78,8 @@ export async function sendCertificateReminders(now: Date = new Date()): Promise<
     const { error: noteError } = await admin.from('driver_notifications').insert({
       driver_id: row.driver_id,
       code: 'certificate.expiring',
-      params: { type: row.type, date: row.expires_at },
+      /* Дата — YYYY-MM-DD без языка: push и «Сообщения» водителя показывают её на его языке (22.11.2026). */
+      params: { type: row.type, date: row.expires_at.slice(0, 10) },
     });
     if (noteError) result.errors.push(noteError.message);
 

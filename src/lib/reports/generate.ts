@@ -82,6 +82,20 @@ export type Span = {
   due: { shipper: string; carrier: string } | null;
 };
 
+/**
+ * Понедельник недели, в которую попадает дата (22.11.2026): повторный
+ * выпуск с пятницей в параметре давал «неделю» с пятницы по четверг и
+ * рассылал её всем. Не дата — ошибка, а не прошлая неделя молча.
+ */
+export function mondayOfDay(day: string): string {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(day) || Number.isNaN(Date.parse(`${day}T00:00:00Z`))) {
+    throw new Error(`week must be a date YYYY-MM-DD, got: ${day.slice(0, 20)}`);
+  }
+  const date = new Date(`${day}T00:00:00Z`);
+  const shift = (date.getUTCDay() + 6) % 7;
+  return new Date(date.getTime() - shift * 86_400_000).toISOString().slice(0, 10);
+}
+
 /** Отрезок недели: конец считается от начала, как было. */
 function weekSpan(start: string): Span {
   const end = new Date(new Date(`${start}T00:00:00Z`).getTime() + 6 * 24 * 3600 * 1000);
@@ -123,7 +137,7 @@ type WaitingLine = {
 };
 
 export async function generateWeeklyReports(week?: string): Promise<GenerateResult> {
-  return run(weekSpan(week ?? lastWeek()));
+  return run(weekSpan(week ? mondayOfDay(week) : lastWeek()));
 }
 
 /**
@@ -195,7 +209,8 @@ export async function generatePeriodSettlement(moment?: string): Promise<Generat
  * старой схемы, где Aivomaa была стороной перевозки. Теперь своё задание:
  * начислить сбор за активные машины, выписать счёт и разослать.
  * Повторный запуск ничего не дублирует: начисление и счёт идемпотентны в
- * базе.
+ * базе, а счёт, уже отправленный или оплаченный, второй раз не печатается
+ * и не рассылается (22.11.2026).
  *
  * month — первый день месяца (YYYY-MM-01); по умолчанию прошлый месяц по
  * Хельсинки.
@@ -214,7 +229,7 @@ export async function generateMonthlyFees(month?: string): Promise<GenerateResul
   const { error: invoiceError } = await admin.rpc('invoice_subscription_fees', { p_month: target });
   if (invoiceError) return { week: target, reports: 0, emails: 0, errors: [`счёт за сбор: ${invoiceError.message}`] };
 
-  return issueSubscriptionInvoices(admin, target, null);
+  return issueSubscriptionInvoices(admin, target);
 }
 
 /** Первый день прошлого месяца по Хельсинки. */
@@ -688,7 +703,8 @@ async function issue(
   let ownPrice = 0;
   const ownRows: OwnRow[] = ownOrders.map((order) => {
     ownKm += order.distance_km ?? 0;
-    const cents = order.rate_cents ?? 0;
+    /* Цена с доплатой за ожидание — та же сумма, что в счёте за рейс (22.11.2026). */
+    const cents = (order.rate_cents ?? 0) + (order.waiting_cents ?? 0);
     const cur = asCurrency(order.currency);
     const converted = fx
       ? fx.convert(cents, cur, totalCurrency, helsinkiDate(order.closed_at ?? order.updated_at))
@@ -713,7 +729,8 @@ async function issue(
         total: t.report_.total,
         rows: ownRows,
         distance: String(ownKm),
-        price: `${fx ? '≈ ' : ''}${f.money(ownPrice, totalCurrency)}`,
+        /* «~», а не «≈»: знака «≈» в шрифте PDF нет. */
+        price: `${fx ? '~ ' : ''}${f.money(ownPrice, totalCurrency)}`,
       }
     : null;
 
@@ -899,6 +916,13 @@ async function issue(
 
   const to = company.billing_email ?? company.contact_email;
 
+  /*
+   * Все рейсы недели прямые — сумма в уведомлении из их итога, а не
+   * «0 €» расчётов через площадку (22.11.2026).
+   */
+  const ownOnly = rows.length === 0 && ownRows.length > 0;
+  const ownOnlyEur = ownOnly && totalCurrency === 'EUR';
+
   const result = await notify({
     companyId,
     kind: 'REPORT',
@@ -910,11 +934,11 @@ async function issue(
       from: week,
       to: span.end,
       count: orders.length,
-      amountCents: net,
+      amountCents: ownOnlyEur ? ownPrice : net,
     },
     title: `${texts.title} · ${period}`,
     /* Словами: «2 kuljetusta · 450 €» вместо «2 · 450 €». */
-    body: m('report.notice', { count: orders.length, amount: f.eur(net) }),
+    body: m('report.notice', { count: orders.length, amount: ownOnly ? f.money(ownPrice, totalCurrency) : f.eur(net) }),
     /*
      * Ссылка ведёт на сам отчёт, а не в раздел выполненных рейсов:
      * человек приходил туда, где отчёта нет, и искал его среди
@@ -983,49 +1007,106 @@ async function issue(
 async function issueSubscriptionInvoices(
   admin: ReturnType<typeof createAdminClient>,
   month: string,
-  due: string | null,
 ): Promise<GenerateResult> {
   const errors: string[] = [];
   let reports = 0;
   let emails = 0;
 
-  const { data: fees, error } = await admin
+  const { data: allFees, error } = await admin
     .from('carrier_subscription_fees')
     .select(
-      'id, month, kind, active_vehicles, unit_cents, net_cents, vat_bps, gross_cents, carrier_company_id, invoices(number)',
+      'id, month, kind, active_vehicles, unit_cents, net_cents, vat_bps, gross_cents, carrier_company_id, invoice_id, paid_at, invoices(number, issued_on)',
     )
     .eq('month', month)
-    .not('invoice_id', 'is', null);
+    .order('carrier_company_id');
 
   if (error) return { week: month, reports: 0, emails: 0, errors: [`счета за сбор: ${error.message}`] };
-  if (!fees?.length) return { week: month, reports: 0, emails: 0, errors: [] };
+  if (!allFees?.length) return { week: month, reports: 0, emails: 0, errors: [] };
 
-  const { data: taken } = await admin
+  const { data: taken, error: takenError } = await admin
     .from('carrier_fee_deductions')
     .select('fee_id, amount_cents')
     .in(
       'fee_id',
-      fees.map((f) => f.id),
+      allFees.map((f) => f.id),
     );
+  /* Без удержаний счёт вышел бы на полную сумму вместо остатка — лучше не выпускать вовсе. */
+  if (takenError) return { week: month, reports: 0, emails: 0, errors: [`удержания сбора: ${takenError.message}`] };
 
   const deductedBy = new Map<string, number>();
   for (const row of taken ?? []) {
     deductedBy.set(row.fee_id, (deductedBy.get(row.fee_id) ?? 0) + row.amount_cents);
   }
+  const openOf = (fee: { id: string; gross_cents: number }) => Math.max(fee.gross_cents - (deductedBy.get(fee.id) ?? 0), 0);
 
-  for (const fee of fees) {
+  /*
+   * Сбор с остатком, но без счёта (22.11.2026). База не дополняет счёт, по
+   * которому документ уже выпущен (invoice_subscription_fees): такой сбор
+   * появился позже и ждёт решения оператора — молчать о нём нельзя.
+   */
+  const orphans = allFees.filter((fee) => !fee.invoice_id && openOf(fee) > 0);
+  if (orphans.length > 0) {
+    const { data: owners } = await admin
+      .from('companies')
+      .select('id, name, is_test')
+      .in('id', [...new Set(orphans.map((fee) => fee.carrier_company_id))]);
+    const owner = new Map((owners ?? []).map((c) => [c.id, c]));
+    for (const fee of orphans) {
+      const company = owner.get(fee.carrier_company_id);
+      if (company?.is_test) continue;
+      errors.push(`сбор без счёта (${fee.kind}): ${company?.name ?? fee.carrier_company_id}`);
+    }
+  }
+
+  /*
+   * Счёт — один на компанию и месяц, сборов в нём может быть два: месячный
+   * и год вперёд, купленный в этом же месяце (22.11.2026). Строки и итоги
+   * собираются по счёту, а не по сбору.
+   */
+  type Fee = (typeof allFees)[number];
+  const byInvoice = new Map<string, Fee[]>();
+  for (const fee of allFees) {
+    if (!fee.invoice_id) continue;
+    byInvoice.set(fee.invoice_id, [...(byInvoice.get(fee.invoice_id) ?? []), fee]);
+  }
+
+  /*
+   * Что уже выпущено за этот месяц (22.11.2026). Повторный запуск задания
+   * (сбой посередине, ручной перезапуск) прежде заново печатал и рассылал
+   * каждый счёт и сдвигал срок оплаты на день запуска. Отправленный счёт
+   * больше не трогаем; напечатанный, но не отправленный — досылаем письмом
+   * без второго уведомления в кабинете.
+   */
+  const { data: issued, error: issuedError } = await admin
+    .from('weekly_reports')
+    .select('id, company_id, emailed_at')
+    .eq('week', month)
+    .eq('role', 'CARRIER')
+    .eq('kind', 'SUBSCRIPTION');
+  if (issuedError) return { week: month, reports: 0, emails: 0, errors: [...errors, `выпущенные счета: ${issuedError.message}`] };
+  const issuedBy = new Map((issued ?? []).map((row) => [row.company_id, row]));
+
+  for (const group of byInvoice.values()) {
+    /* Месячный сбор — первой строкой, год вперёд — второй. */
+    const fees = [...group].sort((a, b) => Number(a.kind === 'ANNUAL') - Number(b.kind === 'ANNUAL'));
+    const companyId = fees[0].carrier_company_id;
     try {
-      const number = (fee.invoices as { number: string } | null)?.number ?? '';
-      const deducted = deductedBy.get(fee.id) ?? 0;
-      const open = Math.max(fee.gross_cents - deducted, 0);
+      const invoice = fees[0].invoices as { number: string; issued_on: string } | null;
+      const number = invoice?.number ?? '';
+      const deducted = fees.reduce((sum, fee) => sum + (deductedBy.get(fee.id) ?? 0), 0);
+      const open = fees.reduce((sum, fee) => sum + openOf(fee), 0);
       if (open <= 0) continue;
+
+      const before = issuedBy.get(companyId) ?? null;
+      /* Уже отправлен или оплачен — второй раз не печатаем и не шлём. */
+      if (before?.emailed_at || fees.every((fee) => fee.paid_at)) continue;
 
       const { data: company } = await admin
         .from('companies')
         .select(
           'name, country, language, contact_email, billing_email, frozen_at, business_id, vat_number, legal_name, legal_street, legal_postal_code, legal_city, legal_country, billing_street, billing_postal_code, billing_city, billing_country, billing_reference',
         )
-        .eq('id', fee.carrier_company_id)
+        .eq('id', companyId)
         .single();
 
       if (!company) continue;
@@ -1037,12 +1118,19 @@ async function issueSubscriptionInvoices(
       const operator = await getOperatorProfile();
       const ids = { businessId: 'Y-tunnus', vatNumber: t.report_.vatNumber };
 
-      const monthLabel = `${Number(fee.month.slice(5, 7))}/${fee.month.slice(0, 4)}`;
-      const description = (fee.kind === 'ANNUAL' ? t.report_.feeLineAnnual : t.report_.feeLine)
-        .replace('{month}', monthLabel)
-        .replace('{count}', String(fee.active_vehicles))
-        .replace('{unit}', f.eur(fee.unit_cents))
-        .replace('{vat}', f.percent(fee.vat_bps / 10_000, 1));
+      const monthLabel = `${Number(month.slice(5, 7))}/${month.slice(0, 4)}`;
+      const describe = (fee: Fee) =>
+        (fee.kind === 'ANNUAL' ? t.report_.feeLineAnnual : t.report_.feeLine)
+          .replace('{month}', monthLabel)
+          .replace('{count}', String(fee.active_vehicles))
+          .replace('{unit}', f.eur(fee.unit_cents))
+          .replace('{vat}', f.percent(fee.vat_bps / 10_000, 1));
+      const descriptions = fees.map(describe);
+
+      /* Ставка у сборов одной компании одна: её задаёт страна (25,5 % или обратное начисление). */
+      const vatBps = fees[0].vat_bps;
+      const netCents = fees.reduce((sum, fee) => sum + fee.net_cents, 0);
+      const grossCents = fees.reduce((sum, fee) => sum + fee.gross_cents, 0);
 
       const street = company.billing_street ?? company.legal_street;
       const city = [
@@ -1059,9 +1147,16 @@ async function issueSubscriptionInvoices(
        * получил срок 15.09 — то есть уже прошедший. У сбора нет периода
        * поставки, есть месяц и срок оплаты из договора перевозчика (п. 3.5):
        * четырнадцать дней (прежде здесь стояло 15 — расходилось с договором).
+       *
+       * День выставления — дата счёта в базе (invoices.issued_on), а не день
+       * запуска задания (22.11.2026): повторный запуск срок не сдвигает. Срок
+       * записывается в строку документа (due_date).
        */
-      const dueDay = new Date(Date.now() + 14 * 24 * 3600 * 1000).toISOString().slice(0, 10);
+      const issuedOn = invoice?.issued_on ?? helsinkiDate(new Date().toISOString());
+      const dueDay = new Date(Date.parse(`${issuedOn}T12:00:00Z`) + 14 * 24 * 3600 * 1000).toISOString().slice(0, 10);
       const dueLine = t.report_.dueShipper.replace('{date}', f.date(dueDay));
+      /* Дата счёта — обязательный реквизит счёта с НДС (AVL 209 e §); прежде в PDF её не было. */
+      const invoiceDate = t.report_.invoiceDate.replace('{date}', f.date(issuedOn));
 
       const texts: ReportTexts = {
         parties: [
@@ -1081,13 +1176,13 @@ async function issueSubscriptionInvoices(
           },
         ],
         title: `${t.report_.subTitle} ${number}`,
-        period: `${monthLabel} · ${company.name}`,
+        period: `${monthLabel} · ${company.name} · ${invoiceDate}`,
         due: dueLine,
         /*
          * Общая пометка «суммы без алв, алв добавится к счёту» здесь
          * лгала бы: это и есть счёт, и налог в итоговой сумме уже стоит.
          */
-        vatNote: fee.vat_bps > 0 ? t.report_.subVatNote : t.report_.subVatNoteReverse,
+        vatNote: vatBps > 0 ? t.report_.subVatNote : t.report_.subVatNoteReverse,
         colRef: t.report_.subColRef,
         colDate: t.report_.subColMonth,
         colRoute: t.report_.subColDescription,
@@ -1104,38 +1199,36 @@ async function issueSubscriptionInvoices(
         page: t.report_.page,
       };
 
-      const vatAmount = fee.gross_cents - fee.net_cents;
+      const vatAmount = grossCents - netCents;
 
       const buffer = await renderToBuffer(
         WeeklyReport({
           texts,
-          rows: [
-            {
-              ref: number,
-              closedAt: monthLabel,
-              route: description,
-              vehicle: String(fee.active_vehicles),
-              distance: '',
-              gross: f.eur(fee.unit_cents),
-              commission: null,
-              net: f.eur(fee.net_cents),
-              documents: 0,
-            },
-          ],
-          totals: {
-            gross: f.eur(fee.net_cents),
+          rows: fees.map((fee, index) => ({
+            ref: number,
+            closedAt: monthLabel,
+            route: descriptions[index],
+            vehicle: String(fee.active_vehicles),
+            distance: '',
+            gross: f.eur(fee.unit_cents),
             commission: null,
             net: f.eur(fee.net_cents),
+            documents: 0,
+          })),
+          totals: {
+            gross: f.eur(netCents),
+            commission: null,
+            net: f.eur(netCents),
             deductions: deducted > 0 ? [{ label: t.report_.subDeducted, amount: `−${f.eur(deducted)}` }] : [],
             payable: deducted > 0 ? { label: t.report_.payable, amount: f.eur(open) } : null,
             distance: '',
             vat:
-              fee.vat_bps > 0
+              vatBps > 0
                 ? {
-                    label: t.report_.vatLine.replace('{rate}', f.percent(fee.vat_bps / 10_000, 1)),
+                    label: t.report_.vatLine.replace('{rate}', f.percent(vatBps / 10_000, 1)),
                     amount: f.eur(vatAmount),
                     grossLabel: t.report_.totalWithVat,
-                    gross: f.eur(fee.gross_cents),
+                    gross: f.eur(grossCents),
                   }
                 : null,
           },
@@ -1143,97 +1236,114 @@ async function issueSubscriptionInvoices(
         }),
       );
 
-      const path = `${fee.carrier_company_id}/${month}-subscription.pdf`;
+      /* Один счёт — один файл и одна строка документа, даже когда сборов в нём два. */
+      const path = `${companyId}/${month}-subscription.pdf`;
       const { error: upload } = await admin.storage
         .from(BUCKET)
         .upload(path, buffer, { contentType: 'application/pdf', upsert: true });
       if (upload) throw new Error(`загрузка: ${upload.message}`);
 
-      const { data: saved } = await admin
+      const { data: saved, error: saveError } = await admin
         .from('weekly_reports')
         .upsert(
           {
             week: month,
-            company_id: fee.carrier_company_id,
+            company_id: companyId,
             role: 'CARRIER',
             file_path: path,
             bytes: buffer.length,
             orders_count: 0,
-            gross_cents: fee.net_cents,
-            commission_cents: fee.net_cents,
+            gross_cents: netCents,
+            commission_cents: netCents,
             payout_cents: null,
             commission_bps: null,
-            vat_bps: fee.vat_bps,
+            vat_bps: vatBps,
             kind: 'SUBSCRIPTION',
-            due_date: due,
+            due_date: dueDay,
             generated_at: new Date().toISOString(),
           },
           { onConflict: 'week,company_id,role,kind' },
         )
         .select('id')
         .single();
+      /* Без строки документа повторный запуск не узнал бы, что счёт уже выпущен. */
+      if (saveError) throw new Error(`запись документа: ${saveError.message}`);
 
       reports += 1;
 
       if (company.frozen_at) continue;
       const to = company.billing_email ?? company.contact_email;
 
-      const result = await notify({
-        companyId: fee.carrier_company_id,
-        kind: 'REPORT',
-        code: 'report.subscription',
-        params: {
-          number,
-          month: monthLabel,
-          annual: fee.kind === 'ANNUAL' ? 'yes' : 'no',
-          count: fee.active_vehicles,
-          unitCents: fee.unit_cents,
-          vatBps: fee.vat_bps,
-        },
-        title: `${texts.title} · ${monthLabel}`,
-        body: description,
-        link: saved?.id ? `/reports/${saved.id}` : '/carrier/done',
-        email: to
-          ? {
-              to,
-              template: 'subscription_invoice',
-              subject: t.report_.subEmailSubject.replace('{number}', number).replace('{month}', monthLabel),
-              text: [
-                mail.greeting,
-                '',
-                `${texts.title}, ${monthLabel}.`,
-                '',
-                t.report_.subEmailLine,
-                description,
-                `${t.report_.subNet}: ${f.eur(fee.net_cents)}`,
-                ...(deducted > 0 ? [`${t.report_.subDeducted}: −${f.eur(deducted)}`] : []),
-                `${t.report_.subPayable}: ${f.eur(open)}`,
-                ...(dueLine ? ['', dueLine] : []),
-                '',
-                texts.vatNote,
-                '',
-                t.report_.emailWhere,
-                '',
-                mail.billing.questions(operatorInbox()),
-                '',
-                texts.operator,
-              ].join('\n'),
-            }
-          : undefined,
-      });
+      const email = to
+        ? {
+            to,
+            template: 'subscription_invoice',
+            subject: t.report_.subEmailSubject.replace('{number}', number).replace('{month}', monthLabel),
+            text: [
+              mail.greeting,
+              '',
+              `${texts.title}, ${monthLabel}. ${invoiceDate}.`,
+              '',
+              t.report_.subEmailLine,
+              ...descriptions,
+              `${t.report_.subNet}: ${f.eur(netCents)}`,
+              ...(deducted > 0 ? [`${t.report_.subDeducted}: −${f.eur(deducted)}`] : []),
+              `${t.report_.subPayable}: ${f.eur(open)}`,
+              ...(dueLine ? ['', dueLine] : []),
+              '',
+              texts.vatNote,
+              '',
+              t.report_.emailWhere,
+              '',
+              mail.billing.questions(operatorInbox()),
+              '',
+              texts.operator,
+            ].join('\n'),
+          }
+        : undefined;
 
-      if (result.emailSent) {
+      let emailSent = false;
+      if (before) {
+        /* Документ и уведомление в кабинете уже были — досылаем только письмо. */
+        if (email) {
+          const { sendEmail } = await import('@/lib/email');
+          emailSent = (await sendEmail({ ...email, companyId })).sent;
+        }
+      } else {
+        /* В уведомлении — первый сбор счёта (месячный, если он есть); второй виден в самом счёте. */
+        const lead = fees[0];
+        const result = await notify({
+          companyId,
+          kind: 'REPORT',
+          code: 'report.subscription',
+          params: {
+            number,
+            month: monthLabel,
+            annual: lead.kind === 'ANNUAL' ? 'yes' : 'no',
+            count: lead.active_vehicles,
+            unitCents: lead.unit_cents,
+            vatBps: lead.vat_bps,
+          },
+          title: `${texts.title} · ${monthLabel}`,
+          body: descriptions.join('\n'),
+          link: saved?.id ? `/reports/${saved.id}` : '/carrier/done',
+          email,
+        });
+        emailSent = result.emailSent;
+      }
+
+      if (emailSent) {
         emails += 1;
         await admin
           .from('weekly_reports')
           .update({ emailed_at: new Date().toISOString() })
           .eq('week', month)
-          .eq('company_id', fee.carrier_company_id)
+          .eq('company_id', companyId)
           .eq('role', 'CARRIER')
           .eq('kind', 'SUBSCRIPTION');
       }
     } catch (cause) {
-      errors.push(`${fee.carrier_company_id}: ${cause instanceof Error ? cause.message : String(cause)}`);
+      errors.push(`${companyId}: ${cause instanceof Error ? cause.message : String(cause)}`);
     }
   }
 

@@ -3,6 +3,7 @@ import 'server-only';
 import type { createClient } from '@/lib/supabase/server';
 import { asCurrency, type Currency } from '@/lib/money/currency';
 import { loadFxHistory } from '@/lib/money/fx';
+import { fetchAll } from '@/lib/money/paging';
 import { fuelAmountIn, fuelStats, monthOf, monthsBack, type FuelRow, type FuelStats } from './fuel';
 
 /**
@@ -73,16 +74,25 @@ export async function loadFuelMonth(
   const until = `${nextMonth(month)}-01T00:00:00Z`;
 
   const [{ data: entries }, { data: vehicles }, { data: drivers }, fx] = await Promise.all([
-    supabase
-      .from('fuel_entries')
-      .select(
-        'id, vehicle_id, driver_id, filled_at, product, quantity, unit, amount_cents, currency, odometer_km, full_tank, station, source, receipt_path, qty_report, qty_driver, qty_telematics',
-      )
-      .eq('company_id', companyId)
-      .gte('filled_at', since)
-      .lt('filled_at', until)
-      .order('filled_at', { ascending: true })
-      .limit(5000),
+    /*
+     * Страницами (22.11.2026): PostgREST отдаёт не больше 1000 строк, и
+     * `.limit(5000)` этого не менял — у парка с тысячей заправок за год
+     * расход и суммы молча считались по началу года. Порядок — время и id:
+     * у строк одного отчёта время совпадает.
+     */
+    fetchAll((a, b) =>
+      supabase
+        .from('fuel_entries')
+        .select(
+          'id, vehicle_id, driver_id, filled_at, product, quantity, unit, amount_cents, currency, odometer_km, full_tank, station, source, receipt_path, qty_report, qty_driver, qty_telematics',
+        )
+        .eq('company_id', companyId)
+        .gte('filled_at', since)
+        .lt('filled_at', until)
+        .order('filled_at', { ascending: true })
+        .order('id', { ascending: true })
+        .range(a, b),
+    ),
     supabase.from('vehicles').select('id, plate').eq('company_id', companyId).order('plate'),
     supabase.from('drivers').select('id, full_name').eq('company_id', companyId),
     loadFxHistory(supabase, since, until),

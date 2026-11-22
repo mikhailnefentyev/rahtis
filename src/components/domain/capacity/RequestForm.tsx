@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useState } from 'react';
 import { Button } from '@/components/ui';
 import { requestCapacityAction, type CapacityRequestState } from '@/lib/capacity/actions';
 import { useDocsBlocked } from '@/lib/forwarders/DocsGateProvider';
@@ -31,6 +31,13 @@ export function RequestForm({
   /* Запрос места закрыт экспедитору без принятых документов (11.11.2026). */
   const docsBlocked = useDocsBlocked();
 
+  /*
+   * Выбранный заказ — в состоянии (22.11.2026): валюта в подписи, цена и
+   * даты брались из первого заказа списка и не менялись при выборе
+   * другого — запрос уходил с ценой в чужой валюте и чужими датами.
+   */
+  const [selectedId, setSelectedId] = useState(defaultOrderId);
+
   if (state.done) return <p className="text-[13px] font-semibold text-ok">{c.requestSent}</p>;
 
   if (orders.length === 0) {
@@ -44,7 +51,7 @@ export function RequestForm({
     );
   }
 
-  const first = orders.find((o) => o.id === defaultOrderId) ?? orders[0];
+  const first = orders.find((o) => o.id === selectedId) ?? orders.find((o) => o.id === defaultOrderId) ?? orders[0];
   const field = 'h-9 rounded-control border border-line bg-surface px-2 text-[13px]';
 
   return (
@@ -54,7 +61,7 @@ export function RequestForm({
       <div className="flex flex-wrap items-end gap-2">
         <label className="flex min-w-48 flex-1 flex-col gap-1 text-[13px]">
           <span className="label-micro">{c.yourOrder}</span>
-          <select name="order_id" defaultValue={first.id} className={field}>
+          <select name="order_id" value={first.id} onChange={(event) => setSelectedId(event.target.value)} className={field}>
             {orders.map((o) => (
               <option key={o.id} value={o.id}>
                 {o.label}
@@ -65,6 +72,7 @@ export function RequestForm({
         <label className="flex flex-col gap-1 text-[13px]">
           <span className="label-micro">{c.price.replace('{currency}', first.currency)}</span>
           <input
+            key={first.id}
             name="price"
             required
             inputMode="decimal"
@@ -74,11 +82,11 @@ export function RequestForm({
         </label>
         <label className="flex flex-col gap-1 text-[13px]">
           <span className="label-micro">{c.dateFrom}</span>
-          <input type="date" name="date_from" defaultValue={first.date ?? ''} className={field} />
+          <input key={first.id} type="date" name="date_from" defaultValue={first.date ?? ''} className={field} />
         </label>
         <label className="flex flex-col gap-1 text-[13px]">
           <span className="label-micro">{c.dateTo}</span>
-          <input type="date" name="date_to" defaultValue={first.date ?? ''} className={field} />
+          <input key={first.id} type="date" name="date_to" defaultValue={first.date ?? ''} className={field} />
         </label>
         <label className="flex flex-col gap-1 text-[13px]">
           <span className="label-micro">{c.palletsLabel}</span>

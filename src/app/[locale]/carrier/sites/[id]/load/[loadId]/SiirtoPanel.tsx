@@ -11,7 +11,7 @@ const RECEIVER_KEYS: SiirtoMissing[] = ['receiverCompany', 'receiverAddress', 'r
 /**
  * Реестр SIIRTO у рейса (Финляндия): что не хватает, отправить, исправить,
  * удалить. Неполный документ не отправляется — список «что дописать» с
- * подсказкой, где это делается. Данные пункта приёмки можно дописать здесь.
+ * подсказкой, где это делается; уже отправленный при этом можно удалить. Данные пункта приёмки можно дописать здесь.
  */
 export function SiirtoPanel({
   loadId,
@@ -70,6 +70,16 @@ export function SiirtoPanel({
               <li key={k}>{ts.missing[k]}</li>
             ))}
           </ul>
+          {/* Неполный документ не отправить и не поправить, но отправленный раньше — удалить можно (22.11.2026). */}
+          {documentId && (
+            <form action={send} className="mt-3">
+              <input type="hidden" name="locale" value={locale} />
+              <input type="hidden" name="load_id" value={loadId} />
+              <Button type="submit" name="intent" value="delete" variant="ghost" size="sm" disabled={sending}>
+                {ts.remove}
+              </Button>
+            </form>
+          )}
         </div>
       ) : (
         <form action={send} className="mt-3 flex flex-wrap gap-2">

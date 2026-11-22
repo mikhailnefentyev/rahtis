@@ -5,6 +5,8 @@ import { todayInHelsinki } from '@/lib/dates';
 import { sendEmail } from '@/lib/email';
 import { createFormat } from '@/lib/format';
 import { asCurrency } from '@/lib/money/currency';
+import { fetchAll, fetchIn } from '@/lib/money/paging';
+import { notify } from '@/lib/notify';
 import { paymentReference, standardVatBps } from '@/lib/sites/invoice';
 import { SiteInvoicePdf } from '@/lib/sites/SiteInvoicePdf';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -20,8 +22,9 @@ import { DEFAULT_SCHEDULE, DEFAULT_TERM_DAYS, invoiceCutoff, isSchedule } from '
  * имя, Y-tunnus, IBAN и серия номеров (та же, что у счетов по объектам).
  * Периодичность и срок оплаты согласуют стороны (invoice_agreements,
  * правило — terms.ts); без согласования — раз в неделю и 14 дней.
- * Задание идёт каждое утро: по каждой паре, у которой сегодня срок,
- * RAHTIS составляет счёт из прямых заказов (contract_party CARRIER) —
+ * Задание идёт каждое утро: по каждой паре RAHTIS составляет счёт из
+ * прямых заказов (contract_party CARRIER), закрытых до последней
+ * наступившей границы её периодичности (в обычный день таких нет) —
  * один на пару «перевозчик — заказчик — валюта», а при «сразу после
  * рейса» один на рейс — и отправляет заказчику с PDF; ответ — на почту
  * перевозчика. Деньги идут перевозчику напрямую.
@@ -34,9 +37,14 @@ import { DEFAULT_SCHEDULE, DEFAULT_TERM_DAYS, invoiceCutoff, isSchedule } from '
  *   · заказы, закрытые до START — счёт задним числом за историю никому
  *     не нужен;
  *   · пары «тестовая — боевая» компания.
+ *
+ * Счёт с номером, который не дошёл до письма (сорвалась печать, загрузка
+ * или почта), досылается следующим запуском — redeliver ниже (22.11.2026).
  */
 
 const BUCKET = 'reports';
+/** Сколько дней после выставления недоставленный счёт ещё досылается сам. */
+const REDELIVER_DAYS = 14;
 /** С какой даты закрытия заказы идут в недельный счёт: первая неделя новой схемы. */
 export const START = '2026-11-16';
 
@@ -65,6 +73,8 @@ export type FreightInvoiceStatus =
   | 'NO_CUSTOMER_EMAIL'
   | 'NOT_FOUND';
 
+type Admin = ReturnType<typeof createAdminClient>;
+
 const helsinkiDate = (iso: string) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Helsinki' }).format(new Date(iso));
 
 const addDays = (iso: string, days: number) => {
@@ -78,24 +88,38 @@ const fiDate = (iso: string) => {
   return `${Number(d)}.${Number(m)}.${y}`;
 };
 
-/** Каждое утро: счета по парам, у которых по согласованной периодичности сегодня срок. */
+/** Каждое утро: досылка недоставленных счетов и новые счета по парам — за рейсы до последней границы их периодичности. */
 export async function runFreightInvoices(now: Date = new Date()): Promise<{ sent: number; skipped: number; reasons: Partial<Record<FreightInvoiceStatus, number>>; errors: string[] }> {
   const admin = createAdminClient();
   const today = todayInHelsinki(now);
   /* reasons — почему пропущены (NO_BUYER_VAT, NO_SELLER_VAT…): видно в ответе планировщику. */
   const out = { sent: 0, skipped: 0, reasons: {} as Partial<Record<FreightInvoiceStatus, number>>, errors: [] as string[] };
 
-  const { data: rows, error } = await admin
-    .from('orders')
-    .select('id, ref, closed_at, rate_cents, waiting_cents, currency, shipper_company_id, assigned_company_id, assigned_vehicle_id')
-    .eq('status', 'DONE')
-    .eq('contract_party', 'CARRIER')
-    .is('carrier_invoice_id', null)
-    .not('assigned_company_id', 'is', null)
-    .gte('closed_at', `${START}T00:00:00Z`);
-  if (error) return { ...out, errors: [error.message] };
+  /* Сначала — счета прошлых запусков, у которых есть номер, но нет письма. */
+  await redeliver(admin, today, out);
 
-  const orders = ((rows ?? []) as OrderRow[]).filter(
+  /*
+   * Страницами и в устойчивом порядке (22.11.2026): без `.range()` сервер
+   * отдавал первую тысячу строк и молчал об остальных. Заказы, которым счёт
+   * не положен никогда (внесён вручную, объект, выключенная настройка),
+   * остаются в выборке — без страниц они со временем вытеснили бы живые.
+   */
+  const { data: rows, error } = await fetchAll((from, to) =>
+    admin
+      .from('orders')
+      .select('id, ref, closed_at, rate_cents, waiting_cents, currency, shipper_company_id, assigned_company_id, assigned_vehicle_id')
+      .eq('status', 'DONE')
+      .eq('contract_party', 'CARRIER')
+      .is('carrier_invoice_id', null)
+      .not('assigned_company_id', 'is', null)
+      .gte('closed_at', `${START}T00:00:00Z`)
+      .order('closed_at')
+      .order('id')
+      .range(from, to),
+  );
+  if (error) return { ...out, errors: [...out.errors, error.message] };
+
+  const orders = (rows as OrderRow[]).filter(
     (o) => o.closed_at && helsinkiDate(o.closed_at) >= START && helsinkiDate(o.closed_at) < today && (o.rate_cents ?? 0) > 0,
   );
   if (orders.length === 0) return out;
@@ -105,19 +129,39 @@ export async function runFreightInvoices(now: Date = new Date()): Promise<{ sent
    *   · счёт, внесённый перевозчиком вручную (freight_invoices);
    *   · заказ, из которого создан объект: его работу выставляет счёт по
    *     объекту за подтверждённые дни (security review 17.11.2026).
+   *
+   * Ошибка любого из трёх запросов останавливает запуск (22.11.2026): с
+   * пустым списком пропусков ушли бы двойные счета, без согласованных
+   * условий — счета не с той периодичностью и сроком. Списки id — частями:
+   * длинный `.in()` не помещается в адрес запроса.
    */
   const orderIds = orders.map((o) => o.id);
   const carrierIds = [...new Set(orders.map((o) => o.assigned_company_id!))];
-  const [{ data: manual }, { data: siteJobs }, { data: agreements }] = await Promise.all([
-    admin.from('freight_invoices').select('order_id').in('order_id', orderIds),
-    admin.from('site_jobs').select('order_id').in('order_id', orderIds),
-    admin
-      .from('invoice_agreements')
-      .select('carrier_company_id, shipper_company_id, schedule, payment_term_days')
-      .in('carrier_company_id', carrierIds),
+  const [manual, siteJobs, agreements] = await Promise.all([
+    fetchIn(orderIds, (part) => admin.from('freight_invoices').select('order_id').in('order_id', part)),
+    fetchIn(orderIds, (part) => admin.from('site_jobs').select('order_id').in('order_id', part)),
+    /* Пар у сотни перевозчиков может быть больше тысячи — каждая часть читается страницами. */
+    fetchIn(carrierIds, (part) =>
+      fetchAll((from, to) =>
+        admin
+          .from('invoice_agreements')
+          .select('carrier_company_id, shipper_company_id, schedule, payment_term_days')
+          .in('carrier_company_id', part)
+          .order('carrier_company_id')
+          .order('shipper_company_id')
+          .range(from, to),
+      ),
+    ),
   ]);
-  const skipIds = new Set([...(manual ?? []), ...(siteJobs ?? [])].map((m) => m.order_id));
-  const terms = new Map((agreements ?? []).map((a) => [`${a.carrier_company_id}|${a.shipper_company_id}`, a]));
+  const failed = [
+    manual.error && `счета вручную: ${manual.error.message}`,
+    siteJobs.error && `объекты: ${siteJobs.error.message}`,
+    agreements.error && `условия счетов: ${agreements.error.message}`,
+  ].filter((x): x is string => Boolean(x));
+  if (failed.length > 0) return { ...out, errors: [...out.errors, ...failed] };
+
+  const skipIds = new Set([...manual.data, ...siteJobs.data].map((m) => m.order_id));
+  const terms = new Map(agreements.data.map((a) => [`${a.carrier_company_id}|${a.shipper_company_id}`, a]));
 
   const groups = new Map<string, { orders: OrderRow[]; termDays: number }>();
   for (const order of orders) {
@@ -125,9 +169,13 @@ export async function runFreightInvoices(now: Date = new Date()): Promise<{ sent
     const pair = `${order.assigned_company_id}|${order.shipper_company_id}`;
     const agreed = terms.get(pair);
     const schedule = agreed && isSchedule(agreed.schedule) ? agreed.schedule : DEFAULT_SCHEDULE;
-    /* Сегодня не срок этой пары — или рейс закрыт сегодня и войдёт в следующий счёт. */
+    /*
+     * Рейс закрыт после последней границы периода этой пары — войдёт в
+     * следующий счёт. Граница считается в любой день, не только в понедельник
+     * или 1-го числа: сорвавшийся запуск навёрстывается наутро (terms.ts).
+     */
     const cutoff = invoiceCutoff(schedule, today);
-    if (!cutoff || helsinkiDate(order.closed_at!) >= cutoff) continue;
+    if (helsinkiDate(order.closed_at!) >= cutoff) continue;
     /* «Сразу после рейса» — счёт на каждый рейс; иначе один на пару и валюту. */
     const key = schedule === 'PER_TRIP' ? `${pair}|${order.id}` : `${pair}|${asCurrency(order.currency)}`;
     const group = groups.get(key) ?? { orders: [], termDays: agreed?.payment_term_days ?? DEFAULT_TERM_DAYS };
@@ -156,7 +204,6 @@ async function createFreightInvoice(orders: OrderRow[], termDays: number): Promi
   const carrierId = orders[0].assigned_company_id!;
   const shipperId = orders[0].shipper_company_id;
   const currency = asCurrency(orders[0].currency);
-  const f = createFormat('fi-FI');
 
   const [{ data: seller }, { data: buyer }] = await Promise.all([
     admin
@@ -270,15 +317,15 @@ async function createFreightInvoice(orders: OrderRow[], termDays: number): Promi
    * уже забрал параллельный запуск, этот счёт отменяется целиком — без
    * номера и письма: в серии нет пропусков, рейс не попадает в два счёта.
    */
-  const { data: claimed } = await admin
+  const { data: claimed, error: claimError } = await admin
     .from('orders')
     .update({ carrier_invoice_id: invoice.id })
     .in('id', ids)
     .is('carrier_invoice_id', null)
     .select('id');
-  if ((claimed ?? []).length !== ids.length) {
-    await admin.from('orders').update({ carrier_invoice_id: null }).eq('carrier_invoice_id', invoice.id);
-    await admin.from('carrier_invoices').delete().eq('id', invoice.id);
+  if (claimError || (claimed ?? []).length !== ids.length) {
+    await discard(admin, invoice.id);
+    if (claimError) throw new Error(`закрепление рейсов: ${claimError.message}`);
     return 'BUSY';
   }
 
@@ -287,24 +334,96 @@ async function createFreightInvoice(orders: OrderRow[], termDays: number): Promi
     p_year: Number(issuedOn.slice(0, 4)),
   });
   if (numberError || !number) {
-    await admin.from('orders').update({ carrier_invoice_id: null }).eq('carrier_invoice_id', invoice.id);
-    await admin.from('carrier_invoices').delete().eq('id', invoice.id);
+    await discard(admin, invoice.id);
     throw new Error(`номер счёта: ${numberError?.message}`);
   }
-  const reference = paymentReference(number, seller.country);
-  await admin.from('carrier_invoices').update({ number, reference }).eq('id', invoice.id);
+  /*
+   * Номер не записался — счёт отменяется, рейсы освобождаются и войдут в
+   * счёт следующего запуска (22.11.2026). Прежде ошибку не смотрели: счёт
+   * оставался с временным номером, рейсы — закреплёнными за ним навсегда.
+   */
+  const { error: numberSaveError } = await admin
+    .from('carrier_invoices')
+    .update({ number, reference: paymentReference(number, seller.country) })
+    .eq('id', invoice.id);
+  if (numberSaveError) {
+    await discard(admin, invoice.id);
+    throw new Error(`запись номера счёта: ${numberSaveError.message}`);
+  }
 
-  const vatLabel = `${seller.country === 'FI' ? 'ALV / VAT' : 'VAT'} ${(vat.vatBps / 100).toLocaleString('fi-FI', { maximumFractionDigits: 1 })} %`;
+  return deliverFreightInvoice(admin, invoice.id);
+}
+
+/** Отменить несостоявшийся счёт: освободить рейсы и убрать строку. */
+async function discard(admin: Admin, invoiceId: string): Promise<void> {
+  const { error: release } = await admin.from('orders').update({ carrier_invoice_id: null }).eq('carrier_invoice_id', invoiceId);
+  if (release) console.error('счёт за перевозки: рейсы не освобождены:', release.message);
+  const { error: remove } = await admin.from('carrier_invoices').delete().eq('id', invoiceId);
+  if (remove) console.error('счёт за перевозки: черновик не удалён:', remove.message);
+}
+
+type StoredLine = { date: string; text: string; unit: string; unitCents: number; amountCents: number; orderId?: string };
+type StoredSeller = { name?: string; business_id?: string; vat_id?: string | null; iban?: string; address?: string; email?: string };
+type StoredCustomer = { name?: string; business_id?: string | null; vat_id?: string | null; address?: string; email?: string; reference?: string | null };
+
+/**
+ * PDF и письмо по уже записанному счёту — и при первом выставлении, и при
+ * повторе (22.11.2026; тот же приём, что у первого счёта рассрочки).
+ *
+ * Всё берётся из строки счёта: реквизиты сторон сняты в неё при
+ * выставлении, и повторная отправка не подхватит ни новый IBAN, ни новый
+ * адрес. Из компаний читается только страна — для подписи и пометки НДС.
+ */
+async function deliverFreightInvoice(admin: Admin, invoiceId: string): Promise<'SENT' | 'CREATED'> {
+  const { data: inv, error } = await admin
+    .from('carrier_invoices')
+    .select('id, company_id, customer_company_id, number, reference, issued_on, due_on, period_from, period_to, seller, customer, lines, net_cents, vat_bps, vat_cents, total_cents, currency, file_path')
+    .eq('id', invoiceId)
+    .maybeSingle();
+  if (error || !inv) throw new Error(`счёт не прочитан: ${error?.message ?? invoiceId}`);
+  if (inv.number.startsWith('DRAFT-')) throw new Error(`счёт без номера: ${invoiceId}`);
+
+  const seller = (inv.seller ?? {}) as StoredSeller;
+  const customer = (inv.customer ?? {}) as StoredCustomer;
+  const lines = (inv.lines ?? []) as StoredLine[];
+  const currency = asCurrency(inv.currency);
+  const f = createFormat('fi-FI');
+  const sellerName = seller.name ?? '';
+  const buyerName = customer.name ?? '';
+  const sendTo = (customer.email ?? '').trim().toLowerCase();
+  const replyTo = seller.email ?? '';
+  const trips = new Set(lines.map((l) => l.orderId ?? l.text)).size;
+
+  const { data: countries, error: countryError } = await admin
+    .from('companies')
+    .select('id, country')
+    .in('id', [inv.company_id, inv.customer_company_id].filter((id): id is string => Boolean(id)));
+  if (countryError) throw new Error(`страны сторон: ${countryError.message}`);
+  const countryOf = new Map((countries ?? []).map((c) => [c.id, c.country]));
+  const sellerCountry = countryOf.get(inv.company_id) ?? null;
+  /* Пометка об обратном начислении — по тем же правилам, что при выставлении; ставка — та, что в счёте. */
+  const vat = freightVat(
+    sellerCountry,
+    inv.customer_company_id ? countryOf.get(inv.customer_company_id) : null,
+    customer.vat_id,
+    standardVatBps(sellerCountry),
+    seller.vat_id ?? null,
+  );
+  if (!vat.ok || vat.vatBps !== inv.vat_bps) {
+    throw new Error(`счёт ${inv.number}: ставка НДС в счёте не сходится с правилом, счёт не отправлен`);
+  }
+
+  const vatLabel = `${sellerCountry === 'FI' ? 'ALV / VAT' : 'VAT'} ${(inv.vat_bps / 100).toLocaleString('fi-FI', { maximumFractionDigits: 1 })} %`;
   const buffer = await renderToBuffer(
     SiteInvoicePdf({
-      number,
-      issuedOn: fiDate(issuedOn),
-      dueOn: fiDate(dueOn),
-      reference,
-      seller: { name: sellerName, businessId: seller.business_id, vatId: seller.vat_number, address: sellerAddress, iban: seller.iban, email: replyTo },
-      customer: { name: buyerName, businessId: buyer.business_id, vatId: buyer.vat_number, address: buyerAddress },
-      job: buyer.billing_reference ? `Kuljetukset / Transport services · Viite / Ref. ${buyer.billing_reference}` : 'Kuljetukset / Transport services',
-      period: `${fiDate(periodFrom)} – ${fiDate(periodTo)}`,
+      number: inv.number,
+      issuedOn: fiDate(inv.issued_on),
+      dueOn: fiDate(inv.due_on),
+      reference: inv.reference,
+      seller: { name: sellerName, businessId: seller.business_id ?? '', vatId: seller.vat_id ?? null, address: seller.address ?? '', iban: seller.iban ?? '', email: replyTo },
+      customer: { name: buyerName, businessId: customer.business_id ?? null, vatId: customer.vat_id ?? null, address: customer.address ?? '' },
+      job: customer.reference ? `Kuljetukset / Transport services · Viite / Ref. ${customer.reference}` : 'Kuljetukset / Transport services',
+      period: `${fiDate(inv.period_from)} – ${fiDate(inv.period_to)}`,
       lines: lines.map((l) => ({
         date: fiDate(l.date),
         text: l.text,
@@ -313,10 +432,10 @@ async function createFreightInvoice(orders: OrderRow[], termDays: number): Promi
         unitPrice: f.money(l.unitCents, currency),
         amount: f.money(l.amountCents, currency),
       })),
-      net: f.money(netCents, currency),
+      net: f.money(inv.net_cents, currency),
       vatLabel,
-      vat: f.money(vatCents, currency),
-      total: f.money(totalCents, currency),
+      vat: f.money(inv.vat_cents, currency),
+      total: f.money(inv.total_cents, currency),
       note: [
         'Kuljetukset on toteutettu ja kuitattu RAHTIS-palvelussa. Laskuttaja on kuljetusliike; RAHTIS (Aivomaa Oy) ei ole kuljetussopimuksen osapuoli eikä vastaanota maksua. / Transports performed and confirmed in RAHTIS. The invoice is issued by the carrier; RAHTIS (Aivomaa Oy) is not a party to the transport contract and does not receive the payment.',
         vat.note,
@@ -326,39 +445,100 @@ async function createFreightInvoice(orders: OrderRow[], termDays: number): Promi
     }),
   );
 
-  const path = `freight-invoices/${seller.id}/${number}.pdf`;
+  const path = `freight-invoices/${inv.company_id}/${inv.number}.pdf`;
   const { error: upload } = await admin.storage.from(BUCKET).upload(path, buffer, { contentType: 'application/pdf', upsert: true });
   if (upload) throw new Error(`загрузка счёта: ${upload.message}`);
 
   const text = [
     `Hei,`,
     ``,
-    `liitteenä lasku ${number}: kuljetukset ${fiDate(periodFrom)}–${fiDate(periodTo)} (${orders.length} kpl). Laskuttaja: ${sellerName}.`,
-    `Maksettava ${f.money(totalCents, currency)}, eräpäivä ${fiDate(dueOn)}.`,
-    `Tilinumero (IBAN) ${seller.iban}, viitenumero ${reference}.`,
+    `liitteenä lasku ${inv.number}: kuljetukset ${fiDate(inv.period_from)}–${fiDate(inv.period_to)} (${trips} kpl). Laskuttaja: ${sellerName}.`,
+    `Maksettava ${f.money(inv.total_cents, currency)}, eräpäivä ${fiDate(inv.due_on)}.`,
+    `Tilinumero (IBAN) ${seller.iban}, viitenumero ${inv.reference}.`,
     `Maksu suoritetaan suoraan kuljetusliikkeelle, ei RAHTIS-palvelulle eikä Aivomaa Oy:lle.`,
     ``,
     `Jos laskusta on kysyttävää, vastatkaa tähän viestiin (${replyTo}).`,
     ``,
     `—`,
-    `Attached is invoice ${number} from ${sellerName} for transports ${fiDate(periodFrom)}–${fiDate(periodTo)} (${orders.length}). Amount due ${f.money(totalCents, currency)}, due date ${fiDate(dueOn)}, IBAN ${seller.iban}, reference ${reference}. Pay the carrier directly, not RAHTIS or Aivomaa Oy. Questions about the invoice? Just reply to this email.`,
+    `Attached is invoice ${inv.number} from ${sellerName} for transports ${fiDate(inv.period_from)}–${fiDate(inv.period_to)} (${trips}). Amount due ${f.money(inv.total_cents, currency)}, due date ${fiDate(inv.due_on)}, IBAN ${seller.iban}, reference ${inv.reference}. Pay the carrier directly, not RAHTIS or Aivomaa Oy. Questions about the invoice? Just reply to this email.`,
   ].join('\n');
 
-  const mail = await sendEmail({
-    template: 'freight_invoice',
-    to: sendTo,
-    toName: buyerName,
-    replyTo,
-    subject: `Lasku ${number} · ${sellerName} · kuljetukset ${fiDate(periodFrom)}–${fiDate(periodTo)}`,
-    text,
-    attachments: [{ bucket: BUCKET, path, filename: `Lasku-${number}.pdf` }],
-    companyId: seller.id,
-  });
+  const mail = sendTo
+    ? await sendEmail({
+        template: 'freight_invoice',
+        to: sendTo,
+        toName: buyerName,
+        replyTo,
+        subject: `Lasku ${inv.number} · ${sellerName} · kuljetukset ${fiDate(inv.period_from)}–${fiDate(inv.period_to)}`,
+        text,
+        attachments: [{ bucket: BUCKET, path, filename: `Lasku-${inv.number}.pdf` }],
+        companyId: inv.company_id,
+      })
+    : { sent: false };
 
-  await admin
+  /*
+   * Отметка об отправке обязана записаться: без неё следующий запуск счёл
+   * бы счёт недоставленным и отправил заказчику второе письмо. Ошибка —
+   * наружу, в ответ планировщику.
+   */
+  const { error: saveError } = await admin
     .from('carrier_invoices')
     .update({ file_path: path, sent_to: sendTo, sent_at: mail.sent ? new Date().toISOString() : null })
-    .eq('id', invoice.id);
+    .eq('id', inv.id);
+  if (saveError) throw new Error(`счёт ${inv.number}: отметка об отправке не записана: ${saveError.message}`);
+
+  /*
+   * Перевозчик узнаёт о счёте, выставленном от его имени, в кабинете
+   * (22.11.2026): прежде счёт уходил заказчику, а сам перевозчик его нигде
+   * не видел. «Письмо не ушло» — один раз, при первой печати, а не каждое
+   * утро, пока идут повторы.
+   */
+  if (mail.sent || !inv.file_path) {
+    const total = f.money(inv.total_cents, currency);
+    await notify({
+      companyId: inv.company_id,
+      kind: 'BILLING',
+      code: 'invoice.issued',
+      params: { number: inv.number, customer: buyerName, total, dueOn: inv.due_on, sent: mail.sent ? 'yes' : 'no' },
+      title: mail.sent ? `Lasku ${inv.number} lähetetty: ${buyerName}` : `Lasku ${inv.number} laadittu, sähköposti ei lähtenyt: ${buyerName}`,
+      body: `${total}, eräpäivä ${fiDate(inv.due_on)}`,
+      link: '/carrier/invoices',
+    });
+  }
 
   return mail.sent ? 'SENT' : 'CREATED';
+}
+
+/**
+ * Досылка: счета с номером, но без письма (22.11.2026).
+ *
+ * Номер выдан и рейсы закреплены до печати, поэтому сорвавшаяся печать,
+ * загрузка или почта оставляли счёт неотправленным навсегда: рейсы в
+ * выборку уже не возвращались. Каждый запуск пробует такие счета снова —
+ * две недели после выставления; дальше это уже разговор с перевозчиком,
+ * а не повтор письма. Оплаченный счёт не досылается.
+ */
+async function redeliver(admin: Admin, today: string, out: { sent: number; errors: string[] }): Promise<void> {
+  const { data: pending, error } = await admin
+    .from('carrier_invoices')
+    .select('id, number')
+    .eq('kind', 'FREIGHT')
+    .is('sent_at', null)
+    .is('paid_at', null)
+    .not('number', 'like', 'DRAFT-%')
+    .gte('issued_on', addDays(today, -REDELIVER_DAYS))
+    .order('issued_on')
+    .order('id')
+    .limit(200);
+  if (error) {
+    out.errors.push(`досылка: ${error.message}`);
+    return;
+  }
+  for (const row of pending ?? []) {
+    try {
+      if ((await deliverFreightInvoice(admin, row.id)) === 'SENT') out.sent++;
+    } catch (cause) {
+      out.errors.push(`досылка ${row.number}: ${cause instanceof Error ? cause.message : String(cause)}`);
+    }
+  }
 }

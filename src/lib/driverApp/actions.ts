@@ -4,7 +4,8 @@ import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { normalizeIntlPhone } from '@/lib/country';
-import { getDriverI18n } from '@/lib/driverApp/i18n';
+import { driverLocaleOf, getDriverI18n } from '@/lib/driverApp/i18n';
+import { getDriver } from '@/lib/driverApp/session';
 import { FLASH_COOKIE, flashError } from '@/lib/forms/flash';
 import { isLocale, type Locale, defaultLocale } from '@/lib/i18n';
 import { cancelOrderAction } from '@/lib/orders/matching';
@@ -239,8 +240,15 @@ export async function markReadAction(formData: FormData): Promise<void> {
  * водитель видит, что одно действие не принято. retry — не дошло до
  * базы или она не ответила: событие остаётся и уйдёт со следующей
  * попыткой.
+ *
+ * signin (22.11.2026) — вход водителя потерян: сессия истекла или её
+ * погасило новое приглашение (на iPhone приложение с экрана «Домой»
+ * держит свою сессию, а ссылку открывают в Safari). База отвечает на это
+ * тем же кодом 42501, что и на «рейс не ваш», и раньше вся очередь
+ * уходила в «отклонено» и стиралась. Теперь события остаются на телефоне,
+ * а водитель видит экран входа; после входа очередь уходит сама.
  */
-export type EventResult = { status: 'ok' | 'rejected' | 'retry' };
+export type EventResult = { status: 'ok' | 'rejected' | 'retry' | 'signin' };
 
 /* Коды, при которых повтор ничего не изменит. */
 /* 22P02 — число не разобралось, 22003 — число вне диапазона (кривое поле с телефона): повтор пришлёт то же самое. */
@@ -262,6 +270,13 @@ export async function applyDriverEventAction(formData: FormData): Promise<EventR
   const supabase = await createClient();
   const eventId = str(formData, 'event_id');
   const at = str(formData, 'pressed_at') || undefined;
+
+  /*
+   * Нет входа водителя — ни одно действие не применится, а отказ базы
+   * (42501) неотличим от отказа по существу. Проверяем до действия:
+   * getDriver кэшируется на запрос и стоит один вызов базы.
+   */
+  if (!(await getDriver())) return { status: 'signin' };
 
   let result: EventResult;
 
@@ -615,7 +630,11 @@ export async function pushSubscribeAction(formData: FormData): Promise<{ ok: boo
     p_endpoint: str(formData, 'endpoint'),
     p_p256dh: str(formData, 'p256dh'),
     p_auth: str(formData, 'auth'),
-    p_locale: toLocale(formData.get('locale')),
+    /*
+     * Язык приложения водителя (выбор в профиле или язык телефона), а не
+     * язык адреса: на нём придёт push, пока выбор в профиле пуст (22.11.2026).
+     */
+    p_locale: await driverLocaleOf(toLocale(formData.get('locale'))),
   });
   return { ok: !error };
 }

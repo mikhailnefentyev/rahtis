@@ -699,6 +699,7 @@ export const et = {
   sites: {
     approveSelf: 'Kinnita päev ise',
     approveSelfHint: 'Juhi mahalaadimisandmete põhjal. Kuvatakse märkega „vedaja“.',
+    approveNoEnd: 'Päeval pole lõpuaega ega koormaid, seega ei saa seda veel kinnitada. Oodake, kuni juht päeva lõpetab, või lisage koorem.',
     nav: 'Objektid',
     title: 'Objektid',
     lede: 'Tööobjektid, kuhu sõidate kalluri või kassettautoga: juht märgib rakenduses saabumise ja koormad, tunnid arvestatakse saabumisest viimase mahalaadimiseni + varuaeg, töödejuhataja kinnitab päevad lingi kaudu.',
@@ -2395,6 +2396,12 @@ export const et = {
     reference: 'viitenumber',
     pdf: 'Ava PDF',
     payNote: 'Makske otse vedajale arvel olevale kontole viitenumbriga. Maksed ei liigu RAHTISe kaudu. Arve märgitakse makstuks, kui vedaja on makse kirja pannud.',
+  },
+
+  /* Счета перевозчика за прямые перевозки, отправленные RAHTIS от его имени (22.11.2026). */
+  carrierInvoices: {
+    title: 'Saadetud arved',
+    subtitle: 'Arved, mille RAHTIS on koostanud ja saatnud teie klientidele teie ettevõtte nimel otsevedude eest. Klient maksab otse teie kontole. Märkige arve tasutuks, kui raha on laekunud – muidu saab klient maksemeeldetuletusi.',
   },
 
   invite: {
@@ -5600,6 +5607,7 @@ export const et = {
     'event.company.sensitive_changed': '{field, select, IBAN {Teie ettevõtte pangakontot muudeti} CONTACT_EMAIL {Teie ettevõtte kontakti e-posti muudeti} BILLING_EMAIL {Teie ettevõtte arvete e-posti muudeti} OWNER {Teie ettevõtte peakasutajat muudeti} other {Teie ettevõtte andmeid muudeti}} – kui see polnud teie, võtke ühendust klienditoega',
     'event.invoice.paid_marked': 'Tellija märkis arve {number} (vedu {ref}) tasutuks – kinnitage, kui raha laekub',
     'event.invoice.collection': 'Arve {number} on 14 päeva üle tähtaja. Kaaluge inkassofirma kasutamist; teie makseteade on eeltäidetud kui „tasumata“.',
+    'event.invoice.issued': '{sent, select, yes {Arve {number} on saadetud kliendile {customer}} other {Arve {number} kliendile {customer} on koostatud, kuid e-kiri ei läinud teele – laadige PDF alla ja saatke see ise}} · {total}, maksetähtaeg {dueOn}',
     'event.trip.stop.done': 'Vedu {ref}: {place} märgitud tehtuks ({done}/{total})',
     'event.order.closed': 'Vedu {ref} on lõpetatud, dokumendid on saadaval',
     'event.vehicle.approved': 'Auto {plate} on kinnitatud',
@@ -5782,11 +5790,13 @@ export const et = {
     'event.installment.handover': "Üleandmine kinnitatud: {plate}",
     'event.installment.handover.body': "Järelmaksuperiood algas. Sõiduk on nüüd ostja autopargis mustandina – saatke see kinnitamiseks.",
     'event.installment.paid_off': "Järelmaks on tasutud: {plate}",
-    'event.installment.paid_off.body': "Kõik osamaksed on tasutud. Müüja esitab 7 päeva jooksul Traficomile võõrandamisteatise ja ostja registreerib end omanikuks.",
+    'event.installment.paid_off.body': "Kõik osamaksed on tasutud. Müüja esitab Traficomile viivitamata võõrandamisteatise ja ostja registreerib end omanikuks 7 päeva jooksul võõrandamise kuupäevast (viimase makse kuupäev).",
     'event.installment.overdue': "Osamakse {n} on hilinenud: {plate}",
     'event.installment.overdue.body': "Osamakse tähtpäev oli {date} ja see on hilinenud {days, plural, one {# päeva} other {# päeva}}. Tasuge otse müüjale arve andmete alusel.",
-    'event.installment.threshold': "Järelmaksumüügi piir on täis: {plate}",
-    'event.installment.threshold.body': "Hilinenud osamaksed ületavad Soome järelmaksumüügi seaduse (osamaksukauppalaki) § 2 piiri. Võite nõuda ülejäänud summa kohe või võtta sõiduki seaduse kohaselt tasaarveldusega tagasi. Käivitusblokeeringut võla sissenõudmiseks ei kasutata.",
+    'event.installment.threshold': "Järelmaksumüügi seaduse künnis on täidetud: {plate}",
+    'event.installment.threshold.body': "Hilinenud osamaksed on jõudnud Soome järelmaksumüügi seaduse (osamaksukauppalaki) §-s 2 sätestatud künniseni. Võite nõuda ülejäänud summa kohe või võtta sõiduki seaduse kohaselt lõpparveldusega tagasi. Käivitusblokeeringut võla sissenõudmiseks ei kasutata.",
+    'event.installment.no_iban': "Osamakse {n} arvet ei saanud koostada: {plate}",
+    'event.installment.no_iban.body': "Teie arvelduskonto (IBAN) puudub. Lisage see jaotises Pangaandmed – seejärel saadetakse arve ostjale automaatselt.",
     'event.maintenance.defect': "{plate}: rikketeade – {area}",
     'event.maintenance.defect_unsafe': "{plate}: SÕITA EI TOHI – {area}",
     'event.maintenance.due': "{count, plural, one {Hooldus: # tähtaeg läheneb} other {Hooldus: # tähtaega läheneb}}",

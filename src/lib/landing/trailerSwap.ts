@@ -198,7 +198,7 @@ const en: LandingCopy = {
     },
     {
       q: "What language does the driver use?",
-      a: "Their own: the app works in ten languages, and messages on the job are translated into the driver’s language automatically.",
+      a: "Their own: the app works in 12 languages, and messages on the job are translated into the driver’s language automatically.",
     },
     {
       q: "Does the app work in the port without a connection?",
@@ -638,7 +638,7 @@ const lt: LandingCopy = {
     },
     {
       q: "Kokia kalba vairuotojas naudoja programėlę?",
-      a: "Savo: programėlė veikia dešimčia kalbų, o reiso žinutės automatiškai verčiamos į vairuotojo kalbą.",
+      a: "Savo: programėlė veikia 12 kalbų, o reiso žinutės automatiškai verčiamos į vairuotojo kalbą.",
     },
     {
       q: "Ar programėlė uoste veikia be ryšio?",

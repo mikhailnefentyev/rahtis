@@ -1,5 +1,6 @@
 'use server';
 
+import { parseMoneyCents } from '@/lib/money/amount';
 import { revalidateOrder, revalidateOrderFinished } from '@/lib/orders/revalidate';
 import { getViewer } from '@/lib/auth/viewer';
 import { getDictionary, isLocale, type Locale, defaultLocale } from '@/lib/i18n';
@@ -183,9 +184,10 @@ export async function repriceOrderAction(
 
   const km = Number.parseInt(str(formData, 'distance_km').replace(/\D/g, ''), 10);
   /* Сумма в валюте заказа (она не меняется): знак «€», «zł», «kr» не важен. */
-  const euros = Number.parseFloat(str(formData, 'rate').replace(/[^\d,.-]/g, '').replace(',', '.'));
+  /* Общий разбор: «1.200,50» — 1200,50, «1.200» не угадывается (22.11.2026). */
+  const rateCents = parseMoneyCents(str(formData, 'rate'));
 
-  if (!Number.isFinite(km) || km <= 0 || !Number.isFinite(euros) || euros <= 0) {
+  if (!Number.isFinite(km) || km <= 0 || rateCents === null) {
     return { error: t.validation.positiveNumber, done: false };
   }
 
@@ -193,7 +195,7 @@ export async function repriceOrderAction(
   const { error } = await supabase.rpc('reprice_order', {
     p_order_id: str(formData, 'order_id'),
     p_distance_km: km,
-    p_rate_cents: Math.round(euros * 100),
+    p_rate_cents: rateCents,
   });
 
   if (error) return { error: await explain(locale, error.code, error.message), done: false };

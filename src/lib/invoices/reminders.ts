@@ -166,10 +166,48 @@ async function freightReminders(admin: Admin, today: string, result: InvoiceRemi
 
 type Party = { name?: string; iban?: string; email?: string };
 
+/**
+ * Напоминание заказчику по счёту за перевозки, который RAHTIS составил от
+ * имени перевозчика (carrier_invoices, kind FREIGHT). Тот же текст, что у
+ * счёта объекта (siteReminderText), но без «työmaa»: объекта у счёта нет.
+ * По-фински с английским повтором — как сам счёт и письмо с ним.
+ */
+function freightWeeklyReminderText(input: {
+  stage: 1 | 2;
+  seller: string;
+  number: string;
+  dueOn: string;
+  amount: string;
+  iban: string | null;
+  reference: string;
+  replyTo: string;
+}): { subject: string; text: string } {
+  const second = input.stage === 2;
+  const account = input.iban ? `, tilille ${input.iban}` : '';
+  const accountEn = input.iban ? `, account ${input.iban}` : '';
+  return {
+    subject: `${second ? 'Toinen maksumuistutus' : 'Maksumuistutus'} · Lasku ${input.number} · ${input.seller}`,
+    text: [
+      'Hei,',
+      '',
+      `${second ? 'toinen muistutus' : 'muistutus'}: kuljetuksia koskeva lasku ${input.number} erääntyi ${input.dueOn}, eikä sitä ole merkitty maksetuksi.`,
+      `Maksettava ${input.amount}${account}, viitenumero ${input.reference}. Laskuttaja: ${input.seller}.`,
+      'Maksu suoritetaan suoraan kuljetusliikkeelle, ei RAHTIS-palvelulle eikä Aivomaa Oy:lle.',
+      'Jos lasku on jo maksettu, vastatkaa tähän viestiin, niin laskuttaja merkitsee sen maksetuksi.',
+      `Kysymykset: ${input.replyTo}.`,
+      '',
+      '—',
+      `${second ? 'Second reminder' : 'Reminder'}: invoice ${input.number} from ${input.seller} for transport services was due on ${input.dueOn} and is not marked as paid. Amount ${input.amount}${accountEn}, reference ${input.reference}. Pay the carrier directly, not RAHTIS or Aivomaa Oy. Already paid? Just reply to this email (${input.replyTo}).`,
+      '',
+      'RAHTIS lähettää muistutuksen laskuttajan puolesta. / Sent by RAHTIS on behalf of the invoicing company.',
+    ].join('\n'),
+  };
+}
+
 async function siteReminders(admin: Admin, today: string, result: InvoiceReminderResult) {
   const { data: invoices, error } = await admin
     .from('carrier_invoices')
-    .select('id, company_id, job_id, number, reference, due_on, total_cents, currency, seller, sent_to, sent_at, reminder_1_at, reminder_2_at, collection_hint_at')
+    .select('id, company_id, job_id, kind, number, reference, due_on, total_cents, currency, seller, sent_to, sent_at, reminder_1_at, reminder_2_at, collection_hint_at')
     .is('paid_at', null)
     .not('sent_at', 'is', null)
     .lt('due_on', today)
@@ -215,20 +253,27 @@ async function siteReminders(admin: Admin, today: string, result: InvoiceReminde
       );
       if (ok) {
         const replyTo = seller.email ?? '';
-        const content = siteReminderText({
+        const input = {
           stage: action.email,
           seller: seller.name ?? '',
           number: inv.number,
-          job: (inv.job_id && jobName.get(inv.job_id)) || '',
           dueOn: f.date(`${inv.due_on}T12:00:00Z`),
           amount: f.money(inv.total_cents, inv.currency),
           /* Счёт со снимка счёта: смена IBAN после выставления напоминание не меняет. */
           iban: seller.iban ?? null,
           reference: inv.reference,
           replyTo,
-        });
+        };
+        /*
+         * Счёт за перевозки — без объекта (22.11.2026): общий текст выходил
+         * «lasku 2026-0012 (työmaa )». У него своя фраза — «kuljetukset».
+         */
+        const freight = inv.kind === 'FREIGHT';
+        const content = freight
+          ? freightWeeklyReminderText(input)
+          : siteReminderText({ ...input, job: (inv.job_id && jobName.get(inv.job_id)) || '' });
         const sent = await sendEmail({
-          template: `site_invoice.reminder_${action.email}`,
+          template: `${freight ? 'freight_invoice' : 'site_invoice'}.reminder_${action.email}`,
           to: inv.sent_to,
           replyTo: replyTo || null,
           subject: content.subject,
@@ -241,7 +286,9 @@ async function siteReminders(admin: Admin, today: string, result: InvoiceReminde
 
     if (action.collection && (await claim(admin, 'carrier_invoices', inv.id, 'collection_hint_at'))) {
       result.collections += 1;
-      await notifyCarrier(admin, inv.company_id, { number: inv.number, ref: '' }, inv.job_id ? `/carrier/sites/${inv.job_id}` : '/carrier/sites');
+      /* Счёт за перевозки ведёт на страницу счетов перевозчика, счёт объекта — на объект. */
+      const link = inv.kind === 'FREIGHT' ? '/carrier/invoices' : inv.job_id ? `/carrier/sites/${inv.job_id}` : '/carrier/sites';
+      await notifyCarrier(admin, inv.company_id, { number: inv.number, ref: '' }, link);
     }
   }
 }

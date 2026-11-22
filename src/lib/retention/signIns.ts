@@ -19,6 +19,16 @@ export async function purgeOldSignInDevices(now = new Date()): Promise<{ deleted
 /** Черновики из пересланных писем — 30 дней с получения (PRIVACY, раздел 2). */
 export async function purgeOldEmailDrafts(now = new Date()): Promise<{ deleted: number; errors: string[] }> {
   const cutoff = new Date(now.getTime() - 30 * 86_400_000);
+  /*
+   * Разбор письма оборвался (предел времени функции, выкладка) — строка
+   * навсегда оставалась «в разборе», а повтор письма отсекался как дубль
+   * (22.11.2026). Всё, что висит дольше 15 минут, — «не разобрано».
+   */
+  await createAdminClient()
+    .from('order_email_drafts')
+    .update({ status: 'FAILED', updated_at: now.toISOString() })
+    .eq('status', 'PENDING')
+    .lt('created_at', new Date(now.getTime() - 15 * 60_000).toISOString());
   const { data, error } = await createAdminClient()
     .from('order_email_drafts')
     .delete()

@@ -1,5 +1,6 @@
 'use server';
 
+import { clientIp, throttleAllowed } from '@/lib/auth/throttle';
 import { recordIncident } from './record';
 
 /**
@@ -25,7 +26,15 @@ export async function reportRenderFailure(input: { digest?: string; path?: strin
    * боевой сборке. Он ничего не рассказывает сам по себе, но по нему
    * строка в журнале сходится со строкой в логе хостинга, где текст есть.
    */
-  const digest = typeof input.digest === 'string' ? input.digest.slice(0, 64) : null;
+  const digest = typeof input.digest === 'string' && /^[A-Za-z0-9_-]{1,64}$/.test(input.digest) ? input.digest : null;
+
+  /*
+   * Действие открыто без входа: без предела и с произвольным путём каждый
+   * вызов давал новую запись FATAL и держал /api/health в «degraded»
+   * (22.11.2026). Предел по адресу, путь — только похожий на адрес страницы.
+   */
+  if (!(await throttleAllowed(`render-fail:${await clientIp()}`, { limit: 20, seconds: 600 }))) return;
+  const path = typeof input.path === 'string' && /^\/[A-Za-z0-9\-._~%/()[\]]{0,199}$/.test(input.path.split('?')[0] ?? '') ? input.path : null;
 
   /*
    * Класс ошибки — одно слово вроде ChunkLoadError или TypeError. Без
@@ -46,7 +55,7 @@ export async function reportRenderFailure(input: { digest?: string; path?: strin
   await recordIncident({
     source: 'render',
     severity: benign ? 'WARN' : 'FATAL',
-    path: typeof input.path === 'string' ? input.path : null,
+    path,
     error: Object.assign(new Error(digest ? `digest ${digest}` : 'отрисовка прервана'), {
       name: name ?? 'RenderError',
     }),

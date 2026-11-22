@@ -513,8 +513,8 @@ const en: Texts = {
     preheader: 'Fleet, drivers and your own customers in one place — plus jobs from the load board.',
     body: (carrier) => `${carrier} uses RAHTIS and invites your haulage company to join.`,
     points: [
-      'Jobs from the load board: trailer swaps, containers and express runs in ports and across Finland.',
-      'A driver app in ten languages: arrivals, photos and consignment notes, no paper.',
+      'Jobs from the load board: trailer swaps, containers and express runs in Finland, the Nordics, the Baltics, Poland and Germany.',
+      'A driver app in 12 languages: arrivals, photos and consignment notes, no paper.',
       'Your own customers in the same place: first truck free, each further truck on the road €14.90 a month. First month free.',
     ],
     button: 'Apply — your details are already filled in',
@@ -556,7 +556,7 @@ const en: Texts = {
       body: 'RAHTIS is a transport management system and freight exchange covering the Nordics, the Baltics, Poland and Germany. You manage your fleet, drivers and customers in one place and pick up jobs from the load board when a truck is free: trailer swaps, containers, and van and truck loads.',
       points: [
         'Your own customers and your own jobs: the customer books your truck directly and gets a tracking link. First truck free, each further truck on the road €14.90 a month, no percentage.',
-        'A driver app in ten languages: arrivals, photos, working hours and the consignment note scanned to PDF.',
+        'A driver app in 12 languages: arrivals, photos, working hours and the consignment note scanned to PDF.',
         'Orders from e-mail: forward your customer’s order message, PDF or photo, and RAHTIS turns it into a draft job for the right truck — no retyping.',
         'Job chat is translated automatically: the dispatcher writes in their language, the driver reads and replies in theirs.',
         'Jobs from the load board, from ports and across your whole operating area. The contract of carriage is made directly with the shipper, and no percentage is taken from any job.',

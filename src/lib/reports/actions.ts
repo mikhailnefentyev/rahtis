@@ -28,6 +28,9 @@ export async function generateReportsAction(
   }
 
   const week = String(formData.get('week') ?? '').trim() || undefined;
+  if (week && (!/^\d{4}-\d{2}-\d{2}$/.test(week) || Number.isNaN(Date.parse(`${week}T00:00:00Z`)))) {
+    return { error: t.validation.required, done: null };
+  }
   const result = await generateWeeklyReports(week);
 
   revalidatePath(`/${locale}/admin/billing`);

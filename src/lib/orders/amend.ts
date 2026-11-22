@@ -1,6 +1,7 @@
 'use server';
 
 import { redirect } from 'next/navigation';
+import { parseMoneyCents } from '@/lib/money/amount';
 import { loadEmailChanges } from '@/lib/inbound/changesLoad';
 import { selectedPatches } from '@/lib/inbound/changes';
 import { revalidateOrder } from '@/lib/orders/revalidate';
@@ -437,13 +438,14 @@ export async function proposePriceAction(_previous: AmendState, formData: FormDa
   if (forbidden) return { error: forbidden, saved: false };
   const t = await getDictionary(locale);
 
-  const euros = Number.parseFloat(str(formData, 'rate').replace(/[^\d,.-]/g, '').replace(',', '.'));
-  if (!Number.isFinite(euros) || euros <= 0) return { error: t.validation.positiveNumber, saved: false };
+  /* Общий разбор: «1.200,50» — 1200,50, «1.200» не угадывается (22.11.2026). */
+  const rateCents = parseMoneyCents(str(formData, 'rate'));
+  if (rateCents === null) return { error: t.validation.positiveNumber, saved: false };
 
   const supabase = await createClient();
   const { error } = await supabase.rpc('propose_price', {
     p_order_id: str(formData, 'order_id'),
-    p_rate_cents: Math.round(euros * 100),
+    p_rate_cents: rateCents,
     p_reason: str(formData, 'reason') || undefined,
   });
   if (error) {

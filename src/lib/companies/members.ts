@@ -114,7 +114,7 @@ export async function inviteMemberAction(_previous: MemberState, formData: FormD
       toName: fullName,
       companyName: owner.company.name,
       companyId: owner.company.id,
-      link: confirmLink({ site: siteUrl(), locale: defaultLocale, hashedToken, type: 'invite', next: '/set-password' }),
+      link: confirmLink({ site: siteUrl(), locale, hashedToken, type: 'invite', next: '/set-password' }),
       operatorEmail: operatorInbox(),
       locale: emailLocaleOf(owner.company.language),
     }),

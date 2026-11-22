@@ -228,8 +228,9 @@ export function WeeklyReport({
         {texts.due ? <Text style={s.due}>{texts.due}</Text> : null}
         {texts.vatNote ? <Text style={s.vat}>{texts.vatNote}</Text> : null}
 
+        {/* «Рейсов не было» — только когда пусты все блоки: прямые рейсы и объекты идут ниже (22.11.2026). */}
         {rows.length === 0 ? (
-          <Text style={s.empty}>{texts.empty}</Text>
+          [own, sites].some((section) => section && section.rows.length > 0) ? null : <Text style={s.empty}>{texts.empty}</Text>
         ) : (
           <>
             <View style={s.head} fixed>

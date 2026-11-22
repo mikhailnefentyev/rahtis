@@ -28,7 +28,7 @@ export default async function DriverAppLayout({
   if (!driver) return <NotLinked locale={locale} />;
 
   return (
-    <OutboxProvider>
+    <OutboxProvider driverId={driver.id}>
       {/*
         * Экран по высоте телефона: прокручивается середина, меню — нижняя
         * строка. См. ScrollArea: на iPhone закреплённое меню уезжало.

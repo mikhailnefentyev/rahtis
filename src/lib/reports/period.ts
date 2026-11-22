@@ -4,6 +4,7 @@ import { vatBpsFor, withVat } from '@/lib/config';
 import { createClient } from '@/lib/supabase/server';
 import { asCurrency, type Currency } from '@/lib/money/currency';
 import { loadFxHistory } from '@/lib/money/fx';
+import { fetchAll } from '@/lib/money/paging';
 import type { ClaimKind, ClaimStatus, PartyRole, PeriodClaim, PeriodReportRow } from '@/types/db';
 
 /**
@@ -139,16 +140,27 @@ export async function buildPeriodReport(input: {
 
   const [{ data: rows, error }, { data: claimRows, error: claimsError }, companyName] =
     await Promise.all([
-      supabase.rpc('period_report', {
-        p_from: input.from,
-        p_to: input.to,
-        p_company: company,
-      }),
-      supabase.rpc('period_claims', {
-        p_from: input.from,
-        p_to: input.to,
-        p_company: company,
-      }),
+      /*
+       * Страницами (22.11.2026): PostgREST отдаёт не больше 1000 строк, а
+       * отчёт за год у оператора или крупной компании длиннее — итоги молча
+       * считались бы по первой тысяче рейсов. Порядок — как в функции
+       * (время закрытия, номер), id — чтобы страницы не пересеклись.
+       */
+      fetchAll((a, b) =>
+        supabase
+          .rpc('period_report', { p_from: input.from, p_to: input.to, p_company: company })
+          .order('closed_at')
+          .order('ref')
+          .order('id')
+          .range(a, b),
+      ),
+      fetchAll((a, b) =>
+        supabase
+          .rpc('period_claims', { p_from: input.from, p_to: input.to, p_company: company })
+          .order('created_at')
+          .order('id')
+          .range(a, b),
+      ),
       company
         ? supabase
             .from('companies')

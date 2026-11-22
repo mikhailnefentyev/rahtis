@@ -149,7 +149,7 @@ function num(formData: FormData, key: string): number | null {
   return Number.isFinite(value) && value > 0 ? value : null;
 }
 
-const BODY_TYPES: readonly BodyType[] = ['TIPPER', 'CASSETTE', 'FLATBED', 'CONTAINER', 'CURTAIN', 'BOX', 'TANK', 'OTHER'];
+const BODY_TYPES: readonly BodyType[] = ['TIPPER', 'CASSETTE', 'FLATBED', 'CONTAINER', 'CURTAIN', 'BOX', 'REEFER', 'ISOTHERM', 'LOWBED', 'TANK', 'OTHER'];
 const TRAILER_KINDS: readonly TrailerKind[] = ['SEMI', 'FULL', 'CENTER_AXLE'];
 
 const bodyType = (formData: FormData): BodyType | null => {
@@ -449,7 +449,7 @@ export async function saveTrailerAction(_previous: TrailerState, formData: FormD
 
   const kind = String(formData.get('kind') ?? '');
   const axles = Number(formData.get('axles') ?? 0);
-  const plate = String(formData.get('plate') ?? '').trim().toUpperCase().replace(/s+/g, '');
+  const plate = String(formData.get('plate') ?? '').trim().toUpperCase().replace(/\s+/g, '');
   if (!(TRAILER_KINDS as readonly string[]).includes(kind) || !(axles >= 1 && axles <= 6) || !/^[A-ZÅÄÖ0-9-]{2,12}$/.test(plate)) {
     return { error: t.validation.required, done: false };
   }

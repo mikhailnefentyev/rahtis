@@ -6,7 +6,6 @@ import { cleanArticleHtml, getArticle, splitAfterTakeaways, tableOfContents } fr
 import { withCharts } from '@/lib/blog/charts';
 import { blogLabels, fixText } from '@/lib/blog/visuals';
 import { articleIn, blogPath, isBlogLocale, languagesOf } from '@/lib/blog/translations';
-import type { Locale } from '@/lib/i18n/config';
 import { SITE_URL } from '@/lib/seo';
 import { BlogFrame, formatDate } from '../BlogFrame';
 
@@ -32,8 +31,9 @@ async function load(locale: string, slug: string) {
 async function alternates(original: { slug: string; language: string }) {
   const langs = await languagesOf(original);
   const entries: [string, string][] = langs.map((l) => [l, canonical(l, original.slug)]);
-  const main = langs.includes('fi') ? 'fi' : (original.language as Locale);
-  entries.push(['x-default', canonical(main, original.slug)]);
+  /* x-default — только на язык, на котором статья точно есть: иначе адрес вёл бы в 404. */
+  const main = langs.includes('fi') ? 'fi' : langs[0];
+  if (main) entries.push(['x-default', canonical(main, original.slug)]);
   return Object.fromEntries(entries);
 }
 

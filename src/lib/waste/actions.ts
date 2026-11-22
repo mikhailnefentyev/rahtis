@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { getViewer } from '@/lib/auth/viewer';
 import { getDictionary, isLocale, defaultLocale, type Locale } from '@/lib/i18n';
+import { parseWholeNumber } from '@/lib/fuel/fuel';
 import { createClient } from '@/lib/supabase/server';
 import { isWasteProcedure, normalizeEwc, RECOVERY_CODES } from './shipment';
 import { REGISTRATION_COUNTRIES } from './registrations';
@@ -39,7 +40,8 @@ export async function saveOrderWasteAction(_previous: WasteState, formData: Form
 
   const procedure = String(formData.get('procedure') ?? 'ANNEX_VII');
   const recovery = String(formData.get('recovery_code') ?? '');
-  const qty = Number.parseInt(String(formData.get('quantity_kg') ?? '').replace(/\s/g, ''), 10);
+  /* Килограммы — целое: «1.200» — тысяча двести, а не 1 (22.11.2026). */
+  const qty = parseWholeNumber(String(formData.get('quantity_kg') ?? '')) ?? Number.NaN;
 
   const { error } = await supabase.from('order_waste').upsert({
     order_id: orderId,

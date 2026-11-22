@@ -12,7 +12,7 @@ import { stopTimeZone } from '@/lib/country';
 import { asCurrency, countryCurrency } from '@/lib/money/currency';
 import type { Json } from '@/types/database';
 import { extractFuelReport } from './extract';
-import { FUEL_MAX_QUANTITY, isFuelProduct, normalizeReport, parseNumber, type ImportRow } from './fuel';
+import { FUEL_MAX_QUANTITY, isAmbiguousAmount, isFuelProduct, normalizeReport, parseNumber, parseWholeNumber, type ImportRow } from './fuel';
 
 /**
  * Топливо в кабинете перевозчика: месячный отчёт, ручная заправка, удаление.
@@ -228,7 +228,8 @@ export async function addFuelEntryAction(_previous: FuelEntryState, formData: Fo
   const product = str(formData, 'product');
   const quantity = parseNumber(str(formData, 'quantity'));
   const amount = parseNumber(str(formData, 'amount'));
-  const odometer = parseNumber(str(formData, 'odometer_km'));
+  /* Одометр — целое: «245.300» — тысячи, а не 245 км (22.11.2026). */
+  const odometer = parseWholeNumber(str(formData, 'odometer_km'));
   const filledAt = operationsLocalToIso(str(formData, 'filled_at'), stopTimeZone(company.country));
   const vehicle = str(formData, 'vehicle_id');
   /* Валюта чека из формы; мусор — валюта компании. */
@@ -237,6 +238,8 @@ export async function addFuelEntryAction(_previous: FuelEntryState, formData: Fo
   if (!vehicle || !filledAt || !isFuelProduct(product) || quantity == null || quantity <= 0 || quantity > FUEL_MAX_QUANTITY) {
     return { error: t.validation.required, done: false };
   }
+  /* «1.250» в сумме — тысяча двести пятьдесят или одна целая с четвертью: не угадываем (22.11.2026). */
+  if (isAmbiguousAmount(str(formData, 'amount'))) return { error: t.validation.required, done: false };
 
   const supabase = await createClient();
   const { error } = await supabase.from('fuel_entries').insert({

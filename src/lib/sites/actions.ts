@@ -1,6 +1,7 @@
 'use server';
 
 import { HAZARD_CODES, TREATMENT_CODES } from '@/lib/siirto/document';
+import { parseMoneyCents } from '@/lib/money/amount';
 import { asCurrency } from '@/lib/money/currency';
 import { revalidatePath } from 'next/cache';
 import { requireRole } from '@/lib/auth/guard';
@@ -66,11 +67,18 @@ export async function saveSiteJobAction(_previous: SiteJobState, formData: FormD
   const material = String(formData.get('material_code') ?? '170504');
   /* Ставка в валюте объекта: символ любой («95 €», «950 kr», «400 zł») — оставляем только число.
      Валюту не пишем: новый объект получает валюту компании триггером, у старого она своя. */
-  const rateRaw = String(formData.get('rate') ?? '0').replace(/[^\d,.-]/g, '').replace(',', '.');
-  const rate = Number.parseFloat(rateRaw || '0');
+  const rateText = String(formData.get('rate') ?? '');
+  /*
+   * Разбор — общий с суммами заказа (src/lib/money/amount.ts, 22.11.2026):
+   * раньше первая запятая менялась на точку, и «1.250» выходило 1,25 в час.
+   * Такую запись («1.250», «1,250») не угадываем — форма покажет ошибку.
+   * Пусто или ноль — ставки пока нет.
+   */
+  const rateCents = /[1-9]/.test(rateText) ? parseMoneyCents(rateText) : 0;
   const buffer = Number.parseInt(String(formData.get('buffer_minutes') ?? '30'), 10);
+  const termDays = Number.parseInt(String(formData.get('payment_term_days') ?? ''), 10);
 
-  if (!name || !customer || !PRICING.includes(pricing) || !isMaterialCode(material) || !Number.isFinite(rate) || rate < 0) {
+  if (!name || !customer || !PRICING.includes(pricing) || !isMaterialCode(material) || rateCents === null || rateCents > 10_000_000) {
     return { error: t.validation.required, done: false };
   }
 
@@ -87,9 +95,10 @@ export async function saveSiteJobAction(_previous: SiteJobState, formData: FormD
     customer_city: text(formData, 'customer_city'),
     customer_country: /^[A-Z]{2}$/.test(String(formData.get('customer_country') ?? '')) ? String(formData.get('customer_country')) : 'FI',
     invoice_schedule: formData.get('invoice_schedule') === 'MANUAL' ? 'MANUAL' : 'WEEKLY',
-    payment_term_days: Math.min(90, Math.max(0, Number.parseInt(String(formData.get('payment_term_days') ?? '14'), 10) || 14)),
+    /* 0 — оплата сразу: база это допускает, а `|| 14` молча делал из нуля две недели (22.11.2026). */
+    payment_term_days: Number.isFinite(termDays) ? Math.min(90, Math.max(0, termDays)) : 14,
     pricing,
-    rate_cents: Math.round(rate * 100),
+    rate_cents: rateCents,
     material_code: material,
     receiving_site_id: text(formData, 'receiving_site_id'),
     /* Документы на груз (7.11.2026): загрязнённость и данные для реестра отходов. */
@@ -141,7 +150,8 @@ export async function foremanApproveAction(_previous: ForemanState, formData: Fo
     p_name: name,
     p_note: text(formData, 'note') ?? undefined,
   });
-  if (error) return { error: t.error.generic, done: false };
+  /* 55000 — у дня нет ни конца, ни рейсов: подтверждать нечего (22.11.2026). */
+  if (error) return { error: error.code === '55000' ? t.sites.approveNoEnd : t.error.generic, done: false };
 
   revalidatePath(`/${locale}/site/${token}`);
   return { error: null, done: true };
@@ -153,7 +163,8 @@ export async function carrierApproveDayAction(formData: FormData): Promise<void>
   await requireRole(locale, 'CARRIER');
   const supabase = await createClient();
   const { error } = await supabase.rpc('carrier_site_approve_day', { p_day_id: String(formData.get('day_id') ?? '') });
-  if (error) await flashFailure(locale, error);
+  /* 55000 — у дня нет ни конца, ни рейсов (22.11.2026). */
+  if (error) await flashFailure(locale, error, { '55000': (await getDictionary(locale)).sites.approveNoEnd });
   revalidatePath(`/${locale}/carrier/sites`, 'layout');
 }
 

@@ -41,6 +41,7 @@ export function LoadTicket({
   expectedPlates,
   limitKg,
   comboTareKg,
+  time,
 }: {
   jobId: string;
   dayId: string;
@@ -51,6 +52,11 @@ export function LoadTicket({
   expectedPlates: string[];
   limitKg: number | null;
   comboTareKg: number | null;
+  /**
+   * Новый рейс: границы времени выгрузки (местное время дня объекта) и
+   * обязательно ли оно — в не сегодняшний день без времени рейс не сохранить.
+   */
+  time?: { required: boolean; min: string; max: string };
 }) {
   const { t, locale } = useI18n();
   const w = t.weighTicket;
@@ -246,8 +252,18 @@ export function LoadTicket({
               {(p) => <InputMono {...p} name="ticket_no" value={ticket} onChange={(e) => setTicket(e.target.value)} maxLength={60} />}
             </Field>
             {!load && (
-              <Field label={w.unloadedAt}>
-                {(p) => <InputMono {...p} type="datetime-local" value={unloadedAt} onChange={(e) => setUnloadedAt(e.target.value)} />}
+              <Field label={w.unloadedAt} required={time?.required}>
+                {(p) => (
+                  <InputMono
+                    {...p}
+                    type="datetime-local"
+                    required={time?.required}
+                    min={time?.min}
+                    max={time?.max}
+                    value={unloadedAt}
+                    onChange={(e) => setUnloadedAt(e.target.value)}
+                  />
+                )}
               </Field>
             )}
           </fieldset>

@@ -7,11 +7,15 @@ import { createFormat } from '@/lib/format';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { ibanHoldActive, maskIban } from '@/lib/trust/changes';
 import { lastIbanChange } from '@/lib/trust/sensitive';
-import { paymentReference, invoiceLines, invoiceTotals, standardVatBps, type InvoiceDay } from './invoice';
+import { paymentReference, invoiceLines, invoiceTotals, quantityLabel, standardVatBps, type InvoiceDay, type InvoiceLine } from './invoice';
 import { SiteInvoicePdf } from './SiteInvoicePdf';
 import { dayMinutes } from './work';
 
 const BUCKET = 'reports';
+/** Сколько дней после выставления недоставленный счёт ещё досылается сам. */
+const REDELIVER_DAYS = 14;
+
+type Admin = ReturnType<typeof createAdminClient>;
 
 export type SiteInvoiceResult =
   | { status: 'SENT' | 'CREATED'; invoiceId: string; number: string }
@@ -39,6 +43,10 @@ const fiDate = (iso: string) => {
  *
  * Работает секретным ключом: зовут и кнопка перевозчика (после проверки,
  * что объект его), и задание по понедельникам.
+ *
+ * Перед новым счётом досылаются счета этого объекта, у которых номер есть,
+ * а PDF не получился (22.11.2026): их дни уже закреплены, и без досылки
+ * такой счёт не дошёл бы до клиента никогда.
  */
 export async function createSiteInvoice(
   jobId: string,
@@ -47,11 +55,10 @@ export async function createSiteInvoice(
   options: { ibanConfirmed?: boolean } = {},
 ): Promise<SiteInvoiceResult> {
   const admin = createAdminClient();
-  /* Счёт на финском/английском — формат чисел fi-FI, валюта — из объекта ниже. */
-  const f = createFormat('fi-FI');
 
   const { data: job } = await admin.from('site_jobs').select('*').eq('id', jobId).maybeSingle();
   if (!job) return { status: 'NOT_FOUND' };
+  const redelivered = await redeliverSiteInvoices(admin, job.id);
   /* Объект из заказа самосвалов по договору RAHTIS оплачивает заказчик через
      Aivomaa — свой счёт перевозчика был бы двойным. */
   if (job.order_id) {
@@ -91,7 +98,8 @@ export async function createSiteInvoice(
     .not('approved_at', 'is', null)
     .lte('day', upTo)
     .order('day');
-  if (!days || days.length === 0) return { status: 'NOTHING' };
+  /* Нового выставлять нечего — ответом будет досланный счёт, если он был. */
+  if (!days || days.length === 0) return redelivered ?? { status: 'NOTHING' };
 
   const dayIds = days.map((d) => d.id);
   const [{ data: loads }, { data: drivers }, { data: vehicles }, { data: trailers }] = await Promise.all([
@@ -157,15 +165,15 @@ export async function createSiteInvoice(
    * забрал другой счёт, этот отменяется целиком — без номера и письма,
    * поэтому в серии не остаётся пропусков, а день не попадает в два счёта.
    */
-  const { data: claimed } = await admin
+  const { data: claimed, error: claimError } = await admin
     .from('site_days')
     .update({ invoice_id: invoice.id })
     .in('id', dayIds)
     .is('invoice_id', null)
     .select('id');
-  if ((claimed ?? []).length !== dayIds.length) {
-    await admin.from('site_days').update({ invoice_id: null }).eq('invoice_id', invoice.id);
-    await admin.from('carrier_invoices').delete().eq('id', invoice.id);
+  if (claimError || (claimed ?? []).length !== dayIds.length) {
+    await discard(admin, invoice.id);
+    if (claimError) throw new Error(`закрепление дней: ${claimError.message}`);
     return { status: 'BUSY' };
   }
 
@@ -174,75 +182,162 @@ export async function createSiteInvoice(
     p_year: Number(issuedOn.slice(0, 4)),
   });
   if (numberError || !number) {
-    await admin.from('site_days').update({ invoice_id: null }).eq('invoice_id', invoice.id);
-    await admin.from('carrier_invoices').delete().eq('id', invoice.id);
+    await discard(admin, invoice.id);
     throw new Error(`номер счёта: ${numberError?.message}`);
   }
-  const reference = paymentReference(number, seller.country);
-  await admin.from('carrier_invoices').update({ number, reference }).eq('id', invoice.id);
+  /*
+   * Номер не записался — счёт отменяется, дни освобождаются (22.11.2026).
+   * Прежде ошибку не смотрели: счёт оставался с временным номером, а дни —
+   * закреплёнными за ним навсегда.
+   */
+  const { error: numberSaveError } = await admin
+    .from('carrier_invoices')
+    .update({ number, reference: paymentReference(number, seller.country) })
+    .eq('id', invoice.id);
+  if (numberSaveError) {
+    await discard(admin, invoice.id);
+    throw new Error(`запись номера счёта: ${numberSaveError.message}`);
+  }
+
+  const status = await deliverSiteInvoice(admin, invoice.id);
+  return { status, invoiceId: invoice.id, number };
+}
+
+/** Отменить несостоявшийся счёт: освободить дни и убрать строку. */
+async function discard(admin: Admin, invoiceId: string): Promise<void> {
+  const { error: release } = await admin.from('site_days').update({ invoice_id: null }).eq('invoice_id', invoiceId);
+  if (release) console.error('счёт объекта: дни не освобождены:', release.message);
+  const { error: remove } = await admin.from('carrier_invoices').delete().eq('id', invoiceId);
+  if (remove) console.error('счёт объекта: черновик не удалён:', remove.message);
+}
+
+type StoredSeller = { name?: string; business_id?: string; vat_id?: string | null; iban?: string; address?: string; email?: string };
+type StoredCustomer = { name?: string; business_id?: string | null; vat_id?: string | null; address?: string; email?: string };
+
+/**
+ * PDF и письмо по уже записанному счёту объекта — и при первом
+ * выставлении, и при досылке (22.11.2026; тот же приём, что у первого
+ * счёта рассрочки). Стороны, строки и суммы — из строки счёта: они сняты в
+ * неё при выставлении. Из объекта — только название и адрес для шапки.
+ */
+async function deliverSiteInvoice(admin: Admin, invoiceId: string): Promise<'SENT' | 'CREATED'> {
+  const { data: inv, error } = await admin
+    .from('carrier_invoices')
+    .select('id, company_id, job_id, number, reference, issued_on, due_on, period_from, period_to, seller, customer, lines, net_cents, vat_bps, vat_cents, total_cents, currency')
+    .eq('id', invoiceId)
+    .maybeSingle();
+  if (error || !inv) throw new Error(`счёт не прочитан: ${error?.message ?? invoiceId}`);
+  if (inv.number.startsWith('DRAFT-') || !inv.job_id) throw new Error(`счёт объекта без номера или объекта: ${invoiceId}`);
+
+  const [{ data: job }, { data: company }] = await Promise.all([
+    admin.from('site_jobs').select('name, address').eq('id', inv.job_id).maybeSingle(),
+    admin.from('companies').select('country').eq('id', inv.company_id).maybeSingle(),
+  ]);
+  if (!job) throw new Error(`объект счёта ${inv.number} не найден`);
+
+  /* Счёт на финском/английском — формат чисел fi-FI, валюта — из счёта. */
+  const f = createFormat('fi-FI');
+  const currency = inv.currency;
+  const seller = (inv.seller ?? {}) as StoredSeller;
+  const customer = (inv.customer ?? {}) as StoredCustomer;
+  const lines = (inv.lines ?? []) as InvoiceLine[];
+  const sellerName = seller.name ?? '';
+  const replyTo = seller.email ?? '';
+  const sendTo = customer.email ?? '';
 
   const unit = { h: 'h', kuorma: 'kuorma', t: 't' } as const;
   const buffer = await renderToBuffer(
     SiteInvoicePdf({
-      number,
-      issuedOn: fiDate(issuedOn),
-      dueOn: fiDate(dueOn),
-      reference,
-      seller: { name: seller.legal_name || seller.name, businessId: seller.business_id, vatId: seller.vat_number, address: sellerAddress, iban: seller.iban, email: replyTo },
-      customer: { name: job.customer_name, businessId: job.customer_business_id, vatId: job.customer_vat_id, address: customerAddress },
+      number: inv.number,
+      issuedOn: fiDate(inv.issued_on),
+      dueOn: fiDate(inv.due_on),
+      reference: inv.reference,
+      seller: { name: sellerName, businessId: seller.business_id ?? '', vatId: seller.vat_id ?? null, address: seller.address ?? '', iban: seller.iban ?? '', email: replyTo },
+      customer: { name: customer.name ?? '', businessId: customer.business_id ?? null, vatId: customer.vat_id ?? null, address: customer.address ?? '' },
       job: [job.name, job.address].filter(Boolean).join(', '),
-      period: `${fiDate(invoiceDays[0].day)} – ${fiDate(invoiceDays[invoiceDays.length - 1].day)}`,
+      period: `${fiDate(inv.period_from)} – ${fiDate(inv.period_to)}`,
       lines: lines.map((l) => ({
         date: fiDate(l.date),
         text: l.text,
-        quantity: l.quantity.toLocaleString('fi-FI', { maximumFractionDigits: 2 }),
+        /* Часы — «ч:мм», тонны — до килограмма: количество × цена сходится с суммой строки. */
+        quantity: quantityLabel(l),
         unit: unit[l.unit],
         unitPrice: f.money(l.unitCents, currency),
         amount: f.money(l.amountCents, currency),
       })),
-      net: f.money(totals.netCents, currency),
-      vatLabel: `${seller.country === 'FI' ? 'ALV / VAT' : 'VAT'} ${(totals.vatBps / 100).toLocaleString('fi-FI', { maximumFractionDigits: 1 })} %`,
-      vat: f.money(totals.vatCents, currency),
-      total: f.money(totals.totalCents, currency),
+      net: f.money(inv.net_cents, currency),
+      vatLabel: `${company?.country === 'FI' ? 'ALV / VAT' : 'VAT'} ${(inv.vat_bps / 100).toLocaleString('fi-FI', { maximumFractionDigits: 1 })} %`,
+      vat: f.money(inv.vat_cents, currency),
+      total: f.money(inv.total_cents, currency),
       note: 'Päivät ja kuormat on hyväksytty työmaalla. Kuormien ja punnitusten erittely toimitetaan pyynnöstä. / Days and loads have been approved at the site. A breakdown of loads and weighings is available on request.',
     }),
   );
 
-  const path = `site-invoices/${job.company_id}/${number}.pdf`;
+  const path = `site-invoices/${inv.company_id}/${inv.number}.pdf`;
   const { error: upload } = await admin.storage.from(BUCKET).upload(path, buffer, { contentType: 'application/pdf', upsert: true });
   if (upload) throw new Error(`загрузка счёта: ${upload.message}`);
 
-  const sellerName = seller.legal_name || seller.name;
   const text = [
     `Hei,`,
     ``,
-    `liitteenä lasku ${number}, työmaa ${job.name}. Laskuttaja: ${sellerName}.`,
-    `Maksettava ${f.money(totals.totalCents, currency)}, eräpäivä ${fiDate(dueOn)}.`,
-    `Tilinumero (IBAN) ${seller.iban}, viitenumero ${reference}.`,
+    `liitteenä lasku ${inv.number}, työmaa ${job.name}. Laskuttaja: ${sellerName}.`,
+    `Maksettava ${f.money(inv.total_cents, currency)}, eräpäivä ${fiDate(inv.due_on)}.`,
+    `Tilinumero (IBAN) ${seller.iban}, viitenumero ${inv.reference}.`,
     ``,
     `Jos laskusta on kysyttävää, vastatkaa tähän viestiin (${replyTo}).`,
     ``,
     `—`,
-    `Attached is invoice ${number} from ${sellerName} for worksite ${job.name}. Amount due ${f.money(totals.totalCents, currency)}, due date ${fiDate(dueOn)}, IBAN ${seller.iban}, reference ${reference}. Questions about the invoice? Just reply to this email.`,
+    `Attached is invoice ${inv.number} from ${sellerName} for worksite ${job.name}. Amount due ${f.money(inv.total_cents, currency)}, due date ${fiDate(inv.due_on)}, IBAN ${seller.iban}, reference ${inv.reference}. Questions about the invoice? Just reply to this email.`,
   ].join('\n');
 
-  const mail = await sendEmail({
-    template: 'site_invoice',
-    to: job.customer_email,
-    toName: job.customer_name,
-    replyTo,
-    subject: `Lasku ${number} · ${sellerName} · ${job.name}`,
-    text,
-    attachments: [{ bucket: BUCKET, path, filename: `Lasku-${number}.pdf` }],
-    companyId: job.company_id,
-  });
+  const mail = sendTo
+    ? await sendEmail({
+        template: 'site_invoice',
+        to: sendTo,
+        toName: customer.name ?? '',
+        replyTo,
+        subject: `Lasku ${inv.number} · ${sellerName} · ${job.name}`,
+        text,
+        attachments: [{ bucket: BUCKET, path, filename: `Lasku-${inv.number}.pdf` }],
+        companyId: inv.company_id,
+      })
+    : { sent: false };
 
-  await admin
+  /* Без этой отметки досылка отправила бы клиенту второе письмо — ошибка идёт наружу. */
+  const { error: saveError } = await admin
     .from('carrier_invoices')
-    .update({ file_path: path, sent_to: job.customer_email, sent_at: mail.sent ? new Date().toISOString() : null })
-    .eq('id', invoice.id);
+    .update({ file_path: path, sent_to: sendTo, sent_at: mail.sent ? new Date().toISOString() : null })
+    .eq('id', inv.id);
+  if (saveError) throw new Error(`счёт ${inv.number}: отметка об отправке не записана: ${saveError.message}`);
 
-  return { status: mail.sent ? 'SENT' : 'CREATED', invoiceId: invoice.id, number };
+  return mail.sent ? 'SENT' : 'CREATED';
+}
+
+/**
+ * Досылка счетов объекта: номер выдан, дни закреплены, а PDF нет —
+ * сорвалась печать или загрузка (22.11.2026). Счёт с готовым PDF, у
+ * которого не ушло только письмо, не трогаем: перевозчику уже сказано
+ * скачать PDF и отправить самому, второе письмо от RAHTIS было бы лишним.
+ * Возвращает итог последнего досланного счёта или null.
+ */
+async function redeliverSiteInvoices(admin: Admin, jobId: string): Promise<SiteInvoiceResult | null> {
+  const { data: pending, error } = await admin
+    .from('carrier_invoices')
+    .select('id, number')
+    .eq('job_id', jobId)
+    .is('sent_at', null)
+    .is('file_path', null)
+    .is('paid_at', null)
+    .not('number', 'like', 'DRAFT-%')
+    .gte('issued_on', addDays(todayInHelsinki(), -REDELIVER_DAYS))
+    .order('issued_on')
+    .order('id');
+  if (error) throw new Error(`досылка счетов объекта: ${error.message}`);
+  let last: SiteInvoiceResult | null = null;
+  for (const row of pending ?? []) {
+    last = { status: await deliverSiteInvoice(admin, row.id), invoiceId: row.id, number: row.number };
+  }
+  return last;
 }
 
 /**

@@ -1,5 +1,6 @@
 'use server';
 
+import { parseMoneyCents } from '@/lib/money/amount';
 import { isDowntimeConflict } from '@/lib/maintenance/conflict';
 import { perKmTotal } from './routePricing';
 import { flashError } from '@/lib/forms/flash';
@@ -45,13 +46,11 @@ const str = (form: FormData, key: string): string =>
 /**
  * Сумма из формы в центы: деньги в системе целые (см. lib/config.ts).
  * Знак валюты не важен — «480 €», «1200 zł», «5000 kr» читаются как число;
- * валюта приходит отдельным полем.
+ * валюта приходит отдельным полем. Разбор — общий (lib/money/amount):
+ * «1.200,50» — это 1200,50, а «1.200» не угадывается (22.11.2026: прежде
+ * оба читались как 1,20).
  */
-function toCents(value: string): number | null {
-  const normalised = value.replace(/[^\d,.-]/g, '').replace(',', '.');
-  const euros = Number.parseFloat(normalised);
-  return Number.isFinite(euros) && euros > 0 ? Math.round(euros * 100) : null;
-}
+const toCents = (value: string): number | null => parseMoneyCents(value);
 
 type StopInput = {
   role: StopRole;

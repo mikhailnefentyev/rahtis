@@ -1,12 +1,12 @@
 import 'server-only';
 
 import { createAdminClient } from '@/lib/supabase/admin';
-import { emailFrom, resendApiKey } from './config';
+import { emailFrom, emailReplyTo, resendApiKey } from './config';
 import { finishEmail, recordEmail } from './outbox';
 import type { EmailAttachment, EmailMessage, EmailProvider, EmailResult } from './types';
 
 /** Ограничение Resend — 40 МБ на письмо. Держимся заметно ниже. */
-const ATTACHMENT_LIMIT_BYTES = 8 * 1024 * 1024;
+const ATTACHMENT_LIMIT_BYTES = 10 * 1024 * 1024;
 
 /**
  * Файлы из Storage в вид, который понимает Resend.
@@ -87,7 +87,7 @@ export const resendProvider: EmailProvider = {
         body: JSON.stringify({
           from: emailFrom(),
           to: [message.to],
-          reply_to: message.replyTo ?? undefined,
+          reply_to: message.replyTo ?? emailReplyTo(),
           subject: message.subject,
           text: message.text,
           html: message.html ?? undefined,

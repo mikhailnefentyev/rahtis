@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { todayInHelsinki } from '@/lib/dates';
-import { getDriverEarnings, monthOf, shiftMonth } from '@/lib/driverApp/earnings';
+import { currentMonth, getDriverEarnings, monthOf, shiftMonth } from '@/lib/driverApp/earnings';
 import { getDriver } from '@/lib/driverApp/session';
 import { isLocale } from '@/lib/i18n';
 import { getDriverI18n } from '@/lib/driverApp/i18n';
@@ -25,15 +24,13 @@ export default async function DriverEarnings({
   const [{ locale }, { month: asked }] = await Promise.all([params, searchParams]);
   if (!isLocale(locale)) notFound();
 
-  const month = monthOf(asked);
-  const [driver, earnings, { t, m, f }] = await Promise.all([
-    getDriver(),
-    getDriverEarnings(month),
-    getDriverI18n(locale),
-  ]);
+  /* «Сейчас» — по поясу компании водителя, как и сами дни заработка (22.11.2026; было по Хельсинки). */
+  const driver = await getDriver();
   if (!driver) return null;
+  const current = currentMonth(driver.company_country);
+  const month = monthOf(asked, current);
+  const [earnings, { t, m, f }] = await Promise.all([getDriverEarnings(month), getDriverI18n(locale)]);
 
-  const current = todayInHelsinki().slice(0, 7);
   const monthName = new Intl.DateTimeFormat(t.meta.intl, { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(
     new Date(`${month}-01T12:00:00Z`),
   );

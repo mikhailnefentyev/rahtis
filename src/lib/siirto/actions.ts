@@ -46,18 +46,25 @@ export async function sendToSiirtoAction(_previous: SiirtoState, formData: FormD
   if (!/^[0-9a-f-]{36}$/i.test(loadId)) return { error: t.error.forbidden, sent: false };
   const data = await loadSiirto(loadId, viewer.company!);
   if (!data) return { error: t.error.forbidden, sent: false };
-  if (!data.result.ok) return { error: t.siirto.incomplete, sent: false };
+  const remove = formData.get('intent') === 'delete';
+  const result = data.result;
+  /*
+   * Неполный документ не отправляется, но удалить уже отправленный можно
+   * всегда (22.11.2026): после правки груза или объекта рейс перестаёт
+   * быть «полным», а документ в реестре остаётся — раньше отказ стоял до
+   * ветки удаления, и убрать его было нечем.
+   */
+  if (!remove && !result.ok) return { error: t.siirto.incomplete, sent: false };
 
   const admin = createAdminClient();
-  const remove = formData.get('intent') === 'delete';
   try {
-    if (remove) {
+    if (remove || !result.ok) {
       if (data.documentId) await deleteShippingDocument(config, data.documentId);
       await admin.from('site_loads').update({ siirto_document_id: null, siirto_sent_at: null, siirto_error: null }).eq('id', loadId);
     } else {
       const id = data.documentId
-        ? await updateShippingDocument(config, data.documentId, data.result.body)
-        : await createShippingDocument(config, data.result.body);
+        ? await updateShippingDocument(config, data.documentId, result.body)
+        : await createShippingDocument(config, result.body);
       await admin
         .from('site_loads')
         .update({ siirto_document_id: id || data.documentId, siirto_sent_at: new Date().toISOString(), siirto_error: null })

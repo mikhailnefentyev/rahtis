@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { cn } from '@/lib/cn';
+import { blobFits } from '@/lib/driverApp/outboxPolicy';
 import { compressPhoto } from '@/lib/driverApp/photo';
 import { useI18n } from '@/lib/i18n/provider';
 import { DEFECT_AREAS, type DefectArea, type DefectSeverity, type MaintenanceKind } from '@/lib/maintenance/status';
@@ -61,7 +62,15 @@ export function DefectScreen({ state }: { state: DefectState }) {
 
   async function onPhoto(file: File | undefined) {
     if (!file) return;
-    setPhoto(await compressPhoto(file));
+    const blob = await compressPhoto(file);
+    /* Снимок не сжался и тяжелее, чем принимает сервер: не прикрепляем, водитель снимает заново (22.11.2026). */
+    if (!blobFits(blob.size)) {
+      setPhoto(null);
+      setError(t.driverApp.failed);
+      return;
+    }
+    setError(null);
+    setPhoto(blob);
   }
 
   async function save() {
@@ -74,7 +83,7 @@ export function DefectScreen({ state }: { state: DefectState }) {
 
     setBusy(true);
     try {
-      await enqueue(
+      const kept = await enqueue(
         'DEFECT',
         {
           data: JSON.stringify({
@@ -89,6 +98,8 @@ export function DefectScreen({ state }: { state: DefectState }) {
         },
         photo ?? undefined,
       );
+      /* Не записалось и не ушло — форма остаётся заполненной, ошибка в полосе сверху. */
+      if (!kept) return;
       setArea(null);
       setSeverity(null);
       setDescription('');

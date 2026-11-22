@@ -699,6 +699,7 @@ export const lv = {
   sites: {
     approveSelf: 'Apstiprināt dienu pašiem',
     approveSelfHint: 'Pēc vadītāja izkraušanas datiem. Būs redzams ar atzīmi „pārvadātājs“.',
+    approveNoEnd: 'Dienai nav beigu laika un nav kravu, tāpēc to vēl nevar apstiprināt. Pagaidiet, līdz vadītājs pabeidz dienu, vai pievienojiet kravu.',
     nav: 'Objekti',
     title: 'Objekti',
     lede: 'Būvlaukumi, uz kuriem braucat ar pašizgāzēju vai kasešu auto: vadītājs lietotnē atzīmē ierašanos un kravas, stundas skaita no ierašanās līdz pēdējai izkraušanai + rezerve, darbu vadītājs apstiprina dienas pa saiti.',
@@ -2395,6 +2396,12 @@ export const lv = {
     reference: 'atsauce',
     pdf: 'Atvērt PDF',
     payNote: 'Maksājiet tieši pārvadātājam uz rēķinā norādīto kontu ar atsauces numuru. Maksājumi neiet caur RAHTIS. Rēķins tiek atzīmēts kā apmaksāts, kad pārvadātājs ir reģistrējis maksājumu.',
+  },
+
+  /* Счета перевозчика за прямые перевозки, отправленные RAHTIS от его имени (22.11.2026). */
+  carrierInvoices: {
+    title: 'Nosūtītie rēķini',
+    subtitle: 'Rēķini, kurus RAHTIS ir sagatavojis un nosūtījis jūsu klientiem jūsu uzņēmuma vārdā par tiešajiem pārvadājumiem. Klients maksā tieši uz jūsu kontu. Atzīmējiet rēķinu kā apmaksātu, kad nauda ir saņemta, – citādi klients saņems maksājuma atgādinājumus.',
   },
 
   invite: {
@@ -5639,6 +5646,7 @@ export const lv = {
     'event.company.sensitive_changed': '{field, select, IBAN {Jūsu uzņēmuma bankas konts ir mainīts} CONTACT_EMAIL {Jūsu uzņēmuma kontakta e-pasts ir mainīts} BILLING_EMAIL {Jūsu uzņēmuma e-pasts rēķiniem ir mainīts} OWNER {Jūsu uzņēmuma galvenais lietotājs ir mainīts} other {Jūsu uzņēmuma dati ir mainīti}} — ja tas nebijāt jūs, sazinieties ar klientu atbalstu',
     'event.invoice.paid_marked': 'Pasūtītājs atzīmēja rēķinu {number} (pasūtījums {ref}) kā apmaksātu — apstipriniet, kad nauda pienāk',
     'event.invoice.collection': 'Rēķina {number} apmaksa kavēta 14 dienas. Apsveriet parādu piedziņas uzņēmuma iesaistīšanu; jūsu maksājuma ziņojums ir iepriekš aizpildīts kā „neapmaksāts“.',
+    'event.invoice.issued': '{sent, select, yes {Rēķins {number} nosūtīts klientam {customer}} other {Rēķins {number} klientam {customer} ir sagatavots, taču e-pasts netika nosūtīts – lejupielādējiet PDF un nosūtiet to paši}} · {total}, apmaksas termiņš {dueOn}',
     'event.trip.stop.done': 'Pārvadājums {ref}: {place} atzīmēts kā izpildīts ({done}/{total})',
     'event.order.closed': 'Pārvadājums {ref} ir pabeigts, dokumenti pieejami',
     'event.vehicle.approved': 'Auto {plate} ir apstiprināts',
@@ -5809,7 +5817,7 @@ export const lv = {
     'event.invoice.terms_rejected': "{name} noraidīja ierosinātos rēķinu noteikumus",
     'event.invoice.terms_rejected.body': "Rēķinu biežumu un apmaksas termiņu jūs saskaņojat ar katru partneri: viena puse ierosina, otra apstiprina. Kamēr nav vienots citādi, rēķins tiek nosūtīts reizi nedēļā un apmaksas termiņš ir 14 dienas.",
     'event.installment.offer': "Jauns piedāvājums transportlīdzeklim {plate}",
-    'event.installment.offer.body': "{name} piedāvā pirkumu uz nomaksu.",
+    'event.installment.offer.body': "{name} piedāvā pirkt uz nomaksu.",
     'event.installment.counter': "Jauni noteikumi: {plate}",
     'event.installment.counter.body': "{name} ierosina mainītus noteikumus.",
     'event.installment.agreed': "Pirkums uz nomaksu saskaņots: {plate}",
@@ -5821,11 +5829,13 @@ export const lv = {
     'event.installment.handover': "Nodošana apstiprināta: {plate}",
     'event.installment.handover.body': "Nomaksas periods ir sācies. Transportlīdzeklis tagad ir pircēja autoparkā kā melnraksts – iesniedziet to apstiprināšanai.",
     'event.installment.paid_off': "Pirkums uz nomaksu samaksāts: {plate}",
-    'event.installment.paid_off.body': "Visi maksājumi ir samaksāti. Pārdevējs 7 dienu laikā iesniedz Traficom paziņojumu par atsavināšanu, un pircējs reģistrējas kā īpašnieks.",
+    'event.installment.paid_off.body': "Visi maksājumi ir samaksāti. Pārdevējs nekavējoties iesniedz Traficom paziņojumu par atsavināšanu, un pircējs reģistrējas kā īpašnieks 7 dienu laikā no atsavināšanas dienas (pēdējā maksājuma diena).",
     'event.installment.overdue': "Maksājums {n} nokavēts: {plate}",
     'event.installment.overdue.body': "Maksājuma termiņš bija {date}, kavējums – {days, plural, zero {# dienas} one {# diena} other {# dienas}}. Maksājiet tieši pārdevējam pēc rēķina rekvizītiem.",
-    'event.installment.threshold': "Sasniegta nomaksas pirkuma robeža: {plate}",
+    'event.installment.threshold': "Sasniegta Nomaksas pirkuma likuma robeža: {plate}",
     'event.installment.threshold.body': "Nokavētie maksājumi sasniedz Somijas Nomaksas pirkuma likuma (osamaksukauppalaki) 2. § robežu. Varat pieprasīt atlikušo summu uzreiz vai likumā noteiktajā kārtībā ar norēķinu atgūt transportlīdzekli. Dzinēja iedarbināšanas bloķēšanu parādu piedziņai neizmanto.",
+    'event.installment.no_iban': "Maksājuma {n} rēķinu neizdevās izrakstīt: {plate}",
+    'event.installment.no_iban.body': "Nav norādīts jūsu bankas konts (IBAN). Pievienojiet to sadaļā Bankas rekvizīti – pēc tam rēķins pircējam tiks nosūtīts automātiski.",
     'event.maintenance.defect': "{plate}: ziņojums par defektu – {area}",
     'event.maintenance.defect_unsafe': "{plate}: NEDRĪKST BRAUKT – {area}",
     'event.maintenance.due': "{count, plural, zero {Apkope: tuvojas # termiņi} one {Apkope: tuvojas # termiņš} other {Apkope: tuvojas # termiņi}}",

@@ -60,8 +60,7 @@ export function StopDone({
         fields.lon = String(position.lon);
         if (position.accuracyM != null) fields.accuracy = String(position.accuracyM);
       }
-      await enqueue('COMPLETE', fields);
-      setNote('');
+      if (await enqueue('COMPLETE', fields)) setNote('');
     } finally {
       setBusy(false);
     }

@@ -10,6 +10,8 @@
  * OutboxProvider.
  */
 
+import type { DeliveryState } from './outboxPolicy';
+
 /**
  * SITE — работа на объекте: прибытие, рейс, конец дня, новый пункт приёмки.
  * FUEL — заправка (с фото чека). DEFECT — дефект машины или прицепа (с фото).
@@ -27,6 +29,13 @@ export type OutboxEvent = {
   blob?: Blob;
   /** Момент нажатия. В учёт идёт он, а не время отправки. */
   pressedAt: string;
+  /**
+   * Чьё действие (с 22.11.2026; у прежних записей поля нет). Вход потерян,
+   * а на телефоне вошёл другой водитель — чужое действие от его имени не уходит.
+   */
+  driverId?: string;
+  /** Счётчик неудачных отправок при живой сети — см. outboxPolicy. */
+  delivery?: DeliveryState;
 };
 
 const DB = 'rahtis-driver';

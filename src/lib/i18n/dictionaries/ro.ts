@@ -711,6 +711,7 @@ export const ro = {
   sites: {
     approveSelf: 'Aprobați ziua personal',
     approveSelfHint: 'Pe baza datelor de descărcare ale șoferului. Apare ca aprobată de transportator.',
+    approveNoEnd: 'Ziua nu are oră de încheiere și nici încărcături, deci nu poate fi aprobată încă. Așteptați ca șoferul să încheie ziua sau adăugați o încărcătură.',
     nav: 'Șantiere',
     title: 'Șantiere',
     lede: 'Șantierele pentru care transportați cu un camion basculant sau kasetti: șoferul înregistrează sosirea și încărcăturile în aplicație, orele se calculează de la sosire până la ultima descărcare + rezervă, iar șeful de șantier aprobă zilele printr-un link.',
@@ -2524,6 +2525,12 @@ export const ro = {
     reference: 'referință',
     pdf: 'Deschideți PDF-ul',
     payNote: 'Plătiți direct transportatorului în contul de pe factură, cu numărul de referință. Plățile nu trec prin RAHTIS. Factura este marcată ca plătită după ce transportatorul înregistrează plata.',
+  },
+
+  /* Счета перевозчика за прямые перевозки, отправленные RAHTIS от его имени (22.11.2026). */
+  carrierInvoices: {
+    title: 'Facturi trimise',
+    subtitle: 'Facturile pe care RAHTIS le-a întocmit și le-a trimis clienților dumneavoastră în numele companiei, pentru transporturile directe. Clientul plătește direct în contul dumneavoastră. Marcați factura ca plătită când intră banii – altfel clientul va primi notificări de plată.',
   },
 
   invite: {
@@ -5795,6 +5802,7 @@ export const ro = {
     'event.company.sensitive_changed': '{field, select, IBAN {Contul bancar al firmei a fost modificat} CONTACT_EMAIL {E-mailul de contact al firmei a fost modificat} BILLING_EMAIL {E-mailul de facturare al firmei a fost modificat} OWNER {Utilizatorul principal al firmei a fost schimbat} other {Datele firmei au fost modificate}} — dacă nu ați fost dumneavoastră, contactați asistența',
     'event.invoice.paid_marked': 'Expeditorul a marcat factura {number} (comanda {ref}) ca plătită — confirmați când primiți banii',
     'event.invoice.collection': 'Factura {number} are o întârziere de 14 zile. Puteți apela la o firmă de recuperare a creanțelor; raportul de plată a fost precompletat ca neplătit.',
+    'event.invoice.issued': '{sent, select, yes {Factura {number} a fost trimisă către {customer}} other {Factura {number} pentru {customer} a fost întocmită, dar e-mailul nu a fost trimis – descărcați PDF-ul și trimiteți-l dumneavoastră}} · {total}, scadentă la {dueOn}',
     'event.trip.stop.done': 'Comanda {ref}: {place} marcat ca efectuat ({done}/{total})',
     'event.order.closed': 'Comanda {ref} este finalizată — documentele sunt gata',
     'event.vehicle.approved': 'Vehiculul {plate} este aprobat',
@@ -5978,11 +5986,13 @@ export const ro = {
     'event.installment.handover': "Predare confirmată: {plate}",
     'event.installment.handover.body': "Perioada de plată în rate a început. Vehiculul se află acum în flota cumpărătorului ca ciornă – trimiteți-l spre aprobare.",
     'event.installment.paid_off': "Vânzare în rate achitată: {plate}",
-    'event.installment.paid_off.body': "Toate ratele au fost plătite. Vânzătorul depune declarația de înstrăinare la Traficom în 7 zile, iar cumpărătorul se înregistrează ca proprietar.",
+    'event.installment.paid_off.body': "Toate ratele au fost plătite. Vânzătorul depune fără întârziere declarația de înstrăinare la Traficom, iar cumpărătorul se înregistrează ca proprietar în 7 zile de la data transferului (data ultimei plăți).",
     'event.installment.overdue': "Rata {n} restantă: {plate}",
     'event.installment.overdue.body': "Rata era scadentă la {date} și are o întârziere de {days, plural, one {# zi} few {# zile} other {# de zile}}. Plătiți direct vânzătorului, conform datelor de pe factură.",
     'event.installment.threshold': "Pragul vânzării în rate a fost atins: {plate}",
-    'event.installment.threshold.body': "Ratele restante ating pragul din § 2 al legii finlandeze privind vânzarea în rate (osamaksukauppalaki). Puteți cere imediat restul sumei sau puteți relua vehiculul conform legii, cu decontare. Blocarea pornirii motorului nu este folosită pentru recuperarea datoriilor.",
+    'event.installment.threshold.body': "Ratele restante ating pragul din § 2 al legii finlandeze privind vânzarea în rate (osamaksukauppalaki). Puteți cere imediat restul sumei sau puteți recupera vehiculul conform legii, cu regularizarea sumelor între părți. Blocarea pornirii motorului nu este folosită pentru recuperarea datoriilor.",
+    'event.installment.no_iban': "Factura pentru rata {n} nu a putut fi emisă: {plate}",
+    'event.installment.no_iban.body': "Lipsește contul dumneavoastră bancar (IBAN). Adăugați-l la Date bancare – factura va fi apoi trimisă automat cumpărătorului.",
     'event.maintenance.defect': "{plate}: raport de defecțiune – {area}",
     'event.maintenance.defect_unsafe': "{plate}: NU CIRCULAȚI – {area}",
     'event.maintenance.due': "{count, plural, one {Întreținere: # element scadent în curând} few {Întreținere: # elemente scadente în curând} other {Întreținere: # de elemente scadente în curând}}",

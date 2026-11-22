@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { WeighTicketWarnings } from '@/components/domain/WeighTicketWarnings';
 import { cn } from '@/lib/cn';
+import { blobFits } from '@/lib/driverApp/outboxPolicy';
 import { compressPhoto } from '@/lib/driverApp/photo';
 import { combinationMass, isMassCountry, type TrailerUnit } from '@/lib/fleet/mass';
 import { useI18n } from '@/lib/i18n/provider';
@@ -60,8 +61,6 @@ export type SiteState = {
 
 const BUTTON = 'h-14 w-full rounded-control px-4 text-[16px] font-semibold disabled:opacity-50';
 const INPUT = 'h-12 w-full rounded-control border border-line bg-surface px-3 text-[16px]';
-
-const tonnes = (kg: number) => (kg / 1000).toLocaleString('fi-FI', { maximumFractionDigits: 1 });
 
 function distanceKm(a: { lat: number; lon: number }, b: { lat: number; lon: number }) {
   const r = (d: number) => (d * Math.PI) / 180;
@@ -149,6 +148,8 @@ function JobCard({
   formatTime: (iso: string) => string;
 }) {
   const { t } = useI18n();
+  /* Числа — по языку водителя, а не по-фински: «12.5 t» у англичанина, «12,5 t» у финна (22.11.2026). */
+  const tonnes = (kg: number) => (kg / 1000).toLocaleString(t.meta.intl, { maximumFractionDigits: 1 });
   const [trailerId, setTrailerId] = useState(job.day?.trailer_id ?? '');
   const [material, setMaterial] = useState(job.material_code);
   const [scaleId, setScaleId] = useState(job.receiving_site_id ?? sites[0]?.id ?? '');
@@ -228,6 +229,11 @@ function JobCard({
     if (!file) return;
     resetTicket();
     const blob = await compressPhoto(file);
+    /* Снимок не сжался и тяжелее, чем принимает сервер: не прикрепляем — веса вводятся вручную или талон снимается заново (22.11.2026). */
+    if (!blobFits(blob.size)) {
+      setPhotoState('FAILED');
+      return;
+    }
     setPreview(URL.createObjectURL(blob));
 
     if (!navigator.onLine) {
@@ -282,7 +288,7 @@ function JobCard({
   async function send(action: 'ARRIVE' | 'LOAD' | 'END', data: Record<string, unknown> = {}, blob?: Blob) {
     setBusy(true);
     try {
-      await enqueue('SITE', { action, job_id: job.id, data: JSON.stringify(data) }, blob);
+      return await enqueue('SITE', { action, job_id: job.id, data: JSON.stringify(data) }, blob);
     } finally {
       setBusy(false);
     }
@@ -294,7 +300,7 @@ function JobCard({
   }
 
   async function saveLoad() {
-    await send(
+    const kept = await send(
       'LOAD',
       {
         material_code: material,
@@ -306,6 +312,8 @@ function JobCard({
       },
       ticketId ? undefined : (offlinePhoto ?? undefined),
     );
+    /* Не записалось и не ушло — веса остаются в форме. */
+    if (!kept) return;
     setGross('');
     setTare('');
     setTicket('');
@@ -455,7 +463,7 @@ function JobCard({
             )}
             {over > 0 && limitKg && (
               <p className="rounded-control bg-danger/10 px-3 py-2 text-[15px] font-semibold text-danger" role="alert">
-                {t.siteWork.overload} {over.toLocaleString('fi-FI')} kg · {t.siteWork.limit} {tonnes(limitKg)} {t.siteWork.tonnes}
+                {t.siteWork.overload} {over.toLocaleString(t.meta.intl)} kg · {t.siteWork.limit} {tonnes(limitKg)} {t.siteWork.tonnes}
               </p>
             )}
             <WeighTicketWarnings
@@ -523,7 +531,8 @@ function AddSite({ position, enqueue }: { position: { lat: number; lon: number }
     setBusy(true);
     try {
       const p = position ?? (await askPosition(4000));
-      await enqueue('SITE', { action: 'ADD_SITE', job_id: '', data: JSON.stringify({ name: name.trim(), lat: p?.lat ?? null, lon: p?.lon ?? null }) });
+      const kept = await enqueue('SITE', { action: 'ADD_SITE', job_id: '', data: JSON.stringify({ name: name.trim(), lat: p?.lat ?? null, lon: p?.lon ?? null }) });
+      if (!kept) return;
       setName('');
       setOpen(false);
     } finally {

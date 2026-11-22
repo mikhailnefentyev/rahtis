@@ -150,7 +150,8 @@ export function buildProposals(
         body: withTrailer.trailer_body ?? head.vehicle_body,
         mode,
         offer: mine.find((o) => LIVE.has(o.status)) ?? null,
-        withdrawn: mine.some((o) => o.status === 'WITHDRAWN'),
+        /* Заполненное место — тоже решение человека: заново автоматом не публикуем (22.11.2026). */
+        withdrawn: mine.some((o) => o.status === 'WITHDRAWN' || o.status === 'FILLED'),
       });
     }
   }
@@ -174,7 +175,8 @@ export function offerInsert(p: FleetProposal, free: Dims, auto: boolean): Databa
     to_lon: p.to.lon,
     available_from: p.availableFrom,
     available_to: p.availableTo,
-    free_ldm: free.ldm,
+    /* Пределы колонок (0–20 ldm): сцепка с 20,3 свободных метров иначе не публиковалась никогда. */
+    free_ldm: free.ldm === null ? null : Math.min(free.ldm, 20),
     free_kg: free.kg,
     free_pallets: free.pallets,
     computed_ldm: p.free.ldm,

@@ -15,6 +15,7 @@ import { dateInZone } from '@/lib/dates';
 import { viewerMoney } from '@/lib/i18n/viewer';
 import { asCurrency } from '@/lib/money/currency';
 import { loadFxHistory } from '@/lib/money/fx';
+import { fetchAll } from '@/lib/money/paging';
 import {
   computeAllowances,
   wageWarnings,
@@ -210,20 +211,32 @@ export async function buildDriverReport(input: {
   let driversQuery = supabase.from('drivers').select('id, full_name, phone, status').order('full_name');
   if (input.driverId) driversQuery = driversQuery.eq('id', input.driverId);
 
-  let shiftsQuery = supabase
-    .from('driver_shifts')
-    .select('id, driver_id, started_at, ended_at, odometer_start, odometer_end, driver_breaks(started_at, ended_at)')
-    .gte('started_at', since)
-    .lt('started_at', until)
-    .order('started_at');
-  if (input.driverId) shiftsQuery = shiftsQuery.eq('driver_id', input.driverId);
+  /*
+   * Смены, отметки дня, рейсы и страны дня — страницами (22.11.2026):
+   * PostgREST отдаёт не больше 1000 строк и об обрезке молчит. Двадцать
+   * водителей за квартал — уже больше тысячи смен, и последним по времени
+   * часы и зарплата считались бы без части смен. Порядок у каждого запроса
+   * устойчивый — заканчивается уникальным полем.
+   */
+  const shiftsQuery = fetchAll((a, b) => {
+    let query = supabase
+      .from('driver_shifts')
+      .select('id, driver_id, started_at, ended_at, odometer_start, odometer_end, driver_breaks(started_at, ended_at)')
+      .gte('started_at', since)
+      .lt('started_at', until);
+    if (input.driverId) query = query.eq('driver_id', input.driverId);
+    return query.order('started_at').order('id').range(a, b);
+  });
 
-  let factsQuery = supabase
-    .from('driver_day_facts')
-    .select('driver_id, day, country, night, meals')
-    .gte('day', input.from)
-    .lte('day', input.to);
-  if (input.driverId) factsQuery = factsQuery.eq('driver_id', input.driverId);
+  const factsQuery = fetchAll((a, b) => {
+    let query = supabase
+      .from('driver_day_facts')
+      .select('driver_id, day, country, night, meals')
+      .gte('day', input.from)
+      .lte('day', input.to);
+    if (input.driverId) query = query.eq('driver_id', input.driverId);
+    return query.order('day').order('driver_id').range(a, b);
+  });
 
   /*
    * Суточные и страны дня: до применения миграции стран таблиц нет —
@@ -243,16 +256,21 @@ export async function buildDriverReport(input: {
   ] = await Promise.all([
     driversQuery,
     shiftsQuery,
-    supabase.rpc('driver_trips', { p_from: input.from, p_to: input.to }),
+    fetchAll((a, b) =>
+      supabase.rpc('driver_trips', { p_from: input.from, p_to: input.to }).order('closed_at').order('order_id').range(a, b),
+    ),
     supabase.from('driver_pay_profiles').select('*'),
     supabase.from('tes_rule_sets').select('*'),
     supabase.from('tes_wage_rates').select('rule_set_id, grade, valid_from, hourly_cents'),
     supabase.from('allowance_rule_sets').select('id, name, country, currency, rule, params, legality'),
     factsQuery,
-    supabase.rpc('driver_day_countries', {
-      p_from: input.from,
-      p_to: input.to,
-    }),
+    fetchAll((a, b) =>
+      supabase
+        .rpc('driver_day_countries', { p_from: input.from, p_to: input.to })
+        .order('day')
+        .order('driver_id')
+        .range(a, b),
+    ),
     getViewer(),
   ]);
 

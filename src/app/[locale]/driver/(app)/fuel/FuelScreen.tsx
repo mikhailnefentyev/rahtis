@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { cn } from '@/lib/cn';
+import { blobFits } from '@/lib/driverApp/outboxPolicy';
 import { compressPhoto } from '@/lib/driverApp/photo';
 import { FUEL_MAX_QUANTITY, fuelUnit, type FuelProduct } from '@/lib/fuel/fuel';
 import { useI18n } from '@/lib/i18n/provider';
@@ -92,7 +93,15 @@ export function FuelScreen({ state }: { state: FuelState }) {
 
   async function onPhoto(file: File | undefined) {
     if (!file) return;
-    setPhoto(await compressPhoto(file));
+    const blob = await compressPhoto(file);
+    /* Снимок не сжался и тяжелее, чем принимает сервер: не прикрепляем, водитель снимает заново (22.11.2026). */
+    if (!blobFits(blob.size)) {
+      setPhoto(null);
+      setError(t.driverApp.failed);
+      return;
+    }
+    setError(null);
+    setPhoto(blob);
   }
 
   async function save(confirmed: boolean) {
@@ -112,7 +121,7 @@ export function FuelScreen({ state }: { state: FuelState }) {
 
     setBusy(true);
     try {
-      await enqueue(
+      const kept = await enqueue(
         'FUEL',
         {
           data: JSON.stringify({
@@ -126,6 +135,8 @@ export function FuelScreen({ state }: { state: FuelState }) {
         },
         photo ?? undefined,
       );
+      /* Не записалось и не ушло — форма остаётся заполненной, ошибка в полосе сверху. */
+      if (!kept) return;
       setOdometer('');
       setLines([{ product: 'DIESEL', quantity: '' }]);
       setAmount('');

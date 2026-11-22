@@ -51,8 +51,15 @@ export type InvoiceDay = {
 export type InvoiceLine = {
   date: string;
   text: string;
-  /** Количество: часы (две цифры после запятой), рейсы или тонны. */
+  /** Количество: часы (две цифры после запятой), рейсы или тонны (до килограмма). */
   quantity: number;
+  /**
+   * Количество для печати, если число выше его не передаёт: часы как «ч:мм»
+   * (22.11.2026). 50 минут по 95 €/ч печатались «0,83 h × 95 € = 79,17 €» —
+   * строка не сходилась с собственным умножением (0,83 × 95 = 78,85). Сумма
+   * считается по минутам, как и раньше; «0:50 h» — то же точное количество.
+   */
+  quantityText?: string;
   unit: 'h' | 'kuorma' | 't';
   unitCents: number;
   amountCents: number;
@@ -68,6 +75,7 @@ export function invoiceLines(pricing: Pricing, rateCents: number, days: readonly
           date: d.day,
           text,
           quantity: Math.round((d.minutes / 60) * 100) / 100,
+          quantityText: hoursText(d.minutes),
           unit: 'h',
           unitCents: rateCents,
           amountCents: Math.round((d.minutes * rateCents) / 60),
@@ -78,13 +86,25 @@ export function invoiceLines(pricing: Pricing, rateCents: number, days: readonly
         return {
           date: d.day,
           text,
-          quantity: Math.round(d.netKg / 10) / 100,
+          /* До килограмма: 12 345 кг по 2,50 €/т — «12,345 t», а не «12,35 t» (сумма та же). */
+          quantity: Math.round(d.netKg) / 1000,
           unit: 't',
           unitCents: rateCents,
           amountCents: Math.round((d.netKg * rateCents) / 1000),
         };
     }
   });
+}
+
+/** Минуты как «ч:мм»: 50 → «0:50», 585 → «9:45». */
+export function hoursText(minutes: number): string {
+  const whole = Math.max(0, Math.round(minutes));
+  return `${Math.floor(whole / 60)}:${String(whole % 60).padStart(2, '0')}`;
+}
+
+/** Количество строки для печати в счёте (число — в формате fi-FI). */
+export function quantityLabel(line: Pick<InvoiceLine, 'quantity' | 'quantityText'>): string {
+  return line.quantityText ?? line.quantity.toLocaleString('fi-FI', { maximumFractionDigits: 3 });
 }
 
 export type InvoiceTotals = { netCents: number; vatBps: number; vatCents: number; totalCents: number };
@@ -119,13 +139,23 @@ export function invoiceTotals(lines: readonly InvoiceLine[], vatBps: number): In
 }
 
 /**
+ * Понедельник, от которого считаются «свои» недели BIWEEKLY — то же число,
+ * что BIWEEKLY_ANCHOR в invoices/terms.ts (модули без импортов друг из
+ * друга: их читают тесты). Чётность номера недели ISO давала разрыв в три
+ * недели на стыке 2026 и 2027 годов: в 2026-м 53 недели (22.11.2026).
+ */
+const BIWEEKLY_ANCHOR = '2026-01-05';
+
+/**
  * Пора ли выставлять по расписанию. Понедельник: WEEKLY — каждый,
- * BIWEEKLY — по чётным неделям ISO. MANUAL — только кнопкой.
+ * BIWEEKLY — через один, считая от 5.1.2026 (в 2026 году — чётные недели
+ * ISO, как раньше). MANUAL — только кнопкой.
  */
 export function invoiceDue(schedule: string, mondayIso: string): boolean {
   if (schedule === 'WEEKLY') return true;
   if (schedule !== 'BIWEEKLY') return false;
-  return isoWeek(mondayIso) % 2 === 0;
+  const weeks = Math.round((Date.parse(`${mondayIso}T12:00:00Z`) - Date.parse(`${BIWEEKLY_ANCHOR}T12:00:00Z`)) / (7 * 86_400_000));
+  return Math.abs(weeks) % 2 === 0;
 }
 
 export function isoWeek(dateIso: string): number {

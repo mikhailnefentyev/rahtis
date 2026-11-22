@@ -63,7 +63,9 @@ export function InspectionScreen({ state }: { state: InspectionState }) {
     try {
       const payload = inspectionPayload(answers as Record<InspectionItem, InspectionAnswer>, odometer);
       /* Машина на экране в момент нажатия: без связи осмотр уйдёт позже, а водителя могут пересадить. */
-      await enqueue('INSPECTION', { data: JSON.stringify({ ...payload, vehicle_id: state.vehicle?.id ?? null }) });
+      const kept = await enqueue('INSPECTION', { data: JSON.stringify({ ...payload, vehicle_id: state.vehicle?.id ?? null }) });
+      /* Не записалось и не ушло — ответы остаются на экране. */
+      if (!kept) return;
       setSaved(faults);
       setAnswers({});
       setOdometer('');

@@ -103,8 +103,8 @@ export function ScanCapture({
         fields.lat = String(position.lat);
         fields.lon = String(position.lon);
       }
-      await enqueue('UPLOAD', fields, pdf);
-      close();
+      /* Не записалось и не ушло (или PDF слишком тяжёлый) — страницы остаются, ошибка в полосе сверху. */
+      if (await enqueue('UPLOAD', fields, pdf)) close();
     } finally {
       setBusy(false);
     }

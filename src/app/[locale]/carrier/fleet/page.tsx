@@ -175,7 +175,7 @@ export default async function FleetPage({ params }: { params: Promise<{ locale: 
         drivers={drivers ?? []}
         driverByVehicle={driverByVehicle}
         documentsOk={state?.documents_ok ?? false}
-        today={new Date().toISOString().slice(0, 10)}
+        today={todayInHelsinki()}
         service={service}
         country={company.country}
       />

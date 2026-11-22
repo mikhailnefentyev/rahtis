@@ -6,6 +6,7 @@ import { invoiceLines, type InvoiceDay } from '@/lib/sites/invoice';
 import { dayMinutes } from '@/lib/sites/work';
 import { asCurrency, type Currency } from '@/lib/money/currency';
 import { loadFxHistory } from '@/lib/money/fx';
+import { chunks, fetchAll, fetchIn } from '@/lib/money/paging';
 import { createAdminClient } from '@/lib/supabase/admin';
 import type { createClient } from '@/lib/supabase/server';
 import { companyConverter } from './convert';
@@ -24,6 +25,14 @@ import { vehicleEconomics, type EconomicsInput, type VehicleFinance } from './pr
  */
 
 type Supabase = Awaited<ReturnType<typeof createClient>>;
+
+/** Ошибка выборки — в журнал: расчёт идёт дальше без этих строк, как и раньше, но не молча. */
+const logged =
+  (what: string) =>
+  <R extends { error: { message: string } | null }>(result: R): R => {
+    if (result.error) console.error(`доходность: ${what} не прочитаны:`, result.error.message);
+    return result;
+  };
 
 const zone = 'Europe/Helsinki';
 const dateFormat = new Intl.DateTimeFormat('en-CA', { timeZone: zone, year: 'numeric', month: '2-digit', day: '2-digit' });
@@ -90,21 +99,33 @@ export async function loadEconomics(
   const [{ data: vehicles }, { data: orders }, { data: fuel }, { data: finance }, { data: costs }, { data: settings }, { data: jobs }, fx] =
     await Promise.all([
       supabase.from('vehicles').select('id, plate, make').eq('company_id', company.id).order('plate'),
-      admin
-        .from('orders')
-        .select('id, rate_cents, commission_bps, waiting_cents, contract_party, currency, closed_at, updated_at, assigned_vehicle_id')
-        .eq('assigned_company_id', company.id)
-        .eq('status', 'DONE')
-        .gte('closed_at', new Date(Date.parse(sinceIso) - 86_400_000).toISOString())
-        .lt('closed_at', untilIso)
-        .limit(5000),
-      supabase
-        .from('fuel_entries')
-        .select('vehicle_id, filled_at, amount_cents, currency')
-        .eq('company_id', company.id)
-        .gte('filled_at', new Date(Date.parse(sinceIso) - 86_400_000).toISOString())
-        .lt('filled_at', untilIso)
-        .limit(10000),
+      /*
+       * Страницами (22.11.2026): `.limit(5000)` сервер всё равно обрезал до
+       * тысячи строк, и доходность большого парка считалась по её началу.
+       */
+      fetchAll((a, b) =>
+        admin
+          .from('orders')
+          .select('id, rate_cents, commission_bps, waiting_cents, contract_party, currency, closed_at, updated_at, assigned_vehicle_id')
+          .eq('assigned_company_id', company.id)
+          .eq('status', 'DONE')
+          .gte('closed_at', new Date(Date.parse(sinceIso) - 86_400_000).toISOString())
+          .lt('closed_at', untilIso)
+          .order('closed_at')
+          .order('id')
+          .range(a, b),
+      ).then(logged('рейсы')),
+      fetchAll((a, b) =>
+        supabase
+          .from('fuel_entries')
+          .select('vehicle_id, filled_at, amount_cents, currency')
+          .eq('company_id', company.id)
+          .gte('filled_at', new Date(Date.parse(sinceIso) - 86_400_000).toISOString())
+          .lt('filled_at', untilIso)
+          .order('filled_at')
+          .order('id')
+          .range(a, b),
+      ).then(logged('топливо')),
       supabase.from('vehicle_finance').select('*').eq('company_id', company.id),
       supabase.from('vehicle_costs').select('id, vehicle_id, spent_on, category, amount_cents, currency, note, supplier').eq('company_id', company.id).gte('spent_on', from).lte('spent_on', to).order('spent_on', { ascending: false }),
       supabase.from('company_economics').select('employer_cost_bps').eq('company_id', company.id).maybeSingle(),
@@ -121,9 +142,9 @@ export async function loadEconomics(
 
   /* Рейсы: машина — назначенная заказу, иначе из отклика перевозчика. */
   const orderIds = (orders ?? []).filter((o) => !o.assigned_vehicle_id).map((o) => o.id);
-  const { data: offers } = orderIds.length
-    ? await admin.from('order_offers').select('order_id, vehicle_id').eq('carrier_company_id', company.id).in('order_id', orderIds.slice(0, 1000))
-    : { data: [] };
+  const { data: offers } = await fetchIn(orderIds, (part) =>
+    admin.from('order_offers').select('order_id, vehicle_id').eq('carrier_company_id', company.id).in('order_id', part),
+  ).then(logged('отклики'));
   const offerVehicle = new Map((offers ?? []).map((o) => [o.order_id, o.vehicle_id]));
 
   const revenue: EconomicsInput['revenue'] = [];
@@ -149,17 +170,30 @@ export async function loadEconomics(
 
   /* Объекты: строки счёта по дням машины — как в счёте клиенту. */
   if ((jobs ?? []).length) {
-    const { data: days } = await supabase
-      .from('site_days')
-      .select('id, job_id, day, vehicle_id, arrived_at, ended_at, buffer_minutes')
-      .in('job_id', (jobs ?? []).map((j) => j.id))
-      .gte('day', from)
-      .lte('day', to)
-      .limit(5000);
-    const dayIds = (days ?? []).map((d) => d.id);
-    const { data: loads } = dayIds.length
-      ? await supabase.from('site_loads').select('day_id, unloaded_at, net_kg').in('day_id', dayIds.slice(0, 2000))
-      : { data: [] };
+    type SiteDay = { id: string; job_id: string; day: string; vehicle_id: string | null; arrived_at: string | null; ended_at: string | null; buffer_minutes: number };
+    type SiteLoad = { day_id: string; unloaded_at: string | null; net_kg: number | null };
+    const days: SiteDay[] = [];
+    for (const part of chunks((jobs ?? []).map((j) => j.id))) {
+      const { data } = await fetchAll((a, b) =>
+        supabase
+          .from('site_days')
+          .select('id, job_id, day, vehicle_id, arrived_at, ended_at, buffer_minutes')
+          .in('job_id', part)
+          .gte('day', from)
+          .lte('day', to)
+          .order('day')
+          .order('id')
+          .range(a, b),
+      ).then(logged('дни объектов'));
+      days.push(...data);
+    }
+    const loads: SiteLoad[] = [];
+    for (const part of chunks(days.map((d) => d.id))) {
+      const { data } = await fetchAll((a, b) =>
+        supabase.from('site_loads').select('day_id, unloaded_at, net_kg').in('day_id', part).order('id').range(a, b),
+      ).then(logged('рейсы объектов'));
+      loads.push(...data);
+    }
     const loadsOf = new Map<string, { unloaded_at: string | null; net_kg: number | null }[]>();
     for (const l of loads ?? []) loadsOf.set(l.day_id, [...(loadsOf.get(l.day_id) ?? []), l]);
     const jobOf = new Map((jobs ?? []).map((j) => [j.id, j]));
@@ -185,7 +219,9 @@ export async function loadEconomics(
   /* Зарплата: ориентировочная по дням водителя, день — на машину его смены. */
   const [report, { data: shifts }, { data: profiles }] = await Promise.all([
     buildDriverReport({ from, to }).catch(() => null),
-    supabase.from('driver_shifts').select('driver_id, started_at, vehicle_id').gte('started_at', sinceIso).lt('started_at', untilIso).limit(10000),
+    fetchAll((a, b) =>
+      supabase.from('driver_shifts').select('driver_id, started_at, vehicle_id').gte('started_at', sinceIso).lt('started_at', untilIso).order('started_at').order('id').range(a, b),
+    ).then(logged('смены')),
     supabase.from('driver_pay_profiles').select('driver_id, valid_from, currency').order('valid_from'),
   ]);
   /*

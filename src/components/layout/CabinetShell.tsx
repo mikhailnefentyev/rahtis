@@ -193,6 +193,8 @@ function navigation(
           label: t.nav.groupDocuments,
           items: [
             { href: `/${locale}/carrier/reports`, label: t.periodReport.title, icon: 'reports' },
+            /* Счета заказчикам за прямые перевозки, выставленные от имени перевозчика (22.11.2026). */
+            { href: `/${locale}/carrier/invoices`, label: t.carrierInvoices.title, icon: 'billing' },
             { href: `/${locale}/carrier/verification`, label: t.verification.nav, icon: 'legal' },
             { href: `/${locale}/carrier/subscription`, label: t.subscription.nav, icon: 'billing' },
             { href: `/${locale}/carrier/claims`, label: t.claims.title, icon: 'claims' },
