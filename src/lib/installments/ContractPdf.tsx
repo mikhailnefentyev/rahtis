@@ -14,6 +14,10 @@ import { ansi } from '@/lib/reports/PeriodReportPdf';
  * взносов, даты; просрочка; досрочное погашение по 3 и 5 §; орган для
  * tilitys; ссылка на закон. Чего в RAHTIS нет (VIN, номер лицензии,
  * выбор страховщика), — поля для заполнения от руки.
+ *
+ * 22.11.2026: п. 5.3 — срок покупателя от дня перехода права собственности
+ * (ajoneuvolaki 84 §); новый п. 9.8 — запись о прекращении сделки в RAHTIS.
+ * Тот же текст — в docs/equipment-sale/osamaksusopimus-pohja.md.
  */
 
 export type ContractPdfInput = {
@@ -167,7 +171,8 @@ export function ContractPdf(d: ContractPdfInput) {
         <H>5. Omistuksenpidätys, rekisteröinti ja käyttö</H>
         <P>5.1 Omistusoikeus ajoneuvoon säilyy myyjällä ja siirtyy ostajalle, kun osamaksuhinta ja kohdan 4.4 mukainen korko on maksettu kokonaan. Omistusoikeuden siirtymisen ehtona ei ole muiden kuin tähän sopimukseen perustuvien velkojen maksaminen.</P>
         <P>5.2 Myyjä tekee haltijaa koskevan rekisteri-ilmoituksen viimeistään luovutuspäivänä (ajoneuvolaki 82/2021 83 ja 84 §). Ostaja nimeää rekisteriin käyttövastaavan ja liittää ajoneuvon tavaraliikenneluvalleen ennen kuin käyttää sitä luvanvaraisessa liikenteessä (laki liikenteen palveluista 320/2017 17 §). Ajoneuvo on ostajan yksinomaisessa hallinnassa, eikä myyjää merkitä rekisteriin haltijaksi. Ajoneuvoverosta vastaa ostaja rekisteriin merkittynä haltijana (ajoneuvoverolaki 1281/2003 5 §).</P>
-        <P>5.3 Kun osamaksuhinta ja korko on maksettu kokonaan, myyjä tekee luovutusilmoituksen seitsemän päivän kuluessa siitä, kun viimeinen suoritus on kirjattu sen tilille, ja ostaja ilmoittaa itsensä omistajaksi seitsemän päivän kuluessa luovutusilmoituksesta.</P>
+        {/* 5.3 (22.11.2026): семь дней покупателя считаются от перехода права собственности — дня последнего платежа, а не от уведомления продавца (ajoneuvolaki 82/2021 84 §). */}
+        <P>5.3 Kun osamaksuhinta ja korko on maksettu kokonaan, omistusoikeus siirtyy ostajalle sinä päivänä, jona viimeinen suoritus on kirjattu myyjän tilille (luovutuspäivä). Myyjä tekee luovutusilmoituksen viipymättä, ja ostaja ilmoittaa itsensä omistajaksi seitsemän päivän kuluessa luovutuspäivästä (ajoneuvolaki 82/2021 84 §).</P>
         <P>5.4 Ostaja ei saa ennen omistusoikeuden siirtymistä ilman myyjän kirjallista suostumusta 1) myydä, vaihtaa tai lahjoittaa ajoneuvoa; 2) pantata ajoneuvoa tai hakea siihen kiinnitystä; 3) vuokrata, lainata tai muutoin luovuttaa ajoneuvoa kolmannen hallintaan tai käyttöön; 4) rekisteröidä ajoneuvoa toiseen valtioon; 5) tehdä ajoneuvoon muutoksia, jotka edellyttävät muutoskatsastusta; 6) liittää ajoneuvoa tai sen lisävarusteita muuhun omaisuuteen taikka irrottaa ajoneuvosta lisävarusteita luovuttaakseen ne edelleen. Kohdan 3 tarkoittamana luovutuksena ei pidetä sitä, että ajoneuvoa kuljettavat ostajan omassa liikenteessä ostajan palveluksessa olevat tai sille vuokratyönä työskentelevät kuljettajat.</P>
         <P>5.5 Ostaja saa käyttää ajoneuvoa omassa liikenteessään sopimusalueella, joka on ETA-valtiot ja Sveitsi. Ajoneuvon käyttö sopimusalueen ulkopuolella edellyttää myyjän etukäteen antamaa kirjallista suostumusta.</P>
 
@@ -198,6 +203,8 @@ export function ContractPdf(d: ContractPdfInput) {
         <P>9.5 Jos ostaja on takaisinottohetkellä arvonlisäverovelvollinen ja ajoneuvo on ollut sen vähennykseen oikeuttavassa käytössä, ostaja antaa myyjälle takaisinottoarvosta arvonlisäverollisen laskun, ja ostajan hyväksi luetaan takaisinottoarvo lisättynä arvonlisäverolla. Muussa tapauksessa, erityisesti jos ostajan arvonlisäverovelvollisuus on päättynyt konkurssin tai muun syyn vuoksi, takaisinottoarvo luetaan ostajan hyväksi ilman arvonlisäveroa.</P>
         <P>9.6 Kun myyjä on vaatinut ajoneuvoa takaisin, ostaja voi pitää ajoneuvon maksamalla kerralla sen määrän, joka osamaksukaupasta annetun lain 3 §:n mukaan on luettava myyjän hyväksi. Jos myyjä on jo ottanut ajoneuvon takaisin, ostaja voi lunastaa sen 14 päivän kuluessa takaisinotosta maksamalla ajoneuvon takaisinottoarvon sekä lain 4 §:n 2 momentin mukaisen erotuksen (lain 5 §).</P>
         <P>9.7 Osamaksutilityksissä toimivaltainen viranomainen on ajoneuvon sijaintipaikkakunnan tai ostajan kotipaikan ulosottomies (Ulosottolaitos). Jos osapuolet eivät sovi tilityksestä, sen toimittaa ulosottomies (osamaksukaupasta annetun lain 9 §:n 1 momentti ja 12 §).</P>
+        {/* 9.8 (22.11.2026): прекращение сделки продавец записывает в RAHTIS — счета через сервис прекращаются; взаиморасчёт — дело сторон. */}
+        <P>9.8 Jos kauppa päättyy siihen, että myyjä ottaa ajoneuvon takaisin, tai siihen, että osapuolet sopivat kaupan purkamisesta, myyjä kirjaa kaupan päättymisen RAHTIS-palveluun viipymättä. Kirjauksesta alkaen palvelun kautta ei enää laadita maksuerien laskuja eikä lähetetä maksumuistutuksia. Kirjaus ei muuta osapuolten oikeuksia eikä velvollisuuksia: osamaksukaupasta annetun lain 3 ja 4 §:n mukainen tilitys toimitetaan osapuolten kesken, ja jos osapuolet eivät sovi tilityksestä, sen toimittaa ulosottomies kohdan 9.7 mukaisesti.</P>
 
         <H>10. Tietojen jakaminen RAHTIS-palvelussa</H>
         <P>10.1 Osapuolet sopivat, että RAHTIS-palvelussa myyjälle näytetään sopimuksen ajan ajoneuvon matkamittarilukema, huolto-, vika-, tarkastus- ja katsastustiedot, maksutilanne sekä sijainti kohdan 8 rajoissa. Ajoneuvon kuljetustehtäviä ja tuloja koskevat tiedot näytetään myyjälle vain kuukausikoosteena ja vain, jos ostaja on sen palvelussa erikseen hyväksynyt.</P>

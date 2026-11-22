@@ -1212,6 +1212,8 @@ export type Database = {
       companies: {
         Row: {
           weekly_invoicing: boolean
+          weekly_invoicing_from: string | null
+          auto_invoice: boolean
           activated_at: string | null
           approved_at: string | null
           bic: string | null
@@ -1260,6 +1262,8 @@ export type Database = {
         }
         Insert: {
           weekly_invoicing?: boolean
+          weekly_invoicing_from?: string | null
+          auto_invoice?: boolean
           activated_at?: string | null
           approved_at?: string | null
           bic?: string | null
@@ -1308,6 +1312,8 @@ export type Database = {
         }
         Update: {
           weekly_invoicing?: boolean
+          weekly_invoicing_from?: string | null
+          auto_invoice?: boolean
           activated_at?: string | null
           approved_at?: string | null
           bic?: string | null
@@ -8352,6 +8358,7 @@ export type Database = {
       carrier_clients: {
         Args: never
         Returns: {
+          auto_invoice: boolean
           business_id: string
           contact_email: string
           country: string
@@ -8638,6 +8645,7 @@ export type Database = {
       }
       carrier_update_client: {
         Args: {
+          p_auto_invoice?: boolean
           p_business_id: string
           p_client_id: string
           p_country?: string

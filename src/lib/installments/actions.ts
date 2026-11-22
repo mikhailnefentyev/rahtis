@@ -9,6 +9,7 @@ import { defaultLocale, isLocale, type Locale } from '@/lib/i18n';
 import { notify } from '@/lib/notify';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
+import { isTerminationReason, vatModeAllowedForNew } from './access';
 import { buildSchedule, type VatMode } from './calc';
 import { fill, installmentUiCopy } from './copy';
 import { createFirstInvoice } from './firstInvoice';
@@ -130,8 +131,9 @@ export async function saveListingAction(_prev: ActionState, fd: FormData): Promi
   const { ok } = await ready();
   if (!ok) return { error: c.notAllowed, saved: false };
 
+  /* В кабинете объявление всегда с обычным НДС (решение 22.11.2026); другой режим не принимает и база. */
   const vatMode = str(fd, 'vat_mode') as VatMode;
-  if (!VAT_MODES.includes(vatMode)) return { error: c.listing.error, saved: false };
+  if (!vatModeAllowedForNew(vatMode)) return { error: c.listing.error, saved: false };
   /* Ставка для проверки калькулятором; в базе — по стране продавца. */
   const terms = readTerms(fd, vatMode, 2550, false);
   const odometer = str(fd, 'odometer') ? Number(str(fd, 'odometer').replace(/\s/g, '')) : null;
@@ -202,8 +204,10 @@ export async function startDealAction(_prev: ActionState, fd: FormData): Promise
   const { viewer, ok } = await ready();
   if (!ok || viewer.status !== 'ready' || !viewer.company) return { error: c.notAllowed, saved: false };
 
+  /* Новая сделка — только с обычным НДС (решение 22.11.2026): по старому объявлению с другим режимом предложение не принимается. */
   const vatMode = str(fd, 'vat_mode') as VatMode;
-  const terms = readTerms(fd, VAT_MODES.includes(vatMode) ? vatMode : 'STANDARD', Number(str(fd, 'vat_bps')) || 0, true);
+  if (!vatModeAllowedForNew(vatMode)) return { error: c.listing.vatOld, saved: false };
+  const terms = readTerms(fd, vatMode, Number(str(fd, 'vat_bps')) || 0, true);
   if (!terms) return { error: c.listing.error, saved: false };
 
   const supabase = await createClient();
@@ -237,6 +241,7 @@ export async function proposeTermsAction(_prev: ActionState, fd: FormData): Prom
   const { viewer, ok } = await ready();
   if (!ok || viewer.status !== 'ready' || !viewer.company) return { error: c.notAllowed, saved: false };
 
+  /* Уже начатая сделка идёт со своим режимом НДС до конца — режим здесь нужен только калькулятору, в базе он не меняется. */
   const vatMode = str(fd, 'vat_mode') as VatMode;
   const terms = readTerms(fd, VAT_MODES.includes(vatMode) ? vatMode : 'STANDARD', Number(str(fd, 'vat_bps')) || 0, true);
   if (!terms) return { error: c.listing.error, saved: false };
@@ -510,4 +515,56 @@ export async function retryCreditNoteAction(_prev: ActionState, fd: FormData): P
   }
   revalidatePath(`/${locale}/carrier/installments/${dealId}`);
   return result;
+}
+
+// ── Прекращение сделки в рассрочке ───────────────────────────────────
+
+/* Функции terminate_installment_deal ещё нет в src/types/database.ts (миграция 20261126100000) — вызов с собственной подписью. */
+type TerminateRpc = {
+  rpc(
+    fn: 'terminate_installment_deal',
+    args: { p_deal_id: string; p_reason: string; p_note: string | null },
+  ): PromiseLike<{ data: string | null; error: { code?: string; message: string } | null }>;
+};
+
+/**
+ * Продавец записывает, что сделка в рассрочке прекращена (22.11.2026):
+ * забрал машину по закону или стороны договорились. Счета, напоминания и
+ * сигналы о пороге по сделке прекращаются; взаиморасчёт RAHTIS не считает.
+ * Покупателю — уведомление в кабинете.
+ */
+export async function terminateDealAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
+  const locale = toLocale(fd.get('locale'));
+  const c = installmentUiCopy(locale);
+  const { viewer, ok } = await ready();
+  if (!ok || viewer.status !== 'ready' || !viewer.company) return failed(c.notAllowed);
+  const dealId = str(fd, 'deal_id');
+  const reason = str(fd, 'reason');
+  const note = str(fd, 'note');
+  if (!isTerminationReason(reason) || note.length > 2000) return failed(c.listing.error);
+
+  const supabase = await createClient();
+  const { error } = await (supabase as unknown as TerminateRpc).rpc('terminate_installment_deal', {
+    p_deal_id: dealId,
+    p_reason: reason,
+    p_note: note || null,
+  });
+  if (error) {
+    console.error('прекращение сделки:', error.message);
+    /* Сделка могла измениться (последний взнос оплачен) — страницу обновляем. */
+    revalidatePath(`/${locale}/carrier/installments/${dealId}`);
+    /* 55006 — у машины покупателя открытые рейсы; 42501 — не продавец или не главный в компании. */
+    return failed(error.code === '55006' ? c.termination.openTrips : error.code === '42501' ? c.notAllowed : c.deal.error);
+  }
+  const parties = await dealParties(dealId);
+  if (parties) {
+    await tell(parties.buyer_company_id, dealId, { code: 'terminated', params: { plate: parties.plate } }, (cc) => ({
+      title: fill(cc.notify.terminatedTitle, { plate: parties.plate }),
+      body: cc.notify.terminatedBody,
+    }));
+  }
+  revalidatePath(`/${locale}/carrier/installments/${dealId}`);
+  revalidatePath(`/${locale}/carrier/installments`);
+  revalidatePath(`/${locale}/carrier/fleet`);
+  return done;
 }

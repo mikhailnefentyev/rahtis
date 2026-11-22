@@ -5,7 +5,7 @@ import { TruckPhoto } from '@/components/domain/TruckPhoto';
 import { Badge, Card, CardBody, EmptyState, buttonClass } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
 import { cn } from '@/lib/cn';
-import { installmentsAvailable } from '@/lib/installments/access';
+import { dealBadgeTone, installmentsAvailable } from '@/lib/installments/access';
 import { setListingStatusAction } from '@/lib/installments/actions';
 import { fill, installmentUiCopy } from '@/lib/installments/copy';
 import { isLocale } from '@/lib/i18n';
@@ -158,7 +158,7 @@ export default async function InstallmentsPage({
                       <div>
                         <div className="flex flex-wrap items-center gap-2">
                           <span className="font-mono text-[15px] font-bold">{d.plate}</span>
-                          <Badge tone={d.status === 'AGREED' || d.status === 'ACTIVE' ? 'ok' : d.status === 'NEGOTIATING' ? 'warn' : d.status === 'PAID_OFF' ? 'info' : 'neutral'}>{ui.status[d.status]}</Badge>
+                          <Badge tone={dealBadgeTone(d.status)}>{ui.status[d.status] ?? d.status}</Badge>
                           <span className="text-[13px] text-ink-muted">{ui.role[d.role]}</span>
                         </div>
                         <p className="mt-1 text-[14px]">

@@ -33,7 +33,7 @@ export function OfferForm({
     <form action={action} className="flex flex-col gap-4">
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="listing_id" value={listingId} />
-      <TermsFields ui={ui} calc={calc} defaults={defaults} vatEditable={false} withDates locale={locale} />
+      <TermsFields ui={ui} calc={calc} defaults={defaults} withDates locale={locale} />
       {state.error && <p className="text-[14px] text-danger">{state.error}</p>}
       <div>
         <Button type="submit" variant="primary" disabled={pending}>
@@ -92,7 +92,7 @@ export function DealResponse({
         <form key={version} action={propose} className="flex flex-col gap-4 rounded-card border border-line p-4">
           <input type="hidden" name="locale" value={locale} />
           <input type="hidden" name="deal_id" value={dealId} />
-          <TermsFields ui={ui} calc={calc} defaults={defaults} vatEditable={false} withDates locale={locale} />
+          <TermsFields ui={ui} calc={calc} defaults={defaults} withDates locale={locale} />
           {proposeState.error && <p className="text-[14px] text-danger">{proposeState.error}</p>}
           <div className="flex gap-2">
             <Button type="submit" variant="primary" disabled={proposing}>

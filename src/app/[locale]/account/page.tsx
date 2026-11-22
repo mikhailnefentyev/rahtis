@@ -233,7 +233,7 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
 
         {/* Недельный счёт заказчику от имени перевозчика (17.11.2026). */}
         {company && company.status === 'ACTIVE' && company.kind === 'CARRIER' && (
-          <InvoicingForm enabled={company.weekly_invoicing} canEdit={isOwner} />
+          <InvoicingForm enabled={company.weekly_invoicing} from={company.weekly_invoicing_from} canEdit={isOwner} />
         )}
 
         {invoiceTerms && <InvoiceTermsPanel rows={invoiceTerms} canEdit={isOwner} />}

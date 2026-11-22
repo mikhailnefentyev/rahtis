@@ -139,6 +139,11 @@ export default async function OwnOrdersPage({
           emailDraft={emailDraft}
           homeCountry={viewer.company?.country ?? 'FI'}
           blocked={legalPending ? t.legal.reacceptNeeded : null}
+          /* Счета своим клиентам — только при включённых недельных счетах; меняет владелец, как и их (22.11.2026). */
+          autoInvoice={{
+            shown: viewer.company?.weekly_invoicing === true,
+            canEdit: viewer.profile.member_kind !== 'DISPATCHER',
+          }}
         />
       )}
     </main>

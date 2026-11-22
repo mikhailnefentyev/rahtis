@@ -39,6 +39,18 @@ export async function loadDeal(dealId: string) {
 
 export type LoadedDeal = NonNullable<Awaited<ReturnType<typeof loadDeal>>>;
 
+/**
+ * Прекращение сделки в рассрочке (22.11.2026, миграция 20261126100000):
+ * когда, почему и пояснение продавца. Столбцов ещё нет в
+ * src/types/database.ts, поэтому читаются из строки сделки отдельно.
+ */
+export type DealTermination = { at: string | null; reason: string | null; note: string | null };
+
+export function dealTermination(deal: LoadedDeal['deal']): DealTermination {
+  const row = deal as unknown as { terminated_at?: string | null; terminated_reason?: string | null; terminated_note?: string | null };
+  return { at: row.terminated_at ?? null, reason: row.terminated_reason ?? null, note: row.terminated_note ?? null };
+}
+
 /** День по Хельсинки из метки времени (договор датируется по финскому календарю). */
 export const helsinkiDay = (iso: string) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Helsinki' }).format(new Date(iso));
 

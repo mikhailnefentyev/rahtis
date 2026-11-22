@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { csvNumber, csvText } from '@/lib/csv';
+import { csvDecimal, csvText } from '@/lib/csv';
 import writeExcelFile, { type SheetData } from 'write-excel-file/node';
 import type { Dictionary } from '@/lib/i18n';
 import type { PeriodReport, ReportClaim, ReportLine } from './period';
@@ -12,10 +12,10 @@ import type { PeriodReport, ReportClaim, ReportLine } from './period';
  * Excel одного отчёта разошлись бы составом на первой же правке.
  *
  * Числа — числами. В XLSX сумма лежит как 1234.5 с форматом, а не как
- * строка «1 234,50 €»: строку бухгалтерия не сложит. В CSV — евро с
- * точкой, даты ISO, разделитель «;», UTF-8 с BOM. Это то, что без
- * настройки понимает и импорт учётной системы, и Excel с финской
- * локалью (где запятая занята под десятичный знак).
+ * строка «1 234,50 €»: строку бухгалтерия не сложит. В CSV — даты ISO,
+ * разделитель «;», UTF-8 с BOM; дробная часть суммы — через запятую для
+ * всех языков кабинета, кроме английского (решение 22.11.2026): Excel с
+ * финской локалью читал «480.00» как текст, а «25.5» как дату.
  */
 
 type Kind = 'text' | 'date' | 'int' | 'money' | 'percent';
@@ -294,10 +294,10 @@ export async function periodXlsx(report: PeriodReport, t: Dictionary): Promise<B
 /* ── CSV ───────────────────────────────────────────────────────── */
 
 /* Текст (имена, адреса, номера) — с защитой от формул; числа пишет код, они без апострофа (lib/csv). */
-function csvValue(kind: Kind, value: string | number | null): string {
+/* Дробная часть — через запятую, кроме английского (22.11.2026, lib/csv). */
+function csvValue(kind: Kind, value: string | number | null, locale: string): string {
   if (kind === 'text' || kind === 'date') return csvText(value);
-  if (value == null) return csvNumber(null);
-  return csvNumber(kind === 'money' ? Number(value).toFixed(2) : String(value));
+  return csvDecimal(value, locale, kind === 'money' ? 2 : undefined);
 }
 
 /**
@@ -312,10 +312,10 @@ function csvValue(kind: Kind, value: string | number | null): string {
  * и те и другие, свои идут вторым блоком после пустой строки и строки
  * с названием, как отдельный лист в XLSX.
  */
-export function periodCsv(report: PeriodReport, t: Dictionary): string {
+export function periodCsv(report: PeriodReport, t: Dictionary, locale: string): string {
   const table = <T,>(columns: Column<T>[], rows: T[]) => [
-    columns.map((c) => csvValue('text', c.header)).join(';'),
-    ...rows.map((row) => columns.map((c) => csvValue(c.kind, c.get(row))).join(';')),
+    columns.map((c) => csvValue('text', c.header, locale)).join(';'),
+    ...rows.map((row) => columns.map((c) => csvValue(c.kind, c.get(row), locale)).join(';')),
   ];
   const trips = table(tripColumns(report, t), report.lines);
   const own = table(ownColumns(report, t), report.own.lines);
@@ -325,6 +325,6 @@ export function periodCsv(report: PeriodReport, t: Dictionary): string {
       ? trips
       : report.lines.length === 0
         ? own
-        : [...trips, '', csvValue('text', t.report_.ownTitle), ...own];
+        : [...trips, '', csvValue('text', t.report_.ownTitle, locale), ...own];
   return `﻿${lines.join('\r\n')}\r\n`;
 }

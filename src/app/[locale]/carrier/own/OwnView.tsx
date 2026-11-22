@@ -8,7 +8,7 @@ import { orderStatusTone } from '@/components/ui/tone';
 import { useI18n } from '@/lib/i18n/provider';
 import type { CarrierClient, OrderStatus, OwnVehicle } from '@/types/db';
 import { OrderForm } from '../../shipper/orders/OrderForm';
-import { OwnClients } from './OwnClients';
+import { OwnClients, type AutoInvoiceAccess } from './OwnClients';
 import { OrderInboxLine } from '@/components/domain/OrderInboxAddress';
 import type { EmailDraftInfo } from '@/lib/inbound/load';
 
@@ -41,7 +41,10 @@ export function OwnView({
   homeCountry = 'FI',
   inboxAddress = null,
   emailDraft = null,
+  autoInvoice = { shown: false, canEdit: false },
 }: {
+  /** Счета своим клиентам от имени перевозчика: виден ли переключатель и кто его меняет (22.11.2026). */
+  autoInvoice?: AutoInvoiceAccess;
   /** Адрес пересылки заказов компании; приём не настроен — null. */
   inboxAddress?: string | null;
   /** Черновик из пересланного письма (?email=): форма открывается заполненной. */
@@ -164,7 +167,7 @@ export function OwnView({
         </div>
       )}
 
-      <OwnClients clients={clients} />
+      <OwnClients clients={clients} autoInvoice={autoInvoice} />
     </>
   );
 }

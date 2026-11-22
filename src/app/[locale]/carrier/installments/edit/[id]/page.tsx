@@ -2,8 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Card, CardBody } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
-import type { VatMode } from '@/lib/installments/calc';
-import { installmentsAvailable, vehicleSellable } from '@/lib/installments/access';
+import { CABINET_VAT_MODE, installmentsAvailable, vehicleSellable } from '@/lib/installments/access';
 import { installmentUiCopy } from '@/lib/installments/copy';
 import { isLocale } from '@/lib/i18n';
 import { installmentCopy } from '@/lib/landing/installment';
@@ -53,7 +52,8 @@ export default async function EditListingPage({ params }: { params: Promise<{ lo
             vehicleId={listing.vehicle_id}
             defaults={{
               price: euros(listing.price_cents),
-              vatMode: listing.vat_mode as VatMode,
+              /* Объявление сохраняется только с обычным НДС (решение 22.11.2026) — и старое с другим режимом тоже. */
+              vatMode: CABINET_VAT_MODE,
               vatBps: listing.vat_bps,
               down: euros(listing.down_payment_cents),
               months: String(listing.months),

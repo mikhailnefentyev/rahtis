@@ -79,7 +79,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
   });
 
   if (format === 'csv') {
-    return new Response(periodCsv(report, t), {
+    return new Response(periodCsv(report, t, locale), {
       headers: headers('text/csv; charset=utf-8', 'csv'),
     });
   }

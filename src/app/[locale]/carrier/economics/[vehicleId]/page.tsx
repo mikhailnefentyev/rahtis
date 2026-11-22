@@ -44,7 +44,7 @@ export default async function VehicleEconomicsPage({
 
   const month = parseFuelMonth(query.month);
   const months = monthRange(month, 12);
-  const data = await loadEconomics(supabase, { id: company.id, partnership: company.partnership ?? null, currency: f.currency }, months);
+  const data = await loadEconomics(supabase, { id: company.id, partnership: company.partnership ?? null, currency: f.currency, country: company.country }, months);
   const vehicle = data.vehicles.find((v) => v.id === vehicleId);
   const econ = data.economics.find((v) => v.vehicleId === vehicleId);
   if (!vehicle || !econ) notFound();
@@ -63,12 +63,13 @@ export default async function VehicleEconomicsPage({
     fin?.financing === 'CASH' && fin.purchase_price_cents
       ? `${s.lineDepreciation} (${fin.residual_cents ? `(${f.money(fin.purchase_price_cents, fin.currency)} − ${f.money(fin.residual_cents, fin.currency)})` : f.money(fin.purchase_price_cents, fin.currency)} ÷ ${fin.useful_life_months} ${s.monthsShort})`
       : s.lineDepreciation;
-  const lines: { label: string; get: (m: MonthEconomics) => number; strong?: boolean }[] = [
+  const lines: { label: string; hint?: string; get: (m: MonthEconomics) => number; strong?: boolean }[] = [
     { label: s.revenuePlatform, get: (m) => m.revenue.platform },
     { label: s.revenueOwn, get: (m) => m.revenue.own },
     { label: s.revenueSite, get: (m) => m.revenue.site },
     { label: s.colRevenue, get: (m) => m.revenue.total, strong: true },
-    { label: s.colFuel, get: (m) => -m.costs.fuel },
+    /* Решение 22.11.2026: топливо — без НДС, из итога чека по общей ставке. */
+    { label: s.colFuel, hint: s.fuelNetNote, get: (m) => -m.costs.fuel },
     { label: s.colDriver, get: (m) => -m.costs.driver },
     { label: s.lineFinancing, get: (m) => -m.costs.financing },
     { label: depLabel, get: (m) => -m.costs.depreciation },
@@ -123,7 +124,10 @@ export default async function VehicleEconomicsPage({
           <tbody>
             {lines.map((line) => (
               <Tr key={line.label}>
-                <Td className={line.strong ? 'font-semibold' : 'text-ink-muted'}>{line.label}</Td>
+                <Td className={line.strong ? 'font-semibold' : 'text-ink-muted'}>
+                  {line.label}
+                  {line.hint && <span className="block max-w-xs text-[11px] leading-snug text-ink-dim">{line.hint}</span>}
+                </Td>
                 {list.map((m) => {
                   const v = line.get(m);
                   return (

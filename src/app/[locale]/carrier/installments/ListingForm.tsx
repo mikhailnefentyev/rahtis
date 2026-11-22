@@ -54,7 +54,7 @@ export function ListingForm({
         </Field>
       </div>
 
-      <TermsFields ui={ui} calc={calc} defaults={defaults} vatEditable withDates={false} locale={locale} />
+      <TermsFields ui={ui} calc={calc} defaults={defaults} withDates={false} locale={locale} />
 
       <Field label={ui.listing.description} hint={ui.listing.descriptionHint}>
         {(p) => <Textarea {...p} name="description" rows={4} maxLength={4000} defaultValue={description} />}

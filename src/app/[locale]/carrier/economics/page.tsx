@@ -56,7 +56,7 @@ export default async function EconomicsPage({
   const current = currentFuelMonth();
   const month = parseFuelMonth(query.month);
   const months = monthRange(month, 12);
-  const data = await loadEconomics(supabase, { id: company.id, partnership: company.partnership ?? null, currency: f.currency }, months);
+  const data = await loadEconomics(supabase, { id: company.id, partnership: company.partnership ?? null, currency: f.currency, country: company.country }, months);
 
   const monthLabel = new Intl.DateTimeFormat(t.meta.intl, { month: 'short', year: 'numeric', timeZone: 'UTC' });
   const monthLong = new Intl.DateTimeFormat(t.meta.intl, { month: 'long', year: 'numeric', timeZone: 'UTC' });
@@ -176,6 +176,8 @@ export default async function EconomicsPage({
         <p className="mt-2 text-[12px] text-warn">{s.unassignedPay.replace('{amount}', eur(data.unassignedPayCents))}</p>
       )}
       <p className="mt-2 max-w-4xl text-[12px] leading-relaxed text-ink-dim">{s.estimateNote}</p>
+      {/* Решение 22.11.2026: топливо — без НДС, из итога чека по общей ставке. */}
+      <p className="mt-1 max-w-4xl text-[12px] leading-relaxed text-ink-dim">{s.fuelNetNote}</p>
 
       <TableFrame caption={s.trendTitle} className="mt-6">
         <Table>

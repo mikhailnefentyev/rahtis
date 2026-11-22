@@ -2,7 +2,7 @@ import { renderToBuffer } from '@react-pdf/renderer';
 import { redirect } from 'next/navigation';
 import { noAccessPath, signInPath } from '@/lib/auth/paths';
 import { getViewer } from '@/lib/auth/viewer';
-import { csvFile, csvNumber, csvText } from '@/lib/csv';
+import { csvDecimal, csvFile, csvText } from '@/lib/csv';
 import { loadEconomics, monthRange } from '@/lib/economics/load';
 import type { MonthEconomics } from '@/lib/economics/profit';
 import { parseFuelMonth } from '@/lib/fuel/month';
@@ -28,8 +28,6 @@ import { createClient } from '@/lib/supabase/server';
  */
 export const dynamic = 'force-dynamic';
 
-const cents2 = (c: number) => (c / 100).toFixed(2);
-
 export async function GET(request: Request, { params }: { params: Promise<{ locale: string }> }) {
   const { locale: raw } = await params;
   const locale = isLocale(raw) ? raw : defaultLocale;
@@ -51,7 +49,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
   const { t, f } = await getViewerI18n(locale);
   const data = await loadEconomics(
     supabase,
-    { id: viewer.company.id, partnership: viewer.company.partnership ?? null, currency: f.currency },
+    { id: viewer.company.id, partnership: viewer.company.partnership ?? null, currency: f.currency, country: viewer.company.country },
     months,
   );
   const s = t.economics;
@@ -68,7 +66,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
   });
 
   if (format === 'csv') {
-    /* Числа — с точкой и без разделителя тысяч, как в остальных выгрузках. */
+    /* Числа — без разделителя тысяч; дробная часть через запятую, кроме английского (22.11.2026, lib/csv). */
     const header = [
       s.month,
       s.colVehicle,
@@ -98,9 +96,9 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
           csvText(m.month),
           csvText(v.plate),
           ...[m.revenue.platform, m.revenue.own, m.revenue.site, m.revenue.total, c.fuel, c.driver, c.financing, c.depreciation, c.insurance, c.tax, c.fixed, c.journal, c.rahtis, c.total, m.profit].map(
-            (x) => csvNumber(cents2(x)),
+            (x) => csvDecimal(x / 100, locale, 2),
           ),
-          csvNumber(m.marginPct?.toFixed(1)),
+          csvDecimal(m.marginPct, locale, 1),
           csvText(data.currency),
         ]);
       }
@@ -241,7 +239,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
         { label: s.statProfit, value: eur(totalOf.profit) },
         { label: s.statMargin, value: margin(totalOf) },
       ],
-      tables: tables.map((tb, i) => (i === 0 ? { ...tb, note: s.estimateNote } : tb)),
+      tables: tables.map((tb, i) => (i === 0 ? { ...tb, note: `${s.estimateNote} ${s.fuelNetNote}` } : tb)),
       page: t.report_.page,
       footer: `${t.workReport.generated} ${f.dateTime(new Date())}`,
     }),

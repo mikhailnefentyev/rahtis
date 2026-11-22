@@ -2,7 +2,7 @@ import 'server-only';
 
 import { payoutCents, COMMISSION_BPS, subscriptionLadderCents } from '@/lib/config';
 import { buildDriverReport } from '@/lib/drivers/report';
-import { invoiceLines, type InvoiceDay } from '@/lib/sites/invoice';
+import { invoiceLines, standardVatBps, type InvoiceDay } from '@/lib/sites/invoice';
 import { dayMinutes } from '@/lib/sites/work';
 import { asCurrency, type Currency } from '@/lib/money/currency';
 import { loadFxHistory } from '@/lib/money/fx';
@@ -10,6 +10,7 @@ import { chunks, fetchAll, fetchIn } from '@/lib/money/paging';
 import { createAdminClient } from '@/lib/supabase/admin';
 import type { createClient } from '@/lib/supabase/server';
 import { companyConverter } from './convert';
+import { fuelNetCents, fuelVatCountry } from './fuelVat';
 import { vehicleEconomics, type EconomicsInput, type VehicleFinance } from './profit';
 
 /**
@@ -19,7 +20,8 @@ import { vehicleEconomics, type EconomicsInput, type VehicleFinance } from './pr
  *
  * Валюта: каждая строка — в своей валюте (рейсы RAHTIS и простой — евро,
  * свои рейсы — валюта заказа, объекты — валюта объекта, топливо — валюта
- * чека, расходы и карточка — своя колонка, абонемент — евро). Всё
+ * чека, расходы и карточка — своя колонка, абонемент — евро). Топливо —
+ * без НДС: из итога чека налог снимается по ставке страны (fuelVat.ts). Всё
  * переводится в рабочую валюту компании по курсу ЕЦБ дня строки до
  * сложения; строка без курса в итог не входит (missingRates).
  */
@@ -78,7 +80,7 @@ const endOf = (month: string) => {
 
 export async function loadEconomics(
   supabase: Supabase,
-  company: { id: string; partnership: string | null; currency?: string | null },
+  company: { id: string; partnership: string | null; currency?: string | null; country?: string | null },
   months: string[],
 ) {
   const currency: Currency = asCurrency(company.currency, 'EUR');
@@ -287,8 +289,15 @@ export async function loadEconomics(
     if (!f.amount_cents || !vehicleIds.has(f.vehicle_id)) continue;
     const date = localDate(f.filled_at);
     if (!inRange(date)) continue;
+    /*
+     * Решение 22.11.2026: топливо в доходности — без НДС, как остальные
+     * суммы раздела. amount_cents — итог чека с налогом; ставка — общая
+     * ставка страны покупки (по валюте чека, у чека в евро — страна
+     * компании). Раздел «Топливо» показывает чек как внесён.
+     */
+    const net = fuelNetCents(f.amount_cents, standardVatBps(fuelVatCountry(f.currency, company.country)));
     /* Чек — в своей валюте (польская машина заправилась в Германии — евро). */
-    const cents = conv.cents(f.amount_cents, f.currency, date);
+    const cents = conv.cents(net, f.currency, date);
     if (cents !== null) fuelRows.push({ vehicleId: f.vehicle_id, month: date.slice(0, 7), cents });
   }
 

@@ -9,7 +9,7 @@ import { SiteInvoicePdf } from '@/lib/sites/SiteInvoicePdf';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { ibanHoldActive } from '@/lib/trust/changes';
 import { lastIbanChange } from '@/lib/trust/sensitive';
-import { vatOf, type VatMode } from './calc';
+import { firstInvoiceSettledAtIssue, vatOf, type VatMode } from './calc';
 
 /**
  * Первый счёт продавца по согласованной сделке (22.11.2026).
@@ -25,6 +25,11 @@ import { vatOf, type VatMode } from './calc';
  * сорвался, повтор допечатывает и досылает уже выданный номер. Если
  * сорвалось между закреплением и номером (у счёта остался DRAFT-…),
  * повтор сначала выдаёт номер (22.11.2026).
+ *
+ * Счёт, по которому сейчас платить нечего (старая сделка без НДС и без
+ * взноса), считается оплаченным сразу при выставлении — иначе передача
+ * ждала бы отметки об оплате нуля (22.11.2026). У новых сделок НДС есть
+ * всегда, и такого счёта не бывает.
  *
  * Счёт от имени продавца, деньги идут продавцу; RAHTIS их не принимает.
  */
@@ -62,16 +67,20 @@ export async function createFirstInvoice(dealId: string): Promise<FirstInvoiceSt
   if (deal.first_invoice_id) {
     const { data: existing } = await admin
       .from('carrier_invoices')
-      .select('id, company_id, number, issued_on, file_path, sent_at')
+      .select('id, company_id, number, issued_on, file_path, sent_at, vat_cents')
       .eq('id', deal.first_invoice_id)
       .maybeSingle();
     if (!existing) return 'NOT_FOUND';
+    if (!existing.number.startsWith(DRAFT_PREFIX)) await settleIfNothingDue(deal.id, existing.id, deal.down_payment_cents, existing.vat_cents);
     if (existing.file_path && existing.sent_at) return 'EXISTS';
     /*
      * Процесс оборвался после закрепления счёта, но до номера: раньше
      * повтор навсегда упирался в NOT_FOUND у deliver (22.11.2026).
      */
-    if (existing.number.startsWith(DRAFT_PREFIX)) await assignNumber(existing.id, existing.company_id, existing.issued_on);
+    if (existing.number.startsWith(DRAFT_PREFIX)) {
+      await assignNumber(existing.id, existing.company_id, existing.issued_on);
+      await settleIfNothingDue(deal.id, existing.id, deal.down_payment_cents, existing.vat_cents);
+    }
     return deliver(existing.id, deal);
   }
 
@@ -184,7 +193,28 @@ export async function createFirstInvoice(dealId: string): Promise<FirstInvoiceSt
     throw cause;
   }
 
+  await settleIfNothingDue(deal.id, invoice.id, deal.down_payment_cents, vatCents);
   return deliver(invoice.id, deal);
+}
+
+/**
+ * Счёт выставлен, а платить по нему сейчас нечего (взнос 0 и НДС 0) —
+ * отметка об оплате ставится сразу, передача не ждёт продавца
+ * (22.11.2026). Только «где пусто» и только у согласованной сделки:
+ * повтор ничего не перепишет.
+ */
+async function settleIfNothingDue(dealId: string, invoiceId: string, downPaymentCents: number, vatCents: number): Promise<void> {
+  if (!firstInvoiceSettledAtIssue(downPaymentCents, vatCents)) return;
+  const admin = createAdminClient();
+  const { error } = await admin
+    .from('installment_deals')
+    .update({ first_invoice_paid_at: new Date().toISOString() })
+    .eq('id', dealId)
+    .eq('status', 'AGREED')
+    .is('first_invoice_paid_at', null);
+  if (error) throw new Error(`первый счёт без суммы к оплате: ${error.message}`);
+  /* paid_at у счёта — дата: день по Хельсинки. */
+  await admin.from('carrier_invoices').update({ paid_at: todayInHelsinki() }).eq('id', invoiceId).is('paid_at', null);
 }
 
 /**

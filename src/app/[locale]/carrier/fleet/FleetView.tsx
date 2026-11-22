@@ -16,6 +16,7 @@ export function FleetView({
   drivers,
   driverByVehicle,
   documentsOk,
+  returned = [],
   today,
   service = {},
   country,
@@ -25,6 +26,8 @@ export function FleetView({
   /** Текущий водитель каждой машины: vehicle_id → driver_id. */
   driverByVehicle: Record<string, string>;
   documentsOk: boolean;
+  /** Машины, возвращённые продавцу после прекращения рассрочки (копии покупателя). */
+  returned?: string[];
   /** Считается на сервере: рендер обязан быть чистым, а часы клиента могут врать. */
   today: string;
   /** Обслуживание машины: худший срок плана и открытые дефекты (src/lib/maintenance/load.ts). */
@@ -86,8 +89,14 @@ export function FleetView({
                       <Badge tone="warn">{t.vehicle.adr}</Badge>
                     )}
                     {vehicle.installment_role === 'SOLD' ? (
-                      /* Продана в рассрочку: работает у покупателя, здесь — только история. */
-                      <Badge tone="neutral">{installmentUiCopy(locale).stage3.soldBadge}</Badge>
+                      /*
+                       * Продана в рассрочку: работает у покупателя, здесь — только история.
+                       * У покупателя после прекращения сделки (22.11.2026) та же отметка
+                       * стоит на его копии — там подпись «сделка прекращена», а не «продана».
+                       */
+                      <Badge tone="neutral">
+                        {returned.includes(vehicle.id) ? installmentUiCopy(locale).status.TERMINATED : installmentUiCopy(locale).stage3.soldBadge}
+                      </Badge>
                     ) : (
                       <Badge tone={vehicleAccessTone[vehicle.access]}>
                         {t.vehicleAccess[vehicle.access]}

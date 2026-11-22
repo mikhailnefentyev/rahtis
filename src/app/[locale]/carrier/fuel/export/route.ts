@@ -8,7 +8,7 @@ import { loadFuelMonth, parseFuelMonth, type FuelEntry } from '@/lib/fuel/month'
 import { defaultLocale, isLocale } from '@/lib/i18n';
 import { getViewerI18n } from '@/lib/i18n/viewer';
 import { createClient } from '@/lib/supabase/server';
-import { csvFile, csvNumber, csvText } from '@/lib/csv';
+import { csvDecimal, csvFile, csvText } from '@/lib/csv';
 
 /**
  * Отчёт о топливе за месяц: PDF или CSV, весь парк или одна машина.
@@ -69,7 +69,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
 
   if (format === 'csv') {
     /*
-     * Числа — с точкой и без разделителя тысяч, как в остальных выгрузках: так их читает любая программа.
+     * Числа — без разделителя тысяч, как в остальных выгрузках; дробная часть через запятую,
+     * кроме английского (22.11.2026, lib/csv). Суммы — итог чека как внесён, с НДС.
      * Сумма — в валюте чека с кодом валюты рядом, и та же сумма в валюте компании по курсу дня заправки.
      */
     const header = [
@@ -94,15 +95,15 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
         csvText(plates.get(row.vehicle_id)),
         csvText(row.driver_id ? drivers.get(row.driver_id) : null),
         csvText(product(row)),
-        csvNumber(row.quantity.toFixed(2)),
+        csvDecimal(row.quantity, locale, 2),
         csvText(row.unit ?? 'l'),
-        csvNumber(row.amount_cents != null ? (row.amount_cents / 100).toFixed(2) : null),
+        csvDecimal(row.amount_cents != null ? row.amount_cents / 100 : null, locale, 2),
         csvText(row.amount_cents != null ? row.currency : null),
-        csvNumber(row.own_amount_cents != null ? (row.own_amount_cents / 100).toFixed(2) : null),
-        csvNumber(row.odometer_km),
+        csvDecimal(row.own_amount_cents != null ? row.own_amount_cents / 100 : null, locale, 2),
+        csvDecimal(row.odometer_km, locale),
         csvText(row.station),
-        ...FUEL_SOURCES.map((source) => csvNumber(sourceQty(row, source)?.toFixed(2))),
-        csvNumber(spreadPct(row)?.toFixed(1)),
+        ...FUEL_SOURCES.map((source) => csvDecimal(sourceQty(row, source), locale, 2)),
+        csvDecimal(spreadPct(row), locale, 1),
       ]);
     }
     return new Response(csvFile(lines), { headers: headers('text/csv; charset=utf-8', 'csv') });

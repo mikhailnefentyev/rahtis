@@ -14,6 +14,11 @@ import { createClient } from '@/lib/supabase/server';
  * навсегда, а дубль — рядом с оригиналом. Права и правила — в базе
  * (carrier_update_client, carrier_delete_client); здесь только перевод
  * формы в вызов и отказов базы в слова.
+ *
+ * Отметка «RAHTIS отправляет этому клиенту счета от моего имени»
+ * (22.11.2026) идёт тем же путём — параметром carrier_update_client.
+ * Форма присылает её, только когда переключатель показан и доступен
+ * (auto_invoice_set); иначе отметка в базе остаётся прежней.
  */
 
 export type ClientState = { error: string | null; done: boolean };
@@ -40,17 +45,27 @@ export async function saveClientAction(_previous: ClientState, formData: FormDat
   const { normalized: businessId, valid } = checkBusinessId(country, raw);
   if (raw && !valid) return { error: t.own.clientInvalid, done: false };
 
+  const email = str(formData, 'email').toLowerCase();
+  const autoInvoice = formData.get('auto_invoice_set') === '1' ? formData.get('auto_invoice') === '1' : null;
+  /* Счёт уходит клиенту письмом: без почты отметку не включить (то же проверяет база, 23514). */
+  if (autoInvoice && !email) return { error: t.own.clientAutoInvoiceNeedsEmail, done: false };
+
   const supabase = await createClient();
   const { error } = await supabase.rpc('carrier_update_client', {
     p_client_id: str(formData, 'client_id'),
     p_name: name,
     p_business_id: raw ? businessId : '',
-    p_email: str(formData, 'email').toLowerCase(),
+    p_email: email,
     p_country: country,
+    /* Не передана — база оставляет отметку как была. */
+    ...(autoInvoice === null ? {} : { p_auto_invoice: autoInvoice }),
   });
 
   if (error) {
     if (error.code === '23505') return { error: t.own.clientDuplicate, done: false };
+    if (error.code === '23514') return { error: t.own.clientAutoInvoiceNeedsEmail, done: false };
+    /* Отметку о счетах меняет владелец компании, не диспетчер (триггер в базе). */
+    if (error.code === '42501') return { error: t.forwarder.roleOwnerOnly, done: false };
     if (error.code === '22023') return { error: t.own.clientInvalid, done: false };
     return { error: t.error.generic, done: false };
   }

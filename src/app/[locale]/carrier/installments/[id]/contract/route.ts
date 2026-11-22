@@ -1,6 +1,7 @@
 import { renderToBuffer } from '@react-pdf/renderer';
 import { NextResponse } from 'next/server';
 import { getViewer } from '@/lib/auth/viewer';
+import { dealHasContract } from '@/lib/installments/access';
 import { contractInput, loadDeal } from '@/lib/installments/contract';
 import { ContractPdf } from '@/lib/installments/ContractPdf';
 
@@ -10,8 +11,8 @@ import { ContractPdf } from '@/lib/installments/ContractPdf';
  * согласованных условий: условия после согласия не меняются.
  * Доступен весь срок рассрочки и после выплаты: страница сделки даёт
  * ссылку и тогда, а раньше после передачи здесь было 404 (22.11.2026).
+ * После прекращения сделки (TERMINATED) договор тоже остаётся доступен.
  */
-const WITH_CONTRACT = ['AGREED', 'ACTIVE', 'PAID_OFF'];
 
 export async function GET(_request: Request, { params }: { params: Promise<{ locale: string; id: string }> }) {
   const { id } = await params;
@@ -19,7 +20,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ loc
   if (viewer.status !== 'ready') return new NextResponse('Unauthorized', { status: 401 });
 
   const loaded = await loadDeal(id);
-  if (!loaded || !WITH_CONTRACT.includes(loaded.deal.status)) return new NextResponse('Not found', { status: 404 });
+  if (!loaded || !dealHasContract(loaded.deal.status)) return new NextResponse('Not found', { status: 404 });
   const input = contractInput(loaded);
   if (!input) return new NextResponse('Not found', { status: 404 });
 

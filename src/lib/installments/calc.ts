@@ -467,3 +467,81 @@ export function buyerCheck(a: {
     thin: marginCents > 0 && marginCents * 10_000 < a.revenueCents * a.thinBps,
   };
 }
+
+// ── Первый счёт без суммы к оплате ───────────────────────────────────
+
+/**
+ * Первый счёт, по которому сейчас платить нечего (взнос 0 и НДС 0), —
+ * оплаченным считается сразу при выставлении, иначе передача ждала бы
+ * отметки об оплате нуля (22.11.2026). У новых сделок НДС есть всегда,
+ * случай возможен только у старых — с режимом без НДС и без взноса.
+ */
+export function firstInvoiceSettledAtIssue(downPaymentCents: number, vatCents: number): boolean {
+  return downPaymentCents + vatCents <= 0;
+}
+
+// ── Прекращение сделки: справка для сторон ───────────────────────────
+
+export type TerminationPayment = {
+  principalCents: number;
+  interestCents: number;
+  paid: boolean;
+  /** Счёт на взнос выставлен. */
+  invoiced: boolean;
+};
+
+export type TerminationSummary = {
+  /** Оплачено по первому счёту: взнос и весь НДС; 0 — счёт не оплачен. */
+  firstInvoicePaidCents: number;
+  /** Оплаченные взносы в счёт цены. */
+  installmentsPaidCents: number;
+  /** Оплаченные проценты. */
+  interestPaidCents: number;
+  /** Всего уплачено покупателем продавцу. */
+  paidTotalCents: number;
+  /** Выставлено и не оплачено: взносы с процентами. */
+  invoicedUnpaidCents: number;
+  /** Взносы, на которые счёт уже не выставляется (без процентов). */
+  notInvoicedCents: number;
+};
+
+/**
+ * Что уплачено и что осталось на день прекращения сделки (22.11.2026) —
+ * только справка: взаиморасчёт по 3–4 § закона 91/1966 зависит от
+ * стоимости машины на день изъятия, которой RAHTIS не знает (settlement
+ * выше — для калькулятора, где стоимость задаёт пользователь).
+ */
+export function terminationSummary(input: {
+  priceCents: number;
+  vatMode: VatMode;
+  vatBps: number;
+  downPaymentCents: number;
+  firstInvoicePaid: boolean;
+  payments: TerminationPayment[];
+}): TerminationSummary {
+  const firstInvoicePaidCents = input.firstInvoicePaid
+    ? input.downPaymentCents + vatOf(input.priceCents, input.vatMode, input.vatBps)
+    : 0;
+  let installmentsPaidCents = 0;
+  let interestPaidCents = 0;
+  let invoicedUnpaidCents = 0;
+  let notInvoicedCents = 0;
+  for (const p of input.payments) {
+    if (p.paid) {
+      installmentsPaidCents += p.principalCents;
+      interestPaidCents += p.interestCents;
+    } else if (p.invoiced) {
+      invoicedUnpaidCents += p.principalCents + p.interestCents;
+    } else {
+      notInvoicedCents += p.principalCents;
+    }
+  }
+  return {
+    firstInvoicePaidCents,
+    installmentsPaidCents,
+    interestPaidCents,
+    paidTotalCents: firstInvoicePaidCents + installmentsPaidCents + interestPaidCents,
+    invoicedUnpaidCents,
+    notInvoicedCents,
+  };
+}

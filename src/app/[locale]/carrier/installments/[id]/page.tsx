@@ -12,8 +12,18 @@ import {
   retryCreditNoteAction,
   retryFirstInvoiceAction,
 } from '@/lib/installments/actions';
-import { buildSchedule, effectiveHandover, overduePayments, payoffCents, remedyAllowed, thresholds, type VatMode } from '@/lib/installments/calc';
-import { dealVehicle, helsinkiDay, loadDeal } from '@/lib/installments/contract';
+import { dealBadgeTone } from '@/lib/installments/access';
+import {
+  buildSchedule,
+  effectiveHandover,
+  overduePayments,
+  payoffCents,
+  remedyAllowed,
+  terminationSummary,
+  thresholds,
+  type VatMode,
+} from '@/lib/installments/calc';
+import { dealTermination, dealVehicle, helsinkiDay, loadDeal } from '@/lib/installments/contract';
 import { fill, installmentUiCopy } from '@/lib/installments/copy';
 import { todayInHelsinki } from '@/lib/dates';
 import { isLocale } from '@/lib/i18n';
@@ -22,6 +32,7 @@ import { installmentCopy } from '@/lib/landing/installment';
 import { ActionForm } from '../ActionForm';
 import { DealResponse } from '../DealForms';
 import { HandoverForm } from '../HandoverForm';
+import { TerminateForm } from '../TerminateForm';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -39,6 +50,11 @@ const fiDate = (iso: string) => {
  * Сделка рассрочки (22.11.2026): текущие условия и расчёт, ответ второй
  * стороне (принять увиденную версию или предложить свои), после согласия
  * — договор, первый счёт и что сделать до передачи машины.
+ *
+ * Сделку в рассрочке продавец может прекратить (22.11.2026): забрал машину
+ * по закону или стороны договорились. После этого обе стороны видят дату,
+ * причину, пояснение и справку о платежах; договор и счета остаются.
+ * Взаиморасчёт (tilitys) RAHTIS не считает — только напоминает, чьё это дело.
  */
 export default async function DealPage({ params }: { params: Promise<{ locale: string; id: string }> }) {
   const { locale, id } = await params;
@@ -116,6 +132,23 @@ export default async function DealPage({ params }: { params: Promise<{ locale: s
   const lastPaid = (payments ?? []).filter((p) => p.paid_at).map((p) => p.due_date).sort().pop() ?? interestFrom;
   const payoff = payoffCents(unpaid.reduce((sum, p) => sum + p.principal_cents, 0), lastPaid < today ? lastPaid : today, today, deal.annual_rate_bps);
   const vs = vehicleStatus?.[0];
+
+  /* Прекращённая сделка: что уплачено и что осталось — справка, без стоимости машины (её RAHTIS не знает). */
+  const terminated = deal.status === 'TERMINATED';
+  const termination = dealTermination(deal);
+  const summary = terminationSummary({
+    priceCents: deal.price_cents,
+    vatMode: deal.vat_mode as VatMode,
+    vatBps: deal.vat_bps,
+    downPaymentCents: deal.down_payment_cents,
+    firstInvoicePaid: Boolean(deal.first_invoice_paid_at),
+    payments: (payments ?? []).map((p) => ({
+      principalCents: p.principal_cents,
+      interestCents: p.interest_cents,
+      paid: Boolean(p.paid_at),
+      invoiced: Boolean(p.invoice_id),
+    })),
+  });
   const dateOf = (iso: string | null) => (iso ? fiDate(helsinkiDay(iso)) : '');
 
   /* Срок первого взноса — фактический, как только график построен: при поздней передаче он сдвинут. */
@@ -155,9 +188,7 @@ export default async function DealPage({ params }: { params: Promise<{ locale: s
             {ui.deal.seller}: {seller.legal_name || seller.name} · {ui.deal.buyer}: {buyer.legal_name || buyer.name}
           </p>
         </div>
-        <Badge tone={deal.status === 'AGREED' || deal.status === 'ACTIVE' ? 'ok' : deal.status === 'NEGOTIATING' ? 'warn' : deal.status === 'PAID_OFF' ? 'info' : 'neutral'}>
-          {ui.status[deal.status]}
-        </Badge>
+        <Badge tone={dealBadgeTone(deal.status)}>{ui.status[deal.status] ?? deal.status}</Badge>
       </header>
 
       <Card>
@@ -312,8 +343,49 @@ export default async function DealPage({ params }: { params: Promise<{ locale: s
         </Card>
       )}
 
-      {(deal.status === 'ACTIVE' || deal.status === 'PAID_OFF') && (
+      {(deal.status === 'ACTIVE' || deal.status === 'PAID_OFF' || terminated) && (
         <>
+          {terminated && (
+            <Card>
+              <CardBody className="flex flex-col gap-3 text-[14px]">
+                <p className="font-semibold text-danger">{fill(ui.termination.done, { date: dateOf(termination.at) })}</p>
+                <dl className="grid gap-1.5">
+                  <div className="flex items-baseline justify-between gap-4 border-b border-line pb-1">
+                    <dt className="text-ink-muted">{ui.termination.reason}</dt>
+                    <dd>{termination.reason ? (ui.termination.reasons[termination.reason] ?? termination.reason) : ui.stage3.none}</dd>
+                  </div>
+                </dl>
+                {termination.note && (
+                  <div>
+                    <p className="text-ink-muted">{ui.termination.sellerNote}</p>
+                    <p className="whitespace-pre-line">{termination.note}</p>
+                  </div>
+                )}
+                <p>{ui.termination.stopped}</p>
+                <p className="text-ink-muted">{isSeller ? ui.termination.vehicleSeller : ui.termination.vehicleBuyer}</p>
+                <h2 className="mt-2 text-[17px] font-semibold">{ui.termination.summaryTitle}</h2>
+                <dl className="grid gap-1.5">
+                  {(
+                    [
+                      [ui.termination.paidFirst, summary.firstInvoicePaidCents],
+                      [ui.termination.paidInstallments, summary.installmentsPaidCents],
+                      [ui.termination.paidInterest, summary.interestPaidCents],
+                      [ui.termination.paidTotal, summary.paidTotalCents],
+                      [ui.termination.invoicedUnpaid, summary.invoicedUnpaidCents],
+                      [ui.termination.notInvoiced, summary.notInvoicedCents],
+                    ] as [string, number][]
+                  ).map(([k, v]) => (
+                    <div key={k} className="flex items-baseline justify-between gap-4 border-b border-line pb-1">
+                      <dt className="text-ink-muted">{k}</dt>
+                      <dd className="font-mono">{eur(v)}</dd>
+                    </div>
+                  ))}
+                </dl>
+                <p className="text-ink-muted">{ui.termination.valueUnknown}</p>
+                <p>{ui.termination.settlement}</p>
+              </CardBody>
+            </Card>
+          )}
           {deal.status === 'PAID_OFF' && (
             <Card>
               <CardBody className="text-[14px] font-semibold text-ok">{fill(ui.stage3.paidOff, { date: dateOf(deal.paid_off_at) })}</CardBody>
@@ -396,7 +468,8 @@ export default async function DealPage({ params }: { params: Promise<{ locale: s
                   <tbody>
                     {(payments ?? []).map((p) => {
                       const inv = p.invoice_id ? invoiceById.get(p.invoice_id) : null;
-                      const late = lateById.get(p.id) ?? 0;
+                      /* Просрочку считаем, только пока сделка в рассрочке: у прекращённой она не растёт. */
+                      const late = deal.status === 'ACTIVE' ? (lateById.get(p.id) ?? 0) : 0;
                       return (
                         <tr key={p.id} className="border-t border-line">
                           <td className="py-1.5 pr-3 font-mono">{p.n}</td>
@@ -440,6 +513,17 @@ export default async function DealPage({ params }: { params: Promise<{ locale: s
               </div>
             </CardBody>
           </Card>
+          {/* Выход из сделки в рассрочке — только продавцу: забрал машину или договорились (22.11.2026). */}
+          {deal.status === 'ACTIVE' && isSeller && owner && (
+            <Card>
+              <CardBody className="flex flex-col gap-3 text-[14px]">
+                <h2 className="text-[17px] font-semibold">{ui.termination.title}</h2>
+                <p className="text-ink-muted">{ui.termination.hint}</p>
+                <p className="text-ink-muted">{ui.termination.settlement}</p>
+                <TerminateForm locale={locale} ui={ui} dealId={deal.id} />
+              </CardBody>
+            </Card>
+          )}
         </>
       )}
 

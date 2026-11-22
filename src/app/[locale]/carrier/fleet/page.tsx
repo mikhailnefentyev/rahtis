@@ -107,6 +107,10 @@ export default async function FleetPage({ params }: { params: Promise<{ locale: 
       ? t.fleet.whyClosedNoVehicle
       : null;
 
+  /* Копии машин, возвращённых продавцу после прекращения рассрочки: у них своя подпись в списке (22.11.2026). До миграции колонки нет — список пуст. */
+  const { data: ended } = await supabase.from('installment_deals').select('buyer_vehicle_id').eq('buyer_company_id', company.id).eq('status', 'TERMINATED');
+  const returned = (ended ?? []).map((d) => d.buyer_vehicle_id).filter((id): id is string => Boolean(id));
+
   return (
     <main className="cab-page">
 
@@ -175,6 +179,7 @@ export default async function FleetPage({ params }: { params: Promise<{ locale: 
         drivers={drivers ?? []}
         driverByVehicle={driverByVehicle}
         documentsOk={state?.documents_ok ?? false}
+        returned={returned}
         today={todayInHelsinki()}
         service={service}
         country={company.country}

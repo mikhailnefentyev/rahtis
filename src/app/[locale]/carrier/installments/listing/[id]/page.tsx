@@ -4,7 +4,7 @@ import { TruckPhoto } from '@/components/domain/TruckPhoto';
 import { Card, CardBody } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
 import { addMonths, type VatMode } from '@/lib/installments/calc';
-import { installmentsAvailable } from '@/lib/installments/access';
+import { installmentsAvailable, vatModeAllowedForNew } from '@/lib/installments/access';
 import { installmentUiCopy } from '@/lib/installments/copy';
 import { isLocale } from '@/lib/i18n';
 import { installmentCopy } from '@/lib/landing/installment';
@@ -62,6 +62,10 @@ export default async function ListingPage({ params }: { params: Promise<{ locale
       <Card>
         <CardBody>
           <h2 className="mb-4 text-[17px] font-semibold">{ui.deal.terms}</h2>
+          {/* Новая сделка — только с обычным НДС (решение 22.11.2026): по старому объявлению с другим режимом предложение не принимается. */}
+          {!vatModeAllowedForNew(l.vat_mode) ? (
+            <p className="rounded-card border border-warn/35 bg-warn/10 px-3 py-2 text-[14px] text-warn">{ui.listing.vatOld}</p>
+          ) : (
           <OfferForm
             locale={locale}
             ui={ui}
@@ -79,6 +83,7 @@ export default async function ListingPage({ params }: { params: Promise<{ locale
               firstDue: addMonths(handover, 1),
             }}
           />
+          )}
         </CardBody>
       </Card>
     </main>

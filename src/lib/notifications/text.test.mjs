@@ -56,6 +56,8 @@ const CASES = {
   'installment.paid_off': { plate: 'ABC-123' },
   'installment.overdue': { plate: 'ABC-123', n: 3, date: '2026-11-01', days: 1 },
   'installment.threshold': { plate: 'ABC-123' },
+  'installment.terminated': { plate: 'ABC-123' },
+  'installment.no_iban': { plate: 'ABC-123', n: 3 },
   'maintenance.defect': { plate: 'ABC-123', area: 'BRAKES', who: 'Matti', text: 'Jarru vetää', orders: [] },
   'maintenance.defect_unsafe': { plate: 'ABC-123', area: 'BRAKES', who: 'Matti', text: 'x', orders: [{ ref: 'RS-1', day: '2026-11-22' }] },
   'maintenance.due': {

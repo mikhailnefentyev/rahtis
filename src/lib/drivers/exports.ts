@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { csvNumber, csvText } from '@/lib/csv';
+import { csvDecimal, csvText } from '@/lib/csv';
 import writeExcelFile, { type SheetData } from 'write-excel-file/node';
 import { payableKm, type WorkDay } from '@/lib/driverPay';
 import type { Format } from '@/lib/format';
@@ -244,22 +244,22 @@ export async function reportXlsx(report: DriverReport, t: Dictionary, f?: Pick<F
 /* ── CSV ───────────────────────────────────────────────────────── */
 
 /* Текст (имена, адреса, номера) — с защитой от формул; числа пишет код, они без апострофа (lib/csv). */
-function csvValue(kind: Kind, value: string | number | null): string {
+/* Дробная часть — через запятую, кроме английского (22.11.2026, lib/csv). */
+function csvValue(kind: Kind, value: string | number | null, locale: string): string {
   if (kind === 'text' || kind === 'date' || kind === 'currency') return csvText(value);
-  if (value == null) return csvNumber(null);
-  return csvNumber(kind === 'money' || kind === 'hours' ? Number(value).toFixed(2) : String(value));
+  return csvDecimal(value, locale, kind === 'money' || kind === 'hours' ? 2 : undefined);
 }
 
-export function reportCsv(report: DriverReport, t: Dictionary, f?: Pick<Format, 'label'>): string {
+export function reportCsv(report: DriverReport, t: Dictionary, locale: string, f?: Pick<Format, 'label'>): string {
   const withAllowance = hasAllowances(report);
   const withAgreement = hasAgreements(report);
   const columns = reportColumns(t, f, report.currency, withAllowance, withAgreement);
   const lines = [
-    csvValue('text', t.pay.disclaimer),
-    ...(withAllowance ? [csvValue('text', t.dayPay.disclaimer)] : []),
-    ...(withAgreement ? [csvValue('text', t.agreed.disclaimer)] : []),
-    columns.map((c) => csvValue('text', c.header)).join(';'),
-    ...reportRows(report).map((row) => columns.map((c) => csvValue(c.kind, c.get(row))).join(';')),
+    csvValue('text', t.pay.disclaimer, locale),
+    ...(withAllowance ? [csvValue('text', t.dayPay.disclaimer, locale)] : []),
+    ...(withAgreement ? [csvValue('text', t.agreed.disclaimer, locale)] : []),
+    columns.map((c) => csvValue('text', c.header, locale)).join(';'),
+    ...reportRows(report).map((row) => columns.map((c) => csvValue(c.kind, c.get(row), locale)).join(';')),
   ];
   return `﻿${lines.join('\r\n')}\r\n`;
 }

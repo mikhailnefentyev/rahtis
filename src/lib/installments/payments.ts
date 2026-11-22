@@ -11,6 +11,7 @@ import { SiteInvoicePdf } from '@/lib/sites/SiteInvoicePdf';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { ibanHoldActive } from '@/lib/trust/changes';
 import { lastIbanChange } from '@/lib/trust/sensitive';
+import { dealBilled } from './access';
 import { buildSchedule, daysBetween, effectiveHandover, overduePayments, remedyAllowed, type VatMode } from './calc';
 import { fill, installmentUiCopy } from './copy';
 
@@ -30,6 +31,11 @@ import { fill, installmentUiCopy } from './copy';
  * правило у страницы сделки): напоминание покупателю на 1-й и 7-й день,
  * продавцу — один сигнал, когда выполнен порог OskL 2 §. Машину задание
  * не изымает и запуск не блокирует.
+ *
+ * Прекращённую сделку (TERMINATED, 22.11.2026: продавец забрал машину или
+ * стороны договорились) задание не ведёт: ни новых счетов, ни
+ * напоминаний, ни сигнала о пороге. Неоплаченные и не выставленные взносы
+ * остаются как есть — взаиморасчёт стороны проводят сами.
  */
 
 const BUCKET = 'reports';
@@ -275,7 +281,8 @@ export async function issuePaymentInvoice(paymentId: string): Promise<IssueStatu
   if (!pay) return 'NOT_FOUND';
   if (pay.invoice_id) return (await deliverInvoice(pay.invoice_id)) ? 'EXISTS' : 'CREATED';
   const { data: deal } = await admin.from('installment_deals').select('*').eq('id', pay.deal_id).maybeSingle();
-  if (!deal || deal.status !== 'ACTIVE' || !deal.contract_number) return 'NOT_FOUND';
+  /* Счёт взноса — только пока сделка в рассрочке: прекращённой и выплаченной счета не выставляются. */
+  if (!deal || !dealBilled(deal.status) || !deal.contract_number) return 'NOT_FOUND';
   const p = await parties(deal.seller_company_id, deal.buyer_company_id);
   if (!p) return 'NOT_FOUND';
   const blocked = await ibanBlock(p.sellerId, p.iban);
@@ -437,6 +444,8 @@ export async function runInstallments(options: { dealId?: string; today?: string
   }
 
   for (const deal of deals ?? []) {
+    /* Прекращённые (TERMINATED), выплаченные и отменённые сделки задание не трогает — явно, а не только отбором выше (22.11.2026). */
+    if (!dealBilled(deal.status)) continue;
     result.deals += 1;
     try {
       await ensureSchedule(deal.id);
@@ -462,6 +471,10 @@ export async function runInstallments(options: { dealId?: string; today?: string
           await deliverInvoice(row.invoice_id);
         }
       }
+
+      /* Сделку могли прекратить, пока выставлялись счета: напоминаний и сигнала о пороге по ней уже не будет (22.11.2026). */
+      const { data: current } = await admin.from('installment_deals').select('status').eq('id', deal.id).maybeSingle();
+      if (!dealBilled(current?.status)) continue;
 
       /* Просрочка — только по взносам, счёт которых отправлен покупателю, от срока или дня отправки (что позже). */
       const { data: fresh } = await admin.from('installment_payments').select('*').eq('deal_id', deal.id).order('n');

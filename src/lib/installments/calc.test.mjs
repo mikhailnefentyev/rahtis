@@ -11,6 +11,7 @@ import {
   buyerCheck,
   defaultScenario,
   effectiveHandover,
+  firstInvoiceSettledAtIssue,
   lateDays,
   lateFrom,
   overduePayments,
@@ -18,6 +19,7 @@ import {
   remedyAllowed,
   sellerTax,
   settlement,
+  terminationSummary,
   thresholds,
   valueAfter,
 } from './calc.ts';
@@ -277,4 +279,77 @@ test('проценты идут с фактической передачи, ес
   // Досрочное погашение до первого оплаченного взноса: проценты за 20 дней, а не за 30.
   const from = effectiveHandover('2026-12-01', '2026-12-11');
   assert.equal(payoffCents(1_000_000, from, '2026-12-31', 600), 1_000_000 + Math.round((1_000_000 * 600 * 20) / 3_650_000));
+});
+
+test('первый счёт без суммы к оплате считается оплаченным при выставлении', () => {
+  /* Старая сделка без НДС и без взноса: платить нечего. */
+  assert.equal(firstInvoiceSettledAtIssue(0, 0), true);
+  /* Есть взнос или НДС — оплату отмечает продавец. */
+  assert.equal(firstInvoiceSettledAtIssue(480_000, 0), false);
+  assert.equal(firstInvoiceSettledAtIssue(0, 612_000), false);
+  /* С обычным НДС сумма к оплате не бывает нулевой даже без взноса. */
+  const s = buildSchedule({ ...DAF, downPaymentCents: 0 });
+  assert.equal(firstInvoiceSettledAtIssue(0, s.vatCents), false);
+});
+
+test('справка при прекращении сделки: уплачено, выставлено и не оплачено, не выставлено', () => {
+  const s = buildSchedule({ ...DAF, annualRateBps: 600 });
+  const payments = s.installments.map((x, i) => ({
+    principalCents: x.principalCents,
+    interestCents: x.interestCents,
+    /* Оплачены первые три, ещё два выставлены и не оплачены, остальные без счёта. */
+    paid: i < 3,
+    invoiced: i < 5,
+  }));
+  const r = terminationSummary({
+    priceCents: DAF.priceCents,
+    vatMode: 'STANDARD',
+    vatBps: 2550,
+    downPaymentCents: DAF.downPaymentCents,
+    firstInvoicePaid: true,
+    payments,
+  });
+  const paid = s.installments.slice(0, 3);
+  const open = s.installments.slice(3, 5);
+  const rest = s.installments.slice(5);
+  assert.equal(r.firstInvoicePaidCents, s.firstInvoiceCents);
+  assert.equal(r.installmentsPaidCents, paid.reduce((a, x) => a + x.principalCents, 0));
+  assert.equal(r.interestPaidCents, paid.reduce((a, x) => a + x.interestCents, 0));
+  assert.equal(r.paidTotalCents, r.firstInvoicePaidCents + r.installmentsPaidCents + r.interestPaidCents);
+  assert.equal(r.invoicedUnpaidCents, open.reduce((a, x) => a + x.principalCents + x.interestCents, 0));
+  assert.equal(r.notInvoicedCents, rest.reduce((a, x) => a + x.principalCents, 0));
+  /* Вся цена без взноса разложена по трём корзинам взносов. */
+  const openPrincipal = open.reduce((a, x) => a + x.principalCents, 0);
+  assert.equal(r.installmentsPaidCents + openPrincipal + r.notInvoicedCents, DAF.priceCents - DAF.downPaymentCents);
+});
+
+test('справка при прекращении: первый счёт не оплачен и режим без НДС', () => {
+  const none = terminationSummary({
+    priceCents: 1_000_000,
+    vatMode: 'STANDARD',
+    vatBps: 2550,
+    downPaymentCents: 100_000,
+    firstInvoicePaid: false,
+    payments: [],
+  });
+  assert.deepEqual(none, {
+    firstInvoicePaidCents: 0,
+    installmentsPaidCents: 0,
+    interestPaidCents: 0,
+    paidTotalCents: 0,
+    invoicedUnpaidCents: 0,
+    notInvoicedCents: 0,
+  });
+  /* Старая сделка с маржинальной схемой: в первом счёте только взнос. */
+  const margin = terminationSummary({
+    priceCents: 1_000_000,
+    vatMode: 'MARGIN',
+    vatBps: 2550,
+    downPaymentCents: 100_000,
+    firstInvoicePaid: true,
+    payments: [{ principalCents: 900_000, interestCents: 0, paid: false, invoiced: false }],
+  });
+  assert.equal(margin.firstInvoicePaidCents, 100_000);
+  assert.equal(margin.paidTotalCents, 100_000);
+  assert.equal(margin.notInvoicedCents, 900_000);
 });

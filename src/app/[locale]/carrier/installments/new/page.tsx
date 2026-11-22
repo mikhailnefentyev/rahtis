@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Card, CardBody, EmptyState } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
-import { installmentsAvailable, vehicleSellable } from '@/lib/installments/access';
+import { CABINET_VAT_MODE, installmentsAvailable, vehicleSellable } from '@/lib/installments/access';
 import { installmentUiCopy } from '@/lib/installments/copy';
 import { isLocale } from '@/lib/i18n';
 import { installmentCopy } from '@/lib/landing/installment';
@@ -73,7 +73,7 @@ export default async function NewListingPage({
             id={null}
             vehicles={vehicles.map((v) => ({ id: v.id, label: `${v.plate} · ${v.make}` }))}
             vehicleId={selected}
-            defaults={{ price: '', vatMode: 'STANDARD', vatBps: 2550, down: '', months: '24', final: '', rate: '0' }}
+            defaults={{ price: '', vatMode: CABINET_VAT_MODE, vatBps: 2550, down: '', months: '24', final: '', rate: '0' }}
             odometer=""
             description=""
           />

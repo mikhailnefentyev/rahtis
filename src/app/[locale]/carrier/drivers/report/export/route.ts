@@ -54,7 +54,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
   });
 
   if (format === 'csv') {
-    return new Response(reportCsv(report, t, f), { headers: headers('text/csv; charset=utf-8', 'csv') });
+    return new Response(reportCsv(report, t, locale, f), { headers: headers('text/csv; charset=utf-8', 'csv') });
   }
 
   if (format === 'xlsx') {

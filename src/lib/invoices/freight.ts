@@ -12,6 +12,7 @@ import { SiteInvoicePdf } from '@/lib/sites/SiteInvoicePdf';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { ibanHoldActive } from '@/lib/trust/changes';
 import { lastIbanChange } from '@/lib/trust/sensitive';
+import { freightScope, ownClientOff } from './freightScope';
 import { freightVat } from './freightVat';
 import { DEFAULT_SCHEDULE, DEFAULT_TERM_DAYS, invoiceCutoff, isSchedule } from './terms';
 
@@ -36,6 +37,12 @@ import { DEFAULT_SCHEDULE, DEFAULT_TERM_DAYS, invoiceCutoff, isSchedule } from '
  *     своей бухгалтерии);
  *   · заказы, закрытые до START — счёт задним числом за историю никому
  *     не нужен;
+ *   · заказы, закрытые до того, как перевозчик включил недельные счета
+ *     (companies.weekly_invoicing_from, 22.11.2026): пока настройка была
+ *     выключена, он выставлял счета сам — включение историю не выставляет;
+ *   · заказы своих клиентов перевозчика (companies.client_of), пока он не
+ *     подтвердил автоматические счета для этого клиента
+ *     (companies.auto_invoice, 22.11.2026) — правило в freightScope.ts;
  *   · пары «тестовая — боевая» компания.
  *
  * Счёт с номером, который не дошёл до письма (сорвалась печать, загрузка
@@ -71,6 +78,8 @@ export type FreightInvoiceStatus =
   | 'NO_BUYER_VAT'
   | 'NO_SELLER_VAT'
   | 'NO_CUSTOMER_EMAIL'
+  /* Свой клиент перевозчика без подтверждения автоматических счетов (22.11.2026). */
+  | 'OWN_CLIENT_OFF'
   | 'NOT_FOUND';
 
 type Admin = ReturnType<typeof createAdminClient>;
@@ -130,14 +139,16 @@ export async function runFreightInvoices(now: Date = new Date()): Promise<{ sent
    *   · заказ, из которого создан объект: его работу выставляет счёт по
    *     объекту за подтверждённые дни (security review 17.11.2026).
    *
-   * Ошибка любого из трёх запросов останавливает запуск (22.11.2026): с
+   * Ошибка любого из запросов останавливает запуск (22.11.2026): с
    * пустым списком пропусков ушли бы двойные счета, без согласованных
-   * условий — счета не с той периодичностью и сроком. Списки id — частями:
+   * условий — счета не с той периодичностью и сроком, без сторон — счета
+   * за историю и своим клиентам без подтверждения. Списки id — частями:
    * длинный `.in()` не помещается в адрес запроса.
    */
   const orderIds = orders.map((o) => o.id);
   const carrierIds = [...new Set(orders.map((o) => o.assigned_company_id!))];
-  const [manual, siteJobs, agreements] = await Promise.all([
+  const partyIds = [...new Set([...carrierIds, ...orders.map((o) => o.shipper_company_id)])];
+  const [manual, siteJobs, agreements, parties] = await Promise.all([
     fetchIn(orderIds, (part) => admin.from('freight_invoices').select('order_id').in('order_id', part)),
     fetchIn(orderIds, (part) => admin.from('site_jobs').select('order_id').in('order_id', part)),
     /* Пар у сотни перевозчиков может быть больше тысячи — каждая часть читается страницами. */
@@ -152,21 +163,40 @@ export async function runFreightInvoices(now: Date = new Date()): Promise<{ sent
           .range(from, to),
       ),
     ),
+    /* С какого момента перевозчик поручил счета RAHTIS и подтверждён ли свой клиент (22.11.2026). */
+    fetchIn(partyIds, (part) => admin.from('companies').select('id, weekly_invoicing_from, client_of, auto_invoice').in('id', part)),
   ]);
   const failed = [
     manual.error && `счета вручную: ${manual.error.message}`,
     siteJobs.error && `объекты: ${siteJobs.error.message}`,
     agreements.error && `условия счетов: ${agreements.error.message}`,
+    parties.error && `стороны: ${parties.error.message}`,
   ].filter((x): x is string => Boolean(x));
   if (failed.length > 0) return { ...out, errors: [...out.errors, ...failed] };
 
   const skipIds = new Set([...manual.data, ...siteJobs.data].map((m) => m.order_id));
   const terms = new Map(agreements.data.map((a) => [`${a.carrier_company_id}|${a.shipper_company_id}`, a]));
 
+  const party = new Map(parties.data.map((c) => [c.id, c]));
+
   const groups = new Map<string, { orders: OrderRow[]; termDays: number }>();
+  /* Пары «перевозчик — свой клиент» без подтверждения: в ответе планировщику — по одной на пару. */
+  const ownOff = new Set<string>();
   for (const order of orders) {
     if (skipIds.has(order.id)) continue;
     const pair = `${order.assigned_company_id}|${order.shipper_company_id}`;
+    /*
+     * Рейс до включения недельных счетов и рейс своего клиента без
+     * подтверждения в счёт не идут (22.11.2026, freightScope.ts). Сторона,
+     * которой нет в ответе базы, рейс тоже не пропускает: неизвестно, свой
+     * ли это клиент.
+     */
+    const carrier = party.get(order.assigned_company_id!);
+    const shipper = party.get(order.shipper_company_id);
+    if (!carrier || !shipper) continue;
+    const skip = freightScope(order.closed_at!, carrier, shipper);
+    if (skip === 'OWN_CLIENT_OFF') ownOff.add(pair);
+    if (skip) continue;
     const agreed = terms.get(pair);
     const schedule = agreed && isSchedule(agreed.schedule) ? agreed.schedule : DEFAULT_SCHEDULE;
     /*
@@ -181,6 +211,10 @@ export async function runFreightInvoices(now: Date = new Date()): Promise<{ sent
     const group = groups.get(key) ?? { orders: [], termDays: agreed?.payment_term_days ?? DEFAULT_TERM_DAYS };
     group.orders.push(order);
     groups.set(key, group);
+  }
+  if (ownOff.size > 0) {
+    out.skipped += ownOff.size;
+    out.reasons.OWN_CLIENT_OFF = ownOff.size;
   }
 
   for (const { orders: list, termDays } of groups.values()) {
@@ -213,7 +247,7 @@ async function createFreightInvoice(orders: OrderRow[], termDays: number): Promi
       .maybeSingle(),
     admin
       .from('companies')
-      .select('id, name, business_id, vat_number, legal_name, legal_street, legal_postal_code, legal_city, legal_country, billing_street, billing_postal_code, billing_city, billing_country, billing_email, billing_reference, contact_email, country, is_test')
+      .select('id, name, business_id, vat_number, legal_name, legal_street, legal_postal_code, legal_city, legal_country, billing_street, billing_postal_code, billing_city, billing_country, billing_email, billing_reference, contact_email, country, is_test, client_of, auto_invoice')
       .eq('id', shipperId)
       .maybeSingle(),
   ]);
@@ -221,6 +255,8 @@ async function createFreightInvoice(orders: OrderRow[], termDays: number): Promi
   if (!seller.weekly_invoicing || seller.status !== 'ACTIVE') return 'NOTHING';
   /* Тестовая и боевая компании в одном счёте — номер из боевой серии ушёл бы тесту. */
   if (seller.is_test !== buyer.is_test) return 'NOTHING';
+  /* Подтверждение сняли между выборкой и счётом — свой клиент счёта не получает (22.11.2026). */
+  if (ownClientOff(buyer)) return 'OWN_CLIENT_OFF';
   if (!seller.iban) return 'NO_IBAN';
   /* Свежий IBAN — то, ради чего захватывают кабинет: 48 часов счёт сам не уходит. */
   const changedAt = await lastIbanChange(seller.id);

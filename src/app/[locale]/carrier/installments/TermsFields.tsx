@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Field, Input, Select } from '@/components/ui';
+import { Field, Input } from '@/components/ui';
 import { eurosToCents } from '@/lib/economics/money';
 import { addMonths, buildSchedule, thresholds, type VatMode } from '@/lib/installments/calc';
 import { fill, type InstallmentUiCopy } from '@/lib/installments/copy';
@@ -11,6 +11,10 @@ import type { InstallmentCopy } from '@/lib/landing/installment';
  * Поля условий рассрочки с живым расчётом (22.11.2026): первый счёт
  * (взнос + весь НДС), взнос в месяц и пороги закона о рассрочке (2 §).
  * Расчёт — тем же модулем installments/calc, что проверяет сервер.
+ *
+ * НДС не выбирается (решение 22.11.2026): в кабинете сделка всегда с
+ * обычным НДС, строка НДС — постоянная справка. Другой режим бывает
+ * только у старой сделки — он показывается как есть и не меняется.
  */
 export type TermsDefaults = {
   price: string;
@@ -28,19 +32,17 @@ export function TermsFields({
   ui,
   calc,
   defaults,
-  vatEditable,
   withDates,
   locale,
 }: {
   ui: InstallmentUiCopy;
   calc: InstallmentCopy;
   defaults: TermsDefaults;
-  vatEditable: boolean;
   withDates: boolean;
   locale: string;
 }) {
   const [price, setPrice] = useState(defaults.price);
-  const [vatMode, setVatMode] = useState<VatMode>(defaults.vatMode);
+  const vatMode: VatMode = defaults.vatMode;
   const [down, setDown] = useState(defaults.down);
   const [months, setMonths] = useState(defaults.months);
   const [final, setFinal] = useState(defaults.final);
@@ -82,23 +84,13 @@ export function TermsFields({
         <Field label={ui.listing.price}>
           {(p) => <Input {...p} name="price" inputMode="decimal" required value={price} onChange={(e) => setPrice(e.target.value)} />}
         </Field>
-        <Field label={ui.listing.vatMode}>
-          {(p) =>
-            vatEditable ? (
-              <Select {...p} name="vat_mode" value={vatMode} onChange={(e) => setVatMode(e.target.value as VatMode)}>
-                {(Object.keys(calc.f.vatModes) as VatMode[]).map((k) => (
-                  <option key={k} value={k}>
-                    {calc.f.vatModes[k]}
-                  </option>
-                ))}
-              </Select>
-            ) : (
-              <>
-                <input type="hidden" name="vat_mode" value={vatMode} />
-                <Input {...p} readOnly value={calc.f.vatModes[vatMode]} />
-              </>
-            )
-          }
+        <Field label={ui.listing.vatMode} hint={vatMode === 'STANDARD' ? ui.listing.vatFixed : undefined}>
+          {(p) => (
+            <>
+              <input type="hidden" name="vat_mode" value={vatMode} />
+              <Input {...p} readOnly value={calc.f.vatModes[vatMode]} />
+            </>
+          )}
         </Field>
         <Field label={ui.listing.down} hint={calc.f.downHint}>
           {(p) => <Input {...p} name="down" inputMode="decimal" value={down} onChange={(e) => setDown(e.target.value)} />}
