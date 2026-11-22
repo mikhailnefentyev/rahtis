@@ -11,7 +11,7 @@ import { SiteInvoicePdf } from '@/lib/sites/SiteInvoicePdf';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { ibanHoldActive } from '@/lib/trust/changes';
 import { lastIbanChange } from '@/lib/trust/sensitive';
-import { dealBilled } from './access';
+import { dealBilled, installmentDealLink } from './access';
 import { buildSchedule, daysBetween, effectiveHandover, overduePayments, remedyAllowed, type VatMode } from './calc';
 import { fill, installmentUiCopy } from './copy';
 
@@ -495,15 +495,18 @@ export async function runInstallments(options: { dealId?: string; today?: string
 
       const plate = ((deal.vehicle_snapshot ?? {}) as { plate?: string }).plate ?? '';
       const [{ data: buyer }, { data: seller }] = await Promise.all([
-        admin.from('companies').select('language').eq('id', deal.buyer_company_id).maybeSingle(),
-        admin.from('companies').select('language').eq('id', deal.seller_company_id).maybeSingle(),
+        admin.from('companies').select('language, kind').eq('id', deal.buyer_company_id).maybeSingle(),
+        admin.from('companies').select('language, kind').eq('id', deal.seller_company_id).maybeSingle(),
       ]);
       const cb = installmentUiCopy(emailLocaleOf(buyer?.language ?? 'fi'));
       const cs = installmentUiCopy(emailLocaleOf(seller?.language ?? 'fi'));
+      /* Сделку каждая сторона открывает в своём кабинете: продавец может быть компанией без парка (23.11.2026). Покупатель — всегда перевозчик. */
+      const sellerLink = installmentDealLink(seller?.kind ?? 'CARRIER', deal.id);
+      const buyerLink = installmentDealLink(buyer?.kind ?? 'CARRIER', deal.id);
 
       /* Продавцу без IBAN — сигнал не чаще раза в неделю по сделке: задание идёт каждый день. */
       if (ibanMissing != null) {
-        const link = `/carrier/installments/${deal.id}`;
+        const link = sellerLink;
         const weekAgo = new Date(Date.now() - 7 * 86_400_000).toISOString();
         const { count: recent } = await admin
           .from('notifications')
@@ -548,7 +551,7 @@ export async function runInstallments(options: { dealId?: string; today?: string
           params: { plate, n: row.n, date: row.due_date, days: late },
           title: fill(cb.notify.overdueTitle, { plate, n: String(row.n) }),
           body: fill(cb.notify.overdueBody, { days: String(late), date: fiDate(row.due_date) }),
-          link: `/carrier/installments/${deal.id}`,
+          link: buyerLink,
         });
         result.reminders += 1;
       }
@@ -578,7 +581,7 @@ export async function runInstallments(options: { dealId?: string; today?: string
             params: { plate },
             title: fill(cs.notify.thresholdTitle, { plate }),
             body: cs.notify.thresholdBody,
-            link: `/carrier/installments/${deal.id}`,
+            link: sellerLink,
           });
           result.thresholds += 1;
         }

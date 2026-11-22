@@ -15,9 +15,17 @@ export const ui: InstallmentUiCopy = {
     'Vindeți propriul vehicul cu plata în rate unui transportator verificat sau cumpărați un vehicul în rate. RAHTIS întocmește contractul conform legii finlandeze privind vânzarea cu plata în rate, graficul de plăți și facturile în numele vânzătorului; cumpărătorul plătește direct în contul vânzătorului.',
   tabs: { mine: 'Vânzările mele', deals: 'Negocieri și tranzacții', catalog: 'De vânzare' },
   calculatorLink: 'Calculator',
-  notAllowed: 'Vânzarea cu plata în rate o poate face utilizatorul principal al unui transportator finlandez, dacă firma are o licență de transport și o asigurare valabile.',
+  notAllowed: 'Orice firmă finlandeză verificată și înregistrată în RAHTIS poate vinde vehicule cu plata în rate; cumpărătorul este întotdeauna un transportator verificat. Vânzarea o face utilizatorul principal al firmei.',
+  buyNotAllowed: 'Pentru a cumpăra în rate, firma dumneavoastră trebuie să aibă o licență de transport și o asigurare valabile.',
+  introSeller:
+    'Vindeți un vehicul cu plata în rate unui transportator verificat. Adăugați vehiculul pe care doriți să îl vindeți; îi verificăm datele, iar după aprobare puteți publica anunțul. RAHTIS întocmește contractul conform legii finlandeze privind vânzarea cu plata în rate, graficul de plăți și facturile în numele vânzătorului; cumpărătorul plătește direct în contul dumneavoastră.',
   sell: 'Vindeți în rate',
   emptyMine: 'Nu aveți anunțuri de vânzare. Alegeți un vehicul din flotă și apăsați „Vindeți în rate”.',
+  emptyMineSeller: 'Nu aveți anunțuri de vânzare. Adăugați vehiculul pe care doriți să îl vindeți și trimiteți-l spre aprobare. După ce este aprobat, apăsați „Vindeți în rate”.',
+  saleVehicles: {
+    title: 'Vehicule de vânzare',
+    hint: 'Verificăm datele vehiculului înainte ca anunțul să poată fi publicat. Un vehicul aflat în verificare sau care are un anunț nu poate fi modificat.',
+  },
   emptyCatalog: 'Momentan nu sunt vehicule de vânzare.',
   emptyDeals: 'Nu aveți negocieri.',
   listing: {
@@ -40,6 +48,7 @@ export const ui: InstallmentUiCopy = {
     withdraw: 'Retrageți de la vânzare',
     saved: 'Salvat.',
     noVehicles: 'În flotă nu există niciun vehicul aprobat care să poată fi vândut. Un vehicul cumpărat în rate poate fi vândut numai după ce a fost plătit integral.',
+    noVehiclesSeller: 'Nu aveți niciun vehicul aprobat care să poată fi vândut. Adăugați un vehicul și trimiteți-l spre aprobare – anunțul poate fi publicat după aprobarea vehiculului.',
     error: 'Verificați valorile.',
   },
   status: {
@@ -134,6 +143,7 @@ export const ui: InstallmentUiCopy = {
     sellerNote: 'Informații suplimentare de la vânzător',
     stopped: 'Nu se mai trimit facturi pentru rate și nici notificări. Contractul și facturile deja emise rămân disponibile.',
     vehicleSeller: 'Vehiculul a revenit în flota dumneavoastră ca ciornă – trimiteți-l spre aprobare înainte de a-l folosi sau de a-l vinde din nou.',
+    vehicleSellerOwn: 'Vehiculul a revenit printre vehiculele dumneavoastră de vânzare ca ciornă – trimiteți-l spre aprobare înainte de a-l vinde din nou.',
     vehicleBuyer: 'Vehiculul a fost scos din uz în flota dumneavoastră; istoricul curselor se păstrează.',
     summaryTitle: 'Situația plăților',
     paidFirst: 'Plătit pe prima factură (avans și TVA)',

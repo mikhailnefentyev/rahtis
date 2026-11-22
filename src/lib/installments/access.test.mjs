@@ -10,7 +10,17 @@ import {
   dealBadgeTone,
   dealBilled,
   dealHasContract,
+  canBuyInstallments,
+  canSellInstallments,
+  catalogTabShown,
+  installmentCabinet,
+  installmentDealLink,
+  installmentsBase,
   installmentsAvailable,
+  parseSaleVehicle,
+  saleVehicleEditable,
+  saleVehicleHasCargo,
+  saleVehicleSellable,
   isTerminationReason,
   vatModeAllowedForNew,
   vehicleSellable,
@@ -59,4 +69,88 @@ test('причина прекращения — только две, как в �
 test('новое объявление и предложение — только с обычным НДС', () => {
   assert.equal(vatModeAllowedForNew('STANDARD'), true);
   for (const mode of ['MARGIN', 'EXEMPT', 'NONE', '', null, undefined]) assert.equal(vatModeAllowedForNew(mode), false);
+});
+
+/* Решение 23.11.2026: продаёт любая проверенная финская компания, покупает только перевозчик. */
+
+const party = (over = {}) => ({ kind: 'SHIPPER', country: 'FI', status: 'ACTIVE', owner: true, ...over });
+
+test('продавать может главный в проверенной финской компании любого вида — без лицензии и страховки', () => {
+  assert.equal(canSellInstallments(party()), true);
+  assert.equal(canSellInstallments(party({ kind: 'CARRIER' })), true);
+  /* Не проверена оператором, не из Финляндии, не главный, оператор платформы — нет. */
+  assert.equal(canSellInstallments(party({ status: 'PENDING' })), false);
+  assert.equal(canSellInstallments(party({ status: 'REJECTED' })), false);
+  assert.equal(canSellInstallments(party({ country: 'EE' })), false);
+  assert.equal(canSellInstallments(party({ owner: false })), false);
+  assert.equal(canSellInstallments(party({ kind: 'ADMIN' })), false);
+  assert.equal(canSellInstallments(party({ kind: null })), false);
+});
+
+test('покупать может только перевозчик с действующими документами', () => {
+  assert.equal(canBuyInstallments(party({ kind: 'CARRIER', documentsOk: true })), true);
+  assert.equal(canBuyInstallments(party({ kind: 'CARRIER', documentsOk: false })), false);
+  /* Компания без парка не покупает, даже если документы почему-то есть. */
+  assert.equal(canBuyInstallments(party({ kind: 'SHIPPER', documentsOk: true })), false);
+  assert.equal(canBuyInstallments(party({ kind: 'CARRIER', documentsOk: true, status: 'PENDING' })), false);
+  assert.equal(canBuyInstallments(party({ kind: 'CARRIER', documentsOk: true, country: 'SE' })), false);
+  assert.equal(canBuyInstallments(party({ kind: 'CARRIER', documentsOk: true, owner: false })), false);
+  /* Перевозчик с истёкшими документами продавать может, покупать — нет. */
+  assert.equal(canSellInstallments(party({ kind: 'CARRIER' })), true);
+});
+
+test('раздел у каждой компании в своём кабинете: ссылки строятся от вида компании', () => {
+  assert.equal(installmentsBase('CARRIER'), '/carrier/installments');
+  assert.equal(installmentsBase('SHIPPER'), '/shipper/installments');
+  assert.equal(installmentDealLink('CARRIER', 'abc'), '/carrier/installments/abc');
+  assert.equal(installmentDealLink('SHIPPER', 'abc'), '/shipper/installments/abc');
+  assert.equal(installmentCabinet('CARRIER'), 'CARRIER');
+  assert.equal(installmentCabinet('SHIPPER'), 'SHIPPER');
+  for (const kind of ['ADMIN', '', null, undefined]) assert.equal(installmentCabinet(kind), null);
+});
+
+test('каталог — только перевозчику: компании без парка вкладка не нужна', () => {
+  assert.equal(catalogTabShown('CARRIER'), true);
+  for (const kind of ['SHIPPER', 'ADMIN', null, undefined]) assert.equal(catalogTabShown(kind), false);
+});
+
+test('карточка машины на продажу: выставить — одобренную и не проданную, править — не на проверке и без объявления', () => {
+  assert.equal(saleVehicleSellable({ access: 'APPROVED', sold_deal_id: null }), true);
+  assert.equal(saleVehicleSellable({ access: 'APPROVED', sold_deal_id: 'd1' }), false);
+  for (const access of ['DRAFT', 'PENDING', 'REJECTED']) assert.equal(saleVehicleSellable({ access, sold_deal_id: null }), false, access);
+  assert.equal(saleVehicleEditable({ access: 'DRAFT', sold_deal_id: null }, false), true);
+  assert.equal(saleVehicleEditable({ access: 'REJECTED', sold_deal_id: null }, false), true);
+  assert.equal(saleVehicleEditable({ access: 'APPROVED', sold_deal_id: null }, false), true);
+  assert.equal(saleVehicleEditable({ access: 'APPROVED', sold_deal_id: null }, true), false);
+  assert.equal(saleVehicleEditable({ access: 'PENDING', sold_deal_id: null }, false), false);
+  assert.equal(saleVehicleEditable({ access: 'APPROVED', sold_deal_id: 'd1' }, false), false);
+});
+
+test('данные машины на продажу: те же пределы, что у машины парка', () => {
+  const base = { plate: ' abc-123 ', make: ' Volvo FH 500 ', vehicleClass: 'TRACTOR', euroClass: 'EURO_6', axles: '3', payloadKg: '', ldm: '' };
+  assert.deepEqual(parseSaleVehicle(base), {
+    plate: 'ABC-123', make: 'Volvo FH 500', vehicleClass: 'TRACTOR', euroClass: 'EURO_6', axles: 3, payloadKg: null, ldm: null,
+  });
+  /* У тягача и самосвала грузоподъёмность не хранится, даже если её ввели. */
+  assert.equal(parseSaleVehicle({ ...base, payloadKg: '9000', ldm: '7' }).payloadKg, null);
+  /* Грузовик и фургон — с грузоподъёмностью и погрузочными метрами. */
+  assert.deepEqual(parseSaleVehicle({ ...base, vehicleClass: 'TRUCK', payloadKg: '12 000', ldm: '7,2' }), {
+    plate: 'ABC-123', make: 'Volvo FH 500', vehicleClass: 'TRUCK', euroClass: 'EURO_6', axles: 3, payloadKg: 12000, ldm: 7.2,
+  });
+  assert.equal(parseSaleVehicle({ ...base, vehicleClass: 'TRUCK' }), null);
+  assert.equal(parseSaleVehicle({ ...base, vehicleClass: 'VAN', axles: '2', payloadKg: '3600', ldm: '4' }), null);
+  assert.ok(parseSaleVehicle({ ...base, vehicleClass: 'VAN', axles: '2', payloadKg: '1200', ldm: '4' }));
+  /* Самосвал — от трёх осей. */
+  assert.equal(parseSaleVehicle({ ...base, vehicleClass: 'TIPPER', axles: '2' }), null);
+  assert.ok(parseSaleVehicle({ ...base, vehicleClass: 'TIPPER', axles: '4' }));
+  /* Номер, марка, класс, эко-класс, оси. */
+  assert.equal(parseSaleVehicle({ ...base, plate: 'AB' }), null);
+  assert.equal(parseSaleVehicle({ ...base, plate: 'ÄÖ-123' }), null);
+  assert.equal(parseSaleVehicle({ ...base, make: 'V' }), null);
+  assert.equal(parseSaleVehicle({ ...base, vehicleClass: 'BUS' }), null);
+  assert.equal(parseSaleVehicle({ ...base, euroClass: 'EURO_3' }), null);
+  assert.equal(parseSaleVehicle({ ...base, axles: '6' }), null);
+  assert.equal(parseSaleVehicle({ ...base, axles: '2.5' }), null);
+  assert.equal(saleVehicleHasCargo('VAN'), true);
+  assert.equal(saleVehicleHasCargo('TRACTOR'), false);
 });

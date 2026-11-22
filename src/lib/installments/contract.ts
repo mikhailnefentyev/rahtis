@@ -18,7 +18,8 @@ export async function loadDeal(dealId: string) {
   if (!deal) return null;
 
   const admin = createAdminClient();
-  const companyCols = 'id, name, legal_name, business_id, vat_number, legal_street, legal_postal_code, legal_city, contact_email, billing_email, country, iban';
+  /* kind — вид компании: страница сделки подбирает тексты для продавца без парка (23.11.2026). */
+  const companyCols = 'id, name, kind, legal_name, business_id, vat_number, legal_street, legal_postal_code, legal_city, contact_email, billing_email, country, iban';
   const [{ data: listing }, { data: seller }, { data: buyer }, { data: invoice }] = await Promise.all([
     admin.from('equipment_listings').select('*').eq('id', deal.listing_id).maybeSingle(),
     admin.from('companies').select(companyCols).eq('id', deal.seller_company_id).maybeSingle(),
@@ -28,11 +29,16 @@ export async function loadDeal(dealId: string) {
       : Promise.resolve({ data: null }),
   ]);
   if (!listing || !seller || !buyer) return null;
-  const { data: vehicle } = await admin
-    .from('vehicles')
-    .select('id, make, plate, vehicle_class, euro_class, axles, base_city')
-    .eq('id', listing.vehicle_id)
-    .maybeSingle();
+  /*
+   * Машина — из парка продавца или, у продавца без парка, из его карточки
+   * на продажу (23.11.2026): у объявления ровно одна из двух ссылок.
+   */
+  const vehicleCols = 'id, make, plate, vehicle_class, euro_class, axles';
+  const { data: vehicle } = listing.vehicle_id
+    ? await admin.from('vehicles').select(vehicleCols).eq('id', listing.vehicle_id).maybeSingle()
+    : listing.sale_vehicle_id
+      ? await admin.from('equipment_sale_vehicles').select(vehicleCols).eq('id', listing.sale_vehicle_id).maybeSingle()
+      : { data: null };
   if (!vehicle) return null;
   return { deal, listing, seller, buyer, vehicle, invoice };
 }

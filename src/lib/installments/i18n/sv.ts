@@ -8,9 +8,17 @@ export const ui: InstallmentUiCopy = {
     'Sälj din egen lastbil på avbetalning till ett kontrollerat åkeri, eller köp en på avbetalning. RAHTIS upprättar avtalet enligt den finska lagen om avbetalningsköp (osamaksukauppalaki), betalningsplanen och fakturorna i säljarens namn; köparen betalar direkt till säljarens konto.',
   tabs: { mine: 'Mina försäljningar', deals: 'Förhandlingar och köp', catalog: 'Till salu' },
   calculatorLink: 'Kalkylator',
-  notAllowed: 'Avbetalningsköp kan göras av huvudanvändaren i ett finländskt åkeri när företaget har ett giltigt trafiktillstånd och en giltig försäkring.',
+  notAllowed: 'Alla kontrollerade finländska företag som är registrerade i RAHTIS kan sälja fordon på avbetalning; köparen är alltid ett kontrollerat åkeri. Köpet görs av företagets huvudanvändare.',
+  buyNotAllowed: 'För att köpa på avbetalning behöver ditt företag ett giltigt trafiktillstånd och en giltig försäkring.',
+  introSeller:
+    'Sälj en lastbil på avbetalning till ett kontrollerat åkeri. Lägg till fordonet du vill sälja; vi kontrollerar uppgifterna, och när fordonet är godkänt kan du publicera en annons. RAHTIS upprättar avtalet enligt den finska lagen om avbetalningsköp (osamaksukauppalaki), betalningsplanen och fakturorna i säljarens namn; köparen betalar direkt till ditt konto.',
   sell: 'Sälj på avbetalning',
   emptyMine: 'Inga annonser. Välj ett fordon i din fordonspark och tryck på ”Sälj på avbetalning”.',
+  emptyMineSeller: 'Inga annonser. Lägg till fordonet du vill sälja och skicka det för godkännande. När det är godkänt trycker du på ”Sälj på avbetalning”.',
+  saleVehicles: {
+    title: 'Fordon till salu',
+    hint: 'Vi kontrollerar fordonets uppgifter innan annonsen kan publiceras. Ett fordon som är under granskning eller har en annons kan inte ändras.',
+  },
   emptyCatalog: 'Inga fordon till salu just nu.',
   emptyDeals: 'Inga förhandlingar.',
   listing: {
@@ -33,6 +41,7 @@ export const ui: InstallmentUiCopy = {
     withdraw: 'Ta bort från försäljning',
     saved: 'Sparat.',
     noVehicles: 'Det finns inget godkänt fordon i fordonsparken som kan säljas. Ett fordon som köpts på avbetalning kan säljas först när det är helt betalt.',
+    noVehiclesSeller: 'Du har inget godkänt fordon som kan säljas. Lägg till ett fordon och skicka det för godkännande – annonsen kan publiceras när fordonet är godkänt.',
     error: 'Kontrollera värdena.',
   },
   status: {
@@ -127,6 +136,7 @@ export const ui: InstallmentUiCopy = {
     sellerNote: 'Säljarens tilläggsuppgifter',
     stopped: 'Inga fler fakturor för delbetalningar eller påminnelser skickas. Avtalet och de fakturor som redan har utfärdats finns kvar.',
     vehicleSeller: 'Fordonet finns åter i din fordonspark som utkast – skicka det för godkännande innan du använder det eller säljer det på nytt.',
+    vehicleSellerOwn: 'Fordonet finns åter bland dina fordon till salu som utkast – skicka det för godkännande innan du säljer det på nytt.',
     vehicleBuyer: 'Fordonet har tagits ur bruk i din fordonspark; transporthistoriken finns kvar.',
     summaryTitle: 'Sammanställning av betalningar',
     paidFirst: 'Betalt på första fakturan (kontantinsats och moms)',

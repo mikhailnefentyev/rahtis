@@ -23,9 +23,17 @@ const fi = {
     'Myy oma auto osamaksulla tarkastetulle kuljetusliikkeelle tai osta auto osamaksulla. RAHTIS laatii osamaksukauppalain mukaisen sopimuksen, maksusuunnitelman ja laskut myyjän nimissä; ostaja maksaa suoraan myyjän tilille.',
   tabs: { mine: 'Omat myynnit', deals: 'Neuvottelut ja kaupat', catalog: 'Myynnissä' },
   calculatorLink: 'Laskuri',
-  notAllowed: 'Osamaksukaupan voi tehdä suomalaisen kuljetusliikkeen pääkäyttäjä, kun yrityksellä on voimassa oleva liikennelupa ja vakuutus.',
+  notAllowed: 'Kalustoa voi myydä osamaksulla jokainen RAHTIKSEEN rekisteröitynyt ja tarkastettu suomalainen yritys, ja ostajana on aina tarkastettu kuljetusliike. Kaupan tekee yrityksen pääkäyttäjä.',
+  buyNotAllowed: 'Ostaminen osamaksulla edellyttää, että yritykselläsi on voimassa oleva liikennelupa ja vakuutus.',
+  introSeller:
+    'Myy auto osamaksulla tarkastetulle kuljetusliikkeelle. Lisää myytävä auto, me tarkastamme sen tiedot, ja hyväksynnän jälkeen voit julkaista myynti-ilmoituksen. RAHTIS laatii osamaksukauppalain mukaisen sopimuksen, maksusuunnitelman ja laskut myyjän nimissä; ostaja maksaa suoraan tilillesi.',
   sell: 'Myy osamaksulla',
   emptyMine: 'Ei myynti-ilmoituksia. Valitse auto kalustosta ja paina ”Myy osamaksulla”.',
+  emptyMineSeller: 'Ei myynti-ilmoituksia. Lisää myytävä auto ja lähetä se hyväksyttäväksi. Kun auto on hyväksytty, paina ”Myy osamaksulla”.',
+  saleVehicles: {
+    title: 'Myytävät autot',
+    hint: 'Tarkastamme auton tiedot ennen kuin myynti-ilmoituksen voi julkaista. Tarkastuksessa olevaa autoa ja autoa, jolla on myynti-ilmoitus, ei voi muokata.',
+  },
   emptyCatalog: 'Myynnissä ei ole autoja juuri nyt.',
   emptyDeals: 'Ei neuvotteluja.',
   listing: {
@@ -48,6 +56,7 @@ const fi = {
     withdraw: 'Poista myynnistä',
     saved: 'Tallennettu.',
     noVehicles: 'Kalustossa ei ole hyväksyttyä autoa, jonka voi myydä. Osamaksulla ostetun auton voi myydä vasta, kun se on kokonaan maksettu.',
+    noVehiclesSeller: 'Sinulla ei ole hyväksyttyä autoa, jonka voi myydä. Lisää myytävä auto ja lähetä se hyväksyttäväksi – ilmoituksen voi julkaista, kun auto on hyväksytty.',
     error: 'Tarkista arvot.',
   },
   status: {
@@ -142,6 +151,7 @@ const fi = {
     sellerNote: 'Myyjän lisätiedot',
     stopped: 'Uusia maksuerälaskuja ja muistutuksia ei enää lähetetä. Sopimus ja jo laaditut laskut ovat edelleen saatavilla.',
     vehicleSeller: 'Auto on palautettu kalustoosi luonnoksena – lähetä se hyväksyttäväksi ennen käyttöä tai uutta myyntiä.',
+    vehicleSellerOwn: 'Auto on palautettu myytäviin autoihisi luonnoksena – lähetä se hyväksyttäväksi ennen uutta myyntiä.',
     vehicleBuyer: 'Auto on poistettu käytöstä kalustossasi; sen kuljetushistoria säilyy.',
     summaryTitle: 'Yhteenveto maksuista',
     paidFirst: 'Maksettu ensimmäisellä laskulla (käsiraha ja arvonlisävero)',
@@ -216,9 +226,17 @@ const en: InstallmentUiCopy = {
     'Sell your own truck in instalments to a verified carrier, or buy one in instalments. RAHTIS prepares the contract under the Finnish Hire Purchase Act, the payment plan and the invoices in the seller’s name; the buyer pays straight to the seller’s account.',
   tabs: { mine: 'My sales', deals: 'Negotiations and deals', catalog: 'For sale' },
   calculatorLink: 'Calculator',
-  notAllowed: 'Instalment sales can be made by the main user of a Finnish carrier that has a valid operating licence and insurance.',
+  notAllowed: 'Any verified Finnish company registered in RAHTIS can sell equipment in instalments; the buyer is always a verified carrier. The sale is made by the company’s main user.',
+  buyNotAllowed: 'To buy in instalments, your company needs a valid operating licence and insurance.',
+  introSeller:
+    'Sell a truck in instalments to a verified carrier. Add the vehicle you want to sell; we check its details, and once it is approved you can publish a listing. RAHTIS prepares the contract under the Finnish Hire Purchase Act, the payment plan and the invoices in the seller’s name; the buyer pays straight to your account.',
   sell: 'Sell in instalments',
   emptyMine: 'No listings. Pick a truck in your fleet and press “Sell in instalments”.',
+  emptyMineSeller: 'No listings. Add the vehicle you want to sell and submit it for approval. Once it is approved, press “Sell in instalments”.',
+  saleVehicles: {
+    title: 'Vehicles for sale',
+    hint: 'We check the vehicle details before a listing can be published. A vehicle that is under review or has a listing cannot be edited.',
+  },
   emptyCatalog: 'No trucks for sale right now.',
   emptyDeals: 'No negotiations.',
   listing: {
@@ -241,6 +259,7 @@ const en: InstallmentUiCopy = {
     withdraw: 'Withdraw',
     saved: 'Saved.',
     noVehicles: 'Your fleet has no approved vehicle that can be sold. A vehicle bought in instalments can be sold only once it is fully paid.',
+    noVehiclesSeller: 'You have no approved vehicle that can be sold. Add a vehicle and submit it for approval – you can publish a listing once it is approved.',
     error: 'Check the values.',
   },
   status: {
@@ -335,6 +354,7 @@ const en: InstallmentUiCopy = {
     sellerNote: 'Seller’s additional information',
     stopped: 'No more instalment invoices or reminders are sent. The contract and the invoices already issued remain available.',
     vehicleSeller: 'The vehicle is back in your fleet as a draft – submit it for approval before using it or listing it again.',
+    vehicleSellerOwn: 'The vehicle is back among your vehicles for sale as a draft – submit it for approval before listing it again.',
     vehicleBuyer: 'The vehicle has been taken out of use in your fleet; its trip history is kept.',
     summaryTitle: 'Payments summary',
     paidFirst: 'Paid on the first invoice (down payment and VAT)',

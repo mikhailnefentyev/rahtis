@@ -8,9 +8,17 @@ export const ui: InstallmentUiCopy = {
     'Müüge oma auto järelmaksuga kontrollitud vedajale või ostke auto järelmaksuga. RAHTIS koostab Soome järelmaksumüügi seaduse (osamaksukauppalaki) kohase lepingu, maksegraafiku ja arved müüja nimel; ostja maksab otse müüja kontole.',
   tabs: { mine: 'Minu müügid', deals: 'Läbirääkimised ja tehingud', catalog: 'Müügil' },
   calculatorLink: 'Kalkulaator',
-  notAllowed: 'Järelmaksumüügi saab teha Soome veoettevõtte peakasutaja, kui ettevõttel on kehtiv tegevusluba ja kindlustus.',
+  notAllowed: 'Sõidukeid saab järelmaksuga müüa iga teenuses RAHTIS registreeritud ja kontrollitud Soome ettevõte; ostja on alati kontrollitud vedaja. Tehingu teeb ettevõtte peakasutaja.',
+  buyNotAllowed: 'Järelmaksuga ostmiseks peab teie ettevõttel olema kehtiv tegevusluba ja kindlustus.',
+  introSeller:
+    'Müüge auto järelmaksuga kontrollitud vedajale. Lisage müüdav auto; kontrollime selle andmed ja pärast kinnitamist saate müügikuulutuse avaldada. RAHTIS koostab Soome järelmaksumüügi seaduse (osamaksukauppalaki) kohase lepingu, maksegraafiku ja arved müüja nimel; ostja maksab otse teie kontole.',
   sell: 'Müü järelmaksuga',
   emptyMine: 'Müügikuulutusi pole. Valige autopargist auto ja vajutage „Müü järelmaksuga“.',
+  emptyMineSeller: 'Müügikuulutusi pole. Lisage müüdav auto ja saatke see kinnitamiseks. Kui auto on kinnitatud, vajutage „Müü järelmaksuga“.',
+  saleVehicles: {
+    title: 'Müüdavad autod',
+    hint: 'Kontrollime auto andmed enne, kui müügikuulutuse saab avaldada. Kontrollimisel olevat autot ja autot, millel on müügikuulutus, ei saa muuta.',
+  },
   emptyCatalog: 'Praegu pole ühtegi autot müügil.',
   emptyDeals: 'Läbirääkimisi pole.',
   listing: {
@@ -33,6 +41,7 @@ export const ui: InstallmentUiCopy = {
     withdraw: 'Eemalda müügist',
     saved: 'Salvestatud.',
     noVehicles: 'Autopargis ei ole kinnitatud autot, mida saaks müüa. Järelmaksuga ostetud autot saab müüa alles siis, kui see on täielikult tasutud.',
+    noVehiclesSeller: 'Teil ei ole kinnitatud autot, mida saaks müüa. Lisage auto ja saatke see kinnitamiseks – kuulutuse saab avaldada, kui auto on kinnitatud.',
     error: 'Kontrollige väärtusi.',
   },
   status: {
@@ -127,6 +136,7 @@ export const ui: InstallmentUiCopy = {
     sellerNote: 'Müüja lisateave',
     stopped: 'Uusi osamaksete arveid ega meeldetuletusi enam ei saadeta. Leping ja juba koostatud arved on endiselt kättesaadavad.',
     vehicleSeller: 'Auto on mustandina tagasi teie autopargis – saatke see enne kasutamist või uut müüki kinnitamiseks.',
+    vehicleSellerOwn: 'Auto on mustandina tagasi teie müüdavate autode hulgas – saatke see enne uut müüki kinnitamiseks.',
     vehicleBuyer: 'Auto on teie autopargis kasutusest eemaldatud; vedude ajalugu säilib.',
     summaryTitle: 'Maksete kokkuvõte',
     paidFirst: 'Tasutud esimese arvega (sissemakse ja käibemaks)',

@@ -3149,12 +3149,13 @@ export type Database = {
           odometer_km: number | null
           price_cents: number
           published_at: string | null
+          sale_vehicle_id: string | null
           seller_company_id: string
           status: string
           updated_at: string
           vat_bps: number
           vat_mode: string
-          vehicle_id: string
+          vehicle_id: string | null
         }
         Insert: {
           annual_rate_bps?: number
@@ -3168,12 +3169,13 @@ export type Database = {
           odometer_km?: number | null
           price_cents: number
           published_at?: string | null
+          sale_vehicle_id?: string | null
           seller_company_id: string
           status?: string
           updated_at?: string
           vat_bps: number
           vat_mode?: string
-          vehicle_id: string
+          vehicle_id?: string | null
         }
         Update: {
           annual_rate_bps?: number
@@ -3187,14 +3189,83 @@ export type Database = {
           odometer_km?: number | null
           price_cents?: number
           published_at?: string | null
+          sale_vehicle_id?: string | null
           seller_company_id?: string
           status?: string
           updated_at?: string
           vat_bps?: number
           vat_mode?: string
-          vehicle_id?: string
+          vehicle_id?: string | null
         }
         Relationships: []
+      }
+      equipment_sale_vehicles: {
+        Row: {
+          access: Database["public"]["Enums"]["vehicle_access"]
+          approved_at: string | null
+          axles: number
+          company_id: string
+          created_at: string
+          euro_class: Database["public"]["Enums"]["euro_class"]
+          id: string
+          ldm: number | null
+          make: string
+          payload_kg: number | null
+          plate: string
+          rejected_at: string | null
+          rejection_reason: string | null
+          sold_deal_id: string | null
+          submitted_at: string | null
+          updated_at: string
+          vehicle_class: Database["public"]["Enums"]["vehicle_class"]
+        }
+        Insert: {
+          access?: Database["public"]["Enums"]["vehicle_access"]
+          approved_at?: string | null
+          axles: number
+          company_id: string
+          created_at?: string
+          euro_class: Database["public"]["Enums"]["euro_class"]
+          id?: string
+          ldm?: number | null
+          make: string
+          payload_kg?: number | null
+          plate: string
+          rejected_at?: string | null
+          rejection_reason?: string | null
+          sold_deal_id?: string | null
+          submitted_at?: string | null
+          updated_at?: string
+          vehicle_class: Database["public"]["Enums"]["vehicle_class"]
+        }
+        Update: {
+          access?: Database["public"]["Enums"]["vehicle_access"]
+          approved_at?: string | null
+          axles?: number
+          company_id?: string
+          created_at?: string
+          euro_class?: Database["public"]["Enums"]["euro_class"]
+          id?: string
+          ldm?: number | null
+          make?: string
+          payload_kg?: number | null
+          plate?: string
+          rejected_at?: string | null
+          rejection_reason?: string | null
+          sold_deal_id?: string | null
+          submitted_at?: string | null
+          updated_at?: string
+          vehicle_class?: Database["public"]["Enums"]["vehicle_class"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "equipment_sale_vehicles_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       installment_deals: {
         Row: {
@@ -9855,6 +9926,21 @@ export type Database = {
         Returns: string
       }
       set_equipment_listing_status: { Args: { p_id: string; p_status: string }; Returns: undefined }
+      save_equipment_sale_vehicle: {
+        Args: {
+          p_id: string | null
+          p_plate: string
+          p_make: string
+          p_vehicle_class: Database["public"]["Enums"]["vehicle_class"]
+          p_euro_class: Database["public"]["Enums"]["euro_class"]
+          p_axles: number
+          p_payload_kg: number | null
+          p_ldm: number | null
+        }
+        Returns: string
+      }
+      submit_equipment_sale_vehicle: { Args: { p_id: string }; Returns: undefined }
+      decide_equipment_sale_vehicle: { Args: { p_id: string; p_decision: string; p_note?: string | null }; Returns: undefined }
       equipment_catalog: {
         Args: never
         Returns: {

@@ -5,11 +5,18 @@ import { redirect } from 'next/navigation';
 import { getViewer } from '@/lib/auth/viewer';
 import { eurosToCents } from '@/lib/economics/money';
 import { emailLocaleOf } from '@/lib/email/text';
-import { defaultLocale, isLocale, type Locale } from '@/lib/i18n';
+import { defaultLocale, getDictionary, isLocale, type Locale } from '@/lib/i18n';
 import { notify } from '@/lib/notify';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
-import { isTerminationReason, vatModeAllowedForNew } from './access';
+import {
+  installmentCabinet,
+  installmentDealLink,
+  installmentsBase,
+  isTerminationReason,
+  parseSaleVehicle,
+  vatModeAllowedForNew,
+} from './access';
 import { buildSchedule, type VatMode } from './calc';
 import { fill, installmentUiCopy } from './copy';
 import { createFirstInvoice } from './firstInvoice';
@@ -17,9 +24,15 @@ import { createCreditNote, ensureSchedule, runInstallments } from './payments';
 
 /**
  * Действия раздела «Продажа техники в рассрочку» (22.11.2026). Права и
- * правила проверяет база (app.installment_party: главный в действующем
- * перевозчике с документами; условия — app.installment_terms_ok). Здесь —
- * разбор формы, та же проверка калькулятором и уведомления второй стороне.
+ * правила проверяет база: продаёт главный в проверенной финской компании
+ * любого вида (app.installment_seller), покупает главный в действующем
+ * перевозчике с документами (app.installment_party) — решение 23.11.2026;
+ * условия — app.installment_terms_ok. Здесь — разбор формы, та же проверка
+ * калькулятором и уведомления второй стороне.
+ *
+ * Раздел есть в двух кабинетах: у перевозчика (/carrier/installments) и у
+ * компании без парка (/shipper/installments). Ссылки и переходы строятся
+ * от вида компании (installmentsBase).
  *
  * Каждое действие возвращает ActionState: отказ базы человек видит рядом
  * с кнопкой (useActionState), а не молчаливо перерисованную страницу
@@ -77,13 +90,30 @@ function readTerms(fd: FormData, vatMode: VatMode, vatBps: number, withDates: bo
   return { price, down, final, rate, months, handover, firstDue };
 }
 
+/* Главный в компании, у которой есть раздел: перевозчик или компания без парка (23.11.2026). Остальное проверяет база. */
 async function ready() {
   const viewer = await getViewer();
+  const kind = viewer.status === 'ready' ? viewer.company?.kind : null;
   const ok =
     viewer.status === 'ready' &&
-    viewer.company?.kind === 'CARRIER' &&
+    installmentCabinet(kind) !== null &&
     viewer.profile.member_kind !== 'DISPATCHER';
-  return { viewer, ok: Boolean(ok) };
+  /* base — раздел в своём кабинете: туда ведут переходы после действия. */
+  return { viewer, ok: Boolean(ok), base: installmentsBase(kind) };
+}
+
+/*
+ * Страницы раздела есть в обоих кабинетах (23.11.2026), и вторая сторона
+ * сделки может смотреть её из другого: после действия обновляются обе.
+ */
+const BASES = [installmentsBase('CARRIER'), installmentsBase('SHIPPER')];
+
+function refreshList(locale: Locale) {
+  for (const base of BASES) revalidatePath(`/${locale}${base}`);
+}
+
+function refreshDeal(locale: Locale, dealId: string) {
+  for (const base of BASES) revalidatePath(`/${locale}${base}/${dealId}`);
 }
 
 /** Уведомление второй стороне — на её языке, со ссылкой на сделку. */
@@ -94,7 +124,7 @@ async function tell(
   event: { code: string; params: Record<string, string | number> },
   build: (c: ReturnType<typeof installmentUiCopy>) => { title: string; body: string },
 ) {
-  const { data: other } = await createAdminClient().from('companies').select('id, language').eq('id', companyId).maybeSingle();
+  const { data: other } = await createAdminClient().from('companies').select('id, language, kind').eq('id', companyId).maybeSingle();
   if (!other) return;
   const c = installmentUiCopy(emailLocaleOf(other.language));
   const { title, body } = build(c);
@@ -105,21 +135,26 @@ async function tell(
     params: event.params,
     title,
     body,
-    link: `/carrier/installments/${dealId}`,
+    /* Сделку каждая сторона открывает в своём кабинете: продавец может быть компанией без парка (23.11.2026). */
+    link: installmentDealLink(other.kind, dealId),
   });
 }
 
 async function dealParties(dealId: string) {
-  const { data } = await createAdminClient()
+  const admin = createAdminClient();
+  const { data } = await admin
     .from('installment_deals')
     .select('id, seller_company_id, buyer_company_id, listing_id, contract_number')
     .eq('id', dealId)
     .maybeSingle();
   if (!data) return null;
-  const { data: listing } = await createAdminClient().from('equipment_listings').select('vehicle_id').eq('id', data.listing_id).maybeSingle();
-  const { data: vehicle } = listing
-    ? await createAdminClient().from('vehicles').select('plate').eq('id', listing.vehicle_id).maybeSingle()
-    : { data: null };
+  /* Машина — из парка продавца или, у продавца без парка, из его карточки на продажу (23.11.2026). */
+  const { data: listing } = await admin.from('equipment_listings').select('vehicle_id, sale_vehicle_id').eq('id', data.listing_id).maybeSingle();
+  const { data: vehicle } = listing?.vehicle_id
+    ? await admin.from('vehicles').select('plate').eq('id', listing.vehicle_id).maybeSingle()
+    : listing?.sale_vehicle_id
+      ? await admin.from('equipment_sale_vehicles').select('plate').eq('id', listing.sale_vehicle_id).maybeSingle()
+      : { data: null };
   return { ...data, plate: vehicle?.plate ?? '' };
 }
 
@@ -128,7 +163,7 @@ async function dealParties(dealId: string) {
 export async function saveListingAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
   const locale = toLocale(fd.get('locale'));
   const c = installmentUiCopy(locale);
-  const { ok } = await ready();
+  const { ok, base } = await ready();
   if (!ok) return { error: c.notAllowed, saved: false };
 
   /* В кабинете объявление всегда с обычным НДС (решение 22.11.2026); другой режим не принимает и база. */
@@ -160,8 +195,8 @@ export async function saveListingAction(_prev: ActionState, fd: FormData): Promi
     const { error: pub } = await supabase.rpc('set_equipment_listing_status', { p_id: id, p_status: 'PUBLISHED' });
     if (pub) return { error: c.listing.error, saved: false };
   }
-  revalidatePath(`/${locale}/carrier/installments`);
-  redirect(`/${locale}/carrier/installments`);
+  refreshList(locale);
+  redirect(`/${locale}${base}`);
 }
 
 export async function setListingStatusAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
@@ -192,7 +227,7 @@ export async function setListingStatusAction(_prev: ActionState, fd: FormData): 
       body: cc.notify.withdrawnBody,
     }));
   }
-  revalidatePath(`/${locale}/carrier/installments`);
+  refreshList(locale);
   return done;
 }
 
@@ -201,7 +236,7 @@ export async function setListingStatusAction(_prev: ActionState, fd: FormData): 
 export async function startDealAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
   const locale = toLocale(fd.get('locale'));
   const c = installmentUiCopy(locale);
-  const { viewer, ok } = await ready();
+  const { viewer, ok, base } = await ready();
   if (!ok || viewer.status !== 'ready' || !viewer.company) return { error: c.notAllowed, saved: false };
 
   /* Новая сделка — только с обычным НДС (решение 22.11.2026): по старому объявлению с другим режимом предложение не принимается. */
@@ -223,7 +258,8 @@ export async function startDealAction(_prev: ActionState, fd: FormData): Promise
   });
   if (error || !dealId) {
     console.error('сделка не начата:', error?.message);
-    return { error: c.deal.error, saved: false };
+    /* 42501 — покупать может только перевозчик с действующими документами. */
+    return { error: error?.code === '42501' ? c.buyNotAllowed : c.deal.error, saved: false };
   }
   const parties = await dealParties(dealId);
   if (parties) {
@@ -232,7 +268,7 @@ export async function startDealAction(_prev: ActionState, fd: FormData): Promise
       body: fill(cc.notify.offerBody, { name: viewer.company!.name }),
     }));
   }
-  redirect(`/${locale}/carrier/installments/${dealId}`);
+  redirect(`/${locale}${base}/${dealId}`);
 }
 
 export async function proposeTermsAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
@@ -270,7 +306,7 @@ export async function proposeTermsAction(_prev: ActionState, fd: FormData): Prom
       body: fill(cc.notify.counterBody, { name: viewer.company!.name }),
     }));
   }
-  revalidatePath(`/${locale}/carrier/installments/${dealId}`);
+  refreshDeal(locale, dealId);
   return { error: null, saved: true };
 }
 
@@ -309,8 +345,8 @@ export async function acceptTermsAction(_prev: ActionState, fd: FormData): Promi
       body: fill(cc.notify.agreedBody, { number }),
     }));
   }
-  revalidatePath(`/${locale}/carrier/installments/${dealId}`);
-  revalidatePath(`/${locale}/carrier/installments`);
+  refreshDeal(locale, dealId);
+  refreshList(locale);
   return { error: null, saved: true };
 }
 
@@ -338,7 +374,7 @@ export async function retryFirstInvoiceAction(_prev: ActionState, fd: FormData):
     console.error('первый счёт рассрочки сорвался:', cause instanceof Error ? cause.message : cause);
     result = failed(c.deal.error);
   }
-  revalidatePath(`/${locale}/carrier/installments/${dealId}`);
+  refreshDeal(locale, dealId);
   return result;
 }
 
@@ -353,7 +389,7 @@ export async function cancelDealAction(_prev: ActionState, fd: FormData): Promis
   if (error) {
     console.error('сделка не отменена:', error.message);
     /* Сделка могла измениться (счёт уже выставлен) — страницу обновляем, чтобы человек увидел нынешнее состояние. */
-    revalidatePath(`/${locale}/carrier/installments/${dealId}`);
+    refreshDeal(locale, dealId);
     return failed(error.code === '42501' ? c.notAllowed : c.deal.error);
   }
   const parties = changed ? await dealParties(dealId) : null;
@@ -364,8 +400,8 @@ export async function cancelDealAction(_prev: ActionState, fd: FormData): Promis
       body: fill(cc.notify.cancelledBody, { name: viewer.company!.name }),
     }));
   }
-  revalidatePath(`/${locale}/carrier/installments/${dealId}`);
-  revalidatePath(`/${locale}/carrier/installments`);
+  refreshDeal(locale, dealId);
+  refreshList(locale);
   return done;
 }
 
@@ -381,7 +417,7 @@ export async function markFirstPaidAction(_prev: ActionState, fd: FormData): Pro
   const supabase = await createClient();
   const { error } = await supabase.rpc('mark_installment_first_paid', { p_deal_id: dealId });
   if (error) console.error('оплата первого счёта:', error.message);
-  revalidatePath(`/${locale}/carrier/installments/${dealId}`);
+  refreshDeal(locale, dealId);
   return error ? failed(c.deal.error) : done;
 }
 
@@ -426,7 +462,7 @@ export async function confirmHandoverAction(_prev: ActionState, fd: FormData): P
       }
     }
   }
-  revalidatePath(`/${locale}/carrier/installments/${dealId}`);
+  refreshDeal(locale, dealId);
   revalidatePath(`/${locale}/carrier/fleet`);
   return { error: null, saved: true };
 }
@@ -444,7 +480,7 @@ export async function markPaidAction(_prev: ActionState, fd: FormData): Promise<
   const { data: status, error } = await supabase.rpc('mark_installment_paid', { p_deal_id: dealId, p_n: n });
   if (error) {
     console.error('оплата взноса:', error.message);
-    revalidatePath(`/${locale}/carrier/installments/${dealId}`);
+    refreshDeal(locale, dealId);
     return failed(c.deal.error);
   }
   if (status === 'PAID_OFF') {
@@ -458,7 +494,7 @@ export async function markPaidAction(_prev: ActionState, fd: FormData): Promise<
       }
     }
   }
-  revalidatePath(`/${locale}/carrier/installments/${dealId}`);
+  refreshDeal(locale, dealId);
   return done;
 }
 
@@ -474,7 +510,7 @@ export async function cancelWithCreditAction(_prev: ActionState, fd: FormData): 
   if (error) {
     console.error('отмена с кредит-нотой:', error.message);
     /* Вторая сторона могла начать передачу — страницу обновляем. */
-    revalidatePath(`/${locale}/carrier/installments/${dealId}`);
+    refreshDeal(locale, dealId);
     return failed(c.deal.error);
   }
   /* Кредит-нота не вышла — сделка всё равно отменена: на странице останется «не выставлена» и кнопка повтора. */
@@ -491,8 +527,8 @@ export async function cancelWithCreditAction(_prev: ActionState, fd: FormData): 
       body: fill(cc.notify.cancelledBody, { name: viewer.company!.name }),
     }));
   }
-  revalidatePath(`/${locale}/carrier/installments/${dealId}`);
-  revalidatePath(`/${locale}/carrier/installments`);
+  refreshDeal(locale, dealId);
+  refreshList(locale);
   return done;
 }
 
@@ -513,7 +549,7 @@ export async function retryCreditNoteAction(_prev: ActionState, fd: FormData): P
     console.error('кредит-нота:', cause instanceof Error ? cause.message : cause);
     result = failed(c.deal.error);
   }
-  revalidatePath(`/${locale}/carrier/installments/${dealId}`);
+  refreshDeal(locale, dealId);
   return result;
 }
 
@@ -552,7 +588,7 @@ export async function terminateDealAction(_prev: ActionState, fd: FormData): Pro
   if (error) {
     console.error('прекращение сделки:', error.message);
     /* Сделка могла измениться (последний взнос оплачен) — страницу обновляем. */
-    revalidatePath(`/${locale}/carrier/installments/${dealId}`);
+    refreshDeal(locale, dealId);
     /* 55006 — у машины покупателя открытые рейсы; 42501 — не продавец или не главный в компании. */
     return failed(error.code === '55006' ? c.termination.openTrips : error.code === '42501' ? c.notAllowed : c.deal.error);
   }
@@ -563,8 +599,106 @@ export async function terminateDealAction(_prev: ActionState, fd: FormData): Pro
       body: cc.notify.terminatedBody,
     }));
   }
-  revalidatePath(`/${locale}/carrier/installments/${dealId}`);
-  revalidatePath(`/${locale}/carrier/installments`);
+  refreshDeal(locale, dealId);
+  refreshList(locale);
   revalidatePath(`/${locale}/carrier/fleet`);
+  return done;
+}
+
+// ── Машина на продажу у компании без парка (23.11.2026) ──────────────
+
+/**
+ * Карточка машины, которую продаёт компания без парка: номер, марка и
+ * модель, класс, эко-класс, оси; у фургона и грузовика — грузоподъёмность
+ * и погрузочные метры. Сохраняется черновиком; кнопка «отправить» сразу
+ * передаёт её оператору на проверку.
+ */
+export async function saveSaleVehicleAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
+  const locale = toLocale(fd.get('locale'));
+  const c = installmentUiCopy(locale);
+  const { ok, base } = await ready();
+  if (!ok) return failed(c.notAllowed);
+  const input = parseSaleVehicle({
+    plate: str(fd, 'plate'),
+    make: str(fd, 'make'),
+    vehicleClass: str(fd, 'vehicle_class'),
+    euroClass: str(fd, 'euro_class'),
+    axles: str(fd, 'axles'),
+    payloadKg: str(fd, 'payload_kg'),
+    ldm: str(fd, 'ldm'),
+  });
+  if (!input) return failed(c.listing.error);
+
+  const supabase = await createClient();
+  const { data: id, error } = await supabase.rpc('save_equipment_sale_vehicle', {
+    p_id: str(fd, 'id') || null,
+    p_plate: input.plate,
+    p_make: input.make,
+    p_vehicle_class: input.vehicleClass,
+    p_euro_class: input.euroClass,
+    p_axles: input.axles,
+    p_payload_kg: input.payloadKg,
+    p_ldm: input.ldm,
+  });
+  if (error || !id) {
+    console.error('машина на продажу не сохранена:', error?.message);
+    if (error?.code === '42501') return failed(c.notAllowed);
+    /* 23505 — этот номер у компании уже есть. */
+    if (error?.code === '23505') return failed((await getDictionary(locale)).fleet.plateInOwnFleet);
+    return failed(c.listing.error);
+  }
+  if (str(fd, 'send') === '1') {
+    const { error: sent } = await supabase.rpc('submit_equipment_sale_vehicle', { p_id: id });
+    if (sent) {
+      console.error('машина на продажу не отправлена на проверку:', sent.message);
+      refreshList(locale);
+      return failed(c.deal.error);
+    }
+  }
+  refreshList(locale);
+  redirect(`/${locale}${base}`);
+}
+
+/** Отправить карточку машины на продажу оператору на проверку. */
+export async function submitSaleVehicleAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
+  const locale = toLocale(fd.get('locale'));
+  const c = installmentUiCopy(locale);
+  const { ok } = await ready();
+  if (!ok) return failed(c.notAllowed);
+  const supabase = await createClient();
+  const { error } = await supabase.rpc('submit_equipment_sale_vehicle', { p_id: str(fd, 'id') });
+  refreshList(locale);
+  if (error) {
+    console.error('машина на продажу не отправлена на проверку:', error.message);
+    return failed(error.code === '42501' ? c.notAllowed : c.deal.error);
+  }
+  return done;
+}
+
+/**
+ * Решение оператора по машине на продажу (экран допуска машин в админке).
+ * Права проверяет база (decide_equipment_sale_vehicle: только оператор);
+ * компании уходит то же уведомление, что о машине парка.
+ */
+export async function decideSaleVehicleAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
+  const locale = toLocale(fd.get('locale'));
+  const t = await getDictionary(locale);
+  const viewer = await getViewer();
+  if (viewer.status !== 'ready' || viewer.role !== 'ADMIN') return failed(t.error.forbidden);
+  const decision = str(fd, 'decision');
+  if (decision !== 'APPROVED' && decision !== 'REJECTED') return failed(t.error.generic);
+  const supabase = await createClient();
+  const { error } = await supabase.rpc('decide_equipment_sale_vehicle', {
+    p_id: str(fd, 'id'),
+    p_decision: decision,
+    p_note: str(fd, 'reason') || null,
+  });
+  if (error) {
+    console.error('решение по машине на продажу:', error.message);
+    /* 23505 — номер уже у одобренной к продаже машины другой компании. */
+    return failed(error.code === '23505' ? t.moderation.vehiclePlateTaken : t.error.generic);
+  }
+  revalidatePath(`/${locale}/admin`);
+  refreshList(locale);
   return done;
 }

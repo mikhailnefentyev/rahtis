@@ -8,9 +8,17 @@ export const ui: InstallmentUiCopy = {
     'Verkaufen Sie Ihren eigenen Lkw auf Raten an ein geprüftes Transportunternehmen, oder kaufen Sie einen auf Raten. RAHTIS erstellt den Vertrag nach dem finnischen Abzahlungsgesetz (osamaksukauppalaki), den Zahlungsplan und die Rechnungen im Namen des Verkäufers; der Käufer zahlt direkt auf das Konto des Verkäufers.',
   tabs: { mine: 'Meine Verkäufe', deals: 'Verhandlungen und Käufe', catalog: 'Zum Verkauf' },
   calculatorLink: 'Rechner',
-  notAllowed: 'Ratenkäufe kann der Hauptbenutzer eines finnischen Transportunternehmens abschließen, wenn das Unternehmen eine gültige Güterkraftverkehrserlaubnis und eine gültige Versicherung hat.',
+  notAllowed: 'Fahrzeuge auf Raten verkaufen kann jedes geprüfte finnische Unternehmen, das bei RAHTIS registriert ist; Käufer ist immer ein geprüftes Transportunternehmen. Den Kauf schließt der Hauptbenutzer des Unternehmens ab.',
+  buyNotAllowed: 'Für den Kauf auf Raten benötigt Ihr Unternehmen eine gültige Güterkraftverkehrserlaubnis und eine gültige Versicherung.',
+  introSeller:
+    'Verkaufen Sie einen Lkw auf Raten an ein geprüftes Transportunternehmen. Fügen Sie das Fahrzeug hinzu, das Sie verkaufen möchten; wir prüfen die Angaben, und nach der Freigabe können Sie eine Anzeige veröffentlichen. RAHTIS erstellt den Vertrag nach dem finnischen Abzahlungsgesetz (osamaksukauppalaki), den Zahlungsplan und die Rechnungen im Namen des Verkäufers; der Käufer zahlt direkt auf Ihr Konto.',
   sell: 'Auf Raten verkaufen',
   emptyMine: 'Keine Anzeigen. Wählen Sie ein Fahrzeug aus Ihrem Fuhrpark und klicken Sie auf „Auf Raten verkaufen“.',
+  emptyMineSeller: 'Keine Anzeigen. Fügen Sie das Fahrzeug hinzu, das Sie verkaufen möchten, und reichen Sie es zur Freigabe ein. Sobald es freigegeben ist, klicken Sie auf „Auf Raten verkaufen“.',
+  saleVehicles: {
+    title: 'Fahrzeuge zum Verkauf',
+    hint: 'Wir prüfen die Fahrzeugdaten, bevor eine Anzeige veröffentlicht werden kann. Ein Fahrzeug, das in Prüfung ist oder zu dem eine Anzeige besteht, kann nicht bearbeitet werden.',
+  },
   emptyCatalog: 'Derzeit stehen keine Fahrzeuge zum Verkauf.',
   emptyDeals: 'Keine Verhandlungen.',
   listing: {
@@ -33,6 +41,7 @@ export const ui: InstallmentUiCopy = {
     withdraw: 'Aus dem Verkauf nehmen',
     saved: 'Gespeichert.',
     noVehicles: 'In Ihrem Fuhrpark gibt es kein freigegebenes Fahrzeug, das verkauft werden kann. Ein auf Raten gekauftes Fahrzeug kann erst verkauft werden, wenn es vollständig bezahlt ist.',
+    noVehiclesSeller: 'Sie haben kein freigegebenes Fahrzeug, das verkauft werden kann. Fügen Sie ein Fahrzeug hinzu und reichen Sie es zur Freigabe ein – die Anzeige können Sie veröffentlichen, sobald das Fahrzeug freigegeben ist.',
     error: 'Bitte prüfen Sie die Werte.',
   },
   status: {
@@ -127,6 +136,7 @@ export const ui: InstallmentUiCopy = {
     sellerNote: 'Weitere Angaben des Verkäufers',
     stopped: 'Es werden keine weiteren Ratenrechnungen und Erinnerungen versendet. Der Vertrag und die bereits erstellten Rechnungen bleiben abrufbar.',
     vehicleSeller: 'Das Fahrzeug ist wieder als Entwurf in Ihrem Fuhrpark – reichen Sie es zur Freigabe ein, bevor Sie es einsetzen oder erneut verkaufen.',
+    vehicleSellerOwn: 'Das Fahrzeug ist wieder als Entwurf bei Ihren Fahrzeugen zum Verkauf – reichen Sie es zur Freigabe ein, bevor Sie es erneut verkaufen.',
     vehicleBuyer: 'Das Fahrzeug wurde in Ihrem Fuhrpark außer Betrieb genommen; die Transporthistorie bleibt erhalten.',
     summaryTitle: 'Zahlungsübersicht',
     paidFirst: 'Mit der ersten Rechnung bezahlt (Anzahlung und Umsatzsteuer)',

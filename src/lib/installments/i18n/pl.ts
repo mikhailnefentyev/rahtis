@@ -8,9 +8,17 @@ export const ui: InstallmentUiCopy = {
     'Sprzedaj własny pojazd na raty zweryfikowanemu przewoźnikowi albo kup pojazd na raty. RAHTIS przygotowuje umowę zgodną z fińską ustawą o sprzedaży ratalnej (osamaksukauppalaki), harmonogram spłat i faktury w imieniu sprzedawcy; kupujący płaci bezpośrednio na konto sprzedawcy.',
   tabs: { mine: 'Moje sprzedaże', deals: 'Negocjacje i transakcje', catalog: 'Na sprzedaż' },
   calculatorLink: 'Kalkulator',
-  notAllowed: 'Umowę sprzedaży ratalnej może zawrzeć główny użytkownik fińskiego przewoźnika, jeśli firma ma ważną licencję transportową i ważne ubezpieczenie.',
+  notAllowed: 'Sprzęt na raty może sprzedać każda zweryfikowana fińska firma zarejestrowana w serwisie RAHTIS; kupującym jest zawsze zweryfikowany przewoźnik. Umowę zawiera główny użytkownik firmy.',
+  buyNotAllowed: 'Aby kupić pojazd na raty, Twoja firma musi mieć ważną licencję transportową i ważne ubezpieczenie.',
+  introSeller:
+    'Sprzedaj pojazd na raty zweryfikowanemu przewoźnikowi. Dodaj pojazd, który chcesz sprzedać; sprawdzimy jego dane, a po zatwierdzeniu opublikujesz ogłoszenie. RAHTIS przygotowuje umowę zgodną z fińską ustawą o sprzedaży ratalnej (osamaksukauppalaki), harmonogram spłat i faktury w imieniu sprzedawcy; kupujący płaci bezpośrednio na Twoje konto.',
   sell: 'Sprzedaj na raty',
   emptyMine: 'Brak ogłoszeń. Wybierz pojazd ze swojej floty i kliknij „Sprzedaj na raty”.',
+  emptyMineSeller: 'Brak ogłoszeń. Dodaj pojazd, który chcesz sprzedać, i prześlij go do zatwierdzenia. Gdy pojazd zostanie zatwierdzony, kliknij „Sprzedaj na raty”.',
+  saleVehicles: {
+    title: 'Pojazdy na sprzedaż',
+    hint: 'Sprawdzamy dane pojazdu, zanim będzie można opublikować ogłoszenie. Pojazdu w weryfikacji ani pojazdu z ogłoszeniem nie można edytować.',
+  },
   emptyCatalog: 'Obecnie nie ma pojazdów na sprzedaż.',
   emptyDeals: 'Brak negocjacji.',
   listing: {
@@ -33,6 +41,7 @@ export const ui: InstallmentUiCopy = {
     withdraw: 'Wycofaj ze sprzedaży',
     saved: 'Zapisano.',
     noVehicles: 'We flocie nie ma zatwierdzonego pojazdu, który można sprzedać. Pojazd kupiony na raty można sprzedać dopiero po spłaceniu go w całości.',
+    noVehiclesSeller: 'Nie masz zatwierdzonego pojazdu, który można sprzedać. Dodaj pojazd i prześlij go do zatwierdzenia – ogłoszenie opublikujesz po zatwierdzeniu pojazdu.',
     error: 'Sprawdź wartości.',
   },
   status: {
@@ -127,6 +136,7 @@ export const ui: InstallmentUiCopy = {
     sellerNote: 'Dodatkowe informacje sprzedawcy',
     stopped: 'Nowe faktury za raty i przypomnienia nie są już wysyłane. Umowa i wystawione faktury pozostają dostępne.',
     vehicleSeller: 'Pojazd wrócił do Twojej floty jako szkic – prześlij go do zatwierdzenia, zanim zaczniesz go używać lub ponownie wystawisz na sprzedaż.',
+    vehicleSellerOwn: 'Pojazd wrócił na listę Twoich pojazdów na sprzedaż jako szkic – prześlij go do zatwierdzenia, zanim ponownie wystawisz go na sprzedaż.',
     vehicleBuyer: 'Pojazd został wycofany z użytku w Twojej flocie; historia przewozów pozostaje.',
     summaryTitle: 'Podsumowanie płatności',
     paidFirst: 'Zapłacono z pierwszej faktury (wpłata własna i VAT)',

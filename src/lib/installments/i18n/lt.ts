@@ -8,9 +8,17 @@ export const ui: InstallmentUiCopy = {
     'Parduokite savo automobilį išsimokėtinai patikrintam vežėjui arba pirkite automobilį išsimokėtinai. RAHTIS parengia sutartį pagal Suomijos pirkimo–pardavimo išsimokėtinai įstatymą (osamaksukauppalaki), mokėjimų grafiką ir sąskaitas pardavėjo vardu; pirkėjas moka tiesiai į pardavėjo sąskaitą.',
   tabs: { mine: 'Mano pardavimai', deals: 'Derybos ir sandoriai', catalog: 'Parduodama' },
   calculatorLink: 'Skaičiuoklė',
-  notAllowed: 'Pirkimo–pardavimo išsimokėtinai sandorį gali sudaryti Suomijos vežėjo įmonės pagrindinis naudotojas, kai įmonė turi galiojančią transporto licenciją ir draudimą.',
+  notAllowed: 'Techniką išsimokėtinai gali parduoti kiekviena RAHTIS sistemoje užregistruota ir patikrinta Suomijos įmonė; pirkėjas visada yra patikrintas vežėjas. Sandorį sudaro įmonės pagrindinis naudotojas.',
+  buyNotAllowed: 'Norint pirkti išsimokėtinai, jūsų įmonė turi turėti galiojančią transporto licenciją ir draudimą.',
+  introSeller:
+    'Parduokite automobilį išsimokėtinai patikrintam vežėjui. Pridėkite parduodamą automobilį; patikrinsime jo duomenis, o kai jis bus patvirtintas, galėsite paskelbti skelbimą. RAHTIS parengia sutartį pagal Suomijos pirkimo–pardavimo išsimokėtinai įstatymą (osamaksukauppalaki), mokėjimų grafiką ir sąskaitas pardavėjo vardu; pirkėjas moka tiesiai į jūsų sąskaitą.',
   sell: 'Parduoti išsimokėtinai',
   emptyMine: 'Skelbimų nėra. Pasirinkite automobilį savo parke ir paspauskite „Parduoti išsimokėtinai“.',
+  emptyMineSeller: 'Skelbimų nėra. Pridėkite parduodamą automobilį ir pateikite jį tvirtinti. Kai automobilis bus patvirtintas, paspauskite „Parduoti išsimokėtinai“.',
+  saleVehicles: {
+    title: 'Parduodami automobiliai',
+    hint: 'Prieš paskelbiant skelbimą patikriname automobilio duomenis. Tikrinamo automobilio ir automobilio, kuris turi skelbimą, keisti negalima.',
+  },
   emptyCatalog: 'Šiuo metu parduodamų automobilių nėra.',
   emptyDeals: 'Derybų nėra.',
   listing: {
@@ -33,6 +41,7 @@ export const ui: InstallmentUiCopy = {
     withdraw: 'Išimti iš pardavimo',
     saved: 'Išsaugota.',
     noVehicles: 'Parke nėra patvirtinto automobilio, kurį galima parduoti. Išsimokėtinai pirktą automobilį galima parduoti tik tada, kai už jį visiškai sumokėta.',
+    noVehiclesSeller: 'Neturite patvirtinto automobilio, kurį galima parduoti. Pridėkite automobilį ir pateikite jį tvirtinti – skelbimą galima paskelbti, kai automobilis patvirtintas.',
     error: 'Patikrinkite reikšmes.',
   },
   status: {
@@ -127,6 +136,7 @@ export const ui: InstallmentUiCopy = {
     sellerNote: 'Pardavėjo papildoma informacija',
     stopped: 'Naujos įmokų sąskaitos ir priminimai nebesiunčiami. Sutartis ir jau išrašytos sąskaitos lieka prieinamos.',
     vehicleSeller: 'Automobilis grąžintas į jūsų parką kaip juodraštis – prieš naudodami ar vėl parduodami pateikite jį tvirtinti.',
+    vehicleSellerOwn: 'Automobilis grąžintas į jūsų parduodamų automobilių sąrašą kaip juodraštis – prieš vėl parduodami pateikite jį tvirtinti.',
     vehicleBuyer: 'Automobilis jūsų parke nebenaudojamas; vežimų istorija išlieka.',
     summaryTitle: 'Mokėjimų suvestinė',
     paidFirst: 'Sumokėta pagal pirmąją sąskaitą (pradinė įmoka ir PVM)',

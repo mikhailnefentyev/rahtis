@@ -219,6 +219,8 @@ function navigation(
           label: t.nav.groupCompany,
           items: [
             { href: `/${locale}/shipper/vehicles`, label: t.known.title, icon: 'vehicles' },
+            /* Продать технику в рассрочку может любая проверенная финская компания, не только перевозчик (решение 23.11.2026). */
+            ...(finnish ? [{ href: `/${locale}/shipper/installments`, label: installmentUiCopy(locale).nav, icon: 'billing' as const }] : []),
             { href: `/${locale}/shipper/api`, label: t.api.nav, icon: 'api' },
           ],
         },

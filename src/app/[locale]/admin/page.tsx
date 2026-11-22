@@ -36,6 +36,7 @@ import { ApplicationCard } from './ApplicationCard';
 import { loadDocsGates } from '@/lib/forwarders/docsGateServer';
 import { DeleteOrderButton } from './DeleteOrderButton';
 import { NoticeForm } from './NoticeForm';
+import { SaleVehicleCard } from './SaleVehicleCard';
 import { VehicleCard } from './VehicleCard';
 import { ForwarderReview, type ReviewDocument } from './forwarders/ForwarderReview';
 import { SHIPPER_DOC_KINDS } from '@/lib/shipper-docs/model';
@@ -138,6 +139,17 @@ export default async function AdminPage({
    */
   const { data: disposableRows } = await supabase.rpc('admin_disposable_orders', { p_limit: 30 });
   const disposable = (disposableRows ?? []).map((row) => ({ ...row, shipper: { name: row.shipper_name } }));
+
+  /*
+   * Машины на продажу в рассрочку у компаний без парка (23.11.2026): та же
+   * очередь проверки, что у машин парка. Лежат в своей таблице — строка
+   * vehicles бывает только у перевозчика.
+   */
+  const { data: pendingSaleVehicles } = await supabase
+    .from('equipment_sale_vehicles')
+    .select('*, company:companies(name)')
+    .eq('access', 'PENDING')
+    .order('submitted_at', { ascending: true });
 
   /* Документы компаний, чьи машины сейчас на допуске: решение принимается вместе. */
   const vehicleCompanyIds = [...new Set((pendingVehicles ?? []).map((v) => v.company_id))];
@@ -323,10 +335,10 @@ export default async function AdminPage({
 
       <section className="mt-10">
         <h2 className="mb-4 border-b border-line pb-2 text-[13px] font-semibold tracking-tight text-ink-faint">
-          {m('fleet.pendingCount', { count: (pendingVehicles ?? []).length })}
+          {m('fleet.pendingCount', { count: (pendingVehicles ?? []).length + (pendingSaleVehicles ?? []).length })}
         </h2>
 
-        {(pendingVehicles ?? []).length === 0 ? (
+        {(pendingVehicles ?? []).length + (pendingSaleVehicles ?? []).length === 0 ? (
           <EmptyState title={t.empty.noVehicles} />
         ) : (
           <div className="flex flex-col gap-3">
@@ -342,6 +354,9 @@ export default async function AdminPage({
                     daysLeft: document.valid_until ? daysUntil(document.valid_until) : null,
                   }))}
               />
+            ))}
+            {(pendingSaleVehicles ?? []).map((vehicle) => (
+              <SaleVehicleCard key={vehicle.id} vehicle={vehicle} companyName={vehicle.company?.name ?? '—'} />
             ))}
           </div>
         )}

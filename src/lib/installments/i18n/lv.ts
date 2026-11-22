@@ -8,9 +8,17 @@ export const ui: InstallmentUiCopy = {
     'Pārdodiet savu automašīnu uz nomaksu pārbaudītam pārvadātājam vai nopērciet automašīnu uz nomaksu. RAHTIS sagatavo līgumu saskaņā ar Somijas Nomaksas pirkuma likumu (osamaksukauppalaki), maksājumu grafiku un rēķinus pārdevēja vārdā; pircējs maksā tieši uz pārdevēja kontu.',
   tabs: { mine: 'Mani pārdošanas sludinājumi', deals: 'Sarunas un darījumi', catalog: 'Pārdošanā' },
   calculatorLink: 'Kalkulators',
-  notAllowed: 'Nomaksas pirkumu var noslēgt Somijas pārvadājumu uzņēmuma galvenais lietotājs, ja uzņēmumam ir derīga pārvadājumu licence un apdrošināšana.',
+  notAllowed: 'Tehniku uz nomaksu var pārdot ikviens pakalpojumā RAHTIS reģistrēts un pārbaudīts Somijas uzņēmums; pircējs vienmēr ir pārbaudīts pārvadātājs. Darījumu noslēdz uzņēmuma galvenais lietotājs.',
+  buyNotAllowed: 'Lai pirktu uz nomaksu, jūsu uzņēmumam ir nepieciešama derīga pārvadājumu licence un apdrošināšana.',
+  introSeller:
+    'Pārdodiet automašīnu uz nomaksu pārbaudītam pārvadātājam. Pievienojiet pārdodamo automašīnu; mēs pārbaudām tās datus, un pēc apstiprināšanas varat publicēt sludinājumu. RAHTIS sagatavo līgumu saskaņā ar Somijas Nomaksas pirkuma likumu (osamaksukauppalaki), maksājumu grafiku un rēķinus pārdevēja vārdā; pircējs maksā tieši uz jūsu kontu.',
   sell: 'Pārdot uz nomaksu',
   emptyMine: 'Sludinājumu nav. Izvēlieties automašīnu autoparkā un nospiediet „Pārdot uz nomaksu”.',
+  emptyMineSeller: 'Sludinājumu nav. Pievienojiet pārdodamo automašīnu un iesniedziet to apstiprināšanai. Kad automašīna ir apstiprināta, nospiediet „Pārdot uz nomaksu”.',
+  saleVehicles: {
+    title: 'Pārdodamās automašīnas',
+    hint: 'Mēs pārbaudām automašīnas datus, pirms sludinājumu var publicēt. Automašīnu, kas ir pārbaudē vai kurai ir sludinājums, nevar labot.',
+  },
   emptyCatalog: 'Pašlaik pārdošanā nav nevienas automašīnas.',
   emptyDeals: 'Sarunu nav.',
   listing: {
@@ -33,6 +41,7 @@ export const ui: InstallmentUiCopy = {
     withdraw: 'Izņemt no pārdošanas',
     saved: 'Saglabāts.',
     noVehicles: 'Autoparkā nav apstiprinātas automašīnas, ko var pārdot. Uz nomaksu pirktu automašīnu var pārdot tikai tad, kad tā ir pilnībā apmaksāta.',
+    noVehiclesSeller: 'Jums nav apstiprinātas automašīnas, ko var pārdot. Pievienojiet automašīnu un iesniedziet to apstiprināšanai – sludinājumu var publicēt, kad automašīna ir apstiprināta.',
     error: 'Pārbaudiet vērtības.',
   },
   status: {
@@ -127,6 +136,7 @@ export const ui: InstallmentUiCopy = {
     sellerNote: 'Pārdevēja papildu informācija',
     stopped: 'Jauni maksājumu rēķini un atgādinājumi vairs netiek sūtīti. Līgums un jau izrakstītie rēķini joprojām ir pieejami.',
     vehicleSeller: 'Automašīna ir atgriezta jūsu autoparkā kā melnraksts – pirms lietošanas vai jaunas pārdošanas iesniedziet to apstiprināšanai.',
+    vehicleSellerOwn: 'Automašīna ir atgriezta jūsu pārdodamo automašīnu sarakstā kā melnraksts – pirms jaunas pārdošanas iesniedziet to apstiprināšanai.',
     vehicleBuyer: 'Automašīna jūsu autoparkā ir izņemta no lietošanas; pārvadājumu vēsture saglabājas.',
     summaryTitle: 'Maksājumu kopsavilkums',
     paidFirst: 'Samaksāts ar pirmo rēķinu (pirmā iemaksa un PVN)',
