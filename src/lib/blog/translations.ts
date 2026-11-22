@@ -1,6 +1,6 @@
 import 'server-only';
 import { locales, type Locale } from '@/lib/i18n/config';
-import type { Article, ArticleSummary } from './heycatch';
+import { BlogUnavailableError, type Article, type ArticleSummary } from './heycatch';
 
 /**
  * Переводы статей блога (08.11.2026).
@@ -56,7 +56,12 @@ export async function articlesIn(locale: Locale, articles: ArticleSummary[]): Pr
 /** Статья на языке: своя или переведённая; null — на этом языке её нет. */
 export async function articleIn(locale: Locale, article: Article): Promise<Article | null> {
   const t = (await table(locale))[article.slug];
-  if (!t) return (article.language || 'en') === locale ? article : null;
+  if (!t) {
+    if ((article.language || 'en') !== locale) return null;
+    // Текст оригинала не пришёл (сбой API, статья собрана из списка), а своей редакции нет.
+    if (!article.content_html) throw new BlogUnavailableError(article.slug);
+    return article;
+  }
   return { ...article, title: t.title, meta_description: t.description, content_html: t.html, language: locale, jsonLd: null };
 }
 

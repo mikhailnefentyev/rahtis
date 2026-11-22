@@ -60,11 +60,20 @@ export async function idempotent(
 
   try {
     const result = await run();
-    await admin
-      .from('api_idempotency')
-      .update({ status: 'DONE', http_status: result.status, response: result.body as never })
-      .eq('key_id', ctx.keyId)
-      .eq('idem_key', idemKey);
+    /*
+     * Запись ответа проверяется и повторяется (22.11.2026): без неё строка
+     * оставалась PENDING, и повтор с тем же ключом сутки получал 409,
+     * хотя заказ уже создан.
+     */
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      const { error: doneError } = await admin
+        .from('api_idempotency')
+        .update({ status: 'DONE', http_status: result.status, response: result.body as never })
+        .eq('key_id', ctx.keyId)
+        .eq('idem_key', idemKey);
+      if (!doneError) break;
+      console.error('idempotency: ответ не записан:', doneError.message);
+    }
     return Response.json(result.body, { status: result.status });
   } catch (cause) {
     await admin.from('api_idempotency').delete().eq('key_id', ctx.keyId).eq('idem_key', idemKey);

@@ -81,11 +81,35 @@ export async function hasArticles(): Promise<boolean> {
   return (data?.total ?? 0) > 0;
 }
 
-/** Одна статья; null — нет такой (или API недоступен). */
+/** HeyCatch не ответил (лимит запросов, сбой, таймаут) — это не «статьи нет». */
+export class BlogUnavailableError extends Error {
+  constructor(slug: string) {
+    super(`Blog API unavailable for ${slug}`);
+    this.name = 'BlogUnavailableError';
+  }
+}
+
+/**
+ * Одна статья; null — такой нет.
+ *
+ * Сбой API — не «нет статьи» (22.11.2026): у HeyCatch лимит 60 запросов в
+ * минуту, и при обходе сайта роботом ответ 429 превращался в 404 на живой
+ * статье. Теперь при сбое статья собирается из списка (он в кэше одним
+ * запросом) — текст для неё берётся из наших переводов, см. articleIn.
+ * Нет её и в списке или недоступен и он — ошибка, а не 404: поисковик
+ * придёт позже, а не выкинет страницу.
+ */
 export async function getArticle(slug: string): Promise<Article | null> {
   if (HIDDEN.has(slug)) return null;
-  const { data } = await get<{ article: Article }>(`/articles/${encodeURIComponent(slug)}`);
-  return data?.article ?? null;
+  const { status, data } = await get<{ article: Article }>(`/articles/${encodeURIComponent(slug)}`);
+  if (data?.article) return data.article;
+  const unavailable = status === 0 || status === 429 || status >= 500;
+  if (!unavailable) return null;
+  const first = await get<{ articles: ArticleSummary[]; total: number }>('/articles', { limit: '50', offset: '0' });
+  if (!first.data) throw new BlogUnavailableError(slug);
+  const summary = (await listArticles()).find((a) => a.slug === slug);
+  if (!summary) return null;
+  return { ...summary, content_html: '', jsonLd: null };
 }
 
 /**

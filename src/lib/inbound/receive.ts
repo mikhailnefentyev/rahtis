@@ -6,6 +6,7 @@ import { orderEmailReceivedEmail } from '@/lib/email/templates/orderEmailReceive
 import { emailLocaleOf } from '@/lib/email/text';
 import { isLocale } from '@/lib/i18n';
 import { importHints, readOrderDraft } from '@/lib/orders/importServer';
+import { recordIncident } from '@/lib/incidents/record';
 import { createAdminClient } from '@/lib/supabase/admin';
 import type { Json } from '@/types/database';
 import { refKey } from './changes';
@@ -117,12 +118,27 @@ export async function acceptInbound(event: ReceivedEvent, domain: string): Promi
 }
 
 async function resend<T>(path: string, apiKey: string): Promise<T> {
-  const response = await fetch(`https://api.resend.com${path}`, {
-    headers: { authorization: `Bearer ${apiKey}` },
-    signal: AbortSignal.timeout(20_000),
-  });
-  if (!response.ok) throw new Error(`Resend ${path}: HTTP ${response.status}`);
-  return (await response.json()) as T;
+  /*
+   * Вебхук уже получил 200, и Resend письмо не повторит: временный отказ
+   * (429, 5xx, обрыв) без повтора означал потерянный заказ (22.11.2026).
+   * Три попытки с паузой; отказ по существу (4xx) — сразу ошибка.
+   */
+  let last: unknown = null;
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    if (attempt > 0) await new Promise((resolve) => setTimeout(resolve, attempt * 1500));
+    try {
+      const response = await fetch(`https://api.resend.com${path}`, {
+        headers: { authorization: `Bearer ${apiKey}` },
+        signal: AbortSignal.timeout(20_000),
+      });
+      if (response.ok) return (await response.json()) as T;
+      last = new Error(`Resend ${path}: HTTP ${response.status}`);
+      if (response.status !== 429 && response.status < 500) break;
+    } catch (cause) {
+      last = cause;
+    }
+  }
+  throw last instanceof Error ? last : new Error(`Resend ${path}: no response`);
 }
 
 type ReceivedEmail = {
@@ -261,8 +277,12 @@ export async function processInbound(accepted: Accepted, apiKey: string): Promis
   } catch (cause) {
     console.error('inbound: письмо не обработано:', cause instanceof Error ? cause.message : cause);
     if (!authenticated) {
-      /* Отправитель не подтверждён — следов не оставляем и не отвечаем. */
+      /*
+       * Отправитель не подтверждён — черновика не оставляем и не отвечаем.
+       * Но письмо при этом пропало молча: оператор должен об этом узнать.
+       */
       await admin.from('order_email_drafts').delete().eq('id', draftId);
+      await recordIncident({ source: 'email', error: cause, path: '/api/inbound/email', severity: 'ERROR' });
       return;
     }
     await finish('FAILED');

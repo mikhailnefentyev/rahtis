@@ -1,4 +1,5 @@
 import { getViewer } from '@/lib/auth/viewer';
+import { throttleAllowed } from '@/lib/auth/throttle';
 import { deliverDispatch, prepareDispatch } from '@/lib/agent/dispatch';
 import { createClient } from '@/lib/supabase/server';
 
@@ -52,6 +53,11 @@ export async function POST(request: Request) {
 
   const text = String(payload.text ?? '').trim();
   if (!text) return Response.json({ error: 'text is required' }, { status: 400 });
+
+  /* Каждый вопрос — платный прогон модели: не больше 30 за 10 минут с человека. */
+  if (!(await throttleAllowed(`agent-ask:${viewer.userId}`, { limit: 30, seconds: 600 }))) {
+    return Response.json({ error: 'too many requests' }, { status: 429 });
+  }
 
   const supabase = await createClient();
 

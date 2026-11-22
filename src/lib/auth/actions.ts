@@ -186,6 +186,11 @@ export async function changePasswordAction(
    * (insufficient_aal), а сам человек оказывался на шаге кода. Пробная
    * сессия тут же гасится.
    */
+  /* Проверка текущего пароля — тоже подбор: с открытой чужой сессии её не перебирают. */
+  if (!(await throttleAllowed(`chpw:${viewer.userId}`, { limit: 6, seconds: 900 }))) {
+    return { error: t.auth.tooManyAttempts, done: false };
+  }
+
   const probe = createSupabaseClient(supabaseUrl(), supabasePublishableKey(), {
     auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
   });

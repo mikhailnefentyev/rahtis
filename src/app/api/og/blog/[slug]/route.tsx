@@ -11,7 +11,8 @@ export const revalidate = 3600;
 
 export async function GET(request: Request, { params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const article = await getArticle(decodeURIComponent(slug));
+  // Сбой HeyCatch не должен ронять картинку: тогда она без заголовка статьи.
+  const article = await getArticle(decodeURIComponent(slug)).catch(() => null);
   const title = article?.title ?? 'RAHTIS';
   const vehicle = vehicleFor(article ?? { slug, title });
   const origin = new URL(request.url).origin;
