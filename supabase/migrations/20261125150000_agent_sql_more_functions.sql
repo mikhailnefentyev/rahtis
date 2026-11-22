@@ -104,6 +104,16 @@ begin
   end loop;
 
   /*
+   * Семейства целиком, а не по одному имени: любая *_to_xml* и
+   * *_to_xmlschema* выполняет запрос или читает таблицу по имени из
+   * текста; pg_ls_* и pg_read_* смотрят в файлы сервера.
+   */
+  if v_flat ~ '(^|[^a-z0-9_])(query|table|cursor|schema|database)_to_xml'
+     or v_flat ~ '(^|[^a-z0-9_])pg_(ls|read)_' then
+    raise exception 'Запрос содержит запрещённую функцию.' using errcode = '42501';
+  end if;
+
+  /*
    * Чужие схемы: там пароли, токены, секрет планировщика (app.runtime_config)
    * и пути к файлам. Сверка по имени с точкой после любых пробелов:
    * «auth . users» закрыт так же, как «auth.users».
