@@ -151,7 +151,7 @@ export function renderEmail(input: {
   neverAsk?: string;
 }): string {
   return `<!doctype html>
-<html lang="fi">
+<html${input.tagline ? '' : ' lang="fi"'}>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">

@@ -133,10 +133,10 @@ export function InstallmentLanding({ locale }: { locale: string }) {
             © {new Date().getFullYear()} {APP.operator.legalName} · Y-tunnus {APP.operator.businessId}
           </span>
           <span className="flex gap-3">
-            <Link href={`/${locale}`} className="hover:text-ink">
+            <Link href={`/${locale}`} className="inline-block py-2 hover:text-ink">
               RAHTIS
             </Link>
-            <ConsentSettingsLink className="hover:text-ink" />
+            <ConsentSettingsLink className="inline-block py-2 hover:text-ink" />
           </span>
         </div>
       </footer>

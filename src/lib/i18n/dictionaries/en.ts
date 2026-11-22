@@ -881,7 +881,7 @@ export const en = {
 
   notFound: {
     title: 'Page not found',
-    lede: 'The address may have changed, or the page may never have existed. The front page describes the service and has our references and contact details.',
+    lede: 'The address may have changed, or the page may never have existed. The front page describes the service and has our contact details.',
     home: 'To the front page',
     signIn: 'Sign in',
   },

@@ -877,7 +877,7 @@ export const ro = {
 
   notFound: {
     title: 'Pagina nu a fost găsită',
-    lede: 'Este posibil ca adresa să se fi schimbat sau ca pagina să nu fi existat niciodată. Pe prima pagină găsiți descrierea serviciului, referințele și datele noastre de contact.',
+    lede: 'Este posibil ca adresa să se fi schimbat sau ca pagina să nu fi existat niciodată. Pe prima pagină găsiți descrierea serviciului și datele noastre de contact.',
     home: 'Către prima pagină',
     signIn: 'Conectați-vă',
   },

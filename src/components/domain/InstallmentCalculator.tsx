@@ -121,6 +121,9 @@ export function InstallmentCalculator({ copy, locale }: { copy: InstallmentCopy;
 
   const group = 'label-micro mb-3 text-ink-muted';
 
+  /* Ошибка — у своего поля: на телефоне общий блок оказывался под всей формой, вне экрана (22.11.2026). */
+  const fieldError = (code: keyof typeof c.errors) => ('error' in result && result.error === code ? c.errors[code] : undefined);
+
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
       <Card>
@@ -128,7 +131,7 @@ export function InstallmentCalculator({ copy, locale }: { copy: InstallmentCopy;
           <div>
             <p className={group}>{c.groups.deal}</p>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <Field label={c.f.price} hint={c.f.priceHint}>
+              <Field label={c.f.price} hint={c.f.priceHint} error={fieldError('PRICE')}>
                 {(p) => <Input {...p} inputMode="decimal" value={price} onChange={(e) => setPrice(e.target.value)} />}
               </Field>
               <Field label={c.f.vatMode}>
@@ -142,16 +145,16 @@ export function InstallmentCalculator({ copy, locale }: { copy: InstallmentCopy;
                   </Select>
                 )}
               </Field>
-              <Field label={c.f.down} hint={c.f.downHint}>
+              <Field label={c.f.down} hint={c.f.downHint} error={fieldError('DOWN_PAYMENT')}>
                 {(p) => <Input {...p} inputMode="decimal" value={down} onChange={(e) => setDown(e.target.value)} />}
               </Field>
-              <Field label={c.f.months}>
+              <Field label={c.f.months} error={fieldError('MONTHS')}>
                 {(p) => <Input {...p} inputMode="numeric" value={months} onChange={(e) => setMonths(e.target.value)} />}
               </Field>
-              <Field label={c.f.final} hint={c.f.finalHint}>
+              <Field label={c.f.final} hint={c.f.finalHint} error={fieldError('FINAL')}>
                 {(p) => <Input {...p} inputMode="decimal" value={final} onChange={(e) => setFinal(e.target.value)} />}
               </Field>
-              <Field label={c.f.rate} hint={c.f.rateHint}>
+              <Field label={c.f.rate} hint={c.f.rateHint} error={fieldError('RATE')}>
                 {(p) => <Input {...p} inputMode="decimal" value={rate} onChange={(e) => setRate(e.target.value)} />}
               </Field>
             </div>
@@ -287,7 +290,31 @@ export function InstallmentCalculator({ copy, locale }: { copy: InstallmentCopy;
                 <CardBody>
                   <h3 className="font-semibold">{c.r.scenarioTitle}</h3>
                   <p className="mt-2 text-[14px] text-ink-muted">{c.r.scenarioText}</p>
-                  <div className="mt-3 overflow-x-auto">
+                  {/* Телефон (22.11.2026): пять колонок не помещались, две уходили за край — здесь строки карточками. */}
+                  <ul className="mt-3 flex flex-col gap-2 sm:hidden">
+                    {result.scenarios.map((s) => (
+                      <li key={s.paidMonths} className="rounded-control border border-line p-3 text-[14px]">
+                        <p className="font-semibold">{fill(c.r.afterMonths, { n: String(s.paidMonths) })}</p>
+                        <dl className="mt-1.5 grid grid-cols-[1fr_auto] gap-x-3 gap-y-1">
+                          <dt className="text-ink-faint">{c.r.colPaid}</dt>
+                          <dd className="text-right font-mono">{eur(s.buyerPaidCents)}</dd>
+                          <dt className="text-ink-faint">{c.r.colValue}</dt>
+                          <dd className="text-right font-mono">{eur(s.valueCents)}</dd>
+                          <dt className="text-ink-faint">{c.r.colSettlement}</dt>
+                          <dd className="text-right">
+                            {s.settlement.sellerPaysCents > 0
+                              ? fill(c.r.sellerPays, { sum: eur(s.settlement.sellerPaysCents) })
+                              : s.settlement.buyerPaysCents > 0
+                                ? fill(c.r.buyerPays, { sum: eur(s.settlement.buyerPaysCents) })
+                                : c.r.even}
+                          </dd>
+                          <dt className="text-ink-faint">{c.r.colSeller}</dt>
+                          <dd className="text-right font-mono">{eur(s.sellerTotalCents)}</dd>
+                        </dl>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="mt-3 hidden overflow-x-auto sm:block">
                     <table className="w-full min-w-[520px] text-[14px]">
                       <thead>
                         <tr className="text-left text-ink-faint">

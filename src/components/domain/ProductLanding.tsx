@@ -168,7 +168,7 @@ export function ProductLanding({
             </Link>
             <Link
               href={`/${locale}/apply`}
-              className={buttonClass({ variant: "primary", size: "sm" })}
+              className={`${buttonClass({ variant: "primary", size: "sm" })} whitespace-nowrap`}
             >
               {c.ctaApply}
             </Link>
@@ -287,10 +287,10 @@ export function ProductLanding({
             {APP.operator.businessId}
           </span>
           <span className="flex gap-3">
-            <Link href={`/${locale}`} className="hover:text-ink">
+            <Link href={`/${locale}`} className="inline-block py-2 hover:text-ink">
               RAHTIS
             </Link>
-            <ConsentSettingsLink className="hover:text-ink" />
+            <ConsentSettingsLink className="inline-block py-2 hover:text-ink" />
           </span>
         </div>
       </footer>

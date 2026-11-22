@@ -864,7 +864,7 @@ export const lv = {
 
   notFound: {
     title: 'Lapa nav atrasta',
-    lede: 'Iespējams, adrese ir mainījusies vai šādas lapas nekad nav bijis. Sākumlapā atradīsiet pakalpojuma aprakstu, atsauksmes un kontaktus.',
+    lede: 'Iespējams, adrese ir mainījusies vai šādas lapas nekad nav bijis. Sākumlapā atradīsiet pakalpojuma aprakstu un kontaktus.',
     home: 'Uz sākumlapu',
     signIn: 'Pieslēgties',
   },

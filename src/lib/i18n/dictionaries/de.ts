@@ -864,7 +864,7 @@ export const de = {
 
   notFound: {
     title: 'Seite nicht gefunden',
-    lede: 'Die Adresse hat sich vielleicht geändert, oder die Seite hat nie existiert. Auf der Startseite finden Sie den Service, die Referenzen und unsere Kontaktdaten.',
+    lede: 'Die Adresse hat sich vielleicht geändert, oder die Seite hat nie existiert. Auf der Startseite finden Sie den Service und unsere Kontaktdaten.',
     home: 'Zur Startseite',
     signIn: 'Anmelden',
   },

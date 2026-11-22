@@ -32,6 +32,14 @@ export default async function ApiDocsPage({ params }: { params: Promise<{ locale
 
   const { t } = await getI18n(locale);
   const d = DOCS[locale];
+  /*
+   * Текст справки есть на финском и английском (22.11.2026): на остальных
+   * языках страница английская, и описания событий — тоже английские, а
+   * не из словаря языка: иначе одна колонка таблицы была бы по-немецки
+   * посреди английской страницы. О языке сказано строкой под заголовком.
+   */
+  const translated = locale === 'fi' || locale === 'en';
+  const eventNames = translated ? t.api.hooks.eventNames : (await getI18n('en')).t.api.hooks.eventNames;
   const base = `${siteUrl()}/api/v1`;
 
   const examples = {
@@ -151,13 +159,14 @@ def verify(header: str, raw_body: bytes, secret: str) -> bool:
     <main className="mx-auto w-full max-w-3xl px-5 py-10">
       <OrganisationLd />
       <nav className="mb-8 flex items-center justify-between gap-4">
-        <Link href={`/${locale}`} className="text-[13px] text-ink-muted hover:text-ink">
+        <Link href={`/${locale}`} className="inline-block py-2 text-[13px] text-ink-muted hover:text-ink">
           ← {t.brand.name}
         </Link>
         <LocaleSwitch current={locale} />
       </nav>
 
       <h1 className="text-2xl font-semibold tracking-tight">{d.title}</h1>
+      {!translated && <p className="mt-2 text-[13px] text-ink-faint">{t.legal.englishText}</p>}
       <p className="mt-3 text-[14px] leading-relaxed text-ink-muted">{d.intro}</p>
       <p className="mt-3 text-[14px] leading-relaxed text-ink-muted">
         {d.openapi}{' '}
@@ -196,7 +205,7 @@ def verify(header: str, raw_body: bytes, secret: str) -> bool:
             </tr>
           </thead>
           <tbody>
-            {WEBHOOK_EVENTS.map((event) => [event, t.api.hooks.eventNames[event]] as const).map(([event, when]) => (
+            {WEBHOOK_EVENTS.map((event) => [event, eventNames[event]] as const).map(([event, when]) => (
               <tr key={event} className="border-b border-line/60 align-top">
                 <td className="py-2 pr-4 font-mono text-[12px] whitespace-nowrap">{event}</td>
                 <td className="py-2 text-ink-muted">{when}</td>
@@ -279,7 +288,7 @@ function Table({ head, rows }: { head: [string, string]; rows: [string, string][
         <tbody>
           {rows.map(([key, text]) => (
             <tr key={key} className="border-b border-line/60 align-top">
-              <td className="py-2 pr-4 font-mono text-[12px] whitespace-nowrap">{key}</td>
+              <td className="py-2 pr-4 align-top font-mono text-[12px] break-words sm:whitespace-nowrap">{key}</td>
               <td className="py-2 text-ink-muted">{text}</td>
             </tr>
           ))}

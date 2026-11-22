@@ -48,6 +48,11 @@ export function privateV6(ip: string): boolean {
   if (v === '::1' || v === '::') return true;
   /* fc00::/7 — частные, fe80::/10 — локальные для канала (fe80…febf, а не только fe80). */
   if (v.startsWith('fc') || v.startsWith('fd') || /^fe[89ab]/.test(v)) return true;
+  /*
+   * NAT64 (64:ff9b::/96) и 6to4 (2002::/16) несут внутри адрес IPv4 —
+   * через них дотягиваются до частной сети в обход проверки выше (22.11.2026).
+   */
+  if (v.startsWith('64:ff9b:') || v.startsWith('2002:')) return true;
   /* IPv4 внутри IPv6: парсер URL пишет ::ffff:127.0.0.1 как ::ffff:7f00:1. */
   const dotted = v.match(/^::ffff:(\d+\.\d+\.\d+\.\d+)$/);
   if (dotted) return privateV4(dotted[1]);

@@ -30,7 +30,7 @@ export async function LegalPage({ locale: raw, kind }: { locale: string; kind: K
     <main className="mx-auto w-full max-w-3xl px-5 py-10">
       <OrganisationLd />
       <nav className="mb-8 flex items-center justify-between gap-4">
-        <Link href={`/${locale}`} className="text-[13px] text-ink-muted hover:text-ink">
+        <Link href={`/${locale}`} className="inline-block py-2 text-[13px] text-ink-muted hover:text-ink">
           ← {t.brand.name}
         </Link>
         <LocaleSwitch current={locale} />

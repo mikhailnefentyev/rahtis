@@ -864,7 +864,7 @@ export const sv = {
 
   notFound: {
     title: 'Sidan hittades inte',
-    lede: 'Adressen kan ha ändrats, eller så har sidan aldrig funnits. På startsidan finns tjänsten, referenserna och hur du når oss.',
+    lede: 'Adressen kan ha ändrats, eller så har sidan aldrig funnits. På startsidan finns tjänsten och hur du når oss.',
     home: 'Till startsidan',
     signIn: 'Logga in',
   },

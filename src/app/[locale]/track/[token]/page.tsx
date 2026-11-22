@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { after } from 'next/server';
 import { stopDateTime, stopEta } from '@/lib/orders/stopTime';
-import { Badge, Card, CardBody, Mono } from '@/components/ui';
+import { Badge, buttonClass, Card, CardBody, Mono } from '@/components/ui';
 import { orderStatusTone } from '@/components/ui/tone';
 import { cn } from '@/lib/cn';
 import { getI18n, isLocale } from '@/lib/i18n';
@@ -68,8 +68,17 @@ export default async function TrackPage({ params }: { params: Promise<{ locale: 
   if (!order) {
     return (
       <main className="mx-auto w-full max-w-2xl px-4 py-16 sm:px-5">
-        <h1 className="text-xl font-semibold tracking-tight">{t.track.title}</h1>
-        <p className="mt-3 text-[13px] text-ink-muted">{t.track.notFound}</p>
+        {/* Неверная ссылка — не тупик: есть куда уйти (22.11.2026). */}
+        <Link href={`/${locale}`} className="inline-block py-2 text-[13px] text-ink-muted hover:text-ink">
+          ← {t.brand.name}
+        </Link>
+        <h1 className="mt-6 text-xl font-semibold tracking-tight">{t.track.title}</h1>
+        <p className="mt-3 text-[14px] leading-relaxed text-ink-muted">{t.track.notFound}</p>
+        <p className="mt-6">
+          <Link href={`/${locale}`} className={buttonClass({ variant: 'ghost', size: 'md' })}>
+            {t.notFound.home}
+          </Link>
+        </p>
       </main>
     );
   }

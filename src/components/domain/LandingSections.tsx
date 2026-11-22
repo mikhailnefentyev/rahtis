@@ -590,7 +590,7 @@ export async function LandingSections({ locale, showBlog = false }: { locale: Lo
               <p className="text-[16px] text-ink-muted">{ew.serviceText2}</p>
               <Link
                 href={earthworksPath(locale)}
-                className="self-start text-[15px] font-semibold text-accent hover:underline"
+                className="self-start py-2 text-[15px] font-semibold text-accent hover:underline"
               >
                 {ew.teaserCta} →
               </Link>
@@ -678,14 +678,15 @@ Rahtis-Event: order.stop_arrived`}</code>
           <p className="mx-auto mt-3.5 max-w-[52ch] text-[16px] text-ink-muted">{l.finalLede}</p>
           <p className="mx-auto mt-2.5 max-w-[52ch] text-[16px] text-ink-muted">{l.finalLede2}</p>
 
-          <div className="mx-auto mt-7 grid max-w-[480px] gap-2.5 sm:grid-cols-2">
+          {/* Ряд по ширине подписей: на немецком они длинные и в сетке 2×240 переносились на две строки (22.11.2026). */}
+          <div className="mx-auto mt-7 flex max-w-[480px] flex-col justify-center gap-2.5 sm:max-w-[820px] sm:flex-row sm:flex-wrap">
             <Link
               href={`/${locale}/apply`}
-              className={buttonClass({ variant: 'primary', size: 'lg', className: 'h-12 text-[15px]' })}
+              className={buttonClass({ variant: 'primary', size: 'lg', className: 'h-12 text-[15px] sm:min-w-[230px] sm:whitespace-nowrap' })}
             >
               {l.applyShipper}
             </Link>
-            <Link href={`/${locale}/apply`} className={buttonClass({ size: 'lg', className: 'h-12 text-[15px]' })}>
+            <Link href={`/${locale}/apply`} className={buttonClass({ size: 'lg', className: 'h-12 text-[15px] sm:min-w-[230px] sm:whitespace-nowrap' })}>
               {l.applyCarrier}
             </Link>
           </div>
@@ -783,12 +784,12 @@ Rahtis-Event: order.stop_arrived`}</code>
           <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-5 text-[12px] text-ink-faint">
             <span>
               © {new Date().getFullYear()} {t.brand.legalEntity} · {l.footerCountry} ·{' '}
-              <ConsentSettingsLink className="hover:text-ink" />
+              <ConsentSettingsLink className="inline-block py-2 hover:text-ink" />
             </span>
             <SocialLinks />
-            <span className="flex flex-wrap gap-x-3 gap-y-1" aria-label="Language">
+            <span className="flex flex-wrap gap-x-4 gap-y-0" aria-label="Language">
               {locales.map((l) => (
-                <Link key={l} href={`/${l}`} lang={l} hrefLang={l} className={locale === l ? 'font-semibold text-ink' : 'hover:text-ink'}>
+                <Link key={l} href={`/${l}`} lang={l} hrefLang={l} className={locale === l ? 'inline-block py-2 font-semibold text-ink' : 'inline-block py-2 hover:text-ink'}>
                   {LOCALE_NAMES[l]}
                 </Link>
               ))}

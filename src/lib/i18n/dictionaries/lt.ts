@@ -864,7 +864,7 @@ export const lt = {
 
   notFound: {
     title: 'Puslapis nerastas',
-    lede: 'Adresas galėjo pasikeisti arba tokio puslapio niekada nebuvo. Pradiniame puslapyje rasite paslaugos aprašymą, atsiliepimus ir kontaktus.',
+    lede: 'Adresas galėjo pasikeisti arba tokio puslapio niekada nebuvo. Pradiniame puslapyje rasite paslaugos aprašymą ir kontaktus.',
     home: 'Į pradinį puslapį',
     signIn: 'Prisijungti',
   },

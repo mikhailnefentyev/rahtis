@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { ConsentSettingsLink } from '@/components/layout/AnalyticsConsent';
+import { LocaleSwitch } from '@/components/layout/LocaleSwitch';
 import { buttonClass } from '@/components/ui';
 import { signInPath } from '@/lib/auth/paths';
 import { APP } from '@/lib/config';
@@ -28,6 +29,8 @@ export function BlogFrame({ children, lang = 'fi' }: { children: React.ReactNode
             <Image src="/logo-header.png" alt="RAHTIS" width={954} height={240} sizes="96px" className="h-6 w-auto" priority />
           </Link>
           <nav className="flex items-center gap-4 text-[14px]">
+            {/* Язык — как на остальных страницах сайта (22.11.2026): блог есть на всех десяти. */}
+            <LocaleSwitch current={site} />
             <Link href={blogPath(site)} className="hidden text-ink-muted hover:text-ink sm:inline">
               {t.blog}
             </Link>
@@ -47,13 +50,13 @@ export function BlogFrame({ children, lang = 'fi' }: { children: React.ReactNode
             © {new Date().getFullYear()} {APP.operator.legalName} · Y-tunnus {APP.operator.businessId}
           </span>
           <span className="flex gap-3">
-            <Link href={`/${site}`} className="hover:text-ink">
+            <Link href={`/${site}`} className="inline-block py-2 hover:text-ink">
               RAHTIS
             </Link>
-            <Link href={site === 'fi' ? '/fi/tietosuoja' : `/${site}/privacy`} className="hover:text-ink">
+            <Link href={site === 'fi' ? '/fi/tietosuoja' : `/${site}/privacy`} className="inline-block py-2 hover:text-ink">
               {t.privacy}
             </Link>
-            <ConsentSettingsLink className="hover:text-ink" />
+            <ConsentSettingsLink className="inline-block py-2 hover:text-ink" />
           </span>
         </div>
       </footer>

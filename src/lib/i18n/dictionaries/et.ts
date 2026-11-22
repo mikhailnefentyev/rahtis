@@ -864,7 +864,7 @@ export const et = {
 
   notFound: {
     title: 'Lehte ei leitud',
-    lede: 'Aadress võib olla muutunud või sellist lehte pole kunagi olnudki. Esilehelt leiad teenuse kirjelduse, referentsid ja kontaktid.',
+    lede: 'Aadress võib olla muutunud või sellist lehte pole kunagi olnudki. Esilehelt leiad teenuse kirjelduse ja kontaktid.',
     home: 'Esilehele',
     signIn: 'Logi sisse',
   },

@@ -864,7 +864,7 @@ export const pl = {
 
   notFound: {
     title: 'Nie znaleziono strony',
-    lede: 'Adres mógł się zmienić albo strona nigdy nie istniała. Na stronie głównej znajdziesz opis usługi, referencje i kontakt.',
+    lede: 'Adres mógł się zmienić albo strona nigdy nie istniała. Na stronie głównej znajdziesz opis usługi i kontakt.',
     home: 'Na stronę główną',
     signIn: 'Zaloguj się',
   },

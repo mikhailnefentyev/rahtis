@@ -888,7 +888,7 @@ export const fi = {
 
   notFound: {
     title: 'Sivua ei löytynyt',
-    lede: 'Osoite on voinut muuttua, tai sivua ei ole koskaan ollut. Etusivulta löytyvät palvelu, referenssit ja yhteydenotto.',
+    lede: 'Osoite on voinut muuttua, tai sivua ei ole koskaan ollut. Etusivulta löytyvät palvelun kuvaus ja yhteystiedot.',
     home: 'Etusivulle',
     signIn: 'Kirjaudu palveluun',
   },
