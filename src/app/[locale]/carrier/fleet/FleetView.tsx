@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useState } from 'react';
-import { Badge, Button, Card, CardBody, EmptyState, Mono, Plate } from '@/components/ui';
+import { Badge, Button, buttonClass, Card, CardBody, EmptyState, Mono, Plate } from '@/components/ui';
 import { vehicleAccessTone } from '@/components/ui/tone';
 import { deleteDraftVehicleAction, submitVehicleAction } from '@/lib/fleet/actions';
 import { EURO_LABEL } from '@/lib/fleet/labels';
@@ -39,6 +39,8 @@ export function FleetView({
   const [editing, setEditing] = useState<Vehicle | null | 'new'>(null);
 
   const close = useCallback(() => setEditing(null), []);
+  const isOpen = (vehicle: Vehicle) => editing !== null && editing !== 'new' && editing.id === vehicle.id;
+  const toggle = (vehicle: Vehicle) => setEditing(isOpen(vehicle) ? null : vehicle);
 
   return (
     <section>
@@ -53,14 +55,15 @@ export function FleetView({
         )}
       </div>
 
-      {editing !== null && (
+      {/*
+        * Сверху — только форма новой машины. Карточка существующей
+        * раскрывается на своём месте в списке (22.11.2026): раньше форма
+        * открывалась над списком, и при большом парке к ней приходилось
+        * проматывать страницу вверх.
+        */}
+      {editing === 'new' && (
         <div className="mb-4">
-          <VehicleForm
-            vehicle={editing === 'new' ? null : editing}
-            drivers={drivers}
-            currentDriverId={editing === 'new' ? null : (driverByVehicle[editing.id] ?? null)}
-            onClose={close}
-          />
+          <VehicleForm vehicle={null} drivers={drivers} currentDriverId={null} onClose={close} />
         </div>
       )}
 
@@ -72,13 +75,16 @@ export function FleetView({
             <Card key={vehicle.id} stripe={vehicleAccessTone[vehicle.access]}>
               <CardBody className="flex flex-col gap-4 sm:flex-row sm:items-start">
                 {/* Фото машины с её номером: парк узнаётся с первого взгляда. */}
-                <TruckPhoto
-                  make={vehicle.make}
-                  vehicleClass={vehicle.vehicle_class}
-                  plate={vehicle.plate}
-                  country={country}
-                  className="sm:w-[220px] sm:shrink-0"
-                />
+                {/* Нажатие на фото раскрывает карточку машины тут же, как и кнопка «Подробнее». */}
+                <button
+                  type="button"
+                  onClick={() => toggle(vehicle)}
+                  aria-expanded={isOpen(vehicle)}
+                  aria-label={`${t.action.details}: ${vehicle.plate}`}
+                  className="block cursor-pointer text-left sm:w-[220px] sm:shrink-0"
+                >
+                  <TruckPhoto make={vehicle.make} vehicleClass={vehicle.vehicle_class} plate={vehicle.plate} country={country} />
+                </button>
                 <div className="flex min-w-0 flex-1 flex-wrap items-start justify-between gap-4">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2.5">
@@ -117,12 +123,6 @@ export function FleetView({
                     </a>
                     {/* Обслуживание: просрочено, скоро, дефекты — видно в списке парка, не открывая машину. */}
                     <ServiceLink href={`/${locale}/carrier/maintenance/${vehicle.id}`} summary={service[vehicle.id]} />
-                    {/* Продать машину в рассрочку проверенному перевозчику (22.11.2026). */}
-                    {country === 'FI' && vehicle.access === 'APPROVED' && (!vehicle.installment_role || vehicle.installment_role === 'OWNED') && (
-                      <a href={`/${locale}/carrier/installments/new?vehicle=${vehicle.id}`} className="text-[12px] text-accent hover:underline">
-                        {installmentUiCopy(locale).sell} ›
-                      </a>
-                    )}
                   </div>
 
                   {/*
@@ -208,9 +208,20 @@ export function FleetView({
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <Button size="sm" onClick={() => setEditing(vehicle)}>
+                  <Button size="sm" onClick={() => toggle(vehicle)} aria-expanded={isOpen(vehicle)}>
                     {t.action.details}
                   </Button>
+
+                  {/*
+                    * Продать в рассрочку — кнопкой, а не мелкой ссылкой среди подписей
+                    * (22.11.2026: «в разделе машин нигде не выбрать Продать»). Только
+                    * одобренная машина и только финской компании — как решает база.
+                    */}
+                  {country === 'FI' && vehicle.access === 'APPROVED' && (!vehicle.installment_role || vehicle.installment_role === 'OWNED') && (
+                    <a href={`/${locale}/carrier/installments/new?vehicle=${vehicle.id}`} className={buttonClass({ size: 'sm', className: 'w-full' })}>
+                      {installmentUiCopy(locale).sell}
+                    </a>
+                  )}
 
                   {(vehicle.access === 'DRAFT' || vehicle.access === 'REJECTED') && vehicle.installment_role !== 'SOLD' && (
                     <form action={submitVehicleAction}>
@@ -241,6 +252,11 @@ export function FleetView({
                 </div>
                 </div>
               </CardBody>
+              {isOpen(vehicle) && (
+                <div className="border-t border-line p-4">
+                  <VehicleForm vehicle={vehicle} drivers={drivers} currentDriverId={driverByVehicle[vehicle.id] ?? null} onClose={close} />
+                </div>
+              )}
             </Card>
           ))}
         </div>

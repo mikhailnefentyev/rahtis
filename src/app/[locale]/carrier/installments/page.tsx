@@ -9,6 +9,7 @@ import { dealBadgeTone, installmentsAvailable } from '@/lib/installments/access'
 import { setListingStatusAction } from '@/lib/installments/actions';
 import { fill, installmentUiCopy } from '@/lib/installments/copy';
 import { isLocale } from '@/lib/i18n';
+import { getViewerI18n } from '@/lib/i18n/viewer';
 import { installmentPath } from '@/lib/landing/installment';
 import { createClient } from '@/lib/supabase/server';
 import { ActionForm } from './ActionForm';
@@ -40,6 +41,7 @@ export default async function InstallmentsPage({
   /* Раздел только для финских компаний: пункта в меню у остальных нет, по прямой ссылке — «страницы нет» (22.11.2026). */
   if (!installmentsAvailable(company.country)) notFound();
   const ui = installmentUiCopy(locale);
+  const { t } = await getViewerI18n(locale);
   const tab: Tab = rawTab === 'deals' || rawTab === 'catalog' ? rawTab : 'mine';
   const supabase = await createClient();
 
@@ -77,12 +79,32 @@ export default async function InstallmentsPage({
           <h1 className="page-title">{ui.title}</h1>
           <p className="mt-1 max-w-[70ch] text-[14px] text-ink-muted">{ui.intro}</p>
         </div>
-        <Link href={`/${locale}${installmentPath(locale)}`} className="text-[13px] text-accent hover:underline">
-          {ui.calculatorLink} ›
-        </Link>
+        <div className="flex flex-wrap items-center gap-3">
+          <Link href={`/${locale}${installmentPath(locale)}`} className="text-[13px] text-accent hover:underline">
+            {ui.calculatorLink} ›
+          </Link>
+          {/*
+            * Вход в продажу — здесь же (22.11.2026): раньше объявление можно было
+            * начать только мелкой ссылкой в карточке машины в парке, и в самом
+            * разделе не было ни выбора машины, ни формы.
+            */}
+          {allowed && (
+            <Link href={`/${locale}/carrier/installments/new`} className={buttonClass({ variant: 'primary', size: 'sm' })}>
+              {ui.sell}
+            </Link>
+          )}
+        </div>
       </header>
 
-      {!allowed && <p className="rounded-card border border-warn/35 bg-warn/10 px-4 py-3 text-[14px] text-warn">{ui.notAllowed}</p>}
+      {!allowed && (
+        <p className="rounded-card border border-warn/35 bg-warn/10 px-4 py-3 text-[14px] text-warn">
+          {ui.notAllowed}{' '}
+          {/* Куда идти, чтобы раздел открылся: документы компании — в парке. */}
+          <Link href={`/${locale}/carrier/fleet`} className="font-semibold underline underline-offset-2">
+            {t.fleet.title} ›
+          </Link>
+        </p>
+      )}
 
       <nav className="flex flex-wrap gap-1 border-b border-line" aria-label={ui.title}>
         {tabs.map((t) => (
@@ -103,7 +125,17 @@ export default async function InstallmentsPage({
 
       {tab === 'mine' &&
         ((listings ?? []).length === 0 ? (
-          <EmptyState title={ui.tabs.mine} description={ui.emptyMine} />
+          <EmptyState
+            title={ui.tabs.mine}
+            description={ui.emptyMine}
+            action={
+              allowed ? (
+                <Link href={`/${locale}/carrier/installments/new`} className={buttonClass({ variant: 'primary', size: 'md' })}>
+                  {ui.sell}
+                </Link>
+              ) : undefined
+            }
+          />
         ) : (
           <div className="flex flex-col gap-3">
             {(listings ?? []).map((l) => {
