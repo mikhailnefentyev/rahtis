@@ -4,12 +4,14 @@ import { renderToBuffer } from '@react-pdf/renderer';
 import { todayInHelsinki } from '@/lib/dates';
 import { sendEmail } from '@/lib/email';
 import { createFormat } from '@/lib/format';
+import { asCurrency } from '@/lib/money/currency';
 import { finnishReference } from '@/lib/sites/invoice';
 import { SiteInvoicePdf } from '@/lib/sites/SiteInvoicePdf';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { ibanHoldActive } from '@/lib/trust/changes';
 import { lastIbanChange } from '@/lib/trust/sensitive';
 import { firstInvoiceSettledAtIssue, vatOf, type VatMode } from './calc';
+import { installmentCountryEntry } from './countries';
 
 /**
  * Первый счёт продавца по согласованной сделке (22.11.2026).
@@ -87,7 +89,7 @@ export async function createFirstInvoice(dealId: string): Promise<FirstInvoiceSt
   const [{ data: seller }, { data: buyer }] = await Promise.all([
     admin
       .from('companies')
-      .select('id, name, business_id, vat_number, iban, legal_name, legal_street, legal_postal_code, legal_city, contact_email, billing_email')
+      .select('id, name, country, business_id, vat_number, iban, legal_name, legal_street, legal_postal_code, legal_city, contact_email, billing_email')
       .eq('id', deal.seller_company_id)
       .maybeSingle(),
     admin
@@ -97,6 +99,13 @@ export async function createFirstInvoice(dealId: string): Promise<FirstInvoiceSt
       .maybeSingle(),
   ]);
   if (!seller || !buyer) return 'NOT_FOUND';
+  /*
+   * Этот счёт — «весь НДС с цены первым счётом» (финское правило). Он
+   * выставляется только в стране, у которой так записано в реестре стран
+   * раздела (23.11.2026); стране с другим порядком нужен свой первый счёт,
+   * и до его появления она закрыта.
+   */
+  if (installmentCountryEntry(seller.country)?.vatOnFirstInvoice !== true) return 'NOT_FOUND';
   if (!seller.iban) return 'NO_IBAN';
   const changedAt = await lastIbanChange(seller.id);
   if (changedAt && ibanHoldActive(changedAt)) return 'IBAN_RECENT';
@@ -165,7 +174,8 @@ export async function createFirstInvoice(dealId: string): Promise<FirstInvoiceSt
       vat_bps: vatMode === 'STANDARD' ? deal.vat_bps : 0,
       vat_cents: vatCents,
       total_cents: netCents + vatCents,
-      currency: 'EUR',
+      /* Валюта счёта — валюта сделки (страны продавца), без пересчёта (23.11.2026). */
+      currency: asCurrency(deal.currency),
     })
     .select('id')
     .single();
@@ -259,7 +269,8 @@ async function deliver(invoiceId: string, deal: Deal): Promise<FirstInvoiceStatu
   const customer = inv.customer as { name: string; business_id: string | null; vat_id: string | null; address: string; email: string };
   const lines = inv.lines as { date: string; text: string; unit: string; unitCents: number; amountCents: number }[];
   const vatMode = deal.vat_mode as VatMode;
-  const currency = 'EUR' as const;
+  /* Суммы — в валюте самого счёта (она же валюта сделки). */
+  const currency = asCurrency(inv.currency);
   const payNowCents = deal.down_payment_cents + inv.vat_cents;
   const restCents = deal.price_cents - deal.down_payment_cents;
   const what = lines[0]?.text.split(' – ')[0] ?? '';

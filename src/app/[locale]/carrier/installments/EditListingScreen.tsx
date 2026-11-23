@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation';
 import { Card, CardBody } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
 import { CABINET_VAT_MODE, installmentsAvailable, type InstallmentCabinet } from '@/lib/installments/access';
+import { installmentCurrency } from '@/lib/installments/countries';
+import { installmentRules } from '@/lib/installments/rules';
 import { installmentUiCopy } from '@/lib/installments/copy';
 import { isLocale } from '@/lib/i18n';
 import { installmentCopy } from '@/lib/landing/installment';
@@ -62,6 +64,9 @@ export async function EditListingScreen({
               /* Объявление сохраняется только с обычным НДС (решение 22.11.2026) — и старое с другим режимом тоже. */
               vatMode: CABINET_VAT_MODE,
               vatBps: listing.vat_bps,
+              /* Валюта объявления — страны продавца; до миграции 20261128100000 столбец всегда 'EUR'. */
+              currency: listing.currency ?? installmentCurrency(viewer.company!.country),
+              rules: installmentRules(viewer.company!.country)?.id ?? null,
               down: euros(listing.down_payment_cents),
               months: String(listing.months),
               final: euros(listing.final_cents),

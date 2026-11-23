@@ -5,6 +5,7 @@ import { todayInHelsinki } from '@/lib/dates';
 import { sendEmail } from '@/lib/email';
 import { emailLocaleOf } from '@/lib/email/text';
 import { createFormat } from '@/lib/format';
+import { asCurrency } from '@/lib/money/currency';
 import { notify } from '@/lib/notify';
 import { finnishReference } from '@/lib/sites/invoice';
 import { SiteInvoicePdf } from '@/lib/sites/SiteInvoicePdf';
@@ -12,8 +13,9 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { ibanHoldActive } from '@/lib/trust/changes';
 import { lastIbanChange } from '@/lib/trust/sensitive';
 import { dealBilled, installmentDealLink } from './access';
-import { buildSchedule, daysBetween, effectiveHandover, overduePayments, remedyAllowed, type VatMode } from './calc';
+import { buildSchedule, daysBetween, effectiveHandover, overduePayments, type VatMode } from './calc';
 import { fill, installmentUiCopy } from './copy';
+import { installmentRules } from './rules';
 
 /**
  * Рассрочка, этап 3 (23.11.2026): график взносов, счета взносов,
@@ -168,6 +170,8 @@ async function createInvoiceRow(input: {
   lines: { date: string; text: string; unitCents: number; amountCents: number }[];
   vatBps: number;
   vatCents: number;
+  /** Валюта сделки (страны продавца): счёт выставляется в ней, без пересчёта (23.11.2026). */
+  currency: string | null | undefined;
   meta: Meta;
 }): Promise<string> {
   const admin = createAdminClient();
@@ -197,7 +201,7 @@ async function createInvoiceRow(input: {
       vat_bps: input.vatBps,
       vat_cents: input.vatCents,
       total_cents: netCents + input.vatCents,
-      currency: 'EUR',
+      currency: asCurrency(input.currency),
     })
     .select('id')
     .single();
@@ -217,6 +221,8 @@ export async function deliverInvoice(invoiceId: string): Promise<boolean> {
   if (!meta) return false;
   const buyer = inv.customer as Party;
   const lines = inv.lines as { date: string; text: string; unitCents: number; amountCents: number }[];
+  /* Суммы — в валюте самого счёта. */
+  const currency = asCurrency(inv.currency);
 
   let path = inv.file_path;
   if (!path) {
@@ -237,16 +243,16 @@ export async function deliverInvoice(invoiceId: string): Promise<boolean> {
           text: l.text,
           quantity: '1',
           unit: 'kpl',
-          unitPrice: f.money(l.unitCents, 'EUR'),
-          amount: f.money(l.amountCents, 'EUR'),
+          unitPrice: f.money(l.unitCents, currency),
+          amount: f.money(l.amountCents, currency),
         })),
-        net: f.money(inv.net_cents, 'EUR'),
+        net: f.money(inv.net_cents, currency),
         vatLabel: inv.vat_bps > 0 ? `ALV / VAT ${(inv.vat_bps / 100).toLocaleString('fi-FI', { maximumFractionDigits: 1 })} %` : 'ALV / VAT 0 %',
-        vat: f.money(inv.vat_cents, 'EUR'),
-        total: f.money(inv.total_cents, 'EUR'),
+        vat: f.money(inv.vat_cents, currency),
+        total: f.money(inv.total_cents, currency),
         note: meta.note,
         title: meta.title,
-        payNow: meta.payNow ? { label: meta.payNow.label, amount: f.money(meta.payNow.cents, 'EUR') } : undefined,
+        payNow: meta.payNow ? { label: meta.payNow.label, amount: f.money(meta.payNow.cents, currency) } : undefined,
         amountLabel: meta.amountLabel,
       }),
     );
@@ -305,7 +311,7 @@ export async function issuePaymentInvoice(paymentId: string): Promise<IssueStatu
   const snapshot = (deal.vehicle_snapshot ?? {}) as { make?: string; plate?: string };
   const what = [snapshot.make, snapshot.plate].filter(Boolean).join(' ');
   const f = createFormat('fi-FI');
-  const total = f.money(pay.principal_cents + pay.interest_cents, 'EUR');
+  const total = f.money(pay.principal_cents + pay.interest_cents, asCurrency(deal.currency));
   const lines = [
     {
       date: pay.due_date,
@@ -335,6 +341,7 @@ export async function issuePaymentInvoice(paymentId: string): Promise<IssueStatu
     lines,
     vatBps: 0,
     vatCents: 0,
+    currency: deal.currency,
     meta: {
       job: `${deal.contract_number} · ${what}`,
       period: `${pay.n} / ${deal.months}`,
@@ -399,6 +406,7 @@ export async function createCreditNote(dealId: string): Promise<IssueStatus> {
     lines: originalLines.map((l) => ({ date: issuedOn, text: `Hyvitys / Credit: ${l.text}`, unitCents: -l.unitCents, amountCents: -l.amountCents })),
     vatBps: original.vat_bps,
     vatCents: -original.vat_cents,
+    currency: original.currency,
     meta: {
       job: `${deal.contract_number} · peruttu / cancelled`,
       period: original.number,
@@ -407,7 +415,7 @@ export async function createCreditNote(dealId: string): Promise<IssueStatus> {
       payNow: { label: ['Palautetaan ostajalle', 'Refunded to the buyer'], cents: refundCents },
       amountLabel: ['Palautetaan', 'Refund'],
       note: [
-        `HYVITYSLASKU / CREDIT NOTE. Hyvittää laskun nro ${original.number} (${fiDate(original.issued_on)}) kokonaisuudessaan, koska osamaksukauppa ${deal.contract_number} peruttiin ennen ajoneuvon luovutusta. ${refundCents > 0 ? `Myyjä palauttaa ostajalle maksetun ${f.money(refundCents, 'EUR')}.` : 'Laskua ei ollut maksettu, joten palautettavaa ei ole.'} / Credits invoice ${original.number} in full because hire-purchase ${deal.contract_number} was cancelled before handover. ${refundCents > 0 ? `The seller refunds the ${f.money(refundCents, 'EUR')} paid to the buyer.` : 'The invoice was not paid, so nothing is refunded.'}`,
+        `HYVITYSLASKU / CREDIT NOTE. Hyvittää laskun nro ${original.number} (${fiDate(original.issued_on)}) kokonaisuudessaan, koska osamaksukauppa ${deal.contract_number} peruttiin ennen ajoneuvon luovutusta. ${refundCents > 0 ? `Myyjä palauttaa ostajalle maksetun ${f.money(refundCents, asCurrency(original.currency))}.` : 'Laskua ei ollut maksettu, joten palautettavaa ei ole.'} / Credits invoice ${original.number} in full because hire-purchase ${deal.contract_number} was cancelled before handover. ${refundCents > 0 ? `The seller refunds the ${f.money(refundCents, asCurrency(original.currency))} paid to the buyer.` : 'The invoice was not paid, so nothing is refunded.'}`,
         'Laskuttaja on myyjä; RAHTIS (Aivomaa Oy) ei ole kaupan osapuoli. / Issued by the seller; RAHTIS (Aivomaa Oy) is not a party to the sale.',
       ].join('\n'),
       mail: {
@@ -496,7 +504,7 @@ export async function runInstallments(options: { dealId?: string; today?: string
       const plate = ((deal.vehicle_snapshot ?? {}) as { plate?: string }).plate ?? '';
       const [{ data: buyer }, { data: seller }] = await Promise.all([
         admin.from('companies').select('language, kind').eq('id', deal.buyer_company_id).maybeSingle(),
-        admin.from('companies').select('language, kind').eq('id', deal.seller_company_id).maybeSingle(),
+        admin.from('companies').select('language, kind, country').eq('id', deal.seller_company_id).maybeSingle(),
       ]);
       const cb = installmentUiCopy(emailLocaleOf(buyer?.language ?? 'fi'));
       const cs = installmentUiCopy(emailLocaleOf(seller?.language ?? 'fi'));
@@ -559,12 +567,16 @@ export async function runInstallments(options: { dealId?: string; today?: string
       const priceGross =
         deal.price_cents + (deal.vat_mode === 'STANDARD' ? Math.round((deal.price_cents * deal.vat_bps) / 10_000) : 0);
       const remaining = (fresh ?? []).filter((r) => !r.paid_at).reduce((s, r) => s + r.principal_cents, 0);
-      const allowed = remedyAllowed(
-        overdue.map((r) => ({ dueDate: r.lateFrom, unpaidCents: r.principal_cents })),
-        today,
-        priceGross,
-        remaining,
-      );
+      /* Порог — по правилам страны сделки (23.11.2026); правил у страны нет — сигнала продавцу нет. */
+      const rules = installmentRules(seller?.country);
+      const allowed =
+        rules !== null &&
+        rules.remedyAllowed(
+          overdue.map((r) => ({ dueDate: r.lateFrom, unpaidCents: r.principal_cents })),
+          today,
+          priceGross,
+          remaining,
+        );
       const newest = overdue[overdue.length - 1];
       if (allowed && newest && !newest.threshold_notified_at) {
         const { data: won } = await admin

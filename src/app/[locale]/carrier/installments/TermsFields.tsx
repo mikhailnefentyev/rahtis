@@ -3,7 +3,9 @@
 import { useMemo, useState } from 'react';
 import { Field, Input } from '@/components/ui';
 import { eurosToCents } from '@/lib/economics/money';
-import { addMonths, buildSchedule, thresholds, type VatMode } from '@/lib/installments/calc';
+import { addMonths, buildSchedule, type VatMode } from '@/lib/installments/calc';
+import { installmentMoney } from '@/lib/installments/countries';
+import { installmentRulesById } from '@/lib/installments/rules';
 import { fill, type InstallmentUiCopy } from '@/lib/installments/copy';
 import type { InstallmentCopy } from '@/lib/landing/installment';
 
@@ -20,6 +22,10 @@ export type TermsDefaults = {
   price: string;
   vatMode: VatMode;
   vatBps: number;
+  /** Валюта объявления или сделки (страны продавца): в ней показывается расчёт (23.11.2026). */
+  currency: string;
+  /** Набор правил страны о порогах просрочки (countries.ts); null — пороги не показываются. */
+  rules: string | null;
   down: string;
   months: string;
   final: string;
@@ -50,11 +56,8 @@ export function TermsFields({
   const [handover, setHandover] = useState(defaults.handover ?? '');
   const [firstDue, setFirstDue] = useState(defaults.firstDue ?? '');
 
-  const money = useMemo(
-    () => new Intl.NumberFormat(locale === 'en' ? 'en-GB' : locale, { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }),
-    [locale],
-  );
-  const eur = (cents: number) => money.format(cents / 100);
+  /* Суммы — в валюте объявления или сделки, без пересчёта (23.11.2026). */
+  const eur = useMemo(() => installmentMoney(locale, defaults.currency, true), [locale, defaults.currency]);
 
   const result = useMemo(() => {
     const p = eurosToCents(price);
@@ -74,8 +77,9 @@ export function TermsFields({
       handoverDate: h,
       firstDueDate: withDates && firstDue ? firstDue : addMonths(h, 1),
     });
-    return 'error' in s ? { error: s.error } : { s, t: thresholds(s) };
-  }, [price, vatMode, down, months, final, rate, handover, firstDue, withDates, defaults.vatBps]);
+    /* Пороги — по правилам страны сделки; правил нет — строки о порогах нет. */
+    return 'error' in s ? { error: s.error } : { s, t: installmentRulesById(defaults.rules)?.thresholds(s) ?? null };
+  }, [price, vatMode, down, months, final, rate, handover, firstDue, withDates, defaults.vatBps, defaults.rules]);
 
   return (
     <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,320px)]">
@@ -127,13 +131,15 @@ export function TermsFields({
             <Row label={calc.r.finalPayment} value={eur(result.s.installments[result.s.installments.length - 1].principalCents)} />
             {result.s.interestTotalCents > 0 && <Row label={calc.r.interestTotal} value={eur(result.s.interestTotalCents)} />}
             <Row label={calc.r.priceWithVat} value={eur(result.s.installmentPriceCents)} />
-            <p className="mt-2 text-[13px] text-ink-muted">
-              {fill(calc.r.thresholdsText, {
-                tenth: eur(result.t.tenthCents),
-                twentieth: eur(result.t.twentiethCents),
-                needed: String(result.t.installmentsNeeded),
-              })}
-            </p>
+            {result.t && (
+              <p className="mt-2 text-[13px] text-ink-muted">
+                {fill(calc.r.thresholdsText, {
+                  tenth: eur(result.t.tenthCents),
+                  twentieth: eur(result.t.twentiethCents),
+                  needed: String(result.t.installmentsNeeded),
+                })}
+              </p>
+            )}
           </dl>
         )}
       </div>

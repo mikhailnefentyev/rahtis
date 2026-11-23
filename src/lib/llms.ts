@@ -1,6 +1,7 @@
 import { ANNUAL_DISCOUNT_BPS, APP, ON_REQUEST_FROM, SUBSCRIPTION_LADDER } from '@/lib/config';
 import { locales, type Locale } from '@/lib/i18n/config';
 import { EARTHWORKS, earthworksPath } from '@/lib/landing/earthworks';
+import { equipmentSalePath } from '@/lib/landing/equipmentSale';
 import { forwardersPath } from '@/lib/landing/forwarders';
 import { trailerSwapPath } from '@/lib/landing/trailerSwap';
 import { SITE_URL } from '@/lib/seo';
@@ -70,6 +71,8 @@ function links(): string {
   const earth = locales.map((l) => `[${LANG_NAME[l]}](${SITE_URL}${earthworksPath(l)})`).join(' · ');
   const fwd = locales.map((l) => `[${LANG_NAME[l]}](${SITE_URL}${forwardersPath(l)})`).join(' · ');
   const swap = locales.map((l) => `[${LANG_NAME[l]}](${SITE_URL}${trailerSwapPath(l)})`).join(' · ');
+  /* Открытая страница объявлений о технике в рассрочку (23.11.2026). */
+  const equipment = locales.map((l) => `[${LANG_NAME[l]}](${SITE_URL}/${l}${equipmentSalePath(l)})`).join(' · ');
   const apply = locales.map((l) => `[${LANG_NAME[l]}](${SITE_URL}/${l}/apply)`).join(' · ');
   const rules = locales.map((l) => `[${LANG_NAME[l]}](${SITE_URL}/${l}/rules)`).join(' · ');
   return `## Pages
@@ -78,6 +81,7 @@ function links(): string {
 - For freight forwarders (find carriers, publish loads; free, no commission): ${fwd}
 - Trailer swaps in ports (carriers doing unaccompanied trailer swaps): ${swap}
 - Earthworks and tipper trucks: ${earth}
+- Trucks and equipment for sale in instalments (public listings from verified companies: make, class, price excl. VAT, down payment, term, country; a sale is always between companies of the same country; RAHTIS is not a party to the sale): ${equipment}
 - Apply as a carrier or shipper: ${apply}
 - Platform rules — what it costs, how loads are ordered on the board, what each side sees, how companies are checked, complaints: ${rules}
 - [Driver training](${SITE_URL}/en/driver/training): quizzes and practice on the tachograph, cargo securing, weights, daily check, ADR and safety

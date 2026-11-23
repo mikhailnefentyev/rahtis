@@ -26,7 +26,7 @@ import {
   vehicleSellable,
 } from './access.ts';
 
-test('раздел рассрочки — только финской компании', () => {
+test('раздел рассрочки — компаниям открытых стран реестра (сейчас только Финляндия)', () => {
   assert.equal(installmentsAvailable('FI'), true);
   for (const country of ['EE', 'SE', 'PL', 'RO', '', null, undefined]) {
     assert.equal(installmentsAvailable(country), false);

@@ -18,13 +18,13 @@ import {
   effectiveHandover,
   overduePayments,
   payoffCents,
-  remedyAllowed,
   terminationSummary,
-  thresholds,
   type VatMode,
 } from '@/lib/installments/calc';
 import { dealTermination, dealVehicle, helsinkiDay, loadDeal } from '@/lib/installments/contract';
 import { fill, installmentUiCopy } from '@/lib/installments/copy';
+import { installmentCurrency, installmentMoney } from '@/lib/installments/countries';
+import { installmentRules } from '@/lib/installments/rules';
 import { todayInHelsinki } from '@/lib/dates';
 import { isLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
@@ -93,10 +93,16 @@ export async function DealScreen({
     handoverDate: deal.handover_date,
     firstDueDate: deal.first_due_date,
   });
-  const money = new Intl.NumberFormat(locale === 'en' ? 'en-GB' : locale, { style: 'currency', currency: 'EUR', minimumFractionDigits: 0, maximumFractionDigits: 2 });
-  /* Целые суммы без копеек, дробные — с копейками (19 000 / 24 = 791,67 €). */
-  const eur = (cents: number) => money.format(cents / 100);
-  const limits = 'error' in schedule ? null : thresholds(schedule);
+  /*
+   * Валюта сделки — страны продавца (23.11.2026), без пересчёта; до миграции
+   * 20261128100000 столбца нет — валюта страны продавца из её пакета.
+   * Целые суммы без копеек, дробные — с копейками (19 000 / 24 = 791,67 €).
+   */
+  const currency = deal.currency ?? installmentCurrency(seller.country);
+  const eur = installmentMoney(locale, currency);
+  /* Пороги и право изъятия — по правилам страны сделки (сейчас только финский закон о рассрочке). */
+  const rules = installmentRules(seller.country);
+  const limits = 'error' in schedule || !rules ? null : rules.thresholds(schedule);
 
   /* Этап 3: график, сводка по машине, кредит-нота. */
   const supabase = await createClient();
@@ -133,7 +139,8 @@ export async function DealScreen({
   const priceGross = 'error' in schedule ? deal.price_cents : schedule.installmentPriceCents;
   const remedy =
     deal.status === 'ACTIVE' &&
-    remedyAllowed(
+    rules !== null &&
+    rules.remedyAllowed(
       overdue.map((p) => ({ dueDate: p.lateFrom, unpaidCents: p.principal_cents })),
       today,
       priceGross,
@@ -247,6 +254,8 @@ export async function DealScreen({
                 price: euros(deal.price_cents),
                 vatMode: deal.vat_mode as VatMode,
                 vatBps: deal.vat_bps,
+                currency,
+                rules: rules?.id ?? null,
                 down: euros(deal.down_payment_cents),
                 months: String(deal.months),
                 final: euros(deal.final_cents),
@@ -493,8 +502,8 @@ export async function DealScreen({
                         <tr key={p.id} className="border-t border-line">
                           <td className="py-1.5 pr-3 font-mono">{p.n}</td>
                           <td className="py-1.5 pr-3 font-mono">{fiDate(p.due_date)}</td>
-                          <td className="py-1.5 pr-3 text-right font-mono">{money.format(p.principal_cents / 100)}</td>
-                          <td className="py-1.5 pr-3 text-right font-mono">{p.interest_cents > 0 ? money.format(p.interest_cents / 100) : ui.stage3.none}</td>
+                          <td className="py-1.5 pr-3 text-right font-mono">{eur(p.principal_cents)}</td>
+                          <td className="py-1.5 pr-3 text-right font-mono">{p.interest_cents > 0 ? eur(p.interest_cents) : ui.stage3.none}</td>
                           <td className="py-1.5 pr-3">
                             {inv?.file_path ? (
                               <a href={`${home}/${deal.id}/invoice?inv=${inv.id}`} className="font-mono text-accent hover:underline">

@@ -1,6 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { after } from 'next/server';
 import { redirect } from 'next/navigation';
 import { getViewer } from '@/lib/auth/viewer';
 import { eurosToCents } from '@/lib/economics/money';
@@ -17,8 +18,11 @@ import {
   parseSaleVehicle,
   vatModeAllowedForNew,
 } from './access';
+import { announceListing } from './announce';
 import { buildSchedule, type VatMode } from './calc';
 import { fill, installmentUiCopy } from './copy';
+import { installmentCountry } from './countries';
+import { installmentCountryCopy } from './countryCopy';
 import { createFirstInvoice } from './firstInvoice';
 import { createCreditNote, ensureSchedule, runInstallments } from './payments';
 
@@ -160,17 +164,29 @@ async function dealParties(dealId: string) {
 
 // ── Объявление ───────────────────────────────────────────────────────
 
+/*
+ * Перевозчикам своей страны — уведомление о новой технике (23.11.2026).
+ * После ответа продавцу: публикация не ждёт рассылки и не срывается из-за
+ * неё. Повторная публикация того же объявления никого не уведомит дважды
+ * (announce.ts, отметки в базе).
+ */
+function announceAfter(listingId: string) {
+  after(() => announceListing(listingId).then(() => undefined));
+}
+
 export async function saveListingAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
   const locale = toLocale(fd.get('locale'));
   const c = installmentUiCopy(locale);
-  const { ok, base } = await ready();
-  if (!ok) return { error: c.notAllowed, saved: false };
+  const { viewer, ok, base } = await ready();
+  /* Страна продавца — из реестра стран раздела (23.11.2026): закрытая страна объявлений не создаёт. */
+  const country = installmentCountry(viewer.status === 'ready' ? viewer.company?.country : null);
+  if (!ok || !country) return { error: c.notAllowed, saved: false };
 
   /* В кабинете объявление всегда с обычным НДС (решение 22.11.2026); другой режим не принимает и база. */
   const vatMode = str(fd, 'vat_mode') as VatMode;
   if (!vatModeAllowedForNew(vatMode)) return { error: c.listing.error, saved: false };
-  /* Ставка для проверки калькулятором; в базе — по стране продавца. */
-  const terms = readTerms(fd, vatMode, 2550, false);
+  /* Ставка для проверки калькулятором — обычная ставка страны продавца из её пакета; в базе — тоже по стране продавца. */
+  const terms = readTerms(fd, vatMode, country.vatStandardBps, false);
   const odometer = str(fd, 'odometer') ? Number(str(fd, 'odometer').replace(/\s/g, '')) : null;
   if (!terms || (odometer != null && (!Number.isInteger(odometer) || odometer < 0))) return { error: c.listing.error, saved: false };
 
@@ -194,6 +210,7 @@ export async function saveListingAction(_prev: ActionState, fd: FormData): Promi
   if (str(fd, 'publish') === '1') {
     const { error: pub } = await supabase.rpc('set_equipment_listing_status', { p_id: id, p_status: 'PUBLISHED' });
     if (pub) return { error: c.listing.error, saved: false };
+    announceAfter(id);
   }
   refreshList(locale);
   redirect(`/${locale}${base}`);
@@ -219,6 +236,7 @@ export async function setListingStatusAction(_prev: ActionState, fd: FormData): 
     /* 42501 — нет прав: не главный или у компании истекли документы. */
     return failed(error.code === '42501' ? c.notAllowed : c.deal.error);
   }
+  if (status === 'PUBLISHED') announceAfter(id);
   for (const deal of open ?? []) {
     const parties = await dealParties(deal.id);
     if (!parties) continue;
@@ -258,6 +276,8 @@ export async function startDealAction(_prev: ActionState, fd: FormData): Promise
   });
   if (error || !dealId) {
     console.error('сделка не начата:', error?.message);
+    /* RC001 — продавец из другой страны: сделка только внутри одной страны (23.11.2026). */
+    if (error?.code === 'RC001') return { error: installmentCountryCopy(locale).differentCountry, saved: false };
     /* 42501 — покупать может только перевозчик с действующими документами. */
     return { error: error?.code === '42501' ? c.buyNotAllowed : c.deal.error, saved: false };
   }

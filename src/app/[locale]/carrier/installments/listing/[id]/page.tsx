@@ -5,7 +5,10 @@ import { Card, CardBody } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
 import { addMonths, type VatMode } from '@/lib/installments/calc';
 import { installmentsAvailable, vatModeAllowedForNew } from '@/lib/installments/access';
-import { installmentUiCopy } from '@/lib/installments/copy';
+import { installmentCurrency } from '@/lib/installments/countries';
+import { countryName, installmentCountryCopy } from '@/lib/installments/countryCopy';
+import { installmentRules } from '@/lib/installments/rules';
+import { fill, installmentUiCopy } from '@/lib/installments/copy';
 import { isLocale } from '@/lib/i18n';
 import { installmentCopy } from '@/lib/landing/installment';
 import { createClient } from '@/lib/supabase/server';
@@ -34,6 +37,14 @@ export default async function ListingPage({ params }: { params: Promise<{ locale
   const { data: catalog } = await supabase.rpc('equipment_catalog');
   const l = (catalog ?? []).find((x) => x.listing_id === id);
   if (!l) notFound();
+  /*
+   * Сделка — только внутри одной страны (23.11.2026): объявление другой
+   * страны видно, но предложение по нему не делается. До миграции
+   * 20261128100000 каталог страну не отдаёт — тогда это страна компании.
+   */
+  const sellerCountry = l.seller_country ?? viewer.company!.country;
+  const sameCountry = l.same_country ?? true;
+  const cc = installmentCountryCopy(locale);
 
   /* Передача — через две недели, первый взнос — через месяц после неё: черновик, покупатель меняет. */
   const today = todayInHelsinki();
@@ -51,6 +62,7 @@ export default async function ListingPage({ params }: { params: Promise<{ locale
             <p>
               {ui.catalog.seller}: <span className="font-semibold">{l.seller_name}</span>
               {l.seller_city ? ` · ${l.seller_city}` : ''}
+              {` · ${countryName(locale, sellerCountry)}`}
             </p>
             <p className="mt-1 text-ink-muted">
               {[l.plate, l.euro_class, l.odometer_km != null ? `${l.odometer_km.toLocaleString(locale === 'en' ? 'en-GB' : locale)} km` : null].filter(Boolean).join(' · ')}
@@ -63,7 +75,11 @@ export default async function ListingPage({ params }: { params: Promise<{ locale
         <CardBody>
           <h2 className="mb-4 text-[17px] font-semibold">{ui.deal.terms}</h2>
           {/* Новая сделка — только с обычным НДС (решение 22.11.2026): по старому объявлению с другим режимом предложение не принимается. */}
-          {!vatModeAllowedForNew(l.vat_mode) ? (
+          {!sameCountry ? (
+            <p className="rounded-card border border-line bg-sunken px-3 py-2 text-[14px] text-ink-muted">
+              {fill(cc.otherCountry, { country: countryName(locale, sellerCountry) })}
+            </p>
+          ) : !vatModeAllowedForNew(l.vat_mode) ? (
             <p className="rounded-card border border-warn/35 bg-warn/10 px-3 py-2 text-[14px] text-warn">{ui.listing.vatOld}</p>
           ) : (
           <OfferForm
@@ -75,6 +91,8 @@ export default async function ListingPage({ params }: { params: Promise<{ locale
               price: euros(l.price_cents),
               vatMode: l.vat_mode as VatMode,
               vatBps: l.vat_bps,
+              currency: l.currency ?? installmentCurrency(sellerCountry),
+              rules: installmentRules(sellerCountry)?.id ?? null,
               down: euros(l.down_payment_cents),
               months: String(l.months),
               final: euros(l.final_cents),

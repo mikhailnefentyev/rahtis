@@ -7,6 +7,7 @@ import { buttonClass } from '@/components/ui';
 import { signInPath } from '@/lib/auth/paths';
 import { APP } from '@/lib/config';
 import { isLocale } from '@/lib/i18n';
+import { equipmentSaleCopy, equipmentSalePath } from '@/lib/landing/equipmentSale';
 import { installmentCopy, installmentPath } from '@/lib/landing/installment';
 import { SITE_URL } from '@/lib/seo';
 import { InstallmentCalculator } from './InstallmentCalculator';
@@ -76,6 +77,10 @@ export function InstallmentLanding({ locale }: { locale: string }) {
             {c.title}
           </h1>
           <p className="mt-4 max-w-[64ch] text-[17px] leading-relaxed text-ink-muted">{c.lede}</p>
+          {/* Открытая страница объявлений: что уже продаётся в рассрочку (23.11.2026). */}
+          <Link href={`/${locale}${equipmentSalePath(locale)}`} className="mt-4 inline-block text-[15px] font-semibold text-accent hover:underline">
+            {equipmentSaleCopy(locale).linkLabel} →
+          </Link>
         </section>
 
         <section className={`${section} pb-16`} aria-label={c.calcTitle}>

@@ -5844,6 +5844,9 @@ export const pl = {
     'event.installment.no_iban.body': "Brak Twojego numeru konta (IBAN). Dodaj go w sekcji Dane bankowe – faktura zostanie wtedy automatycznie wysłana do kupującego.",
     'event.installment.terminated': "Sprzedaż ratalna zakończona: {plate}",
     'event.installment.terminated.body': "Sprzedawca odnotował zakończenie sprzedaży. RAHTIS nie wystawia już faktur do tej umowy; rozliczenie strony przeprowadzają między sobą. Przyczynę i podsumowanie płatności znajdziesz na stronie transakcji.",
+    /* Новая техника в рассрочку — перевозчикам своей страны (23.11.2026). {price} — в валюте объявления. */
+    'event.installment.new_listing': "Nowy pojazd na sprzedaż na raty: {make}",
+    'event.installment.new_listing.body': "{class} · {price} netto · {months} mies. Otwórz ogłoszenie na karcie Na sprzedaż i złóż ofertę.",
     'event.maintenance.defect': "{plate}: zgłoszenie usterki – {area}",
     'event.maintenance.defect_unsafe': "{plate}: NIE JECHAĆ – {area}",
     'event.maintenance.due': "{count, plural, one {Serwis: zbliża się # termin} few {Serwis: zbliżają się # terminy} many {Serwis: zbliża się # terminów} other {Serwis: zbliża się # terminu}}",

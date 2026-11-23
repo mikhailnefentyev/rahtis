@@ -98,6 +98,8 @@ const TRAILER_SWAP: Slug = { fi: 'peravaunun-vaihto', other: 'trailer-swap' };
 const TERMS: Slug = { fi: 'kayttoehdot', other: 'terms', fiOrEnOnly: true };
 const PRIVACY: Slug = { fi: 'tietosuoja', other: 'privacy', fiOrEnOnly: true };
 const INSTALLMENT: Slug = { fi: 'kuorma-auto-osamaksulla', other: 'truck-installment-sale' };
+/* Открытая страница «Техника на продажу в рассрочку» (23.11.2026). */
+const EQUIPMENT_SALE: Slug = { fi: 'kalusto-osamaksulla', other: 'equipment-for-sale' };
 const LOCALIZED_SLUGS = new Map<string, Slug>([
   ['maansiirto', EARTHWORKS],
   ['earthworks', EARTHWORKS],
@@ -111,6 +113,8 @@ const LOCALIZED_SLUGS = new Map<string, Slug>([
   ['privacy', PRIVACY],
   ['kuorma-auto-osamaksulla', INSTALLMENT],
   ['truck-installment-sale', INSTALLMENT],
+  ['kalusto-osamaksulla', EQUIPMENT_SALE],
+  ['equipment-for-sale', EQUIPMENT_SALE],
 ]);
 
 /**

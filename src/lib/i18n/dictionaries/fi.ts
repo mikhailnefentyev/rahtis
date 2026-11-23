@@ -6151,6 +6151,9 @@ export const fi = {
     'event.installment.no_iban.body': "Tilinumerosi (IBAN) puuttuu. Lisää se kohdassa Pankkiyhteys – sen jälkeen lasku lähtee ostajalle automaattisesti.",
     'event.installment.terminated': "Osamaksukauppa päättynyt: {plate}",
     'event.installment.terminated.body': "Myyjä on kirjannut kaupan päättyneeksi. Laskutus RAHTIKSEN kautta on loppunut, ja tilitys tehdään osapuolten kesken. Syy ja yhteenveto maksuista näkyvät kaupan sivulla.",
+    /* Новая техника в рассрочку — перевозчикам своей страны (23.11.2026). {price} — в валюте объявления. */
+    'event.installment.new_listing': "Uusi auto myynnissä osamaksulla: {make}",
+    'event.installment.new_listing.body': "{class} · {price} (alv 0 %) · {months} kk. Avaa ilmoitus Myynnissä-välilehdeltä ja tee tarjous.",
     'event.maintenance.defect': "{plate}: vikailmoitus – {area}",
     'event.maintenance.defect_unsafe': "{plate}: EI SAA AJAA – {area}",
     'event.maintenance.due': "{count, plural, one {Huolto: # määräaika lähestyy} other {Huolto: # määräaikaa lähestyy}}",

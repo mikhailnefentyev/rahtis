@@ -10,6 +10,7 @@ import { APP } from '@/lib/config';
 import { getI18n, LOCALE_NAMES, locales, type Locale } from '@/lib/i18n';
 import { placeCountries } from '@/lib/routing/places';
 import { EARTHWORKS, earthworksPath } from '@/lib/landing/earthworks';
+import { equipmentSaleCopy, equipmentSalePath } from '@/lib/landing/equipmentSale';
 import { FORWARDERS, forwardersPath } from '@/lib/landing/forwarders';
 import { TRAILER_SWAP, trailerSwapPath } from '@/lib/landing/trailerSwap';
 import { LandingFleet, LandingPricing } from './LandingFleet';
@@ -746,6 +747,8 @@ Rahtis-Event: order.stop_arrived`}</code>
                 { href: forwardersPath(locale), label: fw.footerLink },
                 { href: trailerSwapPath(locale), label: ts.footerLink },
                 { href: earthworksPath(locale), label: ew.footerLink },
+                /* Открытая страница объявлений о технике в рассрочку (23.11.2026). */
+                { href: `/${locale}${equipmentSalePath(locale)}`, label: equipmentSaleCopy(locale).linkLabel },
                 ...(showBlog ? [{ href: blogPath(locale), label: t.site.blog }] : []),
               ],
             },

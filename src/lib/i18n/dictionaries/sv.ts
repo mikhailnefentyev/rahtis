@@ -5819,6 +5819,9 @@ export const sv = {
     'event.installment.no_iban.body': "Ditt kontonummer (IBAN) saknas. Lägg till det under Bankuppgifter – därefter skickas fakturan automatiskt till köparen.",
     'event.installment.terminated': "Avbetalningsköpet har avslutats: {plate}",
     'event.installment.terminated.body': "Säljaren har registrerat köpet som avslutat. Faktureringen via RAHTIS har upphört; uppgörelsen görs mellan parterna. Orsaken och en sammanställning av betalningarna finns på köpets sida.",
+    /* Новая техника в рассрочку — перевозчикам своей страны (23.11.2026). {price} — в валюте объявления. */
+    'event.installment.new_listing': "Nytt fordon till salu på avbetalning: {make}",
+    'event.installment.new_listing.body': "{class} · {price} exkl. moms · {months} mån. Öppna annonsen under fliken Till salu och lämna bud.",
     'event.maintenance.defect': "{plate}: felanmälan – {area}",
     'event.maintenance.defect_unsafe': "{plate}: FÅR INTE KÖRAS – {area}",
     'event.maintenance.due': "{count, plural, one {Underhåll: # tidsfrist närmar sig} other {Underhåll: # tidsfrister närmar sig}}",

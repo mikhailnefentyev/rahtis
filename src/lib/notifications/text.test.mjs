@@ -28,6 +28,7 @@ function i18nOf(t) {
   const f = {
     date: (v) => `D(${String(v).slice(0, 10)})`,
     eur: (c) => `EUR(${c})`,
+    money: (c, cur) => `${cur}(${c})`,
     percent: (x) => `P(${x})`,
     number: (n) => `N(${n})`,
   };
@@ -58,6 +59,8 @@ const CASES = {
   'installment.threshold': { plate: 'ABC-123' },
   'installment.terminated': { plate: 'ABC-123' },
   'installment.no_iban': { plate: 'ABC-123', n: 3 },
+  /* Пишет база: public.announce_equipment_listing (миграция 20261128100000). */
+  'installment.new_listing': { make: 'Volvo FH 500', vehicleClass: 'TRACTOR', priceCents: 6500000, currency: 'SEK', months: 36, country: 'SE' },
   'maintenance.defect': { plate: 'ABC-123', area: 'BRAKES', who: 'Matti', text: 'Jarru vetää', orders: [] },
   'maintenance.defect_unsafe': { plate: 'ABC-123', area: 'BRAKES', who: 'Matti', text: 'x', orders: [{ ref: 'RS-1', day: '2026-11-22' }] },
   'maintenance.due': {
@@ -104,4 +107,20 @@ test('без кода и с неизвестным кодом — запасно
   const i18n = i18nOf(fi);
   assert.deepEqual(notificationText({ code: null, params: {}, title: 'Viesti', body: 'Teksti' }, i18n), { title: 'Viesti', body: 'Teksti' });
   assert.deepEqual(notificationText({ code: 'no.such', params: {}, title: 'T', body: 'B' }, i18n), { title: 'T', body: 'B' });
+});
+
+test('новая техника в рассрочку: цена — в валюте объявления, класс — словом читающего', () => {
+  const row = {
+    code: 'installment.new_listing',
+    params: { make: 'Volvo FH 500', vehicleClass: 'TRACTOR', priceCents: 6500000, currency: 'SEK', months: 36, country: 'SE' },
+    title: null,
+    body: null,
+  };
+  const out = notificationText(row, i18nOf(fi));
+  assert.ok(out.title.includes('Volvo FH 500'), out.title);
+  /* Не евро: сумма не пересчитывается и печатается в своей валюте. */
+  assert.ok(out.body.includes('SEK(6500000)'), out.body);
+  assert.ok(!out.body.includes('EUR('), out.body);
+  assert.ok(out.body.includes(fi.vehicleClass.TRACTOR), out.body);
+  assert.ok(out.body.includes('36'), out.body);
 });

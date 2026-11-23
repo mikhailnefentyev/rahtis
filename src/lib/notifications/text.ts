@@ -47,6 +47,17 @@ const LABELS: Record<string, (p: Values, t: I18n['t']) => Values> = {
   'maintenance.defect_unsafe': (p, t) => ({ area: label(t.maintenance.defects.areas, p.area) ?? p.area }),
   'company.document_approved': (p, t) => ({ document: documentLabel(p, t) }),
   'company.document_rejected': (p, t) => ({ document: documentLabel(p, t) }),
+  /* Новая техника в рассрочку (23.11.2026): класс машины — словом читающего. Цена — в MONEY ниже. */
+  'installment.new_listing': (p, t) => ({ class: label(t.vehicleClass, p.vehicleClass) ?? p.vehicleClass }),
+};
+
+/**
+ * Суммы не в евро: {xxx} из xxxCents по умолчанию печатается в евро, а у
+ * этих событий валюта своя и лежит рядом (currency). Не пересчитывается.
+ */
+const MONEY: Record<string, (p: Values, f: I18n['f']) => Values> = {
+  'installment.new_listing': (p, f) =>
+    typeof p.priceCents === 'number' ? { price: f.money(p.priceCents, typeof p.currency === 'string' ? p.currency : 'EUR') } : {},
 };
 
 /** То же правило, что в forwarders/actions.ts: документ заказчика, лицензия или полис. */
@@ -138,7 +149,7 @@ function prepare(code: string, raw: Values, i18n: I18n): MessageValues {
       values[key] = '';
     }
   }
-  const extra = LABELS[code]?.(raw, t) ?? {};
+  const extra = { ...(LABELS[code]?.(raw, t) ?? {}), ...(MONEY[code]?.(raw, f) ?? {}) };
   for (const [key, value] of Object.entries(extra)) {
     if (typeof value === 'string' || typeof value === 'number') values[key] = value;
   }

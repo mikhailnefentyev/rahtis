@@ -37,6 +37,15 @@ const PHOTOS = {
     image: "object-[55%_center] lg:object-[0%_center]",
     mask: "lg:[mask-image:linear-gradient(to_right,transparent_0%,black_30%)]",
   },
+  /*
+   * Открытая страница «Техника на продажу» (23.11.2026): тот же тягач у
+   * парома, что на странице смены прицепов, — отдельного кадра пока нет.
+   */
+  equipmentSale: {
+    src: "/media/peravaunu-hero.webp",
+    image: "object-[55%_center] lg:object-[0%_center]",
+    mask: "lg:[mask-image:linear-gradient(to_right,transparent_0%,black_30%)]",
+  },
 } as const;
 
 export type LandingPhoto = keyof typeof PHOTOS;
@@ -53,6 +62,7 @@ export function LandingHero({
   lede,
   ctaApply,
   ctaSignIn,
+  signInHref,
 }: {
   locale: Locale;
   photo: LandingPhoto;
@@ -61,6 +71,8 @@ export function LandingHero({
   lede: string;
   ctaApply: string;
   ctaSignIn: string;
+  /** Свой адрес входа: с возвратом в нужный раздел кабинета. По умолчанию — обычный вход. */
+  signInHref?: string;
 }) {
   const p = PHOTOS[photo];
   return (
@@ -108,7 +120,7 @@ export function LandingHero({
               {ctaApply}
             </Link>
             <Link
-              href={signInPath(locale)}
+              href={signInHref ?? signInPath(locale)}
               className="inline-flex h-12 items-center gap-2 rounded-control border border-white/30 px-5 text-[15px] font-semibold text-white transition-colors hover:bg-white/10"
             >
               {ctaSignIn}

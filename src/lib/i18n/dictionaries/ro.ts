@@ -6002,6 +6002,9 @@ export const ro = {
     'event.installment.no_iban.body': "Lipsește contul dumneavoastră bancar (IBAN). Adăugați-l la Date bancare – factura va fi apoi trimisă automat cumpărătorului.",
     'event.installment.terminated': "Vânzare în rate încetată: {plate}",
     'event.installment.terminated.body': "Vânzătorul a înregistrat încetarea vânzării. RAHTIS nu mai emite facturi pentru această vânzare; regularizarea se face între părți. Motivul și situația plăților se află pe pagina vânzării.",
+    /* Новая техника в рассрочку — перевозчикам своей страны (23.11.2026). {price} — в валюте объявления. */
+    'event.installment.new_listing': "Vehicul nou de vânzare cu plata în rate: {make}",
+    'event.installment.new_listing.body': "{class} · {price} fără TVA · {months} luni. Deschideți anunțul din fila De vânzare și faceți o ofertă.",
     'event.maintenance.defect': "{plate}: raport de defecțiune – {area}",
     'event.maintenance.defect_unsafe': "{plate}: NU CIRCULAȚI – {area}",
     'event.maintenance.due': "{count, plural, one {Întreținere: # element scadent în curând} few {Întreținere: # elemente scadente în curând} other {Întreținere: # de elemente scadente în curând}}",

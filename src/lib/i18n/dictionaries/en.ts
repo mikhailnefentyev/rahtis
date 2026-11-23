@@ -6010,6 +6010,9 @@ export const en = {
     'event.installment.no_iban.body': "Your bank account (IBAN) is missing. Add it under Bank details – the invoice will then be sent to the buyer automatically.",
     'event.installment.terminated': "Instalment sale ended: {plate}",
     'event.installment.terminated.body': "The seller has recorded the sale as ended. Invoicing through RAHTIS has stopped; the settlement is made between the parties. The reason and a payments summary are on the deal page.",
+    /* Новая техника в рассрочку — перевозчикам своей страны (23.11.2026). {price} — в валюте объявления. */
+    'event.installment.new_listing': "New vehicle for sale in instalments: {make}",
+    'event.installment.new_listing.body': "{class} · {price} excl. VAT · {months} months. Open the listing on the For sale tab to make an offer.",
     'event.maintenance.defect': "{plate}: defect report – {area}",
     'event.maintenance.defect_unsafe': "{plate}: DO NOT DRIVE – {area}",
     'event.maintenance.due': "{count, plural, one {Maintenance: # item due soon} other {Maintenance: # items due soon}}",

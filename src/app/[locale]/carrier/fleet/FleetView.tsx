@@ -8,6 +8,7 @@ import { EURO_LABEL } from '@/lib/fleet/labels';
 import { useI18n } from '@/lib/i18n/provider';
 import { TruckPhoto } from '@/components/domain/TruckPhoto';
 import { installmentUiCopy } from '@/lib/installments/copy';
+import { installmentsAvailable } from '@/lib/installments/access';
 import type { Driver, Vehicle } from '@/types/db';
 import { VehicleForm } from './VehicleForm';
 
@@ -217,7 +218,7 @@ export function FleetView({
                     * (22.11.2026: «в разделе машин нигде не выбрать Продать»). Только
                     * одобренная машина и только финской компании — как решает база.
                     */}
-                  {country === 'FI' && vehicle.access === 'APPROVED' && (!vehicle.installment_role || vehicle.installment_role === 'OWNED') && (
+                  {installmentsAvailable(country) && vehicle.access === 'APPROVED' && (!vehicle.installment_role || vehicle.installment_role === 'OWNED') && (
                     <a href={`/${locale}/carrier/installments/new?vehicle=${vehicle.id}`} className={buttonClass({ size: 'sm', className: 'w-full' })}>
                       {installmentUiCopy(locale).sell}
                     </a>

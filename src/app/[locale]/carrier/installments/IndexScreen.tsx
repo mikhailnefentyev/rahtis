@@ -17,6 +17,9 @@ import {
 } from '@/lib/installments/access';
 import { setListingStatusAction, submitSaleVehicleAction } from '@/lib/installments/actions';
 import { fill, installmentUiCopy } from '@/lib/installments/copy';
+import { installmentCurrency, installmentMoney } from '@/lib/installments/countries';
+import { countryName, installmentCountryCopy } from '@/lib/installments/countryCopy';
+import { equipmentSalePath } from '@/lib/landing/equipmentSale';
 import { isLocale } from '@/lib/i18n';
 import { getViewerI18n } from '@/lib/i18n/viewer';
 import { installmentPath } from '@/lib/landing/installment';
@@ -69,7 +72,7 @@ export async function InstallmentsScreen({
     carrier ? supabase.rpc('company_readiness', { p_company_id: company.id }) : Promise.resolve({ data: null }),
     supabase
       .from('equipment_listings')
-      .select('id, status, price_cents, down_payment_cents, months, vehicle_id, sale_vehicle_id, published_at')
+      .select('id, status, price_cents, currency, down_payment_cents, months, vehicle_id, sale_vehicle_id, published_at')
       .eq('seller_company_id', company.id)
       .order('created_at', { ascending: false }),
     supabase.rpc('my_installment_deals'),
@@ -99,8 +102,14 @@ export async function InstallmentsScreen({
       .map((l) => l.sale_vehicle_id as string),
   );
 
-  const money = new Intl.NumberFormat(locale === 'en' ? 'en-GB' : locale, { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
-  const eur = (cents: number) => money.format(cents / 100);
+  /*
+   * Каждая сумма — в валюте своего объявления или сделки (страны продавца),
+   * без пересчёта (23.11.2026). До миграции 20261128100000 каталог и список
+   * сделок валюту и страну не отдают — тогда это валюта страны компании.
+   */
+  const ownCurrency = installmentCurrency(company.country);
+  const eur = (cents: number, currency?: string | null) => installmentMoney(locale, currency ?? ownCurrency, true)(cents);
+  const cc = installmentCountryCopy(locale);
   const tabs: { key: Tab; label: string; count?: number }[] = [
     { key: 'mine', label: ui.tabs.mine, count: listings?.length },
     { key: 'deals', label: ui.tabs.deals, count: (deals ?? []).filter((d) => d.status === 'NEGOTIATING').length },
@@ -117,6 +126,10 @@ export async function InstallmentsScreen({
         <div className="flex flex-wrap items-center gap-3">
           <Link href={`/${locale}${installmentPath(locale)}`} className="text-[13px] text-accent hover:underline">
             {ui.calculatorLink} ›
+          </Link>
+          {/* Открытая страница объявлений: её видят все, без входа (23.11.2026). */}
+          <Link href={`/${locale}${equipmentSalePath(locale)}`} className="text-[13px] text-accent hover:underline">
+            {cc.publicLink} ›
           </Link>
           {/*
             * Вход в продажу — здесь же (22.11.2026): раньше объявление можно было
@@ -267,7 +280,7 @@ export async function InstallmentsScreen({
                         </div>
                         <p className="mt-1 text-[14px]">{v?.make}</p>
                         <p className="mt-1 font-mono text-[14px]">
-                          {eur(l.price_cents)} · {fill(ui.catalog.terms, { months: String(l.months), down: eur(l.down_payment_cents) })}
+                          {eur(l.price_cents, l.currency)} · {fill(ui.catalog.terms, { months: String(l.months), down: eur(l.down_payment_cents, l.currency) })}
                         </p>
                       </div>
                       {canSell && (l.status === 'DRAFT' || l.status === 'PUBLISHED') && (
@@ -312,7 +325,7 @@ export async function InstallmentsScreen({
                           {d.make} · {d.counterparty_name}
                         </p>
                         <p className="mt-1 font-mono text-[14px]">
-                          {eur(d.price_cents)} · {fill(ui.catalog.monthsShort, { months: String(d.months) })}
+                          {eur(d.price_cents, d.currency)} · {fill(ui.catalog.monthsShort, { months: String(d.months) })}
                           {d.contract_number ? ` · ${d.contract_number}` : ''}
                         </p>
                       </div>
@@ -335,7 +348,7 @@ export async function InstallmentsScreen({
             {(catalog ?? []).map((l) => (
               <Card key={l.listing_id}>
                 <CardBody className="flex h-full flex-col gap-3">
-                  <TruckPhoto make={l.make} vehicleClass={l.vehicle_class} plate={l.plate} country={null} sizes="(min-width: 1280px) 380px, (min-width: 640px) 50vw, 100vw" />
+                  <TruckPhoto make={l.make} vehicleClass={l.vehicle_class} plate={l.plate} country={l.seller_country ?? null} sizes="(min-width: 1280px) 380px, (min-width: 640px) 50vw, 100vw" />
                   <div className="flex-1">
                     <p className="font-semibold">{l.make}</p>
                     <p className="text-[13px] text-ink-muted">
@@ -343,17 +356,27 @@ export async function InstallmentsScreen({
                       {l.seller_city ? ` · ${l.seller_city}` : ''}
                       {l.odometer_km != null ? ` · ${l.odometer_km.toLocaleString(locale === 'en' ? 'en-GB' : locale)} km` : ''}
                     </p>
-                    <p className="mt-2 font-mono text-[15px] font-bold">{eur(l.price_cents)}</p>
+                    <p className="text-[13px] text-ink-muted">
+                      {cc.country}: {countryName(locale, l.seller_country ?? company.country)}
+                    </p>
+                    <p className="mt-2 font-mono text-[15px] font-bold">{eur(l.price_cents, l.currency)}</p>
                     <p className="font-mono text-[13px] text-ink-muted">
-                      {fill(ui.catalog.terms, { months: String(l.months), down: eur(l.down_payment_cents) })}
+                      {fill(ui.catalog.terms, { months: String(l.months), down: eur(l.down_payment_cents, l.currency) })}
                     </p>
                   </div>
-                  <Link
-                    href={l.my_deal_id ? `${home}/${l.my_deal_id}` : `${home}/listing/${l.listing_id}`}
-                    className={buttonClass({ variant: l.my_deal_id ? 'default' : 'primary', size: 'sm', className: 'self-start' })}
-                  >
-                    {l.my_deal_id ? ui.catalog.myDeal : ui.catalog.open}
-                  </Link>
+                  {/* Сделка — только внутри одной страны (23.11.2026): у объявления другой страны вместо кнопки — пояснение. */}
+                  {(l.same_country ?? true) || l.my_deal_id ? (
+                    <Link
+                      href={l.my_deal_id ? `${home}/${l.my_deal_id}` : `${home}/listing/${l.listing_id}`}
+                      className={buttonClass({ variant: l.my_deal_id ? 'default' : 'primary', size: 'sm', className: 'self-start' })}
+                    >
+                      {l.my_deal_id ? ui.catalog.myDeal : ui.catalog.open}
+                    </Link>
+                  ) : (
+                    <p className="text-[13px] text-ink-muted">
+                      {fill(cc.otherCountry, { country: countryName(locale, l.seller_country ?? company.country) })}
+                    </p>
+                  )}
                 </CardBody>
               </Card>
             ))}

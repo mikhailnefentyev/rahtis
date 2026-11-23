@@ -15,6 +15,7 @@ import { SideNav, TabBar, type NavGroup, type NavItem } from './CabinetNav';
 import { NavIcon } from './NavIcon';
 import { getViewerI18n } from '@/lib/i18n/viewer';
 import { inboxBadgeCount } from '@/lib/inbox/badge';
+import { installmentsAvailable } from '@/lib/installments/access';
 
 /**
  * Каркас кабинета: боковая панель, строка сверху, содержимое.
@@ -46,7 +47,7 @@ export async function CabinetShell({
   ]);
 
   const home = cabinetPath(locale, role);
-  const { groups, primary } = navigation(locale, role, home, t, pending, company?.country === 'FI');
+  const { groups, primary } = navigation(locale, role, home, t, pending, installmentsAvailable(company?.country));
   const count = typeof unread === 'number' ? unread : 0;
 
   const signOut = (
@@ -153,7 +154,7 @@ function navigation(
   home: string,
   t: Dictionary,
   actions = 0,
-  finnish = false,
+  installments = false,
 ): { groups: NavGroup[]; primary: NavItem[] } {
   const overview: NavItem = { href: home, label: t.nav.overview, short: t.nav.overviewShort, icon: 'home', count: actions };
 
@@ -183,7 +184,7 @@ function navigation(
             { href: `/${locale}/carrier/fuel`, label: t.fuel.nav, icon: 'fuel' },
             { href: `/${locale}/carrier/economics`, label: t.economics.nav, icon: 'economics' },
             /* Рассрочка техники (22.11.2026) — по финскому закону и только между финскими компаниями: другим пункт не нужен. */
-            ...(finnish ? [{ href: `/${locale}/carrier/installments`, label: installmentUiCopy(locale).nav, icon: 'billing' as const }] : []),
+            ...(installments ? [{ href: `/${locale}/carrier/installments`, label: installmentUiCopy(locale).nav, icon: 'billing' as const }] : []),
             { href: `/${locale}/carrier/gps`, label: t.gps.nav, icon: 'gps' },
             { href: `/${locale}/carrier/parts`, label: t.parts.nav, icon: 'parts' },
             { href: `/${locale}/carrier/partners`, label: t.partners.title, icon: 'clients' },
@@ -220,7 +221,7 @@ function navigation(
           items: [
             { href: `/${locale}/shipper/vehicles`, label: t.known.title, icon: 'vehicles' },
             /* Продать технику в рассрочку может любая проверенная финская компания, не только перевозчик (решение 23.11.2026). */
-            ...(finnish ? [{ href: `/${locale}/shipper/installments`, label: installmentUiCopy(locale).nav, icon: 'billing' as const }] : []),
+            ...(installments ? [{ href: `/${locale}/shipper/installments`, label: installmentUiCopy(locale).nav, icon: 'billing' as const }] : []),
             { href: `/${locale}/shipper/api`, label: t.api.nav, icon: 'api' },
           ],
         },

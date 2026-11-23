@@ -5845,6 +5845,9 @@ export const lv = {
     'event.installment.no_iban.body': "Nav norādīts jūsu bankas konts (IBAN). Pievienojiet to sadaļā Bankas rekvizīti – pēc tam rēķins pircējam tiks nosūtīts automātiski.",
     'event.installment.terminated': "Nomaksas pirkums izbeigts: {plate}",
     'event.installment.terminated.body': "Pārdevējs ir reģistrējis darījuma izbeigšanu. RAHTIS šim darījumam rēķinus vairs nesagatavo; norēķinu puses veic savā starpā. Iemesls un maksājumu kopsavilkums ir darījuma lapā.",
+    /* Новая техника в рассрочку — перевозчикам своей страны (23.11.2026). {price} — в валюте объявления. */
+    'event.installment.new_listing': "Jauna automašīna pārdošanā uz nomaksu: {make}",
+    'event.installment.new_listing.body': "{class} · {price} bez PVN · {months} mēn. Atveriet sludinājumu cilnē Pārdošanā un iesniedziet piedāvājumu.",
     'event.maintenance.defect': "{plate}: ziņojums par defektu – {area}",
     'event.maintenance.defect_unsafe': "{plate}: NEDRĪKST BRAUKT – {area}",
     'event.maintenance.due': "{count, plural, zero {Apkope: tuvojas # termiņi} one {Apkope: tuvojas # termiņš} other {Apkope: tuvojas # termiņi}}",

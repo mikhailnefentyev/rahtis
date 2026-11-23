@@ -5845,6 +5845,9 @@ export const de = {
     'event.installment.no_iban.body': "Ihre Kontonummer (IBAN) fehlt. Tragen Sie sie unter Bankverbindung ein – die Rechnung wird dann automatisch an den Käufer gesendet.",
     'event.installment.terminated': "Ratenkauf beendet: {plate}",
     'event.installment.terminated.body': "Der Verkäufer hat den Kauf als beendet erfasst. Über RAHTIS werden dazu keine Rechnungen mehr gestellt; die Abrechnung erfolgt zwischen den Parteien. Grund und Zahlungsübersicht finden Sie auf der Seite des Kaufs.",
+    /* Новая техника в рассрочку — перевозчикам своей страны (23.11.2026). {price} — в валюте объявления. */
+    'event.installment.new_listing': "Neues Fahrzeug zum Verkauf auf Raten: {make}",
+    'event.installment.new_listing.body': "{class} · {price} zzgl. USt. · {months} Monate. Öffnen Sie das Angebot im Reiter Zum Verkauf und machen Sie ein Angebot.",
     'event.maintenance.defect': "{plate}: Mangelmeldung – {area}",
     'event.maintenance.defect_unsafe': "{plate}: NICHT FAHRBEREIT – {area}",
     'event.maintenance.due': "{count, plural, one {Wartung: # Termin bald fällig} other {Wartung: # Termine bald fällig}}",

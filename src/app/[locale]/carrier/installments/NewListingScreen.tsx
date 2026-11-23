@@ -11,6 +11,7 @@ import {
   vehicleSellable,
   type InstallmentCabinet,
 } from '@/lib/installments/access';
+import { installmentCountry } from '@/lib/installments/countries';
 import { installmentUiCopy } from '@/lib/installments/copy';
 import { isLocale } from '@/lib/i18n';
 import { getViewerI18n } from '@/lib/i18n/viewer';
@@ -68,7 +69,9 @@ export async function NewListingScreen({
   const [{ locale }, { vehicle }] = await Promise.all([params, searchParams]);
   if (!isLocale(locale)) notFound();
   const viewer = await requireRole(locale, role);
-  if (!installmentsAvailable(viewer.company!.country)) notFound();
+  /* Страна компании — из реестра стран раздела: закрытой стране — «страницы нет»; ставка НДС, валюта и правила — её (23.11.2026). */
+  const country = installmentCountry(viewer.company!.country);
+  if (!installmentsAvailable(viewer.company!.country) || !country) notFound();
   const home = `/${locale}${installmentsBase(role)}`;
   const ui = installmentUiCopy(locale);
   const vehicles = await sellableVehicles(viewer.company!.id, role);
@@ -115,7 +118,7 @@ export async function NewListingScreen({
             id={null}
             vehicles={vehicles}
             vehicleId={selected}
-            defaults={{ price: '', vatMode: CABINET_VAT_MODE, vatBps: 2550, down: '', months: '24', final: '', rate: '0' }}
+            defaults={{ price: '', vatMode: CABINET_VAT_MODE, vatBps: country.vatStandardBps, currency: country.currency, rules: country.rules, down: '', months: '24', final: '', rate: '0' }}
             odometer=""
             description=""
           />

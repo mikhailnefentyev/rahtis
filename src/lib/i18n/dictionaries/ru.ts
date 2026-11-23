@@ -5844,6 +5844,9 @@ export const ru = {
     'event.installment.no_iban.body': "Не указан ваш банковский счёт (IBAN). Добавьте его в разделе «Банковские реквизиты» — после этого счёт уйдёт покупателю автоматически.",
     'event.installment.terminated': "Сделка в рассрочку прекращена: {plate}",
     'event.installment.terminated.body': "Продавец отметил, что сделка прекращена. Счета через RAHTIS больше не выставляются; взаиморасчёт стороны проводят между собой. Причина и сводка платежей — на странице сделки.",
+    /* Новая техника в рассрочку — перевозчикам своей страны (23.11.2026). {price} — в валюте объявления. */
+    'event.installment.new_listing': "Новая машина в продаже в рассрочку: {make}",
+    'event.installment.new_listing.body': "{class} · {price} без НДС · {months} мес. Откройте объявление на вкладке «В продаже» и сделайте предложение.",
     'event.maintenance.defect': "{plate}: сообщение о дефекте — {area}",
     'event.maintenance.defect_unsafe': "{plate}: ЕХАТЬ НЕЛЬЗЯ — {area}",
     'event.maintenance.due': "{count, plural, one {ТО: подходит # срок} few {ТО: подходят # срока} many {ТО: подходят # сроков} other {ТО: подходят # срока}}",

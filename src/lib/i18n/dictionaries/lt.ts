@@ -5847,6 +5847,9 @@ export const lt = {
     'event.installment.no_iban.body': "Nenurodyta jūsų banko sąskaita (IBAN). Įrašykite ją skiltyje „Banko rekvizitai“ – tada sąskaita faktūra pirkėjui bus išsiųsta automatiškai.",
     'event.installment.terminated': "Pirkimas–pardavimas išsimokėtinai nutrauktas: {plate}",
     'event.installment.terminated.body': "Pardavėjas užregistravo sandorio nutraukimą. RAHTIS šio sandorio sąskaitų nebeišrašo; atsiskaitymą šalys atlieka tarpusavyje. Priežastis ir mokėjimų suvestinė pateiktos sandorio puslapyje.",
+    /* Новая техника в рассрочку — перевозчикам своей страны (23.11.2026). {price} — в валюте объявления. */
+    'event.installment.new_listing': "Naujas automobilis parduodamas išsimokėtinai: {make}",
+    'event.installment.new_listing.body': "{class} · {price} be PVM · {months} mėn. Atidarykite skelbimą skirtuke Parduodama ir pateikite pasiūlymą.",
     'event.maintenance.defect': "{plate}: pranešimas apie gedimą – {area}",
     'event.maintenance.defect_unsafe': "{plate}: VAŽIUOTI NEGALIMA – {area}",
     'event.maintenance.due': "{count, plural, one {Priežiūra: artėja # terminas} few {Priežiūra: artėja # terminai} many {Priežiūra: artėja # termino} other {Priežiūra: artėja # terminų}}",

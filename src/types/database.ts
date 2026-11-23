@@ -3270,6 +3270,7 @@ export type Database = {
       installment_deals: {
         Row: {
           credit_note_started_at: string | null
+          currency: string
           buyer_vehicle_id: string | null
           credit_note_id: string | null
           first_invoice_paid_at: string | null
@@ -3308,6 +3309,7 @@ export type Database = {
         }
         Insert: {
           credit_note_started_at?: string | null
+          currency?: string
           buyer_vehicle_id?: string | null
           credit_note_id?: string | null
           first_invoice_paid_at?: string | null
@@ -3346,6 +3348,7 @@ export type Database = {
         }
         Update: {
           credit_note_started_at?: string | null
+          currency?: string
           buyer_vehicle_id?: string | null
           credit_note_id?: string | null
           first_invoice_paid_at?: string | null
@@ -9947,6 +9950,8 @@ export type Database = {
           listing_id: string
           seller_name: string
           seller_city: string | null
+          seller_country: string
+          same_country: boolean
           make: string
           vehicle_class: string
           plate: string
@@ -9970,6 +9975,21 @@ export type Database = {
       propose_installment_terms: { Args: { p_deal_id: string; p_price_cents: number; p_down_payment_cents: number; p_months: number; p_final_cents: number | null; p_annual_rate_bps: number; p_handover_date: string; p_first_due_date: string }; Returns: number }
       accept_installment_terms: { Args: { p_deal_id: string; p_version: number }; Returns: string }
       cancel_installment_deal: { Args: { p_deal_id: string }; Returns: boolean }
+      public_equipment_listings: {
+        Args: never
+        Returns: {
+          make: string
+          vehicle_class: string
+          odometer_km: number | null
+          price_cents: number
+          currency: string
+          down_payment_cents: number
+          months: number
+          country: string
+          published_on: string
+        }[]
+      }
+      announce_equipment_listing: { Args: { p_listing_id: string; p_limit?: number }; Returns: number }
       my_installment_deals: {
         Args: never
         Returns: {
@@ -9981,6 +10001,7 @@ export type Database = {
           plate: string
           status: string
           price_cents: number
+          currency: string
           months: number
           proposed_by_me: boolean
           contract_number: string | null

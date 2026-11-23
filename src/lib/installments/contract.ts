@@ -3,7 +3,9 @@ import 'server-only';
 import { createFormat } from '@/lib/format';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
-import { buildSchedule, thresholds, type VatMode } from './calc';
+import { buildSchedule, type VatMode } from './calc';
+import { installmentCurrency } from './countries';
+import { installmentRules } from './rules';
 import type { ContractPdfInput } from './ContractPdf';
 
 /**
@@ -107,9 +109,17 @@ export function contractInput(d: LoadedDeal): ContractPdfInput | null {
     firstDueDate: deal.first_due_date,
   });
   if ('error' in schedule) return null;
-  const limits = thresholds(schedule);
+  /*
+   * Пороги — по правилам страны сделки (23.11.2026). Этот договор — финский
+   * шаблон (FI_OSAMAKSU): пороги 2 § в нём обязательны, поэтому без правил
+   * страны договора нет. Суммы — в валюте сделки, без пересчёта.
+   */
+  const rules = installmentRules(d.seller.country);
+  if (!rules) return null;
+  const limits = rules.thresholds(schedule);
   const f = createFormat('fi-FI');
-  const eur = (cents: number) => f.money(cents, 'EUR');
+  const currency = deal.currency ?? installmentCurrency(d.seller.country);
+  const eur = (cents: number) => f.money(cents, currency);
   const vatPercent = (deal.vat_bps / 100).toLocaleString('fi-FI', { maximumFractionDigits: 1 });
 
   return {

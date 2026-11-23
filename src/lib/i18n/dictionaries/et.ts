@@ -5806,6 +5806,9 @@ export const et = {
     'event.installment.no_iban.body': "Teie arvelduskonto (IBAN) puudub. Lisage see jaotises Pangaandmed – seejärel saadetakse arve ostjale automaatselt.",
     'event.installment.terminated': "Järelmaksumüük on lõpetatud: {plate}",
     'event.installment.terminated.body': "Müüja on märkinud tehingu lõpetatuks. RAHTIS selle tehingu arveid enam ei koosta; lõpparveldus tehakse poolte vahel. Põhjus ja maksete kokkuvõte on tehingu lehel.",
+    /* Новая техника в рассрочку — перевозчикам своей страны (23.11.2026). {price} — в валюте объявления. */
+    'event.installment.new_listing': "Uus sõiduk müügil järelmaksuga: {make}",
+    'event.installment.new_listing.body': "{class} · {price} käibemaksuta · {months} kuud. Avage kuulutus vahekaardil Müügil ja tehke pakkumine.",
     'event.maintenance.defect': "{plate}: rikketeade – {area}",
     'event.maintenance.defect_unsafe': "{plate}: SÕITA EI TOHI – {area}",
     'event.maintenance.due': "{count, plural, one {Hooldus: # tähtaeg läheneb} other {Hooldus: # tähtaega läheneb}}",

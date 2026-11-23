@@ -35,6 +35,8 @@ const PAGES: { fi: string; en: string; priority: number; updated: string; docs?:
   { fi: '/peravaunun-vaihto', en: '/trailer-swap', priority: 0.8, updated: '2026-11-11' },
   /* Калькулятор рассрочки техники: с 21.11.2026 на всех языках сайта. */
   { fi: '/kuorma-auto-osamaksulla', en: '/truck-installment-sale', priority: 0.7, updated: '2026-11-21' },
+  /* Открытая страница объявлений о технике в рассрочку: на всех языках сайта (23.11.2026). */
+  { fi: '/kalusto-osamaksulla', en: '/equipment-for-sale', priority: 0.7, updated: '2026-11-23' },
   { fi: '/kayttoehdot', en: '/terms', priority: 0.3, updated: '2026-10-01', docs: true },
   { fi: '/tietosuoja', en: '/privacy', priority: 0.3, updated: '2026-10-08', docs: true },
   { fi: '/api-docs', en: '/api-docs', priority: 0.4, updated: '2026-09-29', docs: true },
