@@ -23,11 +23,10 @@ test('у каждой страны платформы есть запись в �
   assert.deepEqual(Object.keys(INSTALLMENT_COUNTRIES).sort(), Object.keys(COUNTRY_PACKS).sort());
 });
 
-test('открыта только Финляндия; остальные страны закрыты, пока нет правил и договора', () => {
-  assert.deepEqual(openInstallmentCountries(), ['FI']);
-  assert.equal(installmentCountryOpen('FI'), true);
-  assert.equal(installmentCountryOpen('fi'), true);
-  for (const country of ['SE', 'NO', 'DK', 'EE', 'LV', 'LT', 'PL', 'DE', 'RO', 'XX', '', null, undefined]) {
+test('открыты Финляндия, Эстония и Латвия (23.11.2026); остальные страны закрыты, пока нет правил и договора', () => {
+  assert.deepEqual(openInstallmentCountries(), ['FI', 'EE', 'LV']);
+  for (const country of ['FI', 'fi', 'EE', 'ee', 'LV', 'lv']) assert.equal(installmentCountryOpen(country), true, country);
+  for (const country of ['SE', 'NO', 'DK', 'LT', 'PL', 'DE', 'RO', 'XX', '', null, undefined]) {
     assert.equal(installmentCountryOpen(country), false, String(country));
     assert.equal(installmentCountry(country), null, String(country));
   }

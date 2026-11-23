@@ -5,7 +5,6 @@ import { after } from 'next/server';
 import { redirect } from 'next/navigation';
 import { getViewer } from '@/lib/auth/viewer';
 import { eurosToCents } from '@/lib/economics/money';
-import { emailLocaleOf } from '@/lib/email/text';
 import { defaultLocale, getDictionary, isLocale, type Locale } from '@/lib/i18n';
 import { notify } from '@/lib/notify';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -23,6 +22,7 @@ import { buildSchedule, type VatMode } from './calc';
 import { fill, installmentUiCopy } from './copy';
 import { installmentCountry } from './countries';
 import { installmentCountryCopy } from './countryCopy';
+import { countryEventCode, countryNoticeLocale } from './countryTexts';
 import { createFirstInvoice } from './firstInvoice';
 import { createCreditNote, ensureSchedule, runInstallments } from './payments';
 
@@ -102,8 +102,8 @@ async function ready() {
     viewer.status === 'ready' &&
     installmentCabinet(kind) !== null &&
     viewer.profile.member_kind !== 'DISPATCHER';
-  /* base — раздел в своём кабинете: туда ведут переходы после действия. */
-  return { viewer, ok: Boolean(ok), base: installmentsBase(kind) };
+  /* base — раздел в своём кабинете: туда ведут переходы после действия. country — страна компании: по ней тексты (23.11.2026). */
+  return { viewer, ok: Boolean(ok), base: installmentsBase(kind), companyCountry: viewer.status === 'ready' ? (viewer.company?.country ?? null) : null };
 }
 
 /*
@@ -120,6 +120,9 @@ function refreshDeal(locale: Locale, dealId: string) {
   for (const base of BASES) revalidatePath(`/${locale}${base}/${dealId}`);
 }
 
+/* События, текст которых в словаре кабинета финский по содержанию (Traficom, закон о рассрочке). */
+const COUNTRY_EVENTS = new Set(['paid_off']);
+
 /** Уведомление второй стороне — на её языке, со ссылкой на сделку. */
 async function tell(
   companyId: string,
@@ -128,14 +131,21 @@ async function tell(
   event: { code: string; params: Record<string, string | number> },
   build: (c: ReturnType<typeof installmentUiCopy>) => { title: string; body: string },
 ) {
-  const { data: other } = await createAdminClient().from('companies').select('id, language, kind').eq('id', companyId).maybeSingle();
+  const { data: other } = await createAdminClient().from('companies').select('id, language, kind, country').eq('id', companyId).maybeSingle();
   if (!other) return;
-  const c = installmentUiCopy(emailLocaleOf(other.language));
+  /*
+   * Стороны сделки — из одной страны, поэтому страна получателя и есть страна
+   * сделки (23.11.2026). У Финляндии всё как было: язык fi/en и прежний код.
+   * У другой страны текст — про её право и на языке компании, а у события,
+   * чей текст зависит от страны (полная оплата), — свой код: кабинет покажет
+   * записанный текст, а не финский из словаря.
+   */
+  const c = installmentUiCopy(countryNoticeLocale(other.language, other.country), other.country);
   const { title, body } = build(c);
   await notify({
     companyId: other.id,
     kind: 'BILLING',
-    code: `installment.${event.code}`,
+    code: COUNTRY_EVENTS.has(event.code) ? countryEventCode(event.code, other.country) : `installment.${event.code}`,
     params: event.params,
     title,
     body,
@@ -176,8 +186,9 @@ function announceAfter(listingId: string) {
 
 export async function saveListingAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
   const locale = toLocale(fd.get('locale'));
-  const c = installmentUiCopy(locale);
-  const { viewer, ok, base } = await ready();
+  const { viewer, ok, base, companyCountry } = await ready();
+  /* Тексты — про право страны компании (она же страна сделки: сделка всегда внутри одной страны). */
+  const c = installmentUiCopy(locale, companyCountry);
   /* Страна продавца — из реестра стран раздела (23.11.2026): закрытая страна объявлений не создаёт. */
   const country = installmentCountry(viewer.status === 'ready' ? viewer.company?.country : null);
   if (!ok || !country) return { error: c.notAllowed, saved: false };
@@ -218,8 +229,9 @@ export async function saveListingAction(_prev: ActionState, fd: FormData): Promi
 
 export async function setListingStatusAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
   const locale = toLocale(fd.get('locale'));
-  const c = installmentUiCopy(locale);
-  const { ok } = await ready();
+  const { ok, companyCountry } = await ready();
+  /* Тексты — про право страны компании (она же страна сделки: сделка всегда внутри одной страны). */
+  const c = installmentUiCopy(locale, companyCountry);
   if (!ok) return failed(c.notAllowed);
   const status = str(fd, 'status');
   if (status !== 'PUBLISHED' && status !== 'WITHDRAWN') return failed(c.deal.error);
@@ -253,8 +265,9 @@ export async function setListingStatusAction(_prev: ActionState, fd: FormData): 
 
 export async function startDealAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
   const locale = toLocale(fd.get('locale'));
-  const c = installmentUiCopy(locale);
-  const { viewer, ok, base } = await ready();
+  const { viewer, ok, base, companyCountry } = await ready();
+  /* Тексты — про право страны компании (она же страна сделки: сделка всегда внутри одной страны). */
+  const c = installmentUiCopy(locale, companyCountry);
   if (!ok || viewer.status !== 'ready' || !viewer.company) return { error: c.notAllowed, saved: false };
 
   /* Новая сделка — только с обычным НДС (решение 22.11.2026): по старому объявлению с другим режимом предложение не принимается. */
@@ -293,8 +306,9 @@ export async function startDealAction(_prev: ActionState, fd: FormData): Promise
 
 export async function proposeTermsAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
   const locale = toLocale(fd.get('locale'));
-  const c = installmentUiCopy(locale);
-  const { viewer, ok } = await ready();
+  const { viewer, ok, companyCountry } = await ready();
+  /* Тексты — про право страны компании (она же страна сделки: сделка всегда внутри одной страны). */
+  const c = installmentUiCopy(locale, companyCountry);
   if (!ok || viewer.status !== 'ready' || !viewer.company) return { error: c.notAllowed, saved: false };
 
   /* Уже начатая сделка идёт со своим режимом НДС до конца — режим здесь нужен только калькулятору, в базе он не меняется. */
@@ -332,8 +346,9 @@ export async function proposeTermsAction(_prev: ActionState, fd: FormData): Prom
 
 export async function acceptTermsAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
   const locale = toLocale(fd.get('locale'));
-  const c = installmentUiCopy(locale);
-  const { viewer, ok } = await ready();
+  const { viewer, ok, companyCountry } = await ready();
+  /* Тексты — про право страны компании (она же страна сделки: сделка всегда внутри одной страны). */
+  const c = installmentUiCopy(locale, companyCountry);
   if (!ok || viewer.status !== 'ready' || !viewer.company) return { error: c.notAllowed, saved: false };
   const dealId = str(fd, 'deal_id');
 
@@ -373,8 +388,9 @@ export async function acceptTermsAction(_prev: ActionState, fd: FormData): Promi
 /** Повторить первый счёт (например, после того как продавец указал IBAN). */
 export async function retryFirstInvoiceAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
   const locale = toLocale(fd.get('locale'));
-  const c = installmentUiCopy(locale);
-  const { viewer, ok } = await ready();
+  const { viewer, ok, companyCountry } = await ready();
+  /* Тексты — про право страны компании (она же страна сделки: сделка всегда внутри одной страны). */
+  const c = installmentUiCopy(locale, companyCountry);
   if (!ok || viewer.status !== 'ready' || !viewer.company) return failed(c.notAllowed);
   const dealId = str(fd, 'deal_id');
   /* Доступ — чтением под сессией (сделку видят только стороны); выставляет счёт только продавец. */
@@ -400,8 +416,9 @@ export async function retryFirstInvoiceAction(_prev: ActionState, fd: FormData):
 
 export async function cancelDealAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
   const locale = toLocale(fd.get('locale'));
-  const c = installmentUiCopy(locale);
-  const { viewer, ok } = await ready();
+  const { viewer, ok, companyCountry } = await ready();
+  /* Тексты — про право страны компании (она же страна сделки: сделка всегда внутри одной страны). */
+  const c = installmentUiCopy(locale, companyCountry);
   if (!ok || viewer.status !== 'ready' || !viewer.company) return failed(c.notAllowed);
   const dealId = str(fd, 'deal_id');
   const supabase = await createClient();
@@ -430,8 +447,9 @@ export async function cancelDealAction(_prev: ActionState, fd: FormData): Promis
 /** Продавец отмечает оплату первого счёта (деньги пришли на его счёт). */
 export async function markFirstPaidAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
   const locale = toLocale(fd.get('locale'));
-  const c = installmentUiCopy(locale);
-  const { ok } = await ready();
+  const { ok, companyCountry } = await ready();
+  /* Тексты — про право страны компании (она же страна сделки: сделка всегда внутри одной страны). */
+  const c = installmentUiCopy(locale, companyCountry);
   if (!ok) return failed(c.notAllowed);
   const dealId = str(fd, 'deal_id');
   const supabase = await createClient();
@@ -444,8 +462,9 @@ export async function markFirstPaidAction(_prev: ActionState, fd: FormData): Pro
 /** Подтверждение передачи своей стороной; после второго — график и уведомление обеим сторонам. */
 export async function confirmHandoverAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
   const locale = toLocale(fd.get('locale'));
-  const c = installmentUiCopy(locale);
-  const { viewer, ok } = await ready();
+  const { viewer, ok, companyCountry } = await ready();
+  /* Тексты — про право страны компании (она же страна сделки: сделка всегда внутри одной страны). */
+  const c = installmentUiCopy(locale, companyCountry);
   if (!ok || viewer.status !== 'ready' || !viewer.company) return { error: c.notAllowed, saved: false };
   const dealId = str(fd, 'deal_id');
   const checked = fd.getAll('check').length;
@@ -490,8 +509,9 @@ export async function confirmHandoverAction(_prev: ActionState, fd: FormData): P
 /** Продавец отмечает оплату взноса; последний — сделка выплачена. */
 export async function markPaidAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
   const locale = toLocale(fd.get('locale'));
-  const c = installmentUiCopy(locale);
-  const { ok } = await ready();
+  const { ok, companyCountry } = await ready();
+  /* Тексты — про право страны компании (она же страна сделки: сделка всегда внутри одной страны). */
+  const c = installmentUiCopy(locale, companyCountry);
   if (!ok) return failed(c.notAllowed);
   const dealId = str(fd, 'deal_id');
   const n = Number(str(fd, 'n'));
@@ -521,8 +541,9 @@ export async function markPaidAction(_prev: ActionState, fd: FormData): Promise<
 /** Отмена согласованной сделки после первого счёта (до передачи) — с кредит-нотой; отменяет только продавец. */
 export async function cancelWithCreditAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
   const locale = toLocale(fd.get('locale'));
-  const c = installmentUiCopy(locale);
-  const { viewer, ok } = await ready();
+  const { viewer, ok, companyCountry } = await ready();
+  /* Тексты — про право страны компании (она же страна сделки: сделка всегда внутри одной страны). */
+  const c = installmentUiCopy(locale, companyCountry);
   if (!ok || viewer.status !== 'ready' || !viewer.company) return failed(c.notAllowed);
   const dealId = str(fd, 'deal_id');
   const supabase = await createClient();
@@ -555,8 +576,9 @@ export async function cancelWithCreditAction(_prev: ActionState, fd: FormData): 
 /** Повторить кредит-ноту, если она не вышла сразу (только продавец). */
 export async function retryCreditNoteAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
   const locale = toLocale(fd.get('locale'));
-  const c = installmentUiCopy(locale);
-  const { viewer, ok } = await ready();
+  const { viewer, ok, companyCountry } = await ready();
+  /* Тексты — про право страны компании (она же страна сделки: сделка всегда внутри одной страны). */
+  const c = installmentUiCopy(locale, companyCountry);
   if (!ok || viewer.status !== 'ready' || !viewer.company) return failed(c.notAllowed);
   const dealId = str(fd, 'deal_id');
   const supabase = await createClient();
@@ -591,8 +613,9 @@ type TerminateRpc = {
  */
 export async function terminateDealAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
   const locale = toLocale(fd.get('locale'));
-  const c = installmentUiCopy(locale);
-  const { viewer, ok } = await ready();
+  const { viewer, ok, companyCountry } = await ready();
+  /* Тексты — про право страны компании (она же страна сделки: сделка всегда внутри одной страны). */
+  const c = installmentUiCopy(locale, companyCountry);
   if (!ok || viewer.status !== 'ready' || !viewer.company) return failed(c.notAllowed);
   const dealId = str(fd, 'deal_id');
   const reason = str(fd, 'reason');
@@ -635,8 +658,9 @@ export async function terminateDealAction(_prev: ActionState, fd: FormData): Pro
  */
 export async function saveSaleVehicleAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
   const locale = toLocale(fd.get('locale'));
-  const c = installmentUiCopy(locale);
-  const { ok, base } = await ready();
+  const { ok, base, companyCountry } = await ready();
+  /* Тексты — про право страны компании (она же страна сделки: сделка всегда внутри одной страны). */
+  const c = installmentUiCopy(locale, companyCountry);
   if (!ok) return failed(c.notAllowed);
   const input = parseSaleVehicle({
     plate: str(fd, 'plate'),
@@ -682,8 +706,9 @@ export async function saveSaleVehicleAction(_prev: ActionState, fd: FormData): P
 /** Отправить карточку машины на продажу оператору на проверку. */
 export async function submitSaleVehicleAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
   const locale = toLocale(fd.get('locale'));
-  const c = installmentUiCopy(locale);
-  const { ok } = await ready();
+  const { ok, companyCountry } = await ready();
+  /* Тексты — про право страны компании (она же страна сделки: сделка всегда внутри одной страны). */
+  const c = installmentUiCopy(locale, companyCountry);
   if (!ok) return failed(c.notAllowed);
   const supabase = await createClient();
   const { error } = await supabase.rpc('submit_equipment_sale_vehicle', { p_id: str(fd, 'id') });

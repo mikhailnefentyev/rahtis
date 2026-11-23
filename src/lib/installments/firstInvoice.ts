@@ -1,17 +1,17 @@
 import 'server-only';
 
 import { renderToBuffer } from '@react-pdf/renderer';
-import { todayInHelsinki } from '@/lib/dates';
 import { sendEmail } from '@/lib/email';
 import { createFormat } from '@/lib/format';
 import { asCurrency } from '@/lib/money/currency';
-import { finnishReference } from '@/lib/sites/invoice';
+import { paymentReference } from '@/lib/sites/invoice';
 import { SiteInvoicePdf } from '@/lib/sites/SiteInvoicePdf';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { ibanHoldActive } from '@/lib/trust/changes';
 import { lastIbanChange } from '@/lib/trust/sensitive';
 import { firstInvoiceSettledAtIssue, vatOf, type VatMode } from './calc';
-import { installmentCountryEntry } from './countries';
+import { installmentCountryEntry, installmentToday } from './countries';
+import { documentKind, documentLabels, invoiceTexts } from './invoiceTexts';
 
 /**
  * Первый счёт продавца по согласованной сделке (22.11.2026).
@@ -34,6 +34,14 @@ import { installmentCountryEntry } from './countries';
  * всегда, и такого счёта не бывает.
  *
  * Счёт от имени продавца, деньги идут продавцу; RAHTIS их не принимает.
+ *
+ * 23.11.2026: тот же счёт выставляется в Эстонии и Латвии — там НДС тоже
+ * возникает со всей цены при передаче, а аванс облагается в оплаченной
+ * части (KMS § 11; PVN likums 120. p.). Отличаются тексты и подписи (язык
+ * страны с английским, свои ссылки на закон — invoiceTexts.ts), ссылка
+ * платежа (RF вместо финского viitenumero) и «сегодня» (пояс страны).
+ * Страна продавца записывается в счёт (seller.country): повторная печать
+ * берёт её оттуда; у счетов до этой даты её нет — они финские.
  */
 
 const BUCKET = 'reports';
@@ -42,23 +50,14 @@ const DRAFT_PREFIX = 'DRAFT-';
 
 export type FirstInvoiceStatus = 'SENT' | 'CREATED' | 'EXISTS' | 'NO_IBAN' | 'IBAN_RECENT' | 'NO_EMAIL' | 'NOT_FOUND';
 
-const fiDate = (iso: string) => {
-  const [y, m, d] = iso.split('-');
-  return `${Number(d)}.${Number(m)}.${y}`;
-};
-
 const addDays = (iso: string, days: number) => {
   const d = new Date(`${iso}T12:00:00Z`);
   d.setUTCDate(d.getUTCDate() + days);
   return d.toISOString().slice(0, 10);
 };
 
-const VAT_NOTE: Record<VatMode, string> = {
-  STANDARD: '',
-  MARGIN: 'Voittomarginaalijärjestelmä – käytetyt tavarat. / Margin scheme – second-hand goods.',
-  EXEMPT: 'Veroton myynti, AVL 61 §. / VAT-exempt sale, VAT Act s. 61.',
-  NONE: 'Myyjä ei ole arvonlisäverovelvollinen. / The seller is not VAT-registered.',
-};
+/** Страна продавца, записанная в счёт; у счетов до 23.11.2026 её нет — они финские. */
+const sellerCountry = (seller: unknown) => (seller as { country?: string | null } | null)?.country ?? 'FI';
 
 export async function createFirstInvoice(dealId: string): Promise<FirstInvoiceStatus> {
   const admin = createAdminClient();
@@ -69,19 +68,20 @@ export async function createFirstInvoice(dealId: string): Promise<FirstInvoiceSt
   if (deal.first_invoice_id) {
     const { data: existing } = await admin
       .from('carrier_invoices')
-      .select('id, company_id, number, issued_on, file_path, sent_at, vat_cents')
+      .select('id, company_id, number, issued_on, file_path, sent_at, vat_cents, seller')
       .eq('id', deal.first_invoice_id)
       .maybeSingle();
     if (!existing) return 'NOT_FOUND';
-    if (!existing.number.startsWith(DRAFT_PREFIX)) await settleIfNothingDue(deal.id, existing.id, deal.down_payment_cents, existing.vat_cents);
+    const country = sellerCountry(existing.seller);
+    if (!existing.number.startsWith(DRAFT_PREFIX)) await settleIfNothingDue(deal.id, existing.id, deal.down_payment_cents, existing.vat_cents, country);
     if (existing.file_path && existing.sent_at) return 'EXISTS';
     /*
      * Процесс оборвался после закрепления счёта, но до номера: раньше
      * повтор навсегда упирался в NOT_FOUND у deliver (22.11.2026).
      */
     if (existing.number.startsWith(DRAFT_PREFIX)) {
-      await assignNumber(existing.id, existing.company_id, existing.issued_on);
-      await settleIfNothingDue(deal.id, existing.id, deal.down_payment_cents, existing.vat_cents);
+      await assignNumber(existing.id, existing.company_id, existing.issued_on, country);
+      await settleIfNothingDue(deal.id, existing.id, deal.down_payment_cents, existing.vat_cents, country);
     }
     return deliver(existing.id, deal);
   }
@@ -116,7 +116,9 @@ export async function createFirstInvoice(dealId: string): Promise<FirstInvoiceSt
   const vatMode = deal.vat_mode as VatMode;
   const netCents = deal.price_cents;
   const vatCents = vatOf(netCents, vatMode, deal.vat_bps);
-  const issuedOn = todayInHelsinki();
+  /* «Сегодня» — по часовому поясу страны продавца (у Финляндии — Хельсинки, как было). */
+  const issuedOn = installmentToday(seller.country);
+  const tx = invoiceTexts(seller.country);
   /* Оплата до передачи: срок — накануне передачи, но не раньше сегодняшнего дня. */
   const dayBefore = addDays(deal.handover_date, -1);
   const dueOn = dayBefore > issuedOn ? dayBefore : issuedOn;
@@ -132,9 +134,9 @@ export async function createFirstInvoice(dealId: string): Promise<FirstInvoiceSt
   const lines = [
     {
       date: deal.handover_date,
-      text: `${what} – kauppahinta, osamaksusopimus nro ${deal.contract_number} / purchase price, hire-purchase contract`,
+      text: tx.first.line({ what, contract: deal.contract_number }),
       quantity: 1,
-      unit: 'kpl',
+      unit: tx.unit,
       unitCents: netCents,
       amountCents: netCents,
     },
@@ -160,6 +162,7 @@ export async function createFirstInvoice(dealId: string): Promise<FirstInvoiceSt
         iban: seller.iban,
         address: sellerAddress,
         email: seller.billing_email || seller.contact_email,
+        country: seller.country,
       },
       customer: {
         name: buyer.legal_name || buyer.name,
@@ -196,14 +199,14 @@ export async function createFirstInvoice(dealId: string): Promise<FirstInvoiceSt
 
   /* Номер не выдан или не записан — счёт без номера не оставляем: снять закрепление и удалить, повтор начнёт заново. */
   try {
-    await assignNumber(invoice.id, seller.id, issuedOn);
+    await assignNumber(invoice.id, seller.id, issuedOn, seller.country);
   } catch (cause) {
     await admin.from('installment_deals').update({ first_invoice_id: null }).eq('id', deal.id);
     await admin.from('carrier_invoices').delete().eq('id', invoice.id);
     throw cause;
   }
 
-  await settleIfNothingDue(deal.id, invoice.id, deal.down_payment_cents, vatCents);
+  await settleIfNothingDue(deal.id, invoice.id, deal.down_payment_cents, vatCents, seller.country);
   return deliver(invoice.id, deal);
 }
 
@@ -213,7 +216,7 @@ export async function createFirstInvoice(dealId: string): Promise<FirstInvoiceSt
  * (22.11.2026). Только «где пусто» и только у согласованной сделки:
  * повтор ничего не перепишет.
  */
-async function settleIfNothingDue(dealId: string, invoiceId: string, downPaymentCents: number, vatCents: number): Promise<void> {
+async function settleIfNothingDue(dealId: string, invoiceId: string, downPaymentCents: number, vatCents: number, country: string | null): Promise<void> {
   if (!firstInvoiceSettledAtIssue(downPaymentCents, vatCents)) return;
   const admin = createAdminClient();
   const { error } = await admin
@@ -223,8 +226,8 @@ async function settleIfNothingDue(dealId: string, invoiceId: string, downPayment
     .eq('status', 'AGREED')
     .is('first_invoice_paid_at', null);
   if (error) throw new Error(`первый счёт без суммы к оплате: ${error.message}`);
-  /* paid_at у счёта — дата: день по Хельсинки. */
-  await admin.from('carrier_invoices').update({ paid_at: todayInHelsinki() }).eq('id', invoiceId).is('paid_at', null);
+  /* paid_at у счёта — дата: день по времени страны продавца (у Финляндии — Хельсинки). */
+  await admin.from('carrier_invoices').update({ paid_at: installmentToday(country) }).eq('id', invoiceId).is('paid_at', null);
 }
 
 /**
@@ -232,7 +235,7 @@ async function settleIfNothingDue(dealId: string, invoiceId: string, downPayment
  * ещё DRAFT-…»: параллельный повтор не перепишет уже выданный номер.
  * Ошибка записи не глотается: без номера счёт не печатается.
  */
-async function assignNumber(invoiceId: string, sellerId: string, issuedOn: string): Promise<void> {
+async function assignNumber(invoiceId: string, sellerId: string, issuedOn: string, country: string | null): Promise<void> {
   const admin = createAdminClient();
   const { data: number, error: numberError } = await admin.rpc('next_carrier_invoice_number', {
     p_company_id: sellerId,
@@ -241,7 +244,8 @@ async function assignNumber(invoiceId: string, sellerId: string, issuedOn: strin
   if (numberError || !number) throw new Error(`номер счёта: ${numberError?.message}`);
   const { error } = await admin
     .from('carrier_invoices')
-    .update({ number, reference: finnishReference(number) })
+    /* Ссылка платежа: финскому продавцу — viitenumero, остальным — международная RF (ISO 11649). */
+    .update({ number, reference: paymentReference(number, country) })
     .eq('id', invoiceId)
     .like('number', `${DRAFT_PREFIX}%`);
   if (error) throw new Error(`номер счёта не записан: ${error.message}`);
@@ -261,9 +265,15 @@ type Deal = {
 /** PDF и письмо по уже записанному счёту — и при первом выставлении, и при повторе. */
 async function deliver(invoiceId: string, deal: Deal): Promise<FirstInvoiceStatus> {
   const admin = createAdminClient();
-  const f = createFormat('fi-FI');
   const { data: inv } = await admin.from('carrier_invoices').select('*').eq('id', invoiceId).maybeSingle();
   if (!inv || inv.number.startsWith(DRAFT_PREFIX)) return 'NOT_FOUND';
+  /* Тексты, подписи и вид чисел — по стране продавца, записанной в счёте. */
+  const country = sellerCountry(inv.seller);
+  const tx = invoiceTexts(country);
+  const f = createFormat(tx.intl);
+  const fiDate = tx.date;
+  /* Латвия с 2028 года: PDF счётом быть перестаёт — документ выходит платёжным уведомлением (invoiceTexts.ts). */
+  const notice = documentKind(country, inv.issued_on) === 'NOTICE' ? tx.notice : null;
 
   const seller = inv.seller as { name: string; business_id: string; vat_id: string | null; iban: string; address: string; email: string };
   const customer = inv.customer as { name: string; business_id: string | null; vat_id: string | null; address: string; email: string };
@@ -275,15 +285,19 @@ async function deliver(invoiceId: string, deal: Deal): Promise<FirstInvoiceStatu
   const restCents = deal.price_cents - deal.down_payment_cents;
   const what = lines[0]?.text.split(' – ')[0] ?? '';
 
-  const vatLabel =
-    vatMode === 'STANDARD'
-      ? `ALV / VAT ${(deal.vat_bps / 100).toLocaleString('fi-FI', { maximumFractionDigits: 1 })} %`
-      : 'ALV / VAT 0 %';
+  const vatLabel = tx.vatLabel(
+    vatMode === 'STANDARD' ? (deal.vat_bps / 100).toLocaleString(tx.intl, { maximumFractionDigits: 1 }) : null,
+  );
   const note = [
-    `Osamaksukauppa: koko kauppahinnan arvonlisävero laskutetaan tällä laskulla. Maksettava nyt: käsiraha ${f.money(deal.down_payment_cents, currency)} + arvonlisävero ${f.money(inv.vat_cents, currency)}. Loppuosa ${f.money(restCents, currency)} maksetaan ${deal.months} erässä osamaksusopimuksen nro ${deal.contract_number} mukaisesti; erät eivät sisällä arvonlisäveroa. Omistusoikeus säilyy myyjällä, kunnes kauppahinta on kokonaan maksettu. Ajoneuvo luovutetaan, kun tämä lasku on maksettu.`,
-    `Hire-purchase: VAT on the whole price is invoiced on this invoice. Due now: down payment + VAT. The remainder is paid in ${deal.months} instalments under contract ${deal.contract_number}, without VAT. The seller retains ownership until the price is paid in full. The vehicle is handed over once this invoice is paid.`,
-    VAT_NOTE[vatMode],
-    'Laskuttaja on myyjä; RAHTIS (Aivomaa Oy) ei ole kaupan osapuoli eikä vastaanota maksua. / Issued by the seller; RAHTIS (Aivomaa Oy) is not a party to the sale and does not receive the payment.',
+    notice?.note,
+    tx.first.note({
+      down: f.money(deal.down_payment_cents, currency),
+      vat: f.money(inv.vat_cents, currency),
+      rest: f.money(restCents, currency),
+      months: deal.months,
+      contract: deal.contract_number ?? '',
+      vatMode,
+    }),
   ]
     .filter(Boolean)
     .join('\n');
@@ -297,9 +311,9 @@ async function deliver(invoiceId: string, deal: Deal): Promise<FirstInvoiceStatu
       seller: { name: seller.name, businessId: seller.business_id, vatId: seller.vat_id, address: seller.address, iban: seller.iban, email: seller.email },
       customer: { name: customer.name, businessId: customer.business_id, vatId: customer.vat_id, address: customer.address },
       job: `${what} · ${deal.contract_number}`,
-      jobLabel: ['Kaupan kohde', 'Item sold'],
+      jobLabel: tx.first.jobLabel,
       period: fiDate(deal.handover_date),
-      periodLabel: ['Luovutus', 'Handover'],
+      periodLabel: tx.first.periodLabel,
       lines: lines.map((l) => ({
         date: fiDate(l.date),
         text: l.text,
@@ -312,8 +326,11 @@ async function deliver(invoiceId: string, deal: Deal): Promise<FirstInvoiceStatu
       vatLabel,
       vat: f.money(inv.vat_cents, currency),
       total: f.money(inv.total_cents, currency),
-      payNow: { label: ['Maksettava nyt', 'Due now'], amount: f.money(payNowCents, currency) },
+      payNow: { label: tx.first.payNowLabel, amount: f.money(payNowCents, currency) },
       note,
+      labels: documentLabels(tx, Boolean(notice)),
+      title: notice?.title,
+      docName: notice?.docName,
     }),
   );
 
@@ -322,28 +339,26 @@ async function deliver(invoiceId: string, deal: Deal): Promise<FirstInvoiceStatu
   if (upload) throw new Error(`загрузка счёта: ${upload.message}`);
   await admin.from('carrier_invoices').update({ file_path: path }).eq('id', inv.id);
 
-  const mailText = [
-    'Hei,',
-    '',
-    `liitteenä osamaksukaupan ensimmäinen lasku ${inv.number} (sopimus ${deal.contract_number}, ${what}). Laskuttaja: ${seller.name}.`,
-    `Maksettava nyt ${f.money(payNowCents, currency)} (käsiraha ja koko kauppahinnan arvonlisävero), eräpäivä ${fiDate(inv.due_on)}.`,
-    `Tilinumero (IBAN) ${seller.iban}, viitenumero ${inv.reference}.`,
-    'Maksu suoritetaan suoraan myyjälle, ei RAHTIS-palvelulle eikä Aivomaa Oy:lle.',
-    '',
-    `Kysymykset: vastatkaa tähän viestiin (${seller.email}).`,
-    '',
-    '—',
-    `Attached is the first invoice ${inv.number} of the hire-purchase contract ${deal.contract_number} (${what}) from ${seller.name}. Due now ${f.money(payNowCents, currency)} (down payment and VAT on the whole price), due date ${fiDate(inv.due_on)}, IBAN ${seller.iban}, reference ${inv.reference}. Pay the seller directly, not RAHTIS or Aivomaa Oy.`,
-  ].join('\n');
+  const mailText = tx.first.mailText({
+    number: inv.number,
+    contract: deal.contract_number ?? '',
+    what,
+    seller: seller.name,
+    sellerEmail: seller.email,
+    payNow: f.money(payNowCents, currency),
+    due: fiDate(inv.due_on),
+    iban: seller.iban,
+    reference: inv.reference,
+  });
 
   const mail = await sendEmail({
     template: 'installment_first_invoice',
     to: customer.email,
     toName: customer.name,
     replyTo: seller.email,
-    subject: `Lasku ${inv.number} · ${seller.name} · osamaksusopimus ${deal.contract_number}`,
+    subject: tx.first.mailSubject({ number: inv.number, seller: seller.name, contract: deal.contract_number ?? '' }),
     text: mailText,
-    attachments: [{ bucket: BUCKET, path, filename: `Lasku-${inv.number}.pdf` }],
+    attachments: [{ bucket: BUCKET, path, filename: `${tx.filePrefix}-${inv.number}.pdf` }],
     companyId: inv.company_id,
   });
 

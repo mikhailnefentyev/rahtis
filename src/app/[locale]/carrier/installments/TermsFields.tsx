@@ -105,7 +105,8 @@ export function TermsFields({
         <Field label={ui.listing.final}>
           {(p) => <Input {...p} name="final" inputMode="decimal" value={final} onChange={(e) => setFinal(e.target.value)} />}
         </Field>
-        <Field label={ui.listing.rate} hint={calc.f.rateHint}>
+        {/* Подсказка у процентов — по стране сделки, если у неё свой текст (23.11.2026). */}
+        <Field label={ui.listing.rate} hint={ui.country?.rateHint ?? calc.f.rateHint}>
           {(p) => <Input {...p} name="rate" inputMode="decimal" value={rate} onChange={(e) => setRate(e.target.value)} />}
         </Field>
         {withDates && (
@@ -133,7 +134,7 @@ export function TermsFields({
             <Row label={calc.r.priceWithVat} value={eur(result.s.installmentPriceCents)} />
             {result.t && (
               <p className="mt-2 text-[13px] text-ink-muted">
-                {fill(calc.r.thresholdsText, {
+                {fill(ui.country?.thresholdsText ?? calc.r.thresholdsText, {
                   tenth: eur(result.t.tenthCents),
                   twentieth: eur(result.t.twentiethCents),
                   needed: String(result.t.installmentsNeeded),

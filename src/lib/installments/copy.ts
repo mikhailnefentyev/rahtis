@@ -7,14 +7,24 @@ import { ui as pl } from './i18n/pl';
 import { ui as de } from './i18n/de';
 import { ui as ru } from './i18n/ru';
 import { ui as ro } from './i18n/ro';
+import { withCountryTexts, type InstallmentCountryExtras } from './countryTexts';
 
 /**
  * Тексты раздела «Продажа техники в рассрочку» в кабинете (22.11.2026).
  * Сделка — только между финскими компаниями, но интерфейс на всех языках
  * кабинета (21.11.2026: русскоязычный перевозчик видел английский).
  * Договор всегда на финском — по финскому закону о рассрочке.
+ *
+ * 23.11.2026: раздел открыт в Эстонии и Латвии. Тексты ниже и в i18n/* —
+ * финские по содержанию (финский закон, Traficom) и не менялись; для другой
+ * страны installmentUiCopy(locale, country) подменяет то, что зависит от
+ * права страны (countryTexts/), и добавляет раздел country — пороги,
+ * оговорки о счёте и о договоре. Договор — на языке страны продавца.
  */
-export type InstallmentUiCopy = typeof fi;
+export type InstallmentUiCopy = typeof fi & {
+  /** Только у сделки или компании не из Финляндии: тексты, которых в основном наборе нет. */
+  country?: InstallmentCountryExtras;
+};
 
 const fi = {
   nav: 'Kalusto osamaksulla',
@@ -424,8 +434,14 @@ const en: InstallmentUiCopy = {
 
 const BY_LOCALE: Record<Locale, InstallmentUiCopy> = { fi, en, sv, et, lv, lt, pl, de, ru, ro };
 
-export function installmentUiCopy(locale: Locale | string): InstallmentUiCopy {
-  return BY_LOCALE[locale as Locale] ?? en;
+/**
+ * Тексты раздела. country — страна сделки (страна продавца) или, где сделки
+ * ещё нет, страна компании зрителя. Без страны и для Финляндии — основной
+ * набор, тот же объект, что и раньше.
+ */
+export function installmentUiCopy(locale: Locale | string, country?: string | null): InstallmentUiCopy {
+  const base = BY_LOCALE[locale as Locale] ?? en;
+  return withCountryTexts(base, Object.prototype.hasOwnProperty.call(BY_LOCALE, locale) ? locale : 'en', country);
 }
 
 export const fill = (text: string, values: Record<string, string>) =>

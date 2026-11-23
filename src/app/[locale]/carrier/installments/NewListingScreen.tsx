@@ -17,6 +17,7 @@ import { isLocale } from '@/lib/i18n';
 import { getViewerI18n } from '@/lib/i18n/viewer';
 import { installmentCopy } from '@/lib/landing/installment';
 import { createClient } from '@/lib/supabase/server';
+import { LegalNotice } from './LegalNotice';
 import { ListingForm } from './ListingForm';
 
 export async function newListingMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
@@ -73,7 +74,8 @@ export async function NewListingScreen({
   const country = installmentCountry(viewer.company!.country);
   if (!installmentsAvailable(viewer.company!.country) || !country) notFound();
   const home = `/${locale}${installmentsBase(role)}`;
-  const ui = installmentUiCopy(locale);
+  /* Тексты — про право страны компании-продавца (23.11.2026). */
+  const ui = installmentUiCopy(locale, viewer.company!.country);
   const vehicles = await sellableVehicles(viewer.company!.id, role);
   /* Продавать нечего — объяснение вместо «страницы нет»; компании без парка — сразу кнопка «добавить машину». */
   if (!vehicles.length) {
@@ -109,6 +111,7 @@ export async function NewListingScreen({
   return (
     <main className="cab-page flex flex-col gap-4">
       <h1 className="page-title">{ui.listing.newTitle}</h1>
+      <LegalNotice ui={ui} locale={locale} />
       <Card>
         <CardBody>
           <ListingForm

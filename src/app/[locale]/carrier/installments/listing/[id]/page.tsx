@@ -5,14 +5,14 @@ import { Card, CardBody } from '@/components/ui';
 import { requireRole } from '@/lib/auth/guard';
 import { addMonths, type VatMode } from '@/lib/installments/calc';
 import { installmentsAvailable, vatModeAllowedForNew } from '@/lib/installments/access';
-import { installmentCurrency } from '@/lib/installments/countries';
+import { installmentCurrency, installmentToday } from '@/lib/installments/countries';
 import { countryName, installmentCountryCopy } from '@/lib/installments/countryCopy';
 import { installmentRules } from '@/lib/installments/rules';
+import { LegalNotice } from '../../LegalNotice';
 import { fill, installmentUiCopy } from '@/lib/installments/copy';
 import { isLocale } from '@/lib/i18n';
 import { installmentCopy } from '@/lib/landing/installment';
 import { createClient } from '@/lib/supabase/server';
-import { todayInHelsinki } from '@/lib/dates';
 import { OfferForm } from '../../DealForms';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
@@ -32,7 +32,6 @@ export default async function ListingPage({ params }: { params: Promise<{ locale
   if (!isLocale(locale)) notFound();
   const viewer = await requireRole(locale, 'CARRIER');
   if (!installmentsAvailable(viewer.company!.country)) notFound();
-  const ui = installmentUiCopy(locale);
   const supabase = await createClient();
   const { data: catalog } = await supabase.rpc('equipment_catalog');
   const l = (catalog ?? []).find((x) => x.listing_id === id);
@@ -44,10 +43,12 @@ export default async function ListingPage({ params }: { params: Promise<{ locale
    */
   const sellerCountry = l.seller_country ?? viewer.company!.country;
   const sameCountry = l.same_country ?? true;
+  /* Тексты — про право страны продавца: по нему будет договор (23.11.2026). */
+  const ui = installmentUiCopy(locale, sellerCountry);
   const cc = installmentCountryCopy(locale);
 
   /* Передача — через две недели, первый взнос — через месяц после неё: черновик, покупатель меняет. */
-  const today = todayInHelsinki();
+  const today = installmentToday(sellerCountry);
   const d = new Date(`${today}T12:00:00Z`);
   d.setUTCDate(d.getUTCDate() + 14);
   const handover = d.toISOString().slice(0, 10);
@@ -82,6 +83,10 @@ export default async function ListingPage({ params }: { params: Promise<{ locale
           ) : !vatModeAllowedForNew(l.vat_mode) ? (
             <p className="rounded-card border border-warn/35 bg-warn/10 px-3 py-2 text-[14px] text-warn">{ui.listing.vatOld}</p>
           ) : (
+          <>
+          <div className="mb-4">
+            <LegalNotice ui={ui} locale={locale} />
+          </div>
           <OfferForm
             locale={locale}
             ui={ui}
@@ -101,6 +106,7 @@ export default async function ListingPage({ params }: { params: Promise<{ locale
               firstDue: addMonths(handover, 1),
             }}
           />
+          </>
           )}
         </CardBody>
       </Card>

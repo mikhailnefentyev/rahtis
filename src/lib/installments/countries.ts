@@ -10,10 +10,18 @@
  * Сделка всегда внутри одной страны: продавец и покупатель — компании одной
  * страны (проверяет база, start_installment_deal). Объявления видны всем.
  *
- * Открыта сейчас только Финляндия: для остальных стран нет ни правил, ни
- * договора (их готовят в docs/equipment-sale/countries/). Открыть страну —
- * заполнить её запись, добавить правила и шаблон договора и вписать страну
- * в app.installment_country_open в базе.
+ * Открыты Финляндия, Эстония и Латвия (23.11.2026). Для остальных стран нет
+ * ни правил, ни договора (их готовят в docs/equipment-sale/countries/).
+ * Открыть страну — заполнить её запись, добавить правила (rules.ts), шаблон
+ * договора (contractText/, contractTemplates.ts), тексты счетов
+ * (invoiceTexts.ts) и кабинета (countryTexts/) и вписать страну в
+ * app.installment_country_open в базе. Что у открытой страны всё это есть,
+ * проверяет тест countryOpen.test.mjs.
+ *
+ * Эстония и Латвия открыты по исследованию docs/equipment-sale/countries/
+ * ee.md и lv.md: его не проверял местный юрист, поэтому сторонам в кабинете
+ * показывается оговорка (countryCopy.ts, legalNotice), а неподтверждённые
+ * правила взяты в осторожном варианте.
  *
  * СПИСОК ОТКРЫТЫХ СТРАН ПОВТОРЁН В БАЗЕ: функция app.installment_country_open
  * (последняя миграция, где она определена). Меняешь open здесь — меняй и там;
@@ -23,11 +31,21 @@
  */
 import { COUNTRY_PACKS, type CountryCode } from '../country/index.ts';
 
-/** Набор правил о просрочке и изъятии. FI_OSKL — финский закон о рассрочке 91/1966 (calc.ts). */
-export type InstallmentRulesId = 'FI_OSKL';
+/**
+ * Набор правил о просрочке и изъятии (rules.ts).
+ * FI_OSKL — финский закон о рассрочке 91/1966 (calc.ts);
+ * EE_VOS — Эстония: порогов в законе нет, их задаёт договор (п. 9.1), затем
+ * дополнительный срок и отказ от договора (VÕS § 114, § 116, § 233);
+ * LV_CL2070 — Латвия: два пропущенных срока платежа (Civillikums 2070. p.).
+ */
+export type InstallmentRulesId = 'FI_OSKL' | 'EE_VOS' | 'LV_CL2070';
 
-/** Шаблон договора. FI_OSAMAKSU — ContractPdf.tsx, договор по финскому праву. */
-export type InstallmentContractId = 'FI_OSAMAKSU';
+/**
+ * Шаблон договора. FI_OSAMAKSU — ContractPdf.tsx, договор по финскому праву;
+ * EE_JARELMAKS и LV_NOMAKSA — тексты contractText/ee.ts и lv.ts, печатает
+ * CountryContractPdf.tsx.
+ */
+export type InstallmentContractId = 'FI_OSAMAKSU' | 'EE_JARELMAKS' | 'LV_NOMAKSA';
 
 export type InstallmentCountryEntry = {
   /** Раздел открыт компаниям этой страны. */
@@ -54,8 +72,10 @@ export const INSTALLMENT_COUNTRIES: Record<CountryCode, InstallmentCountryEntry>
   SE: CLOSED,
   NO: CLOSED,
   DK: CLOSED,
-  EE: CLOSED,
-  LV: CLOSED,
+  /* Эстония (23.11.2026): НДС со всей цены при передаче, аванс — в оплаченной части (KMS § 11); первый счёт как в Финляндии. */
+  EE: { open: true, rules: 'EE_VOS', contract: 'EE_JARELMAKS', contractLanguage: 'et', vatOnFirstInvoice: true },
+  /* Латвия (23.11.2026): nomaksas pirkums — поставка товара, PVN со всей цены при передаче (PVN likums 1. p. 13. pkt., 34. p. 8. d.). */
+  LV: { open: true, rules: 'LV_CL2070', contract: 'LV_NOMAKSA', contractLanguage: 'lv', vatOnFirstInvoice: true },
   LT: CLOSED,
   PL: CLOSED,
   DE: CLOSED,
@@ -125,6 +145,26 @@ export function openInstallmentCountries(): CountryCode[] {
 export function installmentCurrency(country: string | null | undefined): string {
   const code = codeOf(country);
   return code ? COUNTRY_PACKS[code].currency : 'EUR';
+}
+
+/**
+ * Часовой пояс страны сделки (страны продавца) — из пакета страны
+ * (23.11.2026): по нему датируются договор, счета и «сегодня» задания.
+ * Неизвестная страна — Хельсинки, как было до открытия других стран.
+ */
+export function installmentTimeZone(country: string | null | undefined): string {
+  const code = codeOf(country);
+  return code ? COUNTRY_PACKS[code].timeZone : COUNTRY_PACKS.FI.timeZone;
+}
+
+/** Календарный день (ГГГГ-ММ-ДД) метки времени в поясе страны сделки. */
+export function installmentDay(country: string | null | undefined, at: string | Date): string {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: installmentTimeZone(country) }).format(new Date(at));
+}
+
+/** «Сегодня» в стране сделки. */
+export function installmentToday(country: string | null | undefined, now: Date = new Date()): string {
+  return installmentDay(country, now);
 }
 
 /** Сделка возможна только внутри одной страны (23.11.2026): продавец и покупатель — из одной открытой страны. */

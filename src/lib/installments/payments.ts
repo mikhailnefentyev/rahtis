@@ -1,13 +1,11 @@
 import 'server-only';
 
 import { renderToBuffer } from '@react-pdf/renderer';
-import { todayInHelsinki } from '@/lib/dates';
 import { sendEmail } from '@/lib/email';
-import { emailLocaleOf } from '@/lib/email/text';
 import { createFormat } from '@/lib/format';
 import { asCurrency } from '@/lib/money/currency';
 import { notify } from '@/lib/notify';
-import { finnishReference } from '@/lib/sites/invoice';
+import { paymentReference } from '@/lib/sites/invoice';
 import { SiteInvoicePdf } from '@/lib/sites/SiteInvoicePdf';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { ibanHoldActive } from '@/lib/trust/changes';
@@ -15,6 +13,9 @@ import { lastIbanChange } from '@/lib/trust/sensitive';
 import { dealBilled, installmentDealLink } from './access';
 import { buildSchedule, daysBetween, effectiveHandover, overduePayments, type VatMode } from './calc';
 import { fill, installmentUiCopy } from './copy';
+import { installmentDay, installmentToday } from './countries';
+import { countryEventCode, countryNoticeLocale } from './countryTexts';
+import { documentKind, documentLabels, invoiceTexts } from './invoiceTexts';
 import { installmentRules } from './rules';
 
 /**
@@ -38,24 +39,25 @@ import { installmentRules } from './rules';
  * стороны договорились) задание не ведёт: ни новых счетов, ни
  * напоминаний, ни сигнала о пороге. Неоплаченные и не выставленные взносы
  * остаются как есть — взаиморасчёт стороны проводят сами.
+ *
+ * 23.11.2026, Эстония и Латвия: тексты счетов и писем, подписи, ссылка
+ * платежа (RF) и «сегодня» — по стране продавца (invoiceTexts.ts,
+ * countries.ts); страна записывается в счёт (meta.country), у счетов до
+ * этой даты её нет — они финские. Сигнал продавцу о пороге говорит о
+ * правиле его страны: в Эстонии — порог договора и дополнительный срок, в
+ * Латвии — два пропущенных срока и предупреждение; о том, что машину можно
+ * забрать самому, там не говорится (rules.ts, countryTexts/).
  */
 
 const BUCKET = 'reports';
 /** За сколько дней до срока выставлять счёт взноса. */
 export const INVOICE_LEAD_DAYS = 14;
 
-const fiDate = (iso: string) => {
-  const [y, m, d] = iso.split('-');
-  return `${Number(d)}.${Number(m)}.${y}`;
-};
-
 const addDays = (iso: string, days: number) => {
   const d = new Date(`${iso}T12:00:00Z`);
   d.setUTCDate(d.getUTCDate() + days);
   return d.toISOString().slice(0, 10);
 };
-
-const helsinkiDay = (iso: string) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Helsinki' }).format(new Date(iso));
 
 type Party = { name: string; business_id: string | null; vat_id: string | null; iban?: string; address: string; email: string };
 type Mail = { template: string; subject: string; text: string };
@@ -69,7 +71,17 @@ type Meta = {
   title?: string;
   payNow?: { label: [string, string]; cents: number };
   amountLabel?: [string, string];
+  /* Страна продавца (23.11.2026): по ней тексты, подписи и вид чисел при печати. Нет — счёт финский. */
+  country?: string | null;
+  /* Название документа в свойствах PDF, если это платёжное уведомление (Латвия с 2028 года). */
+  docName?: string;
 };
+
+/** Страна продавца сделки — для пояса («сегодня», день передачи) и текстов. */
+async function sellerCountryOf(sellerId: string): Promise<string | null> {
+  const { data } = await createAdminClient().from('companies').select('country').eq('id', sellerId).maybeSingle();
+  return data?.country ?? null;
+}
 
 /**
  * График из согласованных условий — один раз. Если машину передали позже
@@ -82,7 +94,8 @@ export async function ensureSchedule(dealId: string): Promise<number> {
   if (!deal || (deal.status !== 'ACTIVE' && deal.status !== 'PAID_OFF') || !deal.handed_over_at) return 0;
   const { count } = await admin.from('installment_payments').select('id', { count: 'exact', head: true }).eq('deal_id', dealId);
   if ((count ?? 0) > 0) return count ?? 0;
-  const start = effectiveHandover(deal.handover_date, helsinkiDay(deal.handed_over_at));
+  /* День передачи — по времени страны продавца (у Финляндии — Хельсинки, как было). */
+  const start = effectiveHandover(deal.handover_date, installmentDay(await sellerCountryOf(deal.seller_company_id), deal.handed_over_at));
   const delay = Math.max(0, daysBetween(deal.handover_date, start));
   const schedule = buildSchedule({
     priceCents: deal.price_cents,
@@ -115,7 +128,7 @@ async function parties(sellerId: string, buyerId: string) {
   const [{ data: seller }, { data: buyer }] = await Promise.all([
     admin
       .from('companies')
-      .select('id, name, legal_name, business_id, vat_number, iban, legal_street, legal_postal_code, legal_city, billing_email, contact_email')
+      .select('id, name, country, legal_name, business_id, vat_number, iban, legal_street, legal_postal_code, legal_city, billing_email, contact_email')
       .eq('id', sellerId)
       .maybeSingle(),
     admin
@@ -145,7 +158,7 @@ async function parties(sellerId: string, buyerId: string) {
       .join(', '),
     email: (buyer.billing_email || buyer.contact_email || '').trim().toLowerCase(),
   };
-  return { seller: sellerParty, buyer: buyerParty, sellerId: seller.id, iban: seller.iban };
+  return { seller: sellerParty, buyer: buyerParty, sellerId: seller.id, iban: seller.iban, country: seller.country as string | null };
 }
 
 /**
@@ -189,14 +202,15 @@ async function createInvoiceRow(input: {
       customer_company_id: input.buyerId,
       job_id: null,
       number,
-      reference: finnishReference(number),
+      /* Ссылка платежа: финскому продавцу — viitenumero, остальным — международная RF (ISO 11649). */
+      reference: paymentReference(number, input.meta.country),
       issued_on: input.issuedOn,
       due_on: input.dueOn,
       period_from: input.issuedOn,
       period_to: input.dueOn,
       seller: { ...input.seller, meta: input.meta },
       customer: input.buyer,
-      lines: input.lines.map((l) => ({ ...l, quantity: 1, unit: 'kpl' })),
+      lines: input.lines.map((l) => ({ ...l, quantity: 1, unit: invoiceTexts(input.meta.country).unit })),
       net_cents: netCents,
       vat_bps: input.vatBps,
       vat_cents: input.vatCents,
@@ -212,13 +226,16 @@ async function createInvoiceRow(input: {
 /** Шаг 2: PDF и письмо по записанному счёту; повтор безопасен. true — письмо отправлено. */
 export async function deliverInvoice(invoiceId: string): Promise<boolean> {
   const admin = createAdminClient();
-  const f = createFormat('fi-FI');
   const { data: inv } = await admin.from('carrier_invoices').select('*').eq('id', invoiceId).maybeSingle();
   if (!inv) return false;
   if (inv.sent_at && inv.file_path) return true;
   const seller = inv.seller as Party & { meta?: Meta };
   const meta = seller.meta;
   if (!meta) return false;
+  /* Подписи, вид чисел и дат — по стране продавца из счёта; у старых счетов её нет — финские. */
+  const tx = invoiceTexts(meta.country);
+  const f = createFormat(tx.intl);
+  const fiDate = tx.date;
   const buyer = inv.customer as Party;
   const lines = inv.lines as { date: string; text: string; unitCents: number; amountCents: number }[];
   /* Суммы — в валюте самого счёта. */
@@ -235,25 +252,28 @@ export async function deliverInvoice(invoiceId: string): Promise<boolean> {
         seller: { name: seller.name, businessId: seller.business_id ?? '', vatId: seller.vat_id, address: seller.address, iban: seller.iban ?? '', email: seller.email },
         customer: { name: buyer.name, businessId: buyer.business_id, vatId: buyer.vat_id, address: buyer.address },
         job: meta.job,
-        jobLabel: ['Osamaksusopimus', 'Hire-purchase contract'],
+        jobLabel: tx.payment.jobLabel,
         period: meta.period,
         periodLabel: meta.periodLabel,
         lines: lines.map((l) => ({
           date: fiDate(l.date),
           text: l.text,
           quantity: '1',
-          unit: 'kpl',
+          unit: tx.unit,
           unitPrice: f.money(l.unitCents, currency),
           amount: f.money(l.amountCents, currency),
         })),
         net: f.money(inv.net_cents, currency),
-        vatLabel: inv.vat_bps > 0 ? `ALV / VAT ${(inv.vat_bps / 100).toLocaleString('fi-FI', { maximumFractionDigits: 1 })} %` : 'ALV / VAT 0 %',
+        vatLabel: tx.vatLabel(inv.vat_bps > 0 ? (inv.vat_bps / 100).toLocaleString(tx.intl, { maximumFractionDigits: 1 }) : null),
         vat: f.money(inv.vat_cents, currency),
         total: f.money(inv.total_cents, currency),
         note: meta.note,
         title: meta.title,
         payNow: meta.payNow ? { label: meta.payNow.label, amount: f.money(meta.payNow.cents, currency) } : undefined,
         amountLabel: meta.amountLabel,
+        /* docName записан только у платёжного уведомления. */
+        labels: documentLabels(tx, Boolean(meta.docName)),
+        docName: meta.docName,
       }),
     );
     path = `installment-invoices/${inv.company_id}/${inv.number}.pdf`;
@@ -268,8 +288,8 @@ export async function deliverInvoice(invoiceId: string): Promise<boolean> {
     toName: buyer.name,
     replyTo: seller.email,
     subject: `${meta.mail.subject} · ${inv.number}`,
-    text: `${meta.mail.text}\n\nLasku / Invoice ${inv.number} · viitenumero / reference ${inv.reference}`,
-    attachments: [{ bucket: BUCKET, path, filename: `Lasku-${inv.number}.pdf` }],
+    text: `${meta.mail.text}\n\n${tx.payment.mailFooter({ number: inv.number, reference: inv.reference })}`,
+    attachments: [{ bucket: BUCKET, path, filename: `${tx.filePrefix}-${inv.number}.pdf` }],
     companyId: inv.company_id,
   });
   if (mail.sent) {
@@ -310,20 +330,26 @@ export async function issuePaymentInvoice(paymentId: string): Promise<IssueStatu
     : { data: null };
   const snapshot = (deal.vehicle_snapshot ?? {}) as { make?: string; plate?: string };
   const what = [snapshot.make, snapshot.plate].filter(Boolean).join(' ');
-  const f = createFormat('fi-FI');
+  const tx = invoiceTexts(p.country);
+  const f = createFormat(tx.intl);
   const total = f.money(pay.principal_cents + pay.interest_cents, asCurrency(deal.currency));
+  const contract = deal.contract_number;
+  const issuedOn = installmentToday(p.country);
+  /* Латвия с 2028 года: документ платформы — платёжное уведомление, счёт продавец выписывает сам (invoiceTexts.ts). */
+  const notice = documentKind(p.country, issuedOn) === 'NOTICE' ? tx.notice : null;
   const lines = [
     {
       date: pay.due_date,
-      text: `Maksuerä ${pay.n}/${deal.months}, osamaksusopimus nro ${deal.contract_number} (${what}) / Instalment ${pay.n}/${deal.months}`,
+      text: tx.payment.line({ n: pay.n, months: deal.months, contract, what }),
       unitCents: pay.principal_cents,
       amountCents: pay.principal_cents,
     },
+    /* Проценты — всегда отдельной строкой: только так они остаются вне налоговой базы цены. */
     ...(pay.interest_cents > 0
       ? [
           {
             date: pay.due_date,
-            text: 'Korko, veroton rahoituspalvelu (AVL 41 §) / Interest, VAT-exempt financial service',
+            text: tx.payment.interestLine,
             unitCents: pay.interest_cents,
             amountCents: pay.interest_cents,
           },
@@ -336,33 +362,32 @@ export async function issuePaymentInvoice(paymentId: string): Promise<IssueStatu
     buyerId: deal.buyer_company_id,
     seller: p.seller,
     buyer: p.buyer,
-    issuedOn: todayInHelsinki(),
+    issuedOn,
     dueOn: pay.due_date,
     lines,
     vatBps: 0,
     vatCents: 0,
     currency: deal.currency,
     meta: {
-      job: `${deal.contract_number} · ${what}`,
+      country: p.country,
+      job: `${contract} · ${what}`,
       period: `${pay.n} / ${deal.months}`,
-      periodLabel: ['Maksuerä', 'Instalment'],
-      note: [
-        `Osamaksuerä ilman arvonlisäveroa: kauppahinnan arvonlisävero on laskutettu kokonaisuudessaan laskulla nro ${first?.number ?? '—'}. / The instalment has no VAT: VAT on the whole price was invoiced on invoice ${first?.number ?? '—'}.`,
-        'Laskuttaja on myyjä; RAHTIS (Aivomaa Oy) ei ole kaupan osapuoli eikä vastaanota maksua. / Issued by the seller; RAHTIS (Aivomaa Oy) is not a party to the sale and does not receive the payment.',
-      ].join('\n'),
+      periodLabel: tx.payment.periodLabel,
+      note: [notice?.note, tx.payment.note({ firstNumber: first?.number ?? '—' })].filter(Boolean).join('\n'),
+      title: notice?.title,
+      docName: notice?.docName,
       mail: {
         template: 'installment_payment_invoice',
-        subject: `Lasku · ${p.seller.name} · maksuerä ${pay.n}/${deal.months}, sopimus ${deal.contract_number}`,
-        text: [
-          'Hei,',
-          '',
-          `liitteenä osamaksusopimuksen ${deal.contract_number} maksuerän ${pay.n}/${deal.months} lasku (${what}).`,
-          `Maksettava ${total}, eräpäivä ${fiDate(pay.due_date)}. Tilinumero (IBAN) ${p.seller.iban}.`,
-          'Maksu suoritetaan suoraan myyjälle, ei RAHTIS-palvelulle eikä Aivomaa Oy:lle.',
-          '',
-          '—',
-          `Attached is the invoice for instalment ${pay.n}/${deal.months} of hire-purchase contract ${deal.contract_number}. Amount ${total}, due ${fiDate(pay.due_date)}, IBAN ${p.seller.iban}. Pay the seller directly.`,
-        ].join('\n'),
+        subject: tx.payment.mailSubject({ seller: p.seller.name, n: pay.n, months: deal.months, contract }),
+        text: tx.payment.mailText({
+          contract,
+          n: pay.n,
+          months: deal.months,
+          what,
+          total,
+          due: tx.date(pay.due_date),
+          iban: p.seller.iban ?? '',
+        }),
       },
     },
   });
@@ -391,10 +416,12 @@ export async function createCreditNote(dealId: string): Promise<IssueStatus> {
   const p = await parties(deal.seller_company_id, deal.buyer_company_id);
   if (!p) return 'NOT_FOUND';
   const originalLines = original.lines as { date: string; text: string; unitCents: number; amountCents: number }[];
-  const issuedOn = todayInHelsinki();
+  const tx = invoiceTexts(p.country);
+  const issuedOn = installmentToday(p.country);
   /* Возвращается только уплаченное по первому счёту: взнос и весь НДС; не оплачен — возврата нет. */
-  const f = createFormat('fi-FI');
+  const f = createFormat(tx.intl);
   const refundCents = deal.first_invoice_paid_at ? deal.down_payment_cents + original.vat_cents : 0;
+  const contract = deal.contract_number ?? '';
 
   const invoiceId = await createInvoiceRow({
     sellerId: deal.seller_company_id,
@@ -403,32 +430,28 @@ export async function createCreditNote(dealId: string): Promise<IssueStatus> {
     buyer: p.buyer,
     issuedOn,
     dueOn: issuedOn,
-    lines: originalLines.map((l) => ({ date: issuedOn, text: `Hyvitys / Credit: ${l.text}`, unitCents: -l.unitCents, amountCents: -l.amountCents })),
+    lines: originalLines.map((l) => ({ date: issuedOn, text: `${tx.credit.linePrefix}${l.text}`, unitCents: -l.unitCents, amountCents: -l.amountCents })),
     vatBps: original.vat_bps,
     vatCents: -original.vat_cents,
     currency: original.currency,
     meta: {
-      job: `${deal.contract_number} · peruttu / cancelled`,
+      country: p.country,
+      job: tx.credit.job({ contract }),
       period: original.number,
-      periodLabel: ['Hyvitettävä lasku', 'Credited invoice'],
-      title: 'HYVITYSLASKU / CREDIT NOTE',
-      payNow: { label: ['Palautetaan ostajalle', 'Refunded to the buyer'], cents: refundCents },
-      amountLabel: ['Palautetaan', 'Refund'],
-      note: [
-        `HYVITYSLASKU / CREDIT NOTE. Hyvittää laskun nro ${original.number} (${fiDate(original.issued_on)}) kokonaisuudessaan, koska osamaksukauppa ${deal.contract_number} peruttiin ennen ajoneuvon luovutusta. ${refundCents > 0 ? `Myyjä palauttaa ostajalle maksetun ${f.money(refundCents, asCurrency(original.currency))}.` : 'Laskua ei ollut maksettu, joten palautettavaa ei ole.'} / Credits invoice ${original.number} in full because hire-purchase ${deal.contract_number} was cancelled before handover. ${refundCents > 0 ? `The seller refunds the ${f.money(refundCents, asCurrency(original.currency))} paid to the buyer.` : 'The invoice was not paid, so nothing is refunded.'}`,
-        'Laskuttaja on myyjä; RAHTIS (Aivomaa Oy) ei ole kaupan osapuoli. / Issued by the seller; RAHTIS (Aivomaa Oy) is not a party to the sale.',
-      ].join('\n'),
+      periodLabel: tx.credit.periodLabel,
+      title: tx.credit.title,
+      payNow: { label: tx.credit.payNowLabel, cents: refundCents },
+      amountLabel: tx.credit.amountLabel,
+      note: tx.credit.note({
+        original: original.number,
+        originalDate: tx.date(original.issued_on),
+        contract,
+        refund: refundCents > 0 ? f.money(refundCents, asCurrency(original.currency)) : null,
+      }),
       mail: {
         template: 'installment_credit_note',
-        subject: `Hyvityslasku · ${p.seller.name} · lasku ${original.number}`,
-        text: [
-          'Hei,',
-          '',
-          `liitteenä hyvityslasku, joka hyvittää laskun ${original.number}: osamaksukauppa ${deal.contract_number} on peruttu ennen luovutusta.`,
-          '',
-          '—',
-          `Attached is a credit note crediting invoice ${original.number}: hire-purchase ${deal.contract_number} was cancelled before handover.`,
-        ].join('\n'),
+        subject: tx.credit.mailSubject({ seller: p.seller.name, original: original.number }),
+        text: tx.credit.mailText({ original: original.number, contract }),
       },
     },
   });
@@ -440,7 +463,6 @@ export type RunResult = { deals: number; invoices: number; reminders: number; th
 
 /** Каждое утро (или по одной сделке после передачи): график, счета взносов, просрочки. */
 export async function runInstallments(options: { dealId?: string; today?: string } = {}): Promise<RunResult> {
-  const today = options.today ?? todayInHelsinki();
   const admin = createAdminClient();
   const result: RunResult = { deals: 0, invoices: 0, reminders: 0, thresholds: 0, errors: [] };
   let query = admin.from('installment_deals').select('*').eq('status', 'ACTIVE');
@@ -456,6 +478,13 @@ export async function runInstallments(options: { dealId?: string; today?: string
     if (!dealBilled(deal.status)) continue;
     result.deals += 1;
     try {
+      /* Стороны — сразу: «сегодня» сделки, тексты и правило порога зависят от страны продавца. */
+      const [{ data: buyer }, { data: seller }] = await Promise.all([
+        admin.from('companies').select('language, kind').eq('id', deal.buyer_company_id).maybeSingle(),
+        admin.from('companies').select('language, kind, country').eq('id', deal.seller_company_id).maybeSingle(),
+      ]);
+      const country = seller?.country ?? null;
+      const today = options.today ?? installmentToday(country);
       await ensureSchedule(deal.id);
       const { data: rows } = await admin.from('installment_payments').select('*').eq('deal_id', deal.id).order('n');
       let ibanMissing: number | null = null;
@@ -490,7 +519,7 @@ export async function runInstallments(options: { dealId?: string; today?: string
       const { data: invs } = invoiceIds.length
         ? await admin.from('carrier_invoices').select('id, sent_at').in('id', invoiceIds)
         : { data: [] as { id: string; sent_at: string | null }[] };
-      const sentDay = new Map((invs ?? []).filter((i) => i.sent_at).map((i) => [i.id, helsinkiDay(i.sent_at!)]));
+      const sentDay = new Map((invs ?? []).filter((i) => i.sent_at).map((i) => [i.id, installmentDay(country, i.sent_at!)]));
       const overdue = overduePayments(
         (fresh ?? []).map((r) => ({
           ...r,
@@ -502,12 +531,9 @@ export async function runInstallments(options: { dealId?: string; today?: string
       );
 
       const plate = ((deal.vehicle_snapshot ?? {}) as { plate?: string }).plate ?? '';
-      const [{ data: buyer }, { data: seller }] = await Promise.all([
-        admin.from('companies').select('language, kind').eq('id', deal.buyer_company_id).maybeSingle(),
-        admin.from('companies').select('language, kind, country').eq('id', deal.seller_company_id).maybeSingle(),
-      ]);
-      const cb = installmentUiCopy(emailLocaleOf(buyer?.language ?? 'fi'));
-      const cs = installmentUiCopy(emailLocaleOf(seller?.language ?? 'fi'));
+      /* Тексты — про право страны сделки; язык записанного текста — см. countryNoticeLocale. */
+      const cb = installmentUiCopy(countryNoticeLocale(buyer?.language ?? 'fi', country), country);
+      const cs = installmentUiCopy(countryNoticeLocale(seller?.language ?? 'fi', country), country);
       /* Сделку каждая сторона открывает в своём кабинете: продавец может быть компанией без парка (23.11.2026). Покупатель — всегда перевозчик. */
       const sellerLink = installmentDealLink(seller?.kind ?? 'CARRIER', deal.id);
       const buyerLink = installmentDealLink(buyer?.kind ?? 'CARRIER', deal.id);
@@ -558,7 +584,7 @@ export async function runInstallments(options: { dealId?: string; today?: string
           code: 'installment.overdue',
           params: { plate, n: row.n, date: row.due_date, days: late },
           title: fill(cb.notify.overdueTitle, { plate, n: String(row.n) }),
-          body: fill(cb.notify.overdueBody, { days: String(late), date: fiDate(row.due_date) }),
+          body: fill(cb.notify.overdueBody, { days: String(late), date: invoiceTexts(country).date(row.due_date) }),
           link: buyerLink,
         });
         result.reminders += 1;
@@ -567,8 +593,13 @@ export async function runInstallments(options: { dealId?: string; today?: string
       const priceGross =
         deal.price_cents + (deal.vat_mode === 'STANDARD' ? Math.round((deal.price_cents * deal.vat_bps) / 10_000) : 0);
       const remaining = (fresh ?? []).filter((r) => !r.paid_at).reduce((s, r) => s + r.principal_cents, 0);
-      /* Порог — по правилам страны сделки (23.11.2026); правил у страны нет — сигнала продавцу нет. */
-      const rules = installmentRules(seller?.country);
+      /*
+       * Порог — по правилам страны сделки (23.11.2026); правил у страны нет —
+       * сигнала продавцу нет. Что порог даёт, говорит текст страны: в Финляндии
+       * — право требовать остаток или изымать, в Эстонии и Латвии — только
+       * следующий шаг (дополнительный срок, предупреждение).
+       */
+      const rules = installmentRules(country);
       const allowed =
         rules !== null &&
         rules.remedyAllowed(
@@ -589,7 +620,7 @@ export async function runInstallments(options: { dealId?: string; today?: string
           await notify({
             companyId: deal.seller_company_id,
             kind: 'BILLING',
-            code: 'installment.threshold',
+            code: countryEventCode('threshold', country),
             params: { plate },
             title: fill(cs.notify.thresholdTitle, { plate }),
             body: cs.notify.thresholdBody,

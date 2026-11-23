@@ -26,9 +26,9 @@ import {
   vehicleSellable,
 } from './access.ts';
 
-test('раздел рассрочки — компаниям открытых стран реестра (сейчас только Финляндия)', () => {
-  assert.equal(installmentsAvailable('FI'), true);
-  for (const country of ['EE', 'SE', 'PL', 'RO', '', null, undefined]) {
+test('раздел рассрочки — компаниям открытых стран реестра (Финляндия, с 23.11.2026 — Эстония и Латвия)', () => {
+  for (const country of ['FI', 'EE', 'LV']) assert.equal(installmentsAvailable(country), true, country);
+  for (const country of ['LT', 'SE', 'PL', 'RO', '', null, undefined]) {
     assert.equal(installmentsAvailable(country), false);
   }
 });
@@ -75,13 +75,16 @@ test('новое объявление и предложение — только
 
 const party = (over = {}) => ({ kind: 'SHIPPER', country: 'FI', status: 'ACTIVE', owner: true, ...over });
 
-test('продавать может главный в проверенной финской компании любого вида — без лицензии и страховки', () => {
+test('продавать может главный в проверенной компании открытой страны, любого вида — без лицензии и страховки', () => {
   assert.equal(canSellInstallments(party()), true);
   assert.equal(canSellInstallments(party({ kind: 'CARRIER' })), true);
-  /* Не проверена оператором, не из Финляндии, не главный, оператор платформы — нет. */
+  /* Эстония и Латвия открыты с 23.11.2026. */
+  assert.equal(canSellInstallments(party({ country: 'EE' })), true);
+  assert.equal(canSellInstallments(party({ country: 'LV', kind: 'CARRIER' })), true);
+  /* Не проверена оператором, из закрытой страны, не главный, оператор платформы — нет. */
   assert.equal(canSellInstallments(party({ status: 'PENDING' })), false);
   assert.equal(canSellInstallments(party({ status: 'REJECTED' })), false);
-  assert.equal(canSellInstallments(party({ country: 'EE' })), false);
+  assert.equal(canSellInstallments(party({ country: 'SE' })), false);
   assert.equal(canSellInstallments(party({ owner: false })), false);
   assert.equal(canSellInstallments(party({ kind: 'ADMIN' })), false);
   assert.equal(canSellInstallments(party({ kind: null })), false);

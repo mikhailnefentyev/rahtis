@@ -21,17 +21,17 @@ import {
   terminationSummary,
   type VatMode,
 } from '@/lib/installments/calc';
-import { dealTermination, dealVehicle, helsinkiDay, loadDeal } from '@/lib/installments/contract';
+import { dealTermination, dealVehicle, loadDeal } from '@/lib/installments/contract';
 import { fill, installmentUiCopy } from '@/lib/installments/copy';
-import { installmentCurrency, installmentMoney } from '@/lib/installments/countries';
+import { installmentCurrency, installmentDay, installmentMoney, installmentToday } from '@/lib/installments/countries';
 import { installmentRules } from '@/lib/installments/rules';
-import { todayInHelsinki } from '@/lib/dates';
 import { isLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
 import { installmentCopy } from '@/lib/landing/installment';
 import { ActionForm } from './ActionForm';
 import { DealResponse } from './DealForms';
 import { HandoverForm } from './HandoverForm';
+import { LegalNotice } from './LegalNotice';
 import { TerminateForm } from './TerminateForm';
 
 export async function dealMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
@@ -77,8 +77,15 @@ export async function DealScreen({
   if (!loaded) notFound();
   const { deal, seller, buyer, invoice } = loaded;
   const vehicle = dealVehicle(loaded);
-  const ui = installmentUiCopy(locale);
+  /*
+   * Тексты — про право страны сделки, то есть страны продавца (23.11.2026):
+   * у эстонской и латвийской сделки свои пороги, чек-лист передачи, порядок
+   * после оплаты и смысл записи о прекращении. У финской — как было.
+   */
+  const ui = installmentUiCopy(locale, seller.country);
   const calc = installmentCopy(locale);
+  /* Дни (согласие, оплата, передача) — по часовому поясу страны сделки; у Финляндии — Хельсинки. */
+  const helsinkiDay = (iso: string) => installmentDay(seller.country, iso);
   const isSeller = deal.seller_company_id === me;
   const owner = viewer.status === 'ready' && viewer.profile.member_kind !== 'DISPATCHER';
 
@@ -106,7 +113,7 @@ export async function DealScreen({
 
   /* Этап 3: график, сводка по машине, кредит-нота. */
   const supabase = await createClient();
-  const today = todayInHelsinki();
+  const today = installmentToday(seller.country);
   const [{ data: payments }, { data: vehicleStatus }, { data: credit }] = await Promise.all([
     supabase.from('installment_payments').select('*').eq('deal_id', deal.id).order('n'),
     deal.buyer_vehicle_id ? supabase.rpc('installment_vehicle_status', { p_deal_id: deal.id }) : Promise.resolve({ data: null }),
@@ -228,7 +235,7 @@ export async function DealScreen({
             </dl>
             {limits && (
               <p className="mt-3 text-[13px] text-ink-muted">
-                {fill(calc.r.thresholdsText, {
+                {fill(ui.country?.thresholdsText ?? calc.r.thresholdsText, {
                   tenth: eur(limits.tenthCents),
                   twentieth: eur(limits.twentiethCents),
                   needed: String(limits.installmentsNeeded),
@@ -238,6 +245,9 @@ export async function DealScreen({
           </div>
         </CardBody>
       </Card>
+
+      {/* Оговорка о договоре — пока его не подписали: в переговорах и после согласия. */}
+      {(deal.status === 'NEGOTIATING' || deal.status === 'AGREED') && <LegalNotice ui={ui} locale={locale} />}
 
       {deal.status === 'NEGOTIATING' && owner && (
         <Card>
@@ -286,6 +296,8 @@ export async function DealScreen({
               )}
             </div>
             <p className="text-ink-muted">{ui.deal.contractHint}</p>
+            {/* Счёт в PDF и электронный счёт страны — оговорка только у сделок не из Финляндии. */}
+            {ui.country && <p className="text-ink-muted">{ui.country.invoiceNote}</p>}
             {!invoiceReady && (
               <div className="rounded-card border border-warn/35 bg-warn/10 px-3 py-2 text-warn">
                 <p>{fill(ui.deal.invoiceMissing, { reason: invoiceReason })}</p>

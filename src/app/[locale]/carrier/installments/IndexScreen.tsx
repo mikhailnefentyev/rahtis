@@ -62,7 +62,8 @@ export async function InstallmentsScreen({
   const company = viewer.company!;
   /* Раздел только для финских компаний: пункта в меню у остальных нет, по прямой ссылке — «страницы нет» (22.11.2026). */
   if (!installmentsAvailable(company.country)) notFound();
-  const ui = installmentUiCopy(locale);
+  /* Вступление и «кто может продавать» — про страну компании (23.11.2026); у финской — как было. */
+  const ui = installmentUiCopy(locale, company.country);
   const { t } = await getViewerI18n(locale);
   const tab: Tab = rawTab === 'deals' || (rawTab === 'catalog' && withCatalog) ? rawTab : 'mine';
   const supabase = await createClient();

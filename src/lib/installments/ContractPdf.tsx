@@ -43,6 +43,22 @@ export type ContractPdfInput = {
   ratePercent: string | null;
   handover: string;
   schedule: { n: number; due: string; principal: string; interest: string }[];
+  /*
+   * Ниже — поля для договоров других стран (23.11.2026, contractText/):
+   * финский шаблон их не читает и печатается как раньше.
+   */
+  /** Ставка НДС числом на языке договора: «24», «25,5». */
+  vatPercent: string;
+  /** Взнос без НДС (часть цены), входящий в первый счёт. */
+  down: string;
+  /** Номер первого счёта, если он уже выставлен; иначе null — в договоре остаётся прочерк. */
+  firstInvoiceNumber: string | null;
+  /** График с итогом строки и остатком цены после платежа — для приложения 1. */
+  plan: { n: number; due: string; principal: string; interest: string; total: string; balance: string }[];
+  /** Итоги графика: взносы 1–N (без первого счёта), проценты, всё вместе с первым счётом. */
+  planTotals: { principal: string; interest: string; all: string };
+  /** Число месяца, на которое приходятся взносы (по первому сроку). */
+  dueDay: number;
 };
 
 type Party = { name: string; businessId: string; address: string; vatRegistered: boolean; email: string; phone: string };

@@ -4,7 +4,7 @@ import { createFormat } from '@/lib/format';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { buildSchedule, type VatMode } from './calc';
-import { installmentCurrency } from './countries';
+import { installmentCurrency, installmentDay } from './countries';
 import { installmentRules } from './rules';
 import type { ContractPdfInput } from './ContractPdf';
 
@@ -62,7 +62,7 @@ export function dealTermination(deal: LoadedDeal['deal']): DealTermination {
 /** День по Хельсинки из метки времени (договор датируется по финскому календарю). */
 export const helsinkiDay = (iso: string) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Helsinki' }).format(new Date(iso));
 
-const fiDate = (iso: string) => {
+const fiDateShort = (iso: string) => {
   const [y, m, d] = iso.split('-');
   return `${Number(d)}.${Number(m)}.${y}`;
 };
@@ -92,8 +92,24 @@ export function dealVehicle(d: LoadedDeal) {
   };
 }
 
-export function contractInput(d: LoadedDeal): ContractPdfInput | null {
+/**
+ * Как печатать договор страны (23.11.2026): язык чисел и вид даты. По
+ * умолчанию — финский договор, как было: числа fi-FI, дата «5.1.2027».
+ * Договоры Эстонии и Латвии — числа своего языка, дата «05.01.2027».
+ * День согласия — по часовому поясу страны продавца (у Финляндии — Хельсинки).
+ */
+export type ContractPrint = { intl: string; paddedDates: boolean };
+
+const FI_PRINT: ContractPrint = { intl: 'fi-FI', paddedDates: false };
+
+const paddedDate = (iso: string) => {
+  const [y, m, d] = iso.split('-');
+  return `${d}.${m}.${y}`;
+};
+
+export function contractInput(d: LoadedDeal, print: ContractPrint = FI_PRINT): ContractPdfInput | null {
   const { deal } = d;
+  const fiDate = print.paddedDates ? paddedDate : fiDateShort;
   if (!deal.contract_number || !deal.agreed_at || !deal.parties_snapshot) return null;
   const parties = deal.parties_snapshot as { seller?: Snapshot; buyer?: Snapshot };
   const vehicle = dealVehicle(d);
@@ -117,20 +133,36 @@ export function contractInput(d: LoadedDeal): ContractPdfInput | null {
   const rules = installmentRules(d.seller.country);
   if (!rules) return null;
   const limits = rules.thresholds(schedule);
-  const f = createFormat('fi-FI');
+  const f = createFormat(print.intl);
   const currency = deal.currency ?? installmentCurrency(d.seller.country);
   const eur = (cents: number) => f.money(cents, currency);
-  const vatPercent = (deal.vat_bps / 100).toLocaleString('fi-FI', { maximumFractionDigits: 1 });
+  const vatPercent = (deal.vat_bps / 100).toLocaleString(print.intl, { maximumFractionDigits: 1 });
+  /* Остаток цены после каждого взноса — для графика в приложении 1 договоров других стран. */
+  let balance = deal.price_cents - deal.down_payment_cents;
+  const plan = schedule.installments.map((x) => {
+    balance -= x.principalCents;
+    return {
+      n: x.n,
+      due: fiDate(x.dueDate),
+      principal: eur(x.principalCents),
+      interest: x.interestCents > 0 ? eur(x.interestCents) : '–',
+      total: eur(x.principalCents + x.interestCents),
+      balance: eur(Math.max(0, balance)),
+    };
+  });
+  const principalTotal = schedule.installments.reduce((sum, x) => sum + x.principalCents, 0);
+  /* Номер-заглушка (DRAFT-…) — счёт ещё без номера: в договоре остаётся прочерк. */
+  const firstInvoiceNumber = d.invoice?.number && !d.invoice.number.startsWith('DRAFT-') ? d.invoice.number : null;
 
   return {
     number: deal.contract_number,
-    date: fiDate(helsinkiDay(deal.agreed_at)),
+    date: fiDate(installmentDay(d.seller.country, deal.agreed_at)),
     seller: party(parties.seller),
     buyer: party(parties.buyer),
     vehicle: {
       make: vehicle.make,
       plate: vehicle.plate,
-      odometer: vehicle.odometerKm != null ? `${vehicle.odometerKm.toLocaleString('fi-FI')} km` : '______________ km',
+      odometer: vehicle.odometerKm != null ? `${vehicle.odometerKm.toLocaleString(print.intl)} km` : '______________ km',
     },
     price: {
       net: eur(deal.price_cents),
@@ -146,7 +178,7 @@ export function contractInput(d: LoadedDeal): ContractPdfInput | null {
     },
     vatMode: deal.vat_mode as ContractPdfInput['vatMode'],
     months: deal.months,
-    ratePercent: deal.annual_rate_bps > 0 ? (deal.annual_rate_bps / 100).toLocaleString('fi-FI', { maximumFractionDigits: 2 }) : null,
+    ratePercent: deal.annual_rate_bps > 0 ? (deal.annual_rate_bps / 100).toLocaleString(print.intl, { maximumFractionDigits: 2 }) : null,
     handover: fiDate(deal.handover_date),
     schedule: schedule.installments.map((x) => ({
       n: x.n,
@@ -154,5 +186,15 @@ export function contractInput(d: LoadedDeal): ContractPdfInput | null {
       principal: eur(x.principalCents),
       interest: x.interestCents > 0 ? eur(x.interestCents) : '–',
     })),
+    vatPercent,
+    down: eur(deal.down_payment_cents),
+    firstInvoiceNumber,
+    plan,
+    planTotals: {
+      principal: eur(principalTotal),
+      interest: schedule.interestTotalCents > 0 ? eur(schedule.interestTotalCents) : '–',
+      all: eur(schedule.firstInvoiceCents + principalTotal + schedule.interestTotalCents),
+    },
+    dueDay: Number(deal.first_due_date.slice(8, 10)),
   };
 }
