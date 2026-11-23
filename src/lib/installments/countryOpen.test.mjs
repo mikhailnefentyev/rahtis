@@ -34,7 +34,17 @@ import {
   lawCountry,
   withCountryTexts,
 } from './countryTexts/index.ts';
-import { documentKind, documentLabels, invoiceTexts, invoiceTextsExist, invoicesReady } from './invoiceTexts.ts';
+import {
+  DE_E_INVOICE_FROM,
+  documentKind,
+  documentLabels,
+  firstDocumentKind,
+  invoiceTexts,
+  invoiceTextsExist,
+  invoicesReady,
+  plainDoc,
+  plainDocLabels,
+} from './invoiceTexts.ts';
 import { INSTALLMENT_RULES } from './rules.ts';
 
 /*
@@ -71,7 +81,7 @@ test('у каждой открытой страны есть правила, д�
       assert.equal(COUNTRY_CONTRACTS[c.contract].intl.slice(0, 2), c.contractLanguage, `${code}: язык чисел договора`);
     }
   }
-  assert.deepEqual(openInstallmentCountries().sort(), ['DK', 'EE', 'FI', 'LV', 'SE']);
+  assert.deepEqual(openInstallmentCountries().sort(), ['DE', 'DK', 'EE', 'FI', 'LT', 'LV', 'SE']);
   /* Закрытая страна без текстов — не «готова», даже если её вписать в реестр. */
   assert.equal(countryTextsExist('NO'), false);
   assert.equal(invoiceTextsExist('NO'), false);
@@ -900,4 +910,303 @@ test('счета Швеции и Дании: свой язык и закон, к
     /* Название машины вынимается из строки первого счёта по « – » (firstInvoice.ts). */
     assert.equal(t.first.line({ what: 'Volvo FH ABC 12D', contract: 'c' }).split(' – ')[0], 'Volvo FH ABC 12D');
   }
+});
+
+/* ── Литва и Германия (23.11.2026) ────────────────────────────────────── */
+
+test('реестр: Литва и Германия — договорные пороги, договор на своём языке; у Литвы счёт с НДС при передаче', () => {
+  assert.deepEqual(INSTALLMENT_COUNTRIES.LT, {
+    open: true,
+    rules: 'LT_CK6414',
+    contract: 'LT_ISSIMOKETINAI',
+    contractLanguage: 'lt',
+    vatOnFirstInvoice: false,
+    vatInvoiceAtHandover: true,
+  });
+  assert.deepEqual(INSTALLMENT_COUNTRIES.DE, { open: true, rules: 'DE_BGB449', contract: 'DE_RATENKAUF', contractLanguage: 'de', vatOnFirstInvoice: true });
+  assert.equal(installmentCountry('LT').vatStandardBps, 2100);
+  assert.equal(installmentCountry('DE').vatStandardBps, 1900);
+  assert.equal(installmentCountry('LT').currency, 'EUR');
+  assert.equal(installmentCountry('DE').currency, 'EUR');
+  /* Проценты в обеих странах предлагаются (с оговорками в кабинете). */
+  assert.equal(installmentInterestOffered('LT'), true);
+  assert.equal(installmentInterestOffered('DE'), true);
+  /* Литва готова по документам не «весь НДС первым счётом», а предварительным счётом и счётом при передаче. */
+  assert.equal(invoicesReady('LT'), true);
+  assert.equal(invoicesReady('DE'), true);
+  assert.equal(INSTALLMENT_RULES.LT_CK6414.source, 'CONTRACT');
+  assert.equal(INSTALLMENT_RULES.DE_BGB449.source, 'CONTRACT');
+  assert.equal(COUNTRY_CONTRACTS.LT_ISSIMOKETINAI.intl, 'lt-LT');
+  assert.equal(COUNTRY_CONTRACTS.LT_ISSIMOKETINAI.isoDates, true);
+  assert.equal(COUNTRY_CONTRACTS.DE_RATENKAUF.intl, 'de-DE');
+  /* Пояса стран — из пакетов: Вильнюс и Берлин. */
+  assert.equal(installmentTimeZone('LT'), 'Europe/Vilnius');
+  assert.equal(installmentTimeZone('DE'), 'Europe/Berlin');
+  const at = '2026-12-31T22:30:00Z';
+  assert.equal(installmentDay('LT', at), '2027-01-01');
+  assert.equal(installmentDay('DE', at), '2026-12-31');
+});
+
+test('тексты кабинета Литвы и Германии: все поля на каждом языке, термины страны, ничего финского', () => {
+  for (const code of ['LT', 'DE']) {
+    const keys = Object.keys(LAW_TEXTS[code].en).sort();
+    for (const l of locales) {
+      const t = LAW_TEXTS[code][l];
+      assert.deepEqual(Object.keys(t).sort(), keys, `${code}/${l}`);
+      for (const [k, v] of Object.entries(t)) {
+        for (const text of Array.isArray(v) ? v : [v]) {
+          assert.ok(typeof text === 'string' && text.trim().length > 10, `${code}/${l}/${k}`);
+          assert.ok(!/Traficom|91\/1966|osamaksukauppalaki|ulosottomies|undefined/i.test(text), `${code}/${l}/${k}: финский термин`);
+        }
+      }
+      assert.ok(t.thresholdTitle.includes('{plate}'), `${code}/${l}`);
+      assert.equal(t.checkBefore.length, 1, `${code}/${l}`);
+    }
+  }
+  for (const l of locales) {
+    const lt = LAW_TEXTS.LT[l];
+    /* Пороги — договорные: 30 дней, 1/10 и 1/20 цены, потом 14 дней. */
+    for (const ph of ['{tenth}', '{twentieth}', '{needed}', '30', '14']) assert.ok(lt.thresholdsText.includes(ph), `LT/${l}: ${ph}`);
+    assert.ok(lt.threshold.includes('antstolis') && lt.threshold.includes('9.3'), `LT/${l}: суд и пункт о половине цены`);
+    assert.ok(lt.checkInsurance.includes('TPVCAPDĮ'), `LT/${l}: страховка — обязанность собственника`);
+    assert.ok(lt.checkRegister.includes('savininkas') && lt.checkRegister.includes('valdytojas') && lt.checkRegister.includes('Regitr'), `LT/${l}`);
+    assert.ok(lt.checkBefore[0].includes('Sutarčių ir teisių suvaržymų registr'), `LT/${l}: реестр договоров`);
+    assert.ok(lt.invoiceNote.includes('išankstinio mokėjimo sąskaita') && lt.invoiceNote.includes('PVM sąskaita faktūra'), `LT/${l}`);
+    assert.ok(/5/.test(lt.afterPaid), `LT/${l}: 5 рабочих дней`);
+    assert.ok(lt.checkFirstPaid, `LT/${l}: пункт об оплате предварительного счёта`);
+    assert.equal(lt.legalNoticeExtra, undefined);
+
+    const de = LAW_TEXTS.DE[l];
+    for (const ph of ['{tenth}', '{needed}', '14']) assert.ok(de.thresholdsText.includes(ph), `DE/${l}: ${ph}`);
+    assert.ok(!de.thresholdsText.includes('{twentieth}'), `DE/${l}: у Германии одна доля`);
+    assert.ok(de.threshold.includes('Gerichtsvollzieher') && de.threshold.includes('Rücktritt') && de.threshold.includes('§ 858'), `DE/${l}`);
+    assert.ok(de.checkRegister.includes('Zulassungsbescheinigung Teil II') && de.checkRegister.includes('Halter') && de.checkRegister.includes('§ 932'), `DE/${l}`);
+    assert.ok(de.checkBefore[0].includes('§ 513'), `DE/${l}: Existenzgründer`);
+    for (const w of ['31.12.2026', 'XRechnung', 'ZUGFeRD', 'Zahlungsaufforderung']) assert.ok(de.invoiceNote.includes(w), `DE/${l}: ${w}`);
+    assert.ok(de.legalNoticeExtra.includes('§ 307') && de.legalNoticeExtra.includes('AGB'), `DE/${l}: AGB`);
+    assert.ok(de.rateHint.includes('§ 4 Nr. 8'), `DE/${l}: проценты`);
+    assert.equal(de.checkFirstPaid, undefined);
+    /* Базовую ставку нельзя записывать числом навсегда; Gutschrift в UStG — счёт покупателя. */
+    for (const v of Object.values(de)) for (const text of Array.isArray(v) ? v : [v]) assert.ok(!/1,52|10,52|1\.52|10\.52|Gutschrift/.test(text), `DE/${l}`);
+  }
+  /* Неподтверждённое не подаётся как точное. */
+  assert.ok(/not confirmed/.test(LAW_TEXTS.LT.en.nextSteps));
+  assert.ok(/не подтвержд/.test(LAW_TEXTS.LT.ru.nextSteps));
+  assert.ok(/not confirmed/.test(LAW_TEXTS.DE.en.nextSteps + LAW_TEXTS.DE.en.checkRegister));
+  assert.ok(/не подтвержд/.test(LAW_TEXTS.DE.ru.nextSteps + LAW_TEXTS.DE.ru.checkRegister));
+  /* Пороги — не «по закону»: в английском тексте Литвы и Германии они названы условиями договора. */
+  assert.ok(/contract/i.test(LAW_TEXTS.LT.en.thresholdsText) && /contract/i.test(LAW_TEXTS.DE.en.thresholdsText));
+});
+
+test('тексты по стране: у Литвы свой пункт об оплате и реестр договоров в чек-листе, у Германии — § 513 и усиленная оговорка (AGB)', () => {
+  const b = base();
+  const lt = withCountryTexts(b, 'en', 'LT');
+  assert.deepEqual(lt.stage3.checklist, [
+    'c0',
+    LAW_TEXTS.LT.en.checkFirstPaid,
+    LAW_TEXTS.LT.en.checkBefore[0],
+    LAW_TEXTS.LT.en.checkRegister,
+    LAW_TEXTS.LT.en.checkInsurance,
+    'c4',
+  ]);
+  assert.equal(lt.country.legalNotice, LEGAL_NOTICE.en);
+  assert.equal(lt.country.rateHint, LAW_TEXTS.LT.en.rateHint);
+  const de = withCountryTexts(b, 'de', 'DE');
+  assert.deepEqual(de.stage3.checklist, ['c0', 'c1', LAW_TEXTS.DE.de.checkBefore[0], LAW_TEXTS.DE.de.checkRegister, LAW_TEXTS.DE.de.checkInsurance, 'c4']);
+  assert.equal(de.country.legalNotice, `${LEGAL_NOTICE.de} ${LAW_TEXTS.DE.de.legalNoticeExtra}`);
+  /* У остальных стран оговорка — прежняя, без добавки. */
+  for (const code of ['EE', 'LV', 'SE', 'DK']) assert.equal(withCountryTexts(b, 'en', code).country.legalNotice, LEGAL_NOTICE.en, code);
+  assert.equal(countryEventCode('threshold', 'LT'), 'installment.threshold.lt');
+  assert.equal(countryEventCode('paid_off', 'de'), 'installment.paid_off.de');
+  assert.equal(countryNoticeLocale('lt', 'LT'), 'lt');
+  assert.equal(countryNoticeLocale('ru', 'DE'), 'ru');
+  assert.deepEqual(b, base());
+});
+
+/* Договор Литвы и Германии: суммы так, как их печатает createFormat (евро, свой язык). */
+function euroInput(intl, over = {}) {
+  const m = (cents) => createFormat(intl).money(cents, 'EUR');
+  const iso = intl === 'lt-LT';
+  const day = (y, mo, d) => (iso ? `${y}-${String(mo).padStart(2, '0')}-${String(d).padStart(2, '0')}` : `${String(d).padStart(2, '0')}.${String(mo).padStart(2, '0')}.${y}`);
+  const plan = Array.from({ length: 24 }, (_, i) => ({
+    n: i + 1,
+    due: day(i < 12 ? 2027 : 2028, (i % 12) + 1, 1),
+    principal: m(229_167),
+    interest: '–',
+    total: m(229_167),
+    balance: m(Math.max(0, 5_500_000 - 229_167 * (i + 1))),
+  }));
+  return {
+    ...contractInput(),
+    number: 'OS-2026-00031',
+    date: day(2026, 11, 23),
+    seller: { name: 'UAB Šiaurės vežėjas', businessId: '110053842', address: 'Perkėlos g. 10, 93264 Klaipėda', vatRegistered: true, email: 's@pavyzdys.lt', phone: '' },
+    buyer: { name: 'Žalgirio transportas UAB', businessId: '136695976', address: 'Straße 2, 21129 Hamburg', vatRegistered: true, email: 'b@beispiel.de', phone: '' },
+    price: {
+      net: m(6_500_000),
+      vatLabel: '',
+      vat: m(intl === 'lt-LT' ? 1_365_000 : 1_235_000),
+      gross: m(intl === 'lt-LT' ? 7_865_000 : 7_735_000),
+      downGross: m(intl === 'lt-LT' ? 2_365_000 : 2_235_000),
+      rest: m(5_500_000),
+      interestTotal: null,
+      installmentPrice: m(intl === 'lt-LT' ? 7_865_000 : 7_735_000),
+      tenth: m(intl === 'lt-LT' ? 786_500 : 773_500),
+      twentieth: m(intl === 'lt-LT' ? 393_250 : 773_500),
+      creditClaim: m(5_500_000),
+      totalPayable: m(intl === 'lt-LT' ? 7_865_000 : 7_735_000),
+    },
+    vatPercent: intl === 'lt-LT' ? '21' : '19',
+    down: m(1_000_000),
+    handover: day(2026, 12, 1),
+    firstInvoiceNumber: null,
+    plan,
+    planTotals: { principal: m(5_500_000), interest: '–', all: m(intl === 'lt-LT' ? 7_865_000 : 7_735_000), instalments: m(5_500_000) },
+    dueDay: 1,
+    ...over,
+  };
+}
+
+test('договор Литвы: дословный текст шаблона, договорные пороги, счёт с НДС — при передаче, пункт 9.3', () => {
+  const doc = COUNTRY_CONTRACTS.LT_ISSIMOKETINAI.build(euroInput('lt-LT'));
+  const text = contractPlainText(doc).replace(/[  ]/g, ' ');
+  assert.ok(text.includes('TRANSPORTO PRIEMONĖS PIRKIMO–PARDAVIMO IŠSIMOKĖTINAI SUTARTIS'));
+  assert.ok(text.includes('NUOSAVYBĖS TEISĖ Į TRANSPORTO PRIEMONĘ PIRKĖJUI PEREINA TIK VISIŠKAI SUMOKĖJUS KAINĄ.'));
+  assert.ok(text.includes('Sutartis Nr. OS-2026-00031 · Data 2026-11-23'));
+  /* 4.3: номер счёта с НДС неизвестен при подписании — прочерк, а не номер предварительного счёта. */
+  assert.ok(text.includes(`PVM sąskaitoje faktūroje Nr. ${'_'.repeat(14)}, išrašytoje perdavimo dieną`));
+  assert.ok(!text.includes('IS-OS-2026'));
+  /* 9.1 и приложение 1: 1/10 и 1/20 цены с НДС; 9.3 — правило половины цены исключено. */
+  assert.ok(text.includes('daugiau kaip 30 dienų'));
+  assert.ok(text.includes('Viena dešimtoji šios sutarties Kainos yra 7 865 Eur, viena dvidešimtoji – 3 932,50 Eur.'));
+  assert.ok(text.includes('Šalys aiškiai susitaria, kad Pardavėjas turi teisę atsiimti Transporto priemonę 9 skyriuje nustatytomis sąlygomis ir tuo atveju, kai Pirkėjas yra sumokėjęs daugiau kaip pusę Kainos'));
+  assert.ok(text.includes('antstolis'));
+  assert.ok(text.includes('Aivomaa Oy (RAHTIS) nėra šios sutarties šalis.'));
+  assert.ok(text.includes('PVM 21 %'));
+  assert.ok(text.includes('Už likusią Kainos dalį palūkanos neskaičiuojamos.'));
+  assert.ok(!/\[[^\]]*\]/.test(text), 'остался заполнитель в квадратных скобках');
+  assert.ok(!/undefined|NaN/.test(text) && !/kyllä|merkki, malli|pp\.kk\.vvvv|variantas|Pasirinktinai|€/i.test(text), 'заполнитель шаблона или знак евро');
+  for (const ch of 'ąčęėįšųūžĄČĘĖĮŠŲŪŽ'.slice(0, 9)) assert.ok(text.includes(ch), ch);
+  /* С процентами — вариант B п. 4.4: ставка и освобождение по PVMĮ 28 str. */
+  const rated = contractPlainText(COUNTRY_CONTRACTS.LT_ISSIMOKETINAI.build(euroInput('lt-LT', { ratePercent: '6,5', price: { ...euroInput('lt-LT').price, interestTotal: '4 100 €' } })));
+  assert.ok(rated.includes('fiksuotos 6,5 procentų metinės palūkanos'));
+  assert.ok(rated.includes('Pridėtinės vertės mokesčio įstatymo 28 straipsnio 1 dalis'));
+});
+
+test('договор Германии: § 513 в заверении покупателя, 10 % или 5 % Gesamtbetrag, согласие на PDF, Teil II у продавца', () => {
+  const text = contractPlainText(COUNTRY_CONTRACTS.DE_RATENKAUF.build(euroInput('de-DE'))).replace(/[  ]/g, ' ');
+  assert.ok(text.includes('KAUFVERTRAG ÜBER EIN NUTZFAHRZEUG MIT RATENZAHLUNG UND EIGENTUMSVORBEHALT'));
+  assert.ok(text.includes('DAS EIGENTUM AM KAUFGEGENSTAND GEHT ERST MIT VOLLSTÄNDIGER ZAHLUNG DES KAUFPREISES AUF DEN KÄUFER ÜBER.'));
+  assert.ok(text.includes('Vertrag Nr. OS-2026-00031 · Datum 23.11.2026'));
+  assert.ok(text.includes('nicht zur Aufnahme einer gewerblichen oder selbständigen beruflichen Tätigkeit im Sinne des § 513 BGB erwirbt'));
+  assert.ok(text.includes('USt-IdNr. / Steuernummer: DE136695976'));
+  assert.ok(text.includes('Der Käufer stimmt zu, dass Rechnungen bis zum Ablauf der Übergangsfristen des § 27 Abs. 38 UStG in einem sonstigen elektronischen Format (PDF) übermittelt werden.'));
+  assert.ok(text.includes('Zahlungsaufforderungen zu den einzelnen Raten sind keine Rechnungen im Sinne des § 14 UStG und weisen keine Umsatzsteuer aus.'));
+  assert.ok(text.includes('10 Prozent des Gesamtbetrags dieses Vertrags sind 7.735 Euro.'));
+  assert.ok(text.includes('Die Zulassungsbescheinigung Teil II ist nach der Umschreibung an den Verkäufer zurückzugeben'));
+  assert.ok(text.includes('Gerichtsvollzieher (§ 883 ZPO)'));
+  assert.ok(text.includes('Die Aivomaa Oy (RAHTIS) ist nicht Partei dieses Vertrags.'));
+  assert.ok(text.includes('Der Restkaufpreis wird nicht verzinst.'));
+  /* Номер первого счёта неизвестен — прочерк. */
+  assert.ok(text.includes(`mit der Rechnung Nr. ${'_'.repeat(14)} berechnet`));
+  assert.ok(!/\[[^\]]*\]/.test(text), 'остался заполнитель в квадратных скобках');
+  assert.ok(!/undefined|NaN/.test(text) && !/kyllä|merkki, malli|pp\.kk\.vvvv|Variante|Optional|Gutschrift/i.test(text), 'заполнитель шаблона');
+  for (const ch of 'äöüßÄÜ') assert.ok(text.includes(ch), ch);
+  /* Срок больше трёх лет — 5 %; с процентами — вариант B п. 4.4 со ссылкой на § 4 Nr. 8 Buchst. a UStG. */
+  const long = contractPlainText(COUNTRY_CONTRACTS.DE_RATENKAUF.build(euroInput('de-DE', { months: 48, ratePercent: '6,5', price: { ...euroInput('de-DE').price, tenth: '3.867,50 €', interestTotal: '9.100 €' } })));
+  assert.ok(long.includes('5 Prozent des Gesamtbetrags dieses Vertrags sind 3.867,50 Euro.'));
+  assert.ok(long.includes('festen Jahreszins von 6,5 Prozent'));
+  assert.ok(long.includes('nach § 4 Nr. 8 Buchst. a UStG umsatzsteuerfrei'));
+});
+
+test('документы Литвы: до передачи — предварительный счёт без НДС, при передаче — счёт с НДС, взносы — платёжные требования', () => {
+  const lt = invoiceTexts('lt');
+  assert.equal(lt.country, 'LT');
+  assert.equal(lt.intl, 'lt-LT');
+  assert.equal(lt.date('2027-01-05'), '2027-01-05');
+  assert.deepEqual(Object.keys(lt.labels).sort(), Object.keys(FI_INVOICE_LABELS).sort());
+  assert.equal(lt.vatLabel('21'), 'PVM / VAT 21 %');
+  assert.equal(lt.labels.title, 'PVM SĄSKAITA FAKTŪRA');
+  /* Первый документ Литвы — всегда предварительный счёт: номер от договора, без строк НДС. */
+  for (const day of ['2026-11-25', '2030-01-01']) assert.equal(firstDocumentKind('LT', day, day), 'PROFORMA');
+  assert.equal(lt.proforma.number({ contract: 'OS-2026-00031' }), 'IS-OS-2026-00031');
+  assert.equal(lt.proforma.noVat, true);
+  assert.equal(lt.paymentDoc.number({ contract: 'OS-2026-00031', n: 3 }), 'MP-OS-2026-00031-03');
+  assert.equal(lt.paymentDoc.noVat, true);
+  assert.equal(lt.cancel.number({ contract: 'c', original: 'IS-OS-2026-00031' }), 'IS-OS-2026-00031-ANUL');
+  assert.deepEqual(plainDocLabels(lt, 'PAYMENT').number, ['Dokumento numeris', 'Document no.']);
+  assert.equal(plainDocLabels(lt, 'PAYMENT').title, lt.labels.title);
+  assert.equal(plainDoc(lt, 'PROFORMA').title, 'IŠANKSTINĖ SĄSKAITA');
+  const note = lt.first.note({ down: '10 000 €', vat: '13 650 €', rest: '55 000 €', months: 24, contract: 'OS-2026-00031', vatMode: 'STANDARD' });
+  assert.ok(note.includes('Tai išankstinio mokėjimo sąskaita, o ne PVM sąskaita faktūra.'));
+  assert.ok(note.includes('14 straipsnio 5 dalis'));
+  const h = lt.handover.note({ proforma: 'IS-OS-2026-00031', advance: '23 650 €', vat: '13 650 €', rest: '55 000 €', months: 24, contract: 'OS-2026-00031' });
+  assert.ok(h.includes('Įskaityta pagal išankstinio mokėjimo sąskaitą Nr. IS-OS-2026-00031 gauta pradinė įmoka 23 650 €'));
+  assert.ok(lt.payment.note({ firstNumber: '2026-0008' }).includes('Tai mokėjimo pranešimas, o ne PVM sąskaita faktūra.'));
+  assert.ok(lt.payment.interestLine.includes('28 straipsnio 1 dalis'));
+  /* Отмена до передачи — аннулирование предварительного счёта, а не кредитный документ. */
+  assert.equal(lt.credit, lt.cancel);
+  assert.ok(lt.cancel.note({ original: 'IS-1', originalDate: 'd', contract: 'c', refund: null }).includes('kreditinis dokumentas nereikalingas'));
+  /* Название машины вынимается из строки первого документа по « – » (firstInvoice.ts). */
+  assert.equal(lt.proforma.line({ what: 'Volvo FH ABC 123', contract: 'c' }).split(' – ')[0], 'Volvo FH ABC 123');
+  assert.match(paymentReference('IS-OS-2026-00031', 'LT'), /^RF\d{2}\d+$/);
+});
+
+test('документы Германии: счёт с USt до 31.12.2026, потом платёжная информация без НДС; взносы — Zahlungsaufforderung', () => {
+  const de = invoiceTexts('DE');
+  assert.equal(de.country, 'DE');
+  assert.equal(de.intl, 'de-DE');
+  assert.equal(de.date('2027-01-05'), '05.01.2027');
+  assert.deepEqual(Object.keys(de.labels).sort(), Object.keys(FI_INVOICE_LABELS).sort());
+  assert.equal(de.vatLabel('19'), 'USt / VAT 19 %');
+  /* PDF — счёт только за обороты до 31.12.2026 (ранняя дата для всех: оборот продавца неизвестен). */
+  assert.equal(DE_E_INVOICE_FROM, '2027-01-01');
+  assert.equal(documentKind('DE', '2026-12-31'), 'INVOICE');
+  assert.equal(documentKind('DE', '2027-01-01'), 'NOTICE');
+  assert.equal(documentKind('DE', '2026-12-20', '2027-01-05'), 'NOTICE');
+  assert.equal(firstDocumentKind('DE', '2026-11-25', '2026-12-01'), 'INVOICE');
+  assert.equal(firstDocumentKind('DE', '2026-12-20', '2027-01-05'), 'NOTICE');
+  assert.equal(firstDocumentKind('DE', '2027-02-01', '2027-02-10'), 'NOTICE');
+  /* Другие страны не тронуты: Латвия — по дню выставления, остальные — всегда счёт. */
+  assert.equal(documentKind('LV', '2027-06-01', '2028-02-01'), 'INVOICE');
+  for (const code of ['FI', 'EE', 'LV', 'SE', 'DK']) assert.equal(firstDocumentKind(code, '2026-11-25', '2026-12-01'), 'INVOICE', code);
+  assert.equal(firstDocumentKind('LV', '2028-02-01', '2028-02-10'), 'INVOICE');
+  const first = de.first.note({ down: '10.000 €', vat: '12.350 €', rest: '55.000 €', months: 24, contract: 'OS-2026-00031', vatMode: 'STANDARD' });
+  for (const w of ['§ 27 Abs. 38 UStG', '31.12.2026', 'XRechnung', 'ZUGFeRD', 'Zustimmung des Käufers', '§ 14 Abs. 2 Satz 7 UStG']) assert.ok(first.includes(w), w);
+  assert.equal(de.notice.noVat, true);
+  assert.ok(de.notice.note.includes('keine Rechnung'));
+  assert.ok(de.notice.firstNote({ down: 'a', vat: 'b', rest: 'c', months: 2, contract: 'k', vatMode: 'STANDARD' }).includes('Vertrag Ziffer 4.2'));
+  assert.equal(de.paymentDoc.number({ contract: 'OS-2026-00031', n: 12 }), 'ZA-OS-2026-00031-12');
+  assert.equal(de.paymentDoc.noVat, true);
+  assert.ok(de.payment.note({ firstNumber: '2026-0007' }).includes('keine Rechnung im Sinne des § 14 UStG und weist keine Umsatzsteuer aus'));
+  assert.ok(de.payment.note({ firstNumber: '' }).includes('mit der Rechnung des Verkäufers über den gesamten Kaufpreis'));
+  assert.ok(de.payment.interestLine.includes('steuerfrei nach § 4 Nr. 8 Buchst. a UStG'));
+  assert.ok(de.credit.note({ original: 'o', originalDate: 'd', contract: 'c', refund: null }).includes('§ 17 UStG'));
+  const all = [
+    first,
+    de.notice.note,
+    de.payment.note({ firstNumber: 'f' }),
+    de.credit.note({ original: 'o', originalDate: 'd', contract: 'c', refund: '1 €' }),
+    de.cancel.note({ original: 'o', originalDate: 'd', contract: 'c', refund: '1 €' }),
+    de.credit.title,
+    de.cancel.title,
+    ...Object.values(de.labels).flat(),
+  ].join('\n');
+  assert.ok(!/Gutschrift|AVL|arvonlisäver|Lasku|viitenumero|undefined/i.test(all));
+  /* Заголовки короткие: длинный налезает на реквизиты продавца. */
+  for (const t of [de.labels.title, de.notice.title, de.paymentDoc.title, de.credit.title, de.cancel.title, invoiceTexts('LT').labels.title, invoiceTexts('LT').proforma.title, invoiceTexts('LT').paymentDoc.title, invoiceTexts('LT').cancel.title]) {
+    assert.ok(t.length <= 21, t);
+  }
+});
+
+test('миграция Литвы и Германии: страны открыты в базе, у сделки столбец счёта с НДС при передаче', () => {
+  const sql = latestSql('create or replace function app.installment_country_open(');
+  for (const code of ['FI', 'EE', 'LV', 'SE', 'DK', 'LT', 'DE']) assert.ok(sql.includes(`'${code}'`), code);
+  assert.ok(!sql.includes("'NO'"));
+  const migration = readFileSync(new URL('../../../supabase/migrations/20261201100000_installment_open_lt_de.sql', import.meta.url), 'utf8');
+  assert.ok(migration.includes('add column if not exists vat_invoice_id uuid references public.carrier_invoices (id) on delete set null'));
+  assert.ok(migration.includes('add column if not exists vat_invoice_started_at timestamptz'));
+  assert.ok(migration.includes("set search_path = ''"));
+  assert.ok(migration.includes('revoke all on function app.installment_country_open(text) from public, anon, authenticated;'));
+  assert.ok(!/end case/i.test(migration));
 });

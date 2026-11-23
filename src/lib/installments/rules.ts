@@ -39,6 +39,26 @@
  *     udbetaling»: цена с НДС плюс все проценты. Изъятие — только через
  *     fogedretten; покупатель вправе погасить просрочку до изъятия (§ 37).
  *
+ *   · LT_CK6414 — Литва, Civilinis kodeksas 6.414 (lt.md): закон порогов не
+ *     даёт (любая просрочка позволяет требовать всю цену или забрать вещь),
+ *     поэтому пороги записаны в договор (п. 9.1) по рекомендации
+ *     исследования: просрочка СТРОГО больше 30 дней («daugiau kaip 30
+ *     dienų») и сумма НЕ МЕНЬШЕ 1/10 (один взнос) или 1/20 (два и больше)
+ *     цены с НДС либо весь остаток. Затем письменное требование с
+ *     дополнительным сроком не короче 14 дней (п. 9.2, CK 6.217 str. 3 d.),
+ *     и только потом — требование всей цены или расторжение. Забрать машину
+ *     самому нельзя (CK 1.139 str.): добровольная передача или суд и antstolis.
+ *   · DE_BGB449 — Германия, BGB § 449 Abs. 2 и § 323 (de.md): порогов для
+ *     сделок между компаниями нет; договор (п. 9.1) добровольно берёт
+ *     образец § 498 BGB: просрочены минимум ДВА ВЗНОСА ПОДРЯД (целиком или
+ *     частично), и просроченная сумма не меньше 10 % Gesamtbetrag (цена с
+ *     НДС; при сроке больше трёх лет — 5 %), либо просрочен последний взнос
+ *     или весь остаток. Просрочка (Verzug) — со дня после срока (§ 286 Abs. 2
+ *     Nr. 1). Затем письменный срок не короче 14 дней с предупреждением, и
+ *     только после него — требование остатка или отказ от договора
+ *     (Rücktritt) и требование вернуть машину. Забрать самому нельзя
+ *     (§ 858 BGB): добровольно или через суд и Gerichtsvollzieher.
+ *
  * База порога (23.11.2026). До Швеции и Дании доля считалась только от цены
  * с НДС, и вызывающий передавал её сам. Теперь базу даёт набор (base): у
  * Финляндии и Эстонии — та же цена с НДС, что и раньше, у Швеции и Дании —
@@ -62,8 +82,9 @@ export type InstallmentRules = {
   thresholds: (schedule: Schedule) => Thresholds;
   /**
    * От какой суммы считается доля просрочки (23.11.2026) — третий аргумент
-   * remedyAllowed. Финляндия и Эстония — цена с НДС, Швеция — kreditfordran,
-   * Дания — вся сумма к уплате; у Латвии доли нет, сумма не используется.
+   * remedyAllowed. Финляндия, Эстония и Литва — цена с НДС, Швеция —
+   * kreditfordran, Дания — вся сумма к уплате; у Латвии доли нет, сумма не
+   * используется. Германия — сразу сумма порога: 10 % (5 %) цены с НДС.
    */
   base: (schedule: Schedule) => number;
   /**
@@ -80,7 +101,7 @@ const priceGross = (schedule: Schedule) => schedule.installmentPriceCents;
 
 /** Эстония, договор п. 9.1: просрочка не короче 14 дней. */
 export const EE_DAYS_LATE = 14;
-/** Эстония, VÕS § 114 и договор п. 9.2; Латвия, договор п. 9.1: письменный срок не короче 14 дней. */
+/** Эстония, VÕS § 114 и договор п. 9.2; Латвия, договор п. 9.1; Литва и Германия, договор п. 9.2 и 9.1: письменный срок не короче 14 дней. */
 export const GRACE_DAYS = 14;
 /** Латвия, Civillikums 2070. p.: два пропущенных срока платежа. */
 export const LV_MISSED_DATES = 2;
@@ -124,6 +145,8 @@ function lvThresholdReached(overdue: Overdue[], todayIso: string): boolean {
 export const SE_DAYS_LATE = 14;
 /** Дания, § 29, stk. 1: сумма не уплачена 30 дней после срока. */
 export const DK_DAYS_LATE = 30;
+/** Литва, договор п. 9.1: просрочка больше 30 дней. */
+export const LT_DAYS_LATE = 30;
 
 const principalSum = (schedule: Schedule) => schedule.installments.reduce((sum, x) => sum + x.principalCents, 0);
 
@@ -146,23 +169,32 @@ export function dkTotalPayableCents(schedule: Schedule): number {
   return schedule.installmentPriceCents + schedule.interestTotalCents;
 }
 
+/*
+ * Строгость «больше» или «не меньше» — отдельно для дней и для доли
+ * (23.11.2026): у Швеции обе строгие, у Дании обе нестрогие, а у Литвы
+ * дни строгие («daugiau kaip 30 dienų»), доля нестрогая («ne mažiau kaip»).
+ * Для Швеции и Дании результат прежний.
+ */
 type ShareRule = {
   /** Сколько дней должно пройти от срока. */
   days: number;
-  /** true — «больше» (Швеция: и дней, и доли), false — «не меньше» (Дания). */
-  strict: boolean;
+  /** true — дней «больше» (Швеция, Литва), false — «не меньше» (Дания). */
+  strictDays: boolean;
+  /** true — доля «больше» (Швеция), false — «не меньше» (Дания, Литва). */
+  strictShare: boolean;
 };
 
-const SE_RULE: ShareRule = { days: SE_DAYS_LATE, strict: true };
-const DK_RULE: ShareRule = { days: DK_DAYS_LATE, strict: false };
+const SE_RULE: ShareRule = { days: SE_DAYS_LATE, strictDays: true, strictShare: true };
+const DK_RULE: ShareRule = { days: DK_DAYS_LATE, strictDays: false, strictShare: false };
+const LT_RULE: ShareRule = { days: LT_DAYS_LATE, strictDays: true, strictShare: false };
 
 /** Доля базы: «больше 1/10» — целая часть (суммы целые), «не меньше 1/10» — с округлением вверх. */
-const shareOf = (base: number, parts: number, rule: ShareRule) => (rule.strict ? Math.floor(base / parts) : Math.ceil(base / parts));
+const shareOf = (base: number, parts: number, rule: ShareRule) => (rule.strictShare ? Math.floor(base / parts) : Math.ceil(base / parts));
 
 /** Сумма взносов достигает доли: один взнос — 1/10, два и больше — 1/20. */
 function shareReached(sum: number, count: number, base: number, rule: ShareRule): boolean {
   const parts = count === 1 ? 10 : 20;
-  return rule.strict ? sum * parts > base : sum * parts >= base;
+  return rule.strictShare ? sum * parts > base : sum * parts >= base;
 }
 
 /** Сколько первых взносов подряд надо просрочить, чтобы доля была достигнута (или просрочен весь остаток). */
@@ -195,12 +227,69 @@ function shareThresholdReached(overdue: Overdue[], todayIso: string, base: numbe
   const late = overdue.filter((o) => {
     if (o.unpaidCents <= 0) return false;
     const days = daysBetween(o.dueDate, todayIso);
-    return rule.strict ? days > rule.days : days >= rule.days;
+    return rule.strictDays ? days > rule.days : days >= rule.days;
   });
   if (late.length === 0) return false;
   const sum = late.reduce((s, o) => s + o.unpaidCents, 0);
   if (sum >= remainingCents) return true;
   return shareReached(sum, late.length, base, rule);
+}
+
+/* ── Германия: два взноса подряд и доля Gesamtbetrag ──────────────────── */
+
+/** Германия, договор п. 9.1 (образец § 498 BGB): срок больше трёх лет — 5 %, иначе 10 %. */
+export const DE_LONG_TERM_MONTHS = 36;
+
+/** Доля Gesamtbetrag в процентах по сроку договора (числу взносов графика). */
+export function deSharePercent(months: number): number {
+  return months > DE_LONG_TERM_MONTHS ? 5 : 10;
+}
+
+/**
+ * Германия: порог в деньгах — 10 % (5 %) Gesamtbetrag, то есть цены с НДС
+ * (проценты в Gesamtbetrag не входят, договор п. 4.1). «Не меньше» — с
+ * округлением вверх. Это и есть база правила (base): в remedyAllowed срок
+ * договора не передаётся, поэтому доля считается здесь, по графику. Если
+ * график не построился, вызывающий подставляет цену с НДС — порог тогда
+ * выше договорного, то есть ошибка только в пользу покупателя.
+ */
+export function deThresholdCents(schedule: Schedule): number {
+  return Math.ceil((schedule.installmentPriceCents * deSharePercent(schedule.installments.length)) / 100);
+}
+
+/** Сколько первых взносов подряд (не меньше двух) нужно просрочить, чтобы набрать долю; один взнос — весь остаток. */
+function deNeeded(schedule: Schedule, share: number): number {
+  const list = schedule.installments.map((x) => x.principalCents);
+  if (list.length <= 1) return list.length;
+  let sum = 0;
+  for (let k = 1; k <= list.length; k++) {
+    sum += list[k - 1];
+    if (k >= 2 && sum >= share) return k;
+  }
+  return list.length;
+}
+
+function deThresholds(schedule: Schedule): Thresholds {
+  const share = deThresholdCents(schedule);
+  /* Доля у Германии одна (10 % или 5 %): обе строки порога показывают её. */
+  return { tenthCents: share, twentiethCents: share, installmentsNeeded: deNeeded(schedule, share) };
+}
+
+/**
+ * Германия, договор п. 9.1: просрочены (со дня после срока) хотя бы два
+ * взноса подряд по номеру графика и вся просрочка не меньше доли (base),
+ * либо просрочен весь остаток (сюда же — последний взнос: когда просрочен
+ * он, просрочено всё неуплаченное). Взнос без номера (n) в пару «подряд»
+ * не входит — так порог наступает не раньше договорного.
+ */
+function deThresholdReached(overdue: Overdue[], todayIso: string, shareCents: number, remainingCents: number): boolean {
+  const late = overdue.filter((o) => o.unpaidCents > 0 && daysBetween(o.dueDate, todayIso) >= 1);
+  if (late.length === 0) return false;
+  const sum = late.reduce((s, o) => s + o.unpaidCents, 0);
+  if (sum >= remainingCents) return true;
+  const numbers = new Set(late.map((o) => o.n).filter((n): n is number => Number.isInteger(n)));
+  const consecutive = [...numbers].some((n) => numbers.has(n + 1));
+  return consecutive && sum >= shareCents;
 }
 
 export const INSTALLMENT_RULES: Record<InstallmentRulesId, InstallmentRules> = {
@@ -222,6 +311,23 @@ export const INSTALLMENT_RULES: Record<InstallmentRulesId, InstallmentRules> = {
     thresholds: (schedule) => shareThresholds(schedule, dkTotalPayableCents(schedule), DK_RULE),
     base: dkTotalPayableCents,
     remedyAllowed: (overdue, todayIso, base, remaining) => shareThresholdReached(overdue, todayIso, base, remaining, DK_RULE),
+  },
+  /* Литва: база — цена с НДС («Kaina» договора, п. 4.1 и 9.1), как у Финляндии и Эстонии. */
+  LT_CK6414: {
+    id: 'LT_CK6414',
+    source: 'CONTRACT',
+    graceDays: GRACE_DAYS,
+    thresholds: (schedule) => shareThresholds(schedule, priceGross(schedule), LT_RULE),
+    base: priceGross,
+    remedyAllowed: (overdue, todayIso, base, remaining) => shareThresholdReached(overdue, todayIso, base, remaining, LT_RULE),
+  },
+  DE_BGB449: {
+    id: 'DE_BGB449',
+    source: 'CONTRACT',
+    graceDays: GRACE_DAYS,
+    thresholds: deThresholds,
+    base: deThresholdCents,
+    remedyAllowed: deThresholdReached,
   },
 };
 

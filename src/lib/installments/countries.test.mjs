@@ -23,10 +23,10 @@ test('у каждой страны платформы есть запись в �
   assert.deepEqual(Object.keys(INSTALLMENT_COUNTRIES).sort(), Object.keys(COUNTRY_PACKS).sort());
 });
 
-test('открыты Финляндия, Эстония, Латвия, Швеция и Дания (23.11.2026); остальные страны закрыты, пока нет правил и договора', () => {
-  assert.deepEqual(openInstallmentCountries().sort(), ['DK', 'EE', 'FI', 'LV', 'SE']);
-  for (const country of ['FI', 'fi', 'EE', 'ee', 'LV', 'lv', 'SE', 'se', 'DK', 'dk']) assert.equal(installmentCountryOpen(country), true, country);
-  for (const country of ['NO', 'LT', 'PL', 'DE', 'RO', 'XX', '', null, undefined]) {
+test('открыты Финляндия, Эстония, Латвия, Швеция, Дания, Литва и Германия (23.11.2026); остальные страны закрыты, пока нет правил и договора', () => {
+  assert.deepEqual(openInstallmentCountries().sort(), ['DE', 'DK', 'EE', 'FI', 'LT', 'LV', 'SE']);
+  for (const country of ['FI', 'fi', 'EE', 'ee', 'LV', 'lv', 'SE', 'se', 'DK', 'dk', 'LT', 'lt', 'DE', 'de']) assert.equal(installmentCountryOpen(country), true, country);
+  for (const country of ['NO', 'PL', 'RO', 'XX', '', null, undefined]) {
     assert.equal(installmentCountryOpen(country), false, String(country));
     assert.equal(installmentCountry(country), null, String(country));
   }
@@ -117,7 +117,7 @@ test('правила Финляндии — расчёты закона о ра�
   assert.equal(rules.remedyAllowed, remedyAllowed);
   assert.equal(installmentRulesById('FI_OSKL'), rules);
   /* У закрытой страны правил нет: ни порогов на экране, ни сигнала продавцу. */
-  for (const country of ['NO', 'DE', 'XX', '', null, undefined]) assert.equal(installmentRules(country), null, String(country));
+  for (const country of ['NO', 'PL', 'XX', '', null, undefined]) assert.equal(installmentRules(country), null, String(country));
   assert.equal(installmentRulesById('toString'), null);
   assert.equal(installmentRulesById(null), null);
 });

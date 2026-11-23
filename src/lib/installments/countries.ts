@@ -10,8 +10,8 @@
  * Сделка всегда внутри одной страны: продавец и покупатель — компании одной
  * страны (проверяет база, start_installment_deal). Объявления видны всем.
  *
- * Открыты Финляндия, Эстония, Латвия, Швеция и Дания (23.11.2026). Для
- * остальных стран нет ни правил, ни договора (их готовят в
+ * Открыты Финляндия, Эстония, Латвия, Швеция, Дания, Литва и Германия
+ * (23.11.2026). Для остальных стран нет ни правил, ни договора (их готовят в
  * docs/equipment-sale/countries/).
  * Открыть страну — заполнить её запись, добавить правила (rules.ts), шаблон
  * договора (contractText/, contractTemplates.ts), тексты счетов
@@ -37,6 +37,20 @@
  *     зарегистрировать в Bilbogen до передачи. Это в текстах страны
  *     (countryTexts/se.ts, dk.ts) и в чек-листе передачи.
  *
+ * Литва и Германия открыты так же, по lt.md и de.md (23.11.2026):
+ *   · пороги просрочки — договорные (закон их не даёт), после порога —
+ *     письменный срок 14 дней (rules.ts: LT_CK6414, DE_BGB449);
+ *   · Литва: НДС со всей цены возникает при передаче, аванс до неё не
+ *     облагается — до передачи предварительный счёт (išankstinio mokėjimo
+ *     sąskaita), счёт с НДС в день передачи (vatInvoiceAtHandover);
+ *     обязательную страховку по закону оформляет записанный собственник, то
+ *     есть продавец — это в чек-листе;
+ *   · Германия: первый счёт как в Финляндии, но PDF — счёт только до
+ *     31.12.2026, дальше платёжная информация без НДС (invoiceTexts.ts);
+ *     ежемесячно — Zahlungsaufforderung без НДС; в реестре только держатель
+ *     (Halter), продавца защищает Zulassungsbescheinigung Teil II; шаблон —
+ *     типовые условия (AGB), оговорка в кабинете усилена.
+ *
  * СПИСОК ОТКРЫТЫХ СТРАН ПОВТОРЁН В БАЗЕ: функция app.installment_country_open
  * (последняя миграция, где она определена). Меняешь open здесь — меняй и там;
  * расхождение ловит тест countries.test.mjs.
@@ -54,16 +68,28 @@ import { COUNTRY_PACKS, type CountryCode } from '../country/index.ts';
  * SE_AVBL — Швеция: больше 14 дней и больше 1/10 (1/20) kreditfordran
  * (lag 1978:599, 7 §);
  * DK_KAL — Дания: 30 дней и не меньше 1/10 (1/20) всей суммы к уплате
- * (kreditaftaleloven § 29).
+ * (kreditaftaleloven § 29);
+ * LT_CK6414 — Литва: порогов в законе нет (CK 6.414), договорные — больше 30
+ * дней и не меньше 1/10 (1/20) цены с НДС, затем срок 14 дней (договор п. 9);
+ * DE_BGB449 — Германия: порогов для компаний нет (BGB § 449, § 323),
+ * договорные по образцу § 498 BGB — два взноса подряд и 10 % (5 %) цены с
+ * НДС, затем срок 14 дней (договор п. 9.1).
  */
-export type InstallmentRulesId = 'FI_OSKL' | 'EE_VOS' | 'LV_CL2070' | 'SE_AVBL' | 'DK_KAL';
+export type InstallmentRulesId = 'FI_OSKL' | 'EE_VOS' | 'LV_CL2070' | 'SE_AVBL' | 'DK_KAL' | 'LT_CK6414' | 'DE_BGB449';
 
 /**
  * Шаблон договора. FI_OSAMAKSU — ContractPdf.tsx, договор по финскому праву;
  * EE_JARELMAKS, LV_NOMAKSA, SE_AVBETALNING и DK_KREDITKOEB — тексты
  * contractText/ee.ts, lv.ts, se.ts и dk.ts, печатает CountryContractPdf.tsx.
  */
-export type InstallmentContractId = 'FI_OSAMAKSU' | 'EE_JARELMAKS' | 'LV_NOMAKSA' | 'SE_AVBETALNING' | 'DK_KREDITKOEB';
+export type InstallmentContractId =
+  | 'FI_OSAMAKSU'
+  | 'EE_JARELMAKS'
+  | 'LV_NOMAKSA'
+  | 'SE_AVBETALNING'
+  | 'DK_KREDITKOEB'
+  | 'LT_ISSIMOKETINAI'
+  | 'DE_RATENKAUF';
 
 export type InstallmentCountryEntry = {
   /** Раздел открыт компаниям этой страны. */
@@ -76,6 +102,12 @@ export type InstallmentCountryEntry = {
   contractLanguage: string | null;
   /** Весь НДС с цены выставляется первым счётом вместе со взносом; null — ещё не выяснено. */
   vatOnFirstInvoice: boolean | null;
+  /**
+   * true — счёт с НДС на всю цену выставляется в день передачи машины, а до
+   * неё — предварительный счёт без НДС на взнос и сумму НДС (Литва,
+   * 23.11.2026: PVMĮ 14 str. 4–5 d.). Тогда vatOnFirstInvoice — false.
+   */
+  vatInvoiceAtHandover?: true;
   /**
    * false — проценты в стране не предлагаются: ставка всегда 0 (Швеция,
    * 23.11.2026). Поля нет — проценты разрешены, как в остальных странах.
@@ -111,9 +143,20 @@ export const INSTALLMENT_COUNTRIES: Record<CountryCode, InstallmentCountryEntry>
   EE: { open: true, rules: 'EE_VOS', contract: 'EE_JARELMAKS', contractLanguage: 'et', vatOnFirstInvoice: true },
   /* Латвия (23.11.2026): nomaksas pirkums — поставка товара, PVN со всей цены при передаче (PVN likums 1. p. 13. pkt., 34. p. 8. d.). */
   LV: { open: true, rules: 'LV_CL2070', contract: 'LV_NOMAKSA', contractLanguage: 'lv', vatOnFirstInvoice: true },
-  LT: CLOSED,
+  /*
+   * Литва (23.11.2026): pirkimas–pardavimas išsimokėtinai по Civilinis kodeksas
+   * 6.411–6.416. НДС со всей цены — при передаче (PVMĮ 4 str. 2 d., 14 str.
+   * 5 d.), аванс до передачи не облагается: первый документ — предварительный
+   * счёт, PVM sąskaita faktūra — в день передачи (payments.ts).
+   */
+  LT: { open: true, rules: 'LT_CK6414', contract: 'LT_ISSIMOKETINAI', contractLanguage: 'lt', vatOnFirstInvoice: false, vatInvoiceAtHandover: true },
   PL: CLOSED,
-  DE: CLOSED,
+  /*
+   * Германия (23.11.2026): Kauf mit Ratenzahlung und Eigentumsvorbehalt (BGB
+   * §§ 433, 449). Весь НДС со всей цены при передаче, с предоплаты — при
+   * получении (§ 13 Abs. 1 Nr. 1 Buchst. a UStG): первый счёт как в Финляндии.
+   */
+  DE: { open: true, rules: 'DE_BGB449', contract: 'DE_RATENKAUF', contractLanguage: 'de', vatOnFirstInvoice: true },
   RO: CLOSED,
 };
 

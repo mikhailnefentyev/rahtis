@@ -5,13 +5,13 @@ import { sendEmail } from '@/lib/email';
 import { createFormat } from '@/lib/format';
 import { asCurrency } from '@/lib/money/currency';
 import { paymentReference } from '@/lib/sites/invoice';
-import { SiteInvoicePdf } from '@/lib/sites/SiteInvoicePdf';
+import { SiteInvoicePdf, type SiteInvoicePdfInput } from '@/lib/sites/SiteInvoicePdf';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { ibanHoldActive } from '@/lib/trust/changes';
 import { lastIbanChange } from '@/lib/trust/sensitive';
 import { firstInvoiceSettledAtIssue, vatOf, type VatMode } from './calc';
 import { installmentCountryEntry, installmentToday } from './countries';
-import { documentKind, documentLabels, invoiceTexts } from './invoiceTexts';
+import { documentKind, documentLabels, firstDocumentKind, invoiceTexts, plainDoc, plainDocLabels, type PlainDocKind } from './invoiceTexts';
 
 /**
  * Первый счёт продавца по согласованной сделке (22.11.2026).
@@ -42,6 +42,16 @@ import { documentKind, documentLabels, invoiceTexts } from './invoiceTexts';
  * платежа (RF вместо финского viitenumero) и «сегодня» (пояс страны).
  * Страна продавца записывается в счёт (seller.country): повторная печать
  * берёт её оттуда; у счетов до этой даты её нет — они финские.
+ *
+ * 23.11.2026, Литва и Германия: первый документ бывает не счётом
+ * (firstDocumentKind). Литва — всегда предварительный счёт (išankstinio
+ * mokėjimo sąskaita): взнос и сумма, равная НДС всей цены, одной строкой и
+ * без строк НДС; номер — от номера договора (IS-…), серию счетов он не
+ * занимает; счёт с НДС выписывается в день передачи (payments.ts
+ * issueHandoverVatInvoice). Германия с 01.01.2027 — платёжная информация без
+ * НДС (номер из серии, как у латвийского уведомления). Вид документа
+ * записывается в счёт (seller.document): по нему печать, отмена и сумма «к
+ * оплате сейчас» — у такого документа это весь его итог.
  */
 
 const BUCKET = 'reports';
@@ -59,6 +69,20 @@ const addDays = (iso: string, days: number) => {
 /** Страна продавца, записанная в счёт; у счетов до 23.11.2026 её нет — они финские. */
 const sellerCountry = (seller: unknown) => (seller as { country?: string | null } | null)?.country ?? 'FI';
 
+/** Вид первого документа, записанный в счёт; нет — обычный счёт с НДС (23.11.2026). */
+export const firstDocOf = (seller: unknown): PlainDocKind | null => {
+  const doc = (seller as { document?: string } | null)?.document;
+  return doc === 'PROFORMA' || doc === 'NOTICE' ? doc : null;
+};
+
+/**
+ * Сколько по первому документу платить до передачи: у счёта — взнос и весь
+ * НДС; у документа без НДС (Литва, Германия с 2027 года) — весь его итог, в
+ * нём уже взнос и сумма НДС (23.11.2026).
+ */
+export const firstDueNowCents = (row: { seller: unknown; vat_cents: number; total_cents: number }, downPaymentCents: number) =>
+  firstDocOf(row.seller) ? row.total_cents : downPaymentCents + row.vat_cents;
+
 export async function createFirstInvoice(dealId: string): Promise<FirstInvoiceStatus> {
   const admin = createAdminClient();
 
@@ -68,20 +92,22 @@ export async function createFirstInvoice(dealId: string): Promise<FirstInvoiceSt
   if (deal.first_invoice_id) {
     const { data: existing } = await admin
       .from('carrier_invoices')
-      .select('id, company_id, number, issued_on, file_path, sent_at, vat_cents, seller')
+      .select('id, company_id, number, issued_on, file_path, sent_at, vat_cents, total_cents, seller')
       .eq('id', deal.first_invoice_id)
       .maybeSingle();
     if (!existing) return 'NOT_FOUND';
     const country = sellerCountry(existing.seller);
-    if (!existing.number.startsWith(DRAFT_PREFIX)) await settleIfNothingDue(deal.id, existing.id, deal.down_payment_cents, existing.vat_cents, country);
+    /* К оплате сейчас — по виду документа: у предварительного счёта и уведомления без НДС это весь итог. */
+    const dueNow = firstDueNowCents(existing, deal.down_payment_cents);
+    if (!existing.number.startsWith(DRAFT_PREFIX)) await settleIfNothingDue(deal.id, existing.id, dueNow, 0, country);
     if (existing.file_path && existing.sent_at) return 'EXISTS';
     /*
      * Процесс оборвался после закрепления счёта, но до номера: раньше
      * повтор навсегда упирался в NOT_FOUND у deliver (22.11.2026).
      */
     if (existing.number.startsWith(DRAFT_PREFIX)) {
-      await assignNumber(existing.id, existing.company_id, existing.issued_on, country);
-      await settleIfNothingDue(deal.id, existing.id, deal.down_payment_cents, existing.vat_cents, country);
+      await assignNumber(existing.id, existing.company_id, existing.issued_on, country, fixedNumber(firstDocOf(existing.seller), country, deal.contract_number));
+      await settleIfNothingDue(deal.id, existing.id, dueNow, 0, country);
     }
     return deliver(existing.id, deal);
   }
@@ -103,9 +129,11 @@ export async function createFirstInvoice(dealId: string): Promise<FirstInvoiceSt
    * Этот счёт — «весь НДС с цены первым счётом» (финское правило). Он
    * выставляется только в стране, у которой так записано в реестре стран
    * раздела (23.11.2026); стране с другим порядком нужен свой первый счёт,
-   * и до его появления она закрыта.
+   * и до его появления она закрыта. Литва (23.11.2026): счёт с НДС — при
+   * передаче, а первым идёт предварительный счёт (vatInvoiceAtHandover).
    */
-  if (installmentCountryEntry(seller.country)?.vatOnFirstInvoice !== true) return 'NOT_FOUND';
+  const entry = installmentCountryEntry(seller.country);
+  if (entry?.vatOnFirstInvoice !== true && entry?.vatInvoiceAtHandover !== true) return 'NOT_FOUND';
   if (!seller.iban) return 'NO_IBAN';
   const changedAt = await lastIbanChange(seller.id);
   if (changedAt && ibanHoldActive(changedAt)) return 'IBAN_RECENT';
@@ -131,15 +159,35 @@ export async function createFirstInvoice(dealId: string): Promise<FirstInvoiceSt
     .filter(Boolean)
     .join(', ');
   const what = [snapshot.make, snapshot.plate].filter(Boolean).join(' ');
+  /*
+   * Документ без НДС (Литва — предварительный счёт; Германия с 2027 года —
+   * платёжная информация): одна строка «взнос и сумма НДС всей цены», налог не
+   * выделяется. Иначе — счёт со всей ценой, как было.
+   */
+  const kind = firstDocumentKind(seller.country, issuedOn, deal.handover_date);
+  const doc: PlainDocKind | null = kind === 'INVOICE' ? null : kind;
+  const docLine =
+    kind === 'PROFORMA' ? tx.proforma?.line : kind === 'NOTICE' ? tx.notice?.firstLine : undefined;
+  if (doc && !docLine) return 'NOT_FOUND';
+  const docCents = deal.down_payment_cents + vatCents;
   const lines = [
-    {
-      date: deal.handover_date,
-      text: tx.first.line({ what, contract: deal.contract_number }),
-      quantity: 1,
-      unit: tx.unit,
-      unitCents: netCents,
-      amountCents: netCents,
-    },
+    doc && docLine
+      ? {
+          date: deal.handover_date,
+          text: docLine({ what, contract: deal.contract_number }),
+          quantity: 1,
+          unit: tx.unit,
+          unitCents: docCents,
+          amountCents: docCents,
+        }
+      : {
+          date: deal.handover_date,
+          text: tx.first.line({ what, contract: deal.contract_number }),
+          quantity: 1,
+          unit: tx.unit,
+          unitCents: netCents,
+          amountCents: netCents,
+        },
   ];
 
   const { data: invoice, error } = await admin
@@ -163,6 +211,8 @@ export async function createFirstInvoice(dealId: string): Promise<FirstInvoiceSt
         address: sellerAddress,
         email: seller.billing_email || seller.contact_email,
         country: seller.country,
+        /* Вид документа, если это не счёт (23.11.2026); у счёта поля нет, как было. */
+        ...(doc ? { document: doc } : {}),
       },
       customer: {
         name: buyer.legal_name || buyer.name,
@@ -173,10 +223,10 @@ export async function createFirstInvoice(dealId: string): Promise<FirstInvoiceSt
         reference: buyer.billing_reference,
       },
       lines,
-      net_cents: netCents,
-      vat_bps: vatMode === 'STANDARD' ? deal.vat_bps : 0,
-      vat_cents: vatCents,
-      total_cents: netCents + vatCents,
+      net_cents: doc ? docCents : netCents,
+      vat_bps: !doc && vatMode === 'STANDARD' ? deal.vat_bps : 0,
+      vat_cents: doc ? 0 : vatCents,
+      total_cents: doc ? docCents : netCents + vatCents,
       /* Валюта счёта — валюта сделки (страны продавца), без пересчёта (23.11.2026). */
       currency: asCurrency(deal.currency),
     })
@@ -199,7 +249,7 @@ export async function createFirstInvoice(dealId: string): Promise<FirstInvoiceSt
 
   /* Номер не выдан или не записан — счёт без номера не оставляем: снять закрепление и удалить, повтор начнёт заново. */
   try {
-    await assignNumber(invoice.id, seller.id, issuedOn, seller.country);
+    await assignNumber(invoice.id, seller.id, issuedOn, seller.country, fixedNumber(doc, seller.country, deal.contract_number));
   } catch (cause) {
     await admin.from('installment_deals').update({ first_invoice_id: null }).eq('id', deal.id);
     await admin.from('carrier_invoices').delete().eq('id', invoice.id);
@@ -208,6 +258,16 @@ export async function createFirstInvoice(dealId: string): Promise<FirstInvoiceSt
 
   await settleIfNothingDue(deal.id, invoice.id, deal.down_payment_cents, vatCents, seller.country);
   return deliver(invoice.id, deal);
+}
+
+/**
+ * Номер документа, который не занимает серию счетов (23.11.2026): у
+ * литовского предварительного счёта — от номера договора. null — номер из
+ * серии продавца, как у счёта (и у немецкой платёжной информации).
+ */
+function fixedNumber(doc: PlainDocKind | null, country: string | null, contract: string | null): string | null {
+  if (doc !== 'PROFORMA' || !contract) return null;
+  return invoiceTexts(country).proforma?.number({ contract }) ?? null;
 }
 
 /**
@@ -235,12 +295,14 @@ async function settleIfNothingDue(dealId: string, invoiceId: string, downPayment
  * ещё DRAFT-…»: параллельный повтор не перепишет уже выданный номер.
  * Ошибка записи не глотается: без номера счёт не печатается.
  */
-async function assignNumber(invoiceId: string, sellerId: string, issuedOn: string, country: string | null): Promise<void> {
+async function assignNumber(invoiceId: string, sellerId: string, issuedOn: string, country: string | null, fixed: string | null = null): Promise<void> {
   const admin = createAdminClient();
-  const { data: number, error: numberError } = await admin.rpc('next_carrier_invoice_number', {
-    p_company_id: sellerId,
-    p_year: Number(issuedOn.slice(0, 4)),
-  });
+  const { data: number, error: numberError } = fixed
+    ? { data: fixed, error: null }
+    : await admin.rpc('next_carrier_invoice_number', {
+        p_company_id: sellerId,
+        p_year: Number(issuedOn.slice(0, 4)),
+      });
   if (numberError || !number) throw new Error(`номер счёта: ${numberError?.message}`);
   const { error } = await admin
     .from('carrier_invoices')
@@ -251,7 +313,7 @@ async function assignNumber(invoiceId: string, sellerId: string, issuedOn: strin
   if (error) throw new Error(`номер счёта не записан: ${error.message}`);
 }
 
-type Deal = {
+export type Deal = {
   id: string;
   contract_number: string | null;
   down_payment_cents: number;
@@ -262,18 +324,38 @@ type Deal = {
   handover_date: string;
 };
 
-/** PDF и письмо по уже записанному счёту — и при первом выставлении, и при повторе. */
-async function deliver(invoiceId: string, deal: Deal): Promise<FirstInvoiceStatus> {
-  const admin = createAdminClient();
-  const { data: inv } = await admin.from('carrier_invoices').select('*').eq('id', invoiceId).maybeSingle();
-  if (!inv || inv.number.startsWith(DRAFT_PREFIX)) return 'NOT_FOUND';
+/** Строка первого документа, как она записана в carrier_invoices (для печати). */
+export type FirstDocRow = {
+  number: string;
+  issued_on: string;
+  due_on: string;
+  reference: string;
+  seller: unknown;
+  customer: unknown;
+  lines: unknown;
+  net_cents: number;
+  vat_cents: number;
+  total_cents: number;
+  currency: string | null;
+};
+
+/**
+ * Что печатается и что уходит письмом по первому документу (23.11.2026):
+ * чистая функция без базы — её же вызывает проверка печати. Для счёта
+ * (всех стран до 23.11.2026) — то же, что печаталось раньше; для документа
+ * без НДС (Литва, Германия с 2027 года) — свой заголовок и подписи, без строк
+ * НДС, к оплате — весь итог.
+ */
+export function firstDocumentPdf(inv: FirstDocRow, deal: Deal): { pdf: SiteInvoicePdfInput; subject: string; text: string; filename: string } {
   /* Тексты, подписи и вид чисел — по стране продавца, записанной в счёте. */
   const country = sellerCountry(inv.seller);
   const tx = invoiceTexts(country);
   const f = createFormat(tx.intl);
   const fiDate = tx.date;
+  const doc = firstDocOf(inv.seller);
+  const plain = plainDoc(tx, doc);
   /* Латвия с 2028 года: PDF счётом быть перестаёт — документ выходит платёжным уведомлением (invoiceTexts.ts). */
-  const notice = documentKind(country, inv.issued_on) === 'NOTICE' ? tx.notice : null;
+  const notice = !doc && documentKind(country, inv.issued_on) === 'NOTICE' ? tx.notice : null;
 
   const seller = inv.seller as { name: string; business_id: string; vat_id: string | null; iban: string; address: string; email: string };
   const customer = inv.customer as { name: string; business_id: string | null; vat_id: string | null; address: string; email: string };
@@ -281,65 +363,61 @@ async function deliver(invoiceId: string, deal: Deal): Promise<FirstInvoiceStatu
   const vatMode = deal.vat_mode as VatMode;
   /* Суммы — в валюте самого счёта (она же валюта сделки). */
   const currency = asCurrency(inv.currency);
-  const payNowCents = deal.down_payment_cents + inv.vat_cents;
+  const payNowCents = firstDueNowCents(inv, deal.down_payment_cents);
   const restCents = deal.price_cents - deal.down_payment_cents;
   const what = lines[0]?.text.split(' – ')[0] ?? '';
+  /* НДС всей цены — для текста документа без НДС: в строке документа он не выделен. */
+  const vatOfPrice = doc ? payNowCents - deal.down_payment_cents : inv.vat_cents;
 
   const vatLabel = tx.vatLabel(
     vatMode === 'STANDARD' ? (deal.vat_bps / 100).toLocaleString(tx.intl, { maximumFractionDigits: 1 }) : null,
   );
-  const note = [
-    notice?.note,
-    tx.first.note({
-      down: f.money(deal.down_payment_cents, currency),
-      vat: f.money(inv.vat_cents, currency),
-      rest: f.money(restCents, currency),
-      months: deal.months,
-      contract: deal.contract_number ?? '',
-      vatMode,
-    }),
-  ]
-    .filter(Boolean)
-    .join('\n');
+  const noteArgs = {
+    down: f.money(deal.down_payment_cents, currency),
+    vat: f.money(vatOfPrice, currency),
+    rest: f.money(restCents, currency),
+    months: deal.months,
+    contract: deal.contract_number ?? '',
+    vatMode,
+  };
+  const note =
+    doc === 'NOTICE' && tx.notice?.firstNote
+      ? [tx.notice.note, tx.notice.firstNote(noteArgs)].filter(Boolean).join('\n')
+      : [notice?.note, tx.first.note(noteArgs)].filter(Boolean).join('\n');
 
-  const buffer = await renderToBuffer(
-    SiteInvoicePdf({
-      number: inv.number,
-      issuedOn: fiDate(inv.issued_on),
-      dueOn: fiDate(inv.due_on),
-      reference: inv.reference,
-      seller: { name: seller.name, businessId: seller.business_id, vatId: seller.vat_id, address: seller.address, iban: seller.iban, email: seller.email },
-      customer: { name: customer.name, businessId: customer.business_id, vatId: customer.vat_id, address: customer.address },
-      job: `${what} · ${deal.contract_number}`,
-      jobLabel: tx.first.jobLabel,
-      period: fiDate(deal.handover_date),
-      periodLabel: tx.first.periodLabel,
-      lines: lines.map((l) => ({
-        date: fiDate(l.date),
-        text: l.text,
-        quantity: '1',
-        unit: l.unit,
-        unitPrice: f.money(l.unitCents, currency),
-        amount: f.money(l.amountCents, currency),
-      })),
-      net: f.money(inv.net_cents, currency),
-      vatLabel,
-      vat: f.money(inv.vat_cents, currency),
-      total: f.money(inv.total_cents, currency),
-      payNow: { label: tx.first.payNowLabel, amount: f.money(payNowCents, currency) },
-      note,
-      labels: documentLabels(tx, Boolean(notice)),
-      title: notice?.title,
-      docName: notice?.docName,
-    }),
-  );
+  const pdf: SiteInvoicePdfInput = {
+    number: inv.number,
+    issuedOn: fiDate(inv.issued_on),
+    dueOn: fiDate(inv.due_on),
+    reference: inv.reference,
+    seller: { name: seller.name, businessId: seller.business_id, vatId: seller.vat_id, address: seller.address, iban: seller.iban, email: seller.email },
+    customer: { name: customer.name, businessId: customer.business_id, vatId: customer.vat_id, address: customer.address },
+    job: `${what} · ${deal.contract_number}`,
+    jobLabel: tx.first.jobLabel,
+    period: fiDate(deal.handover_date),
+    periodLabel: tx.first.periodLabel,
+    lines: lines.map((l) => ({
+      date: fiDate(l.date),
+      text: l.text,
+      quantity: '1',
+      unit: l.unit,
+      unitPrice: f.money(l.unitCents, currency),
+      amount: f.money(l.amountCents, currency),
+    })),
+    net: f.money(inv.net_cents, currency),
+    vatLabel,
+    vat: f.money(inv.vat_cents, currency),
+    total: f.money(inv.total_cents, currency),
+    /* У документа без НДС к оплате — весь итог: отдельной строки «к оплате сейчас» нет. */
+    payNow: doc ? undefined : { label: tx.first.payNowLabel, amount: f.money(payNowCents, currency) },
+    note,
+    labels: doc ? plainDocLabels(tx, doc) : documentLabels(tx, Boolean(notice)),
+    title: plain?.title ?? notice?.title,
+    docName: plain?.docName ?? notice?.docName,
+    ...(plain?.noVat ? { noVat: true } : {}),
+  };
 
-  const path = `installment-invoices/${inv.company_id}/${inv.number}.pdf`;
-  const { error: upload } = await admin.storage.from(BUCKET).upload(path, buffer, { contentType: 'application/pdf', upsert: true });
-  if (upload) throw new Error(`загрузка счёта: ${upload.message}`);
-  await admin.from('carrier_invoices').update({ file_path: path }).eq('id', inv.id);
-
-  const mailText = tx.first.mailText({
+  const mailArgs = {
     number: inv.number,
     contract: deal.contract_number ?? '',
     what,
@@ -349,16 +427,42 @@ async function deliver(invoiceId: string, deal: Deal): Promise<FirstInvoiceStatu
     due: fiDate(inv.due_on),
     iban: seller.iban,
     reference: inv.reference,
-  });
+  };
+  const subjectArgs = { number: inv.number, seller: seller.name, contract: deal.contract_number ?? '' };
+  /* Германия с 2027 года: письмо о платёжной информации, а не о счёте. */
+  const noticeMail = doc === 'NOTICE' ? tx.notice : null;
+  return {
+    pdf,
+    subject: noticeMail?.firstMailSubject ? noticeMail.firstMailSubject(subjectArgs) : tx.first.mailSubject(subjectArgs),
+    text: noticeMail?.firstMailText ? noticeMail.firstMailText(mailArgs) : tx.first.mailText(mailArgs),
+    filename: `${plain?.filePrefix ?? tx.filePrefix}-${inv.number}.pdf`,
+  };
+}
+
+/** PDF и письмо по уже записанному счёту — и при первом выставлении, и при повторе. */
+async function deliver(invoiceId: string, deal: Deal): Promise<FirstInvoiceStatus> {
+  const admin = createAdminClient();
+  const { data: inv } = await admin.from('carrier_invoices').select('*').eq('id', invoiceId).maybeSingle();
+  if (!inv || inv.number.startsWith(DRAFT_PREFIX)) return 'NOT_FOUND';
+  const built = firstDocumentPdf(inv, deal);
+  const customer = inv.customer as { name: string; email: string };
+  const seller = inv.seller as { email: string };
+
+  const buffer = await renderToBuffer(SiteInvoicePdf(built.pdf));
+
+  const path = `installment-invoices/${inv.company_id}/${inv.number}.pdf`;
+  const { error: upload } = await admin.storage.from(BUCKET).upload(path, buffer, { contentType: 'application/pdf', upsert: true });
+  if (upload) throw new Error(`загрузка счёта: ${upload.message}`);
+  await admin.from('carrier_invoices').update({ file_path: path }).eq('id', inv.id);
 
   const mail = await sendEmail({
     template: 'installment_first_invoice',
     to: customer.email,
     toName: customer.name,
     replyTo: seller.email,
-    subject: tx.first.mailSubject({ number: inv.number, seller: seller.name, contract: deal.contract_number ?? '' }),
-    text: mailText,
-    attachments: [{ bucket: BUCKET, path, filename: `${tx.filePrefix}-${inv.number}.pdf` }],
+    subject: built.subject,
+    text: built.text,
+    attachments: [{ bucket: BUCKET, path, filename: built.filename }],
     companyId: inv.company_id,
   });
 

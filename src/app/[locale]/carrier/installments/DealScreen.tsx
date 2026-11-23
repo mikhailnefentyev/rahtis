@@ -114,11 +114,16 @@ export async function DealScreen({
   /* Этап 3: график, сводка по машине, кредит-нота. */
   const supabase = await createClient();
   const today = installmentToday(seller.country);
-  const [{ data: payments }, { data: vehicleStatus }, { data: credit }] = await Promise.all([
+  /* Литва (23.11.2026): счёт с НДС на всю цену, выписанный при передаче; столбца ещё нет в src/types/database.ts. */
+  const vatInvoiceId = (deal as { vat_invoice_id?: string | null }).vat_invoice_id ?? null;
+  const [{ data: payments }, { data: vehicleStatus }, { data: credit }, { data: vatInvoice }] = await Promise.all([
     supabase.from('installment_payments').select('*').eq('deal_id', deal.id).order('n'),
     deal.buyer_vehicle_id ? supabase.rpc('installment_vehicle_status', { p_deal_id: deal.id }) : Promise.resolve({ data: null }),
     deal.credit_note_id
       ? supabase.from('carrier_invoices').select('id, number, file_path').eq('id', deal.credit_note_id).maybeSingle()
+      : Promise.resolve({ data: null }),
+    vatInvoiceId
+      ? supabase.from('carrier_invoices').select('id, number, file_path').eq('id', vatInvoiceId).maybeSingle()
       : Promise.resolve({ data: null }),
   ]);
   const { data: payInvoices } = (payments ?? []).some((p) => p.invoice_id)
@@ -153,7 +158,7 @@ export async function DealScreen({
     deal.status === 'ACTIVE' &&
     rules !== null &&
     rules.remedyAllowed(
-      overdue.map((p) => ({ dueDate: p.lateFrom, unpaidCents: p.principal_cents })),
+      overdue.map((p) => ({ dueDate: p.lateFrom, unpaidCents: p.principal_cents, n: p.n })),
       today,
       thresholdBase,
       unpaid.reduce((sum, p) => sum + p.principal_cents, 0),
@@ -450,6 +455,11 @@ export async function DealScreen({
                 {invoice?.file_path && (
                   <a href={`${home}/${deal.id}/invoice`} className={buttonClass({ size: 'sm' })}>
                     {ui.deal.invoice} · {invoice.number}
+                  </a>
+                )}
+                {vatInvoice?.file_path && (
+                  <a href={`${home}/${deal.id}/invoice?inv=${vatInvoice.id}`} className={buttonClass({ size: 'sm' })}>
+                    {ui.deal.invoice} · {vatInvoice.number}
                   </a>
                 )}
               </div>

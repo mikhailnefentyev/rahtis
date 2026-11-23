@@ -62,8 +62,12 @@ export type ContractPdfInput = {
   firstInvoiceNumber: string | null;
   /** График с итогом строки и остатком цены после платежа — для приложения 1. */
   plan: { n: number; due: string; principal: string; interest: string; total: string; balance: string }[];
-  /** Итоги графика: взносы 1–N (без первого счёта), проценты, всё вместе с первым счётом. */
-  planTotals: { principal: string; interest: string; all: string };
+  /**
+   * Итоги графика: взносы 1–N (без первого счёта), проценты, всё вместе с
+   * первым счётом; instalments — взносы 1–N вместе с процентами, без первого
+   * взноса (итог графика Литвы, 23.11.2026).
+   */
+  planTotals: { principal: string; interest: string; all: string; instalments: string };
   /** Число месяца, на которое приходятся взносы (по первому сроку). */
   dueDay: number;
 };

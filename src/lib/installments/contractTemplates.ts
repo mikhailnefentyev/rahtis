@@ -18,6 +18,11 @@ import { installmentCountryEntry, type InstallmentContractId } from './countries
  *     часовому поясу страны.
  *   · SE_AVBETALNING, DK_KREDITKOEB — тексты contractText/se.ts и dk.ts тем
  *     же компонентом: суммы в кронах, у Швеции даты «ГГГГ-ММ-ДД».
+ *   · LT_ISSIMOKETINAI, DE_RATENKAUF — contractText/lt.ts и de.ts (23.11.2026):
+ *     у Литвы даты «ГГГГ-ММ-ДД».
+ * Номер первого документа в договоре — только если это счёт с НДС: у Литвы
+ * первый документ — предварительный счёт, а номер счёта с НДС появится в день
+ * передачи, поэтому в договоре прочерк (contract.ts).
  * Новая страна — текст договора в contractText/ и запись в COUNTRY_CONTRACTS.
  */
 type ContractTemplate = {
@@ -59,6 +64,8 @@ const TEMPLATES: Record<InstallmentContractId, ContractTemplate> = {
   LV_NOMAKSA: countryTemplate('LV_NOMAKSA'),
   SE_AVBETALNING: countryTemplate('SE_AVBETALNING'),
   DK_KREDITKOEB: countryTemplate('DK_KREDITKOEB'),
+  LT_ISSIMOKETINAI: countryTemplate('LT_ISSIMOKETINAI'),
+  DE_RATENKAUF: countryTemplate('DE_RATENKAUF'),
 };
 
 /**

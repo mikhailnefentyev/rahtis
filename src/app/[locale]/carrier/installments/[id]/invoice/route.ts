@@ -4,7 +4,8 @@ import { loadDeal } from '@/lib/installments/contract';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 /**
- * Счета сделки (22–23.11.2026): первый счёт, счета взносов, кредит-нота.
+ * Счета сделки (22–23.11.2026): первый счёт, счета взносов, кредит-нота;
+ * у Литвы — ещё счёт с НДС, выписанный при передаче (vat_invoice_id).
  * Сделку видят только стороны (RLS в loadDeal); счёт должен принадлежать
  * этой сделке. Подписанная ссылка на пять минут.
  */
@@ -20,8 +21,10 @@ export async function GET(request: Request, { params }: { params: Promise<{ loca
 
   const admin = createAdminClient();
   const { data: payments } = await admin.from('installment_payments').select('invoice_id').eq('deal_id', id);
+  /* Столбец vat_invoice_id (миграция 20261201100000) ещё не в src/types/database.ts. */
+  const vatInvoiceId = (loaded.deal as { vat_invoice_id?: string | null }).vat_invoice_id ?? null;
   const own = new Set(
-    [loaded.deal.first_invoice_id, loaded.deal.credit_note_id, ...(payments ?? []).map((p) => p.invoice_id)].filter(
+    [loaded.deal.first_invoice_id, loaded.deal.credit_note_id, vatInvoiceId, ...(payments ?? []).map((p) => p.invoice_id)].filter(
       (v): v is string => Boolean(v),
     ),
   );

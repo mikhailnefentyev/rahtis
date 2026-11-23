@@ -5,6 +5,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { buildSchedule, type VatMode } from './calc';
 import { installmentCurrency, installmentDay } from './countries';
+import { firstDocOf } from './firstInvoice';
 import { dkTotalPayableCents, installmentRules, seCreditClaimCents } from './rules';
 import type { ContractPdfInput } from './ContractPdf';
 
@@ -27,7 +28,7 @@ export async function loadDeal(dealId: string) {
     admin.from('companies').select(companyCols).eq('id', deal.seller_company_id).maybeSingle(),
     admin.from('companies').select(companyCols).eq('id', deal.buyer_company_id).maybeSingle(),
     deal.first_invoice_id
-      ? admin.from('carrier_invoices').select('id, number, file_path, total_cents, due_on').eq('id', deal.first_invoice_id).maybeSingle()
+      ? admin.from('carrier_invoices').select('id, number, file_path, total_cents, due_on, seller').eq('id', deal.first_invoice_id).maybeSingle()
       : Promise.resolve({ data: null }),
   ]);
   if (!listing || !seller || !buyer) return null;
@@ -153,8 +154,13 @@ export function contractInput(d: LoadedDeal, print: ContractPrint = FI_PRINT): C
     };
   });
   const principalTotal = schedule.installments.reduce((sum, x) => sum + x.principalCents, 0);
-  /* Номер-заглушка (DRAFT-…) — счёт ещё без номера: в договоре остаётся прочерк. */
-  const firstInvoiceNumber = d.invoice?.number && !d.invoice.number.startsWith('DRAFT-') ? d.invoice.number : null;
+  /*
+   * Номер-заглушка (DRAFT-…) — счёт ещё без номера: в договоре остаётся прочерк.
+   * Первый документ без НДС (литовский предварительный счёт, немецкая
+   * платёжная информация, 23.11.2026) — не счёт с НДС: в договоре тоже прочерк.
+   */
+  const firstInvoiceNumber =
+    d.invoice?.number && !d.invoice.number.startsWith('DRAFT-') && !firstDocOf(d.invoice.seller) ? d.invoice.number : null;
 
   return {
     number: deal.contract_number,
@@ -199,6 +205,7 @@ export function contractInput(d: LoadedDeal, print: ContractPrint = FI_PRINT): C
       principal: eur(principalTotal),
       interest: schedule.interestTotalCents > 0 ? eur(schedule.interestTotalCents) : '–',
       all: eur(schedule.firstInvoiceCents + principalTotal + schedule.interestTotalCents),
+      instalments: eur(principalTotal + schedule.interestTotalCents),
     },
     dueDay: Number(deal.first_due_date.slice(8, 10)),
   };

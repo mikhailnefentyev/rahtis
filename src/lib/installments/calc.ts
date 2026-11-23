@@ -185,7 +185,11 @@ export function thresholds(schedule: Schedule): Thresholds {
   };
 }
 
-export type Overdue = { dueDate: string; unpaidCents: number };
+/**
+ * Просроченный взнос. n — номер взноса в графике (23.11.2026): нужен правилу
+ * Германии «два взноса подряд»; остальные правила его не читают.
+ */
+export type Overdue = { dueDate: string; unpaidCents: number; n?: number };
 
 /**
  * Можно ли изымать или требовать досрочно (OskL 2 § 1 mom): сумма,

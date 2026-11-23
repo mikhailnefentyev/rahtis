@@ -1,7 +1,8 @@
 /**
  * Тексты кабинета по стране сделки (23.11.2026). Финляндия — без записи:
  * её тексты в copy.ts и i18n/* показываются как были. У Эстонии, Латвии,
- * Швеции и Дании — свои (ee.ts, lv.ts, se.ts, dk.ts) на всех десяти языках
+ * Швеции, Дании, Литвы и Германии — свои (ee.ts, lv.ts, se.ts, dk.ts, lt.ts,
+ * de.ts; Литва и Германия — 23.11.2026) на всех десяти языках
  * кабинета: эстонская компания
  * может работать в кабинете по-русски или по-английски и должна читать про
  * своё право, а не про финское.
@@ -13,13 +14,22 @@ import { EE_TEXTS } from './ee.ts';
 import { LV_TEXTS } from './lv.ts';
 import { SE_TEXTS } from './se.ts';
 import { DK_TEXTS } from './dk.ts';
+import { LT_TEXTS } from './lt.ts';
+import { DE_TEXTS } from './de.ts';
 import type { InstallmentCommonCopy, InstallmentLawCopy } from './types.ts';
 
 export type { InstallmentCommonCopy, InstallmentLawCopy } from './types.ts';
 
-export type LawCountry = 'EE' | 'LV' | 'SE' | 'DK';
+export type LawCountry = 'EE' | 'LV' | 'SE' | 'DK' | 'LT' | 'DE';
 
-export const LAW_TEXTS: Record<LawCountry, Record<Locale, InstallmentLawCopy>> = { EE: EE_TEXTS, LV: LV_TEXTS, SE: SE_TEXTS, DK: DK_TEXTS };
+export const LAW_TEXTS: Record<LawCountry, Record<Locale, InstallmentLawCopy>> = {
+  EE: EE_TEXTS,
+  LV: LV_TEXTS,
+  SE: SE_TEXTS,
+  DK: DK_TEXTS,
+  LT: LT_TEXTS,
+  DE: DE_TEXTS,
+};
 
 /*
  * Общее для стран, кроме Финляндии. Досрочное погашение во всех четырёх
@@ -163,10 +173,19 @@ export function withCountryTexts<T extends BaseCopy>(base: T, locale: string, co
   /*
    * Чек-лист передачи: договор, первый счёт и акт — общие; реестр и страховка
    * — по стране. У страны могут быть свои пункты перед реестром (Дания —
-   * Bilbogen): форма передачи требует отметить все пункты, сколько бы их ни было.
+   * Bilbogen, Литва — реестр договоров, Германия — проверка § 513 BGB): форма
+   * передачи требует отметить все пункты, сколько бы их ни было. У Литвы
+   * первый документ — предварительный счёт, и пункт об оплате свой
+   * (checkFirstPaid, 23.11.2026).
    */
   const checklist = base.stage3.checklist.flatMap((item, i) =>
-    i === 2 ? [...(law.checkBefore ?? []), law.checkRegister] : i === 3 ? [law.checkInsurance] : [item],
+    i === 1 && law.checkFirstPaid
+      ? [law.checkFirstPaid]
+      : i === 2
+        ? [...(law.checkBefore ?? []), law.checkRegister]
+        : i === 3
+          ? [law.checkInsurance]
+          : [item],
   );
   return {
     ...base,
@@ -198,7 +217,8 @@ export function withCountryTexts<T extends BaseCopy>(base: T, locale: string, co
       thresholdsText: law.thresholdsText,
       rateHint: law.rateHint ?? common.rateHint,
       invoiceNote: law.invoiceNote,
-      legalNotice: LEGAL_NOTICE[l],
+      /* Германия (23.11.2026): к общей оговорке — что шаблон является AGB (§ 307 BGB). */
+      legalNotice: law.legalNoticeExtra ? `${LEGAL_NOTICE[l]} ${law.legalNoticeExtra}` : LEGAL_NOTICE[l],
     },
   };
 }

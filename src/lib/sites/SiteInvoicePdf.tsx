@@ -44,6 +44,13 @@ export type SiteInvoicePdfInput = {
   labels?: InvoiceLabels;
   /** Название документа в свойствах PDF, если это не счёт и не кредит-нота (платёжное уведомление). */
   docName?: string;
+  /**
+   * Документ не счёт и налога не показывает (23.11.2026): предварительный
+   * счёт и платёжное требование Литвы, платёжная информация и
+   * Zahlungsaufforderung Германии. Строк «без НДС» и «НДС» нет — только итог
+   * к оплате. Не передано — счёт печатается как всегда.
+   */
+  noVat?: boolean;
 };
 
 /* Y-tunnus — только у финского номера; у компании другой страны общая подпись (номер хранится в своём виде). */
@@ -144,14 +151,18 @@ export function SiteInvoicePdf(input: SiteInvoicePdfInput) {
         </View>
 
         <View style={s.totals}>
-          <View style={s.totalRow}>
-            <Text>{ansi(L.net)}</Text>
-            <Text>{ansi(input.net)}</Text>
-          </View>
-          <View style={s.totalRow}>
-            <Text>{ansi(input.vatLabel)}</Text>
-            <Text>{ansi(input.vat)}</Text>
-          </View>
+          {input.noVat ? null : (
+            <>
+              <View style={s.totalRow}>
+                <Text>{ansi(L.net)}</Text>
+                <Text>{ansi(input.net)}</Text>
+              </View>
+              <View style={s.totalRow}>
+                <Text>{ansi(input.vatLabel)}</Text>
+                <Text>{ansi(input.vat)}</Text>
+              </View>
+            </>
+          )}
           <View style={s.totalRow}>
             <Text style={input.payNow ? undefined : s.bold}>{ansi(input.payNow ? L.total : L.totalDue)}</Text>
             <Text style={input.payNow ? undefined : s.bold}>{ansi(input.total)}</Text>

@@ -1,6 +1,6 @@
 /**
  * Тексты договоров стран, кроме Финляндии (23.11.2026; Швеция и Дания — с
- * того же дня, se.ts и dk.ts): какой сборщик у
+ * того же дня, se.ts и dk.ts; Литва и Германия — lt.ts и de.ts): какой сборщик у
  * шаблона, на каком языке печатать числа и как назвать файл. Финский
  * шаблон (FI_OSAMAKSU) — отдельный компонент ContractPdf.tsx. Модуль без
  * зависимостей от сервера: его читают contractTemplates.ts и тесты.
@@ -11,6 +11,8 @@ import { eeContractText } from './ee.ts';
 import { lvContractText } from './lv.ts';
 import { seContractText } from './se.ts';
 import { dkContractText } from './dk.ts';
+import { ltContractText } from './lt.ts';
+import { deContractText } from './de.ts';
 
 export type CountryContractId = Exclude<InstallmentContractId, 'FI_OSAMAKSU'>;
 
@@ -35,6 +37,9 @@ export const COUNTRY_CONTRACTS: Record<CountryContractId, CountryContract> = {
   LV_NOMAKSA: { build: lvContractText, intl: 'lv-LV', filePrefix: 'Nomaksas-ligums' },
   SE_AVBETALNING: { build: seContractText, intl: 'sv-SE', filePrefix: 'Avbetalningsavtal', isoDates: true, interest: false },
   DK_KREDITKOEB: { build: dkContractText, intl: 'da-DK', filePrefix: 'Koebekontrakt' },
+  /* Литва (23.11.2026): даты «ГГГГ-ММ-ДД», как просит шаблон lt.md. */
+  LT_ISSIMOKETINAI: { build: ltContractText, intl: 'lt-LT', filePrefix: 'Isimoketinai-sutartis', isoDates: true },
+  DE_RATENKAUF: { build: deContractText, intl: 'de-DE', filePrefix: 'Ratenkaufvertrag' },
 };
 
 /** Шаблоны, у которых договор есть: финский компонент и тексты стран. Для проверки реестра стран. */

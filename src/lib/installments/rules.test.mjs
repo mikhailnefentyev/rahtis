@@ -1,17 +1,22 @@
 /*
  * Правила стран о просрочке (23.11.2026): Эстония — пороги договора,
- * Латвия — два пропущенных срока платежа. Финские расчёты проверяет
+ * Латвия — два пропущенных срока платежа; Литва и Германия — пороги договора
+ * (больше 30 дней и 1/10, 1/20 цены; два взноса подряд и 10 % или 5 %). Финские расчёты проверяет
  * calc.test.mjs. Запуск: npm test.
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { buildSchedule, remedyAllowed, thresholds } from './calc.ts';
 import {
+  DE_LONG_TERM_MONTHS,
   DK_DAYS_LATE,
   GRACE_DAYS,
   INSTALLMENT_RULES,
+  LT_DAYS_LATE,
   LV_MISSED_DATES,
   SE_DAYS_LATE,
+  deSharePercent,
+  deThresholdCents,
   dkTotalPayableCents,
   installmentRules,
   seCreditClaimCents,
@@ -279,4 +284,121 @@ test('финские и эстонские расчёты от новой баз
     }
     assert.deepEqual(rules.thresholds(s), thresholds(s), id);
   }
+});
+
+/* ── Литва и Германия (23.11.2026): пороги договора ───────────────────── */
+
+test('у Литвы и Германии договорные пороги и письменный срок 14 дней после них', () => {
+  assert.equal(installmentRules('LT').id, 'LT_CK6414');
+  assert.equal(installmentRules('de').id, 'DE_BGB449');
+  for (const id of ['LT_CK6414', 'DE_BGB449']) {
+    assert.equal(INSTALLMENT_RULES[id].source, 'CONTRACT', id);
+    assert.equal(INSTALLMENT_RULES[id].graceDays, 14, id);
+  }
+  assert.equal(LT_DAYS_LATE, 30);
+});
+
+test('Литва: пороги — 1/10 и 1/20 цены с НДС 21 %, база — цена с НДС', () => {
+  const s = schedule(2100);
+  assert.equal(s.installmentPriceCents, 7_865_000);
+  assert.equal(INSTALLMENT_RULES.LT_CK6414.base(s), 7_865_000);
+  /* Пороги и число взносов — те же, что у Финляндии и Эстонии при той же цене (доля «не меньше»). */
+  assert.deepEqual(INSTALLMENT_RULES.LT_CK6414.thresholds(s), thresholds(s));
+  assert.deepEqual(INSTALLMENT_RULES.LT_CK6414.thresholds(s), { tenthCents: 786_500, twentiethCents: 393_250, installmentsNeeded: 2 });
+});
+
+test('Литва: порог — строго больше 30 дней и не меньше доли цены либо весь остаток', () => {
+  const s = schedule(2100);
+  const rules = INSTALLMENT_RULES.LT_CK6414;
+  const base = rules.base(s);
+  const remaining = 5_500_000;
+  const inst = s.installments[0].principalCents;
+  /* Два взноса, вместе больше 1/20: ровно 30 дней — ещё нет, 31 — да. */
+  const two = (due1, due2) => [
+    { dueDate: due1, unpaidCents: inst },
+    { dueDate: due2, unpaidCents: inst },
+  ];
+  assert.equal(rules.remedyAllowed(two('2027-01-01', '2027-02-01'), '2027-03-03', base, remaining), false); /* второй — 30 дней */
+  assert.equal(rules.remedyAllowed(two('2027-01-01', '2027-02-01'), '2027-03-04', base, remaining), true);
+  /* Один взнос меньше 1/10 цены — порога нет, сколько бы дней ни прошло. */
+  assert.equal(rules.remedyAllowed([{ dueDate: '2027-01-01', unpaidCents: inst }], '2027-12-31', base, remaining), false);
+  /* Один крупный взнос, ровно 1/10 цены, 31 день — порог («не меньше»). */
+  assert.equal(rules.remedyAllowed([{ dueDate: '2027-01-01', unpaidCents: 786_500 }], '2027-02-01', base, remaining), true);
+  assert.equal(rules.remedyAllowed([{ dueDate: '2027-01-01', unpaidCents: 786_499 }], '2027-02-01', base, remaining), false);
+  /* Весь остаток, 31 день — порог при любой сумме. */
+  assert.equal(rules.remedyAllowed([{ dueDate: '2027-01-01', unpaidCents: 100 }], '2027-02-01', base, 100), true);
+  assert.equal(rules.remedyAllowed([{ dueDate: '2027-01-01', unpaidCents: 100 }], '2027-01-31', base, 100), false);
+  /* Уплаченное не считается. */
+  assert.equal(rules.remedyAllowed([{ dueDate: '2027-01-01', unpaidCents: 0 }], '2027-12-31', base, remaining), false);
+});
+
+test('Германия: порог — 10 % цены с НДС, при сроке больше трёх лет — 5 %; число взносов — не меньше двух', () => {
+  assert.equal(deSharePercent(36), 10);
+  assert.equal(deSharePercent(37), 5);
+  assert.equal(DE_LONG_TERM_MONTHS, 36);
+  const s = schedule(1900);
+  assert.equal(s.installmentPriceCents, 7_735_000);
+  assert.equal(deThresholdCents(s), 773_500);
+  assert.equal(INSTALLMENT_RULES.DE_BGB449.base(s), 773_500);
+  /* Доля одна: обе строки порога — 10 %. Взносы по 2 291,67 €: три — 6 875 €, четыре — 9 166,68 €. */
+  assert.deepEqual(INSTALLMENT_RULES.DE_BGB449.thresholds(s), { tenthCents: 773_500, twentiethCents: 773_500, installmentsNeeded: 4 });
+  const long = schedule(1900, 48);
+  assert.equal(deThresholdCents(long), 386_750);
+  assert.equal(INSTALLMENT_RULES.DE_BGB449.thresholds(long).installmentsNeeded, 4);
+  /* Даже если один взнос больше доли, договор требует двух подряд. */
+  const big = buildSchedule({
+    priceCents: 6_500_000,
+    vatMode: 'STANDARD',
+    vatBps: 1900,
+    downPaymentCents: 1_000_000,
+    months: 2,
+    finalCents: null,
+    annualRateBps: 0,
+    handoverDate: '2026-12-01',
+    firstDueDate: '2027-01-01',
+  });
+  assert.equal(INSTALLMENT_RULES.DE_BGB449.thresholds(big).installmentsNeeded, 2);
+});
+
+test('Германия: порог — два взноса подряд в просрочке и не меньше доли либо весь остаток', () => {
+  const s = schedule(1900);
+  const rules = INSTALLMENT_RULES.DE_BGB449;
+  const share = rules.base(s);
+  const inst = s.installments[0].principalCents;
+  const remaining = 5_500_000;
+  const late = (ns, due = '2027-01-01') => ns.map((n) => ({ dueDate: due, unpaidCents: inst, n }));
+  /* Четыре взноса подряд, со дня после срока — порог. */
+  assert.equal(rules.remedyAllowed(late([1, 2, 3, 4]), '2027-01-02', share, remaining), true);
+  /* В день срока просрочки ещё нет (§ 286 Abs. 2 Nr. 1 — со следующего дня). */
+  assert.equal(rules.remedyAllowed(late([1, 2, 3, 4]), '2027-01-01', share, remaining), false);
+  /* Три взноса — меньше 10 %. */
+  assert.equal(rules.remedyAllowed(late([1, 2, 3]), '2027-06-01', share, remaining), false);
+  /* Сумма достаточна, но взносы не подряд — порога нет. */
+  assert.equal(rules.remedyAllowed(late([1, 3, 5, 7]), '2027-09-01', share, remaining), false);
+  /* Без номера взноса пара «подряд» не засчитывается: порог не раньше договорного. */
+  assert.equal(rules.remedyAllowed([1, 2, 3, 4].map(() => ({ dueDate: '2027-01-01', unpaidCents: inst })), '2027-06-01', share, remaining), false);
+  /* Один крупный взнос больше доли — тоже нет: нужно два подряд. */
+  assert.equal(rules.remedyAllowed([{ dueDate: '2027-01-01', unpaidCents: 900_000, n: 1 }], '2027-06-01', share, remaining), false);
+  /* Последний взнос (весь остаток) в просрочке — порог. */
+  assert.equal(rules.remedyAllowed([{ dueDate: '2028-12-01', unpaidCents: inst, n: 24 }], '2028-12-02', share, inst), true);
+  /* Частично уплаченные взносы считаются («ganz oder teilweise»). */
+  assert.equal(
+    rules.remedyAllowed(
+      [
+        { dueDate: '2027-01-01', unpaidCents: 400_000, n: 1 },
+        { dueDate: '2027-02-01', unpaidCents: 373_500, n: 2 },
+      ],
+      '2027-02-02',
+      share,
+      remaining,
+    ),
+    true,
+  );
+});
+
+test('Литва и Германия не меняют пороги других стран', () => {
+  const s = schedule(2500);
+  assert.deepEqual(INSTALLMENT_RULES.SE_AVBL.thresholds(s), { tenthCents: 550_000, twentiethCents: 275_000, installmentsNeeded: 2 });
+  assert.equal(INSTALLMENT_RULES.DK_KAL.thresholds(s).tenthCents, Math.ceil(dkTotalPayableCents(s) / 10));
+  assert.equal(INSTALLMENT_RULES.FI_OSKL.remedyAllowed, remedyAllowed);
 });
