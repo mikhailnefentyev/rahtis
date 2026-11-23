@@ -159,6 +159,15 @@ begin
   if v_deal.status = 'CANCELLED' then
     return false;
   end if;
+  /*
+   * Отмена — только до передачи (переговоры или согласие). В Польше и
+   * Румынии у сделки нет счёта площадки, и проверка «счёт выставлен» ниже
+   * не останавливала отмену переданной машины: действующую сделку
+   * заканчивает только terminate_installment_deal (23.11.2026).
+   */
+  if v_deal.status not in ('NEGOTIATING', 'AGREED') or v_deal.handed_over_at is not null then
+    raise exception 'Сделку после передачи машины не отменяют — её прекращают.' using errcode = '55000';
+  end if;
   /* Счёт уже выставлен — отмена только с кредит-нотой (этап 3), не одной кнопкой. */
   if v_deal.first_invoice_id is not null then
     raise exception 'Первый счёт уже выставлен — отмена через кредит-ноту.' using errcode = '55000';
