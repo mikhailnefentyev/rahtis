@@ -300,6 +300,8 @@ declare
   v_days integer;
   v_grace public.installment_default_steps;
   v_id uuid;
+  v_overdue jsonb;
+  v_overdue_cents bigint;
 begin
   select * into v_deal from public.installment_deals where id = p_deal_id for update;
   if v_deal.id is null or v_deal.seller_company_id <> v_me then
@@ -311,10 +313,13 @@ begin
   if p_step is null or p_step not in ('GRACE', 'WITHDRAWAL') then
     raise exception 'Шаг.' using errcode = '22023';
   end if;
-  if p_overdue is null or jsonb_typeof(p_overdue) <> 'array' or jsonb_array_length(p_overdue) > 120
-     or p_overdue_cents is null or p_overdue_cents < 0 then
-    raise exception 'Просрочка.' using errcode = '22023';
-  end if;
+  /*
+   * p_overdue и p_overdue_cents не используются (24.11.2026, по проверке
+   * безопасности): просрочку, которая попадёт в письмо покупателю и в его
+   * уведомление, считает сама база по графику платежей — прямым вызовом
+   * функции продавец не может записать выдуманную сумму. Параметры остались
+   * ради совместимости вызова.
+   */
 
   select c.country::text, app.stop_timezone(c.country::text) into v_country, v_zone
     from public.companies c where c.id = v_deal.seller_company_id;
@@ -355,8 +360,18 @@ begin
     end if;
   end if;
 
+  /* Неоплаченные взносы со сроком раньше дня письма — по графику сделки. */
+  select coalesce(jsonb_agg(jsonb_build_object('n', p.n, 'due', p.due_date, 'cents', p.principal_cents + p.interest_cents) order by p.n), '[]'::jsonb),
+         coalesce(sum(p.principal_cents + p.interest_cents), 0)
+    into v_overdue, v_overdue_cents
+    from public.installment_payments p
+    where p.deal_id = p_deal_id and p.paid_at is null and p.due_date < p_given_on;
+  if v_overdue_cents <= 0 then
+    raise exception 'На день письма просроченных взносов нет.' using errcode = '22023';
+  end if;
+
   insert into public.installment_default_steps (deal_id, step, given_on, deadline, overdue, overdue_cents, early, created_by)
-  values (p_deal_id, p_step, p_given_on, p_deadline, p_overdue, p_overdue_cents, coalesce(p_confirmed, false), (select auth.uid()))
+  values (p_deal_id, p_step, p_given_on, p_deadline, v_overdue, v_overdue_cents, coalesce(p_confirmed, false), (select auth.uid()))
   returning id into v_id;
   return v_id;
 end;
