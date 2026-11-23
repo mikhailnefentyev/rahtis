@@ -6,6 +6,7 @@
  * зависимостей от сервера: его читают contractTemplates.ts и тесты.
  */
 import type { InstallmentContractId } from '../countries.ts';
+import type { ContractVersionId } from '../contractVersions.ts';
 import type { ContractTextBuilder } from './blocks.ts';
 import { eeContractText } from './ee.ts';
 import { lvContractText } from './lv.ts';
@@ -45,6 +46,24 @@ export const COUNTRY_CONTRACTS: Record<CountryContractId, CountryContract> = {
   /* Польша и Румыния (23.11.2026): даты «дд.мм.гггг», суммы в злотых и леях. */
   PL_RATY: { build: plContractText, intl: 'pl-PL', filePrefix: 'Umowa-sprzedazy-na-raty' },
   RO_RATE: { build: roContractText, intl: 'ro-RO', filePrefix: 'Contract-vanzare-in-rate' },
+};
+
+/**
+ * Тексты по версиям (24.11.2026): сделка печатается той версией, что записана
+ * при согласии (contractVersions.ts). Версия 2026-11-23 — тексты выше. Когда
+ * текст страны меняется, старый модуль остаётся (копия с датой в имени), а
+ * здесь появляется новая версия со своим сборщиком; запись старой версии не
+ * трогается. Тип требует запись у каждой версии из CONTRACT_TEMPLATE_VERSIONS.
+ */
+export const COUNTRY_CONTRACT_VERSIONS: Record<Exclude<ContractVersionId, `FI_OSAMAKSU@${string}`>, CountryContract> = {
+  'EE_JARELMAKS@2026-11-23': COUNTRY_CONTRACTS.EE_JARELMAKS,
+  'LV_NOMAKSA@2026-11-23': COUNTRY_CONTRACTS.LV_NOMAKSA,
+  'SE_AVBETALNING@2026-11-23': COUNTRY_CONTRACTS.SE_AVBETALNING,
+  'DK_KREDITKOEB@2026-11-23': COUNTRY_CONTRACTS.DK_KREDITKOEB,
+  'LT_ISSIMOKETINAI@2026-11-23': COUNTRY_CONTRACTS.LT_ISSIMOKETINAI,
+  'DE_RATENKAUF@2026-11-23': COUNTRY_CONTRACTS.DE_RATENKAUF,
+  'PL_RATY@2026-11-23': COUNTRY_CONTRACTS.PL_RATY,
+  'RO_RATE@2026-11-23': COUNTRY_CONTRACTS.RO_RATE,
 };
 
 /** Шаблоны, у которых договор есть: финский компонент и тексты стран. Для проверки реестра стран. */

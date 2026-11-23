@@ -4,7 +4,7 @@ import type { InstallmentCopy } from '../installment';
 export const calc: InstallmentCopy = {
   metaTitle: 'Avbetalningsköp av lastbil mellan företag – kalkylator',
   metaDescription:
-    'Sälj eller köp en begagnad lastbil på avbetalning i Finland: delbetalningar, moms, gränserna i lagen om avbetalningsköp, återtagande och säljarens skatt i en kalkylator.',
+    'Sälj eller köp en begagnad lastbil på avbetalning i Finland, Sverige, Danmark, Estland, Lettland, Litauen, Tyskland, Polen eller Rumänien: delbetalningar, moms, dröjsmålsgränserna i säljarens land och återtagande i en kalkylator.',
   eyebrow: 'Avbetalningsköp av fordon',
   title: 'Sälj din lastbil på avbetalning – räkna innan ni kommer överens',
   lede:

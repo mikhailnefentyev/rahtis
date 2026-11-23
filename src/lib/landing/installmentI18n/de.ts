@@ -4,7 +4,7 @@ import type { InstallmentCopy } from '../installment';
 export const calc: InstallmentCopy = {
   metaTitle: 'Lkw-Ratenkauf zwischen Unternehmen – Rechner',
   metaDescription:
-    'Gebrauchten Lkw in Finnland auf Raten verkaufen oder kaufen: Raten, Umsatzsteuer, Schwellen des finnischen Abzahlungsgesetzes, Rücknahme und Steuer des Verkäufers in einem Rechner.',
+    'Gebrauchten Lkw auf Raten verkaufen oder kaufen – in Finnland, Schweden, Dänemark, Estland, Lettland, Litauen, Deutschland, Polen oder Rumänien: Raten, Umsatzsteuer, Verzugsschwellen im Land des Verkäufers und Rücknahme in einem Rechner.',
   eyebrow: 'Ratenkauf von Fahrzeugen',
   title: 'Verkaufen Sie Ihren Lkw auf Raten – erst rechnen, dann vereinbaren',
   lede:

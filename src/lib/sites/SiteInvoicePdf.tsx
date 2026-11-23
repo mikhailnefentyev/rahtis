@@ -76,6 +76,15 @@ const s = StyleSheet.create({
   cAmount: { width: 72, textAlign: 'right' },
   totals: { marginTop: 10, alignSelf: 'flex-end', width: 240 },
   totalRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 2 },
+  /*
+   * Подпись итога — своя колонка, переносится по словам; сумма — своя колонка
+   * у правого края, не сжимается (24.11.2026). Длинная подпись кредит-ноты
+   * («Palautetaan ostajalle / Refunded to the buyer») наезжала на сумму.
+   * Короткие подписи стоят там же, где раньше: колонка подписи начинается у
+   * левого края блока, сумма — у правого.
+   */
+  totalLabel: { flex: 1, flexShrink: 1 },
+  totalAmount: { flexShrink: 0, marginLeft: 8, textAlign: 'right' },
   bold: { fontWeight: 'bold' },
   pay: { marginTop: 22, padding: 10, borderWidth: 1, borderColor: '#dae0ea', borderRadius: 4, flexDirection: 'row', gap: 18 },
   footer: { position: 'absolute', bottom: 22, left: 40, right: 40, fontSize: 7, color: '#8894a6', textAlign: 'center' },
@@ -154,23 +163,23 @@ export function SiteInvoicePdf(input: SiteInvoicePdfInput) {
           {input.noVat ? null : (
             <>
               <View style={s.totalRow}>
-                <Text>{ansi(L.net)}</Text>
-                <Text>{ansi(input.net)}</Text>
+                <Text style={s.totalLabel}>{ansi(L.net)}</Text>
+                <Text style={s.totalAmount}>{ansi(input.net)}</Text>
               </View>
               <View style={s.totalRow}>
-                <Text>{ansi(input.vatLabel)}</Text>
-                <Text>{ansi(input.vat)}</Text>
+                <Text style={s.totalLabel}>{ansi(input.vatLabel)}</Text>
+                <Text style={s.totalAmount}>{ansi(input.vat)}</Text>
               </View>
             </>
           )}
           <View style={s.totalRow}>
-            <Text style={input.payNow ? undefined : s.bold}>{ansi(input.payNow ? L.total : L.totalDue)}</Text>
-            <Text style={input.payNow ? undefined : s.bold}>{ansi(input.total)}</Text>
+            <Text style={input.payNow ? s.totalLabel : [s.totalLabel, s.bold]}>{ansi(input.payNow ? L.total : L.totalDue)}</Text>
+            <Text style={input.payNow ? s.totalAmount : [s.totalAmount, s.bold]}>{ansi(input.total)}</Text>
           </View>
           {input.payNow ? (
             <View style={s.totalRow}>
-              <Text style={s.bold}>{ansi(`${input.payNow.label[0]} / ${input.payNow.label[1]}`)}</Text>
-              <Text style={s.bold}>{ansi(input.payNow.amount)}</Text>
+              <Text style={[s.totalLabel, s.bold]}>{ansi(`${input.payNow.label[0]} / ${input.payNow.label[1]}`)}</Text>
+              <Text style={[s.totalAmount, s.bold]}>{ansi(input.payNow.amount)}</Text>
             </View>
           ) : null}
         </View>

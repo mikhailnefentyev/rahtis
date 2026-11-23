@@ -35,6 +35,8 @@ const s = StyleSheet.create({
   tRow: { flexDirection: 'row', borderBottomWidth: 0.4, borderBottomColor: '#ddd', paddingVertical: 1.5 },
   tFoot: { flexDirection: 'row', borderTopWidth: 0.8, borderTopColor: '#111', paddingTop: 2, fontWeight: 'bold' },
   footer: { position: 'absolute', bottom: 22, left: 44, right: 44, fontSize: 7, color: '#777', flexDirection: 'row', justifyContent: 'space-between' },
+  /* Версия шаблона — отдельной строкой под подвалом, мельче (24.11.2026). */
+  version: { position: 'absolute', bottom: 12, left: 44, fontSize: 5.5, color: '#999' },
 });
 
 /* Столбцы графика: номер, срок, взнос, проценты, итого, остаток. Первые два — по левому краю. */
@@ -132,7 +134,12 @@ function Block({ b }: { b: ContractBlock }) {
   }
 }
 
-export function CountryContractPdf(doc: ContractDocument) {
+/**
+ * version — полное имя версии шаблона (EE_JARELMAKS@2026-11-23), печатается
+ * мелко под подвалом каждой страницы (24.11.2026). Не передана (письма о
+ * просрочке печатаются тем же компонентом) — строки нет.
+ */
+export function CountryContractPdf(doc: ContractDocument, version?: string) {
   return (
     <Document title={ansi(doc.title)} author={ansi(doc.author)}>
       {doc.pages.map((blocks, page) => (
@@ -144,6 +151,11 @@ export function CountryContractPdf(doc: ContractDocument) {
             <Text>{ansi(doc.footer)}</Text>
             <Text render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`} />
           </View>
+          {version ? (
+            <Text style={s.version} fixed>
+              {ansi(version)}
+            </Text>
+          ) : null}
         </Page>
       ))}
     </Document>

@@ -4,7 +4,7 @@ import type { InstallmentCopy } from '../installment';
 export const calc: InstallmentCopy = {
   metaTitle: 'Sprzedaż ciężarówki na raty między firmami – kalkulator',
   metaDescription:
-    'Sprzedaj lub kup używaną ciężarówkę na raty w Finlandii: raty, VAT, progi fińskiej ustawy o sprzedaży ratalnej, odebranie pojazdu i podatek sprzedawcy w jednym kalkulatorze.',
+    'Sprzedaj lub kup używaną ciężarówkę na raty w Finlandii, Szwecji, Danii, Estonii, na Łotwie, Litwie, w Niemczech, Polsce lub Rumunii: raty, VAT, progi opóźnienia w kraju sprzedawcy i odebranie pojazdu w jednym kalkulatorze.',
   eyebrow: 'Sprzęt na raty',
   title: 'Sprzedaj ciężarówkę na raty – policz, zanim się umówisz',
   lede:

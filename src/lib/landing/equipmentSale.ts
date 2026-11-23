@@ -12,6 +12,10 @@
  * Обращение: немецкий — «Sie», шведский — «du», польский — «Ty». Финская
  * марка склоняется: RAHTIKSEEN, RAHTIKSEN, RAHTIKSESSA.
  *
+ * Страница — для всех открытых стран (24.11.2026): о счетах сказано, что в
+ * Польше и Румынии их выставляет сам продавец в KSeF / RO e-Factura, а
+ * RAHTIS присылает уведомления о платеже (sellerInvoices.ts).
+ *
  * Без зависимостей от приложения: модуль читают страницы и тесты.
  */
 import type { Locale } from '../i18n/config.ts';
@@ -80,15 +84,15 @@ const fi: EquipmentSaleCopy = {
       text: 'Ostajana on tarkastettu kuljetusliike, jolla on voimassa oleva liikennelupa ja vakuutus. Hinnasta, käsirahasta ja maksuajasta sovitaan palvelussa.',
     },
     {
-      title: 'Sopimus, laskut ja muistutukset',
-      text: 'RAHTIS laatii sopimuksen, maksusuunnitelman ja laskut myyjän nimissä ja muistuttaa maksueristä. Ostaja maksaa suoraan myyjän tilille.',
+      title: 'Sopimus, asiakirjat ja muistutukset',
+      text: 'RAHTIS laatii sopimuksen, maksusuunnitelman ja laskut myyjän nimissä ja muistuttaa maksueristä. Ostaja maksaa suoraan myyjän tilille. Puolassa ja Romaniassa myyjä laatii laskut itse KSeF- tai RO e-Factura -järjestelmässä, ja RAHTIS lähettää maksuilmoitukset.',
     },
   ],
   calcLink: 'Laske kauppa osamaksulaskurilla',
   notParty: 'RAHTIS ei ole kaupan osapuoli: kauppa tehdään myyjän ja ostajan välillä, eikä RAHTIS vastaanota maksuja.',
   sameCountry: 'Kauppa tehdään aina saman maan yritysten kesken. Hinnat ovat ilmoituksen valuutassa ilman arvonlisäveroa.',
   finalTitle: 'Onko sinulla auto myytävänä?',
-  finalText: 'Rekisteröidy, lisää auto ja julkaise ilmoitus. Sopimus, laskut ja muistutukset hoituvat RAHTIKSESSA.',
+  finalText: 'Rekisteröidy, lisää auto ja julkaise ilmoitus. Sopimus, asiakirjat ja muistutukset hoituvat RAHTIKSESSA.',
   linkLabel: 'Myytävät autot osamaksulla',
 };
 
@@ -120,15 +124,15 @@ const en: EquipmentSaleCopy = {
       text: 'The buyer is a verified carrier with a valid operating licence and insurance. The price, down payment and term are agreed in the service.',
     },
     {
-      title: 'Contract, invoices and reminders',
-      text: 'RAHTIS prepares the contract, the payment plan and the invoices in the seller’s name and sends reminders of the instalments. The buyer pays straight to the seller’s account.',
+      title: 'Contract, documents and reminders',
+      text: 'RAHTIS prepares the contract, the payment plan and the invoices in the seller’s name and sends reminders of the instalments. The buyer pays straight to the seller’s account. In Poland and Romania the seller issues the invoices in KSeF or RO e-Factura, and RAHTIS sends payment notices.',
     },
   ],
   calcLink: 'Work out a sale with the instalment calculator',
   notParty: 'RAHTIS is not a party to the sale: the sale is made between the seller and the buyer, and RAHTIS does not receive the payments.',
   sameCountry: 'A sale is always made between companies of the same country. Prices are in the currency of the listing, excluding VAT.',
   finalTitle: 'Do you have a vehicle to sell?',
-  finalText: 'Register, add the vehicle and publish a listing. The contract, invoices and reminders are handled in RAHTIS.',
+  finalText: 'Register, add the vehicle and publish a listing. The contract, documents and reminders are handled in RAHTIS.',
   linkLabel: 'Trucks for sale in instalments',
 };
 
@@ -160,15 +164,15 @@ const sv: EquipmentSaleCopy = {
       text: 'Köparen är ett kontrollerat åkeri med giltigt trafiktillstånd och giltig försäkring. Pris, kontantinsats och löptid avtalas i tjänsten.',
     },
     {
-      title: 'Avtal, fakturor och påminnelser',
-      text: 'RAHTIS upprättar avtalet, betalningsplanen och fakturorna i säljarens namn och påminner om delbetalningarna. Köparen betalar direkt till säljarens konto.',
+      title: 'Avtal, dokument och påminnelser',
+      text: 'RAHTIS upprättar avtalet, betalningsplanen och fakturorna i säljarens namn och påminner om delbetalningarna. Köparen betalar direkt till säljarens konto. I Polen och Rumänien utfärdar säljaren fakturorna själv i KSeF eller RO e-Factura, och RAHTIS skickar betalningsavier.',
     },
   ],
   calcLink: 'Räkna på köpet med avbetalningskalkylatorn',
   notParty: 'RAHTIS är inte part i köpet: köpet görs mellan säljaren och köparen, och RAHTIS tar inte emot betalningarna.',
   sameCountry: 'Köpet görs alltid mellan företag i samma land. Priserna anges i annonsens valuta, exklusive moms.',
   finalTitle: 'Har du ett fordon att sälja?',
-  finalText: 'Registrera dig, lägg till fordonet och publicera en annons. Avtal, fakturor och påminnelser sköts i RAHTIS.',
+  finalText: 'Registrera dig, lägg till fordonet och publicera en annons. Avtal, dokument och påminnelser sköts i RAHTIS.',
   linkLabel: 'Fordon till salu på avbetalning',
 };
 
@@ -200,15 +204,15 @@ const et: EquipmentSaleCopy = {
       text: 'Ostja on kontrollitud vedaja, kellel on kehtiv tegevusluba ja kindlustus. Hinnas, sissemakses ja perioodis lepitakse kokku teenuses.',
     },
     {
-      title: 'Leping, arved ja meeldetuletused',
-      text: 'RAHTIS koostab lepingu, maksegraafiku ja arved müüja nimel ning tuletab osamakseid meelde. Ostja maksab otse müüja kontole.',
+      title: 'Leping, dokumendid ja meeldetuletused',
+      text: 'RAHTIS koostab lepingu, maksegraafiku ja arved müüja nimel ning tuletab osamakseid meelde. Ostja maksab otse müüja kontole. Poolas ja Rumeenias koostab müüja arved ise süsteemis KSeF või RO e-Factura ning RAHTIS saadab makseteatised.',
     },
   ],
   calcLink: 'Arvutage tehing järelmaksukalkulaatoriga',
   notParty: 'RAHTIS ei ole tehingu pool: tehing sõlmitakse müüja ja ostja vahel ning RAHTIS makseid vastu ei võta.',
   sameCountry: 'Tehing sõlmitakse alati sama riigi ettevõtete vahel. Hinnad on kuulutuse vääringus, käibemaksuta.',
   finalTitle: 'Kas teil on sõiduk müüa?',
-  finalText: 'Liituge, lisage sõiduk ja avaldage kuulutus. Lepingu, arved ja meeldetuletused korraldab RAHTIS.',
+  finalText: 'Liituge, lisage sõiduk ja avaldage kuulutus. Lepingu, dokumendid ja meeldetuletused korraldab RAHTIS.',
   linkLabel: 'Järelmaksuga müügil olevad sõidukid',
 };
 
@@ -240,15 +244,15 @@ const lv: EquipmentSaleCopy = {
       text: 'Pircējs ir pārbaudīts pārvadātājs ar derīgu pārvadājumu licenci un apdrošināšanu. Par cenu, pirmo iemaksu un termiņu vienojas pakalpojumā.',
     },
     {
-      title: 'Līgums, rēķini un atgādinājumi',
-      text: 'RAHTIS sagatavo līgumu, maksājumu grafiku un rēķinus pārdevēja vārdā un atgādina par maksājumiem. Pircējs maksā tieši uz pārdevēja kontu.',
+      title: 'Līgums, dokumenti un atgādinājumi',
+      text: 'RAHTIS sagatavo līgumu, maksājumu grafiku un rēķinus pārdevēja vārdā un atgādina par maksājumiem. Pircējs maksā tieši uz pārdevēja kontu. Polijā un Rumānijā rēķinus pārdevējs izraksta pats sistēmā KSeF vai RO e-Factura, un RAHTIS sūta maksājuma paziņojumus.',
     },
   ],
   calcLink: 'Aprēķiniet darījumu ar nomaksas kalkulatoru',
   notParty: 'RAHTIS nav darījuma puse: darījumu noslēdz pārdevējs un pircējs, un RAHTIS maksājumus nesaņem.',
   sameCountry: 'Darījumu vienmēr noslēdz vienas valsts uzņēmumi. Cenas norādītas sludinājuma valūtā, bez PVN.',
   finalTitle: 'Vai jums ir automašīna, ko pārdot?',
-  finalText: 'Piesakieties, pievienojiet automašīnu un publicējiet sludinājumu. Līgumu, rēķinus un atgādinājumus sagatavo RAHTIS.',
+  finalText: 'Piesakieties, pievienojiet automašīnu un publicējiet sludinājumu. Līgumu, dokumentus un atgādinājumus sagatavo RAHTIS.',
   linkLabel: 'Tehnika pārdošanā uz nomaksu',
 };
 
@@ -280,15 +284,15 @@ const lt: EquipmentSaleCopy = {
       text: 'Pirkėjas – patikrintas vežėjas, turintis galiojančią transporto licenciją ir draudimą. Dėl kainos, pradinės įmokos ir termino susitariama sistemoje.',
     },
     {
-      title: 'Sutartis, sąskaitos ir priminimai',
-      text: 'RAHTIS parengia sutartį, mokėjimų grafiką ir sąskaitas pardavėjo vardu bei primena apie įmokas. Pirkėjas moka tiesiai į pardavėjo sąskaitą.',
+      title: 'Sutartis, dokumentai ir priminimai',
+      text: 'RAHTIS parengia sutartį, mokėjimų grafiką ir sąskaitas pardavėjo vardu bei primena apie įmokas. Pirkėjas moka tiesiai į pardavėjo sąskaitą. Lenkijoje ir Rumunijoje sąskaitas faktūras pardavėjas išrašo pats sistemoje KSeF arba RO e-Factura, o RAHTIS siunčia mokėjimo pranešimus.',
     },
   ],
   calcLink: 'Apskaičiuokite sandorį išsimokėtinai skaičiuokle',
   notParty: 'RAHTIS nėra sandorio šalis: sandorį sudaro pardavėjas ir pirkėjas, o RAHTIS mokėjimų nepriima.',
   sameCountry: 'Sandoris visada sudaromas tarp tos pačios šalies įmonių. Kainos nurodytos skelbimo valiuta, be PVM.',
   finalTitle: 'Turite parduoti automobilį?',
-  finalText: 'Pateikite paraišką, pridėkite automobilį ir paskelbkite skelbimą. Sutartį, sąskaitas ir priminimus parengia RAHTIS.',
+  finalText: 'Pateikite paraišką, pridėkite automobilį ir paskelbkite skelbimą. Sutartį, dokumentus ir priminimus parengia RAHTIS.',
   linkLabel: 'Išsimokėtinai parduodama technika',
 };
 
@@ -320,15 +324,15 @@ const pl: EquipmentSaleCopy = {
       text: 'Kupującym jest zweryfikowany przewoźnik z ważną licencją transportową i ważnym ubezpieczeniem. Cenę, wpłatę własną i okres spłaty strony uzgadniają w serwisie.',
     },
     {
-      title: 'Umowa, faktury i przypomnienia',
-      text: 'RAHTIS przygotowuje umowę, harmonogram spłat i faktury w imieniu sprzedawcy oraz przypomina o ratach. Kupujący płaci bezpośrednio na konto sprzedawcy.',
+      title: 'Umowa, dokumenty i przypomnienia',
+      text: 'RAHTIS przygotowuje umowę, harmonogram spłat i faktury w imieniu sprzedawcy oraz przypomina o ratach. Kupujący płaci bezpośrednio na konto sprzedawcy. W Polsce i Rumunii faktury wystawia sam sprzedawca w KSeF lub RO e-Factura, a RAHTIS wysyła informacje o płatności.',
     },
   ],
   calcLink: 'Policz sprzedaż w kalkulatorze rat',
   notParty: 'RAHTIS nie jest stroną sprzedaży: umowę zawierają sprzedawca i kupujący, a RAHTIS nie przyjmuje płatności.',
   sameCountry: 'Sprzedaż jest zawsze zawierana między firmami z tego samego kraju. Ceny podane są w walucie ogłoszenia, netto.',
   finalTitle: 'Masz pojazd na sprzedaż?',
-  finalText: 'Złóż wniosek, dodaj pojazd i opublikuj ogłoszenie. Umowę, faktury i przypomnienia przygotuje RAHTIS.',
+  finalText: 'Złóż wniosek, dodaj pojazd i opublikuj ogłoszenie. Umowę, dokumenty i przypomnienia przygotuje RAHTIS.',
   linkLabel: 'Pojazdy na sprzedaż na raty',
 };
 
@@ -360,15 +364,15 @@ const de: EquipmentSaleCopy = {
       text: 'Käufer ist ein geprüftes Transportunternehmen mit gültiger Güterkraftverkehrserlaubnis und gültiger Versicherung. Preis, Anzahlung und Laufzeit werden im Dienst vereinbart.',
     },
     {
-      title: 'Vertrag, Rechnungen und Erinnerungen',
-      text: 'RAHTIS erstellt den Vertrag, den Zahlungsplan und die Rechnungen im Namen des Verkäufers und erinnert an die Raten. Der Käufer zahlt direkt auf das Konto des Verkäufers.',
+      title: 'Vertrag, Dokumente und Erinnerungen',
+      text: 'RAHTIS erstellt den Vertrag, den Zahlungsplan und die Rechnungen im Namen des Verkäufers und erinnert an die Raten. Der Käufer zahlt direkt auf das Konto des Verkäufers. In Polen und Rumänien stellt der Verkäufer die Rechnungen selbst in KSeF oder RO e-Factura aus, und RAHTIS versendet Zahlungsinformationen.',
     },
   ],
   calcLink: 'Kauf mit dem Ratenrechner durchrechnen',
   notParty: 'RAHTIS ist nicht Partei des Kaufvertrags: Der Kauf kommt zwischen Verkäufer und Käufer zustande, und RAHTIS nimmt keine Zahlungen entgegen.',
   sameCountry: 'Ein Kauf kommt immer zwischen Unternehmen desselben Landes zustande. Die Preise gelten in der Währung des Angebots, zzgl. Umsatzsteuer.',
   finalTitle: 'Haben Sie ein Fahrzeug zu verkaufen?',
-  finalText: 'Registrieren Sie sich, legen Sie das Fahrzeug an und veröffentlichen Sie ein Angebot. Vertrag, Rechnungen und Erinnerungen übernimmt RAHTIS.',
+  finalText: 'Registrieren Sie sich, legen Sie das Fahrzeug an und veröffentlichen Sie ein Angebot. Vertrag, Dokumente und Erinnerungen übernimmt RAHTIS.',
   linkLabel: 'Fahrzeuge zum Verkauf auf Raten',
 };
 
@@ -400,15 +404,15 @@ const ru: EquipmentSaleCopy = {
       text: 'Покупатель — проверенный перевозчик с действующими лицензией на перевозки и страховкой. О цене, первоначальном взносе и сроке стороны договариваются в сервисе.',
     },
     {
-      title: 'Договор, счета и напоминания',
-      text: 'RAHTIS готовит договор, график платежей и счета от имени продавца и напоминает о платежах. Покупатель платит напрямую на счёт продавца.',
+      title: 'Договор, документы и напоминания',
+      text: 'RAHTIS готовит договор, график платежей и счета от имени продавца и напоминает о платежах. Покупатель платит напрямую на счёт продавца. В Польше и Румынии счета продавец выставляет сам в KSeF или RO e-Factura, а RAHTIS присылает уведомления о платеже.',
     },
   ],
   calcLink: 'Посчитать сделку в калькуляторе рассрочки',
   notParty: 'RAHTIS не является стороной сделки: её заключают продавец и покупатель, и RAHTIS не принимает платежи.',
   sameCountry: 'Сделка всегда заключается между компаниями одной страны. Цены указаны в валюте объявления, без НДС.',
   finalTitle: 'Есть машина на продажу?',
-  finalText: 'Подайте заявку, добавьте машину и опубликуйте объявление. Договор, счета и напоминания — в RAHTIS.',
+  finalText: 'Подайте заявку, добавьте машину и опубликуйте объявление. Договор, документы и напоминания — в RAHTIS.',
   linkLabel: 'Техника на продажу в рассрочку',
 };
 
@@ -440,15 +444,15 @@ const ro: EquipmentSaleCopy = {
       text: 'Cumpărătorul este un transportator verificat, cu licență de transport și asigurare valabile. Prețul, avansul și durata se stabilesc în serviciu.',
     },
     {
-      title: 'Contract, facturi și notificări',
-      text: 'RAHTIS întocmește contractul, graficul de plăți și facturile în numele vânzătorului și amintește de rate. Cumpărătorul plătește direct în contul vânzătorului.',
+      title: 'Contract, documente și notificări',
+      text: 'RAHTIS întocmește contractul, graficul de plăți și facturile în numele vânzătorului și amintește de rate. Cumpărătorul plătește direct în contul vânzătorului. În Polonia și România facturile le emite vânzătorul în KSeF sau RO e-Factura, iar RAHTIS trimite notificări de plată.',
     },
   ],
   calcLink: 'Calculați vânzarea cu calculatorul de rate',
   notParty: 'RAHTIS nu este parte la vânzare: vânzarea se încheie între vânzător și cumpărător, iar RAHTIS nu încasează plățile.',
   sameCountry: 'Vânzarea se încheie întotdeauna între firme din aceeași țară. Prețurile sunt în moneda anunțului, fără TVA.',
   finalTitle: 'Aveți un vehicul de vânzare?',
-  finalText: 'Înscrieți-vă, adăugați vehiculul și publicați un anunț. Contractul, facturile și notificările sunt gestionate în RAHTIS.',
+  finalText: 'Înscrieți-vă, adăugați vehiculul și publicați un anunț. Contractul, documentele și notificările sunt gestionate în RAHTIS.',
   linkLabel: 'Vehicule de vânzare cu plata în rate',
 };
 

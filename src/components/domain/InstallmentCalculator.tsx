@@ -14,7 +14,10 @@ import {
   type DealInput,
   type VatMode,
 } from '@/lib/installments/calc';
+import { installmentMoney } from '@/lib/installments/countries';
+import { installmentRulesById } from '@/lib/installments/rules';
 import type { InstallmentCopy } from '@/lib/landing/installment';
+import type { InstallmentCalcCountry } from '@/lib/landing/installmentCountryView';
 
 /**
  * Калькулятор рассрочки на открытой странице. Всё считается в браузере
@@ -24,9 +27,15 @@ import type { InstallmentCopy } from '@/lib/landing/installment';
  * Значения по умолчанию — пример из документов (DAF 24 000 €). Падение
  * стоимости, расходы на изъятие и порог «малый запас» (15 %) — оценки,
  * которые пользователь меняет сам; поля так и подписаны.
+ *
+ * Страна расчёта (24.11.2026): валюта, ставка НДС, предел процентов и
+ * пороги просрочки — из реестра и правил страны (country собирается на
+ * сервере: installmentCountryView), как в кабинете (TermsFields). У стран,
+ * кроме Финляндии, НДС всегда обычный (решение 22.11.2026), а налог
+ * продавца не считается: расчёт ниже — по финскому EVL и ставке 20 %.
  */
 
-const VAT_BPS = 2550;
+/* Ставка налога на прибыль финской компании — только для Финляндии. */
 const TAX_BPS = 2000;
 const THIN_BPS = 1500;
 
@@ -42,13 +51,11 @@ function firstOfNextMonth(): string {
   return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1)).toISOString().slice(0, 10);
 }
 
-export function InstallmentCalculator({ copy, locale }: { copy: InstallmentCopy; locale: string }) {
+export function InstallmentCalculator({ copy, locale, country }: { copy: InstallmentCopy; locale: string; country: InstallmentCalcCountry }) {
   const c = copy;
-  const money = useMemo(
-    () => new Intl.NumberFormat(locale === 'en' ? 'en-GB' : locale, { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }),
-    [locale],
-  );
-  const eur = (cents: number) => money.format(cents / 100);
+  const k = country;
+  /* Суммы — в валюте страны расчёта, без пересчёта (кроны Швеции и Дании, злотые, леи). */
+  const eur = useMemo(() => installmentMoney(locale, k.currency, true), [locale, k.currency]);
 
   const [price, setPrice] = useState('24000');
   const [vatMode, setVatMode] = useState<VatMode>('STANDARD');
@@ -70,11 +77,13 @@ export function InstallmentCalculator({ copy, locale }: { copy: InstallmentCopy;
     /* Пустой взнос — 0: закон минимума взноса между компаниями не ставит. */
     const downCents = down.trim() ? eurosToCents(down) : 0;
     const finalCents = final.trim() ? eurosToCents(final) : null;
-    const rateBps = percentToBps(rate);
+    /* Швеция: проценты не предлагаются — ставка 0 (как в кабинете). Польша: выше предела страны (7 %) — ошибка ставки. */
+    const parsedRate = k.rateFixed ? 0 : percentToBps(rate);
+    const rateBps = parsedRate != null && parsedRate > k.maxRateBps ? null : parsedRate;
     const input: DealInput = {
       priceCents: priceCents ?? 0,
-      vatMode,
-      vatBps: VAT_BPS,
+      vatMode: k.fi ? vatMode : 'STANDARD',
+      vatBps: k.vatBps,
       downPaymentCents: downCents ?? -1,
       months: Number(months),
       finalCents: finalCents === undefined ? -1 : finalCents,
@@ -87,8 +96,9 @@ export function InstallmentCalculator({ copy, locale }: { copy: InstallmentCopy;
 
     const depBps = percentToBps(depreciation) ?? 0;
     const costsCents = eurosToCents(costs) ?? 0;
-    const tax =
-      taxMethod === 'POOL' && eurosToCents(pool) != null
+    const tax = !k.fi
+      ? null
+      : taxMethod === 'POOL' && eurosToCents(pool) != null
         ? sellerTax({ method: 'POOL', poolStartCents: eurosToCents(pool)!, purchasesThisYearCents: 0, priceCents: input.priceCents, rateBps: TAX_BPS })
         : taxMethod === 'ITEM' && eurosToCents(residual) != null
           ? sellerTax({ method: 'ITEM', residualCents: eurosToCents(residual)!, priceCents: input.priceCents, rateBps: TAX_BPS })
@@ -113,8 +123,10 @@ export function InstallmentCalculator({ copy, locale }: { copy: InstallmentCopy;
         ? buyerCheck({ revenueCents: rev, costsCents: bc, paymentCents: first.principalCents + first.interestCents, thinBps: THIN_BPS })
         : null;
 
-    return { input, schedule, limits: thresholds(schedule), tax, advice, scenarios, buyer };
-  }, [price, vatMode, down, months, final, rate, depreciation, costs, taxMethod, pool, residual, revenue, buyerCosts, handover]);
+    /* Пороги — по правилам страны расчёта (rules.ts), как в кабинете. */
+    const limits = installmentRulesById(k.rules)?.thresholds(schedule) ?? thresholds(schedule);
+    return { input, schedule, limits, tax, advice, scenarios, buyer };
+  }, [price, vatMode, down, months, final, rate, depreciation, costs, taxMethod, pool, residual, revenue, buyerCosts, handover, k]);
 
   const fill = (text: string, values: Record<string, string>) =>
     text.replace(/\{(\w+)\}/g, (_, k: string) => values[k] ?? '');
@@ -122,7 +134,8 @@ export function InstallmentCalculator({ copy, locale }: { copy: InstallmentCopy;
   const group = 'label-micro mb-3 text-ink-muted';
 
   /* Ошибка — у своего поля: на телефоне общий блок оказывался под всей формой, вне экрана (22.11.2026). */
-  const fieldError = (code: keyof typeof c.errors) => ('error' in result && result.error === code ? c.errors[code] : undefined);
+  const errorText = (code: keyof typeof c.errors) => (code === 'RATE' && k.rateMaxError ? k.rateMaxError : c.errors[code]);
+  const fieldError = (code: keyof typeof c.errors) => ('error' in result && result.error === code ? errorText(code) : undefined);
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
@@ -134,17 +147,24 @@ export function InstallmentCalculator({ copy, locale }: { copy: InstallmentCopy;
               <Field label={c.f.price} hint={c.f.priceHint} error={fieldError('PRICE')}>
                 {(p) => <Input {...p} inputMode="decimal" value={price} onChange={(e) => setPrice(e.target.value)} />}
               </Field>
-              <Field label={c.f.vatMode}>
-                {(p) => (
-                  <Select {...p} value={vatMode} onChange={(e) => setVatMode(e.target.value as VatMode)}>
-                    {(Object.keys(c.f.vatModes) as VatMode[]).map((k) => (
-                      <option key={k} value={k}>
-                        {c.f.vatModes[k]}
-                      </option>
-                    ))}
-                  </Select>
-                )}
-              </Field>
+              {k.fi ? (
+                <Field label={c.f.vatMode}>
+                  {(p) => (
+                    <Select {...p} value={vatMode} onChange={(e) => setVatMode(e.target.value as VatMode)}>
+                      {(Object.keys(c.f.vatModes) as VatMode[]).map((m) => (
+                        <option key={m} value={m}>
+                          {c.f.vatModes[m]}
+                        </option>
+                      ))}
+                    </Select>
+                  )}
+                </Field>
+              ) : (
+                /* Не Финляндия: НДС всегда обычный, ставка страны — как в кабинете (решение 22.11.2026). */
+                <Field label={c.f.vatMode} hint={k.vatHint}>
+                  {(p) => <Input {...p} readOnly value={k.vatText} />}
+                </Field>
+              )}
               <Field label={c.f.down} hint={c.f.downHint} error={fieldError('DOWN_PAYMENT')}>
                 {(p) => <Input {...p} inputMode="decimal" value={down} onChange={(e) => setDown(e.target.value)} />}
               </Field>
@@ -154,8 +174,18 @@ export function InstallmentCalculator({ copy, locale }: { copy: InstallmentCopy;
               <Field label={c.f.final} hint={c.f.finalHint} error={fieldError('FINAL')}>
                 {(p) => <Input {...p} inputMode="decimal" value={final} onChange={(e) => setFinal(e.target.value)} />}
               </Field>
-              <Field label={c.f.rate} hint={c.f.rateHint} error={fieldError('RATE')}>
-                {(p) => <Input {...p} inputMode="decimal" value={rate} onChange={(e) => setRate(e.target.value)} />}
+              <Field label={c.f.rate} hint={k.rateHint} error={fieldError('RATE')}>
+                {(p) => (
+                  <Input
+                    {...p}
+                    inputMode="decimal"
+                    value={k.rateFixed ? '0' : rate}
+                    readOnly={k.rateFixed}
+                    onChange={(e) => {
+                      if (!k.rateFixed) setRate(e.target.value);
+                    }}
+                  />
+                )}
               </Field>
             </div>
           </div>
@@ -172,6 +202,8 @@ export function InstallmentCalculator({ copy, locale }: { copy: InstallmentCopy;
             </div>
           </div>
 
+          {/* Налог продавца считается только по финскому праву (EVL, 20 %). */}
+          {k.fi && (
           <div>
             <p className={group}>{c.groups.seller}</p>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -198,6 +230,7 @@ export function InstallmentCalculator({ copy, locale }: { copy: InstallmentCopy;
               )}
             </div>
           </div>
+          )}
 
           <div>
             <p className={group}>{c.groups.buyer}</p>
@@ -217,16 +250,16 @@ export function InstallmentCalculator({ copy, locale }: { copy: InstallmentCopy;
         {'error' in result ? (
           <Card>
             <CardBody>
-              <p className="text-danger">{c.errors[result.error as keyof typeof c.errors]}</p>
+              <p className="text-danger">{errorText(result.error as keyof typeof c.errors)}</p>
             </CardBody>
           </Card>
         ) : (
           <>
             <div className="grid gap-3 sm:grid-cols-2">
               <Stat
-                label={c.r.firstInvoice}
+                label={k.firstInvoiceLabel}
                 value={eur(result.schedule.firstInvoiceCents)}
-                hint={fill(c.r.firstInvoiceHint, { down: eur(result.input.downPaymentCents), vat: eur(result.schedule.vatCents) })}
+                hint={fill(k.firstInvoiceHint, { down: eur(result.input.downPaymentCents), vat: eur(result.schedule.vatCents) })}
               />
               <Stat
                 label={c.r.monthly}
@@ -243,9 +276,9 @@ export function InstallmentCalculator({ copy, locale }: { copy: InstallmentCopy;
 
             <Card>
               <CardBody>
-                <h3 className="font-semibold">{c.r.thresholdsTitle}</h3>
+                <h3 className="font-semibold">{k.thresholdsTitle}</h3>
                 <p className="mt-2 text-[14px] text-ink-muted">
-                  {fill(c.r.thresholdsText, {
+                  {fill(k.thresholdsText, {
                     tenth: eur(result.limits.tenthCents),
                     twentieth: eur(result.limits.twentiethCents),
                     needed: String(result.limits.installmentsNeeded),
@@ -269,10 +302,21 @@ export function InstallmentCalculator({ copy, locale }: { copy: InstallmentCopy;
               </CardBody>
             </Card>
 
+            {/* Польша и Румыния: счета выставляет продавец в KSeF / RO e-Factura, RAHTIS — расчёт, договор и уведомления. */}
+            {k.note && (
+              <Card>
+                <CardBody>
+                  <p className="text-[14px] text-ink-muted">{k.note}</p>
+                </CardBody>
+              </Card>
+            )}
+
             <Card>
               <CardBody>
                 <h3 className="font-semibold">{c.r.taxTitle}</h3>
-                {!result.tax ? (
+                {k.taxNote ? (
+                  <p className="mt-2 text-[14px] text-ink-muted">{k.taxNote}</p>
+                ) : !result.tax ? (
                   <p className="mt-2 text-[14px] text-ink-muted">{c.r.taxUnknown}</p>
                 ) : result.tax.taxableCents === 0 ? (
                   <p className="mt-2 text-[14px] text-ink-muted">{c.r.taxNone}</p>
@@ -289,7 +333,7 @@ export function InstallmentCalculator({ copy, locale }: { copy: InstallmentCopy;
               <Card>
                 <CardBody>
                   <h3 className="font-semibold">{c.r.scenarioTitle}</h3>
-                  <p className="mt-2 text-[14px] text-ink-muted">{c.r.scenarioText}</p>
+                  <p className="mt-2 text-[14px] text-ink-muted">{k.scenarioText}</p>
                   {/* Телефон (22.11.2026): пять колонок не помещались, две уходили за край — здесь строки карточками. */}
                   <ul className="mt-3 flex flex-col gap-2 sm:hidden">
                     {result.scenarios.map((s) => (

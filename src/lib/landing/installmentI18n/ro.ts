@@ -10,7 +10,7 @@ import type { InstallmentCopy } from '../installment';
 export const calc: InstallmentCopy = {
   metaTitle: 'Vânzarea camioanelor cu plata în rate între firme – calculator',
   metaDescription:
-    'Vindeți sau cumpărați în Finlanda un camion second-hand cu plata în rate: rate, TVA, pragurile legii finlandeze privind vânzarea cu plata în rate, recuperarea vehiculului și impozitul vânzătorului, într-un singur calculator.',
+    'Vindeți sau cumpărați în rate un camion second-hand în Finlanda, Suedia, Danemarca, Estonia, Letonia, Lituania, Germania, Polonia sau România: rate, TVA, pragurile de întârziere din țara vânzătorului și recuperarea vehiculului, într-un singur calculator.',
   eyebrow: 'Vânzare de vehicule cu plata în rate',
   title: 'Vindeți-vă camionul în rate – calculați înainte să conveniți',
   lede:

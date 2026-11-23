@@ -2,9 +2,9 @@ import type { InstallmentCopy } from '../installment';
 
 /** Nomaksas pirkuma kalkulators un galvenā lapa, latviešu valodā. Visi aprēķini un atsauces ir pēc Somijas tiesībām. */
 export const calc: InstallmentCopy = {
-  metaTitle: 'Kravas automašīnas nomaksas pirkums starp uzņēmumiem Somijā – kalkulators',
+  metaTitle: 'Kravas automašīnas nomaksas pirkums starp uzņēmumiem – kalkulators',
   metaDescription:
-    'Pārdodiet vai pērciet lietotu kravas automašīnu uz nomaksu Somijā: maksājumi, PVN, Somijas Nomaksas pirkuma likuma robežas, atgūšana un pārdevēja nodoklis vienā kalkulatorā.',
+    'Pārdodiet vai pērciet lietotu kravas automašīnu uz nomaksu Somijā, Zviedrijā, Dānijā, Igaunijā, Latvijā, Lietuvā, Vācijā, Polijā vai Rumānijā: maksājumi, PVN, pārdevēja valsts kavējuma robežas un atgūšana vienā kalkulatorā.',
   eyebrow: 'Tehnikas nomaksas pirkums',
   title: 'Pārdodiet savu kravas automašīnu uz nomaksu – aprēķiniet pirms vienošanās',
   lede:

@@ -33,6 +33,10 @@ import { DealResponse } from './DealForms';
 import { HandoverForm } from './HandoverForm';
 import { LegalNotice } from './LegalNotice';
 import { TerminateForm } from './TerminateForm';
+import { DefaultStepForm } from './DefaultStepForm';
+import { DEFAULT_STEPS_TEXTS } from '@/lib/installments/countryTexts/defaultSteps';
+import { defaultStepPlan, defaultStepState } from '@/lib/installments/defaultSteps';
+import { dealDefaultSteps } from '@/lib/installments/defaultStepsServer';
 
 export async function dealMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -168,6 +172,16 @@ export async function DealScreen({
   const lastPaid = (payments ?? []).filter((p) => p.paid_at).map((p) => p.due_date).sort().pop() ?? interestFrom;
   const payoff = payoffCents(unpaid.reduce((sum, p) => sum + p.principal_cents, 0), lastPaid < today ? lastPaid : today, today, deal.annual_rate_bps);
   const vs = vehicleStatus?.[0];
+
+  /*
+   * Шаги после порога просрочки (24.11.2026): дополнительный срок и отказ от
+   * договора по праву страны — записи продавца, видят обе стороны. Порог —
+   * тот же расчёт, что у плашки выше (remedy).
+   */
+  const stepPlan = defaultStepPlan(seller.country);
+  const steps = deal.status === 'ACTIVE' || deal.status === 'PAID_OFF' || deal.status === 'TERMINATED' ? await dealDefaultSteps(deal.id) : [];
+  const stepState = stepPlan ? defaultStepState(stepPlan, steps, today, remedy) : null;
+  const st = DEFAULT_STEPS_TEXTS[locale];
 
   /* Прекращённая сделка: что уплачено и что осталось — справка, без стоимости машины (её RAHTIS не знает). */
   const terminated = deal.status === 'TERMINATED';
@@ -494,6 +508,110 @@ export async function DealScreen({
           </Card>
           {remedy && isSeller && (
             <p className="rounded-card border border-danger/35 bg-danger/10 px-4 py-3 text-[14px] text-danger">{ui.stage3.remedy}</p>
+          )}
+          {stepPlan && stepState && (deal.status === 'ACTIVE' || steps.length > 0) && (
+            <Card>
+              <CardBody className="flex flex-col gap-3 text-[14px]">
+                <h2 className="text-[17px] font-semibold">{st.title}</h2>
+                <p className="text-ink-muted">{st.intro}</p>
+                {!isSeller && steps.length > 0 && <p>{st.buyerHint}</p>}
+                {!stepPlan.grace && <p className="text-ink-muted">{st.noGrace}</p>}
+                <ol className="flex flex-col gap-3">
+                  {stepPlan.grace && (
+                    <li className="border-l-2 border-line pl-3">
+                      <p className="font-semibold">1. {st.grace[stepPlan.grace.kind]}</p>
+                      <p className="text-ink-muted">
+                        {fill(st.graceRule, {
+                          days: String(stepPlan.grace.days),
+                          term: stepPlan.grace.term,
+                          law: stepPlan.grace.law,
+                          clause: stepPlan.grace.clause,
+                        })}
+                      </p>
+                      {steps.filter((x) => x.step === 'GRACE').length === 0 ? (
+                        <p className="text-ink-muted">{st.notYet}</p>
+                      ) : (
+                        steps
+                          .filter((x) => x.step === 'GRACE')
+                          .map((x) => (
+                            <p key={x.id} className="flex flex-wrap items-center gap-x-3">
+                              <span className="text-ok">{fill(st.graceDone, { date: fiDate(x.given_on), deadline: fiDate(x.deadline ?? x.given_on) })}</span>
+                              <a href={`${home}/${deal.id}/notice?step=${x.id}`} className="text-accent hover:underline">
+                                {st.letter}
+                              </a>
+                            </p>
+                          ))
+                      )}
+                    </li>
+                  )}
+                  <li className="border-l-2 border-line pl-3">
+                    <p className="font-semibold">
+                      {stepPlan.grace ? '2. ' : ''}
+                      {st.final[stepPlan.final.kind]}
+                    </p>
+                    <p className="text-ink-muted">
+                      {fill(st.finalRule, { term: stepPlan.final.term, law: stepPlan.final.law, clause: stepPlan.final.clause })}
+                    </p>
+                    {stepState.withdrawal ? (
+                      <p className="flex flex-wrap items-center gap-x-3">
+                        <span className="text-danger">{fill(st.finalDone, { date: fiDate(stepState.withdrawal.given_on) })}</span>
+                        <a href={`${home}/${deal.id}/notice?step=${steps.find((x) => x.step === 'WITHDRAWAL')?.id ?? ''}`} className="text-accent hover:underline">
+                          {st.letter}
+                        </a>
+                      </p>
+                    ) : (
+                      <p className="text-ink-muted">{st.notYet}</p>
+                    )}
+                  </li>
+                </ol>
+                {stepState.withdrawal && deal.status === 'ACTIVE' && <p>{st.stopped}</p>}
+                {deal.status === 'ACTIVE' && isSeller && owner && (stepState.canGrace || stepState.canWithdraw || stepPlan.grace) && !stepState.withdrawal && (
+                  <>
+                    <p className="text-ink-muted">{st.sendHint}</p>
+                    {stepState.canGrace && stepPlan.grace && (
+                      <DefaultStepForm
+                        locale={locale}
+                        dealId={deal.id}
+                        step="GRACE"
+                        plan={stepPlan}
+                        today={today}
+                        label={st.grace[stepPlan.grace.kind]}
+                        warning={
+                          stepState.graceWarning === 'GRACE_RUNNING'
+                            ? fill(st.warnGraceRunning, { deadline: fiDate(stepState.grace?.deadline ?? today) })
+                            : stepState.graceWarning === 'NO_THRESHOLD'
+                              ? st.warnNoThreshold
+                              : null
+                        }
+                        t={st}
+                        formatDate="short"
+                      />
+                    )}
+                    {stepState.canWithdraw ? (
+                      <DefaultStepForm
+                        locale={locale}
+                        dealId={deal.id}
+                        step="WITHDRAWAL"
+                        plan={stepPlan}
+                        today={today}
+                        label={st.final[stepPlan.final.kind]}
+                        warning={
+                          stepState.withdrawWarning === 'DEADLINE_NOT_PASSED'
+                            ? fill(st.warnDeadline, { deadline: fiDate(stepState.grace?.deadline ?? today) })
+                            : stepState.withdrawWarning === 'NO_THRESHOLD'
+                              ? st.warnNoThreshold
+                              : null
+                        }
+                        t={st}
+                        formatDate="short"
+                      />
+                    ) : (
+                      <p className="text-ink-muted">{st.needGrace}</p>
+                    )}
+                  </>
+                )}
+              </CardBody>
+            </Card>
           )}
           {deal.status === 'ACTIVE' && (
           <Card>

@@ -3267,6 +3267,45 @@ export type Database = {
           },
         ]
       }
+      installment_default_steps: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          deadline: string | null
+          deal_id: string
+          early: boolean
+          given_on: string
+          id: string
+          overdue: Json
+          overdue_cents: number
+          step: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          deadline?: string | null
+          deal_id: string
+          early?: boolean
+          given_on: string
+          id?: string
+          overdue?: Json
+          overdue_cents?: number
+          step: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          deadline?: string | null
+          deal_id?: string
+          early?: boolean
+          given_on?: string
+          id?: string
+          overdue?: Json
+          overdue_cents?: number
+          step?: string
+        }
+        Relationships: []
+      }
       installment_deals: {
         Row: {
           credit_note_started_at: string | null
@@ -3289,6 +3328,8 @@ export type Database = {
           cancelled_at: string | null
           cancelled_by: string | null
           contract_number: string | null
+          contract_template: string | null
+          contract_version: string | null
           created_at: string
           down_payment_cents: number
           final_cents: number | null
@@ -3328,6 +3369,8 @@ export type Database = {
           cancelled_at?: string | null
           cancelled_by?: string | null
           contract_number?: string | null
+          contract_template?: string | null
+          contract_version?: string | null
           created_at?: string
           down_payment_cents: number
           final_cents?: number | null
@@ -3367,6 +3410,8 @@ export type Database = {
           cancelled_at?: string | null
           cancelled_by?: string | null
           contract_number?: string | null
+          contract_template?: string | null
+          contract_version?: string | null
           created_at?: string
           down_payment_cents?: number
           final_cents?: number | null
@@ -10011,6 +10056,18 @@ export type Database = {
       mark_installment_first_paid: { Args: { p_deal_id: string }; Returns: undefined }
       confirm_installment_handover: { Args: { p_deal_id: string; p_odometer_km: number | null; p_notes: string | null }; Returns: string }
       mark_installment_paid: { Args: { p_deal_id: string; p_n: number }; Returns: string }
+      record_installment_default_step: {
+        Args: {
+          p_confirmed: boolean
+          p_deadline: string | null
+          p_deal_id: string
+          p_given_on: string
+          p_overdue: Json
+          p_overdue_cents: number
+          p_step: string
+        }
+        Returns: string
+      }
       cancel_installment_with_credit: { Args: { p_deal_id: string }; Returns: string }
       installment_vehicle_status: {
         Args: { p_deal_id: string }

@@ -18,6 +18,7 @@ import { countryEventCode, countryNoticeLocale } from './countryTexts';
 import { firstDocOf } from './firstInvoice';
 import { documentKind, documentLabels, invoiceTexts, plainDoc, plainDocLabels, type PlainDocKind } from './invoiceTexts';
 import { installmentRules } from './rules';
+import { withdrawalDeclared } from './defaultSteps';
 
 /**
  * Рассрочка, этап 3 (23.11.2026): график взносов, счета взносов,
@@ -824,6 +825,19 @@ export async function runInstallments(options: { dealId?: string; today?: string
       await ensureSchedule(deal.id);
       const { data: rows } = await admin.from('installment_payments').select('*').eq('deal_id', deal.id).order('n');
       let ibanMissing: number | null = null;
+      /*
+       * Продавец записал отказ от договора (расторжение, уведомление об изъятии;
+       * 24.11.2026, installment_default_steps): дальше по сделке — только её
+       * прекращение. Обычных напоминаний покупателю, новых документов на взносы
+       * и сигналов о пороге задание больше не шлёт; график и записи остаются.
+       */
+      const { data: withdrawn } = await admin
+        .from('installment_default_steps')
+        .select('id')
+        .eq('deal_id', deal.id)
+        .eq('step', 'WITHDRAWAL')
+        .limit(1);
+      if (withdrawalDeclared((withdrawn ?? []).map(() => ({ step: 'WITHDRAWAL' })))) continue;
 
       for (const row of rows ?? []) {
         if (row.paid_at) continue;

@@ -25,6 +25,14 @@ import { installmentCountryCopy } from './countryCopy';
 import { countryEventCode, countryNoticeLocale } from './countryTexts';
 import { createFirstInvoice } from './firstInvoice';
 import { createCreditNote, ensureSchedule, runInstallments } from './payments';
+import { createFormat } from '@/lib/format';
+import { installmentCurrency } from './countries';
+import { loadDeal } from './contract';
+import { DEFAULT_STEPS_TEXTS } from './countryTexts/defaultSteps';
+import { defaultStepPlan, defaultStepState, graceDeadline, type DefaultStep } from './defaultSteps';
+import { dealDefaultSteps, dealOverdueNow } from './defaultStepsServer';
+import { invoiceTexts } from './invoiceTexts';
+import { locales } from '@/lib/i18n/config';
 
 /**
  * Действия раздела «Продажа техники в рассрочку» (22.11.2026). Права и
@@ -651,6 +659,92 @@ export async function terminateDealAction(_prev: ActionState, fd: FormData): Pro
   refreshDeal(locale, dealId);
   refreshList(locale);
   revalidatePath(`/${locale}/carrier/fleet`);
+  return done;
+}
+
+// ── Шаги после порога просрочки (24.11.2026) ─────────────────────────
+
+/**
+ * Продавец записывает шаг после порога просрочки: «дополнительный срок дан»
+ * или «отказ от договора заявлен» (defaultSteps.ts). Запись ни денег, ни
+ * машины не двигает. Последний день срока считается здесь по правилу страны
+ * (graceDeadline), база проверяет, что он не короче срока страны. Если срок
+ * ещё идёт или порог по данным платформы не достигнут — нужен флажок
+ * подтверждения (confirm): это предупреждение, а не запрет. Покупателю —
+ * уведомление в кабинете на его языке.
+ */
+export async function recordDefaultStepAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
+  const locale = toLocale(fd.get('locale'));
+  const t = DEFAULT_STEPS_TEXTS[locale];
+  const { viewer, ok, companyCountry } = await ready();
+  const c = installmentUiCopy(locale, companyCountry);
+  if (!ok || viewer.status !== 'ready' || !viewer.company) return failed(c.notAllowed);
+  const dealId = str(fd, 'deal_id');
+  const step = str(fd, 'step') as DefaultStep;
+  const givenOn = isoDate(str(fd, 'given_on'));
+  const confirmed = str(fd, 'confirm') === '1';
+  if ((step !== 'GRACE' && step !== 'WITHDRAWAL') || !givenOn) return failed(t.error);
+
+  const loaded = await loadDeal(dealId);
+  if (!loaded || loaded.deal.seller_company_id !== viewer.company.id || loaded.deal.status !== 'ACTIVE') return failed(c.notAllowed);
+  const plan = defaultStepPlan(loaded.seller.country);
+  if (!plan) return failed(t.error);
+  const [steps, overdue] = await Promise.all([dealDefaultSteps(dealId), dealOverdueNow(loaded)]);
+  if (givenOn > overdue.today) return failed(t.error);
+  const state = defaultStepState(plan, steps, overdue.today, overdue.thresholdReached);
+  if (step === 'GRACE' ? !state.canGrace : !state.canWithdraw) return failed(step === 'WITHDRAWAL' ? t.needGrace : t.error);
+  /* Отказ раньше дня письма о сроке + срок — тоже предупреждение (база сверяет с днём отказа). */
+  const early =
+    step === 'GRACE'
+      ? state.graceWarning !== null
+      : state.withdrawWarning !== null || Boolean(state.grace?.deadline && state.grace.deadline >= givenOn);
+  if (early && !confirmed) return failed(t.confirmNeeded);
+  const deadline = step === 'GRACE' ? graceDeadline(plan, givenOn) : null;
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc('record_installment_default_step', {
+    p_deal_id: dealId,
+    p_step: step,
+    p_given_on: givenOn,
+    p_deadline: deadline,
+    p_overdue: overdue.rows,
+    p_overdue_cents: overdue.totalCents,
+    p_confirmed: early && confirmed,
+  });
+  if (error) {
+    console.error('шаг после просрочки:', error.message);
+    refreshDeal(locale, dealId);
+    return failed(error.code === 'P0010' ? t.needGrace : error.code === 'P0011' ? t.confirmNeeded : error.code === '42501' ? c.notAllowed : t.error);
+  }
+
+  /* Покупателю — на его языке; код события в словаре кабинета не описан, поэтому показывается записанный текст. */
+  const { data: buyer } = await createAdminClient()
+    .from('companies')
+    .select('id, language, kind')
+    .eq('id', loaded.deal.buyer_company_id)
+    .maybeSingle();
+  if (buyer) {
+    const lang = String(buyer.language ?? '').toLowerCase();
+    const bl: Locale = (locales as readonly string[]).includes(lang) ? (lang as Locale) : 'en';
+    const bt = DEFAULT_STEPS_TEXTS[bl];
+    const plate = ((loaded.deal.vehicle_snapshot ?? {}) as { plate?: string }).plate ?? '';
+    const tx = invoiceTexts(loaded.seller.country);
+    const name = step === 'GRACE' && plan.grace ? bt.grace[plan.grace.kind] : bt.final[plan.final.kind];
+    const amount = createFormat(tx.intl).money(overdue.totalCents, loaded.deal.currency ?? installmentCurrency(loaded.seller.country));
+    await notify({
+      companyId: buyer.id,
+      kind: 'BILLING',
+      code: `installment.default_step.${step.toLowerCase()}`,
+      params: { plate },
+      title: `${name}: ${plate}`,
+      body:
+        step === 'GRACE' && plan.grace
+          ? fill(bt.notifyGraceBody, { amount, deadline: tx.date(deadline ?? givenOn), term: plan.grace.term })
+          : fill(bt.notifyFinalBody, { step: name, term: plan.final.term, date: tx.date(givenOn) }),
+      link: installmentDealLink(buyer.kind, dealId),
+    });
+  }
+  refreshDeal(locale, dealId);
   return done;
 }
 

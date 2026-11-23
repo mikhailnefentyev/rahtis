@@ -6,7 +6,7 @@ import { fiOrEnPath, pageMetadata } from '@/lib/seo';
 
 /*
  * Калькулятор рассрочки техники. Финский слаг; английский —
- * /truck-installment-sale. Текст только финский и английский.
+ * /truck-installment-sale. Текст — на всех десяти языках сайта.
  */
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -21,7 +21,14 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   });
 }
 
-export default async function Page({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = await params;
-  return <InstallmentLanding locale={locale} />;
+/* Страна расчёта — ?country= (24.11.2026); в metadata строки запроса нет: canonical и hreflang без неё. */
+export default async function Page({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<{ country?: string | string[] }>;
+}) {
+  const [{ locale }, query] = await Promise.all([params, searchParams]);
+  return <InstallmentLanding locale={locale} country={query.country} />;
 }

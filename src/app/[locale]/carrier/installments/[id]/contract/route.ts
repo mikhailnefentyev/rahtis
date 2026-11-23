@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { getViewer } from '@/lib/auth/viewer';
 import { dealHasContract } from '@/lib/installments/access';
 import { loadDeal } from '@/lib/installments/contract';
-import { contractTemplate } from '@/lib/installments/contractTemplates';
+import { dealContract } from '@/lib/installments/contractTemplates';
 
 /**
  * Договор рассрочки в PDF (22.11.2026) — только сторонам сделки (RLS) и
@@ -13,7 +13,8 @@ import { contractTemplate } from '@/lib/installments/contractTemplates';
  * ссылку и тогда, а раньше после передачи здесь было 404 (22.11.2026).
  * После прекращения сделки (TERMINATED) договор тоже остаётся доступен.
  * Шаблон договора — по стране продавца из реестра стран раздела
- * (23.11.2026); сейчас он один — финский.
+ * (23.11.2026). Версия шаблона — та, что записана в сделке при согласии
+ * (24.11.2026): правка шаблона подписанный договор не меняет.
  */
 
 export async function GET(_request: Request, { params }: { params: Promise<{ locale: string; id: string }> }) {
@@ -23,7 +24,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ loc
 
   const loaded = await loadDeal(id);
   if (!loaded || !dealHasContract(loaded.deal.status)) return new NextResponse('Not found', { status: 404 });
-  const contract = contractTemplate(loaded.seller.country)?.render(loaded);
+  const contract = dealContract(loaded);
   if (!contract) return new NextResponse('Not found', { status: 404 });
 
   const buffer = await renderToBuffer(contract.document);

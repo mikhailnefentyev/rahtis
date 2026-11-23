@@ -93,6 +93,8 @@ const s = StyleSheet.create({
   tHead: { flexDirection: 'row', borderBottomWidth: 0.8, borderBottomColor: '#111', paddingBottom: 2, fontWeight: 'bold' },
   tRow: { flexDirection: 'row', borderBottomWidth: 0.4, borderBottomColor: '#ddd', paddingVertical: 1.5 },
   footer: { position: 'absolute', bottom: 22, left: 44, right: 44, fontSize: 7, color: '#777', flexDirection: 'row', justifyContent: 'space-between' },
+  /* Версия шаблона — отдельной строкой под подвалом, мельче (24.11.2026). */
+  version: { position: 'absolute', bottom: 12, left: 44, fontSize: 5.5, color: '#999' },
 });
 
 const P = ({ children }: { children: string }) => <Text style={s.p}>{ansi(children)}</Text>;
@@ -119,7 +121,11 @@ function PartyBlock({ label, p, extra }: { label: string; p: Party; extra?: stri
   );
 }
 
-export function ContractPdf(d: ContractPdfInput) {
+/**
+ * version — полное имя версии шаблона (FI_OSAMAKSU@2026-11-23), печатается
+ * мелко под подвалом каждой страницы (24.11.2026). Не передана — строки нет.
+ */
+export function ContractPdf(d: ContractPdfInput, version?: string) {
   const vatText =
     d.vatMode === 'STANDARD'
       ? 'Myyjä laskuttaa ensimmäisellä laskulla käteismaksuosuuden, joka sisältää koko kauppahinnan arvonlisäveron. Lasku erääntyy ennen luovutusta. Veron suorittamisvelvollisuus syntyy ennen luovutusta maksetun käteismaksuosuuden osalta maksun kertyessä ja muilta osin ajoneuvon luovutuksessa (arvonlisäverolain 15 §:n 1 momentin 1 ja 2 kohta).'
@@ -259,7 +265,7 @@ export function ContractPdf(d: ContractPdfInput) {
         </View>
         <P>Liitteet: 1. Maksusuunnitelma · 2. Luovutustarkastuspöytäkirja · 3. Ensimmäinen lasku · 4. Huoltosopimus (jos sovittu) · 5. Kuljettajille annettava tietosuojainformaatio</P>
 
-        <Footer number={d.number} />
+        <Footer number={d.number} version={version} />
       </Page>
 
       <Page size="A4" style={s.page}>
@@ -308,17 +314,24 @@ export function ContractPdf(d: ContractPdfInput) {
             <Text style={s.line}>{ansi('Ostaja')}</Text>
           </View>
         </View>
-        <Footer number={d.number} />
+        <Footer number={d.number} version={version} />
       </Page>
     </Document>
   );
 }
 
-function Footer({ number }: { number: string }) {
+function Footer({ number, version }: { number: string; version?: string }) {
   return (
-    <View style={s.footer} fixed>
-      <Text>{ansi(`Osamaksusopimus ${number} · laadittu RAHTIS-palvelussa; Aivomaa Oy ei ole sopimuksen osapuoli`)}</Text>
-      <Text render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`} />
-    </View>
+    <>
+      <View style={s.footer} fixed>
+        <Text>{ansi(`Osamaksusopimus ${number} · laadittu RAHTIS-palvelussa; Aivomaa Oy ei ole sopimuksen osapuoli`)}</Text>
+        <Text render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`} />
+      </View>
+      {version ? (
+        <Text style={s.version} fixed>
+          {ansi(version)}
+        </Text>
+      ) : null}
+    </>
   );
 }

@@ -2,9 +2,9 @@ import type { InstallmentCopy } from '../installment';
 
 /** Järelmaksumüügi kalkulaator ja maandumisleht, eesti keel. Kõik arvutused ja viited on Soome õiguse järgi. */
 export const calc: InstallmentCopy = {
-  metaTitle: 'Veoki järelmaksumüük ettevõtete vahel Soomes – kalkulaator',
+  metaTitle: 'Veoki järelmaksumüük ettevõtete vahel – kalkulaator',
   metaDescription:
-    'Müüge või ostke kasutatud veok järelmaksuga Soomes: osamaksed, käibemaks, Soome järelmaksumüügi seaduse piirid, tagasivõtmine ja müüja maks ühes kalkulaatoris.',
+    'Müüge või ostke kasutatud veok järelmaksuga Soomes, Rootsis, Taanis, Eestis, Lätis, Leedus, Saksamaal, Poolas või Rumeenias: osamaksed, käibemaks, müüja riigi viivituse piirid ja tagasivõtmine ühes kalkulaatoris.',
   eyebrow: 'Sõidukite järelmaksumüük',
   title: 'Müüge oma veok järelmaksuga – arvutage enne kokkuleppimist',
   lede:
