@@ -2,9 +2,9 @@ import type { InstallmentCopy } from '../installment';
 
 /** Pirkimo–pardavimo išsimokėtinai skaičiuoklė ir puslapis, lietuvių kalba. Visi skaičiavimai ir nuorodos – pagal Suomijos teisę. */
 export const calc: InstallmentCopy = {
-  metaTitle: 'Sunkvežimio pardavimas išsimokėtinai tarp įmonių – skaičiuoklė',
+  metaTitle: 'Sunkvežimio pardavimas išsimokėtinai – skaičiuoklė',
   metaDescription:
-    'Parduokite arba pirkite naudotą sunkvežimį išsimokėtinai Suomijoje, Švedijoje, Danijoje, Estijoje, Latvijoje, Lietuvoje, Vokietijoje, Lenkijoje ar Rumunijoje: įmokos, PVM, pardavėjo šalies vėlavimo ribos ir susigrąžinimas vienoje skaičiuoklėje.',
+    'Parduokite arba pirkite naudotą sunkvežimį išsimokėtinai tarp įmonių 9 šalyse: įmokos, PVM, vėlavimo ribos ir susigrąžinimas vienoje skaičiuoklėje.',
   eyebrow: 'Technikos pardavimas išsimokėtinai',
   title: 'Parduokite savo sunkvežimį išsimokėtinai – apskaičiuokite prieš susitardami',
   lede:

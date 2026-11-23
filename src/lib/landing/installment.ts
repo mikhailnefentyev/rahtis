@@ -24,8 +24,8 @@ import { calc as ro } from './installmentI18n/ro';
  * 24.11.2026: страница считает по стране сделки (?country=). Тексты ниже —
  * про право Финляндии и показываются, когда выбрана Финляндия; для других
  * стран страница берёт нейтральные слова и тексты страны
- * (installmentCountryView.ts). metaDescription называет все открытые страны:
- * открыли новую — допишите её во всех десяти языках.
+ * (installmentCountryView.ts). metaDescription говорит «9 стран» (24.11.2026,
+ * короче 155 знаков): открыли новую — поменяйте число во всех десяти языках.
  */
 export const INSTALLMENT_TEXT_LOCALES = locales;
 
@@ -122,7 +122,7 @@ export type InstallmentCopy = {
 const fi: InstallmentCopy = {
   metaTitle: 'Kuorma-auton osamaksukauppa yritysten välillä – laskuri',
   metaDescription:
-    'Myy tai osta käytetty kuorma-auto osamaksulla Suomessa, Ruotsissa, Tanskassa, Virossa, Latviassa, Liettuassa, Saksassa, Puolassa tai Romaniassa: maksuerät, arvonlisävero, myyjän maan viivästysrajat ja takaisinotto yhdellä laskurilla.',
+    'Myy tai osta käytetty kuorma-auto osamaksulla yritysten välillä 9 maassa: erät, arvonlisävero, myyjän maan viivästysrajat ja takaisinotto yhdellä laskurilla.',
   eyebrow: 'Kaluston osamaksukauppa',
   title: 'Myy kuorma-autosi osamaksulla – laske ennen kuin sovit',
   lede:
@@ -241,7 +241,7 @@ const fi: InstallmentCopy = {
 const en: InstallmentCopy = {
   metaTitle: 'Truck instalment sale between companies – calculator',
   metaDescription:
-    'Sell or buy a used truck in instalments in Finland, Sweden, Denmark, Estonia, Latvia, Lithuania, Germany, Poland or Romania: payments, VAT, the late-payment thresholds of the seller’s country and repossession in one calculator.',
+    'Sell or buy a used truck in instalments between companies in 9 countries: payments, VAT, default thresholds and repossession in one calculator.',
   eyebrow: 'Equipment instalment sale',
   title: 'Sell your truck in instalments – calculate before you agree',
   lede:

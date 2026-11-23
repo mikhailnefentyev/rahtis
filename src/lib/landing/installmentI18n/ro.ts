@@ -8,9 +8,9 @@ import type { InstallmentCopy } from '../installment';
  * română.
  */
 export const calc: InstallmentCopy = {
-  metaTitle: 'Vânzarea camioanelor cu plata în rate între firme – calculator',
+  metaTitle: 'Camioane vândute în rate între firme – calculator',
   metaDescription:
-    'Vindeți sau cumpărați în rate un camion second-hand în Finlanda, Suedia, Danemarca, Estonia, Letonia, Lituania, Germania, Polonia sau România: rate, TVA, pragurile de întârziere din țara vânzătorului și recuperarea vehiculului, într-un singur calculator.',
+    'Vindeți sau cumpărați în rate un camion second-hand între firme, în 9 țări: rate, TVA, praguri de întârziere și recuperarea vehiculului.',
   eyebrow: 'Vânzare de vehicule cu plata în rate',
   title: 'Vindeți-vă camionul în rate – calculați înainte să conveniți',
   lede:

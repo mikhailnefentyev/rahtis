@@ -1022,7 +1022,7 @@ const ru: LandingCopy = {
 
 /* Остальные языки — перевод с финского (смысл) и английского (помощь). */
 const ro: LandingCopy = {
-  metaTitle: "Pentru casele de expediții: un transportator pentru fiecare încărcătură",
+  metaTitle: "Case de expediții: transportator pentru fiecare încărcătură",
   metaDescription:
     "Publicați o singură dată o comandă de schimb de semiremorci, de container sau expres, alegeți din oferte un transportator verificat și urmăriți comanda pas cu pas. Gratuit pentru casele de expediții.",
   eyebrow: "RAHTIS pentru casele de expediții",

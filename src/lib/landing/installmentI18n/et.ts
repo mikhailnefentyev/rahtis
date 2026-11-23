@@ -4,7 +4,7 @@ import type { InstallmentCopy } from '../installment';
 export const calc: InstallmentCopy = {
   metaTitle: 'Veoki järelmaksumüük ettevõtete vahel – kalkulaator',
   metaDescription:
-    'Müüge või ostke kasutatud veok järelmaksuga Soomes, Rootsis, Taanis, Eestis, Lätis, Leedus, Saksamaal, Poolas või Rumeenias: osamaksed, käibemaks, müüja riigi viivituse piirid ja tagasivõtmine ühes kalkulaatoris.',
+    'Müüge või ostke kasutatud veok järelmaksuga ettevõtete vahel 9 riigis: osamaksed, käibemaks, viivituse piirid ja tagasivõtmine ühes kalkulaatoris.',
   eyebrow: 'Sõidukite järelmaksumüük',
   title: 'Müüge oma veok järelmaksuga – arvutage enne kokkuleppimist',
   lede:

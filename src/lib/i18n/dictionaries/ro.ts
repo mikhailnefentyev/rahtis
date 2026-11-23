@@ -831,7 +831,7 @@ export const ro = {
     schedules: { MANUAL: 'Când apăs „Trimiteți”', WEEKLY: 'Săptămânal (luni)', BIWEEKLY: 'O dată la două săptămâni (luni)' },
   },
   seo: {
-    homeTitle: 'Bursă de transport și TMS: schimburi de semiremorci, containere',
+    homeTitle: 'Bursă de transport și TMS: semiremorci, containere',
     /* Описание для выдачи поиска: до 160 знаков, иначе обрезается. Длинное homeDescription — для разметки. */
     homeMeta: 'Bursă de transport și management al transporturilor: flotă, șoferi, CMR și comenzi directe. Schimburi de semiremorci, containere și transport expres.',
     applyTitle: 'Înscrieți-vă ca transportator sau expeditor',

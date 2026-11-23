@@ -562,7 +562,7 @@ const ru: EarthworksCopy = {
 
 /* Остальные языки — перевод с финского (смысл) и английского (помощь). */
 const ro: EarthworksCopy = {
-  metaTitle: 'Lucrări de terasament și basculante: transporturi, ore, facturi',
+  metaTitle: 'Terasamente și basculante: transporturi, ore, facturi',
   metaDescription:
     'Aplicație de șantier pentru basculante: transporturi cântărite, documente finlandeze de transfer al deșeurilor, ore (ultima descărcare + 30 min), aprobare de către șeful de șantier și facturi către clientul dumneavoastră.',
   eyebrow: 'Lucrări de terasament și basculante',
