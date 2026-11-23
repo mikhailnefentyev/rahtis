@@ -10,9 +10,9 @@
  * Сделка всегда внутри одной страны: продавец и покупатель — компании одной
  * страны (проверяет база, start_installment_deal). Объявления видны всем.
  *
- * Открыты Финляндия, Эстония, Латвия, Швеция, Дания, Литва и Германия
- * (23.11.2026). Для остальных стран нет ни правил, ни договора (их готовят в
- * docs/equipment-sale/countries/).
+ * Открыты Финляндия, Эстония, Латвия, Швеция, Дания, Литва, Германия, Польша
+ * и Румыния (23.11.2026). Для остальных стран (Норвегия) нет ни правил, ни
+ * договора (их готовят в docs/equipment-sale/countries/).
  * Открыть страну — заполнить её запись, добавить правила (rules.ts), шаблон
  * договора (contractText/, contractTemplates.ts), тексты счетов
  * (invoiceTexts.ts) и кабинета (countryTexts/) и вписать страну в
@@ -51,6 +51,27 @@
  *     (Halter), продавца защищает Zulassungsbescheinigung Teil II; шаблон —
  *     типовые условия (AGB), оговорка в кабинете усилена.
  *
+ * Польша и Румыния открыты так же, по pl.md и ro.md (23.11.2026). Главное
+ * отличие — счета (sellerInvoices): счёт между компаниями там существует
+ * только в государственной системе (KSeF — обязателен для всех польских
+ * компаний с 01.04.2026; RO e-Factura — между румынскими компаниями, PDF вне
+ * системы не счёт, штраф 15 % обеим сторонам). Платформа к этим системам не
+ * подключена, поэтому по решению владельца она в этих странах не печатает
+ * ничего, что называется счётом: только расчёт, договор, график, платёжные
+ * уведомления и напоминания со своей нумерацией (серию счетов продавца они не
+ * занимают), а каждый счёт продавец выставляет в системе сам. Передача ждёт
+ * не «оплаченного счёта», а подтверждения продавца, что платёж до передачи
+ * получен (app.mark_installment_first_paid разрешает это и без документа
+ * платформы — миграция 20261202100000).
+ *   · Польша: пороги договорные (два взноса больше 14 дней или один больше
+ *     30 дней, rules.ts PL_KC589), затем срок 14 дней; проценты по договору не
+ *     выше odsetki maksymalne (2 × (ставка NBP + 3,5 п.п.)) — ставку NBP
+ *     платформа не знает, поэтому разрешает не больше 7 % годовых (maxRateBps):
+ *     ниже этого предел опуститься не может, пока ставка NBP не отрицательна;
+ *   · Румыния: пороги договорные (1/8 цены и 30 дней или два взноса со
+ *     старшим 30 дней, rules.ts RO_CC1755), затем срок 15 дней; оговорку о
+ *     собственности надо записать в RNPM до передачи.
+ *
  * СПИСОК ОТКРЫТЫХ СТРАН ПОВТОРЁН В БАЗЕ: функция app.installment_country_open
  * (последняя миграция, где она определена). Меняешь open здесь — меняй и там;
  * расхождение ловит тест countries.test.mjs.
@@ -73,14 +94,30 @@ import { COUNTRY_PACKS, type CountryCode } from '../country/index.ts';
  * дней и не меньше 1/10 (1/20) цены с НДС, затем срок 14 дней (договор п. 9);
  * DE_BGB449 — Германия: порогов для компаний нет (BGB § 449, § 323),
  * договорные по образцу § 498 BGB — два взноса подряд и 10 % (5 %) цены с
- * НДС, затем срок 14 дней (договор п. 9.1).
+ * НДС, затем срок 14 дней (договор п. 9.1);
+ * PL_KC589 — Польша: порогов для компаний нет (KC 587, 589–591), договорные —
+ * два взноса больше 14 дней или один больше 30 дней, затем срок 14 дней
+ * (договор п. 9.1, KC 491 § 1);
+ * RO_CC1755 — Румыния: закон (Codul civil 1756, 1/8 цены) диспозитивен,
+ * договорные — 30 дней и 1/8 цены с НДС, или два взноса со старшим 30 дней,
+ * или весь остаток, затем срок 15 дней (договор п. 9.2–9.3).
  */
-export type InstallmentRulesId = 'FI_OSKL' | 'EE_VOS' | 'LV_CL2070' | 'SE_AVBL' | 'DK_KAL' | 'LT_CK6414' | 'DE_BGB449';
+export type InstallmentRulesId =
+  | 'FI_OSKL'
+  | 'EE_VOS'
+  | 'LV_CL2070'
+  | 'SE_AVBL'
+  | 'DK_KAL'
+  | 'LT_CK6414'
+  | 'DE_BGB449'
+  | 'PL_KC589'
+  | 'RO_CC1755';
 
 /**
  * Шаблон договора. FI_OSAMAKSU — ContractPdf.tsx, договор по финскому праву;
  * EE_JARELMAKS, LV_NOMAKSA, SE_AVBETALNING и DK_KREDITKOEB — тексты
- * contractText/ee.ts, lv.ts, se.ts и dk.ts, печатает CountryContractPdf.tsx.
+ * contractText/ee.ts, lv.ts, se.ts и dk.ts, печатает CountryContractPdf.tsx;
+ * LT_ISSIMOKETINAI, DE_RATENKAUF, PL_RATY и RO_RATE — lt.ts, de.ts, pl.ts и ro.ts.
  */
 export type InstallmentContractId =
   | 'FI_OSAMAKSU'
@@ -89,7 +126,9 @@ export type InstallmentContractId =
   | 'SE_AVBETALNING'
   | 'DK_KREDITKOEB'
   | 'LT_ISSIMOKETINAI'
-  | 'DE_RATENKAUF';
+  | 'DE_RATENKAUF'
+  | 'PL_RATY'
+  | 'RO_RATE';
 
 export type InstallmentCountryEntry = {
   /** Раздел открыт компаниям этой страны. */
@@ -113,6 +152,20 @@ export type InstallmentCountryEntry = {
    * 23.11.2026). Поля нет — проценты разрешены, как в остальных странах.
    */
   interestOffered?: false;
+  /**
+   * true — счета выставляет только продавец в государственной системе
+   * электронных счетов (KSeF, RO e-Factura), платформа — только платёжные
+   * уведомления (Польша и Румыния, 23.11.2026). Тогда vatOnFirstInvoice — false.
+   */
+  sellerInvoices?: true;
+  /**
+   * Наибольшая ставка процентов, б. п. (23.11.2026). Польша: проценты по
+   * договору не выше odsetki maksymalne — 2 × (ставка NBP + 3,5 п.п.), KC 359
+   * § 2¹. Ставку NBP платформа не отслеживает и не зашивает: 700 = 2 × 3,5 —
+   * предел, ниже которого максимум не опустится, пока ставка NBP не
+   * отрицательна. Поля нет — общий предел калькулятора (50 %).
+   */
+  maxRateBps?: number;
 };
 
 const CLOSED: InstallmentCountryEntry = { open: false, rules: null, contract: null, contractLanguage: null, vatOnFirstInvoice: null };
@@ -150,14 +203,36 @@ export const INSTALLMENT_COUNTRIES: Record<CountryCode, InstallmentCountryEntry>
    * счёт, PVM sąskaita faktūra — в день передачи (payments.ts).
    */
   LT: { open: true, rules: 'LT_CK6414', contract: 'LT_ISSIMOKETINAI', contractLanguage: 'lt', vatOnFirstInvoice: false, vatInvoiceAtHandover: true },
-  PL: CLOSED,
+  /*
+   * Польша (23.11.2026): sprzedaż z zastrzeżeniem własności (KC 589–591), особых
+   * правил рассрочки для компаний нет (KC 587). НДС со всей цены — при
+   * передаче, платёж до неё — аванс, облагаемый при получении (ustawa o VAT
+   * art. 7 ust. 1 pkt 2, art. 19a ust. 1 и 8). Счета — только в KSeF и только
+   * продавцом (sellerInvoices).
+   */
+  PL: {
+    open: true,
+    rules: 'PL_KC589',
+    contract: 'PL_RATY',
+    contractLanguage: 'pl',
+    vatOnFirstInvoice: false,
+    sellerInvoices: true,
+    maxRateBps: 700,
+  },
   /*
    * Германия (23.11.2026): Kauf mit Ratenzahlung und Eigentumsvorbehalt (BGB
    * §§ 433, 449). Весь НДС со всей цены при передаче, с предоплаты — при
    * получении (§ 13 Abs. 1 Nr. 1 Buchst. a UStG): первый счёт как в Финляндии.
    */
   DE: { open: true, rules: 'DE_BGB449', contract: 'DE_RATENKAUF', contractLanguage: 'de', vatOnFirstInvoice: true },
-  RO: CLOSED,
+  /*
+   * Румыния (23.11.2026): vânzarea cu plata prețului în rate și rezerva
+   * proprietății (Codul civil 1755–1757). По договору (п. 4.2) продавец
+   * выставляет счёт на всю цену с НДС до передачи (Codul fiscal art. 282),
+   * взносы по цене счетами не оформляются, проценты — ежемесячным счётом без
+   * НДС (art. 292). Все счета — только в RO e-Factura и только продавцом.
+   */
+  RO: { open: true, rules: 'RO_CC1755', contract: 'RO_RATE', contractLanguage: 'ro', vatOnFirstInvoice: false, sellerInvoices: true },
 };
 
 export type InstallmentCountry = {
@@ -223,6 +298,29 @@ export function installmentCountryOpen(country: string | null | undefined): bool
  */
 export function installmentInterestOffered(country: string | null | undefined): boolean {
   return installmentCountryEntry(country)?.interestOffered !== false;
+}
+
+/** Общий предел ставки калькулятора, б. п. (calc.ts buildSchedule: 0–50 %). */
+export const MAX_RATE_BPS = 5000;
+
+/**
+ * Наибольшая ставка процентов в стране сделки, б. п. (23.11.2026): у Польши —
+ * 700 (см. maxRateBps), у остальных — общий предел 50 %. Где проценты не
+ * предлагаются (Швеция), это решает installmentInterestOffered.
+ * ТО ЖЕ ПРАВИЛО В БАЗЕ: app.installment_max_rate_bps; расхождение ловит тест
+ * countryOpen.test.mjs.
+ */
+export function installmentMaxRateBps(country: string | null | undefined): number {
+  return installmentCountryEntry(country)?.maxRateBps ?? MAX_RATE_BPS;
+}
+
+/**
+ * Выставляет ли продавец все счета сам в государственной системе, а
+ * платформа — только платёжные уведомления (Польша, Румыния; 23.11.2026).
+ * ТО ЖЕ ПРАВИЛО В БАЗЕ: app.installment_seller_invoices.
+ */
+export function installmentSellerInvoices(country: string | null | undefined): boolean {
+  return installmentCountryEntry(country)?.sellerInvoices === true;
 }
 
 /**

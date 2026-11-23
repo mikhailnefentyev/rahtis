@@ -20,6 +20,8 @@ import { installmentCountryEntry, type InstallmentContractId } from './countries
  *     же компонентом: суммы в кронах, у Швеции даты «ГГГГ-ММ-ДД».
  *   · LT_ISSIMOKETINAI, DE_RATENKAUF — contractText/lt.ts и de.ts (23.11.2026):
  *     у Литвы даты «ГГГГ-ММ-ДД».
+ *   · PL_RATY, RO_RATE — contractText/pl.ts и ro.ts (23.11.2026): номер счёта
+ *     продавца в KSeF / RO e-Factura платформе неизвестен — строка от руки.
  * Номер первого документа в договоре — только если это счёт с НДС: у Литвы
  * первый документ — предварительный счёт, а номер счёта с НДС появится в день
  * передачи, поэтому в договоре прочерк (contract.ts).
@@ -66,6 +68,8 @@ const TEMPLATES: Record<InstallmentContractId, ContractTemplate> = {
   DK_KREDITKOEB: countryTemplate('DK_KREDITKOEB'),
   LT_ISSIMOKETINAI: countryTemplate('LT_ISSIMOKETINAI'),
   DE_RATENKAUF: countryTemplate('DE_RATENKAUF'),
+  PL_RATY: countryTemplate('PL_RATY'),
+  RO_RATE: countryTemplate('RO_RATE'),
 };
 
 /**

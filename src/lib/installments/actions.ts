@@ -20,7 +20,7 @@ import {
 import { announceListing } from './announce';
 import { buildSchedule, type VatMode } from './calc';
 import { fill, installmentUiCopy } from './copy';
-import { installmentCountry, installmentInterestOffered } from './countries';
+import { installmentCountry, installmentInterestOffered, installmentMaxRateBps } from './countries';
 import { installmentCountryCopy } from './countryCopy';
 import { countryEventCode, countryNoticeLocale } from './countryTexts';
 import { createFirstInvoice } from './firstInvoice';
@@ -83,6 +83,8 @@ function readTerms(fd: FormData, vatMode: VatMode, vatBps: number, withDates: bo
   const firstDue = withDates ? isoDate(str(fd, 'first_due')) : '2099-02-01';
   if (price == null || down == null || final === undefined || rate == null || !handover || !firstDue) return null;
   if (rate !== 0 && !installmentInterestOffered(country)) return null;
+  /* Польша (23.11.2026): не выше предела odsetek maksymalnych — 7 % (countries.ts); то же правило в базе. */
+  if (rate > installmentMaxRateBps(country)) return null;
   const schedule = buildSchedule({
     priceCents: price,
     vatMode,

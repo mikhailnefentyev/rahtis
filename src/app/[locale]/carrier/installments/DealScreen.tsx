@@ -23,7 +23,7 @@ import {
 } from '@/lib/installments/calc';
 import { dealTermination, dealVehicle, loadDeal } from '@/lib/installments/contract';
 import { fill, installmentUiCopy } from '@/lib/installments/copy';
-import { installmentCurrency, installmentDay, installmentMoney, installmentToday, vatRateText } from '@/lib/installments/countries';
+import { installmentCurrency, installmentDay, installmentMoney, installmentSellerInvoices, installmentToday, vatRateText } from '@/lib/installments/countries';
 import { installmentRules } from '@/lib/installments/rules';
 import { isLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
@@ -200,9 +200,19 @@ export async function DealScreen({
     [ui.deal.firstDue, fiDate(payments?.[0]?.due_date ?? deal.first_due_date)],
   ];
   if (!('error' in schedule)) {
-    rows.push([calc.r.firstInvoice, eur(schedule.firstInvoiceCents)], [calc.r.priceWithVat, eur(schedule.installmentPriceCents)]);
+    /* Польша и Румыния: «к оплате до передачи» — платформа счетов там не выставляет. */
+    rows.push(
+      [ui.country?.sellerInvoices?.firstPaymentLabel ?? calc.r.firstInvoice, eur(schedule.firstInvoiceCents)],
+      [calc.r.priceWithVat, eur(schedule.installmentPriceCents)],
+    );
   }
   const hidden = { locale, deal_id: deal.id };
+  /*
+   * Польша и Румыния (23.11.2026): счета выставляет продавец в KSeF / RO
+   * e-Factura, а передача ждёт его подтверждения, что платёж до передачи
+   * получен, — и без уведомления платформы (миграция 20261202100000).
+   */
+  const sellerInvoices = installmentSellerInvoices(seller.country);
 
   /* Почему счёта нет или он не дошёл — те же проверки, что у создания (firstInvoice.ts). */
   const invoiceReady = Boolean(invoice?.file_path);
@@ -318,7 +328,7 @@ export async function DealScreen({
               </div>
             )}
             <p>{ui.deal.nextSteps}</p>
-            {invoice && (
+            {(invoice || sellerInvoices) && (
               <div className="flex flex-wrap items-center gap-3">
                 <p className={deal.first_invoice_paid_at ? 'text-ok' : 'text-warn'}>
                   {deal.first_invoice_paid_at ? fill(ui.stage3.firstPaid, { date: dateOf(deal.first_invoice_paid_at) }) : ui.stage3.firstUnpaid}
@@ -336,7 +346,10 @@ export async function DealScreen({
             {owner && isSeller && invoice && !deal.handover_seller_at && !deal.handover_buyer_at && (
               <ActionForm action={cancelWithCreditAction} fields={hidden} label={ui.stage3.cancelCredit} variant="danger" />
             )}
-            {owner && !invoice && <ActionForm action={cancelDealAction} fields={hidden} label={ui.deal.cancel} variant="danger" />}
+            {/* Платёж подтверждён без документа платформы (Польша, Румыния) — отменяет только продавец, как и в базе. */}
+            {owner && !invoice && (!deal.first_invoice_paid_at || isSeller) && (
+              <ActionForm action={cancelDealAction} fields={hidden} label={ui.deal.cancel} variant="danger" />
+            )}
           </CardBody>
         </Card>
       )}
@@ -459,7 +472,8 @@ export async function DealScreen({
                 )}
                 {vatInvoice?.file_path && (
                   <a href={`${home}/${deal.id}/invoice?inv=${vatInvoice.id}`} className={buttonClass({ size: 'sm' })}>
-                    {ui.deal.invoice} · {vatInvoice.number}
+                    {/* Польша и Румыния: справка о передаче, не счёт. */}
+                    {ui.country?.sellerInvoices?.handoverDoc ?? ui.deal.invoice} · {vatInvoice.number}
                   </a>
                 )}
               </div>

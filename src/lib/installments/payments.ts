@@ -56,6 +56,12 @@ import { installmentRules } from './rules';
  * (issueHandoverVatInvoice), до этого был только предварительный счёт.
  * Отмена до передачи документа без НДС (предварительного счёта, немецкой
  * платёжной информации) — не кредит-нота, а отмена без НДС (tx.cancel).
+ *
+ * 23.11.2026, Польша и Румыния: платформа счетов не выставляет вовсе — счета
+ * только в KSeF / RO e-Factura у продавца. Все документы — уведомления со
+ * своей нумерацией от договора: первое (firstInvoice.ts), справка о передаче
+ * (issueHandoverVatInvoice, столбец vat_invoice_id), ежемесячное (paymentDoc)
+ * и отмена (cancel). Серию счетов продавца они не занимают.
  */
 
 const BUCKET = 'reports';
@@ -396,6 +402,8 @@ export function paymentDocument(a: {
   dueIso: string;
   iban: string;
   sellerName: string;
+  /** В документе есть строка процентов (23.11.2026): тексты Польши и Румынии говорят, кто и как их фактурирует. */
+  hasInterest?: boolean;
 }): { meta: Meta; number?: string } {
   const tx = invoiceTexts(a.country);
   const plain = tx.paymentDoc;
@@ -408,7 +416,7 @@ export function paymentDocument(a: {
       job: `${a.contract} · ${a.what}`,
       period: `${a.n} / ${a.months}`,
       periodLabel: tx.payment.periodLabel,
-      note: [notice?.note, tx.payment.note({ firstNumber: a.firstNumber })].filter(Boolean).join('\n'),
+      note: [notice?.note, tx.payment.note({ firstNumber: a.firstNumber, hasInterest: a.hasInterest })].filter(Boolean).join('\n'),
       title: plain?.title ?? notice?.title,
       docName: plain?.docName ?? notice?.docName,
       ...(plain ? { doc: 'PAYMENT' as const, noVat: Boolean(plain.noVat) } : {}),
@@ -507,6 +515,7 @@ export async function issuePaymentInvoice(paymentId: string): Promise<IssueStatu
     dueIso: pay.due_date,
     iban: p.seller.iban ?? '',
     sellerName: p.seller.name,
+    hasInterest: pay.interest_cents > 0,
   });
 
   const invoiceId = await createInvoiceRow({
@@ -646,15 +655,29 @@ export function handoverInvoiceDocument(a: {
   proformaNumber: string;
   currency: string | null;
   sellerName: string;
-}): { lines: { date: string; text: string; unitCents: number; amountCents: number }[]; meta: Meta } | null {
+  /** Ставка НДС сделки, б. п. (23.11.2026): справке Польши и Румынии — «что должен содержать счёт продавца». */
+  vatBps?: number;
+}): { lines: { date: string; text: string; unitCents: number; amountCents: number }[]; meta: Meta; number?: string } | null {
   const tx = invoiceTexts(a.country);
   const h = tx.handover;
   if (!h) return null;
   const f = createFormat(tx.intl);
   const cur = asCurrency(a.currency);
+  /*
+   * Польша и Румыния (23.11.2026): при передаче — справка без НДС со своим
+   * номером, не счёт. Строка — цена с НДС (налог отдельно не выделяется),
+   * платить по ней нечего; что должен содержать счёт продавца — в примечании.
+   */
+  const doc = tx.handoverDoc;
+  const advanceCents = a.downPaymentCents + a.vatCents;
+  const grossCents = a.priceCents + a.vatCents;
+  const bps = a.vatBps ?? 0;
+  const lineCents = doc ? grossCents : a.priceCents;
   return {
-    lines: [{ date: a.handoverDay, text: h.line({ what: a.what, contract: a.contract }), unitCents: a.priceCents, amountCents: a.priceCents }],
+    number: doc?.number({ contract: a.contract }),
+    lines: [{ date: a.handoverDay, text: h.line({ what: a.what, contract: a.contract }), unitCents: lineCents, amountCents: lineCents }],
     meta: {
+      ...(doc ? { doc: 'HANDOVER' as const, noVat: true, title: doc.title, docName: doc.docName } : {}),
       country: a.country,
       job: `${a.what} · ${a.contract}`,
       jobLabel: tx.first.jobLabel,
@@ -664,11 +687,17 @@ export function handoverInvoiceDocument(a: {
       amountLabel: h.amountLabel,
       note: h.note({
         proforma: a.proformaNumber,
-        advance: f.money(a.downPaymentCents + a.vatCents, cur),
+        advance: f.money(advanceCents, cur),
         vat: f.money(a.vatCents, cur),
         rest: f.money(a.priceCents - a.downPaymentCents, cur),
         months: a.months,
         contract: a.contract,
+        /* Поля ниже читают только тексты Польши и Румынии. */
+        price: f.money(a.priceCents, cur),
+        gross: f.money(grossCents, cur),
+        vatPercent: (bps / 100).toLocaleString(tx.intl, { maximumFractionDigits: 1 }),
+        advanceVat: f.money(bps > 0 ? Math.round((advanceCents * bps) / (10_000 + bps)) : 0, cur),
+        handover: tx.date(a.handoverDay),
       }),
       mail: {
         template: 'installment_payment_invoice',
@@ -694,7 +723,9 @@ export async function issueHandoverVatInvoice(dealId: string): Promise<IssueStat
   if (!deal || (deal.status !== 'ACTIVE' && deal.status !== 'PAID_OFF') || !deal.handed_over_at || !deal.contract_number) return 'NOT_FOUND';
   if (deal.vat_invoice_id) return (await deliverInvoice(deal.vat_invoice_id)) ? 'EXISTS' : 'CREATED';
   const p = await parties(deal.seller_company_id, deal.buyer_company_id);
-  if (!p || installmentCountryEntry(p.country)?.vatInvoiceAtHandover !== true) return 'NOT_FOUND';
+  const entry = p ? installmentCountryEntry(p.country) : null;
+  /* Литва — счёт с НДС; Польша и Румыния (23.11.2026) — справка о передаче, не счёт. */
+  if (!p || (entry?.vatInvoiceAtHandover !== true && entry?.sellerInvoices !== true)) return 'NOT_FOUND';
 
   const staleBefore = new Date(Date.now() - 10 * 60_000).toISOString();
   const deals = admin.from('installment_deals') as unknown as UntypedDeals;
@@ -725,8 +756,11 @@ export async function issueHandoverVatInvoice(dealId: string): Promise<IssueStat
     proformaNumber: proforma?.number ?? '—',
     currency: deal.currency,
     sellerName: p.seller.name,
+    vatBps: deal.vat_mode === 'STANDARD' ? deal.vat_bps : 0,
   });
   if (!built) return 'NOT_FOUND';
+  /* Справка — не счёт: без строк НДС и с номером от договора, серию счетов продавца она не занимает. */
+  const plain = Boolean(built.meta.noVat);
 
   const invoiceId = await createInvoiceRow({
     sellerId: deal.seller_company_id,
@@ -736,10 +770,11 @@ export async function issueHandoverVatInvoice(dealId: string): Promise<IssueStat
     issuedOn: handoverDay,
     dueOn: handoverDay,
     lines: built.lines,
-    vatBps: deal.vat_mode === 'STANDARD' ? deal.vat_bps : 0,
-    vatCents,
+    vatBps: !plain && deal.vat_mode === 'STANDARD' ? deal.vat_bps : 0,
+    vatCents: plain ? 0 : vatCents,
     currency: deal.currency,
     meta: built.meta,
+    number: built.number,
   });
   const { error: linked } = await deals.update({ vat_invoice_id: invoiceId }).eq('id', dealId).is('vat_invoice_id', null);
   if (linked) throw new Error(`счёт с НДС при передаче: ${linked.message}`);
@@ -775,7 +810,9 @@ export async function runInstallments(options: { dealId?: string; today?: string
       const country = seller?.country ?? null;
       const today = options.today ?? installmentToday(country);
       /* Литва: счёт с НДС на всю цену — в день передачи, до первого платёжного требования (23.11.2026). */
-      if (installmentCountryEntry(country)?.vatInvoiceAtHandover === true) {
+      /* Польша и Румыния: справка о передаче (не счёт) — тем же путём (23.11.2026). */
+      const handoverEntry = installmentCountryEntry(country);
+      if (handoverEntry?.vatInvoiceAtHandover === true || handoverEntry?.sellerInvoices === true) {
         /* Сорвался — в итог задания и повтор завтра; взносы и напоминания по сделке всё равно идут. */
         try {
           const status = await issueHandoverVatInvoice(deal.id);

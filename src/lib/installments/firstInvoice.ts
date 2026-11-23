@@ -52,6 +52,14 @@ import { documentKind, documentLabels, firstDocumentKind, invoiceTexts, plainDoc
  * НДС (номер из серии, как у латвийского уведомления). Вид документа
  * записывается в счёт (seller.document): по нему печать, отмена и сумма «к
  * оплате сейчас» — у такого документа это весь его итог.
+ *
+ * 23.11.2026, Польша и Румыния: первый документ — всегда уведомление о платеже
+ * (NOTICE) без НДС с номером от номера договора (IP-…, NP-…): серию счетов
+ * продавца он не занимает, а счёт продавец выставляет сам в KSeF / RO
+ * e-Factura. В примечании — что этот счёт должен содержать (цена без НДС, НДС,
+ * цена с НДС, НДС внутри аванса). Передача ждёт не оплаты этого документа, а
+ * подтверждения продавца, что платёж получен (mark_installment_first_paid —
+ * у этих стран и без документа платформы).
  */
 
 const BUCKET = 'reports';
@@ -133,7 +141,8 @@ export async function createFirstInvoice(dealId: string): Promise<FirstInvoiceSt
    * передаче, а первым идёт предварительный счёт (vatInvoiceAtHandover).
    */
   const entry = installmentCountryEntry(seller.country);
-  if (entry?.vatOnFirstInvoice !== true && entry?.vatInvoiceAtHandover !== true) return 'NOT_FOUND';
+  /* Польша и Румыния (23.11.2026): первый документ — уведомление о платеже, счёт выставляет продавец в KSeF / RO e-Factura. */
+  if (entry?.vatOnFirstInvoice !== true && entry?.vatInvoiceAtHandover !== true && entry?.sellerInvoices !== true) return 'NOT_FOUND';
   if (!seller.iban) return 'NO_IBAN';
   const changedAt = await lastIbanChange(seller.id);
   if (changedAt && ibanHoldActive(changedAt)) return 'IBAN_RECENT';
@@ -266,8 +275,11 @@ export async function createFirstInvoice(dealId: string): Promise<FirstInvoiceSt
  * серии продавца, как у счёта (и у немецкой платёжной информации).
  */
 function fixedNumber(doc: PlainDocKind | null, country: string | null, contract: string | null): string | null {
-  if (doc !== 'PROFORMA' || !contract) return null;
-  return invoiceTexts(country).proforma?.number({ contract }) ?? null;
+  if (!contract) return null;
+  if (doc === 'PROFORMA') return invoiceTexts(country).proforma?.number({ contract }) ?? null;
+  /* Польша и Румыния (23.11.2026): уведомление — тоже от номера договора; у немецкой платёжной информации номера в текстах нет — серия, как было. */
+  if (doc === 'NOTICE') return invoiceTexts(country).notice?.number?.({ contract }) ?? null;
+  return null;
 }
 
 /**
@@ -379,6 +391,17 @@ export function firstDocumentPdf(inv: FirstDocRow, deal: Deal): { pdf: SiteInvoi
     months: deal.months,
     contract: deal.contract_number ?? '',
     vatMode,
+    /*
+     * Что должен содержать счёт продавца в KSeF / RO e-Factura (23.11.2026):
+     * читают только тексты Польши и Румынии, остальные эти поля не используют.
+     * НДС внутри платежа до передачи — платёж считается суммой с НДС (Польша, art. 19a ust. 8).
+     */
+    price: f.money(deal.price_cents, currency),
+    vatPercent: (deal.vat_bps / 100).toLocaleString(tx.intl, { maximumFractionDigits: 1 }),
+    gross: f.money(deal.price_cents + vatOfPrice, currency),
+    advance: f.money(payNowCents, currency),
+    advanceVat: f.money(vatMode === 'STANDARD' ? Math.round((payNowCents * deal.vat_bps) / (10_000 + deal.vat_bps)) : 0, currency),
+    handover: fiDate(deal.handover_date),
   };
   const note =
     doc === 'NOTICE' && tx.notice?.firstNote

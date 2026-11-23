@@ -14,11 +14,17 @@ import {
   INSTALLMENT_RULES,
   LT_DAYS_LATE,
   LV_MISSED_DATES,
+  PL_DAYS_LATE_ONE,
+  PL_DAYS_LATE_TWO,
+  PL_GRACE_DAYS,
+  RO_DAYS_LATE,
+  RO_GRACE_DAYS,
   SE_DAYS_LATE,
   deSharePercent,
   deThresholdCents,
   dkTotalPayableCents,
   installmentRules,
+  roEighthCents,
   seCreditClaimCents,
 } from './rules.ts';
 
@@ -401,4 +407,97 @@ test('Литва и Германия не меняют пороги других
   assert.deepEqual(INSTALLMENT_RULES.SE_AVBL.thresholds(s), { tenthCents: 550_000, twentiethCents: 275_000, installmentsNeeded: 2 });
   assert.equal(INSTALLMENT_RULES.DK_KAL.thresholds(s).tenthCents, Math.ceil(dkTotalPayableCents(s) / 10));
   assert.equal(INSTALLMENT_RULES.FI_OSKL.remedyAllowed, remedyAllowed);
+});
+
+/* ── Польша и Румыния (23.11.2026) ──────────────────────────────────── */
+
+test('Польша: правила договора — без доли цены, база — цена с НДС 23 %, срок 14 дней', () => {
+  const s = schedule(2300);
+  const rules = installmentRules('PL');
+  assert.equal(rules.id, 'PL_KC589');
+  assert.equal(rules.source, 'CONTRACT');
+  assert.equal(rules.graceDays, 14);
+  assert.equal(PL_GRACE_DAYS, 14);
+  assert.equal(PL_DAYS_LATE_TWO, 14);
+  assert.equal(PL_DAYS_LATE_ONE, 30);
+  assert.equal(s.installmentPriceCents, 7_995_000);
+  assert.equal(rules.base(s), 7_995_000);
+  assert.deepEqual(rules.thresholds(s), { tenthCents: 0, twentiethCents: 0, installmentsNeeded: 2 });
+  /* Один взнос в графике — порог даёт только он сам. */
+  assert.equal(rules.thresholds(schedule(2300, 1)).installmentsNeeded, 1);
+});
+
+test('Польша: порог — два взноса строго больше 14 дней или один строго больше 30 дней; суммы не важны', () => {
+  const rules = INSTALLMENT_RULES.PL_KC589;
+  const base = 7_995_000;
+  const remaining = 5_500_000;
+  const small = 100;
+  const two = [
+    { dueDate: '2027-01-20', unpaidCents: small },
+    { dueDate: '2027-02-01', unpaidCents: small },
+  ];
+  /* Второй взнос — ровно 14 дней (первый — 26, меньше 30): ещё нет; 15 — да. Сумма любая, даже крошечная. */
+  assert.equal(rules.remedyAllowed(two, '2027-02-15', base, remaining), false);
+  assert.equal(rules.remedyAllowed(two, '2027-02-16', base, remaining), true);
+  /* Один взнос: 30 дней — нет, 31 — да (и это при сумме меньше любой доли). */
+  const one = [{ dueDate: '2027-01-01', unpaidCents: small }];
+  assert.equal(rules.remedyAllowed(one, '2027-01-31', base, remaining), false);
+  assert.equal(rules.remedyAllowed(one, '2027-02-01', base, remaining), true);
+  /* Весь остаток сам по себе порога не даёт: дни те же (договор п. 9.1 о нём не говорит). */
+  assert.equal(rules.remedyAllowed([{ dueDate: '2027-01-01', unpaidCents: remaining }], '2027-01-20', base, remaining), false);
+  /* Уплаченное не считается. */
+  assert.equal(rules.remedyAllowed([{ dueDate: '2027-01-01', unpaidCents: 0 }, { dueDate: '2027-01-02', unpaidCents: 0 }], '2027-12-31', base, remaining), false);
+  assert.equal(rules.remedyAllowed([], '2027-12-31', base, remaining), false);
+});
+
+test('Румыния: правила договора — 1/8 цены с НДС 21 %, база — цена с НДС, срок 15 дней', () => {
+  const s = schedule(2100);
+  const rules = installmentRules('ro');
+  assert.equal(rules.id, 'RO_CC1755');
+  assert.equal(rules.source, 'CONTRACT');
+  assert.equal(rules.graceDays, 15);
+  assert.equal(RO_GRACE_DAYS, 15);
+  assert.equal(RO_DAYS_LATE, 30);
+  assert.equal(s.installmentPriceCents, 7_865_000);
+  assert.equal(rules.base(s), 7_865_000);
+  assert.equal(roEighthCents(s), 983_125);
+  /* Первый взнос меньше 1/8 — нужно два взноса (правило 2). */
+  assert.deepEqual(rules.thresholds(s), { tenthCents: 983_125, twentiethCents: 983_125, installmentsNeeded: 2 });
+  /* Один взнос в графике — он и есть весь остаток. */
+  assert.equal(rules.thresholds(schedule(2100, 1)).installmentsNeeded, 1);
+  /* Короткий график: взнос сам не меньше 1/8 — достаточно одного. */
+  assert.equal(rules.thresholds(schedule(2100, 4)).installmentsNeeded, 1);
+});
+
+test('Румыния: порог — 30 дней и 1/8 цены, или два взноса со старшим 30 дней, или весь остаток', () => {
+  const rules = INSTALLMENT_RULES.RO_CC1755;
+  const base = 7_865_000;
+  const remaining = 5_500_000;
+  /* (1) один взнос: ровно 1/8 цены и 30 дней — да; 29 дней — нет; на цент меньше 1/8 — нет. */
+  assert.equal(rules.remedyAllowed([{ dueDate: '2027-01-01', unpaidCents: 983_125 }], '2027-01-31', base, remaining), true);
+  assert.equal(rules.remedyAllowed([{ dueDate: '2027-01-01', unpaidCents: 983_125 }], '2027-01-30', base, remaining), false);
+  assert.equal(rules.remedyAllowed([{ dueDate: '2027-01-01', unpaidCents: 983_124 }], '2027-12-31', base, remaining), false);
+  /* (2) два взноса: старший 30 дней — да, 29 — нет; сумма не важна. */
+  const two = [
+    { dueDate: '2027-01-01', unpaidCents: 100 },
+    { dueDate: '2027-01-25', unpaidCents: 100 },
+  ];
+  assert.equal(rules.remedyAllowed(two, '2027-01-30', base, remaining), false);
+  assert.equal(rules.remedyAllowed(two, '2027-01-31', base, remaining), true);
+  /* Второй ещё не просрочен (день срока) — он не считается, остаётся правило (1). */
+  assert.equal(rules.remedyAllowed([{ dueDate: '2027-01-01', unpaidCents: 100 }, { dueDate: '2027-01-31', unpaidCents: 100 }], '2027-01-31', base, remaining), false);
+  /* (3) весь остаток просрочен — со следующего дня после срока. */
+  assert.equal(rules.remedyAllowed([{ dueDate: '2027-01-01', unpaidCents: 100 }], '2027-01-02', base, 100), true);
+  assert.equal(rules.remedyAllowed([{ dueDate: '2027-01-01', unpaidCents: 100 }], '2027-01-01', base, 100), false);
+  /* Уплаченное не считается. */
+  assert.equal(rules.remedyAllowed([{ dueDate: '2027-01-01', unpaidCents: 0 }], '2027-12-31', base, remaining), false);
+});
+
+test('Польша и Румыния не меняют пороги других стран', () => {
+  const s = schedule(2500);
+  assert.deepEqual(INSTALLMENT_RULES.SE_AVBL.thresholds(s), { tenthCents: 550_000, twentiethCents: 275_000, installmentsNeeded: 2 });
+  assert.equal(INSTALLMENT_RULES.FI_OSKL.remedyAllowed, remedyAllowed);
+  assert.equal(INSTALLMENT_RULES.FI_OSKL.thresholds, thresholds);
+  assert.equal(installmentRules('NO'), null);
+  assert.deepEqual(Object.keys(INSTALLMENT_RULES).sort(), ['DE_BGB449', 'DK_KAL', 'EE_VOS', 'FI_OSKL', 'LT_CK6414', 'LV_CL2070', 'PL_KC589', 'RO_CC1755', 'SE_AVBL']);
 });

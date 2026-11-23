@@ -58,6 +58,26 @@
  *     только после него — требование остатка или отказ от договора
  *     (Rücktritt) и требование вернуть машину. Забрать самому нельзя
  *     (§ 858 BGB): добровольно или через суд и Gerichtsvollzieher.
+ *   · PL_KC589 — Польша (pl.md): правила sprzedaż na raty (KC 583–588) для
+ *     покупателя-предприятия не действуют (KC 587), порогов закон не даёт.
+ *     Договорные пороги (п. 9.1) — как предлагает исследование: «co najmniej
+ *     dwóch rat dłużej niż 14 dni» — хотя бы ДВА взноса просрочены СТРОГО
+ *     больше 14 дней каждый, «albo jednej raty dłużej niż 30 dni» — или один
+ *     взнос СТРОГО больше 30 дней. Доли цены нет: база (base) — цена с НДС, в
+ *     правиле не участвует (как у Латвии). После порога — письменное
+ *     требование с дополнительным сроком не короче 14 дней (KC 491 § 1), и
+ *     только потом отказ от договора; забрать машину самому нельзя (KC 342):
+ *     добровольно или komornik sądowy по исполнительному документу.
+ *   · RO_CC1755 — Румыния (ro.md): Codul civil 1756 (одна неуплата не больше
+ *     1/8 цены не даёт расторжения) диспозитивна, договор (п. 9.2) задаёт
+ *     своё: (1) взнос просрочен НЕ МЕНЬШЕ 30 дней («cel puțin 30 de zile») и
+ *     просрочено НЕ МЕНЬШЕ 1/8 цены с НДС («preț total» — цена с НДС, п. 4.1);
+ *     (2) или просрочены два и больше взноса, старший — не меньше 30 дней;
+ *     (3) или просрочен весь остаток. База — цена с НДС. В сумму доли (1)
+ *     идут только взносы, просроченные 30 дней и больше: так порог наступает
+ *     не раньше договорного (ошибка — только в пользу покупателя). Затем
+ *     письменное уведомление со сроком 15 дней (п. 9.3); забрать машину —
+ *     только executor judecătoresc или суд (осторожный вариант исследования).
  *
  * База порога (23.11.2026). До Швеции и Дании доля считалась только от цены
  * с НДС, и вызывающий передавал её сам. Теперь базу даёт набор (base): у
@@ -83,8 +103,9 @@ export type InstallmentRules = {
   /**
    * От какой суммы считается доля просрочки (23.11.2026) — третий аргумент
    * remedyAllowed. Финляндия, Эстония и Литва — цена с НДС, Швеция —
-   * kreditfordran, Дания — вся сумма к уплате; у Латвии доли нет, сумма не
-   * используется. Германия — сразу сумма порога: 10 % (5 %) цены с НДС.
+   * kreditfordran, Дания — вся сумма к уплате; у Латвии и Польши доли нет,
+   * сумма не используется. Германия — сразу сумма порога: 10 % (5 %) цены с
+   * НДС. Румыния — цена с НДС, порог — 1/8 от неё (23.11.2026).
    */
   base: (schedule: Schedule) => number;
   /**
@@ -235,6 +256,69 @@ function shareThresholdReached(overdue: Overdue[], todayIso: string, base: numbe
   return shareReached(sum, late.length, base, rule);
 }
 
+/* ── Польша: два взноса больше 14 дней или один больше 30 дней ────────── */
+
+/** Польша, договор п. 9.1: два взноса — просрочка строго больше 14 дней. */
+export const PL_DAYS_LATE_TWO = 14;
+/** Польша, договор п. 9.1: один взнос — просрочка строго больше 30 дней. */
+export const PL_DAYS_LATE_ONE = 30;
+/** Польша, договор п. 9.1 и KC 491 § 1: дополнительный срок не короче 14 дней. */
+export const PL_GRACE_DAYS = 14;
+
+/*
+ * Доли цены в польском правиле нет: суммы 1/10 и 1/20 — нули, в тексте
+ * страны не используются. Число взносов на экране — два: один взнос даёт
+ * порог только через 30 дней, это сказано словами (countryTexts/pl.ts).
+ */
+function plThresholds(schedule: Schedule): Thresholds {
+  return { tenthCents: 0, twentiethCents: 0, installmentsNeeded: Math.min(2, schedule.installments.length) };
+}
+
+function plThresholdReached(overdue: Overdue[], todayIso: string): boolean {
+  const unpaid = overdue.filter((o) => o.unpaidCents > 0);
+  const over14 = unpaid.filter((o) => daysBetween(o.dueDate, todayIso) > PL_DAYS_LATE_TWO).length;
+  return over14 >= 2 || unpaid.some((o) => daysBetween(o.dueDate, todayIso) > PL_DAYS_LATE_ONE);
+}
+
+/* ── Румыния: 1/8 цены и 30 дней, два взноса или весь остаток ──────────── */
+
+/** Румыния, договор п. 9.2: просрочка не меньше 30 дней. */
+export const RO_DAYS_LATE = 30;
+/** Румыния, договор п. 9.3: срок уведомления — 15 дней. */
+export const RO_GRACE_DAYS = 15;
+
+/** Одна восьмая цены с НДС, «cel puțin» — с округлением вверх. */
+export function roEighthCents(schedule: Schedule): number {
+  return Math.ceil(schedule.installmentPriceCents / 8);
+}
+
+/** Сколько взносов надо просрочить: один, если первый взнос сам не меньше 1/8 цены (или он единственный), иначе два. */
+function roThresholds(schedule: Schedule): Thresholds {
+  const eighth = roEighthCents(schedule);
+  const list = schedule.installments;
+  const needed = list.length <= 1 || list[0].principalCents >= eighth ? 1 : 2;
+  /* Доля у Румынии одна (1/8): обе строки порога показывают её. */
+  return { tenthCents: eighth, twentiethCents: eighth, installmentsNeeded: needed };
+}
+
+/**
+ * base — цена с НДС (п. 4.1 «preț total»). Взносы без номера и без срока не
+ * нужны: «старший» — по сроку, он есть у каждого просроченного взноса.
+ */
+function roThresholdReached(overdue: Overdue[], todayIso: string, priceGrossCents: number, remainingCents: number): boolean {
+  const late = overdue.filter((o) => o.unpaidCents > 0 && daysBetween(o.dueDate, todayIso) >= 1);
+  if (late.length === 0) return false;
+  const sum = late.reduce((s, o) => s + o.unpaidCents, 0);
+  /* (3) просрочен весь остаток. */
+  if (sum >= remainingCents) return true;
+  const old = late.filter((o) => daysBetween(o.dueDate, todayIso) >= RO_DAYS_LATE);
+  if (old.length === 0) return false;
+  /* (2) два и больше просроченных взноса, старший — 30 дней и больше. */
+  if (late.length >= 2) return true;
+  /* (1) взнос просрочен 30 дней и больше, и это не меньше 1/8 цены. */
+  return old.reduce((s, o) => s + o.unpaidCents, 0) * 8 >= priceGrossCents;
+}
+
 /* ── Германия: два взноса подряд и доля Gesamtbetrag ──────────────────── */
 
 /** Германия, договор п. 9.1 (образец § 498 BGB): срок больше трёх лет — 5 %, иначе 10 %. */
@@ -328,6 +412,24 @@ export const INSTALLMENT_RULES: Record<InstallmentRulesId, InstallmentRules> = {
     thresholds: deThresholds,
     base: deThresholdCents,
     remedyAllowed: deThresholdReached,
+  },
+  /* Польша: доли цены нет, base не используется (цена с НДС — как у Латвии). */
+  PL_KC589: {
+    id: 'PL_KC589',
+    source: 'CONTRACT',
+    graceDays: PL_GRACE_DAYS,
+    thresholds: plThresholds,
+    base: priceGross,
+    remedyAllowed: plThresholdReached,
+  },
+  /* Румыния: база — цена с НДС (1/8 от неё). */
+  RO_CC1755: {
+    id: 'RO_CC1755',
+    source: 'CONTRACT',
+    graceDays: RO_GRACE_DAYS,
+    thresholds: roThresholds,
+    base: priceGross,
+    remedyAllowed: roThresholdReached,
   },
 };
 

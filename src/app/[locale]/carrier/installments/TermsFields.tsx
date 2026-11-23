@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import { Field, Input } from '@/components/ui';
 import { eurosToCents } from '@/lib/economics/money';
 import { addMonths, buildSchedule, type VatMode } from '@/lib/installments/calc';
-import { installmentInterestOffered, installmentMoney, vatRateText } from '@/lib/installments/countries';
+import { installmentInterestOffered, installmentMaxRateBps, installmentMoney, vatRateText } from '@/lib/installments/countries';
 import { installmentRulesById } from '@/lib/installments/rules';
 import { fill, type InstallmentUiCopy } from '@/lib/installments/copy';
 import type { InstallmentCopy } from '@/lib/landing/installment';
@@ -70,7 +70,9 @@ export function TermsFields({
     const d = down.trim() ? eurosToCents(down) : 0;
     const fin = final.trim() ? eurosToCents(final) : null;
     const r = rate.replace(/\s|%/g, '').replace(',', '.');
-    const rateBps = r ? (/^\d+(\.\d{1,2})?$/.test(r) ? Math.round(Number(r) * 100) : -1) : 0;
+    const parsed = r ? (/^\d+(\.\d{1,2})?$/.test(r) ? Math.round(Number(r) * 100) : -1) : 0;
+    /* Польша (23.11.2026): выше предела страны (7 %) — та же ошибка ставки, что и выше 50 %; почему — в подсказке у поля. */
+    const rateBps = parsed > installmentMaxRateBps(ui.country?.code) ? -1 : parsed;
     const h = withDates && handover ? handover : '2099-01-01';
     const s = buildSchedule({
       priceCents: p ?? 0,
@@ -85,7 +87,7 @@ export function TermsFields({
     });
     /* Пороги — по правилам страны сделки; правил нет — строки о порогах нет. */
     return 'error' in s ? { error: s.error } : { s, t: installmentRulesById(defaults.rules)?.thresholds(s) ?? null };
-  }, [price, vatMode, down, months, final, rate, handover, firstDue, withDates, defaults.vatBps, defaults.rules]);
+  }, [price, vatMode, down, months, final, rate, handover, firstDue, withDates, defaults.vatBps, defaults.rules, ui.country?.code]);
 
   return (
     <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,320px)]">
@@ -145,7 +147,8 @@ export function TermsFields({
           <p className="text-danger">{calc.errors[result.error as keyof typeof calc.errors]}</p>
         ) : (
           <dl className="grid gap-2">
-            <Row label={calc.r.firstInvoice} value={eur(result.s.firstInvoiceCents)} strong />
+            {/* Польша и Румыния: платформа счетов не выставляет — «к оплате до передачи», а не «первый счёт». */}
+            <Row label={ui.country?.sellerInvoices?.firstPaymentLabel ?? calc.r.firstInvoice} value={eur(result.s.firstInvoiceCents)} strong />
             <Row label={calc.r.monthly} value={eur(result.s.installments[0].principalCents)} />
             <Row label={calc.r.finalPayment} value={eur(result.s.installments[result.s.installments.length - 1].principalCents)} />
             {result.s.interestTotalCents > 0 && <Row label={calc.r.interestTotal} value={eur(result.s.interestTotalCents)} />}

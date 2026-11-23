@@ -47,15 +47,59 @@
  *   получают номер от номера договора, а не из серии счетов продавца:
  *   серию счетов они не занимают.
  *
+ * Польша и Румыния (23.11.2026, pl.md и ro.md) — платформа счетов НЕ делает
+ * совсем (countries.ts sellerInvoices). Счёт между компаниями там — только
+ * структурированный счёт в KSeF (обязателен для всех польских компаний с
+ * 01.04.2026) или XML в RO e-Factura (между румынскими компаниями; PDF вне
+ * системы не счёт, штраф 15 % и выставителю, и получателю). Поэтому каждый
+ * документ платформы — платёжное уведомление без НДС со своим номером от
+ * номера договора, и в каждом прямо сказано: «это не счёт, счёт выставляет
+ * продавец в KSeF / RO e-Factura», и что этот счёт должен содержать:
+ *   · до передачи — уведомление о первом платеже (notice, IP-/NP-…);
+ *   · при передаче — справка о передаче (handoverDoc, IW-/PV-…): Польша —
+ *     НДС со всей цены возникает при передаче (art. 7 ust. 1 pkt 2, art. 19a
+ *     ust. 1), платёж до неё — аванс (art. 19a ust. 8), счёт на всю цену
+ *     выставляется при передаче; Румыния — по договору (п. 4.2) вся цена
+ *     фактурируется до передачи (art. 282), дата передачи — дата поставки;
+ *   · каждый месяц — уведомление о взносе (paymentDoc): взносы по цене
+ *     счетами не оформляются (Польша — один счёт при передаче; Румыния —
+ *     цена уже фактурирована), проценты в Румынии продавец фактурирует сам
+ *     ежемесячно без НДС (art. 292), в Польше — как решит бухгалтер (pl.md,
+ *     открытый вопрос 2: до решения — только сумма, без вывода о НДС);
+ *   · отмена до передачи — отмена уведомления (cancel), не кредит-нота.
+ * Слово «счёт» на языке страны (faktura, factură) в этих документах стоит
+ * только в предложениях «это не счёт…» — это проверяют тест и печать.
+ *
  * Модуль без зависимостей от сервера: его читают счета и тесты.
  */
 import type { VatMode } from './calc.ts';
 import { installmentCountryEntry } from './countries.ts';
 import type { Bilingual, InvoiceLabels } from '../sites/invoiceLabels.ts';
 
-export type InvoiceTextCountry = 'FI' | 'EE' | 'LV' | 'SE' | 'DK' | 'LT' | 'DE';
+export type InvoiceTextCountry = 'FI' | 'EE' | 'LV' | 'SE' | 'DK' | 'LT' | 'DE' | 'PL' | 'RO';
 
-type FirstNote = { down: string; vat: string; rest: string; months: number; contract: string; vatMode: VatMode };
+/**
+ * Подстановки примечания первого документа. Поля после vatMode (23.11.2026)
+ * нужны уведомлениям Польши и Румынии — что должен содержать счёт продавца в
+ * KSeF / RO e-Factura; тексты других стран их не читают.
+ */
+type FirstNote = {
+  down: string;
+  vat: string;
+  rest: string;
+  months: number;
+  contract: string;
+  vatMode: VatMode;
+  /** Цена без НДС, НДС-ставка числом («23»), цена с НДС. */
+  price?: string;
+  vatPercent?: string;
+  gross?: string;
+  /** Платёж до передачи (взнос и сумма НДС всей цены) и НДС, содержащийся в нём (Польша: аванс — сумма с НДС, art. 19a ust. 8). */
+  advance?: string;
+  advanceVat?: string;
+  /** Согласованный день передачи. */
+  handover?: string;
+};
 type FirstMail = {
   number: string;
   contract: string;
@@ -131,7 +175,8 @@ export type InstallmentInvoiceTexts = {
     periodLabel: Bilingual;
     line: (a: { n: number; months: number; contract: string; what: string }) => string;
     interestLine: string;
-    note: (a: { firstNumber: string }) => string;
+    /** hasInterest — в документе есть строка процентов (23.11.2026; читают тексты Польши и Румынии). */
+    note: (a: { firstNumber: string; hasInterest?: boolean }) => string;
     mailSubject: (a: { seller: string; n: number; months: number; contract: string }) => string;
     mailText: (a: PaymentMail) => string;
     /** Последняя строка письма: номер документа и ссылка платежа. */
@@ -152,6 +197,12 @@ export type InstallmentInvoiceTexts = {
         /** Письмо с первым документом, если он уведомление, а не счёт (Германия). */
         firstMailSubject?: (a: { number: string; seller: string; contract: string }) => string;
         firstMailText?: (a: FirstMail) => string;
+        /**
+         * Номер первого уведомления от номера договора (Польша, Румыния,
+         * 23.11.2026): серию счетов продавца оно не занимает. Нет — номер из
+         * серии, как у немецкой платёжной информации.
+         */
+        number?: NumberOf;
       })
     | null;
   /**
@@ -159,10 +210,26 @@ export type InstallmentInvoiceTexts = {
    * (взнос и сумма НДС всей цены); его примечание — first.note.
    */
   proforma?: PlainDocTexts & { line: (a: { what: string; contract: string }) => string; number: NumberOf };
-  /** Литва: счёт с НДС на всю цену в день передачи, с зачётом аванса. */
+  /**
+   * Литва: счёт с НДС на всю цену в день передачи, с зачётом аванса. Польша и
+   * Румыния: справка о передаче — не счёт (handoverDoc), с тем, что должен
+   * содержать счёт продавца; поля после contract — для неё.
+   */
   handover?: {
     line: (a: { what: string; contract: string }) => string;
-    note: (a: { proforma: string; advance: string; vat: string; rest: string; months: number; contract: string }) => string;
+    note: (a: {
+      proforma: string;
+      advance: string;
+      vat: string;
+      rest: string;
+      months: number;
+      contract: string;
+      price?: string;
+      gross?: string;
+      vatPercent?: string;
+      advanceVat?: string;
+      handover?: string;
+    }) => string;
     payNowLabel: Bilingual;
     amountLabel: Bilingual;
     /* Номер счёта добавляется к теме и в конец письма при отправке (payments.ts deliverInvoice). */
@@ -171,6 +238,12 @@ export type InstallmentInvoiceTexts = {
   };
   /** Литва и Германия: ежемесячный документ — платёжное требование без НДС, не счёт. */
   paymentDoc?: PlainDocTexts & { number: NumberOf };
+  /**
+   * Польша и Румыния: документ при передаче — справка без НДС со своим
+   * номером, не счёт (тексты — handover). Нет поля — при передаче, если
+   * документ есть, это счёт с НДС (Литва).
+   */
+  handoverDoc?: PlainDocTexts & { number: NumberOf };
   /** Отмена документа без НДС (предварительного счёта, платёжной информации) — не кредит-нота. */
   cancel?: CreditTexts & PlainDocTexts & { number: NumberOf };
 };
@@ -1195,7 +1268,444 @@ const DE: InstallmentInvoiceTexts = {
   },
 };
 
-const TEXTS: Record<InvoiceTextCountry, InstallmentInvoiceTexts> = { FI, EE, LV, SE, DK, LT, DE };
+/* ── Польша ──────────────────────────────────────────────────────────── */
+
+/*
+ * Польша (23.11.2026, docs/equipment-sale/countries/pl.md). Счёт между
+ * польскими компаниями — только faktura ustrukturyzowana в KSeF (ustawa o VAT
+ * art. 106ga; для всех — с 01.04.2026); RAHTIS к KSeF не подключён и счетов не
+ * выставляет. Документы платформы — informacja o płatności со своей нумерацией:
+ *   · до передачи (IP-<договор>) — первый платёж: взнос и сумма, равная НДС
+ *     всей цены. Это аванс: НДС с него возникает при получении, полученная
+ *     сумма считается суммой с НДС (art. 19a ust. 8), — в тексте и сумма
+ *     аванса, и НДС внутри неё;
+ *   · при передаче (IW-<договор>) — справка: НДС со всей цены возникает при
+ *     передаче (art. 7 ust. 1 pkt 2, art. 19a ust. 1), продавец выставляет в
+ *     KSeF счёт на всю цену с учётом аванса; порядок «счёт на аванс и итоговый
+ *     счёт или один счёт» исследование не подтвердило (art. 106b, 106f, 106i не
+ *     читались) — его утверждает бухгалтер продавца, так и написано;
+ *   · каждый месяц (IP-<договор>-NN) — уведомление о взносе: взносы счетами не
+ *     оформляются (договор п. 4.3); проценты — только сумма, без вывода о НДС
+ *     (pl.md, открытый вопрос 2);
+ *   · отмена до передачи (…-ANUL) — отмена уведомления; faktura korygująca —
+ *     дело продавца в KSeF.
+ * Даты — «дд.мм.гггг», суммы — «123 456,78 zł» (pl-PL).
+ */
+const PL_ISSUER =
+  'Dokument przygotowany w imieniu Sprzedawcy w serwisie RAHTIS; Aivomaa Oy (RAHTIS) nie jest stroną sprzedaży i nie przyjmuje płatności. / Prepared on behalf of the seller in RAHTIS; Aivomaa Oy (RAHTIS) is not a party to the sale and does not receive payments.';
+
+const PL_LABELS: InvoiceLabels = {
+  /* Ни одна подпись не называет документ счётом: всё, что печатает платформа в Польше, — информация о платеже. */
+  docName: 'Informacja o płatności',
+  creditDocName: 'Anulowanie informacji o płatności',
+  title: 'INFORMACJA O WPŁACIE',
+  vatId: 'VAT UE',
+  businessId: 'NIP',
+  customer: ['Kupujący', 'Buyer'],
+  number: ['Numer dokumentu', 'Document no.'],
+  date: ['Data dokumentu', 'Date'],
+  due: ['Termin płatności', 'Due date'],
+  job: ['Przedmiot sprzedaży', 'Item sold'],
+  period: ['Okres', 'Period'],
+  colDate: 'Data / Date',
+  colText: 'Opis / Description',
+  colQty: 'Ilość / Qty',
+  colPrice: 'Kwota / Unit',
+  colAmount: 'Razem / Total',
+  net: 'Kwota netto / Total excl. VAT',
+  total: 'Razem / Total',
+  totalDue: 'Do zapłaty / Total due',
+  iban: ['Rachunek (IBAN)', 'Bank account'],
+  reference: ['Tytuł płatności', 'Reference'],
+  amountDue: ['Do zapłaty', 'Amount due'],
+  footer: 'Dokument przygotowany w serwisie RAHTIS',
+};
+
+const PL_DOC_LABELS: Partial<InvoiceLabels> = { number: ['Numer dokumentu', 'Document no.'], date: ['Data dokumentu', 'Date'] };
+
+const PL_NOT_INVOICE_EN =
+  'This is not an invoice: invoices between Polish companies are structured invoices in KSeF, and the seller issues them himself; RAHTIS issues no invoices and is not connected to KSeF.';
+
+const plFirstLine = ({ what, contract }: { what: string; contract: string }) =>
+  `${what} – pierwsza wpłata przed wydaniem pojazdu (część ceny i kwota równa podatkowi VAT od całej ceny), umowa nr ${contract} / payment before handover`;
+
+const plFirstNote = (a: FirstNote) =>
+  lines(
+    `Informacja o płatności przed wydaniem pojazdu (pkt 3.2 i 4.2 umowy nr ${a.contract}): Kupujący wpłaca na rachunek Sprzedawcy pierwszą wpłatę ${a.advance ?? ''} – część ceny ${a.down} oraz kwotę ${a.vat} równą podatkowi VAT ${a.vatPercent ?? ''} % od całej ceny. Pozostała część ceny ${a.rest} jest płatna w ${a.months} ratach. Pojazd zostaje wydany, gdy umowa ma datę pewną, a Sprzedawca potwierdzi otrzymanie wpłaty. Do zapłaty całej ceny właścicielem pojazdu pozostaje Sprzedawca (art. 589 Kodeksu cywilnego).`,
+    `To nie jest faktura: Sprzedawca sam dokumentuje tę wpłatę w Krajowym Systemie e-Faktur (KSeF) jako zaliczkę – obowiązek podatkowy powstaje z chwilą jej otrzymania, a otrzymana kwota ${a.advance ?? ''} jest kwotą brutto zawierającą podatek ${a.advanceVat ?? ''} (art. 19a ust. 8 ustawy o podatku od towarów i usług); fakturę na całą cenę – netto ${a.price ?? ''}, VAT ${a.vatPercent ?? ''} % ${a.vat}, brutto ${a.gross ?? ''} – Sprzedawca wystawia w KSeF z datą wydania pojazdu (art. 7 ust. 1 pkt 2 i art. 19a ust. 1), uwzględniając zaliczkę, a na raty nie wystawia odrębnych faktur; czy zaliczka wymaga odrębnej faktury, czy wystarczy jedna faktura, gdy wpłata i wydanie przypadają w tym samym miesiącu, ustala księgowy Sprzedawcy.`,
+    `${PL_NOT_INVOICE_EN} Due before handover: ${a.advance ?? ''} (down payment ${a.down} plus an amount equal to the VAT on the whole price). Under the VAT act the payment is an advance taxed on receipt; the seller issues the invoice for the whole price (net ${a.price ?? ''}, VAT ${a.vat}, gross ${a.gross ?? ''}) in KSeF on the handover date, taking the advance into account. The instalments are not invoiced. The seller retains ownership until the price is paid in full.`,
+    PL_ISSUER,
+  );
+
+const plFirstMailSubject = ({ number, seller, contract }: { number: string; seller: string; contract: string }) =>
+  `Informacja o płatności ${number} · ${seller} · umowa ${contract}`;
+
+const plFirstMailText = (a: FirstMail) =>
+  [
+    'Dzień dobry,',
+    '',
+    `w załączeniu informacja o płatności ${a.number} przed wydaniem pojazdu – umowa sprzedaży na raty ${a.contract} (${a.what}), Sprzedawca: ${a.seller}.`,
+    `Do zapłaty przed wydaniem: ${a.payNow} (część ceny i kwota równa podatkowi VAT od całej ceny), termin ${a.due}.`,
+    `Rachunek (IBAN) ${a.iban}, tytuł płatności ${a.reference}.`,
+    'Płatność trafia bezpośrednio do Sprzedawcy, nie do RAHTIS ani Aivomaa Oy.',
+    'To nie jest faktura: faktury wystawia Sprzedawca w KSeF.',
+    '',
+    `Pytania: odpowiedz na tę wiadomość (${a.sellerEmail}).`,
+    '',
+    '—',
+    `Attached is payment information ${a.number} due before handover under instalment sale contract ${a.contract} (${a.what}) from ${a.seller}. Due ${a.payNow} by ${a.due}, IBAN ${a.iban}, reference ${a.reference}. Pay the seller directly, not RAHTIS or Aivomaa Oy. This is not an invoice: the seller issues the invoices in KSeF.`,
+  ].join('\n');
+
+const PL_CANCEL: CreditTexts & PlainDocTexts & { number: NumberOf } = {
+  title: 'ANULOWANIE INFORMACJI',
+  docName: 'Anulowanie informacji o płatności',
+  labels: PL_DOC_LABELS,
+  noVat: true,
+  filePrefix: 'Anulowanie',
+  number: ({ original }) => `${original}-ANUL`,
+  linePrefix: 'Anulowano / Cancelled: ',
+  job: ({ contract }) => `${contract} · anulowano / cancelled`,
+  periodLabel: ['Anulowany dokument', 'Cancelled document'],
+  payNowLabel: ['Do zwrotu', 'Refund'],
+  amountLabel: ['Do zwrotu', 'Refund'],
+  note: ({ original, originalDate, contract, refund }) =>
+    [
+      `Anulowanie informacji o płatności nr ${original} z dnia ${originalDate}: sprzedaż na raty ${contract} została odwołana przed wydaniem pojazdu. ${refund ? `Sprzedawca zwraca Kupującemu wpłaconą kwotę ${refund}.` : 'Nic nie zostało wpłacone, więc nie ma zwrotu.'}`,
+      'To nie jest faktura korygująca: jeżeli Sprzedawca udokumentował wpłatę fakturą w KSeF, korektę (fakturę korygującą) wystawia sam w KSeF.',
+      `Cancels payment information ${original} because instalment sale ${contract} was cancelled before handover. ${refund ? `The seller refunds the ${refund} paid to the buyer.` : 'Nothing was paid, so nothing is refunded.'} This is not a correcting invoice: if the seller documented the payment with an invoice in KSeF, he issues the correction in KSeF himself.`,
+      PL_ISSUER,
+    ].join('\n'),
+  mailSubject: ({ seller, original }) => `Anulowanie informacji o płatności · ${seller} · ${original}`,
+  mailText: ({ original, contract }) =>
+    [
+      'Dzień dobry,',
+      '',
+      `w załączeniu anulowanie informacji o płatności ${original}: sprzedaż na raty ${contract} została odwołana przed wydaniem pojazdu.`,
+      '',
+      '—',
+      `Attached is the cancellation of payment information ${original}: sale ${contract} was cancelled before handover.`,
+    ].join('\n'),
+};
+
+const PL: InstallmentInvoiceTexts = {
+  country: 'PL',
+  intl: 'pl-PL',
+  date: paddedDate,
+  unit: 'szt.',
+  labels: PL_LABELS,
+  filePrefix: 'Informacja-o-platnosci',
+  vatLabel: (percent) => (percent ? `VAT ${percent} %` : 'VAT 0 %'),
+  /* Первый документ Польши — всегда уведомление (notice): эти поля — для единообразия типа, тексты те же. */
+  first: {
+    line: plFirstLine,
+    jobLabel: ['Przedmiot sprzedaży', 'Item sold'],
+    periodLabel: ['Wydanie pojazdu', 'Handover'],
+    payNowLabel: ['Do zapłaty teraz', 'Due now'],
+    note: plFirstNote,
+    mailSubject: plFirstMailSubject,
+    mailText: plFirstMailText,
+  },
+  payment: {
+    jobLabel: ['Umowa sprzedaży na raty', 'Instalment sale contract'],
+    periodLabel: ['Rata', 'Instalment'],
+    line: ({ n, months, contract, what }) => `Rata ${n}/${months}, umowa nr ${contract} (${what}) / Instalment ${n}/${months}`,
+    /* Проценты — отдельной строкой и без вывода о НДС: освобождение (art. 43 ust. 1 pkt 38) или часть цены (art. 29a) — не подтверждено. */
+    interestLine: 'Odsetki od odroczonej części ceny (pkt 4.4 umowy) / Interest on the deferred part of the price',
+    note: ({ hasInterest }) =>
+      [
+        `To nie jest faktura: rata jest zapłatą części ceny objętej fakturą, którą Sprzedawca wystawia w KSeF przy wydaniu pojazdu, i Sprzedawca nie wystawia odrębnych faktur na raty (pkt 4.3 umowy)${hasInterest ? '; sposób udokumentowania odsetek (zwolnienie z VAT jako usługa kredytowa albo część ceny) nie został potwierdzony i ustala go księgowy Sprzedawcy' : ''}.`,
+        `This is a payment notice, not an invoice: the instalment pays part of the price invoiced by the seller in KSeF at handover; instalments are not invoiced separately.${hasInterest ? ' How interest is documented for VAT is not confirmed and is for the seller’s accountant to decide.' : ''}`,
+        PL_ISSUER,
+      ].join('\n'),
+    mailSubject: ({ seller, n, months, contract }) => `Informacja o płatności raty · ${seller} · rata ${n}/${months}, umowa ${contract}`,
+    mailText: (a) =>
+      [
+        'Dzień dobry,',
+        '',
+        `w załączeniu informacja o płatności raty ${a.n}/${a.months} – umowa sprzedaży na raty ${a.contract} (${a.what}).`,
+        `Do zapłaty ${a.total}, termin ${a.due}. Rachunek (IBAN) ${a.iban}.`,
+        'Płatność trafia bezpośrednio do Sprzedawcy, nie do RAHTIS ani Aivomaa Oy.',
+        '',
+        '—',
+        `Attached is the payment notice for instalment ${a.n}/${a.months} of instalment sale contract ${a.contract}. Amount ${a.total}, due ${a.due}, IBAN ${a.iban}. Pay the seller directly.`,
+      ].join('\n'),
+    mailFooter: ({ number, reference }) => `Dokument / Document ${number} · tytuł płatności / reference ${reference}`,
+  },
+  credit: PL_CANCEL,
+  notice: {
+    title: 'INFORMACJA O WPŁACIE',
+    docName: 'Informacja o płatności przed wydaniem',
+    labels: PL_DOC_LABELS,
+    noVat: true,
+    filePrefix: 'Informacja-o-platnosci',
+    number: ({ contract }) => `IP-${contract}`,
+    note: PL_NOT_INVOICE_EN.replace('This is not an invoice', 'This document is not an invoice'),
+    firstLine: plFirstLine,
+    firstNote: plFirstNote,
+    firstMailSubject: plFirstMailSubject,
+    firstMailText: plFirstMailText,
+  },
+  handover: {
+    line: ({ what, contract }) => `${what} – wydanie pojazdu, cena brutto według umowy nr ${contract} / vehicle handed over, gross price`,
+    note: (a) =>
+      lines(
+        `Pojazd został wydany Kupującemu w dniu ${a.handover ?? ''} (protokół zdawczo-odbiorczy, umowa nr ${a.contract}). Cena: netto ${a.price ?? ''}, VAT ${a.vatPercent ?? ''} % ${a.vat}, brutto ${a.gross ?? ''}. Przed wydaniem Kupujący wpłacił ${a.advance}. Pozostała część ceny ${a.rest} jest płatna w ${a.months} ratach; na podstawie tego dokumentu nic nie jest teraz do zapłaty. Do zapłaty całej ceny właścicielem pojazdu pozostaje Sprzedawca.`,
+        `To nie jest faktura: z chwilą wydania pojazdu powstaje obowiązek podatkowy od całej ceny (art. 7 ust. 1 pkt 2 i art. 19a ust. 1 ustawy o podatku od towarów i usług), więc Sprzedawca wystawia w KSeF fakturę na całą cenę – netto ${a.price ?? ''}, VAT ${a.vatPercent ?? ''} % ${a.vat}, brutto ${a.gross ?? ''}, data dostawy ${a.handover ?? ''} – uwzględniając wpłatę przed wydaniem ${a.advance} (zaliczka, w tym VAT ${a.advanceVat ?? ''}), i przekazuje Kupującemu numer faktury w KSeF; na raty Sprzedawca nie wystawia odrębnych faktur (pkt 4.3 umowy), a dokładny sposób rozliczenia zaliczki ustala jego księgowy.`,
+        `This is not an invoice. The vehicle was handed over on ${a.handover ?? ''}; VAT on the whole price arises on handover, so the seller issues in KSeF the invoice for the whole price (net ${a.price ?? ''}, VAT ${a.vat}, gross ${a.gross ?? ''}), taking into account the advance of ${a.advance} paid before handover, and gives the buyer its KSeF number. The remainder ${a.rest} is paid in ${a.months} instalments, which are not invoiced; nothing is due on this document now.`,
+        PL_ISSUER,
+      ),
+    payNowLabel: ['Do zapłaty teraz', 'Due now'],
+    amountLabel: ['Do zapłaty', 'Amount due'],
+    mailSubject: ({ seller, contract }) => `Informacja o wydaniu pojazdu · ${seller} · umowa ${contract}`,
+    mailText: (a) =>
+      [
+        'Dzień dobry,',
+        '',
+        `w załączeniu informacja o wydaniu pojazdu – umowa sprzedaży na raty ${a.contract} (${a.what}), Sprzedawca: ${a.seller}. Na jej podstawie nic nie jest teraz do zapłaty.`,
+        'To nie jest faktura: fakturę na całą cenę Sprzedawca wystawia w KSeF z datą wydania pojazdu.',
+        '',
+        '—',
+        `Attached is the handover statement under instalment sale contract ${a.contract} (${a.what}). Nothing is due on it now. This is not an invoice: the seller issues the invoice for the whole price in KSeF as of the handover date.`,
+      ].join('\n'),
+  },
+  handoverDoc: {
+    title: 'INFORMACJA O WYDANIU',
+    docName: 'Informacja o wydaniu pojazdu',
+    labels: PL_DOC_LABELS,
+    noVat: true,
+    filePrefix: 'Informacja-o-wydaniu',
+    number: ({ contract }) => `IW-${contract}`,
+  },
+  paymentDoc: {
+    title: 'INFORMACJA O RACIE',
+    docName: 'Informacja o płatności raty',
+    labels: PL_DOC_LABELS,
+    noVat: true,
+    filePrefix: 'Informacja-o-racie',
+    number: ({ contract, n }) => `IP-${contract}-${String(n ?? 0).padStart(2, '0')}`,
+  },
+  cancel: PL_CANCEL,
+};
+
+/* ── Румыния ─────────────────────────────────────────────────────────── */
+
+/*
+ * Румыния (23.11.2026, docs/equipment-sale/countries/ro.md). Между румынскими
+ * компаниями счётом считается только счёт, переданный через RO e-Factura
+ * (Codul fiscal art. 319 alin. (1^1), OUG 120/2021); PDF вне системы — не
+ * счёт, штраф 15 % суммы и выставителю, и получателю. RAHTIS к системе не
+ * подключён. Документы платформы — notificare de plată со своей нумерацией:
+ *   · до передачи (NP-<договор>) — аванс: взнос и НДС всей цены. По договору
+ *     (п. 4.2) продавец ДО передачи выставляет в RO e-Factura счёт на всю цену
+ *     с НДС 21 % и передаёт его в систему в 5 рабочих дней; НДС — на дату
+ *     счёта, если он раньше поставки (art. 282 alin. (2) lit. a));
+ *   · при передаче (PV-<договор>) — справка: дата передачи — дата поставки
+ *     (art. 281 alin. (6)); если счёт ещё не выставлен, НДС — на эту дату;
+ *   · каждый месяц (NP-<договор>-NN) — уведомление о взносе: взносы по цене
+ *     счетами не оформляются (цена уже фактурирована, п. 4.3); проценты после
+ *     передачи — освобождённый кредит (art. 292 alin. (2) lit. a) pct. 1), их
+ *     продавец фактурирует ежемесячно в RO e-Factura (п. 4.4);
+ *   · отмена до передачи (…-ANUL) — отмена уведомления; factură de corecție и
+ *     письменное соглашение о расторжении (art. 287 lit. b)) — дело продавца.
+ * Даты — «дд.мм.гггг», суммы — «10.000,00 lei» (ro-RO); ș и ț — с запятой.
+ */
+const RO_ISSUER =
+  'Document întocmit în numele vânzătorului în serviciul RAHTIS; Aivomaa Oy (RAHTIS) nu este parte la vânzare și nu încasează plăți. / Prepared on behalf of the seller in RAHTIS; Aivomaa Oy (RAHTIS) is not a party to the sale and does not receive payments.';
+
+const RO_LABELS: InvoiceLabels = {
+  /* Ни одна подпись не называет документ счётом. */
+  docName: 'Notificare de plată',
+  creditDocName: 'Anularea notificării de plată',
+  title: 'NOTIFICARE DE PLATĂ',
+  vatId: 'Cod TVA',
+  businessId: 'CUI',
+  customer: ['Cumpărător', 'Buyer'],
+  number: ['Număr document', 'Document no.'],
+  date: ['Data documentului', 'Date'],
+  due: ['Scadența', 'Due date'],
+  job: ['Obiectul vânzării', 'Item sold'],
+  period: ['Perioada', 'Period'],
+  colDate: 'Data / Date',
+  colText: 'Descriere / Description',
+  colQty: 'Cant. / Qty',
+  colPrice: 'Preț unitar / Unit',
+  colAmount: 'Valoare / Total',
+  net: 'Total fără TVA / Total excl. VAT',
+  total: 'Total / Total',
+  totalDue: 'Total de plată / Total due',
+  iban: ['Cont (IBAN)', 'Bank account'],
+  reference: ['Referință plată', 'Reference'],
+  amountDue: ['De plată', 'Amount due'],
+  footer: 'Document întocmit în serviciul RAHTIS',
+};
+
+const RO_DOC_LABELS: Partial<InvoiceLabels> = { number: ['Număr document', 'Document no.'], date: ['Data documentului', 'Date'] };
+
+const RO_NOT_INVOICE_EN =
+  'This is not an invoice: between Romanian companies only invoices transmitted through RO e-Factura are invoices, and the seller issues them; RAHTIS issues no invoices and is not connected to RO e-Factura.';
+
+const roFirstLine = ({ what, contract }: { what: string; contract: string }) =>
+  `${what} – avans înainte de predare (parte din preț și TVA aferentă întregului preț), contract nr. ${contract} / advance before handover`;
+
+const roFirstNote = (a: FirstNote) =>
+  lines(
+    `Notificare de plată înainte de predarea vehiculului (pct. 3.2 și 4.2 din contractul nr. ${a.contract}): cumpărătorul plătește în contul vânzătorului avansul de ${a.advance ?? ''} – parte din preț ${a.down} și TVA de ${a.vat} aferentă întregului preț. Restul de preț ${a.rest} se plătește în ${a.months} rate. Vehiculul se predă după ce rezerva proprietății este înscrisă în Registrul Național de Publicitate Mobiliară și vânzătorul confirmă încasarea avansului. Dreptul de proprietate rămâne al vânzătorului până la plata integrală a prețului.`,
+    `Aceasta nu este o factură: potrivit pct. 4.2 din contract, vânzătorul emite înainte de predare, prin RO e-Factura, factura pentru prețul total – fără TVA ${a.price ?? ''}, TVA ${a.vatPercent ?? ''} % ${a.vat}, total ${a.gross ?? ''} – și o transmite în sistem în termen de 5 zile lucrătoare de la emitere; TVA devine exigibilă la data facturii, dacă aceasta este anterioară predării (art. 282 alin. (2) lit. a) din Codul fiscal), iar ratele din preț nu se facturează.`,
+    `${RO_NOT_INVOICE_EN} Due before handover: ${a.advance ?? ''} (down payment ${a.down} plus the VAT on the whole price). Under the contract the seller issues the invoice for the total price (excl. VAT ${a.price ?? ''}, VAT ${a.vat}, total ${a.gross ?? ''}) through RO e-Factura before handover and transmits it within 5 working days of issue; the price instalments are not invoiced. The seller retains ownership until the price is paid in full.`,
+    RO_ISSUER,
+  );
+
+const roFirstMailSubject = ({ number, seller, contract }: { number: string; seller: string; contract: string }) =>
+  `Notificare de plată ${number} · ${seller} · contract ${contract}`;
+
+const roFirstMailText = (a: FirstMail) =>
+  [
+    'Bună ziua,',
+    '',
+    `vă transmitem notificarea de plată ${a.number} pentru avansul datorat înainte de predare – contractul de vânzare cu plata prețului în rate ${a.contract} (${a.what}), vânzător: ${a.seller}.`,
+    `De plată înainte de predare: ${a.payNow} (parte din preț și TVA aferentă întregului preț), scadență ${a.due}.`,
+    `Cont (IBAN) ${a.iban}, referință plată ${a.reference}.`,
+    'Plata se face direct vânzătorului, nu către RAHTIS sau Aivomaa Oy.',
+    'Aceasta nu este o factură: facturile le emite vânzătorul prin RO e-Factura.',
+    '',
+    `Întrebări: răspundeți la acest mesaj (${a.sellerEmail}).`,
+    '',
+    '—',
+    `Attached is payment notice ${a.number} for the advance due before handover under instalment sale contract ${a.contract} (${a.what}) from ${a.seller}. Due ${a.payNow} by ${a.due}, IBAN ${a.iban}, reference ${a.reference}. Pay the seller directly, not RAHTIS or Aivomaa Oy. This is not an invoice: the seller issues the invoices through RO e-Factura.`,
+  ].join('\n');
+
+const RO_CANCEL: CreditTexts & PlainDocTexts & { number: NumberOf } = {
+  title: 'ANULARE NOTIFICARE',
+  docName: 'Anularea notificării de plată',
+  labels: RO_DOC_LABELS,
+  noVat: true,
+  filePrefix: 'Anulare',
+  number: ({ original }) => `${original}-ANUL`,
+  linePrefix: 'Anulat / Cancelled: ',
+  job: ({ contract }) => `${contract} · anulat / cancelled`,
+  periodLabel: ['Document anulat', 'Cancelled document'],
+  payNowLabel: ['De restituit', 'Refund'],
+  amountLabel: ['De restituit', 'Refund'],
+  note: ({ original, originalDate, contract, refund }) =>
+    [
+      `Se anulează notificarea de plată nr. ${original} din ${originalDate}, deoarece vânzarea cu plata prețului în rate ${contract} a încetat înainte de predarea vehiculului. ${refund ? `Vânzătorul restituie cumpărătorului suma plătită de ${refund}.` : 'Nu s-a plătit nimic, deci nu există sume de restituit.'}`,
+      'Aceasta nu este o factură de corecție: dacă vânzătorul a emis deja factura prin RO e-Factura, tot el emite factura de corecție prin RO e-Factura, iar părțile semnează un acord scris privind desființarea contractului (art. 287 lit. b) din Codul fiscal).',
+      `Cancels payment notice ${original} because instalment sale ${contract} ended before handover. ${refund ? `The seller refunds the ${refund} paid to the buyer.` : 'Nothing was paid, so nothing is refunded.'} This is not a correcting invoice: if the seller already issued the invoice through RO e-Factura, he issues the correction there himself, and the parties sign a written termination agreement.`,
+      RO_ISSUER,
+    ].join('\n'),
+  mailSubject: ({ seller, original }) => `Anularea notificării de plată · ${seller} · ${original}`,
+  mailText: ({ original, contract }) =>
+    [
+      'Bună ziua,',
+      '',
+      `vă transmitem anularea notificării de plată ${original}: vânzarea ${contract} a încetat înainte de predarea vehiculului.`,
+      '',
+      '—',
+      `Attached is the cancellation of payment notice ${original}: sale ${contract} ended before handover.`,
+    ].join('\n'),
+};
+
+const RO: InstallmentInvoiceTexts = {
+  country: 'RO',
+  intl: 'ro-RO',
+  date: paddedDate,
+  unit: 'buc.',
+  labels: RO_LABELS,
+  filePrefix: 'Notificare-de-plata',
+  vatLabel: (percent) => (percent ? `TVA / VAT ${percent} %` : 'TVA / VAT 0 %'),
+  /* Первый документ Румынии — всегда уведомление (notice): эти поля — для единообразия типа, тексты те же. */
+  first: {
+    line: roFirstLine,
+    jobLabel: ['Obiectul vânzării', 'Item sold'],
+    periodLabel: ['Predare', 'Handover'],
+    payNowLabel: ['De plată acum', 'Due now'],
+    note: roFirstNote,
+    mailSubject: roFirstMailSubject,
+    mailText: roFirstMailText,
+  },
+  payment: {
+    jobLabel: ['Contract de vânzare cu plata în rate', 'Instalment sale contract'],
+    periodLabel: ['Rata', 'Instalment'],
+    line: ({ n, months, contract, what }) => `Rata ${n}/${months}, contract nr. ${contract} (${what}) / Instalment ${n}/${months}`,
+    /* Проценты после передачи — освобождённый кредит (ro.md: подтверждено). */
+    interestLine: 'Dobândă remuneratorie (pct. 4.4) – scutită de TVA, art. 292 alin. (2) lit. a) pct. 1 din Codul fiscal / Interest, VAT-exempt credit',
+    note: ({ hasInterest }) =>
+      [
+        `Aceasta nu este o factură: rata din preț nu se facturează, deoarece prețul total, cu TVA, este facturat de vânzător prin RO e-Factura (pct. 4.2 și 4.3 din contract)${hasInterest ? '; dobânda remuneratorie din această notificare o facturează vânzătorul lunar, prin RO e-Factura, scutită de TVA (pct. 4.4 din contract)' : ''}.`,
+        `This is a payment notice, not an invoice: the price instalment is not invoiced because the seller invoices the total price with VAT through RO e-Factura.${hasInterest ? ' The seller invoices the interest in this notice monthly through RO e-Factura, VAT-exempt.' : ''}`,
+        RO_ISSUER,
+      ].join('\n'),
+    mailSubject: ({ seller, n, months, contract }) => `Notificare de plată · ${seller} · rata ${n}/${months}, contract ${contract}`,
+    mailText: (a) =>
+      [
+        'Bună ziua,',
+        '',
+        `vă transmitem notificarea de plată pentru rata ${a.n}/${a.months} din contractul de vânzare cu plata prețului în rate ${a.contract} (${a.what}).`,
+        `De plată ${a.total}, scadență ${a.due}. Cont (IBAN) ${a.iban}.`,
+        'Plata se face direct vânzătorului, nu către RAHTIS sau Aivomaa Oy.',
+        '',
+        '—',
+        `Attached is the payment notice for instalment ${a.n}/${a.months} of instalment sale contract ${a.contract}. Amount ${a.total}, due ${a.due}, IBAN ${a.iban}. Pay the seller directly.`,
+      ].join('\n'),
+    mailFooter: ({ number, reference }) => `Document ${number} · referință plată / reference ${reference}`,
+  },
+  credit: RO_CANCEL,
+  notice: {
+    title: 'NOTIFICARE DE PLATĂ',
+    docName: 'Notificare de plată – avans',
+    labels: RO_DOC_LABELS,
+    noVat: true,
+    filePrefix: 'Notificare-de-plata',
+    number: ({ contract }) => `NP-${contract}`,
+    note: RO_NOT_INVOICE_EN.replace('This is not an invoice', 'This document is not an invoice'),
+    firstLine: roFirstLine,
+    firstNote: roFirstNote,
+    firstMailSubject: roFirstMailSubject,
+    firstMailText: roFirstMailText,
+  },
+  handover: {
+    line: ({ what, contract }) => `${what} – predarea vehiculului, prețul total cu TVA conform contractului nr. ${contract} / vehicle handed over, total price`,
+    note: (a) =>
+      lines(
+        `Vehiculul a fost predat cumpărătorului la ${a.handover ?? ''} (proces-verbal de predare-primire, contractul nr. ${a.contract}); data predării este data livrării (art. 281 alin. (6) din Codul fiscal). Preț: fără TVA ${a.price ?? ''}, TVA ${a.vatPercent ?? ''} % ${a.vat}, total ${a.gross ?? ''}. Înainte de predare cumpărătorul a plătit avansul de ${a.advance}. Restul de preț ${a.rest} se plătește în ${a.months} rate; în baza acestui document nu este nimic de plată acum. Dreptul de proprietate rămâne al vânzătorului până la plata integrală a prețului.`,
+        `Aceasta nu este o factură: prețul total – fără TVA ${a.price ?? ''}, TVA ${a.vatPercent ?? ''} % ${a.vat}, total ${a.gross ?? ''} – îl facturează vânzătorul prin RO e-Factura înainte de predare (pct. 4.2 din contract), iar dacă factura nu a fost emisă înainte de predare, TVA devine exigibilă la data predării (art. 282 alin. (1) din Codul fiscal); ratele din preț nu se facturează.`,
+        `This is not an invoice. The vehicle was handed over on ${a.handover ?? ''}, which is the date of supply. The seller invoices the total price (excl. VAT ${a.price ?? ''}, VAT ${a.vat}, total ${a.gross ?? ''}) through RO e-Factura before handover; if it has not been invoiced yet, VAT is chargeable on the handover date. The remainder ${a.rest} is paid in ${a.months} instalments, which are not invoiced; nothing is due on this document now.`,
+        RO_ISSUER,
+      ),
+    payNowLabel: ['De plată acum', 'Due now'],
+    amountLabel: ['De plată', 'Amount due'],
+    mailSubject: ({ seller, contract }) => `Situație la predarea vehiculului · ${seller} · contract ${contract}`,
+    mailText: (a) =>
+      [
+        'Bună ziua,',
+        '',
+        `vă transmitem situația la predarea vehiculului – contractul de vânzare cu plata prețului în rate ${a.contract} (${a.what}), vânzător: ${a.seller}. În baza acesteia nu este nimic de plată acum.`,
+        'Aceasta nu este o factură: prețul total îl facturează vânzătorul prin RO e-Factura.',
+        '',
+        '—',
+        `Attached is the handover statement under instalment sale contract ${a.contract} (${a.what}). Nothing is due on it now. This is not an invoice: the seller invoices the total price through RO e-Factura.`,
+      ].join('\n'),
+  },
+  handoverDoc: {
+    title: 'SITUAȚIE LA PREDARE',
+    docName: 'Situație la predarea vehiculului',
+    labels: RO_DOC_LABELS,
+    noVat: true,
+    filePrefix: 'Situatie-la-predare',
+    number: ({ contract }) => `PV-${contract}`,
+  },
+  paymentDoc: {
+    title: 'NOTIFICARE DE PLATĂ',
+    docName: 'Notificare de plată – rată',
+    labels: RO_DOC_LABELS,
+    noVat: true,
+    filePrefix: 'Notificare-de-plata',
+    number: ({ contract, n }) => `NP-${contract}-${String(n ?? 0).padStart(2, '0')}`,
+  },
+  cancel: RO_CANCEL,
+};
+
+const TEXTS: Record<InvoiceTextCountry, InstallmentInvoiceTexts> = { FI, EE, LV, SE, DK, LT, DE, PL, RO };
 
 /** Есть ли у страны свои тексты счетов — для проверки, что открытую страну можно обслуживать. */
 export function invoiceTextsExist(country: string | null | undefined): boolean {
@@ -1249,7 +1759,7 @@ export function documentLabels(tx: InstallmentInvoiceTexts, notice: boolean): In
  * выбираются заголовок и подписи. Нет — обычный счёт (или латвийское
  * уведомление, у которого записан docName, как было).
  */
-export type PlainDocKind = 'PROFORMA' | 'NOTICE' | 'PAYMENT' | 'CANCEL';
+export type PlainDocKind = 'PROFORMA' | 'NOTICE' | 'PAYMENT' | 'CANCEL' | 'HANDOVER';
 
 /** Тексты документа, который не счёт, по его виду; null — у страны такого документа нет. */
 export function plainDoc(tx: InstallmentInvoiceTexts, kind: PlainDocKind | null | undefined): PlainDocTexts | null {
@@ -1257,6 +1767,8 @@ export function plainDoc(tx: InstallmentInvoiceTexts, kind: PlainDocKind | null 
   if (kind === 'NOTICE') return tx.notice ?? null;
   if (kind === 'PAYMENT') return tx.paymentDoc ?? null;
   if (kind === 'CANCEL') return tx.cancel ?? null;
+  /* Польша и Румыния (23.11.2026): справка при передаче — не счёт. */
+  if (kind === 'HANDOVER') return tx.handoverDoc ?? null;
   return null;
 }
 
@@ -1271,10 +1783,13 @@ export function plainDocLabels(tx: InstallmentInvoiceTexts, kind: PlainDocKind |
  *   · INVOICE — счёт со всей ценой и всем НДС (Финляндия и остальные, Германия
  *     до 2027 года, Латвия — и её уведомление с 2028 года, оно с НДС, как было);
  *   · PROFORMA — Литва: предварительный счёт без НДС, счёт с НДС — при передаче;
- *   · NOTICE — Германия с 2027 года: платёжная информация без НДС.
+ *   · NOTICE — Германия с 2027 года: платёжная информация без НДС; Польша и
+ *     Румыния — всегда (23.11.2026): счета там выставляет только продавец в
+ *     KSeF / RO e-Factura, платформа — уведомление о платеже.
  */
 export function firstDocumentKind(country: string | null | undefined, issuedOn: string, handoverOn: string): 'INVOICE' | 'PROFORMA' | 'NOTICE' {
   if (installmentCountryEntry(country)?.vatInvoiceAtHandover === true) return 'PROFORMA';
+  if (installmentCountryEntry(country)?.sellerInvoices === true) return 'NOTICE';
   const tx = invoiceTexts(country);
   return tx.notice?.noVat && documentKind(country, issuedOn, handoverOn) === 'NOTICE' ? 'NOTICE' : 'INVOICE';
 }
@@ -1289,5 +1804,15 @@ export function invoicesReady(country: string | null | undefined): boolean {
   const entry = installmentCountryEntry(country);
   if (entry?.vatOnFirstInvoice === true) return true;
   const tx = invoiceTexts(country);
+  /*
+   * Польша и Румыния (sellerInvoices, 23.11.2026): все документы — уведомления:
+   * первое с номером от договора, справка при передаче, ежемесячное и отмена.
+   */
+  if (entry?.sellerInvoices === true) {
+    const n = tx.notice;
+    return Boolean(
+      n?.noVat && n.number && n.firstLine && n.firstNote && tx.handover && tx.handoverDoc?.noVat && tx.paymentDoc?.noVat && tx.cancel?.noVat,
+    );
+  }
   return entry?.vatInvoiceAtHandover === true && Boolean(tx.proforma && tx.handover && tx.paymentDoc && tx.cancel);
 }

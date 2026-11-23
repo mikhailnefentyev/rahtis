@@ -81,7 +81,7 @@ test('у каждой открытой страны есть правила, д�
       assert.equal(COUNTRY_CONTRACTS[c.contract].intl.slice(0, 2), c.contractLanguage, `${code}: язык чисел договора`);
     }
   }
-  assert.deepEqual(openInstallmentCountries().sort(), ['DE', 'DK', 'EE', 'FI', 'LT', 'LV', 'SE']);
+  assert.deepEqual(openInstallmentCountries().sort(), ['DE', 'DK', 'EE', 'FI', 'LT', 'LV', 'PL', 'RO', 'SE']);
   /* Закрытая страна без текстов — не «готова», даже если её вписать в реестр. */
   assert.equal(countryTextsExist('NO'), false);
   assert.equal(invoiceTextsExist('NO'), false);

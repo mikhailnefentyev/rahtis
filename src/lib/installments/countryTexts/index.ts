@@ -16,11 +16,14 @@ import { SE_TEXTS } from './se.ts';
 import { DK_TEXTS } from './dk.ts';
 import { LT_TEXTS } from './lt.ts';
 import { DE_TEXTS } from './de.ts';
+import { PL_TEXTS } from './pl.ts';
+import { RO_TEXTS } from './ro.ts';
+import { SELLER_INVOICE_SYSTEMS, SELLER_INVOICE_TEXTS, type SellerInvoiceCountry } from './sellerInvoices.ts';
 import type { InstallmentCommonCopy, InstallmentLawCopy } from './types.ts';
 
 export type { InstallmentCommonCopy, InstallmentLawCopy } from './types.ts';
 
-export type LawCountry = 'EE' | 'LV' | 'SE' | 'DK' | 'LT' | 'DE';
+export type LawCountry = 'EE' | 'LV' | 'SE' | 'DK' | 'LT' | 'DE' | 'PL' | 'RO';
 
 export const LAW_TEXTS: Record<LawCountry, Record<Locale, InstallmentLawCopy>> = {
   EE: EE_TEXTS,
@@ -29,6 +32,8 @@ export const LAW_TEXTS: Record<LawCountry, Record<Locale, InstallmentLawCopy>> =
   DK: DK_TEXTS,
   LT: LT_TEXTS,
   DE: DE_TEXTS,
+  PL: PL_TEXTS,
+  RO: RO_TEXTS,
 };
 
 /*
@@ -131,7 +136,18 @@ export function countryTextsExist(country: string | null | undefined): boolean {
   const code = (country ?? '').toUpperCase();
   if (code === 'FI') return true;
   const law = lawCountry(code);
-  return law !== null && locales.every((l) => Boolean(LAW_TEXTS[law]?.[l]) && Boolean(COMMON_TEXTS[l]) && Boolean(LEGAL_NOTICE[l]));
+  return (
+    law !== null &&
+    locales.every((l) => Boolean(LAW_TEXTS[law]?.[l]) && Boolean(COMMON_TEXTS[l]) && Boolean(LEGAL_NOTICE[l])) &&
+    /* Польша и Румыния: ещё слова «уведомление вместо счёта» на всех языках (23.11.2026). */
+    (!sellerInvoiceCountry(law) || locales.every((l) => Boolean(SELLER_INVOICE_TEXTS[l]?.dealInvoice)))
+  );
+}
+
+/** Страна, где счета выставляет только продавец в государственной системе (KSeF, RO e-Factura); null — остальные. */
+export function sellerInvoiceCountry(country: string | null | undefined): SellerInvoiceCountry | null {
+  const code = (country ?? '').toUpperCase();
+  return Object.prototype.hasOwnProperty.call(SELLER_INVOICE_SYSTEMS, code) ? (code as SellerInvoiceCountry) : null;
 }
 
 /** Добавка к текстам раздела: то, чего в основном наборе нет. */
@@ -145,6 +161,13 @@ export type InstallmentCountryExtras = {
   invoiceNote: string;
   /** Оговорка «договор подготовлен платформой»; {country} — название страны. */
   legalNotice: string;
+  /**
+   * Польша и Румыния (23.11.2026): счета выставляет только продавец в
+   * государственной системе — короткая оговорка о документах (форма
+   * объявления, предложение, страница сделки), подпись суммы «к оплате до
+   * передачи» вместо «первый счёт» и кнопки справки о передаче.
+   */
+  sellerInvoices?: { system: string; listingNote: string; firstPaymentLabel: string; handoverDoc: string };
 };
 
 /* Поля основного набора (copy.ts), которые заменяет страна. Тип — по форме, без импорта copy.ts. */
@@ -152,10 +175,43 @@ type BaseCopy = {
   intro: string;
   introSeller: string;
   notAllowed: string;
-  deal: { contract: string; nextSteps: string };
-  notify: { thresholdTitle: string; thresholdBody: string; paidOffBody: string };
-  termination: { hint: string; reasons: Record<string, string>; settlement: string };
-  stage3: { checklist: string[]; remedy: string; payoff: string; paidOff: string };
+  listing: { vatFixed: string };
+  deal: { contract: string; nextSteps: string; invoice: string; invoiceMissing: string };
+  invoiceReasons: Record<string, string>;
+  notify: {
+    thresholdTitle: string;
+    thresholdBody: string;
+    paidOffBody: string;
+    agreedBody: string;
+    overdueBody: string;
+    noIbanTitle: string;
+    noIbanBody: string;
+    terminatedBody: string;
+  };
+  termination: {
+    hint: string;
+    reasons: Record<string, string>;
+    settlement: string;
+    confirm: string;
+    stopped: string;
+    paidFirst: string;
+    invoicedUnpaid: string;
+    notInvoiced: string;
+  };
+  stage3: {
+    checklist: string[];
+    remedy: string;
+    payoff: string;
+    paidOff: string;
+    firstPaid: string;
+    firstUnpaid: string;
+    markFirstPaid: string;
+    cancelCredit: string;
+    creditNote: string;
+    creditMissing: string;
+    makeCredit: string;
+    colInvoice: string;
+  };
 };
 
 const asLocale = (locale: string): Locale => ((locales as readonly string[]).includes(locale) ? (locale as Locale) : 'en');
@@ -187,26 +243,76 @@ export function withCountryTexts<T extends BaseCopy>(base: T, locale: string, co
           ? [law.checkInsurance]
           : [item],
   );
+  /*
+   * Польша и Румыния (23.11.2026): счета выставляет только продавец в KSeF /
+   * RO e-Factura. Всё, что основной набор говорит о «первом счёте», «счетах
+   * взносов» и «кредит-ноте» платформы, заменяется словами об уведомлениях о
+   * платеже (sellerInvoices.ts), {system} — название системы страны.
+   */
+  const sic = sellerInvoiceCountry(code);
+  const si = sic ? SELLER_INVOICE_TEXTS[l] : null;
+  const sys = (text: string) => (sic ? text.replaceAll('{system}', SELLER_INVOICE_SYSTEMS[sic]) : text);
   return {
     ...base,
+    ...(si
+      ? {
+          listing: { ...base.listing, vatFixed: sys(si.vatFixed) },
+          invoiceReasons: { ...base.invoiceReasons, UNSENT: si.unsent },
+        }
+      : {}),
     intro: law.intro,
     introSeller: law.introSeller,
     notAllowed: law.notAllowed,
-    deal: { ...base.deal, contract: law.contract, nextSteps: law.nextSteps },
+    deal: {
+      ...base.deal,
+      contract: law.contract,
+      nextSteps: law.nextSteps,
+      ...(si ? { invoice: si.dealInvoice, invoiceMissing: si.invoiceMissing } : {}),
+    },
     notify: {
       ...base.notify,
       thresholdTitle: law.thresholdTitle,
       thresholdBody: law.threshold,
       paidOffBody: `${common.allPaid} ${law.afterPaid}`,
+      ...(si
+        ? {
+            agreedBody: sys(si.agreedBody),
+            overdueBody: si.overdueBody,
+            noIbanTitle: si.noIbanTitle,
+            noIbanBody: si.noIbanBody,
+            terminatedBody: si.terminatedBody,
+          }
+        : {}),
     },
     termination: {
       ...base.termination,
       hint: law.terminationHint,
       reasons: { ...base.termination.reasons, REPOSSESSED: law.reasonRepossessed },
       settlement: law.settlement,
+      ...(si
+        ? {
+            confirm: si.terminationConfirm,
+            stopped: si.stopped,
+            paidFirst: si.paidFirst,
+            invoicedUnpaid: si.invoicedUnpaid,
+            notInvoiced: si.notInvoiced,
+          }
+        : {}),
     },
     stage3: {
       ...base.stage3,
+      ...(si
+        ? {
+            firstPaid: si.firstPaid,
+            firstUnpaid: sys(si.firstUnpaid),
+            markFirstPaid: si.markFirstPaid,
+            cancelCredit: si.cancelCredit,
+            creditNote: si.creditNote,
+            creditMissing: si.creditMissing,
+            makeCredit: si.makeCredit,
+            colInvoice: si.colInvoice,
+          }
+        : {}),
       checklist,
       remedy: law.threshold,
       payoff: common.payoff,
@@ -219,6 +325,16 @@ export function withCountryTexts<T extends BaseCopy>(base: T, locale: string, co
       invoiceNote: law.invoiceNote,
       /* Германия (23.11.2026): к общей оговорке — что шаблон является AGB (§ 307 BGB). */
       legalNotice: law.legalNoticeExtra ? `${LEGAL_NOTICE[l]} ${law.legalNoticeExtra}` : LEGAL_NOTICE[l],
+      ...(si && sic
+        ? {
+            sellerInvoices: {
+              system: SELLER_INVOICE_SYSTEMS[sic],
+              listingNote: law.listingNote ?? '',
+              firstPaymentLabel: si.firstPaymentLabel,
+              handoverDoc: si.handoverDoc,
+            },
+          }
+        : {}),
     },
   };
 }
