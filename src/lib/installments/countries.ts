@@ -10,8 +10,9 @@
  * Сделка всегда внутри одной страны: продавец и покупатель — компании одной
  * страны (проверяет база, start_installment_deal). Объявления видны всем.
  *
- * Открыты Финляндия, Эстония и Латвия (23.11.2026). Для остальных стран нет
- * ни правил, ни договора (их готовят в docs/equipment-sale/countries/).
+ * Открыты Финляндия, Эстония, Латвия, Швеция и Дания (23.11.2026). Для
+ * остальных стран нет ни правил, ни договора (их готовят в
+ * docs/equipment-sale/countries/).
  * Открыть страну — заполнить её запись, добавить правила (rules.ts), шаблон
  * договора (contractText/, contractTemplates.ts), тексты счетов
  * (invoiceTexts.ts) и кабинета (countryTexts/) и вписать страну в
@@ -22,6 +23,19 @@
  * ee.md и lv.md: его не проверял местный юрист, поэтому сторонам в кабинете
  * показывается оговорка (countryCopy.ts, legalNotice), а неподтверждённые
  * правила взяты в осторожном варианте.
+ *
+ * Швеция и Дания открыты так же, по se.md и dk.md (23.11.2026). Чем они
+ * отличаются от остальных:
+ *   · валюта — кроны (SEK, DKK), из пакета страны; суммы не пересчитываются;
+ *   · Швеция: проценты не предлагаются (interestOffered: false) — как
+ *     проценты рассрочки облагаются НДС, не выяснено (два источника
+ *     Skatteverket расходятся), и исследование советует не включать их до
+ *     ответа бухгалтера. Ставка в форме стоит 0, сервер и база другую не
+ *     принимают (app.installment_interest_allowed);
+ *   · Швеция: в реестре владельцем записывается ПОКУПАТЕЛЬ, у продавца —
+ *     только отметка о kreditköp; Дания: оговорку о собственности надо
+ *     зарегистрировать в Bilbogen до передачи. Это в текстах страны
+ *     (countryTexts/se.ts, dk.ts) и в чек-листе передачи.
  *
  * СПИСОК ОТКРЫТЫХ СТРАН ПОВТОРЁН В БАЗЕ: функция app.installment_country_open
  * (последняя миграция, где она определена). Меняешь open здесь — меняй и там;
@@ -36,16 +50,20 @@ import { COUNTRY_PACKS, type CountryCode } from '../country/index.ts';
  * FI_OSKL — финский закон о рассрочке 91/1966 (calc.ts);
  * EE_VOS — Эстония: порогов в законе нет, их задаёт договор (п. 9.1), затем
  * дополнительный срок и отказ от договора (VÕS § 114, § 116, § 233);
- * LV_CL2070 — Латвия: два пропущенных срока платежа (Civillikums 2070. p.).
+ * LV_CL2070 — Латвия: два пропущенных срока платежа (Civillikums 2070. p.);
+ * SE_AVBL — Швеция: больше 14 дней и больше 1/10 (1/20) kreditfordran
+ * (lag 1978:599, 7 §);
+ * DK_KAL — Дания: 30 дней и не меньше 1/10 (1/20) всей суммы к уплате
+ * (kreditaftaleloven § 29).
  */
-export type InstallmentRulesId = 'FI_OSKL' | 'EE_VOS' | 'LV_CL2070';
+export type InstallmentRulesId = 'FI_OSKL' | 'EE_VOS' | 'LV_CL2070' | 'SE_AVBL' | 'DK_KAL';
 
 /**
  * Шаблон договора. FI_OSAMAKSU — ContractPdf.tsx, договор по финскому праву;
- * EE_JARELMAKS и LV_NOMAKSA — тексты contractText/ee.ts и lv.ts, печатает
- * CountryContractPdf.tsx.
+ * EE_JARELMAKS, LV_NOMAKSA, SE_AVBETALNING и DK_KREDITKOEB — тексты
+ * contractText/ee.ts, lv.ts, se.ts и dk.ts, печатает CountryContractPdf.tsx.
  */
-export type InstallmentContractId = 'FI_OSAMAKSU' | 'EE_JARELMAKS' | 'LV_NOMAKSA';
+export type InstallmentContractId = 'FI_OSAMAKSU' | 'EE_JARELMAKS' | 'LV_NOMAKSA' | 'SE_AVBETALNING' | 'DK_KREDITKOEB';
 
 export type InstallmentCountryEntry = {
   /** Раздел открыт компаниям этой страны. */
@@ -58,6 +76,11 @@ export type InstallmentCountryEntry = {
   contractLanguage: string | null;
   /** Весь НДС с цены выставляется первым счётом вместе со взносом; null — ещё не выяснено. */
   vatOnFirstInvoice: boolean | null;
+  /**
+   * false — проценты в стране не предлагаются: ставка всегда 0 (Швеция,
+   * 23.11.2026). Поля нет — проценты разрешены, как в остальных странах.
+   */
+  interestOffered?: false;
 };
 
 const CLOSED: InstallmentCountryEntry = { open: false, rules: null, contract: null, contractLanguage: null, vatOnFirstInvoice: null };
@@ -69,9 +92,21 @@ const CLOSED: InstallmentCountryEntry = { open: false, rules: null, contract: nu
  */
 export const INSTALLMENT_COUNTRIES: Record<CountryCode, InstallmentCountryEntry> = {
   FI: { open: true, rules: 'FI_OSKL', contract: 'FI_OSAMAKSU', contractLanguage: 'fi', vatOnFirstInvoice: true },
-  SE: CLOSED,
+  /*
+   * Швеция (23.11.2026): avbetalningsköp по lag (1978:599); фактическая передача
+   * по такому договору — поставка товара, НДС со всей цены при передаче, с
+   * аванса — при получении (ML 5 kap. 3 §, 7 kap. 4 и 7 §§); первый счёт как в
+   * Финляндии. Проценты не предлагаются — см. выше.
+   */
+  SE: { open: true, rules: 'SE_AVBL', contract: 'SE_AVBETALNING', contractLanguage: 'sv', vatOnFirstInvoice: true, interestOffered: false },
   NO: CLOSED,
-  DK: CLOSED,
+  /*
+   * Дания (23.11.2026): kreditkøb med ejendomsforbehold по kreditaftaleloven;
+   * продажа в кредит с оговоркой — поставка при фактической передаче, весь
+   * НДС при передаче, предоплата — в момент оплаты (momsloven § 4, stk. 3,
+   * nr. 2; § 23). Проценты вне базы НДС, если показаны отдельно (§ 27, stk. 3, nr. 4).
+   */
+  DK: { open: true, rules: 'DK_KAL', contract: 'DK_KREDITKOEB', contractLanguage: 'da', vatOnFirstInvoice: true },
   /* Эстония (23.11.2026): НДС со всей цены при передаче, аванс — в оплаченной части (KMS § 11); первый счёт как в Финляндии. */
   EE: { open: true, rules: 'EE_VOS', contract: 'EE_JARELMAKS', contractLanguage: 'et', vatOnFirstInvoice: true },
   /* Латвия (23.11.2026): nomaksas pirkums — поставка товара, PVN со всей цены при передаче (PVN likums 1. p. 13. pkt., 34. p. 8. d.). */
@@ -134,6 +169,29 @@ export function installmentCountry(country: string | null | undefined): Installm
 
 export function installmentCountryOpen(country: string | null | undefined): boolean {
   return installmentCountry(country) !== null;
+}
+
+/**
+ * Предлагаются ли в стране проценты на остаток цены (23.11.2026). Нет —
+ * только в Швеции: ставка там всегда 0. Неизвестная и закрытая страна —
+ * как раньше, без ограничения (проверка страны — отдельно).
+ * ТО ЖЕ ПРАВИЛО В БАЗЕ: app.installment_interest_allowed; расхождение ловит
+ * тест countryOpen.test.mjs.
+ */
+export function installmentInterestOffered(country: string | null | undefined): boolean {
+  return installmentCountryEntry(country)?.interestOffered !== false;
+}
+
+/**
+ * Значение строки «НДС» в условиях сделки не из Финляндии (23.11.2026):
+ * ставка сделки — «25 %». В словаре калькулятора подпись обычного режима
+ * написана про Финляндию («Soome üldmäär 25,5 %»), и шведский, датский,
+ * эстонский или латвийский продавец читал бы чужую ставку. У финской сделки
+ * подпись словаря остаётся как была.
+ */
+export function vatRateText(vatBps: number, locale: string): string {
+  const percent = (vatBps / 100).toLocaleString(locale === 'en' ? 'en-GB' : locale, { maximumFractionDigits: 2 });
+  return `${percent} %`;
 }
 
 /** Коды открытых стран — для фильтров открытой страницы и сверки с базой. */

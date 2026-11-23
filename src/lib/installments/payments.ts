@@ -592,6 +592,23 @@ export async function runInstallments(options: { dealId?: string; today?: string
 
       const priceGross =
         deal.price_cents + (deal.vat_mode === 'STANDARD' ? Math.round((deal.price_cents * deal.vat_bps) / 10_000) : 0);
+      /*
+       * От чего считается доля просрочки — по правилам страны (23.11.2026):
+       * в Финляндии и Эстонии цена с НДС, как было; в Швеции — kreditfordran,
+       * в Дании — вся сумма к уплате. База — из согласованных условий, тем же
+       * расчётом, что у договора и страницы сделки (rules.ts, base).
+       */
+      const agreed = buildSchedule({
+        priceCents: deal.price_cents,
+        vatMode: deal.vat_mode as VatMode,
+        vatBps: deal.vat_bps,
+        downPaymentCents: deal.down_payment_cents,
+        months: deal.months,
+        finalCents: deal.final_cents,
+        annualRateBps: deal.annual_rate_bps,
+        handoverDate: deal.handover_date,
+        firstDueDate: deal.first_due_date,
+      });
       const remaining = (fresh ?? []).filter((r) => !r.paid_at).reduce((s, r) => s + r.principal_cents, 0);
       /*
        * Порог — по правилам страны сделки (23.11.2026); правил у страны нет —
@@ -605,7 +622,7 @@ export async function runInstallments(options: { dealId?: string; today?: string
         rules.remedyAllowed(
           overdue.map((r) => ({ dueDate: r.lateFrom, unpaidCents: r.principal_cents })),
           today,
-          priceGross,
+          'error' in agreed ? priceGross : rules.base(agreed),
           remaining,
         );
       const newest = overdue[overdue.length - 1];

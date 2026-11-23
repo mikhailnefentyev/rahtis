@@ -18,13 +18,20 @@
  * даты её документ для латвийского продавца — платёжное уведомление, а счёт
  * продавец выписывает в своей бухгалтерской программе (documentKind).
  *
+ * Швеция и Дания (23.11.2026, se.md и dk.md): тот же порядок — первый счёт
+ * со всей ценой и всем НДС, взносы без НДС. Суммы в кронах (валюта сделки),
+ * ссылка платежа — RF: шведский OCR/bankgiro и датский FI-kort требуют
+ * договора продавца с банком, которого у платформы нет, и счёт говорит об
+ * этом прямо. В Дании обязательность электронного счёта не подтверждена —
+ * это тоже написано на счёте.
+ *
  * Модуль без зависимостей от сервера: его читают счета и тесты.
  */
 import type { VatMode } from './calc.ts';
 import { installmentCountryEntry } from './countries.ts';
 import type { Bilingual, InvoiceLabels } from '../sites/invoiceLabels.ts';
 
-export type InvoiceTextCountry = 'FI' | 'EE' | 'LV';
+export type InvoiceTextCountry = 'FI' | 'EE' | 'LV' | 'SE' | 'DK';
 
 type FirstNote = { down: string; vat: string; rest: string; months: number; contract: string; vatMode: VatMode };
 type FirstMail = {
@@ -445,7 +452,281 @@ const LV: InstallmentInvoiceTexts = {
   },
 };
 
-const TEXTS: Record<InvoiceTextCountry, InstallmentInvoiceTexts> = { FI, EE, LV };
+/* ── Швеция ──────────────────────────────────────────────────────────── */
+
+/*
+ * Швеция (23.11.2026, docs/equipment-sale/countries/se.md). Первый счёт — как
+ * в Финляндии: вся цена и весь НДС, к оплате сейчас kontantinsats (взнос и
+ * НДС); основание — ML 5 kap. 3 § и 7 kap. 7 §. Счета взносов — без НДС.
+ * Процентов в шведской сделке нет (их НДС не выяснен, кабинет ставку не
+ * предлагает), поэтому строка процентов ничего не говорит о налоге: она
+ * останется только на случай, если проценты когда-нибудь включат.
+ * PDF — законный счёт при согласии получателя (ML 17 kap. 20 §); обязательных
+ * электронных счетов между компаниями нет.
+ * Ссылка платежа — международная RF: шведский OCR-номер и bankgiro требуют
+ * договора продавца с банком, которого у платформы нет, — об этом сказано в
+ * счёте, чтобы покупатель не искал OCR.
+ */
+const SE_ISSUER =
+  'Fakturan utfärdas av säljaren; RAHTIS (Aivomaa Oy) är inte part i köpet och tar inte emot betalningen. / Issued by the seller; RAHTIS (Aivomaa Oy) is not a party to the sale and does not receive the payment.';
+const SE_PAYMENT =
+  'Betalning görs till säljarens konto (IBAN) med betalningsreferensen som meddelande. Fakturan har inget OCR-nummer och inget bankgiro. / Pay to the seller’s account (IBAN) quoting the payment reference; this invoice has no OCR number or bankgiro.';
+
+const SE_LABELS: InvoiceLabels = {
+  docName: 'Faktura',
+  creditDocName: 'Kreditnota',
+  title: 'FAKTURA / INVOICE',
+  vatId: 'Momsreg.nr',
+  businessId: 'Organisationsnummer / Org. no.',
+  customer: ['Köpare', 'Customer'],
+  number: ['Fakturanummer', 'Invoice no.'],
+  date: ['Fakturadatum', 'Invoice date'],
+  due: ['Förfallodag', 'Due date'],
+  job: ['Köpeobjekt', 'Item sold'],
+  period: ['Period', 'Period'],
+  colDate: 'Datum / Date',
+  colText: 'Beskrivning / Description',
+  colQty: 'Antal / Qty',
+  colPrice: 'À-pris / Unit',
+  colAmount: 'Belopp / Total',
+  net: 'Summa exkl. moms / Total excl. VAT',
+  total: 'Summa / Total',
+  totalDue: 'Att betala / Total due',
+  iban: ['Kontonummer (IBAN)', 'Bank account'],
+  reference: ['Betalningsreferens', 'Reference'],
+  amountDue: ['Att betala', 'Amount due'],
+  footer: 'Fakturan är upprättad i tjänsten RAHTIS',
+};
+
+const isoDate = (iso: string) => iso;
+
+const SE: InstallmentInvoiceTexts = {
+  country: 'SE',
+  intl: 'sv-SE',
+  date: isoDate,
+  unit: 'st',
+  labels: SE_LABELS,
+  filePrefix: 'Faktura',
+  vatLabel: (percent) => (percent ? `Moms / VAT ${percent} %` : 'Moms / VAT 0 %'),
+  first: {
+    line: ({ what, contract }) => `${what} – pris, avtal om avbetalningsköp nr ${contract} / purchase price, instalment purchase contract`,
+    jobLabel: ['Köpeobjekt', 'Item sold'],
+    periodLabel: ['Utlämnande', 'Handover'],
+    payNowLabel: ['Att betala nu', 'Due now'],
+    note: ({ down, vat, rest, months, contract }) =>
+      lines(
+        `Avbetalningsköp med förbehåll om återtaganderätt (lagen (1978:599) om avbetalningsköp mellan näringsidkare m.fl.): mervärdesskatten på hela köpet faktureras med denna faktura (5 kap. 3 § andra stycket 2 och 7 kap. 7 § mervärdesskattelagen (2023:200)). Att betala nu (kontantinsats): ${down} av priset + mervärdesskatt ${vat}. Kreditbeloppet ${rest} betalas genom ${months} avbetalningar enligt avtal nr ${contract}; avbetalningarna innehåller ingen mervärdesskatt. Äganderätten övergår till köparen först när hela kreditfordran är betald. Fordonet lämnas ut när denna faktura är betald.`,
+        `Instalment purchase with a reservation of the right to repossess: VAT on the whole price is invoiced on this invoice. Due now: down payment + VAT. The credited amount is paid in ${months} instalments under contract ${contract}, without VAT. Ownership passes to the buyer only when the whole credit claim is paid. The vehicle is handed over once this invoice is paid.`,
+        SE_PAYMENT,
+        SE_ISSUER,
+      ),
+    mailSubject: ({ number, seller, contract }) => `Faktura ${number} · ${seller} · avtal om avbetalningsköp ${contract}`,
+    mailText: (a) =>
+      [
+        'Hej,',
+        '',
+        `bifogat finns den första fakturan ${a.number} för avbetalningsköpet (avtal ${a.contract}, ${a.what}). Fakturan utfärdas av: ${a.seller}.`,
+        `Att betala nu ${a.payNow} (kontantinsats inklusive mervärdesskatten på hela köpet), förfallodag ${a.due}.`,
+        `Kontonummer (IBAN) ${a.iban}, betalningsreferens ${a.reference}. Fakturan har inget OCR-nummer; ange referensen som meddelande.`,
+        'Betalningen görs direkt till säljaren, inte till RAHTIS eller Aivomaa Oy.',
+        '',
+        `Frågor: svara på detta meddelande (${a.sellerEmail}).`,
+        '',
+        '—',
+        `Attached is the first invoice ${a.number} of the instalment purchase contract ${a.contract} (${a.what}) from ${a.seller}. Due now ${a.payNow} (down payment and VAT on the whole price), due date ${a.due}, IBAN ${a.iban}, reference ${a.reference}. Pay the seller directly, not RAHTIS or Aivomaa Oy.`,
+      ].join('\n'),
+  },
+  payment: {
+    jobLabel: ['Avtal om avbetalningsköp', 'Instalment purchase contract'],
+    periodLabel: ['Avbetalning', 'Instalment'],
+    line: ({ n, months, contract, what }) => `Avbetalning ${n}/${months}, avtal om avbetalningsköp nr ${contract} (${what}) / Instalment ${n}/${months}`,
+    /* В шведской сделке процентов нет; строка без утверждений о налоге — НДС на проценты не выяснен (se.md, открытый вопрос 1). */
+    interestLine: 'Ränta på kreditbeloppet enligt avtalets punkt 4.4 / Interest on the credited amount',
+    note: ({ firstNumber }) =>
+      [
+        `Avbetalningen innehåller ingen mervärdesskatt: mervärdesskatten på hela köpet har fakturerats med faktura nr ${firstNumber}. / The instalment has no VAT: VAT on the whole price was invoiced on invoice ${firstNumber}.`,
+        SE_PAYMENT,
+        SE_ISSUER,
+      ].join('\n'),
+    mailSubject: ({ seller, n, months, contract }) => `Faktura · ${seller} · avbetalning ${n}/${months}, avtal ${contract}`,
+    mailText: (a) =>
+      [
+        'Hej,',
+        '',
+        `bifogat finns fakturan för avbetalning ${a.n}/${a.months} enligt avtal om avbetalningsköp ${a.contract} (${a.what}).`,
+        `Att betala ${a.total}, förfallodag ${a.due}. Kontonummer (IBAN) ${a.iban}.`,
+        'Betalningen görs direkt till säljaren, inte till RAHTIS eller Aivomaa Oy.',
+        '',
+        '—',
+        `Attached is the invoice for instalment ${a.n}/${a.months} of instalment purchase contract ${a.contract}. Amount ${a.total}, due ${a.due}, IBAN ${a.iban}. Pay the seller directly.`,
+      ].join('\n'),
+    mailFooter: ({ number, reference }) => `Faktura / Invoice ${number} · betalningsreferens / reference ${reference}`,
+  },
+  credit: {
+    linePrefix: 'Kreditering / Credit: ',
+    job: ({ contract }) => `${contract} · hävt / cancelled`,
+    periodLabel: ['Krediterad faktura', 'Credited invoice'],
+    title: 'KREDITNOTA / CREDIT NOTE',
+    payNowLabel: ['Återbetalas till köparen', 'Refunded to the buyer'],
+    amountLabel: ['Återbetalas', 'Refund'],
+    note: ({ original, originalDate, contract, refund }) =>
+      [
+        `KREDITNOTA / CREDIT NOTE. Krediterar faktura nr ${original} (${originalDate}) i sin helhet, eftersom avbetalningsköpet ${contract} hävdes före utlämnandet av fordonet (17 kap. 22 § mervärdesskattelagen). ${refund ? `Säljaren återbetalar det betalda beloppet ${refund} till köparen.` : 'Fakturan hade inte betalats, så inget återbetalas.'} / Credits invoice ${original} in full because instalment purchase ${contract} was cancelled before handover. ${refund ? `The seller refunds the ${refund} paid to the buyer.` : 'The invoice was not paid, so nothing is refunded.'}`,
+        'Kreditnotan utfärdas av säljaren; RAHTIS (Aivomaa Oy) är inte part i köpet. / Issued by the seller; RAHTIS (Aivomaa Oy) is not a party to the sale.',
+      ].join('\n'),
+    mailSubject: ({ seller, original }) => `Kreditnota · ${seller} · faktura ${original}`,
+    mailText: ({ original, contract }) =>
+      [
+        'Hej,',
+        '',
+        `bifogat finns en kreditnota som krediterar faktura ${original}: avbetalningsköpet ${contract} hävdes före utlämnandet.`,
+        '',
+        '—',
+        `Attached is a credit note crediting invoice ${original}: instalment purchase ${contract} was cancelled before handover.`,
+      ].join('\n'),
+  },
+  notice: null,
+};
+
+/* ── Дания ───────────────────────────────────────────────────────────── */
+
+/*
+ * Дания (23.11.2026, docs/equipment-sale/countries/dk.md). Первый счёт — как
+ * в Финляндии: вся цена и весь НДС, к оплате сейчас udbetaling (взнос и
+ * НДС); основание — momsloven § 4, stk. 3, nr. 2 и § 23. Счета взносов — без
+ * НДС; проценты — отдельной строкой с суммой: только при этом условии они
+ * вне базы НДС (momsloven § 27, stk. 3, nr. 4).
+ * Обязателен ли электронный счёт между компаниями, исследование по
+ * первоисточнику не подтвердило (momsbekendtgørelsen не открыт): на каждом
+ * счёте об этом сказано прямо, без обещания.
+ * Ссылка платежа — международная RF: датская строка FI-kort (+71) требует
+ * договора продавца с банком, которого у платформы нет.
+ */
+const DK_ISSUER =
+  'Fakturaen udstedes af sælger; RAHTIS (Aivomaa Oy) er ikke part i handlen og modtager ikke betalingen. / Issued by the seller; RAHTIS (Aivomaa Oy) is not a party to the sale and does not receive the payment.';
+const DK_PAYMENT =
+  'Betaling sker til sælgers konto (IBAN) med angivelse af betalingsreferencen. Fakturaen har ingen FI-betalingslinje (+71). / Pay to the seller’s account (IBAN) quoting the payment reference; this invoice has no FI payment line (+71).';
+const DK_EINVOICE =
+  'Fakturaen sendes som PDF. Om der gælder krav om elektronisk faktura mellem virksomheder, er ikke bekræftet af RAHTIS; afklar det med jeres revisor. / Sent as PDF. Whether an electronic invoice is required between companies has not been confirmed by RAHTIS; check with your accountant.';
+
+const DK_LABELS: InvoiceLabels = {
+  docName: 'Faktura',
+  creditDocName: 'Kreditnota',
+  title: 'FAKTURA / INVOICE',
+  vatId: 'Momsnr.',
+  businessId: 'CVR-nr. / Business ID',
+  customer: ['Køber', 'Customer'],
+  number: ['Fakturanummer', 'Invoice no.'],
+  date: ['Fakturadato', 'Invoice date'],
+  due: ['Forfaldsdato', 'Due date'],
+  job: ['Købsgenstand', 'Item sold'],
+  period: ['Periode', 'Period'],
+  colDate: 'Dato / Date',
+  colText: 'Beskrivelse / Description',
+  colQty: 'Antal / Qty',
+  colPrice: 'Enhedspris / Unit',
+  colAmount: 'Beløb / Total',
+  net: 'I alt ekskl. moms / Total excl. VAT',
+  total: 'I alt / Total',
+  totalDue: 'Til betaling / Total due',
+  iban: ['Kontonummer (IBAN)', 'Bank account'],
+  reference: ['Betalingsreference', 'Reference'],
+  amountDue: ['Til betaling', 'Amount due'],
+  footer: 'Fakturaen er udarbejdet i tjenesten RAHTIS',
+};
+
+const DK: InstallmentInvoiceTexts = {
+  country: 'DK',
+  intl: 'da-DK',
+  date: paddedDate,
+  unit: 'stk.',
+  labels: DK_LABELS,
+  filePrefix: 'Faktura',
+  vatLabel: (percent) => (percent ? `Moms / VAT ${percent} %` : 'Moms / VAT 0 %'),
+  first: {
+    line: ({ what, contract }) => `${what} – købesum, købekontrakt med ejendomsforbehold nr. ${contract} / purchase price, contract with retention of title`,
+    jobLabel: ['Købsgenstand', 'Item sold'],
+    periodLabel: ['Overgivelse', 'Handover'],
+    payNowLabel: ['Til betaling nu', 'Due now'],
+    note: ({ down, vat, rest, months, contract }) =>
+      lines(
+        `Kreditkøb med ejendomsforbehold (lov om kreditaftaler): momsen af hele købesummen faktureres med denne faktura (momslovens § 4, stk. 3, nr. 2, og § 23). Til betaling nu (udbetaling): ${down} af købesummen + moms ${vat}. Restkøbesummen ${rest} betales i ${months} afdrag efter købekontrakt nr. ${contract}; afdragene indeholder ikke moms. Sælger forbeholder sig ejendomsretten, indtil hele købesummen med renter og omkostninger er betalt. Køretøjet overgives, når denne faktura er betalt, og ejendomsforbeholdet er anmeldt til tinglysning i bilbogen.`,
+        `Credit purchase with retention of title: VAT on the whole price is invoiced on this invoice. Due now: down payment + VAT. The remainder is paid in ${months} instalments under contract ${contract}, without VAT. The seller retains ownership until the price with interest and costs is paid in full. The vehicle is handed over once this invoice is paid and the retention of title has been filed for registration in the Bilbogen.`,
+        DK_EINVOICE,
+        DK_PAYMENT,
+        DK_ISSUER,
+      ),
+    mailSubject: ({ number, seller, contract }) => `Faktura ${number} · ${seller} · købekontrakt ${contract}`,
+    mailText: (a) =>
+      [
+        'Hej,',
+        '',
+        `vedhæftet er den første faktura ${a.number} for kreditkøbet (købekontrakt ${a.contract}, ${a.what}). Fakturaen udstedes af: ${a.seller}.`,
+        `Til betaling nu ${a.payNow} (udbetaling inklusive momsen af hele købesummen), forfaldsdato ${a.due}.`,
+        `Kontonummer (IBAN) ${a.iban}, betalingsreference ${a.reference}. Fakturaen har ingen FI-betalingslinje; angiv referencen ved betalingen.`,
+        'Betalingen sker direkte til sælger, ikke til RAHTIS eller Aivomaa Oy.',
+        '',
+        `Spørgsmål: svar på denne mail (${a.sellerEmail}).`,
+        '',
+        '—',
+        `Attached is the first invoice ${a.number} of the purchase contract with retention of title ${a.contract} (${a.what}) from ${a.seller}. Due now ${a.payNow} (down payment and VAT on the whole price), due date ${a.due}, IBAN ${a.iban}, reference ${a.reference}. Pay the seller directly, not RAHTIS or Aivomaa Oy.`,
+      ].join('\n'),
+  },
+  payment: {
+    jobLabel: ['Købekontrakt med ejendomsforbehold', 'Contract with retention of title'],
+    periodLabel: ['Afdrag', 'Instalment'],
+    line: ({ n, months, contract, what }) => `Afdrag ${n}/${months}, købekontrakt nr. ${contract} (${what}) / Instalment ${n}/${months}`,
+    /* Проценты — отдельной строкой с суммой: условие, при котором они вне базы НДС (momsloven § 27, stk. 3, nr. 4). */
+    interestLine:
+      'Rente af den til enhver tid skyldige del af købesummen – indgår ikke i momsgrundlaget (momslovens § 27, stk. 3, nr. 4) / Interest on the outstanding part of the price, outside the VAT base',
+    note: ({ firstNumber }) =>
+      [
+        `Afdraget indeholder ikke moms: momsen af hele købesummen er faktureret med faktura nr. ${firstNumber}. / The instalment has no VAT: VAT on the whole price was invoiced on invoice ${firstNumber}.`,
+        DK_EINVOICE,
+        DK_PAYMENT,
+        DK_ISSUER,
+      ].join('\n'),
+    mailSubject: ({ seller, n, months, contract }) => `Faktura · ${seller} · afdrag ${n}/${months}, købekontrakt ${contract}`,
+    mailText: (a) =>
+      [
+        'Hej,',
+        '',
+        `vedhæftet er fakturaen for afdrag ${a.n}/${a.months} efter købekontrakt ${a.contract} (${a.what}).`,
+        `Til betaling ${a.total}, forfaldsdato ${a.due}. Kontonummer (IBAN) ${a.iban}.`,
+        'Betalingen sker direkte til sælger, ikke til RAHTIS eller Aivomaa Oy.',
+        '',
+        '—',
+        `Attached is the invoice for instalment ${a.n}/${a.months} of purchase contract ${a.contract}. Amount ${a.total}, due ${a.due}, IBAN ${a.iban}. Pay the seller directly.`,
+      ].join('\n'),
+    mailFooter: ({ number, reference }) => `Faktura / Invoice ${number} · betalingsreference / reference ${reference}`,
+  },
+  credit: {
+    linePrefix: 'Kreditering / Credit: ',
+    job: ({ contract }) => `${contract} · annulleret / cancelled`,
+    periodLabel: ['Krediteret faktura', 'Credited invoice'],
+    title: 'KREDITNOTA / CREDIT NOTE',
+    payNowLabel: ['Tilbagebetales til køber', 'Refunded to the buyer'],
+    amountLabel: ['Tilbagebetales', 'Refund'],
+    note: ({ original, originalDate, contract, refund }) =>
+      [
+        `KREDITNOTA / CREDIT NOTE. Krediterer faktura nr. ${original} (${originalDate}) fuldt ud, fordi kreditkøbet ${contract} blev annulleret før overgivelsen af køretøjet. ${refund ? `Sælger tilbagebetaler det betalte beløb ${refund} til køber.` : 'Fakturaen var ikke betalt, så der tilbagebetales intet.'} / Credits invoice ${original} in full because credit purchase ${contract} was cancelled before handover. ${refund ? `The seller refunds the ${refund} paid to the buyer.` : 'The invoice was not paid, so nothing is refunded.'}`,
+        'Kreditnotaen udstedes af sælger; RAHTIS (Aivomaa Oy) er ikke part i handlen. / Issued by the seller; RAHTIS (Aivomaa Oy) is not a party to the sale.',
+      ].join('\n'),
+    mailSubject: ({ seller, original }) => `Kreditnota · ${seller} · faktura ${original}`,
+    mailText: ({ original, contract }) =>
+      [
+        'Hej,',
+        '',
+        `vedhæftet er en kreditnota, der krediterer faktura ${original}: kreditkøbet ${contract} blev annulleret før overgivelsen.`,
+        '',
+        '—',
+        `Attached is a credit note crediting invoice ${original}: credit purchase ${contract} was cancelled before handover.`,
+      ].join('\n'),
+  },
+  notice: null,
+};
+
+const TEXTS: Record<InvoiceTextCountry, InstallmentInvoiceTexts> = { FI, EE, LV, SE, DK };
 
 /** Есть ли у страны свои тексты счетов — для проверки, что открытую страну можно обслуживать. */
 export function invoiceTextsExist(country: string | null | undefined): boolean {

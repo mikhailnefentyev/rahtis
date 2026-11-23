@@ -26,9 +26,9 @@ import {
   vehicleSellable,
 } from './access.ts';
 
-test('раздел рассрочки — компаниям открытых стран реестра (Финляндия, с 23.11.2026 — Эстония и Латвия)', () => {
-  for (const country of ['FI', 'EE', 'LV']) assert.equal(installmentsAvailable(country), true, country);
-  for (const country of ['LT', 'SE', 'PL', 'RO', '', null, undefined]) {
+test('раздел рассрочки — компаниям открытых стран реестра (Финляндия; с 23.11.2026 — Эстония, Латвия, Швеция и Дания)', () => {
+  for (const country of ['FI', 'EE', 'LV', 'SE', 'DK']) assert.equal(installmentsAvailable(country), true, country);
+  for (const country of ['LT', 'NO', 'PL', 'RO', '', null, undefined]) {
     assert.equal(installmentsAvailable(country), false);
   }
 });
@@ -78,13 +78,15 @@ const party = (over = {}) => ({ kind: 'SHIPPER', country: 'FI', status: 'ACTIVE'
 test('продавать может главный в проверенной компании открытой страны, любого вида — без лицензии и страховки', () => {
   assert.equal(canSellInstallments(party()), true);
   assert.equal(canSellInstallments(party({ kind: 'CARRIER' })), true);
-  /* Эстония и Латвия открыты с 23.11.2026. */
+  /* Эстония, Латвия, Швеция и Дания открыты с 23.11.2026. */
   assert.equal(canSellInstallments(party({ country: 'EE' })), true);
   assert.equal(canSellInstallments(party({ country: 'LV', kind: 'CARRIER' })), true);
+  assert.equal(canSellInstallments(party({ country: 'SE' })), true);
+  assert.equal(canSellInstallments(party({ country: 'DK', kind: 'CARRIER' })), true);
   /* Не проверена оператором, из закрытой страны, не главный, оператор платформы — нет. */
   assert.equal(canSellInstallments(party({ status: 'PENDING' })), false);
   assert.equal(canSellInstallments(party({ status: 'REJECTED' })), false);
-  assert.equal(canSellInstallments(party({ country: 'SE' })), false);
+  assert.equal(canSellInstallments(party({ country: 'NO' })), false);
   assert.equal(canSellInstallments(party({ owner: false })), false);
   assert.equal(canSellInstallments(party({ kind: 'ADMIN' })), false);
   assert.equal(canSellInstallments(party({ kind: null })), false);
@@ -96,7 +98,7 @@ test('покупать может только перевозчик с дейс�
   /* Компания без парка не покупает, даже если документы почему-то есть. */
   assert.equal(canBuyInstallments(party({ kind: 'SHIPPER', documentsOk: true })), false);
   assert.equal(canBuyInstallments(party({ kind: 'CARRIER', documentsOk: true, status: 'PENDING' })), false);
-  assert.equal(canBuyInstallments(party({ kind: 'CARRIER', documentsOk: true, country: 'SE' })), false);
+  assert.equal(canBuyInstallments(party({ kind: 'CARRIER', documentsOk: true, country: 'NO' })), false);
   assert.equal(canBuyInstallments(party({ kind: 'CARRIER', documentsOk: true, owner: false })), false);
   /* Перевозчик с истёкшими документами продавать может, покупать — нет. */
   assert.equal(canSellInstallments(party({ kind: 'CARRIER' })), true);

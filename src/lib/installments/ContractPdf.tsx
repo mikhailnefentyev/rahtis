@@ -37,6 +37,13 @@ export type ContractPdfInput = {
     installmentPrice: string;
     tenth: string;
     twentieth: string;
+    /*
+     * Для договоров Швеции и Дании (23.11.2026); финский шаблон их не читает.
+     * creditClaim — kreditfordran: часть цены в кредит и все проценты;
+     * totalPayable — вся сумма к уплате: цена с НДС и все проценты.
+     */
+    creditClaim: string;
+    totalPayable: string;
   };
   vatMode: 'STANDARD' | 'MARGIN' | 'EXEMPT' | 'NONE';
   months: number;

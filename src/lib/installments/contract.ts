@@ -5,7 +5,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { buildSchedule, type VatMode } from './calc';
 import { installmentCurrency, installmentDay } from './countries';
-import { installmentRules } from './rules';
+import { dkTotalPayableCents, installmentRules, seCreditClaimCents } from './rules';
 import type { ContractPdfInput } from './ContractPdf';
 
 /**
@@ -96,9 +96,11 @@ export function dealVehicle(d: LoadedDeal) {
  * Как печатать договор страны (23.11.2026): язык чисел и вид даты. По
  * умолчанию — финский договор, как было: числа fi-FI, дата «5.1.2027».
  * Договоры Эстонии и Латвии — числа своего языка, дата «05.01.2027».
+ * Договор Швеции — дата «2027-01-05» (isoDates), как пишут в стране; Дании —
+ * «05.01.2027».
  * День согласия — по часовому поясу страны продавца (у Финляндии — Хельсинки).
  */
-export type ContractPrint = { intl: string; paddedDates: boolean };
+export type ContractPrint = { intl: string; paddedDates: boolean; isoDates?: boolean };
 
 const FI_PRINT: ContractPrint = { intl: 'fi-FI', paddedDates: false };
 
@@ -109,7 +111,7 @@ const paddedDate = (iso: string) => {
 
 export function contractInput(d: LoadedDeal, print: ContractPrint = FI_PRINT): ContractPdfInput | null {
   const { deal } = d;
-  const fiDate = print.paddedDates ? paddedDate : fiDateShort;
+  const fiDate = print.isoDates ? (iso: string) => iso : print.paddedDates ? paddedDate : fiDateShort;
   if (!deal.contract_number || !deal.agreed_at || !deal.parties_snapshot) return null;
   const parties = deal.parties_snapshot as { seller?: Snapshot; buyer?: Snapshot };
   const vehicle = dealVehicle(d);
@@ -175,6 +177,9 @@ export function contractInput(d: LoadedDeal, print: ContractPrint = FI_PRINT): C
       installmentPrice: eur(schedule.installmentPriceCents),
       tenth: eur(limits.tenthCents),
       twentieth: eur(limits.twentiethCents),
+      /* Базы порогов Швеции и Дании (23.11.2026) — теми же функциями, что считают порог (rules.ts). */
+      creditClaim: eur(seCreditClaimCents(schedule)),
+      totalPayable: eur(dkTotalPayableCents(schedule)),
     },
     vatMode: deal.vat_mode as ContractPdfInput['vatMode'],
     months: deal.months,

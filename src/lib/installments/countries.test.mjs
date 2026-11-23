@@ -23,10 +23,10 @@ test('у каждой страны платформы есть запись в �
   assert.deepEqual(Object.keys(INSTALLMENT_COUNTRIES).sort(), Object.keys(COUNTRY_PACKS).sort());
 });
 
-test('открыты Финляндия, Эстония и Латвия (23.11.2026); остальные страны закрыты, пока нет правил и договора', () => {
-  assert.deepEqual(openInstallmentCountries(), ['FI', 'EE', 'LV']);
-  for (const country of ['FI', 'fi', 'EE', 'ee', 'LV', 'lv']) assert.equal(installmentCountryOpen(country), true, country);
-  for (const country of ['SE', 'NO', 'DK', 'LT', 'PL', 'DE', 'RO', 'XX', '', null, undefined]) {
+test('открыты Финляндия, Эстония, Латвия, Швеция и Дания (23.11.2026); остальные страны закрыты, пока нет правил и договора', () => {
+  assert.deepEqual(openInstallmentCountries().sort(), ['DK', 'EE', 'FI', 'LV', 'SE']);
+  for (const country of ['FI', 'fi', 'EE', 'ee', 'LV', 'lv', 'SE', 'se', 'DK', 'dk']) assert.equal(installmentCountryOpen(country), true, country);
+  for (const country of ['NO', 'LT', 'PL', 'DE', 'RO', 'XX', '', null, undefined]) {
     assert.equal(installmentCountryOpen(country), false, String(country));
     assert.equal(installmentCountry(country), null, String(country));
   }
@@ -47,20 +47,21 @@ test('валюта и ставка НДС открытой страны — из
 });
 
 test('страну нельзя открыть наполовину: без правил, договора или решения об НДС она закрыта', () => {
-  const saved = INSTALLMENT_COUNTRIES.SE;
+  /* Норвегия закрыта (23.11.2026) — на ней и проверяется «открыть наполовину». */
+  const saved = INSTALLMENT_COUNTRIES.NO;
   try {
-    INSTALLMENT_COUNTRIES.SE = { open: true, rules: null, contract: null, contractLanguage: null, vatOnFirstInvoice: null };
-    assert.equal(installmentCountryOpen('SE'), false);
-    INSTALLMENT_COUNTRIES.SE = { open: true, rules: 'FI_OSKL', contract: 'FI_OSAMAKSU', contractLanguage: 'sv', vatOnFirstInvoice: null };
-    assert.equal(installmentCountryOpen('SE'), false);
-    INSTALLMENT_COUNTRIES.SE = { open: true, rules: 'FI_OSKL', contract: 'FI_OSAMAKSU', contractLanguage: 'sv', vatOnFirstInvoice: true };
+    INSTALLMENT_COUNTRIES.NO = { open: true, rules: null, contract: null, contractLanguage: null, vatOnFirstInvoice: null };
+    assert.equal(installmentCountryOpen('NO'), false);
+    INSTALLMENT_COUNTRIES.NO = { open: true, rules: 'FI_OSKL', contract: 'FI_OSAMAKSU', contractLanguage: 'no', vatOnFirstInvoice: null };
+    assert.equal(installmentCountryOpen('NO'), false);
+    INSTALLMENT_COUNTRIES.NO = { open: true, rules: 'FI_OSKL', contract: 'FI_OSAMAKSU', contractLanguage: 'no', vatOnFirstInvoice: true };
     /* Полная запись — открыта, со своей валютой и ставкой из пакета. */
-    assert.equal(installmentCountry('SE').currency, 'SEK');
-    assert.equal(installmentCountry('SE').vatStandardBps, COUNTRY_PACKS.SE.vatStandardBps);
-    assert.equal(sameInstallmentCountry('SE', 'SE'), true);
-    assert.equal(sameInstallmentCountry('SE', 'FI'), false);
+    assert.equal(installmentCountry('NO').currency, 'NOK');
+    assert.equal(installmentCountry('NO').vatStandardBps, COUNTRY_PACKS.NO.vatStandardBps);
+    assert.equal(sameInstallmentCountry('NO', 'NO'), true);
+    assert.equal(sameInstallmentCountry('NO', 'FI'), false);
   } finally {
-    INSTALLMENT_COUNTRIES.SE = saved;
+    INSTALLMENT_COUNTRIES.NO = saved;
   }
 });
 
@@ -79,7 +80,11 @@ test('сделка — только внутри одной открытой с�
   assert.equal(sameInstallmentCountry('FI', 'FI'), true);
   assert.equal(sameInstallmentCountry('FI', 'fi'), true);
   assert.equal(sameInstallmentCountry('FI', 'SE'), false);
-  assert.equal(sameInstallmentCountry('SE', 'SE'), false);
+  assert.equal(sameInstallmentCountry('SE', 'DK'), false);
+  /* Швеция и Дания открыты (23.11.2026): сделка внутри страны возможна; Норвегия закрыта. */
+  assert.equal(sameInstallmentCountry('SE', 'se'), true);
+  assert.equal(sameInstallmentCountry('DK', 'DK'), true);
+  assert.equal(sameInstallmentCountry('NO', 'NO'), false);
   assert.equal(sameInstallmentCountry(null, null), false);
   assert.equal(sameInstallmentCountry('FI', null), false);
 });
@@ -112,7 +117,7 @@ test('правила Финляндии — расчёты закона о ра�
   assert.equal(rules.remedyAllowed, remedyAllowed);
   assert.equal(installmentRulesById('FI_OSKL'), rules);
   /* У закрытой страны правил нет: ни порогов на экране, ни сигнала продавцу. */
-  for (const country of ['SE', 'DE', 'XX', '', null, undefined]) assert.equal(installmentRules(country), null, String(country));
+  for (const country of ['NO', 'DE', 'XX', '', null, undefined]) assert.equal(installmentRules(country), null, String(country));
   assert.equal(installmentRulesById('toString'), null);
   assert.equal(installmentRulesById(null), null);
 });

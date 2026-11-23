@@ -15,12 +15,15 @@ import {
   INSTALLMENT_COUNTRIES,
   installmentCountry,
   installmentDay,
+  installmentInterestOffered,
+  installmentMoney,
   installmentTimeZone,
   installmentToday,
   openInstallmentCountries,
+  vatRateText,
 } from './countries.ts';
 import { COUNTRY_CONTRACTS, contractTemplateExists } from './contractText/index.ts';
-import { bare, contractPlainText } from './contractText/blocks.ts';
+import { bare, bareKr, contractPlainText } from './contractText/blocks.ts';
 import {
   COMMON_TEXTS,
   LAW_TEXTS,
@@ -34,6 +37,22 @@ import {
 import { documentKind, documentLabels, invoiceTexts, invoiceTextsExist, invoicesReady } from './invoiceTexts.ts';
 import { INSTALLMENT_RULES } from './rules.ts';
 
+/*
+ * Сумма так, как её печатает createFormat(intl).money (src/lib/format.ts):
+ * узкий знак валюты, копейки — только когда они есть. Сам модуль format.ts
+ * тесты не грузят (он тянет настройки приложения), поэтому правило повторено.
+ */
+const createFormat = (intl) => ({
+  money: (cents, currency) =>
+    new Intl.NumberFormat(intl, {
+      style: 'currency',
+      currency,
+      currencyDisplay: 'narrowSymbol',
+      minimumFractionDigits: cents % 100 === 0 ? 0 : 2,
+      maximumFractionDigits: cents % 100 === 0 ? 0 : 2,
+    }).format(cents / 100),
+});
+
 test('у каждой открытой страны есть правила, договор, тексты счетов и тексты кабинета на всех десяти языках', () => {
   assert.equal(locales.length, 10);
   for (const code of openInstallmentCountries()) {
@@ -44,10 +63,18 @@ test('у каждой открытой страны есть правила, д�
     assert.ok(invoicesReady(code), `${code}: не решён порядок первого счёта`);
     assert.ok(countryTextsExist(code), `${code}: нет текстов кабинета на всех языках`);
     assert.equal(invoiceTexts(code).country, code);
+    /* У страны, кроме Финляндии, — свой текст на каждом из десяти языков и договор на её языке. */
+    if (code !== 'FI') {
+      assert.equal(lawCountry(code), code);
+      for (const l of locales) assert.ok(LAW_TEXTS[code][l]?.intro, `${code}/${l}: нет текста кабинета`);
+      assert.ok(COUNTRY_CONTRACTS[c.contract], `${code}: нет текста договора`);
+      assert.equal(COUNTRY_CONTRACTS[c.contract].intl.slice(0, 2), c.contractLanguage, `${code}: язык чисел договора`);
+    }
   }
+  assert.deepEqual(openInstallmentCountries().sort(), ['DK', 'EE', 'FI', 'LV', 'SE']);
   /* Закрытая страна без текстов — не «готова», даже если её вписать в реестр. */
-  assert.equal(countryTextsExist('SE'), false);
-  assert.equal(invoiceTextsExist('SE'), false);
+  assert.equal(countryTextsExist('NO'), false);
+  assert.equal(invoiceTextsExist('NO'), false);
   assert.equal(contractTemplateExists(null), false);
   assert.equal(contractTemplateExists('toString'), false);
 });
@@ -107,7 +134,7 @@ const base = () => ({
 test('тексты по стране: финская компания получает тот же объект, эстонская и латвийская — свои', () => {
   const b = base();
   /* Финляндия, пусто и страна без текстов — основной набор без копии и без раздела country. */
-  for (const country of ['FI', 'fi', null, undefined, '', 'SE']) {
+  for (const country of ['FI', 'fi', null, undefined, '', 'NO']) {
     assert.equal(withCountryTexts(b, 'fi', country), b, String(country));
     assert.equal(withCountryTexts(b, 'ru', country).country, undefined);
   }
@@ -307,7 +334,7 @@ test('счета: тексты выбираются по стране прода
   assert.equal(invoiceTexts('FI').country, 'FI');
   assert.equal(invoiceTexts('EE').country, 'EE');
   assert.equal(invoiceTexts('lv').country, 'LV');
-  for (const country of [null, undefined, '', 'SE', 'toString']) assert.equal(invoiceTexts(country).country, 'FI', String(country));
+  for (const country of [null, undefined, '', 'NO', 'toString']) assert.equal(invoiceTexts(country).country, 'FI', String(country));
   /* Финский счёт — с подписями по умолчанию, остальные — со своими. */
   assert.equal(invoiceTexts('FI').labels, undefined);
   assert.equal(invoiceTexts('EE').labels.title, 'ARVE / INVOICE');
@@ -484,4 +511,393 @@ test('объявление берёт ставку НДС из одной фун
   assert.ok(/security definer/.test(accept) && /set search_path = ''/.test(accept));
   /* В plpgsql — без оператора case … end case. */
   assert.ok(!/end case/i.test(save) && !/end case/i.test(accept));
+});
+
+/* ── Швеция и Дания (23.11.2026) ──────────────────────────────────────── */
+
+test('реестр: Швеция и Дания — свои правила, договор на своём языке, кроны, весь НДС первым счётом', () => {
+  assert.deepEqual(INSTALLMENT_COUNTRIES.SE, {
+    open: true,
+    rules: 'SE_AVBL',
+    contract: 'SE_AVBETALNING',
+    contractLanguage: 'sv',
+    vatOnFirstInvoice: true,
+    interestOffered: false,
+  });
+  assert.deepEqual(INSTALLMENT_COUNTRIES.DK, { open: true, rules: 'DK_KAL', contract: 'DK_KREDITKOEB', contractLanguage: 'da', vatOnFirstInvoice: true });
+  assert.equal(installmentCountry('SE').currency, 'SEK');
+  assert.equal(installmentCountry('DK').currency, 'DKK');
+  assert.equal(installmentCountry('SE').vatStandardBps, 2500);
+  assert.equal(installmentCountry('DK').vatStandardBps, 2500);
+  assert.equal(installmentTimeZone('SE'), 'Europe/Stockholm');
+  assert.equal(installmentTimeZone('DK'), 'Europe/Copenhagen');
+  /* 22:30 UTC 31 декабря: в Хельсинки уже 1 января, в Стокгольме и Копенгагене ещё 31-е. */
+  const at = '2026-12-31T22:30:00Z';
+  assert.equal(installmentDay('FI', at), '2027-01-01');
+  assert.equal(installmentDay('SE', at), '2026-12-31');
+  assert.equal(installmentDay('DK', at), '2026-12-31');
+});
+
+test('Швеция: проценты не предлагаются — в коде и в базе одно правило', () => {
+  assert.equal(installmentInterestOffered('SE'), false);
+  assert.equal(installmentInterestOffered('se'), false);
+  for (const country of ['FI', 'EE', 'LV', 'DK', 'NO', 'XX', '', null, undefined]) assert.equal(installmentInterestOffered(country), true, String(country));
+  /* В базе — список стран без процентов; он совпадает с реестром. */
+  const sql = latestSql('create or replace function app.installment_interest_allowed(');
+  assert.ok(sql, 'функция app.installment_interest_allowed не найдена в миграциях');
+  const list = /not in\s*\(([^)]*)\)/.exec(sql.slice(sql.indexOf('$$')));
+  assert.ok(list, 'в теле функции нет списка стран');
+  const inDb = [...list[1].matchAll(/'([A-Z]{2})'/g)].map((m) => m[1]).sort();
+  const inCode = Object.keys(INSTALLMENT_COUNTRIES).filter((code) => !installmentInterestOffered(code)).sort();
+  assert.deepEqual(inDb, inCode);
+  assert.ok(/set search_path = ''/.test(sql));
+  /* Правило действует на объявление и на сделку — триггером, какой бы функцией условия ни писались. */
+  const guard = latestSql('create or replace function app.installment_interest_guard(');
+  assert.ok(guard.includes('app.installment_interest_allowed(') && guard.includes('new.annual_rate_bps <> 0'));
+  assert.ok(/security definer/.test(guard) && /set search_path = ''/.test(guard) && !/end case/i.test(guard));
+  const migration = readFileSync(new URL('../../../supabase/migrations/20261130100000_installment_open_se_dk.sql', import.meta.url), 'utf8');
+  for (const table of ['equipment_listings', 'installment_deals']) {
+    assert.ok(new RegExp(`before insert or update of annual_rate_bps, seller_company_id on public\\.${table}`).test(migration), table);
+  }
+  assert.ok(migration.includes('revoke all on function app.installment_interest_guard() from public, anon, authenticated;'));
+  assert.ok(migration.includes('revoke all on function app.installment_country_open(text) from public, anon, authenticated;'));
+  /* Договор Швеции без варианта с процентами: сделка с процентами договора не получает. */
+  assert.equal(COUNTRY_CONTRACTS.SE_AVBETALNING.interest, false);
+  assert.equal(COUNTRY_CONTRACTS.DK_KREDITKOEB.interest, undefined);
+});
+
+test('тексты кабинета Швеции и Дании: все поля на каждом языке, термины страны, ничего финского', () => {
+  for (const code of ['SE', 'DK']) {
+    const keys = Object.keys(LAW_TEXTS[code].en).sort();
+    for (const l of locales) {
+      const t = LAW_TEXTS[code][l];
+      assert.deepEqual(Object.keys(t).sort(), keys, `${code}/${l}`);
+      for (const [k, v] of Object.entries(t)) {
+        for (const text of Array.isArray(v) ? v : [v]) {
+          assert.ok(typeof text === 'string' && text.trim().length > 10, `${code}/${l}/${k}`);
+          assert.ok(!/Traficom|91\/1966|osamaksukauppalaki|ulosottomies|undefined/i.test(text), `${code}/${l}/${k}: финский термин`);
+          /* Суммы в текстах — только подстановками: ни «€», ни «евро» в кронных странах. */
+          assert.ok(!/€|\beur\b|евро|euro[ans]?\b/i.test(text), `${code}/${l}/${k}: евро в тексте`);
+        }
+      }
+      assert.ok(t.thresholdTitle.includes('{plate}'), `${code}/${l}`);
+      for (const ph of ['{tenth}', '{twentieth}', '{needed}']) assert.ok(t.thresholdsText.includes(ph), `${code}/${l}: ${ph}`);
+      assert.ok(typeof t.rateHint === 'string', `${code}/${l}: нет подсказки у процентов`);
+    }
+  }
+  for (const l of locales) {
+    const se = LAW_TEXTS.SE[l];
+    /* Швеция: закон и его термины; порог — от kreditfordran; покупатель записан владельцем. */
+    assert.ok(/1978:599/.test(se.intro) && se.intro.includes('återtaganderätt'), `SE/${l}: закон`);
+    assert.ok(se.thresholdsText.includes('kreditfordran') && /14/.test(se.thresholdsText), `SE/${l}: база порога`);
+    assert.ok(se.threshold.includes('Kronofogden') && se.threshold.includes('handräckning') && se.threshold.includes('avräkning'), `SE/${l}`);
+    assert.ok(/8/.test(se.threshold) && se.threshold.includes('dröjsmålsränta'), `SE/${l}: право покупателя погасить просрочку`);
+    assert.ok(se.checkRegister.includes('ägare') && se.checkRegister.includes('kreditgivare') && se.checkRegister.includes('Transportstyrelsen'), `SE/${l}`);
+    assert.ok(se.nextSteps.includes('ägare') && se.nextSteps.includes('10'), `SE/${l}: реестр и срок`);
+    assert.ok(se.checkInsurance.toLowerCase().includes('trafikförsäkring'), `SE/${l}`);
+    assert.ok(se.afterPaid.includes('Transportstyrelsen'), `SE/${l}`);
+    assert.ok(se.invoiceNote.includes('RF') && se.invoiceNote.includes('OCR'), `SE/${l}: ссылка платежа`);
+    assert.ok(se.rateHint.includes('0'), `SE/${l}`);
+    assert.ok(se.checkBefore === undefined, `SE/${l}`);
+    const dk = LAW_TEXTS.DK[l];
+    /* Дания: закон, 30 дней, Bilbogen до передачи, fogedretten, 14 дней на выкуп. */
+    assert.ok(dk.intro.includes('kreditaftaleloven') && dk.intro.includes('ejendomsforbehold') && dk.intro.includes('Bilbogen'), `DK/${l}: закон`);
+    assert.ok(/30/.test(dk.thresholdsText) && !/14/.test(dk.thresholdsText), `DK/${l}: 30 дней`);
+    assert.ok(dk.threshold.includes('fogedretten') && dk.threshold.includes('§ 37') && dk.threshold.includes('indløsning') && /14/.test(dk.threshold), `DK/${l}`);
+    assert.equal(dk.checkBefore.length, 1, `DK/${l}`);
+    assert.ok(dk.checkBefore[0].includes('Bilbogen') && dk.checkBefore[0].includes('tinglysning'), `DK/${l}: Bilbogen в чек-листе`);
+    assert.ok(dk.nextSteps.includes('Bilbogen') && /1[.,]5 %/.test(dk.nextSteps) && /1[ ,.]?850/.test(dk.nextSteps), `DK/${l}: сбор`);
+    assert.ok(dk.checkRegister.includes('bruger') && dk.checkRegister.includes('ejer') && dk.checkRegister.includes('5.3'), `DK/${l}: реестр нейтрально`);
+    assert.ok(dk.checkInsurance.includes('ansvarsforsikring'), `DK/${l}`);
+    assert.ok(dk.afterPaid.includes('aflysning') && dk.afterPaid.includes('Bilbogen'), `DK/${l}`);
+    assert.ok(dk.invoiceNote.includes('RF') && dk.invoiceNote.includes('§ 27'), `DK/${l}: счёт`);
+    assert.ok(dk.rateHint.includes('§ 27'), `DK/${l}`);
+  }
+  /* Швеция: ни на одном языке не сказано, что продавец остаётся владельцем в реестре. */
+  assert.ok(!/seller (stays|remains) the (registered )?owner/i.test(LAW_TEXTS.SE.en.nextSteps + LAW_TEXTS.SE.en.checkRegister));
+  assert.ok(!/продавец остаётся (собственником|владельцем)/i.test(LAW_TEXTS.SE.ru.nextSteps + LAW_TEXTS.SE.ru.checkRegister));
+  assert.ok(!/säljaren (är fortfarande|står kvar som|förblir) ägare/i.test(LAW_TEXTS.SE.sv.nextSteps + LAW_TEXTS.SE.sv.checkRegister));
+  /* Неподтверждённое названо неподтверждённым. */
+  assert.ok(/not confirmed/.test(LAW_TEXTS.SE.en.nextSteps) && /not been confirmed/.test(LAW_TEXTS.SE.en.thresholdsText));
+  assert.ok(/not confirmed/.test(LAW_TEXTS.DK.en.nextSteps) && /not confirmed|has not confirmed/.test(LAW_TEXTS.DK.en.invoiceNote));
+  assert.ok(/не подтвержд/.test(LAW_TEXTS.DK.ru.nextSteps) && /не подтвердило/.test(LAW_TEXTS.DK.ru.invoiceNote));
+});
+
+test('тексты по стране: шведская и датская компания получают свои; у Дании в чек-листе на пункт больше', () => {
+  const b = base();
+  for (const code of ['SE', 'DK']) {
+    for (const l of locales) {
+      const law = LAW_TEXTS[code][l];
+      const t = withCountryTexts(b, l, code);
+      assert.notEqual(t, b);
+      assert.equal(t.intro, law.intro);
+      assert.equal(t.deal.contract, law.contract);
+      assert.equal(t.deal.nextSteps, law.nextSteps);
+      assert.equal(t.notify.thresholdBody, law.threshold);
+      assert.equal(t.stage3.remedy, law.threshold);
+      assert.ok(t.notify.paidOffBody.endsWith(law.afterPaid));
+      assert.equal(t.termination.settlement, law.settlement);
+      assert.deepEqual(t.termination.reasons, { REPOSSESSED: law.reasonRepossessed, AGREEMENT: 'FI agr' });
+      /* Подсказка у процентов — своя у страны, остальное общее — как у Эстонии и Латвии. */
+      assert.deepEqual(t.country, {
+        code,
+        thresholdsText: law.thresholdsText,
+        rateHint: law.rateHint,
+        invoiceNote: law.invoiceNote,
+        legalNotice: LEGAL_NOTICE[l],
+      });
+      assert.equal(t.stage3.payoff, COMMON_TEXTS[l].payoff);
+    }
+  }
+  /* Швеция: чек-лист той же длины. Дания: перед реестром — Bilbogen; остальные пункты на своих местах. */
+  assert.deepEqual(withCountryTexts(b, 'en', 'SE').stage3.checklist, ['c0', 'c1', LAW_TEXTS.SE.en.checkRegister, LAW_TEXTS.SE.en.checkInsurance, 'c4']);
+  assert.deepEqual(withCountryTexts(b, 'da', 'DK').stage3.checklist, [
+    'c0',
+    'c1',
+    LAW_TEXTS.DK.en.checkBefore[0],
+    LAW_TEXTS.DK.en.checkRegister,
+    LAW_TEXTS.DK.en.checkInsurance,
+    'c4',
+  ]);
+  /* Эстония и Латвия: без своих пунктов и своей подсказки — как были. */
+  for (const code of ['EE', 'LV']) {
+    assert.equal(withCountryTexts(b, 'en', code).stage3.checklist.length, 5);
+    assert.equal(withCountryTexts(b, 'en', code).country.rateHint, COMMON_TEXTS.en.rateHint);
+    assert.equal(LAW_TEXTS[code].en.rateHint, undefined);
+  }
+  assert.deepEqual(b, base());
+  /* Уведомления: свой код страны и язык компании. */
+  assert.equal(countryEventCode('threshold', 'SE'), 'installment.threshold.se');
+  assert.equal(countryEventCode('paid_off', 'dk'), 'installment.paid_off.dk');
+  assert.equal(countryNoticeLocale('sv', 'SE'), 'sv');
+  assert.equal(countryNoticeLocale('da', 'DK'), 'en');
+  assert.equal(countryNoticeLocale('ru', 'DK'), 'ru');
+  const fi = readFileSync(new URL('../i18n/dictionaries/fi.ts', import.meta.url), 'utf8');
+  for (const code of ['installment.threshold.se', 'installment.threshold.dk', 'installment.paid_off.se', 'installment.paid_off.dk']) {
+    assert.ok(!fi.includes(`'event.${code}'`), code);
+  }
+});
+
+/* Данные договора в кронах — в том виде, в каком их отдаёт contract.ts для sv-SE и da-DK. */
+function kronorInput(intl, over = {}) {
+  const f = createFormat(intl);
+  const cur = intl === 'sv-SE' ? 'SEK' : 'DKK';
+  const kr = (cents) => f.money(cents, cur);
+  const date = (y, m, d) => (intl === 'sv-SE' ? `${y}-${m}-${d}` : `${d}.${m}.${y}`);
+  let balance = 60_000_000;
+  const plan = Array.from({ length: 24 }, (_, i) => {
+    balance -= 2_500_000;
+    return {
+      n: i + 1,
+      due: date(i < 12 ? 2027 : 2028, String((i % 12) + 1).padStart(2, '0'), '01'),
+      principal: kr(2_500_000),
+      interest: '–',
+      total: kr(2_500_000),
+      balance: kr(balance),
+    };
+  });
+  return {
+    ...contractInput(),
+    number: 'OS-2026-00031',
+    date: date(2026, 11, 23),
+    seller: { name: 'Säljaren Åkeri AB', businessId: '556123-4567', address: 'Hamngatan 1, 411 14 Göteborg', vatRegistered: true, email: 'a@exempel.se', phone: '' },
+    buyer: { name: 'Køber Transport Øster Å A/S', businessId: '87654321', address: 'Åboulevarden 9, 5000 Odense C', vatRegistered: true, email: 'b@eksempel.dk', phone: '' },
+    price: {
+      net: kr(75_000_000),
+      vatLabel: '',
+      vat: kr(18_750_000),
+      gross: kr(93_750_000),
+      downGross: kr(33_750_000),
+      rest: kr(60_000_000),
+      interestTotal: null,
+      installmentPrice: kr(93_750_000),
+      tenth: kr(intl === 'sv-SE' ? 6_000_000 : 9_375_000),
+      twentieth: kr(intl === 'sv-SE' ? 3_000_000 : 4_687_500),
+      creditClaim: kr(60_000_000),
+      totalPayable: kr(93_750_000),
+    },
+    vatPercent: '25',
+    down: kr(15_000_000),
+    handover: date(2026, 12, '01'),
+    firstInvoiceNumber: '2026-0007',
+    plan,
+    planTotals: { principal: kr(60_000_000), interest: '–', all: kr(93_750_000) },
+    ...over,
+  };
+}
+
+test('суммы в кронах: знак валюты страны, число без знака для договора', () => {
+  const se = createFormat('sv-SE').money(75_000_000, 'SEK');
+  const dk = createFormat('da-DK').money(75_000_000, 'DKK');
+  assert.ok(/kr$/.test(se) && !se.includes('€'), se);
+  assert.ok(/kr\.$/.test(dk) && !dk.includes('€'), dk);
+  assert.equal(bareKr(se).replace(/\s/g, ' '), '750 000');
+  assert.equal(bareKr(dk), '750.000');
+  assert.equal(bareKr(createFormat('da-DK').money(4_687_550, 'DKK')), '46.875,50');
+  assert.equal(bareKr('–'), '–');
+  /* Кабинет: сумма в валюте сделки на любом языке, без евро. */
+  for (const l of locales) {
+    assert.ok(!installmentMoney(l, 'SEK')(75_000_000).includes('€'), l);
+    assert.ok(!installmentMoney(l, 'DKK', true)(75_000_000).includes('€'), l);
+  }
+  /* Строка «НДС» у сделки не из Финляндии — ставка сделки, а не финские 25,5 %. */
+  assert.equal(vatRateText(2500, 'sv'), '25 %');
+  assert.equal(vatRateText(2400, 'en'), '24 %');
+  /* Финляндия не тронута: «евро» по-прежнему убирает bare. */
+  assert.equal(bare('12 345,67 €'), '12 345,67');
+});
+
+test('договор Швеции: величины закона, пороги от kreditfordran, покупатель — владелец в реестре, без процентов', () => {
+  assert.equal(COUNTRY_CONTRACTS.SE_AVBETALNING.intl, 'sv-SE');
+  assert.equal(COUNTRY_CONTRACTS.SE_AVBETALNING.isoDates, true);
+  const doc = COUNTRY_CONTRACTS.SE_AVBETALNING.build(kronorInput('sv-SE'));
+  const text = contractPlainText(doc).replace(/[\u00a0\u202f]/g, ' ');
+  assert.equal(doc.pages.length, 2);
+  assert.ok(text.includes('AVTAL OM AVBETALNINGSKÖP'));
+  assert.ok(text.includes('SÄLJAREN FÖRBEHÅLLER SIG RÄTTEN ATT ÅTERTA FORDONET') && text.includes('ÄGANDERÄTTEN ÖVERGÅR TILL KÖPAREN FÖRST NÄR HELA KREDITFORDRAN ÄR BETALD.'));
+  assert.ok(text.includes('Avtal nr OS-2026-00031 · Datum 2026-11-23'));
+  assert.ok(text.includes('Organisationsnummer: 556123-4567'));
+  /* Четыре величины закона (11 §) — в п. 4.1. */
+  assert.ok(text.includes('Kontantpris (inklusive mervärdesskatt): 937 500'));
+  assert.ok(text.includes('innehåller ingen mervärdesskatt): 600 000'));
+  assert.ok(text.includes('inga andra avgifter): ingen kreditkostnad'));
+  assert.ok(text.includes('Kreditfordran (kreditbelopp och kreditkostnad): 600 000'));
+  assert.ok(text.includes('Mervärdesskatt 25 % på 750 000: 187 500'));
+  assert.ok(text.includes('Avbetalning 1–23: vardera 25 000 kronor, förfallodag den 1 i varje månad, första gången 2027-01-01.'));
+  assert.ok(text.includes('Sista avbetalningen 24: 25 000 kronor, förfallodag 2028-12-01.'));
+  assert.ok(text.includes('den första fakturan nr 2026-0007.'));
+  assert.ok(text.includes('Ingen ränta tas ut på kreditbeloppet.'));
+  /* Пороги — от kreditfordran: 60 000 и 30 000, а не 93 750 от цены. */
+  assert.ok(text.includes('En tiondel av kreditfordran enligt detta avtal är 60 000 kronor och en tjugondel 30 000 kronor.'));
+  assert.ok(text.includes('sedan mer än fjorton dagar') && text.includes('till mer än en tiondel av hela kreditfordran'));
+  assert.ok(!text.includes('93 750 kronor'));
+  /* Право покупателя погасить просрочку, обязательный расчёт, только Kronofogden. */
+  assert.ok(text.includes('(8 § avbetalningsköplagen)') && text.includes('ska avräkning göras mellan parterna'));
+  assert.ok(text.includes('Säljaren får inte på egen hand ta fordonet i besittning mot köparens vilja.'));
+  assert.ok(text.includes('ansöker säljaren om handräckning hos Kronofogdemyndigheten'));
+  /* Реестр: владельцем записывается покупатель; срок — десять дней. */
+  assert.ok(text.includes('Köparen registreras därmed som fordonets ägare i vägtrafikregistret'));
+  assert.ok(text.includes('inom tio dagar från dagen för ägarbytet'));
+  /* Финского пункта о счёте покупателя при возврате нет. */
+  assert.ok(text.includes('köparen utfärdar ingen faktura för återtagandet'));
+  assert.ok(text.includes('Aivomaa Oy (RAHTIS) är inte part i detta avtal.'));
+  assert.ok(text.includes('Bilaga 1. Betalningsplan') && text.includes('Bilaga 2. Överlämnandeprotokoll'));
+  assert.ok(text.includes('Kreditfordran (kreditbelopp och kreditkostnad): 600 000 kr. En tiondel: 60 000 kr. En tjugondel: 30 000 kr.'));
+  /* Ни евро, ни заполнителей шаблона, ни финских слов. */
+  assert.ok(!/€|\beuro|\bEUR\b/i.test(text), 'евро в шведском договоре');
+  assert.ok(!/\[[^\]]*\]/.test(text), 'остался заполнитель в квадратных скобках');
+  assert.ok(!/kyllä|merkki, malli|pp\.kk\.vvvv|määrä|luettelo|nimi\b|klo |Alternativ|Valfritt/i.test(text), 'остался заполнитель шаблона');
+  /* Все буквы шведского алфавита на месте. */
+  for (const ch of 'åäöÅÄÖ') assert.ok(text.includes(ch), ch);
+});
+
+test('договор Дании: 30 дней и доля всей суммы к уплате, Bilbogen до передачи, fogedretten, проценты отдельно', () => {
+  assert.equal(COUNTRY_CONTRACTS.DK_KREDITKOEB.intl, 'da-DK');
+  const doc = COUNTRY_CONTRACTS.DK_KREDITKOEB.build(kronorInput('da-DK'));
+  const text = contractPlainText(doc).replace(/[\u00a0\u202f]/g, ' ');
+  assert.equal(doc.pages.length, 2);
+  assert.ok(text.includes('KØBEKONTRAKT MED EJENDOMSFORBEHOLD') && text.includes('(kreditkøb mellem erhvervsdrivende)'));
+  assert.ok(text.includes('SÆLGER FORBEHOLDER SIG EJENDOMSRETTEN TIL DET SOLGTE, INDTIL HELE KØBESUMMEN MED RENTER OG OMKOSTNINGER ER BETALT.'));
+  assert.ok(text.includes('Kontrakt nr. OS-2026-00031 · Dato 23.11.2026'));
+  assert.ok(text.includes('CVR-nr.: 87654321'));
+  assert.ok(text.includes('Moms 25 % af 750.000: 187.500'));
+  assert.ok(text.includes('Kontantpris i alt (inkl. moms): 937.500'));
+  assert.ok(text.includes('rente efter punkt 4.4 ved betaling efter betalingsplanen: ingen rente'));
+  assert.ok(text.includes('Samlet beløb, der skal betales (udbetaling, afdrag 1–24 og rente): 937.500'));
+  assert.ok(text.includes('Afdrag 1–23: hver 25.000 kr., forfalder den 1. i hver måned, første gang 01.01.2027.'));
+  assert.ok(text.includes('Sidste afdrag 24: 25.000 kr., forfalder 01.12.2028.'));
+  assert.ok(text.includes('Restkøbesummen forrentes ikke.'));
+  /* Порог: 30 дней, 1/10 и 1/20 всей суммы к уплате, включая первый взнос. */
+  assert.ok(text.includes('udeblevet med et beløb 30 dage efter dets forfaldstid'));
+  assert.ok(text.includes('mindst en tiendedel af det samlede beløb, der skal betales, inklusive udbetalingen'));
+  assert.ok(text.includes('En tiendedel af det samlede beløb efter denne kontrakt er 93.750 kr., og en tyvendedel er 46.875 kr.'));
+  /* Bilbogen — условие передачи; изъятие — только через fogedretten; 14 дней на выкуп. */
+  assert.ok(text.includes('3. ejendomsforbeholdet er anmeldt til tinglysning i bilbogen (punkt 5.2);'));
+  assert.ok(text.includes('Ejendomsforbeholdet anmeldes af sælger til tinglysning i bilbogen før overgivelsen'));
+  assert.ok(text.includes('Sælger tager ikke køretøjet tilbage uden fogedrettens medvirken mod købers vilje.'));
+  assert.ok(text.includes('kan køber i 14 dage derefter indløse det'));
+  assert.ok(text.includes('(kreditaftalelovens § 37)') && text.includes('Ved tilbagetagelse opgøres parternes mellemværende.'));
+  assert.ok(text.includes('Aivomaa Oy (RAHTIS) er ikke part i denne kontrakt.'));
+  assert.ok(text.includes('Bilag 1. Betalingsplan') && text.includes('Bilag 2. Overdragelsesprotokol'));
+  assert.ok(text.includes('efter at købekontrakt nr. OS-2026-00031 var underskrevet, og ejendomsforbeholdet var anmeldt til tinglysning.'));
+  assert.ok(!/€|\beuro|\bEUR\b/i.test(text), 'евро в датском договоре');
+  assert.ok(!/\[[^\]]*\]/.test(text), 'остался заполнитель в квадратных скобках');
+  assert.ok(!/kyllä|merkki, malli|pp\.kk\.vvvv|määrä|luettelo|nimenselvennys|kunkin hinta|Alternativ|Valgfrit/i.test(text), 'остался заполнитель шаблона');
+  for (const ch of 'æøåÆØÅ') assert.ok(text.includes(ch), ch);
+  /* С процентами — вариант B п. 4.4: сумма процентов и ссылка на momsloven; база порога с процентами. */
+  const f = createFormat('da-DK');
+  const withRate = kronorInput('da-DK', { ratePercent: '6,5' });
+  withRate.price = { ...withRate.price, interestTotal: f.money(4_100_000, 'DKK'), totalPayable: f.money(97_850_000, 'DKK'), tenth: f.money(9_785_000, 'DKK'), twentieth: f.money(4_892_500, 'DKK') };
+  const rated = contractPlainText(COUNTRY_CONTRACTS.DK_KREDITKOEB.build(withRate)).replace(/[\u00a0\u202f]/g, ' ');
+  assert.ok(rated.includes('med en fast årlig rente på 6,5 procent'));
+  assert.ok(rated.includes('udgør renten i alt 41.000 kr. Renten indgår ikke i momsgrundlaget (momslovens § 27, stk. 3, nr. 4).'));
+  assert.ok(rated.includes('(udbetaling, afdrag 1–24 og rente): 978.500'));
+  assert.ok(rated.includes('er 97.850 kr., og en tyvendedel er 48.925 kr.'));
+});
+
+test('счета Швеции и Дании: свой язык и закон, кроны, RF без OCR и FI-kort, финского текста нет', () => {
+  const se = invoiceTexts('SE');
+  const dk = invoiceTexts('dk');
+  assert.equal(se.country, 'SE');
+  assert.equal(dk.country, 'DK');
+  assert.equal(se.intl, 'sv-SE');
+  assert.equal(dk.intl, 'da-DK');
+  assert.equal(se.date('2027-01-05'), '2027-01-05');
+  assert.equal(dk.date('2027-01-05'), '05.01.2027');
+  assert.equal(se.labels.title, 'FAKTURA / INVOICE');
+  assert.equal(dk.labels.title, 'FAKTURA / INVOICE');
+  for (const t of [se, dk]) assert.deepEqual(Object.keys(t.labels).sort(), Object.keys(FI_INVOICE_LABELS).sort(), t.country);
+  assert.equal(se.vatLabel('25'), 'Moms / VAT 25 %');
+  assert.equal(dk.vatLabel(null), 'Moms / VAT 0 %');
+  assert.equal(se.unit, 'st');
+  assert.equal(dk.unit, 'stk.');
+  /* Счёт — всегда счёт: платёжного уведомления в этих странах нет. */
+  assert.equal(se.notice, null);
+  assert.equal(dk.notice, null);
+  for (const code of ['SE', 'DK']) assert.equal(documentKind(code, '2030-01-01'), 'INVOICE', code);
+  /* Ссылка платежа — RF, как у Эстонии и Латвии. */
+  for (const code of ['SE', 'DK']) assert.match(paymentReference('2026-0007', code), /^RF\d{2}202600075$/, code);
+  const kr = (intl, cur) => (cents) => createFormat(intl).money(cents, cur);
+  const args = (m) => ({ down: m(15_000_000), vat: m(18_750_000), rest: m(60_000_000), months: 24, contract: 'OS-2026-00031', vatMode: 'STANDARD' });
+  const seNote = se.first.note(args(kr('sv-SE', 'SEK'))).replace(/[\u00a0\u202f]/g, ' ');
+  const dkNote = dk.first.note(args(kr('da-DK', 'DKK'))).replace(/[  ]/g, ' ');
+  assert.ok(seNote.includes('5 kap. 3 § andra stycket 2 och 7 kap. 7 § mervärdesskattelagen (2023:200)'));
+  assert.ok(seNote.includes('150 000 kr av priset + mervärdesskatt 187 500 kr') && seNote.includes('Kreditbeloppet 600 000 kr'));
+  assert.ok(seNote.includes('inget OCR-nummer och inget bankgiro'));
+  assert.ok(dkNote.includes('momslovens § 4, stk. 3, nr. 2, og § 23'));
+  assert.ok(dkNote.includes('150.000 kr. af købesummen + moms 187.500 kr.') && dkNote.includes('Restkøbesummen 600.000 kr.'));
+  assert.ok(dkNote.includes('anmeldt til tinglysning i bilbogen'));
+  /* Дания: обязательность электронного счёта не подтверждена — так и написано, на каждом документе. */
+  assert.ok(dkNote.includes('er ikke bekræftet af RAHTIS') && dk.payment.note({ firstNumber: 'f' }).includes('er ikke bekræftet af RAHTIS'));
+  assert.ok(dkNote.includes('ingen FI-betalingslinje (+71)'));
+  /* Проценты: в Дании — вне базы НДС при отдельной строке; в Швеции о налоге на проценты ничего не утверждается. */
+  assert.ok(dk.payment.interestLine.includes('momslovens § 27, stk. 3, nr. 4'));
+  assert.ok(!/moms|mervärdesskatt|VAT/i.test(se.payment.interestLine));
+  const dump = (t) =>
+    [
+      t.first.line({ what: 'w', contract: 'c' }),
+      t.first.note(args((c) => String(c))),
+      t.first.mailSubject({ number: 'n', seller: 's', contract: 'c' }),
+      t.first.mailText({ number: 'n', contract: 'c', what: 'w', seller: 's', sellerEmail: 'e', payNow: 'p', due: 'd', iban: 'i', reference: 'r' }),
+      t.payment.line({ n: 1, months: 2, contract: 'c', what: 'w' }),
+      t.payment.interestLine,
+      t.payment.note({ firstNumber: 'f' }),
+      t.payment.mailSubject({ seller: 's', n: 1, months: 2, contract: 'c' }),
+      t.payment.mailText({ contract: 'c', n: 1, months: 2, what: 'w', total: 't', due: 'd', iban: 'i' }),
+      t.payment.mailFooter({ number: 'n', reference: 'r' }),
+      t.credit.note({ original: 'o', originalDate: 'd', contract: 'c', refund: null }),
+      t.credit.note({ original: 'o', originalDate: 'd', contract: 'c', refund: '1 kr' }),
+      t.credit.mailSubject({ seller: 's', original: 'o' }),
+      t.credit.mailText({ original: 'o', contract: 'c' }),
+      t.credit.title,
+      t.credit.linePrefix,
+      ...Object.values(t.labels).flat(),
+    ].join('\n');
+  for (const t of [se, dk]) {
+    const all = dump(t);
+    assert.ok(!/AVL|arvonlisäver|osamaksu|Lasku|viitenumero|Hyvitys|Y-tunnus|undefined|€|\beuro/i.test(all), `${t.country}: финский текст или евро в счёте`);
+    assert.ok(all.includes('RAHTIS (Aivomaa Oy)'), t.country);
+    /* Название машины вынимается из строки первого счёта по « – » (firstInvoice.ts). */
+    assert.equal(t.first.line({ what: 'Volvo FH ABC 12D', contract: 'c' }).split(' – ')[0], 'Volvo FH ABC 12D');
+  }
 });

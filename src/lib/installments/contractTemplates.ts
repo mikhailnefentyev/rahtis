@@ -16,6 +16,8 @@ import { installmentCountryEntry, type InstallmentContractId } from './countries
  *   · EE_JARELMAKS, LV_NOMAKSA — тексты contractText/ee.ts и lv.ts, печатает
  *     CountryContractPdf.tsx: числа на языке договора, даты «дд.мм.гггг» по
  *     часовому поясу страны.
+ *   · SE_AVBETALNING, DK_KREDITKOEB — тексты contractText/se.ts и dk.ts тем
+ *     же компонентом: суммы в кронах, у Швеции даты «ГГГГ-ММ-ДД».
  * Новая страна — текст договора в contractText/ и запись в COUNTRY_CONTRACTS.
  */
 type ContractTemplate = {
@@ -27,7 +29,7 @@ function countryTemplate(id: CountryContractId): ContractTemplate {
   const contract = COUNTRY_CONTRACTS[id];
   return {
     render: (deal) => {
-      const input = contractInput(deal, { intl: contract.intl, paddedDates: true });
+      const input = contractInput(deal, { intl: contract.intl, paddedDates: true, isoDates: contract.isoDates });
       /*
        * Тексты Эстонии и Латвии написаны для обычного НДС: другого режима в
        * кабинете нет (решение 22.11.2026), а варианты шаблона для маржи и
@@ -35,6 +37,8 @@ function countryTemplate(id: CountryContractId): ContractTemplate {
        * договора не получает — лучше 404, чем неверный текст о налоге.
        */
       if (!input || input.vatMode !== 'STANDARD') return null;
+      /* Швеция (23.11.2026): в договоре нет варианта с процентами — сделка с процентами договора не получает. */
+      if (contract.interest === false && input.ratePercent) return null;
       return {
         document: CountryContractPdf(contract.build(input)),
         number: input.number,
@@ -53,6 +57,8 @@ const TEMPLATES: Record<InstallmentContractId, ContractTemplate> = {
   },
   EE_JARELMAKS: countryTemplate('EE_JARELMAKS'),
   LV_NOMAKSA: countryTemplate('LV_NOMAKSA'),
+  SE_AVBETALNING: countryTemplate('SE_AVBETALNING'),
+  DK_KREDITKOEB: countryTemplate('DK_KREDITKOEB'),
 };
 
 /**

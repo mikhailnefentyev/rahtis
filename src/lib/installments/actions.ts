@@ -20,7 +20,7 @@ import {
 import { announceListing } from './announce';
 import { buildSchedule, type VatMode } from './calc';
 import { fill, installmentUiCopy } from './copy';
-import { installmentCountry } from './countries';
+import { installmentCountry, installmentInterestOffered } from './countries';
 import { installmentCountryCopy } from './countryCopy';
 import { countryEventCode, countryNoticeLocale } from './countryTexts';
 import { createFirstInvoice } from './firstInvoice';
@@ -68,8 +68,11 @@ function isoDate(value: string): string | null {
   return /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : null;
 }
 
-/** Условия из формы; null — что-то не так. Проверка — тем же калькулятором, что видит пользователь. */
-function readTerms(fd: FormData, vatMode: VatMode, vatBps: number, withDates: boolean) {
+/**
+ * Условия из формы; null — что-то не так. Проверка — тем же калькулятором, что видит пользователь.
+ * country — страна сделки: где проценты не предлагаются (Швеция, 23.11.2026), ставка может быть только 0.
+ */
+function readTerms(fd: FormData, vatMode: VatMode, vatBps: number, withDates: boolean, country: string | null | undefined) {
   const price = eurosToCents(str(fd, 'price'));
   const down = str(fd, 'down') ? eurosToCents(str(fd, 'down')) : 0;
   const finalRaw = str(fd, 'final');
@@ -79,6 +82,7 @@ function readTerms(fd: FormData, vatMode: VatMode, vatBps: number, withDates: bo
   const handover = withDates ? isoDate(str(fd, 'handover')) : '2099-01-01';
   const firstDue = withDates ? isoDate(str(fd, 'first_due')) : '2099-02-01';
   if (price == null || down == null || final === undefined || rate == null || !handover || !firstDue) return null;
+  if (rate !== 0 && !installmentInterestOffered(country)) return null;
   const schedule = buildSchedule({
     priceCents: price,
     vatMode,
@@ -197,7 +201,7 @@ export async function saveListingAction(_prev: ActionState, fd: FormData): Promi
   const vatMode = str(fd, 'vat_mode') as VatMode;
   if (!vatModeAllowedForNew(vatMode)) return { error: c.listing.error, saved: false };
   /* Ставка для проверки калькулятором — обычная ставка страны продавца из её пакета; в базе — тоже по стране продавца. */
-  const terms = readTerms(fd, vatMode, country.vatStandardBps, false);
+  const terms = readTerms(fd, vatMode, country.vatStandardBps, false, country.code);
   const odometer = str(fd, 'odometer') ? Number(str(fd, 'odometer').replace(/\s/g, '')) : null;
   if (!terms || (odometer != null && (!Number.isInteger(odometer) || odometer < 0))) return { error: c.listing.error, saved: false };
 
@@ -273,7 +277,7 @@ export async function startDealAction(_prev: ActionState, fd: FormData): Promise
   /* Новая сделка — только с обычным НДС (решение 22.11.2026): по старому объявлению с другим режимом предложение не принимается. */
   const vatMode = str(fd, 'vat_mode') as VatMode;
   if (!vatModeAllowedForNew(vatMode)) return { error: c.listing.vatOld, saved: false };
-  const terms = readTerms(fd, vatMode, Number(str(fd, 'vat_bps')) || 0, true);
+  const terms = readTerms(fd, vatMode, Number(str(fd, 'vat_bps')) || 0, true, companyCountry);
   if (!terms) return { error: c.listing.error, saved: false };
 
   const supabase = await createClient();
@@ -313,7 +317,7 @@ export async function proposeTermsAction(_prev: ActionState, fd: FormData): Prom
 
   /* Уже начатая сделка идёт со своим режимом НДС до конца — режим здесь нужен только калькулятору, в базе он не меняется. */
   const vatMode = str(fd, 'vat_mode') as VatMode;
-  const terms = readTerms(fd, VAT_MODES.includes(vatMode) ? vatMode : 'STANDARD', Number(str(fd, 'vat_bps')) || 0, true);
+  const terms = readTerms(fd, VAT_MODES.includes(vatMode) ? vatMode : 'STANDARD', Number(str(fd, 'vat_bps')) || 0, true, companyCountry);
   if (!terms) return { error: c.listing.error, saved: false };
   const dealId = str(fd, 'deal_id');
 

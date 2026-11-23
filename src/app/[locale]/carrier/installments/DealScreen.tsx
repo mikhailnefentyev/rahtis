@@ -23,7 +23,7 @@ import {
 } from '@/lib/installments/calc';
 import { dealTermination, dealVehicle, loadDeal } from '@/lib/installments/contract';
 import { fill, installmentUiCopy } from '@/lib/installments/copy';
-import { installmentCurrency, installmentDay, installmentMoney, installmentToday } from '@/lib/installments/countries';
+import { installmentCurrency, installmentDay, installmentMoney, installmentToday, vatRateText } from '@/lib/installments/countries';
 import { installmentRules } from '@/lib/installments/rules';
 import { isLocale } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/server';
@@ -143,14 +143,19 @@ export async function DealScreen({
     today,
   );
   const lateById = new Map(overdue.map((p) => [p.id, p.lateDays]));
-  const priceGross = 'error' in schedule ? deal.price_cents : schedule.installmentPriceCents;
+  /*
+   * От чего считается доля просрочки — по правилам страны (23.11.2026): в
+   * Финляндии и Эстонии цена с НДС, как было, в Швеции — kreditfordran, в
+   * Дании — вся сумма к уплате (rules.ts, base).
+   */
+  const thresholdBase = 'error' in schedule || !rules ? deal.price_cents : rules.base(schedule);
   const remedy =
     deal.status === 'ACTIVE' &&
     rules !== null &&
     rules.remedyAllowed(
       overdue.map((p) => ({ dueDate: p.lateFrom, unpaidCents: p.principal_cents })),
       today,
-      priceGross,
+      thresholdBase,
       unpaid.reduce((sum, p) => sum + p.principal_cents, 0),
     );
   /* Проценты идут с фактической передачи, если она позже согласованной, — как сдвинут график (payments.ts ensureSchedule). */
@@ -180,7 +185,8 @@ export async function DealScreen({
   /* Срок первого взноса — фактический, как только график построен: при поздней передаче он сдвинут. */
   const rows: [string, string][] = [
     [ui.listing.price, eur(deal.price_cents)],
-    [ui.listing.vatMode, calc.f.vatModes[deal.vat_mode as VatMode]],
+    /* У сделки не из Финляндии — ставка сделки: подпись словаря написана про финские 25,5 % (23.11.2026). */
+    [ui.listing.vatMode, ui.country && deal.vat_mode === 'STANDARD' ? vatRateText(deal.vat_bps, locale) : calc.f.vatModes[deal.vat_mode as VatMode]],
     [ui.listing.down, eur(deal.down_payment_cents)],
     [ui.listing.months, String(deal.months)],
     [ui.listing.final, deal.final_cents != null ? eur(deal.final_cents) : '—'],

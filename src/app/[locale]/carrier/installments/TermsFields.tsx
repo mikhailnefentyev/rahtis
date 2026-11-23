@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import { Field, Input } from '@/components/ui';
 import { eurosToCents } from '@/lib/economics/money';
 import { addMonths, buildSchedule, type VatMode } from '@/lib/installments/calc';
-import { installmentMoney } from '@/lib/installments/countries';
+import { installmentInterestOffered, installmentMoney, vatRateText } from '@/lib/installments/countries';
 import { installmentRulesById } from '@/lib/installments/rules';
 import { fill, type InstallmentUiCopy } from '@/lib/installments/copy';
 import type { InstallmentCopy } from '@/lib/landing/installment';
@@ -52,7 +52,13 @@ export function TermsFields({
   const [down, setDown] = useState(defaults.down);
   const [months, setMonths] = useState(defaults.months);
   const [final, setFinal] = useState(defaults.final);
-  const [rate, setRate] = useState(defaults.rate);
+  /*
+   * Швеция (23.11.2026): проценты не предлагаются — как они облагаются НДС,
+   * не выяснено. Ставка стоит 0 и не меняется; почему — в подсказке страны.
+   * То же правило проверяют сервер (actions.ts) и база.
+   */
+  const rateFixed = !installmentInterestOffered(ui.country?.code);
+  const [rate, setRate] = useState(rateFixed ? '0' : defaults.rate);
   const [handover, setHandover] = useState(defaults.handover ?? '');
   const [firstDue, setFirstDue] = useState(defaults.firstDue ?? '');
 
@@ -92,7 +98,8 @@ export function TermsFields({
           {(p) => (
             <>
               <input type="hidden" name="vat_mode" value={vatMode} />
-              <Input {...p} readOnly value={calc.f.vatModes[vatMode]} />
+              {/* У сделки не из Финляндии — ставка сделки: подпись словаря написана про финские 25,5 % (23.11.2026). */}
+              <Input {...p} readOnly value={ui.country && vatMode === 'STANDARD' ? vatRateText(defaults.vatBps, locale) : calc.f.vatModes[vatMode]} />
             </>
           )}
         </Field>
@@ -107,7 +114,18 @@ export function TermsFields({
         </Field>
         {/* Подсказка у процентов — по стране сделки, если у неё свой текст (23.11.2026). */}
         <Field label={ui.listing.rate} hint={ui.country?.rateHint ?? calc.f.rateHint}>
-          {(p) => <Input {...p} name="rate" inputMode="decimal" value={rate} onChange={(e) => setRate(e.target.value)} />}
+          {(p) => (
+            <Input
+              {...p}
+              name="rate"
+              inputMode="decimal"
+              value={rate}
+              readOnly={rateFixed}
+              onChange={(e) => {
+                if (!rateFixed) setRate(e.target.value);
+              }}
+            />
+          )}
         </Field>
         {withDates && (
           <>

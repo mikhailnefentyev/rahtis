@@ -46,6 +46,13 @@ export type ContractTextBuilder = (d: ContractPdfInput) => ContractDocument;
 /** Сумма без знака валюты: в тексте договора валюта названа словом («eurot», «EUR»). */
 export const bare = (money: string) => money.replace(/[\s  ]*€[\s  ]*/g, '').trim();
 
+/**
+ * Сумма без знака кроны (23.11.2026): «750 000 kr» и «750.000 kr.» → число.
+ * В шведском и датском договоре валюта стоит в шапке таблицы («kr», «kr.»)
+ * или словом после суммы («kronor», «kr.»).
+ */
+export const bareKr = (money: string) => money.replace(/[\s\u00a0\u202f]*kr\.?/g, '').trim();
+
 export const BLANK = '______________';
 export const LONG_BLANK = '______________________________';
 

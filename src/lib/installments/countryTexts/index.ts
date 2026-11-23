@@ -1,7 +1,8 @@
 /**
  * Тексты кабинета по стране сделки (23.11.2026). Финляндия — без записи:
- * её тексты в copy.ts и i18n/* показываются как были. У Эстонии и Латвии —
- * свои (ee.ts, lv.ts) на всех десяти языках кабинета: эстонская компания
+ * её тексты в copy.ts и i18n/* показываются как были. У Эстонии, Латвии,
+ * Швеции и Дании — свои (ee.ts, lv.ts, se.ts, dk.ts) на всех десяти языках
+ * кабинета: эстонская компания
  * может работать в кабинете по-русски или по-английски и должна читать про
  * своё право, а не про финское.
  *
@@ -10,17 +11,20 @@
 import { locales, type Locale } from '../../i18n/config.ts';
 import { EE_TEXTS } from './ee.ts';
 import { LV_TEXTS } from './lv.ts';
+import { SE_TEXTS } from './se.ts';
+import { DK_TEXTS } from './dk.ts';
 import type { InstallmentCommonCopy, InstallmentLawCopy } from './types.ts';
 
 export type { InstallmentCommonCopy, InstallmentLawCopy } from './types.ts';
 
-export type LawCountry = 'EE' | 'LV';
+export type LawCountry = 'EE' | 'LV' | 'SE' | 'DK';
 
-export const LAW_TEXTS: Record<LawCountry, Record<Locale, InstallmentLawCopy>> = { EE: EE_TEXTS, LV: LV_TEXTS };
+export const LAW_TEXTS: Record<LawCountry, Record<Locale, InstallmentLawCopy>> = { EE: EE_TEXTS, LV: LV_TEXTS, SE: SE_TEXTS, DK: DK_TEXTS };
 
 /*
- * Общее для Эстонии и Латвии. Досрочное погашение в обоих договорах —
- * п. 4.6: остаток цены и проценты по день оплаты. О процентах: в Эстонии
+ * Общее для стран, кроме Финляндии. Досрочное погашение во всех четырёх
+ * договорах — п. 4.6: остаток цены и проценты по день оплаты. У Швеции и
+ * Дании подсказка у процентов своя (rateHint в текстах страны). О процентах: в Эстонии
  * освобождение подтверждено (KMS § 12 lg 8), в Латвии разъяснения VID нет,
  * поэтому подсказка ничего не обещает и отсылает к бухгалтеру.
  */
@@ -89,7 +93,7 @@ export const COMMON_TEXTS: Record<Locale, InstallmentCommonCopy> = {
 
 /*
  * Оговорка для сторон не из Финляндии — на форме объявления и на странице
- * сделки. Договоры Эстонии и Латвии собраны по исследованию права страны,
+ * сделки. Договоры Эстонии, Латвии, Швеции и Дании собраны по исследованию права страны,
  * которое местный юрист не проверял: платформа об этом говорит прямо.
  * Название страны подставляется в именительном падеже (в скобках).
  */
@@ -109,7 +113,7 @@ export const LEGAL_NOTICE: Record<Locale, string> = {
 /** Страна со своими текстами кабинета; null — Финляндия и страны без текстов (им показывается основной текст). */
 export function lawCountry(country: string | null | undefined): LawCountry | null {
   const code = (country ?? '').toUpperCase();
-  return code === 'EE' || code === 'LV' ? code : null;
+  return Object.prototype.hasOwnProperty.call(LAW_TEXTS, code) ? (code as LawCountry) : null;
 }
 
 /** Есть ли у страны тексты кабинета: у Финляндии — основные, у остальных — запись здесь на всех языках. */
@@ -117,7 +121,7 @@ export function countryTextsExist(country: string | null | undefined): boolean {
   const code = (country ?? '').toUpperCase();
   if (code === 'FI') return true;
   const law = lawCountry(code);
-  return law !== null && locales.every((l) => Boolean(LAW_TEXTS[law][l]) && Boolean(COMMON_TEXTS[l]) && Boolean(LEGAL_NOTICE[l]));
+  return law !== null && locales.every((l) => Boolean(LAW_TEXTS[law]?.[l]) && Boolean(COMMON_TEXTS[l]) && Boolean(LEGAL_NOTICE[l]));
 }
 
 /** Добавка к текстам раздела: то, чего в основном наборе нет. */
@@ -156,8 +160,14 @@ export function withCountryTexts<T extends BaseCopy>(base: T, locale: string, co
   const l = asLocale(locale);
   const law = LAW_TEXTS[code][l];
   const common = COMMON_TEXTS[l];
-  /* Чек-лист передачи: договор, первый счёт и акт — общие; реестр и страховка — по стране. */
-  const checklist = base.stage3.checklist.map((item, i) => (i === 2 ? law.checkRegister : i === 3 ? law.checkInsurance : item));
+  /*
+   * Чек-лист передачи: договор, первый счёт и акт — общие; реестр и страховка
+   * — по стране. У страны могут быть свои пункты перед реестром (Дания —
+   * Bilbogen): форма передачи требует отметить все пункты, сколько бы их ни было.
+   */
+  const checklist = base.stage3.checklist.flatMap((item, i) =>
+    i === 2 ? [...(law.checkBefore ?? []), law.checkRegister] : i === 3 ? [law.checkInsurance] : [item],
+  );
   return {
     ...base,
     intro: law.intro,
@@ -186,7 +196,7 @@ export function withCountryTexts<T extends BaseCopy>(base: T, locale: string, co
     country: {
       code,
       thresholdsText: law.thresholdsText,
-      rateHint: common.rateHint,
+      rateHint: law.rateHint ?? common.rateHint,
       invoiceNote: law.invoiceNote,
       legalNotice: LEGAL_NOTICE[l],
     },
